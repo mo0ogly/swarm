@@ -1,0 +1,27 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/workspace/swarm/tools/swarm_local.py", line 329, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/home/fpizzi/workspace/swarm/tools/swarm_local.py", line 208, in main
+    else:prepared, _ = prepare_versioned_build(SOURCE, binary)
+                       ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/swarm_version.py", line 191, in prepare
+    built=builder.build(source,evidence/'build',target,version)
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/rust-migration/build_native.py", line 84, in build
+    result=subprocess.run(args,env=env,stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr)
+  File "/usr/lib/python3.13/subprocess.py", line 556, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 1214, in communicate
+    self.wait()
+    ~~~~~~~~~^^
+  File "/usr/lib/python3.13/subprocess.py", line 1280, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 2066, in _wait
+    (pid, sts) = self._try_wait(0)
+                 ~~~~~~~~~~~~~~^^^
+  File "/usr/lib/python3.13/subprocess.py", line 2024, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

@@ -5,9 +5,7 @@ struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
         let p =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("swarm-root-").unwrap());
-        fs::create_dir(&p).unwrap();
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("swarm-root-");
         Self(p)
     }
 }

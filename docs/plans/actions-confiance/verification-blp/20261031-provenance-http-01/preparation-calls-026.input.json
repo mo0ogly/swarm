@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "preparation_id": "prep-f846d64d9d9caa8a04737dee",
+  "event_id": "tool-call",
+  "expected_revision": 3,
+  "provider": "api-local",
+  "capability_hash": "5931f4f88bc19a9773e72ef3da030b6ada867d4c532772d98bb423b10267266c",
+  "message": "Propose a brief",
+  "context_mode": "full"
+}

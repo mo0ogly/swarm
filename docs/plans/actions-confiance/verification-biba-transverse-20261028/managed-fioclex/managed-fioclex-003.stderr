@@ -1,0 +1,13 @@
+{
+  "error": "format",
+  "failure": {
+    "causes": [
+      "format",
+      "format"
+    ],
+    "code": "format",
+    "message": "format",
+    "retryable": false
+  },
+  "schema_version": 1
+}

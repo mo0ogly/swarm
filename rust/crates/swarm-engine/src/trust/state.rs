@@ -12,6 +12,8 @@ fn null_vec<'de, D: Deserializer<'de>, T: Deserialize<'de>>(d: D) -> Result<Vec<
 /// Persisted version1. This is not a credential dump or an authorization token.
 #[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct State {
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="super::confidentiality::present")]
+    pub confidentiality:Option<super::confidentiality::Record>,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub public_evidence_registry:Option<super::public_evidence::Registry>,
     #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="super::separation::present")]
@@ -55,6 +57,7 @@ impl State {
             raw,
             &[
                 "schema_version",
+                "confidentiality",
                 "role_separation",
                 "public_evidence_registry",
                 "revision",
@@ -79,6 +82,7 @@ impl State {
     /// and private identities. This performs no IO and grants no operation.
     pub fn initial() -> Self {
         Self {
+            confidentiality:None,
             role_separation:None,
             public_evidence_registry:None,
             schema_version: 1,
@@ -109,6 +113,7 @@ impl State {
             return Err(TrustError::Integrity("trust-state-revision"));
         }
         self.policy.validate().map_err(TrustError::Invalid)?;
+        if let Some(record)=&self.confidentiality{record.validate()?;}
         // A mapping never carries an alternative bearer credential. Duplicate
         // issuer/subject identities would bypass canonical-person separation.
         for (index, id) in self.identities.iter().enumerate() {
@@ -168,12 +173,29 @@ impl State {
             if !value.is_object() || value.get("enabled").is_some_and(|v| !v.is_boolean()) {
                 return Err(TrustError::Integrity("trust-policy-shape"));
             }
-            if name == "delegation" && value.get("max_depth").and_then(Value::as_i64).is_none() {
-                return Err(TrustError::Integrity("trust-delegation-shape"));
+            if name == "delegation" {
+                let depth = value.get("max_depth").and_then(Value::as_i64);
+                if depth.is_none() {
+                    return Err(TrustError::Integrity("trust-delegation-shape"));
+                }
+                // Delegation is ported: any explicit depth (including 0, which
+                // disables child mandates) is a supported admission shape.
+                if *depth.as_ref().unwrap() < 0 {
+                    return Err(TrustError::Integrity("trust-delegation-shape"));
+                }
+                continue;
             }
-            if value.get("enabled").and_then(Value::as_bool) == Some(true)
-                || name == "delegation" && value.get("max_depth").and_then(Value::as_i64) != Some(0)
-            {
+            if name == "data_policy" {
+                // Data provenance is ported: deep-validate the stored block in
+                // place of the structural-only extension check, mirroring the
+                // Go config/consistency contract. Corruption is a state-integrity
+                // refusal, not a business authorization one.
+                let policy:super::data_policy::DataPolicy =
+                    swarm_wire_json::decode(raw.raw().as_bytes())?;
+                policy.validate()?;
+                continue;
+            }
+            if value.get("enabled").and_then(Value::as_bool) == Some(true) {
                 return Err(TrustError::Unsupported("trust-active-extension-not-ported"));
             }
         }
@@ -207,14 +229,36 @@ impl State {
     /// Operator audit projection: no raw token, hash, sessions or original bytes.
     /// Read access is local operator / authenticated native web control, not an
     /// agent-selected integrity level or direct read of an official object.
+    /// Errors: a technical stored-state failure while projecting any mandate
+    /// (e.g. unparseable stored timestamp) refuses the whole projection with
+    /// the original typed error; it is never folded into an available label or
+    /// an empty success. Business refusals (Ok nonempty reasons) stay displayed.
     pub fn public(&self) -> Result<Value, TrustError> {
         let identities:Vec<Value>=self.identities.iter().map(|id| {
             let mut value=serde_json::json!({"subject":id.subject,"integrity":id.integrity,"roles":id.roles,"disabled":id.disabled});
             if let Some(p)=&id.enrollment_principal {value["enrollment_principal"]=serde_json::json!({"principal_id":p.id,"principal_kind":p.kind,"issuer":p.issuer,"subject":p.subject});}
             value
         }).collect();
-        let mut view = serde_json::json!({"schema_version":1,"revision":self.revision,"policy":self.policy,"identities":identities,"mandates":self.mandates,"actions":self.actions,"ledger":self.ledger,"access_ledger":self.access_ledger,"effect_receipts":self.connector_receipts,"evidence_count":self.evidence.len(),"simulation":true,"originals_missing":self.evidence.iter().filter(|e|self.originals.get(&e.original_digest).is_none_or(|v|v.is_empty())).count(),"limits":["aucun paiement réel","identités locales authentifiées","politiques avancées actives non portées : refus fermé"],"biba":{"model":"strict-with-named-endorsement-v1","scope":"trust-actions-only","os_confinement":false},"amount_minor_text":self.actions.iter().map(|(id,a)|(id.clone(),Value::String(a.get("amount_minor").and_then(Value::as_i64).unwrap_or(0).to_string()))).collect::<BTreeMap<_,_>>()});
+        let mut view = serde_json::json!({"schema_version":1,"revision":self.revision,"policy":self.policy,"identities":identities,"mandates":self.mandates,"actions":self.actions,"ledger":self.ledger,"access_ledger":self.access_ledger,"effect_receipts":self.connector_receipts,"evidence_count":self.evidence.len(),"simulation":true,"originals_missing":self.evidence.iter().filter(|e|self.originals.get(&e.original_digest).is_none_or(|v|v.is_empty())).count(),"limits":["aucun paiement réel","identités locales authentifiées","délégation de mandat et contexte de données portés ; admission distante A2A encore refusée"],"biba":{"model":"strict-with-named-endorsement-v1","scope":"trust-actions-only","os_confinement":false},"amount_minor_text":self.actions.iter().map(|(id,a)|(id.clone(),Value::String(a.get("amount_minor").and_then(Value::as_i64).unwrap_or(0).to_string()))).collect::<BTreeMap<_,_>>()});
+        // Effective per-mandate freshness/chain verdicts; a stored timestamp or
+        // hash is never replaced by an empty success here. Chain refusals reuse
+        // the engine's admission reasons exactly. A technical error (invalid
+        // stored timestamp, missing mandate) propagates typed and refuses the
+        // projection; only business refusals surface as status labels.
+        let now = time::OffsetDateTime::now_utc();
+        let mut status: BTreeMap<String, String> = BTreeMap::new();
+        for id in self.mandates.keys() {
+            let reason = super::operations::active(self, id, now)?;
+            let label = if reason.is_empty() {
+                "Mandat disponible".to_string()
+            } else {
+                reason
+            };
+            status.insert(id.clone(), label);
+        }
+        view["mandate_status"] = serde_json::to_value(status)?;
         view["identity_authentication"]=serde_json::json!({"local_bearer":true,"held_enrollment":{"root_api_available":cfg!(target_os="linux"),"http_available":false,"reason":"trusted-enrollment-startup-not-bound"}});
+        view["confidentiality"]=super::confidentiality::capability(self)?;
         for (name, raw) in self.controls()? {
             view[&name] = serde_json::from_str(raw.raw())?;
         }

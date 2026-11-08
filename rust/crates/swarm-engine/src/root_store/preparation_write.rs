@@ -376,10 +376,20 @@ impl RootStore {
     /// It grants no start; another release is explicit. Automatic initial team
     /// modes remain unavailable. All failures roll back jointly
     /// or retain explicit unknown/known publication semantics as described above.
+    /// `reader_token` (BF-16d) is the caller's reader credential, extracted
+    /// from SWARM_TRUST_TOKEN by the CLI and from the Bearer header by HTTP —
+    /// never rendered, never persisted. The command frontier is a presentation
+    /// frontier: use-proposal adoption carries the source turn's classified
+    /// answer into documents and a receipt replay serves a historical
+    /// preparation body, so ONE dialogue verdict runs inside the transaction
+    /// before commit, covering both paths. Zero matched admissions keeps the
+    /// legacy bare-session behavior; a refusal rolls back every mutation
+    /// (documents, revision, receipt row) and carries no classified byte.
     pub fn preparation_command<W: WorkEnvironment>(
         &self,
         raw: &[u8],
         environment: &mut W,
+        reader_token: Option<&str>,
     ) -> Result<super::PreparationReadObservation<Preparation>, E> {
         if !self.writable {
             return Err(E::Refused("root-read-only"));
@@ -428,6 +438,21 @@ impl RootStore {
                         .map_err(|e| E::Launch(Box::new(crate::AgentLaunchError::from(e))))?;
                 tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
                 let changed = apply(&WriteContext{root:self,policy:&read,settings:&settings.values,at:&at,document:settings}, &tx, &r, method, &mut causes,environment).and_then(|p| {
+                    // BF-16d: the command surface is a presentation frontier
+                    // too — an adoption (use-proposal) carries the source
+                    // turn's classified answer into documents, and a receipt
+                    // replay serves a historical preparation body. One verdict
+                    // inside the transaction covers both paths before the
+                    // commit: a refusal rolls back every mutation (documents,
+                    // revision, receipt row). Zero matched receipts keeps the
+                    // legacy bare-session path.
+                    super::preparation_dialogue::reader_verdict(
+                        self,
+                        &tx,
+                        &p,
+                        &super::preparation_read::recorded_turn_keys(&tx, &p)?,
+                        reader_token,
+                    )?;
                     super::material_path::verify_material_path(self, &binding)?;
                     if !binding.matches(self)? {
                         return Err(E::Refused("preparation-root-instance-changed"));

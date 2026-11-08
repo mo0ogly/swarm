@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "review_kind": "focused same-context review; not independent acceptance",
+  "scope": "public routing of existing I3/admin object-attribution producer; unrelated changes excluded",
+  "files": {
+    "rust/crates/swarm-cli/src/trust.rs": "d54a83b312068759b3be2c850d6f3c4b512ff31277b79d8d0f97c1e04fedfeb9",
+    "rust/crates/swarm-cli/src/lib.rs": "c7d8239047876f0e64333efc9f189f1a9d449959db1549ee6bad7ed60c065b0a",
+    "rust/crates/swarm-web/src/service/trust.rs": "1005af9a85eb052e9831bea5d09a851c7821c96f14f276be8773830e666539a9",
+    "rust/crates/swarm-web/tests/confidentiality_http.rs": "017614c69bbe802ad444ec322d0e4330ace7996ed067e211f9e852cba411e97b",
+    "tests/blp_attribution_history_cli.py": "8652793f2e492f750a342c4cde862acc205cde7552ab2d350bb20a8c19b53a03",
+    "tools/verification/recipes/blp-attribution-history-cli.json": "d382bc2c3cd83c009c350f2927bd6cab1973e6db152adbf740f57eba43e21cde",
+    "docs/architecture/BIBA-RUST.md": "4da4771d2147894b6d2b38a84306e2f42aedf30259d06e87821fd2263719de00",
+    "docs/en/BIBA-RUST.md": "74c1b8d52030763cddadde67c62f5ea5e1b80a9003de22454ada3b5feeea4c8a",
+    "tools/verification/README.md": "abc25365974f389939e61d9727caec7585efd6301cb6ccf067de483faa6a45fd",
+    "version_history.json": "e6e70567efbba7257183942d486316a9b10f150cc57063ffe88deab883dc0fe3",
+    "docs/plans/actions-confiance/BLP-APEX.md": "600a5a71f249942a894a06624f550872dbcc5a5bb38803d8fce25a9160c11d9a",
+    "docs/en/plans/actions-confiance/BLP-APEX.md": "45cc0d6473339f5ddecf0b8fc1129c24c3b1cf4c2fe888fbd70beb41060dbe52"
+  },
+  "policies": {
+    "operation_names": "fixed protocol vocabulary in existing allowlists; no configurable execution policy added",
+    "authorization": "existing engine source/authentication, I3/admin, clearance and current revisions unchanged; session does not establish actor",
+    "fixture_literals": "synthetic identities, labels and revisions are test inputs, not live policy",
+    "proof_output": "optional verification artifact destination, not product execution policy"
+  },
+  "functions": [
+    "CLI trust::execute contract updated",
+    "HTTP NativeHttpService::trust_actions contract updated",
+    "HTTP post/post_as/attribute/test helper contracts reviewed",
+    "CLI main/call/check helper contracts and module scope updated"
+  ],
+  "errors": {
+    "admission": "HTTP session/Host/Origin/CSRF gate precedes existing engine identity; CLI credentials remain environment-only",
+    "authority_and_freshness": "existing authorization_required/blp-policy-stale errors; tests assert journal unchanged",
+    "conflict": "existing blp-attribution-conflict and blp-declassification-required retain producer causes before publication",
+    "late_failures": "unchanged Root close/publication wrappers and CLI output-preservation path; no empty-success fallback added"
+  },
+  "evidence": {
+    "http": "20261101-public-producer-web-01 PASS and integrity VERIFIED",
+    "counterexample": "20261101-public-producer-before-01; ad hoc HTTP evidence limitations and TMPDIR incident retained",
+    "cli": "20261101-public-producer-cli-01: PASS, integrity VERIFIED, 25 assertions, 78 channel/input artifact hashes and final journey digest VERIFIED",
+    "installation": "20261101-public-producer-installed-01: PASS; delivery-scope.json clarifies increment restart versus readonly probe; 56 browser assertions, 2 help checks, 9 source matches"
+  },
+  "limits": [
+    "No object-attribution Admin form added; existing Admin policy controls unchanged",
+    "No physical source identity, preparation labels, authenticated preparation domain, response inheritance or transversal mediation",
+    "Existing same-context review only; no independent acceptance"
+  ],
+  "delivery": {
+    "version": "v0.1.1-dev.295",
+    "sha256": "e1adea56e4cf53e0787d362f55e14bbd53d40c82a38b3815a081b0a33e203c73",
+    "compiled_commit": "a76fb3ef5fb814ea857f5caca802dd300c6e1f8a",
+    "modified": true,
+    "normal_profile": "VERIFIED_DEFAULT_NATIVE_PROFILE",
+    "restart_by_increment": true,
+    "restart_by_readonly_probe": false
+  },
+  "reused_evidence": "HTTP recipe source bytes remained stable during compilation/tests. Only CLI English help changed afterwards, outside this target compiler dependencies; delivered FR/EN help independently checked. Runtime router/test/engine bytes unchanged since HTTP PASS. Later changes limited to proof/test-output retention and docs.",
+  "retrospective": "Public producer allowlists must match engine capabilities; explicit Admin control proves no physical provenance. Retain detailed channel hashes and distinguish increment/probe scope. Use recipe runner TMPDIR from first reproducer. No foreign process interruption or arbitrary timeout during observed build contention."
+}

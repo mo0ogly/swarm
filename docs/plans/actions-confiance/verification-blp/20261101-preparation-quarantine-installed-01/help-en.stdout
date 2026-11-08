@@ -1,0 +1,115 @@
+swarm-rust — development: partial migration
+Available commands:
+  swarm-rust lifecycle list --root ROOT --json
+  swarm-rust planning history WORK --root ROOT --json
+  swarm-rust visit show|mark WORK --root ROOT [--input INTENT.json] --json
+  swarm-rust runtime-health --root ROOT --json
+  swarm-rust logs query WORK AGENT --root ROOT [--input QUERY.json] --json
+  swarm-rust run-limits logs show|history|preview|apply --root ROOT [--input FILE] --json
+  swarm-rust activity show WORK --root ROOT [--input QUERY.json] --json
+  swarm-rust run-limits activity show|history|preview|apply --root ROOT [--input FILE] --json
+  swarm-rust exchange list WORK --root ROOT --json
+  swarm-rust run-limits performance show|history|preview|apply --root ROOT [--input FILE] --json
+  swarm-rust run-limits web-requests show|history|preview|apply [--input FILE] [--json]
+  swarm-rust paea reconcile-effects LEDGER --root ROOT --json
+    Read-only reconciliation of the real effect journals (PA-09); no effect, no authority.
+  swarm-rust paea transfer-call SERVICE PROJECT WORK CHILD PIN STAGING DECLARATION --input REQUEST.json
+    Guarded two-phase Git transfer: public preparation, out-of-band provisioning, private stdin frame; native Reconcile operation, no ref effect.
+  swarm-rust paea promote-call commit|reconcile SERVICE PROJECT WORK CHILD PIN DECLARATION --input REQUEST.json
+    Guarded two-phase Git promotion: durable intent + OLD-fenced reference transaction (commit) or pure journal read (reconcile); private stdin frame.
+  swarm-rust paea settlement-call commit|reconcile PROJECT LEDGER DECLARATION --input REQUEST.json
+    Guarded two-phase fictitious settlement: durable separate-ledger effect (commit) or pure journal read (reconcile); private stdin frame.
+  swarm-rust run-limits show|history|preview|apply SCOPE MISSION KEY --root ROOT [--input FILE] --json
+  swarm-rust run-limits effective MISSION ROLE TASK --root ROOT --json
+  swarm-rust run-limits rollback-preview|rollback SCOPE MISSION KEY REV --root ROOT --input FILE --json
+  swarm-rust run-limits provider-wait show|history|preview|apply --root ROOT [--input FILE] --json
+  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify|blp-show|blp-policy-preview|blp-policy-apply|blp-check|blp-object-attribute|blp-preparation-check --root ROOT [--input FILE|-]
+    blp-*: Bell-LaPadula confidentiality policy administration and diagnostic on supplied labels; no runtime control (runtime_enforced:false). blp-show/blp-policy-preview/blp-check/blp-object-attribute require a current I3/admin. blp-object-attribute classifies an exact canonical digest/path at current revisions; no declassification or physical lineage proof.
+  swarm-rust version [--json] [--root ROOT]
+  swarm-rust --version [--json]
+  swarm-rust init --root ROOT [--json]
+  swarm-rust web [ADDRESS] --root ROOT [--json]
+  swarm-rust web-ticket ADDRESS [PATH] --root ROOT --json
+    Single-use sign-in link for the running cockpit; secret on stdout, never log it.
+  swarm-rust web-rotate ADDRESS --root ROOT --json
+    Replace the cockpit local key (server stopped); old cookies and tickets refused at next start.
+  swarm-rust prepare send|stop|use-proposal|create|save|method|adopt-brief|validate-plan|answer-questions|create-missions|revise-missions|configure-team|release-plan|budget|source-add|source-remove [ID] --root ROOT --input FILE [--json]
+  swarm-rust prepare list|methods|capabilities --root ROOT [--json]
+  swarm-rust prepare show|budget|release-review|dialogue ID --root ROOT [--json]
+  swarm-rust prepare files ID [SCOPE [QUERY]] --root ROOT [--json]
+  swarm-rust prepare templates | template ID | template-check --input JSON
+  swarm-rust project-profile show|check|list --root ROOT [--json]
+  swarm-rust project-profile preview|apply|select [PROFILE] --root ROOT --input JSON [--json]
+  swarm-rust prepare source ID PATH START END --root ROOT [--json]
+  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]
+  swarm-rust work list --root ROOT [--json]
+  swarm-rust work show ID --root ROOT [--json]
+  swarm-rust resume ID --root ROOT [--json]
+  swarm-rust planning show ID --root ROOT
+  swarm-rust costs show ID --root ROOT [--json]
+  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]
+  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]
+  swarm-rust providers config show --root ROOT [--json]
+  swarm-rust providers config init --root ROOT --input FILE [--json]
+  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]
+  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json
+  swarm-rust providers config backups --root ROOT [--json]
+  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]
+  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]
+  swarm-rust task review|review-preview|review-inputs|review-check|baseline-preview|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]
+  swarm-rust agent run ID --root ROOT [--json]
+  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]
+  swarm-rust agent history ID --root ROOT [--json]
+  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]
+  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]
+  swarm-rust agent guard ID --root ROOT --input FILE [--json]
+  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]
+  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE
+  swarm-rust planning step WORK --root ROOT [--json]
+  swarm-rust planning reconcile CLAIM --root ROOT [--json]
+  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]
+  swarm-rust task add|update|submit|graph-preview|graph-apply ID --root ROOT --input FILE [--json]
+  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]
+  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]
+  swarm-rust mission watch ID --root ROOT [--json]
+  swarm-rust mission changes|spending|seen ID --root ROOT [--json]
+  swarm-rust mission status ID --root ROOT [--json]
+  swarm-rust mission status-native ID --root ROOT --json
+  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json
+  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]
+  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]
+  swarm-rust project-profile show|check --root ROOT [--json]
+  swarm-rust project-context ROLE --root ROOT [--json]
+  swarm-rust agent-workflow ROLE --root ROOT [--json]
+  swarm-rust planning-output check --root ROOT --input FILE [--json]
+  swarm-rust planning-report --root ROOT --input FILE [--json]
+  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]
+  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]
+  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]
+  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]
+  swarm-rust identity service-call SHA256 PRIVATE_SEED --input BOOTSTRAP [--json]
+    Local operator call: binary stdin packet, no listener or session.
+  swarm-rust identity service-install|service-resume|service-reconcile SHA256 --input ABSOLUTE_PRIVATE_ARTIFACT [--json]
+    Initial installation only; no human account or service started.
+  swarm-rust identity personal-init|personal-enroll|personal-recover SHA256_DIGEST PRIVATE_KEY --input BOOTSTRAP [--json]
+    personal-enroll: binary frame on stdin; no secrets in argv.
+  swarm-rust identity initial-create|initial-reconcile REQUEST_PIN OPERATOR_DIRECTORY PRIVATE_ANCHOR --input PRIVATE_REQUEST [--json]
+    Dormant material only; intent before generation, no account/Root/service/human admitted.
+  swarm-rust identity checkpoint-check REQUEST_PIN --input ABSOLUTE_PRIVATE_ANCHOR [--json]
+    Read only; caller must establish locator trust, no package read/creation.
+  swarm-rust identity operator-check PIN --input PRIVATE_OPERATOR_DIRECTORY [--json]
+  swarm-rust identity service-export|service-export-reconcile PIN PRIVATE_OUTPUT --input PRIVATE_OPERATOR_DIRECTORY [--json]
+    Service artifact only; no installation, new keys/proof or verified human identity.
+  swarm-rust identity provisioning-check SHA256_DIGEST --input ABSOLUTE_PRIVATE_REQUEST [--json]
+    Preflight only; no material generated, account verified or service started.
+  swarm-rust identity bootstrap-check SHA256_DIGEST --input FILE [--json]
+  swarm-rust identity control-check SHA256_DIGEST --input FILE [--json] (preflight, no service start)
+Language: --lang fr|en. init starts no service; web starts the native development API.
+Partial migration: only the listed Rust commands are currently available.
+  swarm-rust protection canonicalize --input FILE|- --json (offline data only; no authority)
+  swarm-rust protection inspect --input FILE|- --json (exact action content; no approval or effect)
+  swarm-rust protection check-approval ACTION APPROVAL --json (supplied binding correspondence; no approval or effect)
+  swarm-rust protection compare BEFORE AFTER --json (two files; no authority)
+  swarm-rust protection resolve-payment REGISTRY REQUEST --json (offline debt resolution; no authority)
+  swarm-rust protection check-receipt ACTION RECEIPT SINK PREVIOUS_STATE --json (two files; no authenticity or effect established)
+  swarm-rust protection receipt-report ACTION RECEIPT SINK PREVIOUS_STATE --json (schema v2; exact input hashes; no authenticity or effect established)

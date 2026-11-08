@@ -1,11 +1,22 @@
-use std::{fs, path::PathBuf};
+use std::{fs, os::unix::fs::DirBuilderExt, path::PathBuf};
 use swarm_engine::{read_project_context, EngineSettingsValues};
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
-        let p = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("project-context-").unwrap());
-        fs::create_dir(&p).unwrap();
+        // Repository fixture area, never /tmp (operator interdiction of
+        // 2026-10-31): 0700 base, per-fixture 0700 dir, self-cleaned on Drop
+        // unless the test panicked (retained for diagnosis).
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../.swarm-fixtures");
+        fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(&base)
+            .unwrap();
+        // Canonicalize so the fixture path carries no lexical `..`: these tests
+        // exercise source-path cleaning, which refuses unclean paths outright.
+        let base = fs::canonicalize(&base).unwrap();
+        let p = base.join(swarm_engine::generate_identifier("project-context-").unwrap());
+        fs::DirBuilder::new().mode(0o700).create(&p).unwrap();
         Self(p)
     }
 }
@@ -131,7 +142,11 @@ fn review_document_cap_and_managed_memory_alias_refusals_are_explicit() {
             if PathBuf::from(&name).is_absolute() {
                 "source-path"
             } else {
-                "versioned-memory-source-guard-not-ported"
+                // The versioned guard is ported (project_memory_source.rs): the
+                // guide source triggers its Root/SQL inventory read, which here
+                // refuses explicitly on this plain fixture (no initialized Root
+                // state) — a caused refusal, never a silent pass-through.
+                "project-memory-source-inventory"
             },
             "{name}"
         );
@@ -150,7 +165,9 @@ fn review_document_cap_and_managed_memory_alias_refusals_are_explicit() {
         fs::remove_file(f.0.join("alias.md")).unwrap();
         std::os::unix::fs::symlink(".claude/field-guide/lesson.md", f.0.join("alias.md")).unwrap();
         let error = read_project_context(&f.0, "reviewer", &caps).err().unwrap();
-        assert_eq!(error.reason(), "versioned-memory-source-guard-not-ported");
+        // The physical alias resolves into the managed guide, so the ported
+        // versioned guard still runs and its inventory read refuses.
+        assert_eq!(error.reason(), "project-memory-source-inventory");
     }
 }
 #[cfg(unix)]

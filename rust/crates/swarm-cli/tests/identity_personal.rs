@@ -37,7 +37,9 @@ impl Case {
     /// Build personal generation7 at bootstraphead1 and business grant1 in separate
     /// private domains; explicit cheap test KDF costs come from shared fixture.
     fn new() -> Self {
-        let root = tempfile::tempdir().unwrap();
+        // Personal/anchor reads walk ancestors with open_private_directory
+        // (checkout is 775): the private fallback area is required here.
+        let root = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
         mode(root.path(), 0o700);
         let personal = personal_common::Fixture::with_generation(7);
         mode(personal._dir.path(), 0o700);

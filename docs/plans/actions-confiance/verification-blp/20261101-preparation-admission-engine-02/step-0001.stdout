@@ -1,0 +1,24 @@
+
+running 7 tests
+PREPARATION_CALL_FAULT_ROOT /home/fpizzi/.local/state/swarm-fixtures/runner-tmp/swarm-preparation-call-commit-2799240-1793557787991676676
+PREPARATION_CALL_FAULT_ROOT /home/fpizzi/.local/state/swarm-fixtures/runner-tmp/swarm-preparation-call-triggers-2799240-1793557787989032923
+PREPARATION_CALL_FAULT_ROOT /home/fpizzi/.local/state/swarm-fixtures/runner-tmp/swarm-preparation-call-source-2799240-1793557787988021200
+PREPARATION_CALL_FAULT_ROOT /home/fpizzi/.local/state/swarm-fixtures/runner-tmp/swarm-preparation-call-legacy-terminal-2799240-1793557787999048232
+PREPARATION_CALL_FAULT_ROOT /home/fpizzi/.local/state/swarm-fixtures/runner-tmp/swarm-preparation-call-root-2799240-1793557787997840360
+PREPARATION_CALL_FAULT_ROOT /home/fpizzi/.local/state/swarm-fixtures/runner-tmp/swarm-preparation-call-legacy-active-2799240-1793557787988444116
+PREPARATION_CALL_FAULT_ROOT /home/fpizzi/.local/state/swarm-fixtures/runner-tmp/swarm-preparation-call-blp-domain-2799240-1793557787997179066
+test legacy_terminal_replay_without_native_authority ... ok
+test legacy_active_replay_remains_explicitly_unported ... FAILED
+test commit_failure_rolls_back_for_same_root_reuse ... ok
+test physical_root_switch_refuses_and_owned_restore_recovers ... ok
+test last_write_witness_refuses_turn_and_budget_drift ... ok
+test changed_source_and_policy_refuse_before_contact ... ok
+test confidential_admission_is_fixed_authenticated_and_never_dispatchable ... ok
+
+failures:
+
+failures:
+    legacy_active_replay_remains_explicitly_unported
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.34s
+

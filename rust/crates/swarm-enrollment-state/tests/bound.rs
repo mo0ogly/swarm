@@ -1,3 +1,4 @@
+mod common;
 use ed25519_dalek::SigningKey;
 use std::{
     fs,
@@ -13,7 +14,7 @@ struct Fixture {
 impl Fixture {
     /// Create a disposable signed WAL journal; setup failures panic, no live storage is used.
     fn new() -> Self {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
         let key = SigningKey::from_bytes(&[7; 32]);
         let journal = Journal::open(
             &Context::new(),

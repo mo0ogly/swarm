@@ -20,7 +20,7 @@ fn call(root: &Path, args: &[&str]) -> Output {
 /// Initialize real native schema then seed one historical agent fixture.
 /// No live mission, provider or process is touched; retained PIDs are passive.
 fn fixture() -> tempfile::TempDir {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     RootStore::initialize(root.path(), &mut SystemEnvironment)
         .unwrap()
         .close()

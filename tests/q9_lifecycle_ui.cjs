@@ -8,7 +8,7 @@ const puppeteer=require('puppeteer');
 (async()=>{
  const binary=process.argv[2]||'/tmp/swarm-q9-companion';
  const fixture=cp.spawnSync('python3',['tests/web_fixture.py',binary],{encoding:'utf8'});if(fixture.status!==0||!fixture.stdout.trim())throw Error(fixture.stderr||fixture.error?.message||'Fixture indisponible');const root=fixture.stdout.trim();
- const output=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-q9-ui-'));
+ const output=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-q9-ui-'));
  const cli=(args,data)=>{const full=['--root',root,'--json',...args,...(data?['--input','-']:[])],r=cp.spawnSync(binary,full,{encoding:'utf8',input:data?JSON.stringify(data):undefined});if(r.status!==0)throw Error(r.stderr);return JSON.parse(r.stdout)};
  let target=cli(['work','create'],{schema_version:1,event_id:'q9-create',expected_revision:0,title:'Mission à supprimer en recette',objective:'Tester la corbeille Q9 sur une racine isolée.',scope:'Fixture temporaire uniquement.',criteria:['Cycle récupérable'],next:'Examiner un aperçu.'}).work;
  const server=cp.spawn(binary,['--root',root,'web']);let stdout='';server.stdout.on('data',d=>stdout+=d);server.stderr.on('data',d=>stdout+=d);

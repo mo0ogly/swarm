@@ -4,6 +4,10 @@ import hashlib
 import pathlib
 import subprocess
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import sys
 import json
 
@@ -28,7 +32,7 @@ if mode in ('entry', 'all'):
 if mode in ('version', 'all'):
     run(['go', 'test', './internal/engine', '-run', '^TestServerVersionReflectsBuildAndLocalGitWithoutNetwork$', '-count=1', '-v'])
 if mode in ('browser', 'all'):
-    with tempfile.TemporaryDirectory(prefix='swarm-t6-control-') as directory:
+    with tempfile.TemporaryDirectory(prefix='swarm-t6-control-', dir=fixture_area()) as directory:
         binary = str(pathlib.Path(directory) / 'swarm')
         run(['go', 'build', '-o', binary, './cmd/swarm'])
         run(['node', 'tests/quick_wins_ui.cjs', binary, str(out)])

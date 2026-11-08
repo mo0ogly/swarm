@@ -13,7 +13,7 @@ fn call(root: &std::path::Path, document: &std::path::Path, approval: &std::path
 /// success of a negative data check grants no authority and opens no Root.
 #[test]
 fn approval_cli_matches_shared_bytes_for_match_and_mismatch_without_root() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let document = root.path().join("document.json"); let approval = root.path().join("approval.json");
     for prefix in ["payment", "git"] {
         let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../web/paea-examples/v1");
@@ -42,7 +42,7 @@ fn approval_cli_matches_shared_bytes_for_match_and_mismatch_without_root() {
 /// caller files and cause-bearing diagnostics without exposing input canaries.
 #[test]
 fn approval_cli_refuses_invalid_inputs_and_options_then_recovers_exactly() {
-    let root = tempfile::tempdir().unwrap(); let document = root.path().join("document.json"); let approval = root.path().join("approval.json");
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap(); let document = root.path().join("document.json"); let approval = root.path().join("approval.json");
     fs::write(&document, include_bytes!("../../../../web/paea-examples/v1/payment-document.json")).unwrap();
     let bytes = include_bytes!("../../../../web/paea-examples/v1/payment-approval.json"); fs::write(&approval, bytes).unwrap();
     let control = call(root.path(), &document, &approval, "en"); assert!(control.status.success());

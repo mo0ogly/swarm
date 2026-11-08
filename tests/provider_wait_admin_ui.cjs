@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{spawn,spawnSync}=require('child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-provider-wait-ui-'));let app,browser;
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-provider-wait-ui-'));let app,browser;
 function cli(args,input){const p=spawnSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{input:input?JSON.stringify(input):undefined,encoding:'utf8'});assert.equal(p.status,0,p.stderr+p.stdout);return p.stdout?JSON.parse(p.stdout):null}
 (async()=>{cli(['init']);const w=cli(['work','create'],{schema_version:1,event_id:'create',expected_revision:0,title:'Preparation settings QA',objective:'Configure preparation timeouts',scope:'isolated',criteria:['Admin values affect preparation'],next:'Configure'}).work;
 app=spawn(binary,['--root',root,'web','127.0.0.1:0']);const url=await new Promise((resolve,reject)=>{let text='';app.stdout.on('data',x=>{text+=x;const m=text.match(/http:\/\/[^\s]+/);if(m)resolve(m[0])});app.on('exit',c=>reject(Error('server '+c)))});

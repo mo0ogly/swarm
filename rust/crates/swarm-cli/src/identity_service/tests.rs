@@ -64,7 +64,9 @@ impl Write for Broken {
 }
 /// Actual random service-only material file; no root/journal/account created.
 fn input() -> (tempfile::TempDir, std::path::PathBuf, String) {
-    let d = tempfile::tempdir().unwrap();
+    // open_private_directory walks ancestors: the checkout is 775, so the
+    // operator fallback area (fully private 0700 chain) is required here.
+    let d = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
     fs::set_permissions(d.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let mut request: swarm_enrollment_authority::provisioning::Request = serde_json::from_str(
         include_str!("../../../../../tests/fixtures/paea_provisioning_request.json"),

@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-attribution-renewal-web",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "compile-web-regression-with-retained-diagnostics",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "confidentiality_http",
+        "--no-run"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 8.768921909999335,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "bind-built-web-test-image",
+      "command": [
+        "/usr/bin/python3",
+        "tools/verification/bind_cargo_test_binary.py",
+        "--deps",
+        "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-verification-target/debug/deps",
+        "--target",
+        "confidentiality_http",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-attribution-renewal-web-binary.json"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 1.3564166409923928,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "fresh-http-history-control-refusal-and-recovery",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "confidentiality_http",
+        "policy_renewal_and_poisoned_history_refuse_through_http",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 1.8287644379888661,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "verify-same-web-test-image",
+      "command": [
+        "/usr/bin/python3",
+        "tools/verification/bind_cargo_test_binary.py",
+        "--deps",
+        "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-verification-target/debug/deps",
+        "--target",
+        "confidentiality_http",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-attribution-renewal-web-binary.json",
+        "--verify-stable"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.8669409650028683,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-observable-assertion-missing",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "b8d4df7e881cbdf9b72ed3e54c781e4d2e07e3d267c22dfb8596bad1d270ce25",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "0382deefed550bd9600bd87ebff09e7016b88e955ac1c93c145bcf1aebba51ee",
+    "declared-inputs.tar.gz": "be7db86a4d2a7e57d0819d3a9d43c73fea2b632889660a490d20002e0d08976a",
+    "environment.json": "5bb3210e002c55a567147892b20d4eb8449de3a250e9a119554abecea3f95608",
+    "step-0001.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.stderr": "7fb99b5483dd8e260d5981a0c149cc2085e9c6f09d9b924bae751b66f0c0d968",
+    "step-0001.json": "1b66398e1aa142788b6db9c9fecde454380fe3e3afcfba2623b4802524517ef3",
+    "step-0002.stdout": "146b7bd2049e1fe6bf03fbe936b2b3dbf639700b24c4e7c05d2a65197b07a44e",
+    "step-0002.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0002.json": "e0c53f24879774aa2745d881e130ded8833275c61d73cda18ab921a446de1ee3",
+    "step-0003.stdout": "1e8bdb0a97d052ab1f8bcadb4a621c62d36047559adaa582f7096a8afb01b31b",
+    "step-0003.stderr": "aafb236829667b316e6bfe6e30aa7d840a44e01d06bb31c48651ef32ee18c08a",
+    "step-0003.json": "ae3552f412832eef6363b11143b8314b66a8e4565fdc84ee1e2d26a7ee486217",
+    "step-0004.stdout": "ef4a63bcce704a9a6645e6386182b4fda80d6cb6c66af33a0ad29ee0db17bd7e",
+    "step-0004.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0004.json": "609cae7918edbb8be5df4b98d81b31084b4330e0467825a7b2e42f4724decb2e",
+    "inputs.after.json": "0382deefed550bd9600bd87ebff09e7016b88e955ac1c93c145bcf1aebba51ee"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "error": "blp-classification-invalid",
+  "failure": {
+    "causes": [
+      "blp-classification-invalid"
+    ],
+    "code": "blp-classification-invalid",
+    "message": "blp-classification-invalid",
+    "retryable": false
+  },
+  "schema_version": 1
+}

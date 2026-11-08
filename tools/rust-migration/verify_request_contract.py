@@ -8,6 +8,10 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import time
 import tomllib
 from qualification_inputs import collect
@@ -18,7 +22,7 @@ from bootstrap_scenarios import run as bootstrap_scenarios
 from cli_bootstrap_scenarios import run as cli_scenarios
 ROOT=Path(__file__).resolve().parents[2];OUTPUT=Path(sys.argv[1]).resolve();EVIDENCE=ROOT/'docs/plans/migration-rust/evidence'
 if OUTPUT.exists()and any(OUTPUT.iterdir()):raise SystemExit('Fresh evidence directory required')
-OUTPUT.mkdir(parents=True,exist_ok=True);WORK=Path(tempfile.mkdtemp(prefix='swarm-request-contract-'));ENV=dict(os.environ,CARGO_TARGET_DIR=os.environ.get('CARGO_TARGET_DIR',str(WORK/'target')));commands=[]
+OUTPUT.mkdir(parents=True,exist_ok=True);WORK=Path(tempfile.mkdtemp(prefix='swarm-request-contract-', dir=fixture_area()));ENV=dict(os.environ,CARGO_TARGET_DIR=os.environ.get('CARGO_TARGET_DIR',str(WORK/'target')));commands=[]
 REFERENCES=dict(proof=EVIDENCE/'20261017-02/qualified-01',journal=EVIDENCE/'20261017-03/qualified-01',authority=EVIDENCE/'20261017-05/qualified-01',config=EVIDENCE/'20261017-06/qualified-03',store=EVIDENCE/'20261017-08/qualified-02')
 def run(label,args,data=None,expected=0):
  start=datetime.datetime.now(datetime.timezone.utc).isoformat();clock=time.monotonic();p=subprocess.run(args,cwd=ROOT,env=ENV,input=data,capture_output=True)

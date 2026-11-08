@@ -1,0 +1,20 @@
+{
+  "id": "blp-confidentiality-unit-run",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "swarm-confidentiality",
+    "--lib",
+    "--",
+    "--quiet"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 0.11022292999768979,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

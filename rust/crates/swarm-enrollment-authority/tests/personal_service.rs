@@ -1,4 +1,5 @@
 //! Guarded request data and real isolated service core, not peer/OS acceptance.
+mod common;
 use std::{fs, os::unix::fs::PermissionsExt, path::Path};
 use swarm_enrollment_authority::{
     authenticated_control::Context,
@@ -212,7 +213,7 @@ fn personal_service_packet_encode_empty_secret_and_invalid_change_refuse() {
 }
 /// New real protected service root, current euid only as a disposable fixture label.
 fn fixture() -> (tempfile::TempDir, p::Prepared, install::Installed) {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(d.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let mut request: p::Request = serde_json::from_str(include_str!(
         "../../../../tests/fixtures/paea_provisioning_request.json"

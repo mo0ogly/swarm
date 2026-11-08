@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from unittest.mock import patch
 
@@ -22,7 +23,7 @@ class ContinuationGuards(unittest.TestCase):
 
     def test_profile_hash_default_and_test_identity(self):
         """Valid two-artifact witness precedes invalid profile/hash variants."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             normal, test = Path(directory) / 'normal', Path(directory) / 'test'
             normal.write_bytes(b'normal fixture bytes')
             test.write_bytes(b'test fixture bytes')
@@ -138,7 +139,7 @@ class ContinuationGuards(unittest.TestCase):
 
     def test_fresh_output_refuses_existing_and_dangling_symlink(self):
         """Fresh witness, existing-file refusal and dangling-link refusal recover."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             output = Path(directory).resolve() / 'result.json'
             self.assertEqual(subject.fresh(output), output)
             output.write_bytes(b'original proof')
@@ -155,7 +156,7 @@ class ContinuationGuards(unittest.TestCase):
 
     def test_invoke_forwards_fixture_environment_without_recording_values(self):
         """Mocked launch preserves CODEX_HOME and fixture descriptor, no env dump."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             output = Path(directory).resolve()
             environment = dict(CODEX_HOME='private-fixture-home',
                                SWARM_CONTINUATION_LEDGER_FIXTURE='owned-marker',
@@ -178,7 +179,7 @@ class ContinuationGuards(unittest.TestCase):
 
     def test_failure_publication_preserves_primary_and_secondary_causes(self):
         """Witness metadata survives; publication refusal retains both objects."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             output = Path(directory).resolve()
             primary, secondary = RuntimeError('private-primary'), OSError('private-secondary')
             subject.publish_failure(output, primary)

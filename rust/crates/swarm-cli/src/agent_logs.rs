@@ -124,7 +124,7 @@ mod tests {
     /// file and failures preserve both typed branches without exposing IO text.
     #[test]
     fn agent_logs_export_and_cause_matrix() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
         let path = dir.path().join("logs");
         publish_file(&path, b"original", false).unwrap_or_else(|e| panic!("{e}"));
         assert!(publish_file(&path, b"replace", true).is_err());

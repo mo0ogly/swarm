@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{spawn,execFileSync}=require('child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-profile-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser;
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-profile-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser;
 const cli=(args,input)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{input:input?JSON.stringify(input):undefined,encoding:'utf8'}));
 (async()=>{try{
  cli(['init']);fs.writeFileSync(path.join(root,'AGENTS.md'),'PRIVATE_INSTRUCTION_CONTENT');fs.mkdirSync(path.join(root,'.claude'),{recursive:true});fs.writeFileSync(path.join(root,'.claude/settings.json'),'{"test":"PRIVATE_SETTINGS_CONTENT"}');

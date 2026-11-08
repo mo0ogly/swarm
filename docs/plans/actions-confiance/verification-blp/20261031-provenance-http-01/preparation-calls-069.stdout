@@ -1,0 +1,39 @@
+{
+  "actual_cost_scope": "Somme des coûts rapportés par les échanges de cette préparation ; couverture indiquée par cost_turns et turns.",
+  "budget": {
+    "limit_usd": 2,
+    "reserve_per_launch_usd": 0.5,
+    "estimate_source": "Synthetic linked fixture",
+    "reference_date": "2026-10-27",
+    "updated": "2026-10-31T20:44:10.660389485Z",
+    "actor": "fpizzi/uid:1001"
+  },
+  "reserved_usd": 0,
+  "committed_estimate_usd": 1.5,
+  "remaining_usd": 0.5,
+  "warning": false,
+  "actual_cost_usd": null,
+  "policy": "Enveloppe estimative, pas une facture. Réservation avant envoi ; estimation engagée dès qu’un appel peut avoir démarré. Le coût rapporté et les jetons ne couvrent que les échanges qui les fournissent.",
+  "work_budget": {
+    "actual_cost_scope": "Coûts rapportés par les agents et planificateurs ; les valeurs absentes restent inconnues. Estimations partagées entre exécution, planification, assistance et préparation.",
+    "budget": {
+      "limit_usd": 10,
+      "reserve_per_launch_usd": 1,
+      "estimate_source": "Owned shared budget fixture",
+      "reference_date": "2026-10-27",
+      "updated": "2026-10-31T20:44:12.453131209Z",
+      "actor": "fpizzi/uid:1001"
+    },
+    "reserved_usd": 0,
+    "committed_estimate_usd": 3,
+    "remaining_usd": 7,
+    "warning": false,
+    "actual_cost_usd": null,
+    "policy": "Budget estimatif non garanti. Réservations atomiques avant départ ; les agents actifs continuent. Le réservé n'est pas une dépense : le coût rapporté est indiqué à part."
+  },
+  "turns": 3,
+  "usage_turns": 2,
+  "cost_turns": 0,
+  "input_tokens": 14,
+  "output_tokens": 22
+}

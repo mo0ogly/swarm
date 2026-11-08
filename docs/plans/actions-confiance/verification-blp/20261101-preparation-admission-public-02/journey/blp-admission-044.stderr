@@ -1,0 +1,12 @@
+{
+  "error": "blp-admission-invalid",
+  "failure": {
+    "causes": [
+      "blp-admission-invalid"
+    ],
+    "code": "blp-admission-invalid",
+    "message": "blp-admission-invalid",
+    "retryable": false
+  },
+  "schema_version": 1
+}

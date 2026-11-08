@@ -1,0 +1,24 @@
+{
+  "id": "historical-replay-keeps-no-native-custody",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--test",
+    "preparation_calls",
+    "legacy_active_replay_is_readonly_without_native_authority",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 2.9844451489916537,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

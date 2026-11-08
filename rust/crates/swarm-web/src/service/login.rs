@@ -11,6 +11,12 @@ pub(super) fn public<B>(r: &Request<B>) -> bool {
     (r.uri().path() == "/login" && matches!(*r.method(), Method::GET | Method::HEAD | Method::POST))
         || (matches!(*r.method(), Method::GET | Method::HEAD) && asset(r.uri().path()).is_some())
 }
+/// True for a `/login` request carrying a `ticket` query field: it consumes
+/// Root state, so it is never a datastore-free browser resource.
+pub(super) fn ticket_request<B>(r: &Request<B>) -> bool {
+    r.uri().path() == "/login"
+        && form_urlencoded::parse(r.uri().query().unwrap_or("").as_bytes()).any(|(k, _)| k == "ticket")
+}
 /// Embedded canonical assets, not a file server, remote resource or traversal fallback.
 fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
     match path {
@@ -66,7 +72,8 @@ fn field(raw: &[u8]) -> Result<String, HttpServiceError> {
         .map(str::to_owned)
         .map_err(HttpServiceError::LoginEncoding)
 }
-/// Unique form fields; query tokens never authenticate. Unknown/duplicate keys
+/// Unique form fields; the owner key is never accepted from the query (only a
+/// single-use `ticket`, handled separately, is). Unknown/duplicate keys
 /// refuse rather than selecting a convenient first/last key. Missing next is '/'.
 fn form(raw: &[u8]) -> Result<(String, String), HttpServiceError> {
     let mut token = None;
@@ -202,6 +209,21 @@ impl NativeHttpService {
             form_urlencoded::parse(r.uri().query().unwrap_or("").as_bytes()).collect();
         let english = query.iter().any(|(k, v)| k == "lang" && v == "en");
         let light = query.iter().any(|(k, v)| k == "theme" && v == "etat");
+        #[cfg(target_os = "linux")]
+        if r.method() == Method::GET && r.uri().path() == "/login" {
+            let mut tickets = query.iter().filter(|(k, _)| k == "ticket");
+            if let Some((_, ticket)) = tickets.next() {
+                if tickets.next().is_some() {
+                    return Err(HttpServiceError::Refused("web-ticket-ambiguous"));
+                }
+                let next = query
+                    .iter()
+                    .find(|(k, _)| k == "next")
+                    .map(|(_, v)| v.as_ref())
+                    .unwrap_or("/");
+                return self.ticket_reply(ticket, next, english, light);
+            }
+        }
         if r.method() != Method::POST {
             return Ok(reply(
                 StatusCode::OK,
@@ -259,7 +281,14 @@ impl NativeHttpService {
                 ));
             }
         };
-        let next = redirect(&next);
+        self.owner_login_reply(&next, json, head)
+    }
+    /// Successful sign-in reply shared by the key form and the single-use
+    /// ticket: owner cookie (HttpOnly, SameSite=Strict, saved Max-Age), then a
+    /// 303 to the sanitized same-origin `next` (or JSON `{"redirect"}`).
+    /// The value is the existing owner key; no new authority is created.
+    fn owner_login_reply(&self, next: &str, json: bool, head: bool) -> Result<HttpReply, HttpServiceError> {
+        let next = redirect(next);
         let body = if json {
             serde_json::to_vec(&serde_json::json!({"redirect":next}))
                 .map_err(HttpServiceError::ResponseJson)?
@@ -277,11 +306,14 @@ impl NativeHttpService {
             "application/json; charset=utf-8",
             None,
         );
-        let mut cookie = cookie::Cookie::build((self.authority.cookie_name().to_owned(), token))
-            .path("/")
-            .http_only(true)
-            .same_site(cookie::SameSite::Strict)
-            .build();
+        let mut cookie = cookie::Cookie::build((
+            self.authority.cookie_name().to_owned(),
+            self.authority.owner_cookie_value().to_owned(),
+        ))
+        .path("/")
+        .http_only(true)
+        .same_site(cookie::SameSite::Strict)
+        .build();
         cookie.set_max_age(
             self.cookie_max_age_seconds
                 .map(cookie::time::Duration::seconds),
@@ -297,6 +329,75 @@ impl NativeHttpService {
             );
         }
         Ok(result)
+    }
+    /// `POST /api/v1/logout` after the protected head checks: expire the
+    /// address-scoped and legacy owner cookies (Max-Age=0, same Path/flags)
+    /// and return `{"redirect":"/login"}`. Only this browser is signed out:
+    /// the persisted owner key, other browsers and tickets are unchanged, so
+    /// this is not revocation (see owner key rotation). Other methods refuse
+    /// with 405 semantics; no Root IO occurs.
+    pub(super) fn logout_reply(&self, r: &Request<Vec<u8>>) -> Result<HttpReply, HttpServiceError> {
+        if r.method() != Method::POST {
+            return Err(HttpServiceError::Method("POST"));
+        }
+        let body = serde_json::to_vec(&serde_json::json!({"redirect":"/login"}))
+            .map_err(HttpServiceError::ResponseJson)?;
+        let mut result = reply(StatusCode::OK, body, false, "application/json; charset=utf-8", None);
+        for name in [self.authority.cookie_name(), "swarm_session"] {
+            let mut cookie = cookie::Cookie::build((name.to_owned(), String::new()))
+                .path("/")
+                .http_only(true)
+                .same_site(cookie::SameSite::Strict)
+                .build();
+            cookie.make_removal();
+            result.response.headers_mut().append(
+                SET_COOKIE,
+                HeaderValue::from_str(&cookie.to_string()).map_err(HttpServiceError::HeaderEncoding)?,
+            );
+        }
+        Ok(result)
+    }
+    /// `GET /login?ticket=T[&next=…]`: consume a single-use ticket issued by
+    /// `web-ticket` for this exact listener address. Accepted → owner sign-in
+    /// reply. Unknown, replayed, expired or malformed tickets all render the
+    /// login page with one generic 401 message (no oracle) and the typed
+    /// refusal kept as the reply failure. Storage failures propagate typed.
+    /// HEAD never consumes. Only the owner key's access is granted.
+    #[cfg(target_os = "linux")]
+    fn ticket_reply(&self, ticket: &str, next: &str, english: bool, light: bool) -> Result<HttpReply, HttpServiceError> {
+        let address: std::net::SocketAddr = self
+            .authority
+            .host()
+            .parse()
+            .map_err(|_| HttpServiceError::Refused("web-ticket-address-invalid"))?;
+        let store = swarm_engine::RootStore::open(&self.root, true)
+            .map_err(|cause| super::root("open", cause))?;
+        let outcome = (|| {
+            self.check_binding(&store)?;
+            store.consume_web_login_ticket(address, self.authority.owner_cookie_value(), ticket).map_err(|e| match e {
+                swarm_engine::WebTicketError::Session(e) => HttpServiceError::Session(e),
+                swarm_engine::WebTicketError::Settings(e) => super::root("ticket-settings", e),
+            })
+        })();
+        let outcome = super::close(outcome, store.close())?;
+        if outcome == swarm_engine::WebTicketUse::Accepted {
+            return self.owner_login_reply(next, false, false);
+        }
+        let message = if english {
+            "This sign-in link has expired or was already used. Run swarm open again or enter the access key."
+        } else {
+            "Ce lien de connexion a expiré ou a déjà servi. Relancez swarm open ou saisissez la clé d’accès."
+        };
+        Ok(reply(
+            StatusCode::UNAUTHORIZED,
+            page(english, light, message)?,
+            false,
+            "text/html; charset=utf-8",
+            Some(HttpServiceError::Refused(match outcome {
+                swarm_engine::WebTicketUse::Expired => "web-ticket-expired",
+                _ => "web-ticket-unknown",
+            })),
+        ))
     }
 }
 

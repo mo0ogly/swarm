@@ -2,6 +2,7 @@ use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use swarm_enrollment_config::{Change, Entry, Head, Pins, Snapshot, Values};
 use swarm_identity_contract::Principal;
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
+pub mod fixture_area;
 pub fn at(raw: &str) -> OffsetDateTime {
     OffsetDateTime::parse(raw, &Rfc3339).unwrap()
 }

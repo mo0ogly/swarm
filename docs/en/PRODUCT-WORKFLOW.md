@@ -105,9 +105,9 @@ See the [French guide's JSON example](../PRODUCT-WORKFLOW.md#ajouter-la-structur
 ## Reproduce the isolated recipe
 
 ```sh
-sh build.sh /tmp/swarm-product
-python3 tests/product_recipe.py /tmp/swarm-product /tmp/swarm-product-empty-project
-/tmp/swarm-product --root /tmp/swarm-product-empty-project web 127.0.0.1:18844
+sh build.sh .swarm-fixtures/swarm-product
+python3 tests/product_recipe.py .swarm-fixtures/swarm-product .swarm-fixtures/swarm-product-empty-project
+.swarm-fixtures/swarm-product --root .swarm-fixtures/swarm-product-empty-project web 127.0.0.1:18844
 ```
 
 Use a free port and an empty root. Open the local session link, then Application →

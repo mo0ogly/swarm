@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "version": "v0.1.1-dev.296",
+  "binary_sha256": "e4a802c4dc4d32d90d036169604168c64db15196695d692885369b748686ca72",
+  "runtime_sources_match": [
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+    "rust/crates/swarm-engine/src/trust/authentication.rs",
+    "rust/crates/swarm-engine/src/trust/confidentiality.rs",
+    "rust/crates/swarm-engine/src/trust/state.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-engine/src/root_store/reader_guard.rs",
+    "rust/crates/swarm-engine/src/trust/error.rs",
+    "rust/crates/swarm-confidentiality/src/lib.rs",
+    "rust/crates/swarm-web/src/service/trust.rs",
+    "rust/crates/swarm-cli/src/trust.rs",
+    "rust/crates/swarm-cli/src/lib.rs"
+  ],
+  "profile": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-0ukzkap_/build/profile",
+  "service_restarted_by_readonly_probe": false,
+  "global_watchdog": null,
+  "scope": "installed preparation-source diagnostic and read-only PAEA/version/assets; no global BLP conformance"
+}

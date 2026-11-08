@@ -1,10 +1,12 @@
 # Imported agent history
 
-State: candidate being connected; local version219 still refuses `agent history`.
+State: delivered and locally verified in version233, image `b11b4baf…`.
+Recipe:102assertions across45cases,3generator tests;31delivery checks including
+14FR/EN Version checks, plus8specific checks, five Works/settings preserved.
 The active plan and evidence are in
 [AGENT-HISTORY-20261027](../plans/migration-rust/AGENT-HISTORY-20261027.md).
 
-The target `agent history ID --root ROOT [--json]` reads the private manifest
+The `agent history ID --root ROOT [--json]` reads the private manifest
 `.swarm/imports/ID/manifest.json`. It always returns JSON, even without `--json`:
 `{"historical_only":true,"history":...}`. Missing/null history stays `null`; empty
 collections and omitted fields follow Go's format. The identifier must be a
@@ -12,7 +14,7 @@ valid local name; the current Work need not exist.
 
 ```mermaid
 flowchart LR
-    CLI[CLI agent history — target] --> R[Bound Root and read reservation]
+    CLI[CLI agent history] --> R[Bound Root and read reservation]
     R --> F[Private descriptors imports / ID / manifest.json]
     F --> G[Frozen historical Bundle JSON graph]
     G --> H[Historical Cockpit projection]
@@ -42,3 +44,7 @@ Memory follows manifest size, without a new hidden read ceiling.
 File restoration in the recipe uses inert fixtures only. It is neither a
 supported Rust import/restore operation nor permission to modify a real Work's
 private data.
+
+Permanent recipe: `tools/verification/recipes/agent-archive-history-rust.json`, frozen binary selected by `SWARM_AGENT_HISTORY_BINARY`. Generation reads no Go sources; local Go is a verification-only JSON oracle.
+
+The final recipe also checks two harness resource paths: SQLite closure after a valid read and after an iterator failure. Neither uses a live database.

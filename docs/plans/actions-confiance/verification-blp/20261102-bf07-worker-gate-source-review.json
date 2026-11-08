@@ -1,0 +1,74 @@
+{
+ "schema_version": 1,
+ "review_kind": "same-context source review; not independent acceptance",
+ "scope": "BF-07 worker emission hook: Api branch of preparation_worker.rs calls the last-use decision through preparation_worker_transport_gate before building any request; legacy path untouched; no result/reader inheritance, no OS confinement, not activated in production",
+ "files": {
+  "rust/crates/swarm-engine/src/root_store/preparation_transport.rs": "see bf07-hashes.json (c70cf31c278ce35d…)",
+  "rust/crates/swarm-engine/src/root_store/preparation_call.rs": "see bf07-hashes.json (8c2b8c85b465b7f3…)",
+  "rust/crates/swarm-cli/src/preparation_worker.rs": "see bf07-hashes.json (9f810034affc30d5…)",
+  "rust/crates/swarm-engine/tests/preparation_worker_transport.rs": "see bf07-hashes.json (d7edf155f0722b9b…)",
+  "rust/crates/swarm-engine/tests/preparation_calls.rs": "see bf07-hashes.json (a7bd90c9b1db409a…)",
+  "rust/crates/swarm-engine/tests/preparation_transport.rs": "see bf07-hashes.json (8fdafd7827601ae7…)",
+  "tools/verification/recipes/blp-preparation-worker-gate.json": "see bf07-hashes.json (743b85bebc1ccd7f…)",
+  "docs/architecture/BELL-LAPADULA.md": "see bf07-hashes.json (1abf732cd2896a8c…)",
+  "docs/en/BELL-LAPADULA.md": "see bf07-hashes.json (bb61459032fbf81b…)",
+  "docs/architecture/BIBA-RUST.md": "see bf07-hashes.json (09e2fd01280d5bc9…)",
+  "docs/en/BIBA-RUST.md": "see bf07-hashes.json (cd1676cd6154a8e4…)",
+  "docs/architecture/BLP-FLOWS.md": "see bf07-hashes.json (897537d26f51eac0…)",
+  "docs/en/BLP-FLOWS.md": "see bf07-hashes.json (a2bb36f5276096e8…)",
+  "docs/plans/actions-confiance/BLP-APEX.md": "see bf07-hashes.json (61066202497959b5…)",
+  "docs/en/plans/actions-confiance/BLP-APEX.md": "see bf07-hashes.json (a68cb8d141c9d954…)",
+  "docs/architecture/blp-flow-inventory.json": "see bf07-hashes.json (e26072b772d48dc7…)",
+  "version_history.json": "see bf07-hashes.json (dc6b02be22f54b3b…)",
+  "hash_provenance": "bf07-hashes.json holds the full 64-hex digests; it was written first and this file cites it. version_history.json and inventory are shared files also touched by concurrent sessions; the digests pin this review's read, not sole authorship."
+ },
+ "policies": {
+  "protocol": "admission receipt grammar `blp-admission-{64 lowercase hex}.receipt`, turn status `running`, token=SHA256(native nonce) and typed refusal codes are protocol invariants; zero-matching-receipts Ok is the declared legacy fast path, not an operator switch",
+  "operator": "no new execution policy, default classification, timeout, retry, cap or watchdog; the gate adds no budget consumption, no reservation and no saved-setting write",
+  "fixtures": "fixture tokens (fixture-admin-token/fixture-sender-token/fixture-reader-token), PRIVATE_FIXTURE_KEY and the .swarm-fixtures roots are test inputs; the fixture registers its own PID/stamp/host by writing the row directly — declared fixture injection, never enrollment evidence",
+  "resources": "no timeout added anywhere; the recipe keeps JOBS=1 for cache-stable assertions and no global watchdog exists"
+ },
+ "functions": [
+  "RootStore::preparation_worker_transport_gate: egress-wrapped entry (shared re-entry never blocks; quarantine snapshot re-checked, strictly no weaker); doc-comment states contract, refusal codes, non-effects and non-grants",
+  "worker_transport_gate: gated_turn under with_material_read → exact-grammar receipt scan over names() (non-admission names never read; valid-format but unreadable/undecodable refuses blp-admission-not-found/blp-admission-record-invalid — fail-closed, no silent pass) → empty match returns Ok before any Trust read → >=1 match: reserve_trust(false) after the scan (lock order egress→material→scan→trust→close) → State decode/validate/require_supported, current Entry required (blp-policy-required) → per receipt full preparation_admission::verify with the receipt's principal (caller never supplies identity) → custody.settings_digest vs current_settings_digest (blp-transport-settings-changed) → resolve_destination from the turn's provider with mandatory worker base_url/model echo (blp-destination-echo-mismatch; closes claim→send TOCTOU) → per receipt provider_source/settings freshness vs captured values → destination_digest over the resolved account → entry.attribution_for on the recomputed digest for this project root (blp-destination-not-attributed) → per receipt provenance classifications under current entry + ExecutionDomain::prepare re-derivation under CURRENT policy (no-write-down) + output-classification equality + check_output(Some(label)) → observe_budget read-only → finished folds lock-close failures",
+  "TurnCustody/gated_turn (preparation_call.rs): re-read under material guard; requires exactly running, token==SHA256(nonce), PID/stamp/host == SupervisorIdentity::current(), unchanged root instance; exposes only turn + request_level + settings_digest; prompt/provenance/nonce stay private; doc-comment declares observation-not-authority",
+  "preparation_worker run (swarm-cli): gate call is the first statement, before any Request object exists; call site wraps run in with_preparation_egress; CLI path (preparation_call_cli.rs) keeps its own egress control and was not modified",
+  "destination_digest/resolve_destination/observe_budget/current_settings_digest: reviewed unchanged BLP-05 helpers as consumed — resolve_destination reads the live catalogue (TOCTOU pin), observe_budget is rollback-only and refuses unavailable preparations, current_settings_digest refuses truncated/missing history",
+  "preparation_admission::verify signature consumed as (root, state, principal, admission) -> Result<usize,E>: schema, identity digest, instance, revisions, policy digest, per-source re-join, output label — re-run per matched receipt",
+  "test preparation_worker_transport.rs: fixture under .swarm-fixtures (never /tmp), birth marker, 0600 config files, self-cleaning; ordering constraints encoded (admission before any send — preparation-turn-active; claim before gate; one active turn — legacy turn finished before bound turn); same event_id for admission and bound turn (request_hash covers event_id — verified empirically and by capture source: request_hash = hash(encode_model(send))); refusals asserted: wrong token, unattributed destination, wrong base_url echo, wrong model echo; exact pass asserted with reservation count before==after+claims (gate adds none)"
+ ],
+ "errors": {
+  "authentication": "the worker holds no principal: identity always comes from the receipt's re-verified record; custody requires the turn this very process claimed (running + token + PID/stamp/host) so another process's turn never gates through",
+  "data": "non-receipt directory names are skipped without IO; receipt grammar mismatches never read; undecodable matching receipts refuse typed instead of authorizing; admission/turn field mismatch simply does not match (no error) — legacy semantics",
+  "storage": "Trust reservation taken only after >=1 match and inside the already-held egress reservation; finished() folds lock-close failures preserving the primary refusal; names()/read_native_receipt IO errors propagate as Storage, only absence maps to blp-admission-not-found",
+  "effects": "gate performs no provider IO, no reservation and no SQL write; budget observation is rollback-only; refusals happen before the request struct is built, so no socket opens",
+  "cleanup": "egress wrapper cleanup folding unchanged; test fixture removes its root (asserted in fixture drop); no /tmp allocation anywhere in the increment",
+  "http": "no new HTTP surface in this increment (worker-side call); all refusal codes reused from the BLP-05 typed families"
+ },
+ "inventory_semantic_review": {
+  "checker": "tools/paea/check_blp_inventory.py --inventory docs/architecture/blp-flow-inventory.json → failures: [] , 67 references / 25 flows",
+  "refresh": "11 references whose sources changed since BLP-05 were re-read: all 11 anchors still present; lines and sha256 refreshed (send, claim, api_worker, finish, preparation_blp_check, captured_source, shared_prompt_producer, pretransport_capture, transport_digest, transport_resolve, transport_execute)",
+  "added": "worker_gate (preparation_transport.rs gate method) and worker_gate_cli (preparation_worker.rs call site) added as BF-07 flow references; BF-07 current_controls extended with the delivered hook and its remaining OPEN items",
+  "scope": "declared-source inventory only — anchors and hashes prove no compiler graph and no runtime enforcement"
+ },
+ "evidence": {
+  "integration_test": "preparation_worker_transport.rs 1/1 PASS (1.8s), self-cleaned fixture",
+  "neighbors": "preparation_calls 7/7 PASS, preparation_transport 1/1 PASS (no regression)",
+  "recipe": "tools/verification/recipes/blp-preparation-worker-gate.json — recipe.py run PASS 3/3, evidence .cache/bf07-proof/ (declared-inputs.tar.gz, inputs.before/after.json, result.json)",
+  "compile": "cargo check -p swarm-cli Finished dev profile (step 3 of recipe)",
+  "tmp_interdiction": "no increment file or fixture under /tmp; all fixtures under .swarm-fixtures/, evidence under .cache/"
+ },
+ "limits": [
+  "The gate authorizes nothing at OS/runtime level: runtime_authorized/runtime_enforced stay false by construction (no reply at all — the gate either passes or refuses)",
+  "Result inheritance (BF-16), descendant confinement, upstream transformations, migration, human declassification, capsule withdrawal: out of scope, unchanged",
+  "Legacy sends without admission receipts pass unchanged by design; quarantine (OFF in tests) remains the only legacy-path control when enabled",
+  "One active turn per preparation is an engine constraint, not new policy; the test encodes it (legacy turn finished before the bound turn)",
+  "version_history.json and blp-flow-inventory.json are shared files edited by concurrent sessions; digests pin this review's read",
+  "Local verification and same-context review are not independent review, native acceptance or real-data acceptance; Bell-LaPadula is not declared finished"
+ ],
+ "delivery": {
+  "status": "implemented and locally verified; NOT installed locally yet (pending qualified build per the 24 October decision), NOT activated in production, commit/push awaiting fresh explicit authorization",
+  "version": "not assigned yet — see the local-install step in the APEX plan"
+ },
+ "same_context_review_verdict": "BF-07 worker emission hook implemented, locally verified (integration test + permanent recipe + green neighbors + current inventory), same-context source review complete; no independent/global BLP acceptance; BF-16 remains the next increment"
+}

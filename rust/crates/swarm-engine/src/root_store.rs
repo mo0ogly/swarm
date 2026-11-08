@@ -15,6 +15,9 @@ mod mission_report_relay;
 #[cfg(target_os = "linux")]
 pub use mission_report_relay::MissionReportRelayOutcome;
 mod agent_log_history;
+mod graph_batch;
+#[cfg(target_os = "linux")]
+mod agent_archive_history;
 pub use agent_log_history::HistoricalAgentLog;
 use rusqlite::{Connection, OpenFlags};
 use std::{
@@ -70,6 +73,8 @@ mod admin_budget;
 pub use admin_budget::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};
 mod material_path;
 mod trust_store;
+mod reader_guard;
+pub use reader_guard::ReaderVerdict;
 #[cfg(target_os="linux")]
 mod trust_enrollment;
 #[cfg(target_os="linux")]
@@ -87,13 +92,35 @@ mod managed_git_current;
 #[cfg(target_os = "linux")]
 mod paea_git_repository;
 #[cfg(target_os = "linux")]
-pub use paea_git_repository::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat};
+pub use paea_git_repository::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat,PaeaGitSource};
 #[cfg(target_os = "linux")]
 pub use managed_git_current::CurrentManagedGitPublication;
 #[cfg(target_os = "linux")]
 pub use paea_git_intent::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};
 #[cfg(target_os = "linux")]
-pub use paea_settlement::{PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
+pub use paea_settlement::{PaeaPaymentAgreement,PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
+#[cfg(target_os = "linux")]
+mod paea_git_transfer_call;
+#[cfg(target_os = "linux")]
+pub use paea_git_transfer_call::{PaeaGitTransferCall, PaeaGitTransferCallError, PaeaGitTransferReceipt};
+#[cfg(target_os = "linux")]
+mod paea_git_agreement;
+#[cfg(target_os = "linux")]
+pub use paea_git_agreement::{PaeaGitAgreementMatch, PaeaGitAgreementTerms};
+#[cfg(target_os = "linux")]
+mod paea_git_promote_call;
+#[cfg(target_os = "linux")]
+pub use paea_git_promote_call::{
+    PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt,
+};
+#[cfg(target_os = "linux")]
+mod paea_effect_reconcile;
+#[cfg(target_os = "linux")]
+pub use paea_effect_reconcile::{
+    PaeaEffectReconcileFinding, PaeaEffectReconcileJournal, PaeaEffectReconcileReport,
+};
+#[cfg(target_os = "linux")]
+pub(crate) use paea_git_repository::transfer::TransferFailure;
 #[cfg(target_os="linux")]
 mod trust_evidence_runtime;
 mod quotas;
@@ -147,6 +174,16 @@ pub enum RootStoreError {
     /// known reply and every independent authority/action cause remain retained.
     #[cfg(target_os = "linux")]
     TrustEnrollment(Box<TrustEnrollmentCallError>),
+    /// Guarded PAEA Git transfer consumption failed. The typed envelope retains
+    /// authority, backend and known-receipt branches; no rollback or retry
+    /// follows from this wrapper and the one-shot call never runs twice.
+    #[cfg(target_os = "linux")]
+    PaeaGitTransferCall(Box<PaeaGitTransferCallError>),
+    /// Guarded PAEA Git promotion consumption failed. The typed envelope retains
+    /// authority, backend and known-outcome branches, including the explicit
+    /// negative reconciliation; no rollback or retry follows from this wrapper.
+    #[cfg(target_os = "linux")]
+    PaeaGitPromoteCall(Box<PaeaGitPromoteCallError>),
     /// Recorded trust reply or visibly uncertain file publication. No rollback
     /// is inferred; consumer must expose this marker through close/output errors.
     TrustPublished { primary: Box<Self>, publication: &'static str },
@@ -270,6 +307,16 @@ impl RootStoreError {
             },_=>None,
         }
     }
+    /// Observe a live, durably settled pre-exec planner scope change only.
+    /// Receipt/usage/refusal feedback and cleanup succeeded; original refusal
+    /// remains an Err. Clean WorkRecorded wrappers preserve the actual settled
+    /// revision; independent cleanup/output failures refuse classification.
+    /// This neither refunds the claim nor grants retry, execution or acceptance.
+    /// A conductor may reobserve under the existing consent and saved budgets.
+    #[cfg(target_os="linux")]
+    pub fn recorded_planning_scope_change(&self) -> Option<(&str, &str, &str, i64)> {
+        planning_native::stale_gate::metadata(self)
+    }
     /// Observe a typed configuration-preservation marker through compound Root
     /// cleanup. It can mean known prior/replayed data or visible uncertain bytes;
     /// false is not proof of rollback. Never infer authority, new write or retry.
@@ -378,6 +425,10 @@ impl RootStoreError {
             Self::Trust(e)=>e.code(),
             #[cfg(target_os = "linux")]
             Self::TrustEnrollment(e)=>e.code(),
+            #[cfg(target_os = "linux")]
+            Self::PaeaGitTransferCall(e)=>e.code(),
+            #[cfg(target_os = "linux")]
+            Self::PaeaGitPromoteCall(e)=>e.code(),
             Self::TrustPublished{..}=>"trust-state-preserved",
             Self::Schema(e) => e.code(),
             #[cfg(target_os = "linux")]
@@ -497,6 +548,10 @@ impl Error for RootStoreError {
             Self::Trust(e)=>Some(e.as_ref()),
             #[cfg(target_os = "linux")]
             Self::TrustEnrollment(e)=>Some(e.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::PaeaGitTransferCall(e)=>Some(e.as_ref()),
+            #[cfg(target_os = "linux")]
+            Self::PaeaGitPromoteCall(e)=>Some(e.as_ref()),
             Self::TrustPublished{primary,..}=>Some(primary.as_ref()),
             Self::Schema(e) => Some(e.as_ref()),
             #[cfg(target_os = "linux")]
@@ -804,7 +859,7 @@ pub(crate) use mission_control_write::stage as stage_mission_control;
 pub(crate) use mission_controls::require_planning_mission_active;
 #[cfg(target_os = "linux")]
 pub use mission_controls::{
-    MissionAutonomy, MissionConsentObservation, MissionControlSettings, MissionControlsObservation,
+    CockpitAutonomyObservation, MissionAutonomy, MissionConsentObservation, MissionControlSettings, MissionControlsObservation,
     MissionDispatchObservation,
 };
 #[cfg(target_os = "linux")]
@@ -816,6 +871,11 @@ mod mission_producer;
 mod mission_supervision_store;
 #[cfg(target_os = "linux")]
 pub(crate) mod reported_costs;
+mod cockpit_health;
+mod cockpit_actions;
+pub(crate) mod cockpit_post_delivery;
+#[cfg(target_os = "linux")]
+mod cockpit_snapshot;
 #[cfg(target_os = "linux")]
 pub use reported_costs::{CostSummary, CostTotal};
 #[cfg(target_os = "linux")]
@@ -1781,6 +1841,51 @@ impl RootStore {
             &self.db, &self.directory, false, |_, settings| Ok(settings.clone()),
         )
     }
+    /// Apply the saved v51 temporary directory to this process: resolve it
+    /// against `root`, create it (mode 0700, parents too) when missing, then
+    /// export `TMPDIR` so this process and every child it starts use it.
+    ///
+    /// Returns `Ok(None)` without effect when `root/.swarm` has no settings
+    /// file yet (before `init`) or the document predates v51 (absence is
+    /// reported by runtime health, never replaced by a default). Errors:
+    /// unreadable/invalid settings, an existing non-directory, or a creation
+    /// failure — the caller must refuse rather than continue in `/tmp`.
+    /// Precondition: call before starting threads (environment mutation).
+    #[cfg(unix)]
+    pub fn apply_runtime_temporary_directory(
+        root: &Path,
+    ) -> Result<Option<std::path::PathBuf>, RootStoreError> {
+        let private = root.join(".swarm");
+        if !private.join(SETTINGS).is_file() {
+            return Ok(None);
+        }
+        let directory = LocalDirectory::open(&private).map_err(RootStoreError::Storage)?;
+        let values = Self::read_settings_from(&directory)?.values;
+        if values.runtime_temporary_directory.is_none() {
+            return Ok(None);
+        }
+        let path = values
+            .runtime_temporary_path(root)
+            .map_err(RootStoreError::Settings)?;
+        use std::os::unix::fs::DirBuilderExt;
+        match std::fs::DirBuilder::new().recursive(true).mode(0o700).create(&path) {
+            Ok(()) if path.is_dir() => {}
+            Ok(()) => {
+                return Err(RootStoreError::Runtime(crate::RuntimeError::new(
+                    crate::RuntimeOperation::TemporaryDirectory,
+                    std::io::Error::from(std::io::ErrorKind::NotADirectory),
+                )))
+            }
+            Err(e) => {
+                return Err(RootStoreError::Runtime(crate::RuntimeError::new(
+                    crate::RuntimeOperation::TemporaryDirectory,
+                    e,
+                )))
+            }
+        }
+        std::env::set_var("TMPDIR", &path);
+        Ok(Some(path))
+    }
     /// Read this root's validated saved settings without adopting defaults.
     /// Owned-directory IO, syntax/history/policy errors retain typed causes.
     fn read_settings(&self) -> Result<EngineSettingsDocument, RootStoreError> {
@@ -1874,6 +1979,117 @@ impl RootStore {
         })();
         finished(result, reservation.close().map_err(RootStoreError::Storage))
     }
+    /// Read-only project-memory proposal under one settings reservation,
+    /// mirroring Go `projectMemoryPreview` byte-for-byte: decode, revision
+    /// observation, selection guards/idle/projected attachments or next-version
+    /// candidate with the verified-source recheck, active-use impact list and
+    /// binding token. Starts no agent, admits no version and grants no
+    /// authority; the mutation path independently rechecks everything it relies
+    /// on. Raw request bytes and the `memory.<action>-preview` kind both arrive
+    /// through the caller's dispatch.
+    pub fn preview_project_memory(
+        &self,
+        work: &str,
+        raw: &[u8],
+        action: &str,
+    ) -> Result<crate::project_memory::ProjectMemoryPreview, RootStoreError> {
+        crate::check_command_input_size(raw).map_err(RootStoreError::Input)?;
+        let request = crate::project_memory::decode_project_memory_request(raw, action)
+            .map_err(|e| RootStoreError::Mutation(WorkEngineError::Memory(e)))?;
+        let reservation = self
+            .directory
+            .reserve(false, false)
+            .map_err(RootStoreError::Storage)?;
+        let result = (|| {
+            let settings = self.read_settings()?;
+            let limits = crate::EngineMutationLimits {
+                task: crate::TaskDefinitionLimits::legacy_go(),
+                policy: crate::ValidationPolicyLimits::legacy_go(),
+            };
+            let policy = settings.quality_policy_snapshot().ok();
+            let lifecycle = crate::TaskLifecycleContext {
+                root: &self.root,
+                quality_policy: policy.as_ref(),
+                task_limits: &limits.task,
+                validation_limits: &limits.policy,
+            };
+            crate::project_memory::preview(
+                &self.db,
+                &self.root,
+                work,
+                action,
+                &request,
+                &lifecycle,
+                Some(&settings),
+            )
+            .map_err(|e| RootStoreError::Mutation(WorkEngineError::Memory(e)))
+        })();
+        finished(result, reservation.close().map_err(RootStoreError::Storage))
+    }
+    /// Read-only versioned-memory catalog under one settings reservation,
+    /// mirroring Go `projectMemoryCatalog`: the whole Work inventory (rowid
+    /// descending) and the active-use inventory come from this root's own
+    /// connection, each stored version reports its current status with Go's
+    /// reason text, and the folded literal query filters body+conditions. No
+    /// admission, no authority and no mutation follows; a read or decode
+    /// failure refuses the whole catalog instead of returning a partial one.
+    /// Settings are read like every other memory surface so planning works'
+    /// freshness checks observe the same saved policy snapshot.
+    pub fn memory_catalog(
+        &self,
+        query: &str,
+    ) -> Result<crate::memory_catalog::MemoryCatalog, RootStoreError> {
+        let reservation = self
+            .directory
+            .reserve(false, false)
+            .map_err(RootStoreError::Storage)?;
+        let result = (|| {
+            let settings = self.read_settings()?;
+            let limits = crate::EngineMutationLimits {
+                task: crate::TaskDefinitionLimits::legacy_go(),
+                policy: crate::ValidationPolicyLimits::legacy_go(),
+            };
+            let policy = settings.quality_policy_snapshot().ok();
+            let lifecycle = crate::TaskLifecycleContext {
+                root: &self.root,
+                quality_policy: policy.as_ref(),
+                task_limits: &limits.task,
+                validation_limits: &limits.policy,
+            };
+            crate::memory_catalog::memory_catalog_from_connection(
+                &self.db,
+                &self.root,
+                &lifecycle,
+                Some(&settings),
+                query,
+            )
+            .map_err(|e| RootStoreError::Mutation(WorkEngineError::Memory(e)))
+        })();
+        finished(result, reservation.close().map_err(RootStoreError::Storage))
+    }
+    /// Read-only extractive summary source under one directory reservation,
+    /// mirroring Go `Store.memorySummarySource`: the 1 MiB transport ceiling
+    /// and strict decode run first, then the stored Work row is the complete
+    /// consistency boundary (task definition and selected answers from the
+    /// same row). No settings read, no admission, no authority and no Work
+    /// mutation follows; a read or decode failure refuses the whole packet
+    /// instead of returning a partial one.
+    pub fn memory_summary_source(
+        &self,
+        raw: &[u8],
+    ) -> Result<crate::memory_summary_source::MemorySummarySourcePacket, RootStoreError> {
+        let reservation = self
+            .directory
+            .reserve(false, false)
+            .map_err(RootStoreError::Storage)?;
+        let result = crate::memory_summary_source::summary_source_from_connection(
+            &self.db,
+            &self.root,
+            raw,
+        )
+        .map_err(|e| RootStoreError::Mutation(WorkEngineError::Memory(e)));
+        finished(result, reservation.close().map_err(RootStoreError::Storage))
+    }
     /// Retain the directory and actual SQLite identities with owned CLOEXEC handles.
     /// The caller can compare future Root opens without trusting a pathname or
     /// allowing inode reuse. This observes storage, grants no permissions and
@@ -1918,6 +2134,69 @@ impl RootStore {
             return Err(crate::WebSessionError::Refused("web-session-readonly"));
         }
         crate::web_session::load_or_create(&self.directory, listener)
+    }
+    /// Issue a single-use cockpit login ticket for the server bound at
+    /// `address`, valid for the saved v50 `web_login_ticket_seconds` and bound
+    /// to that address's current owner key. Requires a writable Root; settings
+    /// absence/invalidity refuses (no default is adopted), and an address with
+    /// no owner key yet refuses with `web-ticket-server-never-started`. Publishes one private expiry file; no cookie, account or
+    /// authority beyond the existing owner key is created. The caller must
+    /// deliver the token only to the operator's browser and never log it.
+    #[cfg(target_os = "linux")]
+    pub fn issue_web_login_ticket(
+        &self,
+        address: std::net::SocketAddr,
+    ) -> Result<crate::WebLoginTicket, crate::WebTicketError> {
+        if !self.writable {
+            return Err(crate::WebTicketError::Session(crate::WebSessionError::Refused("web-session-readonly")));
+        }
+        let lifetime = self
+            .read_settings()
+            .map_err(crate::WebTicketError::Settings)?
+            .values
+            .web_login_ticket_seconds()
+            .map_err(|e| crate::WebTicketError::Settings(RootStoreError::Settings(e)))?;
+        let key = crate::web_session::read_existing(&self.directory, address)
+            .map_err(crate::WebTicketError::Session)?
+            .ok_or(crate::WebTicketError::Session(crate::WebSessionError::Refused("web-ticket-server-never-started")))?;
+        let now = time::OffsetDateTime::now_utc().unix_timestamp();
+        crate::web_login_ticket::issue(&self.directory, address, &key, lifetime, now)
+            .map_err(crate::WebTicketError::Session)
+    }
+    /// Replace the owner key of the cockpit address `address` (server must be
+    /// stopped: a bound listener refuses with `web-rotate-server-running`).
+    /// Requires a writable Root. After the next server start, every existing
+    /// cookie and unconsumed login ticket of the old key is refused. Returns
+    /// the new credential (Debug-redacted); callers must not print its secret.
+    #[cfg(target_os = "linux")]
+    pub fn rotate_web_session(
+        &self,
+        address: std::net::SocketAddr,
+    ) -> Result<crate::WebSessionCredential, crate::WebSessionError> {
+        if !self.writable {
+            return Err(crate::WebSessionError::Refused("web-session-readonly"));
+        }
+        crate::web_session::rotate(&self.directory, address)
+    }
+    /// Consume a presented login ticket for the server bound at `address`
+    /// whose in-memory owner key is `owner_key` (a ticket of another key is
+    /// unknown).
+    /// Single use: the first call removes it whatever the outcome; only
+    /// `Accepted` may lead to a session. Requires a writable Root. Typed
+    /// storage causes are retained; no other Root state changes.
+    #[cfg(target_os = "linux")]
+    pub fn consume_web_login_ticket(
+        &self,
+        address: std::net::SocketAddr,
+        owner_key: &str,
+        token: &str,
+    ) -> Result<crate::WebTicketUse, crate::WebTicketError> {
+        if !self.writable {
+            return Err(crate::WebTicketError::Session(crate::WebSessionError::Refused("web-session-readonly")));
+        }
+        let now = time::OffsetDateTime::now_utc().unix_timestamp();
+        crate::web_login_ticket::consume(&self.directory, address, owner_key, token, now)
+            .map_err(crate::WebTicketError::Session)
     }
     pub fn read_work(&self, id: &str) -> Result<Work, RootStoreError> {
         crate::read_recorded_work(&self.db, id).map_err(RootStoreError::Work)
@@ -3012,9 +3291,7 @@ mod planning_lease_pause_tests {
     #[test]
     fn planning_lease_renewal_respects_persisted_mission_pause_and_recovers() {
         let path =
-            std::env::temp_dir().join(crate::generate_identifier("lease-pause115-").unwrap());
-        std::fs::create_dir(&path).unwrap();
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+            crate::fixture_root("lease-pause115-");
         let fixture = Fixture(path);
         println!("owned legacy-controls fixture: {}", fixture.0.display());
         let mut env = crate::SystemEnvironment;
@@ -3208,9 +3485,7 @@ mod planning_lease_pause_tests {
     #[test]
     fn planning_transaction_hooks_pause_archive_and_corrupt_controls_are_atomic() {
         let path =
-            std::env::temp_dir().join(crate::generate_identifier("planning-hooks116-").unwrap());
-        std::fs::create_dir(&path).unwrap();
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+            crate::fixture_root("planning-hooks116-");
         let fixture = Fixture(path);
         println!("owned legacy-hook fixture: {}", fixture.0.display());
         let mut store = RootStore::initialize(&fixture.0, &mut crate::SystemEnvironment).unwrap();
@@ -3305,10 +3580,7 @@ mod planning_lease_pause_tests {
     fn planning_claim_input_schema_refuses_atomically_then_recovers() {
         for fault in ["view", "ddl", "index", "trigger"] {
             for healthy in [true, false] {
-                let path = std::env::temp_dir()
-                    .join(crate::generate_identifier("claim-input117-").unwrap());
-                std::fs::create_dir(&path).unwrap();
-                std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+                let path = crate::fixture_root("claim-input117-");
                 let fixture = Fixture(path);
                 println!("owned claim-input fixture: {}", fixture.0.display());
                 let mut store =
@@ -3422,9 +3694,7 @@ mod bootstrap_busy_tests {
     impl Fixture {
         /// Initialize and close a genuine Root through its supported API.
         fn new() -> Self {
-            let path = std::env::temp_dir()
-                .join(crate::generate_identifier("bootstrap-busy201-").unwrap());
-            fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+            let path = crate::fixture_root("bootstrap-busy201-");
             let store = RootStore::initialize(&path, &mut crate::SystemEnvironment).unwrap();
             store.close().unwrap();
             Self(path)
@@ -3641,8 +3911,7 @@ mod interruption_scope_tests {
     #[test]
     fn interruption_scope_restores_nested_state_and_unwind(){
         use std::os::unix::fs::PermissionsExt;
-        let path=std::env::temp_dir().join(crate::generate_identifier("interrupt-scope-").unwrap());
-        std::fs::create_dir(&path).unwrap();std::fs::set_permissions(&path,std::fs::Permissions::from_mode(0o700)).unwrap();
+        let path=crate::fixture_root("interrupt-scope-");
         let mut root=RootStore::initialize(&path,&mut crate::SystemEnvironment).unwrap();
         let source=crate::ExecutionInterrupt::new().unwrap();let inner=crate::ExecutionInterrupt::new().unwrap();
         inner.request(crate::ExecutionInterruptReason::Terminate).unwrap();
@@ -3718,6 +3987,19 @@ mod preparation_call_budget;
 
 #[cfg(target_os = "linux")]
 mod preparation_call;
+
+#[cfg(target_os = "linux")]
+mod preparation_confidentiality;
+#[cfg(target_os = "linux")]
+mod preparation_attribution;
+#[cfg(target_os = "linux")]
+mod preparation_admission;
+#[cfg(target_os = "linux")]
+mod preparation_transport;
+#[cfg(target_os = "linux")]
+mod preparation_prompt;
+#[cfg(target_os = "linux")]
+mod provider_network;
 #[cfg(target_os = "linux")]
 pub use preparation_call::{worker_error as preparation_worker_error,PreparationSend,PreparationCallCapabilities,PreparationApiRequest,execute_preparation_cli_gate,PreparationWorkerRequest,PreparationCliRequest,decode_send as decode_preparation_send,decode_stop as decode_preparation_stop,PreparationStop};
 

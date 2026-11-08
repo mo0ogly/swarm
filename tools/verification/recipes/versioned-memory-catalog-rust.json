@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "id": "versioned-memory-catalog-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/memory_catalog.rs",
+    "rust/crates/swarm-engine/src/project_memory.rs",
+    "rust/crates/swarm-engine/src/recorded_work.rs",
+    "rust/crates/swarm-engine/src/work.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/tests/memory_catalog_root.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/project_memory.rs",
+    "rust/crates/swarm-web/tests/project_memory.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/memory.rs",
+    "rust/crates/swarm-cli/tests/memory.rs",
+    "internal/engine/project_memory_public.go",
+    "internal/engine/dialogue_context.go",
+    "internal/engine/retex.go",
+    "internal/engine/memory_work.go",
+    "internal/engine/memory_work_test.go",
+    "tools/verification/recipes/versioned-memory-catalog-rust.json",
+    "rust/crates/swarm-engine/src/memory_summary_source.rs",
+    "internal/engine/memory_summary_source.go",
+    "internal/engine/memory_summary_source_test.go"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "catalog-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "memory_catalog",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 5 tests",
+        "test result: ok. 5 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "catalog-rootstore",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "memory_catalog_root",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 3 tests",
+        "test result: ok. 3 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "catalog-http",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-web",
+        "--test",
+        "project_memory",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 3 tests",
+        "test result: ok. 3 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "catalog-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "memory",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 8 tests",
+        "test result: ok. 8 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "summary-source-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "memory_summary_source",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 6 tests",
+        "test result: ok. 6 passed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

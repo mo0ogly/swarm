@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{spawn,execFileSync}=require('child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-templates-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-templates-'));
 const cli=(args,input)=>JSON.parse(execFileSync(binary,['--root',root,...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined}));
 cli(['init']);
 for(const file of ['.claude/skills/apex/SKILL.md','.claude/skills/debug/SKILL.md','tools/agent-workflows/CONTRACT.md']){const p=path.join(root,file);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,'Preparation only.');}

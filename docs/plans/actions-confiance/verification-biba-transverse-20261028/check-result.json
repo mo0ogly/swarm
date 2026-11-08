@@ -1,0 +1,25 @@
+{
+  "exit": 0,
+  "sources_stable": false,
+  "changed": [
+    "rust/crates/swarm-engine/src/root_store/cockpit_actions.rs"
+  ],
+  "argv": [
+    "cargo",
+    "check",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--lib"
+  ],
+  "profile": {
+    "dev_debug": "0",
+    "incremental": "0",
+    "test_fixtures_requested": false,
+    "effective_features_not_qualified": true
+  },
+  "qualification": false
+}

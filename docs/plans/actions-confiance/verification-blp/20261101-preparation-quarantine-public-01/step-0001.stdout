@@ -1,0 +1,34 @@
+OBSERVE pt-0e011ca9af40af09da8172e818106da8 running
+OBSERVE pt-0e011ca9af40af09da8172e818106da8 answered
+PASS valid-api-control-before-quarantine
+OBSERVE pt-29adbad572d4a71c05076db0250df68c running
+OBSERVE pt-29adbad572d4a71c05076db0250df68c answered
+PASS valid-cli-control-before-quarantine
+PASS actual-pending-engine-producer
+PASS actual-engaged-api-request-received
+PASS actual-http-operation-holds-egress-reservation
+PASS business-trust-reservation-remains-available
+PASS activation-cannot-publish-during-engaged-egress
+OBSERVE pt-63582f0d38a1ea9af4ae438fd1b668eb answered
+PASS engaged-operation-completes-before-quarantine
+PASS quarantine-persisted
+PASS api-send-explicitly-refuses
+PASS cli-send-explicitly-refuses
+PASS refusal-keeps-journal-budget-and-turns
+PASS refused-cli-api-send-no-socket-or-byte
+PASS pending-production-worker-refuses-at-claim
+PASS pending-refusal-no-socket-or-byte
+PASS unstarted-reservation-released-not-estimated
+{"state": "RUN", "case": "quarantine-http", "phase": "waiting-bound"}
+PASS http403-quarantine-refusal
+PASS http-refusal-no-socket-or-byte
+PASS explicit-disabled-state-reread
+OBSERVE pt-5c73b2ea1b498ecdfe38fdf44e4bef87 running
+OBSERVE pt-5c73b2ea1b498ecdfe38fdf44e4bef87 answered
+PASS explicit-recovery-resumes-legacy-egress
+PASS actual-engaged-cli-request-received
+PASS actual-cli-operation-holds-egress-reservation
+PASS activation-cannot-publish-during-cli-egress
+OBSERVE pt-fa0ebff61b46c05c9dff0b9a8526b181 answered
+PASS engaged-cli-completes-before-quarantine
+PASS second-explicit-disabled-state-reread

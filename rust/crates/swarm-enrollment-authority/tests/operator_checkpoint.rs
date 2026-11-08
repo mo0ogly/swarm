@@ -1,5 +1,6 @@
 #![cfg(target_os = "linux")]
 //! Actual private synthetic pin records; no keys/package/Root or current authority.
+mod common;
 use std::{error::Error as StdError, fs, os::unix::fs::PermissionsExt};
 use swarm_enrollment_authority::provisioning::{
     checkpoint::{self as c, Checkpoint},
@@ -22,7 +23,7 @@ fn record() -> Checkpoint {
 }
 /// Real current-owned private fixture; every operation explicitly closes itself.
 fn fixture() -> tempfile::TempDir {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(d.path(), fs::Permissions::from_mode(0o700)).unwrap();
     d
 }

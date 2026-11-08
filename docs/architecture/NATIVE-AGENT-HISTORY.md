@@ -1,10 +1,12 @@
 # Historique d’agents importé
 
-État : candidat en raccordement ; la version locale219 refuse encore `agent history`.
+État : livré et vérifié localement en version233, image `b11b4baf…`.
+Recette :102assertions sur45cas, générateur3tests ; livraison31contrôles et
+Version FR/EN14, plus8contrôles spécifiques, cinq travaux et réglages conservés.
 Le plan et les preuves courantes sont dans
 [AGENT-HISTORY-20261027](../plans/migration-rust/AGENT-HISTORY-20261027.md).
 
-Le parcours cible `agent history ID --root ROOT [--json]` lit le manifeste privé
+Le parcours `agent history ID --root ROOT [--json]` lit le manifeste privé
 `.swarm/imports/ID/manifest.json`. Il rend toujours du JSON, y compris sans `--json` :
 `{"historical_only":true,"history":...}`. Une histoire absente/null reste `null` ;
 les collections vides et les champs omis suivent le format Go. L’identifiant doit
@@ -12,7 +14,7 @@ les collections vides et les champs omis suivent le format Go. L’identifiant d
 
 ```mermaid
 flowchart LR
-    CLI[CLI agent history — cible] --> R[Root lié et réservation de lecture]
+    CLI[CLI agent history] --> R[Root lié et réservation de lecture]
     R --> F[Descripteurs privés imports / ID / manifest.json]
     F --> G[Graphe JSON historique figé Bundle]
     G --> H[Projection Cockpit historique]
@@ -44,3 +46,7 @@ La mémoire suit la taille du manifeste, sans nouveau plafond de lecture caché.
 Les restaurations de fichiers dans la recette sont exclusivement des fixtures
 inertes. Elles ne constituent pas une opération Rust d’import/restauration prise
 en charge, ni une autorisation de modifier les données privées d’un travail réel.
+
+Recette permanente : `tools/verification/recipes/agent-archive-history-rust.json`, binaire figé choisi par `SWARM_AGENT_HISTORY_BINARY`. Le générateur est rejoué sans lire les sources Go ; le Go local ne sert que d’oracle JSON de vérification.
+
+La recette finale comprend aussi deux contrôles du banc : fermeture SQLite après lecture valide et après échec d’itération. Ils ne testent aucune base vivante.

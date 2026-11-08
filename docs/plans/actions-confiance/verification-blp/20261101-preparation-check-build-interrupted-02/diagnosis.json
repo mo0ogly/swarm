@@ -1,0 +1,20 @@
+{
+  "status": "INCOMPLETE_INTERRUPTED",
+  "exit": 130,
+  "candidate_installed": false,
+  "original_evidence": ".cache/local-delivery/rust-zit1wgl1/build",
+  "observed_parent_pid": 1384186,
+  "owned_process_group": 1384152,
+  "action": "SIGINT to verified owned build group only; no foreign process stopped",
+  "cause": "new diagnostic business refusal HTTP500 reproduced while candidate compiling; stop obsolete build, fix typed HTTP mapping, requalify",
+  "resource_observation": "~7m build; compiling continued but two rustc plus foreign Git pack consumed memory; pack >6GiB RSS; this interruption does not turn incomplete build into PASS",
+  "reproducer": "20261101-preparation-http-status-before-01, unqualified compiled image, valid HTTP200 control then blp-access-denied HTTP500",
+  "artifacts": {
+    "build.stderr": "1867a2356a6238c3a12f146eff234d743374f14f1122e359bb5188b83fad87ef",
+    "build.stdout": "dc881442425ffd52afb46c23622f8b7e604644263538a854119c006380c8504f",
+    "build-metadata.json": "b5a2129b7752b084b9b2c2bb846ac376e191e6c70f1f5a595ab0b293c7b57ec3",
+    "profile-failure.json": "4f969e2b63df0e9aae93a24a42557534083adc9e577b51050188686add8006e5",
+    "invocation.json": "2f9e81b20c798ef31bebc6fe7dbe20d77725ebefffbb4aaa096a6c71298988eb",
+    "cargo.stderr": "8d30e87f6e7efc8e2b22079c2023015908c5f7f91e938e581ca36488c1095285"
+  }
+}

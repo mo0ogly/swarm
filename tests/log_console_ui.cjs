@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {spawn,execFileSync}=require('node:child_process');
 const puppeteer=require(process.env.PUPPETEER_MODULE||'puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-log-console-ui-'));let browser,server,page;const errors=[],csp=[],checks=[];
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-log-console-ui-'));let browser,server,page;const errors=[],csp=[],checks=[];
 const cli=(...a)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...a],{encoding:'utf8'}));
 const write=(a,data)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...a,'--input','-'],{encoding:'utf8',input:JSON.stringify(data)}));
 const mutate=(a,revision,fields)=>write(a,{schema_version:1,event_id:crypto.randomUUID(),expected_revision:revision,...fields}).work;

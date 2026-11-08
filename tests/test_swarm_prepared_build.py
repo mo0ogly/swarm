@@ -4,6 +4,7 @@ Synthetic records are unit fixtures only. The public lifecycle test requires an
 actual retained qualified build supplied by the caller; no compilation, provider
 call, live Root or global watchdog. Preserve production binary originals.
 """
+from fixture_area import fixture_area
 import hashlib, importlib.util, json, os, shutil, socket, subprocess, sys, tarfile, tempfile, unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -36,7 +37,7 @@ def fixture(root):
 class PreparedUnit(unittest.TestCase):
     """Check gate failures against a valid synthetic witness, no process exec."""
     def test_valid_copy_preserves_binary_and_pending_sources(self):
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as d:
             f=fixture(Path(d));publish(f.root/'version_history.json',{'changed':'pending'})
             builder=SimpleNamespace(profile=SimpleNamespace(digest=sha,publish=publish))
             with patch.object(version,'native_builder',return_value=builder),patch.object(version,'verify_candidate') as verify:
@@ -44,7 +45,7 @@ class PreparedUnit(unittest.TestCase):
             self.assertEqual(candidate.read_bytes(),f.frozen.read_bytes());self.assertEqual(f.binary.read_bytes(),b'PRIOR');self.assertEqual(state,f.state);verify.assert_called_once();candidate.unlink()
     def test_rejections_keep_binary_and_do_not_probe(self):
         for fault in ['selection','status','feature','metadata','archive','artifact','inventory']:
-            with self.subTest(fault=fault),tempfile.TemporaryDirectory() as d:
+            with self.subTest(fault=fault),tempfile.TemporaryDirectory(dir=fixture_area()) as d:
                 f=fixture(Path(d));expected=f.digest
                 if fault=='selection':expected='0'*64
                 elif fault=='status':f.built['status']='FAIL';publish(f.evidence/'build/result.json',f.built)
@@ -59,7 +60,7 @@ class PreparedUnit(unittest.TestCase):
                     verify.assert_not_called()
                 self.assertEqual(f.binary.read_bytes(),b'PRIOR');self.assertEqual(list(f.binary.parent.glob('*.candidate-*')),[])
     def test_artifact_race_refuses_before_probe(self):
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as d:
             f=fixture(Path(d))
             def raced(path):
                 """Change only the owned inert file after its first valid digest."""
@@ -79,7 +80,7 @@ class PreparedUnit(unittest.TestCase):
 class PreparedLifecycle(unittest.TestCase):
     """Exercise actual start/refusal/recovery/stop through the public launcher."""
     def test_public_prepared_restart_and_tamper_refusal(self):
-        with tempfile.TemporaryDirectory(prefix='swarm-prepared-lifecycle-') as d:
+        with tempfile.TemporaryDirectory(prefix='swarm-prepared-lifecycle-', dir=fixture_area()) as d:
             root=Path(d);source=root/'source';project=root/'project';source.mkdir();project.mkdir()
             for name in ['tools/swarm_local.py','tools/swarm_version.py','tools/rust-migration/build_native.py','tools/verification/verify_native_profile.py']:
                 dst=source/name;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(SOURCE/name,dst)

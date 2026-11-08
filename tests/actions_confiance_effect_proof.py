@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Public regression of protected evidence chains and exact effect receipts."""
 import argparse,base64,hashlib,json,os,subprocess,tempfile,time,uuid
+from fixture_area import fixture_area
 from pathlib import Path
 p=argparse.ArgumentParser()
 p.add_argument('--binary',type=Path,required=True)
@@ -24,7 +25,7 @@ def cli(root,operation,data=None,actor=None,expected=0):
   raise AssertionError('public flow failed; private original retained')
  return json.loads(r.stdout) if r.stdout.strip() else None
 def fixture(access=False):
- root=Path(tempfile.mkdtemp(prefix='swarm-effect-proof-'));roots.append(str(root));cli(root,'init')
+ root=Path(tempfile.mkdtemp(prefix='swarm-effect-proof-', dir=fixture_area()));roots.append(str(root));cli(root,'init')
  config=body(expected_revision=0,reason='isolated evidence proof regression',policy=dict(mandate_ttl_seconds=3600,unknown_reconcile_seconds=0,evidence_retention_days=365,require_separation=True),identities=[dict(subject=k,token=v,integrity=3 if k=='admin' else 1 if k=='requester' else 2,roles=[k if k!='admin' else 'admin']) for k,v in tokens.items()])
  cli(root,'trust config-apply',config)
  connector=dict(id='local-access-simulation',version=1,access=dict(subject='employee',role='reader')) if access else None

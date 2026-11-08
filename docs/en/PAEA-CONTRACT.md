@@ -48,6 +48,18 @@ Delivery 15 qualified these commands on the native profile and installed dev80.
 The historical build restriction was lifted; earlier evidence retains its
 original scope.
 
+## Bell-LaPadula confidentiality: qualification mapping
+
+The [BLP-to-PAEA mapping](plans/actions-confiance/PAEA-APEX.md#bell-lapadula-integration--october-31-2026)
+specifies confidentiality criteria independently from Biba: levels and
+compartments, propagation to derived outputs, effective recipient controls and
+exact human declassification. These extend PA-02/04/05/06/08/09 and their checks
+without changing the v1 data schema or historical canonical bytes. Supplied
+labels remain non-authoritative; protected attribution and consumption need
+separate evidence. This documentary mapping proves neither confinement,
+non-disclosure nor transversal qualification. States remain in the PAEA register
+and technical evidence in [BLP tracking](plans/actions-confiance/BLP-APEX.md).
+
 ## Representation and validation
 
 `schemas/paea/contract-v1.schema.json` describes document/proposal/context/approval/

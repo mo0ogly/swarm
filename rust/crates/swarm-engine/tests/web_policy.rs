@@ -179,9 +179,7 @@ fn web_policy_saved_preview_replay_and_readback_keep_original_history() {
         EngineSettingsChange, RootStore, SettingCap, SettingCount, SystemEnvironment,
     };
     let root =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("web-policy94-").unwrap());
-    fs::create_dir(&root).unwrap();
-    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        swarm_engine::fixture_root("web-policy94-");
     let r = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
     let before = r.settings().unwrap();
     let db = fs::read(root.join(".swarm/state.db")).unwrap();

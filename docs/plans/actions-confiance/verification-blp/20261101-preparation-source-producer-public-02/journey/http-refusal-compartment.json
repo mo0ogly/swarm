@@ -1,0 +1,10 @@
+{
+  "status": 403,
+  "body": {
+    "error": "blp-access-denied",
+    "failure": {
+      "code": "blp-access-denied"
+    },
+    "schema_version": 1
+  }
+}

@@ -19,6 +19,8 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tests"))
+from fixture_area import fixture_area  # noqa: E402 — operator /tmp interdiction
 REQUIRED = {
     "TestSQLiteAuditPlanning",
     "TestSQLiteAuditReview",
@@ -88,7 +90,7 @@ def measurement_summary(path):
 
 
 def measure(runner, baseline_ref):
-    with tempfile.TemporaryDirectory(prefix="sqlite-contention-qualification-") as folder:
+    with tempfile.TemporaryDirectory(prefix="sqlite-contention-qualification-", dir=fixture_area()) as folder:
         temp = Path(folder)
         baseline = temp / "baseline"
         baseline.mkdir()

@@ -51,15 +51,59 @@
     "tests/rust_preparation_plan.py",
     "tests/rust_preparation_reads.py",
     "tests/rust_project_memory_source.py",
+    "tests/fixture_area.py",
     "rust/crates/swarm-engine/examples/memory_source_fixture.rs",
-    "rust/crates/swarm-engine/src/root_store/preparation_call_legacy.rs"
+    "rust/crates/swarm-engine/src/root_store/preparation_call_legacy.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs"
   ],
   "environment": {
     "CARGO_INCREMENTAL": "0",
-    "CARGO_TARGET_DIR": ".cache/rust-native-version846-target",
-    "SWARM_PREPARATION_DISABLED": "0"
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "SWARM_PREPARATION_DISABLED": "0",
+    "SWARM_PROJECT_MEMORY_SEEDER": "{root}/.cache/blp-verification-target/debug/examples/memory_source_fixture"
   },
   "steps": [
+    {
+      "id": "fixture-placement-guard",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--example",
+        "memory_source_fixture",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "explicit_fixture_area_guard_retains_refusals",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "fixture-memory-sidecar",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--example",
+        "memory_source_fixture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
     {
       "id": "public-cli-http-browser",
       "command": [
@@ -69,7 +113,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "PREPARATION_CALLS_PASS 34",
+        "PREPARATION_CALLS_PASS 35",
         "PREPARATION_CALLS_BROWSER_PASS 48",
         "PASS exact-replay-no-second-contact",
         "PASS work-refusal-no-turn-or-prep-debit",
@@ -127,8 +171,26 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "running 7 tests",
-        "test result: ok. 7 passed; 0 failed"
+        "running 18 tests",
+        "test result: ok. 18 passed; 0 failed",
+        "test root_store::preparation_call::level_tests::levels_normalize_routing_without_inventing_a_choice ... ok",
+        "test root_store::preparation_call::level_tests::private_versions_refuse_ambiguous_or_api_explicit_level ... ok",
+        "test root_store::preparation_call::level_tests::v1_encoding_omits_new_field_and_v2_retains_exact_request ... ok",
+        "test root_store::preparation_call::level_tests::v3_requires_provenance_and_preserves_cli_level_validation ... ok",
+        "test root_store::preparation_call::level_tests::private_record_refuses_changed_prompt_before_worker_and_recovers ... ok",
+        "test root_store::preparation_call::cli::level_tests::only_typed_selection_refusals_become_unavailable_modes ... ok",
+        "test root_store::preparation_call::cli::level_tests::workspace_path_stays_inside_root_outside_private_scope_and_tmp ... ok",
+        "test root_store::preparation_call_budget::tests::prep_limit_and_corrupt_ledger_refuse_without_insert ... ok",
+        "test root_store::preparation_call_budget::tests::triggers_cannot_replace_exact_state_or_amount ... ok",
+        "test root_store::preparation_call_budget::tests::unlimited_reserves_zero_and_attempt_is_never_refunded ... ok",
+        "test engine_settings::preparation_calls::tests::defaults_are_complete_disabled_and_versioned ... ok",
+        "test engine_settings::preparation_calls::tests::partial_null_zero_and_switch_are_distinct ... ok",
+        "test engine_settings::preparation_calls::tests::legacy_absence_is_not_adopted ... ok",
+        "test engine_settings::preparation_calls::tests::timeout_and_header_representation_refuse ... ok",
+        "test root_store::preparation_call::legacy::tests::amended_preserves_private_unknown_and_ordered_fields ... ok",
+        "test root_store::preparation_call::legacy::tests::explicit_null_native_refuses_legacy_fallback ... ok",
+        "test root_store::preparation_call::confidentiality_tests::captured_source_reuses_caller_transaction_and_refuses_corruption ... ok",
+        "test root_store::preparation_call::confidentiality_tests::recorded_sources_authentication_join_refusal_and_recovery ... ok"
       ],
       "required_stderr": []
     },
@@ -148,14 +210,15 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "running 6 tests",
-        "test result: ok. 6 passed; 0 failed",
+        "running 7 tests",
+        "test result: ok. 7 passed; 0 failed",
         "test commit_failure_rolls_back_for_same_root_reuse ... ok",
         "test physical_root_switch_refuses_and_owned_restore_recovers ... ok",
         "test last_write_witness_refuses_turn_and_budget_drift ... ok",
         "test changed_source_and_policy_refuse_before_contact ... ok",
         "test legacy_terminal_replay_without_native_authority ... ok",
-        "test legacy_active_replay_remains_explicitly_unported ... ok"
+        "test legacy_active_replay_is_readonly_without_native_authority ... ok",
+        "test confidential_admission_is_fixed_authenticated_and_never_dispatchable ... ok"
       ],
       "required_stderr": []
     }

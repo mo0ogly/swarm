@@ -3,6 +3,7 @@
   "id": "mission-manual-automatic-controls",
   "inputs": [
     "rust/crates/swarm-cli/src/mission_watch.rs",
+    "rust/crates/swarm-cli/src/mission_watch/role_job.rs",
     "rust/crates/swarm-engine/config/engine-settings-catalog.json",
     "rust/crates/swarm-engine/config/engine-settings.json",
     "rust/crates/swarm-engine/src/agent_completion_journal.rs",
@@ -13,10 +14,14 @@
     "rust/crates/swarm-engine/src/mission_agent.rs",
     "rust/crates/swarm-engine/src/mission_supervision_store.rs",
     "rust/crates/swarm-engine/src/native_diagnostics.rs",
+    "rust/crates/swarm-engine/src/planning_run_material.rs",
     "rust/crates/swarm-engine/src/root_store.rs",
     "rust/crates/swarm-engine/src/root_store/agent_execution_origin.rs",
     "rust/crates/swarm-engine/src/root_store/mission_producer.rs",
     "rust/crates/swarm-engine/src/root_store/mission_report_relay.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_native.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_stale_gate.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_step.rs",
     "rust/crates/swarm-engine/src/root_store/review_preview.rs",
     "rust/crates/swarm-engine/src/root_store/review_preview/*.rs",
     "rust/crates/swarm-engine/src/root_store/reviewer_native/*.rs",
@@ -57,12 +62,35 @@
     "tests/rust_planning_rejection_recovery.py",
     "tests/rust_planning_worker_public_flow.py",
     "tests/rust_workspace_fifo_completion.py",
+    "tests/test_rust_async_role_completion.py",
+    "tests/test_rust_manual_provider_roles.py",
     "tests/test_rust_mission_control_helpers.py",
-    "tests/test_rust_report_relay_guards.py",
-    "tests/test_rust_async_role_completion.py"
+    "tests/test_rust_report_relay_guards.py"
   ],
   "environment": {},
   "steps": [
+    {
+      "id": "three-inert-provider-roles",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_manual_provider_roles.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_current_planner_delivery_and_worker_use_same_frozen_program",
+        "test_malformed_planner_never_falls_back_to_successful_worker",
+        "Ran 2 tests",
+        "OK"
+      ]
+    },
     {
       "id": "async-role-completion-guards",
       "command": [

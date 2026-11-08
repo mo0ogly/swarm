@@ -1,0 +1,13 @@
+{
+  "docs/architecture/BIBA-RUST.md": "39330c7d97721cb91d0a138724c911df8b4a5e0236e11a420621512c36516ca0",
+  "docs/en/BIBA-RUST.md": "bc7da91a972c18169211c00ddfa5a9dd0c9a69e2bb6a9a5c9a64d529c95dfa12",
+  "rust/Cargo.lock": "b6b62cceb791ded1310d66f73181c2b99ee886f352083ccd0ad5c5cc9a5afa37",
+  "rust/crates/swarm-biba-linux/Cargo.toml": "c730a232832331d2cbd4614f8b93eb1a6f0f2adf24301e5b2abddf5212656b1d",
+  "rust/crates/swarm-biba-linux/src/kernel.rs": "6949a9592675cea6feecbce9f87daee4d32ea0cbd5e15fc371b0bb8b20340514",
+  "rust/crates/swarm-biba-linux/src/lib.rs": "ee7964ccc8b7000c4453e1c404d3b8ae60f00d6c02750b4505f2a893c42ae7c9",
+  "tests/rust_agent_model_route.py": "fa2bad462b761024c15d3705ac26996385cb53e7b41bf4ae409a11570bf18145",
+  "tests/rust_biba_boundary_driver.rs": "5586ee284fef44808f10c8beffa83c940be11c4f8de388dec94fc9eba6aca802",
+  "tests/rust_biba_linux_boundary.py": "a4c4dffb6cf05918f81464cb62b412b25a118a36e16570a8e79d492cb345d9c6",
+  "tests/rust_biba_linux_boundary_build.py": "37e1a36444cb6e32a48f4f295e23e32b1073a274607f458c45ab5852f9a347b6",
+  "tools/verification/recipes/biba-linux-boundary.json": "af493ca6e80f5c107383d6d3cc6fb424b5b0f3ea433d58b680961bdacdac8f11"
+}

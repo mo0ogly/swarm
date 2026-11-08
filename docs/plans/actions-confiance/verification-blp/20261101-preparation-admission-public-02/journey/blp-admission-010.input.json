@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "action": "budget",
+  "preparation_id": "prep-fa8847b0c33183273f594550",
+  "event_id": "budget",
+  "expected_revision": 1,
+  "budget": {
+    "limit_usd": 10,
+    "reserve_per_launch_usd": 0.5,
+    "estimate_source": "inert fixture",
+    "reference_date": "2026-11-01"
+  }
+}

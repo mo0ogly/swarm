@@ -220,7 +220,7 @@ def cli_failure(argv,result):
     """
     error=NativeCliFailure(argv,result)
     try:
-        directory=Path(tempfile.mkdtemp(prefix='swarm-native-cli-failure-'))
+        directory=retained.fixture_root('swarm-native-cli-failure-')
         assert directory.stat().st_mode&0o777==0o700 and directory.stat().st_uid==os.getuid()
         error.evidence_directory=directory
         error.add_note('Original private CLI diagnostics retained at '+str(directory))
@@ -245,8 +245,13 @@ def cli(binary,root,arguments):
 
 
 def owned_root(binary):
-    """Create private disposable fixture and explicitly initialize it through CLI."""
-    root=Path(tempfile.mkdtemp(prefix='swarm-cli-http97-'));assert root.stat().st_mode&0o777==0o700
+    """Create private fixture root in the repository area and initialize it through CLI.
+
+    The root lives under `.swarm-fixtures/`, never `/tmp` (operator
+    interdiction): retained evidence must survive reboot. Not disposable:
+    callers own retention and the documented regeneration path applies.
+    """
+    root=retained.fixture_root('swarm-cli-http97-');assert root.stat().st_mode&0o777==0o700
     try:cli(binary,root,['init'])
     except BaseException as error:
         error.add_note('Owned initialization fixture retained at '+str(root));raise

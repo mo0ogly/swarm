@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-check-public",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "qualified-preparation-sources-cli-http",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-preparation-proof-')/'journey'; subprocess.run(['python3','tests/blp_preparation_check.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_PREPARATION_CLI_HTTP_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "exit": 1,
+      "seconds": 25.40670237800805,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "47d175442e9edf93bafdac9d17c668c38f079436be82749a33bcadd937bd67a3",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "31b6d281821ec8a9e0cae638c45559794654a60b68781ab4dc277d0e77fc71dc",
+    "declared-inputs.tar.gz": "fcf08fe3d055a910f764a91d67b5dc4a6c5420ee2b85813bd86d8f6cac1a0847",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "01180e7d7c273f935605a18bbe2aeb47352ce797dde3d808c1de91a396edb6ea",
+    "step-0001.stderr": "e31e094f7d17bbfeda642afff623e7c66ad95e31b3d1458840dc11d2d1448329",
+    "step-0001.json": "4ffabb8dcb3b7abe9ed1c2202b085cd7a62dc47af961a21e68f4fac0c6f7f552",
+    "inputs.after.json": "31b6d281821ec8a9e0cae638c45559794654a60b68781ab4dc277d0e77fc71dc"
+  }
+}

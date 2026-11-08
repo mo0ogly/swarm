@@ -21,9 +21,7 @@ fn exchange(address: std::net::SocketAddr, request: String) -> String {
 /// must leave Work/settings unchanged and shutdown must close owned resources.
 #[test]
 fn native_transport_real_tcp_gates_before_root_and_drains_owned_jobs() {
-    let p = std::env::temp_dir().join(swarm_engine::generate_identifier("transport95-").unwrap());
-    fs::create_dir(&p).unwrap();
-    fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+    let p = swarm_engine::fixture_root("transport95-");
     RootStore::initialize(&p, &mut SystemEnvironment)
         .unwrap()
         .close()
@@ -79,7 +77,7 @@ fn native_transport_real_tcp_gates_before_root_and_drains_owned_jobs() {
     assert!(capabilities.starts_with("HTTP/1.1 200"));
     let capabilities: serde_json::Value =
         serde_json::from_str(capabilities.split_once("\r\n\r\n").unwrap().1).unwrap();
-    assert_eq!(capabilities["actions"], serde_json::json!(["task"]));
+    assert_eq!(capabilities["actions"], serde_json::json!(["task", "task-add"]));
     assert_eq!(
         capabilities["settings"],
         serde_json::json!(["describe", "show", "preview", "apply"])
@@ -117,10 +115,7 @@ fn native_transport_real_tcp_gates_before_root_and_drains_owned_jobs() {
 fn native_transport_enforces_saved_header_and_body_limits_then_recovers() {
     use sha2::{Digest, Sha256};
     use swarm_engine::{EngineSettingsChange, SettingCap, SettingCount};
-    let p = std::env::temp_dir()
-        .join(swarm_engine::generate_identifier("transport-limits95-").unwrap());
-    fs::create_dir(&p).unwrap();
-    fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+    let p = swarm_engine::fixture_root("transport-limits95-");
     let r = RootStore::initialize(&p, &mut SystemEnvironment).unwrap();
     let document = r.settings().unwrap();
     let mut values = document.values;
@@ -217,10 +212,7 @@ fn header_block(stream: &mut TcpStream) -> String {
 fn native_transport_root_admin_lanes_and_pre_root_shutdown_are_distinct() {
     use sha2::{Digest, Sha256};
     use swarm_engine::{EngineSettingsChange, SettingCap, SettingCount};
-    let p =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("transport-lanes95-").unwrap());
-    fs::create_dir(&p).unwrap();
-    fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+    let p = swarm_engine::fixture_root("transport-lanes95-");
     let r = RootStore::initialize(&p, &mut SystemEnvironment).unwrap();
     let document = r.settings().unwrap();
     let mut values = document.values;
@@ -319,10 +311,7 @@ fn native_transport_root_admin_lanes_and_pre_root_shutdown_are_distinct() {
 fn native_transport_connection_cap_is_persisted_consumed_and_released() {
     use sha2::{Digest, Sha256};
     use swarm_engine::{EngineSettingsChange, SettingCap, SettingCount};
-    let p = std::env::temp_dir()
-        .join(swarm_engine::generate_identifier("transport-connections95-").unwrap());
-    fs::create_dir(&p).unwrap();
-    fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+    let p = swarm_engine::fixture_root("transport-connections95-");
     let r = RootStore::initialize(&p, &mut SystemEnvironment).unwrap();
     let document = r.settings().unwrap();
     let mut values = document.values;

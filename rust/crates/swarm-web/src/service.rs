@@ -1,7 +1,9 @@
 //! Typed HTTP dispatcher with a separate owner-observed HTTP/1 transport.
 //! Supported Go paths are deliberately partial; unknown operations never fall back.
-use crate::{LocalWebAuthority, WebAccessError};
+use crate::{LocalWebAuthority, WebAccessError, WebPrincipal};
 mod listener;
+#[cfg(test)]
+mod status_tests;
 mod live;
 mod live_events;
 mod otel;
@@ -12,9 +14,21 @@ mod transport;
 pub use transport::{NativeOutcomeObserver, NativeRequestError, NativeServerReport};
 mod observation;
 mod settings;
+mod paea_reconcile;
 mod trust;
 mod trust_enrollment;
 pub use trust_enrollment::{TrustEnrollmentSource, TrustEnrollmentSourceError};
+#[cfg(target_os = "linux")]
+mod paea_git_call;
+mod paea_git_call_preview;
+#[cfg(target_os = "linux")]
+mod paea_git_call_approval;
+#[cfg(target_os = "linux")]
+pub use paea_git_call::{PaeaGitCallAuthority, PaeaGitCallSourceError};
+#[cfg(target_os = "linux")]
+pub use paea_git_call::PaeaGitCallSource;
+#[cfg(target_os = "linux")]
+pub use paea_git_call::PaeaGitCallApprovalSource;
 mod paea;
 mod planning;
 mod lifecycle_inventory;
@@ -38,6 +52,7 @@ mod activity;
 mod activity_policy;
 mod exchanges;
 mod graph_performance;
+mod graph_batch;
 mod web_request_policy;
 mod run_limits_admin;
 mod api_connection_probe;
@@ -79,6 +94,10 @@ pub struct RecordedConfiguration {
 pub enum HttpServiceError {
     /// Independent trusted-source startup/close causes beside any earlier error.
     EnrollmentSource { primary: Option<Box<Self>>, cause: Box<TrustEnrollmentSourceError> },
+    /// Independent prepared-git-call startup/close causes beside any earlier
+    /// error. A close failure is never consumption; no grant or head exists.
+    #[cfg(target_os = "linux")]
+    GitCallSource { primary: Option<Box<Self>>, cause: Box<PaeaGitCallSourceError> },
     /// Local output failure after a manual probe; possible contact survives.
     ProviderProbe { primary: Box<Self>, receipt: std::sync::Arc<ProviderProbeReceipt> },
     /// A known preparation receipt preceded a later response/close failure.
@@ -159,6 +178,8 @@ impl HttpServiceError {
     /// encoding errors. None is unknown, never proof of rollback or retry safety.
     pub fn trust_publication(&self)->Option<&'static str>{match self{
       Self::EnrollmentSource{primary,..}=>primary.as_deref().and_then(Self::trust_publication),
+      #[cfg(target_os = "linux")]
+      Self::GitCallSource{primary,..}=>primary.as_deref().and_then(Self::trust_publication),
       Self::Root{cause,..}=>cause.trust_publication(),
       Self::Close{primary,cleanup}=>primary.as_deref().and_then(Self::trust_publication).or_else(||cleanup.trust_publication()),
       Self::ResponseEncoding{primary,..}|Self::AuxiliaryState{primary,..}|Self::Recorded{primary,..}|Self::ConfigurationState{primary}|Self::ConfigurationRecorded{primary,..}|Self::SessionState{primary}=>primary.trust_publication(),_=>None,
@@ -168,6 +189,8 @@ impl HttpServiceError {
     pub fn code(&self) -> &'static str {
         match self {
             Self::EnrollmentSource { .. } => "web-trust-enrollment-source",
+            #[cfg(target_os = "linux")]
+            Self::GitCallSource { .. } => "web-paea-git-call-source",
             Self::ProviderProbe { primary, .. } => primary.code(),
             Self::ConfigurationState { .. } | Self::ConfigurationRecorded { .. } => {
                 "web-configuration-state-preserved"
@@ -290,15 +313,18 @@ impl HttpServiceError {
     /// revision/owners use409, invalid proposals400 and unsupported windows501.
     /// No retry, rollback or authentication decision is inferred from this code.
     fn status(&self) -> StatusCode {
+        if let Self::Root{operation,cause}=self {if let Some(status)=graph_batch::status(operation,cause){return status}}
         if self.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}
         if let Self::Root{cause,..}=self {if cause.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}
-        if let Some(e)=cause.trust_failure(){return match e{swarm_engine::TrustError::Authorization=>StatusCode::FORBIDDEN,swarm_engine::TrustError::Conflict(_)|swarm_engine::TrustError::Integrity(_)=>StatusCode::CONFLICT,swarm_engine::TrustError::Unsupported(_)=>StatusCode::NOT_IMPLEMENTED,_=>StatusCode::BAD_REQUEST};}}
+        if let Some(e)=cause.trust_failure(){return match e{swarm_engine::TrustError::Authorization|swarm_engine::TrustError::Data(_)=>StatusCode::FORBIDDEN,swarm_engine::TrustError::Conflict(_)|swarm_engine::TrustError::Integrity(_)=>StatusCode::CONFLICT,swarm_engine::TrustError::Unsupported(_)=>StatusCode::NOT_IMPLEMENTED,_=>StatusCode::BAD_REQUEST};}}
 
         if self.recorded_preparation().is_some() || self.recorded_work().is_some() || self.configuration_may_be_recorded() {
             return StatusCode::INTERNAL_SERVER_ERROR;
         }
         match self {
             Self::EnrollmentSource { .. } => StatusCode::INTERNAL_SERVER_ERROR,
+            #[cfg(target_os = "linux")]
+            Self::GitCallSource { .. } => StatusCode::INTERNAL_SERVER_ERROR,
             Self::ProviderProbe {..}=>StatusCode::INTERNAL_SERVER_ERROR,
             Self::ConfigurationState { .. }
             | Self::ConfigurationRecorded { .. }
@@ -326,6 +352,24 @@ impl HttpServiceError {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
             Self::Refused("web-root-binding-changed" | "budget-revision-conflict" | "preparation-stale-plan" | "preparation-already-released") => StatusCode::CONFLICT,
+            // BLP reader-frontier guard codes (BLP-RET-05, BF-16a dialogue,
+            // BF-16b show/history): a refused classified projection is a
+            // caller authorization state, never a bad request — the reconcile,
+            // dialogue, show, history and release-review routes' reader
+            // refusals rely on this mapping to stay an observable 403
+            // instead of a silent empty success.
+            Self::Refused(
+                "paea-reader-authentication-required"
+                | "paea-reader-policy-required"
+                | "paea-reader-policy-stale"
+                | "paea-reader-attribution-required"
+                | "paea-reader-attribution-mismatch"
+                | "paea-reader-access-denied"
+                | "blp-dialogue-authentication-required"
+                | "blp-dialogue-policy-required"
+                | "blp-dialogue-policy-stale"
+                | "blp-dialogue-access-denied",
+            ) => StatusCode::FORBIDDEN,
             Self::Refused("web-route-unported" | "live-agent-unknown" | "live-run-unknown" | "live-task-unknown") => StatusCode::NOT_FOUND,
             Self::Refused(
                 "web-operation-unported" | "preparation-release-scope-unported"
@@ -335,10 +379,54 @@ impl HttpServiceError {
                 StatusCode::NOT_IMPLEMENTED
             }
             Self::Root { operation, cause } => match cause.code() {
+                "blp-preparation-quarantined" if *operation=="preparation-call" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
+                // Only these typed Trust diagnostic refusals are caller states.
+                // Corrupt provenance, storage and wrapped cleanup stay server errors.
+                "blp-access-denied" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
+                "blp-policy-required"|"blp-policy-stale"|"blp-classification-required"|"blp-preparation-provenance-required"|"blp-preparation-parent-mismatch"|"preparation-revision-conflict"|"blp-admission-event-conflict"|"blp-admission-policy-changed"
+                    if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "preparation-send-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Preparation(_))=>StatusCode::BAD_REQUEST,
+                "preparation-send-invalid"|"preparation-message-over-limit"|"preparation-context-over-limit"
+                    if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
+                "preparation-capability-stale"|"preparation-method-unavailable"|"preparation-stale-method"|"preparation-turn-active"|"preparation-call-disabled"
+                    if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "blp-admission-invalid"|"blp-preparation-check-invalid"|"blp-preparation-attribute-invalid"|"blp-classification-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
+                "blp-transport-invalid"|"blp-destination-invalid"|"blp-destination-echo-mismatch" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
+                "blp-destination-not-attributed" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
+                "blp-transport-connection-changed"|"blp-transport-provider-source-changed"|"blp-transport-settings-changed" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "blp-admission-not-found"|"preparation-turn-not-found"|"blp-preparation-source-not-found" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
+                "blp-preparation-platform-unsupported" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
                 "project-profile-conflict" if matches!(*operation,"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
                 "project-profile-choice-unknown" if *operation=="project-profile-write" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
-                _ if project_profile::caller_invalid(operation,cause.as_ref()) && !matches!(cause.as_ref(),RootStoreError::Context(e) if e.reason()=="versioned-memory-source-guard-not-ported")=>StatusCode::BAD_REQUEST,
-                "project-context-invalid" if matches!(*operation,"project-profile-read"|"preparation-call"|"project-profile-catalog"|"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Context(error) if error.reason()=="versioned-memory-source-guard-not-ported" && error.cleanup_cause().is_none())=>StatusCode::NOT_IMPLEMENTED,
+                // The versioned-memory guard is ported (project_memory_source.rs),
+                // so the dedicated unported-memory 501 mapping is retired: caller
+                // input failures are 400 through caller_invalid, SQL/inventory
+                // failures keep their server-error default, and a refusal for the
+                // managed canonical guide source is the typed caller refusal
+                // project-source-memory-managed (also 400 here).
+                _ if project_profile::caller_invalid(operation,cause.as_ref())=>StatusCode::BAD_REQUEST,
+                // MemoryError family through Mutation(WorkEngineError::Memory(e)):
+                // caller states only; SQL/row/identity corruption stays server error.
+                _ if project_memory::memory_caller_status(operation,cause.as_ref()).is_some()
+                    => project_memory::memory_caller_status(operation,cause.as_ref()).unwrap(),
+                // Extractive-summary admission and before-start refusals (Launch):
+                // caller/state conflicts; storage, commit and cleanup stay server errors.
+                "agent-launch-summary-branch-unported"
+                | "agent-launch-summary-selection-incomplete"
+                | "agent-launch-summary-context-hash-required"
+                    if matches!(cause.as_ref(),RootStoreError::Launch(e) if matches!(e.as_ref(),swarm_engine::AgentLaunchError::Refused(_)))=>StatusCode::BAD_REQUEST,
+                "agent-launch-summary-sources-changed"
+                    if matches!(cause.as_ref(),RootStoreError::Launch(e) if matches!(e.as_ref(),swarm_engine::AgentLaunchError::Refused(_)))=>StatusCode::CONFLICT,
+                "agent-launch-summary-selection-invalid"
+                    if matches!(cause.as_ref(),RootStoreError::Launch(error) if matches!(error.as_ref(),swarm_engine::AgentLaunchError::Cause{..}))=>StatusCode::BAD_REQUEST,
+                // Before-start receipt refusals surface from the supervision
+                // startup writer as Launch errors (record_permission returns
+                // AgentLaunchError; agent_supervision wraps it in Launch), so
+                // the guard matches Launch, not the Agent store family. Both
+                // are state conflicts the caller resolves by re-examination.
+                "agent-execution-summary-sources-changed-before-start"
+                | "agent-execution-summary-sources-stale"
+                    if matches!(cause.as_ref(),RootStoreError::Launch(_))=>StatusCode::CONFLICT,
                 "settings-context-policy-not-configured" if matches!(*operation,"project-profile-read"|"preparation-call"|"project-profile-catalog"|"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
                 "settings-revision-conflict"
                 | "settings-event-conflict"
@@ -392,7 +480,26 @@ impl HttpServiceError {
                 "preparation-source-range"|"preparation-source-start-beyond-file"|"preparation-source-path-refused"|"preparation-source-type-refused"|"preparation-source-scope-refused"|"preparation-source-not-regular"|"preparation-source-file-over-limit"|"preparation-source-excerpt-over-limit"|"preparation-source-binary"|"preparation-source-utf8"|"preparation-source-secret"|"preparation-source-count-over-limit"|"preparation-source-total-over-limit"|"preparation-source-query-over-limit"|"preparation-source-absent"
                     if matches!(*operation,"preparation-read"|"preparation-command") && matches!(cause.as_ref(),RootStoreError::Refused(_)|RootStoreError::Preparation(_))=>StatusCode::BAD_REQUEST,
                 "preparation-dialogue-active-unported" if matches!(*operation,"preparation-read"|"preparation-call") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
+                // BLP-RET-05 / BF-16a dialogue frontier: the dialogue route's real
+                // adapter (service/preparations.rs `encode`) forwards the engine
+                // read as Root{operation:"preparation-read"}, so the four typed
+                // reader refusals are classified HERE, on the exact bare Refused
+                // variant. A Cleanup wrapper keeps its own "root-cleanup" family
+                // and stays a server error: a close/rollback failure must never be
+                // reclassified as a caller authorization state, and its refused
+                // primary remains inspectable through the typed causes.
+                "blp-dialogue-authentication-required"|"blp-dialogue-policy-required"|"blp-dialogue-policy-stale"|"blp-dialogue-access-denied"
+                    if *operation=="preparation-read" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
+                // BF-16c send/stop frontiers: the same four typed reader
+                // refusals arrive here under operation "preparation-call" (the
+                // send/stop route's adapter). Same exact-bare-Refused rule as
+                // the dialogue arm above: a Cleanup wrapper stays a server
+                // error, never a caller authorization state.
+                "blp-dialogue-authentication-required"|"blp-dialogue-policy-required"|"blp-dialogue-policy-stale"|"blp-dialogue-access-denied"
+                    if *operation=="preparation-call" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
                 "preparation-organization-mode-unported" | "preparation-organization-worker-role-required" | "preparation-release-scope-unported" => StatusCode::NOT_IMPLEMENTED,
+                // Declared port boundary of the planning-tree status read, not a server fault.
+                "mission-status-planning-unported" if *operation == "read" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_IMPLEMENTED,
                 "command_not_ported" if *operation == "resume-read" && matches!(cause.as_ref(), RootStoreError::Projection(_)) => StatusCode::NOT_IMPLEMENTED,
                 "provider-configuration-preview-required" if *operation == "provider-policy-apply"
                     && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::CONFLICT,
@@ -443,6 +550,12 @@ impl HttpServiceError {
                 "preparation-write-disabled" => StatusCode::FORBIDDEN,
                 "preparation-not-found" | "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
                 "authorization_required" => StatusCode::FORBIDDEN,
+                // Read-only PA-09 reconciliation: the typed separation refusal
+                // (shared service/ledger root) is a caller conflict, never a
+                // silent success; corrupt/uninitialized states stay in the
+                // report body and IO/close failures remain server errors.
+                "paea-effect-reconcile-separate-ledger-required" if *operation=="reconcile" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "settings-paea-ledger-root-not-configured" | "settings-paea-ledger-root-invalid" if *operation=="settings-ledger-root" && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
                 "admin-budget-input-invalid"|"admin-budget-policy-invalid"|"admin-budget-intent-invalid"=>StatusCode::BAD_REQUEST,
                 "storage_unavailable" => StatusCode::INSUFFICIENT_STORAGE,
                 _ if matches!(*operation, "mutate" | "settings-preview" | "settings-apply" | "mission-input")
@@ -486,6 +599,8 @@ impl Error for HttpServiceError {
         match self {
             Self::ProviderProbe { primary, .. } => Some(primary.as_ref()),
             Self::EnrollmentSource { primary, cause } => primary.as_deref().map(|e|e as &(dyn Error+'static)).or(Some(cause.as_ref())),
+            #[cfg(target_os = "linux")]
+            Self::GitCallSource { primary, cause } => primary.as_deref().map(|e|e as &(dyn Error+'static)).or(Some(cause.as_ref())),
             Self::ConfigurationState { primary } | Self::ConfigurationRecorded { primary, .. } => {
                 Some(primary.as_ref())
             }
@@ -592,13 +707,29 @@ impl DispatchProfile {
     fn capabilities(self) -> serde_json::Value {
         match self {
             Self::Typed => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task","task-add"],"graph_batch":["preview","apply","undo-last-batch"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
             Self::ObservedHttp1 => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task","task-add"],"graph_batch":["preview","apply","undo-last-batch"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"planning_history":["show"],"lifecycle_inventory":["list"],"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"provider_policies":["show","preview","apply"],"provider_resolution":["show"],"provider_admin":["show"],"api_connections":["show","preview","apply","test"],"provider_wait":["show","history","preview","apply"],"web_requests":["show","history","preview","apply","script"],"graph_performance":["show","history","preview","apply"],"exchanges":["list"],"logs":["query"],"runtime_health":["show"],"session_visit":["show","mark"],"log_read_policy":["show","history","preview","apply"],"activity":["show"],"activity_policy":["show","history","preview","apply"],"run_limits":["show","history","effective","preview","apply","rollback-preview","rollback"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan","answer-questions","create-missions", "revise-missions", "configure-team", "release-plan", "budget", "files", "source", "source-add", "source-remove", "templates", "template-check"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
         }
     }
+}
+/// Inject the real access-gate mode (read at server start) into the existing
+/// capability document under the single new key `access.mode`: "owner-key"
+/// when no authority daemon routes are served, "authority" when assertion-
+/// gated administration is offered. Read-only disclosure for the embedded
+/// cockpit: it grants no right, exposes no key material, freshness window,
+/// nonce or ledger record, and the daemon keeps authorizing every route
+/// independently. Both dispatch profiles keep their exact existing keys;
+/// only `access` is added. Pure function: no IO, no request data, no fallback.
+fn capabilities_document(profile: DispatchProfile, access: &AccessGate) -> serde_json::Value {
+    let mut document = profile.capabilities();
+    document["access"] = serde_json::json!({"mode": match access {
+        AccessGate::OwnerKey => "owner-key",
+        AccessGate::Authority { .. } => "authority",
+    }});
+    document
 }
 /// Trusted service configuration: private Root path and bound-address capability.
 /// Request data cannot replace either. No Root is initialized implicitly; each
@@ -609,11 +740,44 @@ impl DispatchProfile {
 /// cockpit are not supplied by this dispatcher.
 pub struct NativeHttpService {
     trust_enrollment: Option<TrustEnrollmentSource>,
+    #[cfg(target_os = "linux")]
+    paea_git_call: Option<PaeaGitCallAuthority>,
     root: PathBuf,
     authority: LocalWebAuthority,
     binding: RootBinding,
     cookie_max_age_seconds: Option<i64>,
+    /// v52 access gate read at start (owner key or authority assertions).
+    access: AccessGate,
     probe_shutdown: std::sync::atomic::AtomicBool,
+}
+/// Read-only identity/readiness probes of the local launcher (`swarm.sh
+/// status|restart`): GET/HEAD of the compiled version and native capabilities
+/// only. In `authority` mode these alone still accept the owner key; they
+/// expose no project data and change nothing.
+fn launcher_probe<B>(request: &Request<B>) -> bool {
+    matches!(*request.method(), Method::GET | Method::HEAD)
+        && matches!(request.uri().path(), "/api/v1/native-version" | "/api/v1/native-capabilities")
+        && request.uri().query().is_none()
+}
+/// Who may pass protected routes, fixed at server start from v52 settings.
+/// `Authority` keeps the replay memory for its freshness window.
+/// B8 attribution of one daemon-authenticated write (request extension).
+#[derive(Clone)]
+struct Attributed {
+    subject: String,
+    nonce: String,
+    method: String,
+    path: String,
+}
+enum AccessGate {
+    OwnerKey,
+    Authority {
+        key: ed25519_dalek::VerifyingKey,
+        max_age_seconds: i64,
+        nonces: std::sync::Mutex<swarm_authority::assertion::WindowNonces>,
+        /// EP-06 witness and B8 attribution ledger (Root, operator UID).
+        records: crate::authority_ledger::AuthorityRecords,
+    },
 }
 impl NativeHttpService {
     /// Trusted typed bootstrap of one exact prepared/provisioned intent. No
@@ -625,6 +789,63 @@ impl NativeHttpService {
             Err(primary)=>match source.close() {
                 Ok(())=>Err(primary),
                 Err(cause)=>Err(HttpServiceError::EnrollmentSource{primary:Some(Box::new(primary)),cause:Box::new(cause)}),
+            },
+        }
+    }
+    /// Trusted typed bootstrap of one exact prepared/provisioned PAEA Git call.
+    /// Both root paths are trusted startup inputs supplied by the owner, never
+    /// request data. Both prepared witnesses are checked against the actually
+    /// opened service Root at bind (the project Root is rechecked at
+    /// consumption against its own prepared witness); failed setup also closes
+    /// the authority. Ordinary session/CSRF and the engine-side binding recheck
+    /// under the held authority remain independent guards.
+    #[cfg(target_os = "linux")]
+    pub fn open_git_call(
+        root_path: &Path,
+        authority: LocalWebAuthority,
+        source: PaeaGitCallAuthority,
+    ) -> Result<Self, HttpServiceError> {
+        Self::open_git_call_with_approval(root_path, authority, source, None)
+    }
+    /// Same trusted bootstrap with one optional prepared approval command
+    /// (frozen operation + exact bytes bound to the project root) attached to
+    /// the held authority before any session publication. On any refusal the
+    /// supplied authority — approval witness included — is closed explicitly.
+    /// The approval binds nothing new: the request must still match the exact
+    /// frozen bytes under the held enrolled authority at consumption.
+    #[cfg(target_os = "linux")]
+    pub fn open_git_call_with_approval(
+        root_path: &Path,
+        authority: LocalWebAuthority,
+        mut source: PaeaGitCallAuthority,
+        approval: Option<super::PaeaGitCallApprovalSource>,
+    ) -> Result<Self, HttpServiceError> {
+        let approval_result = match approval {
+            Some(approval) => source.bind_approval(approval).err(),
+            None => None,
+        };
+        if let Some(cause) = approval_result {
+            // The bind refused: close the supplied authority (approval witness
+            // included) and retain both independent causes typed.
+            return match source.close() {
+                Ok(()) => Err(root("paea-git-call-approval-bind", cause)),
+                Err(cleanup) => Err(HttpServiceError::GitCallSource {
+                    primary: Some(Box::new(root("paea-git-call-approval-bind", cause))),
+                    cause: Box::new(cleanup),
+                }),
+            };
+        }
+        match Self::open_checked_source(root_path, authority, None, Some(&source)) {
+            Ok(mut service) => {
+                service.paea_git_call = Some(source);
+                Ok(service)
+            }
+            Err(primary) => match source.close() {
+                Ok(()) => Err(primary),
+                Err(cause) => Err(HttpServiceError::GitCallSource {
+                    primary: Some(Box::new(primary)),
+                    cause: Box::new(cause),
+                }),
             },
         }
     }
@@ -658,6 +879,12 @@ impl NativeHttpService {
         listener: &std::net::TcpListener,
         cookie_max_age_seconds: Option<i64>,
     ) -> Result<Self, HttpServiceError> {
+        // v52 access gate from the same open Root as the transport policy
+        // (production `swarm-rust web` and `open_local` both pass here).
+        let access = match Self::access_gate(&store) {
+            Ok(access) => access,
+            Err(error) => return close(Err(error), store.close()),
+        };
         let prepared = match store.web_session(listener) {
             Err(error) => Err(HttpServiceError::Session(error)),
             Ok(session) => LocalWebAuthority::from_session(listener, &session)
@@ -675,10 +902,13 @@ impl NativeHttpService {
         match (prepared, store.close()) {
             (Ok((authority, binding)), Ok(())) => Ok(Self {
                 trust_enrollment: None,
+                #[cfg(target_os = "linux")]
+                paea_git_call: None,
                 root: root_path.to_path_buf(),
                 authority,
                 binding,
                 cookie_max_age_seconds,
+                access,
                 probe_shutdown:std::sync::atomic::AtomicBool::new(false),
             }),
             (Err(primary), cleanup) => close(Err(primary), cleanup),
@@ -705,10 +935,36 @@ impl NativeHttpService {
     /// Bind the same opened descriptor checked against the prepared owner;
     /// source selection never comes from HTTP or an inferred principal.
     fn open_source(root_path:&Path,authority:LocalWebAuthority,source:Option<&TrustEnrollmentSource>)->Result<Self,HttpServiceError>{
+        Self::open_checked_source(root_path,authority,source,None)
+    }
+    /// Same bootstrap with the optional prepared Git-call witness check: the
+    /// service Root is opened read-only and retained, the project Root is
+    /// opened read-only from the trusted startup path, and both prepared
+    /// witnesses are compared before any session publication. Consumption
+    /// rechecks both witnesses on writable opens under the held authority.
+    #[cfg_attr(not(target_os = "linux"), allow(unused_variables))]
+    fn open_checked_source(root_path:&Path,authority:LocalWebAuthority,source:Option<&TrustEnrollmentSource>,git_call:Option<&PaeaGitCallAuthority>)->Result<Self,HttpServiceError>{
         let store = RootStore::open(root_path, false).map_err(|cause| root("open", cause))?;
         if let Some(source)=source { if let Err(error)=source.check_root(&store) { return close(Err(root("trust-enrollment-root",error)),store.close()); } }
+        #[cfg(target_os = "linux")]
+        if let Some(git_call)=git_call {
+            let project = match RootStore::open(git_call.project_path(), false).map_err(|cause| root("paea-git-call-project-open", cause)) {
+                Ok(project) => project,
+                Err(error) => return close(Err(error),store.close()),
+            };
+            let result = git_call
+                .check_roots(&store, &project)
+                .map_err(|cause| root("paea-git-call-root", cause));
+            if let Err(error) = close(result, project.close()) {
+                return close(Err(error),store.close());
+            }
+        }
         let cookie_max_age_seconds = match Self::cookie_age(&store) {
             Ok(age) => age,
+            Err(error) => return close(Err(error), store.close()),
+        };
+        let access = match Self::access_gate(&store) {
+            Ok(access) => access,
             Err(error) => return close(Err(error), store.close()),
         };
         match store.bind_root() {
@@ -716,10 +972,13 @@ impl NativeHttpService {
             Ok(binding) => match store.close() {
                 Ok(()) => Ok(Self {
                     trust_enrollment: None,
+                    #[cfg(target_os = "linux")]
+                    paea_git_call: None,
                     root: root_path.to_path_buf(),
                     authority,
                     binding,
                     cookie_max_age_seconds,
+                    access,
                     probe_shutdown:std::sync::atomic::AtomicBool::new(false),
                 }),
                 Err(cause) => close(Err(root("bootstrap-close", cause)), binding.close()),
@@ -729,6 +988,63 @@ impl NativeHttpService {
     /// Snapshot saved v20 cookie policy through authoritative settings validation.
     /// No fallback/legacy file read, mutation, expiry/revocation or runtime hot reload.
     /// The older Go web-session.json still requires migration/arbitration before cutover.
+    /// Read the saved v52 access policy. A Root that predates v52 keeps the
+    /// historical owner-key behaviour (absence is not a new policy); a present
+    /// but invalid group refuses server start. No hot reload.
+    fn access_gate(store: &RootStore) -> Result<AccessGate, HttpServiceError> {
+        let values = store.settings().map_err(|cause| root("settings", cause))?.values;
+        match values.web_access_policy() {
+            Ok(policy) => match policy.mode {
+                swarm_engine::WebAccessMode::OwnerKey => Ok(AccessGate::OwnerKey),
+                swarm_engine::WebAccessMode::Authority { public_key } => Ok(AccessGate::Authority {
+                    key: ed25519_dalek::VerifyingKey::from_bytes(&public_key)
+                        .map_err(|_| HttpServiceError::Refused("web-access-key-invalid"))?,
+                    max_age_seconds: policy.assertion_max_age_seconds,
+                    nonces: std::sync::Mutex::new(Default::default()),
+                    records: Default::default(),
+                }),
+            },
+            Err(e) if e.reason() == "settings-web-access-not-configured" => Ok(AccessGate::OwnerKey),
+            Err(e) => Err(root("settings", RootStoreError::Settings(e))),
+        }
+    }
+    /// Authorize a protected request whose body is already read. Owner-key
+    /// mode: the existing cookie/Origin/CSRF head checks. Authority mode:
+    /// exact Host, then the daemon assertion bound to method, path+query and
+    /// body, fresh and single-use; the owner cookie is accepted only for the
+    /// launcher's read-only probes ([`launcher_probe`]).
+    fn authorize_request(&self, request: &Request<Vec<u8>>) -> Result<WebPrincipal, WebAccessError> {
+        match &self.access {
+            AccessGate::OwnerKey => self.authority.authorize(request),
+            AccessGate::Authority { key, max_age_seconds, nonces, records } => {
+                self.authority.authorize_host(request)?;
+                if launcher_probe(request) && request.headers().get(swarm_authority::assertion::HEADER).is_none() {
+                    // Local launcher identity/readiness probes keep the owner
+                    // key (unreadable by confined agents); nothing else does.
+                    return self.authority.authorize(request);
+                }
+                let header = request
+                    .headers()
+                    .get(swarm_authority::assertion::HEADER)
+                    .and_then(|v| v.to_str().ok())
+                    .ok_or(WebAccessError::Refused("web-assertion-required"))?;
+                let path = request.uri().path_and_query().map(|p| p.as_str()).unwrap_or("/");
+                let now = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_secs() as i64)
+                    .map_err(|_| WebAccessError::Refused("web-assertion-clock"))?;
+                let mut memory = nonces.lock().map_err(|_| WebAccessError::Refused("web-assertion-state"))?;
+                memory.prune(now, *max_age_seconds);
+                let claims = swarm_authority::assertion::verify(
+                    key, header, request.method().as_str(), path, request.body(), now, *max_age_seconds, &mut *memory,
+                )
+                .map_err(WebAccessError::Refused)?;
+                drop(memory);
+                records.check(&self.root, &claims.witness, claims.issued_at, now).map_err(WebAccessError::Refused)?;
+                Ok(WebPrincipal::authority(&claims.subject, &claims.nonce))
+            }
+        }
+    }
     fn cookie_age(store: &RootStore) -> Result<Option<i64>, HttpServiceError> {
         let document = store.settings().map_err(|cause| root("settings", cause))?;
         document
@@ -737,18 +1053,24 @@ impl NativeHttpService {
             .map(|p| p.cookie_max_age_seconds)
             .map_err(|cause| root("settings", RootStoreError::Settings(cause)))
     }
-    /// Exact local browser resources contain no datastore operation. The caller
+    /// Exact local browser resources contain no datastore operation (a ticket
+    /// sign-in consumes Root state and is excluded). The caller
     /// must additionally check an empty incoming body and authorize before using
     /// cancellable lane waiting; POST/API/unknown routes never gain this behavior.
     fn browser_resource<B>(&self, request: &Request<B>) -> bool {
         matches!(*request.method(), Method::GET | Method::HEAD)
+            && !login::ticket_request(request)
             && (login::public(request) || native_admin::resource(request) || live::resource(request))
     }
     /// Like Go's public landing, a GET/HEAD / without a usable session renders
     /// login only. Malformed/ambiguous headers and other access failures keep
     /// their typed refusal; no API/private asset receives this exception.
+    /// Owner-key mode only: in `authority` mode the daemon owns sign-in and
+    /// `/` is an ordinary assertion-checked page (the owner key page would
+    /// otherwise be shown to a signed-in daemon user).
     fn root_login<B>(&self, request: &Request<B>) -> bool {
-        request.uri().path() == "/"
+        matches!(self.access, AccessGate::OwnerKey)
+            && request.uri().path() == "/"
             && matches!(*request.method(), Method::GET | Method::HEAD)
             && matches!(
                 self.authority.authorize(request),
@@ -765,21 +1087,76 @@ impl NativeHttpService {
         }
         if login::public(request) || self.root_login(request) {
             self.authority.authorize_login(request)
+        } else if matches!(self.access, AccessGate::Authority { .. }) {
+            // Body not read yet: Host and assertion presence only; the full
+            // signature/binding check runs in authorize_request.
+            self.authority.authorize_host(request)?;
+            if launcher_probe(request) && request.headers().get(swarm_authority::assertion::HEADER).is_none() {
+                return self.authority.authorize(request).map(drop);
+            }
+            request
+                .headers()
+                .get(swarm_authority::assertion::HEADER)
+                .map(drop)
+                .ok_or(WebAccessError::Refused("web-assertion-required"))
         } else {
-            self.authority.authorize(request)
+            self.authority.authorize(request).map(drop)
         }
     }
     /// Explicitly close the datastore binding after the owner has drained all
     /// requests. Errors remain typed; Drop alone does not prove checked release.
     /// No project data, credential or agent is removed/stopped.
     pub fn close(self) -> Result<(), HttpServiceError> {
-        let source = self.trust_enrollment.map(TrustEnrollmentSource::close).transpose();
-        let binding = self.binding
-            .close()
-            .map_err(|cause| root("binding-close", cause));
-        match source {
-            Ok(_) => binding,
-            Err(cause) => Err(HttpServiceError::EnrollmentSource { primary:binding.err().map(Box::new), cause:Box::new(cause) }),
+        #[cfg(target_os = "linux")]
+        let git_call = self
+            .paea_git_call
+            .map(PaeaGitCallAuthority::close)
+            .transpose()
+            .err()
+            .map(|cause| {
+                HttpServiceError::GitCallSource {
+                    primary: None,
+                    cause: Box::new(cause),
+                }
+            });
+        #[cfg(not(target_os = "linux"))]
+        let git_call: Option<HttpServiceError> = None;
+        let source = self
+            .trust_enrollment
+            .map(TrustEnrollmentSource::close)
+            .transpose()
+            .err()
+            .map(|cause| {
+                HttpServiceError::EnrollmentSource {
+                    primary: None,
+                    cause: Box::new(cause),
+                }
+            });
+        // Independent source close failures pair without losing either cause;
+        // the enrollment error stays the typed cause of the joined wrapper.
+        let source = match (git_call, source) {
+            (None, None) => Ok(()),
+            (Some(git), None) => Err(git),
+            (None, Some(enrollment)) => Err(enrollment),
+            (Some(git), Some(enrollment)) => Err(HttpServiceError::EnrollmentSource {
+                primary: Some(Box::new(git)),
+                cause: match enrollment {
+                    HttpServiceError::EnrollmentSource { cause, .. } => cause,
+                    _ => unreachable!("constructed above"),
+                },
+            }),
+        };
+        let binding = self.binding.close();
+        match (source, binding) {
+            (Ok(()), Ok(())) => Ok(()),
+            (Ok(()), Err(cleanup)) => Err(root("binding-close", cleanup)),
+            // The joined source failure stays typed (enrollment or git-call
+            // wrapper); a failed binding close pairs as the retained cleanup.
+            (Err(primary), Ok(())) => Err(primary),
+            (Err(primary), Err(cleanup)) => Err(HttpServiceError::Close {
+                primary: Some(Box::new(primary)),
+                cleanup: Box::new(cleanup),
+            }),
         }
     }
     /// Gate every protected route before body decode/per-request Root open, then dispatch the
@@ -838,27 +1215,67 @@ impl NativeHttpService {
                 })
                 .or_else(|error| error_reply(error, head));
         }
+        if request.uri().path() == "/api/v1/logout" {
+            // Protected like any API mutation (cookie + Origin + CSRF); only
+            // clears this browser's cookies, never the persisted owner key.
+            return self
+                .authorize_request(&request)
+                .map_err(HttpServiceError::Access)
+                .and_then(|_principal| self.logout_reply(&request))
+                .or_else(|error| error_reply(error, head));
+        }
         if live::owns(request.uri().path()) {
             return self
-                .authority
-                .authorize(&request)
+                .authorize_request(&request)
                 .map_err(HttpServiceError::Access)
-                .and_then(|()| live::reply(&request))
+                .and_then(|_principal| live::reply(&request))
                 .or_else(|error| error_reply(error, head));
         }
         if native_admin::owns(request.uri().path()) {
             return self
-                .authority
-                .authorize(&request)
+                .authorize_request(&request)
                 .map_err(HttpServiceError::Access)
-                .and_then(|()| native_admin::reply(&request))
+                .and_then(|_principal| native_admin::reply(&request))
                 .or_else(|error| error_reply(error, head));
         }
+        let mut request = request;
         let result = self
-            .authority
-            .authorize(&request)
+            .authorize_request(&request)
             .map_err(HttpServiceError::Access)
-            .and_then(|()| self.route(&request, profile, peer_closed));
+            .and_then(|principal| {
+                // B8: attribute a daemon-authenticated write before it runs.
+                if let Some(entry) = self.attribution(&request, &principal) {
+                    self.attribute(&entry, "intent", None).map_err(HttpServiceError::Refused)?;
+                    request.extensions_mut().insert(entry);
+                }
+                // Attribution for route handlers; grants no right beyond the checks above.
+                request.extensions_mut().insert(principal);
+                self.route(&request, profile, peer_closed)
+            });
+        let entry = request.extensions().get::<Attributed>().cloned();
+        let reply = self.reply_of(result, &request, head);
+        if let (Some(entry), Ok(r)) = (entry, &reply) {
+            if self.attribute(&entry, "outcome", Some(r.response.status().as_u16())).is_err() {
+                eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "web-attribution-unavailable", "path": entry.path}));
+            }
+        }
+        reply
+    }
+    /// Attribution entry for an authority-mode request that is not GET/HEAD.
+    fn attribution<B>(&self, request: &Request<B>, principal: &WebPrincipal) -> Option<Attributed> {
+        let nonce = principal.assertion()?;
+        if matches!(*request.method(), Method::GET | Method::HEAD) {
+            return None;
+        }
+        Some(Attributed { subject: principal.subject().into(), nonce: nonce.into(), method: request.method().as_str().into(), path: request.uri().path().into() })
+    }
+    fn attribute(&self, e: &Attributed, event: &str, status: Option<u16>) -> Result<(), &'static str> {
+        let AccessGate::Authority { records, .. } = &self.access else { return Ok(()) };
+        let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs() as i64).unwrap_or(0);
+        records.record(&self.root, event, &e.subject, &e.nonce, &e.method, &e.path, status, now)
+    }
+    /// Build the HTTP reply of a protected route result (unchanged behavior).
+    fn reply_of(&self, result: Result<RouteBody, HttpServiceError>, request: &Request<Vec<u8>>, head: bool) -> Result<HttpReply, HttpServiceError> {
         match result {
             Ok(body) => {
                 let mut response = response(StatusCode::OK, body.bytes, head, None);
@@ -884,7 +1301,10 @@ impl NativeHttpService {
     /// command. GET/HEAD remain observational; POST action/settings apply can mutate.
     /// Native version returns compiled identity and embedded release notes only;
     /// malformed declarations preserve typed causes without borrowing live Git.
-    /// Shared session/Host admission still precedes this read-only route.
+    /// The native capability document adds the started access-gate mode
+    /// (`access.mode`, right-free disclosure); every other capability key and
+    /// both dispatch profiles stay unchanged. Shared session/Host admission
+    /// still precedes this read-only route.
     fn route(
         &self,
         request: &Request<Vec<u8>>,
@@ -916,12 +1336,13 @@ impl NativeHttpService {
                 if request.method() != Method::GET && request.method() != Method::HEAD {
                     return Err(HttpServiceError::Method("GET, HEAD"));
                 }
-                serde_json::to_vec(&profile.capabilities())
+                serde_json::to_vec(&capabilities_document(profile, &self.access))
                     .map(RouteBody::plain)
                     .map_err(HttpServiceError::ResponseJson)
             }
             "/api/v1/run-limits"|"/api/v1/run-limits/effective"|"/api/v1/run-limits/preview"|"/api/v1/run-limits/apply"|"/api/v1/run-limits/rollback"|"/api/v1/run-limits/rollback/preview"=>self.run_limits_admin(request),
             "/api/v1/project-profile"=>self.project_profile_status(request),
+            "/api/v1/project-memory"=>self.project_memory(request),
             "/api/v1/project-profile/catalog"|"/api/v1/project-profile/preview"|"/api/v1/project-profile/apply"|"/api/v1/project-profile/select"=>self.project_profile_configuration(request),
             "/api/v1/preparations/command" => self.preparation_command(request),
             "/api/v1/preparations/send"|"/api/v1/preparations/stop"|"/api/v1/preparations/capabilities"=>self.preparation_calls(request),
@@ -989,6 +1410,7 @@ impl NativeHttpService {
                 let action = task_action(request.body())?;
                 self.task(action)
             }
+            "/api/v1/graph-batch/preview"|"/api/v1/graph-batch/apply"=>self.graph_batch(request),
             #[cfg(target_os = "linux")]
             "/api/v1/admin-advice-budget"=>self.admin_budget(admin_budget::Operation::Show,request),
             #[cfg(target_os = "linux")]
@@ -1003,7 +1425,18 @@ impl NativeHttpService {
             "/api/v1/quotas/apply" => self.quotas(quotas::Operation::Apply,request),
             "/api/v1/trust-actions" => self.trust_actions(request),
             #[cfg(target_os = "linux")]
+            "/api/v1/paea/git-call" => self.paea_git_call(request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/paea/git-call/preview" => self.paea_git_call_preview(request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/paea/git-call/approval" => self.paea_git_call_approval(request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/paea/git-call/approval/presentation" => {
+                self.paea_git_call_approval_presentation(request)
+            }
+            #[cfg(target_os = "linux")]
             "/api/v1/protection/linux-prerequisites" => paea::linux_prerequisites(request),
+            "/api/v1/paea/reconcile-effects" => self.reconcile_effects(request),
             "/api/v1/protection/receipt-report" => paea::receipt_report(request),
             "/api/v1/protection/resolve-payment" => paea::resolve_payment(request),
             "/api/v1/protection/compare" => paea::compare(request),
@@ -1046,9 +1479,16 @@ impl NativeHttpService {
         Ok(())
     }
     /// Apply server-derived outer fields through Root's common external boundary;
+    /// Only task.update/task.add are selected by the validated outer vocabulary;
     /// no Request origin can impersonate engine/conductor authority. Known Work
     /// survives encoding/close failure; Root late-release metadata also propagates.
     fn task(&self, mut action: TaskAction) -> Result<RouteBody, HttpServiceError> {
+        // Fixed operation vocabulary, never a caller-selected engine command.
+        let kind = match action.kind.as_str() {
+            "task" => "task.update",
+            "task-add" => "task.add",
+            _ => return Err(HttpServiceError::Refused("web-operation-unported")),
+        };
         action.request.schema_version = 1;
         action.request.event_id = action.event_id;
         action.request.expected_revision = action.expected_revision;
@@ -1061,7 +1501,7 @@ impl NativeHttpService {
         let result = (|| {
             self.check_binding(&store)?;
             let outcome = store
-                .execute_external(&action.work, "task.update", &raw, &mut SystemEnvironment)
+                .execute_external(&action.work, kind, &raw, &mut SystemEnvironment)
                 .map_err(|cause| root("mutate", cause))?;
             let work = outcome.result.work;
             recorded = Some((work.id.clone(), work.revision));
@@ -1093,6 +1533,7 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
     if let Some(probe)=error.provider_probe(){document["provider_contact_may_have_occurred"]=probe.contact_may_have_occurred.into();}
     #[cfg(target_os="linux")]
     if let Some(reason)=project_profile::public_reason(&error){document["failure"]["reason"]=reason.into();}
+    if let Some(reason)=graph_batch::public_reason(&error){document["failure"]["reason"]=reason.into();}
     if let Some((work, revision)) = error.recorded_work() {
         document["recorded_work"] = serde_json::json!({"id":work,"revision":revision});
     }
@@ -1158,6 +1599,8 @@ struct TaskAction {
 /// Decode the common Go null/case/merge shape using the actual generated Request
 /// descriptor. Require task/event/work identities and positive revision before
 /// Root open; current business/revision/origin rules remain authoritative there.
+/// `task` updates and `task-add` creates via the same admission and publication
+/// path. Nested schema/event/revision/id/origin never override the outer fields.
 fn task_action(raw: &[u8]) -> Result<TaskAction, HttpServiceError> {
     swarm_engine::check_command_input_size(raw).map_err(HttpServiceError::Input)?;
     const FIELDS: Fields = &[
@@ -1170,7 +1613,7 @@ fn task_action(raw: &[u8]) -> Result<TaskAction, HttpServiceError> {
     ];
     let value = projection::project(raw, FIELDS, true).map_err(HttpServiceError::Projection)?;
     let action: TaskAction = serde_json::from_value(value).map_err(HttpServiceError::Json)?;
-    if action.kind != "task" {
+    if !matches!(action.kind.as_str(), "task" | "task-add") {
         return Err(HttpServiceError::Refused("web-operation-unported"));
     }
     if [&action.work, &action.task, &action.event_id]
@@ -1189,6 +1632,36 @@ fn root(operation: &'static str, cause: RootStoreError) -> HttpServiceError {
         operation,
         cause: Box::new(cause),
     }
+}
+/// Extract the optional reader Bearer credential of a served PAEA read
+/// projection (BLP-RET-05). `None` means "no Authorization header at all" =
+/// bare session, which the engine guard treats as never-authorization. The
+/// header shape is controlled like the POST approval route: more than one
+/// Authorization header, a non-Bearer scheme or an empty token refuses typed
+/// BEFORE any Root open — a malformed credential is never silently downgraded
+/// to a bare session, so no credential oracle and no fallback path exists.
+/// Input: the request; output `Ok(Some(token))` for exactly one
+/// `Authorization: Bearer <non-empty>` header, `Ok(None)` without any
+/// Authorization header; errors: `HttpServiceError::Refused` with a stable
+/// code for any other shape. No store is touched, no credential is echoed.
+fn reader_bearer_token(r: &Request<Vec<u8>>) -> Result<Option<String>, HttpServiceError> {
+    let mut values = r.headers().get_all(http::header::AUTHORIZATION).iter();
+    let first = match values.next() {
+        None => return Ok(None),
+        Some(value) => value,
+    };
+    if values.next().is_some() {
+        return Err(HttpServiceError::Refused("trust-authentication-header"));
+    }
+    let encoded = first
+        .to_str()
+        .map_err(|_| HttpServiceError::Refused("paea-reader-credential"))?
+        .strip_prefix("Bearer ")
+        .ok_or(HttpServiceError::Refused("paea-reader-credential"))?;
+    if encoded.is_empty() {
+        return Err(HttpServiceError::Refused("paea-reader-credential"));
+    }
+    Ok(Some(encoded.to_owned()))
 }
 /// Join primary result and explicit Root close, retaining both failures. No
 /// successful empty body, rollback or retry is inferred from a cleanup failure.
@@ -1230,6 +1703,88 @@ fn response(
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// The native-capabilities document discloses the real started access-gate
+    /// mode ("owner-key" or "authority") and nothing else about the gate: no
+    /// key material, freshness window, nonce or ledger record appears, and the
+    /// added `access` key is the only difference from the plain capability DTO
+    /// on both dispatch profiles. Read-only information: it grants no right and
+    /// the daemon keeps authorizing each route, so an embedded consumer may
+    /// gate its authority probes on this field alone.
+    #[test]
+    fn capabilities_document_discloses_access_mode_without_gate_secrets() {
+        let owner_key = AccessGate::OwnerKey;
+        let authority = AccessGate::Authority {
+            key: ed25519_dalek::SigningKey::from_bytes(&[7u8; 32]).verifying_key(),
+            max_age_seconds: 120,
+            nonces: std::sync::Mutex::new(Default::default()),
+            records: Default::default(),
+        };
+        for (access, mode) in [(&owner_key, "owner-key"), (&authority, "authority")] {
+            for profile in [DispatchProfile::Typed, DispatchProfile::ObservedHttp1] {
+                let document = capabilities_document(profile, access);
+                assert_eq!(document["access"], serde_json::json!({"mode": mode}));
+                assert_eq!(document["access"].as_object().unwrap().len(), 1);
+                let plain = profile.capabilities();
+                let plain = plain.as_object().unwrap();
+                let document = document.as_object().unwrap();
+                assert_eq!(document.len(), plain.len() + 1, "only access is added");
+                for (key, value) in plain {
+                    assert_eq!(document.get(key), Some(value), "{key} changed");
+                }
+            }
+        }
+    }
+    /// Explicit quarantine is a typed policy refusal; cleanup or another
+    /// operation context must not be disguised as a caller authorization error.
+    #[test]
+    fn preparation_quarantine_status_keeps_cleanup_failures_server_errors() {
+        assert_eq!(root("preparation-call",RootStoreError::Refused("blp-preparation-quarantined")).status(),StatusCode::FORBIDDEN);
+        assert_eq!(root("other-operation",RootStoreError::Refused("blp-preparation-quarantined")).status(),StatusCode::INTERNAL_SERVER_ERROR);
+        let wrapped=RootStoreError::Cleanup {
+            primary:Some(Box::new(RootStoreError::Refused("blp-preparation-quarantined"))),
+            cleanup:Box::new(RootStoreError::Refused("fixture-release-failed")),
+        };
+        assert_eq!(root("preparation-call",wrapped).status(),StatusCode::INTERNAL_SERVER_ERROR);
+    }
+    /// Diagnostic business refusals are exact typed client states; corrupt
+    /// native provenance and late cleanup remain server failures. A matching
+    /// code from another operation never inherits this diagnostic's mapping.
+    #[test]
+    fn blp_preparation_status_preserves_refusal_and_internal_failures() {
+        for (code,status) in [
+            ("blp-access-denied",StatusCode::FORBIDDEN),
+            ("blp-policy-required",StatusCode::CONFLICT),
+            ("blp-policy-stale",StatusCode::CONFLICT),
+            ("blp-classification-required",StatusCode::CONFLICT),
+            ("blp-preparation-provenance-required",StatusCode::CONFLICT),
+            ("blp-preparation-parent-mismatch",StatusCode::CONFLICT),
+            ("blp-preparation-check-invalid",StatusCode::BAD_REQUEST),
+            ("blp-preparation-attribute-invalid",StatusCode::BAD_REQUEST),
+            ("blp-classification-invalid",StatusCode::BAD_REQUEST),
+            ("blp-preparation-source-not-found",StatusCode::NOT_FOUND),
+            ("preparation-revision-conflict",StatusCode::CONFLICT),
+            ("preparation-turn-not-found",StatusCode::NOT_FOUND),
+            ("blp-preparation-platform-unsupported",StatusCode::NOT_IMPLEMENTED),
+            ("blp-transport-invalid",StatusCode::BAD_REQUEST),
+            ("blp-destination-invalid",StatusCode::BAD_REQUEST),
+            ("blp-destination-echo-mismatch",StatusCode::BAD_REQUEST),
+            ("blp-destination-not-attributed",StatusCode::NOT_FOUND),
+            ("blp-transport-connection-changed",StatusCode::CONFLICT),
+            ("blp-transport-provider-source-changed",StatusCode::CONFLICT),
+            ("blp-transport-settings-changed",StatusCode::CONFLICT),
+            ("preparation-prompt-provenance-invalid",StatusCode::INTERNAL_SERVER_ERROR),
+            ("preparation-root-instance-changed",StatusCode::INTERNAL_SERVER_ERROR),
+        ] {
+            let error=root("trust-command",RootStoreError::Refused(code));
+            assert_eq!(error.status(),status,"{code}");assert_eq!(error.code(),code);
+        }
+        assert_eq!(root("other-operation",RootStoreError::Refused("blp-access-denied")).status(),StatusCode::INTERNAL_SERVER_ERROR);
+        let error=root("trust-command",RootStoreError::Cleanup {
+            primary:Some(Box::new(RootStoreError::Refused("blp-access-denied"))),
+            cleanup:Box::new(RootStoreError::Refused("fixture-close-failed")),
+        });
+        assert_eq!(error.status(),StatusCode::INTERNAL_SERVER_ERROR);
+    }
     /// Quota validation refusals are client/state/capability responses. Corrupt
     /// history, encoding, clock and settings failures stay server errors; no
     /// prefix-based catch-all may hide an internal fault as invalid client data.
@@ -1256,16 +1811,104 @@ mod tests {
         }
     }
 
+    /// Extractive-summary refusal codes keep their typed caller states: an
+    /// admission refusal invalidates the confirmed request (400), changed
+    /// sources and the before-start receipt state conflicts need a re-examined
+    /// decision (409), and an invalid extractive selection stays caller data
+    /// (400). Storage, commit, cleanup and the Agent store family never inherit
+    /// these mappings, and a matching code from another operation stays a
+    /// server failure — no prefix catch-all disguises an internal fault.
+    #[test]
+    fn summary_status_preserves_typed_refusals_and_server_failures() {
+        // Admission side, produced by attach_summary_selection in
+        // RootStoreError::Launch(Refused) / Launch(Cause) during prepare.
+        let launch_refused = |code: &'static str| {
+            root("trust-command",RootStoreError::Launch(Box::new(swarm_engine::AgentLaunchError::Refused(code))))
+        };
+        assert_eq!(launch_refused("agent-launch-summary-branch-unported").status(),StatusCode::BAD_REQUEST);
+        assert_eq!(launch_refused("agent-launch-summary-selection-incomplete").status(),StatusCode::BAD_REQUEST);
+        assert_eq!(launch_refused("agent-launch-summary-context-hash-required").status(),StatusCode::BAD_REQUEST);
+        assert_eq!(launch_refused("agent-launch-summary-sources-changed").status(),StatusCode::CONFLICT);
+        let selection_invalid=root("trust-command",RootStoreError::Launch(Box::new(
+            swarm_engine::AgentLaunchError::Cause {
+                code:"agent-launch-summary-selection-invalid",
+                cause:Box::new(std::io::Error::other("fixture")),
+            })));
+        assert_eq!(selection_invalid.status(),StatusCode::BAD_REQUEST);
+        // Before-start side, produced by checked_memory_summary_receipt in
+        // record_permission and wrapped Launch by the supervision writer.
+        assert_eq!(launch_refused("agent-execution-summary-sources-changed-before-start").status(),StatusCode::CONFLICT);
+        let sources_stale=root("trust-command",RootStoreError::Launch(Box::new(
+            swarm_engine::AgentLaunchError::Cause {
+                code:"agent-execution-summary-sources-stale",
+                cause:Box::new(std::io::Error::other("fixture")),
+            })));
+        assert_eq!(sources_stale.status(),StatusCode::CONFLICT);
+        // A matching code on another operation stays a server failure only when
+        // it is not Launch-carried: the admission arms guard the variant, not
+        // the operation (no web operation reaches them today — quota precedent).
+        assert_eq!(root("other-operation",RootStoreError::Refused("agent-launch-summary-branch-unported")).status(),
+            StatusCode::INTERNAL_SERVER_ERROR);
+        // Storage-side launch variants and the Agent store family keep server
+        // defaults: no summary code may be synthesized from a non-Refused,
+        // non-Cause variant.
+        let storage=root("trust-command",RootStoreError::Launch(Box::new(
+            swarm_engine::AgentLaunchError::Cleanup {
+                primary:Box::new(swarm_engine::AgentLaunchError::Refused("agent-launch-summary-sources-changed")),
+                cleanup:Box::new(swarm_engine::AgentLaunchError::Refused("fixture-close-failed")),
+            })));
+        assert_eq!(storage.status(),StatusCode::INTERNAL_SERVER_ERROR);
+        let agent_store=root("trust-command",RootStoreError::Agent(
+            swarm_engine::AgentStoreError::Refused("agent-launch-summary-sources-changed")));
+        assert_eq!(agent_store.status(),StatusCode::INTERNAL_SERVER_ERROR);
+        // Cleanup-wrapped primary keeps the server default.
+        let wrapped=root("trust-command",RootStoreError::Cleanup {
+            primary:Some(Box::new(RootStoreError::Launch(Box::new(
+                swarm_engine::AgentLaunchError::Refused("agent-launch-summary-sources-changed"))))),
+            cleanup:Box::new(RootStoreError::Refused("fixture-close-failed")),
+        });
+        assert_eq!(wrapped.status(),StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    /// Memory caller states on the four project-memory operations keep their
+    /// typed client mappings: caller-invalid refusals are 400, revision
+    /// conflicts 409, unknown work 404. SQL, row incoherence and identity
+    /// mismatch stay server errors, and no other operation inherits the
+    /// memory mapping even with the identical code.
+    #[test]
+    fn memory_status_preserves_caller_states_and_server_failures() {
+        use swarm_engine::MemoryError;
+        let memory = |error: MemoryError| root("project-memory-mutate",
+            RootStoreError::Mutation(swarm_engine::WorkEngineError::Memory(error)));
+        assert_eq!(memory(MemoryError::Refused("project-memory-refused")).status(),StatusCode::BAD_REQUEST);
+        assert_eq!(memory(MemoryError::RevisionConflict("revision-conflict")).status(),StatusCode::CONFLICT);
+        assert_eq!(memory(MemoryError::Missing).status(),StatusCode::NOT_FOUND);
+        for (label,error) in [
+            ("row-incoherent",MemoryError::Row(swarm_engine::WorkError::Incoherent)),
+            ("project-memory-storage",MemoryError::Row(swarm_engine::WorkError::Identity)),
+        ] {
+            assert_eq!(memory(error).status(),StatusCode::INTERNAL_SERVER_ERROR,"{label}");
+        }
+        // Identical caller code on a non-memory operation stays server error.
+        let other=root("other-operation",RootStoreError::Mutation(
+            swarm_engine::WorkEngineError::Memory(MemoryError::Refused("project-memory-refused"))));
+        assert_eq!(other.status(),StatusCode::INTERNAL_SERVER_ERROR);
+        // Cleanup-wrapped memory primary keeps the server default.
+        let wrapped=root("project-memory-mutate",RootStoreError::Cleanup {
+            primary:Some(Box::new(RootStoreError::Mutation(swarm_engine::WorkEngineError::Memory(
+                MemoryError::Refused("project-memory-refused"))))),
+            cleanup:Box::new(RootStoreError::Refused("fixture-close-failed")),
+        });
+        assert_eq!(wrapped.status(),StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
     /// Reproduce a saved settings update between server-policy read and service
     /// construction. The cookie must use the same validated snapshot as transport,
     /// not silently re-read a later revision. No scheduling delay or provider used.
     #[test]
     fn native_cookie_policy_keeps_the_server_snapshot_when_saved_values_change() {
         use std::{fs, net::TcpListener, os::unix::fs::PermissionsExt};
-        let root = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("cookie-snapshot98-").unwrap());
-        fs::create_dir(&root).unwrap();
-        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        let root = swarm_engine::fixture_root("cookie-snapshot98-");
         let store = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
         let document = store.settings().unwrap();
         let policy = document.values.web_transport_policy().unwrap();
@@ -1469,6 +2112,9 @@ mod tests {
 }
 
 mod preparations;
+
+#[cfg(target_os="linux")]
+mod project_memory;
 
 #[cfg(target_os="linux")]
 mod project_profile;

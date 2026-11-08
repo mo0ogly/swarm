@@ -1,6 +1,7 @@
 """Effective-source archive guards on synthetic bytes, without Cargo or a Root."""
 from pathlib import Path
 import json,sys,tarfile,tempfile,unittest
+from fixture_area import fixture_area
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools/verification'))
 import verify_native_profile as profile
 
@@ -9,7 +10,7 @@ class EffectiveSourceArchive(unittest.TestCase):
     """A valid archive witness precedes source drift and its explicit recovery."""
     def setUp(self):
         """Create only two synthetic compiled-input stand-ins and private outputs."""
-        temp=tempfile.TemporaryDirectory(prefix='native-profile-archive-');self.addCleanup(temp.cleanup)
+        temp=tempfile.TemporaryDirectory(prefix='native-profile-archive-', dir=fixture_area());self.addCleanup(temp.cleanup)
         self.root=Path(temp.name);(self.root/'one.rs').write_bytes(b'synthetic source one')
         (self.root/'asset.txt').write_bytes(b'synthetic exact asset')
         self.inputs={name:profile.digest(self.root/name) for name in ['one.rs','asset.txt']}
@@ -48,6 +49,20 @@ class EffectiveSourceArchive(unittest.TestCase):
         config.unlink()
         with tarfile.open(out/'effective-sources.tar.gz') as archive:
             self.assertEqual(archive.extractfile('.cargo/config.toml').read(),raw)
+            self.assertEqual(set(archive.getnames()),set(inputs))
+
+    def test_admission_support_bytes_survive_source_removal(self):
+        """Build records retain exact wrapper/policy bytes independently of the checkout."""
+        expected={}
+        for name in profile.CARGO_SUPPORT_NAMES:
+            path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True)
+            expected[name]=('fixture support '+name).encode();path.write_bytes(expected[name])
+        inputs={**self.inputs,**profile.manifest(self.root,profile.cargo_config_inputs(self.root))}
+        out=self.root/'support-witness';out.mkdir()
+        profile.archive_effective_sources(self.root,out,inputs)
+        for name in expected:(self.root/name).unlink()
+        with tarfile.open(out/'effective-sources.tar.gz') as archive:
+            for name,raw in expected.items():self.assertEqual(archive.extractfile(name).read(),raw)
             self.assertEqual(set(archive.getnames()),set(inputs))
 
 

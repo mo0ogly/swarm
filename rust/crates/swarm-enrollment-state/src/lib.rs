@@ -464,6 +464,29 @@ impl Journal {
             Ok(next.clone())
         })
     }
+    /// Read the verified current head and the sorted ids of active (enrolled,
+    /// not revoked) records, from one signed load under the journal's write
+    /// reservation. Read-only: nothing is appended. Errors: closed journal,
+    /// cancellation, Busy (no retry) and any load/signature failure. The head
+    /// is the caller's CAS base for the next `apply`; it is not a rollback
+    /// witness by itself (callers must compare it with an independent one).
+    pub fn snapshot(&self, ctx: &Context) -> Result<(Head, Vec<String>), Error> {
+        let closed = self.closed.read().map_err(|_| Error::State)?;
+        if *closed {
+            return Err(Error::Closed);
+        }
+        let c = self.connect(ctx)?;
+        self.transaction(ctx, &c, |c| {
+            let Loaded { head, records } = self.load(ctx, c)?;
+            let mut active: Vec<String> = records
+                .into_iter()
+                .filter(|(_, e)| !e.revoked)
+                .map(|(id, _)| id)
+                .collect();
+            active.sort();
+            Ok((head, active))
+        })
+    }
     /// Keep callbacks local and reversible. No reentry, close or waiting on writers.
     /// Commit can fail after callback execution; this is not an external-action permit.
     pub fn with_active<T>(
@@ -558,10 +581,28 @@ fn advance(records: &mut HashMap<String, Entry>, c: &Change) -> Result<(), Error
 
 #[cfg(test)]
 mod tests {
+    /// Private operator fallback fixture area (0700 chain), replicating
+    /// `swarm_engine::fallback_area()` inline: this crate has no swarm-engine
+    /// dependency and these fixtures contract private ancestors.
+    fn area() -> std::path::PathBuf {
+        use std::os::unix::fs::DirBuilderExt;
+        let home = std::env::var_os("HOME")
+            .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+        let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+        std::fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(&area)
+            .unwrap_or_else(|e| {
+                panic!("fallback fixture area {} cannot be created: {e}", area.display())
+            });
+        area
+    }
+
     use super::*;
     #[test]
     fn every_connection_has_full_sync_no_busy_timeout_and_sql_cancellation_recovers() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(area()).unwrap();
         let key = SigningKey::from_bytes(&[7; 32]);
         let ctx = Context::new();
         let j = Journal::open(

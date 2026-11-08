@@ -1,0 +1,259 @@
+[
+  {
+    "name": "null-records",
+    "work_id": "w",
+    "task": {
+      "id": "task",
+      "status": "accepted"
+    },
+    "kind": "source"
+  },
+  {
+    "name": "empty-criteria",
+    "work_id": "w",
+    "task": {
+      "id": "task",
+      "criteria": [],
+      "status": "accepted"
+    },
+    "kind": "source"
+  },
+  {
+    "name": "empty-dependencies",
+    "work_id": "w",
+    "task": {
+      "id": "task",
+      "depends": [],
+      "status": "accepted"
+    },
+    "kind": "source"
+  },
+  {
+    "name": "html-and-separators",
+    "work_id": "<work>",
+    "task": {
+      "id": "task",
+      "title": "<title>&  ",
+      "deliverable": "report.md",
+      "criteria": [
+        "A & B"
+      ],
+      "status": "accepted"
+    },
+    "kind": "source"
+  },
+  {
+    "name": "latest-attempt",
+    "work_id": "w",
+    "task": {
+      "id": "task",
+      "attempts": [
+        {
+          "id": "first"
+        },
+        {
+          "id": "last"
+        }
+      ],
+      "status": "accepted"
+    },
+    "kind": "source"
+  },
+  {
+    "name": "gate-present",
+    "work_id": "w",
+    "task": {
+      "id": "task",
+      "gate": {
+        "at": "fixture",
+        "document": {
+          "z": "<raw>&",
+          "a": []
+        },
+        "evaluation": {
+          "allowed": true,
+          "artifacts": {
+            "z.md": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "a.md": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "domain_scores": {
+            "quality": 0.5
+          }
+        }
+      },
+      "status": "accepted"
+    },
+    "kind": "source"
+  },
+  {
+    "name": "review-present",
+    "work_id": "w",
+    "task": {
+      "id": "task",
+      "independent_review": {
+        "id": "review",
+        "state": "passed",
+        "reason": "A & B",
+        "attempt": "last"
+      },
+      "status": "accepted"
+    },
+    "kind": "source"
+  },
+  {
+    "name": "automatic-present",
+    "work_id": "w",
+    "task": {
+      "id": "task",
+      "automatic_validation": {
+        "at": "fixture",
+        "artifacts": {
+          "a.md": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "state": "passed",
+        "attempt_id": "last"
+      },
+      "status": "accepted"
+    },
+    "kind": "source"
+  },
+  {
+    "name": "combined-records",
+    "work_id": "w",
+    "task": {
+      "id": "task",
+      "title": "source",
+      "criteria": [
+        "one"
+      ],
+      "depends": [
+        "dependency"
+      ],
+      "plan_brief_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "gate": {
+        "at": "fixture",
+        "document": {
+          "z": "<raw>&",
+          "a": []
+        },
+        "evaluation": {
+          "allowed": true,
+          "artifacts": {
+            "z.md": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "a.md": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "domain_scores": {
+            "quality": 0.5
+          }
+        }
+      },
+      "independent_review": {
+        "id": "review",
+        "state": "passed",
+        "attempt": "last"
+      },
+      "automatic_validation": {
+        "at": "fixture",
+        "state": "passed",
+        "attempt_id": "last"
+      },
+      "attempts": [
+        {
+          "id": "last"
+        }
+      ],
+      "status": "accepted"
+    },
+    "kind": "source"
+  },
+  {
+    "kind": "cost",
+    "name": "cost-empty",
+    "cost": {
+      "reported_usd": 0,
+      "attempts_with_cost": 0,
+      "attempts_without_cost": 0
+    }
+  },
+  {
+    "kind": "cost",
+    "name": "cost-unreported",
+    "cost": {
+      "reported_usd": 0,
+      "attempts_with_cost": 0,
+      "attempts_without_cost": 3
+    }
+  },
+  {
+    "kind": "cost",
+    "name": "cost-zero-reported",
+    "cost": {
+      "reported_usd": 0,
+      "attempts_with_cost": 1,
+      "attempts_without_cost": 0
+    }
+  },
+  {
+    "kind": "cost",
+    "name": "cost-rounding-down",
+    "cost": {
+      "reported_usd": 1.005,
+      "attempts_with_cost": 1,
+      "attempts_without_cost": 0
+    }
+  },
+  {
+    "kind": "cost",
+    "name": "cost-partial",
+    "cost": {
+      "reported_usd": 2.675,
+      "attempts_with_cost": 1,
+      "attempts_without_cost": 4
+    }
+  },
+  {
+    "kind": "cost",
+    "name": "cost-rounding-even",
+    "cost": {
+      "reported_usd": 3.125,
+      "attempts_with_cost": 2,
+      "attempts_without_cost": 0
+    }
+  },
+  {
+    "kind": "cost",
+    "name": "cost-large",
+    "cost": {
+      "reported_usd": 1e+20,
+      "attempts_with_cost": 1,
+      "attempts_without_cost": 0
+    }
+  },
+  {
+    "kind": "cost",
+    "name": "cost-negative-zero",
+    "cost": {
+      "reported_usd": -0.0,
+      "attempts_with_cost": 1,
+      "attempts_without_cost": 0
+    }
+  },
+  {
+    "name": "raw-number-decimal",
+    "kind": "source",
+    "work_id": "w",
+    "task_json": "{\"id\":\"task\",\"status\":\"accepted\",\"gate\":{\"document\":{\"n\":1.00}}}"
+  },
+  {
+    "name": "raw-number-exponent",
+    "kind": "source",
+    "work_id": "w",
+    "task_json": "{\"id\":\"task\",\"status\":\"accepted\",\"gate\":{\"document\":{\"n\":1e0}}}"
+  },
+  {
+    "kind": "source",
+    "name": "raw-whitespace",
+    "work_id": "w",
+    "task_json": "{ \"id\": \"task\", \"status\": \"accepted\", \"gate\": {\"document\": { \"n\" : 1.00 }}}"
+  }
+]

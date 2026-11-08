@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Isolated public signing-key lifecycle; no external account or production effect."""
 import argparse,hashlib,json,os,re,selectors,signal,subprocess,tempfile,time
+from fixture_area import fixture_area
 from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--archive',action='store_true');p.add_argument('--checkpoint',action='store_true');p.add_argument('--binary',type=Path,required=True);p.add_argument('--evidence-dir',type=Path,required=True);p.add_argument('--timeout-seconds',type=int,default=120);a=p.parse_args();assert a.timeout_seconds>0
 binary=a.binary.resolve();proof=a.evidence_dir.resolve();proof.mkdir(parents=True,exist_ok=True);checks=[]
@@ -29,7 +30,7 @@ def stop(child):
   try:child.wait(timeout=5)
   except subprocess.TimeoutExpired:os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=5)
  child.stdout.close()
-with tempfile.TemporaryDirectory(prefix='swarm-evidence-public-')as fixture:
+with tempfile.TemporaryDirectory(prefix='swarm-evidence-public-', dir=fixture_area())as fixture:
  base=Path(fixture);root=base/'server';root.mkdir();absent=base/'client-absent';call(root,'init');policy={'enabled':True,'key_ttl_seconds':3600}
  identities=[{'subject':s,'token':tokens[k],'integrity':i,'roles':[r]}for k,s,i,r in [('admin','admin',3,'admin'),('admin-two','admin-two',3,'admin'),('alice','alice',1,'requester'),('bob','bob',2,'approver'),('effect','effect-service',2,'effect')]]
  call(root,'trust','config-apply',command('evidence-config',expected_revision=0,reason='isolated evidence lifecycle recipe',policy={'mandate_ttl_seconds':3600,'unknown_reconcile_seconds':0,'evidence_retention_days':365,'require_separation':True},identities=identities,evidence_signing=policy,process_policy={'enabled':True},data_policy={'enabled':True,'classifications':['internal'],'destinations':['local-process-state'],'providers':['swarm'],'tools':['process-workflow'],'resources':[{'resource':'invoice/acme','classification':'internal'}]}));server,origin,session=start(root,'127.0.0.1:0')

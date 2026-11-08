@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "status": "ACTIVE_CODE_VERIFIED_LIVE_AUTHORITY_UI_OPEN",
+  "independent_review": false,
+  "binary_sha256": "c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+  "runtime_files": {
+    "rust/crates/swarm-engine/src/root_store/preparation_admission.rs": "777db35a172fe3202328e7998ae662bb59eb31b27106c17cdbe64a21583c3a8b",
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs": "ba23e645bf79d5ad79463dc0c6328635a259824983cd10ca0377ddd153d18eda",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs": "18f5f716992f4b22f4e884c922c6ec206e0a5564dbbf5511223c5ecef068b6ac",
+    "rust/crates/swarm-engine/src/root_store.rs": "d81699783d724d6bc9bd1932858d6459abae67aa06642a334cf5bad9e9d2b7b0",
+    "rust/crates/swarm-cli/src/trust.rs": "bab985ebda405272640218c9196b53b09eba9305cecb99a717ba705da0c284d9",
+    "rust/crates/swarm-cli/src/lib.rs": "9e159276c61c4fd43da59866b37e0e98ab84ca6b4c4b9d7f57a17aa2025be6ac",
+    "rust/crates/swarm-web/src/service/trust.rs": "f31f0ac23a7783b9ba55a940e0fe04bcda1fd58a01750e5573e5c6038f3ce321",
+    "rust/crates/swarm-web/src/service.rs": "c217f333216a239ed8528720786187c5725e243acf25ff00a4995f72d8acb971"
+  },
+  "policies": {
+    "status": "REVIEWED",
+    "operator_policy_introduced": false,
+    "invariants": [
+      "schema_version1; hash/receipt widths and zero-based slice index are protocol representations, not operator cutoffs",
+      "Canonical existing I3/admin authority plus explicit label clearance for classification; actual authenticated principal clearance for admission, no supplied actor/label",
+      "Existing enable/context/source/freshness/contention settings from shared producer; no new retry/deadline/budget/retention cutoff",
+      "Immutable create-only capsule, no purge/transport behavior implemented; retirement/migration retained as future contract",
+      "No turn, reservation, provider key, worker gate or implicit legacy activation"
+    ]
+  },
+  "functions": {
+    "status": "REVIEWED",
+    "contracts": [
+      "validated_send and capture_in_tx: unchanged send validation/body reused; old send retains atomic save/reserve/verify, exact producer-parity proof retained",
+      "capture_admission_intent: existing saved contention/settings and material binding, Deferred read snapshot and explicit rollback, no business mutation or provider IO",
+      "admission::attribute: canonical I3/admin/current policy before capture, selected exact source; canonical attribution retains uniqueness and monotone history; only request hash in reason, no prompt text",
+      "admission::execute/current/identity/filename: explicit authority, owned private Root and filename grammar, create-only framed file, replay-before-recapture, metadata-only reads",
+      "admission::verify/metadata: owner first, Root/current policy/digest and every captured source rechecked; reconstructed join must equal fixed label; no maximum-clearance substitution",
+      "trust_scoped dispatch and CLI/HTTP namespace/readonly: file ops keep their own checked reservation, input attribution uses canonical journal publication; no local operator shortcut",
+      "HTTP status: exact caller-state variants; stored JSON is Preparation error500 with original cause retained and safe JSON category; corrupt Root/framing/label remain500",
+      "FR/EN help, permanent recipes and fixture contracts reviewed; producer/provider/routing metadata do not authorize a future sink"
+    ]
+  },
+  "errors": {
+    "status": "REVIEWED",
+    "paths": [
+      "auth/grant missing before context/file lookup; strict outer schema refuses actor/label/path injection",
+      "source snapshot errors close/rollback before state publication; context/classification mismatch creates no capsule",
+      "private stored JSON errors preserve cause under safe record-invalid context, not client format success; actual HTTP injected STORED_SECRET never rendered",
+      "native framing checks actual extent/hash before allocation, private descriptor/ownership/regular/no-hardlink guards reused",
+      "create-only storage failures preserve existing originals; renamed durability uncertainty retained under admission-durability-unknown; post-publication Root/release/output failures retain known admission effect",
+      "TrustReply/TrustPublished and CLI preserve()/HTTP publication traversal retain exact markers; Err never implies absent capsule or rollback",
+      "legacy readonly replay test corrected from real304 behavior, no dispatch/claim adoption and reservation unchanged; original FAIL retained"
+    ]
+  },
+  "evidence": {
+    "engine": "engine-02 six exact passed test bodies + legacy-01 one verified replacement; original full batch remains FAIL, engine-reuse records exact scope",
+    "public": "public-02:74 actual CLI/HTTP assertions PASS/VERIFIED; inert executable sentinel control, zero provider launch/turn/reservation",
+    "legacy_public": "legacy-public-01:103 actual CLI/HTTP legacy producer assertions PASS/VERIFIED on same image",
+    "inventory": "inventory-01:60 anchors,25 OPEN flows,5 checker regressions",
+    "production_profile": "qualified default native, empty core features, no fixtures, actual dependency hashes stable",
+    "installed": "installed-02: actual309 image/PID/FR-EN notes/help and22 source hashes verified; modeAuthority owner cookie rejects3 UI assets403; PARTIAL_AUTHORITY_UI_NOT_VERIFIED",
+    "fixture_ui": "ui-02:56 unchanged browser assertions on owned fixture using same production image; actual protected HTTP bytes/FR-EN notes/commit; NOT real Authority acceptance"
+  },
+  "limits": [
+    "This is an opt-in pre-transport prompt-domain path, not transversal legacy-send enforcement",
+    "No account/recipient capability, key classification, output inheritance or OS/descendant confinement",
+    "Upstream transformations do not automatically propagate all classifications; exact assembled source control attribution is explicit",
+    "No human identity/declassification, migration, retirement, backup rollback or malicious same-UID guarantee",
+    "No real policy/classification changed, paid provider call, commit, push or global acceptance",
+    "Live Authority UI requires actual authenticated session; browser host unavailable, user observation requested and pending",
+    "Newer Authority assertion.rs v2 source remains outside this image; actual daemon reports installed != latest build, not reviewed/installed as part of BLP"
+  ],
+  "supporting_files": {
+    "rust/crates/swarm-engine/tests/preparation_calls.rs": "fc4d2aeaaa8c01eb9cecc33ca8af9d53f500b61ef26d232e9f09c4fd19ef4510",
+    "tests/blp_admission_public.py": "c75c1185537613f796b3c56f2c725b1feb517a1f2d15704c0a3cd3542318e79d",
+    "tests/blp_admission_ui.py": "f2b1b6c0c7366f1d27d516cd6b45bcf73c6d2f73cee0fac2e157dea45fef1f6d",
+    "tests/blp_quarantine_installed.py": "fb9a7f16ff7e75aadc0151fd3add1f413f693b9a8c4a154a2d3d1b37c738fca1",
+    "tests/paea_local_delivery_test.cjs": "cbe23a2bc12e079c7e65ed5765970b66ddcc4e9f61d8dd73bfab75f9012d4641",
+    "tools/verification/recipes/blp-preparation-admission-engine.json": "c0eb347515b77750b77d67fd8301df807a3ac2924e5c9b8c9be48117523573cc",
+    "tools/verification/recipes/blp-preparation-admission-legacy-replay.json": "4ad10e9a0af7bfe6ee982cd16e0ae22ed637709212d844195619aba15c2cc846",
+    "tools/verification/recipes/blp-preparation-admission-public.json": "78691a8d6fa881de171619cbb43075709d4be27c782161bde698068632fb40fe",
+    "tools/verification/recipes/blp-preparation-admission-ui.json": "367f390923380e6bc78f68f39f3bbbf45b83c603c4a199b43238c37f6e17e01f",
+    "tools/verification/recipes/blp-flow-inventory.json": "3620cb0e8e1f924a2440ec1753484bd0cb2fc312311f0056d20569440d554d59",
+    "docs/architecture/blp-flow-inventory.json": "b0cbf3e1e5c8f7e4e4442325257a5635ff025738359433b830717e8cfb16de45",
+    "version_history.json": "ed1a493b0a6f02f7b289944353a76d62fae5bcb66d3ea7b8fdd491638fb67e6f"
+  },
+  "supporting_review": {
+    "status": "REVIEWED",
+    "scope": [
+      "Exact six passed test bodies reused; historical active replay case corrected against real304 without touching runtime replay; source/proof hashes retained",
+      "Public CLI/HTTP fixture has valid sentinel, no business SQL writes, safe file faults with controls/restores; helper naming/import error retained and corrected",
+      "Optional installed Authority metadata mode explicitly PARTIAL, requires actualmode and owner-key UI403; never silently skips failed UI assertions",
+      "New browser fixture mode retains all56 assertions and requires own marker/scope; reports distinct fixture result; no real Authority credential or gate bypass",
+      "Private browser data stays under ignored evidence, no live config/classification/source writes or fabricated identity",
+      "Source inventory60 remains25 OPEN; exact flags/profile/runtime image separately retained; later Authority source not included"
+    ]
+  }
+}

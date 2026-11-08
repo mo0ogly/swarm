@@ -40,6 +40,7 @@ or an exhaustive normative assessment.
 | [OWASP ASVS 5.0.0](https://asvs.owasp.org/) | Web application and service verification requirements | Proposed reference for APIs, sessions, permissions and configuration; no ASVS level evaluated here |
 | [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) | Security and privacy control catalogue | Twelve selected controls already map to contextual evidence in the [R19 matrix](actions-confiance-referentiels.md), without a score or global compliance |
 | Biba | Integrity flow control model | I0–I3 monitor in the [Rust trusted actions core](actions-confiance-rust.md); neither content truth, general semantic injection protection nor Linux access control |
+| Bell-LaPadula | Confidentiality flow-control model | [Existing implementation](BELL-LAPADULA.md): revisioned policy, object attribution, targeted readers and preparation diagnostic; end-to-end integration remains incomplete (`runtime_enforced:false`) |
 
 The OWASP ACS page is dated September 1, 2026. The inspected repository README
 already describes a deterministic layer with optional LLM involvement. Swarm

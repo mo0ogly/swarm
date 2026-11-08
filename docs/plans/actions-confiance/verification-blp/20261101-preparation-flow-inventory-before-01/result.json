@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-flow-inventory",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "reviewed-source-flow-contracts",
+      "command": [
+        "/usr/bin/python3",
+        "tools/paea/check_blp_inventory.py",
+        "--inventory",
+        "docs/architecture/blp-flow-inventory.json"
+      ],
+      "expected_exit": 0,
+      "exit": 1,
+      "seconds": 0.06557122399681248,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "24a4185384b2854f0b8ab3f0e7df7b64277643d1862d3808bf45270121c8d6aa",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "7bbacbc538f26f519b9b4103e3ec4fcf3735ea8c69c56330d1ebb7917609bf6e",
+    "declared-inputs.tar.gz": "8a32767e1dc0fb9fb357d8403f6eda756eb474cdaaa7f5704fdf79612d43fa8c",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "38d2cb9362cc5573cccc766b543a56a7954542cdc2c0dd33d088742782221053",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "a230f592caf5521be3bf97f119b3aba4244c4e8ccb9411202c7de7138f99ed49",
+    "inputs.after.json": "7bbacbc538f26f519b9b4103e3ec4fcf3735ea8c69c56330d1ebb7917609bf6e"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "scope": "Native standalone boundary fixture only",
+  "valid_control": {
+    "private_read": true,
+    "private_write": true,
+    "official_write": true,
+    "unix_socket": true,
+    "child_write": true
+  },
+  "confined": {
+    "private_read": false,
+    "private_write": false,
+    "official_write": false,
+    "unix_socket": false,
+    "child_write": false
+  },
+  "workspace_output": true,
+  "hardlink_refused": true,
+  "product_qualified": false,
+  "installed": false
+}

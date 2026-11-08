@@ -474,9 +474,7 @@ mod tests {
     fn receipt_read_snapshot_holds_settings_reservation_until_rollback() {
         use std::{fs, os::unix::fs::PermissionsExt, sync::mpsc};
         let path =
-            std::env::temp_dir().join(crate::generate_identifier("swarm-receipt-read-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            crate::fixture_root("swarm-receipt-read-");
         let mut env = crate::SystemEnvironment;
         let parent = RootStore::initialize(&path, &mut env).unwrap();
         let doc = parent.settings().unwrap();

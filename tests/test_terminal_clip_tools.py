@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from unittest.mock import patch
 
@@ -25,7 +26,7 @@ class TerminalTools(unittest.TestCase):
     """Public generator contracts and atomic pre-publication failure recovery."""
     def setUp(self):
         """Copy only source inputs to this test's isolated filesystem fixture."""
-        self.temp=tempfile.TemporaryDirectory(prefix='terminal-tools-')
+        self.temp=tempfile.TemporaryDirectory(prefix='terminal-tools-', dir=fixture_area())
         self.addCleanup(self.temp.cleanup);self.root=Path(self.temp.name)
         self.source=self.root/'source';self.source.mkdir()
         for name in generator.EXPECTED:shutil.copyfile(SOURCE/name,self.source/name)
@@ -102,7 +103,7 @@ class OracleInputs(unittest.TestCase):
         """Valid pinned inputs precede extra-source refusals and exact recovery."""
         spec=importlib.util.spec_from_file_location('checked_terminal_oracle',ROOT/'tests/generate_terminal_clip_oracle.py')
         oracle=importlib.util.module_from_spec(spec);spec.loader.exec_module(oracle)
-        with tempfile.TemporaryDirectory(prefix='oracle input ') as temp:
+        with tempfile.TemporaryDirectory(prefix='oracle input ', dir=fixture_area()) as temp:
             source=Path(temp)
             for name in oracle.EXPECTED:shutil.copyfile(SOURCE/name,source/name)
             oracle.validate_source(source)

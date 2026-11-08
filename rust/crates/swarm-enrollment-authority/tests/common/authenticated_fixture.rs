@@ -33,6 +33,27 @@ pub(crate) struct Fixture {
 pub(crate) fn mode(path: &std::path::Path, bits: u32) {
     fs::set_permissions(path, fs::Permissions::from_mode(bits)).unwrap()
 }
+/// Governed operator fallback fixture area (0700 chain under
+/// `$HOME/.local/state/swarm-fixtures`), replicating
+/// `swarm_engine::fallback_area()` inline. This file is also included
+/// cross-crate via `#[path]` from `swarm-engine/tests/trust_enrollment.rs`,
+/// where `super::` resolves to the including crate root, so a sibling
+/// `common::fixture_area` path would not resolve there.
+pub(crate) fn area() -> std::path::PathBuf {
+    use std::os::unix::fs::DirBuilderExt;
+    let home = std::env::var_os("HOME").unwrap_or_else(|| {
+        panic!("HOME required for the operator fallback fixture area")
+    });
+    let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+    std::fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(&area)
+        .unwrap_or_else(|e| {
+            panic!("fallback fixture area {} cannot be created: {e}", area.display())
+        });
+    area
+}
 /// Pure existing config operation used after actual account and grant checks.
 pub(crate) fn change() -> Change {
     Change {
@@ -65,7 +86,11 @@ impl Fixture {
         enrolled: bool,
         action: Option<swarm_identity_contract::Permission>,
     ) -> Self {
-        Self::build_bound(enrolled, action, None)
+        Self::build_bound(
+            enrolled,
+            action.into_iter().collect(),
+            None,
+        )
     }
     /// Bind the same real producers to a consumer-owned current plan/revision.
     pub(crate) fn build_for_trust(
@@ -73,14 +98,26 @@ impl Fixture {
         scope: Scope,
         revision: i64,
     ) -> Self {
-        Self::build_bound(true, Some(action), Some((scope, revision)))
+        Self::build_bound(true, vec![action], Some((scope, revision)))
+    }
+    /// Same binding with several exact action permissions signed into the one
+    /// real grant at bootstrap (e.g. one paea-action permission plus the
+    /// trust-action permission of a frozen approval command); nothing else
+    /// changes. The journal accepts one enroll per enrollment id, so every
+    /// permission an account must hold has to be signed at construction.
+    pub(crate) fn build_for_trust_actions(
+        actions: Vec<swarm_identity_contract::Permission>,
+        scope: Scope,
+        revision: i64,
+    ) -> Self {
+        Self::build_bound(true, actions, Some((scope, revision)))
     }
     fn build_bound(
         enrolled: bool,
-        action: Option<swarm_identity_contract::Permission>,
+        actions: Vec<swarm_identity_contract::Permission>,
         binding: Option<(Scope, i64)>,
     ) -> Self {
-        let root = tempfile::tempdir().unwrap();
+        let root = tempfile::tempdir_in(area()).unwrap();
         mode(root.path(), 0o700);
         for name in [
             "bootstrap",
@@ -134,7 +171,7 @@ impl Fixture {
             permissions: [Request::Read, Request::Create(change())]
                 .iter()
                 .map(|r| control::permission(&installation, r).unwrap())
-                .chain(action)
+                .chain(actions)
                 .collect(),
             delegable: vec![],
             not_before: now - Duration::hours(1),

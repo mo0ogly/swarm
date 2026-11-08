@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_biba_stdin_transport.py", line 75, in <module>
+    run(p.parse_args())
+    ~~~^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_biba_stdin_transport.py", line 61, in run
+    assert c.returncode==0,(label,'compiler',c.stderr.decode()[-1800:])
+           ^^^^^^^^^^^^^^^
+AssertionError: ('before', 'compiler', 'error[E0624]: associated function `caused` is private\n  --> /home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/stdio-real-source/before/transport.rs:18:42\n   |\n18 |     E::Launch(Box::new(AgentLaunchError::caused(code, error)))\n   |                                          ^^^^^^ private associated function\n   |\n  --> crates/swarm-engine/src/agent_launch_error.rs:30:4\n   |\n   = note: private associated function defined here\n\nerror: aborting due to 1 previous error\n\nFor more information about this error, try `rustc --explain E0624`.\n')

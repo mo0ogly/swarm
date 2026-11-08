@@ -20,7 +20,7 @@ if __name__=='__main__':
     (ROOT/'.cache').mkdir(exist_ok=True)
     WORK=Path(tempfile.mkdtemp(prefix='swarm-work-read-',dir=ROOT/'.cache'))
 else:
-    WORK=Path(tempfile.gettempdir()) # No artifact allocation on import.
+    WORK=ROOT/'.cache' # No artifact allocation on import; created only by __main__.
 ENV=dict(os.environ,CARGO_TARGET_DIR=os.environ.get('CARGO_TARGET_DIR',str(WORK/'target')));commands=[]
 def save(name,value):
     p=OUTPUT/name;fd,tmp=tempfile.mkstemp(dir=p.parent,prefix='.'+p.name+'.')

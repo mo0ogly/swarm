@@ -426,9 +426,12 @@ remain migration work. For this read, refusals expose a safe static identifier i
 internal causes remain hidden. The interface displays that identifier as text;
 control decisions still use stable codes without parsing message wording.
 
-A canonical source under `.claude/field-guide` still refuses with HTTP501 and
-`versioned-memory-source-guard-not-ported` until its versioned guard is ported.
-The status reader does not bypass this limitation.
+A canonical source under `.claude/field-guide` still refuses: its versioned
+guard is ported (project_memory_source.rs) and exposes typed refusals — a
+managed memory source targeted as a directive refuses with 400
+`project-source-memory-managed` (400 for invalid caller input through
+caller_invalid; a root/SQL inventory failure stays a server error). The
+status reader does not bypass this limitation.
 
 `prepare release-review ID` reads the same `{preparation, work}` object as GET
 `/api/v1/preparations/release-review?id=ID`. Two sequential observations are not
@@ -444,11 +447,16 @@ identity/type/causes refuse. used_in_brief/used_in_plan and stale are recalculat
 from current documents and observed method bytes. The private prompt cannot be
 serialized by this readonly DTO.
 
-Reading kills/finishes no process and changes no reservation. A pending/running/
-stopping turn explicitly refuses501 until its supervisor is ported. Completed
+Reading kills/finishes no process and changes no reservation. An active
+pending/running/stopping turn is observed READ-ONLY: an exact same-event send
+replay returns its recorded status without dispatch, a new reservation or
+worker adoption; a mismatching message conflicts (409
+`preparation-event-conflict`). No row, ledger or provider mutation results;
+the historical `reserved`/`estimated` ledger states stay unchanged. Completed
 history is readable as text in the existing conversation view; send/stop/use
-proposal remain unavailable. No polling, inherited20-turn cap or15s deadline is
-introduced. Future calls and policies require their own saved contract.
+proposal remain unavailable as native-call operations. No polling, inherited
+20-turn cap or15s deadline is introduced. Future calls and policies require
+their own saved contract.
 
 ### Rust preparation AI calls — local pilot
 
@@ -493,16 +501,23 @@ establish neither agent authentication nor OS confinement.
 
 Explicit comparison precedes `use-proposal` with event identity and CAS; version
 history and `source_turn` are preserved. Brief adoption remains explicit, and a
-plan still needs validation. This flow starts no mission. CLI provider adapters,
-legacy active turns and Work API agents remain outside this first integration.
-Versioned-memory sources retain their501 guard and static reason; removing it
-is not a recovery mode.
+plan still needs validation. This flow starts no mission. CLI provider adapters
+and Work API agents remain outside this first integration (legacy active turns
+are since observed read-only, see above). Versioned-memory sources are guarded
+by their ported guard (project_memory_source.rs): a managed source targeted as
+a directive refuses with a typed static reason; removing it is not a recovery
+mode.
 
 Delivered historical compatibility: an exact completed Go turn can be
 replayed without native-worker metadata, provider contact or mutation. Parent and
 request hash still bind the record; another message conflicts. Legacy active
-turns remain explicitly unported (CLI and HTTP501). New calls still accept only
-empty/auto levels. See the historical replay migration record.
+turns (pending/running/stopping) are observed read-only: exact same-event
+replay serves the recorded status across `reserved`/`estimated` ledgers
+without dispatch or adoption; a changed message keeps the 409
+`preparation-event-conflict`; the row and ledger never move. This is a
+read-only historical observation, not a native call: dispatch, stop authority,
+worker adoption and provider contact stay outside it. New calls still accept
+only empty/auto levels. See the historical replay migration record.
 
 ### Rust project profile selection — local pilot
 
@@ -531,8 +546,9 @@ an invalid active JSON profile's SHA for explicit repair, without calling it val
 Recognizable secrets are checked in names, paths and text. Actual `.swarm`/`.git`
 targets and aliases to non-Markdown/text files refuse; on Unix, multiple hardlinks
 and component redirection during open refuse. Evidence concerns Linux, not absence
-of every secret, OS confinement or agent attestation. Versioned memory retains
-its501 guard. The form keeps draft/original SHA on failure; refreshing never
+of every secret, OS confinement or agent attestation. Versioned memory is guarded
+by its ported guard (project_memory_source.rs), with a typed refusal. The form
+keeps draft/original SHA on failure; refreshing never
 silently rebases it. Installation selects no live configuration. See the
 [migration record](../plans/migration-rust/PROJECT-PROFILE-SELECT-20261027.md).
 
@@ -614,7 +630,7 @@ Known structured Claude/Codex tool call/result declarations also interrupt the C
 
 The `simple`, `standard`, `exigeant` levels appear in preparation CLI capabilities with their model, policy and digest, subject to saved announcements and restrictions. Automatic mode keeps its configured route; if denied, a human must choose an allowed explicit mode. No neighboring model is substituted. APIs keep their fixed model and refuse an explicit level. Manual reservations are neither pricing nor invoices.
 
-Explicit sends retain their level in private v2 metadata; API/automatic turns keep v1. An old worker refuses v2 before contact. Terminal receipts and budgets remain retained; finish/interrupt turns using a compatible version before downgrading. A pending event keeps its original payload after capability withdrawal, allowing known-state replay without an implicit new launch.
+New turns retain byte origins and digests in private v3 metadata; explicit CLI levels remain preserved. The manifest covers the complete prompt and its nine data fields, with consistency rechecked before worker handoff. It proves neither BLP classification nor disclosure authority. Historical v1/v2 turns remain readable without a manifest; older workers refuse v3 before contact. Terminal receipts and budgets remain retained; finish/interrupt turns using a compatible version before downgrading. A pending event keeps its original payload after capability withdrawal, allowing known-state replay without an implicit new launch.
 
 ### Profile sources and versioned memory — pilot201
 

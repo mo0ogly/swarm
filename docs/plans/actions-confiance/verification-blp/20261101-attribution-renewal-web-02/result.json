@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-attribution-renewal-web",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "bind-built-web-test-image",
+      "command": [
+        "/usr/bin/python3",
+        "tools/verification/bind_cargo_test_binary.py",
+        "--deps",
+        "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-verification-target/debug/deps",
+        "--target",
+        "paea_git_call",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-attribution-renewal-web-binary.json"
+      ],
+      "expected_exit": 0,
+      "exit": 2,
+      "seconds": 115.87140464098775,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "38db578f9bb229f2b500ef48fead8e615622ebf812a795af0c5cf55356720507",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "7e4e8e7d1c6ed8cdf496dce70b76facc9e1edc05313f321e4758dff2056f3f31",
+    "declared-inputs.tar.gz": "d7abeb18287e4830b8a3c292c51d21519a391af2e13251e44cc8fb14bc8c94f5",
+    "environment.json": "5bb3210e002c55a567147892b20d4eb8449de3a250e9a119554abecea3f95608",
+    "step-0001.stdout": "e8af6022b5da4f403b13f5fb34310f06ee8a5aaecad46220032d1cec0e87b0ad",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "a015f86111ccfd28acb5bfc7825ca3ad488700483ed7ed07bd86d4378ce2027c",
+    "inputs.after.json": "7e4e8e7d1c6ed8cdf496dce70b76facc9e1edc05313f321e4758dff2056f3f31"
+  }
+}

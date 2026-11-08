@@ -1,0 +1,2 @@
+   Compiling swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+error: could not compile `swarm-engine` (lib) due to 1 previous error; 3 warnings emitted

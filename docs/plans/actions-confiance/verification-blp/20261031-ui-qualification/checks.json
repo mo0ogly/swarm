@@ -1,0 +1,21 @@
+{
+  "checks": [
+    "real page served; BLP asset referenced",
+    "Admin dialog opens",
+    "blp-load business refusal displayed: Identité ou autorité insuffisante ; l’Admin exige un jeton I3 courant — Vérifier l’état avant reprise (one 403 authorization_required)",
+    "example fills 4-level no-clearance policy; status: Exemple sans habilitation ; aucune modification enregistrée",
+    "save disabled without validated preview",
+    "EN legend: Bell-LaPadula confidentiality",
+    "EN typed refusal: Insufficient identity or authority; Admin requires a current I3 token — Inspect state before recovery",
+    "theme toggled to: etat",
+    "no horizontal overflow at 390px"
+  ],
+  "errors": [],
+  "expectedHttp": [
+    "403 http://127.0.0.1:38433/api/v1/trust-actions?action=blp-show",
+    "403 http://127.0.0.1:38433/api/v1/trust-actions?action=blp-show"
+  ],
+  "sessionFile": ".swarm/web-session-e6ed55c9891a1038",
+  "server": "v0.1.1-dev.282",
+  "at": "2026-10-31T20:11:48.220Z"
+}

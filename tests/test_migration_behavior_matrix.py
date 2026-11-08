@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 
@@ -18,7 +19,7 @@ class MatrixRefusals(unittest.TestCase):
 
     def setUp(self):
         """Load explicit known-good input; fixture cleanup owns only its temp root."""
-        self.fixture = tempfile.TemporaryDirectory(prefix='migration-matrix-')
+        self.fixture = tempfile.TemporaryDirectory(prefix='migration-matrix-', dir=fixture_area())
         self.addCleanup(self.fixture.cleanup)
         self.base = Path(self.fixture.name)
         self.inventory = json.loads(Path(os.environ['SWARM_MATRIX_INVENTORY']).read_bytes())

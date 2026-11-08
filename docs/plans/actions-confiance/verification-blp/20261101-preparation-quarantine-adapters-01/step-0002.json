@@ -1,0 +1,22 @@
+{
+  "id": "build-separate-pending-fixture-helper",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "build",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--features",
+    "test-fixtures",
+    "--example",
+    "preparation_quarantine_fixture"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 48.25169284299773,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

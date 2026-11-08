@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/home/fpizzi/Documents/ChatGPT/swarm/tools/verification/verify_native_profile.py",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "--target-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-native-version846-target",
+    "--output",
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-zit1wgl1/build/profile"
+  ],
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "metadata_sha256": "24ae7b7e26655622aa242cd43aad495fd7618570423eae6842f965bb78b6571f",
+  "global_watchdog": null
+}

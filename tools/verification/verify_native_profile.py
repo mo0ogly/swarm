@@ -55,26 +55,30 @@ def manifest(root,paths):
 
 
 CARGO_CONFIG_NAMES=('.cargo/config','.cargo/config.toml')
+CARGO_SUPPORT_NAMES=('.cargo/storage-policy.json','tools/verification/cargo_space_guard.py')
 
 
 def cargo_config_inputs(root):
-    """Return checkout-local Cargo configuration selected from the build cwd.
+    """Return checkout-local Cargo configuration and admission-tool input bytes.
 
     Both Cargo filename spellings are retained if present; Cargo resolves their
     precedence. Aliased/symlinked config paths refuse: their canonical manifest
     key could otherwise hide config removal. Missing historical config is valid.
+    The optional local admission wrapper/policy are retained when present, even
+    though rustc depfiles omit them. Their drift/removal invalidates reuse just
+    like config drift; absent historical support files remain compatible.
     Ancestor/CARGO_HOME configuration and C compiler flags are not authenticated
     by this local inventory. Exact config bytes are evidence, not runtime proof.
     """
-    paths=[root/name for name in CARGO_CONFIG_NAMES
+    paths=[root/name for name in (*CARGO_CONFIG_NAMES,*CARGO_SUPPORT_NAMES)
            if (root/name).exists() or (root/name).is_symlink()]
     require(all(path.resolve()==path for path in paths),'profile-cargo-config-symlink-unsupported')
     return paths
 
 
 def config_manifest(inputs):
-    """Project an existing manifest onto Cargo config keys, preserving absence."""
-    return {name:inputs[name] for name in CARGO_CONFIG_NAMES if name in inputs}
+    """Select Cargo config/wrapper/policy input hashes, preserving historical absence."""
+    return {name:inputs[name] for name in (*CARGO_CONFIG_NAMES,*CARGO_SUPPORT_NAMES) if name in inputs}
 
 
 def verify_config_invocation(root,call):

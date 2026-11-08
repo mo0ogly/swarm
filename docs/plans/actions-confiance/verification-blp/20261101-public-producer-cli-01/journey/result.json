@@ -1,0 +1,189 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "qualified-image-init",
+      "passed": true
+    },
+    {
+      "name": "trust-policy-produced",
+      "passed": true
+    },
+    {
+      "name": "blp-revision-1-produced",
+      "passed": true
+    },
+    {
+      "name": "session-cannot-attribute",
+      "passed": true
+    },
+    {
+      "name": "worker-cannot-attribute",
+      "passed": true
+    },
+    {
+      "name": "public-attribution-1-produced",
+      "passed": true
+    },
+    {
+      "name": "attribution-1-exact-replay",
+      "passed": true
+    },
+    {
+      "name": "attribution-1-duplicate-refuses",
+      "passed": true
+    },
+    {
+      "name": "blp-revision-2-produced",
+      "passed": true
+    },
+    {
+      "name": "stale-attribution-refuses",
+      "passed": true
+    },
+    {
+      "name": "producer-downgrade-refuses",
+      "passed": true
+    },
+    {
+      "name": "public-attribution-2-produced",
+      "passed": true
+    },
+    {
+      "name": "attribution-2-exact-replay",
+      "passed": true
+    },
+    {
+      "name": "attribution-2-duplicate-refuses",
+      "passed": true
+    },
+    {
+      "name": "equal-label-history-positive-control",
+      "passed": true
+    },
+    {
+      "name": "positive-read-is-readonly",
+      "passed": true
+    },
+    {
+      "name": "public-downgrade-refuses",
+      "passed": true
+    },
+    {
+      "name": "public-refusal-preserves-journal",
+      "passed": true
+    },
+    {
+      "name": "public-refusal-redacts-material",
+      "passed": true
+    },
+    {
+      "name": "public-exact-fixture-recovery",
+      "passed": true
+    },
+    {
+      "name": "confidential-downgrade-refuses",
+      "passed": true
+    },
+    {
+      "name": "confidential-refusal-preserves-journal",
+      "passed": true
+    },
+    {
+      "name": "confidential-refusal-redacts-material",
+      "passed": true
+    },
+    {
+      "name": "confidential-exact-fixture-recovery",
+      "passed": true
+    },
+    {
+      "name": "image-stayed-identical",
+      "passed": true
+    }
+  ],
+  "artifacts": {
+    "01-init.argv.json": "4d0adaa1c0f28b698be9d9f6f84c8064f9f2c0e603a5fe9f15473e1e603d4a25",
+    "01-init.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-init.stdout": "dc7eebe068ca820368b8d962e072fd4260d4ec40619242b47007e14f0bb350f9",
+    "02-config-apply.argv.json": "014f4e9ff7876c119a1302564d3a730b2455a16278484ec656d4274d670a4b99",
+    "02-config-apply.input.json": "13c8eb6c2e9b28c95acb7e85585c3a26026987b126fc1d27a6baf62e3e125fe3",
+    "02-config-apply.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-config-apply.stdout": "7df13294d7ecd6a275e04ee2ca596692934306cff2c130e44371b7e12806a568",
+    "03-blp-policy-apply.argv.json": "e73f71f83fca9dcc66b7a79133d62a7ba27ca5143637d31effa6b15e855c7f60",
+    "03-blp-policy-apply.input.json": "8c7b189b2caaa245fc64e1288de5faceaaab3a36b2b826b3b7a6c9247914e8a3",
+    "03-blp-policy-apply.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-blp-policy-apply.stdout": "3700b6f83db6d5ded85daea6b606731208d6d5488e591dde9ee755b4f3b35049",
+    "04-blp-object-attribute.argv.json": "053666f7705302f0bf0e67b3703b025031b4df37071f763789e7b26f67958e7d",
+    "04-blp-object-attribute.input.json": "01b1736a9a73ab2dba6be2b947d0e6dd9e714537284d7dfaa6d824d2d9bc6bb7",
+    "04-blp-object-attribute.stderr": "91b63438f9d842a289863c2589bad61cfba0e3c307f4f6a203707d93bf8b5ad8",
+    "04-blp-object-attribute.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "05-blp-object-attribute.argv.json": "5f7b4b40b8c885c86fe79a2735cc18e9f7e438d15bd5daa8599e1f0d7cafe82b",
+    "05-blp-object-attribute.input.json": "01b1736a9a73ab2dba6be2b947d0e6dd9e714537284d7dfaa6d824d2d9bc6bb7",
+    "05-blp-object-attribute.stderr": "91b63438f9d842a289863c2589bad61cfba0e3c307f4f6a203707d93bf8b5ad8",
+    "05-blp-object-attribute.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-blp-object-attribute.argv.json": "9736baa5ec5cef68c1578c117e6d35fcb9cfff15f5a042ce48013cab85f5b739",
+    "06-blp-object-attribute.input.json": "01b1736a9a73ab2dba6be2b947d0e6dd9e714537284d7dfaa6d824d2d9bc6bb7",
+    "06-blp-object-attribute.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-blp-object-attribute.stdout": "b15f106ab987efa0669b5cc62f42a011a053318b927571b9695d085a4102283e",
+    "07-blp-object-attribute.argv.json": "b41921956fa31caa19db20b553ee73836ba478b48de31c6cdb5dadd1a601f5f6",
+    "07-blp-object-attribute.input.json": "01b1736a9a73ab2dba6be2b947d0e6dd9e714537284d7dfaa6d824d2d9bc6bb7",
+    "07-blp-object-attribute.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "07-blp-object-attribute.stdout": "b15f106ab987efa0669b5cc62f42a011a053318b927571b9695d085a4102283e",
+    "08-blp-object-attribute.argv.json": "98eef7639d2b71088fcc81ec300cc8015655a1f61421ab77e67661ce81ed27d0",
+    "08-blp-object-attribute.input.json": "c3a91561f44bb3092c1567646e608441b2044ded9a05414703c46990dd42348a",
+    "08-blp-object-attribute.stderr": "8af40bdf1bac9ae40203c944f8be94843551827ea95eeb2c2e24889c62d7acc7",
+    "08-blp-object-attribute.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "09-blp-policy-apply.argv.json": "3a2085bb590387c57fbdb724a346058d62b290c090a2aaded0ac996922b7de7b",
+    "09-blp-policy-apply.input.json": "26640f71240c0558ef5cc1dff7ca34fb2478d0f6bf386661aae22027d750756c",
+    "09-blp-policy-apply.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "09-blp-policy-apply.stdout": "979f73b9f8c83974ad4c1570ed1d6ce7fde827614353870a7db1f8ad5307a3c3",
+    "10-blp-object-attribute.argv.json": "3680d2202258e1b43f7a8ea9a6a62dd6ea4dbb77515377dc42590e5039ebcf12",
+    "10-blp-object-attribute.input.json": "b396f25e73cec48146c60d199450c40175be00d32762d5f89d4f58234cf3d309",
+    "10-blp-object-attribute.stderr": "d712a89cd11e812dbaf103a455074170aee09517f8881c9b7c5cf65ca60939dd",
+    "10-blp-object-attribute.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "11-blp-object-attribute.argv.json": "7c5ca99174e8d067659655aaa4f5dc66d29b866e104d542074e171572b2ca9da",
+    "11-blp-object-attribute.input.json": "c287478de39743de2f87456b33fef5f9a6c5fa4b370a5dece77369eb5e8bc7da",
+    "11-blp-object-attribute.stderr": "8ddf453f3a5a28de0c8ba3d71b5c5ccfb10edab2b4d16ca9c827d4bd6459333e",
+    "11-blp-object-attribute.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "12-blp-object-attribute.argv.json": "6e90fee222788accc5b5780bf64849a95508438a4a090f8f03bc8ccf53b44d25",
+    "12-blp-object-attribute.input.json": "7647e2f1e96cb9d4039204b4a41f147a0676a41c6f45d87f59b972cc08cb6d6f",
+    "12-blp-object-attribute.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "12-blp-object-attribute.stdout": "5648f55ab57b720f24a2c85ccf334e5058ccd918a8ef8eef48407fd01f06e4f0",
+    "13-blp-object-attribute.argv.json": "de3a0d1609e0876a9240db52cc9075b6fabed9571c2118a386650ace599abeff",
+    "13-blp-object-attribute.input.json": "7647e2f1e96cb9d4039204b4a41f147a0676a41c6f45d87f59b972cc08cb6d6f",
+    "13-blp-object-attribute.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "13-blp-object-attribute.stdout": "5648f55ab57b720f24a2c85ccf334e5058ccd918a8ef8eef48407fd01f06e4f0",
+    "14-blp-object-attribute.argv.json": "d10e1f986852c86eff4781ca615cb0bbc54eacc2c2d4c4b7a1a6fded87e09f40",
+    "14-blp-object-attribute.input.json": "9758e313c05954811a953a2a8537acd212bfd59f4760052d157117765c2ebf3f",
+    "14-blp-object-attribute.stderr": "8af40bdf1bac9ae40203c944f8be94843551827ea95eeb2c2e24889c62d7acc7",
+    "14-blp-object-attribute.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "15-blp-show.argv.json": "8a16d0fa3405c2c3e845c846b6fc3e326e661c42b040f9e75d052a1014e1ddab",
+    "15-blp-show.input.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "15-blp-show.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "15-blp-show.stdout": "03cc2d3dd661d9b2d3763f88774e02dd6240ddc76cf129d9903c7d053fd0bdd4",
+    "16-blp-show.argv.json": "1e2a9ee9977a60d454399df08026ec7b9376e2d2d1e51043c28335b3ccecba46",
+    "16-blp-show.input.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "16-blp-show.stderr": "f6200fc709ad90a1ea9403938115f0ecaf36a9ac9bd09e2272998b3b4a7b6edf",
+    "16-blp-show.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "17-blp-show.argv.json": "89f95a52a172da79501e9857500ceb269c517225032797f1a34fb2f34d115057",
+    "17-blp-show.input.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "17-blp-show.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "17-blp-show.stdout": "03cc2d3dd661d9b2d3763f88774e02dd6240ddc76cf129d9903c7d053fd0bdd4",
+    "18-blp-show.argv.json": "170f387233fc001e80706171afcba16bf6e500c95b5949aa67c4fd3e3ec6b6c9",
+    "18-blp-show.input.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "18-blp-show.stderr": "f6200fc709ad90a1ea9403938115f0ecaf36a9ac9bd09e2272998b3b4a7b6edf",
+    "18-blp-show.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "19-blp-show.argv.json": "13dd499645d1b8bd5d6ef1e9fd42048ae319bcc666123587abe0170497db0283",
+    "19-blp-show.input.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "19-blp-show.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "19-blp-show.stdout": "03cc2d3dd661d9b2d3763f88774e02dd6240ddc76cf129d9903c7d053fd0bdd4",
+    "checks.json": "6846ce0071c9d6e0469661684a0b5764089993d3a6ce544729eb4c94fa507972",
+    "identity.json": "7ad888a16494a683e07cb89593dee53feced4c7a053c8ec955da0abba085a675",
+    "valid-history-state.json": "f129d8d4a335217715bcbb2d518990b7e43bd1c77a8661cf29ad6cc8215f8c4c"
+  },
+  "binary_sha256": "e1adea56e4cf53e0787d362f55e14bbd53d40c82a38b3815a081b0a33e203c73",
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-blp-history-dkd7bc3r",
+  "global_watchdog": null,
+  "limits": "public attribution controls; negative history fixture only; no physical source lineage/declassification/independent acceptance"
+}

@@ -45,10 +45,7 @@ fn write_record(sink: &mut dyn Write, outcome: &NativeJobOutcome) -> io::Result<
 #[test]
 fn native_observer_write_and_flush_failure_retain_actual_settings_publication() {
     for flush_failure in [false, true] {
-        let p =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("observer96-").unwrap());
-        fs::create_dir(&p).unwrap();
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+        let p = swarm_engine::fixture_root("observer96-");
         let r = RootStore::initialize(&p, &mut SystemEnvironment).unwrap();
         let document = r.settings().unwrap();
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();

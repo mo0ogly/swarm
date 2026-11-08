@@ -18,10 +18,7 @@ struct Fixture {
 impl Fixture {
     /// Real owned Root and persisted session; all test data stays under this0700root.
     fn new() -> Self {
-        let root = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("settings-http93-").unwrap());
-        fs::create_dir(&root).unwrap();
-        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        let root = swarm_engine::fixture_root("settings-http93-");
         let r = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let key = r.web_session(&listener).unwrap().secret().to_owned();

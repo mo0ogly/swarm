@@ -32,6 +32,11 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/paea-linux.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-linux.html"))),
         "/paea-linux.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-linux.js"))),
         "/paea-lab.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-lab.html"))),
+        "/paea-effects.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-effects.html"))),
+        "/paea-effects.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-effects.js"))),
+        "/paea-approval-form.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-approval-form.js"))),
+        "/paea-consent.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-consent.html"))),
+        "/paea-consent.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-consent.js"))),
         "/paea-lab.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-lab.js"))),
         "/paea.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea.js"))),
         "/paea.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/paea.css"))),
@@ -45,8 +50,12 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/paea-examples/v1/payment-request.json"=>Some(("application/json; charset=utf-8",include_bytes!("../../../../../web/paea-examples/v1/payment-request.json"))),
         "/paea-examples/v1/payment-after.json"=>Some(("application/json; charset=utf-8",include_bytes!("../../../../../web/paea-examples/v1/payment-after.json"))),
         "/paea-examples/v1/git-after.json"=>Some(("application/json; charset=utf-8",include_bytes!("../../../../../web/paea-examples/v1/git-after.json"))),
+        "/security-proofs.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/security-proofs.html"))),
+        "/security-proofs.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/security-proofs.js"))),
+        "/security-proofs.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/security-proofs.css"))),
         "/trust-actions.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/trust-native.html"))),
         "/trust-native.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/trust-native.js"))),
+        "/trust-confidentiality.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/trust-confidentiality.js"))),
         "/trust-native.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/trust-native.css"))),
 
         "/cockpit.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/cockpit.css"))),
@@ -82,6 +91,7 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/cockpit-native-pricing.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-pricing.js"))),
         "/cockpit-native-quotas.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-quotas.js"))),
         "/cockpit-native.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native.js"))),
+        "/cockpit-authority.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-authority.js"))),
         "/native-runtime/base.css" => Some((
             "text/css; charset=utf-8",
             include_bytes!("../../../../../web/processes.css"),
@@ -113,6 +123,7 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/native-runtime/log-read-policy.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-log-read-policy.js"))),
         "/native-runtime/activity-policy.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-activity-policy.js"))),
         "/native-runtime/graph-performance.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-graph-performance.js"))),
+        "/native-runtime/authority-admin.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-authority-admin.js"))),
         "/native-runtime/web-requests-admin.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-web-requests.js"))),
         "/native-runtime/provider-wait.js" => Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/native-provider-wait.js"))),
         "/native-runtime/settings.js" => Some((
@@ -176,8 +187,18 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
     if source.matches("</head>").count() != 1 {
         return Err(HttpServiceError::Refused("web-cockpit-template-invalid"));
     }
-    source=source.replacen("</nav>","<a href=\"/trust-actions.html\" data-i18n>Biba — Actions de confiance</a><a href=\"/paea.html\" data-i18n>Vérifications PAEA</a></nav>",1);
-    let scripts = "<link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native-resume.js\" defer></script><script src=\"/cockpit-native-logs.js\" defer></script><script src=\"/cockpit-native-instructions.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
+    source=source.replacen("</nav>","<a href=\"/trust-actions.html\" data-i18n>Biba — Actions de confiance</a><a href=\"/security-proofs.html\" data-i18n>Sécurité et preuves</a><a href=\"/paea.html\" data-i18n>Vérifications PAEA</a></nav>",1);
+    // Wattson-style "Utilisateurs et accès" view next to Administration
+    // (accounts, permissions, access logs from the authority daemon; the
+    // entry hides itself outside authority mode).
+    let admin_button = "<button data-view=\"admin\">Administration</button>";
+    let admin_section = "<section id=\"admin\" class=\"view\"";
+    if source.matches(admin_button).count() != 1 || source.matches(admin_section).count() != 1 {
+        return Err(HttpServiceError::Refused("web-cockpit-template-invalid"));
+    }
+    source = source.replacen(admin_button, "<button data-view=\"admin\">Administration</button><button data-view=\"authority\">Utilisateurs et accès</button>", 1);
+    source = source.replacen(admin_section, "<section id=\"authority\" class=\"view\" hidden aria-labelledby=\"authority-title\"><h2 id=\"authority-title\">Utilisateurs et accès</h2><div id=\"native-authority-admin\" hidden></div></section><section id=\"admin\" class=\"view\"", 1);
+    let scripts = "<link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native-resume.js\" defer></script><script src=\"/cockpit-native-logs.js\" defer></script><script src=\"/cockpit-native-instructions.js\" defer></script><script src=\"/native-runtime/authority-admin.js\" defer></script><script src=\"/cockpit-authority.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
     source = source.replacen("</head>", scripts, 1);
     let tag = "<html lang=\"fr\" data-theme=\"etat\">";
     if source.matches(tag).count() != 1 {
@@ -191,8 +212,8 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
 
 /// Respond only after the caller checks the scoped cookie/exact Host and CSRF for
 /// non-GET/HEAD methods. Assets cannot mutate Root; unsupported methods return405.
-/// Shared CSP/no-store/HEAD behavior applies. The page truthfully hosts only native
-/// mission reads, settings and unused-instruction rejection, not complete parity.
+/// Shared CSP/no-store/HEAD behavior applies. The page hosts native reads and
+/// explicitly ported task/settings/instruction edits, not complete parity.
 /// Explicit writes reuse protected Root APIs and their revision/ownership checks;
 /// asset delivery itself grants no mutation or complete workflow authority.
 pub(super) fn reply(r: &Request<Vec<u8>>) -> Result<HttpReply, HttpServiceError> {

@@ -1,0 +1,20 @@
+{
+  ".cache/rust-build-local/debug/.fingerprint/swarm-web-a085ed2f074b586a/lib-swarm_web.json": {
+    "sha256": "5e5b417fa3f7b3151e0e8ee1bc9819fb45e623701f982bb3d3cfeb661e6cf88d",
+    "features": "[]",
+    "rustflags": [],
+    "compile_kind": 0
+  },
+  ".cache/rust-build-local/debug/.fingerprint/swarm-cli-563fa70d72480a3c/lib-swarm_cli.json": {
+    "sha256": "75e55410eda564c870fa4a4bbbe82ddbed6a19ddf7abad5d099a137b1465f5f6",
+    "features": "[]",
+    "rustflags": [],
+    "compile_kind": 0
+  },
+  ".cache/rust-build-local/debug/.fingerprint/swarm-engine-8ee5b2515d0e3fad/lib-swarm_engine.json": {
+    "sha256": "d5ba429a3c6deeefdb875382bb2b8a2a41d309fe307b902a937888b0cc0dbee7",
+    "features": "[]",
+    "rustflags": [],
+    "compile_kind": 0
+  }
+}

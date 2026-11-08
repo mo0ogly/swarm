@@ -1,0 +1,4 @@
+Vérification isolée du serveur Rust et de sa version…
+Candidat Rust qualifié sélectionné : v0.1.1-dev.309 · SHA256 c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b
+Entrées compilées modifiées depuis ce candidat, non installées : 1
+Swarm : http://127.0.0.1:38433/ (démon d’autorité ; moteur interne 127.0.0.1:38434)

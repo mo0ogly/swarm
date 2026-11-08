@@ -1,4 +1,5 @@
 """Offline fixture snapshot refusal/recovery; synthetic bytes are not a real DB."""
+from fixture_area import fixture_area
 from pathlib import Path
 import importlib.util,tempfile,unittest,os,json,errno
 from unittest.mock import patch
@@ -10,7 +11,7 @@ class FixtureSnapshot(unittest.TestCase):
     """Valid capture/restore precedes each corruption or publication fault."""
     def setUp(self):
         """Use one owned disposable tree; no Root SQL/process/provider exists."""
-        t=tempfile.TemporaryDirectory(prefix='cutover-synthetic-');self.addCleanup(t.cleanup)
+        t=tempfile.TemporaryDirectory(prefix='cutover-synthetic-', dir=fixture_area());self.addCleanup(t.cleanup)
         self.base=Path(t.name);self.root=self.base/'root';self.root.mkdir(mode=0o700)
         (self.root/'.swarm').mkdir(mode=0o700);(self.root/'.swarm/state.db').write_bytes(b'opaque fixture DB stand-in')
         (self.root/'empty').mkdir(mode=0o700);(self.root/'config').write_bytes(b'PRIVATE inert fixture config')

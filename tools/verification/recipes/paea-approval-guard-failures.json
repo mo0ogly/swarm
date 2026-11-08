@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "paea-approval-guard-failures",
+  "inputs": [
+    "tests/paea_approval_guard_failures.py",
+    "tests/paea-approval-state-fail-closed.cjs",
+    "web/**/*",
+    "locales/en.json",
+    "package.json",
+    "package-lock.json",
+    "tools/verification/README.md",
+    "tools/verification/recipes/paea-approval-guard-failures.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "paea-approval-guard-failures-fresh-tmpdir-python",
+      "command": [
+        "sh",
+        "-c",
+        "dir=$(mktemp -d \"${TMPDIR:-/tmp}/paea-approval-guard-failures.XXXXXXXX\") && echo \"$dir\" && exec python3 tests/paea_approval_guard_failures.py --output \"$dir\""
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_APPROVAL_GUARD_FAILURES_PASS 4"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

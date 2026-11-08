@@ -25,7 +25,7 @@ fn version(path: &std::path::Path) -> i64 {
 fn every_older_store_reads_as_is_and_migrates_on_write() {
     assert_eq!(TELEMETRY_SCHEMA_VERSION, 7, "extend ADDED when the schema grows");
     for old in [2, 4, 5, 6] {
-        let root = std::env::temp_dir().join(swarm_engine::generate_identifier("telemetry-migrate-").unwrap());
+        let root = swarm_engine::fixture_root("telemetry-migrate-");
         fs::create_dir_all(root.join(".swarm")).unwrap();
         TelemetryStore::open(&root, true).unwrap().close().unwrap();
         let db = root.join(".swarm").join(TELEMETRY_DB);

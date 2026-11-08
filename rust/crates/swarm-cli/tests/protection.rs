@@ -31,7 +31,7 @@ fn cli(root: &std::path::Path, input: &std::path::Path, language: &str, operatio
 
 #[test]
 fn protection_both_domains_are_offline_and_context_never_becomes_authority() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let input = dir.path().join("document.json");
     for language in ["fr", "en"] {
         for index in [0, 8] {
@@ -50,7 +50,7 @@ fn protection_both_domains_are_offline_and_context_never_becomes_authority() {
 
 #[test]
 fn protection_refusal_then_recovery_preserves_safe_causes_and_empty_root() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let input = dir.path().join("document.json");
     let raw = serde_json::to_string(&fixture(0)).unwrap();
     fs::write(
@@ -77,7 +77,7 @@ fn protection_refusal_then_recovery_preserves_safe_causes_and_empty_root() {
 
 #[test]
 fn protection_live_operations_are_not_advertised_as_implemented() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let input = dir.path().join("document.json");
     fs::write(&input, serde_json::to_vec(&fixture(0)).unwrap()).unwrap();
     for op in ["commit", "approve", "config-apply", "mandate-create"] {
@@ -106,7 +106,7 @@ fn protection_live_operations_are_not_advertised_as_implemented() {
 #[cfg(target_os = "linux")]
 #[test]
 fn protection_output_failure_is_nonzero_without_project_side_effects() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let input = dir.path().join("document.json");
     fs::write(&input, serde_json::to_vec(&fixture(8)).unwrap()).unwrap();
     let full = fs::OpenOptions::new()
@@ -142,7 +142,7 @@ fn compare_cli(root: &std::path::Path, language: &str, extra: &[&str]) -> Output
 
 #[test]
 fn protection_comparison_both_domains_preserves_values_and_authority_boundary() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     for language in ["fr", "en"] {
         for (before, after, path) in [(0, 2, "/action/amount_minor"), (8, 10, "/action/candidate_oid")] {
             let old = serde_json::to_vec(&fixture(before)).unwrap();
@@ -169,7 +169,7 @@ fn protection_comparison_both_domains_preserves_values_and_authority_boundary() 
 
 #[test]
 fn protection_comparison_fault_on_either_side_refuses_then_recovers() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let valid = serde_json::to_vec(&fixture(0)).unwrap();
     for file in ["before.json", "after.json"] {
         fs::write(dir.path().join("before.json"), &valid).unwrap();
@@ -201,7 +201,7 @@ fn protection_comparison_fault_on_either_side_refuses_then_recovers() {
 
 #[test]
 fn protection_comparison_rejects_runtime_options_without_project_effects() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let valid = serde_json::to_vec(&fixture(8)).unwrap();
     fs::write(dir.path().join("before.json"), &valid).unwrap();
     fs::write(dir.path().join("after.json"), &valid).unwrap();
@@ -236,7 +236,7 @@ fn protection_comparison_rejects_runtime_options_without_project_effects() {
 #[cfg(target_os = "linux")]
 #[test]
 fn protection_comparison_output_failure_then_recovery() {
-    let dir = tempfile::tempdir().unwrap();
+    let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let valid = serde_json::to_vec(&fixture(0)).unwrap();
     fs::write(dir.path().join("before.json"), &valid).unwrap();
     fs::write(dir.path().join("after.json"), &valid).unwrap();

@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-verification-target/debug/examples/preparation_quarantine_fixture",
+    "dispatch",
+    "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+    "pt-6e1cd379a273c13fff5eb037ec9f2663"
+  ],
+  "exit": 0,
+  "fixture_binary_sha256": "83b1003158d7f011bb74d1fd1f0da6e4e26945d8a62e5499ee791daf73af988b",
+  "production_binary_sha256": "75ad879faf4807d33b6b9c3ff5a71e570aa76d252f394da3b309d95ecadda5e9"
+}

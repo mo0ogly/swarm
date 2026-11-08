@@ -17,6 +17,8 @@ pub enum RuntimeOperation {
     Hostname,
     Output,
     Platform,
+    /// Creating/checking the saved runtime temporary directory (v51).
+    TemporaryDirectory,
 }
 pub struct RuntimeError {
     operation: RuntimeOperation,
@@ -39,6 +41,7 @@ impl RuntimeError {
             RuntimeOperation::Hostname => "runtime-hostname",
             RuntimeOperation::Output => "runtime-output",
             RuntimeOperation::Platform => "runtime-platform",
+            RuntimeOperation::TemporaryDirectory => "runtime-temporary-directory",
         }
     }
 }

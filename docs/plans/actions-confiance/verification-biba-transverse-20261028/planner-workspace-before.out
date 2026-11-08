@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_managed_planning.py", line 169, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_managed_planning.py", line 163, in main
+    try:run(args.binary.resolve(),args.profile.resolve(),args.output.resolve())
+        ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_managed_planning.py", line 74, in run
+    first=f.ok(['planning','step',f.work]);assert first['run']['decision_applied']
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_agent_model_route.py", line 143, in ok
+    assert code == 0, (self.label,args,code,value)
+           ^^^^^^^^^
+AssertionError: ('managed-planning', ['planning', 'step', 'w-b1296361b0f028f5d65996f0'], 2, {'error': 'Travail w-b1296361b0f028f5d65996f0 révision 4 enregistré ; échec de sortie/fermeture : work state recorded (w-b1296361b0f028f5d65996f0, revision 4); operation refused or failed; re-read before retrying. Vérifier l’état enregistré avant de relancer le contrôle.', 'failure': {'causes': ['work-state-preserved', 'planning-provider-gate-refused'], 'code': 'work-state-preserved', 'message': 'Travail w-b1296361b0f028f5d65996f0 révision 4 enregistré ; échec de sortie/fermeture : work state recorded (w-b1296361b0f028f5d65996f0, revision 4); operation refused or failed; re-read before retrying. Vérifier l’état enregistré avant de relancer le contrôle.', 'retryable': False}, 'recorded_work': {'id': 'w-b1296361b0f028f5d65996f0', 'revision': 4}, 'schema_version': 1})

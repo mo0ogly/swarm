@@ -80,9 +80,7 @@ mod tests {
     /// Generated technical commits are fixtures, never source checkout commits.
     fn fixture() -> (PathBuf, LocalDirectory, EngineSettingsDocument, String) {
         let path =
-            std::env::temp_dir().join(crate::generate_identifier("managed-candidate-").unwrap());
-        std::fs::create_dir(&path).unwrap();
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+            crate::fixture_root("managed-candidate-");
         println!("CANDIDATE_FIXTURE {}", path.display());
         let directory = LocalDirectory::open_owned(&path).unwrap();
         let values = crate::EngineSettingsValues::installation_defaults().unwrap();

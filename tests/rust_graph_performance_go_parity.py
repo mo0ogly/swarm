@@ -7,6 +7,7 @@ live mission, global watchdog or accepted identity is inferred.
 """
 from pathlib import Path
 import argparse,json,os,subprocess,tempfile,traceback
+from fixture_area import fixture_area
 from rust_agent_model_route import publish,digest
 
 def run(binary,go,output):
@@ -16,7 +17,7 @@ def run(binary,go,output):
     live history. Projections exclude only observed actor/time and native view
     extensions; actual values/config/history remain compared.
     """
-    output.mkdir(parents=True,exist_ok=False);publish(output/'harness.py',Path(__file__).read_bytes());commands=[];roots={kind:Path(tempfile.mkdtemp(prefix='web-policy-parity-'+kind+'-')) for kind in ['go','native']};checks=[]
+    output.mkdir(parents=True,exist_ok=False);publish(output/'harness.py',Path(__file__).read_bytes());commands=[];roots={kind:Path(tempfile.mkdtemp(prefix='web-policy-parity-'+kind+'-', dir=fixture_area())) for kind in ['go','native']};checks=[]
     for root in roots.values():(root/'empty-bin').mkdir()
     def call(kind,args,value=None,success=True):
         exe=go if kind=='go' else binary;argv=[str(exe),*args,'--root',str(roots[kind]),'--json'];number=len(commands)

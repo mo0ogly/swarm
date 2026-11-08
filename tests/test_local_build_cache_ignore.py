@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,7 +55,7 @@ class LocalBuildCacheIgnore(unittest.TestCase):
 
     def test_ignore_keeps_data_and_already_tracked_files(self):
         """A valid isolated index witness survives adopting the same ignore rules."""
-        root = Path(tempfile.mkdtemp(prefix='swarm186-ignore-'))
+        root = Path(tempfile.mkdtemp(prefix='swarm186-ignore-', dir=fixture_area()))
         try:
             self.assertEqual(git(root, 'init', '--quiet').returncode, 0)
             cache = root / '.cache'

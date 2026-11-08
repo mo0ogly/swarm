@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-quarantine-adapters",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "http-quarantine-refusal-and-cleanup",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--lib",
+        "service::tests::preparation_quarantine_status_keeps_cleanup_failures_server_errors",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 53.93214233299659,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "build-separate-pending-fixture-helper",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--features",
+        "test-fixtures",
+        "--example",
+        "preparation_quarantine_fixture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 48.25169284299773,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "b1c28f2e5e808f28326f14b020d744bda70098ae40c2821a7bb412520084f8b5",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "18d619331f80b1133ad0981e9d255e372f4c82b37efa34b6f675c96a4bce867b",
+    "declared-inputs.tar.gz": "afa1c82770d64f8850a9c52b048d72b9bfc1b38f58bf4813bdfeb5021ad59cf1",
+    "environment.json": "5bb3210e002c55a567147892b20d4eb8449de3a250e9a119554abecea3f95608",
+    "step-0001.stdout": "50938f773368b7c72e13aa7f1cda8266ae48964ea1c0c569b2cc8a748b5c5cb2",
+    "step-0001.stderr": "59a337f3d235e14a6a587b72ae0779c1fc25bfa213ce01a1baeae61b4806b971",
+    "step-0001.json": "3bcbe7a3bae1bc1b5410d922b2a388d14a646996cd19557f00b7c757d1d19ff4",
+    "step-0002.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0002.stderr": "ecd7af4c834373e021ef4653b9a5ba3327cd93fa1332ac5514e3844e6a50827f",
+    "step-0002.json": "863e529b028a0d2ca3d4eb31af16f69ae2f37fb80eb73d81f08e66e370f34ef8",
+    "inputs.after.json": "18d619331f80b1133ad0981e9d255e372f4c82b37efa34b6f675c96a4bce867b"
+  }
+}

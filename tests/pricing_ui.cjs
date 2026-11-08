@@ -3,7 +3,7 @@
 // themes, modal widths, persistence, stale writes and CLI/API parity. No global
 // watchdog or provider call; named progress and retained screenshots aid diagnosis.
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{spawn}=require('child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-budget-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser;
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-budget-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser;
 // cli runs only the supplied local binary against this private fixture root;
 // it returns parsed JSON or rejects, never calling a provider.
 async function cli(args,input){return new Promise((resolve,reject)=>{const p=spawn(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])]);let text='',err='';p.stdout.on('data',x=>text+=x);p.stderr.on('data',x=>err+=x);p.on('exit',c=>c?reject(Error(err||text)):resolve(text?JSON.parse(text):null));p.stdin.end(input?JSON.stringify(input):undefined)})}

@@ -1,0 +1,57 @@
+{
+  "enabled": true,
+  "policy": {
+    "message_max_bytes": 8000,
+    "context_max_bytes": 96000,
+    "turn_limit": 20,
+    "response_max_bytes": 1048576,
+    "timeout_seconds": 300,
+    "timeout_maximum_seconds": 600,
+    "refresh_ms": 2000,
+    "transport": "json"
+  },
+  "providers": [
+    {
+      "name": "api-local",
+      "model": "fixed-model",
+      "digest": "5931f4f88bc19a9773e72ef3da030b6ada867d4c532772d98bb423b10267266c"
+    },
+    {
+      "name": "fixture",
+      "model": "fixture-standard",
+      "digest": "8bce4dfa8d0b95df833a621765e7a078e5b8372aa154b5bb6916d4d30e5ce476",
+      "levels": [
+        {
+          "level": "auto",
+          "available": true,
+          "model": "fixture-standard",
+          "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+          "digest": "8bce4dfa8d0b95df833a621765e7a078e5b8372aa154b5bb6916d4d30e5ce476"
+        },
+        {
+          "level": "simple",
+          "available": false,
+          "model": "",
+          "policy_hash": "",
+          "digest": "",
+          "reason": "agent-model-choice-not-announced"
+        },
+        {
+          "level": "standard",
+          "available": true,
+          "model": "fixture-standard",
+          "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+          "digest": "12a94376369b00b5f1dde1b7a1ef329513c58ff07f0e025063d71198d6097054"
+        },
+        {
+          "level": "exigeant",
+          "available": false,
+          "model": "",
+          "policy_hash": "",
+          "digest": "",
+          "reason": "agent-model-choice-not-announced"
+        }
+      ]
+    }
+  ]
+}

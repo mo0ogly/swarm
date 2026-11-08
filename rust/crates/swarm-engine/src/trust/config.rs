@@ -107,9 +107,17 @@ pub(crate) fn change(
             policy.validate()?;continue;
         }
         super::extensions::validate(name, value)?;
-        let prior = st.extensions.get(name).or_else(|| controls.get(name));
-        if prior.is_none_or(|v|v.raw()!=value.raw()) {
-            return Err(E::Unsupported("trust-extension-edit-not-ported"));
+        // Delegation and data_policy are ported: an operator may admit or
+        // change them (delegation depth 0 disables child mandates; a data
+        // policy block replaces the effective policy). Every other retained
+        // block stays frozen: an unported active policy must never silently
+        // become effective. The effective data_policy (supplied or stored) is
+        // deep-validated below via require_supported before any persistence.
+        if name != "delegation" && name != "data_policy" {
+            let prior = st.extensions.get(name).or_else(|| controls.get(name));
+            if prior.is_none_or(|v|v.raw()!=value.raw()) {
+                return Err(E::Unsupported("trust-extension-edit-not-ported"));
+            }
         }
     }
     let fingerprint = super::digest(&ConfigDigest(&c))?;
@@ -151,6 +159,10 @@ pub(crate) fn change(
         let public = proposed.public()?;
         let mut value=json!({"schema_version":1,"current_revision":st.revision,"proposed_revision":next,"policy":proposed.policy,"identities":public["identities"],"identity_count":proposed.identities.len(),"applied":false});
         if let Some(policy)=public.get("role_separation"){value["role_separation"]=policy.clone();}
+        // Go's preview projects the effective data policy (supplied or stored,
+        // defaulted when nil) so an operator sees the admission path that the
+        // proposal would activate before applying it.
+        if let Some(policy)=public.get("data_policy"){value["data_policy"]=policy.clone();}
         return encoded(&value);
     }
     proposed.revision = next;

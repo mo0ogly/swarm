@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "status": "SCOPED_INCREMENT_VERIFIED_INSTALLED",
+  "review_kind": "self-review, not independent acceptance",
+  "baseline": "installed303 compiler source archive; exact scoped runtime diff retained",
+  "runtime_files": {
+    "rust/crates/swarm-engine/src/root_store/preparation_attribution.rs": {
+      "baseline303_sha256": null,
+      "current_sha256": "8b9a4761cae66822a44e86c883265957cd745316aa38ebfacf970c4a20f81886"
+    },
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs": {
+      "baseline303_sha256": "71ed5917ea0a84e77574fbae609eeda6fc928e682183099564b0576e8f74c3df",
+      "current_sha256": "12ef0111b53c4d7f86ca93869c1bd1c75bfe02482ac01ea6ff92ef21338af856"
+    },
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs": {
+      "baseline303_sha256": "95f3ffe4d4a03c7d0068868abae1b67be6ecb4e2341d0cbaf6e0c888cb6d98cd",
+      "current_sha256": "2c977828bd39969af3fc6f94dd1df724d1dc1e3559407aa30508b64d3c76725d"
+    },
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs": {
+      "baseline303_sha256": "4dcfc08ec162c8c17286cfc08a1cd5ffc44ef793df7ea99207c44534274d0ca6",
+      "current_sha256": "e2692af15e92476560807a34e6f7dfcfdf1373da30181fb9bbc969614228d894"
+    },
+    "rust/crates/swarm-engine/src/root_store.rs": {
+      "baseline303_sha256": "cf1770cfc7a9657927cc954e3e472820c4683424ded72068fc88c97258f1f493",
+      "current_sha256": "e9fbfe6efbfae8d38cb3053fcc32a9e6f1b8876b3c9003234298f88e7abfbd19"
+    },
+    "rust/crates/swarm-cli/src/trust.rs": {
+      "baseline303_sha256": "5649bc7d822f4ba8f80a9c647ef66fd5138114df1c29f0c8225607c30bc4e95e",
+      "current_sha256": "5e3c035fa0cfa7906bb174bc2492c606d4a4ff990857450a82f9754c5716c089"
+    },
+    "rust/crates/swarm-cli/src/lib.rs": {
+      "baseline303_sha256": "258f9bd9f2d0011ee64693a9009dd90a5d8abefe06c953e7c7006bd92752c698",
+      "current_sha256": "79c1659f39055d0160907495544c0b159052d85aa54a668806d5dc968ffcaf82"
+    },
+    "rust/crates/swarm-web/src/service/trust.rs": {
+      "baseline303_sha256": "0eb2bf8c2ba360cbd859a2ac16bbea270c465e9794efde41b9d00e730923e5a5",
+      "current_sha256": "7dafb19493a756814e639c7562a1eb1069c38d9bb320b7a01cde42180e9492bf"
+    },
+    "rust/crates/swarm-web/src/service.rs": {
+      "baseline303_sha256": "fe238d4fbef71c11d76662a7ac7356e7fdbfeb4848e16d96523ea6900c187d29",
+      "current_sha256": "a42eadeb7fdde9f6fc69aa130402dfbc93d0ce0802cb6ec4d0c4faf679682886"
+    }
+  },
+  "policies": {
+    "status": "REVIEWED",
+    "new_operator_policy": false,
+    "items": [
+      "schema_version1 and zero-based source indexing are wire/protocol invariants; usize is a technical representation, not an operator cutoff",
+      "I3/admin classification authority uses canonical existing authentication::require_administrator; label clearance is checked separately before row access",
+      "No default label, implicit public source, retry, timeout, budget or grant introduced",
+      "producer_captured:true records source resolution only; global runtime_enforced:false and explicit quarantine semantics unchanged",
+      "Whole-prompt DATA_FIELDS and native v3 provenance remain existing protocol inventories; every slice is still required for diagnostic join"
+    ]
+  },
+  "functions": {
+    "status": "REVIEWED",
+    "contracts": [
+      "preparation_attribution::execute: exclusive Trust caller; authenticate/clearance/current authority, capture selection, canonical attribution, content-free failures; no classified transport",
+      "preparation_call::attribution_source: one complete row SELECT, statement cleanup, caller transaction preserved, parent/source_revision/native Root/full manifest validation; no text returned",
+      "Manifest::source_digest: complete provenance verification before exact index; invalid index refuses",
+      "RootStore::trust_scoped_reserved: mutating namespace retains writable check, exclusive Trust, canonical validation/proof and publication/cleanup",
+      "CLI trust::execute and HTTP NativeHttpService::trust_actions: fixed operation namespace, existing independent bearer/CSRF/Root closure/publication behavior; no new read shortcut",
+      "HttpServiceError::status: exact trust-command Refused variants map400/403/404/409/501; wrappers/corrupt provenance and Root mismatch stay500",
+      "CLI FR/EN help updated for partial quarantine enforcement and authenticated blp-check rather than Admin-only claim",
+      "Fixture functions/documentation reviewed; added Rustdoc-only insertion preserves executable test bytes, separate test-doc-review retained"
+    ]
+  },
+  "errors": {
+    "status": "REVIEWED",
+    "paths": [
+      "Absent/disabled/weak actor rejects before turn lookup; no source metadata leak via error code",
+      "Malformed/forged digest/path fields reject via strict Request decode; no fallback",
+      "Stale policy/trust or wrong parent/source revision refuse before attribution; unknown index404, corrupted source/root500",
+      "Source read/statement/material-postcheck/close failures occur before canonical state mutation; causes propagate",
+      "Canonical uniqueness, event conflict and cross-revision no-declassification retain original protocol; event fingerprint pins capture selector/reason",
+      "Root publishes only successful validated local State; in-memory failures are discarded, existing TrustPublished/cleanup preserve late known/uncertain effects; no Err implies rollback",
+      "Single SELECT avoids nested transaction; valid control, held caller transaction, faults and exact restoration tested on owned fixtures"
+    ]
+  },
+  "evidence": {
+    "engine": "20261101-preparation-source-producer-engine-04 (2 named tests PASS/VERIFIED; doc-only insertion later documented)",
+    "adapters": "20261101-preparation-source-producer-adapters-02 (1 named HTTP unit PASS/VERIFIED)",
+    "public": "20261101-preparation-source-producer-public-02 (103 assertions PASS/VERIFIED, normal qualified image and inert local provider)",
+    "inventory": "20261101-preparation-source-producer-inventory-02 (56 references,25 OPEN flows,5 checker regressions)",
+    "installed": "20261101-preparation-source-producer-installed-01 (304,21 runtime inputs,56 browser assertions,help FR/EN)"
+  },
+  "limits": [
+    "Post-capture control attribution; original admission principal/fixed domain/producer inheritance not established",
+    "No account/recipient transport authorization, OS/descendant confidentiality, output inheritance, migration or human declassification",
+    "No classification or policy changes on real data; no paid provider call",
+    "Concurrent Authority/Graph changes are preserved but not independently reviewed by this BLP scope",
+    "Failed source collectors/builds and original fixture recipe defects remain intact, superseded only for the specific corrected criteria",
+    "No commit, push or independent acceptance performed by this increment"
+  ],
+  "supporting_files": {
+    "rust/crates/swarm-engine/src/root_store/preparation_confidentiality_tests.rs": "b52a5161fe3ea20bdf75ec05dafd84878ca7679d924cf69d3fc8a9025a420835",
+    "tests/blp_preparation_check.py": "405611fadbac6e151f0babb34a127f02254bc1ea41296ed19efd1312b90ff456",
+    "tests/blp_quarantine_installed.py": "2184c3c5c8090e8c0d7ad0c370460b8adc038c722df01a53e8eab50e37162a09",
+    "tools/verification/recipes/blp-preparation-source-producer-engine.json": "948614fc0239f3afc325a216bf3ce36c8a4c79079bcf6418c8d08c698baa1fe2",
+    "tools/verification/recipes/blp-preparation-source-producer-adapters.json": "a2f6393a8376bcc7e63b1d2aa0fe04e176ac45cc7348d92e61581db75c722095",
+    "tools/verification/recipes/blp-preparation-source-producer-public.json": "5e7fcb92f13003aaa13ea552543d54796b2a3e352ef7175f9d48970666384fdc",
+    "tools/verification/recipes/blp-flow-inventory.json": "8136ebee469ebef539b223a68cc7dd930247f692cc8802581e8ce89fd0b8627d",
+    "docs/architecture/blp-flow-inventory.json": "20381969c01931d0aaaa530986c9951a6a6f33cbfd55863f504455df661eb3c2",
+    "version_history.json": "aad4b54793575729da1f485bb09651ed8e8d683b244d36f9ddb01ac80c229b34"
+  },
+  "supporting_review": {
+    "status": "REVIEWED",
+    "scope": [
+      "Test CLI/HTTP tuple-order defect corrected with retained original403 response; all103 final assertions passed",
+      "Fixtures use owned roots/inert providers; native/SQL fault tests restore controls, production helper never enabled",
+      "Installed read-only probe optional source-producer flag pins21 actual runtime inputs plus FR/EN help;56 browser assertions retained; no live business write",
+      "Recipe engine closure separated from web; source guards preserved and failed batches never rewritten as PASS",
+      "Inventory56 source anchors remains all25 flows OPEN",
+      "version_history new FR/EN captured-source entry and304 notes match compiled/live history; unrelated release notes preserved",
+      "Rustdoc-only addition after engine04 preserves executable test bytes; no extra application test required for wording change"
+    ]
+  },
+  "documentation_recovery": "Final concurrent stash conflict: both299/304 summaries retained, originals compressed losslessly and only two documentation index entries resolved; no runtime bytes changed"
+}

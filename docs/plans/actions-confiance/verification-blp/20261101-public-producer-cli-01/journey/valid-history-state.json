@@ -1,0 +1,528 @@
+{
+  "confidentiality": {
+    "schema_version": 1,
+    "history": [
+      {
+        "revision": 1,
+        "trust_revision": 1,
+        "event_id": "blp-policy-0",
+        "actor": "admin",
+        "at": "2026-11-01T11:08:18.57820878Z",
+        "reason": "Explicit fixture policy",
+        "policy_digest": "81120fee1c5caa0863b71272496a953c140946867ec885849db675c1c982595c",
+        "policy": {
+          "schema_version": 1,
+          "levels": [
+            {
+              "id": "public",
+              "name_fr": "Public",
+              "name_en": "Public"
+            },
+            {
+              "id": "confidential",
+              "name_fr": "Confidentiel",
+              "name_en": "Confidential"
+            }
+          ],
+          "compartments": [
+            "client-a"
+          ],
+          "clearances": {
+            "admin": {
+              "level": "confidential",
+              "compartments": [
+                "client-a"
+              ]
+            }
+          }
+        },
+        "attributions": [
+          {
+            "canonical_digest": "52496607b734d45a6cf5aebc775596f79ca5a14fe6c4483aa2676358d92d1fbd",
+            "project_path": [
+              47,
+              104,
+              111,
+              109,
+              101,
+              47,
+              102,
+              112,
+              105,
+              122,
+              122,
+              105,
+              47,
+              68,
+              111,
+              99,
+              117,
+              109,
+              101,
+              110,
+              116,
+              115,
+              47,
+              67,
+              104,
+              97,
+              116,
+              71,
+              80,
+              84,
+              47,
+              115,
+              119,
+              97,
+              114,
+              109,
+              47,
+              46,
+              115,
+              119,
+              97,
+              114,
+              109,
+              45,
+              102,
+              105,
+              120,
+              116,
+              117,
+              114,
+              101,
+              115,
+              47,
+              115,
+              119,
+              97,
+              114,
+              109,
+              45,
+              98,
+              108,
+              112,
+              45,
+              104,
+              105,
+              115,
+              116,
+              111,
+              114,
+              121,
+              45,
+              100,
+              107,
+              100,
+              55,
+              98,
+              99,
+              51,
+              114
+            ],
+            "policy_revision": 1,
+            "level": "confidential",
+            "compartments": [
+              "client-a"
+            ],
+            "actor": "admin",
+            "at": "2026-11-01T11:08:18.992814462Z",
+            "reason": "PRIVATE_BLP_HISTORY_FIXTURE"
+          }
+        ]
+      },
+      {
+        "revision": 2,
+        "trust_revision": 1,
+        "event_id": "blp-policy-1",
+        "actor": "admin",
+        "at": "2026-11-01T11:08:19.361861234Z",
+        "reason": "Explicit fixture policy",
+        "policy_digest": "81120fee1c5caa0863b71272496a953c140946867ec885849db675c1c982595c",
+        "policy": {
+          "schema_version": 1,
+          "levels": [
+            {
+              "id": "public",
+              "name_fr": "Public",
+              "name_en": "Public"
+            },
+            {
+              "id": "confidential",
+              "name_fr": "Confidentiel",
+              "name_en": "Confidential"
+            }
+          ],
+          "compartments": [
+            "client-a"
+          ],
+          "clearances": {
+            "admin": {
+              "level": "confidential",
+              "compartments": [
+                "client-a"
+              ]
+            }
+          }
+        },
+        "attributions": [
+          {
+            "canonical_digest": "52496607b734d45a6cf5aebc775596f79ca5a14fe6c4483aa2676358d92d1fbd",
+            "project_path": [
+              47,
+              104,
+              111,
+              109,
+              101,
+              47,
+              102,
+              112,
+              105,
+              122,
+              122,
+              105,
+              47,
+              68,
+              111,
+              99,
+              117,
+              109,
+              101,
+              110,
+              116,
+              115,
+              47,
+              67,
+              104,
+              97,
+              116,
+              71,
+              80,
+              84,
+              47,
+              115,
+              119,
+              97,
+              114,
+              109,
+              47,
+              46,
+              115,
+              119,
+              97,
+              114,
+              109,
+              45,
+              102,
+              105,
+              120,
+              116,
+              117,
+              114,
+              101,
+              115,
+              47,
+              115,
+              119,
+              97,
+              114,
+              109,
+              45,
+              98,
+              108,
+              112,
+              45,
+              104,
+              105,
+              115,
+              116,
+              111,
+              114,
+              121,
+              45,
+              100,
+              107,
+              100,
+              55,
+              98,
+              99,
+              51,
+              114
+            ],
+            "policy_revision": 2,
+            "level": "confidential",
+            "compartments": [
+              "client-a"
+            ],
+            "actor": "admin",
+            "at": "2026-11-01T11:08:19.731217868Z",
+            "reason": "PRIVATE_BLP_HISTORY_FIXTURE"
+          }
+        ]
+      }
+    ]
+  },
+  "schema_version": 1,
+  "revision": 1,
+  "policy": {
+    "mandate_ttl_seconds": 3600,
+    "unknown_reconcile_seconds": 0,
+    "evidence_retention_days": 365,
+    "require_separation": true
+  },
+  "identities": [
+    {
+      "subject": "admin",
+      "token_hash": "9a15be1f2e1a5b4e41600f7d58814b0c30aa097b0d4819830219bf15c8cdeecb",
+      "integrity": 3,
+      "roles": [
+        "admin"
+      ]
+    },
+    {
+      "subject": "worker",
+      "token_hash": "eecbee6f990fc47bd045523f400c18b95be2a1121a8dd1d02a02357542a49fcc",
+      "integrity": 1,
+      "roles": [
+        "requester"
+      ]
+    },
+    {
+      "subject": "approver",
+      "token_hash": "e158cea318dc8c5dc4b3ab23c6cafc75a22c81d89a90e8742a273ce8c08608a4",
+      "integrity": 2,
+      "roles": [
+        "approver"
+      ]
+    }
+  ],
+  "history": [
+    {
+      "actor": "local-operator",
+      "at": "2026-11-01T11:08:18.420962225Z",
+      "event_id": "trust-init",
+      "policy": {
+        "evidence_retention_days": 365,
+        "mandate_ttl_seconds": 3600,
+        "require_separation": true,
+        "unknown_reconcile_seconds": 0
+      },
+      "reason": "Owned inert history fixture",
+      "revision": 1
+    }
+  ],
+  "mandates": {},
+  "actions": {},
+  "connector_receipts": {},
+  "ledger": [],
+  "evidence": [
+    {
+      "policy_context": {
+        "schema_version": 1,
+        "revision": 1,
+        "policy": {
+          "mandate_ttl_seconds": 3600,
+          "unknown_reconcile_seconds": 0,
+          "evidence_retention_days": 365,
+          "require_separation": true
+        },
+        "controls": {"data_policy":{"resources":[],"enabled":false,"classifications":[],"destinations":[],"providers":[],"tools":[]},"delegation":{"max_depth":0},"evidence_signing":{"enabled":false,"key_ttl_seconds":86400},"group_mapping":{"enabled":false,"claim":"groups","rules":[]},"kernel_check":{"enabled":false,"timeout_seconds":15,"ring_bytes":65536},"kernel_observation":{"enabled":false,"window_seconds":5,"timeout_seconds":15,"ring_bytes":65536,"max_events":128},"laboratory":{"enabled":false,"timeout_seconds":30,"max_concurrent_runs":1},"oidc_logout":{"enabled":false,"max_age_seconds":300,"replay_retention_seconds":600},"process_policy":{"enabled":false},"sealed_execution":{"enabled":false,"timeout_seconds":15},"secret_broker":{"enabled":false,"material_ttl_seconds":300,"grant_ttl_seconds":60,"max_material_bytes":4096,"max_entries":16},"step_up":{"enabled":false,"operations":["approve"],"acr_values":[],"max_age_seconds":0,"proof_ttl_seconds":300},"workload_introspection":{"enabled":false,"endpoint":"","client_id":"","timeout_seconds":15,"validation_window_seconds":5,"max_sessions":64,"max_token_bytes":16384}}
+      },
+      "identity_context": {
+        "schema_version": 1,
+        "configuration_revision": 1,
+        "principal_id": "admin",
+        "principal_kind": "local",
+        "issuer": "urn:swarm:local",
+        "subject": "admin",
+        "assurance": {
+          "method": "local_bearer",
+          "provider_authenticated_at": null
+        },
+        "attributes": {
+          "roles": [
+            "admin"
+          ],
+          "integrity": 3
+        },
+        "delegation_id": null,
+        "authenticated_at": "2026-11-01T11:08:18.57820878Z",
+        "expires_at": null,
+        "token_digest": "9a15be1f2e1a5b4e41600f7d58814b0c30aa097b0d4819830219bf15c8cdeecb"
+      },
+      "sequence": 1,
+      "previous_hash": "",
+      "hash": "c7f8831905554aa07dee4376c55f28757f8d0d8f19b0f0fa7cfc7721f0bf0a64",
+      "kind": "blp-policy-apply",
+      "actor": "admin",
+      "integrity": 3,
+      "object_id": "blp-policy",
+      "content_digest": "3700b6f83db6d5ded85daea6b606731208d6d5488e591dde9ee755b4f3b35049",
+      "original_digest": "8c7b189b2caaa245fc64e1288de5faceaaab3a36b2b826b3b7a6c9247914e8a3",
+      "result": "recorded",
+      "reason": "BLP policy recorded; runtime integration not established",
+      "at": "2026-11-01T11:08:18.57820878Z"
+    },
+    {
+      "policy_context": {
+        "schema_version": 1,
+        "revision": 1,
+        "policy": {
+          "mandate_ttl_seconds": 3600,
+          "unknown_reconcile_seconds": 0,
+          "evidence_retention_days": 365,
+          "require_separation": true
+        },
+        "controls": {"data_policy":{"resources":[],"enabled":false,"classifications":[],"destinations":[],"providers":[],"tools":[]},"delegation":{"max_depth":0},"evidence_signing":{"enabled":false,"key_ttl_seconds":86400},"group_mapping":{"enabled":false,"claim":"groups","rules":[]},"kernel_check":{"enabled":false,"timeout_seconds":15,"ring_bytes":65536},"kernel_observation":{"enabled":false,"window_seconds":5,"timeout_seconds":15,"ring_bytes":65536,"max_events":128},"laboratory":{"enabled":false,"timeout_seconds":30,"max_concurrent_runs":1},"oidc_logout":{"enabled":false,"max_age_seconds":300,"replay_retention_seconds":600},"process_policy":{"enabled":false},"sealed_execution":{"enabled":false,"timeout_seconds":15},"secret_broker":{"enabled":false,"material_ttl_seconds":300,"grant_ttl_seconds":60,"max_material_bytes":4096,"max_entries":16},"step_up":{"enabled":false,"operations":["approve"],"acr_values":[],"max_age_seconds":0,"proof_ttl_seconds":300},"workload_introspection":{"enabled":false,"endpoint":"","client_id":"","timeout_seconds":15,"validation_window_seconds":5,"max_sessions":64,"max_token_bytes":16384}}
+      },
+      "identity_context": {
+        "schema_version": 1,
+        "configuration_revision": 1,
+        "principal_id": "admin",
+        "principal_kind": "local",
+        "issuer": "urn:swarm:local",
+        "subject": "admin",
+        "assurance": {
+          "method": "local_bearer",
+          "provider_authenticated_at": null
+        },
+        "attributes": {
+          "roles": [
+            "admin"
+          ],
+          "integrity": 3
+        },
+        "delegation_id": null,
+        "authenticated_at": "2026-11-01T11:08:18.992814462Z",
+        "expires_at": null,
+        "token_digest": "9a15be1f2e1a5b4e41600f7d58814b0c30aa097b0d4819830219bf15c8cdeecb"
+      },
+      "sequence": 2,
+      "previous_hash": "c7f8831905554aa07dee4376c55f28757f8d0d8f19b0f0fa7cfc7721f0bf0a64",
+      "hash": "91923a4317f8156652c7e47501c419f86741c2841f2608dd8098afc5d6cbfd63",
+      "kind": "blp-object-attribute",
+      "actor": "admin",
+      "integrity": 3,
+      "object_id": "blp-attribution",
+      "content_digest": "b15f106ab987efa0669b5cc62f42a011a053318b927571b9695d085a4102283e",
+      "original_digest": "01b1736a9a73ab2dba6be2b947d0e6dd9e714537284d7dfaa6d824d2d9bc6bb7",
+      "result": "recorded",
+      "reason": "Object attribution recorded under the current BLP policy; runtime integration not established",
+      "at": "2026-11-01T11:08:18.992814462Z"
+    },
+    {
+      "policy_context": {
+        "schema_version": 1,
+        "revision": 1,
+        "policy": {
+          "mandate_ttl_seconds": 3600,
+          "unknown_reconcile_seconds": 0,
+          "evidence_retention_days": 365,
+          "require_separation": true
+        },
+        "controls": {"data_policy":{"resources":[],"enabled":false,"classifications":[],"destinations":[],"providers":[],"tools":[]},"delegation":{"max_depth":0},"evidence_signing":{"enabled":false,"key_ttl_seconds":86400},"group_mapping":{"enabled":false,"claim":"groups","rules":[]},"kernel_check":{"enabled":false,"timeout_seconds":15,"ring_bytes":65536},"kernel_observation":{"enabled":false,"window_seconds":5,"timeout_seconds":15,"ring_bytes":65536,"max_events":128},"laboratory":{"enabled":false,"timeout_seconds":30,"max_concurrent_runs":1},"oidc_logout":{"enabled":false,"max_age_seconds":300,"replay_retention_seconds":600},"process_policy":{"enabled":false},"sealed_execution":{"enabled":false,"timeout_seconds":15},"secret_broker":{"enabled":false,"material_ttl_seconds":300,"grant_ttl_seconds":60,"max_material_bytes":4096,"max_entries":16},"step_up":{"enabled":false,"operations":["approve"],"acr_values":[],"max_age_seconds":0,"proof_ttl_seconds":300},"workload_introspection":{"enabled":false,"endpoint":"","client_id":"","timeout_seconds":15,"validation_window_seconds":5,"max_sessions":64,"max_token_bytes":16384}}
+      },
+      "identity_context": {
+        "schema_version": 1,
+        "configuration_revision": 1,
+        "principal_id": "admin",
+        "principal_kind": "local",
+        "issuer": "urn:swarm:local",
+        "subject": "admin",
+        "assurance": {
+          "method": "local_bearer",
+          "provider_authenticated_at": null
+        },
+        "attributes": {
+          "roles": [
+            "admin"
+          ],
+          "integrity": 3
+        },
+        "delegation_id": null,
+        "authenticated_at": "2026-11-01T11:08:19.361861234Z",
+        "expires_at": null,
+        "token_digest": "9a15be1f2e1a5b4e41600f7d58814b0c30aa097b0d4819830219bf15c8cdeecb"
+      },
+      "sequence": 3,
+      "previous_hash": "91923a4317f8156652c7e47501c419f86741c2841f2608dd8098afc5d6cbfd63",
+      "hash": "c3364cf1868748bf9d01e6561088fa64cc1b58e965700da63903a9f5a6df90e7",
+      "kind": "blp-policy-apply",
+      "actor": "admin",
+      "integrity": 3,
+      "object_id": "blp-policy",
+      "content_digest": "979f73b9f8c83974ad4c1570ed1d6ce7fde827614353870a7db1f8ad5307a3c3",
+      "original_digest": "26640f71240c0558ef5cc1dff7ca34fb2478d0f6bf386661aae22027d750756c",
+      "result": "recorded",
+      "reason": "BLP policy recorded; runtime integration not established",
+      "at": "2026-11-01T11:08:19.361861234Z"
+    },
+    {
+      "policy_context": {
+        "schema_version": 1,
+        "revision": 1,
+        "policy": {
+          "mandate_ttl_seconds": 3600,
+          "unknown_reconcile_seconds": 0,
+          "evidence_retention_days": 365,
+          "require_separation": true
+        },
+        "controls": {"data_policy":{"resources":[],"enabled":false,"classifications":[],"destinations":[],"providers":[],"tools":[]},"delegation":{"max_depth":0},"evidence_signing":{"enabled":false,"key_ttl_seconds":86400},"group_mapping":{"enabled":false,"claim":"groups","rules":[]},"kernel_check":{"enabled":false,"timeout_seconds":15,"ring_bytes":65536},"kernel_observation":{"enabled":false,"window_seconds":5,"timeout_seconds":15,"ring_bytes":65536,"max_events":128},"laboratory":{"enabled":false,"timeout_seconds":30,"max_concurrent_runs":1},"oidc_logout":{"enabled":false,"max_age_seconds":300,"replay_retention_seconds":600},"process_policy":{"enabled":false},"sealed_execution":{"enabled":false,"timeout_seconds":15},"secret_broker":{"enabled":false,"material_ttl_seconds":300,"grant_ttl_seconds":60,"max_material_bytes":4096,"max_entries":16},"step_up":{"enabled":false,"operations":["approve"],"acr_values":[],"max_age_seconds":0,"proof_ttl_seconds":300},"workload_introspection":{"enabled":false,"endpoint":"","client_id":"","timeout_seconds":15,"validation_window_seconds":5,"max_sessions":64,"max_token_bytes":16384}}
+      },
+      "identity_context": {
+        "schema_version": 1,
+        "configuration_revision": 1,
+        "principal_id": "admin",
+        "principal_kind": "local",
+        "issuer": "urn:swarm:local",
+        "subject": "admin",
+        "assurance": {
+          "method": "local_bearer",
+          "provider_authenticated_at": null
+        },
+        "attributes": {
+          "roles": [
+            "admin"
+          ],
+          "integrity": 3
+        },
+        "delegation_id": null,
+        "authenticated_at": "2026-11-01T11:08:19.731217868Z",
+        "expires_at": null,
+        "token_digest": "9a15be1f2e1a5b4e41600f7d58814b0c30aa097b0d4819830219bf15c8cdeecb"
+      },
+      "sequence": 4,
+      "previous_hash": "c3364cf1868748bf9d01e6561088fa64cc1b58e965700da63903a9f5a6df90e7",
+      "hash": "ddb38b03eff6a5a5bf013d11a638f6231bdd91566d0631111cdd3184213923d0",
+      "kind": "blp-object-attribute",
+      "actor": "admin",
+      "integrity": 3,
+      "object_id": "blp-attribution",
+      "content_digest": "5648f55ab57b720f24a2c85ccf334e5058ccd918a8ef8eef48407fd01f06e4f0",
+      "original_digest": "7647e2f1e96cb9d4039204b4a41f147a0676a41c6f45d87f59b972cc08cb6d6f",
+      "result": "recorded",
+      "reason": "Object attribution recorded under the current BLP policy; runtime integration not established",
+      "at": "2026-11-01T11:08:19.731217868Z"
+    }
+  ],
+  "originals": {
+    "01b1736a9a73ab2dba6be2b947d0e6dd9e714537284d7dfaa6d824d2d9bc6bb7": "ewogICJzY2hlbWFfdmVyc2lvbiI6IDEsCiAgImV2ZW50X2lkIjogImF0dHJpYnV0ZS0xIiwKICAiZXhwZWN0ZWRfcmV2aXNpb24iOiAxLAogICJleHBlY3RlZF90cnVzdF9yZXZpc2lvbiI6IDEsCiAgImNhbm9uaWNhbF9kaWdlc3QiOiAiNTI0OTY2MDdiNzM0ZDQ1YTZjZjVhZWJjNzc1NTk2Zjc5Y2E1YTE0ZmU2YzQ0ODNhYTI2NzYzNThkOTJkMWZiZCIsCiAgInByb2plY3RfcGF0aCI6ICIvaG9tZS9mcGl6emkvRG9jdW1lbnRzL0NoYXRHUFQvc3dhcm0vLnN3YXJtLWZpeHR1cmVzL3N3YXJtLWJscC1oaXN0b3J5LWRrZDdiYzNyIiwKICAiY2xhc3NpZmljYXRpb24iOiB7CiAgICAibGV2ZWwiOiAiY29uZmlkZW50aWFsIiwKICAgICJjb21wYXJ0bWVudHMiOiBbCiAgICAgICJjbGllbnQtYSIKICAgIF0KICB9LAogICJyZWFzb24iOiAiUFJJVkFURV9CTFBfSElTVE9SWV9GSVhUVVJFIgp9Cg==",
+    "26640f71240c0558ef5cc1dff7ca34fb2478d0f6bf386661aae22027d750756c": "ewogICJzY2hlbWFfdmVyc2lvbiI6IDEsCiAgImV2ZW50X2lkIjogImJscC1wb2xpY3ktMSIsCiAgImV4cGVjdGVkX3JldmlzaW9uIjogMSwKICAiZXhwZWN0ZWRfdHJ1c3RfcmV2aXNpb24iOiAxLAogICJyZWFzb24iOiAiRXhwbGljaXQgZml4dHVyZSBwb2xpY3kiLAogICJwb2xpY3kiOiB7CiAgICAic2NoZW1hX3ZlcnNpb24iOiAxLAogICAgImxldmVscyI6IFsKICAgICAgewogICAgICAgICJpZCI6ICJwdWJsaWMiLAogICAgICAgICJuYW1lX2ZyIjogIlB1YmxpYyIsCiAgICAgICAgIm5hbWVfZW4iOiAiUHVibGljIgogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogImNvbmZpZGVudGlhbCIsCiAgICAgICAgIm5hbWVfZnIiOiAiQ29uZmlkZW50aWVsIiwKICAgICAgICAibmFtZV9lbiI6ICJDb25maWRlbnRpYWwiCiAgICAgIH0KICAgIF0sCiAgICAiY29tcGFydG1lbnRzIjogWwogICAgICAiY2xpZW50LWEiCiAgICBdLAogICAgImNsZWFyYW5jZXMiOiB7CiAgICAgICJhZG1pbiI6IHsKICAgICAgICAibGV2ZWwiOiAiY29uZmlkZW50aWFsIiwKICAgICAgICAiY29tcGFydG1lbnRzIjogWwogICAgICAgICAgImNsaWVudC1hIgogICAgICAgIF0KICAgICAgfQogICAgfQogIH0KfQo=",
+    "7647e2f1e96cb9d4039204b4a41f147a0676a41c6f45d87f59b972cc08cb6d6f": "ewogICJzY2hlbWFfdmVyc2lvbiI6IDEsCiAgImV2ZW50X2lkIjogImF0dHJpYnV0ZS0yIiwKICAiZXhwZWN0ZWRfcmV2aXNpb24iOiAyLAogICJleHBlY3RlZF90cnVzdF9yZXZpc2lvbiI6IDEsCiAgImNhbm9uaWNhbF9kaWdlc3QiOiAiNTI0OTY2MDdiNzM0ZDQ1YTZjZjVhZWJjNzc1NTk2Zjc5Y2E1YTE0ZmU2YzQ0ODNhYTI2NzYzNThkOTJkMWZiZCIsCiAgInByb2plY3RfcGF0aCI6ICIvaG9tZS9mcGl6emkvRG9jdW1lbnRzL0NoYXRHUFQvc3dhcm0vLnN3YXJtLWZpeHR1cmVzL3N3YXJtLWJscC1oaXN0b3J5LWRrZDdiYzNyIiwKICAiY2xhc3NpZmljYXRpb24iOiB7CiAgICAibGV2ZWwiOiAiY29uZmlkZW50aWFsIiwKICAgICJjb21wYXJ0bWVudHMiOiBbCiAgICAgICJjbGllbnQtYSIKICAgIF0KICB9LAogICJyZWFzb24iOiAiUFJJVkFURV9CTFBfSElTVE9SWV9GSVhUVVJFIgp9Cg==",
+    "8c7b189b2caaa245fc64e1288de5faceaaab3a36b2b826b3b7a6c9247914e8a3": "ewogICJzY2hlbWFfdmVyc2lvbiI6IDEsCiAgImV2ZW50X2lkIjogImJscC1wb2xpY3ktMCIsCiAgImV4cGVjdGVkX3JldmlzaW9uIjogMCwKICAiZXhwZWN0ZWRfdHJ1c3RfcmV2aXNpb24iOiAxLAogICJyZWFzb24iOiAiRXhwbGljaXQgZml4dHVyZSBwb2xpY3kiLAogICJwb2xpY3kiOiB7CiAgICAic2NoZW1hX3ZlcnNpb24iOiAxLAogICAgImxldmVscyI6IFsKICAgICAgewogICAgICAgICJpZCI6ICJwdWJsaWMiLAogICAgICAgICJuYW1lX2ZyIjogIlB1YmxpYyIsCiAgICAgICAgIm5hbWVfZW4iOiAiUHVibGljIgogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogImNvbmZpZGVudGlhbCIsCiAgICAgICAgIm5hbWVfZnIiOiAiQ29uZmlkZW50aWVsIiwKICAgICAgICAibmFtZV9lbiI6ICJDb25maWRlbnRpYWwiCiAgICAgIH0KICAgIF0sCiAgICAiY29tcGFydG1lbnRzIjogWwogICAgICAiY2xpZW50LWEiCiAgICBdLAogICAgImNsZWFyYW5jZXMiOiB7CiAgICAgICJhZG1pbiI6IHsKICAgICAgICAibGV2ZWwiOiAiY29uZmlkZW50aWFsIiwKICAgICAgICAiY29tcGFydG1lbnRzIjogWwogICAgICAgICAgImNsaWVudC1hIgogICAgICAgIF0KICAgICAgfQogICAgfQogIH0KfQo="
+  },
+  "event_replies": {
+    "attribute-1": {"actor":"admin","attributed":true,"canonical_digest":"52496607b734d45a6cf5aebc775596f79ca5a14fe6c4483aa2676358d92d1fbd","classification":{"compartments":["client-a"],"level":"confidential"},"policy_revision":"1","reason":"PRIVATE_BLP_HISTORY_FIXTURE","runtime_enforced":false,"schema_version":1,"trust_revision":"1"},
+    "attribute-2": {"actor":"admin","attributed":true,"canonical_digest":"52496607b734d45a6cf5aebc775596f79ca5a14fe6c4483aa2676358d92d1fbd","classification":{"compartments":["client-a"],"level":"confidential"},"policy_revision":"2","reason":"PRIVATE_BLP_HISTORY_FIXTURE","runtime_enforced":false,"schema_version":1,"trust_revision":"1"},
+    "blp-policy-0": {"applied":true,"current_revision":"0","policy":{"clearances":{"admin":{"compartments":["client-a"],"level":"confidential"}},"compartments":["client-a"],"levels":[{"id":"public","name_en":"Public","name_fr":"Public"},{"id":"confidential","name_en":"Confidential","name_fr":"Confidentiel"}],"schema_version":1},"policy_digest":"81120fee1c5caa0863b71272496a953c140946867ec885849db675c1c982595c","proposed_revision":"1","runtime_enforced":false,"schema_version":1,"trust_revision":"1"},
+    "blp-policy-1": {"applied":true,"current_revision":"1","policy":{"clearances":{"admin":{"compartments":["client-a"],"level":"confidential"}},"compartments":["client-a"],"levels":[{"id":"public","name_en":"Public","name_fr":"Public"},{"id":"confidential","name_en":"Confidential","name_fr":"Confidentiel"}],"schema_version":1},"policy_digest":"81120fee1c5caa0863b71272496a953c140946867ec885849db675c1c982595c","proposed_revision":"2","runtime_enforced":false,"schema_version":1,"trust_revision":"1"},
+    "trust-init": {"access_ledger":[],"actions":{},"amount_minor_text":{},"biba":{"model":"strict-with-named-endorsement-v1","os_confinement":false,"scope":"trust-actions-only"},"confidentiality":{"authority_current":false,"configured":false,"declassification_available":false,"policy_revision":null,"reason":"blp-producer-and-sink-integration-required","runtime_enforced":false,"schema_version":1,"scope":"policy-administration-and-data-only-diagnostics"},"data_policy":{"classifications":[],"destinations":[],"enabled":false,"providers":[],"resources":[],"tools":[]},"delegation":{"max_depth":0},"effect_receipts":{},"evidence_count":0,"evidence_signing":{"enabled":false,"key_ttl_seconds":86400},"group_mapping":{"claim":"groups","enabled":false,"rules":[]},"identities":[{"disabled":false,"integrity":3,"roles":["admin"],"subject":"admin"},{"disabled":false,"integrity":1,"roles":["requester"],"subject":"worker"},{"disabled":false,"integrity":2,"roles":["approver"],"subject":"approver"}],"identity_authentication":{"held_enrollment":{"http_available":false,"reason":"trusted-enrollment-startup-not-bound","root_api_available":true},"local_bearer":true},"kernel_check":{"enabled":false,"ring_bytes":65536,"timeout_seconds":15},"kernel_observation":{"enabled":false,"max_events":128,"ring_bytes":65536,"timeout_seconds":15,"window_seconds":5},"laboratory":{"enabled":false,"max_concurrent_runs":1,"timeout_seconds":30},"ledger":[],"limits":["aucun paiement réel","identités locales authentifiées","politiques avancées actives non portées : refus fermé"],"mandates":{},"oidc_logout":{"enabled":false,"max_age_seconds":300,"replay_retention_seconds":600},"originals_missing":0,"policy":{"evidence_retention_days":365,"mandate_ttl_seconds":3600,"require_separation":true,"unknown_reconcile_seconds":0},"policy_bounds":{"command_max_bytes":16777216,"evidence_retention_days":{"max":9007199254740991,"min":1},"mandate_ttl_seconds":{"max":9223372036,"min":0},"proof_key_bytes":32,"state_max_bytes":8388608,"unknown_reconcile_seconds":{"max":9223372036,"min":0}},"process_policy":{"enabled":false},"revision":1,"schema_version":1,"sealed_execution":{"enabled":false,"timeout_seconds":15},"secret_broker":{"enabled":false,"grant_ttl_seconds":60,"material_ttl_seconds":300,"max_entries":16,"max_material_bytes":4096},"simulation":true,"step_up":{"acr_values":[],"enabled":false,"max_age_seconds":0,"operations":["approve"],"proof_ttl_seconds":300},"workload_introspection":{"client_id":"","enabled":false,"endpoint":"","max_sessions":64,"max_token_bytes":16384,"timeout_seconds":15,"validation_window_seconds":5}}
+  },
+  "event_digests": {
+    "attribute-1": "d4825d50bf604cb58889e279adbabc1539058c317240a1d61a95356fe42c59fd",
+    "attribute-2": "e2aa185fde9521b9c88374b6513268f97676416208bf8d8eda881f7ade02cb3c",
+    "blp-policy-0": "dad578f2edd27837498f7aaa1fbe0a8670861b5a304977e0af67419e9d4ca697",
+    "blp-policy-1": "c97577334a4c5af530f73cc56d47f97a8eead5fc384ac700dfacb294c3694693",
+    "trust-init": "857fa331badec371cefc2e25ebd5a76c32c5f32f48d53b323a3fb75081bb9947"
+  }
+}

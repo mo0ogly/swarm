@@ -15,6 +15,7 @@ import shutil
 from pathlib import Path
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 
@@ -28,7 +29,7 @@ class GitFixture(unittest.TestCase):
     """Own one isolated bare repository and all synchronous fixed Git commands."""
     def setUp(self):
         """Create an owned bare fixture, synthetic commits and the initial direct ref."""
-        self.tmp = tempfile.TemporaryDirectory(prefix='paea-git-transaction-')
+        self.tmp = tempfile.TemporaryDirectory(prefix='paea-git-transaction-', dir=fixture_area())
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
         self.env = {k: v for k, v in os.environ.items() if not k.startswith('GIT_')}

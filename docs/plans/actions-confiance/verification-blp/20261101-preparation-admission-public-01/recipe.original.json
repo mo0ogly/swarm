@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-admission-public",
+  "inputs": [
+    "tests/blp_attribution_history_cli.py",
+    "tests/fixture_area.py",
+    "tests/rust_agent_model_route.py",
+    "tools/verification/recipe.py",
+    "tests/blp_preparation_check.py",
+    "tests/rust_native_http_cli.py",
+    "tests/blp_admission_public.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "fixed-domain-actual-cli-http",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-preparation-proof-')/'journey'; subprocess.run(['python3','tests/blp_admission_public.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_PREPARATION_CLI_HTTP_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS authenticated-nonadmin-domain",
+        "PASS http-real-domain-publication",
+        "PASS event-cannot-change-fixed-context",
+        "PASS policy-change-cannot-refresh-old-domain",
+        "PASS current-identity-revocation-refuses",
+        "PASS no-provider-launch-or-business-mutation",
+        "BLP_ADMISSION_PUBLIC_PASS",
+        "BLP_ADMISSION_JOURNEY_SHA256"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

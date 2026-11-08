@@ -1,0 +1,57 @@
+{
+ "schema_version": 1,
+ "id": "blp-confidentiality-rust",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  "rust/crates/swarm-confidentiality/Cargo.toml",
+  "rust/crates/swarm-confidentiality/src/**/*",
+  "rust/crates/swarm-engine/Cargo.toml",
+  "rust/crates/swarm-engine/src/**/*",
+  "rust/crates/swarm-engine/tests/confidentiality.rs",
+  "rust/crates/swarm-cli/src/**/*",
+  "rust/crates/swarm-web/src/**/*",
+  "tools/verification/recipe.py"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+  "CARGO_INCREMENTAL": "0"
+ },
+ "steps": [
+  {
+   "id": "blp-confidentiality-unit-contracts",
+   "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "swarm-confidentiality", "--lib", "--", "--list"],
+   "expected_exit": 0,
+   "required_stdout": [
+    "tests::dominance_exhaustive_independent_matrix: test",
+    "tests::no_read_up_no_write_down_and_no_compartment_loss: test",
+    "tests::fixed_domain_does_not_use_maximum_clearance_for_later_reads: test",
+    "tests::policy_change_and_revocation_require_new_execution: test",
+    "tests::successor_preserves_historical_catalog_semantics: test",
+    "10 tests, 0 benchmarks"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "blp-confidentiality-unit-run",
+   "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "swarm-confidentiality", "--lib", "--", "--quiet"],
+   "expected_exit": 0,
+   "required_stdout": ["10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out"],
+   "required_stderr": []
+  },
+  {
+   "id": "blp-engine-integration-history-replay-and-refusals",
+   "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "swarm-engine", "--test", "confidentiality", "--", "--quiet"],
+   "expected_exit": 0,
+   "required_stdout": ["5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out"],
+   "required_stderr": []
+  },
+  {
+   "id": "blp-engine-trust-biba-coexistence",
+   "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "swarm-engine", "--test", "trust_biba", "--", "--quiet"],
+   "expected_exit": 0,
+   "required_stdout": ["14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out"],
+   "required_stderr": []
+  }
+ ]
+}

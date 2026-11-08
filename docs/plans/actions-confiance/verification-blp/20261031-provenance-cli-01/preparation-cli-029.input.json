@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "preparation_id": "prep-688350fb6dec4e0d4b1bb93f",
+  "event_id": "reject-tool",
+  "expected_revision": 3,
+  "provider": "fixture",
+  "capability_hash": "4fd0af485b070202b3c7ea651b42cf9ca8ac6a9f46b5334c6e4803e8dd2f1d95",
+  "model_policy_hash": "",
+  "level": "auto",
+  "message": "Propose brief",
+  "context_mode": "full"
+}

@@ -1,5 +1,5 @@
 #![cfg(target_os = "linux")]
-use std::{fs, os::unix::fs::PermissionsExt};
+use std::fs;
 use swarm_engine::{
     EngineSettingsChange, Provider, Providers, RootStore, SettingCap, SettingCount,
     SystemEnvironment,
@@ -23,11 +23,7 @@ impl Drop for OwnedRoot {
 /// Fresh private Root with real settings/storage and existing engine dependencies.
 /// No provider/server/account or unlisted tempfile crate is required.
 fn root() -> OwnedRoot {
-    let root = OwnedRoot(
-        std::env::temp_dir().join(swarm_engine::generate_identifier("provider-config-").unwrap()),
-    );
-    fs::create_dir(root.path()).unwrap();
-    fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
+    let root = OwnedRoot(swarm_engine::fixture_root("provider-config-"));
     RootStore::initialize(root.path(), &mut SystemEnvironment)
         .unwrap()
         .close()

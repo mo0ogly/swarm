@@ -3,6 +3,10 @@
 No real Go/Cargo, provider, live Root or deadline is used. The broad native
 recipe separately exercises Rust. Fresh roots/results remain for diagnostics.
 """
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import json, sys, tempfile, unittest
 from pathlib import Path
 from native_no_go import run
@@ -12,7 +16,7 @@ class NoGoTests(unittest.TestCase):
     """Require a valid witness before explicit dependency/failure variants."""
     def setUp(self):
         """Keep an owned tiny source fixture; no real project data is copied."""
-        self.root=Path(tempfile.mkdtemp(prefix='native-no-go141-'))
+        self.root=Path(tempfile.mkdtemp(prefix='native-no-go141-', dir=fixture_area()))
         (self.root/'source.txt').write_text('fixture input\n');self.path=self.root/'recipe.json'
         self.value=dict(schema_version=1,id='fixture',inputs=['source.txt'],environment={},steps=[self.step("print('named fixture PASS')")])
         self.write()

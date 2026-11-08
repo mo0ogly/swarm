@@ -1,6 +1,7 @@
 """Real engine and cockpit on explicitly synthetic, isolated telemetry."""
+from fixture_area import fixture_area
 import os, pathlib, subprocess, tempfile
-with tempfile.TemporaryDirectory(prefix='swarm-qw7-controls-') as tmp:
+with tempfile.TemporaryDirectory(prefix='swarm-qw7-controls-', dir=fixture_area()) as tmp:
     env=dict(os.environ, SWARM_QW7_EVIDENCE=tmp)
     binary=str(pathlib.Path(tmp)/'swarm')
     for command in [

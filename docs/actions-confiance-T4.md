@@ -80,7 +80,7 @@ contexte explicite est refusé lorsque le contrôle est désactivé.
 
 ```sh
 go test -race -count=1 -run '^TestActionsConfianceT4DataPolicy' -v ./internal/engine
-node tests/actions_confiance_data_policy_ui.cjs bin/swarm-actions-confiance-data-policy-resources /tmp/swarm-data-policy-recipe
+node tests/actions_confiance_data_policy_ui.cjs bin/swarm-actions-confiance-data-policy-resources .swarm-fixtures/swarm-data-policy-recipe
 ```
 
 La recette crée sa racine et ses identités locales : aperçu sans mutation,
@@ -144,7 +144,7 @@ dédié suivant couvre seul le helper fixe.
 
 ```sh
 swarm --root PROJET --json trust confinement-check
-node tests/actions_confiance_sealed_ui.cjs BINAIRE /tmp/swarm-sealed-recipe
+node tests/actions_confiance_sealed_ui.cjs BINAIRE .swarm-fixtures/swarm-sealed-recipe
 ```
 
 Le CLI utilise les codes5 pour indisponibilité/état occupé et6 pour interruption

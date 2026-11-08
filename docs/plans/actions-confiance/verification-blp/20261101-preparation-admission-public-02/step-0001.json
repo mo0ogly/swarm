@@ -1,0 +1,13 @@
+{
+  "id": "fixed-domain-actual-cli-http",
+  "command": [
+    "/usr/bin/python3",
+    "-c",
+    "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-preparation-proof-')/'journey'; subprocess.run(['python3','tests/blp_admission_public.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_ADMISSION_CLI_HTTP_EVIDENCE '+str(out))"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 9.68575077499554,
+  "executable": "/usr/bin/python3.13",
+  "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+}

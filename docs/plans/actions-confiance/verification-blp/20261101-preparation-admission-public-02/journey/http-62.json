@@ -1,0 +1,10 @@
+{
+  "status": 500,
+  "body": {
+    "error": "blp-admission-record-invalid",
+    "failure": {
+      "code": "blp-admission-record-invalid"
+    },
+    "schema_version": 1
+  }
+}

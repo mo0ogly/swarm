@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "authority-admin-ui-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-authority/src/**/*",
+    "rust/crates/swarm-authority/config/*.json",
+    "rust/crates/swarm-authority/tests/*.rs",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/authority_ledger.rs",
+    "rust/crates/swarm-cli/src/main.rs",
+    "web/index.html",
+    "web/cockpit-native.js",
+    "web/cockpit.js",
+    "web/cockpit-authority.js",
+    "web/native-authority-admin.js",
+    "web/i18n.js",
+    "web/i18n-en.js",
+    "web/wattson_themes.css",
+    "web/swarm-design.css",
+    "web/swarm-logo.png",
+    "web/native-runtime.css",
+    "frontend/engine-settings/admin.css",
+    "locales/en.json",
+    "scripts/i18n/build.cjs",
+    "tests/authority_admin_ui.cjs",
+    "tests/authority_admin_ui_recipe.py",
+    "package.json",
+    "package-lock.json",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/authority-admin-ui-rust.json",
+    "docs/plans/acces-cockpit/ADMIN-APEX.md",
+    "docs/en/plans/acces-cockpit/ADMIN-APEX.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "i18n-generated",
+      "command": [
+        "node",
+        "scripts/i18n/build.cjs",
+        "--check"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"mode\":\"check\"",
+        "\"status\":\"pass\""
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "managed-binary-browser-qualification",
+      "command": [
+        "python3",
+        "tests/authority_admin_ui_recipe.py",
+        "--engine",
+        "rust/target/debug/swarm-rust",
+        "--daemon",
+        "rust/target/debug/swarm-authority",
+        "--output-parent",
+        ".swarm-fixtures"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "AUTHORITY_ADMIN_UI_BROWSER_VERIFIED 41"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "model_route": {
+    "level": "standard",
+    "model": "fixture-standard",
+    "effort": "",
+    "billing": "external",
+    "policy_hash": "1fe3eaf59e14447dba38882e33056f1c767a93127d00d1b29de54d54c9ea3439",
+    "reason": "Politique fournisseur enregistrée · preparation · sans montée en gamme automatique ; annonce non authentifiée"
+  },
+  "context_mode": "full",
+  "used_in_plan": false,
+  "used_in_brief": false,
+  "id": "pt-4c0b85682b9a8f52f7f17f34f1f6bc38",
+  "preparation_id": "prep-688350fb6dec4e0d4b1bb93f",
+  "status": "pending",
+  "created_at": "2026-10-31T20:43:55.631656139Z",
+  "source_revision": 2,
+  "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+  "provider": "fixture",
+  "provider_digest": "8d9b8852659767c4c3c476e1a5f40795768a4dd0f19ec725d29396f3429c0e21",
+  "request_hash": "8f7fa288c54ba0d38c1d3e5d502d7fca4af6f9ccad10c1e05cf00ed23bfcbca7",
+  "question": "Propose brief",
+  "stale": false,
+  "timeout_seconds": 300,
+  "timeout_maximum_seconds": 600
+}

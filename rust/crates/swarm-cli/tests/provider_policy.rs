@@ -7,7 +7,7 @@ use swarm_engine::{RootStore, SystemEnvironment};
 /// One isolated Root with a configured custom model announcement; the private
 /// unavailable command is staging data and is never executed by these tests.
 fn fixture() -> (tempfile::TempDir, PathBuf) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let store = RootStore::initialize(root.path(), &mut SystemEnvironment).unwrap();
     let configuration=swarm_engine::decode_provider_configuration(br#"{"schema_version":1,"providers":{"fixture":{"command":"/PRIVATE/program","args":["--model","shared"],"env_allow":["PRIVATE_ENV"]}}}"#).unwrap();
     let source = store

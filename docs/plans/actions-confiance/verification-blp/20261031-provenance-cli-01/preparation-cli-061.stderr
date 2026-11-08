@@ -1,0 +1,12 @@
+{
+  "error": "preparation-capability-stale",
+  "failure": {
+    "causes": [
+      "preparation-capability-stale"
+    ],
+    "code": "preparation-capability-stale",
+    "message": "preparation-capability-stale",
+    "retryable": false
+  },
+  "schema_version": 1
+}

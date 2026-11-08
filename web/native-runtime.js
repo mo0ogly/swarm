@@ -36,7 +36,9 @@
   * no repeated operation, hidden queue cap or timeout is added. */
  function request(operation,change,work){const previous=barrier;let release;barrier=new Promise(resolve=>{release=resolve});return previous.then(async()=>{try{return await send(operation,change,work)}finally{release()}})}
  /** Bootstrap a protected dedicated CSRF and mount the existing component once.
-  * Terminal errors stay visible with an explicit reload. Navigation/unload does
+  * Terminal errors stay visible with an explicit reload. The authority Admin
+  * mount never hides a failure: an unexpected throw is logged by stable code,
+  * rendered in the card, its original cause retained unmutated. Navigation/unload does
   * not claim to cancel an already admitted Root publication; history owns replay. */
  async function start(){if(starting||component)return;starting=true;retry.hidden=true;status.hidden=false;status.className='notice info';status.textContent=tr('Chargement…');
   try{const session=await request('session');if(session?.schema_version!==1||session.csrf_format!=='hmac-sha256-v1'||typeof session.csrf_token!=='string'||!/^[0-9a-f]{64}$/.test(session.csrf_token))throw failure('web-native-session-invalid');csrf=session.csrf_token;
@@ -44,6 +46,13 @@
    SwarmLogReadPolicyAdmin.mount(document.getElementById("native-log-read-policy"),{show:()=>request("logReadPolicyShow"),preview:r=>request("logReadPolicyPreview",r),apply:r=>request("logReadPolicyApply",r)},{translate:tr});
    SwarmActivityPolicyAdmin.mount(document.getElementById("native-activity-policy"),{show:()=>request("activityPolicyShow"),preview:r=>request("activityPolicyPreview",r),apply:r=>request("activityPolicyApply",r)},{translate:tr});
    SwarmGraphPerformanceAdmin.mount(document.getElementById("native-graph-performance"),{show:()=>request("graphPerformanceShow"),preview:r=>request("graphPerformancePreview",r),apply:r=>request("graphPerformanceApply",r)},{translate:tr});
+   SwarmAuthorityAdmin.mount(document.getElementById('native-authority-admin'),document.querySelector('.native-runtime-header nav'),{translate:tr}).catch(original=>{ // B8: contract errors resolve mode 'error' with the diagnostic already rendered; an unexpected throw stays visible here — the original error stays unmutated on `.cause` of a stable wrapper (reason copied when a plain string), safe code only
+    const error=Error('authority-mount-unexpected',{cause:original});
+    if(typeof original.reason==='string')error.reason=original.reason;
+    console.error('SwarmAuthorityAdmin mount:',error.message);
+    const host=document.getElementById('native-authority-admin');host.hidden=false;
+    const notice=document.createElement('p');notice.className='notice alert';notice.textContent=tr('Refus du démon d’autorité.')+' ('+error.message+')';host.replaceChildren(notice);
+   });
    component=SwarmEngineSettingsAdmin.mount(document.getElementById('native-settings-admin'),{describe:()=>request('describe'),show:()=>request('show'),preview:change=>request('preview',change),apply:change=>request('apply',change),budget:{show:()=>request('budgetShow'),preview:change=>request('budgetPreview',change),apply:change=>request('budgetApply',change)}},{translate:tr});
    if(!lifecycleInventory)lifecycleInventory=SwarmLifecycleInventory.mount(document.getElementById('native-lifecycle-inventory'),{show:()=>request('lifecycleInventory')},{translate:tr});
    if(!cockpit)cockpit=SwarmNativeCockpit.mount(document.getElementById('native-cockpit'),{list:()=>request('quotaList'),controls:work=>request('missionControls',undefined,work),status:work=>request('missionStatus',undefined,work),activity:query=>request('activity',undefined,query),exchanges:work=>request('exchanges',undefined,work),planningHistory:work=>request('planningHistory',undefined,work),visit:{show:work=>request('visitShow',undefined,work),mark:(work,intent)=>request('visitMark',intent,work)}},{translate:tr});
@@ -65,6 +74,11 @@ SwarmNativeQuotas.mount(document.getElementById('native-quotas-admin'),{list:()=
  SwarmRuntimeHealth.mount(document.getElementById("native-runtime-health"),{read:()=>send("runtimeHealth")},{translate:tr});
  livePreferences();
  retry.addEventListener('click',start);
+ /** Protected sign-out of this browser only; the local key stays valid.
+  * Works before startup finished (fetches its own CSRF token); on refusal the
+  * page stays and says so. */
+ document.querySelector('[data-action="logout"]')?.addEventListener('click',async e=>{const b=e.currentTarget;b.disabled=true;try{let token=csrf;if(!token){const session=await(await fetch('/api/v1/native-session',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}})).json();if(session?.schema_version!==1||typeof session.csrf_token!=='string'||!/^[0-9a-f]{64}$/.test(session.csrf_token))throw failure('web-native-session-invalid');token=session.csrf_token}const r=await fetch('/api/v1/logout',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json','X-Swarm-CSRF':token}});const body=r.ok?await r.json():null;if(body?.redirect!=='/login')throw failure('web-logout-refused');location.assign('/login'+location.search)}catch{b.disabled=false;status.className='notice error';status.textContent=tr('Déconnexion impossible. Réessayez.');status.hidden=false;status.focus?.()}});
+ {const b=document.querySelector('[data-action="logout"]');if(b)b.disabled=false} // enabled only once its handler exists
  document.querySelectorAll('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>{const theme=button.dataset.themeChoice;if(!['etat','sombre'].includes(theme))return;document.documentElement.dataset.theme=theme;const url=new URL(location.href);url.searchParams.set('theme',theme);history.replaceState(null,'',url);livePreferences()}));
  addEventListener('swarm:language-change',event=>{if(document.querySelector('dialog[data-engine-settings][open],dialog[data-native-quotas][open],dialog[data-provider-wait][open],dialog[data-connection-probe][open],dialog[data-log-read-policy][open],dialog[data-activity-policy][open],dialog[data-run-limits][open]')){event.preventDefault();warning.textContent=tr('Enregistrez ou terminez vos modifications avant de changer de langue.');warning.hidden=false}});
  // Resource completion precedes the first API read; no hidden timing assumption.

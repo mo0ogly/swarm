@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_quarantine_public.py", line 209, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_quarantine_public.py", line 187, in main
+    run=subprocess.run(['node','tests/blp_quarantine_ui.cjs',str(out/'evidence/ui-config.json')],env=f.environment,capture_output=True);publish(out/'ui.stdout',run.stdout);publish(out/'ui.stderr',run.stderr);assert run.returncode==0,'browser failed; see retained diagnostics'
+                                                                                                                                                                                                                       ^^^^^^^^^^^^^^^^^
+AssertionError: browser failed; see retained diagnostics
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import os,subprocess; subprocess.run(['python3','tests/blp_quarantine_public.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--helper',os.environ['SWARM_BLP_HELPER'],'--output',os.environ['SWARM_BLP_PROOF_OUTPUT']],check=True)
+                          ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python3', 'tests/blp_quarantine_public.py', '--binary', '/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in', '--profile', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-_llnx6jz/build/profile/result.json', '--helper', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-verification-target/debug/examples/preparation_quarantine_fixture', '--output', '/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey']' returned non-zero exit status 1.

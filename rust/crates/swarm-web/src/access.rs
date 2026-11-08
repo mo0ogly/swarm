@@ -11,6 +11,60 @@ use std::{
     net::{IpAddr, Ipv4Addr, Ipv6Addr, TcpListener},
 };
 use subtle::ConstantTimeEq;
+/// How the caller of a protected request proved access: the persisted owner
+/// key, or (v52 `authority` mode) an assertion signed by the authority daemon.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum WebAuthMethod {
+    /// Scoped or legacy cookie carrying the project's private `.swarm` key.
+    Owner,
+    /// Assertion signed by the authority daemon (v52 `authority` mode).
+    Authority,
+}
+/// Authenticated request subject produced by [`LocalWebAuthority::authorize`].
+/// It records who passed the head checks; it grants no business right by
+/// itself. Route handlers read it from `Request::extensions` to attribute
+/// effects. Contains no credential material, so Debug/Clone are safe.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct WebPrincipal {
+    subject: Box<str>,
+    method: WebAuthMethod,
+    /// Nonce of the daemon assertion (authority mode): links engine-side
+    /// attribution to the daemon audit. `None` for the owner key.
+    assertion: Option<Box<str>>,
+}
+impl WebPrincipal {
+    /// Fixed subject of the project owner key (break-glass local account).
+    pub const OWNER_SUBJECT: &'static str = "owner";
+    /// Principal for a request authenticated with the project owner key.
+    pub(crate) fn owner() -> Self {
+        Self {
+            subject: Self::OWNER_SUBJECT.into(),
+            method: WebAuthMethod::Owner,
+            assertion: None,
+        }
+    }
+    /// Principal named by a verified authority-daemon assertion (`nonce`
+    /// identifies that assertion).
+    pub(crate) fn authority(subject: &str, nonce: &str) -> Self {
+        Self {
+            subject: subject.into(),
+            method: WebAuthMethod::Authority,
+            assertion: Some(nonce.into()),
+        }
+    }
+    /// Nonce of the daemon assertion that authenticated this request.
+    pub fn assertion(&self) -> Option<&str> {
+        self.assertion.as_deref()
+    }
+    /// Stable account subject used for attribution; never a secret.
+    pub fn subject(&self) -> &str {
+        &self.subject
+    }
+    /// Authentication method that produced this principal.
+    pub fn method(&self) -> WebAuthMethod {
+        self.method
+    }
+}
 /// Local bearer-capability gate scoped to an observed bound loopback address.
 /// Private fields prevent deserializing request data as authority. Construction
 /// validates representation only: the caller still owes trusted credential
@@ -148,9 +202,11 @@ impl LocalWebAuthority {
     /// business permissions/revision/evidence checks and handle body/Root errors.
     /// No login/static exception, session expiry/rotation, parser/network bound,
     /// listener loop, response/CSP or underlying business action is implemented.
-    pub fn authorize<B>(&self, request: &Request<B>) -> Result<(), E> {
+    /// Success returns the authenticated [`WebPrincipal`]; the owner key is the
+    /// only credential today, so every success is the `owner` principal.
+    pub fn authorize<B>(&self, request: &Request<B>) -> Result<WebPrincipal, E> {
         self.authorize_host(request)?;
-        self.session(request.headers())?;
+        let principal = self.session(request.headers())?;
         if request.method() != Method::GET && request.method() != Method::HEAD {
             let origin = one(request.headers(), ORIGIN.as_str())?
                 .ok_or(E::Refused("web-origin-refused"))?
@@ -167,7 +223,7 @@ impl LocalWebAuthority {
                 return Err(E::Refused("web-csrf-refused"));
             }
         }
-        Ok(())
+        Ok(principal)
     }
     /// Public login checks exact Host and one exact POST Origin, without cookie
     /// or CSRF (the submitted key is checked only after bounded form decoding).
@@ -190,7 +246,8 @@ impl LocalWebAuthority {
     /// the maintained cookie parser; percent decoding is deliberately absent.
     /// Save comparison observations only, not another copy of credential strings.
     /// Duplicate scoped/legacy names refuse; Some(false) scoped blocks fallback.
-    fn session(&self, headers: &HeaderMap) -> Result<(), E> {
+    /// A matching owner key yields the owner principal.
+    fn session(&self, headers: &HeaderMap) -> Result<WebPrincipal, E> {
         let mut scoped = None;
         let mut legacy = None;
         for field in headers.get_all(COOKIE).iter() {
@@ -213,7 +270,14 @@ impl LocalWebAuthority {
         if scoped.or(legacy) != Some(true) {
             return Err(E::Refused("web-session-required"));
         }
-        Ok(())
+        Ok(WebPrincipal::owner())
+    }
+    /// Owner key bytes as the cookie value set after a successful login or
+    /// accepted ticket. Crate-private: never logged, serialized or sent other
+    /// than in that HttpOnly SameSite=Strict cookie.
+    pub(crate) fn owner_cookie_value(&self) -> &str {
+        // Built from &str in from_observed_address, so always valid UTF-8.
+        std::str::from_utf8(&self.credential).unwrap_or_default()
     }
     /// Compare content without early byte-position exit. Credential length/format
     /// are public protocol facts; this comparison alone grants no other authority.

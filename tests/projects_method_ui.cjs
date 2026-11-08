@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]||'test-results/projects-method');fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-projects-method-'));execFileSync(binary,['--root',root,'init']);
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-projects-method-'));execFileSync(binary,['--root',root,'init']);
 const app=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser;const errors=[],mutations=[];
 (async()=>{
  const session=await new Promise((resolve,reject)=>{let s='';const timer=setTimeout(()=>reject(Error('startup timeout')),20000);app.stdout.on('data',x=>{s+=x;const m=s.match(/http:\/\/\S+\/session\/\S+/);if(m){clearTimeout(timer);resolve(m[0])}});app.on('exit',c=>reject(Error('exit '+c)))});

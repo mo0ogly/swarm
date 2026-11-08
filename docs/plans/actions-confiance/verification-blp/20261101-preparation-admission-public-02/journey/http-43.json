@@ -1,0 +1,10 @@
+{
+  "status": 403,
+  "body": {
+    "error": "authorization_required",
+    "failure": {
+      "code": "authorization_required"
+    },
+    "schema_version": 1
+  }
+}

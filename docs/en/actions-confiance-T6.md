@@ -107,8 +107,8 @@ Isolated recipes without a provider or payment:
 
 ```sh
 go test -race -count=1 -run '^TestActionsConfianceT6(Evidence|Archive)' -v ./internal/engine
-python3 tests/actions_confiance_evidence.py --binary BIN --evidence-dir /tmp/swarm-evidence-public
-node tests/actions_confiance_evidence_ui.cjs BIN /tmp/swarm-evidence-ui
+python3 tests/actions_confiance_evidence.py --binary BIN --evidence-dir .swarm-fixtures/swarm-evidence-public
+node tests/actions_confiance_evidence_ui.cjs BIN .swarm-fixtures/swarm-evidence-ui
 ```
 
 Signing an anchor does not make every log immutable or every effect mandatorily

@@ -1,5 +1,6 @@
 #![cfg(target_os = "linux")]
 //! Initial private material only; no service Root/account/current authority.
+mod common;
 use sha2::{Digest, Sha256};
 use std::{
     fs,
@@ -35,7 +36,7 @@ impl Case {
     /// Current-owned test directories and explicit UID/crypto data only. Service
     /// UID is synthetic other data; no account or namespace separation is claimed.
     fn new() -> Self {
-        let root = tempfile::tempdir().unwrap();
+        let root = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         let operator = root.path().join("operator");
         let anchor_dir = root.path().join("anchor");

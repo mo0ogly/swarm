@@ -26,6 +26,15 @@ impl std::ops::Deref for Actor {
         &self.identity
     }
 }
+
+/// Require the existing I3/admin control contract on an already authenticated
+/// actor. This adds no confidentiality clearance or human identity. Used by
+/// authoritative controls and their non-authorizing lock-wait preflight.
+pub(crate) fn require_administrator(actor: &Actor) -> Result<(), E> {
+    if actor.integrity == 3 && actor.roles.iter().any(|role|role=="admin") {
+        Ok(())
+    } else { Err(E::Authorization) }
+}
 /// Resolve a current stored role mapping with exactly one authentication source.
 /// Enrolled mappings reject every bearer. No source fallback or mutation occurs.
 pub(crate) fn authenticated<'a>(st: &State, source: impl Into<Source<'a>>) -> Result<Actor, E> {

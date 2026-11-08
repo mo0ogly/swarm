@@ -27,6 +27,28 @@ def digest(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
+def _ancestor_modes_private(path):
+    """Report whether every ancestor component of an existing directory is
+    private to group and other (no group/other write bit).
+
+    Purpose: decide whether the pinned recipe TMPDIR can host fixtures that
+    verify private-directory contracts (swarm-enrollment-config
+    `open_private_directory` refuses any group/other-writable ancestor).
+    Inputs: `path`, an existing directory. Output: True when every component
+    from `/` down to `path` has no group/other write bit; False otherwise.
+    Errors: OSError from os.stat propagates (unreadable ancestor is not
+    proven private). Limits: checks write bits only — a later change of
+    ownership or mode invalidates a past result; not a security boundary,
+    a run-local placement decision.
+    """
+    resolved = Path(path).resolve()
+    for candidate in (resolved, *resolved.parents):
+        mode = os.stat(candidate).st_mode
+        if mode & 0o022:
+            return False
+    return True
+
+
 def publish(path, raw):
     """Publish fresh evidence atomically; errors leave any existing file intact.
 
@@ -184,8 +206,47 @@ def run_recipe(root, recipe_path, output):
         tracked.append('declared-inputs.tar.gz')
         environment = dict(os.environ)
         overrides = {key: item.replace('{root}', str(root)) for key, item in recipe['environment'].items()}
+        # Operator /tmp interdiction (2026-10-31): recipe steps must not allocate
+        # project data in the system temp directory. TMPDIR is pinned under the
+        # configured fixture area so every temp API honoring TMPDIR (Python
+        # tempfile, Rust env::temp_dir/TempDir, Node os.tmpdir(), Go t.TempDir())
+        # lands there for the duration of the run. Explicit dir=/temp_dir() uses
+        # that bypass TMPDIR remain a source-level obligation (see
+        # tools/check_tmp_interdiction.py) — this override is the runner net,
+        # not a substitute for the source contract.
+        # Area = Admin setting `runtime_temporary_directory` (saved value, else
+        # shipped installation default), resolved by tests/fixture_area.py.
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('fixture_area', root / 'tests' / 'fixture_area.py')
+        area = importlib.util.module_from_spec(spec); spec.loader.exec_module(area)
+        interdiction_dir = area.configured_area(root) / 'runner-tmp'
+        interdiction_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+        if not _ancestor_modes_private(interdiction_dir):
+            # The configured area may sit under a group/other-writable ancestor
+            # (typical checkouts are 775). Fixtures that verify private-directory
+            # contracts (swarm-enrollment-config store.rs refuses any
+            # group-writable ancestor) fail there even though each tempdir
+            # itself is 0700. Fall back to the operator private state area
+            # (~/.local/state/<project>-fixtures/, the fallback the user rule
+            # reserves for checks requiring non-group-writable ancestors);
+            # never /tmp. The root name is kept SHORT on purpose: Chrome binds
+            # its ProcessSingleton socket at
+            # `$TMPDIR/.com.google.Chrome.XXXXXX/SingletonSocket` and dies with
+            # SIGTRAP (CHECK/ud2) as soon as that absolute path exceeds the
+            # sockaddr_un usable bound (measured 2026-10-31: a 107-byte socket
+            # path launches, a 108-byte path traps). The former root
+            # swarm-recipe-fallback-fixtures (67 + 49 = 116 bytes) killed every
+            # browser qualification run; swarm-fixtures (51 + 49 = 93 bytes,
+            # <project>-fixtures/ per the operator rule) keeps a safe margin.
+            fallback = Path.home() / '.local/state/swarm-fixtures'
+            fallback.mkdir(mode=0o700, parents=True, exist_ok=True)
+            interdiction_dir = fallback / 'runner-tmp'
+            interdiction_dir.mkdir(mode=0o700, exist_ok=True)
+            if not _ancestor_modes_private(interdiction_dir):
+                raise ValueError('recipe-tmpdir-ancestors-not-private: ' + str(interdiction_dir))
+        overrides['TMPDIR'] = str(interdiction_dir)
         environment.update(overrides)
-        save('environment.json', {'overrides': overrides, 'scope': 'Inherited environment not logged; compiler graph/profile needs separate qualification'})
+        save('environment.json', {'overrides': overrides, 'scope': 'Inherited environment not logged; compiler graph/profile needs separate qualification; TMPDIR pinned under the configured fixture area (Admin setting runtime_temporary_directory) per the 2026-10-31 operator interdiction, with fallback to the operator private state area when checkout ancestors are group-writable (private-directory contracts)'})
         for number, step in enumerate(recipe['steps'], 1):
             args = [arg.replace('{root}', str(root)) for arg in step['command']]
             search_path = os.pathsep.join(str(root / part) if not Path(part).is_absolute() else part for part in environment.get('PATH', os.defpath).split(os.pathsep))

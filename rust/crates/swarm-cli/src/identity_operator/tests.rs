@@ -22,7 +22,9 @@ impl Case {
     /// Store an explicit synthetic package with or without matching controller UID.
     /// Fixture draws entropy and writes keys only in its private operator vault.
     fn new(wrong_role: bool) -> Self {
-        let root = tempfile::tempdir().unwrap();
+        // open_private_directory walks ancestors: the checkout is 775, so the
+        // operator fallback area (fully private 0700 chain) is required here.
+        let root = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
         mode(root.path());
         let operator = root.path().join("operator");
         fs::create_dir(&operator).unwrap();

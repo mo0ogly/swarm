@@ -1,0 +1,26 @@
+{
+  "model_route": {
+    "level": "",
+    "model": "fixed-model",
+    "effort": "",
+    "billing": "",
+    "policy_hash": "4f45803d28a1d93ac6076c408e1035241af771d9b9fbd6d103fb6933c8c37b65",
+    "reason": "configured-api-fixed-model"
+  },
+  "context_mode": "full",
+  "used_in_plan": false,
+  "used_in_brief": false,
+  "id": "pt-63582f0d38a1ea9af4ae438fd1b668eb",
+  "preparation_id": "prep-0d6e4079e36703ebd37c0072",
+  "status": "pending",
+  "created_at": "2026-11-01T14:29:29.992060297Z",
+  "source_revision": 2,
+  "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+  "provider": "api-local",
+  "provider_digest": "f2b37204f4c69ef02f7b677b80384848b5684fa0761fe1a075b9842de61370f0",
+  "request_hash": "c7c322df63ca7ff667f74838b99a82a9c727ba897623793181cf7524d89f5c46",
+  "question": "PRIVATE_QUARANTINE_FIXTURE",
+  "stale": false,
+  "timeout_seconds": 300,
+  "timeout_maximum_seconds": 600
+}

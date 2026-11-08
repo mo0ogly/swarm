@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Completed manual native worker consumed by automatic mission reviewer.
 
-The existing public planner setup is reused. Before worker/reviewer native
-preflight, one combined inert executable is fixed for both roles; it is never
+The existing public planner setup is reused. Before worker/planner/reviewer native
+preflight, one combined inert executable is fixed for all three roles; it is never
 rewritten during either execution. Report submission and controls use public
 operations, then only mission watch may admit review. No SQL writes or fake
 receipts, legacy provenance upgrade, paid provider or global watchdog.
@@ -18,6 +18,35 @@ import rust_mission_watch_worker as worker
 import rust_native_parent_death as parent_death
 check=worker.check
 
+def provider_program():
+    """Freeze three inert roles before preflight, selected by actual wire input.
+
+    Reviewer uses the existing explicit contract marker. Planner consumes only
+    the final scope context appended by planning_run_material::prompt and emits
+    an empty-operation acknowledgement of exactly its delivered events. It never
+    reads a stale proposal file or mutates Work. Other input uses the real manual
+    worker fixture. Malformed planner context raises, rather than falling back to
+    a successful worker. These markers select fixture code, not product rights.
+    """
+    tree=ast.parse(Path(planning.__file__).read_text())
+    prefixes=[n.value for n in ast.walk(tree) if isinstance(n,ast.Constant) and isinstance(n.value,str) and n.value.startswith('import io,json,hashlib,os,sys\n')]
+    check(len(prefixes)==1,'reviewer fixture prefix boundary changed')
+    original="proposal=json.load(open('planning-proposal.json'))"
+    check(flow.feedback.PROGRAM.count(original)==1,'planner fixture boundary changed')
+    replacement="""context=json.loads(raw.rsplit(b'\\n\\n',1)[1])
+assert isinstance(context,dict) and isinstance(context['scope']['id'],str)
+assert isinstance(context['events'],list)
+assert all(isinstance(e['id'],str) and e['scope']==context['scope']['id'] for e in context['events'])
+proposal=dict(input_events=[e['id'] for e in context['events']],reason='Owned inert current delivery acknowledgement; no task acceptance',operations=[])"""
+    planner=flow.feedback.PROGRAM.replace(original,replacement)
+    dispatch=("if "+repr('Tu es le planificateur du périmètre reçu.'.encode())+" in _fixture_raw:\n"
+        +" exec(compile("+repr(planner)+",'<owned-manual-planner>','exec'))\n"
+        +"else:\n exec(compile("+repr(manual.PROGRAM)+",'<owned-manual-worker>','exec'))\n")
+    program='#!/usr/bin/python3\n'+prefixes[0].replace('REVIEW_FAULT','False').replace('REVIEW_GATE','False')+dispatch
+    compile(program,'owned-manual-review-provider','exec')
+    return program
+
+
 def prepare(binary,out,manual_controls=True):
     """Prepare actual manual worker/report/controls and explicit mission consent.
     Return an inactive owned Root before any automatic review admission; this
@@ -26,12 +55,8 @@ def prepare(binary,out,manual_controls=True):
     the first actual batch to watch, without seeding a validation receipt.
     """
     setup=out/'setup';setup.mkdir();ready,owned=flow.flow(binary,setup,before_worker=True,return_fixture=True)
-    # Reuse the actual declared reviewer-role prefix, then the actual manual
-    # worker implementation. The AST extraction is a fixture code boundary.
-    tree=ast.parse(Path(planning.__file__).read_text());prefixes=[n.value for n in ast.walk(tree) if isinstance(n,ast.Constant) and isinstance(n.value,str) and n.value.startswith('import io,json,hashlib,os,sys\n')]
-    check(len(prefixes)==1,'reviewer fixture prefix boundary changed')
-    program='#!/usr/bin/python3\n'+prefixes[0].replace('REVIEW_FAULT','False').replace('REVIEW_GATE','False')+manual.PROGRAM.split('\n',1)[1]
-    compile(program,'owned-manual-review-provider','exec');fixture.publish(owned.root/'codex',program.encode());os.chmod(owned.root/'codex',0o700);program_sha=fixture.digest(program.encode())
+    program=provider_program()
+    fixture.publish(owned.root/'codex',program.encode());os.chmod(owned.root/'codex',0o700);program_sha=fixture.digest(program.encode())
     preview=owned.prepare(preview=True);owned.request['model_policy_hash']=preview['agent']['model_route']['policy_hash'];prepared=owned.prepare();owned.run_and_assert(prepared);manual.submit(owned)
     if manual_controls:
         current=relay.work(owned);done=owned.ok(['task','validate',owned.work],dict(schema_version=1,event_id='manual-source-controls',expected_revision=current['revision'],task_id='task'));check(done['controls_passed'],'manual source controls failed')

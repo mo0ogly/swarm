@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "blp-attribution-renewal-web",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "rust/crates/swarm-engine/tests/confidentiality.rs",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-web/tests/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/tests/**/*",
+    "web/**/*",
+    "locales/**/*"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "preview_reader_guard_enforces_produced_attribution",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "preview_reader_guard_enforces_produced_attribution",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "preview_reader_guard_enforces_produced_attribution",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "reader_refusal_matrix_on_bound_approval_both_routes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "reader_refusal_matrix_on_bound_approval_both_routes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "reader_refusal_matrix_on_bound_approval_both_routes",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

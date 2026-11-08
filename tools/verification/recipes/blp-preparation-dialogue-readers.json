@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-dialogue-readers",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/config/**/*",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-confidentiality/src/**/*",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-engine/tests/preparation_dialogue_readers.rs",
+    "rust/crates/swarm-engine/tests/preparation_worker_transport.rs",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-wire-json/src/**/*",
+    "rust/crates/swarm-cli/src/**/*"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-dialogue-target",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_BUILD_JOBS": "1"
+  },
+  "steps": [
+    {
+      "id": "dialogue-reader-rejection-matrix-and-legacy-continuity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "preparation_dialogue_readers",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "dialogue_admitted_answer_readable_without_any_reader_control",
+        "dialogue_without_any_matched_admission_keeps_legacy_bare_read",
+        "2 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "transport-gate-neighbor-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "preparation_worker_transport",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "worker_gate_refuses_unauthorized_and_passes_bound_sends",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "cli-compiles-with-token-threading",
+      "command": [
+        "cargo",
+        "check",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": ["Finished `dev` profile"]
+    }
+  ]
+}

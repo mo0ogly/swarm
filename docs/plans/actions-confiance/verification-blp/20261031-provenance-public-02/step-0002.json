@@ -1,0 +1,19 @@
+{
+  "id": "fixture-memory-sidecar",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "build",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--example",
+    "memory_source_fixture"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 1.3630701459987904,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

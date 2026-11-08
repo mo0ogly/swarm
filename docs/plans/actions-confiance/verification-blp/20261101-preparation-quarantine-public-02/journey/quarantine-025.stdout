@@ -1,0 +1,72 @@
+[
+  {
+    "model_route": {
+      "level": "",
+      "model": "fixed-model",
+      "effort": "",
+      "billing": "",
+      "policy_hash": "4f45803d28a1d93ac6076c408e1035241af771d9b9fbd6d103fb6933c8c37b65",
+      "reason": "configured-api-fixed-model"
+    },
+    "context_mode": "full",
+    "used_in_plan": false,
+    "used_in_brief": false,
+    "id": "pt-0e011ca9af40af09da8172e818106da8",
+    "preparation_id": "prep-0d6e4079e36703ebd37c0072",
+    "status": "answered",
+    "created_at": "2026-11-01T14:29:26.162561862Z",
+    "ended_at": "2026-11-01T14:29:26.322003106Z",
+    "source_revision": 2,
+    "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+    "provider": "api-local",
+    "provider_digest": "f2b37204f4c69ef02f7b677b80384848b5684fa0761fe1a075b9842de61370f0",
+    "request_hash": "3a779491a0be9e9c2a865583eb96567a82de3f3eada3e9f66ff9b0671704e012",
+    "question": "PRIVATE_QUARANTINE_FIXTURE",
+    "answer": {
+      "message": "Inert quarantine answer",
+      "brief": "Inert brief"
+    },
+    "usage": {
+      "input_tokens": 1,
+      "output_tokens": 1,
+      "source": "api-provider-declared",
+      "scope": "preparation-turn",
+      "at": ""
+    },
+    "stale": false,
+    "timeout_seconds": 300,
+    "timeout_maximum_seconds": 600,
+    "supervisor_pid": 1979922,
+    "supervisor_stamp": "10127354",
+    "host": "fpizzi:93ca189a-b565-4bcd-8585-7b98e29f74b1:pid:[4026531836]"
+  },
+  {
+    "model_route": {
+      "level": "standard",
+      "model": "fixture-standard",
+      "effort": "",
+      "billing": "external",
+      "policy_hash": "1fe3eaf59e14447dba38882e33056f1c767a93127d00d1b29de54d54c9ea3439",
+      "reason": "Politique fournisseur enregistrée · preparation · sans montée en gamme automatique ; annonce non authentifiée"
+    },
+    "context_mode": "full",
+    "used_in_plan": false,
+    "used_in_brief": false,
+    "id": "pt-29adbad572d4a71c05076db0250df68c",
+    "preparation_id": "prep-0d6e4079e36703ebd37c0072",
+    "status": "running",
+    "created_at": "2026-11-01T14:29:26.63749Z",
+    "source_revision": 2,
+    "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+    "provider": "fixture",
+    "provider_digest": "52b48d09b777e1e84e29726f5a6722b74f288c9ffa9be2c5b7f5b64af927486d",
+    "request_hash": "6acc61214c75e293c1d495474740d2d8690fdf1f43c30a908c29ef0bc223d884",
+    "question": "PRIVATE_QUARANTINE_FIXTURE",
+    "stale": false,
+    "timeout_seconds": 300,
+    "timeout_maximum_seconds": 600,
+    "supervisor_pid": 1979958,
+    "supervisor_stamp": "10127402",
+    "host": "fpizzi:93ca189a-b565-4bcd-8585-7b98e29f74b1:pid:[4026531836]"
+  }
+]

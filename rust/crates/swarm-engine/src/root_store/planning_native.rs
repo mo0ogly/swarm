@@ -2,6 +2,8 @@
 use super::{finished, RootStore, RootStoreError as E};
 #[path = "planning_rejection_feedback.rs"]
 mod rejection_feedback;
+#[path = "planning_stale_gate.rs"]
+pub(super) mod stale_gate;
 #[path = "planning_run_binding.rs"]
 mod run_binding;
 use crate::planning_run_material::{self, Material};
@@ -247,17 +249,20 @@ impl RootStore {
     /// Prepare complete claim/model/host observations under the owning read TX and
     /// current saved policy. This starts no process and holds no provider lock on
     /// return; original freshness and a committed private gate are still required.
+    /// Only the initial run creates its I0 output leaf; gate/controller calls
+    /// require the existing inode under the persisted host scope.
     fn planner_material(
         &mut self,
         work: &str,
         r: &PlanningCallPreviewRequest,
+        create_workspace: bool,
     ) -> Result<Material, E> {
         let root = &self.root;
         let directory = &self.directory;
         crate::agent_storage_retry::execute(&mut self.db, directory, false, |db, settings| {
             let mut tx = db.transaction().map_err(E::Sql)?;
             tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
-            let result = planning_run_material::prepare(&tx, root, directory, settings, work, r)
+            let result = planning_run_material::prepare(&tx, root, directory, settings, work, r, create_workspace)
                 .map_err(launch);
             finished(result, tx.rollback().map_err(E::Sql))
         })
@@ -419,7 +424,7 @@ impl RootStore {
             return Err(E::Refused("planning-gate-parent-changed"));
         }
         let work = self.read_work(&row.work_id)?;
-        let material = self.planner_material(&row.work_id, &request(&row, work.revision))?;
+        let material = self.planner_material(&row.work_id, &request(&row, work.revision), false)?;
         if material.settings.revision.0 != row.settings_revision
             || material.host.preflight.scope != row.host_scope
             || crate::agent_launch_preflight::hash(&material.prompt) != row.prompt_sha256
@@ -463,6 +468,8 @@ fn original_fresh(material: &Material, row: &Run) -> Result<(), E> {
 /// permission precede exec. Empty EOF is not execution proof. No OS confinement,
 /// cryptographic identity, descendant termination or business acceptance implied.
 /// Shared raw credential validation rejects PID0/invalid UID-GID before grant or Root use.
+/// The shared transport additionally requires an isolated I0 Linux boundary.
+/// Unsafe workspace/backend failure refuses before provider exec, without fallback.
 pub fn execute_planning_gate(root: &Path, claim: &str) -> Result<Infallible, E> {
     if !swarm_identity_contract::name(claim.as_bytes()) {
         return Err(E::Refused("planning-gate-claim-invalid"));
@@ -492,16 +499,21 @@ pub fn execute_planning_gate(root: &Path, claim: &str) -> Result<Infallible, E> 
             return Err(E::Refused("planning-gate-release-invalid"));
         }
         let mut store = RootStore::open(root, false)?;
-        let (material, row) = finished(
-            store.prepare_planning_gate(claim, i64::from(peer.pid())),
-            store.close(),
-        )?;
+        // Frozen engine-read transport decision, taken under this same store
+        // before closure; the exec point poses the additive kernel refusal.
+        let operation = (|| {
+            let (material, row) = store.prepare_planning_gate(claim, i64::from(peer.pid()))?;
+            let internet_denied = store.provider_internet_denied_snapshot()?;
+            Ok((material, row, internet_denied))
+        })();
+        let (material, row, internet_denied) = finished(operation, store.close())?;
         let transport = crate::native_provider_exec::PreparedExec::prepare(
             material.model.provider(),
             &material.host.environment_names,
             &material.host.workspace,
             &material.prompt,
-        )?;
+        )?.with_workspace_identity(material.host.directory_identity)
+          .with_internet_denied(internet_denied);
         if let Err(error) = material
             .fresh(root)
             .map_err(launch)
@@ -520,7 +532,8 @@ pub fn execute_planning_gate(root: &Path, claim: &str) -> Result<Infallible, E> 
             Ok(t) => t,
             Err(error) => return finished(Err(caused("planning-telemetry-setup-failed", error)), transport.close()),
         };
-        transport.add_environment(telemetry.environment)?.add_leading_arguments(telemetry.arguments)?.execute()
+        // Shared exec requires the I0 boundary; failure never falls back to raw exec.
+        transport.add_environment(telemetry.environment)?.add_leading_arguments(telemetry.arguments)?.execute(root)
     })();
     let error = match operation {
         Ok(never) => match never {},
@@ -973,7 +986,7 @@ impl OwnedProcessControl for Control<'_> {
                 validate_after_gate(self.gate_eof, || {
                     let inputs = self
                         .store
-                        .planner_material(&self.row.work_id, &request(&self.row, current.revision))?;
+                        .planner_material(&self.row.work_id, &request(&self.row, current.revision), false)?;
                     if inputs.inputs.preview.context_sha256 != self.row.context_sha256
                         || inputs.inputs.preview.workflow_prompt_sha256
                             != self.row.workflow_prompt_sha256
@@ -1275,7 +1288,7 @@ impl RootStore {
                 return Err(E::Refused("planning-run-already-recorded"));
             }
         }
-        let m = self.planner_material(work, &r)?;
+        let m = self.planner_material(work, &r, true)?;
         let policy = m
             .settings
             .values
@@ -1488,7 +1501,7 @@ impl RootStore {
                     Ok(None)
                 }
             });
-            return Err(feedback_error(error, settled));
+            return Err(stale_gate::settled(error, &receipt, settled));
         }
         saved?;
         self.apply_planning_receipt(&receipt, &body, false)
@@ -1977,9 +1990,7 @@ mod tests {
     #[test]
     fn pending_gate_defers_parent_provider_lock_but_eof_keeps_validation() {
         use std::{fs, os::unix::fs::PermissionsExt};
-        let path=std::env::temp_dir().join(crate::generate_identifier("swarm-gate184-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path,fs::Permissions::from_mode(0o700)).unwrap();
+        let path=crate::fixture_root("swarm-gate184-");
         eprintln!("Owned provider-gate fixture {}",path.display());
         let store=RootStore::initialize(&path,&mut crate::SystemEnvironment).unwrap();
         let probe=|| store.directory.reserve_provider_configuration().map_err(E::Storage)?.close().map_err(E::Storage);

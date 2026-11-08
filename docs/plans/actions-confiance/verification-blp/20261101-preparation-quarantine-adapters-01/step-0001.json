@@ -1,0 +1,23 @@
+{
+  "id": "http-quarantine-refusal-and-cleanup",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--lib",
+    "service::tests::preparation_quarantine_status_keeps_cleanup_failures_server_errors",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 53.93214233299659,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

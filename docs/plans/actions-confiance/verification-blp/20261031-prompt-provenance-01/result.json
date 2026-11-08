@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-provenance",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "prompt-byte-origins",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::preparation_prompt::tests",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 64.25118775900046,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "native-record-consumer",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::preparation_call::level_tests",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.4345666680019349,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "ae797fbdb98eda4051411611f347cc2abf25b98351228bf8bc9b874bc0ceb778",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "c40b1ca3c3073a9819fdeeab31257db01cca2a9a5f19430a4686f3f10fc29398",
+    "declared-inputs.tar.gz": "26f55add54d2a03cd1724b0ff83d979afa9d3994c9fed3d374a7b7a577ea7ccf",
+    "environment.json": "3e8fa0f79406ea53103c26fe13edbe05e64764bc5acb094ffb9c7a21e361e8bc",
+    "step-0001.stdout": "56ebc9dba04842821a899a07c1abd0e8cb9c16571808f297771fa1da10231e5c",
+    "step-0001.stderr": "212004ded0c8f610acfc4f14131926789ccbb03c808c27c782f1207ac4eab5c7",
+    "step-0001.json": "7f8e04574b45e1d844e0dba23668d265b37f768f52cdc67ac112a3abe33b3a9e",
+    "step-0002.stdout": "991f7ebe71ca1eee64e7fba6e4a91b6014cc8b2cdecbfb3c251780d41a6475f1",
+    "step-0002.stderr": "41cd0824c926e0dacab5c09b6739a17faec7997205893246ae3616b723738fd0",
+    "step-0002.json": "00d7075e225d4ef16e5b5c6be53baad49ed073dee3f80ac34f8a5d9fdab5bc54",
+    "inputs.after.json": "c40b1ca3c3073a9819fdeeab31257db01cca2a9a5f19430a4686f3f10fc29398"
+  }
+}

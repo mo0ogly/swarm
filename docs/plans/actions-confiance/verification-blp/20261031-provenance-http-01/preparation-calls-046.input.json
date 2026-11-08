@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "action": "budget",
+  "preparation_id": "prep-90b5e76df052bba38e4699e6",
+  "event_id": "linked-budget",
+  "expected_revision": 1,
+  "budget": {
+    "limit_usd": 2,
+    "reserve_per_launch_usd": 0.5,
+    "estimate_source": "Synthetic linked fixture",
+    "reference_date": "2026-10-27"
+  }
+}

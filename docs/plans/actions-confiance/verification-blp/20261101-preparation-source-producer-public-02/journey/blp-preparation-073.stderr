@@ -1,0 +1,12 @@
+{
+  "error": "event_conflict",
+  "failure": {
+    "causes": [
+      "event_conflict"
+    ],
+    "code": "event_conflict",
+    "message": "event_conflict",
+    "retryable": false
+  },
+  "schema_version": 1
+}

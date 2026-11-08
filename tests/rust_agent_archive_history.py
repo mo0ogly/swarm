@@ -6,6 +6,7 @@ contains private inert manifests; CLI history must never adopt their PIDs or
 write SQL. No live database, implicit retry, model call or global watchdog.
 """
 from pathlib import Path
+from contextlib import closing
 import argparse,base64,copy,hashlib,json,os,sqlite3,subprocess,traceback
 from rust_agent_model_route import Fixture,publish,digest
 
@@ -46,8 +47,8 @@ def run(binary,output,unported=False):
     output.mkdir(parents=True,exist_ok=False);publish(output/'harness.py',Path(__file__).read_bytes());f=Fixture(binary,output,'archive-history');checks=[]
     imports=f.root/'.swarm/imports';imports.mkdir(mode=0o700,exist_ok=True);directory=imports/f.work;directory.mkdir(mode=0o700);manifest=directory/'manifest.json';publish(manifest,b'{"cockpit_history":{"agents":[],"logs":[],"controls":[],"limits":"inert"}}')
     def sql():
-        """Read-only dump of this owned fixture, never the live application."""
-        with sqlite3.connect((f.root/'.swarm/state.db').as_uri()+'?mode=ro',uri=True) as c:return '\n'.join(c.iterdump())
+        """Read-only owned-fixture dump; close the connection on success/error."""
+        with closing(sqlite3.connect((f.root/'.swarm/state.db').as_uri()+'?mode=ro',uri=True)) as c:return '\n'.join(c.iterdump())
     before=sql();settings=(f.root/'.swarm/engine-settings.json').read_bytes()
     def check(name,value):
         assert value,name
@@ -57,6 +58,11 @@ def run(binary,output,unported=False):
     if unported:
         check('history-explicitly-unported',code!=0);check('unported-sql-unchanged',sql()==before);publish(output/'result.json',dict(status='GAP_OBSERVED',checks=checks));print('AGENT_ARCHIVE_HISTORY_GAP 3',flush=True);return
     check('baseline-historical-wire',code==0 and value=={'historical_only':True,'history':{'agents':[],'logs':[],'controls':[],'limits':'inert'}})
+    # Legacy Go emits JSON even without the global --json presentation flag.
+    argv=[str(f.binary),'agent','history',f.work,'--root',str(f.root)]
+    plain=subprocess.run(argv,env=f.environment,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    publish(output/'without-json.stdout',plain.stdout);publish(output/'without-json.stderr',plain.stderr);publish(output/'without-json-command.json',dict(argv=argv,exit=plain.returncode))
+    check('without-json-still-historical-json',plain.returncode==0 and json.loads(plain.stdout)==value and sql()==before)
     layout=json.loads(CONTRACT.read_bytes())['layout'];source=output/'oracle.go';publish(source,oracle(layout));exe=output/'go-json-oracle';env={**os.environ,'GOTOOLCHAIN':'local','GOPROXY':'off'}
     done=subprocess.run(['go','build','-o',str(exe),str(source)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env);publish(output/'go-build.stdout',done.stdout);publish(output/'go-build.stderr',done.stderr);assert done.returncode==0,done.stderr.decode()
     corpus=cases();packets=b''.join(json.dumps({'raw':base64.b64encode(raw).decode()}).encode()+b'\n' for _,raw in corpus);done=subprocess.run([str(exe)],input=packets,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env);publish(output/'go-input.jsonl',packets);publish(output/'go-output.jsonl',done.stdout);publish(output/'go-stderr',done.stderr);assert done.returncode==0 and not done.stderr

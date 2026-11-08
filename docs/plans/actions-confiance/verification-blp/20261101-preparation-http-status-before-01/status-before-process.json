@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-preparation-unqualified-status-before",
+    "web",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-y51u_a8q",
+    "--json",
+    "--lang",
+    "en"
+  ],
+  "pid": 1404590,
+  "start": 1793533078.9630888,
+  "global_watchdog": null,
+  "owned": true
+}

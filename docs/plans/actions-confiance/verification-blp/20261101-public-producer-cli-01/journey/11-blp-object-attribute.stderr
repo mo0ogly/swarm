@@ -1,0 +1,12 @@
+{
+  "error": "blp-declassification-required",
+  "failure": {
+    "causes": [
+      "blp-declassification-required"
+    ],
+    "code": "blp-declassification-required",
+    "message": "blp-declassification-required",
+    "retryable": false
+  },
+  "schema_version": 1
+}

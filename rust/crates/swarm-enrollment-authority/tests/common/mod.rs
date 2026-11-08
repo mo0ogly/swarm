@@ -1,4 +1,5 @@
 use swarm_enrollment_authority::Document;
+pub mod fixture_area;
 use swarm_identity_contract::{Permission, Principal, Scope};
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 fn at(raw: &str) -> OffsetDateTime {

@@ -1,34 +1,13 @@
 #![cfg(unix)]
-use std::{
-    fs,
-    os::unix::fs::symlink,
-    path::PathBuf,
-    sync::atomic::{AtomicU64, Ordering},
-};
+use std::{fs, os::unix::fs::symlink, path::PathBuf};
 use swarm_engine::{
     apply_checkpoint, canonical_owned_project_path, canonical_project_root, local_file, GitState,
     LocalPathError, PathRefusal, Request, Work,
 };
-static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
-        loop {
-            let path = std::env::temp_dir().join(format!(
-                "swarm-path-{}-{}-{}",
-                std::process::id(),
-                std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_nanos(),
-                NEXT.fetch_add(1, Ordering::Relaxed)
-            ));
-            match fs::create_dir(&path) {
-                Ok(()) => return Self(path),
-                Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
-                Err(e) => panic!("fixture creation failed: {e}"),
-            }
-        }
+        Self(swarm_engine::fixture_root("swarm-path-"))
     }
 }
 impl Drop for Fixture {

@@ -3,15 +3,23 @@
 //! Protected-request consistency is not agent/model/business authority.
 #![forbid(unsafe_code)]
 mod access;
+#[cfg(target_os = "linux")]
+mod authority_ledger;
 mod error;
 #[cfg(target_os = "linux")]
 mod service;
-pub use access::LocalWebAuthority;
+pub use access::{LocalWebAuthority, WebAuthMethod, WebPrincipal};
 pub use error::WebAccessError;
+#[cfg(target_os = "linux")]
+pub use authority_ledger::reset_witness;
 #[cfg(target_os = "linux")]
 pub use service::{
     HttpReply, HttpServiceError, NativeHttpServer, NativeHttpService, NativeJobOutcome,
     NativeObservationCause, NativeObservationFailure, NativeOutcomeObserver, NativeOutcomeRecord,
     NativeRequestError, NativeServerError, NativeServerReport, RecordedConfiguration,
     TrustEnrollmentSource, TrustEnrollmentSourceError,
+};
+#[cfg(target_os = "linux")]
+pub use service::{
+    PaeaGitCallApprovalSource, PaeaGitCallAuthority, PaeaGitCallSource, PaeaGitCallSourceError,
 };

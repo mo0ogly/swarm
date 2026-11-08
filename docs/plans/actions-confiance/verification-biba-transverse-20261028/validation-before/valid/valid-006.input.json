@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "event_id": "authorize",
+  "expected_revision": 3,
+  "id": "task",
+  "validation_policy": {
+    "mode": "human",
+    "controls": [
+      {
+        "id": "owned-report-test",
+        "command": [
+          "python3",
+          "-c",
+          "from pathlib import Path\ntext=Path('handoff.md').read_text()\ncode=text.split('\\nFIXTURE_CODE\\n',1)[1].split('\\nEND_FIXTURE_CODE\\n',1)[0]\nexec(compile(code,'<owned_i0_report>','exec'),{})\nfrom pathlib import Path\nimport os,json,re,hashlib\nraw=Path('handoff.md').read_bytes()\nassert re.search(rb'Input SHA256: [0-9a-f]{64}',raw)\nwith Path('validation-executed.json').open('x') as f:\n json.dump(dict(pid=os.getpid(),ppid=os.getppid(),cwd=os.getcwd(),report_sha256=hashlib.sha256(raw).hexdigest()),f)\n f.flush();os.fsync(f.fileno())\nprint('CONTROL-PROBE-SUCCESS',flush=True)\n"
+        ],
+        "criteria": [
+          1
+        ],
+        "inputs": [
+          "handoff.md"
+        ],
+        "review_output": true,
+        "justification": "Run owned report test code, never accept the task"
+      }
+    ]
+  }
+}

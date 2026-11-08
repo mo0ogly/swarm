@@ -79,6 +79,7 @@ use crate::provider_model_route::same_authority_route as same_route;
 /// adapters/probes or missing runtime permission fail closed through shared code.
 /// Root/SQL/settings reservation ownership belongs to the caller; this function
 /// starts no process, grants no gate and neither acknowledges nor settles inputs.
+/// The initial run creates an engine-owned I0 output leaf; rechecks never create it.
 /// Provider lock/directory/IO/codec and preparation causes retain checked cleanup.
 pub(crate) fn prepare(
     tx: &Transaction<'_>,
@@ -87,6 +88,7 @@ pub(crate) fn prepare(
     settings: &EngineSettingsDocument,
     work: &str,
     request: &PlanningCallPreviewRequest,
+    create_workspace: bool,
 ) -> Result<Material, E> {
     // Presence is enough to require explicit R6 adoption; do not read/reset or
     // silently replace a possibly public historical Go configuration/history.
@@ -123,7 +125,9 @@ pub(crate) fn prepare(
         .values
         .agent_launch_policy()
         .map_err(|e| E::caused(e.reason(), e))?;
+    let workspace = crate::native_provider_exec::output_workspace(directory, crate::native_provider_exec::OutputRole::Planner, &request.claim_id, create_workspace)?;
     let launch = Launch {
+        workspace,
         provider: inputs.model.provider.clone(),
         level: inputs
             .model

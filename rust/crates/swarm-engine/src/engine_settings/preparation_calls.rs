@@ -94,7 +94,8 @@ mod tests {
     fn defaults_are_complete_disabled_and_versioned() {
         let s = EngineSettingsValues::installation_defaults().unwrap();
         let p = s.preparation_call_policy().unwrap();
-        assert!(s.schema_version() >= 46);
+        // v52 adds the independent access mode group above the v46 call group.
+        assert_eq!(s.schema_version(), 52);
         assert!(!p.enabled);
         assert_eq!((p.timeout_seconds, p.timeout_maximum_seconds), (300, 600));
     }
@@ -104,11 +105,22 @@ mod tests {
         let mut v = serde_json::to_value(s).unwrap();
         v.as_object_mut()
             .unwrap()
-            .retain(|k, _| !k.starts_with("preparation_call_"));
+            .retain(|k, _| {
+                // A genuine historical v45 document also lacks the later
+                // report-read, cockpit and ledger-root groups; strip them too.
+                !k.starts_with("preparation_call_")
+                    && !k.starts_with("report_")
+                    && k != "cockpit_default_autonomy"
+                    && k != "paea_settlement_ledger_root"
+                    && k != "web_login_ticket_seconds"
+                    && k != "runtime_temporary_directory"
+                    && !k.starts_with("web_access")
+                    && k != "web_authority_public_key"
+                    && k != "web_assertion_max_age_seconds"
+            });
         let s: EngineSettingsValues = serde_json::from_value(v).unwrap();
         s.validate().unwrap();
-        // Later independently adopted groups retain their newer schema.
-        assert_eq!(s.schema_version(), EngineSettingsValues::installation_defaults().unwrap().schema_version());
+        assert_eq!(s.schema_version(), 45);
         assert!(s.preparation_call_policy().is_err());
     }
     #[test]

@@ -1,0 +1,1 @@
+{"cause":"Conservative all-target collector required a dynamic include in a noncompiled integration test; no compiler ran","decision":"Compilation diagnostic snapshots library source and literal assets; production qualification still requires effective compiler profile","original":"run-check-before.py","qualification":false}

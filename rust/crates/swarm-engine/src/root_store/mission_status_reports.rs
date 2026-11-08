@@ -1014,10 +1014,7 @@ mod tests {
     impl Fixture {
         /// Create only this test's attributed root; no Work/Agent authority seed.
         fn new() -> Self {
-            let path =
-                std::env::temp_dir().join(crate::generate_identifier("status-reports-").unwrap());
-            disk::create_dir(&path).unwrap();
-            disk::set_permissions(&path, disk::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("status-reports-");
             Self(path)
         }
     }

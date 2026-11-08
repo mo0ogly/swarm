@@ -1106,11 +1106,14 @@ cannot replace them. A descriptor extracted from the actual Go producer fixes
 ordering, prefixes and role boundaries. Product Rust never invokes Go. Ordinary
 project context is read under its separate saved limits.
 
-Settings v13 `agent_workflow_max_body_bytes` proposes 32000 bytes for the **base
+Settings v13 `agent_workflow_max_body_bytes` proposes 33000 bytes for the **base
 body**, before manifest and project context. Zero refuses; `null` removes this cap.
 V12 journals require explicit adoption. Project limits and model capacity remain
 separate. Nothing is truncated. Output includes `body_bytes`, `body_limit`, observed
 `settings_revision` and `prompt_sha256`. Root reads under one settings reservation.
+The frozen embedded-source corpus outgrew the former 32000 default on 31 October
+2026 (measured worker body 32441 bytes); the installation default is now 33000,
+applied to new roots only — an existing root keeps its saved policy.
 
 `Workflow.SHA` follows Go's base/project composition and does not alone bind every
 prompt byte. An actual counterexample retained equal metadata with different notice

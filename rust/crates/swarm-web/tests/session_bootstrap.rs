@@ -12,9 +12,7 @@ use swarm_web::{LocalWebAuthority, NativeHttpService};
 /// replace the cookie. Preview stays read-only; no human/agent identity is inferred.
 #[test]
 fn native_session_returns_scoped_csrf_without_exposing_bearer_authority() {
-    let root = std::env::temp_dir().join(swarm_engine::generate_identifier("csrf95-").unwrap());
-    fs::create_dir(&root).unwrap();
-    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    let root = swarm_engine::fixture_root("csrf95-");
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
     let r = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
     let session = r.web_session(&listener).unwrap();

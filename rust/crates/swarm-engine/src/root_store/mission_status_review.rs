@@ -362,10 +362,19 @@ mod tests {
         ));
     }
     /// A real current report then changed/missing bytes and restoration exercise
-    /// semantic sidecars. The unique owned fixture is retained for diagnostics.
+    /// semantic sidecars. The unique owned fixture lives under the repository
+    /// fixture area (never /tmp per the 2026-10-31 operator interdiction) and is
+    /// retained for diagnostics.
     #[test]
     fn current_review_report_and_artifact_staleness_recover() {
-        let root = std::env::temp_dir().join(format!(
+        use std::os::unix::fs::DirBuilderExt;
+        let fixtures = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../.swarm-fixtures");
+        std::fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(&fixtures)
+            .unwrap();
+        let root = fixtures.join(format!(
             "swarm-status-review-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
@@ -373,7 +382,7 @@ mod tests {
                 .unwrap()
                 .as_nanos()
         ));
-        std::fs::create_dir(&root).unwrap();
+        std::fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
         eprintln!("OWNED_REVIEW_FIXTURE {}", root.display());
         std::fs::write(root.join("report.md"), b"original").unwrap();
         let hash = artifact_hash(&root, "report.md").unwrap().1;

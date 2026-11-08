@@ -1,10 +1,12 @@
 """Exercise both real installer recipe entry points without installer/daemon execution."""
 import importlib.util,pathlib,sys,tempfile,unittest
 from unittest.mock import patch
+sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent))
+from fixture_area import fixture_area  # noqa: E402 — operator /tmp interdiction
 class StopBeforeExternal(RuntimeError):pass
 class OutputContract(unittest.TestCase):
  def check_recipe(self,name,missing,existing):
-  with tempfile.TemporaryDirectory() as temp:
+  with tempfile.TemporaryDirectory(dir=fixture_area()) as temp:
    output=pathlib.Path(temp)/('missing/parent/result' if missing else 'result')
    if existing:output.mkdir();(output/'keep').write_bytes(b'preserve')
    spec=importlib.util.spec_from_file_location(name,pathlib.Path(__file__).parent/name);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)

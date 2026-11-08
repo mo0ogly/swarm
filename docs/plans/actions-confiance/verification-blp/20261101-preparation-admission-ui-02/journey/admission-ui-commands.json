@@ -1,0 +1,61 @@
+[
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "init",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-ao_r2tox",
+      "--json"
+    ],
+    "start": 1793559235.9678223,
+    "end": 1793559236.0568917,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "work",
+      "create",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-ao_r2tox",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-ui-02/journey/admission-ui-002.input.json"
+    ],
+    "start": 1793559236.0733197,
+    "end": 1793559236.371025,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "task",
+      "add",
+      "w-ab8a7465311938ebfe55f2d6",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-ao_r2tox",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-ui-02/journey/admission-ui-003.input.json"
+    ],
+    "start": 1793559236.389915,
+    "end": 1793559236.5949004,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "budget",
+      "apply",
+      "w-ab8a7465311938ebfe55f2d6",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-ao_r2tox",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-ui-02/journey/admission-ui-004.input.json"
+    ],
+    "start": 1793559236.6111221,
+    "end": 1793559236.6974385,
+    "exit": 0
+  }
+]

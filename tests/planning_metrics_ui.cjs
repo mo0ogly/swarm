@@ -3,7 +3,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 const {spawn}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-planning-metrics-'));let app,browser;
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-planning-metrics-'));let app,browser;
 async function cli(args,input){return new Promise((resolve,reject)=>{const p=spawn(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])]);let text='',err='';p.stdout.on('data',x=>text+=x);p.stderr.on('data',x=>err+=x);p.on('exit',c=>c?reject(Error(err||text)):resolve(text?JSON.parse(text):null));p.stdin.end(input?JSON.stringify(input):undefined)})}
 (async()=>{
  await cli(['init']);

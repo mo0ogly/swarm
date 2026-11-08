@@ -10,15 +10,17 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
 const cfg=JSON.parse(fs.readFileSync(0,'utf8')),output=path.resolve(cfg.output);fs.mkdirSync(output,{recursive:false});
 // waitForFunction defaults to requestAnimationFrame polling, which never runs in
 // background tabs; every wait polls on an interval instead (not a timeout).
-const checks=[],problems=[],saturated=[];
+const checks=[],problems=[],saturated=[],busy=[];
 // Refusals a step provokes on purpose (label|path|status), each consumed once:
 // they are asserted by that step, not counted as problems.
 const expected=[];
 const base='http://'+cfg.address;
-// Explicit 503 web-workers-saturated replies on live reads are the server's
-// designed no-queue refusal under burst; they are counted separately and the
-// windows must keep following. Every other error, console or CSP issue fails.
-function watch(page,label){page.setDefaultTimeout(0);page.setDefaultNavigationTimeout(0);page.on('console',m=>{if(m.type()!=='error'||/status of 503/.test(m.text()))return;const s=/status of (\d{3})/.exec(m.text());const i=s?expected.findIndex(e=>e.label===label&&e.status===+s[1]&&!e.console):-1;if(i>=0){expected[i].console=true;return}problems.push({label,console:m.text()})});page.on('pageerror',e=>problems.push({label,pageerror:String(e)}));page.on('response',async r=>{const p=new URL(r.url()).pathname;if(r.status()===503&&p.startsWith('/api/v1/live/')){let body='';try{body=await r.text()}catch{}if(body.trim()==='web-workers-saturated'){saturated.push({label,path:p});return}}if(r.status()>=400&&!p.startsWith('/login')){const i=expected.findIndex(e=>e.label===label&&e.path===p&&e.status===r.status()&&!e.response);if(i>=0){expected[i].response=true;return}problems.push({label,path:p,status:r.status()})}})}
+// Designed 503 refusals on live reads are counted separately and the windows
+// must keep following: web-workers-saturated (no-queue refusal under burst)
+// and telemetry-store-busy (another writer holds the store; the page retries
+// once per failure streak, web/live.js alerts()). Every other error, console
+// or CSP issue fails.
+function watch(page,label){page.setDefaultTimeout(0);page.setDefaultNavigationTimeout(0);page.on('console',m=>{if(m.type()!=='error'||/status of 503/.test(m.text()))return;const s=/status of (\d{3})/.exec(m.text());const i=s?expected.findIndex(e=>e.label===label&&e.status===+s[1]&&!e.console):-1;if(i>=0){expected[i].console=true;return}problems.push({label,console:m.text()})});page.on('pageerror',e=>problems.push({label,pageerror:String(e)}));page.on('response',async r=>{const p=new URL(r.url()).pathname;if(r.status()===503&&p.startsWith('/api/v1/live/')){let body='';try{body=await r.text()}catch{}if(body.trim()==='web-workers-saturated'){saturated.push({label,path:p});return}if(body.trim()==='telemetry-store-busy'){busy.push({label,path:p});return}}if(r.status()>=400&&!p.startsWith('/login')){const i=expected.findIndex(e=>e.label===label&&e.path===p&&e.status===r.status()&&!e.response);if(i>=0){expected[i].response=true;return}problems.push({label,path:p,status:r.status()})}})}
 /** Fixture-only: record a new failed agent so a fresh attention signal appears. */
 function addFailedAgent(id,work){const body=JSON.stringify({progress:{},diagnostic:{agent_id:'',attempt_id:'',observed_errors:0,consecutive_error_limit:0,limit_reached:false,consecutive_error_limit_reached:false},recovery:{},limits:{},id,work_id:work,task_id:'t9-'+id,attempt_id:'',provider:'fixture',role:'nouveau',workspace:'/isolated/'+id,status:'failed',activity:'Échec simulé',started:'2026-10-21T10:00:00Z'});
  const r=spawnSync('python3',['-c','import sqlite3,sys;d=sqlite3.connect(sys.argv[1]);d.execute("INSERT INTO agents(id,work_id,task_id,cwd,status,body,request) VALUES(?,?,?,?,\'failed\',?,\'{}\')",(sys.argv[2],sys.argv[3],"t9-"+sys.argv[2],"/isolated/"+sys.argv[2],sys.argv[4].encode()));d.commit();d.close()',cfg.db,id,work,body]);assert.equal(r.status,0,String(r.stderr))}
@@ -340,7 +342,7 @@ async function nextRender(page){await page.$eval('#live-works .live-work',e=>{e.
    await context.close();
   }
   assert.deepEqual(problems,[],'console/CSP/HTTP problems');
-  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({status:'PASS',scope:'Local native live dashboard + harness UI on a private fixture Root; not installation, independent review or cutover',checks,problems,saturated_reads:saturated.length},null,2)+'\n');
+  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({status:'PASS',scope:'Local native live dashboard + harness UI on a private fixture Root; not installation, independent review or cutover',checks,problems,saturated_reads:saturated.length,busy_reads:busy.length},null,2)+'\n');
  }catch(error){fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({status:'FAIL',error:String(error.stack||error),checks,problems},null,2)+'\n');process.exitCode=1}
  finally{await browser.close()}
 })();

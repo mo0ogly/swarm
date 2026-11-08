@@ -6,6 +6,7 @@ compared; native saved ceilings and preview token are extensions, not inferred
 Go parity. Actor/time are local observations deliberately excluded from equality.
 """
 import argparse,json,os,subprocess,tempfile,traceback
+from fixture_area import fixture_area
 from pathlib import Path
 from rust_agent_model_route import publish,digest
 
@@ -15,7 +16,7 @@ def run(binary,go,output):
     """
     output.mkdir(parents=True,exist_ok=False);publish(output/'harness.py',Path(__file__).read_bytes());commands=[];roots={};checks=[]
     for kind in ['native','go']:
-        roots[kind]=Path(tempfile.mkdtemp(prefix='limits-parity-'+kind+'-'));(roots[kind]/'empty-bin').mkdir()
+        roots[kind]=Path(tempfile.mkdtemp(prefix='limits-parity-'+kind+'-', dir=fixture_area()));(roots[kind]/'empty-bin').mkdir()
     def call(kind,args,value=None,success=True):
         number=len(commands);exe=binary if kind=='native' else go;argv=[str(exe),*args,'--root',str(roots[kind]),'--json']
         if value is not None:

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Isolated CLI -> real local API recipe; no provider account or payment."""
+from fixture_area import fixture_area
 import argparse, hashlib, json, os, re, selectors, signal, subprocess, tempfile, time
 from pathlib import Path
 
@@ -33,7 +34,7 @@ def cli(root, action=None, data=None, token='', origin=None, session='', expecte
         raise AssertionError(f'operation {action}: expected exit {expected}, observed {r.returncode}; private diagnostic saved')
     return json.loads(r.stdout if expected == 0 else r.stderr)
 
-with tempfile.TemporaryDirectory(prefix='swarm-trust-remote-recipe-') as fixture:
+with tempfile.TemporaryDirectory(prefix='swarm-trust-remote-recipe-', dir=fixture_area()) as fixture:
     base = Path(fixture)
     root, absent = base/'server', base/'client-must-stay-absent'
     root.mkdir()

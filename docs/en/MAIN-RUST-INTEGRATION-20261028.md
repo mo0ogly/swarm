@@ -26,8 +26,34 @@ The historical Go acceptance-runner unit test now injects fixture dependencies j
 
 CI now retains cockpit recipe step channels and targeted browser errors. Work Roots, databases, token-bearing configuration, private transcripts and screenshots are excluded from that artifact. The initial opaque recipe failure is retained; a FAIL summary alone does not establish its cause.
 
-The cockpit recipe expects the19scripts explicitly published by the Rust producer, including the native instruction client. It rejects missing/duplicate/inline/foreign-origin scripts, then compares protected HTTP bytes to versioned inputs (native quotas route maps to native-quotas.js). The permanent recipe and driver inventory include that client. The original inventory refusal is retained; no product action or script is added.
+The cockpit recipe expects the 21 scripts explicitly published by the Rust producer: the 19 native scripts (including the native instruction client) plus the two authority-console clients injected unconditionally by `cockpit_page` (`rust/crates/swarm-web/src/service/native_admin.rs`: `/native-runtime/authority-admin.js` → `web/native-authority-admin.js` and `/cockpit-authority.js`). It rejects missing/duplicate/inline/foreign-origin scripts, then compares protected HTTP bytes to versioned inputs (native quotas route maps to native-quotas.js; authority maps to native-authority-admin.js). The permanent recipe and driver inventory include that client. The original inventory refusal is retained; no product action or script is added. Realignment of 8 November 2026: merge 197d663f6 had combined main's strict 19-entry check with the branch's 21-script page (commit 3b41131dd, 3 November 2026, which added the two authority clients without updating the test's inventory); the CI `fr-etat-native-scripts-only` failure (run 42484108884) and its local reproduction (`.cache/existing-cockpit-razju52o`) are retained as witnesses; the test is realigned to the actual 21-script served inventory with strict guarantees unchanged (no missing, duplicate, inline or foreign script tolerated). Second semantic conflict of the same merge, same cause: f9ff58214 (31 October) had removed the empty-graph early return (the graph of a task-less Work now draws an empty svg, the "Aucune tâche" message and mounts the toolbar with the `#pilot-add-task` create control — behavior verified by `tests/rust_graph_navigation_ui.cjs`: `empty-graph-has-create-control`), without updating the `actual-empty-graph-after-selection` assertion that required no svg; the assertion is realigned to the delivered contract (message present, zero `.graph-noeud`, create control mounted). No CI ran on the branch between 29 October and 8 November: both contract breaks were only observable on the merged tree.
 
 The Version recipe compares the local-change disclosure to the binary’s actual published modified flag instead of assuming a dirty build. After that real witness, explicitly marked client responses check clean/dirty rendering in FR/EN and each theme. Those fixtures never become binary metadata or an observed source comparison. The original clean-build CI failure is retained.
 
 The check targets the Version component’s exact disclosure paragraph, not all historical release-note text, which can legitimately mention uncommitted changes. Clean/dirty variants also cover that vocabulary collision.
+
+Third semantic conflict of the same merge, same root cause: wiring the mandatory
+Biba I0 boundary into `PreparedExec::execute` (6706e201b, 30 October, per BT02 in
+`docs/plans/actions-confiance/BIBA-TRANSVERSE-APEX.md`, "no unconfined fallback")
+now refuses any workspace overlapping the Root (`biba-workspace-overlaps-root`,
+`rust/crates/swarm-biba-linux/src/lib.rs`: `root.starts_with(&path)` is true for
+equality). The default request of the `tests/rust_agent_model_route.py` fixture
+set no workspace: the preflight (`agent_launch_preflight.rs::workspace`) resolves
+an empty workspace to the Root itself, which main's boundary-less execution
+(9075649c7: chdir + execve without Biba) tolerated. The delivered contract lives
+elsewhere: `preparation_call_cli.rs::workspace_path` places workspaces deeper
+than the Root precisely to pass both Biba guards, and the sibling tests
+`rust_cockpit_biba_compatibility.py::make_i0_workspace` and
+`rust_mission_worker_dispatch.py` (`workspace='dispatch-shared'`) mount a Root
+child outside `.swarm`. The fixture is realigned to that contract: it now
+creates an `i0-workspace` child (0700) and the default request carries it;
+`run_and_assert` reads the provider proof (`model-received.json`) from that
+workspace, and refusal assertions require no proof anywhere under the Root
+(rglob), a faithful contraction of "no execution anywhere". Fixture consumers
+that still read the proof at the Root after a successful run (nine files,
+including `rust_native_completion_recovery.py`, `rust_scoped_worker.py`,
+`rust_status_accepted.py`) remain failing on the merged tree — already-mapped
+BT02 debt to realign during their documented requalification (BLP-APEX.md);
+their current failure was already the Biba refusal itself, not a green pass.
+Failure witnesses retained: `.swarm-fixtures/agent-logs-repro1` (Biba refusal)
+and `.swarm-fixtures/agent-logs-repro2` (full green journey after realignment).

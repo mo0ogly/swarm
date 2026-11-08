@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "review_kind": "focused same-context review; not independent acceptance or migration qualification",
+  "observed_at": "2026-11-01T10:32:43.537488+00:00",
+  "head_at_review": "8e76ff7ee3ff4fcc31e601a0a7a5bedd6f91dea0",
+  "scope": "cross-policy monotonic object attribution under the existing canonical digest/project-path identity; unrelated dirty work excluded",
+  "files": {
+    "rust/crates/swarm-engine/src/trust/confidentiality.rs": "4bad3731bf2089d97ef7000befd15b366e809e68aa29bc3e175fb22bf3dbe691",
+    "rust/crates/swarm-engine/tests/confidentiality.rs": "a3c4f76425e546c34681795daddd720dfaa9b2b948c1d0b991234a3f0678bc9e",
+    "rust/crates/swarm-web/tests/confidentiality_http.rs": "d23dd00467bd2159aabf39ab34ddabfbeaacd063d7fde935d1e52dc2ec939204",
+    "tests/blp_attribution_history_cli.py": "af287d0b16cd509ac8999d24981498f8924df32e246b18738725cc10ec2d7a8c",
+    "tools/verification/recipes/blp-attribution-renewal.json": "1df226b3ad415dba403dab200caf52844d614c9cf465e4a3565bba7d80fb8811",
+    "tools/verification/recipes/blp-attribution-renewal-web.json": "7246bd4c50c86f8d13b25281b17fd47e08c67dc96a7c04798ca8ec37a7d3e27c",
+    "tools/verification/recipes/blp-attribution-history-cli.json": "36f42f275d0f55413aa5b46b0688d3af68be9cc2a4f7e9baf551309ba51eeb7b",
+    "tools/verification/recipes/blp-confidentiality-rust.json": "d70850ed9a562ca7f64862cd5a713a1c2cda2b03d4e8216b2934734cb64e0887",
+    "tools/verification/recipes/blp-flow-inventory.json": "24a4185384b2854f0b8ab3f0e7df7b64277643d1862d3808bf45270121c8d6aa",
+    "docs/architecture/blp-flow-inventory.json": "f5ebbf85ca571650897f9e65bc08e74118adc636bd49e9821b70232751830eaf",
+    "docs/architecture/BIBA-RUST.md": "0feffa2c9eaa179d044b30ca95a6127c896dd87e4eb64ebb419cc7a346bf5af4",
+    "docs/en/BIBA-RUST.md": "460ec2a8f6e299b342729fc4c38f57d751b11e088739600e6ee68e09bb0ec18c",
+    "docs/architecture/BLP-FLOWS.md": "ced58e0f02521b01b406f7e747f81ad452a977208c2e39c623896f687493d40f",
+    "docs/en/BLP-FLOWS.md": "5ad3a35639c1b08df9c9ffc9682cb0aff9d886b2f79e3270b260fdcc551a4292",
+    "docs/plans/actions-confiance/BLP-APEX.md": "da58980acd65b3144903cf7a18dd33cff9b4cfdad1efbc54c504d5aa595a4238",
+    "docs/en/plans/actions-confiance/BLP-APEX.md": "c2fe91b2cc44d042536bce7055bce2fb2b539c70c30e400d2781d2468dac360d",
+    "tools/verification/README.md": "95c8dbf64e43693c88596ed57c54d162998561b7158c2545aac97ea910b2c0ba",
+    "version_history.json": "daef7997d8157019eb2678272973717795c008e8eb3a3a314838db58aa448774"
+  },
+  "policies": {
+    "security_invariants": [
+      "new attribution dominates prior classifications for the same digest/project across revisions",
+      "persisted history rejects decreases before consumption",
+      "no human/declassification right inferred from admin role or policy renewal"
+    ],
+    "protocol": [
+      "existing schema 1, stable digest/path/revision identity, existing I3/admin admission",
+      "existing catalog successor preserves level order and compartments"
+    ],
+    "fixture_inputs": "catalog identifiers, fake tokens, dates, TTL/retention values are isolated test data; no new product defaults",
+    "technical_choices": [
+      "1 MiB complete-image hash IO buffer, no file size cutoff",
+      "test debug symbols 0 as delivery, single compiler job after measured memory stalls; no global watchdog"
+    ],
+    "new_operator_policy": false
+  },
+  "functions_reviewed": [
+    "Record::validate",
+    "confidentiality::execute",
+    "classification_dominates",
+    "classified_object_fixture",
+    "object_reader",
+    "policy_revision_cannot_lower_or_remove_object_classification",
+    "stored_cross_revision_downgrade_refuses_without_disclosure",
+    "HTTP post/inject/attribute/test helpers",
+    "CLI digest/main/call/check helpers"
+  ],
+  "documentation": "FR/EN behavior, refusal codes, history-recovery limit, function contracts, permanent recipes and actual delivery evidence updated; persisted wire shape unchanged",
+  "errors": {
+    "producer": "Conflict(blp-declassification-required) before state push/evidence/reply publication, same-revision conflict/replay preserved",
+    "storage": "Integrity(blp-attribution-history-downgrade) through State::validate and real reader; safe family trust-proof-integrity",
+    "consumers": [
+      "engine API checks exact cause and unchanged bytes",
+      "fresh HTTP fixture checks failure status/body/header redaction and recovery",
+      "qualified production CLI checks rejection/redaction/unchanged journal/recovery"
+    ],
+    "typed_attribution": "removed JSON round-trip/default label/compartment extraction; retain validated typed classification",
+    "historical_failure_handling": "original counterexamples, diagnostic failures, source instability, interruptions/SIGTERM remain incomplete/FAIL; none rewritten as PASS"
+  },
+  "evidence": {
+    "engine": "20261101-attribution-renewal-06",
+    "http": "20261101-attribution-renewal-web-06",
+    "cli": "20261101-attribution-history-cli-02",
+    "installed": "20261101-attribution-installed-01",
+    "inventory": "20261101-flow-inventory-01"
+  },
+  "delivery": {
+    "version": "v0.1.1-dev.292",
+    "sha256": "4164953c841c2b22476bd552a12496aac2b7f95e9b26de04d986c3238e2ed83c",
+    "already_installed_parallel_delivery": true,
+    "restart_by_this_increment": false,
+    "runtime_source_matches": 7,
+    "browser_assertions": 56,
+    "private_browser_profile_git_ignored": true
+  },
+  "limits": [
+    "canonical digest/project path is existing identity, not physical source/copy lineage",
+    "complete preparation attribution, authenticated principal/domain, sink mediation and response inheritance remain open",
+    "prepared-call PAEA-route qualification requires verifier-owned native fixture and was not run here",
+    "no repair command for previously lowered historical state; observed local instance has no Trust journal",
+    "no global BLP conformance, independent acceptance or qualification of unrelated source changes"
+  ]
+}

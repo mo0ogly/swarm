@@ -8,7 +8,7 @@ const {spawn,spawnSync}=require('node:child_process');
 if(!process.argv[2]||!process.argv[3])throw Error('usage: node tests/graph_automation_e2e.cjs BINARY OUTPUT');
 const binary=path.resolve(process.argv[2]),output=path.resolve(process.argv[3]);
 fs.mkdirSync(output,{recursive:true});
-const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-d01-'));
+const scratch=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-d01-'));
 const graphOutput=path.join(output,'graph'),automationOutput=path.join(output,'programs');
 
 function executeAsync(command,args,options={}){

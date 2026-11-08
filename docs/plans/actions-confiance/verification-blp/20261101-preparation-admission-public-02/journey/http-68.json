@@ -1,0 +1,10 @@
+{
+  "status": 409,
+  "body": {
+    "error": "blp-declassification-required",
+    "failure": {
+      "code": "blp-declassification-required"
+    },
+    "schema_version": 1
+  }
+}

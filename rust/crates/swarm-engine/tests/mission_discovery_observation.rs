@@ -6,8 +6,7 @@ use swarm_engine::{RootStore,SystemEnvironment,EngineSettingsChange,SettingCount
 /// Retain every owned Root on success/failure for attributed replay. No live
 /// project selected; stdout records birth before engine initialization.
 fn fixture() -> (PathBuf,RootStore) {
-    let path=std::env::temp_dir().join(swarm_engine::generate_identifier("swarm-discovery-observation-").unwrap());
-    fs::create_dir(&path).unwrap();fs::set_permissions(&path,fs::Permissions::from_mode(0o700)).unwrap();
+    let path=swarm_engine::fixture_root("swarm-discovery-observation-");
     println!("OWNED_DISCOVERY_ROOT {}",path.display());
     let mut env=SystemEnvironment;let store=RootStore::initialize(&path,&mut env).unwrap();
     let doc=store.settings().unwrap();let mut values=doc.values.clone();values.storage_busy_retries=Some(SettingCount(0));

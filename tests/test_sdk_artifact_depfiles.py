@@ -1,5 +1,6 @@
 """SDK dep-info must belong to the actual artifact, never a stale normal alias."""
 import os,tempfile,unittest
+from fixture_area import fixture_area
 from pathlib import Path
 from rust_reviewer_claim_candidate import sdk_artifact_depfile
 
@@ -17,24 +18,24 @@ class ArtifactDepfiles(unittest.TestCase):
 
     def test_current_inode_chooses_hashed_depfile_and_keeps_stale_original(self):
         """A valid current companion disproves reuse of the stale alias."""
-        with tempfile.TemporaryDirectory() as folder:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as folder:
             a,hashed,dep,old=self.fixture(Path(folder));before=old.read_bytes();self.assertEqual(sdk_artifact_depfile(a),dep);self.assertEqual(old.read_bytes(),before)
 
     def test_ambiguous_same_inode_refuses_instead_of_picking_first(self):
         """One valid witness precedes a second matching hardlink fault."""
-        with tempfile.TemporaryDirectory() as folder:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as folder:
             a,hashed,dep,_=self.fixture(Path(folder));self.assertEqual(sdk_artifact_depfile(a),dep);os.link(hashed,hashed.parent/'swarm_rust-3c4d')
             with self.assertRaisesRegex(ValueError,'owner-missing-or-ambiguous'):sdk_artifact_depfile(a)
 
     def test_identical_bytes_without_inode_binding_do_not_supply_authority(self):
         """Same content alone cannot choose an adjacent depfile after unlink."""
-        with tempfile.TemporaryDirectory() as folder:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as folder:
             a,hashed,dep,_=self.fixture(Path(folder));self.assertEqual(sdk_artifact_depfile(a),dep);data=hashed.read_bytes();hashed.unlink();hashed.write_bytes(data)
             with self.assertRaisesRegex(ValueError,'owner-missing-or-ambiguous'):sdk_artifact_depfile(a)
 
     def test_test_and_library_paths_are_direct_and_missing_depinfo_refuses(self):
         """Existing hashed test/library behavior is preserved without a fallback."""
-        with tempfile.TemporaryDirectory() as folder:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as folder:
             root=Path(folder);test=root/'test-1a2b';test.write_bytes(b'test');dep=test.with_suffix('.d');dep.write_text('test: source.rs\n')
             a=dict(executable=str(test),profile=dict(test=True));self.assertEqual(sdk_artifact_depfile(a),dep)
             lib=root/'libengine-3c4d.rlib';lib.write_bytes(b'lib');ld=root/'engine-3c4d.d';ld.write_text('lib: source.rs\n');self.assertEqual(sdk_artifact_depfile(dict(executable=None,filenames=[str(lib)])),ld)

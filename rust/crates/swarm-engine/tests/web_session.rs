@@ -15,8 +15,7 @@ impl Fixture {
     /// Initialize real schema/settings; no fixture database or account is reused.
     fn new() -> Self {
         let path =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("web-session91-").unwrap());
-        fs::create_dir(&path).unwrap();
+            swarm_engine::fixture_root("web-session91-");
         RootStore::initialize(&path, &mut SystemEnvironment)
             .unwrap()
             .close()

@@ -1,9 +1,10 @@
 """Isolated nominal A9: two deterministic producers, exchanges, consumer, controls."""
+from fixture_area import fixture_area
 import hashlib, json, pathlib, subprocess, sys, tempfile, time, uuid
 binary=str(pathlib.Path(sys.argv[1]).resolve());out=pathlib.Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True)
 scenario=sys.argv[3] if len(sys.argv)>3 else 'nominal'
 assert scenario in ['nominal','shared','replay','correction','transient','environment','dual','restart']
-root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-a9-'));calls=[]
+root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-a9-', dir=fixture_area()));calls=[]
 def cli(args,data=None):
  p=subprocess.run([binary,'--root',str(root),'--json',*args]+(['--input','-'] if data is not None else []),input=json.dumps(data) if data is not None else None,text=True,capture_output=True,timeout=15)
  calls.append({'args':args,'mutation':data is not None,'at':time.time(),'code':p.returncode})

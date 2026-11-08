@@ -22,6 +22,31 @@ fn retained(e: R, publication: Option<&'static str>) -> R {
     }
 }
 impl RootStore {
+    /// Read-only observation of the current persisted Trust revision, without
+    /// executing any trust operation or reserving the trust lock: a shared
+    /// reader is deliberately NOT taken because this is presentation-only
+    /// observation beside an already running protocol, not a transaction.
+    /// The bounded state file is decoded and validated like every other trust
+    /// read; `Ok(None)` distinguishes an absent journal (never initialized)
+    /// from a readable revision. Decode/validate failures refuse typed and
+    /// are never converted to a fabricated revision or empty success. The
+    /// observed value proves no current grant, authority or acceptance.
+    pub fn trust_revision(&self) -> Result<Option<i64>, R> {
+        match self.directory.read_bounded(STATE, MAX_STATE) {
+            Ok(raw) => {
+                let state = State::decode(&raw).map_err(failure)?;
+                state.validate().map_err(failure)?;
+                state
+                    .require_supported()
+                    .map_err(failure)?;
+                Ok(Some(state.revision))
+            }
+            // Absent journal: explicitly uninitialized trust state, a real
+            // observed prerequisite state for preview consumers, not an error.
+            Err(e) if absent(&e) => Ok(None),
+            Err(e) => Err(R::Storage(e)),
+        }
+    }
     /// Execute the trust protocol against this opened root under its historical
     /// flock. Local configuration requires operator ownership; business actions
     /// authenticate their own stored token. Late errors retain publication state.
@@ -40,9 +65,61 @@ impl RootStore {
     /// Serialize one request; the fixed caller context selects authentication,
     /// never an input field or operator policy. Preserve publication on errors.
     pub(super) fn trust_scoped(&self, operation: &str, raw: &[u8], token: Source<'_>, principal: bool) -> Result<TrustReply, R> {
+        #[cfg(target_os="linux")]
+        if matches!(operation,"blp-preparation-admit"|"blp-preparation-admission-show"|"blp-preparation-transport") {
+            if operation=="blp-preparation-transport" {
+                return super::preparation_transport::execute(self,operation,raw,token);
+            }
+            return super::preparation_admission::execute(self,operation,raw,token);
+        }
+        self.with_preparation_control(operation,token,principal,||self.trust_scoped_reserved(operation,raw,token,principal))
+    }
+    /// Acquire the egress writer before any SQL/Trust reservation for an identity
+    /// or BLP-policy mutation. Other business operations run unchanged. Preflight
+    /// rejects unauthorized waiters but grants no authority; callback must repeat
+    /// current admission. Preserve recorded publication on late release failure.
+    pub(super) fn with_preparation_control(&self, operation: &str, token: Source<'_>, principal: bool,
+        apply: impl FnOnce()->Result<TrustReply,R>) -> Result<TrustReply,R> {
+        if !matches!(operation,"config-apply"|"blp-policy-apply") { return apply(); }
+        if !self.writable { return Err(R::Refused("read-only-root")); }
+        // Reject unauthorized control before waiting behind provider IO. This
+        // snapshot grants nothing: the authoritative path authenticates again.
+        self.preparation_control_preflight(operation,token,principal)?;
+        let egress=self.directory.reserve_preparation_egress(true).map_err(R::Storage)?;
+        let result=apply();
+        let publication=result.as_ref().ok().and_then(|reply|reply.publication);
+        finished(result,egress.close().map_err(R::Storage)).map_err(|error|retained(error,publication))
+    }
+    /// Observe control authority under a short Trust read before acquiring the
+    /// egress writer. Current I3/admin is required exactly where the existing
+    /// operation requires it; unconfigured session bootstrap/local recovery
+    /// retain their prior contract. Final authorization is always repeated.
+    fn preparation_control_preflight(&self, operation: &str, token: Source<'_>, principal: bool) -> Result<(),R> {
+        let reservation=self.directory.reserve_trust(false).map_err(R::Storage)?;
+        let result=(||{
+            let state=match self.directory.read_bounded(STATE,MAX_STATE) {
+                Ok(raw)=>State::decode(&raw).map_err(failure)?,
+                Err(error) if absent(&error)=>State::initial(),
+                Err(error)=>return Err(R::Storage(error)),
+            };
+            state.validate().map_err(failure)?;
+            if operation=="blp-policy-apply" || (principal && state.revision!=0) {
+                let actor=trust::authentication::authenticated(&state,token).map_err(failure)?;
+                trust::authentication::require_administrator(&actor).map_err(failure)?;
+            }
+            Ok(())
+        })();
+        finished(result,reservation.close().map_err(R::Storage))
+    }
+    /// Apply the existing Trust protocol after any required egress writer is
+    /// held. Short business reservations and publication/cleanup semantics stay
+    /// unchanged; configuration/BLP mutations repeat current authentication here.
+    pub(super) fn trust_scoped_reserved(&self, operation: &str, raw: &[u8], token: Source<'_>, principal: bool) -> Result<TrustReply,R> {
         let readonly = matches!(
             operation,
             "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
+                | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check"
+                | "blp-preparation-transport" | "security-show"
         );
         if !readonly && !self.writable {
             return Err(R::Refused("read-only-root"));
@@ -77,13 +154,40 @@ impl RootStore {
             let operator = if principal && (operation=="audit-transaction" || matches!(operation, "config-preview" | "config-apply") && st.revision != 0) {
                 st.require_supported().map_err(failure)?;
                 let actor = trust::operations::authenticated(&st, token).map_err(failure)?;
-                if actor.integrity != 3 || !actor.roles.iter().any(|r| r == "admin") {
-                    return Err(failure(E::Authorization));
-                }
+                trust::authentication::require_administrator(&actor).map_err(failure)?;
                 actor.subject.clone()
             } else { "local-operator".to_owned() };
             let mut planned = None;
             let bytes = match operation {
+                "security-show" => trust::security::observe(&st,raw,token)?,
+                #[cfg(target_os="linux")]
+                "blp-preparation-input-attribute" => {
+                    let (bytes,state)=super::preparation_admission::attribute(self,&mut st,raw,token,now)?;
+                    planned=state;bytes
+                }
+                #[cfg(target_os="linux")]
+                "blp-preparation-destination-attribute" => {
+                    let (bytes,state)=super::preparation_transport::destination_attribute(self,&mut st,raw,token,now)?;
+                    planned=state;bytes
+                }
+
+                #[cfg(target_os="linux")]
+                "blp-preparation-attribute" => {
+                    let (bytes, publication) = super::preparation_attribution::execute(self, &mut st, raw, token, now)?;
+                    planned = publication;
+                    bytes
+                }
+                #[cfg(not(target_os="linux"))]
+                "blp-preparation-attribute" => return Err(R::Refused("blp-preparation-platform-unsupported")),
+                #[cfg(target_os="linux")]
+                "blp-preparation-check" => super::preparation_call::confidentiality_check(self, &st, raw, token)?,
+                #[cfg(not(target_os="linux"))]
+                "blp-preparation-check" => return Err(R::Refused("blp-preparation-platform-unsupported")),
+                "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
+                | "blp-object-attribute" => {
+                    let (bytes, state)=trust::confidentiality::execute(&mut st,operation,raw,token,now).map_err(failure)?;
+                    planned=state; bytes
+                }
                 #[cfg(target_os="linux")]
                 "public-anchor"=>super::trust_evidence_runtime::anchor(self,&st,raw,token,now)?,
                 #[cfg(target_os="linux")]
@@ -97,7 +201,7 @@ impl RootStore {
                 "audit-transaction"=>{
                     st.require_supported().map_err(failure)?;
                     let actor=trust::operations::authenticated(&st,token).map_err(failure)?;
-                    if actor.integrity!=3||!actor.roles.iter().any(|r|r=="admin"){return Err(failure(E::Authorization));}
+                    trust::authentication::require_administrator(&actor).map_err(failure)?;
                     let report=trust::audit::transaction(&st,raw).map_err(failure)?;
                     let mut value:serde_json::Value=serde_json::from_slice(&report).map_err(|e|failure(e.into()))?;
                     let id=value["action_id"].as_str().ok_or_else(||failure(E::Integrity("trust-audit-action-missing")))?.to_owned();

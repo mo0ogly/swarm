@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "action": "use-proposal",
+  "preparation_id": "prep-b0f3364296da8a02bb4c7164",
+  "event_id": "use-plan",
+  "expected_revision": 4,
+  "turn_id": "pt-d78ee2eec209310bfbd6b562555d9279"
+}

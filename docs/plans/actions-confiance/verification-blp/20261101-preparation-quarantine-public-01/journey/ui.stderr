@@ -1,0 +1,11 @@
+Error: unexpected-browser-diagnostic
+    at bad (/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_quarantine_ui.cjs:14:51)
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/blp_quarantine_ui.cjs:24:153
+    at /home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/third_party/mitt/mitt.js:62:7
+    at Array.map (<anonymous>)
+    at Object.emit (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/third_party/mitt/mitt.js:61:20)
+    at CdpPage.emit (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/common/EventEmitter.js:83:23)
+    at /home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/Page.js:202:18
+    at /home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/third_party/mitt/mitt.js:62:7
+    at Array.map (<anonymous>)
+    at Object.emit (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/third_party/mitt/mitt.js:61:20)

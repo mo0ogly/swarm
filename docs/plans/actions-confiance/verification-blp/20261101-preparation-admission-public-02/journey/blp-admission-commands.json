@@ -1,0 +1,911 @@
+[
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "init",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json"
+    ],
+    "start": 1793558309.0081398,
+    "end": 1793558309.1111236,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "work",
+      "create",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-002.input.json"
+    ],
+    "start": 1793558309.1277459,
+    "end": 1793558309.4720984,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "task",
+      "add",
+      "w-42c8c14d21dcbfa1cce986ed",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-003.input.json"
+    ],
+    "start": 1793558309.488493,
+    "end": 1793558309.7170014,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "budget",
+      "apply",
+      "w-42c8c14d21dcbfa1cce986ed",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-004.input.json"
+    ],
+    "start": 1793558309.7338421,
+    "end": 1793558309.8140845,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "engine-settings",
+      "show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json"
+    ],
+    "start": 1793558309.9779685,
+    "end": 1793558310.0337203,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "engine-settings",
+      "preview",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-006.input.json"
+    ],
+    "start": 1793558310.05043,
+    "end": 1793558310.4055083,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "engine-settings",
+      "apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-007.input.json"
+    ],
+    "start": 1793558310.4230707,
+    "end": 1793558310.5067816,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "engine-settings",
+      "show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json"
+    ],
+    "start": 1793558310.5155628,
+    "end": 1793558310.5744617,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "prepare",
+      "create",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-009.input.json"
+    ],
+    "start": 1793558310.6611238,
+    "end": 1793558310.749725,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "prepare",
+      "budget",
+      "prep-fa8847b0c33183273f594550",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-010.input.json"
+    ],
+    "start": 1793558310.7660997,
+    "end": 1793558310.8562305,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json"
+    ],
+    "start": 1793558310.865075,
+    "end": 1793558310.9434912,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "config-apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-012.input.json"
+    ],
+    "start": 1793558310.960018,
+    "end": 1793558311.030582,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-policy-apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-013.input.json"
+    ],
+    "start": 1793558311.0476825,
+    "end": 1793558311.1220212,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-014.input.json"
+    ],
+    "start": 1793558311.140704,
+    "end": 1793558311.2271676,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-015.input.json"
+    ],
+    "start": 1793558311.2632318,
+    "end": 1793558311.330078,
+    "exit": 4
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-016.input.json"
+    ],
+    "start": 1793558311.3562772,
+    "end": 1793558311.4494548,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-017.input.json"
+    ],
+    "start": 1793558311.4770243,
+    "end": 1793558311.5754359,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-018.input.json"
+    ],
+    "start": 1793558311.6003046,
+    "end": 1793558311.6946774,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-019.input.json"
+    ],
+    "start": 1793558311.7199793,
+    "end": 1793558311.8154628,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-020.input.json"
+    ],
+    "start": 1793558311.8420837,
+    "end": 1793558311.9332378,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-021.input.json"
+    ],
+    "start": 1793558311.9590738,
+    "end": 1793558312.052795,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-022.input.json"
+    ],
+    "start": 1793558312.0786624,
+    "end": 1793558312.1734905,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-023.input.json"
+    ],
+    "start": 1793558312.2026792,
+    "end": 1793558312.2979727,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-024.input.json"
+    ],
+    "start": 1793558312.324199,
+    "end": 1793558312.4231305,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-025.input.json"
+    ],
+    "start": 1793558312.44928,
+    "end": 1793558312.5403895,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-026.input.json"
+    ],
+    "start": 1793558312.5683374,
+    "end": 1793558312.672183,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-027.input.json"
+    ],
+    "start": 1793558312.7000408,
+    "end": 1793558312.8020394,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-028.input.json"
+    ],
+    "start": 1793558312.8306441,
+    "end": 1793558312.9383273,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-029.input.json"
+    ],
+    "start": 1793558312.965341,
+    "end": 1793558313.1044135,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-030.input.json"
+    ],
+    "start": 1793558313.130383,
+    "end": 1793558313.246005,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-031.input.json"
+    ],
+    "start": 1793558313.2729392,
+    "end": 1793558313.3841004,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-032.input.json"
+    ],
+    "start": 1793558313.4179704,
+    "end": 1793558313.545997,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-033.input.json"
+    ],
+    "start": 1793558313.5735557,
+    "end": 1793558313.6620264,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-034.input.json"
+    ],
+    "start": 1793558313.6888108,
+    "end": 1793558313.8053322,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-035.input.json"
+    ],
+    "start": 1793558313.8318205,
+    "end": 1793558313.9512281,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-input-attribute",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-036.input.json"
+    ],
+    "start": 1793558313.9773722,
+    "end": 1793558314.0870912,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-037.input.json"
+    ],
+    "start": 1793558314.1259313,
+    "end": 1793558314.2197158,
+    "exit": 4
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-038.input.json"
+    ],
+    "start": 1793558314.2489278,
+    "end": 1793558314.3205514,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-039.input.json"
+    ],
+    "start": 1793558314.3502264,
+    "end": 1793558314.439361,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-040.input.json"
+    ],
+    "start": 1793558314.4703367,
+    "end": 1793558314.5429316,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-041.input.json"
+    ],
+    "start": 1793558314.5728822,
+    "end": 1793558314.6449263,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-042.input.json"
+    ],
+    "start": 1793558314.674744,
+    "end": 1793558314.7523165,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-043.input.json"
+    ],
+    "start": 1793558314.7811887,
+    "end": 1793558314.855891,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-044.input.json"
+    ],
+    "start": 1793558314.8850543,
+    "end": 1793558314.952615,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-045.input.json"
+    ],
+    "start": 1793558314.979888,
+    "end": 1793558315.0688832,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-046.input.json"
+    ],
+    "start": 1793558315.1225166,
+    "end": 1793558315.1939569,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-047.input.json"
+    ],
+    "start": 1793558315.2121897,
+    "end": 1793558315.2838256,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-048.input.json"
+    ],
+    "start": 1793558315.3197968,
+    "end": 1793558315.399796,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-049.input.json"
+    ],
+    "start": 1793558315.4268837,
+    "end": 1793558315.4950118,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-050.input.json"
+    ],
+    "start": 1793558315.5226393,
+    "end": 1793558315.5977933,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admit",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-051.input.json"
+    ],
+    "start": 1793558316.4088778,
+    "end": 1793558316.482384,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-052.input.json"
+    ],
+    "start": 1793558316.5093913,
+    "end": 1793558316.58308,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-053.input.json"
+    ],
+    "start": 1793558316.6795006,
+    "end": 1793558316.7525659,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-054.input.json"
+    ],
+    "start": 1793558316.7798178,
+    "end": 1793558316.8594024,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-055.input.json"
+    ],
+    "start": 1793558316.9598246,
+    "end": 1793558317.033994,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-056.input.json"
+    ],
+    "start": 1793558317.0608337,
+    "end": 1793558317.1311562,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-057.input.json"
+    ],
+    "start": 1793558317.2319312,
+    "end": 1793558317.3060424,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-058.input.json"
+    ],
+    "start": 1793558317.3326836,
+    "end": 1793558317.4061146,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-preparation-admission-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-059.input.json"
+    ],
+    "start": 1793558317.5349572,
+    "end": 1793558317.610499,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "blp-policy-apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-060.input.json"
+    ],
+    "start": 1793558317.6361947,
+    "end": 1793558317.7348804,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+      "trust",
+      "config-apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-02/journey/blp-admission-061.input.json"
+    ],
+    "start": 1793558318.0641415,
+    "end": 1793558318.167015,
+    "exit": 0
+  }
+]

@@ -17,6 +17,10 @@ pub enum SettingUnit {
     Percent,
     Programs,
     Phases,
+    /// Single scalar operator choice among declared wire options, distinct
+    /// from the Phases checkbox arrays; the saved scalar must be a listed
+    /// choice, and the installation default must be among them.
+    Choice,
     /// Explicit operator string lists; consumer validates vocabulary and rules.
     Strings,
 }
@@ -97,6 +101,8 @@ impl EngineSettingsCatalog {
     /// Metadata is not the installed operator configuration.
     /// v4 adds address fields, explicit null labels, restart boundaries and
     /// technical maxima populated from engine constraints, not operator metadata.
+    /// v6 adds the scalar choice unit: nonnullable, options with nonempty
+    /// unique values and nonempty labels; the installation default must be listed.
     /// Readable historical document versions and field introduction bounds use
     /// the same current schema derived from validated defaults. Rendering this
     /// metadata never adopts missing values into an older saved installation.
@@ -111,7 +117,7 @@ impl EngineSettingsCatalog {
             .as_object()
             .ok_or(EngineSettingsError::Refused("settings-catalog-values"))?;
         let names: BTreeSet<_> = descriptor.fields.iter().map(|f| f.name.as_str()).collect();
-        if descriptor.schema_version != 5
+        if descriptor.schema_version != 6
             || names.len() != descriptor.fields.len()
             || names != object.keys().map(String::as_str).collect()
             || descriptor.fields.iter().any(|f| {
@@ -134,6 +140,24 @@ impl EngineSettingsCatalog {
                                 != crate::MANUAL_GATE_PHASES.into_iter().collect()
                             || f.choices.len() != crate::MANUAL_GATE_PHASES.len()
                             || f.choices.iter().any(|c| c.label.trim().is_empty())
+                    } else if f.unit == SettingUnit::Choice {
+                        // Scalar choice: nonnullable, nonempty unique values and
+                        // labels, and the installed default must be a listed option.
+                        f.nullable
+                            || f.choices.is_empty()
+                            || f.choices
+                                .iter()
+                                .any(|c| c.value.trim().is_empty() || c.label.trim().is_empty())
+                            || f.choices
+                                .iter()
+                                .map(|c| c.value.as_str())
+                                .collect::<BTreeSet<_>>()
+                                .len()
+                                != f.choices.len()
+                            || !object
+                                .get(&f.name)
+                                .and_then(|v| v.as_str())
+                                .is_some_and(|default| f.choices.iter().any(|c| c.value == default))
                     } else {
                         !f.choices.is_empty()
                     }
@@ -167,7 +191,7 @@ impl EngineSettingsCatalog {
             }
         }
         Ok(Self {
-            schema_version: 5,
+            schema_version: 6,
             document_schema_version: defaults.schema_version(),
             // Document history is contiguous from protocol v1; derive its range
             // from actual validated installation values, not a second ceiling.

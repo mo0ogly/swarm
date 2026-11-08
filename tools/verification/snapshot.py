@@ -11,7 +11,9 @@ the declared inputs were sufficient: an undeclared input fails visibly instead
 of being read from the live checkout.
 
 It grants no rights and touches no live state: `.swarm`, `.git`, dependency and
-build caches are excluded by `recipe.snapshot`. The snapshot must be on a disk
+build caches are excluded by `recipe.snapshot`. The runner and its
+`tests/fixture_area.py` (the /tmp interdiction area it resolves) are shipped
+even when undeclared. The snapshot must be on a disk
 with room for the build cache the recipe's environment points at (a tmpfs such
 as /tmp may be too small). Exit codes follow recipe.py: 0 PASS, 1 FAIL, 2 refusal.
 """
@@ -81,6 +83,14 @@ def freeze(root, recipe_path, destination, links):
     if not runner.is_file():
         raise ValueError('snapshot-runner-missing')
     inventory.setdefault(str(runner.relative_to(root)), recipe.digest(runner.read_bytes()))
+    # recipe.py resolves the operator /tmp interdiction area through
+    # tests/fixture_area.py (Admin setting runtime_temporary_directory) at run
+    # time; without it every snapshot run fails before its first step. Ship it
+    # alongside the runner even when the recipe does not declare it.
+    fixture_area = root / 'tests' / 'fixture_area.py'
+    if not fixture_area.is_file():
+        raise ValueError('snapshot-fixture-area-missing')
+    inventory.setdefault(str(fixture_area.relative_to(root)), recipe.digest(fixture_area.read_bytes()))
     destination.mkdir(parents=False, exist_ok=False)
     for name, expected in inventory.items():
         target = destination / name

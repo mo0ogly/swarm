@@ -303,6 +303,30 @@ pub(crate) fn record_permission(
             ));
         }
         crate::root_store::agent_execution_origin::stage(tx,dir,id)?;
+        // Go checkMemorySummaryBeforeStart (agents_process.go:396) runs right
+        // before cmd.Start(): prove the queued extractive receipt against the
+        // stored request and re-resolved sources, stamp the checked receipt,
+        // and persist it before the provider is released. Failure here refuses
+        // the provider start (the CAS save is the only write point).
+        if agent.context.as_ref().and_then(|c| c.summary.as_ref()).is_some()
+            || agent
+                .prepared_context
+                .as_ref()
+                .and_then(|c| c.summary.as_ref())
+                .is_some()
+        {
+            let now = crate::system_timestamp()
+                .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))?;
+            if let Some(checked) = crate::memory_summary_selection::checked_memory_summary_receipt(
+                tx,
+                root,
+                &agent,
+                &now,
+            )? {
+                let context = agent.context.as_mut().expect("summary presence checked above");
+                context.summary = Some(Box::new(checked));
+            }
+        }
         snapshot.phase = AgentExecutionPhase::PermissionRecorded;
         agent.native_execution = Some(crate::GoRaw(
             serde_json::value::to_raw_value(&snapshot)

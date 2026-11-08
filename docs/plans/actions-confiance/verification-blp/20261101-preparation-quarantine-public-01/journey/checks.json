@@ -1,0 +1,102 @@
+[
+  {
+    "name": "valid-api-control-before-quarantine",
+    "passed": true
+  },
+  {
+    "name": "valid-cli-control-before-quarantine",
+    "passed": true
+  },
+  {
+    "name": "actual-pending-engine-producer",
+    "passed": true
+  },
+  {
+    "name": "actual-engaged-api-request-received",
+    "passed": true
+  },
+  {
+    "name": "actual-http-operation-holds-egress-reservation",
+    "passed": true
+  },
+  {
+    "name": "business-trust-reservation-remains-available",
+    "passed": true
+  },
+  {
+    "name": "activation-cannot-publish-during-engaged-egress",
+    "passed": true
+  },
+  {
+    "name": "engaged-operation-completes-before-quarantine",
+    "passed": true
+  },
+  {
+    "name": "quarantine-persisted",
+    "passed": true
+  },
+  {
+    "name": "api-send-explicitly-refuses",
+    "passed": true
+  },
+  {
+    "name": "cli-send-explicitly-refuses",
+    "passed": true
+  },
+  {
+    "name": "refusal-keeps-journal-budget-and-turns",
+    "passed": true
+  },
+  {
+    "name": "refused-cli-api-send-no-socket-or-byte",
+    "passed": true
+  },
+  {
+    "name": "pending-production-worker-refuses-at-claim",
+    "passed": true
+  },
+  {
+    "name": "pending-refusal-no-socket-or-byte",
+    "passed": true
+  },
+  {
+    "name": "unstarted-reservation-released-not-estimated",
+    "passed": true
+  },
+  {
+    "name": "http403-quarantine-refusal",
+    "passed": true
+  },
+  {
+    "name": "http-refusal-no-socket-or-byte",
+    "passed": true
+  },
+  {
+    "name": "explicit-disabled-state-reread",
+    "passed": true
+  },
+  {
+    "name": "explicit-recovery-resumes-legacy-egress",
+    "passed": true
+  },
+  {
+    "name": "actual-engaged-cli-request-received",
+    "passed": true
+  },
+  {
+    "name": "actual-cli-operation-holds-egress-reservation",
+    "passed": true
+  },
+  {
+    "name": "activation-cannot-publish-during-cli-egress",
+    "passed": true
+  },
+  {
+    "name": "engaged-cli-completes-before-quarantine",
+    "passed": true
+  },
+  {
+    "name": "second-explicit-disabled-state-reread",
+    "passed": true
+  }
+]

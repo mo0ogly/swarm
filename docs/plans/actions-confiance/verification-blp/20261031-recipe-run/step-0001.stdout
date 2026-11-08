@@ -1,0 +1,12 @@
+tests::catalog_and_labels_reject_unknowns_duplicates_and_malformed_input: test
+tests::dominance_exhaustive_independent_matrix: test
+tests::fixed_domain_does_not_use_maximum_clearance_for_later_reads: test
+tests::join_preserves_all_exposed_compartments_and_maximum_level: test
+tests::no_read_up_no_write_down_and_no_compartment_loss: test
+tests::policy_change_and_revocation_require_new_execution: test
+tests::same_level_distinct_compartments_are_incomparable: test
+tests::successor_preserves_historical_catalog_semantics: test
+tests::unknown_or_empty_context_never_becomes_public: test
+tests::unrecognized_principal_learns_no_object_status_and_errors_are_content_free: test
+
+10 tests, 0 benchmarks

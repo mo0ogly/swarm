@@ -1,0 +1,17 @@
+PASS qualified-image-init
+PASS trust-policy-produced
+PASS blp-revision-1-produced
+PASS blp-revision-2-produced
+PASS equal-label-history-positive-control
+PASS positive-read-is-readonly
+PASS public-downgrade-refuses
+PASS public-refusal-preserves-journal
+PASS public-refusal-redacts-material
+PASS public-exact-fixture-recovery
+PASS confidential-downgrade-refuses
+PASS confidential-refusal-preserves-journal
+PASS confidential-refusal-redacts-material
+PASS confidential-exact-fixture-recovery
+PASS image-stayed-identical
+BLP_HISTORY_CLI_PASS 15
+BLP_HISTORY_CLI_EVIDENCE /home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/blp-history-proof-g82k34bk/journey

@@ -4,10 +4,7 @@ use swarm_engine::{RootStore, SystemEnvironment};
 struct Fixture(std::path::PathBuf);
 impl Fixture {
     fn new() -> Self {
-        let p = std::env::temp_dir().join(swarm_engine::generate_identifier("biba-").unwrap());
-        std::fs::create_dir(&p).unwrap();
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&p, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let p = swarm_engine::fixture_root("biba-");
         let s = RootStore::initialize(&p, &mut SystemEnvironment).unwrap();
         s.close().unwrap();
         Self(p)
@@ -117,8 +114,8 @@ fn biba_extension_fields_and_unported_edits_refuse_without_mutation() {
         ("oidc",json!({"enabled":false,"clients":"not-an-array"}),"format"),
         ("workloads",json!({"enabled":false,"clients":"not-an-array"}),"format"),
         ("data_policy",json!({"enabled":false,"unexpected_authority":true}),"format"),
+        ("data_policy",json!({"enabled":false,"classifications":["public","public"]}),"format"),
         ("oidc",json!({"enabled":true}),"command_not_ported"),
-        ("data_policy",json!({"enabled":true}),"command_not_ported"),
     ] {
         let mut c=base.clone();c[name]=value;
         for op in ["config-preview","config-apply"] {
@@ -224,7 +221,7 @@ fn biba_extension_reaches_authoritative_guard_without_mutation() {
     let path = f.0.join(".swarm/trust-actions.json");
     let before = std::fs::read(&path).unwrap();
     let store = RootStore::open(&f.0, true).unwrap();
-    let proposal = json!({"schema_version":1,"event_id":"extension","expected_revision":1,"reason":"Explicit extension fixture","policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":true},"identities":[{"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},{"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]},{"subject":"admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}],"data_policy":{"enabled":true}});
+    let proposal = json!({"schema_version":1,"event_id":"extension","expected_revision":1,"reason":"Explicit extension fixture","policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,"evidence_retention_days":365,"require_separation":true},"identities":[{"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},{"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]},{"subject":"admin","token":"fixture-admin-token","integrity":3,"roles":["admin"]}],"workloads":{"enabled":true}});
     let error = store
         .trust("config-apply", &serde_json::to_vec(&proposal).unwrap(), "")
         .err()
@@ -317,7 +314,7 @@ fn biba_raw_extension_reopens_and_key_loss_fails_closed() {
     f.config();
     let path = f.0.join(".swarm/trust-actions.json");
     let mut state: Value = serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
-    state["data_policy"] = json!({"enabled":false,"resources":[]});
+    state["data_policy"] = json!({"resources":[],"enabled":false,"classifications":[],"destinations":[],"providers":[],"tools":[]});
     std::fs::write(&path, serde_json::to_vec(&state).unwrap()).unwrap();
     assert_eq!(
         f.call("show", json!({}), "")["data_policy"]["enabled"],

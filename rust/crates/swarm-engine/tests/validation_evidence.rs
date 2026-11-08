@@ -6,10 +6,7 @@ struct Fixture(PathBuf);
 impl Fixture {
     /// Private ordinary files only; this fixture declares data, never real control execution.
     fn new() -> Self {
-        let p = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("validation-evidence-").unwrap());
-        fs::create_dir(&p).unwrap();
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+        let p = swarm_engine::fixture_root("validation-evidence-");
         fs::write(p.join("receipt.json"), b"original receipt bytes").unwrap();
         Self(p)
     }

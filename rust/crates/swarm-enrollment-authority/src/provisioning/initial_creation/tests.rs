@@ -3,6 +3,23 @@ use super::*;
 use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf};
 use swarm_enrollment_config::store::FixtureFault as F;
 use zeroize::Zeroizing;
+/// Private operator fallback fixture area (0700 chain), replicating
+/// `swarm_engine::fallback_area()` inline: this crate has no swarm-engine
+/// dependency and these fixtures contract private ancestors.
+fn area() -> std::path::PathBuf {
+    use std::os::unix::fs::DirBuilderExt;
+    let home = std::env::var_os("HOME")
+        .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+    let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+    std::fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(&area)
+        .unwrap_or_else(|e| {
+            panic!("fallback fixture area {} cannot be created: {e}", area.display())
+        });
+    area
+}
 struct Case {
     root: tempfile::TempDir,
     op: PathBuf,
@@ -14,7 +31,7 @@ struct Case {
 impl Case {
     /// Synthetic explicit current-controller data, never actual separate accounts.
     fn new() -> Self {
-        let root = tempfile::tempdir().unwrap();
+        let root = tempfile::tempdir_in(area()).unwrap();
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         let op = root.path().join("operator");
         let a = root.path().join("anchor");

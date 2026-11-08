@@ -25,10 +25,11 @@ struct Fixture {
     other: String,
 }
 impl Fixture {
-    /// Build a private bare repository and three real synthetic commit objects.
+    /// Build a private bare repository under the governed repository fixture
+    /// area and three real synthetic commit objects.
     /// No project commit, identity, provider or mission database is created.
     fn new() -> Self {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
         let path = dir.path();
         output(path, &["init", "--bare", "."]);
         let input = path.join("fixture-input");
@@ -537,7 +538,7 @@ fn git_reference_durable_intent_survives_missing_ack() {
     for fault in [false, true] {
         let f = Fixture::new();
         f.control();
-        let journal_dir = tempfile::tempdir().unwrap();
+        let journal_dir = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
         fs::set_permissions(journal_dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
         let journal = RootStore::initialize(journal_dir.path(), &mut SystemEnvironment).unwrap();
         let pin = "a".repeat(64);

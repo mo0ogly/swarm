@@ -7,9 +7,7 @@ use swarm_engine::{
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {
-        let p = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("review-evidence-").unwrap());
-        fs::create_dir(&p).unwrap();
+        let p = swarm_engine::fixture_root("review-evidence-");
         fs::write(p.join("report.md"), b"Review report").unwrap();
         fs::write(p.join("delivery.md"), b"Delivery").unwrap();
         Self(p)

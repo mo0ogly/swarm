@@ -1,0 +1,6 @@
+OBSERVE running
+PASS actual-public-send-with-inert-provider
+PASS actual-producer-provenance
+PASS complete-byte-coverage
+PASS unattributed-source-refuses
+PASS missing-attribution-does-not-mutate

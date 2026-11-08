@@ -3,6 +3,9 @@
 //! whole-backup rollback. External identity/witness/confinement remains separate.
 #![cfg(unix)]
 use crate::{generate_identifier, RuntimeError};
+#[cfg(target_os="linux")]
+#[path="local_pack_files.rs"]
+pub(crate) mod pack_files;
 use rustix::fs::{self as fs, AtFlags, FlockOperation, Mode, OFlags};
 use std::{
     error::Error,
@@ -62,6 +65,8 @@ pub enum LocalStorageOperation {
     CloseLock,
     RemoveTemporary,
     Entropy,
+    /// Unlink of a named private file (single-use consumption).
+    Remove,
 }
 pub struct LocalStorageError {
     pub operation: LocalStorageOperation,
@@ -91,6 +96,25 @@ impl LocalStorageError {
         } else {
             "local-storage"
         }
+    }
+
+    /// Whether this error is exactly a clean failed whole-lock acquisition:
+    /// the `Lock` operation was refused by the typed nonblocking flock cause
+    /// `rustix::io::Errno::AGAIN` while nothing was published and no cleanup
+    /// error was recorded. This is pure classification of the already-typed
+    /// boxed cause: no `std::io::Error` or source-chain unwrapping, no
+    /// message or Display matching, and no lock-owner identity exists here.
+    /// It grants no retry, blocking, creation or release rights; callers own
+    /// any waiting or repeat policy. Every other operation, errno,
+    /// publication state, cleanup chain or custom wrapper returns `false`.
+    pub(crate) fn is_clean_lock_contention(&self) -> bool {
+        self.operation == LocalStorageOperation::Lock
+            && self.publication == PublicationState::NotPublished
+            && self.cleanup.is_none()
+            && self
+                .cause
+                .downcast_ref::<rustix::io::Errno>()
+                .is_some_and(|errno| *errno == rustix::io::Errno::AGAIN)
     }
 }
 impl fmt::Display for LocalStorageError {
@@ -218,6 +242,23 @@ impl LocalDirectory {
         }
         if let Some(error)=error {Err(error)}else{Ok(())}
     }
+    /// Unlink one simple-name entry of this retained directory, then sync the
+    /// directory. Exactly one concurrent caller can succeed for a given entry,
+    /// so this is the consumption boundary for single-use files; a missing
+    /// entry returns the original NOENT cause under `Remove`. A sync failure
+    /// after a successful unlink is reported as `RenamedDurabilityUnknown`
+    /// (the entry is gone but its disappearance may not be durable).
+    #[cfg(target_os = "linux")]
+    pub(crate) fn remove(&self, name: &str) -> Result<(), LocalStorageError> {
+        Self::name(name)?;
+        fs::unlinkat(&self.file, name, AtFlags::empty())
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::Remove, e))?;
+        self.file.sync_all().map_err(|cause| {
+            let mut e = LocalStorageError::new(LocalStorageOperation::SyncDirectory, cause);
+            e.publication = PublicationState::RenamedDurabilityUnknown;
+            e
+        })
+    }
     /// Borrow the retained directory only for the private gate transport. No
     /// pathname reopen, duplicate ownership or execution permission is created.
     #[cfg(all(test, target_os = "linux"))]
@@ -304,6 +345,27 @@ impl LocalDirectory {
             Ok(())
         }
     }
+    /// Create a new private child without adopting an existing name. Parent
+    /// sync precedes the returned handle; an error after mkdir may leave the
+    /// visible directory, so callers retain the planned name and never retry
+    /// blindly. No recursive path or caller-controlled mode is accepted.
+    pub(crate) fn create_private_child(&self,name:&str)->Result<Self,LocalStorageError>{
+        Self::name(name)?;
+        fs::mkdirat(&self.file,name,Mode::RWXU).map_err(|e|LocalStorageError::new(LocalStorageOperation::CreateDirectory,e))?;
+        self.file.sync_all().map_err(|e|LocalStorageError::new(LocalStorageOperation::SyncDirectory,e))?;
+        self.child(name,false)
+    }
+    /// Create an empty private regular file exclusively, anchored to this
+    /// directory. Existing names/symlinks refuse unchanged. The caller owns
+    /// streaming, fsync, dependent child lifetime and explicit checked close.
+    pub(crate) fn create_stream(&self,name:&str)->Result<File,LocalStorageError>{self.open_file(name,OFlags::RDWR|OFlags::CREATE|OFlags::EXCL)}
+    /// Open a private single-link regular input at offset zero via NOFOLLOW.
+    /// Ownership/mode/link errors retain their cause and checked partial close.
+    /// This is a file capability, not data authenticity or effect permission.
+    pub(crate) fn open_stream(&self,name:&str)->Result<File,LocalStorageError>{self.open_file(name,OFlags::RDONLY)}
+    /// Close one owned stream explicitly. Consumes the descriptor even on error;
+    /// do not retry close on a potentially reused numeric FD. No fsync is implied.
+    pub(crate) fn close_stream(file:File)->Result<(),LocalStorageError>{close(file,LocalStorageOperation::CloseFile)}
     fn open_file(&self, name: &str, flags: OFlags) -> Result<File, LocalStorageError> {
         Self::name(name)?;
         let file: File = fs::openat(
@@ -382,6 +444,18 @@ impl LocalDirectory {
     /// and close remain explicit and preserve their original causes.
     pub(crate) fn reserve_trust(&self, exclusive: bool) -> Result<LocalReservation, LocalStorageError> {
         let file=self.open_file("trust-actions.lock",OFlags::RDWR|OFlags::CREATE)?;
+        if let Err(error)=fs::flock(&file,if exclusive {FlockOperation::LockExclusive}else{FlockOperation::LockShared}) {
+            return close_after(Err(LocalStorageError::new(LocalStorageOperation::Lock,error)),file);
+        }
+        Ok(LocalReservation{file})
+    }
+
+    /// Serialize preparation egress with BLP-policy/identity changes without
+    /// holding the general Trust business journal through provider IO. The
+    /// fixed lock name is protocol vocabulary. Callers acquire this BEFORE a
+    /// short Trust reservation and explicitly preserve unlock/close failures.
+    pub(crate) fn reserve_preparation_egress(&self, exclusive: bool) -> Result<LocalReservation, LocalStorageError> {
+        let file=self.open_file("preparation-egress.lock",OFlags::RDWR|OFlags::CREATE)?;
         if let Err(error)=fs::flock(&file,if exclusive {FlockOperation::LockExclusive}else{FlockOperation::LockShared}) {
             return close_after(Err(LocalStorageError::new(LocalStorageOperation::Lock,error)),file);
         }
@@ -884,6 +958,14 @@ pub(crate) struct LocalReservation {
     file: File,
 }
 impl LocalReservation {
+    /// Observe the actual retained private lock inode, not its current pathname.
+    /// This checks ownership/regular/single-link metadata but does not acquire a
+    /// new lock or prove confinement. Metadata failures preserve the IO cause.
+    pub(crate) fn identity(&self)->Result<(u64,u64),LocalStorageError>{
+        owned(&self.file,false)?;
+        let metadata=self.file.metadata().map_err(|e|LocalStorageError::new(LocalStorageOperation::Metadata,e))?;
+        Ok((metadata.dev(),metadata.ino()))
+    }
     pub(crate) fn close(self) -> Result<(), LocalStorageError> {
         let unlocked = fs::flock(&self.file, FlockOperation::Unlock)
             .map_err(|e| LocalStorageError::new(LocalStorageOperation::Unlock, e));
@@ -908,11 +990,7 @@ mod binding_tests {
     #[test]
     fn directory_binding_duplicate_preserves_identity_and_cloexec() {
         use std::os::unix::fs::DirBuilderExt;
-        let path = std::env::temp_dir().join(generate_identifier("binding-storage-").unwrap());
-        std::fs::DirBuilder::new()
-            .mode(0o700)
-            .create(&path)
-            .unwrap();
+        let path = crate::fixture_root("binding-storage-");
         let original = LocalDirectory::open(&path).unwrap();
         let duplicate = original.duplicate().unwrap();
         assert_eq!(original.identity().unwrap(), duplicate.identity().unwrap());
@@ -931,9 +1009,7 @@ mod tests {
     struct Fixture(std::path::PathBuf);
     impl Fixture {
         fn new() -> Self {
-            let p = std::env::temp_dir().join(generate_identifier("atomic-storage-").unwrap());
-            disk::create_dir(&p).unwrap();
-            disk::set_permissions(&p, disk::Permissions::from_mode(0o700)).unwrap();
+            let p = crate::fixture_root("atomic-storage-");
             Self(p)
         }
     }
@@ -943,6 +1019,46 @@ mod tests {
                 disk::remove_dir_all(&self.0).unwrap();
             }
         }
+    }
+
+    /// Pure typed classification of clean lock contention. The first error is
+    /// the exact shape `reserve` produces for a refused nonblocking flock;
+    /// every later case is a synthetic variant that must stay unclassified:
+    /// an explicit cleanup chain, a different operation, a different typed
+    /// errno, an uncertain publication state and an errno wrapped in
+    /// `std::io::Error` instead of kept as the direct typed cause. No
+    /// fault-injection arm or OS close-failure path is claimed or exercised.
+    #[test]
+    fn clean_lock_contention_classifies_only_typed_again_lock() {
+        let clean = LocalStorageError::new(LocalStorageOperation::Lock, rustix::io::Errno::AGAIN);
+        assert!(clean.is_clean_lock_contention());
+
+        let mut with_cleanup =
+            LocalStorageError::new(LocalStorageOperation::Lock, rustix::io::Errno::AGAIN);
+        with_cleanup.cleanup = Some(Box::new(LocalStorageError::new(
+            LocalStorageOperation::CloseFile,
+            rustix::io::Errno::AGAIN,
+        )));
+        assert!(!with_cleanup.is_clean_lock_contention());
+
+        let wrong_operation =
+            LocalStorageError::new(LocalStorageOperation::OpenFile, rustix::io::Errno::AGAIN);
+        assert!(!wrong_operation.is_clean_lock_contention());
+
+        let wrong_errno =
+            LocalStorageError::new(LocalStorageOperation::Lock, rustix::io::Errno::PERM);
+        assert!(!wrong_errno.is_clean_lock_contention());
+
+        let mut uncertain =
+            LocalStorageError::new(LocalStorageOperation::Lock, rustix::io::Errno::AGAIN);
+        uncertain.publication = PublicationState::RenamedDurabilityUnknown;
+        assert!(!uncertain.is_clean_lock_contention());
+
+        let io_wrapped = LocalStorageError::new(
+            LocalStorageOperation::Lock,
+            std::io::Error::from_raw_os_error(rustix::io::Errno::AGAIN.raw_os_error()),
+        );
+        assert!(!io_wrapped.is_clean_lock_contention());
     }
     #[test]
     fn publication_faults_preserve_original_or_report_visible_uncertain_write_and_recover() {
@@ -1166,9 +1282,7 @@ mod database_initialization_tests {
     impl Fixture {
         /// Create the isolated private directory needed by real O_PATH calls.
         fn new() -> Self {
-            let path = std::env::temp_dir().join(generate_identifier("database-init-").unwrap());
-            disk::create_dir(&path).unwrap();
-            disk::set_permissions(&path, disk::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("database-init-");
             Self(path)
         }
     }

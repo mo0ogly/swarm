@@ -1,0 +1,16 @@
+{
+  "id": "public-cli",
+  "command": [
+    "/usr/bin/python3",
+    "tests/rust_preparation_cli_calls.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-vtt3bjzt",
+    "--output",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261031-provenance-cli-01"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 11.105707716000325,
+  "executable": "/usr/bin/python3.13",
+  "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+}

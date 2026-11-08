@@ -7,6 +7,7 @@ Native source/preview projections, new-row actor/time and safe diagnostic envelo
 are explicit differences; original history metadata and JSON types are preserved.
 """
 import argparse,json,subprocess,tempfile,traceback
+from fixture_area import fixture_area
 from pathlib import Path
 import rust_agent_model_route as proof
 
@@ -21,7 +22,7 @@ def run(native,reference,output):
     output.mkdir(parents=True,exist_ok=False);proof.publish(output/'harness-source.py',Path(__file__).read_bytes());ref=json.loads(reference.read_bytes());assert ref['status']=='QUALIFIED_PROJECT_SOURCE_REFERENCE';go=Path(ref['binary']);assert proof.digest(go.read_bytes())==ref['sha256'];inventory=json.loads((reference.parent/'inputs.before.json').read_bytes())
     for name,h in inventory.items():
         if name.endswith('.go') or name=='config/provider-wait.json':assert proof.digest(Path(name).read_bytes())==h,('reference-producer-changed',name)
-    roots={name:Path(tempfile.mkdtemp(prefix='swarm-wait-parity-'+name+'-')) for name in ['go','native']};binaries={'go':go,'native':native};commands=[];checks=[];serial=0
+    roots={name:Path(tempfile.mkdtemp(prefix='swarm-wait-parity-'+name+'-', dir=fixture_area())) for name in ['go','native']};binaries={'go':go,'native':native};commands=[];checks=[];serial=0
     def call(kind,args,value=None,success=True):
         """One real CLI call with raw output and exact input/return retained."""
         nonlocal serial

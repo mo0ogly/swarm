@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "kind": "owned_inert_fixture_birth",
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-vvgq7dqb",
+  "binary_sha256": "e4a802c4dc4d32d90d036169604168c64db15196695d692885369b748686ca72",
+  "label": "blp-preparation",
+  "actor_authenticated": false,
+  "runtime_permission": false
+}

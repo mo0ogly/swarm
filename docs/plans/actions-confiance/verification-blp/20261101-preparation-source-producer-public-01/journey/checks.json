@@ -1,0 +1,342 @@
+[
+  {
+    "name": "actual-public-send-with-inert-provider",
+    "passed": true
+  },
+  {
+    "name": "actual-producer-provenance",
+    "passed": true
+  },
+  {
+    "name": "complete-byte-coverage",
+    "passed": true
+  },
+  {
+    "name": "unattributed-source-refuses",
+    "passed": true
+  },
+  {
+    "name": "missing-attribution-does-not-mutate",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-session-before-row",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-weak-role-before-row",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-uncleared-before-row",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-invalid-label",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-bad-schema",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-bad-index",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-stale-turn",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-wrong-parent",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-stale-policy",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-stale-trust",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-forged-digest",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-forged-path",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-null-label",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-empty-reason",
+    "passed": true
+  },
+  {
+    "name": "producer-cli-missing-turn",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-1",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-1",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-2",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-2",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-3",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-3",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-4",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-4",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-5",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-5",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-6",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-6",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-7",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-7",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-8",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-8",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-9",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-9",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-10",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-10",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-11",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-11",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-12",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-12",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-13",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-13",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-14",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-14",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-15",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-15",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-16",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-16",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-17",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-17",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-18",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-18",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-19",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-19",
+    "passed": true
+  },
+  {
+    "name": "producer-captured-source-20",
+    "passed": true
+  },
+  {
+    "name": "producer-replay-20",
+    "passed": true
+  },
+  {
+    "name": "producer-event-conflict",
+    "passed": true
+  },
+  {
+    "name": "producer-selector-conflict",
+    "passed": true
+  },
+  {
+    "name": "producer-duplicate-object-refuses",
+    "passed": true
+  },
+  {
+    "name": "source-derived-join",
+    "passed": true
+  },
+  {
+    "name": "diagnostic-is-not-dispatch-authority",
+    "passed": true
+  },
+  {
+    "name": "source-count-and-prompt-binding",
+    "passed": true
+  },
+  {
+    "name": "session-alone",
+    "passed": true
+  },
+  {
+    "name": "clearance-compartment",
+    "passed": true
+  },
+  {
+    "name": "no-grant-before-row-lookup",
+    "passed": true
+  },
+  {
+    "name": "stale-policy",
+    "passed": true
+  },
+  {
+    "name": "forged-label",
+    "passed": true
+  },
+  {
+    "name": "wrong-parent",
+    "passed": true
+  },
+  {
+    "name": "cli-refusals-do-not-mutate",
+    "passed": true
+  },
+  {
+    "name": "exact-read-replay",
+    "passed": true
+  },
+  {
+    "name": "http-join",
+    "passed": true
+  },
+  {
+    "name": "http-refusal-session",
+    "passed": true
+  },
+  {
+    "name": "http-refusal-compartment",
+    "passed": true
+  },
+  {
+    "name": "http-invalid-schema",
+    "passed": true
+  },
+  {
+    "name": "http-stale-policy",
+    "passed": true
+  },
+  {
+    "name": "http-missing-turn",
+    "passed": true
+  },
+  {
+    "name": "http-wrong-parent",
+    "passed": true
+  },
+  {
+    "name": "http-forged-label",
+    "passed": true
+  },
+  {
+    "name": "http-read-does-not-mutate",
+    "passed": true
+  },
+  {
+    "name": "producer-http-replay",
+    "passed": true
+  },
+  {
+    "name": "producer-http-session-before-row",
+    "passed": false
+  }
+]

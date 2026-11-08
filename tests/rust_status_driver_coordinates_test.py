@@ -2,6 +2,7 @@
 """Reproduce relative evidence paths breaking CLI input after child cwd change."""
 from pathlib import Path
 import json,os,sys,tempfile,unittest
+from fixture_area import fixture_area
 import rust_mission_status_contract as shared
 
 
@@ -9,7 +10,7 @@ class DriverCoordinates(unittest.TestCase):
     """Owned inert Python child only; no engine, SQLite, provider or timeout."""
     def test_relative_evidence_survives_child_root_cwd(self):
         """A real child reads the retained JSON request despite a different cwd."""
-        fixture=Path(tempfile.mkdtemp(prefix='swarm-driver-path-')).resolve()
+        fixture=Path(tempfile.mkdtemp(prefix='swarm-driver-path-', dir=fixture_area())).resolve()
         print('OWNED_DRIVER_FIXTURE '+str(fixture),flush=True)
         root=fixture/'root';root.mkdir();out=fixture/'evidence';out.mkdir()
         previous=Path.cwd()

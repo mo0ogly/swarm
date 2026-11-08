@@ -24,7 +24,7 @@ fn input(root: &Path) -> std::path::PathBuf {
 /// strict request fields and legitimate absent-reference null as distinct outcomes.
 #[test]
 fn public_report_read_is_complete_readonly_and_refusals_do_not_become_null() {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     assert!(call(root.path(), &["init", "--json"]).status.success());
     let p = input(root.path());
     let args = ["planning-report", "--input", p.to_str().unwrap(), "--json"];
@@ -75,7 +75,7 @@ fn public_report_write_and_flush_errors_keep_cause_and_allow_recovery() {
             Err(io::Error::other("PRIVATE_FLUSH"))
         }
     }
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     assert!(call(root.path(), &["init", "--json"]).status.success());
     let p = input(root.path());
     let db = fs::read(root.path().join(".swarm/state.db")).unwrap();

@@ -5,6 +5,23 @@ use state::{sign_change, Context, Journal};
 use std::{fs, sync::mpsc};
 use time::Duration;
 
+/// Private operator fallback fixture area (0700 chain), replicating
+/// `swarm_engine::fallback_area()` inline: this crate has no swarm-engine
+/// dependency and these fixtures contract private ancestors.
+fn area() -> std::path::PathBuf {
+    use std::os::unix::fs::DirBuilderExt;
+    let home = std::env::var_os("HOME")
+        .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+    let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+    std::fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(&area)
+        .unwrap_or_else(|e| {
+            panic!("fallback fixture area {} cannot be created: {e}", area.display())
+        });
+    area
+}
 struct Fixture {
     _dir: tempfile::TempDir,
     path: PathBuf,
@@ -40,7 +57,7 @@ impl Fixture {
     /// Create disposable real storage and a synthetic one-hour signed grant.
     /// Fixture-only keys/identity prove no human authentication; setup failures panic.
     fn new() -> Self {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(area()).unwrap();
         let path = dir.path().join("journal.sqlite");
         let config = dir.path().join("config");
         let witness = dir.path().join("witness");
@@ -564,8 +581,8 @@ impl PersonalFixture {
     fn new(installation: &str, principal: &Principal) -> Self {
         use crate::{credentials::Parameters, personal as p};
         use std::os::unix::fs::PermissionsExt;
-        let root = tempfile::tempdir().unwrap();
-        let witness = tempfile::tempdir().unwrap();
+        let root = tempfile::tempdir_in(area()).unwrap();
+        let witness = tempfile::tempdir_in(area()).unwrap();
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         fs::set_permissions(witness.path(), fs::Permissions::from_mode(0o700)).unwrap();
         let path = root.path().join("personal.sqlite");

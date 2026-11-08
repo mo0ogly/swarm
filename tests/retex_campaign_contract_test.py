@@ -1,10 +1,11 @@
 """Reject misleading execution modes before filesystem or provider access."""
 import subprocess,tempfile,unittest
+from fixture_area import fixture_area
 from pathlib import Path
 
 class CampaignModeContract(unittest.TestCase):
  def reject(self,flags,reason):
-  with tempfile.TemporaryDirectory() as directory:
+  with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
    out=Path(directory)/'never-created'
    command=['python3',str(Path(__file__).with_name('retex_real_campaign.py')),'--binary','missing-binary','--output',str(out),'--providers','missing-providers','--provider','codex','--scenario','parallel','--tasks','4','--slots','1','--activations','16','--decisions','16','--reviews','8','--observation-seconds','900','--cli-seconds','45','--control-seconds','15','--poll-seconds','2','--control-program','python3',*flags]
    result=subprocess.run(command,capture_output=True,text=True)

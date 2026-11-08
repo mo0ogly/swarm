@@ -1,0 +1,10 @@
+{
+  "status": 403,
+  "body": {
+    "error": "blp-preparation-quarantined",
+    "failure": {
+      "code": "blp-preparation-quarantined"
+    },
+    "schema_version": 1
+  }
+}

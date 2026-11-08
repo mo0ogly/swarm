@@ -1,0 +1,16 @@
+{
+  "id": "public-http",
+  "command": [
+    "/usr/bin/python3",
+    "tests/rust_preparation_calls.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-vtt3bjzt",
+    "--output",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261031-provenance-http-01"
+  ],
+  "expected_exit": 0,
+  "exit": 1,
+  "seconds": 12.635852678999072,
+  "executable": "/usr/bin/python3.13",
+  "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+}

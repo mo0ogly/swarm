@@ -1,0 +1,18 @@
+{
+  "swarm_engine": {
+    "path": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libswarm_engine-8ee5b2515d0e3fad.rlib",
+    "sha256": "d582be589d0952cb067bc4d22da77952e0d602181040220fef7caa818027285b"
+  },
+  "nix": {
+    "path": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libnix-d5cd711d197fb0e3.rlib",
+    "sha256": "3844120140d946571b22f52161bff0d62906361d2c77aaaaa8a27207b4aa1698"
+  },
+  "rustix": {
+    "path": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/librustix-772a604bba6979b1.rlib",
+    "sha256": "898fa04f457f1b8791c6bcfc0ad3a94bb523affb9ee21811de4033d4b8a018cd"
+  },
+  "swarm_biba_linux": {
+    "path": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/libswarm_biba_linux.rlib",
+    "sha256": "f96489da77f774940f978dd13aef049452980aea3bf6f6cf07ea73852834a348"
+  }
+}

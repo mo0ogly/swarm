@@ -1,3 +1,4 @@
+mod common;
 use ed25519_dalek::SigningKey;
 use sha2::{Digest, Sha256};
 use swarm_enrollment_state::{sign_change, BoundJournal, Context, Head, Journal};
@@ -11,7 +12,7 @@ struct Fixture {
 impl Fixture {
     /// Open only a disposable initialized signed WAL store with independent fixture pins.
     fn new() -> Self {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
         let path = dir.path().join("journal.sqlite");
         let key = SigningKey::from_bytes(&[21; 32]);
         let j = Journal::open(

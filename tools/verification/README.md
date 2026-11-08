@@ -1,5 +1,10 @@
 # Recettes permanentes / Permanent verification recipes
 
+Pour les paramètres des prochaines compilations Cargo et le garde d'admission
+disque, voir [Stockage des compilations](BUILD-STORAGE.md).
+For future Cargo settings and the disk admission guard, see
+[Local build storage](BUILD-STORAGE.en.md). This is not a filesystem quota.
+
 Le lanceur Python standard `recipe.py` exécute des commandes explicites sans shell
 implicite, relance ni watchdog global. Les recettes JSON version 1 résident dans
 `recipes/`. Elles déclarent sources, environnement explicite, commandes, code de
@@ -20,6 +25,13 @@ arguments, sorties intégrales, durée, code et cause d'échec. Il ne journalise
 l'environnement hérité. Les processus reçoivent EOF sur stdin. Arrêt à la première
 anomalie ; aucun prochain pas après un échec. Écriture exclusive et atomique des
 preuves ; une panne disque peut laisser un lot incomplet, jamais un PASS confirmé.
+
+**Conserver les échecs.** Ne jamais supprimer un dossier FAIL/incomplet pour
+réutiliser son nom : choisir un nouveau dossier frère et consigner le prédécesseur,
+la cause et la précondition corrigée dans le suivi existant. Le refus d'une
+sortie existante ne doit pas être contourné par effacement. Les empreintes et
+`verify` ne restaurent ni ne prouvent l'existence d'un original supprimé.
+Une perte reste déclarée ; un PASS ultérieur ne remplace pas l'ancien FAIL.
 
 `run` retourne 0 pour PASS, 1 pour FAIL, 2 pour refus/prérequis impossible.
 `verify` contrôle empreintes, archive et cohérence ; il retourne 1 pour un FAIL
@@ -43,6 +55,12 @@ explicit environment overrides, launcher hash, argv, complete stdout/stderr, dur
 exit and failure cause. Inherited environment is not recorded; stdin receives EOF.
 The first anomaly stops subsequent steps. Atomic exclusive publication preserves
 old evidence; disk failure can leave an incomplete batch, never a confirmed PASS.
+**Retain failures.** Never delete a FAIL/incomplete directory to reuse its name.
+Choose a fresh sibling and record predecessor, cause and corrected precondition
+in the existing tracking record. Do not bypass destination refusal by deletion.
+Hashes and verify cannot restore or attest the historical existence of a deleted
+original. Declare the loss; a later PASS never substitutes for the original FAIL.
+
 Run exits: 0 PASS, 1 FAIL, 2 refusal/prerequisite failure. Verify checks archive,
 hashes and consistency without executing tests: intact FAIL remains exit 1,
 inconsistent evidence exits 2. These are local self-consistency checks, not signed
@@ -51,11 +69,176 @@ compiler graph, feature, dependency and production-binary qualification. A manif
 grants no live-state, provider or deployment authority. Review a recipe whenever
 its consumed contract changes.
 
+### Nettoyage concurrent des caches / Concurrent cache cleanup
+
+Un scan de processus seul laisse une course avec un nouveau build. Préparer les
+empreintes et copies hors verrou, puis obtenir sans attente le verrou réel du
+producteur avant de revalider inode, taille, mtime et références actives et de
+supprimer. Conserver les fichiers si le verrou est occupé ou l’identité a changé ;
+ne pas supprimer le verrou. Qualifier d’abord ce protocole avec l’outil installé.
+Cargo 1.96.0 a été observé via strace : `.cargo-build-lock` exclusif et
+`.cargo-lock` partagé ; un verrou exclusif sur le `.cargo-lock` existant a bloqué
+un Cargo témoin puis permis sa reprise. Ce verrou ne protège pas contre tous les
+lecteurs directs non coordonnés : leurs références doivent rester préservées.
+Cette méthode ne change aucune politique produit et ne qualifie pas les tests
+d’un build concurrent. Le 6 novembre 2026, un build a démarré après le scan initial
+du ménage ; le refus de rmdir a préservé ses nouveaux fichiers. La revue et les
+preuves conservées portent sur la portée exacte, pas sur une absence globale
+d’impact non mesurée. Voir le module officiel des verrous Cargo :
+https://doc.rust-lang.org/stable/nightly-rustc/cargo/util/flock/index.html.
+
+A process scan alone races a new build. Prepare hashes and copies outside the
+lock, then nonblockingly acquire the actual producer lock and revalidate file
+identity and live references before unlinking. Retain busy/changed/uncertain
+candidates; never remove a lock file. Qualify the installed tool’s protocol first.
+Observed Cargo 1.96.0 uses an exclusive `.cargo-build-lock` and shared `.cargo-lock`;
+an exclusive lock on its existing `.cargo-lock` blocked a control Cargo invocation
+and allowed completion after release. This does not exclude all uncoordinated
+direct readers. Preserve their references. It adds no product retention policy
+and proves no other build’s test verdict. Retain original races and exact proof
+scope; a directory-removal refusal preserving new files is not a complete purge.
+
+### Stockage USB préféré / Preferred USB storage
+
+Décision utilisateur du 4 novembre 2026 : privilégier les futures preuves sur la
+clé identifiée (actuellement Lexar, `/media/fpizzi/Lexar`) si elle est montée,
+inscriptible et suffisamment libre. Contrôler le support monté avant l’écriture ;
+un répertoire existant ne prouve pas la présence de la clé. Garder un index local
+avec emplacement, inventaire/empreintes et restauration. Le paramètre `--output`
+reste explicite et le dossier de sortie doit être neuf. Vérifier la compatibilité
+du parcours avant une sortie directe : FAT32 ne conserve pas les permissions/liens
+Unix et limite la taille d’un fichier. Si nécessaire, conserver fixtures et staging
+sur le stockage Unix configuré puis transférer les preuves dans des archives
+préservant les métadonnées, fractionnées selon la limite réelle du support.
+Synchroniser, relire et comparer intégralement avant de retirer les seuls originaux
+inchangés dont le déplacement est autorisé. Ne pas déplacer sources versionnées,
+missions ou travaux actifs ; conserver les FAIL. Si la clé est indisponible ou
+inadaptée, signaler explicitement le repli local et vérifier l’espace disponible.
+Cela ne modifie ni `runtime_temporary_directory`, ni une exécution déjà démarrée.
+
+User decision, 4 November 2026: prefer the identified USB drive (currently Lexar
+at `/media/fpizzi/Lexar`) for future evidence when mounted, writable and with
+adequate free space. Verify the mounted device, not merely the directory. Keep a
+local location/inventory/hash/restore index. `--output` remains explicit and its
+output directory must be fresh. Check flow compatibility before direct output:
+FAT32 lacks Unix permission/link semantics and limits individual file size. Where
+needed, keep fixtures and staging on configured Unix storage, then transfer
+metadata-preserving archives, split to the actual filesystem limit. Sync, read
+back and compare all copied content before removing only authorized unchanged
+originals. Preserve tracked sources, missions, active work and historical FAILs.
+Report any local fallback and check free space. This changes neither the configured
+`runtime_temporary_directory` nor an already running execution.
+
+### Interdiction /tmp et aire de fixtures — /tmp interdiction and fixture area
+
+Interdiction opérateur (2026-10-31) : aucune donnée du projet sous `/tmp` (tmpfs
+perdue au redémarrage ; les preuves conservées pointeraient vers des racines
+disparues). Tout root de fixture, scratch et scratch de preuve est alloué sous
+le **réglage Admin `runtime_temporary_directory`** (« Dossier temporaire », v51 ;
+défaut d'installation `<repo>/.swarm-fixtures/`, 0700, gitignored, chemin court
+pour rester sous la limite noyau des sockets AF_UNIX). Valeur enregistrée lue
+dans `.swarm/engine-settings.json`, sinon défaut livré ; `/tmp` refusé. Le moteur
+exporte aussi ce dossier comme `TMPDIR` au démarrage de chaque commande et de
+`web`. Le contrat unique est `tests/fixture_area.py`
+(`fixture_root(prefix)`, `fixture_area()`) et son miroir Node
+`tests/fixture_area.cjs`, et le miroir Rust
+`rust/crates/swarm-engine/src/fixture_area.rs` (`crate::fixture_root(prefix)`
+dans swarm-engine ; `swarm_engine::fixture_root(prefix)` dans swarm-web,
+swarm-cli et les tests d'intégration). Deux niveaux de couverture : (1) à la source —
+`tools/check_tmp_interdiction.py` scanne les allocations tempfile sans `dir=`
+et échoue s'il en reste (garde de non-récidive ; les lectures gettempdir sont
+signalées pour revue) ; depuis la migration D04 du 7 novembre 2026, il scanne
+aussi les sources Rust : tout `env::temp_dir()` hors carte d'exemptions
+documentée `RUST_EXEMPT` (sondes lecture-seule du volume système, chemins
+assertés inexistants, assertions de composition, assertion du pinning TMPDIR)
+est une violation ; les mentions dans commentaires/doc sont ignorées ; depuis la
+migration D05 du 7 novembre 2026, toute allocation Rust `tempfile::tempdir()` /
+`TempDir::new()` (y compris la fenêtre `Builder::new().…tempdir()`) est aussi une
+violation : la forme gouvernée est `tempdir_in(<aire>)`/`new_in(<aire>)` —
+`swarm_engine::fixture_area()` (aire de dépôt) ou `swarm_engine::fallback_area()`
+(`~/.local/state/swarm-fixtures/`, 0700) pour les contrats qui refusent un
+dépôt Git ancêtre ou exigent une chaîne entièrement privée (fixtures
+`open_private_directory` : crates enrollment, git_metadata,
+version_no_repository, les modules identity swarm-cli qui appellent
+`provisioning::prepare`/`Documents::open` et les suites swarm-cli
+trust_enrollment + identity_checkpoint/control/initial/personal/
+operator/provisioning dont le parcours lit ancres/déclarations via le
+walk privé) ;
+les crates sans dépendance swarm-engine répliquent l'aire de repli inline ;
+**règle décisionnelle** (8 novembre 2026, obtenue en trois vagues de rouges) :
+le critère est le parcours, pas le crate — toute suite ou module dont le code
+(allumé ou enfant CLI) relit une ancre ou une déclaration via
+`open_private_directory` (walk NOFOLLOW des ancêtres, refus de tout ancêtre
+inscriptible groupe/autres), via `Documents::open`/`authenticated_startup::open`
+ou via `load_authenticated` exige l'aire de repli, même sous swarm-cli ; les
+crates enrollment exigent la repli d'office ; les autres allocations prennent
+l'aire de dépôt ; un enfant CLI qui relit un fichier de fixture suffit à
+déclencher la règle ;
+(2) au runner — `recipe.py` épingle `TMPDIR` sous
+`<dossier temporaire configuré>/runner-tmp` pour la durée de chaque run, couvrant Python
+tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` et Go
+`t.TempDir()` qui l'honorent. `mkstemp(dir=destination.
+parent)` est un échafaudage d'écriture atomique adjacente à la destination,
+pas une allocation de fixture : exempté.
+
+Operator interdiction (2026-10-31): no project data under `/tmp` (tmpfs dies on
+reboot; retained evidence would point at vanished roots). Every fixture root,
+scratch and evidence scratch is allocated under the **Admin setting
+`runtime_temporary_directory`** ("Temporary directory", v51; installation default
+`<repo>/.swarm-fixtures/`, 0700, gitignored, short path keeping AF_UNIX sockets
+under the kernel limit). The saved value is read from `.swarm/engine-settings.json`,
+else the shipped default; `/tmp` is refused. The engine also exports it as
+`TMPDIR` when every command and `web` start. The
+single contract is `tests/fixture_area.py` (`fixture_root(prefix)`,
+`fixture_area()`) and its Node mirror `tests/fixture_area.cjs`, plus the Rust
+mirror `rust/crates/swarm-engine/src/fixture_area.rs`
+(`crate::fixture_root(prefix)` inside swarm-engine;
+`swarm_engine::fixture_root(prefix)` in swarm-web, swarm-cli and integration
+tests). Two coverage
+levels: (1) at source — `tools/check_tmp_interdiction.py` scans tempfile
+allocations without `dir=` and fails if any remain (non-regression guard;
+gettempdir reads are reported for review); since the 7 November 2026 D04
+migration it also scans Rust sources: any `env::temp_dir()` outside the
+documented `RUST_EXEMPT` map (read-only system-volume probes, paths asserted
+not to exist, pure path-composition assertions, the TMPDIR-pinning assertion
+itself) is a violation; mentions inside comments/docs are ignored; since the
+7 November 2026 D05 migration, any Rust `tempfile::tempdir()` /
+`TempDir::new()` allocation (including the `Builder::new().…tempdir()` window)
+is also a violation: the governed form is `tempdir_in(<area>)`/`new_in(<area>)`
+— `swarm_engine::fixture_area()` (repository area) or
+`swarm_engine::fallback_area()` (`~/.local/state/swarm-fixtures/`, 0700) for
+contracts refusing an ancestor Git repository or requiring a fully private
+chain (`open_private_directory` fixtures: enrollment crates, git_metadata,
+version_no_repository, the swarm-cli identity modules calling
+`provisioning::prepare`/`Documents::open`, and the swarm-cli
+trust_enrollment + identity_checkpoint/control/initial/personal/
+operator/provisioning suites whose flow reads anchors/declarations
+through the private walk); crates without a swarm-engine
+dependency replicate the fallback inline;
+**decision rule** (8 November 2026, obtained through three red waves): the
+criterion is the flow, not the crate — any suite or module whose code (in-process
+or CLI child) reads an anchor or declaration back through
+`open_private_directory` (NOFOLLOW ancestor walk, refusing any
+group/other-writable ancestor), through
+`Documents::open`/`authenticated_startup::open`, or through
+`load_authenticated` requires the fallback area, even inside swarm-cli;
+enrollment crates take the fallback outright; all other allocations take the
+repository area; a CLI child re-reading a fixture file is enough to trigger
+the rule; (2) at runner — `recipe.py` pins
+`TMPDIR` under `<configured temporary directory>/runner-tmp` for each run, covering Python
+tempfile, Rust `env::temp_dir()`/TempDir, Node `os.tmpdir()` and Go
+`t.TempDir()` which honor it. `mkstemp(dir=
+destination.parent)` is adjacent-to-destination atomic-write scaffolding, not
+fixture allocation: exempt.
+
 ### Instantané figé des entrées déclarées / Frozen declared-input snapshot
 
 Quand un autre travail modifie le checkout pendant un run (`source_stable: false`),
 `snapshot.py` copie **uniquement** les fichiers sélectionnés par les `inputs` de la
-recette (même sélection et mêmes refus que `recipe.py`), la recette et le lanceur,
+recette (même sélection et mêmes refus que `recipe.py`), la recette, le lanceur et
+`tests/fixture_area.py` (l'aire d'interdiction /tmp que le lanceur résout à
+l'exécution, embarqué même s'il n'est pas déclaré ; refus
+`snapshot-fixture-area-missing` s'il manque),
 dans un répertoire neuf ; il lie les dossiers de dépendances nommés (`--link`,
 jamais copiés ni déclarés) puis lance `recipe.py run --root <instantané>`. Une
 entrée non déclarée échoue visiblement au lieu d'être lue dans le checkout vivant.
@@ -68,8 +251,10 @@ python3 tools/verification/snapshot.py --recipe tools/verification/recipes/live-
 ```
 
 When concurrent work changes the checkout during a run, `snapshot.py` copies only
-the recipe's declared inputs (same selection/refusals as `recipe.py`), the manifest
-and runner into a fresh directory, symlinks named dependency directories and runs
+the recipe's declared inputs (same selection/refusals as `recipe.py`), the manifest,
+runner and `tests/fixture_area.py` (the /tmp interdiction area the runner resolves
+at run time, shipped even when undeclared; refusal `snapshot-fixture-area-missing`
+when absent) into a fresh directory, symlinks named dependency directories and runs
 the recipe with `--root` there; an undeclared input fails visibly. Before copying,
 it refuses (exit 2, `snapshot-embedded-input-undeclared: <chemins>`) a declared
 `.rs` whose literal `include_str!`/`include_bytes!` target is not declared, so a
@@ -1160,15 +1345,24 @@ simple décompte de tests. Les sources/profils65 et124 restent distincts.
 texte/JSON/alias/refus et l’absence de création du Root. Fournir les variables
 `SWARM_STATUS_CONTRACT_BINARY` et `SWARM_STATUS_CONTRACT_PROFILE` vers un binaire
 figé qualifié et son profil exact ; la recette ne compile et n’installe rien.
-Le build explicite `tools/rust-migration/build_native.py` prépare séparément un
-candidat avec faits Git/date compilés et preuve de consommation. La présence et
-l’empreinte `native_build_metadata` du profil lient une entrée déclarée : elles
-ne prouvent seules ni consommation, ni authenticité.
+Le garde de refus vérifie qu’aucune valeur sensible passée en argv n’est renvoyée :
+chaque appel de refus utilise un jeton unique par exécution (dérivé de l’empreinte
+du binaire) et exige son absence exacte de stderr ; les placeholders de
+documentation de l’usage statique (ex. «PRIVATE_ANCHOR») ne sont pas un écho
+d’entrée et ne déclenchent plus le garde. Le build explicite
+`tools/rust-migration/build_native.py` prépare séparément un candidat avec faits
+Git/date compilés et preuve de consommation. La présence et l’empreinte
+`native_build_metadata` du profil lient une entrée déclarée : elles ne prouvent
+seules ni consommation, ni authenticité.
 
 `native-version-public.json` requires an exact frozen qualified binary/profile
 in `SWARM_STATUS_CONTRACT_BINARY` and `SWARM_STATUS_CONTRACT_PROFILE`. It verifies
 metadata guards, cold text/JSON/alias/refusal and no Root creation without building
-or installing. `build_native.py` separately produces a native candidate with
+or installing. The refusal guard checks that no sensitive argv value is echoed
+back: each refusal call uses a run-unique token (derived from the binary digest)
+and requires its exact absence from stderr; static usage-text placeholders
+(e.g. «PRIVATE_ANCHOR») are documentation, not an input echo, and no longer trip
+the guard. `build_native.py` separately produces a native candidate with
 observed Git/date facts and actual compiled-consumption proof. Metadata presence/
 hash alone establish neither consumption nor authenticity.
 
@@ -2292,3 +2486,2510 @@ The pack recipe also reuses two existing common diagnostic regressions: the
 direct/launch/custom-IO/Root-cleanup wrapper matrix and transparent typed IO source
 with redaction. This extension is justified by the new shared native_error_links
 handler, beyond the pack-specific primary/secondary channel witness.
+
+
+Owned source lane: `recipes/paea-native-git-source.json` requires the immutable
+`SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE` for the six binding/format cases and a
+separate newly owned `SWARM_PAEA_SOURCE_FIXTURE` produced by
+`rust_native_first_publication.py --binary IMAGE --profile PROFILE --output NEW`.
+Fixture lifecycle (verified 2026-10-31, operator interdiction): fixture roots
+must NOT live in `/tmp` — tmpfs dies on reboot, the retained evidence then
+points at a vanished root, and 16 recipes were found in exactly that state
+(`RootStore::open` fails `Err value: path`). Fixture roots are created under
+`<repo>/.swarm-fixtures/` (gitignored, 0700, short path so AF_UNIX sockets
+inside the root stay under the 108-byte kernel limit) by
+`rust_agent_model_route.fixture_root()`; that area holds fixture evidence, not
+a disposable cache, and survives reboot. Never copy a live fixture root;
+regenerate the fixture with `rust_native_first_publication.py` into a NEW
+`--output` directory (the script refuses an existing path), then repoint the
+recipe's `SWARM_PAEA_SOURCE_FIXTURE` env and `result.json` declared input.
+Also watch the state-size bound: every `config-apply` on a shared retained
+fixture appends a full-state reply (~100 KB), and `trust-actions.json` is
+refused past `MAX_STATE` = 8 MiB with the typed code `format`
+(`trust-state-format-bound`, root_store/trust_store.rs) — a saturated fixture
+fails its recipes with `format` while `config-preview` still passes (verified
+2026-11-01 on a 8.31/8.39 MiB root). Diagnosis: compare file size against
+`MAX_STATE`, then regenerate per the rule above; do not raise the bound for
+fixtures.
+Until the Biba provider sandbox interacts with the managed-auto scenario
+control socket (see PAEA-APEX Increment113), regenerate with the retained
+sandbox-less binary `.cache/rust-migration-binaries/swarm-rust-b11b4baf…`
+plus its own verified profile, the combination the original fixtures were
+built from; recipe binary witnesses stay pinned to the delivered candidate.
+Never run a live fixture's provider program against its control socket; that
+collapses the scenario run. Remaining sweep: about 120 other test scripts
+still create `/tmp` evidence dirs and must migrate to `fixture_root()`.
+
+Attente causale du producteur managed-auto (correction du 2026-11-05, preuve
+réelle `supervisor-source-fixture-missing-provider-replan.json`) : l'ancien
+`select([listener, server_fd], [], [])` de `tests/rust_managed_auto_worker.py`
+attendait indéfiniment alors que les deux agents canoniques du tour étaient déjà
+terminal failed (cause réelle : le noyau Biba refuse `socket(AF_UNIX)` par
+contrat — protection à ne PAS affaiblir). Le nouveau helper documenté
+`await_provider_turn` remplace ce select : souscription inotify sur
+`root/'.swarm'` (`worker.watch_directory`, `modifications=True`) AVANT la
+première lecture publique, relecture publique après activité réelle de la base
+ou socket lisible, BUSY SQLite structuré conservé comme refus avec sa raison
+(jamais un succès vide), refus terminal structuré pour tout agent nouvellement
+lancé qui n'est plus starting/running — exception typée
+`ManagedAutoTerminalRefusal` : message rendu minimal et sûr (identifiant,
+statut, exit code, code d'échec public seulement), payload public complet
+conservé dans l'attribut possédé `payload` (exit code, `native_execution_result`,
+cause réelle comme EPERM sur `socket(AF_UNIX)`, agent public intégral) pour un
+accès programmatique exact —, agents des tours précédents ignorés par identité
+(id + génération strictement croissante), refus immédiat si la socket
+conducteur devient lisible (serveur sorti avant le provider), priorité du
+terminal sur une connexion prête simultanément : relecture publique AVANT
+`accept` après activité réelle, connexion refusée laissée non consommée dans le
+backlog, fermeture contrôlée du descripteur en toutes sorties — succès rendu
+seulement APRÈS fermeture et vérification des causes, refus de fermeture
+conservé avec l'agent public sans jamais rendre un succès à erreur perdue ni
+fuir la socket acceptée (`_close_watch_fd` cousu module-level pour la régression
+ciblée). Aucun timeout global, polling temporel, plafond, retry ni attente sur
+texte ; les `failure.json` et le cleanup publics existants restent inchangés.
+Limites : la fenêtre sonde/acceptation reste causale, pas atomique ; sans aucun
+événement l'attente se poursuit (pas de minuteur autorisé). Régressions ciblées :
+`python3 tests/test_managed_auto_provider_wait.py -v` (lancement direct qui rend
+`tests/` importable — la forme `python3 -m unittest
+tests.test_managed_auto_provider_wait -v` échoue en ImportError réelle du
+2026-11-05, 0 cas exécuté ; fixtures simulées clairement étiquetées, aucun
+binaire produit ni fausse acceptation ; zone de fixtures explicite via
+`SWARM_TEST_FIXTURE_AREA`, par défaut `<repo>/.swarm-fixtures`, jamais /tmp) ;
+Codex l'exécute personnellement après stabilité des sources. (Phrase
+historique 2026-11-05, remplacée depuis : « tant que le raccord managed-auto
+du rendez-vous n'existe pas, régénérer les fixtures avec le binaire sans
+sandbox ci-dessus » — ce binaire n'établit aucune preuve Biba et n'est plus
+la route indiquée ; voir le raccord codé plus bas.)
+FR — Rendez-vous de fixture par fichiers du provider (2026-11-05, module
+standalone vérifié par Codex : 23 tests OK, exit 0, sans ResourceWarning) :
+Biba refuse volontairement
+`socket(AF_UNIX)` (protection à ne pas affaiblir) ; le nouveau module
+`tests/rust_managed_file_provider.py` remplace la socket de contrôle des
+providers de fixture par des fichiers réguliers DANS un workspace. Côté
+enfant, `program(nonce, turn_name)` produit un provider Python inerte sans
+aucune socket : vrai stdin jusqu'à EOF, `--model` en argv,
+`model-received.json` hérité (champs pid/ppid/stdin_sha256/stdin_bytes/argv),
+inotify du workspace SOUSCRIT AVANT la publication de `ready-<tour>.json`
+(temp 0600 exclusif, fsync, rename ; champs nonce,pid,ppid,sid,pgid) ; chaque
+requête de probe identifiée est répondue par un fichier reply atomique
+portant la même identité ; `release-<tour>.json` doit porter exactement
+`{'nonce':…,'release':True}` ou l'enfant refuse avec cause conservée et vraie
+sortie non nulle ; release valide donne `handoff.md` puis les trois événements
+JSONL usage 7/8, `total_cost_usd` 1, sans modèle payant. Les fichiers créés
+par l'enfant (`model-received.json`, `handoff.md`) sont ouverts 0600 dès
+`os.open` exclusif (pas d'umask ambiante, pas de chmod après coup) ; tous les
+fichiers du protocole sont donc réellement 0600. Côté parent,
+`FileRendezvous` reçoit workspace/nonce/nom de tour, une identité DÉJÀ validée
+par l'appelant et un pidfd appartenant à l'appelant ; il ne valide ni ne
+fabrique aucune autorité UID/root et ne signale aucun PID — les champs
+nonce/PID déclarés doivent correspondre à l'identité fournie, un rapport
+n'autorise jamais un PID. API explicite `ready()`/`probe()`/`release()` ;
+souscription inotify avant première lecture ; `select(watch, pidfd)` causal :
+la mort réelle de l'enfant avant ready/probe termine l'attente par refus, pas
+de boucle infinie, sans délai, poll temporel, plafond, tentative ni watchdog.
+Publication lue complète seulement après rename atomique ; refus lien
+symbolique (O_NOFOLLOW), lien physique (st_nlink>1), traversée, hors
+workspace, mauvais nonce et PID forgé, originaux préservés ; création
+parente exclusive 0600/fsync sans suppression ni remplacement d'originaux ;
+probes identifiées jamais réutilisées, sans plafond ; fermeture via un seam
+module avec causes primaire+secondaire conservées et retour après erreurs
+vérifiées. Limites : protocole de fixture seulement — ni confinement ni
+acceptation ; les tests standalone ne prouvent PAS Biba réel, le prochain
+raccord managed-auto (identité publique/pidfd et deux vrais tours) devra
+l'établir. Régressions ciblées :
+`python3 tests/test_managed_file_provider.py -v` (lancement direct qui rend
+`tests/` importable ; témoin Popen réel stdin→ready→probe→release→exit0,
+refus nonce/PID forgé/lien/traversée sans perte de preuves, mort réelle avant
+ready/probe via pidfd, refus de fermeture injecté avec témoin valide avant ;
+déterminisme causal sans sleep ni watchdog arbitraire ; fixtures via
+`fixture_area.fixture_root`, jamais /tmp, aucune DB live) ; Codex l'exécute
+personnellement après stabilité des sources (25 gardes protocole OK exit 0
+sans ResourceWarning, vérifiées personnellement par Codex le 2026-11-05 :
+23 initiales + garde 24 terminal externe + garde constructeur
+`terminal_fds` ; les 9 gardes helper `await_provider_turn` le sont aussi —
+le helper reste qualifié lecture inchangé mais n'est PLUS appelé par run).
+Raccord managed-auto (2026-11-05, CODÉ mais NON EXÉCUTÉ) : `run()` de
+`tests/rust_managed_auto_worker.py` utilise désormais le module vérifié
+(`file_provider.program(nonce, turn_name)` + `FileRendezvous(workspace,
+nonce, turn_name, identity, pidfd, terminal_fds=(('conductor', server_fd),
+('helper', supervisor_fd)))) pour les deux vrais tours : bootstrap SANS
+socket — le helper `_attach_canonical_agent` attend le nouvel agent via
+public `mission status-native` + `agent show` (inotify Root/'.swarm' souscrit
+AVANT le premier read, BUSY structuré conservé, refus terminal typé
+`ManagedAutoTerminalRefusal`, aucun poll temporel/timeout/retry) puis
+valide l'identité kernel (`_attach_agent_kernel` : stamps `supervisor_pid`/
+`child_pid`/`supervisor_identity`/`child_identity` comparés au /proc réel,
+chaîne provider→supervisor→serveur possédé, argv superviseur EXACT, hash
+`/proc/<supervisor>/exe` == image, pidfds caller-owned, aucun pidfd
+abandonné sur refus partielle) ; ready/probe causaux côté conducteur, stop
+serveur réel puis adoption (`ppid == os.getpid()`), release physique après
+le stop, settlement inchangé ; `release-<turn>.json` garde le nommage
+protocole pour tous les tours, `model-received.json`/`handoff.md` restent
+renommés par `disjoint_results` ; aucune revendication SO_PEERCRED sur
+aucun canal ; un rapport (payload public ou fichier) ne fait jamais que
+répéter une identité déjà établie du /proc réel — il n'autorise jamais un
+PID. MAIS ce raccord n'a PAS encore été exécuté : Biba réel, producteur
+normal et parcours HTTP positifs restent inconnus jusqu'à la vérification
+personnelle de Codex (compatibilité 9 helper puis nouveau producteur normal
+332/profile exact avant HTTP positif). Les vieux conseils « binaire sans
+sandbox » du paragraphe sur la régénération de fixtures sont HISTORIQUES :
+ce binaire n'établit aucune preuve Biba et n'est pas la route par défaut ;
+un nouveau producteur réel sera produit par Codex après stabilité, sans
+réutiliser une ancienne fixture failed/copie/faux result. Option
+`terminal_fds` ajoutée au module vérifié : tuples `(role, fd)` appartenant
+à l'appelant, observés par le même selector causal (erreur nommant le ROLE
+si un terminal externe devient lisible, aucun fd de l'appelant fermé,
+défaut sans option inchangé).
+Correction refus terminal faux sur `queued` (2026-11-05, CODÉ mais NON
+EXÉCUTÉ ; preuve réelle du premier refus par Codex :
+`docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-managed-public-identity-attach-20261105T054735Z/supervisor-source-fixture.stdout/.stderr/.exit.json`
+et `supervisor-source-fixture-20261105T060141Z`, root privé conservé) : sur le
+producteur réel, `_running_new_agent` a classé TERMINAL un agent public
+`status=queued`, `exit_code=null` — erreur de protocole : l'état Queued est
+légitime et validé par `agent_execution_preflight.rs` (PIDs 0, stamps vides,
+`native_execution_result` None), et le contrat produit
+`agent_contract.rs` `is_active` reconnaît `queued|starting|running|stopping`
+comme membres actifs. Correctif appliqué dans
+`tests/rust_managed_auto_worker.py` : `_running_new_agent` ET
+`_observe_new_agents` suivent l'appartenance de cycle de vie — `queued`,
+`starting`, `stopping` continuent d'observer (jamais terminal faux) ;
+`running` n'est candidat qu'avec PIDs entiers positifs ET stamps chaînes
+décimales non vides (`supervisor_identity`/`child_identity`), sinon l'activité
+causale continue ; seuls les vrais terminaux `failed`/`completed` déclenchent
+le refus typé payload-safe ; un statut inconnu/malformed (y compris un payload
+sans statut) conserve la cause de phase via l'exception typée bornée
+`ObservationRefusal` (message statique sûr rendant AUCUN champ de payload —
+la valeur du statut elle-même pourrait porter un secret — payload public
+complet conservé dans l'attribut possédé ``payload``, jamais de dump dans
+message/repr/traceback, jamais succès vide, jamais classification terminale
+fabriquée ; la classe `ManagedAutoTerminalRefusal` n'est ni affaiblie ni
+réutilisée). Même incrément :
+`_attach_canonical_agent` ne fait plus `return` dans le try après attachement
+des 2 pidfds (l'ancienne faute déjà corrigée dans `await_provider_turn`) — le
+résultat n'est rendu qu'APRÈS la fermeture watch contrôlée ; si la fermeture
+watch échoue après attachement réussi, les 2 pidfds sont explicitement rendus
+avec leurs erreurs secondaires groupées et aucun succès n'est rendu ; le
+pending BUSY est effacé (`pending=None`) par la fresh read valide. Trois
+nouvelles régressions ciblées dans `tests/test_managed_auto_provider_wait.py`
+(9 gardes existantes préservées, 12 au total) : queued→running après vraie
+activité (attachement kernel EXPLICITEMENT simulé — deux descripteurs réels
+possédés comme stand-ins, aucun droit signal, aucun fait /proc revendiqué),
+queued→failed préserve la cause sans faux premier refus, fermeture watch
+refusée après attachement rend les 2 pidfds sans succès perdu. Réception
+critique du 2026-11-05 (CODÉ mais NON EXÉCUTÉ) : la garde de fermeture
+n'affirme l'EBADF des 2 descripteurs rendus qu'AVANT son cleanup de test
+(l'ancienne version fermait d'abord dans le finally — garde passant à vide) ;
+une phase seam bornée annule la fermeture des seuls 2 FDs retournés pour
+prouver la non-vacuité (la garde passe ROUGE, AssertionError attendue au sein
+de la régression, jamais fausse acceptation ; le cleanup ferme par identité
+st_dev/st_ino uniquement les FDs encore possédés par la fixture) ; deux
+gardes `ObservationRefusal` plantent un nonce dans statut/prompt/context/
+capture (absent de str, repr, traceback rendu ; payload strictement égal
+accessible) et un payload sans statut (payload exact, raison statique, jamais
+succès vide) — 14 gardes au total. NON EXÉCUTÉ :
+Codex exécute `python3 tests/test_managed_auto_provider_wait.py -v` puis le
+NOUVEAU producteur normal après stabilité, pas l'ancien état muté.
+FR — Frontière d'observation SQL causale du producteur managed-auto (2026-11-05,
+CODÉ mais NON EXÉCUTÉ ; constat réel Codex sur le producteur NORMAL333 qualifié
+`ee1d29c5…f220` : premier vrai cycle worker entièrement passé, réouverture pause
+passée, second `_attach_canonical_agent` réussi, puis le SELECT direct
+`rows()` sur `managed_attempts` a levé `sqlite3.OperationalError: database is
+locked` — `rows()` ouvre readonly timeout=0 pendant que le serveur natif/worker
+réel écrit au démarrage ; FAIL original conservé, aucun rerun inchangé) : les
+assertions SQL brutes de `run()` sont déplacées hors des phases d'écriture
+concurrente vers les fenêtres stables existantes. (1) Les vérifications
+`managed_attempts` « ready » et `workspace_turns` « waiting » (tour 0) sont lues
+APRÈS `server.stop()`/`native.finish` et AVANT `rendezvous.release()` : ready
+et probe déjà acquis causalement, serveur réellement arrêté, pidfd du helper
+et identité provider validée toujours détenues, provider lui-même BLOQUÉ sur
+`release-<tour>.json` — la sonde suit les écritures concurrentes connues ;
+tout refus reste un échec, et le release qui suit commence exactement le
+settlement que ces lignes attestent (jamais déplacé au-delà du
+release/settlement qu'elles observent). (2) L'`assert_resources` de la
+réouverture en pause (tour 1) est lue AVANT le démarrage du second serveur —
+lignes réglées du tour 0, aucun écrivain vivant — tandis que l'observation
+HTTP publique « paused » reste sur le serveur rouvert live. Toutes les
+assertions exactes sont conservées (témoins inchangés : seconde tâche en
+attente sans seconde copie) ; ni timeout global, ni busy_timeout, ni
+retry/sleep/poll, ni changement SQLite produit ; les `assert_resources`
+post-release/settlement et les lectures HTTP publiques gardent leur position
+de témoin ; aucun mock unitaire miroir. NON EXÉCUTÉ : Codex relance
+personnellement le producteur source frais (deux vrais cycles + reviewer +
+publication) sur le même NORMAL333 qualifié après handback stable, puis
+poursuit la porte e2e d'approbation originale.
+EN — Managed-auto producer causal wait (2026-11-05 correction, real evidence
+`supervisor-source-fixture-missing-provider-replan.json`): the former bare
+`select([listener, server_fd], [], [])` in `tests/rust_managed_auto_worker.py`
+waited forever while both canonical agents of the turn were already terminal
+failed (real cause: the Biba kernel refuses `socket(AF_UNIX)` by contract —
+protection must NOT be weakened). The new documented helper
+`await_provider_turn` replaces that select: inotify subscription on
+`root/'.swarm'` (`worker.watch_directory`, `modifications=True`) BEFORE the
+first public read, public re-read after real database activity or a readable
+socket, structured SQLite BUSY preserved as a refusal with its reason (never an
+empty success), structured terminal refusal for any newly launched agent no
+longer starting/running — typed exception `ManagedAutoTerminalRefusal`: the
+rendered message stays minimal and safe (identifier, status, exit code and
+public failure code only), the full public payload is kept in the owned
+`payload` attribute (exit code, `native_execution_result`, the real cause such
+as EPERM on `socket(AF_UNIX)`, the whole public agent) for exact programmatic
+access —, previous-turn agents ignored by identity (id + strictly increasing
+generation), immediate refusal when the conductor socket becomes readable
+(server exited before the provider), terminal priority over a simultaneously
+ready connection: public re-observation BEFORE `accept` after real activity,
+the refused connection left unconsumed in the backlog, controlled descriptor
+closure on every exit path — success returned only AFTER closure and cause
+check, a refusing close conserved with the public agent without ever returning
+a lost-error success or leaking the accepted socket (`_close_watch_fd`
+module-level seam for the targeted regression). No global timeout, temporal
+polling, cap, retry or text-based wait; the existing public `failure.json`
+writing and cleanup stay unchanged. Limits: the probe/accept window stays
+causal, not atomic; with no event at all the wait continues (no timer allowed).
+Targeted regressions: `python3 tests/test_managed_auto_provider_wait.py -v`
+(direct run which makes `tests/` importable — the `python3 -m unittest
+tests.test_managed_auto_provider_wait -v` form failed with a real ImportError
+on 2026-11-05, 0 cases executed; clearly labeled simulated fixtures, no product
+binary and no fabricated acceptance; explicit fixture area via
+`SWARM_TEST_FIXTURE_AREA`, default `<repo>/.swarm-fixtures`, never /tmp); Codex
+executes it personally after sources are stable. (Historical sentence as of
+2026-11-05, superseded since: "until the managed-auto wiring of the rendezvous
+exists, regenerate fixtures with the sandbox-less binary from the paragraph
+above" — that binary establishes no Biba evidence and is no longer the
+indicated route; see the coded wiring below.)
+EN — File-based fixture rendezvous for the provider (2026-11-05, standalone
+module verified by Codex: 23 tests OK, exit 0, no ResourceWarning): Biba
+voluntarily refuses
+`socket(AF_UNIX)` (protection not to be weakened); the new module
+`tests/rust_managed_file_provider.py` replaces the fixture providers' control
+socket with regular files INSIDE one workspace. On the child side,
+`program(nonce, turn_name)` produces an inert Python provider with no socket
+at all: real stdin to EOF, `--model` on argv, inherited `model-received.json`
+(fields pid/ppid/stdin_sha256/stdin_bytes/argv), workspace inotify subscribed
+BEFORE publishing `ready-<turn>.json` (exclusive 0600 temp, fsync, rename;
+fields nonce,pid,ppid,sid,pgid); each identified probe request is answered by
+an atomic reply file carrying the same identity; `release-<turn>.json` must
+carry exactly `{'nonce':…,'release':True}` or the child refuses with its cause
+conserved and a real non-zero exit; a valid release produces `handoff.md` then
+the three JSONL events usage 7/8, `total_cost_usd` 1, with no paid model. The
+files the child creates (`model-received.json`, `handoff.md`) are opened 0600
+from the exclusive `os.open` itself (no ambient umask, no after-the-fact
+chmod); every protocol file is therefore really 0600. On
+the parent side, `FileRendezvous` receives workspace/nonce/turn name, an
+identity the caller has ALREADY validated, and a caller-owned pidfd; it never
+validates or manufactures any UID/root authority and never signals a PID —
+declared nonce/PID fields must match the provided identity, a report never
+authorizes a PID. Explicit `ready()`/`probe()`/`release()` API; inotify
+subscription before the first read; causal `select(watch, pidfd)`: the real
+child death before ready/probe terminates the wait with a refusal, no infinite
+loop, no delay, temporal poll, cap, retry or watchdog. Publications are read
+completely only after their atomic rename; symlink (O_NOFOLLOW), hard link
+(st_nlink>1), traversal, outside-workspace, wrong-nonce and forged-PID
+refusals preserve the originals; parent creation is exclusive 0600/fsync
+without deleting or replacing originals; identified probes are never reused,
+with no cap; closure goes through a module seam with primary+secondary causes
+conserved and a return only after errors are verified. Limits: fixture
+protocol only — neither confinement nor acceptance; standalone tests do NOT
+prove the real Biba, the upcoming managed-auto wiring (public identity/pidfd
+and the two real turns) will have to establish it. Targeted regressions:
+`python3 tests/test_managed_file_provider.py -v` (direct run which makes
+`tests/` importable; real Popen witness stdin→ready→probe→release→exit0,
+wrong-nonce/forged-PID/link/traversal refusals without evidence loss, real
+death before ready/probe via pidfd, injected close refusal with a valid
+witness first; causal determinism without sleep or arbitrary watchdog;
+fixtures via `fixture_area.fixture_root`, never /tmp, no live DB); Codex
+executes it personally after sources are stable (25 protocol guards OK exit 0
+without ResourceWarning, personally verified by Codex on 2026-11-05: 23
+initial + guard 24 external terminal + the `terminal_fds` constructor guard;
+the 9 `await_provider_turn` helper guards are verified too — the helper keeps
+its unchanged read qualification but is NO LONGER called by run). Managed-auto
+wiring (2026-11-05, CODED but NOT EXECUTED): the `run()` of
+`tests/rust_managed_auto_worker.py` now uses the verified module
+(`file_provider.program(nonce, turn_name)` + `FileRendezvous(workspace, nonce,
+turn_name, identity, pidfd, terminal_fds=(('conductor', server_fd),
+('helper', supervisor_fd)))`) for the two real turns: SOCKET-FREE bootstrap —
+the `_attach_canonical_agent` helper waits for the newly launched agent via
+public `mission status-native` + `agent show` (inotify on root/'.swarm'
+subscribed BEFORE the first read, structured BUSY kept as a refusal, typed
+`ManagedAutoTerminalRefusal`, no temporal poll/timeout/retry) then validates
+the kernel identity (`_attach_agent_kernel`: `supervisor_pid`/`child_pid`/
+`supervisor_identity`/`child_identity` stamps compared to the real /proc,
+parent chain provider→supervisor→owned server, EXACT supervisor argv, real
+`/proc/<supervisor>/exe` hash == provided image, caller-owned pidfds, no
+pidfd abandoned on a partial refusal); causal ready/probe on the conductor
+side, real server stop then adoption (`ppid == os.getpid()`), physical
+release after the stop, settlement unchanged; `release-<turn>.json` keeps
+the protocol naming for every turn, `model-received.json`/`handoff.md` stay
+renamed by `disjoint_results`; no SO_PEERCRED is claimed on any channel; a
+report (public payload or file) only ever repeats an identity already
+established from real /proc facts — it never authorizes a PID. BUT this
+wiring has NOT been executed yet: the real Biba behavior, the normal producer
+and the positive HTTP path remain unknown until Codex's personal verification
+(helper 9 compatibility then a NEW normal producer 332/exact profile before
+positive HTTP). The old "sandbox-less binary" advice in the fixture-regeneration
+paragraph is HISTORICAL: that binary establishes no Biba proof and is not the
+default route; a new real producer will be produced by Codex after stability,
+without reusing any old failed/copied/fake-result fixture. The optional
+`terminal_fds` parameter was added to the verified module: caller-owned
+`(role, fd)` tuples observed by the same causal selector (an error naming the
+ROLE fires when an external terminal becomes readable, no caller fd is ever
+closed, the no-option default is unchanged).
+EN — False terminal refusal on `queued` correction (2026-11-05, CODED but NOT
+EXECUTED; real first-refusal evidence recorded by Codex:
+`docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-managed-public-identity-attach-20261105T054735Z/supervisor-source-fixture.stdout/.stderr/.exit.json`
+and `supervisor-source-fixture-20261105T060141Z`, private root retained): on
+the real producer run, `_running_new_agent` classified a public agent with
+`status=queued`, `exit_code=null` as TERMINAL — a protocol error: the Queued
+state is legitimate and validated by `agent_execution_preflight.rs` (PIDs 0,
+empty stamps, `native_execution_result` None), and the product contract
+`agent_contract.rs` `is_active` recognizes
+`queued|starting|running|stopping` as active membership. Fix applied in
+`tests/rust_managed_auto_worker.py`: `_running_new_agent` AND
+`_observe_new_agents` now follow the product lifecycle membership — `queued`,
+`starting`, `stopping` keep observing (never falsely terminal); a `running`
+entry is a candidate only with positive-int PIDs AND non-empty decimal stamp
+strings (`supervisor_identity`/`child_identity`), otherwise causal activity
+continues; only the real terminals `failed`/`completed` raise the typed
+payload-safe refusal; an unknown/malformed status (including a payload
+without a status at all) conserves the phase cause via the bounded typed
+exception `ObservationRefusal` (static safe message rendering NO payload
+field — the status value itself could carry a secret — complete public
+payload kept in the owned ``payload`` attribute, never dumped into
+message/repr/traceback, never an empty success, never a fabricated terminal
+classification; `ManagedAutoTerminalRefusal` is neither weakened nor reused).
+Same
+increment: `_attach_canonical_agent` no longer returns inside the try after
+attaching the 2 pidfds (the old fault already corrected in
+`await_provider_turn`) — the result is returned only AFTER the controlled
+watch closure; when the watch close fails after a successful attachment, both
+pidfds are explicitly released with their secondary errors grouped and no
+success is returned; the pending BUSY is cleared (`pending=None`) by the
+fresh valid read. Three new targeted regressions in
+`tests/test_managed_auto_provider_wait.py` (9 existing guards preserved, 12
+total): queued→running after real activity (kernel attachment EXPLICITLY
+simulated — two real owned descriptor stand-ins, no signal right, no /proc
+fact claimed), queued→failed cause preserved without a false first refusal,
+refusing watch close after attachment releasing both pidfds without a
+lost-error success. Critical reception of 2026-11-05 (CODED but NOT
+EXECUTED): the close guard asserts the EBADF of the 2 released descriptors
+BEFORE its test cleanup (the former version closed them in the finally first
+— a vacuously passing guard); a bounded seam phase suppresses the close of
+exactly the 2 returned fds to prove non-vacuity (the guard goes RED, an
+expected AssertionError inside the regression, never a false acceptance;
+cleanup closes by st_dev/st_ino identity only fds still owned by the
+fixture); two `ObservationRefusal` guards plant a nonce in
+status/prompt/context/capture (absent from str, repr and the rendered
+traceback; strictly equal payload stays accessible) and a payload without a
+status (exact payload, static reason, never an empty success) — 14 guards
+total. NOT EXECUTED: Codex runs
+`python3 tests/test_managed_auto_provider_wait.py -v` then the NEW normal
+producer after stability, not the old mutated state.
+EN — Managed-auto causal SQL observation boundary (2026-11-05, CODED but NOT
+EXECUTED; real Codex finding on the qualified NORMAL333 producer
+`ee1d29c5…f220`: the first real worker cycle fully passed, the paused reopen
+passed, the second `_attach_canonical_agent` succeeded, then the direct
+`rows()` SELECT on `managed_attempts` raised `sqlite3.OperationalError:
+database is locked` — `rows()` opens readonly timeout=0 while the real native
+server/worker writes at startup; the original FAIL is retained, no unchanged
+rerun): the raw SQL assertions of `run()` are moved out of concurrent
+live-writer phases into the existing stable windows. (1) The `managed_attempts`
+"ready" and `workspace_turns` "waiting" (turn 0) checks are read AFTER
+`server.stop()`/`native.finish` and BEFORE `rendezvous.release()`: ready and
+probe already causally acquired, the server really stopped, the helper pidfd
+and the validated provider identity still held, the provider itself BLOCKED on
+`release-<turn>.json` — the probe follows the known concurrent write phase;
+any refusal remains a failure, and the following release starts exactly the settlement those rows
+witness (never moved beyond the release/settlement they observe). (2) The
+paused-reopen `assert_resources` (turn 1) is read BEFORE the second server
+starts — settled turn-0 rows, no live writer — while the public "paused" HTTP
+observation stays on the live reopened server. All exact assertions are
+retained (unchanged witnesses: second task waiting without a second copy); no
+global timeout, no busy_timeout, no retry/sleep/poll, no product SQLite
+change; post-release/settlement `assert_resources` and public HTTP reads keep
+their witness positions; no mirroring unit mocks. NOT EXECUTED: Codex
+personally reruns the fresh source producer (two real cycles + reviewer +
+publication) on the same qualified NORMAL333 after the stable handback, then
+continues the original approval e2e gate.
+FR — Fixture reviewer native : config gelée embarquée et marqueur dans le vrai
+output I0 (2026-11-05, CODÉ mais NON EXÉCUTÉ) : le cwd réel du provider inerte
+est la feuille I0 créée par le moteur `.swarm/biba-i0/reviewer/{request.event_id}`
+(contrat natif `native_provider_workspace.rs`, claim = event_id de la requête
+vérifiée, aucune autorité conférée) — l'ancienne écriture d'un config/marqueur
+relatifs à Root échouait (FileNotFoundError réel du producteur). Le programme
+généré par `tests/rust_native_managed_reviewer.py` embarque sa config JSON
+sérialisée quotésûre (aucun fichier Root lu, aucun fallback cwd) et publie le
+marqueur d'invocation réel O_EXCL 0600 + flush/fsync DANS ce cwd (champs
+pid/ppid/stdin_sha256/context_sha256/catalog_sha256/native_invocation_supported,
+observation de fixture — ni permission, ni indépendance, ni acceptation).
+Toute lecture parent passe par `reviewer_leaf`/`read_reviewer_marker` : claim
+simple refusant traversée/lien, containment résolue, owner (st_dev, st_ino)
+optionnel, marqueur racine historique reconnu schéma incompatible — jamais
+consommé ni réécrit. Les consommateurs `run`, `recover_original` et
+`tests/rust_native_first_publication.py` sont raccordés à l'event_id RETENU de
+`native-review.input.json` (écrit par invoke avant l'appel) ; no-new-call/débit,
+finance, work et original natif restent prouvés. Variantes : `publish-refusal`
+— l'obstruction répertoire `.swarm/native-review-context-v1-<context_sha256>.json`
+est plantée par le parent AVANT l'appel public, retirée AVANT reconcile,
+restauration garantie en finally ; `source` écrit le fichier suivi par son
+chemin ABSOLU déclaré (chronologie causale réelle) — limites de variantes
+conservées, aucun affaiblissement Biba. Régression ciblée :
+`python3 tests/test_managed_reviewer_fixture_workspace.py -v` (Popen réel du
+programme inerte avec cwd privé ≠ Root, config embarquée sans fichier root,
+stdin de protocole clairement simulé → marqueur 0600 + frames + exit 0 ; refus
+claim/lien/owner/marqueur racine conservés ; ne prouve NI Biba NI permission
+native NI acceptation) — NON EXÉCUTÉ : Codex lance d'abord ce script ciblé puis
+le VRAI producteur NEW normal 332/profil exact après stabilité des sources,
+jamais une copie d'un run failed.
+Correction lecture unique / raw retenu (2026-11-05, CODÉ mais NON EXÉCUTÉ ;
+3 gardes ciblées précédentes vérifiées personnellement par Codex, preuve
+`supervisor-reviewer-workspace-three`) : `read_reviewer_marker` n'a PLUS
+d'option `wait` (branche inventée à boucle vide infinie supprimée) — lecture
+UNIQUE après l'issue réelle connue de la CLI, marqueur absent →
+FileNotFoundError/refus legacy causal, jamais d'attente texte/timer/retry ni
+de borne ajoutée pour masquer. `run` gèle les octets EXACTS du marqueur AVANT
+parsing et la replay les compare à CES octets (source de vérité), jamais à une
+re-canonification JSON — `json.dump` écrit avec espacements, un JSON compact
+n'est jamais égal à la preuve originale, laquelle n'est ni réécrite ni
+canonisée. Une garde Popen réelle dans une feuille I0 SIMULÉE clairement
+(répertoires de fixture ordinaires, aucun label engine/permission fabriqué)
+prouve que le helper retourne les octets exacts du provider (espacement
+préservé, prouvé ≠ JSON compacté) et qu'un marqueur absent refuse après la
+vraie sortie de l'enfant. Variante `source` : elle écrit le chemin ABSOLU
+HORS feuille I0 — la vraie Biba refuse cette écriture, la variante reste NON
+QUALIFIÉE avec limite visible (le passer à `os.open(...,0700)` ne créerait PAS
+de chronologie causale réelle) ; `publish-refusal` reste à qualifier
+indépendamment. Limites : pid/ppid du marqueur sont des champs de cohérence —
+jamais une qualification d'identité de processus ; le vrai NEW producer et la
+raw frame restent personnels à Codex.
+EN — Native reviewer fixture: frozen embedded config and marker in the REAL I0
+output (2026-11-05, CODED but NOT EXECUTED): the inert provider's real cwd is
+the engine-created I0 leaf `.swarm/biba-i0/reviewer/{request.event_id}` (native
+contract `native_provider_workspace.rs`, claim = the verified request event_id,
+no authority conferred) — the former Root-relative config/marker writes failed
+with the producer's real FileNotFoundError. The program generated by
+`tests/rust_native_managed_reviewer.py` embeds its serialized JSON config
+quoting-safe (no Root file read, no cwd fallback) and publishes the
+real-invocation marker O_EXCL 0600 + flush/fsync INSIDE that cwd (fields
+pid/ppid/stdin_sha256/context_sha256/catalog_sha256/native_invocation_supported
+— fixture observation, neither permission, nor independence, nor acceptance).
+Every parent read goes through `reviewer_leaf`/`read_reviewer_marker`: simple
+claim refusing traversal/links, resolved containment, optional (st_dev, st_ino)
+owner, historical root marker recognized as an incompatible schema — never
+consumed or rewritten. Consumers `run`, `recover_original` and
+`tests/rust_native_first_publication.py` are rewired to the RETAINED event_id
+of `native-review.input.json` (written by invoke before the call); no-new-call/
+debit, finance, work and native-original assertions stay in place. Variants:
+`publish-refusal` — the `.swarm/native-review-context-v1-<context_sha256>.json`
+directory obstruction is planted by the PARENT BEFORE the public call, removed
+BEFORE reconcile, restoration guaranteed in finally; `source` writes the
+tracked file at its DECLARED ABSOLUTE path (real causal chronology) — variant
+limits conserved, no Biba weakening. Targeted regression:
+`python3 tests/test_managed_reviewer_fixture_workspace.py -v` (real Popen of
+the inert program with a private cwd ≠ Root, embedded config with no root
+file, clearly simulated protocol stdin → 0600 marker + frames + exit 0;
+claim/link/owner/root-marker refusals conserved; proves NEITHER Biba NOR
+native permission NOR acceptance) — NOT EXECUTED: Codex first runs this
+targeted script then the REAL NEW normal producer 332/exact profile after
+source stability, never a copy of a failed run.
+Single-read / exact-raw correction (2026-11-05, CODED but NOT EXECUTED; the
+previous 3 targeted guards personally verified by Codex, evidence
+`supervisor-reviewer-workspace-three`): `read_reviewer_marker` no longer has a
+`wait` option (the invented infinite busy-spin branch is removed) — a SINGLE
+read after the CLI call whose real outcome is already known, absent marker →
+causal FileNotFoundError/legacy refusal, never text-based waits/timers/retries
+and no added bound to mask anything. `run` freezes the marker's EXACT bytes
+BEFORE parsing and the replay compares THOSE bytes (source of truth), never a
+JSON re-canonicalization — `json.dump` writes with spacing, a compacted JSON is
+never equal to the original evidence, which is neither rewritten nor
+canonicalized. A real Popen guard in a CLEARLY SIMULATED I0-like leaf (plain
+fixture directories, no fabricated engine label/permission) proves the helper
+returns the provider's exact bytes (spacing preserved, provably ≠ compacted
+JSON) and that an absent marker refuses after the child's real exit. Variant
+`source`: it writes the declared ABSOLUTE path OUTSIDE the I0 leaf — real Biba
+refuses that write, so the variant stays NOT QUALIFIED with its limit visible
+(switching it to `os.open(...,0700)` would NOT create real causal chronology);
+`publish-refusal` stays to be qualified independently. Limits: the marker's
+pid/ppid are coherence fields — never a process-identity qualification; the
+real NEW producer and raw frame remain Codex's personal steps.
+
+The source case checks actual shared-lane writer contention, retained custody
+after repository-capability close, wrong Root/candidate, bare and lock inode
+substitution/refusal/restoration, explicit source close/writer recovery and
+unchanged project DB bytes. One fresh source case plus six binding cases, strict
+Rustdoc. Binding-only recipe filters git_repository_ so it does not mutate or
+require the source fixture. No transfer/grant/ref effect or child lifecycle is
+proved by this guard.
+
+
+Source writer/context: `recipes/paea-native-git-source-context.json` requires
+immutable71 via SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE and a newly owned native
+first-publication fixture via BOTH SWARM_PAEA_WRITER_FIXTURE and
+SWARM_PAEA_SOURCE_FIXTURE. Steps are sequential because the final public-settings
+case durably advances that fixture's configuration history. One named lib-unit
+case checks no/read/write transaction, nested observer refusal without losing the
+writer, independent SQLITE_BUSY and rollback/recovery. Eight normal-library
+integration cases include the seven source/binding controls and a public no-policy-
+change settings preview/apply, same-candidate old-source refusal, fresh-source
+recovery and reopen persistence. Unit and normal-library evidence stay separate;
+this provides no business grant, pack transfer or protected ref effect.
+
+
+Private pack files: `recipes/paea-private-pack-files.json` runs four named
+lib-unit cases: exclusive directory/revision refusal, link rejection/recovery,
+real Git export/import with retained staging directory after rename, and pack
+inode substitution/refusal/recovery. Real commit identity, digest/size, unchanged
+refs and empty lookalike staging path are asserted. Files and source/destination
+handles stay owned through actual runner reap, then checked close leaves artifacts
+on disk. Unit cfg(test) coverage is not a production service/job-lifecycle proof;
+strict Rustdoc and separately qualified normal profile remain required.
+
+
+Owned Git object preparation: `recipes/paea-owned-git-transfer.json` runs three
+retained-child recovery adapter units and three job units against an explicit
+read-only genuine publication fixture. Real candidate object import/no ref
+mutation, first refusal/new-job recovery/source lane lifetime, and refused close
+with a real Child attached to a synthetic error are separate named cases.
+Synthetic attachment tests ownership adapters, not natural runner fault injection.
+All are cfg(test) units; production profile and protected service acceptance are
+separate. Strict Rustdoc is included; unknown wrappers/lost ownership stay open.
+
+Recovery includes actual external waitpid → ECHILD (no forged reap receipt),
+and an unsupported mutable wrapper whose read-only source still blocks release.
+
+The three job cases run sequentially: they share a read-only genuine source,
+and the exclusive source-lane witness must not race another test's valid guard.
+
+The recovery matrix includes the actual managed Git producer's Root → launch →
+GitReport Process → ValidationRunError chain, plus a separate GitPackError
+envelope case. Child attachment is synthetic with a real process; neither case
+claims a naturally injected production failure. Seven distinct units total.
+
+
+Owned source acquisition: `recipes/paea-owned-source-acquisition.json` runs seven
+sequential job units (four new Pending builder cases, three ready-source legacy
+compatibility cases), the actual-source writer unit, the normal-library source
+custody/rebinding SDK case and strict Rustdoc. New cases check Pending before any
+native observation, actual source import and service-root staging, refused initial
+observation/new-job recovery, real Child attached to a synthetic initial error,
+existing staging preservation and wrong-service refusal. The old ready-source job
+constructor is cfg(test) only. Recovery adapter and pack-envelope proofs from80
+remain reusable while their exact source inputs are unchanged; no protected service
+or complete lifecycle claim for unrelated legacy observers follows from this.
+
+
+Run this acquisition recipe under the cooperative local build lock when another
+session edits shared sources; release it before the launcher. An added compiler
+module after the declared inventory refuses closure even if all named tests pass.
+The normal source SDK performs reversible bare/lock substitutions in our inert
+fixture, restores originals before checking each observation, and checks DB bytes;
+this is not a filesystem-read-only test. Job source observations remain read only.
+
+The recipe now also includes the Root FS-only factory (eight job cases total) and
+normal-library object-format compatibility. A real malformed bare permits pure
+Pending construction, then refuses its native check inside the owner before pack
+writes, followed by restoration and a newly owned valid recovery job. Eleven
+named cases total: nine unit, two normal SDK. Public legacy provision/open are
+separate; the protected factory never calls their native observation-first path.
+
+
+PAEA input inventories retain the whole swarm-biba-linux crate, including new
+transitive modules such as kernel.rs, instead of just Cargo.toml/lib.rs. This
+expands declared source retention without changing recipe commands or policy.
+Historical evidence is not rewritten; the new dependency graph needs fresh proof.
+A passing declared-input run alone cannot bind an undeclared compiler input.
+
+
+For concurrent source work, run the source-acquisition contract with
+`python3 tests/paea_source_acquisition_inventory.py --recipe tools/verification/recipes/paea-owned-source-acquisition.json --output FRESH_DIRECTORY`.
+It freezes current candidates, compiles unit/normal-SDK targets without running
+cases, validates their actual workspace depfiles against prebound bytes using the
+native profiler, then invokes the existing recipe runner on explicit frozen paths.
+Actual new/changed compiled inputs still refuse; later unrelated file births are
+not silently treated as compiler inputs or admitted from a cache. The wrapper
+retains methods, environment, depfiles, argv, executable hashes and original recipe;
+no-run never counts as functional PASS. It introduces no global test watchdog.
+The read-only Root counterexample is retained separately; the final twelve named
+cases include actual mode refusal before staging and execution. Test-only ready
+constructors, normal code and protected service acceptance remain distinguished.
+
+
+Delivered-binary composed chain: `recipes/paea-delivered-chain-cli-rust.json`
+runs the `delivered_chain_transfer_promote_replay_reconcile_once` case, the
+shared-root guard sensitivity and the wrong-SHA refusal guard. The harness
+defaults to `CARGO_BIN_EXE_swarm-rust` and is unchanged without the override;
+when the explicit test environment sets `SWARM_PAEA_DELIVERED_BIN`, all four
+chain spawns — the public two-phase `paea transfer-call` preparation, the two
+guarded promotion preparations and the public `reconcile-effects` call — spawn
+that one externally designated file, re-proving its SHA-256 against the
+mandatory `SWARM_PAEA_DELIVERED_BIN_SHA256` witness at every spawn and printing
+a `delivered-binary-witness` line per spawn. `bin/swarm` and its expected hash
+are declared recipe inputs, compared before and after. The transfer step runs
+the same two-phase public CLI operation (`paea transfer-call`) with the exact
+permission-provisioning and fixture-enrollment pattern of the transfer harness,
+never a direct engine-library call. A separate plain-lot case proves that a
+designated binary whose actual hash differs from its witness refuses before any
+spawn. This proves the composed transfer→promotion→replay→reconciliation
+behavior of the designated binary's CLI on isolated owned fixtures; it does not
+prove build-profile qualification, delivery provenance of the file, service
+installation, UID separation or any accepted live mission.
+
+
+Promote CLI suite regression: `recipes/paea-promote-cli-suite-regression-rust.json`
+runs the whole `paea_promote` test binary in ONE process with
+`--include-ignored --test-threads=1` — the exact precondition under which the
+October 30 2026 suite regression reproduced. Historical guard: the harness
+derived Trust event/mandate ids from the process id alone, which is NOT
+run-unique inside one suite process, so the second `config-apply` on the shared
+retained fixture refused with `event_conflict` (`expected_revision` is part of
+the replay fingerprint) and six tests panicked at the fixture setup; the
+composed two-domain test additionally consumed an agreement seeded at the
+pre-revocation revision, refused by the documented last-use freshness guard
+`paea-git-promote-agreement-stale`. The harness now derives every id from a
+pid+atomic-sequence nonce, re-seeds a fresh agreement (real
+mandate/request/approve chain) before every expected successful commit after a
+revision change, and names the agreement admin token
+`fixture-agreement-admin-token` to match the harness'
+`fixture-{subject}-token` reconstruction convention (`show` never serializes
+tokens). The recipe asserts each of the seven previously failing named cases
+green plus `9 passed; 0 failed` overall. Limits: fixture authority, same UID,
+no human enrollment, no live mission, no delivery profile qualification; the
+delivered-binary witness steps stay in `paea-delivered-chain-cli-rust`.
+
+Régression de suite CLI promote : la recette
+`recipes/paea-promote-cli-suite-regression-rust.json` exécute tout le binaire
+de test `paea_promote` en UN processus avec `--include-ignored
+--test-threads=1` — la précondition exacte sous laquelle la régression de
+suite du 30 octobre 2026 s'est reproduite. Garde historique : le harnais
+dérivait les identifiants Trust (événements/mandats) du seul PID, qui n'est
+PAS unique à l'exécution dans un processus de suite ; le second `config-apply`
+sur la fixture retenue partagée refusait avec `event_conflict`
+(`expected_revision` fait partie de l'empreinte de rejeu) et six tests
+paniquaient à l'installation de fixture ; le test composé bi-domaines
+consommait en outre un accord semé à la révision d'avant-révocation, refusé
+par la garde de fraîcheur au dernier usage documentée
+`paea-git-promote-agreement-stale`. Le harnais dérive désormais chaque
+identifiant d'un nonce pid+séquence atomique, re-sème un accord frais (chaîne
+réelle mandat/requête/approbation) avant chaque commit réussi attendu après un
+changement de révision, et nomme le token admin `fixture-agreement-admin-token`
+conformément à la convention de reconstruction `fixture-{subject}-token` du
+harnais (`show` ne sérialise jamais les tokens). La recette affirme chacun des
+sept cas nommés auparavant en échec, plus `9 passed; 0 failed` au total.
+Limites : autorité fixture, même UID, pas d'enrôlement humain, pas de mission
+vivante, pas de qualification du profil livré ; les étapes témoin du binaire
+livré restent dans `paea-delivered-chain-cli-rust`.
+
+
+Chaîne composée du binaire livré : la recette
+`recipes/paea-delivered-chain-cli-rust.json`
+exécute le cas `delivered_chain_transfer_promote_replay_reconcile_once`, la
+sensibilité du garde de racine partagée et le garde de refus de mauvaise
+empreinte. Le harnais garde `CARGO_BIN_EXE_swarm-rust` par défaut, sans
+surcharge ; quand l'environnement de test explicite pose
+`SWARM_PAEA_DELIVERED_BIN`, les quatre spawns de la chaîne — préparation
+publique deux-phases `paea transfer-call`, deux préparations de promotion
+gardées et appel public `reconcile-effects` — pointent ce seul fichier externe
+désigné, dont le SHA-256 est reposé à chaque spawn contre le témoin obligatoire
+`SWARM_PAEA_DELIVERED_BIN_SHA256`, avec une ligne `delivered-binary-witness`
+par spawn. `bin/swarm` et son empreinte attendue sont des entrées preuve
+déclarées, comparées avant et après. Le transfert passe par la même opération
+CLI publique deux-phases (`paea transfer-call`) avec le motif exact de
+provision de permission et d'enrôlement fixture du harnais transfert, jamais
+par un appel direct à la bibliothèque moteur. Un cas séparé du lot simple prouve
+qu'un binaire désigné dont l'empreinte réelle diffère du témoin refuse avant
+tout spawn. Cela prouve le comportement composé
+transfert→promotion→rejeu→rapprochement du CLI du binaire désigné sur fixtures
+isolées possédées ; cela ne prouve ni la qualification du profil de
+compilation, ni la provenance de livraison du fichier, ni l'installation du
+service, la séparation UID ou une mission vivante acceptée.
+
+
+Delivered-binary fictitious settlement chain: `recipes/paea-delivered-settlement-cli-rust.json`
+runs the second domain (separate fictitious ledger) through the same one
+designated delivered ELF. With fresh isolated owned project/ledger roots and the
+fictitious debt provisioned through the documented library initialization
+(`paea_initialize_settlement`, never first-request adoption), the composed case
+`delivered_settlement_commit_replay_reconcile_once` exercises the guarded public
+CLI `paea settlement-call commit` twice plus the read-only `paea
+reconcile-effects` call, all three business spawns on the externally designated
+`SWARM_PAEA_DELIVERED_BIN`, re-proving its SHA-256 against the mandatory
+`SWARM_PAEA_DELIVERED_BIN_SHA256` witness at every spawn (one
+`delivered-binary-witness` line per spawn, plus the printed spawn argv). The
+assertions check the actual producer semantics, not an invented receipt shape:
+exactly one durable `paea_settlement_effects` row whose receipt binds the
+invoice, the unchanged provisioned debt terms and the canonical payment action;
+the identical second commit replays `replayed=true` with the same
+`intent_id`/`action_digest` and no second row or debt change; the reconciliation
+report is `settlement.state=consistent`, `effectCount=1`, `verified=true` bound
+to that intent, and `git.state=uninitialized` on the project root never
+configured for Git. The refusal case
+`delivered_settlement_refuses_bad_frame_without_consumption` proves a wrong
+private frame refuses through the designated binary before any consumption, with
+Trust state, effect count and debt unchanged. Without the override the harness
+still runs `CARGO_BIN_EXE_swarm-rust`, unchanged. The revocation case
+`delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers`
+opens one real window between the prepared event and the private frame through the
+promote-motif `invoke_between`: a public project `config-apply` disabling the effect
+identity makes the still-signed grant refuse `paea-settlement-trust-revision`, then
+`paea-settlement-effect-role` with a revision-matched grant, each time with no effect
+row and the provisioned debt intact; the public restore recovers with exactly one
+fresh `recorded` consumption and a `consistent` reconciliation journal. Fictitious
+SQLite effects
+only: no real payment, live database, UID separation, human presence or accepted
+service; authority stays the explicitly simulated fixture enrollment, and
+build-profile qualification and delivery provenance remain separately retained.
+The contention case
+`delivered_settlement_two_cli_instances_same_business_terms_single_effect`
+proves ledger business uniqueness under two genuinely contending normal CLI
+instances: both public `settlement-call commit` processes concurrently prepare
+the SAME provisioned debt (same terms, same request document, same current
+fixture authority, simultaneously live preparations witnessed by distinct
+`root_digest`s and one identical canonical `action_digest`), then consume their
+private frames after an explicit harness barrier (`std::sync::Barrier`, no
+sleep or assumed ordering). Exactly one business effect is admissible whichever
+side wins the race: the loser either replays the exact same durable `intent_id`
+(`replayed=true`) or refuses explicitly — two distinct effects or zero effects
+fail the test — and the public reconciliation journal stays `consistent` with
+`effectCount=1`, the exact provisioned terms and the debt settled once, also
+read through SQLite connections opened read-only separately from the CLI. No
+UID separation, real payment or independent acceptance is claimed by this case.
+
+Chaîne de règlement fictif sur binaire livré : la recette
+`recipes/paea-delivered-settlement-cli-rust.json` exécute le second domaine
+(grand livre fictif séparé) à travers le même ELF livré désigné. Avec des racines
+projet/grand livre fraîches isolées possédées et la dette fictive provisionnée
+par l'initialisation documentée (`paea_initialize_settlement`, jamais une
+adoption de première demande), le cas composé
+`delivered_settlement_commit_replay_reconcile_once` exerce le CLI public gardé
+`paea settlement-call commit` deux fois plus l'appel lecture seule `paea
+reconcile-effects`, les trois spawns métier sur le fichier externe désigné
+`SWARM_PAEA_DELIVERED_BIN`, dont le SHA-256 est reposé à chaque spawn contre le
+témoin obligatoire `SWARM_PAEA_DELIVERED_BIN_SHA256` (une ligne
+`delivered-binary-witness` par spawn, plus l'argv affiché). Les assertions
+vérifient la sémantique réelle du producteur, pas une forme de reçu inventée :
+exactement une ligne durable `paea_settlement_effects` dont le reçu lie la
+facture, les termes de dette provisionnés inchangés et l'action de paiement
+canonique ; le second commit identique rejoue `replayed=true` avec le même
+`intent_id`/`action_digest` sans seconde ligne ni changement de dette ; le
+rapport de rapprochement vaut `settlement.state=consistent`, `effectCount=1`,
+`verified=true` lié à cette intention, et `git.state=uninitialized` sur la
+racine projet jamais configurée pour Git. Le cas de refus
+`delivered_settlement_refuses_bad_frame_without_consumption` prouve qu'une frame
+privée erronée refuse via le binaire désigné avant toute consommation, avec
+état Trust, compteur d'effets et dette inchangés. Sans surcharge, le harnais
+garde `CARGO_BIN_EXE_swarm-rust`, inchangé. Le cas de révocation
+`delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers`
+ouvre une fenêtre réelle entre l'événement préparé et la trame privée via
+`invoke_between` (motif promote) : un `config-apply` public sur le projet
+désactivant l'identité d'effet fait refuser le grant encore signé avec
+`paea-settlement-trust-revision`, puis `paea-settlement-effect-role` avec un
+grant lié à la révision révoquée, chaque fois sans ligne d'effet et avec la
+dette provisionnée intacte ; la restauration publique rétablit exactement une
+consommation `recorded` fraîche et un journal de rapprochement `consistent`.
+Effets SQLite fictifs seulement :
+aucun paiement réel, base vivante, séparation UID, présence humaine ou service
+accepté ; l'autorité reste l'enrôlement fixture explicitement simulé, et la
+qualification du profil de compilation et la provenance de livraison restent
+conservées séparément. Le cas de contention
+`delivered_settlement_two_cli_instances_same_business_terms_single_effect`
+prouve l'unicité métier du grand livre sous deux instances CLI normales
+réellement concurrentes : les deux processus publics `settlement-call commit`
+préparent simultanément LA MÊME dette provisionnée (mêmes termes, même
+document de requête, même autorité fixture courante, préparations vivantes
+simultanées attestées par des `root_digest` distincts et un `action_digest`
+canonique identique), puis consomment leurs trames privées après une barrière
+de harnais explicite (`std::sync::Barrier`, aucune temporisation ni ordre
+supposé). Un seul effet métier est admissible, quel que soit l'ordre gagnant :
+le perdant rejoue exactement le même `intent_id` durable (`replayed=true`) ou
+refuse explicitement — deux effets distincts ou zéro effet échouent au test —
+et le journal de rapprochement public reste `consistent` avec `effectCount=1`,
+les termes provisionnés exacts et la dette réglée une seule fois, lus aussi par
+des connexions SQLite lecture seule distinctes du CLI. Aucune preuve de
+séparation UID, de paiement réel ou d'acceptation indépendante n'est revendiquée
+par ce cas.
+
+
+Class-2 governed fixture areas: `recipes/rust-class2-fixture-areas.json` proves
+the permanent result of the D05 migration — every fixture allocation under
+`rust/crates` that a code path reads back through `open_private_directory`
+(enrollment `Documents`, provisioning prepare, service installation,
+anchor/declaration reads) allocates in the fully private fallback area
+(`~/.local/state/swarm-fixtures/`, 0700 chain), because the checkout's
+group-writable ancestors are refused by the private ancestor walk, while all
+other allocations use the repository area `.swarm-fixtures/` with RAII `Drop`
+cleanup preserved. Step 1 runs `tools/check_tmp_interdiction.py`, whose exit 0
+asserts `0 allocation violation(s)` (the 10 review items are documented
+exemptions and `os.tmpdir()` readers, not fixture writes). Steps 2–4 run the
+representative flows: the swarm-cli `identity` unit modules (18 passed) and the
+two integration suites whose CLI children or in-process runs traverse the
+private walk — `trust_enrollment` (2 passed) and `identity_checkpoint`
+(6 passed), the exact suites that exposed the first-pass area choice as red on
+November 8. The runner itself pins `TMPDIR` under the configured fixture area
+per its own contract, so no step needs an explicit TMPDIR override. Scope:
+declared recipe checks on isolated owned fixtures, same UID; not mission
+acceptance, not the excluded agent_launch/planning reds (owner Codex, consigned
+in BLP-APEX), and not the 20 `#[ignore]`-gated canonical-fixture paea suites,
+which keep their dedicated recipes. Evidence of the qualification run:
+`.swarm-fixtures/class2-recipe-20261108T030000Z` (PASS 4/4, verify VERIFIED).
+
+Aires de fixtures gouvernées class-2 : la recette
+`recipes/rust-class2-fixture-areas.json` prouve le résultat permanent de la
+migration D05 — chaque allocation de fixture sous `rust/crates` qu'un parcours
+de code relit via `open_private_directory` (Documents d'enrôlement, prepare de
+provisioning, installation de service, lectures d'ancres/déclarations) alloue
+dans l'aire de repli entièrement privée (`~/.local/state/swarm-fixtures/`,
+chaîne 0700), car les ancêtres inscriptibles au groupe du dépôt sont refusés par
+le walk privé d'ancêtres, tandis que toutes les autres allocations utilisent
+l'aire de dépôt `.swarm-fixtures/` avec le nettoyage RAII `Drop` préservé.
+L'étape 1 lance `tools/check_tmp_interdiction.py`, dont l'exit 0 affirme
+`0 allocation violation(s)` (les 10 review items sont des exemptions documentées
+et des lectures `os.tmpdir()`, pas des écritures de fixture). Les étapes 2–4
+lancent les parcours représentatifs : les modules unitaires `identity` de
+swarm-cli (18 passed) et les deux suites d'intégration dont les enfants CLI ou
+runs en processus traversent le walk privé — `trust_enrollment` (2 passed) et
+`identity_checkpoint` (6 passed), exactement les suites qui ont révélé en rouge
+le premier choix d'aire le 8 novembre. Le runner lui-même épingle `TMPDIR` sous
+l'aire de fixtures configurée selon son propre contrat, donc aucune étape n'a
+besoin de surcharge TMPDIR explicite. Périmètre : vérifications déclarées de la
+recette sur fixtures isolées possédées, même UID ; ni acceptation de mission, ni
+les rouges agent_launch/planning exclus (propriétaire Codex, consignés dans
+BLP-APEX), ni les 20 suites paea gardées par `#[ignore]` sur fixture canonique,
+qui conservent leurs recettes dédiées. Preuve de la run de qualification :
+`.swarm-fixtures/class2-recipe-20261108T030000Z` (PASS 4/4, vérification
+VERIFIED).
+
+## PAEA I16 stale lease after holder reopen / Ancien bail après reprise du porteur (PA-07)
+
+EN: `recipes/paea-i16-lease-reopen-rust.json` runs the named scenario
+`lease_reopen_case` in `tests/rust_planning_lease_reopen.py` against the frozen
+qualified native binary (`.cache/rust-migration-binaries/swarm-rust-1a021b7e…`,
+sha256 `1a021b7e…`) and its profile witness (`.cache/mission-watch-planning-
+hf3b_40f/run/profile.json`, `no_fixture_feature`, bound sha256). One owned
+inactive Root, one inert local provider held at an owned UNIX-socket barrier
+(SO_PEERCRED uid check + persisted `permitted` row with the exact pids), and
+public CLI operations only: the run owner is frozen (SIGSTOP) while the actual
+product lease expiry is observed through `expiry_ns` (no sleep, no agent clock
+as ordering source); the exact recorded run replay refuses
+`planning-run-already-recorded` and stale preview/renew replay the lease fence
+`stale_lease`, each verified for cause with unchanged Work, snapshot, ledger
+and provider marker before any new durable effect; public pause/resume reopen
+bumps every scope generation by 1 per control (witness 1 → reopened 3) and
+clears holder/lease_until (omitted from public JSON), after which the stale
+token is refused again (`stale_lease` at the reopened generation); the frozen
+owner is then released, self-refuses at its own `live()` fence (terminal
+`refused` disposition, bounded by the saved
+`agent_supervision_poll_interval_ms` cadence, not a watchdog), the registry
+releases execution ownership (`require_claim_available`), and the legitimate
+new acquisition succeeds exactly once (generation 4) with a second claim
+refusing `lease_busy`. Original ledger rows are compared exactly; the fresh
+claim adds exactly one reservation. Declared inputs cover the fence/registry
+contracts consumed by the case; `source_stable` compares their digests
+before/after the step. This proves planner/lifecycle lease semantics
+(I16/PA-07) on an isolated fixture; it is not a Git/settlement effect proof,
+authenticated identity, service installation or acceptance.
+
+FR : la recette `recipes/paea-i16-lease-reopen-rust.json` exécute le scénario
+nommé `lease_reopen_case` de `tests/rust_planning_lease_reopen.py` sur le
+binaire natif figé qualifié (`.cache/rust-migration-binaries/swarm-rust-
+1a021b7e…`, sha256 `1a021b7e…`) et son témoin de profil (`.cache/mission-watch-
+planning-hf3b_40f/run/profile.json`, `no_fixture_feature`, empreinte liée).
+Une Root inactive possédée, un fournisseur local inerte retenu à une barrière
+socket UNIX possédée (contrôle SO_PEERCRED + ligne `permitted` persistée avec
+les pids exacts) et uniquement des opérations CLI publiques : le porteur du
+run est gelé (SIGSTOP) pendant que le dépassement réel du bail produit est
+observé via `expiry_ns` (aucun sleep, aucun ordre par horloge d'agent) ; le
+rejeu exact du run enregistré refuse `planning-run-already-recorded` et les
+rejeux preview/renew périmés traversent le fence du bail `stale_lease`, chacun
+vérifié en cause avec Work, snapshot, ledger et marqueur fournisseur inchangés
+avant tout nouvel effet durable ; la reprise publique pause/resume incrémente
+la génération de chaque portée d'un par contrôle (témoin 1 → reopen 3) et vide
+holder/lease_until (omis du JSON public) ; le jeton périmé est alors refusé à
+nouveau (`stale_lease` sur la génération rouverte) ; le porteur gelé est
+libéré, se refuse à son propre fence `live()` (disposition terminale `refused`,
+bornée par la cadence sauvegardée `agent_supervision_poll_interval_ms`, pas un
+watchdog), le registre libère la propriété d'exécution
+(`require_claim_available`), et la nouvelle acquisition légitime réussit
+exactement une fois (génération 4), un second claim refusant `lease_busy`. Les
+lignes d'origine du ledger sont comparées exactement ; le nouveau claim ajoute
+exactement une réservation. Les entrées déclarées couvrent les contrats
+fence/registre consommés par le cas ; `source_stable` compare leurs empreintes
+avant/après l'étape. Ceci prouve la sémantique de bail planificateur/cycle de
+vie (I16/PA-07) sur une fixture isolée ; ce n'est ni une preuve d'effets
+Git/règlement, d'identité authentifiée, d'installation de service ni
+d'acceptation.
+
+## Recette paea-git-call-preview-rust (aperçu protégé de l'action préparée)
+
+FR : la recette `recipes/paea-git-call-preview-rust.json` exécute le contrôle
+permanent du raccord I04/PA-08 : la route de lecture
+`GET/HEAD /api/v1/paea/git-call/preview` présente l'action préparée exacte
+détenue par le moteur à un approbateur futur. Cinq étapes : absence
+explicite sans source liée (`available:false` + raison, refus typés de forme) ;
+aperçu exact avec fixture native retenue (--ignored : proposal/context
+verbatim, identité canonique recalculée et comparée, témoins des racines,
+révision de confiance courante, aucun consentement ni consommation — le POST
+gardé reste `bound:true` ensuite) ; **frontière lecteur BLP-RET-05**
+(`preview_reader_guard_enforces_produced_attribution` : session seule →
+`paea-reader-authentication-required` exact, lecteur enrôlé non habilité →
+`paea-reader-access-denied` exact sans marqueur privé, lecteur autorisé par
+une attribution produite par les producteurs soutenus → projection exacte avec
+marqueur, politique périmée via `config-apply` réel →
+`paea-reader-policy-stale`) ; actifs embarqués de la page
+`paea-effects.html` étendue (section aperçu, aucun bouton de consentement) ;
+catalogue i18n généré à jour. `source_stable` compare les empreintes des
+entrées déclarées avant/après l'étape ; la fixture source vit en tmpfs
+(chemin persisté dans le dossier de preuve, régénérable par la voie
+documentée `tests/rust_native_first_publication.py`). Ceci prouve la
+présentation de l'action préparée seulement : aucun consentement capturé,
+aucun grant, aucun appel exécuté, aucune acceptation.
+
+## Recipe paea-git-call-preview-rust (protected preview of the prepared action)
+
+EN: `recipes/paea-git-call-preview-rust.json` runs the permanent check of the
+I04/PA-08 connection: the read route `GET/HEAD /api/v1/paea/git-call/preview`
+presents the exact prepared action held by the engine to a future approver.
+Five steps: explicit absence without a bound source (`available:false` +
+reason, typed shape refusals); exact preview with the retained native fixture
+(--ignored: proposal/context verbatim, recomputed and compared canonical
+identity, root witnesses, current Trust revision, no consent and no
+consumption — the guarded POST stays `bound:true` afterwards); **BLP-RET-05
+reader frontier** (`preview_reader_guard_enforces_produced_attribution`: bare
+session → exact `paea-reader-authentication-required`, enrolled-but-uncleared
+reader → exact `paea-reader-access-denied` without a private marker, reader
+authorized by an attribution produced through the supported producers → exact
+projection with marker, stale policy through a real `config-apply` →
+`paea-reader-policy-stale`); embedded assets of the extended
+`paea-effects.html` page (preview section, no consent button); up-to-date
+generated i18n catalog. `source_stable` compares declared input digests
+before/after the steps; the source fixture lives on tmpfs (path persisted in
+the evidence directory, regenerable by the documented
+`tests/rust_native_first_publication.py` path). This proves presentation of
+the prepared action only: no consent captured, no grant, no executed call,
+no acceptance.
+
+## Recette paea-git-call-agreement-terms-rust (termes d'accord exacts dans l'aperçu)
+
+FR : la recette `recipes/paea-git-call-agreement-terms-rust.json` exécute le
+contrôle permanent de la tranche PA08 des termes exacts : le champ
+`agreement_terms` de l'aperçu protégé expose, pour LES octets canoniques de
+l'action préparée, les termes que la garde d'accord existante reconnaît —
+dérivés moteur par la recette fixe `paea-git-agreement-v1`
+(`paea_git_agreement_terms`, type public `PaeaGitAgreementTerms` exporté par
+swarm-engine), jamais calculés ni choisis par le navigateur. Cinq étapes :
+observation moteur accord+termes (7 tests, dont la boucle termes→approve
+réel→match de la garde) ; absence explicite sans source liée ; aperçu exposant
+les termes exacts (binding `recipe`, ressource projet/dépôt/réf/candidat,
+montant 1, devise OID, bénéficiaire = OLD, révision courante, `action_id`
+vide placeholder) ; parcours complet termes→capture via les producteurs Trust
+réels du root projet→reconnaissance exacte par la garde (mauvais rôle et
+termes dérivés refusés, autre candidat jamais reconnu) ; catalogue i18n. La
+frontière observée est documentée : la route HTTP `/api/v1/trust-actions`
+sert le root SERVICE et refuse un bearer métier
+(`authorization_required`) — le routage du canal d'approbateur authentifié
+est la tranche suivante, non implémentée ici. Fixture native liée au dossier
+de preuve (producteur documenté, régénérable) ; `source_stable` compare les
+empreintes des entrées déclarées avant/après. Ceci prouve l'exposition en
+lecture seule des termes exacts et leur correspondance avec la garde : aucun
+consentement capturé, aucun grant, aucun appel exécuté, aucune identité
+créée, aucune acceptation.
+
+## Recipe paea-git-call-agreement-terms-rust (exact agreement terms in the preview)
+
+EN: `recipes/paea-git-call-agreement-terms-rust.json` runs the permanent
+check of the PA08 exact-terms tranche: the `agreement_terms` field of the
+protected preview exposes, for the canonical bytes of the prepared action,
+the terms the existing agreement guard recognizes — derived engine-side by
+the fixed `paea-git-agreement-v1` recipe (`paea_git_agreement_terms`, public
+type `PaeaGitAgreementTerms` exported by swarm-engine), never computed or
+selected by the browser. Five steps: engine agreement+terms observation (7
+tests, including the terms→real approve→guard-match loop); explicit absence
+without a bound source; preview exposing the exact terms (binding `recipe`,
+project/repository/ref/candidate resource, amount 1, currency OID,
+beneficiary = OLD, current revision, empty placeholder `action_id`); full
+journey terms→capture through the PROJECT root's real Trust producers→exact
+guard recognition (wrong role and drifted terms denied, another candidate
+never matched); i18n catalog. The observed boundary is documented: the
+`/api/v1/trust-actions` HTTP route serves the SERVICE root and refuses a
+business bearer (`authorization_required`) — routing the authenticated
+approver channel is the NEXT tranche, not implemented here. Native fixture
+bound to the evidence directory (documented producer, regenerable);
+`source_stable` compares declared input digests before/after the steps. This
+proves read-only exposure of the exact terms and their agreement with the
+guard: no consent captured, no grant, no executed call, no identity created,
+no acceptance.
+
+## Recette paea-git-call-approval-rust (canal d'approbation protégé)
+
+FR : la recette `recipes/paea-git-call-approval-rust.json` exécute le contrôle
+permanent du canal HTTP `POST /api/v1/paea/git-call/approval` sur le test
+`paea_git_call` de swarm-web. Neuf étapes épinglant 15 tests nommés
+(7 moteur + 8 HTTP) : observation moteur des accords (7 tests
+`root_store::paea_git_agreement`) ; parcours positif
+`approval_route_captures_project_agreement_and_refuses_wrong_body_revision`
+(capture d'accord + refus corps/révision modifiés) ;
+`approval_route_wrong_physical_project_root_refuses_without_effects` — une
+préparation d'approbation valide de la même famille (mêmes octets approve
+figés, même fixture d'enrôlement) est présentée contre une racine projet B
+physiquement distincte, jamais une copie de A : le bind refuse AVANT toute
+publication de session, refus typé `trust-enrollment-root` — la vérification
+du témoin physique du moteur compare la racine réellement ouverte au binding
+retenu et ferme l'autorité et le témoin fournis sur le chemin du refus —,
+aucun accord capturé nulle part, états Trust de A, serviceA, la VRAIE racine
+B et serviceB octet pour octet identiques, listing des refs gérées de A
+inchangé avec la ref cible de promotion explicitement absente avant ET après
+(Git réel), journaux d'effets durables des deux racines service inchangés
+(lus via des connexions lecture seule indépendantes) — le bind ne prépare
+qu'un témoin, il n'écrit jamais l'état Trust ;
+`approval_route_wrong_role_denies_without_approval_or_service_effects` —
+acteur réellement enrôlé mais sans le rôle Trust `approver` : la permission
+signée injectée est VOLONTAIREMENT valide, le refus est la garde RÔLE du
+projet (refus métier HTTP 200 `denied`, enregistré au journal Trust projet,
+action intacte `pending_approval`, aucun accord, refs/journaux/Trust service
+octet pour octet inchangés, rejeu stable) PUIS reprise légitime réelle par
+les seuls producteurs publics (`config-apply` accordant `approver` à la
+MÊME identité enrôlée → révision+1, anciens mandat/grant invalidés, NOUVEAU
+mandat+requête, préparation transfert+approbation fraîches, NOUVEAU grant
+enrôlement signé à la révision courante, re-bind, POST HTTP réel →
+`approved`/`trust-status-ack-v1`, garde projet reconnaît les MÊMES octets
+canoniques comme NOUVEL accord à la révision courante, rejeu sans second
+entrant de journal, action refusée jamais rétro-approuvée) ; consommation
+avec accord capturé ; annulation d'accord après changement de révision ;
+présentation de l'action liée exacte
+(`preview_route_presents_exact_bound_action_with_current_state` : l'aperçu
+présente l'action préparée exacte détenue à un lecteur Bearer autorisé —
+proposal/context déclarés verbatim, identité canonique recalculée, état
+témoin courant, révision Trust courante ; politique+attribution produites
+par les producteurs soutenus avant lecture (BLP-RET-05) ; une session seule
+n'obtient aucun marqueur classifié, sans consentement/grant/consommation) ;
+statut des siblings sans digest classifié (fn Rust
+`status_siblings_serve_no_classified_digest_to_bare_session`, étape de
+recette `web-status-siblings-serve-no-classified-digest`) ;
+non-discrimination de deux intentions préparées (fn Rust
+`status_does_not_discriminate_two_prepared_intentions`, étape
+`web-status-does-not-discriminate-two-prepared-intentions`, cas
+`--ignored`). Fixture native via `SWARM_PAEA_SOURCE_FIXTURE`
+(producteur documenté `tests/rust_native_first_publication.py`, fixture
+`.swarm-fixtures/source-fixture-approval-fresh-regen-20261031`, distincte de
+celle de la recette formulaire) ; les étapes web épinglent des cas nommés
+`--exact` — étapes de parcours en `--ignored` sans `--nocapture`, les deux
+étapes statut ajoutent `--nocapture`, seule la dernière est `--ignored`.
+Réception Codex 4 novembre 2026 : run0/verify0, `source_stable` vrai, le
+test mauvais racine physique passe en étape 3 (preuve brute
+`step-0003.stdout` sous
+`../../docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-project-root-recipe-20261104T044456Z/supervisor-http-recipe/recipe/`).
+TMPDIR : quand les ancêtres du checkout sont inscriptibles au groupe, le
+lanceur bascule seul vers `~/.local/state/swarm-fixtures/runner-tmp`
+(méthode existante de `tools/verification/recipe.py`, sans chmod partagé,
+jamais `/tmp`). Ceci prouve le canal d'approbation protégé et sa reprise par
+rôle sur fixture isolée : aucun commit/push Git, aucun règlement, aucun
+enrôlement humain, aucune acceptation ; l'image de test est le binaire de
+profil test, distincte de la production 331 ; les étapes non couvertes par
+cette recette (autres tests du binaire, profils livrés) restent non rejugées
+ici.
+
+## Recipe paea-git-call-approval-rust (protected approval channel)
+
+EN: `recipes/paea-git-call-approval-rust.json` runs the permanent check of
+the `POST /api/v1/paea/git-call/approval` channel on the swarm-web
+`paea_git_call` test binary. Nine steps pinning 15 named tests
+(7 engine + 8 HTTP): engine agreement observation
+(7 `root_store::paea_git_agreement` tests); the positive journey
+`approval_route_captures_project_agreement_and_refuses_wrong_body_revision`
+(agreement capture + modified body/revision refusals);
+`approval_route_wrong_physical_project_root_refuses_without_effects` — a
+valid same-family approval preparation (same frozen approve bytes, same
+enrollment fixture) is presented against a physically distinct project root
+B, never a copy of A: bind refuses BEFORE any session publication with typed
+`trust-enrollment-root` — the engine's physical-witness check compares the
+actually opened project root against the retained binding and closes the
+supplied authority and witness on the refusal path —, no agreement captured
+anywhere, Trust states of A, serviceA, the REAL root B and serviceB
+byte-identical, A's managed refs unchanged with the promotion target ref
+explicitly absent before AND after (real Git), both service roots' durable
+effect journals unchanged (read via independent read-only connections) —
+bind prepares a witness only, it never writes Trust state;
+`approval_route_wrong_role_denies_without_approval_or_service_effects` — an
+actually enrolled actor WITHOUT the Trust `approver` role: the injected
+signed permission is deliberately VALID, the refusal under test is the
+project's ROLE guard (HTTP 200 business `denied`, recorded in the project
+Trust journal, action intact `pending_approval`, no agreement, refs/
+journals/service Trust byte-identical, stable replay) THEN a real
+legitimate recovery through supported public producers only (`config-apply`
+granting `approver` to the SAME enrolled identity → revision+1, old
+mandate/grant invalidated, NEW mandate+request, fresh transfer+approval
+preparations, NEW enrollment grant signed at the current revision, re-bind,
+real HTTP POST → `approved`/`trust-status-ack-v1`, project guard recognizes
+the SAME canonical bytes as a NEW agreement at the current revision, replay
+without a second journal entry, denied action never retro-approved);
+consumption with a captured agreement; agreement void after a revision
+change; presentation of the exact bound action
+(`preview_route_presents_exact_bound_action_with_current_state`: the preview
+presents the exact held action to an authorized Bearer reader — declared
+proposal/context verbatim, recomputed canonical identity, current witness
+state, current Trust revision; policy+attribution produced through the
+supported producers before read (BLP-RET-05); a bare session gets no
+classified marker, with no consent/grant/consumption); sibling status serves
+no classified digest (Rust fn
+`status_siblings_serve_no_classified_digest_to_bare_session`, recipe step
+`web-status-siblings-serve-no-classified-digest`); non-discrimination of
+two prepared intentions (Rust fn
+`status_does_not_discriminate_two_prepared_intentions`, step
+`web-status-does-not-discriminate-two-prepared-intentions`, `--ignored`
+case). Native fixture via `SWARM_PAEA_SOURCE_FIXTURE` (documented producer
+`tests/rust_native_first_publication.py`, fixture
+`.swarm-fixtures/source-fixture-approval-fresh-regen-20261031`, distinct
+from the form recipe's); web steps pin named `--exact` cases — journey
+steps run `--ignored` without `--nocapture`, both status steps add
+`--nocapture`, only the last is `--ignored`. Codex reception 4 November
+2026: run0/verify0, `source_stable` true, the wrong-physical-root test
+passes as step 3 (raw evidence `step-0003.stdout` under
+`../../docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-project-root-recipe-20261104T044456Z/supervisor-http-recipe/recipe/`).
+TMPDIR: when checkout ancestors are group-writable, the runner falls back on
+its own to `~/.local/state/swarm-fixtures/runner-tmp` (existing method of
+`tools/verification/recipe.py`, no shared chmod, never `/tmp`). This
+proves the protected approval channel and its role recovery on an isolated
+fixture: no Git commit/push, no settlement, no human enrollment, no
+acceptance; the test image is the test-profile binary, distinct from
+production 331; steps not covered by this recipe (the binary's other tests,
+delivered profiles) remain un-replayed here.
+
+## Recette paea-consent-ui-rust (surface navigateur du consentement approbateur)
+
+FR : la recette `recipes/paea-consent-ui-rust.json` qualifie la surface
+navigateur `/paea-consent.html` du consentement approbateur. Dix étapes :
+aperçu explicite d'indisponibilité sans source liée (test nommé
+`approval_presentation_reports_explicit_absence_without_source`) ; actifs
+embarqués (`paea_consent_page`, contrat corps vide détenu par le service :
+aucune entrée fichier, POST unique, refus sans session 403, catalogue EN) ;
+catalogue i18n (`scripts/i18n/build.cjs --check`) ; contre-exemple entretenu
+de la projection périmée (`tests/paea-consent-projection-erasure.cjs`,
+points d'extrémité prérequis explicitement synthétiques contre le vrai
+frontend dans Chrome réel — CSRF de session native servi comme le produit ;
+aucune identité, aucun enrôlement réel, aucune approbation produit) ;
+contre-exemples méthode/base/faille du contrat d'échec et de flush du driver
+(`tests/paea_consent_driver_control.py`, doublones étiquetés remplaçant
+subprocess/threading dans le module importé — sans build Rust réel, sans
+timeout, sans processus étranger) ; construction du binaire de test
+navigateur (touch du fichier embarquant, puis `cargo test --no-run
+--message-format=json`) ; liaison du binaire comme sortie liée
+(`bind_cargo_test_binary.py` : résolution par le flux `compiler-artifact` de
+cargo — jamais un mtime ou un glob —, publication atomique du record ; la
+sortie liée est distincte d'une entrée déclarée immuable, cf. incident
+run4 `paea-approval-form-rust` du 2026-10-31) ; qualification navigateur
+réelle (`paea_consent_browser` + `tests/paea_consent_ui.cjs` via le driver
+`tests/paea_consent_ui_recipe.py`, résolution binaire par artefacts cargo) :
+serveur réellement lié par `NativeHttpServer::bind_git_call_with_approval`,
+page servie aux octets embarqués, formulaire FR/EN deux thèmes sans
+débordement, corps non vide (octets dérivés, bon mot de passe) → refus typé
+visible `paea-git-call-approval-request` via fetch d'origine page, corps
+vide + mot de passe erroné → `authorization_required` FR/EN, journal Trust
+projet octet-identique après chaque refus, échos console Chrome des refus
+attendus comptés un pour un, approbation jamais consommée ; garde de
+stabilité de la liaison (`--verify-stable` : un chemin ou un digest modifié
+refuse sans réécrire le record — une vraie recompilation concurrente d'une
+entrée compilée ne peut pas être masquée) ; contre-preuves typées du contrat
+de sortie liée (`test_bind_cargo_test_binary.py`, les deux directions :
+l'artefact produit par le pas passe, un fichier créé sous un motif d'entrée
+déclarée échoue toujours `recipe-declared-inputs-changed`). Fixture native
+tmpfs via `SWARM_PAEA_SOURCE_FIXTURE` (producteur
+`tests/rust_native_first_publication.py`). Ceci prouve la surface navigateur
+sur les deux refus typés : aucune consommation d'approbation, aucun
+enrôlement humain, aucun appel Git, aucune acceptation ; le parcours
+d'approbation effectif (mot de passe correct → consommation) reste prouvé
+par `paea-git-call-approval-rust.json` et le test route, pas par un
+navigateur.
+
+## Recipe paea-consent-ui-rust (approver-consent browser surface)
+
+EN: `recipes/paea-consent-ui-rust.json` qualifies the approver-consent
+browser surface `/paea-consent.html`. Ten steps: explicit unavailability
+presentation without a bound source (named test
+`approval_presentation_reports_explicit_absence_without_source`); embedded
+assets (`paea_consent_page`, held-by-service empty-body contract: no file
+input, single POST, no-session refusal 403, EN catalog); i18n catalog
+(`scripts/i18n/build.cjs --check`); maintained stale-projection counterexample
+(`tests/paea-consent-projection-erasure.cjs`, prerequisite endpoints being
+EXPLICIT synthetic fixtures against the real frontend in real Chrome —
+native-session CSRF served as the product ships it; no identity, no real
+enrollment, no product approval); method/baseline/fault counterexamples for
+the driver's failure-and-flush contract (`tests/paea_consent_driver_control.py`,
+labelled doubles replacing subprocess/threading inside the imported module —
+no real Rust build, no timeout, no foreign process); browser test-binary
+build (touching the embedding file, then `cargo test --no-run
+--message-format=json`); binary binding as a linked output
+(`bind_cargo_test_binary.py`: resolution through cargo's `compiler-artifact`
+stream — never an mtime or a glob —, atomic record publication; the linked
+output is distinct from a declared immutable input, cf. the 2026-10-31 run4
+`paea-approval-form-rust` incident); real-browser qualification
+(`paea_consent_browser` + `tests/paea_consent_ui.cjs` via driver
+`tests/paea_consent_ui_recipe.py`, binary resolved from cargo artifacts):
+server really bound by `NativeHttpServer::bind_git_call_with_approval`,
+page served from the embedded bytes, FR/EN both-themes form without
+overflow, non-empty body (drifted bytes, good password) → visible typed
+refusal `paea-git-call-approval-request` via page-origin fetch, empty body +
+wrong password → `authorization_required` FR/EN, project Trust journal
+byte-identical after each refusal, Chrome console echoes of expected refusals
+counted one for one, approval never consumed; binding stability guard
+(`--verify-stable`: a changed path or digest refuses without rewriting the
+record — a real concurrent rebuild of a compiled input cannot be masked);
+typed counter-proofs of the linked-output contract
+(`test_bind_cargo_test_binary.py`, both directions: a step-produced artifact
+passes, a file created under a declared-input pattern still fails
+`recipe-declared-inputs-changed`). Native tmpfs fixture via
+`SWARM_PAEA_SOURCE_FIXTURE` (producer
+`tests/rust_native_first_publication.py`). This proves the browser surface
+on the two typed refusals: no approval consumption, no human enrollment, no
+Git call, no acceptance; the effective approval journey (correct password →
+consumption) stays proven by `paea-git-call-approval-rust.json` and the
+route test, not by a browser.
+
+Cockpit / identity-Biba compatibility: `recipes/cockpit-biba-identity-compatibility.json` runs the public safe-I0 control, Root-workspace pre-exec refusal and original-inode recovery on `SWARM_COCKPIT_BIBA_BINARY`. It is a scoped compatibility proof, not global Biba or cryptographic identity acceptance; retained native execution outcomes, not CLI exit0 alone, determine the result.
+
+## Recette paea-approval-form-rust (formulaire d'approbation consommé, fraîche puis périmée)
+
+FR : la recette `recipes/paea-approval-form-rust.json` qualifie de bout en
+bout le formulaire d'approbation déjà implémenté
+(`web/paea-approval-form.js`, section « Approbation » de `paea-effects.html`,
+route `POST /api/v1/paea/git-call/approval` à corps vide, commande figée
+détenue côté service) sur le contrat conservé, sans redesign. Douze étapes — les
+deux gardes driver d'abord, avant toute compilation ou navigateur :
+`approval-form-resolution-raw-evidence-guard`
+(`tests/test_approval_resolution_raw_evidence.py`, 6 cas) reproduit les deux
+contre-exemples reçus (exit enfant 42 avec stderr de plus de 2000 octets
+jadis réduit à la queue du message ; enfant non UTF-8/CRLF jadis perdu à
+`UnicodeDecodeError`) et prouve que chaque tentative écrit AVANT tout
+filtrage ou refus, dans un dossier de preuve NEUF dédié de la zone fixtures
+(`tempfile.mkdtemp(prefix="approval-resolution-evidence-", dir=fixture_area())`),
+l'argv réel, l'exit réel et stdout/stderr INTÉGRAUX en OCTETS ORIGINAUX ; le
+décodage humain (`errors="replace"`, queue coupée) ne vaut que pour le
+message de diagnostic ; un skip de la garde est un échec dur. Puis la
+`approval-form-driver-stream-drain-guard`
+(`tests/test_approval_driver_stream_drain.py`, 6 cas) prouve le contrat de
+drain du driver : les QUATRE enregistreurs (les deux canaux des deux
+enfants) sont retenus, joints jusqu'à leur vrai EOF AVANT tout verdict ou
+marqueur de résultat — l'observation causale est l'ordre strict des
+événements (joint du recorder suspendu, puis verdict), détecté par
+suspension d'un enregistreur sur un handshake d'événements, sans timer ni
+sleep ; une erreur d'un worker d'enregistrement (échec d'ouverture/écriture
+du sink — oracle réel `FileExistsError` : l'ouverture exclusive sur un
+chemin préexistant échoue EEXIST avant tout contrôle répertoire ; l'oracle
+initial `IsADirectoryError` du garde, contredit par cette sémantique reçue
+et reproduite 2026-11-04, a été corrigé dans la garde, pas dans le produit)
+est capturée avec son canal puis OBSERVÉE DANS LES BOUCLES D'ATTENTE du
+driver — le run refuse SANS attendre le producteur du canal défaillant,
+susceptible d'être bloqué à jamais à écrire dans le tube dont le seul
+lecteur vient de disparaître ; le containment annule alors uniquement les
+deux enfants OWNED (jamais de PID extérieur), draine les enregistreurs
+restants, record les exits réels observés (exit négatif de signal d'un
+enfant annulé enregistré tel quel, jamais d'exit inventé, jamais de 0/0
+forcé sous annulation) et le refus nomme la cause en marquant le canal
+« INCOMPLETE by capture » — jamais de « all channels drained » prétendu
+pour une capture échouée ; un cas backpressure reproduit le repro reçu
+(`supervisor-stream-backpressure/` : capacité du tube MESURÉE causalement
+sur un tube sonde avant tout enfant — jamais le 8192 supposé à tort,
+conservé comme diagnostic de méthode —, enfant vrai remplissant exactement
+cette capacité puis acquittant sur un tube auxiliaire, enregistreur
+rust.stdout du producteur bloqué lui-même à porte d'acquittement tué par
+un sink répertoire précréé, producteur bloqué à sa deuxième écriture puis
+annulé exit −9 réel, canal INCOMPLETE prouvé sur disque, reprise sur
+dossier de sortie neuf) ; un cas fenêtre tardive reproduit le repro reçu
+(`supervisor-late-wait-probe/` : après sortie du harnais et check one-shot
+sur boîte VIDE, l'enregistreur rust.stdout échoue PENDANT l'attente bloquante
+jadis nue — tube plein non lu, producteur vivant, FileExistsError capturé,
+wait intercepté ; la boucle corrigée observe error_box jusqu'au vrai exit,
+libération causale par seams (wait harnais marque la frontière post-harnais,
+premier poll rust de la boucle tardive libère le worker à porte), refus avec
+nom de canal réel et INCOMPLETE, annulation owned exit −9 réel, témoin sain
+0/0 avec la même suspension, reprise sur dossier neuf) — jamais de faux PASS
+sur exception de thread ;
+exits.json porte l'exit réel de chaque enfant sur tous les chemins (None
+explicite si jamais créé, jamais d'exit inventé) ; les enfants de la garde
+sont deux vrais processus python minuscules (pas de cargo/node/Chrome, pas
+de réseau, pas d'ELF copié).
+Suivent
+`approval-presentation-absence-without-source` (absence explicite sans
+source liée, `--exact --nocapture --test-threads=1`) ;
+`approval-presentation-frozen-command-and-terms` (projection figée
+commandes+termes, `--ignored --exact --nocapture --test-threads=1`) ;
+`approval-page-embedded-assets` (actifs embarqués de la page, 2 tests) ;
+`approval-page-i18n-catalog` (catalogue i18n généré à jour) ;
+`approval-form-reader-credential-erasure` (6 contrôles, zéro diagnostic
+inattendu) ; `approval-form-test-binary-build` (touch du fichier
+embarquant puis `cargo test --no-run --message-format=json`) ;
+`approval-form-test-binary-bind` ; `approval-form-real-browser-qualification` ;
+`approval-form-bound-binary-stable` ;
+`approval-form-linked-output-counterproofs`.
+
+Qualification navigateur (driver `tests/paea_approval_form_ui_recipe.py` +
+harnais `tests/paea-approval-form-ui.cjs`) : binaire résolu par le flux
+`compiler-artifact` — jamais par mtime —, les deux processus enfants sont
+attendus avec leur vrai exit et leurs quatre canaux bruts sont drainés en
+entier (quatre enregistreurs retenus et joints jusqu'à EOF réel) avant tout
+verdict ; un travailleur d'enregistrement en échec est OBSERVÉ DANS LES
+BOUCLES D'ATTENTE du driver — le run refuse SANS attendre le producteur de
+ce canal (susceptible d'être bloqué à jamais à écrire dans le tube dont le
+seul lecteur vient de disparaître, reçu et reproduit 2026-11-04 avec un
+tube mesuré 65536 octets), le containment annule uniquement les deux
+enfants OWNED, record les exits réels observés (jamais inventés) et le
+refus nomme la cause en marquant le canal « INCOMPLETE by capture » —
+contrat réalisé par GLM 4 novembre 2026 dans
+`tests/paea_approval_form_ui_recipe.py` et sa garde ; la garde exécutée
+par Codex le même jour a échoué (exit 1, oracle `IsADirectoryError`
+contredit) puis a été corrigée — oracle réel `FileExistsError`,
+containment et cas backpressure ajoutés ; la fenêtre tardive reçue le
+même jour (`supervisor-late-wait-probe/` : après sortie du harnais,
+recorder_failure() vérifié UNE SEULE FOIS puis `rust.wait()` nu bloqué,
+l'enregistreur échouant PENDANT cette attente était inobservé jusqu'au
+containment) a été comblée le même jour : TOUTE attente bloquante d'un
+enfant possédé observe error_box jusqu'au vrai exit de l'enfant —
+y compris `harness.wait()` après le rejet Rust désormais drainé en boucle
+observée — sans timeout ni plafond nouveau ; exécution UNEXÉCUTÉE par GLM
+(Read/Edit/Write/Grep seuls), exécution réelle de la garde corrigée (6 cas)
+et du parcours browser par Codex en attente —, digest du binaire exécuté
+identique avant/après ;
+serveur natif réellement lié, vrai Chrome, une consommation explicite à
+corps vide via le formulaire avec le mot de passe fixture étiqueté (auth
+simulée), rejeu à révision courante = ack enregistré 200
+`trust-status-ack-v1`, puis `config-apply` Trust réel (révision +1) :
+péremption visible FR/EN sans confirmation ni normalisation, refus
+post-péremption typé 403 par le même canal réel (l'autorité enrôlée détenue
+est liée à la révision consommée — le chemin rejeu est inatteignable après
+la mutation, jamais de re-consommation ni de re-approbation).
+Régression du geste clavier réel (contre-exemple reçu
+`supervisor-stale-confirm-discriminant/`, 2026-11-04 : focus
+`#approval-confirm` + Espace réel rendait `checked=true` ET send utilisable
+sur l'état périmé, la case restant active) : le formulaire porte désormais
+un état commun d'admissibilité (`confirmable` dans `web/paea-approval-form.js`,
+écrit par les transitions d'état — début de chargement, indisponible,
+périmé, racines, succès admissible —, lu par `sync()`, par l'état disabled
+de la case et par la sortie `finally` de `guarded`, qui ne réactive plus la
+case à l'aveugle) ; sur tout état non admissible la case elle-même est
+désactivée, donc aucun geste clavier ne peut la cocher ni réactiver
+l'envoi, l'état reste error avec la projection de refus maintenue, et la
+reprise passe par la relecture existante (contrôlée en phase 1 : case de
+nouveau utilisable après la relecture admissible). Prérequis de focus de
+l'oracle corrigé (discriminant `supervisor-disabled-focus-discriminant/`,
+2026-11-04, reçu après l'échec d'étape 10 « 'loading' !== 'error' » : un
+contrôle désactivé ne prend pas le focus — le `page.focus` de la case
+désactivée était sans effet, `activeElement` restait sur le bouton de
+relecture laissé par son propre clic, et l'Espace réel AGISSAIT SUR CE
+BOUTON, lançant la boucle de relecture ; défaut d'ORACLE, jamais du
+produit — la case est restée non cochée, aucun POST) : le harnais pose
+explicitement un focus neutre (flou de l'élément actif, `activeElement`
+observé égal à body), tente le focus de la case désactivée et OBSERVE que
+le focus ne peut pas s'y déplacer (toujours body), puis presse l'Espace
+réel — il n'atteint ni la case ni aucun autre contrôle — et les
+post-conditions restent exigées : case non cochée et désactivée, send
+désactivé, refus error, projection visible. L'absence de POST
+supplémentaire est observée par un compteur du canal de réponses (2 POST
+d'approbation réglés comme exacts après la navigation EN : consommation
+explicite + rejeu à révision courante, aucun de plus dans la fenêtre du
+geste). Précondition de vérification, jamais un patch produit : ni sleep,
+ni ignore du loading, ni fabrication de changement DOM. Oracle lecteur
+exact : à chaque chargement de page, un GET
+`/api/v1/paea/reconcile-effects` en session nue doit être refusé 403 avec le
+code `paea-reader-authentication-required` observé dans le corps, confirmé
+sur `error` ET `failure.code` ; l'ancienne attente d'un 500 a été retirée
+comme inatteignable derrière la porte lecteur — ce n'est pas un
+relâchement, tout 500 ou autre statut reste inattendu ; les messages console
+d'échec de fetch de Chrome, sans URL, sont différés verbatim puis rattachés
+à exactement un refus confirmé, tout reste devient un échec ; 4 chargements
+→ 4 refus GET 403 codés conservés verbatim dans la preuve
+`expected_refusals` ; le POST périmé armé (403 classifié attendu) est le 5e
+refus attendu sur 5 ; le verdict exige l'observation réelle complétée
+(settle → `page.close()` → drain console → vérifications par refus). 4
+contrôles harnais exigés par le driver ; arrêt owned (`phase2.done` →
+marqueur stop → `serve_until` fermé vérifié). Marqueurs publiés
+atomiquement (tmp+rename) : le sondage Rust à 100 ms ne voit jamais un
+fichier tronqué. Sortie stable : la sortie orpheline d'une tentative
+remplacée est archivée `<name>-superseded-<UTC>`. Écriture de preuve NEUVE
+exigée (`recipe-output-must-be-new-outside-live-state`) ; les tentatives en
+échec restent conservées intactes. Réception Codex 4 novembre 2026 :
+run0/verify0, 11 étapes stables, 4 parcours FR/EN avec zéro diagnostic
+inattendu, 6 gardes + 7 contre-cas binder PASS (réception
+`../../docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-observation-completion-20261104T042459Z/supervisor-reception.json`)
+; image de test
+`bf775a5b80075361fe1379c62ec0b498ca7e06794f82300d9a93bb320c6f2625` (profil
+test, `features[]`, distincte de la production 331) ; fixture
+`.swarm-fixtures/source-fixture-fresh-regen-20261031`, distincte de celle de
+la recette HTTP approbation. Limites : auth simulée étiquetée, aucune
+présence humaine, aucun enrôlement réel, aucun appel Git, aucune
+acceptation ; la consommation correcte n'est prouvée que sur cette fixture
+owned, jamais sur la base live.
+
+FR (contrat du binaire lié, 2026-10-31) : parmi les étapes, l'identité
+du binaire de test est une SORTIE LIÉE, jamais une entrée
+déclarée — la recette ne doit déclarer aucun chemin que ses propres étapes
+créent (le run4 du 2026-10-31 échouait `recipe-declared-inputs-changed` sur
+les métadonnées `.fingerprint/swarm-web-*/test-integration-test-paea_git_call`
+créées par cargo lui-même, sans un octet de source modifié). Deux étapes
+ajoutées : `approval-form-test-binary-bind` résout le binaire exact par le
+flux `compiler-artifact` de cargo (`tools/verification/bind_cargo_test_binary.py`,
+jamais mtime ni glob) et publie atomiquement son identité (chemin émis,
+sha256, taille) dans le cache retenu
+`.cache/paea-approval-form-bound-binary-20261031.json` ; publication =
+tmp+fsync+`os.replace` (le cache est re-publié à chaque run, l'historique
+par run vit dans les dossiers de preuve — un lien exclusif provoquait
+`FileExistsError` au run2) ; toute résolution cargo échouée ou ambiguë refuse
+typé (exit 2, cause `cargo-artifact-resolution-failed`/`-ambiguous`) sans
+toucher au record. `approval-form-bound-binary-stable` relit `--verify-stable`
+après le parcours navigateur : même chemin+digest exigés, sinon refus typé
+exit 1 `bound-binary-unstable` sans réécriture du record. Contre-preuve
+typée : `tools/verification/test_bind_cargo_test_binary.py` (7 tests) +
+`test_recipe.py` (8 tests) : production d'un artefact hors entrées déclarées
+passe, création sous un pattern déclaré refuse toujours, toute édition réelle
+d'une source compilée refuse toujours. TMPDIR épinglé : Chrome lie son socket
+ProcessSingleton sous `$TMPDIR/.com.google.Chrome.XXXXXX/SingletonSocket`
+(+49 octets) et meurt en SIGTRAP silencieux (« Failed to launch the browser
+process! Code: null », stderr vide) quand le chemin dépasse la borne
+sockaddr_un (mesuré 2026-10-31 : 107 octets passe, 108 piège) ; le repli
+`~/.local/state/swarm-fixtures` (93 octets) garde la marge. Preuve fraîche :
+`evidence/20261028-acquisition81-mvfdts57/glm-form-qualify-execute-20261031T200316Z/qualification-fresh-20261031T200327Z/`
+(8/8 PASS, `source_stable true`, marqueur `PAEA_APPROVAL_FORM_BROWSER_VERIFIED 4`,
+`recipe.py verify` VERIFIED).
+
+## Recipe paea-approval-form-rust (consumed approval form, fresh then stale)
+
+EN: `recipes/paea-approval-form-rust.json` qualifies end to end the
+already-implemented approval form (`web/paea-approval-form.js`, the
+"Approbation" section of `paea-effects.html`, route
+`POST /api/v1/paea/git-call/approval` with an empty body, frozen command
+held server-side) on the conserved contract, no redesign. Twelve steps —
+the two driver guards first, before any compile or browser:
+`approval-form-resolution-raw-evidence-guard`
+(`tests/test_approval_resolution_raw_evidence.py`, 6 cases) reproduces the
+two received counterexamples (child exit 42 with a >2000-byte stderr once
+reduced to the message tail; non-UTF-8/CRLF child once lost to
+`UnicodeDecodeError`) and proves that each attempt writes, BEFORE any
+filtering or refusal, into a fresh dedicated evidence directory of the
+fixtures area
+(`tempfile.mkdtemp(prefix="approval-resolution-evidence-", dir=fixture_area())`),
+the real argv, the real exit and stdout/stderr INTACT as ORIGINAL BYTES;
+human decoding (`errors="replace"`, tail cut) applies only to the diagnosis
+message; a skipped guard is a hard failure. Then the
+`approval-form-driver-stream-drain-guard`
+(`tests/test_approval_driver_stream_drain.py`, 6 cases) proves the driver's
+drain contract: ALL FOUR recorders (both channels of both children) are
+retained, joined to their real EOF BEFORE any verdict or result marker —
+the causal observation is the strict event ordering (suspended recorder
+joined, then verdict), detected by suspending one recorder on an
+event-handshake, with no timer and no sleep; a recorder worker error
+(sink open/write failure — real oracle `FileExistsError`: an exclusive
+open on a pre-existing path fails EEXIST before any directory check; the
+guard's original `IsADirectoryError` oracle, contradicted by that
+received-and-reproduced 2026-11-04 semantics, was corrected in the guard,
+not in the product) is captured with its channel then OBSERVED INSIDE THE
+DRIVER'S WAIT LOOPS — the run refuses WITHOUT waiting for the failing
+channel's producer, which may be blocked forever writing into the pipe
+whose only reader just disappeared; the containment then cancels only the
+two OWNED children (never an external PID), drains the remaining
+recorders, records the real observed exits (a cancelled child's negative
+signal exit recorded as-is, never an invented exit, never a forced 0/0
+under cancellation) and the refusal names the cause marking the channel
+"INCOMPLETE by capture" — "all channels drained" is never claimed for a
+failed capture; a backpressure case reproduces the received repro
+(`supervisor-stream-backpressure/`: pipe capacity MEASURED causally on a
+probe pipe before any child — never the wrongly assumed 8192, conserved
+as a method diagnostic —, a real child filling exactly that capacity then
+acknowledging over an aux pipe, the blocked producer's OWN rust.stdout
+recorder ack-gated and killed by a pre-created directory sink, the
+producer blocked on its second write then cancelled with its real −9
+exit, the channel INCOMPLETE proven on disk, recovery on a fresh output
+directory); a late-window case reproduces the received repro
+(`supervisor-late-wait-probe/`: after harness exit and a one-shot check
+reading an EMPTY box, the rust.stdout recorder fails DURING the formerly
+bare blocking wait — full unread pipe, producer alive, FileExistsError
+captured, the wait intercepted; the corrected loop observes error_box
+until the real exit, causal release through the seams (harness wait marks
+the post-harness boundary, the late loop's first rust poll releases the
+gated worker), refusal with the real channel name and INCOMPLETE, owned
+cancellation with the real −9 exit, healthy 0/0 witness with the same
+suspension, recovery on a fresh directory) — never a false PASS on a
+thread exception; exits.json carries
+the real exit of each child on every path (explicit None if never
+spawned, never an invented exit); the guard's children are two tiny real
+python processes (no cargo/node/Chrome, no network, no copied ELF). Then
+`approval-presentation-absence-without-source` (explicit absence without a
+bound source, `--exact --nocapture --test-threads=1`);
+`approval-presentation-frozen-command-and-terms` (frozen commands+terms
+projection, `--ignored --exact --nocapture --test-threads=1`);
+`approval-page-embedded-assets` (embedded page assets, 2 tests);
+`approval-page-i18n-catalog` (up-to-date generated i18n catalog);
+`approval-form-reader-credential-erasure` (6 checks, zero unexpected
+diagnostics); `approval-form-test-binary-build` (embedding file touched
+then `cargo test --no-run --message-format=json`);
+`approval-form-test-binary-bind`; `approval-form-real-browser-qualification`;
+`approval-form-bound-binary-stable`; `approval-form-linked-output-counterproofs`.
+
+Browser qualification (driver `tests/paea_approval_form_ui_recipe.py` +
+harness `tests/paea-approval-form-ui.cjs`): binary resolved from the
+`compiler-artifact` stream — never mtimes —, both child processes are
+expected with their real exit and their four raw channels are fully
+drained (four retained recorders joined to real EOF) before any verdict;
+a failing recorder worker is OBSERVED INSIDE the driver's wait loops — the
+run refuses WITHOUT waiting for that channel's producer (which may be
+blocked forever writing into the pipe whose only reader just died,
+received and reproduced 2026-11-04 with a measured 65536-byte pipe), the
+containment cancels only the two OWNED children, records the real
+observed exits (never invented) and the refusal names the cause marking
+the channel INCOMPLETE by capture — contract realized by GLM on
+4 November 2026 in `tests/paea_approval_form_ui_recipe.py` and its guard;
+the guard executed by Codex the same day failed (exit 1, contradicted
+`IsADirectoryError` oracle) and was then corrected — real
+`FileExistsError` oracle, containment and backpressure case added;
+the late window received the same day (`supervisor-late-wait-probe/`:
+after harness exit, recorder_failure() checked ONCE then the bare
+`rust.wait()` blocked — a recorder failing DURING that wait went
+unobserved until containment) was closed the same day: EVERY blocking
+wait of an owned child observes error_box until the child's real exit —
+including `harness.wait()` after a Rust refusal, now drained by an
+observed loop — with no new timeout or ceiling; execution NOT RUN by GLM
+(Read/Edit/Write/Grep only), real execution of
+the corrected guard (6 cases) and of the browser flow by Codex pending —, executed-binary digest
+identical before/after; really bound native server, real Chrome, one explicit
+empty-body consumption through the form with the labeled fixture password
+(simulated auth), replay at current revision = recorded 200
+`trust-status-ack-v1` ack, then a real Trust `config-apply` (revision +1):
+visible FR/EN staleness with no confirmation and no normalization,
+post-stale typed 403 refusal over the same real channel (the held enrolled
+authority is bound to the consumed revision — the replay path is
+unreachable after the mutation, never a re-consumption or re-approval).
+Real-keyboard-gesture regression (received counterexample
+`supervisor-stale-confirm-discriminant/`, 2026-11-04: focus on
+`#approval-confirm` + a real Space press set `checked=true` AND enabled
+send on the stale state, the checkbox staying enabled): the form now
+carries a common admissibility state (`confirmable` in
+`web/paea-approval-form.js`, written by the state transitions — load
+start, unavailable, stale, wrong-roots, admissible success — and read by
+`sync()`, the checkbox's disabled state and the guarded `finally` exit,
+which no longer re-enables the checkbox blindly); on any non-admissible
+state the checkbox itself is disabled, so no keyboard gesture can check
+it or re-enable send, the state stays error with the refusal projection
+maintained, and recovery runs through the existing re-read control
+(checked in phase 1: the checkbox is usable again after the admissible
+re-read). Corrected oracle focus precondition (received
+`supervisor-disabled-focus-discriminant/`, 2026-11-04, after the step-10
+failure "'loading' !== 'error'": a disabled control cannot take focus —
+the blind `page.focus` on the disabled checkbox was a no-op,
+`activeElement` stayed on the reload button left there by its own click,
+and the real Space ACTED ON THAT BUTTON, starting the re-read loop; an
+ORACLE defect, never a product defect — the checkbox stayed unchecked,
+no POST): the harness explicitly sets a neutral focus (blur of the
+active element, observed `activeElement` equal to body), attempts to
+focus the disabled confirmation and OBSERVES that focus cannot move onto
+it (still body), then presses the real Space — it reaches neither the
+checkbox nor any other control — and the post-conditions stay required:
+checkbox unchecked and disabled, send disabled, error refusal, visible
+projection. The no-additional-POST observation is a response-channel
+counter (2 approval POSTs settled as exact after the EN navigation: the
+explicit consumption + the replay while current, none more within the
+gesture window). A verification precondition, never a product patch: no
+sleep, no loading ignore, no fabricated DOM change. Exact reader
+oracle: on every page load, a bare-session GET
+`/api/v1/paea/reconcile-effects` must be refused 403 with code
+`paea-reader-authentication-required` observed in the body, confirmed on
+BOTH `error` and `failure.code`; the former 500 expectation was removed as
+unreachable behind the reader gate — this is not a relaxation, any 500 or
+other status stays unexpected; Chrome's URL-less console fetch-failure
+messages are deferred verbatim then attached to exactly one confirmed
+refusal, leftovers become failures; 4 page loads → 4 coded GET-403 refusals
+kept verbatim in the proof's `expected_refusals`; the armed stale POST
+(expected classified 403) is the 5th of 5 expected denials; the verdict
+requires real observation completion (settle → `page.close()` → console
+drain → per-refusal checks). 4 harness checks enforced by the driver;
+owned shutdown (`phase2.done` → stop marker → verified-closed
+`serve_until`). Markers published atomically (tmp+rename): the Rust 100ms
+poll never observes a truncated file. Stable output: orphan output of a
+superseded attempt is archived `<name>-superseded-<UTC>`. Fresh proof
+writing enforced (`recipe-output-must-be-new-outside-live-state`); failed
+attempts stay retained intact. Codex reception 4 November 2026:
+run0/verify0, 11 stable steps, 4 FR/EN flows with zero unexpected
+diagnostics, 6 guards + 7 binder counter-cases PASS (reception
+`../../docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-approval-observation-completion-20261104T042459Z/supervisor-reception.json`);
+test image
+`bf775a5b80075361fe1379c62ec0b498ca7e06794f82300d9a93bb320c6f2625`
+(test profile, `features[]`, distinct from production 331); fixture
+`.swarm-fixtures/source-fixture-fresh-regen-20261031`, distinct from the
+HTTP approval recipe's. Limits: labeled simulated auth, no human presence,
+no real enrollment, no Git call, no acceptance; the correct consumption is
+proven only on this owned fixture, never on the live base.
+
+EN (linked-binary contract, 2026-10-31): among the steps, the
+test-binary identity is a LINKED OUTPUT, never a declared input — the
+manifest must not declare any path its own steps create (run4 on 2026-10-31
+failed `recipe-declared-inputs-changed` on the
+`.fingerprint/swarm-web-*/test-integration-test-paea_git_call` metadata
+written by cargo itself, with no source byte changed). Two added steps:
+`approval-form-test-binary-bind` resolves the exact binary from cargo's
+`compiler-artifact` stream (`tools/verification/bind_cargo_test_binary.py`,
+never mtimes or globs) and atomically publishes its identity (emitted path,
+sha256, size) into the retained cache
+`.cache/paea-approval-form-bound-binary-20261031.json`; publication is
+tmp+fsync+`os.replace` (the cache is re-published by every run, per-run
+history lives in the evidence directories — an exclusive link caused
+`FileExistsError` on run2); a failed or ambiguous cargo resolution refuses
+typed (exit 2, cause `cargo-artifact-resolution-failed`/`-ambiguous`)
+without touching the record. `approval-form-bound-binary-stable` re-runs
+`--verify-stable` after the browser journey: same path+digest required,
+otherwise typed exit-1 refusal `bound-binary-unstable` without rewriting the
+record. Typed counter-proof: `tools/verification/test_bind_cargo_test_binary.py`
+(7 tests) + `test_recipe.py` (8 tests): producing an artifact outside
+declared inputs passes, creating under a declared pattern always refuses,
+any real edit of a compiled source always refuses. Pinned TMPDIR: Chrome
+binds its ProcessSingleton socket under
+`$TMPDIR/.com.google.Chrome.XXXXXX/SingletonSocket` (+49 bytes) and dies
+with a silent SIGTRAP ("Failed to launch the browser process! Code: null",
+empty stderr) when the path exceeds the sockaddr_un bound (measured
+2026-10-31: 107-byte path launches, 108 traps); the
+`~/.local/state/swarm-fixtures` fallback (93 bytes) keeps the margin. Fresh
+proof: `evidence/20261028-acquisition81-mvfdts57/glm-form-qualify-execute-20261031T200316Z/qualification-fresh-20261031T200327Z/`
+(8/8 PASS, `source_stable true`, marker `PAEA_APPROVAL_FORM_BROWSER_VERIFIED 4`,
+`recipe.py verify` VERIFIED).
+
+### I15 mutation forces re-admission / La mutation force la réadmission
+
+FR : `recipes/paea-i15-tool-substitution-rust.json` qualifie la barrière
+I15 sur la barrière produit réelle, en deux tests nommés `--exact` du module
+`agent_execution_preflight::tests` (swarm-engine) : (1)
+`preflight_admitted_provider_artifact_mutation_refuses_before_consumption_and_recovers`
+— substitution réelle d'un artefact admis : refus typé
+`agent-execution-preflight-changed` avant consommation, aucun effet SQL, la
+restauration des octets exacts revalide la même intention (Incrément101) ;
+(2) `preflight_admitted_artifact_mutation_forces_fresh_admission_binding_mutated_digest`
+— après mutation, l'admission retenue est une fin de voie : le rejeu du même
+event id retourne l'agent en file sans ré-observation, une admission parallèle
+est refusée `agent-launch-workspace-busy`, l'annulation règle l'intention
+(agent `interrupted`, tâche bloquée, révision work +1, réservations libérées),
+la réadmission à nouvel event id lie les octets mutés (nouvelle portée preflight
+différente), la restauration des octets d'origine refuse la consommation du
+nouvel agent et l'agent annulé n'est plus jamais consommable (Incrément112,
+`evidence/claude-i15-readmission-20261031T100227Z/`). Fournisseur = copie
+test-owned sous la racine de fixture, jamais un binaire partagé ; aucune base
+live, aucun processus enfant. Exécution fraîche puis `recipe.py verify` sur le
+dossier de preuve ; entrées déclarées étendues à `agent_store.rs` et
+`root_store.rs`. Portée : fixture same-UID, données fictives ; aucune preuve
+d'enrôlement humain, de séparation UID ou d'acceptation indépendante.
+
+EN: `recipes/paea-i15-tool-substitution-rust.json` qualifies the I15 barrier
+on the real product barrier, through two `--exact` named tests of the
+`agent_execution_preflight::tests` module (swarm-engine): (1)
+`preflight_admitted_provider_artifact_mutation_refuses_before_consumption_and_recovers`
+— real substitution of an admitted artifact: typed refusal
+`agent-execution-preflight-changed` before consumption, no SQL effect,
+restoring the exact bytes revalidates the same intention (Increment101); (2)
+`preflight_admitted_artifact_mutation_forces_fresh_admission_binding_mutated_digest`
+— after mutation, the retained admission is a dead end: replaying the same
+event id returns the queued agent with no re-observation, a parallel admission
+is refused `agent-launch-workspace-busy`, cancellation settles the stale
+intention (agent `interrupted`, task blocked, work revision +1, reservations
+released), the re-admission with a new event id binds the mutated bytes (new
+preflight scope), restoring the original bytes refuses the new agent's
+consumption and the cancelled agent is never consumable again (Increment112,
+`evidence/claude-i15-readmission-20261031T100227Z/`). Provider = test-owned
+copy under the fixture root, never a shared binary; no live database, no child
+process. Fresh run then `recipe.py verify` on the evidence directory; declared
+inputs extended to `agent_store.rs` and `root_store.rs`. Scope: same-UID
+fixture, fictitious data; no human-enrollment, UID-separation or
+independent-acceptance evidence.
+
+### Lien de connexion à usage unique — Single-use sign-in link
+
+`recipes/web-login-ticket-rust.json` vérifie le ticket de `swarm open` : stockage
+moteur (usage unique par suppression, lié à l'adresse, échéance), réglage v50
+`web_login_ticket_seconds` et son catalogue, consommation web (303 + cookie owner,
+rejeu 401, `next` assaini, liaison à la clé), rotation de la clé, déconnexion protégée, principal owner, la suite du
+lanceur puis le parcours navigateur (FR/EN, deux thèmes, mobile, clavier) sur le
+binaire installé `bin/swarm`. Il ne prouve aucune séparation face aux agents
+(même UID, EP-07 ouvert) ni l'adoption du réglage par un Root existant.
+
+`recipes/web-login-ticket-rust.json` checks the `swarm open` ticket: engine
+storage (single use by unlink, address-bound, expiry), the v50
+`web_login_ticket_seconds` setting and catalog, web consumption (303 + owner
+cookie, replay 401, sanitized `next`, key binding), key rotation, protected sign-out, the owner principal,
+the launcher suite, then the browser journey (FR/EN, both themes, mobile,
+keyboard) against the installed `bin/swarm`. It proves no separation from agents
+(same UID, EP-07 open) nor adoption of the setting by an existing Root.
+
+### Native graph and installed identity
+
+`recipes/rust-graph-workbench.json` consumes `SWARM_GRAPH_BINARY` pointing to an
+immutable qualified image (`.cache/rust-migration-binaries/swarm-rust-SHA256`),
+not an ephemeral `bin/swarm.candidate-*` staging path consumed by local delivery.
+It checks navigation without Work mutation separately from explicit task/link
+saves, refusals, persistence and acknowledgement loss; no provider or live Root.
+The harness retains exact source bytes/hashes before/after, argv/exit and streams.
+A deliberate failing before-image is a counterexample, never a PASS recipe.
+
+For runtime checks use the same process/network visibility as the service:
+a sandbox unable to see host `/proc` can report an unobservable server as absent.
+Corroborate supported launcher status with protected HTTP, executable hash and
+Version dialog before diagnosing a stop. Modal `open=false` precedes `close`:
+wait for focus restoration and actual reload completion before the next gesture.
+See [the graph recovery evidence](../../docs/plans/migration-rust/GRAPH-REGRESSION-20261031.md).
+
+### Provenance des prompts BLP / BLP prompt provenance
+
+`recipes/blp-preparation-provenance.json` exerce onze tests ciblés : assembleur
+(4), enveloppes/consommateur natif (5), reprise historique (2). Aucun fournisseur
+n’est invoqué ; le registre ne prouve aucune classification ou habilitation.
+`recipes/blp-preparation-provenance-public.json` exige
+`SWARM_PREPARATION_UI_BINARY` désignant le candidat natif déjà qualifié ; il
+construit séparément le sidecar mémoire de fixture, vérifie sa garde de placement,
+puis exerce CLI et HTTP avec programmes/serveur locaux inertes. Les racines sont
+créées par `fixture_area`, les preuves de parcours conservées sous ces racines
+et leur chemin imprimé dans les sorties du runner. Le sidecar exige le dossier
+configuré explicite, un enfant direct au nom de fixture et son marqueur ; /tmp
+reste interdit. Ce programme de fixture ne fait pas partie du profil livré.
+
+The unit recipe runs eleven named tests (4 assembly, 5 native envelope/consumer,
+2 historical recovery), without providers or confidentiality authorization.
+The public recipe requires `SWARM_PREPARATION_UI_BINARY` pointing to an already
+qualified native candidate. It separately builds the fixture-only memory sidecar,
+tests its placement guard, then exercises CLI/HTTP with inert local providers.
+`fixture_area` allocates retained journey evidence; stdout names its location.
+The sidecar requires an explicit configured area, a direct fixture child and its
+marker; /tmp stays forbidden. This fixture executable is outside the delivered
+profile. Recipe success does not establish BLP labels, sink mediation, independent
+review or paid-provider/account confinement.
+
+### Recette HTTP positive approval-web (fixture qualifiée consommée, image normale épinglée) / Positive approval-web HTTP recipe (consumed qualified fixture, pinned normal image)
+
+FR : `recipes/paea-approval-web-positive.json` est re-pointée le 2026-11-05 vers la
+fixture source nouvellement validée par le producteur NEW normal 332 réellement
+exécuté par Codex (exit 0 ; résultat PASS/`task_accepted=true`/`mission_accepted=false`/`paid_provider=false` ;
+12 entrées de revue, 5 contrôles reviewer et 8 contrôles first-publication réellement
+passés, frames SR1 vérifiés personnellement) : `SWARM_PAEA_SOURCE_FIXTURE` vaut
+désormais
+`{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-reviewer-marker-raw-no-spin-20261105T083858Z/supervisor-source-fixture-20261105T085106Z`
+et ses `result.json`/`inputs.json` sont déclarés en entrées. Le re-pointage se fait
+PAR CONSOMMATION : seules les deux anciennes entrées pointant la fixture 025309
+failed quittent la liste — les preuves elles-mêmes ne sont jamais supprimées ni
+réécrites. Sélection NORMALE explicite, distincte du harnais de test (ce n'est PAS
+le défaut `CARGO_BIN_EXE` test-feature) : `SWARM_PAEA_APPROVAL_WEB_CLI` épingle
+`{root}/.cache/rust-migration-binaries/swarm-rust-00560d87ddc4b1a615981952076c064808445c13010f839e263819f6efe1ccf5`
+et `SWARM_PAEA_APPROVAL_WEB_CLI_SHA256` la même empreinte ; le parent existant
+`approval_web_cli()` lit exactement ces deux variables, chemin+SHA ensemble, sans
+fallback, et le binaire épinglé ainsi que le `result.json` du profil qualifié
+(`.cache/local-delivery/rust-3hwotoxm/build/profile/result.json`) sont des entrées
+déclarées pour un binding réel. Objectif : premier positif direct sur l'image
+NORMALE qualifiée 332 sur une fixture isolée. État et limites : l'HTTP réel reste
+NON EXÉCUTÉ tant que Codex n'a pas rejoué la recette après stabilité ; si l'image
+refuse, le vrai FAIL est conservé avant tout diagnostic, jamais de dégradation du
+profil pour passer ; la commande est inchangée (un seul test ignoré explicite, nom
+PASS et `1 passed; 0 failed; 0 ignored;` attendus), toutes les assertions restent
+en place, aucun watchdog ; aucune livraison sur instance n'est annoncée et aucun
+binaire sans sandbox n'est autorisé.
+
+EN: `recipes/paea-approval-web-positive.json` is re-pointed on 2026-11-05 to the
+source fixture newly validated by the REAL normal-332 NEW producer personally run
+by Codex (exit 0; PASS/`task_accepted=true`/`mission_accepted=false`/`paid_provider=false`
+result; 12 review inputs, 5 reviewer and 8 first-publication checks really passed,
+SR1 frames personally verified): `SWARM_PAEA_SOURCE_FIXTURE` now points to
+`{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-reviewer-marker-raw-no-spin-20261105T083858Z/supervisor-source-fixture-20261105T085106Z`
+and its `result.json`/`inputs.json` are declared inputs. The re-point is BY
+CONSUMPTION: only the two old entries pointing at the failed 025309 fixture leave
+the input list — the evidence themselves are never deleted or rewritten. Explicit
+NORMAL selection, distinct from the test harness (NOT the `CARGO_BIN_EXE`
+test-feature default): `SWARM_PAEA_APPROVAL_WEB_CLI` pins
+`{root}/.cache/rust-migration-binaries/swarm-rust-00560d87ddc4b1a615981952076c064808445c13010f839e263819f6efe1ccf5`
+and `SWARM_PAEA_APPROVAL_WEB_CLI_SHA256` the same digest; the existing parent
+`approval_web_cli()` reads exactly these two variables, path+SHA together, no
+fallback, and the pinned binary plus the qualified profile's `result.json`
+(`.cache/local-delivery/rust-3hwotoxm/build/profile/result.json`) are declared
+inputs for a real binding. Objective: the first direct positive on the NORMAL
+qualified 332 image on an isolated fixture. Status and limits: the real HTTP stays
+NOT EXECUTED until Codex reruns the recipe after stability; if the image refuses,
+the real FAIL is kept before any diagnosis, the profile is never degraded to pass;
+the command is unchanged (one explicit ignored test, PASS name and
+`1 passed; 0 failed; 0 ignored;` expected), every assertion stays in place, no
+watchdog; no delivery on an instance is announced and no sandbox-less binary is
+authorized.
+
+### Renouvellement d’attribution BLP / BLP attribution renewal
+
+`recipes/blp-attribution-renewal.json` exerce les 12 régressions d’historique et
+attribution, dont la conservation du niveau/compartiments entre révisions, le
+rejet sans mutation, le renouvellement égal/plus restrictif et le refus d’un
+historique déjà abaissé aux lecteurs réels. Le contre-exemple original conserve
+une admission confidentiel → public avec lecteur public autorisé. Aucun fournisseur
+ni journal vivant ne sert de fixture.
+
+`recipes/blp-attribution-renewal-web.json` exerce le test HTTP autonome du target
+`confidentiality_http` : politique via HTTP, refus au producteur moteur, renouvellement
+égal, relecture HTTP d’un historique abaissé refusée sans données et reprise exacte.
+Les routes PAEA à appel préparé demandent une fixture native distincte ; elles ne
+sont pas revendiquées comme exécutées par cette recette.
+La compilation de tests et les fixtures d’enrôlement sont distinctes du profil
+livré. La recette ne prouve ni déclassification humaine ni médiation générale.
+
+The engine recipe covers 12 history/attribution regressions, including cross-policy
+level/compartment preservation, refusal without mutation, equal/stricter renewal,
+and rejection of already-lowered history at real readers. Original failing
+counterexample remains retained. The web recipe runs one fresh `confidentiality_http` test: HTTP policy control,
+engine-producer refusal/equal renewal, HTTP lowered-history refusal/redaction and
+exact recovery. Prepared-call PAEA routes require a separate native fixture and
+are not claimed as executed by this recipe. Only isolated fixtures are used;
+test/enrollment fixtures are separate from the delivered profile. No provider,
+live-journal fixture, human declassification or general mediation is claimed.
+
+Ces deux recettes de renouvellement utilisent explicitement `CARGO_PROFILE_DEV_DEBUG=0`,
+`CARGO_PROFILE_TEST_DEBUG=0` (symboles, comme le profil de livraison) et
+`CARGO_BUILD_JOBS=1` : décision technique après observation d’environ 1 Gio de
+swap dans rustc et 25 % de blocage mémoire global le 1er novembre. Aucun test,
+condition métier ou contrôle n’est retiré ; aucun watchdog global n’est ajouté.
+La recette web lie l’image de test exacte résolue par Cargo avant/après les cas.
+
+`recipes/blp-attribution-history-cli.json` exige `SWARM_BLP_BINARY` et
+`SWARM_BLP_PROFILE` (preuve `verify_native_profile.py`) : 15 assertions sur le
+binaire produit, avec historique synthétique injecté dans une racine inerte,
+témoin positif, refus/redaction, journal inchangé et reprise exacte. Cela teste
+le consommateur public, pas le producteur d’attribution ni une migration réelle.
+La CLI n’expose pas encore `blp-object-attribute` ; ne pas ajouter un droit pour
+fabriquer une preuve. L’API moteur et les tests HTTP exercent le producteur.
+
+Renewal recipes explicitly select debug-symbol level 0 (as delivery) and one
+compiler job after measured swapping/memory stalls; functional cases/checks and
+absence of a global watchdog are unchanged. The web recipe binds Cargo's exact
+test image before/after execution. The CLI history recipe requires
+`SWARM_BLP_BINARY` and its `SWARM_BLP_PROFILE` proof, then runs 15 assertions on
+that production image with synthetic history in an inert Root. It verifies the
+public reader/refusal/recovery, not the producer or real migration. Object
+attribution is not currently exposed by the CLI; no new right is introduced to
+manufacture a runtime witness.
+
+BLP public attribution follow-up: `blp-attribution-renewal-web.json` now drives
+object admission through the protected HTTP route, including session-only/weak
+bearer, stale revision, duplicate, downgrade, replay and recovery cases.
+`blp-attribution-history-cli.json` expects 25 assertions: valid attributions now
+come from the public producer, with atomic fixture injection reserved for invalid
+histories. Retained earlier 15-assertion runs keep their narrower original scope.
+Neither recipe proves physical source lineage or complete preparation mediation.
+
+Set `SWARM_BLP_PROOF_OUTPUT` to a fresh journey directory when running the CLI
+recipe to retain raw requests/channels alongside its outer evidence. The script
+hashes those files in `result.json` and prints that result's SHA256 into the
+recipe's retained stdout. `recipe.py verify` verifies the outer receipt; also
+verify the journey manifest/hash before reusing its detailed channels.
+
+### Recette blp-object-attribute-public (formulaire Admin d'attribution) / Admin object-attribution form
+
+`recipes/blp-object-attribute-public.json` exige `SWARM_BLP_BINARY`,
+`SWARM_BLP_PROFILE` (preuve `verify_native_profile.py`) et
+`SWARM_BLP_PROOF_OUTPUT` (répertoire neuf) : le driver Puppeteer
+`tests/blp_object_attribute_public.py` pilote l'Admin réel du binaire qualifié
+— formulaire présent (empreinte, chemin absolu, niveau/compartiments issus de
+la politique relue, motif), prévisualisation puis enregistrement rejouant les
+mêmes octets `blp-object-attribute`, persistance exacte d'une attribution par parcours (huit objets distincts, un par combo — le producteur refuse un doublon d'empreinte/chemin/révision),
+refus typés 403 (session seule, bearer faible) sans mutation, 2 langues × 2
+thèmes × 2 largeurs, empreintes des assets servis = `after.json` du profil.
+Les assets `web/*`/`locales/*` sont des entrées déclarées : toute modification
+de surface invalide la preuve (embed `include_bytes!`). 4 assertions ; la
+recette ne prouve ni la médiation fichiers (BF-13/BF-15), ni BLP-06, ni une
+migration réelle de données.
+
+`recipes/blp-object-attribute-public.json` requires `SWARM_BLP_BINARY`,
+`SWARM_BLP_PROFILE` (a `verify_native_profile.py` proof) and
+`SWARM_BLP_PROOF_OUTPUT` (a fresh directory): the Puppeteer driver
+`tests/blp_object_attribute_public.py` drives the qualified binary's real
+Admin — form present (digest, absolute path, level/compartments from the
+re-read policy, reason), preview then save replaying the same
+`blp-object-attribute` bytes, exact persistence of one attribution per journey (eight distinct objects, one per combo — the producer refuses a digest/path/revision duplicate), typed 403
+refusals (session alone, weak bearer) without mutation, 2 languages × 2 themes
+× 2 widths, served-asset digests = the profile's `after.json`. The
+`web/*`/`locales/*` assets are declared inputs: any surface change invalidates
+the evidence (`include_bytes!` embedding). 4 assertions; the recipe proves
+neither file mediation (BF-13/BF-15), nor BLP-06, nor a real data migration.
+
+
+### Sources de préparation classifiées / Classified preparation sources
+
+`recipes/blp-preparation-check.json` exerce le consommateur natif sous
+authentification Trust : attribution exacte de chaque tranche, combinaison,
+source manquante, compartiment refusé, intention périmée/forgée, parent erroné,
+prompt altéré et reprise, relecture readonly et renouvellement de politique.
+L’insertion du prompt natif est une fixture de consommateur ; elle ne prouve
+ni admission, ni dispatch, ni confinement d’un fournisseur. Aucun fournisseur appelé.
+
+`recipes/blp-preparation-check.json` exercises the native consumer with Trust
+authentication: exact slice attribution/join, missing source, denied compartment,
+stale/forged request, wrong parent, altered prompt/recovery, readonly reopen and
+policy renewal. Native-row insertion is a consumer fixture, not evidence of send
+admission, dispatch or provider confinement. No provider is called.
+
+`recipes/blp-preparation-check-public.json` exige `SWARM_BLP_BINARY` et
+`SWARM_BLP_PROFILE` (profil normal qualifié) ; `SWARM_BLP_PROOF_OUTPUT` peut
+sélectionner un dossier de parcours neuf. Il produit réellement un prompt via
+CLI avec un exécutable local inerte, observe sa provenance en SQL lecture seule
+dans sa propre fixture, attribue toutes les parties par opérations publiques,
+puis compare CLI et HTTP protégé. Les erreurs originales restent conservées.
+Le digest final imprimé lie le manifeste des canaux de parcours ; vérifier ses
+fichiers en plus du reçu externe de `recipe.py verify`.
+
+The public recipe requires `SWARM_BLP_BINARY` and `SWARM_BLP_PROFILE` for a
+qualified normal image; optional `SWARM_BLP_PROOF_OUTPUT` selects fresh journey
+evidence. It produces the real prompt using a local inert executable, observes
+its owned fixture provenance through readonly SQL, attributes all slices using
+public operations, then compares CLI and protected HTTP. Original failures stay
+retained. The printed final digest binds journey artifacts; verify them as well
+as the outer recipe receipt.
+
+`recipes/blp-preparation-quarantine-public.json` additionally requires
+`SWARM_BLP_HELPER`: the path to the compiled
+`swarm-engine` example `preparation_quarantine_fixture` (inert fixture-only
+pending-turn helper, private child exec of the exact qualified binary).
+Compile the example separately, never through a recipe step; the example
+source follows engine call-site changes (BF-16 reader tokens), so a stale
+prebuilt helper refuses. `recipes/blp-preparation-provenance-public.json`
+compiles its own example in-step and therefore cannot run against a frozen
+binary without compiling the current workspace sources.
+
+### Recette agrégée blp-aggregate-public / Aggregated recipe blp-aggregate-public
+
+`recipes/blp-aggregate-public.json` enchaîne six recettes publiques (inventaire,
+check, admission, dialogue-reader, transport, object-attribute UI) en une seule
+commande `recipe.py run` + `verify`. Elle exige `SWARM_BLP_BINARY` et
+`SWARM_BLP_PROFILE` (le candidat qualifié sous test) dans l'environnement de
+lancement ; chaque étape enfant alloue sa sortie fraîche (racine `blp-aggr-NN-*`
+de l'aire de fixtures + parcours `journey/`) et fixe `SWARM_BLP_PROOF_OUTPUT`
+elle-même. Les preuves retenues : le reçu externe (étapes 6/6) et les six
+preuves enfant indépendamment verify-ables. Hors agrégat : recettes cargo-test
+(qualifient les sources courantes, pas un candidat gelé), quarantaine et
+provenance (helper/compilation).
+
+`recipes/blp-aggregate-public.json` chains six public recipes (inventory,
+check, admission, dialogue-reader, transport, object-attribute UI) under a
+single `recipe.py run` + `verify`. It requires `SWARM_BLP_BINARY` and
+`SWARM_BLP_PROFILE` (the qualified candidate under test) in the launching
+environment; each child step allocates its own fresh output (`blp-aggr-NN-*`
+fixture-area root + `journey/`) and sets `SWARM_BLP_PROOF_OUTPUT` itself.
+Retained evidence: the outer receipt (6/6 steps) plus the six child evidence
+trees, each independently verify-able. Outside the aggregate: cargo-test
+recipes (qualify current sources, not a frozen candidate), quarantine and
+provenance (helper/compilation).
+
+`recipes/blp-preparation-http-status.json` vérifie un test nommé de traduction
+des refus métier typés ; provenance corrompue, racine incompatible, contexte
+d’opération différent et nettoyage conservent le statut serveur. La recette
+publique exige désormais 26 assertions, dont huit cas HTTP avec statuts et codes
+exacts (200/400/403/404/409). Le contre-exemple HTTP500 a été observé sur une image
+compilée non qualifiée, uniquement comme preuve du défaut, jamais livrée.
+
+The status recipe runs one named typed-refusal regression, keeping server errors
+for corrupted provenance, incompatible Root, different operation context and
+cleanup. The public recipe now requires 26 assertions, including eight exact
+HTTP status/code cases (200/400/403/404/409). The HTTP500 reproducer used an
+explicitly unqualified compiled image for defect evidence only, never delivery.
+
+## Recette blp-preparation-transport-public (liaison du destinataire, décision au dernier usage)
+
+`recipes/blp-preparation-transport-public.json` exige `SWARM_BLP_BINARY` et
+`SWARM_BLP_PROFILE` (profil normal qualifié) ; `SWARM_BLP_PROOF_OUTPUT` peut
+sélectionner un dossier de parcours neuf. Le parcours exerce la liaison
+explicite du destinataire (`blp-preparation-destination-attribute` : grammaire
+`api-`, écho TOCTOU `base_url`/`model`, réservée admin, rejeu exact, sans clé)
+puis la décision de transport au dernier usage (`blp-preparation-transport` :
+champs fixes non émissifs, rejeu identique, ownership, écho erroné, connexion
+autre, invalidation par renouvellement de politique, refus no-write-down
+`blp-access-denied`, fraîcheur des paramètres, révocation d'identité), et la
+même décision via la route HTTP protégée (200/400/404/404-ownership/403).
+Un programme sentinelle prouve qu'aucun fournisseur n'est lancé sur refus,
+décision ou rejeu ; les compteurs SQL en lecture seule prouvent l'absence de
+tour/réservation. La décision n'engage pas le transport réel, n'hérite pas des
+résultats et ne confine pas les descendants ; `runtime_enforced:false` reste
+justifié. Le digest final imprimé lie le manifeste du parcours ; vérifier ses
+fichiers en plus du reçu externe de `recipe.py verify`.
+
+## Recipe blp-preparation-transport-public (recipient binding, last-use decision)
+
+`recipes/blp-preparation-transport-public.json` requires `SWARM_BLP_BINARY` and
+`SWARM_BLP_PROFILE` (qualified normal profile); `SWARM_BLP_PROOF_OUTPUT` may
+select a fresh journey directory. The journey exercises the explicit recipient
+binding (`blp-preparation-destination-attribute`: `api-` grammar, `base_url`/
+`model` TOCTOU echo, admin-only, exact replay, key-free) then the last-use
+transport decision (`blp-preparation-transport`: fixed non-emissive fields,
+identical replay, ownership, wrong echo, other connection, policy-renewal
+invalidation, no-write-down refusal `blp-access-denied`, settings freshness,
+identity revocation), and the same decision through the protected HTTP route
+(200/400/404/404-ownership/403). A sentinel program proves no provider is
+launched on refusal, decision or replay; readonly SQL counters prove no
+turn/reservation. The decision does not engage the real transport, inherits no
+results and confines no descendants; `runtime_enforced:false` stays justified.
+The printed final digest binds the journey manifest; verify those files as well
+as the outer recipe receipt.
+
+## Recette local-pair-guard-rust (garde de paire d'assertion avant remplacement moteur)
+
+`recipes/local-pair-guard.json` épingle la prévention de l'incident du
+31 octobre 2026 : un `start`/`restart` du lanceur dont le mode d'accès
+sauvegardé est `authority` refuse (exit 2, sans arrêt) quand le démon installé
+et le moteur candidat ne parlent pas le même protocole d'assertion (octets du
+domaine embarqué v2/v1). 12 tests nommés (`tests/test_local_pair_guard.py`) :
+forme d'incident, sens inverse, paire égale, marqueur inconnu, owner-key,
+Root jamais initialisé, démon absent, réglages illisibles, et le parcours
+public réel (serveur lancé puis refusé sans changement de pid ; contrôle
+paire égale remplaçant le serveur). Fournir `SWARM_STATUS_CONTRACT_BINARY` et
+`SWARM_STATUS_CONTRACT_PROFILE` (binaire figé qualifié et empreinte), comme
+`native-version-public`. Aucune opération sudo, aucun démon réel, aucune
+compilation ; aire de fixtures uniquement, jamais /tmp. La recette observe le
+chemin d'installation par défaut uniquement ; un démon servi d'ailleurs échoue
+fermé à l'exécution.
+
+## Recipe local-pair-guard-rust (assertion pair guard before engine replacement)
+
+`recipes/local-pair-guard.json` pins the October 31, 2026 incident prevention:
+a launcher `start`/`restart` whose saved access mode is `authority` refuses
+(exit 2, before any stop) when the installed daemon and the candidate engine do
+not speak the same assertion protocol (embedded v2/v1 domain bytes). 12 named
+tests (`tests/test_local_pair_guard.py`): incident shape, reverse direction,
+equal pair, unknown marker, owner-key, never-initialized Root, absent daemon,
+unreadable settings, and the real public path (running server refused with an
+unchanged pid; equal-pair control replacing the server). Supply
+`SWARM_STATUS_CONTRACT_BINARY` and `SWARM_STATUS_CONTRACT_PROFILE` (frozen
+qualified binary and digest), like `native-version-public`. No sudo, no real
+daemon, no compilation; fixture area only, never /tmp. The recipe observes the
+default installation path only; a daemon served from elsewhere fails closed at
+runtime.
+
+## Recipe authority-admin-ui-rust (accounts and access browser qualification)
+
+`recipes/authority-admin-ui-rust.json` qualifie la vue « Comptes et accès » du
+cockpit natif en mode authority : étape i18n (`scripts/i18n/build.cjs --check`)
+puis `tests/authority_admin_ui_recipe.py --engine … --daemon …` (binaires
+fournis, jamais reconstruits ; sortie fraîche obligatoire sous l'aire de
+fixtures ; /tmp refusé avant toute allocation ; empreintes SHA-256 du moteur et
+du démon figées dans `result.json`). Le driver `tests/authority_admin_ui.cjs`
+lance un démon `swarm-authority serve` réel devant un moteur réel et vérifie
+41 contrôles nommés : connexion FR/EN × clair/sombre, mot de passe oublié,
+mobile de connexion, entrée de menu cockpit, lien direct refusé sans le droit
+(message clair, l'API répond 403), création de compte avec restauration du
+focus, variante refusée, clé API (secret affiché une fois puis Bearer valide),
+matrice des habilitations (30 cases admin verrouillées, schéma 3 = 14 familles
++ 16 vues), création d'un rôle personnalisé + enregistrement + offre à la
+création de compte, journal d'accès (connexions → détail action → tableau de
+bord → purge refusée sans jours valides), traduction anglaise intégrale,
+mobile 390 px sans débordement global. Le wrapper `verify` refuse une preuve
+de forme inattendue (41 exactement, aucune entrée « error »). Exécuter
+`recipe.py run` puis `recipe.py verify` sur la preuve conservée. Limites :
+vérification locale sur binaires fournis — ni acceptation indépendante ni
+installation ; ni le relais distant ni la rotation des clés au-delà du secret
+affiché une fois. Prédicat de rendu : tous les blocs `<details>` **ouverts**
+remplis (« Aide » n'a jamais de table), borne 60 s justifiée par l'observation
+(≤ 26 s rendu réel), diagnostic conservant l'état rendu.
+
+## Recipe authority-admin-ui-rust (browser qualification of the accounts and access view)
+
+`recipes/authority-admin-ui-rust.json` qualifies the native cockpit's
+« Comptes et accès » view in authority mode: an i18n step
+(`scripts/i18n/build.cjs --check`) then
+`tests/authority_admin_ui_recipe.py --engine … --daemon …` (supplied binaries,
+never rebuilt; fresh output under the fixture area; /tmp refused before any
+allocation; SHA-256 of engine and daemon frozen in `result.json`). The driver
+`tests/authority_admin_ui.cjs` runs a real `swarm-authority serve` daemon in
+front of a real engine and checks 41 named controls: FR/EN × light/dark
+sign-in, forgot password, mobile sign-in, cockpit menu entry, direct link
+refused without the right (clear message, the API answers 403), account
+creation with focus restoration, refusal variant, API key (secret shown once
+then a valid Bearer), habilitations matrix (30 locked admin boxes, schema 3 =
+14 families + 16 views), custom role creation + save + offered on account
+creation, access journal (connections → action detail → dashboard → purge
+refused without valid days), full English translation, 390 px mobile with no
+global overflow. The wrapper `verify` refuses an unexpected proof shape
+(exactly 41, no « error » entry). Run `recipe.py run` then `recipe.py verify`
+on the retained evidence. Limits: local verification on supplied binaries —
+neither independent acceptance nor installation; neither the remote relay nor
+key rotation beyond the secret-shown-once. Rendering predicate: every **open**
+`<details>` block filled (« Aide » never holds a table), 60 s bound justified
+by observation (≤ 26 s real rendering), diagnostic keeping the rendered state.
+
+### Primitive PAEA / PAEA primitive
+
+La recette `paea-capture-reader` attend 23 gardes de capture nommées, dont `paea_capture_receipt_temp_create_refusal_keeps_stage_inventory_and_recovers_fresh` ; les 22 gardes antérieures — dont `paea_capture_parent_wait_refusal_retains_owned_handoff` — sont conservées à l'identique. Le nouveau garde attend : un fixture privé frais de `private_fixture_leaf` (0700 exclusif sous un TMPDIR explicite, préservé sur disque, jamais `TempDir`, jamais une mission utilisateur) ; une écriture de reçu saine RÉELLE d’abord, avec `stdout.raw`/`stderr.raw` contrôlés, relue et validée champ par champ avec les vrais SHA-256 — pas seulement un code de sortie ; une précondition UID explicite (uid propriétaire du répertoire == uid effectif du processus, mode 0700) qui REFUSE proprement au lieu de PASSER si elle ne s’applique pas ; puis `chmod 0500` par le propriétaire même-uid : les raw existants restent lisibles tandis que le `create_new` exclusif du temp du reçu est refusé par l’OS (EACCES, os error 13) au stade connu `receipt temp creation refused` — un refus de CRÉATION fraîche, jamais une collision de rename, sans jamais deviner le nom du temp ; l’inventaire réel et la comparaison octet par octet prouvent qu’aucun temp n’existe et qu’aucun octet n’a bougé ; le restore 0700 précède TOUTE assertion pouvant paniquer, toute erreur secondaire de restore restant une donnée ; enfin une écriture de récupération explicite et fraîche (payload distinct) est relue sur le même leaf restauré. Pas d’erreur OS synthétique, pas de nouvel UID, pas de root réel, pas de /tmp codé en dur, pas de timestamp inféré, pas de retry d’entrée inchangée, pas de kill automatique, pas de timeout. Limites exposées : le rédacteur de reçu renvoie `Err(String)` — stade et cause non typés en chaîne OS, l’errno étant validé via le suffixe `os error 13` indépendant de la locale ; les couvertures child-wait, HTTP live, installation et acceptation Authority restent hors périmètre ; les ouvertures du garde 22 (`PreparationRefused`, `SignalRefused`, refus de setup du helper) sont inchangées. Ce sont les assertions attendues de la recette, pas un PASS : Codex vérifie après stabilité. Preuve conservée : les observations de faute (JSON 0600) restent dans la feuille de preuve externe 0700, chemin imprimé sur stderr pour relecture par Codex.
+
+The `paea-capture-reader` recipe expects 23 named capture guards, including `paea_capture_receipt_temp_create_refusal_keeps_stage_inventory_and_recovers_fresh`; the prior 22 guards — including `paea_capture_parent_wait_refusal_retains_owned_handoff` — are preserved unchanged. The new guard expects: a fresh private fixture from `private_fixture_leaf` (exclusive 0700 under an explicit TMPDIR, preserved on disk, never `TempDir`, never a user mission); a real healthy receipt write FIRST with controlled `stdout.raw`/`stderr.raw`, read back and validated field by field against the real SHA-256 hashes — not just an exit code; an explicit same-UID precondition (fixture dir owner uid == process effective uid, mode 0700) that REFUSES safely instead of PASSING when it does not apply; then `chmod 0500` by the same-uid owner: the existing raw files stay readable while the receipt writer's exclusive `create_new` temp open is refused by the OS (EACCES, os error 13) at the known stage `receipt temp creation refused` — a FRESH-CREATION refusal, never a rename collision, with the temp filename never guessed; the real inventory plus byte-for-byte comparison prove no temp exists and no byte moved; the 0700 restore precedes ANY assertion that could panic, with any secondary restore error preserved as data; finally an explicit fresh recovery write (distinct payload) is read back on the same restored leaf. No synthetic OS error, no new UID, no live root, no hardcoded /tmp, no inferred timestamp, no retry of unchanged input, no automatic kill, no timeout. Exposed limitations: the receipt writer reports stage and cause as a single `Err(String)` — not a typed OS error chain — so the errno is validated through std's locale-independent `os error 13` display; child-wait, live HTTP, installation, and Authority acceptance coverage stays out of scope; the guard-22 openings (`PreparationRefused`, `SignalRefused`, the helper-setup refusal) are unchanged. These are the recipe's expected assertions, not a PASS claim: Codex verifies after stability. Retained proof: the fault observations (JSON 0600) stay in the external 0700 proof leaf, path printed to stderr for Codex to re-read.
+
+`recipes/paea-capture-stream.json` vérifie trois gardes nommées de copie brute,
+refus d'écrasement et préfixe/erreur/reprise fraîche, avec témoin valide avant
+chaque faute. TMPDIR est celui résolu par le runner depuis l'aire configurée ;
+les feuilles Unix privées sont créées exclusivement. Cette recette ne qualifie
+ni la capture d'un enfant, ni son vrai exit, ni un profil produit installé.
+
+The recipe verifies three named raw-copy, overwrite-refusal and failure-prefix /
+fresh-recovery guards, with valid controls before faults and exclusively created
+private leaves under the runner-resolved configured TMPDIR. It does not qualify
+child capture, actual child exit or an installed production profile.
+
+
+### Approbation PAEA à échec fermé / PAEA fail-closed approval
+
+#### Défaillances de la garde entretenues (4 vérifications) / Maintained guard-failure regression (4 checks)
+
+FR : la recette `tools/verification/recipes/paea-approval-guard-failures.json` exécute `tests/paea_approval_guard_failures.py`, qui transforme les défaillances vérifiées une seule fois à la main en régression permanente : (1) contrôle valide sur la garde actuelle — 36 vérifications, 0 diagnostic inattendu, sortie 0 ; puis 3 défaillances réelles en sortie 1 — écoute du serveur fixture (EACCES synthétique local), lancement (`CHROME_BIN` vers un chemin fixture inexistant, jamais un vrai chemin utilisateur), écriture de l'artefact d'échec (cause primaire + secondaire toutes deux sur stderr, artefact absent, aucun PASS). Limites explicites : la couture de préchargement est strictement synthétique, locale et privée — aucun service externe ni fournisseur, aucune échéance, relance, limite d'essais, force-kill ni watchdog global ; aucun EACCES au niveau de l'OS n'est effectué ni revendiqué ; les preuves brutes (stdout/stderr, codes de sortie réels, SHA-256 de la source avant/après) sont conservées sous `--output` et jamais supprimées. `PAEA_APPROVAL_GUARD_FAILURES_PASS 4` n'est émis que si les 4 vérifications tiennent. La recette existante des 36 vérifications reste séparée et inchangée.
+
+EN: the recipe `tools/verification/recipes/paea-approval-guard-failures.json` runs `tests/paea_approval_guard_failures.py`, which turns the once-hand-verified faults into a permanent regression: (1) valid control on the current guard — 36 checks, 0 unexpected diagnostics, exit 0; then 3 real exit-1 faults — fixture server listen (local synthetic EACCES), launch (`CHROME_BIN` pointing at a nonexistent fixture path, never a real user path), failure-artifact write (primary + secondary cause both on stderr, no artifact, no PASS). Explicit limits: the preload seam is strictly synthetic, local and private — no external service or provider, no deadline, retry, attempt cap, force-kill or global watchdog; no OS-level EACCES is performed or claimed; raw proofs (stdout/stderr, real exit codes, before/after source SHA-256) are retained under `--output` and never deleted. `PAEA_APPROVAL_GUARD_FAILURES_PASS 4` is printed only when all 4 checks hold. The existing 36-check recipe stays separate and unchanged.
+
+Recette permanente `tools/verification/recipes/paea-approval-state-fail-closed.json` : `python3 tools/verification/recipe.py run --recipe tools/verification/recipes/paea-approval-state-fail-closed.json --output FRESH`, puis `python3 tools/verification/recipe.py verify --evidence FRESH` sur ce même répertoire FRESH produit par la recette (manifeste d’exécution, entrées et sorties brutes conservés dans FRESH) ; 36 contrôles nommés FR/EN attendus, 0 diagnostic. Le navigateur crée séparément, via node, son propre TMPDIR privé et frais, imprimé dans la sortie d’étape ; `verify` ne consomme pas ce TMPDIR. Les preuves ROUGE originales des deux faux succès (formulaire d’approbation FR `admitted` ; consentement FR `admitted` après contrôles sains) sont conservées séparément. Cette preuve ne démontre ni le navigateur réellement servi par le profil normal, ni une installation.
+
+Permanent recipe `tools/verification/recipes/paea-approval-state-fail-closed.json`: `python3 tools/verification/recipe.py run --recipe tools/verification/recipes/paea-approval-state-fail-closed.json --output FRESH`, then `python3 tools/verification/recipe.py verify --evidence FRESH` on that same FRESH directory produced by the recipe run (run manifest, inputs and raw outputs retained in FRESH); 36 named FR/EN checks expected, 0 diagnostics. The browser separately creates, via node, its own private and fresh TMPDIR, printed in the step stdout; `verify` does not consume that TMPDIR. The original RED proofs of the two false successes (approval form FR `admitted`; consent FR `admitted` after healthy controls) are retained separately. This evidence proves neither the browser actually served by the normal profile nor an installation.
+
+### Lecteur PAEA / PAEA reader
+
+`recipes/paea-capture-reader.json` exige vingt et une gardes nommées : trois pour la
+primitive, dix pour le lecteur live et sept gardes du propriétaire
+Child. La vingt-et-unième garde parente `paea_capture_startup_eof_retains_actual_exit_and_raw` (collectée par le filtre `paea_capture_` existant) partage le lecteur de ligne complète de démarrage extrait des deux boucles live du témoin positif — décodage UTF-8 exact, et non plus octet-par-caractère. L’enfant réel sain émet une ligne préparée complète puis attend l’EOF stdin : lecture causale, libération, collecte réelle. L’enfant fautif réel ignore SIGINT, écrit un fragment stdout sans newline et un diagnostic stderr connu, puis sort naturellement 7 sans ligne préparée : sous le vrai wrapper `signal_stop`, l’EOF avant newline est un échec du lecteur partagé (diagnostic sûr — phase et chemin brut, jamais les octets capturés), la propriété brute est capturée avant tout verdict, le payload de panic d’origine n’est observé qu’après la collecte, l’exit réel 7 est récolté par l’unique vrai wait (enfant réellement reapé, jamais un faux exit de nettoyage) et les deux terminaux `Completed` conservent les octets bruts exacts. Le même constructeur local de reçu du témoin écrit ensuite, AVANT tout verdict, un reçu de chemin terminé pour l’enfant sain réel d’abord (exit réel 0, aucun signal, succès réel, deux `Completed` aux compteurs exacts, absence réelle de panic contrôleur) puis pour l’enfant fautif réel : code de sortie réel 7, aucun signal Unix, pas de succès, présence du panic contrôleur vraie (jamais le payload privé ni les octets bruts dans le JSON), les deux variantes terminales réelles avec leurs compteurs `Completed` exacts, chemin relatif et hachage SHA-256 réels des deux fichiers bruts conservés, et mode 0600 appliqué À LA CRÉATION du fichier temporaire via `OpenOptionsExt::mode` (aucune fenêtre de protection post-création ; mêmes fsync fichier, rename, fsync répertoire ; un refus d’écriture du reçu reste un échec, jamais un faux PASS). L’erreur retournée par le constructeur est un texte étiqueté par étape (`Err(String)`, p. ex. `receipt atomic rename refused: <affichage de l’erreur io>`), pas une cause OS typée ni une chaîne d’erreurs traversable ; une régression déterministe, sur une feuille privée avec des octets bruts contrôlés puis un vrai répertoire vide nommé `process-receipt.json`, force le refus RÉEL du rename (aucun horodatage deviné, aucune erreur OS simulée) et vérifie, après capture du unwind et downcast, que le transporteur typé `CompoundPanic` conserve à la fois l’étape/cause secondaire du reçu et le payload d’origine resté downcastable — le type de premier niveau est honnêtement le transporteur, jamais déguisé ; la voie normale à payload seul garde le type de panic d’origine. Portée et limites : ce lecteur de démarrage, ses fautes et ce reçu de chemin terminé seulement — ni confinement OS, ni approbation humaine, ni acceptation globale ; aucune limite, minuteur, retry, chemin ou dépendance inventé ; la propriété typée des routes de refus (enveloppe UNKNOWN / non terminé, conservation du panic d’origine) reste une tâche ultérieure ouverte. Le lecteur doit rendre le premier fragment avant EOF, rester lié au
+fichier réservé après substitution du chemin, refuser un EOF physique prématuré,
+conserver le fichier vide et la cause d’un refus de préparation du descripteur
+(injection déterministe locale), conserver préfixes et causes en erreur/panic,
+et traiter le buffer vide sans
+consommer l’erreur terminale, y compris avant tout octet. La quatrième garde
+Child prouve la prise de main en poignée de main : un enfant local constant
+écrit et purge deux préfixes bruts distincts (NUL, non UTF-8, CRLF), attend
+exactement un octet de stdin, puis émet des queues connues et sort avec son code
+réel ; le contrôleur lit les deux préfixes exacts via les lecteurs d’évidence
+AVANT d’écrire l’octet unique de déblocage sur le stdin exposé — cet ordre
+causal prouve la lisibilité avant l’EOF du producteur. La cinquième garde Child
+prouve le wrapper coopératif `run_controller_then_finish` : le contrôleur
+panique (message distinctif original) APRÈS ses deux lectures causales mais
+AVANT l’octet de déblocage, le wrapper exécute quand même le finish réel via
+l’EOF stdin (le `read(1)` unique du script retourne, queues connues, code réel
+9), et retourne à la fois le résultat complet de collecte (exit réel, deux
+`Completed` aux compteurs exacts, fichiers préfixe+queue exacts sur disque,
+modes 0600) ET le payload d’origine, retenu verbatim puis réémis par
+l’appelant via un `catch_unwind` de test APRÈS conservation du reçu — un
+témoin sain (même feuille, mêmes octets, même protocole) précède l’injection
+de panic. La sixième garde Child épingle le nouveau contrat de remise de refus
+d’attente : UN SEUL essai d’attente par finish — le chemin public passe le vrai
+`Child::wait` par une couture privée `finish_with_wait` (forme `FnOnce` de la
+vraie signature de méthode), et un refus rend `WaitRefusalHandback` : cause
+d’origine NON Clone déplacée verbatim, Child avec stdin déjà fermé, DEUX
+captures encore en cours (aucun join sur le chemin de refus) et les deux
+chemins d’évidence, statut de sortie INCONNU ; aucune re-attente automatique
+n’existe dans le module — la résolution est une décision explicite de
+l’appelant. Les helpers consommateurs de test conservent tout refus inattendu dans un
+porteur typé COMPLET (`WaitRefusalCarrier` : cause, même Child, les DEUX états
+terminaux de capture réellement joints, les deux chemins d’évidence et
+l’éventuel payload de panic contrôleur d’origine) — aucun champ abandonné.
+La garde exerce la frontière typée RÉELLE de bout en bout : le porteur
+conservé (portant un payload contrôleur original distinctif, mis en boîte
+AVANT la porte de panic) traverse la VRAIE fonction
+`fail_unexpected_wait_refusal` au sein d’un `catch_unwind` de test, et le
+payload boxed est récupéré PAR VALEUR (`downcast::<WaitRefusalCarrier>` — un
+simple `downcast_ref` ne passe pas la propriété) ; la conservation ne
+re-attend jamais l’enfant (statut de sortie INCONNU ; toute re-attente reste
+une décision explicite).
+La garde injecte un refus SYNTHÉTIQUE distinctif via la couture
+privée AVANT tout vrai wait (témoin sain réel du même script/feuille/protocole
+avant l’injection, finish public vérifié), SNAPSHOTNE d’abord les faits sans
+verdict (cause par `to_string` ; compteur d’invocation du handler : exactement
+un essai ; même Child rendu ; les deux chemins ; stdin exposé), puis, après la
+récupération par valeur, SNAPSHOTNE les faits du porteur récupéré (libellé de
+contexte, cause récupérée, pid du Child récupéré, les deux chemins, les deux
+états terminaux, présence du payload) — toujours sans verdict — résout
+ENSUITE explicitement le Child récupéré par sa PREMIÈRE vraie attente directe
+(precondition réellement changée car l’injection n’a jamais atteint le vrai
+`Child::wait`) sans jamais joindre une seconde fois les captures (déjà
+terminales dans le porteur), puis exécute TOUTES les assertions
+APRÈS la vraie collecte — aucune affaiblie : libellé de contexte conservé
+verbatim, cause d’origine par égalité au travers de la frontière typée
+(conservation, `panic_any`, `catch_unwind`, downcast par valeur) et inchangée
+dans le porteur récupéré, un seul essai, même Child à chaque étape, deux
+chemins conservés, payload original présent, redowncast PAR VALEUR en `String`
+et égal EXACTEMENT à l’original détenu (jamais affiché, jamais inventé après
+la porte), stdin exposé, exit réel 5, deux `Completed` aux compteurs exacts
+37/38, fichiers bruts préfixe+queue exacts, modes 0600. ÉTIQUETTE
+: le refus injecté est SYNTHÉTIQUE — il prouve le contrat de remise ET la
+récupération typée, PAS une erreur OS d’attente réelle. Portée réelle du wrapper : uniquement un enfant dont le protocole
+propose un arrêt coopératif à l’EOF stdin ; ni annulation d’enfant arbitraire,
+ni mécanisme général de Drop/unwind, ni couverture d’un panic interne au
+finish ou d’un épuisement de ressources ; toute issue secondaire de nettoyage
+est conservée avec sa cause, jamais masquée. Les lectures et l’écriture
+sont enregistrées et assertées seulement après la vraie collecte (attente réelle
+plus les deux joins). Chaque injection suit
+un témoin sain ; les issues réelles sont collectées, les preuves d’échec restent.
+Le manifeste vise le seul test d’intégration `paea_approval_web`, filtre
+`paea_capture_`, sans exécuter son témoin métier ignoré. Aucun watchdog global ;
+TMPDIR explicite fourni par le runner, mêmes protections que la primitive.
+Une réussite qualifie ces gardes de composant : ni intégration du lecteur au
+parcours d’approbation, ni campagne de refus de setup au-delà des épingles
+présentes, ni annulation/Drop du Child, ni profil produit installé,
+ni protection contre une réécriture externe de même taille. Aucun redémarrage
+du cockpit n’est requis pour des helpers compilés seulement dans ce test.
+
+La septième garde Child prouve le wrapper de décision EXPLICITE
+`signal_stop` pour un enfant qui IGNORE l’EOF stdin : l’appelant fournit
+lui-même la décision d’arrêt (signal exact, aucun timeout, politique,
+retry, poll, plafond, PID kill nu ou signal de secours implicite) ; le
+wrapper ouvre un pidfd DIRECTEMENT depuis le Child possédé AVANT l’appel
+contrôleur (jamais d’API pid arbitraire), demande le signal UNE fois par
+ce descripteur tenu sur la sortie normale ET sur le chemin de panic
+(`catch_unwind`), et seulement après une demande réussie exécute le
+finish explicite existant (EOF stdin — sans effet sur cet enfant — UN
+vrai wait, DEUX joins). Témoin sain D’ABORD (même feuille, mêmes octets,
+même protocole : l’enfant `/usr/bin/python3` installe son handler SIGINT
+AVANT toute sortie, écrit deux préfixes bruts distincts, puis bloque dans
+`signal.pause()` sans jamais lire stdin), puis phase panic (message
+original distinctif) où le signal est quand même demandé sur le chemin de
+panic et le payload d’origine retenu verbatim puis réémis via un
+`catch_unwind` de test APRÈS conservation du reçu. Les queues connues
+n’existent que dans le handler : leur présence prouve la livraison
+réelle du signal, et l’exit réel 0 via le handler est l’arrêt contrôlé
+épinglé (contrasté avec les gardes à exit non nul). Tout refus de
+préparation pidfd ou de demande de signal rend la propriété COMPLÈTE
+typée (capture intacte — Child non récolté, stdin NON fermé, DEUX
+captures encore en cours, les deux chemins —, pidfd tenu le cas échéant,
+cause non Clone d’origine, payload contrôleur éventuel) sans aucune
+attente aveugle ; ces chemins de refus ne sont PAS exercés par la garde
+et restent des limites explicites du contrat. Le pidfd ne prouve ni
+l’indépendance UID, ni le confinement OS, ni l’acceptation métier ;
+l’enfant qui ignorerait le signal demandé garderait le wait bloqué (pas
+de minuteur).
+
+`recipes/paea-capture-reader.json` requires twenty named guards: three
+primitive, ten live-reader, and seven Child-owner guards. It checks
+first-fragment visibility before EOF, reserved-file identity after pathname
+replacement, refusal of premature physical EOF, empty-artifact/cause
+preservation on a deterministically injected descriptor-preparation refusal,
+preserved prefixes/causes on failure/panic,
+and empty-buffer reads that do not consume terminal errors, including before
+any byte. The fourth Child guard proves the stdin/live-output handshake: a
+constant local child writes and flushes two distinct raw prefixes (NUL,
+non-UTF-8, CRLF), waits for exactly one stdin byte, then emits known tails and
+exits with its real code; the controller reads both exact prefixes through the
+evidence readers BEFORE writing the single release byte to the exposed stdin —
+this causal ordering proves readability before producer EOF. The fifth Child
+guard proves the cooperative wrapper `run_controller_then_finish`: the
+controller panics (distinctive original message) AFTER its two causal reads
+but BEFORE the release byte, the wrapper still runs the real finish via stdin
+EOF (the script's single `read(1)` returns, known tails, real exit code 9),
+and returns BOTH the complete real outcome (real exit, two `Completed`
+captures with exact counts, exact prefix+tail files on disk, 0600 modes) AND
+the original payload, retained verbatim then re-emitted by the caller through
+a test `catch_unwind` AFTER the receipt is conserved — a healthy witness
+(same leaf, same bytes, same protocol) precedes the panic injection. The
+sixth Child guard pins the repaired wait-refusal handback contract: ONE wait
+attempt per finish — the public path passes the real `Child::wait` through a
+private `finish_with_wait` seam (`FnOnce` shape of the real method
+signature), and a refusal returns `WaitRefusalHandback`: the original
+non-Clone cause moved verbatim, the Child with stdin already closed, BOTH
+still-running captures (no join on the refusal path) and both evidence
+paths, exit status UNKNOWN; no automatic re-wait exists anywhere in the
+module — resolution is the caller's explicit decision. Test-side consumer helpers conserve any unexpected refusal into a COMPLETE
+typed carrier (`WaitRefusalCarrier`: the cause, the same Child, BOTH
+really-joined capture terminal states, both evidence paths and any original
+controller panic payload) — no field dropped.
+The guard exercises the REAL typed frontier end-to-end: the conserved carrier
+(carrying a distinctive ORIGINAL controller payload, boxed BEFORE the panic
+door) goes through the REAL `fail_unexpected_wait_refusal` function inside a
+test `catch_unwind`, and the boxed payload is recovered BY VALUE
+(`downcast::<WaitRefusalCarrier>` — a bare `downcast_ref` borrow would not
+pass ownership); conservation never re-waits the child (exit status UNKNOWN;
+any re-wait remains an explicit caller decision). The guard injects a
+distinctive SYNTHETIC refusal through the private seam BEFORE any real wait
+(a healthy real witness of the same script/leaf/protocol precedes the
+injection, public finish verified), first SNAPSHOTS the facts without a
+verdict (cause via `to_string`; handler invocation count: exactly one
+attempt; same Child handed back; both paths; stdin exposed), then, after the
+by-value recovery, SNAPSHOTS the recovered carrier's facts (context label,
+recovered cause, recovered Child pid, both paths, both terminal states,
+payload presence) — still without a verdict — then resolves the recovered
+Child EXPLICITLY through its FIRST direct real wait (genuinely changed
+precondition because the injection never reached the real `Child::wait`)
+without ever joining the captures a second time (already terminal inside the
+carrier), and only then runs ALL assertions AFTER the real collection — none
+weakened: the conserved context label verbatim, the original cause by
+equality through the typed frontier (conservation, `panic_any`,
+`catch_unwind`, by-value downcast) and unchanged in the recovered carrier,
+exactly one attempt, the same Child at every stage, both paths conserved, the
+ORIGINAL payload present, downcast BY VALUE to `String` and EXACTLY equal to
+the held original (never displayed, never invented after the door), stdin
+exposed, real exit 5, two `Completed` captures with the exact 37/38 counts,
+exact prefix+tail raw files, 0600 modes.
+LABEL: the injected refusal is SYNTHETIC — it proves the handback contract
+AND the typed recovery, NOT a real OS wait error. Real
+wrapper scope: only a child whose own protocol offers a cooperative stop at
+stdin EOF; neither arbitrary-child cancellation, nor a general Drop/unwind
+mechanism, nor coverage of an internal panic inside `finish` or resource
+exhaustion; any secondary cleanup issue is conserved with its real cause,
+never masked. Reads and the
+write are recorded and asserted only after the real finish (true wait plus
+both joins). Each injection follows a
+healthy control; real outcomes are collected and
+failed evidence retained. Only the `paea_approval_web` integration target with
+the `paea_capture_` filter runs; the ignored business witness does not run. No
+global watchdog; explicit runner-provided TMPDIR and the primitive’s privacy
+protections.
+The seventh Child guard proves the EXPLICIT `signal_stop` decision wrapper
+for a child that IGNORES stdin EOF: the caller provides the stop decision
+itself (the exact signal; no implicit timeout, policy, retry, poll, cap,
+bare-PID kill or fallback signal); the wrapper opens a pidfd DIRECTLY from
+the owned Child BEFORE the controller call (never an arbitrary-PID API),
+requests the signal EXACTLY ONCE through that held descriptor on the normal
+AND the panic path (`catch_unwind`), and only after a successful request
+runs the existing explicit finish (stdin EOF — no effect on this child —
+ONE real wait, BOTH joins). A healthy witness FIRST (same leaf, same bytes,
+same protocol: the `/usr/bin/python3` child installs its SIGINT handler
+BEFORE any output, writes two distinct raw prefixes, then blocks in
+`signal.pause()` without ever reading stdin), then the panic phase
+(distinctive original message) where the signal is still requested on the
+panic path and the original payload is retained verbatim then re-emitted
+through a test `catch_unwind` AFTER the receipt is conserved. The known
+tails exist ONLY inside the handler: their presence proves the real signal
+delivery, and the real exit 0 through the handler is the pinned controlled
+stop (contrasted with the nonzero-exit guards). Every pidfd-preparation or
+signal-request refusal returns the COMPLETE typed ownership (intact capture
+— unreaped Child, stdin NOT closed, BOTH still-running captures, both paths
+—, the held pidfd when acquired, the original non-Clone cause, any
+controller payload) with NO blind wait; those refusal paths are NOT
+exercised by the guard and remain EXPLICIT limits of the contract. The
+pidfd proves neither UID independence, nor OS confinement, nor business
+acceptance; a child that ignored the requested signal would keep `wait`
+blocked (no timer).
+A pass qualifies these component guards, not approval-flow integration,
+a setup-refusal campaign beyond the pins present, Child cancellation/Drop, an
+installed production profile or protection against same-size external
+rewriting. These test-only helpers require no cockpit restart.
+
+`recipes/paea-approval-web-positive.json` branche enfin ces fondations sur le
+VRAI témoin HTTP `approval_web_cli_binds_and_consumes_exact_preparation_once`
+(ignoré, un seul test, exécuté via `-- --ignored --exact --nocapture
+--test-threads=1`). Le Child est pris en main par `OwnedChildCapture::start` :
+stdout et stderr sont conservés en continu dans deux fichiers exclusifs 0600
+(`stdout.raw`, `stderr.raw`) sous une feuille privée 0700
+`private_fixture_leaf("approval-web-positive")` créée sous le TMPDIR explicite
+du runner (jamais /tmp, aucun repli système). Les événements `prepared` puis
+`bound` sont lus AVANT la fin du producteur via le lecteur live
+(`evidence_reader`) — la frame pin-only de 87 octets est écrite par l'extrémité
+stdin TRANSFÉRÉE (`take_stdin`) puis l'extrémité est détruite explicitement :
+c'est ce drop qui délivre l'EOF réel que `read_packet`/`read_guarded` attend
+(lecture jusqu'à EOF), un simple emprunt fermé par la capture ne suffirait pas.
+Tout le contrôleur HTTP (session native, CSRF, status GET, consommation POST
+unique) et les assertions métier (ack `approved`/`trust-status-ack-v1`/
+`object_id`/`content_redacted`, action durable `approved` attribuée au
+principal `operator` dans le root PROJET, SERVICE et refs Git inchangés)
+s'exécutent DANS le wrapper `signal_stop` : le pidfd est ouvert AVANT le
+contrôleur depuis le Child possédé, le signal est demandé exactement une fois
+sur les chemins normal ET panic. Les routes typées `PreparationRefused`,
+`SignalRefused` et `WaitRefused` sont gérées explicitement (reçu écrit, cause
+et propriété conservées, réémission) mais ne sont PAS exercées par ce témoin
+positif — elles restent des limites déclarées. Après l'arrêt, les événements
+`prepared`/`bound` (re-prouvés identiques aux lectures live) et les
+`NativeOutcomeRecord` v1 sont parsés depuis `stdout.raw` conservé — aucune
+nouvelle boucle de conservation, aucun thread de drain. Preuves persistantes :
+le reçu processus (chemins relatifs + SHA-256 des octets bruts + argv exact,
+mode de sélection, PID, boot id/start ticks, hash `/proc/<pid>/exe` réel lu
+pendant la vie du Child) est écrit 0600 de façon atomique (temp exclusif,
+fsync, rename, fsync répertoire) AVANT tout verdict — refus, panic ou PASS —
+et la feuille (stdout.raw, stderr.raw, reçu) n'est JAMAIS supprimée par le
+témoin : elle reste dans la zone privée TMPDIR jusqu'à réception par Codex.
+Une seule ligne manifeste JSON est imprimée sur STDERR (jamais stdout : sous
+`--nocapture`, une `println!` du témoin s'intercalerait dans les lignes de
+sortie du harnais que la recette épingle sur `required_stdout`). Les fixtures
+sont synthétiques et la sélection d'image est source-fixture par défaut :
+aucun UID, enrôlement, confinement, indépendance ni acceptation humaine n'est
+fabriqué, et aucun profil normal/livraison n'est prouvé — la sélection d'image
+source (profil normal des tests) est distincte du profil livré. La recette
+fournit `SWARM_PAEA_SOURCE_FIXTURE` : la fixture source réelle attendue
+(`project()` ouvre explicitement `SWARM_PAEA_SOURCE_FIXTURE/result.json` et
+refuse sinon — panic « explicit new source fixture »), produite par le
+superviseur via `rust_native_first_publication.py` dans un `--output` NOUVEAU ;
+ses `result.json` et `inputs.json` sont des `inputs` déclarés de la recette.
+Conformément à la convention du README (voir la voie `paea-native-git-source`,
+règle vérifiée du 2026-10-31) : une fixture source n'est jamais copiée ni
+mutée — toute régénération passe par un NOUVEAU répertoire `--output` du
+producteur, puis on REPOINTE `SWARM_PAEA_SOURCE_FIXTURE` (substitution
+`{root}` uniquement) et les entrées `result.json`/`inputs.json` de la recette
+avant toute nouvelle consommation ; la recette n'est pas réutilisable
+inchangée sur une fixture mutée. Reprise : rejouer la recette telle quelle
+(`recipe.py run` puis `verify --evidence`), chaque exécution crée une feuille
+fraîche unique ; les feuilles des exécutions précédentes restent en place
+comme preuves historiques.
+
+`recipes/paea-approval-web-positive.json` finally wires these foundations onto
+the REAL HTTP witness
+`approval_web_cli_binds_and_consumes_exact_preparation_once` (ignored,
+single test, run via `-- --ignored --exact --nocapture --test-threads=1`).
+The Child is taken over by `OwnedChildCapture::start`: stdout and stderr are
+conserved continuously into two exclusive 0600 files (`stdout.raw`,
+`stderr.raw`) under a private 0700 leaf
+`private_fixture_leaf("approval-web-positive")` created under the runner's
+EXPLICIT TMPDIR (never /tmp, no system fallback). The `prepared` then `bound`
+events are read BEFORE producer EOF through the live reader
+(`evidence_reader`) — the 87-byte pin-only frame is written through the
+TRANSFERRED stdin end (`take_stdin`) and the end is then explicitly DROPPED:
+that drop delivers the real EOF that `read_packet`/`read_guarded` waits on
+(reads to EOF); a borrowed end closed by the capture could not establish it.
+The whole HTTP controller (native session, CSRF, status GET, single
+consumption POST) and the business assertions (ack
+`approved`/`trust-status-ack-v1`/`object_id`/`content_redacted`, durable
+`approved` action attributed to principal `operator` in the PROJECT root,
+SERVICE and Git refs unchanged) run INSIDE the `signal_stop` wrapper: the
+pidfd is opened BEFORE the controller from the owned Child, the signal is
+requested exactly once on both the normal and the panic path. The typed
+routes `PreparationRefused`, `SignalRefused` and `WaitRefused` are handled
+explicitly (receipt written, cause and ownership conserved, re-raise) but are
+NOT exercised by this positive witness — they remain declared limits. After
+the stop, the `prepared`/`bound` events (re-proven identical to the live
+reads) and the `NativeOutcomeRecord` v1 records are parsed from the conserved
+`stdout.raw` — no second conservation loop, no drain thread. Persistent
+evidence: the process receipt (relative paths + SHA-256 of the raw bytes +
+exact argv, selection mode, PID, boot id/start ticks, real `/proc/<pid>/exe`
+hash read while the Child was alive) is written 0600 atomically (exclusive
+temp, fsync, rename, directory fsync) BEFORE any verdict — refusal, panic or
+PASS — and the leaf (stdout.raw, stderr.raw, receipt) is NEVER deleted by the
+witness: it stays in the private TMPDIR area until Codex receives it. A
+single manifest JSON line is printed on STDERR (never stdout: under
+`--nocapture`, a witness `println!` would interleave with the harness's own
+stdout lines that the recipe pins via `required_stdout`). The fixtures are
+synthetic and the image selection defaults to the source-fixture: no UID,
+enrollment, confinement, independence or human acceptance is fabricated, and
+no normal/delivery profile is proven — the source image selection (the tests'
+normal profile) is distinct from the delivered profile. The recipe supplies
+`SWARM_PAEA_SOURCE_FIXTURE`: the real source fixture the witness expects
+(`project()` explicitly opens `SWARM_PAEA_SOURCE_FIXTURE/result.json` and
+refuses otherwise — the "explicit new source fixture" panic), produced by the
+supervisor through `rust_native_first_publication.py` into a NEW `--output`
+directory; its `result.json` and `inputs.json` are declared recipe `inputs`.
+Per the README convention (see the `paea-native-git-source` lane, rule
+verified 2026-10-31): a source fixture is never copied or mutated in place —
+every regeneration goes through a NEW producer `--output` directory, then the
+recipe's `SWARM_PAEA_SOURCE_FIXTURE` (`{root}` substitution only) and its
+`result.json`/`inputs.json` inputs are REPOINTED before any new consumption;
+the recipe is not reusable unchanged against a mutated fixture. Resumption:
+replay the recipe as-is (`recipe.py run` then `verify --evidence`); every run
+creates one fresh unique leaf; leaves of previous runs stay in place as
+historical evidence.
+
+
+### Managed result lane contention (2026-11-05)
+
+`paea-managed-retention-contention.json` exercises one real separate-process
+nonblocking lane conflict, verifies retained ref/report/manifest/proof bytes are
+unchanged, releases the holder, then recovers the same frozen result. It also
+runs typed classification negatives and the existing candidate custody guard.
+Only the direct typed flock `EAGAIN` at a failed acquisition, with no publication
+or cleanup error, becomes `managed-operation-busy` waiting in report discovery
+and result retention. No operation body ran for that failed acquisition; earlier
+recorded Work effects remain recorded. Unknown/wrapped causes, other operations,
+permission failures and cleanup failures retain their error paths. The existing
+saved conductor cadence remains authoritative: no new retry, delay or ceiling.
+The classifier is meaningful only at the reviewed acquisition producer; it does
+not prove absence of effects in arbitrary error chains. The unit fixture is not
+native provider, approval E2E or independent acceptance evidence. Preserve the
+original red and a fresh green; `recipe.py verify` validates retained integrity,
+not a production delivery. Full source publication and protected approval flows
+remain separate required checks.
+
+### Contention du verrou des résultats managed (5 novembre 2026)
+
+La recette `paea-managed-retention-contention.json` tient le vrai verrou depuis
+un processus distinct, vérifie les octets ref/rapport/manifeste/preuve inchangés,
+libère le verrou puis retrouve le même résultat figé. Elle exécute aussi les
+refus du classificateur typé et la garde existante de custody du candidat.
+Seul `EAGAIN` typé direct à l’acquisition, sans publication ni erreur de nettoyage,
+devient l’attente `managed-operation-busy` dans découverte et rétention. Le corps
+de cette acquisition n’a pas tourné ; les effets Work déjà enregistrés restent
+acquis. Autres opérations, permissions, wrappers, causes inconnues et nettoyages
+restent des erreurs. La cadence enregistrée existante reste seule autorité :
+aucune nouvelle tentative, durée ou limite. Le classificateur ne vaut qu’au
+producteur d’acquisition relu ; il ne prouve pas l’absence d’effet d’une chaîne
+arbitraire. Cette fixture unitaire ne prouve ni fournisseur natif, ni approbation
+E2E, ni acceptation indépendante. Garder le rouge original et un vert frais ;
+`recipe.py verify` contrôle l’intégrité, pas la livraison. Publication source
+complète et approbation protégée restent des vérifications distinctes.

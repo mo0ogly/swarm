@@ -1,0 +1,16 @@
+{
+  "error": "managed-repository-open",
+  "failure": {
+    "causes": [
+      "managed-repository-open",
+      "managed-repository-open",
+      "managed-repository-open",
+      "storage-operation:OpenDirectory",
+      "os-errno:2"
+    ],
+    "code": "managed-repository-open",
+    "message": "managed-repository-open",
+    "retryable": false
+  },
+  "schema_version": 1
+}

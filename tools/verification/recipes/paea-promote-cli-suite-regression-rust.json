@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "paea-promote-cli-suite-regression-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-cli/src/**/*",
+    "rust/crates/swarm-cli/tests/paea_promote.rs",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-engine/tests/paea_git_promote_call.rs",
+    "rust/crates/swarm-enrollment-*/src/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-protection-contract/src/**/*",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-promote-cli-suite-regression-rust.json",
+    ".swarm-fixtures/source-fixture-lastuse-regen-20261031b/result.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/.swarm-fixtures/source-fixture-lastuse-regen-20261031b"
+  },
+  "steps": [
+    {
+      "id": "cli-promote-full-suite-one-process-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_promote",
+        "--",
+        "--include-ignored",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "composed_git_settlement_stale_preparations_refuse_then_fresh_recover",
+        "composed-git-refusal",
+        "composed-settlement-refusal",
+        "delivered_chain_transfer_promote_replay_reconcile_once ... ok",
+        "promote_call_cli_chain_transfer_promote_replay_reconcile_once ... ok",
+        "promote_call_cli_commits_once_and_records_effect ... ok",
+        "promote_call_cli_reconciles_before_commit_reports_not_committed ... ok",
+        "promote_call_cli_refuses_bad_frame_without_consumption ... ok",
+        "promote_call_cli_revoked_current_authority_refuses_without_effect_then_recovers ... ok",
+        "9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

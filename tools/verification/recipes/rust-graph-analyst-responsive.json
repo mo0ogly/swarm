@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "rust-graph-analyst-responsive",
+  "inputs": [
+    "tests/rust_graph_analyst_responsive.py",
+    "tests/rust_graph_analyst_responsive.cjs",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py",
+    "tests/fixture_area.py",
+    "web/cockpit-native-graph.js",
+    "web/graph.css",
+    "web/swarm-design.css",
+    "web/i18n-en.js",
+    "locales/en.json",
+    "docs/architecture/GRAPH-STUDIO.md",
+    "docs/en/GRAPH-STUDIO.md",
+    "package-lock.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-analyst-all-design-widths",
+      "command": ["python3", "-c", "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='graph-responsive-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_graph_analyst_responsive.py','--binary',os.environ['SWARM_GRAPH_BINARY'],'--output',str(p)],check=True); print('GRAPH_RESPONSIVE_EVIDENCE '+str(p))"],
+      "expected_exit": 0,
+      "required_stdout": ["PASS en-sombre-responsive-1024-pilot-selection-mode", "PASS en-sombre-responsive-760-pilot-path-from", "PASS en-sombre-responsive-exclusive-320-pilot-selection-mode", "PASS responsive-no-browser-errors-or-posts", "ANALYST_RESPONSIVE_UNCHANGED_WORK_PASS"],
+      "required_stderr": []
+    }
+  ]
+}

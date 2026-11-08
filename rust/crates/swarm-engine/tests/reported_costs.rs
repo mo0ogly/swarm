@@ -8,9 +8,7 @@ impl Fixture {
     /// declarations only; they do not start providers or grant execution rights.
     fn new() -> (Self, RootStore, String) {
         let path =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("costs186-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("costs186-");
         let mut store = RootStore::initialize(&path, &mut SystemEnvironment).unwrap();
         let work=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Costs","objective":"Observe","scope":"Owned","criteria":["Partial remains partial"]}"#,&mut SystemEnvironment).unwrap().result.work.id;
         (Self(path), store, work)

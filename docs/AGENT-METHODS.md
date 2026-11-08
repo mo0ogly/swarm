@@ -26,6 +26,14 @@ preuves historiques ou les processus déjà démarrés.
 
 Pour la migration Rust, [APEX](../.claude/skills/apex/SKILL.md) intègre la méthode adoptée le 22 octobre 2026 : contrats stricts et banc différentiel, réécriture par parcours, lots verticaux, preuves selon le risque, durcissement différé, plan court, fichiers propriétaires et préparation R6/R7. La bascule des écritures reste unique ; le service anticipé en lecture seule attend une confirmation explicite. Cette consigne persistante ne met pas à jour les contextes déjà démarrés. Les huit points sont conservés dans la référence conditionnelle APEX `references/rust-migration.md` : ils sont chargés pour la migration, sans gonfler toutes les instructions natives. Une préparation sans outils doit recevoir cette référence explicitement.
 
+La condensation APEX du 31 octobre conserve les étapes, les rôles, le tableau de
+bord PAEA et la référence de migration ; elle retire des répétitions du contrat
+commun. Le préflight passe de 33 022/33 025 à 31 953/31 956 octets pour les rôles
+concernés, sans changer la politique initiale de 32 000 octets. La revue de texte
+ne remplace ni les tests Rust des quatre contextes ni leur réception : une nouvelle
+compilation est nécessaire ; les processus déjà démarrés restent inchangés.
+[Origine, mesures et limites](plans/migration-rust/GRAPH-REGRESSION-20261031.md).
+
 ## Catalogue lisible
 
 Les noms destinés aux utilisateurs sont ceux du [catalogue du README](../README.md#communication-et-méthodes). Les méthodes de spécification couvrent la rédaction du besoin et l’examen du plan. Les identifiants historiques ci-dessous servent uniquement aux commandes natives et à la compatibilité ; ils ne sont pas les noms à afficher dans l’interface.
@@ -57,6 +65,7 @@ Exemples à saisir dans la conversation :
 
 ```text
 $apex --plan-only Définir une reprise après quota, avec les mêmes règles web et CLI.
+$apex Tableau de bord PAEA : état des campagnes T01–T22 et invariants I01–I17 en pourcentages, avec sources.
 $audit-pdca Auditer l'acceptation des résultats ; rapport seulement, sans correction.
 $audit-pdca --fix Corriger les défauts confirmés dans ce périmètre et rejouer les contrôles.
 $verify-fix Vérifier que le refus de lancement ne crée ni agent ni réservation.

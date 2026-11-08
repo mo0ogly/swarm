@@ -1,0 +1,36 @@
+{
+  "budget": {
+    "limit_usd": 2,
+    "reserve_per_launch_usd": 0.5,
+    "estimate_source": "Synthetic fixture",
+    "reference_date": "2026-10-27",
+    "updated": "2026-10-31T20:44:06.132762644Z",
+    "actor": "fpizzi/uid:1001"
+  },
+  "id": "prep-f846d64d9d9caa8a04737dee",
+  "title": "Owned AI preparation",
+  "method": "apex",
+  "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+  "revision": 3,
+  "created_at": "2026-10-31T20:44:06.032678454Z",
+  "updated_at": "2026-10-31T20:44:07.263115169Z",
+  "documents": {
+    "besoin": {
+      "kind": "besoin",
+      "text": "Need fixture",
+      "revision": 1,
+      "sha256": "f38feeebd580160f3650a45697a74566f3685bff7371683d04090222406f7132",
+      "at": "2026-10-31T20:44:06.032678454Z"
+    },
+    "brief": {
+      "source_turn": "pt-04a69badbba2cc649aa8162ea95c4bc7",
+      "kind": "brief",
+      "text": "Proposed brief",
+      "revision": 1,
+      "sha256": "f847499e6dc904becf4200a4364c2386f216682dbf8e82bc5c97190768de1d12",
+      "at": "2026-10-31T20:44:07.263115169Z",
+      "need_hash": "f38feeebd580160f3650a45697a74566f3685bff7371683d04090222406f7132"
+    }
+  },
+  "plan_ready": false
+}

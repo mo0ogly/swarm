@@ -12,13 +12,15 @@ mod trust_types;
 #[cfg(unix)]
 mod trust;
 #[cfg(unix)]
-pub use trust::{TrustError,TrustReply,verify_trust,verify_public_trust};
+pub use trust::{TrustError,TrustReply,verify_trust,verify_public_trust,digest_trust};
 #[cfg(target_os = "linux")]
 mod agent_launch;
 #[cfg(target_os = "linux")]
 pub use agent_launch::AgentLaunchOutcome;
 mod agent_launch_error;
 mod task_model;
+mod graph_batch;
+pub use graph_batch::{decode_graph_batch, GraphBatchRequest, GraphBatchPreview, GraphTaskChange, GraphTaskDefinition};
 mod task_report;
 pub use task_model::{decode_task_model_request, TaskModelPreview, TaskModelRequest};
 pub use task_report::{decode_task_report_request, TaskReportRequest};
@@ -102,7 +104,7 @@ pub use mission_supervision::{
 };
 #[cfg(target_os = "linux")]
 pub use root_store::{
-    MissionAutonomy, MissionConsentObservation, MissionControlSettings, MissionControlsObservation,
+    CockpitAutonomyObservation, MissionAutonomy, MissionConsentObservation, MissionControlSettings, MissionControlsObservation,
     CostSummary, CostTotal,
     TaskFreshnessEvidence, MissionResultObservation, MissionStatusObservation,
     MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact,
@@ -160,6 +162,12 @@ pub use agent_models::{
     Providers, RecoveryState, ReportedModel,
 };
 mod agent_contract;
+#[cfg(target_os = "linux")]
+mod archive_history;
+#[cfg(target_os = "linux")]
+mod archive_history_shapes;
+#[cfg(target_os = "linux")]
+pub use archive_history::{ArchivedAgentHistory, ArchivedCockpitHistory, ArchivedDecision, ArchivedVisit, ArchivedAgentLog};
 pub use agent_contract::{decode_agent, decode_agent_row, decode_launch, decode_providers};
 #[cfg(unix)]
 mod agent_storage_retry;
@@ -251,6 +259,8 @@ pub use run_limits::{
 };
 mod engine_settings;
 mod engine_settings_catalog;
+mod fixture_area;
+pub use fixture_area::{configured_area, fallback_area, fixture_area, fixture_root};
 mod gate_contract;
 mod gate_evaluation;
 mod managed_receipt;
@@ -332,11 +342,27 @@ pub use root_store::TrustEnrollmentCallError;
 #[cfg(target_os = "linux")]
 pub use root_store::CurrentManagedGitPublication;
 #[cfg(target_os = "linux")]
-pub use root_store::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat};
+pub use root_store::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat,PaeaGitSource};
 #[cfg(target_os = "linux")]
 pub use root_store::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};
 #[cfg(target_os = "linux")]
-pub use root_store::{PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
+pub use root_store::{PaeaPaymentAgreement,PaeaSettlementRequest,PaeaSettlementReceipt,PaeaSettlementOutcome,PaeaSettlementError,PaeaSettlementObservation,PaeaSettlementCallError};
+#[cfg(target_os = "linux")]
+pub use root_store::{PaeaGitTransferCall, PaeaGitTransferCallError, PaeaGitTransferReceipt};
+#[cfg(target_os = "linux")]
+pub use root_store::{PaeaGitAgreementMatch, PaeaGitAgreementTerms};
+#[cfg(target_os = "linux")]
+pub use root_store::{
+    PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt,
+};
+#[cfg(unix)]
+pub use root_store::ReaderVerdict;
+#[cfg(target_os = "linux")]
+pub use root_store::{
+    PaeaEffectReconcileFinding, PaeaEffectReconcileJournal, PaeaEffectReconcileReport,
+};
+#[cfg(target_os = "linux")]
+pub(crate) use root_store::TransferFailure;
 #[cfg(unix)]
 pub use root_store::QuotaPreview;
 #[cfg(target_os = "linux")]
@@ -359,11 +385,31 @@ mod identity_plan_rules;
 mod identity_plan_upgrade;
 mod instruction;
 mod instruction_learning;
+pub mod agent_identity_kernel;
+mod memory_catalog;
 mod memory_files;
+mod memory_summary_selection;
+mod memory_summary_source;
+mod memory_usage_binding;
+pub mod memory_usage_decision;
+pub use memory_summary_source::{
+    decode_summary_source_request, summary_source_for_work, MemorySummarySource,
+    MemorySummarySourcePacket, MemorySummarySourceRequest,
+};
+pub use memory_usage_binding::{
+    memory_summary_usage_binding, Actor, MemoryUsageBinding, MemoryUsageProjection,
+    MemoryUsageRequest, MemoryUsageSourceBinding, MemoryUsageTarget,
+};
 mod local_path;
 mod model_wire;
 mod models;
 mod mutation_guard;
+mod project_memory;
+pub use project_memory::{
+    decode_project_memory_request, memory_preview_token, memory_source_sha, memory_version_sha,
+    MemoryError, MemoryUse, ProjectMemoryPreview, ProjectMemoryRequest,
+};
+pub use memory_catalog::{memory_catalog, MemoryCatalog, MemoryCatalogEntry};
 pub use financial_budget::{
     check_launch_budget, check_reserved_agent_budget, check_reserved_planning_start_budget,
     decode_budget_change, reserve_planning_call, validate_budget, validate_budget_change, Budget,
@@ -605,6 +651,49 @@ pub use work::encode_public_model;
 mod web_session;
 #[cfg(target_os = "linux")]
 pub use web_session::{valid_web_session_credential, WebSessionCredential, WebSessionError};
+#[cfg(target_os = "linux")]
+mod web_login_ticket;
+#[cfg(target_os = "linux")]
+pub use web_login_ticket::{valid_web_login_ticket, WebLoginTicket, WebTicketUse};
+/// Failure issuing or consuming a cockpit login ticket: saved-settings causes
+/// (including historical absence of the v50 lifetime) are kept apart from
+/// storage/entropy causes. Display shows a stable code only, never a token.
+#[cfg(target_os = "linux")]
+pub enum WebTicketError {
+    Settings(RootStoreError),
+    Session(WebSessionError),
+}
+#[cfg(target_os = "linux")]
+impl WebTicketError {
+    /// Stable diagnostic family; no token, path or raw cause text.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::Settings(_) => "web-ticket-settings",
+            Self::Session(e) => e.code(),
+        }
+    }
+}
+#[cfg(target_os = "linux")]
+impl std::fmt::Display for WebTicketError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.code())
+    }
+}
+#[cfg(target_os = "linux")]
+impl std::fmt::Debug for WebTicketError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.code())
+    }
+}
+#[cfg(target_os = "linux")]
+impl std::error::Error for WebTicketError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Settings(e) => Some(e),
+            Self::Session(e) => Some(e),
+        }
+    }
+}
 
 mod web_policy;
 pub use web_policy::{WebTransportConstraints, WebTransportPolicy, WEB_POLICY_FIELDS};
@@ -672,6 +761,7 @@ pub use root_store::MissionReportRelayOutcome;
 mod preparation_models;
 pub use preparation_models::{Preparation, PreparationDocument, PreparationSource, PreparationVerdict, PreparationConversion};
 pub use engine_settings::{PreparationReadPolicy, PreparationWritePolicy, PreparationPlanPolicy, PreparationSourcePolicy, PreparationTemplatePolicy};
+pub use engine_settings::{WebAccessMode, WebAccessPolicy};
 pub use root_store::{PreparationReadError, PreparationReadObservation};
 pub use preparation_models::PreparationMethod;
 pub use root_store::PreparationList;

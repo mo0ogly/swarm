@@ -1,15 +1,13 @@
 #![cfg(target_os = "linux")]
 use std::{fs, os::unix::ffi::OsStrExt, path::PathBuf, process::Command};
 use swarm_engine::{EngineSettingsChange, RootStore, SettingCap, SettingCount, SystemEnvironment};
+
 struct Fixture(PathBuf);
 impl Fixture {
     /// Initialize a real isolated Git repository and native Root with private data.
     fn new() -> Self {
-        use std::os::unix::fs::PermissionsExt;
         let p =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("git-metadata-").unwrap());
-        fs::create_dir(&p).unwrap();
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("git-metadata-");
         let f = Self(p);
         RootStore::initialize(&f.0, &mut SystemEnvironment)
             .unwrap()
@@ -125,9 +123,23 @@ fn root_legacy_and_mutation_git_reads_disable_external_filters_and_preserve_inde
 /// value is reported as a verified clean checkpoint, and private output stays redacted.
 #[test]
 fn unavailable_fields_keep_original_failures_and_recover_after_real_git_initialization() {
-    let p =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("git-unavailable-").unwrap());
-    fs::create_dir(&p).unwrap();
+    // This test's precondition is a Root with no ancestor Git repository. The
+    // repository fixture area lives inside the Swarm checkout, whose Git
+    // discovery would silently satisfy the metadata commands, and the engine's
+    // runner strips GIT_* variables by contract, so no ceiling can be passed
+    // through the environment. The operator fallback area for fixtures that the
+    // repository area cannot host (no ancestor repository) realizes the
+    // precondition naturally; `git init` below replaces the state under test.
+    let base = std::path::Path::new(&std::env::var_os("HOME").unwrap())
+        .join(".local/state/swarm-fixtures");
+    std::fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(&base)
+        .unwrap();
+    use std::os::unix::fs::DirBuilderExt;
+    let p = base.join(swarm_engine::generate_identifier("git-unavailable-").unwrap());
+    std::fs::DirBuilder::new().mode(0o700).create(&p).unwrap();
     let s = RootStore::initialize(&p, &mut SystemEnvironment).unwrap();
     let missing = s.inspect_git_metadata().unwrap();
     assert_eq!(missing.issues.len(), 3);

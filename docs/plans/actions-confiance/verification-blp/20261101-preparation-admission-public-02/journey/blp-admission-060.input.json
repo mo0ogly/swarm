@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "event_id": "renewal",
+  "expected_revision": 1,
+  "expected_trust_revision": 1,
+  "reason": "Explicit fixture policy revision",
+  "policy": {
+    "schema_version": 1,
+    "levels": [
+      {
+        "id": "public",
+        "name_fr": "Public",
+        "name_en": "Public"
+      },
+      {
+        "id": "secret",
+        "name_fr": "Secret",
+        "name_en": "Secret"
+      },
+      {
+        "id": "top",
+        "name_fr": "Très secret",
+        "name_en": "Top"
+      }
+    ],
+    "compartments": [
+      "a",
+      "b",
+      "c"
+    ],
+    "clearances": {
+      "admin": {
+        "level": "top",
+        "compartments": [
+          "a",
+          "b",
+          "c"
+        ]
+      },
+      "sender": {
+        "level": "top",
+        "compartments": [
+          "a",
+          "b",
+          "c"
+        ]
+      },
+      "low": {
+        "level": "secret",
+        "compartments": [
+          "a"
+        ]
+      }
+    },
+    "preparation_quarantine": true
+  }
+}

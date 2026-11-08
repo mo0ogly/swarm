@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 DIRECTORY = Path(__file__).resolve().parents[1] / "tools/memory-evaluation"
@@ -104,7 +105,7 @@ class MemoryKnowledge(unittest.TestCase):
                     KNOWLEDGE.grade(self.pack, answers)
 
     def test_source_snapshots_and_constant_are_bound(self):
-        with tempfile.TemporaryDirectory(prefix="swarm-knowledge-source-") as temporary:
+        with tempfile.TemporaryDirectory(prefix="swarm-knowledge-source-", dir=fixture_area()) as temporary:
             root = Path(temporary)
             pack = copy.deepcopy(self.pack)
             model = b"package engine\nconst schemaVersion = 33\n"

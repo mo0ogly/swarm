@@ -3,6 +3,10 @@ import os
 from pathlib import Path
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import threading
 import unittest
 from recorded_process import capture
@@ -13,7 +17,7 @@ class RecordedProcessTests(unittest.TestCase):
 
     def test_progress_is_visible_before_child_exit_and_nonzero_result_is_preserved(self):
         """A descriptor handshake proves observation precedes completion, without sleeping."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root = Path(directory)
             ready_read, ready_write = os.pipe()
             ack_read, ack_write = os.pipe()
@@ -57,7 +61,7 @@ class RecordedProcessTests(unittest.TestCase):
 
     def test_previous_evidence_is_not_overwritten_and_fresh_capture_recovers(self):
         """Refuse a reused evidence name before child execution, then succeed with fresh names."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root = Path(directory)
             (root/'stdout').write_bytes(b'original evidence')
             args = [sys.executable, '-c', "print('fresh result')"]

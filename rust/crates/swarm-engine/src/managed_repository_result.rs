@@ -117,11 +117,18 @@ fn report_bytes(bare: &Path, oid: &str, base: &str, path: &str, settings: &Engin
 /// read, and must repeat authority at submission. Git runs without a Root writer
 /// transaction; the managed lane serializes only retention. Existing result refs
 /// are reused after interruption, never overwritten from the mutable copy.
-/// Missing initial report waits. Other failures retain causes and may leave Git
-/// objects, ref or published files; they do not imply rollback. No retry, SQL,
+/// Missing initial report waits. A clean failed exclusive-lane acquisition is
+/// classified on the whole retention attempt before the incomplete wrapper is
+/// applied: it returns the existing pending reason with no retention effect —
+/// no new Git object, ref, publication or store write, and no whole-Work
+/// rollback — so the caller may repeat the entire guarded retention later.
+/// Other failures retain causes and may leave Git objects, ref or published
+/// files; they do not imply rollback. No retry, SQL,
 /// provider, candidate publication, task acceptance or deletion is performed.
 pub(crate) fn retain_result(root: &Path, work: &Work, agent: &Agent, settings: &EngineSettingsDocument) -> Result<Result<RetainedResult, &'static str>, E> {
-    with_storage(root, work, true, |dir| {
+    // One retention attempt: a clean failed lane acquisition is recognized on
+    // its result, before the incomplete wrapper is applied.
+    let attempt = with_storage(root, work, true, |dir| {
         repository(dir, work, settings)?;
         let p = proof(dir, &format!("native-worker-{}.json", agent.id))?;
         let repo = work.planning.as_deref().and_then(|v| v.repository.as_deref()).ok_or(E::Refused("managed-repository-required"))?;
@@ -184,7 +191,16 @@ pub(crate) fn retain_result(root: &Path, work: &Work, agent: &Agent, settings: &
                 })
             })
         })
-    }).map_err(|e| E::caused("managed-result-retention-incomplete", e))
+    });
+    match attempt {
+        // Only a clean failed exclusive-lane acquisition happened, before any
+        // retention write, so the caller can wait on the existing reason and
+        // repeat the whole guarded retention. Lock-close, directory-close,
+        // partial Git/publication and every other failure keep the original
+        // result, wrapper and cause.
+        Err(e) if super::clean_lane_contention(&e) => Ok(Err("managed-operation-busy")),
+        other => other.map_err(|e| E::caused("managed-result-retention-incomplete", e)),
+    }
 }
 
 /// Verify an already retained result without opening the worker copy or mutating

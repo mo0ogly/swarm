@@ -1,0 +1,5 @@
+{
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-4n8b0993",
+  "schema_version": 1,
+  "state": ".swarm/state.db"
+}

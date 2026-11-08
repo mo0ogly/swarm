@@ -80,6 +80,32 @@ fn with_storage<T>(
         },
     )
 }
+
+/// Whether an error is exactly a clean failed managed-lane acquisition: the
+/// direct producer code `managed-operation-busy` wrapping a typed
+/// `LocalStorageError` whose whole nonblocking lock acquisition was refused
+/// with `rustix::io::Errno::AGAIN`, with nothing published and no cleanup
+/// failure recorded. Inputs: any `AgentLaunchError` raised while opening or
+/// reserving the managed storage. Effects: none — a pure classifier. Limits:
+/// no Display or message matching, no cause-chain walk, and no classification
+/// of `Cleanup`, `Commit` or `Busy` wrappers, missing-lane open failures,
+/// partial operations or unknown layers. Call only on the current acquisition
+/// path, whose producer emits this exact shape before running the operation;
+/// this classifier alone is not evidence about arbitrary callers or earlier
+/// effects. It grants no retry, waiting or authorization, and the caller still
+/// owns its guards and repeat policy.
+pub(crate) fn clean_lane_contention(error: &E) -> bool {
+    match error {
+        E::Cause {
+            code: "managed-operation-busy",
+            cause,
+        } => cause
+            .downcast_ref::<crate::local_storage::LocalStorageError>()
+            .is_some_and(|storage| storage.is_clean_lock_contention()),
+        _ => false,
+    }
+}
+
 /// Check the existing repository originals while holding the managed lane.
 /// This validates Git objects, never trusts a copied path or metadata alone.
 fn repository(

@@ -22,7 +22,14 @@
  function url(path){const u=new URL(path,location.href);u.searchParams.set('lang',globalThis.SwarmI18n?.language==='en'?'en':'fr');u.searchParams.set('theme',document.documentElement.dataset.theme);return u.pathname+u.search}
  /** Reuse original sections/navigation. Unconnected sections remain reachable,
   * with visible limitations and disabled commands, never silently empty success. */
- function showView(name,focus=false){if(!views.has(name))name='conduite';for(const section of document.querySelectorAll('.view'))section.hidden=section.id!==name;for(const button of document.querySelectorAll('#tabs [data-view]')){if(button.dataset.view===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')}
+ function showView(name,focus=false){if(!views.has(name))name='conduite';
+  // ADM-04: a direct view access without the menu right stays refused with a
+  // clear message; the API answers 403 on its own — the UI grants nothing.
+  if(globalThis.SwarmAuthorityMenu&&!globalThis.SwarmAuthorityMenu.visibleView(name)){
+   $('message').hidden=false;$('message').className='notice alert';$('message').textContent=globalThis.SwarmAuthorityMenu.deniedMessage();
+   return;
+  }
+  for(const section of document.querySelectorAll('.view'))section.hidden=section.id!==name;for(const button of document.querySelectorAll('#tabs [data-view]')){if(button.dataset.view===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')}
   $('assistant').hidden=true;globalThis.SwarmShell?.navigate(name);const u=new URL(location.href);u.searchParams.set('view',name);history.replaceState(null,'',u);if(focus)$('main-content').focus();if(name==='manage')renderManager();if(name==='resume')resumePanel?.refresh();if(name==='logs')logsPanel?.refresh();if(name!=='logs'&&current?.statusObserved===false)select(selected);
  }
  /** Filter the original mission manager with actual Work rows. No lifecycle
@@ -35,9 +42,11 @@
   * separately observed lazy resume/log panels. Logs do not request calculated
   * mission status; opening another view observes it then, with its refusal intact. A generation
   * prevents delayed responses replacing newer selection. Errors are visible and
-  * data is read-only; controls do not establish conductor/process liveness. */
+  * data is read-only; controls do not establish conductor/process liveness.
+  * An empty/missing selection clears the owned graph modal and view memory;
+  * another Work cannot inherit that modal or its pending presentation. */
  async function select(id){const ticket=++generation,changedContext=selected!==id;selected=id;resumePanel?.setWork(id);logsPanel?.setWork(id);const work=works.find(w=>w.id===id);budgetEditor?.setWork(work?id:'');current=null;if(instructions){if(changedContext)SwarmNativeInstructions.clear(instructions);else instructions.replaceChildren()}SwarmRustCockpitPanels.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));const u=new URL(location.href);if(id)u.searchParams.set('work',id);else u.searchParams.delete('work');history.replaceState(null,'',u);
-  if(!work){$('title').textContent=tr('Choisissez une mission');$('objective').textContent='';for(const id of ['task-count','accepted-count','active-count','decision-count'])$(id).textContent='—';for(const id of ['tasks-body','conduite-plan','graph'])$(id).replaceChildren();$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr('Aucune mission sélectionnée.');return}
+  if(!work){$('title').textContent=tr('Choisissez une mission');$('objective').textContent='';for(const id of ['task-count','accepted-count','active-count','decision-count'])$(id).textContent='—';for(const id of ['tasks-body','conduite-plan'])$(id).replaceChildren();SwarmRustDependencyGraph.clear(tr('Aucune mission sélectionnée.'));$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr('Aucune mission sélectionnée.');return}
   $('title').textContent=work.title;$('objective').textContent=work.objective;$('connection').textContent=tr('Lecture de la mission…');$('main-content').setAttribute('aria-busy','true');
   // Clear the previous mission before starting a potentially failing read.
   SwarmRustCockpitRead.render({work,mission:null,missionError:'web-native-read-pending',control:null});
@@ -92,15 +101,20 @@
  }
  /** Limitations sit in their original sections, with working navigation and an
   * actual link to the already supported Rust Admin. No unsupported action sends
-  * an HTTP request, records a visit, mutates a mission or starts an agent. */
+  * an HTTP request, records a visit, mutates a mission or starts an agent.
+  * Explicit graph editors register a separate awaited readback consumer; their
+  * protected writes are not inferred from the disabled historical controls. */
  function setup(){for(const section of document.querySelectorAll('.view')){
    for(const control of section.querySelectorAll('button,input,select,textarea'))control.disabled=true;
-   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='conduite'?tr('Les consignes attribuées sont consultables et rejetables avant transmission. Les autres commandes restent à raccorder.'):section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents','resume','logs'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
+   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='conduite'?tr('Le graphe permet de créer des tâches et de modifier leurs liens. Les consignes attribuées sont consultables et rejetables avant transmission.'):section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents','resume','logs'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
   }
   $('manage-search').disabled=false;$('manage-search').addEventListener('input',renderManager);$('manage-state').value='all';
   $('assistant').hidden=true;$('mode').disabled=true;$('help').disabled=true;$('version-open').disabled=false;
   const link=document.createElement('a');link.href=url('/native-runtime.html?view=admin');link.textContent=tr('Ouvrir les réglages Rust');$('admin-title').after(link);
   for(const a of document.querySelectorAll('a[href^="/"]')){if(a===link)continue;const target=new URL(a.href);if(target.pathname==='/prepare.html'){a.href=url('/prepare.html');continue;}if(target.pathname!=='/'){a.addEventListener('click',event=>{event.preventDefault();$('message').hidden=false;$('message').className='notice info';$('message').textContent=tr('Cette destination reste à raccorder au moteur Rust.');$('message').scrollIntoView({block:'nearest'})})}}
+  // Saving remains pending through the actual observation reload. The editor
+  // owns error display and duplicate-submit protection; preserve changed views.
+  SwarmRustDependencyGraph.setRefreshHandler(async(id,revision)=>{if(selected!==id)return;const observed=await load();if(selected===id&&(!observed||!current||!Number.isSafeInteger(current.work.revision)||current.work.revision<revision))throw failure('web-native-graph-refresh-unconfirmed')});
   $('tabs').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view,true)});$('work').addEventListener('change',()=>select($('work').value));$('refresh').addEventListener('click',load);
   $('theme').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat';document.documentElement.dataset.theme=theme;$('theme').textContent=tr(theme==='etat'?'Passer au thème sombre':'Passer au thème clair');link.href=url('/native-runtime.html?view=admin')});
   instructions=document.createElement('div');instructions.id='native-instruction-history';$('conduite-plan').after(instructions);

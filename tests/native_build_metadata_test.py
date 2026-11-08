@@ -1,4 +1,5 @@
 """Native candidate invocation metadata guards; fixtures perform no Cargo build."""
+from fixture_area import fixture_area
 import importlib.util,sys,unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools/verification'))
@@ -24,7 +25,7 @@ class MetadataBinding(unittest.TestCase):
         """
         import json,tempfile,subprocess
         from unittest.mock import patch
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root=Path(directory);out=root/'proof'
             with patch.object(build,'observe',return_value=dict(commit='a'*40,modified=True)),patch.object(build.subprocess,'run',return_value=subprocess.CompletedProcess([], -9)):
                 with self.assertRaisesRegex(ValueError,'native-build-profile-failed'):
@@ -44,7 +45,7 @@ class MetadataBinding(unittest.TestCase):
         import hashlib,json,tempfile,subprocess
         from unittest.mock import patch
         for changed,allowed in [(dict(status_sha256='b'*64),True),(dict(commit='b'*40),False),(dict(modified=False),False)]:
-            with self.subTest(changed=changed),tempfile.TemporaryDirectory() as directory:
+            with self.subTest(changed=changed),tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
                 root=Path(directory);out=root/'proof';binary=root/'fixture-binary';binary.write_bytes(b'inert fixture');before=dict(commit='a'*40,modified=True,status_sha256='a'*64);after={**before,**changed}
                 declared={}
                 def run(argv,**kwargs):

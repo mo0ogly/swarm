@@ -4,7 +4,7 @@ use http::{
     HeaderValue, Request,
 };
 use std::{error::Error, net::TcpListener};
-use swarm_web::{LocalWebAuthority, WebAccessError};
+use swarm_web::{LocalWebAuthority, WebAccessError, WebAuthMethod, WebPrincipal};
 const KEY: &str = "session-0123456789abcdef01234567";
 /// Actual private loopback listener supplies an observed assigned port; no fixed port.
 fn fixture() -> (TcpListener, LocalWebAuthority) {
@@ -29,7 +29,7 @@ fn request(a: &LocalWebAuthority, method: &str) -> Request<Vec<u8>> {
     r
 }
 /// Stable error family and safe diagnostics, never a reflected credential/header.
-fn refused(r: Result<(), WebAccessError>, code: &str) {
+fn refused<T: std::fmt::Debug>(r: Result<T, WebAccessError>, code: &str) {
     let e = r.unwrap_err();
     assert_eq!(e.code(), code);
     assert!(!format!("{e:?} {e}").contains(KEY));
@@ -202,4 +202,20 @@ fn protected_gate_does_not_consume_or_replace_the_body() {
     a.authorize(&r).unwrap();
     assert_eq!(r.body().position(), 0);
     assert_eq!(r.body().get_ref(), b"unconsumed fixture body");
+}
+
+/// Owner key success names the fixed owner subject; the principal carries no
+/// credential material in Debug, and a refused head yields no principal.
+#[test]
+fn owner_key_yields_owner_principal_without_secret() {
+    let (_l, a) = fixture();
+    for method in ["GET", "POST"] {
+        let p = a.authorize(&request(&a, method)).unwrap();
+        assert_eq!(p.subject(), WebPrincipal::OWNER_SUBJECT);
+        assert_eq!(p.method(), WebAuthMethod::Owner);
+        assert!(!format!("{p:?}").contains(KEY));
+    }
+    let mut r = request(&a, "GET");
+    r.headers_mut().remove(COOKIE);
+    refused(a.authorize(&r), "web-session-required");
 }

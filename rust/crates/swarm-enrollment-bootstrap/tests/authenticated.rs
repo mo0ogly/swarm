@@ -1,3 +1,4 @@
+mod common;
 use swarm_enrollment_bootstrap::{
     decode_authenticated, encode_authenticated, AuthenticatedDocument, ControlDocument, Document,
     PersonalDeclaration,
@@ -126,7 +127,7 @@ mod loading {
     /// Six actual private fixture directories, two opaque metadata-only files.
     /// No SQLite, grant, key custody or live daemon; pin is fixture-selected only.
     fn fixture() -> (tempfile::TempDir, AuthenticatedDocument, std::path::PathBuf) {
-        let root = tempfile::tempdir().unwrap();
+        let root = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         for name in [
             "bootstrap",

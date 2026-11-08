@@ -1,0 +1,99 @@
+{
+ "schema_version": 1,
+ "id": "paea-git-call-agreement-last-use-rust",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/*/Cargo.toml",
+  "rust/crates/swarm-engine/src/**/*",
+  "rust/crates/swarm-engine/tests/paea_git_promote_call.rs",
+  "rust/crates/swarm-enrollment-*/src/**/*",
+  "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+  "rust/crates/swarm-identity-contract/src/**/*",
+  "rust/crates/swarm-protection-contract/src/**/*",
+  "tools/verification/recipe.py",
+  "tools/verification/recipes/paea-git-call-agreement-last-use-rust.json",
+  ".swarm-fixtures/source-fixture-lastuse-regen-20261031b/result.json"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/.swarm-fixtures/source-fixture-lastuse-regen-20261031b"
+ },
+ "steps": [
+  {
+   "id": "engine-last-use-counter-order",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--test",
+    "paea_git_promote_call",
+    "--",
+    "--ignored",
+    "--exact",
+    "promote_call_refuses_mandate_revoked_after_agreement_then_readmits_once",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "promote_call_refuses_mandate_revoked_after_agreement_then_readmits_once ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "engine-promote-regressions",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--test",
+    "paea_git_promote_call",
+    "--",
+    "--ignored",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "5 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "engine-agreement-lib-tests",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--lib",
+    "--",
+    "root_store::paea_git_agreement",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "7 passed; 0 failed"
+   ],
+   "required_stderr": []
+  }
+ ]
+}

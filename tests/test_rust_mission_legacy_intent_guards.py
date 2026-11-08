@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import sqlite3
 import tempfile
+from fixture_area import fixture_area
 import types
 import unittest
 from unittest.mock import Mock, patch
@@ -66,7 +67,7 @@ class LegacyIntentGuards(unittest.TestCase):
 
     def test_business_snapshot_masks_only_owned_pulse_fields(self):
         """Actual readonly SQLite witness permits pulses but preserves stop/body/other Work."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root = Path(temporary)
             (root / '.swarm').mkdir()
             db = sqlite3.connect(root / '.swarm/state.db')
@@ -110,7 +111,7 @@ class LegacyIntentGuards(unittest.TestCase):
 
     def test_archived_bundle_requires_exact_old_binary_and_source_bytes(self):
         """A valid local inventory precedes tamper and root/path escape refusals."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             base = Path(temporary)
             root = base / 'v1/root'
             (root / 'tests').mkdir(parents=True)
@@ -139,7 +140,7 @@ class LegacyIntentGuards(unittest.TestCase):
 
     def test_loaded_historical_modules_cannot_fallback_to_current_checkout(self):
         """Exact module source set passes; missing or unlisted rust imports are refused."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             path = Path(temporary) / 'rust_mission_task_profile.py'
             path.write_bytes(b'inert source')
             files = {path.resolve(): subject.digest(path.read_bytes())}
@@ -187,7 +188,7 @@ class LegacyIntentGuards(unittest.TestCase):
     def test_actual_refusal_consumer_cancels_only_after_exact_typed_denial(self):
         """Real Python flow under public doubles accepts denial/cancel/replay, rejects generic wrapper."""
         for valid in (True, False):
-            with self.subTest(valid=valid), tempfile.TemporaryDirectory() as temporary:
+            with self.subTest(valid=valid), tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
                 base = Path(temporary)
                 root = base / 'owned-root'
                 root.mkdir()

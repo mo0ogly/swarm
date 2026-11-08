@@ -243,8 +243,7 @@ fn saved_model_policy_public_apply_reopen_preserves_history_and_effect() {
         EngineSettingsChange, EngineSettingsDocument, RootStore, SystemEnvironment,
     };
     let root =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("model-policy81-").unwrap());
-    fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+        swarm_engine::fixture_root("model-policy81-");
     RootStore::initialize(&root, &mut SystemEnvironment)
         .unwrap()
         .close()

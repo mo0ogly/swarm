@@ -1,0 +1,537 @@
+{
+  "schema_version": 1,
+  "job_id": "validation-6b37d1ffef5da3023b7f5a2e",
+  "controls_passed": true,
+  "task_accepted": false,
+  "retired": false,
+  "replayed": true,
+  "work": {
+    "planning": {
+      "reviewer_required": true,
+      "reviewer": {
+        "max_context_files": 24,
+        "max_source_bytes": 98304,
+        "max_context_bytes": 131072,
+        "max_files": 100,
+        "provider": "fixture",
+        "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+        "model_route": {
+          "level": "standard",
+          "model": "fixture-standard",
+          "effort": "fixture-medium",
+          "billing": "external",
+          "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+          "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+        },
+        "max_calls": 2,
+        "calls": 0,
+        "authorized": "2026-10-28T17:52:31.709374503Z"
+      },
+      "model_route": {
+        "level": "standard",
+        "model": "fixture-standard",
+        "effort": "fixture-medium",
+        "billing": "external",
+        "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+        "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+      },
+      "checks": {
+        "req-1": [
+          {
+            "review_output": true,
+            "inputs": [
+              "tracked.txt"
+            ],
+            "id": "biba-control",
+            "command": [
+              "python3",
+              "-c",
+              "from pathlib import Path\nimport os,json,hashlib\nassert Path('tracked.txt').read_bytes()==b'Committed planning input\\n'\nroot=next(p.parent for p in Path.cwd().parents if p.name=='.swarm')\nfacts={}\ntry:\n with (root/'.swarm/engine-settings.json').open('rb') as f:facts['private_read']=bool(f.read(1))\nexcept OSError:facts['private_read']=False\ntry:\n fd=os.open(root/'.swarm/state.db',os.O_RDWR);os.close(fd);facts['database_write']=True\nexcept OSError:facts['database_write']=False\ntry:\n with (root/'.swarm'/('biba-control-'+str(os.getpid()))).open('xb') as f:f.write(b'OWNED_SYNTHETIC_LOW_CONTROL')\n facts['private_write']=True\nexcept OSError:facts['private_write']=False\ntry:\n fd=os.open(root/'source/tracked.txt',os.O_WRONLY);os.close(fd);facts['official_write']=True\nexcept OSError:facts['official_write']=False\nwith Path('biba-control-result-'+str(os.getpid())+'.json').open('x') as f:json.dump(facts,f)\nprint('OWNED_BIBA_CONTROL '+json.dumps(facts),flush=True)\n"
+            ],
+            "criteria": [
+              1
+            ],
+            "justification": "Observe only owned synthetic Biba boundaries; never accept a task",
+            "timeout_seconds": 60
+          }
+        ]
+      },
+      "repository": {
+        "source": "/tmp/swarm-model83-74_5nz19/source",
+        "storage": "/tmp/swarm-model83-74_5nz19/.swarm/managed/w-10fb269432444817aedce668",
+        "base_commit": "70f9efba95ff9bafc4a303054ea9980735628fa2",
+        "candidate_commit": "70f9efba95ff9bafc4a303054ea9980735628fa2",
+        "snapshot_digest": "9a80f3fd1639c9cdee5aded2890a8abd5ec43aad80d1c572b38ef1001e09c2a0",
+        "request_digest": "44857e71ce04d382e59eda18dbe1bc3b7cbcace02e4cf93cc2118244ab49ad01"
+      },
+      "provider": "fixture",
+      "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+      "activations": 2,
+      "max_activations": 6,
+      "version": 1,
+      "paused": false,
+      "max_tasks": 2,
+      "max_decisions": 10,
+      "decisions": 2,
+      "scopes": [
+        {
+          "last_model": {
+            "provider": "fixture",
+            "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+            "route": {
+              "level": "standard",
+              "model": "fixture-standard",
+              "effort": "fixture-medium",
+              "billing": "external",
+              "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+              "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+            },
+            "actor": "",
+            "at": "2026-10-28T17:52:31.841990327Z"
+          },
+          "delivery": {
+            "judge_available": true,
+            "judge_cycle": 1,
+            "task_budget": 2,
+            "activation_budget": 6,
+            "closure_unavailable": true,
+            "review_retry_unavailable": true,
+            "production_retry_unavailable": true,
+            "context_sha256": "6605e2a8e3ed3e9a421a5ebec815c9a50a0f40a95c203de9c03a91d5a1bd147a",
+            "events": [
+              "managed-planning-enable"
+            ],
+            "decision": "planning-decision-a754c5c9932f4cad13052720"
+          },
+          "workflow": {
+            "version": 1,
+            "role": "planner",
+            "methods": [
+              "apex",
+              "audit-pdca",
+              "spec-builder",
+              "spec-audit",
+              "replan",
+              "debug",
+              "product-planning"
+            ],
+            "sha256": "0ee8956b70ffdc7971b868f62666fa89f4cd40edeb68fb9211755de537572e55"
+          },
+          "activations": 2,
+          "id": "root",
+          "objective": "Scoped fixture planning",
+          "requirements": [],
+          "revision": 2,
+          "generation": 8,
+          "state": "ready"
+        },
+        {
+          "last_model": {
+            "provider": "fixture",
+            "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+            "route": {
+              "level": "standard",
+              "model": "fixture-standard",
+              "effort": "fixture-medium",
+              "billing": "external",
+              "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+              "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+            },
+            "actor": "",
+            "at": "2026-10-28T17:52:32.580286892Z"
+          },
+          "delivery": {
+            "task_budget": 2,
+            "activation_budget": 6,
+            "closure_unavailable": true,
+            "review_retry_unavailable": true,
+            "production_retry_unavailable": true,
+            "context_sha256": "1619669d2af2c95c4cd01a960b808951501888a6751e8b0a1e44273ceb055267",
+            "events": [
+              "plan-167645b41f0e7f09b19d07486c766cb61e2ce797b3bf1640b4eb8b49b4d3a813"
+            ],
+            "decision": "planning-decision-17a2c1f9567222c51b2a67b2"
+          },
+          "workflow": {
+            "version": 1,
+            "role": "subplanner",
+            "methods": [
+              "apex",
+              "audit-pdca",
+              "spec-builder",
+              "spec-audit",
+              "replan",
+              "debug",
+              "product-planning"
+            ],
+            "sha256": "43738280430f12d723d0b5e40128bc92616cb0bfe6a38d2487aceb877eb2a206"
+          },
+          "max_tasks": 2,
+          "max_activations": 3,
+          "activations": 1,
+          "id": "child",
+          "parent": "root",
+          "objective": "Owned child scope\nPlan the owned requirement",
+          "requirements": [
+            "req-1"
+          ],
+          "revision": 2,
+          "generation": 8,
+          "state": "ready"
+        }
+      ],
+      "inbox": [
+        {
+          "id": "managed-planning-enable",
+          "scope": "root",
+          "kind": "brief",
+          "message": "Scoped fixture planning",
+          "decision": "planning-decision-a754c5c9932f4cad13052720",
+          "at": "2026-10-28T17:52:31.709374503Z"
+        },
+        {
+          "id": "plan-167645b41f0e7f09b19d07486c766cb61e2ce797b3bf1640b4eb8b49b4d3a813",
+          "scope": "child",
+          "kind": "delegation",
+          "message": "Owned child scope",
+          "decision": "planning-decision-17a2c1f9567222c51b2a67b2",
+          "at": "2026-10-28T17:52:32.133197751Z"
+        },
+        {
+          "id": "plan-f3ad6c3686165334c2b09c9e1f84b20f1da946bb90236ca40974aab5d7ef2f11",
+          "scope": "child",
+          "kind": "attempt_ended",
+          "task": "task",
+          "attempt": "a-99bd596dba1a2c98b0b1be52",
+          "message": "completed : processus récolté ; validation requise",
+          "at": "2026-10-28T17:52:42.37154556Z"
+        },
+        {
+          "id": "plan-54172cc253b606fa9c9edf6c3baa734dfe193642b1f90f89221ff905723dae7e",
+          "scope": "child",
+          "kind": "attempt_ended",
+          "task": "task-2",
+          "attempt": "a-b22a9f751702c46da9e33c14",
+          "message": "completed : processus récolté ; validation requise",
+          "at": "2026-10-28T17:52:48.366412344Z"
+        },
+        {
+          "handoff": {
+            "path": ".swarm/managed/w-10fb269432444817aedce668/results/watch-6f47cbfd98339c6053cca6d1/report.md",
+            "sha256": "9412baa415cea7cab68ace4bfe5ff11f7c8d899bf2bfad66399bc476fbd8c848"
+          },
+          "id": "plan-7a57bcb8bf107567c2c4fc119c5fb7670de16079e709e7549cff6f0f55f568dc",
+          "scope": "child",
+          "kind": "handoff",
+          "task": "task-2",
+          "attempt": "a-b22a9f751702c46da9e33c14",
+          "message": "Rapport du worker remis au propriétaire ; preuves et validation requises",
+          "artifacts": [
+            {
+              "path": ".swarm/managed/w-10fb269432444817aedce668/results/watch-6f47cbfd98339c6053cca6d1/report.md",
+              "sha256": "9412baa415cea7cab68ace4bfe5ff11f7c8d899bf2bfad66399bc476fbd8c848"
+            }
+          ],
+          "at": "2026-10-28T17:52:51.594452164Z"
+        },
+        {
+          "handoff": {
+            "path": ".swarm/managed/w-10fb269432444817aedce668/results/watch-12e525926625c1504db9d47d/report.md",
+            "sha256": "9412baa415cea7cab68ace4bfe5ff11f7c8d899bf2bfad66399bc476fbd8c848"
+          },
+          "id": "plan-62d949eca04f305ecb0f3fdf7cf3f0cd68a9256139ec86c307ee01aa40c877bd",
+          "scope": "child",
+          "kind": "handoff",
+          "task": "task",
+          "attempt": "a-99bd596dba1a2c98b0b1be52",
+          "message": "Rapport du worker remis au propriétaire ; preuves et validation requises",
+          "artifacts": [
+            {
+              "path": ".swarm/managed/w-10fb269432444817aedce668/results/watch-12e525926625c1504db9d47d/report.md",
+              "sha256": "9412baa415cea7cab68ace4bfe5ff11f7c8d899bf2bfad66399bc476fbd8c848"
+            }
+          ],
+          "at": "2026-10-28T17:52:52.199409463Z"
+        },
+        {
+          "id": "biba-controls-planning",
+          "scope": "root",
+          "kind": "operator_resume",
+          "message": "Authorize only manual control of retained fixture reports",
+          "at": "2026-10-28T18:09:30.862561678Z"
+        }
+      ],
+      "judge": {
+        "cycle": 1,
+        "max_cycles": 0,
+        "closed": false
+      }
+    },
+    "launch_profile": {
+      "provider": "fixture",
+      "role": "worker",
+      "workspace": "/tmp/swarm-model83-74_5nz19/source",
+      "level": "standard",
+      "capture_output": true,
+      "updated": "2026-10-28T17:52:33.458086254Z",
+      "actor": "fpizzi/uid:1001"
+    },
+    "schema_version": 1,
+    "id": "w-10fb269432444817aedce668",
+    "revision": 26,
+    "title": "Public planning bootstrap",
+    "objective": "Scoped fixture planning",
+    "scope": "Owned local bootstrap",
+    "criteria": [
+      "Configuration is persisted without model execution"
+    ],
+    "next": "",
+    "summary": "",
+    "memory": null,
+    "created": "2026-10-28T17:52:31.583683443Z",
+    "updated": "2026-10-28T18:10:18.562690263Z",
+    "git": {
+      "head": "",
+      "branch": "",
+      "changes": ""
+    },
+    "tasks": [
+      {
+        "scope_id": "child",
+        "requirements": [
+          "req-1"
+        ],
+        "validation_policy": {
+          "mode": "automatic",
+          "controls": [
+            {
+              "review_output": true,
+              "inputs": [
+                "tracked.txt"
+              ],
+              "id": "check-5c4845eda50c68a014667308",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path\nimport os,json,hashlib\nassert Path('tracked.txt').read_bytes()==b'Committed planning input\\n'\nroot=next(p.parent for p in Path.cwd().parents if p.name=='.swarm')\nfacts={}\ntry:\n with (root/'.swarm/engine-settings.json').open('rb') as f:facts['private_read']=bool(f.read(1))\nexcept OSError:facts['private_read']=False\ntry:\n fd=os.open(root/'.swarm/state.db',os.O_RDWR);os.close(fd);facts['database_write']=True\nexcept OSError:facts['database_write']=False\ntry:\n with (root/'.swarm'/('biba-control-'+str(os.getpid()))).open('xb') as f:f.write(b'OWNED_SYNTHETIC_LOW_CONTROL')\n facts['private_write']=True\nexcept OSError:facts['private_write']=False\ntry:\n fd=os.open(root/'source/tracked.txt',os.O_WRONLY);os.close(fd);facts['official_write']=True\nexcept OSError:facts['official_write']=False\nwith Path('biba-control-result-'+str(os.getpid())+'.json').open('x') as f:json.dump(facts,f)\nprint('OWNED_BIBA_CONTROL '+json.dumps(facts),flush=True)\n"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Observe only owned synthetic Biba boundaries; never accept a task",
+              "timeout_seconds": 60
+            }
+          ],
+          "authorized_at": "2026-10-28T17:52:32.931113708Z",
+          "actor": "autorisation initiale de la mission"
+        },
+        "automatic_validation": {
+          "attempt_id": "a-99bd596dba1a2c98b0b1be52",
+          "revision": 24,
+          "candidate_sha": "b043f52a9d73f0a5b86ed50544aae0b41ab36e56",
+          "producer_agent_id": "watch-12e525926625c1504db9d47d",
+          "controller": "controller://swarm-validation",
+          "policy_digest": "18820eb00fe307b14a4bf27732acabfb9abfea608a80b70c88c7717daaacf52e",
+          "policy": {
+            "mode": "automatic",
+            "controls": [
+              {
+                "review_output": true,
+                "inputs": [
+                  "tracked.txt"
+                ],
+                "id": "check-5c4845eda50c68a014667308",
+                "command": [
+                  "python3",
+                  "-c",
+                  "from pathlib import Path\nimport os,json,hashlib\nassert Path('tracked.txt').read_bytes()==b'Committed planning input\\n'\nroot=next(p.parent for p in Path.cwd().parents if p.name=='.swarm')\nfacts={}\ntry:\n with (root/'.swarm/engine-settings.json').open('rb') as f:facts['private_read']=bool(f.read(1))\nexcept OSError:facts['private_read']=False\ntry:\n fd=os.open(root/'.swarm/state.db',os.O_RDWR);os.close(fd);facts['database_write']=True\nexcept OSError:facts['database_write']=False\ntry:\n with (root/'.swarm'/('biba-control-'+str(os.getpid()))).open('xb') as f:f.write(b'OWNED_SYNTHETIC_LOW_CONTROL')\n facts['private_write']=True\nexcept OSError:facts['private_write']=False\ntry:\n fd=os.open(root/'source/tracked.txt',os.O_WRONLY);os.close(fd);facts['official_write']=True\nexcept OSError:facts['official_write']=False\nwith Path('biba-control-result-'+str(os.getpid())+'.json').open('x') as f:json.dump(facts,f)\nprint('OWNED_BIBA_CONTROL '+json.dumps(facts),flush=True)\n"
+                ],
+                "criteria": [
+                  1
+                ],
+                "justification": "Observe only owned synthetic Biba boundaries; never accept a task",
+                "timeout_seconds": 60
+              }
+            ],
+            "authorized_at": "2026-10-28T17:52:32.931113708Z",
+            "actor": "autorisation initiale de la mission"
+          },
+          "artifacts": {
+            ".swarm/managed/w-10fb269432444817aedce668/candidates/bedad25ed9909b452f9335bf42e4532cc5418be36f3e7cf42286f1d0ccd17cf9/stages/candidate-8c5339092431185ab41f166a/copy/tracked.txt": "f388bd51de6897e8d76eff3821060a5d1949f41925a85d2e68ba9ffe5016e437",
+            ".swarm/managed/w-10fb269432444817aedce668/results/watch-12e525926625c1504db9d47d/report.md": "9412baa415cea7cab68ace4bfe5ff11f7c8d899bf2bfad66399bc476fbd8c848",
+            ".swarm/native-validation-public-54815dd1f76e1ae800719702ea075a8442d0e5a0e63267e1bc87eb208cf0b5fe.json": "0c4f5d95ccadbd7084315983dbdffe00d00e9aa2d4aae2b46a79ada799a79210"
+          },
+          "controls": [
+            {
+              "review_output": "OWNED_BIBA_CONTROL {\"private_read\": false, \"database_write\": false, \"private_write\": false, \"official_write\": false}\n",
+              "output_bytes": 117,
+              "id": "check-5c4845eda50c68a014667308",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path\nimport os,json,hashlib\nassert Path('tracked.txt').read_bytes()==b'Committed planning input\\n'\nroot=next(p.parent for p in Path.cwd().parents if p.name=='.swarm')\nfacts={}\ntry:\n with (root/'.swarm/engine-settings.json').open('rb') as f:facts['private_read']=bool(f.read(1))\nexcept OSError:facts['private_read']=False\ntry:\n fd=os.open(root/'.swarm/state.db',os.O_RDWR);os.close(fd);facts['database_write']=True\nexcept OSError:facts['database_write']=False\ntry:\n with (root/'.swarm'/('biba-control-'+str(os.getpid()))).open('xb') as f:f.write(b'OWNED_SYNTHETIC_LOW_CONTROL')\n facts['private_write']=True\nexcept OSError:facts['private_write']=False\ntry:\n fd=os.open(root/'source/tracked.txt',os.O_WRONLY);os.close(fd);facts['official_write']=True\nexcept OSError:facts['official_write']=False\nwith Path('biba-control-result-'+str(os.getpid())+'.json').open('x') as f:json.dump(facts,f)\nprint('OWNED_BIBA_CONTROL '+json.dumps(facts),flush=True)\n"
+              ],
+              "executed": true,
+              "passed": true,
+              "exit_code": 0,
+              "output_sha256": "a73357418117de2307f80725229b12592a9e2728e32881a573200a3480a675de",
+              "summary": "contrôle réussi",
+              "started_at": "2026-10-28T18:10:17.10892175Z",
+              "finished_at": "2026-10-28T18:10:18.159145441Z",
+              "wall_duration_ms": 1050,
+              "cpu_duration_ms": 797
+            }
+          ],
+          "receipt": ".swarm/native-validation-public-54815dd1f76e1ae800719702ea075a8442d0e5a0e63267e1bc87eb208cf0b5fe.json",
+          "state": "pending_review",
+          "reason": "controls-passed-review-required",
+          "at": "2026-10-28T18:10:18.160976017Z"
+        },
+        "plan_checks": {
+          "check-5c4845eda50c68a014667308": "delivery"
+        },
+        "plan_role": "worker",
+        "plan_max_attempts": 2,
+        "id": "task",
+        "title": "Owned task",
+        "owner": "fixture",
+        "deliverable": "handoff.md",
+        "criteria": [
+          "Configuration is persisted without model execution"
+        ],
+        "depends": null,
+        "status": "submitted",
+        "blocker": "",
+        "next": "Évaluer les preuves et la gate delivery ; handoff : .swarm/managed/w-10fb269432444817aedce668/results/watch-12e525926625c1504db9d47d/report.md",
+        "attempts": [
+          {
+            "id": "a-99bd596dba1a2c98b0b1be52",
+            "status": "completed",
+            "started": "2026-10-28T17:52:40.30792995Z",
+            "ended": "2026-10-28T17:52:42.375824624Z"
+          }
+        ],
+        "gate": {
+          "name": "deterministic-control-conformity",
+          "document": {
+            "artifacts": {
+              ".swarm/managed/w-10fb269432444817aedce668/candidates/bedad25ed9909b452f9335bf42e4532cc5418be36f3e7cf42286f1d0ccd17cf9/stages/candidate-8c5339092431185ab41f166a/copy/tracked.txt": "f388bd51de6897e8d76eff3821060a5d1949f41925a85d2e68ba9ffe5016e437",
+              ".swarm/managed/w-10fb269432444817aedce668/results/watch-12e525926625c1504db9d47d/report.md": "9412baa415cea7cab68ace4bfe5ff11f7c8d899bf2bfad66399bc476fbd8c848",
+              ".swarm/native-validation-public-54815dd1f76e1ae800719702ea075a8442d0e5a0e63267e1bc87eb208cf0b5fe.json": "0c4f5d95ccadbd7084315983dbdffe00d00e9aa2d4aae2b46a79ada799a79210"
+            },
+            "checks": [
+              {
+                "domain": "controls",
+                "gate": "delivery",
+                "id": "check-5c4845eda50c68a014667308",
+                "mandatory": true,
+                "max_penalty": 100,
+                "penalty": 100,
+                "severity": "none"
+              }
+            ],
+            "domains": {
+              "controls": 1
+            },
+            "method_version": "3",
+            "results": [
+              {
+                "count": 0,
+                "evidence": [
+                  ".swarm/managed/w-10fb269432444817aedce668/candidates/bedad25ed9909b452f9335bf42e4532cc5418be36f3e7cf42286f1d0ccd17cf9/stages/candidate-8c5339092431185ab41f166a/copy/tracked.txt",
+                  ".swarm/managed/w-10fb269432444817aedce668/results/watch-12e525926625c1504db9d47d/report.md",
+                  ".swarm/native-validation-public-54815dd1f76e1ae800719702ea075a8442d0e5a0e63267e1bc87eb208cf0b5fe.json"
+                ],
+                "id": "check-5c4845eda50c68a014667308",
+                "status": "PASS"
+              }
+            ],
+            "scope_id": "task"
+          },
+          "evaluation": {
+            "method_version": "3",
+            "scope_id": "task",
+            "phase": "delivery",
+            "config_digest": "d33a60d193ad7fd30678aa1e527c677589f404ba6cd9e5ee04f877db8ff8e763",
+            "applicability_digest": "0ecb3ad03c0439ac46ca0d66859dda17bc4c9f8d5fa3a2a85b4cdae8ff7f472d",
+            "artifacts": {
+              ".swarm/managed/w-10fb269432444817aedce668/candidates/bedad25ed9909b452f9335bf42e4532cc5418be36f3e7cf42286f1d0ccd17cf9/stages/candidate-8c5339092431185ab41f166a/copy/tracked.txt": "f388bd51de6897e8d76eff3821060a5d1949f41925a85d2e68ba9ffe5016e437",
+              ".swarm/managed/w-10fb269432444817aedce668/results/watch-12e525926625c1504db9d47d/report.md": "9412baa415cea7cab68ace4bfe5ff11f7c8d899bf2bfad66399bc476fbd8c848",
+              ".swarm/native-validation-public-54815dd1f76e1ae800719702ea075a8442d0e5a0e63267e1bc87eb208cf0b5fe.json": "0c4f5d95ccadbd7084315983dbdffe00d00e9aa2d4aae2b46a79ada799a79210"
+            },
+            "domain_scores": {
+              "controls": 100
+            },
+            "quality": 100,
+            "provisional": false,
+            "quality_band": "OK",
+            "progress": {
+              "passed": 1,
+              "applicable": 1,
+              "percent": 100
+            },
+            "max_severity": "none",
+            "blockers": [],
+            "allowed": true,
+            "ship_allowed": true
+          },
+          "at": "2026-10-28T18:10:18.160976017Z"
+        }
+      },
+      {
+        "scope_id": "child",
+        "requirements": [
+          "req-1"
+        ],
+        "validation_policy": {
+          "mode": "automatic",
+          "controls": [
+            {
+              "review_output": true,
+              "inputs": [
+                "tracked.txt"
+              ],
+              "id": "check-5c4845eda50c68a014667308",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path\nimport os,json,hashlib\nassert Path('tracked.txt').read_bytes()==b'Committed planning input\\n'\nroot=next(p.parent for p in Path.cwd().parents if p.name=='.swarm')\nfacts={}\ntry:\n with (root/'.swarm/engine-settings.json').open('rb') as f:facts['private_read']=bool(f.read(1))\nexcept OSError:facts['private_read']=False\ntry:\n fd=os.open(root/'.swarm/state.db',os.O_RDWR);os.close(fd);facts['database_write']=True\nexcept OSError:facts['database_write']=False\ntry:\n with (root/'.swarm'/('biba-control-'+str(os.getpid()))).open('xb') as f:f.write(b'OWNED_SYNTHETIC_LOW_CONTROL')\n facts['private_write']=True\nexcept OSError:facts['private_write']=False\ntry:\n fd=os.open(root/'source/tracked.txt',os.O_WRONLY);os.close(fd);facts['official_write']=True\nexcept OSError:facts['official_write']=False\nwith Path('biba-control-result-'+str(os.getpid())+'.json').open('x') as f:json.dump(facts,f)\nprint('OWNED_BIBA_CONTROL '+json.dumps(facts),flush=True)\n"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Observe only owned synthetic Biba boundaries; never accept a task",
+              "timeout_seconds": 60
+            }
+          ],
+          "authorized_at": "2026-10-28T17:52:32.931113708Z",
+          "actor": "autorisation initiale de la mission"
+        },
+        "plan_checks": {
+          "check-5c4845eda50c68a014667308": "delivery"
+        },
+        "plan_role": "worker",
+        "plan_max_attempts": 2,
+        "id": "task-2",
+        "title": "Owned task-2",
+        "owner": "fixture",
+        "deliverable": "handoff.md",
+        "criteria": [
+          "Configuration is persisted without model execution"
+        ],
+        "depends": null,
+        "status": "submitted",
+        "blocker": "",
+        "next": "Évaluer les preuves et la gate delivery ; handoff : .swarm/managed/w-10fb269432444817aedce668/results/watch-6f47cbfd98339c6053cca6d1/report.md",
+        "attempts": [
+          {
+            "id": "a-b22a9f751702c46da9e33c14",
+            "status": "completed",
+            "started": "2026-10-28T17:52:46.145057629Z",
+            "ended": "2026-10-28T17:52:48.368681845Z"
+          }
+        ]
+      }
+    ]
+  }
+}

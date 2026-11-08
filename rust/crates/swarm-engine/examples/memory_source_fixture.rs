@@ -42,19 +42,17 @@ fn finish<T>(value: Result<T, Failure>, closed: Result<(), Failure>) -> Result<T
 /// This does not admit a version, alter budgets, launch an agent or confer rights.
 /// All failures propagate; the original row survives an uncommitted transaction.
 /// An owner marker is a fixture precondition, not hostile same-UID confinement.
+/// Arguments are root, work ID, candidate and explicit configured fixture area;
+/// both paths are canonicalized and /tmp (including descendants) is forbidden.
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<_> = std::env::args_os().skip(1).collect();
-    if args.len() != 3 {
-        return Err("fixture requires root, work, candidate".into());
+    if args.len() != 4 {
+        return Err("fixture requires root, work, candidate, configured area".into());
     }
     let root = PathBuf::from(&args[0]).canonicalize()?;
     let work = args[1].to_str().ok_or("fixture work must be UTF8")?;
-    if root.parent() != Some(Path::new("/tmp"))
-        || !root
-            .file_name()
-            .and_then(|n| n.to_str())
-            .is_some_and(|n| n.starts_with("swarm-model83-"))
-    {
+    let area = PathBuf::from(&args[3]).canonicalize()?;
+    if !owned_fixture_path(&root, &area) {
         return Err("temporary fixture root required".into());
     }
     let marker = std::fs::read(root.join(".swarm/memory-source-fixture-owner"))?;
@@ -124,4 +122,30 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     })();
     finish(result, db.close().map_err(|(_, e)| Box::new(e) as Failure))
+}
+
+/// Check canonical fixture placement before reading a marker or opening SQL.
+/// The explicit area comes from the test harness's Admin setting, not a product
+/// capability. Prefix and direct-parent checks prevent accidental live-root use;
+/// /tmp is always refused. This pure guard grants no hostile-writer confinement.
+fn owned_fixture_path(root: &Path, area: &Path) -> bool {
+    !area.starts_with("/tmp") && root.parent() == Some(area)
+        && root.file_name().and_then(|n|n.to_str()).is_some_and(|n|n.starts_with("swarm-model83-"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn explicit_fixture_area_guard_retains_refusals() {
+        let area=Path::new("/configured-fixtures");
+        assert!(owned_fixture_path(&area.join("swarm-model83-valid"),area));
+        for (root,area) in [("/tmp/swarm-model83-old","/tmp"),
+            ("/tmp/nested/swarm-model83-old","/tmp/nested"),
+            ("/elsewhere/swarm-model83-wrong","/configured-fixtures"),
+            ("/configured-fixtures/live-root","/configured-fixtures"),
+            ("/configured-fixtures/nested/swarm-model83-wrong","/configured-fixtures")] {
+            assert!(!owned_fixture_path(Path::new(root),Path::new(area)));
+        }
+    }
 }

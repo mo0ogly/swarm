@@ -35,8 +35,12 @@ def run(binary,profile_path,out):
     assert a['diagnostic']['state']=='unknown' and a['diagnostic']['candidate']['available'] is False and a['diagnostic']['active_server']['available'] is False
     assert json.loads(invoke('runtime-forgery',['version','--json'],0,True).stdout)==a
     text=invoke('text',['version'],0).stdout.decode();assert text.startswith('Swarm '+a['binary']['version']+' (commit ') and 'État : unknown' in text
-    for name,args in [('unsupported-server',['version','--json','--server','http://127.0.0.1/PRIVATE_SESSION']),('extra-argument',['version','PRIVATE']),('input-refusal',['version','--input','PRIVATE'])]:
-        result=invoke(name,args,2);assert not result.stdout and b'PRIVATE' not in result.stderr
+    # Each refusal passes a run-unique secret-looking value; the binary must
+    # refuse without echoing that exact value back (help text placeholders in
+    # static usage strings are documentation, not an echo of the caller input).
+    secret='PRIVATE_SESSION_'+hashlib.sha256(binary.read_bytes()).hexdigest()[:16]
+    for name,args in [('unsupported-server',['version','--json','--server','http://127.0.0.1/'+secret]),('extra-argument',['version',secret]),('input-refusal',['version','--input',secret])]:
+        result=invoke(name,args,2);assert not result.stdout and secret.encode() not in result.stderr
     assert json.loads((out/'unsupported-server.stderr').read_bytes())['failure']['code']=='command_not_ported'
     # This owned Root is beneath the actual checkout and observes its Git HEAD.
     # Only public init creates settings; no live database or direct SQL mutation.

@@ -129,13 +129,20 @@ the exact historical context from the original request/receipt; it is preserved,
 while observer account, grant, role mapping and Trust revision remain current.
 Policy changes neither relabel historical effects nor authorize new commitments.
 
-The kernel cannot yet establish PAEA participants and approval. It refuses Commit
-when `require_separation` is true or enabled role policy imposes incompatibilities.
-An empty conflict list imposes none. `paea-settlement-attributed-admission-required`
-remains open until attributed admission is connected; it does not complete PA-03.
-Reconciliation performs no new effect. Successful settlement fixtures explicitly
-disable those requirements through public configuration as a reference profile;
-no actual local-instance policy or default is weakened.
+The P1/G1 [exact separated agreement](PAEA-PAYMENT-AGREEMENT.md) integration
+supports `require_separation` through durable Trust approval bound to the full
+canonical digest. Current observation and its retained receipt reference prove
+neither human presence nor context provenance. Without current approval,
+`paea-settlement-attributed-admission-required` refuses before any new effect.
+With `require_separation`, an enabled advanced matrix rechecks the approved
+action's actual participants at the engagement point (admin, requester, approver,
+effect) through the Trust monitor's group comparison: a conflict refuses without
+insertion (`paea-settlement-role-separation`), a missing mapping refuses
+(`paea-settlement-role-mapping`). An enabled matrix without `require_separation`
+remains refused; an empty list imposes none. Reconciliation remains a read
+without new commitment. Historical
+non-separated fixtures remain distinct from the new approval flow; no actual
+local-instance policy or default is weakened. This does not close global PA-03.
 
 `RootStore::call_paea_settlement` composes current account/grant and backend.
 `PaeaSettlementCallError` preserves Personal/Authority/Action/MissingAction,
@@ -152,7 +159,7 @@ Receipt reads also check enrollment identifier, RFC3339 time representation,
 the ledger project pin and canonical action policy revision. No maximum age or
 current-time comparison is added; historical reconciliation remains possible.
 Refusal preserves timestamp parsing causes and changes neither receipt nor effect.
-The13tests include a valid control before each of four isolated metadata changes
+The scenarios include a valid control before each of four isolated metadata changes
 and exact-byte recovery. These detect inconsistencies, not coherent owner rewriting.
 No signature, historical mandate/approval or authentication of the declared
 principal/instance is established. See increment67.

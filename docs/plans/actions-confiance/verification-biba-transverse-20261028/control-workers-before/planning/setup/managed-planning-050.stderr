@@ -1,0 +1,17 @@
+{
+  "error": "mission-root-unavailable",
+  "failure": {
+    "causes": [
+      "mission-root-unavailable",
+      "mission-root-unavailable",
+      "mission-root-unavailable",
+      "managed-worker-proof-invalid",
+      "managed-worker-proof-invalid",
+      "json-category:Data"
+    ],
+    "code": "mission-root-unavailable",
+    "message": "mission-root-unavailable",
+    "retryable": false
+  },
+  "schema_version": 1
+}

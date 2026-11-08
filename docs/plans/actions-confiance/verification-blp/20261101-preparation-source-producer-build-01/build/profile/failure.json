@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "type": "ValueError",
+  "reason": "profile-effective-input-changed:locales/en.json,web/i18n-en.js,web/native-authority-admin.js",
+  "scope": "Build unqualified; inspect original Cargo channels",
+  "global_watchdog": null
+}

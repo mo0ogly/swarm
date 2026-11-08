@@ -1,0 +1,18 @@
+{
+  "mode": "authority",
+  "owner_key_ui_refusals": [
+    {
+      "route": "/trust-actions.html",
+      "status": 403
+    },
+    {
+      "route": "/trust-confidentiality.js",
+      "status": 403
+    },
+    {
+      "route": "/i18n-en.js",
+      "status": 403
+    }
+  ],
+  "live_ui_verified": false
+}

@@ -1,4 +1,5 @@
 //! Isolated operator package fixtures, no live key, grant, journal or service.
+mod common;
 use std::{fs, os::unix::fs::PermissionsExt};
 use swarm_enrollment_authority::provisioning::{self as p, repository as v};
 use swarm_enrollment_config::store::{
@@ -8,7 +9,7 @@ use swarm_enrollment_config::store::{
 /// Real private temporary directory and a descriptor-bound store. The Documents
 /// clone is retained solely for isolated public test-fixture fault injection.
 fn fixture() -> (tempfile::TempDir, Documents, v::PackageStore) {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(d.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let docs = Documents::open(d.path(), rustix::process::geteuid().as_raw()).unwrap();
     let store = v::PackageStore::new(docs.clone());

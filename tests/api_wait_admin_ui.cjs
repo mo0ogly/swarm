@@ -2,7 +2,7 @@
 // A local HTTP text fixture exercises the real Swarm API transport. No model,
 // provider account or native mission is used.
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),http=require('node:http'),crypto=require('node:crypto'),{spawn,spawnSync}=require('node:child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-api-wait-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser,page,upstream;let calls=0,cancelled=0;
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-api-wait-ui-'));fs.mkdirSync(out,{recursive:true});let app,browser,page,upstream;let calls=0,cancelled=0;
 function cli(args,input){const p=spawnSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{input:input?JSON.stringify(input):undefined,encoding:'utf8'});assert.equal(p.status,0,p.stdout+p.stderr);return p.stdout?JSON.parse(p.stdout):null}
 (async()=>{
  upstream=http.createServer((req,res)=>{calls++;req.resume();const timer=setTimeout(()=>{res.setHeader('Content-Type','application/json');res.end('{"choices":[{"message":{"content":"Local fixture received"}}]}')},1300);res.on('close',()=>{if(!res.writableEnded){cancelled++;clearTimeout(timer)}})});await new Promise(resolve=>upstream.listen(0,'127.0.0.1',resolve));

@@ -1,3 +1,4 @@
+mod common;
 use ed25519_dalek::SigningKey;
 use rusqlite::Connection;
 use std::sync::{mpsc, Arc};
@@ -12,7 +13,7 @@ struct Fixture {
 }
 impl Fixture {
     fn new() -> Self {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
         let key = SigningKey::from_bytes(&[7; 32]);
         let project = [11; 32];
         let journal = Arc::new(

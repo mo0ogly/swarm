@@ -26,7 +26,10 @@ impl Fixture {
     /// Create disposable protected storage and a synthetic signed grant. No real
     /// human/provider is authenticated; editing the grant happens before enrollment.
     fn new(edit: impl FnOnce(&mut Grant)) -> Self {
-        let root = tempfile::tempdir().unwrap();
+        // Declaration reads and anchors walk ancestors with
+        // open_private_directory (checkout is 775): the private fallback
+        // area is required here.
+        let root = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         for name in ["bootstrap", "configuration", "witness", "authority"] {
             let p = root.path().join(name);

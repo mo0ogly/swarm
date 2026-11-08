@@ -1,0 +1,1 @@
+{"scope": "declared-source-inventory-only", "runtime_enforced": false, "failures": ["send:source-changed", "send:anchor-changed", "claim:source-changed", "claim:anchor-changed", "finish:source-changed", "finish:anchor-changed", "trust_store:source-changed", "prompt_provenance:source-changed", "prompt_provenance:anchor-changed"], "reference_count": 45, "flow_count": 24}

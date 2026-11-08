@@ -1,0 +1,8 @@
+{
+  "status": "DEFECT_OBSERVED",
+  "reason": "business refusal incorrectly rendered HTTP500",
+  "binary_sha256": "bb17f681a42131e47d41e6c1e70343f873e7d7a8a3a6972dbbd882f97e70b4ec",
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-preparation-unqualified-status-before",
+  "image_qualified": false,
+  "scope": "unqualified compiled image copied before next link; diagnostic reproducer only, no installation or acceptance"
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "event_id": "part-17",
+  "expected_revision": 1,
+  "expected_trust_revision": 1,
+  "preparation_id": "prep-fa8847b0c33183273f594550",
+  "turn_id": "pt-5306ceae0f48faf9274e1a1492b9df4e",
+  "expected_turn_revision": 2,
+  "source_index": 16,
+  "classification": {
+    "level": "public",
+    "compartments": [
+      "a"
+    ]
+  },
+  "reason": "Explicit captured fixture slice"
+}

@@ -11,6 +11,83 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Régression graphe —31 octobre, APEX demandé
+
+G1/G11 : restituer zoom, fond/cartes, orientation et plein écran ; G4 : création
+et liens via les vrais Work/validations Rust. Codex seul, aucun agent/fournisseur.
+Témoin natif valide puis bouton de zoom absent reproduit ; navigation en overlay
+vérifiée dans les quatre langues/thèmes. Création refusée sur l’ancien binaire
+reproduite. Correctif de route `task-add`, éditeur/ports et rafraîchissement attendu vérifiés.
+Dix tests HTTP examinés : neuf existants passent, nouveau cas passe après correction
+d’une attente du banc (code public `format`, pas motif interne du cycle).
+Rust281 installé et actif :5ae98571… ;270contrôles graphe FR/EN/thèmes sur
+l’image281 exacte PASS/verify VERIFIED,7assets réellement servis et Version14
+PASS ; notice d’édition alignée. Consignes APEX compactées sous le cap32000,4rôles/9tests et témoin Biba
+public avec refus/reprise vérifiés ; aucune limite relevée. Revue locale liée aux
+octets, pas d’acceptation indépendante ni de conformité Biba globale.
+Brouillons atomiques historiques/aperçu/undo restent distincts et ouverts.
+[Plan, limites et originaux](GRAPH-REGRESSION-20261031.md).
+
+Incrément analyste (1novembre) : ergonomie A1–A3 installée en
+v0.1.1-dev.298, image f5a154da… ; branche transitive, tous les chemins orientés
+et placement groupé réversible. Deux recettes VERIFIED/PASS,1554assertions
+navigateur et14 contrôles Version ;7assets servis identiques. Sources parallèles
+postérieures non installées ; qualification globale Authority reste ouverte.
+[Critères, échecs et RETEX](GRAPH-REGRESSION-20261031.md#ergonomie-analyste-a1a3-livrée--rust298).
+
+Incrément métier précédent : B1–B4 livrés localement en **v0.1.1-dev.303**,
+image `5f22359a9b0acfed477b0e2e95b80d814a81b08d885362f6ac060be8164f518a`.
+Duplication de définition, aperçu moteur, brouillon chiffré/application atomique,
+compensation du dernier lot ; plans manuels uniquement, aucun lancement implicite.
+Recette303 VERIFIED/PASS :14tests moteur/API/CLI +246assertions navigateur.
+1409graphe +145responsive302 réutilisées sur producteurs inchangés, sans
+réexécution303 revendiquée. Revue indépendante lecture seule autorisée par « gfo » :
+302 request changes (définition complète interprétée comme patch) puis303 approve
+après reproduction, correction, refus/reprise/compensation vérifiés.
+Installation supportée avec prepared-build exact ; PID2298105, hash exécuté,
+7assets protégés, Version14contrôles et notes/capacités Graph FR/EN vérifiés.
+Revue corrective302→303 complète1/1 ; limites globales298→302/BLP/Authority
+conservées, aucun commit/push.
+[Suivi et RETEX](GRAPH-REGRESSION-20261031.md#clôture-b1b4--rust303) ·
+[Revue indépendante](GRAPH-BUSINESS-INDEPENDENT-20261101.md).
+
+Dernier incrément graphe UI : candidat308 qualifié, glissement direct de cadre,
+icônes/couleurs des outils, aide modale, modification/retrait explicites de lien.
+Trois recettes308 PASS/VERIFIED :14tests et1952assertions navigateur ; revue
+indépendante approve. Image e54a1dd5… activée via prepared-build exact ; identité
+/version/notes/capacités vérifiées. **Vérification publique U5 partielle** :
+Root en mode authority, cookie propriétaire limité aux sondes ; façade38433
+requiert la session humaine, navigateur CUA indisponible. Question utilisateur
+envoyée, ni7assets publics ni fenêtre Version revendiqués vérifiés. Reprise avec
+connexion publique et onglet authentifié/retour utilisateur ; aucun changement
+de compte/politique, aucune acceptation globale Authority/BLP, pas de commit/push.
+[Preuves, axes et limite](GRAPH-DIRECT-REVIEW-20261101.md).
+
+Incident public après308 : moteur309 assertion-v2 activé pendant que le démon
+installé restev1 ; assertion-format utilisateur confirmé par contrat et empreintes.
+Pas de downgrade ou acceptationv1. Récupération supportée préparée :
+`./swarm.sh authority install` sans identifiant sur installation initialisée,
+comptes préservés, erreurs/état connu explicites ;8tests/recette VERIFIED et revue
+indépendante approve. **Bloqué à l’étape sudo humaine**, aucune mise à jour
+système ou réparation effective revendiquée. Prévention générique de paire
+incompatible livrée le 31 octobre 2026 : garde lanceur avant tout arrêt
+(refus exit 2 sur paire divergente, reprise `./swarm.sh authority install`),
+reproduiseur `tests/test_local_pair_guard.py` 12 tests et recette
+`local-pair-guard.json` PASS sur v312. [Suivi](GRAPH-REGRESSION-20261031.md#prévention-paire-protocole-livrée-clôture-de-litem-ouvert).
+
+## Point de reprise —28 octobre : consultation historique233 livrée
+
+`agent history` raccordé :102assertions/45cas et générateur3PASS, recette
+vérifiée ; image233 b11b4baf… installée via lanceur préparé. Livraison31contrôles
+(incluant Version FR/EN14) et8spécifiques ; cinq travaux/réglages conservés.
+[Lot et limites](AGENT-HISTORY-20261027.md). Le tableau27oct ci-dessous conserve
+son historique ; il ne décrit pas tous les apports parallèles PAEA/Biba récents.
+`agent list` reste un contrat composite à porter ; aucune clôture globale déduite.
+Deux contributions GLM terminées : avis lecteur rejeté après vérification,
+fermeture SQLite du banc améliorée et vérifiée ;60360tokens déclarés, aucun
+gain établi. Recette finale3steps (générateur3, ressources2, public102).
+Ces avis ne constituent pas une acceptation indépendante. PAEA77 reste sous son propriétaire.
+
 ## État courant consolidé —27 octobre, préparation et découverte web218, consultation CLI219
 
 Ce tableau prime sur les états historiques ci-dessous. Vérification locale bornée,
@@ -914,6 +991,177 @@ Clippy FAIL sur 16 lints des fichiers en cours mission_status_*/mission_worker_a
 (aucun Live), puis recette dérivée sans Clippy 6/6 PASS dont navigateur ; preuves
 `.cache/ev-tel31-231532` et `ev-tel31b-231532`. Recette complète à rejouer après
 Clippy PASS du lot Codex. `snapshot.py` refuse désormais tout `include_str!` non déclaré.
+
+Reprise console live tel33 (Claude, 6 nov., après ménages disque du 4–6 nov. qui
+ont retiré preuves tel31/tel31b déjà vérifiées et binaire) : défouts partagés
+corrigés test-first. (1) `recipe.py` importe `tests/fixture_area.py` depuis la
+racine de run depuis l'interdiction /tmp du 31 oct. ; le snapshot ne l'embarquait
+pas et tout run figé échouait avant la première étape — `snapshot.py` l'embarque
+maintenant avec le lanceur (refus `snapshot-fixture-area-missing`), test e2e
+étendu, README FR/EN à jour. (2) La recette attendait « Ran 3 tests » sur
+`test_snapshot.py` qui en a 4 depuis le test de régression du 23 oct. — assertion
+passée à « Ran 4 tests ». État Clippy 6 nov. : 7 lints nouveaux (rustc 1.96 :
+is_multiple_of, useless_conversion, result_large_err, too_many_arguments,
+nonminimal_bool) dans swarm-linux-identity-channel / swarm-linux-prerequisites /
+swarm-enrollment-config committées le 28 oct., et 12 appels de test périmés
+`preparation_show(&id)` (tests preparation_plan/preparation_writes) après le
+changement de signature BF-16a en cours de Codex (`preparation_read.rs`
+modifié à l'instant) — fichiers consommateurs non raccordés, propriétaire Codex.
+Run complet tel33 relancé ; recette dérivée attendue si Clippy bloque encore.
+
+tel33b (Claude, 7 nov. 00:49, après commit global 13d4ff5bc et lot Codex
+af513a417) : tué par le système à 12,1 Go RAM utilisés / swap 9,3 Go pendant
+l'étape 5 ; étapes 1–4 partielles sans result.json (preuve conservée
+`.cache/ev-tel33-181951`). Cause amont diagnostiquée : boucle `git maintenance
+--auto` — chaque repack cruft (~3 Go, 4,9 Go RSS, >45 min) tué par la pression
+mémoire laissait son `.tmp-<PID>-pack-*` orphelin (7 cycles depuis le 2 nov.,
+14,3 Go de débris + tmp_pack 2,84 Go). Ménage du 7 nov. : tmp-packs orphelins
+et poubelle git retirés (garde PID vivant, verrou, ~17 Go), `git fsck
+--connectivity-only` propre. La saturation disque à 34 Mo libres pendant un
+build concurrent (proc-macro2) a évité l'ENOSPC de justesse ; `rust/target`
+(61→2,4 Go) a ensuite été purgé par un autre acteur à 01:44. Nouveau test
+durant le run complet de reprise : voir tel33c.
+
+tel33c (Claude, 7 nov. 02:49, préconditions réunies : HEAD af513a417, arbre
+propre, disque 75 Go, RAM 3,7 Go dispo, 0 build concurrent) : FAIL étape 4
+`engine-live-read-unit` exit 101, deux causes séparées. (1) Nouveau :
+`agent_supervision::pending_gate_observes_stop_without_heartbeat_writes`
+FAILED (`agent_supervision.rs:662` assertion `control.ack_eof`) pendant le
+run, 64 passed/1 failed ; repro isolé sous l'env exact de la recette (8 runs,
+mêmes CARGO_TARGET_DIR/CARGO_INCREMENTAL) : 8/8 ok. Module inchangé depuis le
+24 oct. (b76e934b3). Hypothèse qualifiée : instabilité sous contention (disque
+momentanément à 34 Mo libres pendant la compilation du run) ; à requalifier
+sur run en conditions normales, défaut read_gate à ouvrir si récidive —
+propriétaire Codex (module). (2) Connue et toujours non raccordée : 8+ E0061
+`preparation_show(&p.id)` sans `reader_token` (tests preparation_plan.rs —
+29:21, 37:76 — et preparation_writes.rs), BF-16a, dernier commit consommateur
+Codex af513a417 sans raccord ; bloque la compilation `--tests` donc toutes
+les étapes suivantes. Recette dérivée étapes 19–24 (web-rustdoc →
+telemetry-admin-browser, id live-monitor-native-derived-tel33b) lancée sur
+`.cache/ev-tel33b-derived-0323` ; les étapes 5–17 restent derrière le blocage
+de compilation Codex.
+
+tel33d (Claude, 7 nov. 09:12, arbre propre HEAD 1265081eb, RAM 5,3 Go dispo) :
+requalification des étapes 19–24 après deux interruptions d'exploitation —
+0323 arrêté par mon propre tuyau `head -5` sur la sortie du run
+(BrokenPipeError à la 6ᵉ ligne de progression ; 3 étapes PASS conservées :
+web-rustdoc 82 s, binary-build 119 s, token-fixture-build 63 s) puis 0323b
+FAIL étape 4 `browser-live` à 57 s. Diagnostic 0323b qualifié : les 32 checks
+UI des deux passes (fr-etat, en-sombre) sont PASS ; l'assertion finale
+`problems: []` (rust_native_live_ui.cjs:342) échoue sur un seul 503
+`POST /api/v1/live/alerts/evaluate` sur 774 requêtes (770×200). Le code côté
+serveur enregistré pour cette réponse est `telemetry-store-unavailable`
+(preuve `.cache/live-monitor-browser-evidence/live-ui-73xb6zm8`,
+live-native-records.json : erreurs {telemetry-store-unavailable: 1}) — ce
+n'est PAS le refus `telemetry-store-busy` documenté comme conçu dans
+`evaluate_alerts` (service/live.rs:1406 : busy timeout 0, l'UI retente une
+fois, live.js:273) que le harnais devrait distinguer. La classification
+serveur (tout défaut SQL/IO non-busy → unavailable, otel.rs:104 → 503) est
+conforme à son contrat ; le harnais a raison de compter un 503 non
+`web-workers-saturated` comme problème. Cause probable : défaut IO/SQL
+transitoire sous la contention du 0323b (disque 87 %, modifications concurrentes
+Codex, 9 fenêtres navigateur + captures) ; requalification en cours sur arbre
+propre (`.cache/ev-tel33b-derived-0912`). Le harnais ne tolérait que le corps
+`web-workers-saturated` (cjs:21) ; le raccord mineur est réalisé (7 nov.) :
+`watch()` classe désormais le 503 busy conçu `telemetry-store-busy` (page
+retente une fois, live.js alerts()) dans une liste `busy[]` comptée à part —
+`busy_reads` dans result.json — tout autre 503 reste un problème ;
+requalification `browser-live` seule relancée (recette dérivée
+`.swarm-fixtures/derived-browserlive.json`, `.cache/ev-browserlive-raccord`).
+
+tel33d — issue 0912 (Claude, 7 nov. 10:0x, qualifications vérifiées) : (1)
+`browser-live` **PASS** en conditions normales (arbre propre, 83 s) — la
+requalification confirme l'hypothèse : le 503 `unavailable` du 0323b était
+transitoire sous contention, pas un défaut serveur. (2) `telemetry-launch-e2e`
+**FAIL** déterministe, cause racine établie par le journal de complétion
+(`.swarm-fixtures/swarm-cli-http97-qslswgwu/.swarm/native-completion-2871652a83beabd9929d98edfe1c930d7d08b655edd1de8f140d6f9d5365cf33.json`) :
+refus **pré-exec** `biba-workspace-overlaps-root`, chaîne
+`agent-telemetry-after-token-failed ← telemetry-token-issued ← biba-workspace-overlaps-root`.
+Mécanisme : un agent opérateur lancé sans champ `workspace` (cas du test E2E
+LIVE-UX-03, `agent prepare` sans workspace) reçoit par défaut
+`workspace = Racine` (agent_launch_preflight.rs:89-93 : vide → root) ; le
+preflight de lancement l'accepte, puis à l'exécution `biba::prepare` refuse
+`root.starts_with(&path)` avec égalité (swarm-biba-linux/src/lib.rs:80) → aucun
+exec du fournisseur. Effets observés, tous cohérents : jeton télémétrie par
+tentative émis avant le refus (INSERT engagé), aucune connexion acceptée par le
+serveur web (telemetry-web-records.json : accepted_connections 0), ni
+provider-proof.json ni codex-proof.json, exit helper 2, et les 528 octets
+d'erreur JSON de la CLI (stderr fusionné dans le tuyau stdout par
+validation_run.rs:452-465) deviennent `first_event_error =
+agent-guard-input-invalid` / `degraded: MalformedEvent` — cosmétique, le journal
+enregistre correctement pre_exec_failure et les trames de canal privé. Premier
+run enregistré de cette E2E (aucun PASS/FAIL antérieur en local ni sur USB) :
+jamais passée ; conflit de contrat déterministe entre le défaut de lancement
+(workspace = Racine, parité Go) et la frontière I0 à l'exec (workspace distinct
+de la Racine exigée). Périmètre moteur : agent_launch_preflight.rs,
+agent_execution_gate.rs, biba — **zone Codex** ; le scénario du test (lancement
+opérateur au défaut) est légitime et ne doit pas être masqué par un workspace
+explicite. Reprise conditionnée à la décision produit (refuser workspace=Racine
+au lancement avec un code clair, ou admettre l'égalité à l'exec avec une feuille
+de sortie distincte) puis relance de la recette dérivée
+`.swarm-fixtures/derived-tel33b-19-24.json`. Le point ouvert mineur du 0323b
+(distinguer le 503 busy conçu) reste valable tel quel.
+
+tel33d — issue 1415 (Claude, 7 nov. 14:00-15:15) : `telemetry-admin-browser`
+**FAIL déterministe par attente infinie**, cause racine double, établie par
+sonde CDP sur la page vivante (`.cache/ev-adminbrowser-0912` puis
+`.cache/ev-adminbrowser-fix-1`, preuves conservées). (1) **Raccord harnais**
+(ma zone, corrigé) : la refonte cockpit f9ff58214 a déplacé le panneau Admin
+hors de `/` post-login (devenue sélecteur de mission) vers
+`native-runtime.html?view=admin` ; `tests/rust_telemetry_settings_ui.cjs:20`
+attendait `waitForSettingsState('loaded')` sur l'ancien layout sans délai —
+corrigé : navigation vers `native-runtime.html?view=admin` après login. (2)
+**Défaut produit, zone Codex** : le formulaire Admin refuse tout `submit`
+silencieusement (`form.reportValidity()` false) car le champ v52
+`web_authority_public_key` (introduit 8cb059831, required dès que la valeur
+courante ≠ null, règle frontend 174b89106) porte la valeur `""` des défauts
+d'installation (`engine-settings.json` v52 : `web_authority_public_key: ""`,
+mode `owner-key` où la doc produit dit « Vide seulement en mode owner-key ») ;
+`engine_settings_admin_state.cjs` attend alors `preview` sans fin. Repro
+vérifié par sonde : clic confirm → `submitFired:false`, `:invalid` =
+`web_authority_public_key` (« Please fill out this field. »), aucune requête
+réseau. Contradiction de contrat : défauts d'installation incohérents avec le
+formulaire qui exige non-vide dès que la valeur est présente (owner-key exige
+"" côté Rust web_access.rs:59 — toute sauvegarde Admin depuis l'état installé
+est impossible). Affects tout scénario Admin qui ouvre le formulaire sur un
+root frais v52. Décision produit requise (Codex) : défaut `owner-key` sans
+clé ouverte doit être traité comme valide au formulaire (champ désactivé ou
+non-required en owner-key), ou les défauts d'installation ne doivent pas
+sérialiser `""`. Le scénario telemetry-settings reste légitime tel quel
+(édite seulement agent_telemetry_providers + plafonds v33). Reprise : après
+correction produit, relance `.swarm-fixtures/derived-adminbrowser.json`
+(répertoire de sortie neuf) — le run corrigé-harnais de 14:41 a bien dépassé
+le bloqueur cockpit (captures fr-etat écrites) et s'est bloqué exactement au
+submit confirm, prouvant le raccord (1) et isolant le défaut (2). Portée
+vérifiée : tout root créé par `Fixture` (tests/rust_agent_model_route.py:107,
+`self.ok(['init'])` → défauts v52) frappé par un scénario qui soumet le vrai
+formulaire est bloqué pareillement (rust_preparation_admin_ui.cjs:36,
+rust_preparation_sources_admin_ui.cjs, rust_preparation_templates_admin_ui.cjs,
+telemetry-settings). Garde harnais ajouté (telemetry-settings) : avant chaque
+clic confirm, assert `:invalid` vide dans le formulaire, faute nommée
+immédiate au lieu d'attente infinie — ce garde échouera proprement tant que
+le défaut produit (2) subsiste. Les deux répertoires de preuve attestent des
+runs tués en cours (pas de result.json, kill volontaire après diagnostic) :
+`recipe.py verify` les refuse par conception ; ils prouvent les mécanismes
+(1) et (2), pas un résultat qualifié. Commit ea9d55848 ; push resté bloqué
+par la panne du classifieur de permissions (8+ tentatives), à repousser
+quand la voie le permet.
+
+tel33d — issue 1415 suite (Claude, 8 nov. 09:45) : relance
+`.swarm-fixtures/derived-adminbrowser.json` dans sortie neuve
+`.swarm-fixtures/ev-adminbrowser-guard-1` (push ea9d55848/4901d7979 entre-temps
+effectué). FAIL propre en 10,6 s : le garde fail-fast a tiré exactement comme
+conçu — assertion `form refused submit on invalid fields + ['web_authority_public_key']`
+(telemetry-settings, `tests/rust_telemetry_settings_ui.cjs:42`) au lieu du
+pendage de 25 min ; le raccord (1) reste bon (état `loaded` atteint, captures
+fr-etat écrites) et le défaut produit (2) est re-attesté à jour sur l'état
+courant (admin.js:292 et engine-settings.json:246 intouchés par Codex au 8 nov).
+Ce run est un result.json qualifié côté harnais : il prouve le garde et le
+blocage, pas l'acceptation du scénario (réputé rouge tant que (2) subsiste).
+/tmp vérifié propre pour ce run ; profil chrome du navigateur sous la racine
+figée `.swarm-fixtures/swarm-cli-http97-ba3up_wj` (login_ui.cjs:16). Reprise
+inchangée : correction produit v52 (Codex), puis relance en sortie neuve —
+elle doit alors passer le garde et finir verte.
 
 ## Limites et décisions qui conditionnent la suite
 
@@ -4107,3 +4355,44 @@ Le serveur normal garde la source enrôlée absente. Activation utilisateur sous
 ### Reprise GLM — disponibilité Admin et cache, version228
 
 Livraison locale vérifiée du28octobre : disponibilité du bouton enrôlé réparée,9casJS/27public/44navigateur sur image228, cycle de livraison et15testsPython passent. Panne de preuves de cache prise en charge par validation commune et reconstruction fraîche ; aucune preuve historique inventée. Image/profil/versionFR/EN et état public inchangé vérifiés. Dossier availability-20261028/verification.json, RETEX.md, source-review228 et delivery-tool-review. Les57 contrôles liés sur227 sont réutilisés sous comparaison exacte des entrées Rust/UI, pas réannoncés sur228. Activation réelle toujours distincte ; pas acceptation globale.
+
+### Migration hors PAEA — autonomie du cockpit livrée240
+
+Le28octobre, choix Autonome configurable Admin, priorités du mode de mission et
+absence de consentement implicite livrés en240.9cas UI/20CLI-API/78navigateur,
+plus lecture réelle14Version/16Admin,5Works préservés. Adoption ciblée du
+journal41au48 sans adoption d’autres politiques ; correction générale de la
+présence des groupes indépendants dans Admin. Voir
+[suivi hors PAEA](COMPLETION-HORS-PAEA-20261028.md) et
+[contrat cockpit](../../architecture/COCKPIT-COMPATIBILITY.md).
+Agent list14clés, positif du conducteur sous Biba et clôture R6/R7 demeurent
+ouverts. Aucune clôture globale ni acceptation indépendante revendiquée.
+
+### Premier raccord natif agent list —241
+
+14clés Go/Rust vérifiées pour un Work ordinaire sans tâches/planification/agents ;
+52assertions publiques,4tests de comparateur, profil normal241 installé et lecture
+réelle14Version/16Admin sans POST,5Works préservés. Refus explicites des autres
+états, pas de faux tableaux vides. Revue exacte du delta compilé240→241 :4fichiers,
+4axes et références originales archivées. Suites globales et limites dans le
+[suivi hors PAEA](COMPLETION-HORS-PAEA-20261028.md). Tranche initiale seulement ;
+la migration globale reste ouverte.
+
+Suite cockpit243 — tâchesTODO sans historique/dépendances, pas d’agent ni planning :
+raccordement public Go/Rust vérifié85+15assertions ; comparateur4tests ;
+actions14tests et priorité1test PASS. Profil normal, quatre entrées effectives
+modifiées depuis241, revue liée aux octets4/0ouvert sur ce delta uniquement.
+Installé via prepared-build9bc11252d9c37d1f76f2241325a6f05afee85a804c4e64d11e9aa6475fe909c3 ;
+PID1102767, version243et notesFR/EN/commit/dirty observés,4assets conformes,
+5Works/contrôles/réglages préservés. Échecs de module et fixture GLM originaux
+conservés. Suite horsPAEA dans COMPLETION-HORS-PAEA-20261028.md ; aucun verdict
+global, conducteur Biba et autres états cockpit restent ouverts.
+
+Suite244 — dépendances entre tâchesTODO raccordées : liens, waiting_on, premier
+motif de départ/dérogation, ordre et révision observés ; fraîcheur toujoursfausse
+pourTODO. Go/Rust101+15assertions et5comparateur PASS/intégrité VERIFIED.
+Source-review2/0sur lecteur/notes, actions et ordre15unités réutilisées avec
+empreintes inchangées. Installé244image2d28e0bc7fe061131617ee9c26ceb276bce74b2c36a304d85648b5b57e34015b,
+PID1130985 ;4assets/FR-ENVersion/Admin vérifiés,5Works et contrôles préservés.
+Recette cockpit-dependencies-permanent244, détails et propositionGLM dans suivi
+COMPLETION-HORS-PAEA-20261028. Autres états cockpit et migrationglobale ouverts.

@@ -1,0 +1,566 @@
+--- qualified308/rust/crates/swarm-engine/src/root_store/preparation_admission.rs
++++ candidate309/rust/crates/swarm-engine/src/root_store/preparation_admission.rs
+@@ -0,0 +1,226 @@
++//! Immutable authenticated pre-transport domains. No capsule is a legacy turn,
++//! worker request, budget reservation or provider-send capability.
++use super::{absent, finished, RootStore, RootStoreError as E, RootInstanceIdentity};
++use crate::trust::{self, authentication::{self, Source}, state::State};
++use serde::{Deserialize, Serialize};
++use serde_json::{json, Value};
++use swarm_confidentiality::{Classification, ExecutionDomain};
++use super::preparation_call::AdmissionCapture;
++
++/// Explicit admission identity and unchanged legacy-compatible send intent.
++/// No actor, output label, destination or execution permission may be supplied.
++#[derive(Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++struct Request {
++    schema_version: u32,
++    event_id: String,
++    expected_revision: u64,
++    expected_trust_revision: i64,
++    intent: Value,
++}
++/// Explicit control attribution for one freshly captured input slice. Unknown
++/// duplicate objects retain the canonical attribution conflict, never overwrite.
++#[derive(Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++struct Attribute {
++    schema_version: u32,
++    event_id: String,
++    expected_revision: u64,
++    expected_trust_revision: i64,
++    intent: Value,
++    source_index: usize,
++    classification: Classification,
++    reason: String,
++}
++/// Metadata read selects only a private admission ID, never a filesystem path.
++#[derive(Deserialize)]
++#[serde(deny_unknown_fields)]
++struct Show {
++    schema_version: u32,
++    admission_id: String,
++    expected_revision: u64,
++    expected_trust_revision: i64,
++}
++/// Private producer-written record. Decoding/framing alone grants nothing;
++/// every read reconstructs the domain under current authority and exact sources.
++#[derive(Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++struct Admission {
++    schema_version: u32,
++    admission_id: String,
++    event_id: String,
++    principal: String,
++    root: RootInstanceIdentity,
++    trust_revision: i64,
++    policy_revision: u64,
++    policy_digest: String,
++    request_digest: String,
++    classification: Classification,
++    captured: AdmissionCapture,
++}
++
++/// Stable safe wrapper; diagnostics never include prompt or credential bytes.
++fn failure(e: trust::TrustError) -> E { E::Trust(Box::new(e)) }
++/// Require an already authenticated principal's current policy grant before any
++/// context/file lookup. The returned entry remains under the caller's Trust lock.
++fn current(state: &State, revision: u64, trust_revision: i64)
++    -> Result<&trust::confidentiality::Entry, E>
++{
++    let entry=state.confidentiality.as_ref().ok_or(E::Refused("blp-policy-required"))?.current().map_err(failure)?;
++    if revision!=entry.revision() || trust_revision!=state.revision || entry.trust_revision()!=state.revision {
++        return Err(E::Refused("blp-policy-stale"));
++    }
++    Ok(entry)
++}
++/// Domain-separated opaque identity scoped to actor, parent and idempotence key;
++/// neither the digest nor possession of the ID is a permission or OS boundary.
++fn identity(principal: &str, preparation: &str, event: &str) -> Result<String,E> {
++    Ok(format!("ba-{}",trust::digest(&json!({"operation":"blp-preparation-admit",
++        "principal":principal,"preparation_id":preparation,"event_id":event})).map_err(failure)?))
++}
++/// Technical filename grammar. Exact hash width is protocol representation,
++/// not an operator policy or caller-selected path.
++fn filename(id: &str) -> Result<String,E> {
++    let hash=id.strip_prefix("ba-").ok_or(E::Refused("blp-admission-invalid"))?;
++    if hash.len()!=64 || !hash.bytes().all(|c|c.is_ascii_digit() || (b'a'..=b'f').contains(&c)) {
++        return Err(E::Refused("blp-admission-invalid"));
++    }
++    Ok(format!("blp-admission-{hash}.receipt"))
++}
++/// Verify complete stored bytes, owner, Root and current policy before exposing
++/// metadata. Reconstruct the exact fixed label; stale grants/policies or any
++/// mismatch refuse. This checks consistency, not malicious same-UID rollback.
++fn verify(root: &RootStore, state: &State, principal: &str, admission: &Admission) -> Result<usize,E> {
++    if admission.principal!=principal { return Err(E::Refused("blp-admission-not-found")); }
++    if admission.schema_version!=1 || admission.captured.source_revision<1
++        || !crate::valid_preparation_key(&admission.captured.preparation_id)
++        || !swarm_identity_contract::name(admission.captured.provider.as_bytes())
++        || !swarm_identity_contract::name(admission.event_id.as_bytes())
++        || admission.admission_id!=identity(principal,&admission.captured.preparation_id,&admission.event_id)?
++        || admission.request_digest.len()!=64 || !admission.request_digest.bytes().all(|c|c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
++    { return Err(E::Refused("blp-admission-record-invalid")); }
++    if admission.root!=root.instance()? { return Err(E::Refused("preparation-root-instance-changed")); }
++    let entry=state.confidentiality.as_ref().ok_or(E::Refused("blp-policy-required"))?.current().map_err(failure)?;
++    if admission.trust_revision!=state.revision || entry.trust_revision()!=state.revision
++        || admission.policy_revision!=entry.revision()
++        || admission.policy_digest!=trust::digest(entry.policy()).map_err(failure)? {
++        return Err(E::Refused("blp-admission-policy-changed"));
++    }
++    let sources=admission.captured.provenance.classifications(&admission.captured.prompt,entry,root.root.as_os_str().as_encoded_bytes())?;
++    let domain=ExecutionDomain::prepare(entry.policy(),entry.revision(),principal,&sources).map_err(|e|E::Refused(e.code()))?;
++    if domain.output_classification()!=&admission.classification { return Err(E::Refused("blp-admission-record-invalid")); }
++    Ok(sources.len())
++}
++/// Return fixed metadata only to the current authenticated owner. No prompt,
++/// worker gate, key or supplied label becomes an execution capability.
++fn metadata(admission: &Admission, source_count: usize) -> Result<Vec<u8>,E> {
++    trust::encoded(&json!({"schema_version":1,"admitted":true,"state":"admitted-no-transport",
++        "admission_id":admission.admission_id,"principal":admission.principal,
++        "preparation_id":admission.captured.preparation_id,"source_revision":admission.captured.source_revision.to_string(),
++        "policy_revision":admission.policy_revision.to_string(),"trust_revision":admission.trust_revision.to_string(),
++        "prompt_sha256":trust::hash(admission.captured.prompt.as_bytes()),"source_count":source_count,
++        "output_classification":admission.classification,"runtime_authorized":false,"runtime_enforced":false})).map_err(failure)
++}
++
++/// Attribute a freshly captured source under the outer exclusive Trust lock.
++/// The current I3/admin must dominate its explicit label before source lookup.
++/// Reuses the unchanged send producer but records no turn/reservation/IO. Only
++/// a digest of the request enters the canonical event reason, never user text.
++/// Canonical attribution owns uniqueness, no-declassification and publication.
++pub(super) fn attribute(root: &RootStore, state: &mut State, raw: &[u8], source: Source<'_>, now: time::OffsetDateTime)
++    -> Result<(Vec<u8>,Option<&'static str>),E>
++{
++    state.require_supported().map_err(failure)?;
++    let actor=authentication::authenticated(state,source).map_err(failure)?;
++    authentication::require_administrator(&actor).map_err(failure)?;
++    let req: Attribute=swarm_wire_json::decode(raw).map_err(|e|failure(e.into()))?;
++    if req.schema_version!=1 || !swarm_identity_contract::name(req.event_id.as_bytes())
++        || req.reason.trim().is_empty() || req.reason.chars().any(char::is_control) { return Err(E::Refused("blp-admission-invalid")); }
++    let entry=current(state,req.expected_revision,req.expected_trust_revision)?;
++    entry.policy().check_read(&actor.subject,Some(&req.classification)).map_err(|e|E::Refused(e.code()))?;
++    let captured=root.capture_admission_intent(&trust::encoded(&req.intent).map_err(failure)?)?;
++    let (digest,count)=captured.provenance.source_digest(&captured.prompt,req.source_index)?;
++    let reason=serde_json::to_string(&json!({"operation":"blp-preparation-input-attribute",
++        "request_digest":trust::digest(&req).map_err(failure)?,"source_index":req.source_index,"reason":req.reason})).map_err(|e|failure(e.into()))?;
++    let input=trust::encoded(&json!({"schema_version":1,"event_id":req.event_id,
++        "expected_revision":req.expected_revision,"expected_trust_revision":req.expected_trust_revision,
++        "canonical_digest":digest,"project_path":root.root.to_str().ok_or(E::Refused("blp-attribute-project-invalid"))?,
++        "classification":req.classification,"reason":reason})).map_err(failure)?;
++    let (bytes,publication)=trust::confidentiality::execute(state,"blp-object-attribute",&input,source,now).map_err(failure)?;
++    let mut result: Value=serde_json::from_slice(&bytes).map_err(|e|failure(e.into()))?;
++    result["producer_captured"]=true.into();result["capture_phase"]="pre-admission".into();
++    result["source_index"]=req.source_index.into();result["source_count"]=count.into();
++    Ok((trust::encoded(&result).map_err(failure)?,publication))
++}
++
++/// Execute immutable admission/metadata read under a held current Trust snapshot.
++/// Authenticate/grant before lookup; admission captures and joins EVERY source
++/// before create-only publication. Replays never recapture or change the fixed
++/// context. No SQL/business turn/budget/Trust-journal mutation or provider IO.
++/// Private receipts use observed native framing, not a new operator size cap.
++/// Late publication/sync/Root/lock-close failures retain known/uncertain effects.
++/// This grants no sink authority, OS confinement or output-reader protection.
++pub(super) fn execute(root: &RootStore, op: &str, raw: &[u8], source: Source<'_>) -> Result<trust::TrustReply,E> {
++    let readonly=op=="blp-preparation-admission-show";
++    if !readonly && !root.writable { return Err(E::Refused("read-only-root")); }
++    let initial=root.instance()?;
++    let lock=root.directory.reserve_trust(!readonly).map_err(E::Storage)?;
++    let mut publication=None;
++    let result=(|| {
++        let state=match root.directory.read_bounded(super::trust_store::STATE,super::trust_store::MAX_STATE) {
++            Ok(bytes)=>State::decode(&bytes).map_err(failure)?,
++            Err(e) if absent(&e)=>State::initial(),Err(e)=>return Err(E::Storage(e)),
++        };state.validate().map_err(failure)?;state.require_supported().map_err(failure)?;
++        let actor=authentication::authenticated(&state,source).map_err(failure)?;
++        let entry=state.confidentiality.as_ref().ok_or(E::Refused("blp-policy-required"))?.current().map_err(failure)?;
++        if !entry.policy().clearances.contains_key(&actor.subject) { return Err(E::Refused("blp-access-denied")); }
++        if readonly {
++            let req: Show=swarm_wire_json::decode(raw).map_err(|e|failure(e.into()))?;
++            if req.schema_version!=1 { return Err(E::Refused("blp-admission-invalid")); }
++            current(&state,req.expected_revision,req.expected_trust_revision)?;
++            let bytes=root.directory.read_native_receipt(&filename(&req.admission_id)?).map_err(|e|if absent(&e){E::Refused("blp-admission-not-found")}else{E::Storage(e)})?;
++            let admission: Admission=serde_json::from_slice(&bytes).map_err(|e|super::preparation_read::cause("blp-admission-record-invalid",e))?;
++            if admission.admission_id!=req.admission_id { return Err(E::Refused("blp-admission-record-invalid")); }
++            return Ok(trust::TrustReply{bytes:metadata(&admission,verify(root,&state,&actor.subject,&admission)?)?,publication:None});
++        }
++        let req: Request=swarm_wire_json::decode(raw).map_err(|e|failure(e.into()))?;
++        if req.schema_version!=1 || !swarm_identity_contract::name(req.event_id.as_bytes()) { return Err(E::Refused("blp-admission-invalid")); }
++        current(&state,req.expected_revision,req.expected_trust_revision)?;
++        let intent_bytes=trust::encoded(&req.intent).map_err(failure)?;
++        let intent=super::preparation_call::decode_send(&intent_bytes)?;
++        if !crate::valid_preparation_key(&intent.preparation_id) { return Err(E::Refused("blp-admission-invalid")); }
++        let id=identity(&actor.subject,&intent.preparation_id,&req.event_id)?;
++        let name=filename(&id)?;
++        let fingerprint=trust::digest(&json!({"operation":op,"principal":actor.subject,"request":req})).map_err(failure)?;
++        match root.directory.read_native_receipt(&name) {
++            Ok(bytes)=>{
++                let admission: Admission=serde_json::from_slice(&bytes).map_err(|e|super::preparation_read::cause("blp-admission-record-invalid",e))?;
++                if admission.admission_id!=id || admission.request_digest!=fingerprint { return Err(E::Refused("blp-admission-event-conflict")); }
++                let bytes=metadata(&admission,verify(root,&state,&actor.subject,&admission)?)?;
++                publication=Some("admission-replayed");return Ok(trust::TrustReply{bytes,publication});
++            }
++            Err(e) if absent(&e)=>{}, Err(e)=>return Err(E::Storage(e)),
++        }
++        let captured=root.capture_admission_intent(&intent_bytes)?;
++        let sources=captured.provenance.classifications(&captured.prompt,entry,root.root.as_os_str().as_encoded_bytes())?;
++        let domain=ExecutionDomain::prepare(entry.policy(),entry.revision(),&actor.subject,&sources).map_err(|e|E::Refused(e.code()))?;
++        let admission=Admission{schema_version:1,admission_id:id,event_id:req.event_id,principal:actor.subject.clone(),
++            root:initial.clone(),trust_revision:state.revision,policy_revision:entry.revision(),
++            policy_digest:trust::digest(entry.policy()).map_err(failure)?,request_digest:fingerprint,
++            classification:domain.output_classification().clone(),captured};
++        let bytes=metadata(&admission,sources.len())?;
++        let body=trust::encoded(&admission).map_err(failure)?;
++        let framed=crate::native_receipt::encode(&body).map_err(|e|super::preparation_read::cause("blp-admission-encode",e))?;
++        if root.instance()?!=initial { return Err(E::Refused("preparation-root-instance-changed")); }
++        if let Err(e)=root.directory.publish_new_with_fault(&name,&framed,crate::local_storage::AtomicStorageFault::None) {
++            if e.publication==crate::PublicationState::RenamedDurabilityUnknown { publication=Some("admission-durability-unknown"); }
++            return Err(E::Storage(e));
++        }
++        publication=Some("admission-recorded");
++        if root.instance()?!=initial { return Err(E::Refused("preparation-root-instance-changed")); }
++        Ok(trust::TrustReply{bytes,publication})
++    })();
++    finished(result,lock.close().map_err(E::Storage)).map_err(|primary|match publication {
++        Some(publication)=>E::TrustPublished{primary:Box::new(primary),publication},None=>primary,
++    })
++}
+--- qualified308/rust/crates/swarm-engine/src/root_store/preparation_call.rs
++++ candidate309/rust/crates/swarm-engine/src/root_store/preparation_call.rs
+@@ -117,6 +117,42 @@
+     pub refresh_ms: u64,
+     pub transport: String,
+ }
++/// Private immutable admission input. Captured from the shared send producer;
++/// serialization never grants authority and contains no provider credential.
++#[derive(Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++pub(super) struct AdmissionCapture {
++    pub(super) preparation_id: String,
++    pub(super) source_revision: i64,
++    pub(super) provider: String,
++    pub(super) provider_source: String,
++    pub(super) request_level: String,
++    pub(super) target: String,
++    pub(super) context_mode: String,
++    pub(super) request_hash: String,
++    pub(super) settings_digest: String,
++    pub(super) prompt: String,
++    pub(super) provenance: super::preparation_prompt::Manifest,
++}
++
++/// Validate one legacy-compatible send intent for either producer consumer.
++/// No capture, mutation, classification or transport occurs on failure.
++fn validated_send(raw: &[u8]) -> Result<PreparationSend,E> {
++        let r = decode_send(raw)?;
++        if r.version != 1
++            || !crate::valid_preparation_key(&r.preparation_id)
++            || !crate::valid_preparation_key(&r.event_id)
++            || r.expected_revision.is_none_or(|v| v < 1)
++            || !swarm_identity_contract::name(r.provider.as_bytes())
++            || !matches!(r.context_mode.as_str(), "" | "full" | "recent")
++            || !matches!(r.target.as_str(), "" | "brief" | "plan")
++            || crate::text::trim_space(&r.message).is_empty()
++        {
++            return Err(E::Refused("preparation-send-invalid"));
++        }
++    Ok(r)
++}
++
+ /// Private persistence envelope; public historical DTO always omits prompt.
+ /// Nonce/kernel/datastore association does not authenticate another local user.
+ #[derive(Serialize, Deserialize)]
+@@ -602,18 +638,7 @@
+         raw: &[u8],
+         environment: &mut W,
+     ) -> Result<PreparationTurn, E> {
+-        let r = decode_send(raw)?;
+-        if r.version != 1
+-            || !crate::valid_preparation_key(&r.preparation_id)
+-            || !crate::valid_preparation_key(&r.event_id)
+-            || r.expected_revision.is_none_or(|v| v < 1)
+-            || !swarm_identity_contract::name(r.provider.as_bytes())
+-            || !matches!(r.context_mode.as_str(), "" | "full" | "recent")
+-            || !matches!(r.target.as_str(), "" | "brief" | "plan")
+-            || crate::text::trim_space(&r.message).is_empty()
+-        {
+-            return Err(E::Refused("preparation-send-invalid"));
+-        }
++        let r = validated_send(raw)?;
+         let request_hash =
+             hash(&crate::encode_model(&r).map_err(|e| cause("preparation-send-encode", e))?);
+         let id = format!(
+@@ -628,6 +653,18 @@
+             let exists=stmt.query_row([&id],|row|row.get::<_,i64>(0)).map_err(E::Sql);
+             let exists=finished(exists,stmt.finalize().map_err(E::Sql))?;
+             if exists>0{return replay_turn(db,&id,&r.preparation_id,&request_hash);}
++            let (t,n,p)=self.capture_in_tx(db,settings,&r,at.clone(),nonce.clone(),id.clone(),request_hash.clone())?;
++            save(db,&t,&n,true)?;let w=super::preparation_call_budget::reserve(db,&p,&t.id)?;verify_record(db,&t,&encoded(&t,&n)?)?;super::preparation_call_budget::verify(db,&w)?;Ok(t)
++        })
++    }
++    /// Shared historical send producer. All source/settings/provider/limit
++    /// checks and prompt assembly occur here under the caller's SQL/settings
++    /// snapshot. Returns captured intent plus native provenance and parent,
++    /// without recording a turn, reserving budget or invoking a provider.
++    fn capture_in_tx(&self, db: &Connection, settings: &crate::EngineSettingsDocument,
++        r: &PreparationSend, at: String, nonce: String, id: String, request_hash: String)
++        -> Result<(PreparationTurn, Native, crate::Preparation), E>
++    {
+             let requested=requested_level(&r.level)?;
+             if r.provider.starts_with("api-") && !requested.is_empty(){return Err(E::Refused("preparation-send-invalid"));}
+             let policy=settings.values.preparation_call_policy().map_err(E::Settings)?;
+@@ -669,9 +706,38 @@
+             let t=PreparationTurn{id:id.clone(),preparation_id:p.id.clone(),status:"pending".into(),created_at:at.clone(),revision:p.revision,method_hash:method.sha256.clone(),provider:r.provider.clone(),provider_digest:source.clone(),request_hash:request_hash.clone(),question:crate::text::trim_space(&r.message).into(),prompt,context_mode:r.context_mode.clone(),target:r.target.clone(),project:project.as_ref().map(|o|Box::new(o.context.clone())),model_route:route.clone().map(Box::new),timeout_seconds:i64::try_from(policy.timeout_seconds).map_err(|e|cause("preparation-timeout-representation",e))?,timeout_maximum:i64::try_from(policy.timeout_maximum_seconds).map_err(|e|cause("preparation-timeout-representation",e))?,..Default::default()};
+             let event=settings.values.agent_execution_policy().map_err(E::Settings)?.event_max_bytes.0.map(|v|usize::try_from(v.0)).transpose().map_err(|e|cause("preparation-event-representation",e))?;
+             let n=Native{monitor:None,version:3,prompt_provenance:Some(prompt_provenance),request_level:requested.into(),root:self.instance()?,nonce:nonce.clone(),settings_digest:settings.history.last().ok_or(E::Refused("preparation-settings-history-missing"))?.digest.clone(),provider_source:source,project:project.map(|p|p.context),policy:SavedPolicy{timeout:policy.timeout_seconds,observation:policy.observation_ms,response:policy.response_max_bytes,event,h1:policy.http1_max_headers,h2:policy.http2_max_header_bytes,transport:policy.transport}};
+-            save(db,&t,&n,true)?;let w=super::preparation_call_budget::reserve(db,&p,&t.id)?;verify_record(db,&t,&encoded(&t,&n)?)?;super::preparation_call_budget::verify(db,&w)?;Ok(t)
++        Ok((t,n,p))
++    }
++
++    /// Capture the SAME producer as send in a rolled-back read transaction,
++    /// under existing saved settings/contention and material-Root guards.
++    /// Returns private bytes/provenance only to trusted admission consumers;
++    /// never writes SQL, reserves budget, dispatches or assigns classification.
++    /// Caller owns Trust authority; this requires an autocommit Root connection.
++    /// Every read/rollback/material/close cause propagates without a fallback.
++    pub(super) fn capture_admission_intent(&self, raw: &[u8]) -> Result<AdmissionCapture, E> {
++        use crate::WorkEnvironment;
++        let r=validated_send(raw)?;
++        let request_hash=hash(&crate::encode_model(&r).map_err(|e|cause("preparation-send-encode",e))?);
++        let id=format!("pt-{}",&hash(format!("{}\0{}",r.preparation_id,r.event_id).as_bytes())[..32]);
++        let mut environment=crate::SystemEnvironment;
++        let at=environment.timestamp().map_err(E::Runtime)?;
++        let nonce=environment.identifier("pc-").map_err(E::Runtime)?;
++        crate::agent_storage_retry::execute_borrowed(&self.db,&self.directory,false,|db,settings| {
++            super::material_path::with_material_read(self,|| {
++                let mut tx=Transaction::new_unchecked(db,TransactionBehavior::Deferred).map_err(E::Sql)?;
++                tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
++                let result=self.capture_in_tx(&tx,settings,&r,at.clone(),nonce.clone(),id.clone(),request_hash.clone())
++                    .and_then(|(t,n,_)| Ok(AdmissionCapture {preparation_id:t.preparation_id,
++                        source_revision:t.revision,provider:t.provider,provider_source:n.provider_source,
++                        request_level:n.request_level,target:t.target,context_mode:t.context_mode,
++                        request_hash:t.request_hash,settings_digest:n.settings_digest,prompt:t.prompt,
++                        provenance:n.prompt_provenance.ok_or(E::Refused("blp-preparation-provenance-required"))?}));
++                finished(result,tx.rollback().map_err(E::Sql))
++            })
+         })
+     }
++
+ }
+ 
+ /// Current saved plan/task policies accompany a fixed wire-format example.
+--- qualified308/rust/crates/swarm-engine/src/root_store/trust_store.rs
++++ candidate309/rust/crates/swarm-engine/src/root_store/trust_store.rs
+@@ -65,6 +65,10 @@
+     /// Serialize one request; the fixed caller context selects authentication,
+     /// never an input field or operator policy. Preserve publication on errors.
+     pub(super) fn trust_scoped(&self, operation: &str, raw: &[u8], token: Source<'_>, principal: bool) -> Result<TrustReply, R> {
++        #[cfg(target_os="linux")]
++        if matches!(operation,"blp-preparation-admit"|"blp-preparation-admission-show") {
++            return super::preparation_admission::execute(self,operation,raw,token);
++        }
+         self.with_preparation_control(operation,token,principal,||self.trust_scoped_reserved(operation,raw,token,principal))
+     }
+     /// Acquire the egress writer before any SQL/Trust reservation for an identity
+@@ -151,6 +155,12 @@
+             } else { "local-operator".to_owned() };
+             let mut planned = None;
+             let bytes = match operation {
++                #[cfg(target_os="linux")]
++                "blp-preparation-input-attribute" => {
++                    let (bytes,state)=super::preparation_admission::attribute(self,&mut st,raw,token,now)?;
++                    planned=state;bytes
++                }
++
+                 #[cfg(target_os="linux")]
+                 "blp-preparation-attribute" => {
+                     let (bytes, publication) = super::preparation_attribution::execute(self, &mut st, raw, token, now)?;
+--- qualified308/rust/crates/swarm-engine/src/root_store.rs
++++ candidate309/rust/crates/swarm-engine/src/root_store.rs
+@@ -3892,6 +3892,8 @@
+ #[cfg(target_os = "linux")]
+ mod preparation_attribution;
+ #[cfg(target_os = "linux")]
++mod preparation_admission;
++#[cfg(target_os = "linux")]
+ mod preparation_prompt;
+ #[cfg(target_os = "linux")]
+ pub use preparation_call::{worker_error as preparation_worker_error,PreparationSend,PreparationCallCapabilities,PreparationApiRequest,execute_preparation_cli_gate,PreparationWorkerRequest,PreparationCliRequest,decode_send as decode_preparation_send,decode_stop as decode_preparation_stop,PreparationStop};
+--- qualified308/rust/crates/swarm-cli/src/trust.rs
++++ candidate309/rust/crates/swarm-cli/src/trust.rs
+@@ -23,7 +23,7 @@
+     if !matches!(
+         op,
+         "show"
+-            | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute" | "blp-preparation-check" | "blp-preparation-attribute"
++            | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute" | "blp-preparation-check" | "blp-preparation-attribute" | "blp-preparation-input-attribute" | "blp-preparation-admit" | "blp-preparation-admission-show"
+             | "export"
+             | "anchor"
+             | "verify"
+@@ -67,7 +67,7 @@
+         write_output(out, &bytes)?;
+         return Ok(0);
+     }
+-    let readonly = read || matches!(op, "config-preview" | "read-object" | "read-original" | "public-anchor" | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check");
++    let readonly = read || matches!(op, "config-preview" | "read-object" | "read-original" | "public-anchor" | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check" | "blp-preparation-admission-show");
+     let store = swarm_engine::RootStore::open(Path::new(&a.root), !readonly)
+         .map_err(|e| CliError::Root(Box::new(e)))?;
+     let token = std::env::var("SWARM_TRUST_TOKEN").unwrap_or_default();
+--- qualified308/rust/crates/swarm-cli/src/lib.rs
++++ candidate309/rust/crates/swarm-cli/src/lib.rs
+@@ -32,8 +32,8 @@
+ };
+ use swarm_enrollment_bootstrap as bootstrap;
+ const USAGE:&str="swarm-rust init --root ROOT | work list --json --root ROOT | work show ID | resume ID | planning show|enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions ID | mission show|order|queue|priority|start|resume|pause|unpause|stop ID --input FILE | mission watch|status|changes|spending ID | mission status-native ID --json | costs show ID | budget show|preview|apply ID [--input FILE] | task add|update|submit|validation-preview|validation-candidate ID --input FILE | task-model show|preview|apply ID | providers config show|init|inspect|backups|preview|apply --root ROOT [--input FILE] | providers policies export|preview|apply --root ROOT [--input FILE] | pricing list|save|estimate --input FILE | engine-settings show|preview|apply|model-check --root ROOT [--input FILE] | admin-budget show|preview|apply --root ROOT [--input FILE] | identity initial-create|initial-reconcile REQUEST_SHA256 OPERATOR_DIRECTORY PRIVATE_ANCHOR --input PRIVATE_REQUEST | identity checkpoint-check REQUEST_SHA256 --input PRIVATE_ANCHOR | identity operator-check SHA256 --input PRIVATE_OPERATOR_DIRECTORY | identity service-export|service-export-reconcile SHA256 PRIVATE_OUTPUT --input PRIVATE_OPERATOR_DIRECTORY | identity provisioning-check SHA256 --input PRIVATE_REQUEST | identity bootstrap-check|control-check SHA256 --input FILE | identity personal-init|personal-enroll|personal-recover SHA256 SEED_PATH --input BOOTSTRAP | identity service-install|service-resume|service-reconcile SHA256 --input PRIVATE_ARTIFACT | identity service-call SHA256 SEED_PATH --input BOOTSTRAP | trust enrollment-call OPERATION ABSOLUTE_DECLARATION --input REQUESTFILE | trust enrollment-serve OPERATION ABSOLUTE_DECLARATION [LOOPBACK_ADDRESS] --input REQUESTFILE | paea transfer-call SERVICE PROJECT WORK CHILD PIN STAGING DECLARATION --input REQUESTFILE | paea promote-call OPERATION SERVICE PROJECT WORK CHILD PIN DECLARATION --input REQUESTFILE | paea settlement-call OPERATION PROJECT LEDGER DECLARATION --input REQUESTFILE";
+-const HELP_FR:&str="swarm-rust — développement : migration partielle\nCommandes disponibles :\n  swarm-rust lifecycle list --root ROOT --json\n  swarm-rust planning history WORK --root ROOT --json\n  swarm-rust visit show|mark WORK --root ROOT [--input INTENT.json] --json\n  swarm-rust runtime-health --root ROOT --json\n  swarm-rust logs query WORK AGENT --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits logs show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust activity show WORK --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits activity show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust exchange list WORK --root ROOT --json\n  swarm-rust run-limits performance show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust run-limits web-requests show|history|preview|apply [--input FICHIER] [--json]\n  swarm-rust paea reconcile-effects LEDGER --root ROOT --json\n    Rapprochement lecture seule des journaux d’effets réels (PA-09) ; aucun effet, aucune autorité.\n  swarm-rust paea transfer-call SERVICE PROJECT WORK CHILD PIN STAGING DECLARATION --input DEMANDE.json\n    Transfert Git gardé deux phases : préparation publique, provisionnement hors bande, frame privée stdin ; opération Reconcile native, aucun effet ref.\n  swarm-rust paea promote-call commit|reconcile SERVICE PROJECT WORK CHILD PIN DECLARATION --input DEMANDE.json\n    Promotion Git gardée deux phases : intention durable + transaction de ref avec OLD exact (commit) ou lecture pure du journal (reconcile) ; frame privée stdin.\n  swarm-rust paea settlement-call commit|reconcile PROJECT LEDGER DECLARATION --input DEMANDE.json\n    Règlement fictif gardé deux phases : effet durables du grand livre séparé (commit) ou lecture pure du journal (reconcile) ; frame privée stdin.\n  swarm-rust run-limits show|history|preview|apply SCOPE MISSION KEY --root ROOT [--input FILE] --json\n  swarm-rust run-limits effective MISSION ROLE TASK --root ROOT --json\n  swarm-rust run-limits rollback-preview|rollback SCOPE MISSION KEY REV --root ROOT --input FILE --json\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify|blp-show|blp-policy-preview|blp-policy-apply|blp-check|blp-object-attribute|blp-preparation-check|blp-preparation-attribute --root RACINE [--input FICHIER|-]\n    blp-* : contrôles partiels Bell-LaPadula : administration, attribution, diagnostic et quarantaine de préparation (runtime_enforced:false pour la protection globale). blp-show/blp-policy-preview/blp-object-attribute exigent I3/admin courant ; blp-check exige une identité authentifiée habilitée. blp-object-attribute classe un digest canonique/chemin exact à révisions courantes ; aucun déclassement ni preuve de filiation physique. blp-preparation-attribute classe une tranche capturée vérifiée, sous I3/admin habilité ; aucun droit d’envoi.\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust web-ticket ADRESSE [CHEMIN] --root ROOT --json\n    Lien de connexion à usage unique pour le cockpit lancé ; secret sur stdout, à ne jamais journaliser.\n  swarm-rust web-rotate ADRESSE --root ROOT --json\n    Remplace la clé locale du cockpit (serveur arrêté) ; anciens cookies et tickets refusés au prochain démarrage.\n  swarm-rust prepare send|stop|use-proposal|create|save|method|adopt-brief|validate-plan|answer-questions|create-missions|revise-missions|configure-team|release-plan|budget|source-add|source-remove [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods|capabilities --root ROOT [--json]\n  swarm-rust prepare show|budget|release-review|dialogue ID --root ROOT [--json]\n  swarm-rust prepare files ID [SCOPE [QUERY]] --root ROOT [--json]\n  swarm-rust prepare templates | template ID | template-check --input JSON\n  swarm-rust project-profile show|check|list --root ROOT [--json]\n  swarm-rust project-profile preview|apply|select [PROFILE] --root ROOT --input JSON [--json]\n  swarm-rust prepare source ID PATH START END --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust run-limits provider-wait show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers connections show|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|review-check|baseline-preview|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent history ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit|graph-preview|graph-apply ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending|seen ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-profile show|check --root ROOT [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity linux-prerequisites --json [--lang fr|en]\n    Read-only current CLI namespace metadata; no launch or protection verified.\n  swarm-rust identity service-call SHA256 PRIVATE_SEED --input BOOTSTRAP [--json]\n    Appel opérateur local : paquet binaire sur stdin, aucun listener ou session.\n  swarm-rust identity service-install|service-resume|service-reconcile SHA256 --input ARTEFACT_PRIVE_ABSOLU [--json]\n    Installation initiale, sans compte humain ni démarrage de service.\n  swarm-rust identity personal-init|personal-enroll|personal-recover EMPREINTE_SHA256 CLE_PRIVEE --input BOOTSTRAP [--json]\n    personal-enroll : frame binaire sur stdin ; aucun secret dans argv.\n  swarm-rust identity initial-create|initial-reconcile PIN_DEMANDE DOSSIER_OPERATEUR ANCRE_PRIVEE --input DEMANDE_PRIVEE [--json]\n    Matière dormante uniquement ; intention avant génération, aucun compte/Root/service/humain admis.\n  swarm-rust identity checkpoint-check PIN_DEMANDE --input ANCRE_PRIVEE_ABSOLUE [--json]\n    Lecture uniquement ; confiance du localisateur à établir par l’appelant, aucun paquet lu/créé.\n  swarm-rust identity operator-check PIN --input DOSSIER_OPERATEUR_PRIVE [--json]\n  swarm-rust identity service-export|service-export-reconcile PIN SORTIE_PRIVEE --input DOSSIER_OPERATEUR_PRIVE [--json]\n    Artefact de service uniquement ; aucune installation, nouvelle clé/preuve ou identité humaine vérifiée.\n  swarm-rust identity provisioning-check EMPREINTE_SHA256 --input DEMANDE_PRIVEE_ABSOLUE [--json]\n    Précontrôle uniquement ; aucun secret créé, compte vérifié ou service démarré.\n  swarm-rust identity bootstrap-check EMPREINTE_SHA256 --input FILE [--json]\n  swarm-rust identity control-check EMPREINTE_SHA256 --input FILE [--json] (précontrôle, sans démarrage)\nLangue : --lang fr|en. init initialise sans service ; web lance l’API native de développement.\nMigration partielle : seules les commandes Rust listées sont actuellement disponibles.\n";
+-const HELP_EN:&str="swarm-rust — development: partial migration\nAvailable commands:\n  swarm-rust lifecycle list --root ROOT --json\n  swarm-rust planning history WORK --root ROOT --json\n  swarm-rust visit show|mark WORK --root ROOT [--input INTENT.json] --json\n  swarm-rust runtime-health --root ROOT --json\n  swarm-rust logs query WORK AGENT --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits logs show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust activity show WORK --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits activity show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust exchange list WORK --root ROOT --json\n  swarm-rust run-limits performance show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust run-limits web-requests show|history|preview|apply [--input FILE] [--json]\n  swarm-rust paea reconcile-effects LEDGER --root ROOT --json\n    Read-only reconciliation of the real effect journals (PA-09); no effect, no authority.\n  swarm-rust paea transfer-call SERVICE PROJECT WORK CHILD PIN STAGING DECLARATION --input REQUEST.json\n    Guarded two-phase Git transfer: public preparation, out-of-band provisioning, private stdin frame; native Reconcile operation, no ref effect.\n  swarm-rust paea promote-call commit|reconcile SERVICE PROJECT WORK CHILD PIN DECLARATION --input REQUEST.json\n    Guarded two-phase Git promotion: durable intent + OLD-fenced reference transaction (commit) or pure journal read (reconcile); private stdin frame.\n  swarm-rust paea settlement-call commit|reconcile PROJECT LEDGER DECLARATION --input REQUEST.json\n    Guarded two-phase fictitious settlement: durable separate-ledger effect (commit) or pure journal read (reconcile); private stdin frame.\n  swarm-rust run-limits show|history|preview|apply SCOPE MISSION KEY --root ROOT [--input FILE] --json\n  swarm-rust run-limits effective MISSION ROLE TASK --root ROOT --json\n  swarm-rust run-limits rollback-preview|rollback SCOPE MISSION KEY REV --root ROOT --input FILE --json\n  swarm-rust run-limits provider-wait show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify|blp-show|blp-policy-preview|blp-policy-apply|blp-check|blp-object-attribute|blp-preparation-check|blp-preparation-attribute --root ROOT [--input FILE|-]\n    blp-*: partial Bell-LaPadula controls: administration, attribution, diagnostics and preparation quarantine (runtime_enforced:false for overall protection). blp-show/blp-policy-preview/blp-object-attribute require a current I3/admin; blp-check requires an authenticated cleared identity. blp-object-attribute classifies an exact canonical digest/path at current revisions; no declassification or physical lineage proof. blp-preparation-attribute classifies a verified captured slice under cleared I3/admin authority; no send permission.\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust web-ticket ADDRESS [PATH] --root ROOT --json\n    Single-use sign-in link for the running cockpit; secret on stdout, never log it.\n  swarm-rust web-rotate ADDRESS --root ROOT --json\n    Replace the cockpit local key (server stopped); old cookies and tickets refused at next start.\n  swarm-rust prepare send|stop|use-proposal|create|save|method|adopt-brief|validate-plan|answer-questions|create-missions|revise-missions|configure-team|release-plan|budget|source-add|source-remove [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods|capabilities --root ROOT [--json]\n  swarm-rust prepare show|budget|release-review|dialogue ID --root ROOT [--json]\n  swarm-rust prepare files ID [SCOPE [QUERY]] --root ROOT [--json]\n  swarm-rust prepare templates | template ID | template-check --input JSON\n  swarm-rust project-profile show|check|list --root ROOT [--json]\n  swarm-rust project-profile preview|apply|select [PROFILE] --root ROOT --input JSON [--json]\n  swarm-rust prepare source ID PATH START END --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|review-check|baseline-preview|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent history ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit|graph-preview|graph-apply ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending|seen ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-profile show|check --root ROOT [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity service-call SHA256 PRIVATE_SEED --input BOOTSTRAP [--json]\n    Local operator call: binary stdin packet, no listener or session.\n  swarm-rust identity service-install|service-resume|service-reconcile SHA256 --input ABSOLUTE_PRIVATE_ARTIFACT [--json]\n    Initial installation only; no human account or service started.\n  swarm-rust identity personal-init|personal-enroll|personal-recover SHA256_DIGEST PRIVATE_KEY --input BOOTSTRAP [--json]\n    personal-enroll: binary frame on stdin; no secrets in argv.\n  swarm-rust identity initial-create|initial-reconcile REQUEST_PIN OPERATOR_DIRECTORY PRIVATE_ANCHOR --input PRIVATE_REQUEST [--json]\n    Dormant material only; intent before generation, no account/Root/service/human admitted.\n  swarm-rust identity checkpoint-check REQUEST_PIN --input ABSOLUTE_PRIVATE_ANCHOR [--json]\n    Read only; caller must establish locator trust, no package read/creation.\n  swarm-rust identity operator-check PIN --input PRIVATE_OPERATOR_DIRECTORY [--json]\n  swarm-rust identity service-export|service-export-reconcile PIN PRIVATE_OUTPUT --input PRIVATE_OPERATOR_DIRECTORY [--json]\n    Service artifact only; no installation, new keys/proof or verified human identity.\n  swarm-rust identity provisioning-check SHA256_DIGEST --input ABSOLUTE_PRIVATE_REQUEST [--json]\n    Preflight only; no material generated, account verified or service started.\n  swarm-rust identity bootstrap-check SHA256_DIGEST --input FILE [--json]\n  swarm-rust identity control-check SHA256_DIGEST --input FILE [--json] (preflight, no service start)\nLanguage: --lang fr|en. init starts no service; web starts the native development API.\nPartial migration: only the listed Rust commands are currently available.\n";
++const HELP_FR:&str="swarm-rust — développement : migration partielle\nCommandes disponibles :\n  swarm-rust lifecycle list --root ROOT --json\n  swarm-rust planning history WORK --root ROOT --json\n  swarm-rust visit show|mark WORK --root ROOT [--input INTENT.json] --json\n  swarm-rust runtime-health --root ROOT --json\n  swarm-rust logs query WORK AGENT --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits logs show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust activity show WORK --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits activity show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust exchange list WORK --root ROOT --json\n  swarm-rust run-limits performance show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust run-limits web-requests show|history|preview|apply [--input FICHIER] [--json]\n  swarm-rust paea reconcile-effects LEDGER --root ROOT --json\n    Rapprochement lecture seule des journaux d’effets réels (PA-09) ; aucun effet, aucune autorité.\n  swarm-rust paea transfer-call SERVICE PROJECT WORK CHILD PIN STAGING DECLARATION --input DEMANDE.json\n    Transfert Git gardé deux phases : préparation publique, provisionnement hors bande, frame privée stdin ; opération Reconcile native, aucun effet ref.\n  swarm-rust paea promote-call commit|reconcile SERVICE PROJECT WORK CHILD PIN DECLARATION --input DEMANDE.json\n    Promotion Git gardée deux phases : intention durable + transaction de ref avec OLD exact (commit) ou lecture pure du journal (reconcile) ; frame privée stdin.\n  swarm-rust paea settlement-call commit|reconcile PROJECT LEDGER DECLARATION --input DEMANDE.json\n    Règlement fictif gardé deux phases : effet durables du grand livre séparé (commit) ou lecture pure du journal (reconcile) ; frame privée stdin.\n  swarm-rust run-limits show|history|preview|apply SCOPE MISSION KEY --root ROOT [--input FILE] --json\n  swarm-rust run-limits effective MISSION ROLE TASK --root ROOT --json\n  swarm-rust run-limits rollback-preview|rollback SCOPE MISSION KEY REV --root ROOT --input FILE --json\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify|blp-show|blp-policy-preview|blp-policy-apply|blp-check|blp-object-attribute|blp-preparation-check|blp-preparation-attribute|blp-preparation-input-attribute|blp-preparation-admit|blp-preparation-admission-show --root RACINE [--input FICHIER|-]\n    blp-* : contrôles partiels Bell-LaPadula : administration, attribution, diagnostic et quarantaine de préparation (runtime_enforced:false pour la protection globale). blp-show/blp-policy-preview/blp-object-attribute exigent I3/admin courant ; blp-check exige une identité authentifiée habilitée. blp-object-attribute classe un digest canonique/chemin exact à révisions courantes ; aucun déclassement ni preuve de filiation physique. blp-preparation-attribute classe une tranche capturée vérifiée, sous I3/admin habilité ; aucun droit d’envoi. blp-preparation-input-attribute classe avant admission ; blp-preparation-admit fige les sources sous le principal authentifié, sans tour exécutable ; admission-show relit ses métadonnées, sans droit fournisseur.\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust web-ticket ADRESSE [CHEMIN] --root ROOT --json\n    Lien de connexion à usage unique pour le cockpit lancé ; secret sur stdout, à ne jamais journaliser.\n  swarm-rust web-rotate ADRESSE --root ROOT --json\n    Remplace la clé locale du cockpit (serveur arrêté) ; anciens cookies et tickets refusés au prochain démarrage.\n  swarm-rust prepare send|stop|use-proposal|create|save|method|adopt-brief|validate-plan|answer-questions|create-missions|revise-missions|configure-team|release-plan|budget|source-add|source-remove [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods|capabilities --root ROOT [--json]\n  swarm-rust prepare show|budget|release-review|dialogue ID --root ROOT [--json]\n  swarm-rust prepare files ID [SCOPE [QUERY]] --root ROOT [--json]\n  swarm-rust prepare templates | template ID | template-check --input JSON\n  swarm-rust project-profile show|check|list --root ROOT [--json]\n  swarm-rust project-profile preview|apply|select [PROFILE] --root ROOT --input JSON [--json]\n  swarm-rust prepare source ID PATH START END --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust run-limits provider-wait show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers connections show|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|review-check|baseline-preview|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent history ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit|graph-preview|graph-apply ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending|seen ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-profile show|check --root ROOT [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity linux-prerequisites --json [--lang fr|en]\n    Read-only current CLI namespace metadata; no launch or protection verified.\n  swarm-rust identity service-call SHA256 PRIVATE_SEED --input BOOTSTRAP [--json]\n    Appel opérateur local : paquet binaire sur stdin, aucun listener ou session.\n  swarm-rust identity service-install|service-resume|service-reconcile SHA256 --input ARTEFACT_PRIVE_ABSOLU [--json]\n    Installation initiale, sans compte humain ni démarrage de service.\n  swarm-rust identity personal-init|personal-enroll|personal-recover EMPREINTE_SHA256 CLE_PRIVEE --input BOOTSTRAP [--json]\n    personal-enroll : frame binaire sur stdin ; aucun secret dans argv.\n  swarm-rust identity initial-create|initial-reconcile PIN_DEMANDE DOSSIER_OPERATEUR ANCRE_PRIVEE --input DEMANDE_PRIVEE [--json]\n    Matière dormante uniquement ; intention avant génération, aucun compte/Root/service/humain admis.\n  swarm-rust identity checkpoint-check PIN_DEMANDE --input ANCRE_PRIVEE_ABSOLUE [--json]\n    Lecture uniquement ; confiance du localisateur à établir par l’appelant, aucun paquet lu/créé.\n  swarm-rust identity operator-check PIN --input DOSSIER_OPERATEUR_PRIVE [--json]\n  swarm-rust identity service-export|service-export-reconcile PIN SORTIE_PRIVEE --input DOSSIER_OPERATEUR_PRIVE [--json]\n    Artefact de service uniquement ; aucune installation, nouvelle clé/preuve ou identité humaine vérifiée.\n  swarm-rust identity provisioning-check EMPREINTE_SHA256 --input DEMANDE_PRIVEE_ABSOLUE [--json]\n    Précontrôle uniquement ; aucun secret créé, compte vérifié ou service démarré.\n  swarm-rust identity bootstrap-check EMPREINTE_SHA256 --input FILE [--json]\n  swarm-rust identity control-check EMPREINTE_SHA256 --input FILE [--json] (précontrôle, sans démarrage)\nLangue : --lang fr|en. init initialise sans service ; web lance l’API native de développement.\nMigration partielle : seules les commandes Rust listées sont actuellement disponibles.\n";
++const HELP_EN:&str="swarm-rust — development: partial migration\nAvailable commands:\n  swarm-rust lifecycle list --root ROOT --json\n  swarm-rust planning history WORK --root ROOT --json\n  swarm-rust visit show|mark WORK --root ROOT [--input INTENT.json] --json\n  swarm-rust runtime-health --root ROOT --json\n  swarm-rust logs query WORK AGENT --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits logs show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust activity show WORK --root ROOT [--input QUERY.json] --json\n  swarm-rust run-limits activity show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust exchange list WORK --root ROOT --json\n  swarm-rust run-limits performance show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust run-limits web-requests show|history|preview|apply [--input FILE] [--json]\n  swarm-rust paea reconcile-effects LEDGER --root ROOT --json\n    Read-only reconciliation of the real effect journals (PA-09); no effect, no authority.\n  swarm-rust paea transfer-call SERVICE PROJECT WORK CHILD PIN STAGING DECLARATION --input REQUEST.json\n    Guarded two-phase Git transfer: public preparation, out-of-band provisioning, private stdin frame; native Reconcile operation, no ref effect.\n  swarm-rust paea promote-call commit|reconcile SERVICE PROJECT WORK CHILD PIN DECLARATION --input REQUEST.json\n    Guarded two-phase Git promotion: durable intent + OLD-fenced reference transaction (commit) or pure journal read (reconcile); private stdin frame.\n  swarm-rust paea settlement-call commit|reconcile PROJECT LEDGER DECLARATION --input REQUEST.json\n    Guarded two-phase fictitious settlement: durable separate-ledger effect (commit) or pure journal read (reconcile); private stdin frame.\n  swarm-rust run-limits show|history|preview|apply SCOPE MISSION KEY --root ROOT [--input FILE] --json\n  swarm-rust run-limits effective MISSION ROLE TASK --root ROOT --json\n  swarm-rust run-limits rollback-preview|rollback SCOPE MISSION KEY REV --root ROOT --input FILE --json\n  swarm-rust run-limits provider-wait show|history|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify|blp-show|blp-policy-preview|blp-policy-apply|blp-check|blp-object-attribute|blp-preparation-check|blp-preparation-attribute|blp-preparation-input-attribute|blp-preparation-admit|blp-preparation-admission-show --root ROOT [--input FILE|-]\n    blp-*: partial Bell-LaPadula controls: administration, attribution, diagnostics and preparation quarantine (runtime_enforced:false for overall protection). blp-show/blp-policy-preview/blp-object-attribute require a current I3/admin; blp-check requires an authenticated cleared identity. blp-object-attribute classifies an exact canonical digest/path at current revisions; no declassification or physical lineage proof. blp-preparation-attribute classifies a verified captured slice under cleared I3/admin authority; no send permission. blp-preparation-input-attribute classifies before admission; blp-preparation-admit freezes source exposure for the authenticated principal, without an executable turn; admission-show reads its metadata, without provider authority.\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust web-ticket ADDRESS [PATH] --root ROOT --json\n    Single-use sign-in link for the running cockpit; secret on stdout, never log it.\n  swarm-rust web-rotate ADDRESS --root ROOT --json\n    Replace the cockpit local key (server stopped); old cookies and tickets refused at next start.\n  swarm-rust prepare send|stop|use-proposal|create|save|method|adopt-brief|validate-plan|answer-questions|create-missions|revise-missions|configure-team|release-plan|budget|source-add|source-remove [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods|capabilities --root ROOT [--json]\n  swarm-rust prepare show|budget|release-review|dialogue ID --root ROOT [--json]\n  swarm-rust prepare files ID [SCOPE [QUERY]] --root ROOT [--json]\n  swarm-rust prepare templates | template ID | template-check --input JSON\n  swarm-rust project-profile show|check|list --root ROOT [--json]\n  swarm-rust project-profile preview|apply|select [PROFILE] --root ROOT --input JSON [--json]\n  swarm-rust prepare source ID PATH START END --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|review-check|baseline-preview|publication-preview|publish|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent history ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit|graph-preview|graph-apply ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending|seen ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-profile show|check --root ROOT [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity service-call SHA256 PRIVATE_SEED --input BOOTSTRAP [--json]\n    Local operator call: binary stdin packet, no listener or session.\n  swarm-rust identity service-install|service-resume|service-reconcile SHA256 --input ABSOLUTE_PRIVATE_ARTIFACT [--json]\n    Initial installation only; no human account or service started.\n  swarm-rust identity personal-init|personal-enroll|personal-recover SHA256_DIGEST PRIVATE_KEY --input BOOTSTRAP [--json]\n    personal-enroll: binary frame on stdin; no secrets in argv.\n  swarm-rust identity initial-create|initial-reconcile REQUEST_PIN OPERATOR_DIRECTORY PRIVATE_ANCHOR --input PRIVATE_REQUEST [--json]\n    Dormant material only; intent before generation, no account/Root/service/human admitted.\n  swarm-rust identity checkpoint-check REQUEST_PIN --input ABSOLUTE_PRIVATE_ANCHOR [--json]\n    Read only; caller must establish locator trust, no package read/creation.\n  swarm-rust identity operator-check PIN --input PRIVATE_OPERATOR_DIRECTORY [--json]\n  swarm-rust identity service-export|service-export-reconcile PIN PRIVATE_OUTPUT --input PRIVATE_OPERATOR_DIRECTORY [--json]\n    Service artifact only; no installation, new keys/proof or verified human identity.\n  swarm-rust identity provisioning-check SHA256_DIGEST --input ABSOLUTE_PRIVATE_REQUEST [--json]\n    Preflight only; no material generated, account verified or service started.\n  swarm-rust identity bootstrap-check SHA256_DIGEST --input FILE [--json]\n  swarm-rust identity control-check SHA256_DIGEST --input FILE [--json] (preflight, no service start)\nLanguage: --lang fr|en. init starts no service; web starts the native development API.\nPartial migration: only the listed Rust commands are currently available.\n";
+ pub enum CliError {
+     Trust(Box<swarm_engine::TrustError>),
+     TrustPublication { primary:Box<Self>, publication: &'static str },
+@@ -788,6 +788,10 @@
+     #[cfg(target_os = "linux")]
+     if a.pos[0] == "web-rotate" {
+         return web_ticket::execute_rotate(a, out);
++    }
++    #[cfg(target_os = "linux")]
++    if a.pos[0] == "web-authority-witness" {
++        return web_ticket::execute_witness_reset(a, out);
+     }
+     #[cfg(target_os = "linux")]
+     if matches!(
+--- qualified308/rust/crates/swarm-web/src/service/trust.rs
++++ candidate309/rust/crates/swarm-web/src/service/trust.rs
+@@ -43,7 +43,7 @@
+                 | "read-object"
+                 | "read-original"
+                 | "audit-transaction"
+-                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute" | "blp-preparation-check" | "blp-preparation-attribute"
++                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute" | "blp-preparation-check" | "blp-preparation-attribute" | "blp-preparation-input-attribute" | "blp-preparation-admit" | "blp-preparation-admission-show"
+                 | "public-anchor" | "public-verify" | "evidence-key-prepare" | "evidence-key-activate" | "evidence-key-revoke"
+         ) {
+             return Err(HttpServiceError::Refused("trust-action-unknown"));
+@@ -75,7 +75,7 @@
+         let readonly = matches!(
+             op,
+             "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
+-                | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check"
++                | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check" | "blp-preparation-admission-show"
+         );
+         let store = RootStore::open(&self.root, !readonly).map_err(|e| root("trust-open", e))?;
+         let mut publication = None;
+--- qualified308/rust/crates/swarm-web/src/service.rs
++++ candidate309/rust/crates/swarm-web/src/service.rs
+@@ -363,10 +363,15 @@
+                 // Only these typed Trust diagnostic refusals are caller states.
+                 // Corrupt provenance, storage and wrapped cleanup stay server errors.
+                 "blp-access-denied" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
+-                "blp-policy-required"|"blp-policy-stale"|"blp-classification-required"|"blp-preparation-provenance-required"|"blp-preparation-parent-mismatch"|"preparation-revision-conflict"
++                "blp-policy-required"|"blp-policy-stale"|"blp-classification-required"|"blp-preparation-provenance-required"|"blp-preparation-parent-mismatch"|"preparation-revision-conflict"|"blp-admission-event-conflict"|"blp-admission-policy-changed"
+                     if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+-                "blp-preparation-check-invalid"|"blp-preparation-attribute-invalid"|"blp-classification-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
+-                "preparation-turn-not-found"|"blp-preparation-source-not-found" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
++                "preparation-send-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Preparation(_))=>StatusCode::BAD_REQUEST,
++                "preparation-send-invalid"|"preparation-message-over-limit"|"preparation-context-over-limit"
++                    if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
++                "preparation-capability-stale"|"preparation-method-unavailable"|"preparation-stale-method"|"preparation-turn-active"|"preparation-call-disabled"
++                    if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
++                "blp-admission-invalid"|"blp-preparation-check-invalid"|"blp-preparation-attribute-invalid"|"blp-classification-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
++                "blp-admission-not-found"|"preparation-turn-not-found"|"blp-preparation-source-not-found" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
+                 "blp-preparation-platform-unsupported" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
+                 "project-profile-conflict" if matches!(*operation,"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                 "project-profile-choice-unknown" if *operation=="project-profile-write" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
+@@ -671,12 +676,22 @@
+ }
+ /// Who may pass protected routes, fixed at server start from v52 settings.
+ /// `Authority` keeps the replay memory for its freshness window.
++/// B8 attribution of one daemon-authenticated write (request extension).
++#[derive(Clone)]
++struct Attributed {
++    subject: String,
++    nonce: String,
++    method: String,
++    path: String,
++}
+ enum AccessGate {
+     OwnerKey,
+     Authority {
+         key: ed25519_dalek::VerifyingKey,
+         max_age_seconds: i64,
+         nonces: std::sync::Mutex<swarm_authority::assertion::WindowNonces>,
++        /// EP-06 witness and B8 attribution ledger (Root, operator UID).
++        records: crate::authority_ledger::AuthorityRecords,
+     },
+ }
+ impl NativeHttpService {
+@@ -901,6 +916,7 @@
+                         .map_err(|_| HttpServiceError::Refused("web-access-key-invalid"))?,
+                     max_age_seconds: policy.assertion_max_age_seconds,
+                     nonces: std::sync::Mutex::new(Default::default()),
++                    records: Default::default(),
+                 }),
+             },
+             Err(e) if e.reason() == "settings-web-access-not-configured" => Ok(AccessGate::OwnerKey),
+@@ -915,7 +931,7 @@
+     fn authorize_request(&self, request: &Request<Vec<u8>>) -> Result<WebPrincipal, WebAccessError> {
+         match &self.access {
+             AccessGate::OwnerKey => self.authority.authorize(request),
+-            AccessGate::Authority { key, max_age_seconds, nonces } => {
++            AccessGate::Authority { key, max_age_seconds, nonces, records } => {
+                 self.authority.authorize_host(request)?;
+                 if launcher_probe(request) && request.headers().get(swarm_authority::assertion::HEADER).is_none() {
+                     // Local launcher identity/readiness probes keep the owner
+@@ -938,7 +954,9 @@
+                     key, header, request.method().as_str(), path, request.body(), now, *max_age_seconds, &mut *memory,
+                 )
+                 .map_err(WebAccessError::Refused)?;
+-                Ok(WebPrincipal::authority(&claims.subject))
++                drop(memory);
++                records.check(&self.root, &claims.witness, claims.issued_at, now).map_err(WebAccessError::Refused)?;
++                Ok(WebPrincipal::authority(&claims.subject, &claims.nonce))
+             }
+         }
+     }
+@@ -1140,10 +1158,39 @@
+             .authorize_request(&request)
+             .map_err(HttpServiceError::Access)
+             .and_then(|principal| {
++                // B8: attribute a daemon-authenticated write before it runs.
++                if let Some(entry) = self.attribution(&request, &principal) {
++                    self.attribute(&entry, "intent", None).map_err(HttpServiceError::Refused)?;
++                    request.extensions_mut().insert(entry);
++                }
+                 // Attribution for route handlers; grants no right beyond the checks above.
+                 request.extensions_mut().insert(principal);
+                 self.route(&request, profile, peer_closed)
+             });
++        let entry = request.extensions().get::<Attributed>().cloned();
++        let reply = self.reply_of(result, &request, head);
++        if let (Some(entry), Ok(r)) = (entry, &reply) {
++            if self.attribute(&entry, "outcome", Some(r.response.status().as_u16())).is_err() {
++                eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "web-attribution-unavailable", "path": entry.path}));
++            }
++        }
++        reply
++    }
++    /// Attribution entry for an authority-mode request that is not GET/HEAD.
++    fn attribution<B>(&self, request: &Request<B>, principal: &WebPrincipal) -> Option<Attributed> {
++        let nonce = principal.assertion()?;
++        if matches!(*request.method(), Method::GET | Method::HEAD) {
++            return None;
++        }
++        Some(Attributed { subject: principal.subject().into(), nonce: nonce.into(), method: request.method().as_str().into(), path: request.uri().path().into() })
++    }
++    fn attribute(&self, e: &Attributed, event: &str, status: Option<u16>) -> Result<(), &'static str> {
++        let AccessGate::Authority { records, .. } = &self.access else { return Ok(()) };
++        let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs() as i64).unwrap_or(0);
++        records.record(&self.root, event, &e.subject, &e.nonce, &e.method, &e.path, status, now)
++    }
++    /// Build the HTTP reply of a protected route result (unchanged behavior).
++    fn reply_of(&self, result: Result<RouteBody, HttpServiceError>, request: &Request<Vec<u8>>, head: bool) -> Result<HttpReply, HttpServiceError> {
+         match result {
+             Ok(body) => {
+                 let mut response = response(StatusCode::OK, body.bytes, head, None);

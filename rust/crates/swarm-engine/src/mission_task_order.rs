@@ -109,29 +109,41 @@ pub(super) fn ordered(work: &Work, priorities: &BTreeMap<String, i64>) -> Result
     })
 }
 
+/// Read the strict persisted `cockpit_tasks` priority rows for one Work in the
+/// caller's SQL snapshot: the raw task→priority map and nothing else — no
+/// neutral per-task default is synthesized. Repeated rows for one task
+/// refuse; SQL and finalization causes stay typed and the statement is always
+/// finalized. No Work re-read, graph validation or orphan check happens here:
+/// `ordered` owns those against a caller-supplied Work, so this raw map alone
+/// is not a validated order and orphan keys refuse there, never silently pass.
+pub(super) fn read_priorities(
+    db: &rusqlite::Connection,
+    work: &str,
+) -> Result<BTreeMap<String, i64>, E> {
+    let mut statement = db
+        .prepare("SELECT task_id,priority FROM cockpit_tasks WHERE work_id=? ORDER BY task_id")
+        .map_err(E::Sql)?;
+    let result = (|| {
+        let mut rows = statement.query([work]).map_err(E::Sql)?;
+        let mut priorities = BTreeMap::new();
+        while let Some(row) = rows.next().map_err(E::Sql)? {
+            let task = row.get::<_, String>(0).map_err(E::Sql)?;
+            let value = row.get::<_, i64>(1).map_err(E::Sql)?;
+            if priorities.insert(task, value).is_some() {
+                return Err(E::Refused("mission-order-priority-duplicate"));
+            }
+        }
+        Ok(priorities)
+    })();
+    finish(result, statement.finalize().map_err(E::Sql))
+}
+
 /// Read strict persisted priorities and order a supplied Work in the caller's
 /// existing SQL snapshot. Malformed rows/graph and finalization retain causes;
 /// this creates no transaction, mutation, capacity observation or permission.
 pub(super) fn read_order(db: &rusqlite::Connection, saved: &Work) -> Result<MissionTaskOrder, E> {
-    let work = saved.id.as_str();
-            let mut statement = db
-                .prepare(
-                    "SELECT task_id,priority FROM cockpit_tasks WHERE work_id=? ORDER BY task_id",
-                )
-                .map_err(E::Sql)?;
-            let result = (|| {
-                let mut rows = statement.query([work]).map_err(E::Sql)?;
-                let mut priorities = BTreeMap::new();
-                while let Some(row) = rows.next().map_err(E::Sql)? {
-                    let task = row.get::<_, String>(0).map_err(E::Sql)?;
-                    let value = row.get::<_, i64>(1).map_err(E::Sql)?;
-                    if priorities.insert(task, value).is_some() {
-                        return Err(E::Refused("mission-order-priority-duplicate"));
-                    }
-                }
-                ordered(saved, &priorities)
-            })();
-            finish(result, statement.finalize().map_err(E::Sql))
+    let priorities = read_priorities(db, saved.id.as_str())?;
+    ordered(saved, &priorities)
 }
 
 impl RootStore {

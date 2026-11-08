@@ -1,0 +1,11 @@
+{
+  "status": "FAIL",
+  "installed": false,
+  "cause": "profile-effective-input-changed:locales/en.json,web/i18n-en.js,web/native-authority-admin.js",
+  "compilation_exit": 0,
+  "compilation_seconds": 38.88,
+  "previous_running_version": "v0.1.1-dev.303",
+  "owner_of_concurrent_files": "Authority/UI session",
+  "resumption": "new effective input snapshot after current translation/assets edits; never install refused304",
+  "engine_tests_reused": "20261101-preparation-source-producer-engine-reuse.json"
+}

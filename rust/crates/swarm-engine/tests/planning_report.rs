@@ -9,8 +9,7 @@ struct Fixture(std::path::PathBuf);
 impl Fixture {
     fn new() -> Self {
         let root =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("report65-").unwrap());
-        fs::create_dir(&root).unwrap();
+            swarm_engine::fixture_root("report65-");
         RootStore::initialize(&root, &mut SystemEnvironment)
             .unwrap()
             .close()

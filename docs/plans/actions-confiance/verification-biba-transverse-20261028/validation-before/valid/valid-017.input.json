@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "control",
+  "expected_revision": 7,
+  "task_id": "task"
+}

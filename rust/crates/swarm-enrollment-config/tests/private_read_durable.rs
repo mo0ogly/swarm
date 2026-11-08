@@ -1,5 +1,6 @@
 #![cfg(target_os = "linux")]
 //! Explicit local-FS acknowledgements in isolated private roots, no live package.
+mod common;
 use sha2::{Digest, Sha256};
 use std::{fs, os::unix::fs::PermissionsExt};
 use swarm_enrollment_config::store::{
@@ -8,7 +9,7 @@ use swarm_enrollment_config::store::{
 };
 /// Actual private root/store with synthetic data; no policy default or live key.
 fn fixture() -> (tempfile::TempDir, Documents, String) {
-    let d = tempfile::tempdir().unwrap();
+    let d = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(d.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let s = Documents::open(d.path(), rustix::process::geteuid().as_raw()).unwrap();
     let ctx = Context::new();

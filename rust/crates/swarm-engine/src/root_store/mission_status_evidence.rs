@@ -560,9 +560,7 @@ mod tests {
     #[test]
     fn mission_status_freshness_rejects_retargeted_or_missing_project_path() {
         use std::{fs, os::unix::fs::DirBuilderExt};
-        let parent =
-            std::env::temp_dir().join(crate::generate_identifier("status-path-fixture-").unwrap());
-        fs::DirBuilder::new().mode(0o700).create(&parent).unwrap();
+        let parent = crate::fixture_root("status-path-fixture-");
         let path = parent.join("project");
         fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
         let mut env = crate::SystemEnvironment;

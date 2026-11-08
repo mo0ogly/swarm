@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-source-producer-engine",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "captured-source-snapshot-and-existing-diagnostic",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::preparation_call::confidentiality_tests",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 67.73792763899837,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "948614fc0239f3afc325a216bf3ce36c8a4c79079bcf6418c8d08c698baa1fe2",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "de120775a987bfd3d2a868071c0c70b2105baf5bce4b1dd5c8f91ce324c2aaa7",
+    "declared-inputs.tar.gz": "c7b30169d7d3f81ee2913bacb9348fe341d43393bea3528a98100f08ad1c8aa3",
+    "environment.json": "5bb3210e002c55a567147892b20d4eb8449de3a250e9a119554abecea3f95608",
+    "step-0001.stdout": "163ea3ea2b62ae604ef7eafaf44f892ebb3ed93417e378ffe00621d8567f4cc9",
+    "step-0001.stderr": "ff84b392f2a07bae6848bf6f0fb11914ade1f2b70288e469d558f624d3f4c8af",
+    "step-0001.json": "40489bf64b91efa2b156119ef74deac49c22e41be43302ee0e4954cc34cfd1b0",
+    "inputs.after.json": "de120775a987bfd3d2a868071c0c70b2105baf5bce4b1dd5c8f91ce324c2aaa7"
+  }
+}

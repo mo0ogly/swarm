@@ -8,8 +8,7 @@ use swarm_engine::{RootStore,SystemEnvironment};
 /// exact owned original permits recovery; both roots and their birth survive.
 #[test]
 fn held_root_profile_refuses_replacement_and_recovers() {
-    let path=std::env::temp_dir().join(format!("swarm-profile-config-root-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
-    std::fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+    let path=swarm_engine::fixture_root("swarm-profile-config-root-");
     let mut birth=std::fs::OpenOptions::new().write(true).create_new(true).mode(0o600).open(path.join("fixture-birth.json")).unwrap();
     birth.write_all(serde_json::to_vec(&serde_json::json!({"root":path,"fixture":true,"live":false,"owner":"profile-configuration-root-test"})).unwrap().as_slice()).unwrap();birth.sync_all().unwrap();drop(birth);
     println!("PROJECT_PROFILE_CONFIGURATION_FIXTURE {}",path.display());

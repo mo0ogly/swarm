@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/rust-migration/build_native.py", line 145, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/rust-migration/build_native.py", line 141, in main
+    result=build(root,a.output.resolve(),a.target_dir.resolve(),a.version or 'devel')
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/rust-migration/build_native.py", line 93, in build
+    profile.require(result.returncode==0,'native-build-profile-failed')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/verification/verify_native_profile.py", line 19, in require
+    if not condition:raise ValueError(reason)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: native-build-profile-failed

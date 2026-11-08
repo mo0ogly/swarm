@@ -1,0 +1,109 @@
+{
+ "schema_version": 1,
+ "id": "paea-settlement-call-cli-rust",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/*/Cargo.toml",
+  "rust/crates/swarm-cli/src/**/*",
+  "rust/crates/swarm-cli/tests/paea_settlement.rs",
+  "rust/crates/swarm-engine/src/**/*",
+  "rust/crates/swarm-engine/tests/paea_settlement.rs",
+  "rust/crates/swarm-enrollment-*/src/**/*",
+  "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+  "rust/crates/swarm-identity-contract/src/**/*",
+  "rust/crates/swarm-protection-contract/src/**/*",
+  "web/paea-examples/v1/payment-document.json",
+  "tools/verification/recipe.py"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0"
+ },
+ "steps": [
+  {
+   "id": "settlement-cli-commits-once-and-records-effect",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-cli",
+    "--test",
+    "paea_settlement",
+    "settlement_call_cli_commits_once_and_records_effect",
+    "--message-format=json",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "settlement_call_cli_commits_once_and_records_effect ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "settlement-cli-reconcile-before-commit-reports-not-committed",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-cli",
+    "--test",
+    "paea_settlement",
+    "settlement_call_cli_reconciles_before_commit_reports_not_committed",
+    "--message-format=json",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "settlement_call_cli_reconciles_before_commit_reports_not_committed ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "settlement-cli-refuses-bad-frame-without-consumption",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-cli",
+    "--test",
+    "paea_settlement",
+    "settlement_call_cli_refuses_bad_frame_without_consumption",
+    "--message-format=json",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "settlement_call_cli_refuses_bad_frame_without_consumption ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  }
+ ]
+}

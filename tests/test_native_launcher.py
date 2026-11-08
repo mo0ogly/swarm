@@ -1,4 +1,5 @@
 """Rust-only launcher regression guards; mocks prove probes, not installation."""
+from fixture_area import fixture_area
 import importlib.util,json,sys,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch,MagicMock
@@ -11,7 +12,7 @@ class NativeLauncher(unittest.TestCase):
     def test_protected_native_probe_rejects_login_and_foreign_success(self):
         """Valid profile control precedes login HTML and wrong-profile refusals."""
         response=MagicMock();response.__enter__.return_value=response;response.status=200
-        with tempfile.TemporaryDirectory() as temporary,patch.object(local.urllib.request,'urlopen',return_value=response) as probe:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary,patch.object(local.urllib.request,'urlopen',return_value=response) as probe:
             root=Path(temporary);(root/'.swarm').mkdir()
             import hashlib
             key=root/'.swarm'/('web-session-'+hashlib.sha256(b'127.0.0.1:38433').hexdigest()[:16])

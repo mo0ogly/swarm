@@ -10,6 +10,8 @@ stays failure; a source/binary hash establishes neither authenticity nor review.
 from pathlib import Path
 import argparse, hashlib, json, os, sqlite3, subprocess, tempfile, time, traceback
 
+from fixture_area import fixture_root
+
 
 def digest(raw):
     """Bind complete bytes, not a declared model, identity or price."""
@@ -68,8 +70,10 @@ class Fixture:
         before CLI initialization; partial initialization still leaves its Root
         path/binary/label for recovery. A marker is no actor authentication or
         permission. IO/CLI failures propagate, no cleanup or provider call is
-        inferred. An empty temporary directory can remain if birth publication
+        inferred. An empty fixture directory can remain if birth publication
         itself fails; no Root initialization runs before that write succeeds.
+        The Root lives in the repository fixture area, never `/tmp` (operator
+        interdiction): it must survive reboot as retained evidence.
         """
         binary = Path(binary)
         output = Path(output)
@@ -78,7 +82,7 @@ class Fixture:
         self.output.mkdir(parents=True, exist_ok=True)
         self.label = label
         binary_sha256 = digest(Path(self.binary).read_bytes())
-        self.root = Path(tempfile.mkdtemp(prefix='swarm-model83-'))
+        self.root = fixture_root('swarm-model83-')
         publish(self.output / ('owned-root-'+digest(str(self.root).encode())+'.json'),
                 dict(schema_version=1, kind='owned_inert_fixture_birth', root=str(self.root),
                      binary_sha256=binary_sha256, label=label,
@@ -104,7 +108,21 @@ class Fixture:
         self.work = self.ok(['work','create'], dict(schema_version=1,event_id='create',expected_revision=0,title='Requested model fixture',objective='Observe route',scope='Owned local program',criteria=['Observed, not accepted']))['work']['id']
         self.ok(['task','add',self.work], dict(schema_version=1,event_id='add',expected_revision=1,id='task',title='Run',deliverable='Evidence',criteria=['Observed, not accepted']))
         self.ok(['budget','apply',self.work], dict(schema_version=1,event_id='budget',expected_revision=2,budget=dict(limit_usd=10,reserve_per_launch_usd=1,estimate_source='Local model fixture',reference_date='2026-10-19')))
-        self.request = dict(schema_version=1,event_id='session',expected_revision=3,task_id='task',provider='fixture',capture_output=True)
+        # The delivered I0 boundary (rust/crates/swarm-biba-linux/src/lib.rs
+        # prepare_bound: root.starts_with(path) refuses) makes an empty launch
+        # workspace — resolved to the Root itself by agent_launch_preflight::
+        # workspace — a pre-exec refusal since the boundary gate wired into
+        # execute() (6706e201b, 30 October 2026). The delivered contract is a
+        # workspace child of the Root outside .swarm, deeper than the Root:
+        # rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs
+        # workspace_path, tests/rust_cockpit_biba_compatibility.py
+        # make_i0_workspace and tests/rust_mission_worker_dispatch.py
+        # ('dispatch-shared'). Create that attributed child here so the default
+        # request carries a valid absolute workspace; consumers may override
+        # request['workspace'] before prepare, like the biba-compatibility test.
+        self.workspace = self.root / 'i0-workspace'
+        os.mkdir(self.workspace, 0o700)
+        self.request = dict(schema_version=1,event_id='session',expected_revision=3,task_id='task',provider='fixture',capture_output=True,workspace=str(self.workspace))
         self.providers = self.root / '.swarm/providers.json'
         self.save_provider()
         publish(output / (label+'-fixture.json'), dict(root=str(self.root),work=self.work,binary_sha256=digest(binary.read_bytes()),scope='owned local fixture, no account/model authentication'))
@@ -210,10 +228,13 @@ class Fixture:
         sources=[c for c in prepared['agent']['preflight']['checks'] if c['name']=='model_route_sources']
         assert len(sources)==1 and sources[0]['status']=='declared_unverified' and len(sources[0]['detail'])==64
         assert self.reservation()==('reserved',1.0)
-        assert not (self.root/'model-received.json').exists()
+        # The provider writes its proof into its cwd — the attributed I0
+        # workspace, never the Root. The workspace copy must be absent before
+        # the run (no stale execution) and is the only observed proof after.
+        assert not (self.workspace/'model-received.json').exists()
         result=run_observed() if run_observed is not None else self.ok(['agent','run','session'])
         assert result['task_accepted'] is False and result['agent']['status']=='completed',result
-        actual=json.loads((self.root/'model-received.json').read_bytes())
+        actual=json.loads((self.workspace/'model-received.json').read_bytes())
         args=actual['argv']
         expected=[*self.expected_prefix,'--model',choice['model']]
         if choice['effort']: expected+=['-c','model_reasoning_effort='+json.dumps(choice['effort'],ensure_ascii=False)]
@@ -256,7 +277,10 @@ def cache_change(binary, output):
     publish(f.cache,changed)
     f.denied(['agent','run','session'],None,'agent-execution-model-route-source-changed')
     assert f.snapshot()==before
-    assert not (f.root/'model-received.json').exists()
+    # A refusal executes nowhere: no provider proof under the Root at all,
+    # workspace included (the delivered boundary runs the helper only inside
+    # the attributed I0 workspace, never the Root).
+    assert not list(f.root.rglob('model-received.json'))
     publish(f.cache,f.cache_bytes)
     f.run_and_assert(prepared)
     return dict(case='cache-change',status='PASS',root=str(f.root))
@@ -271,7 +295,7 @@ def rules_change(binary, output):
     f.settings_change(agent_model_automatic_levels=['simple'])
     before=f.snapshot()
     f.denied(['agent','run','session'],None,'settings-model-automatic-level-denied')
-    assert f.snapshot()==before and not (f.root/'model-received.json').exists()
+    assert f.snapshot()==before and not list(f.root.rglob('model-received.json'))
     f.settings_change(agent_model_automatic_levels=['simple','standard'])
     f.settings_change(work_view_recent_decisions='3')
     f.run_and_assert(prepared)
@@ -513,7 +537,7 @@ def configuration_update_restore(binary,output):
     assert f.providers.read_bytes()!=original and (f.root/'.swarm'/reference).read_bytes()==original and f.snapshot()==before
     changed=f.providers.read_bytes()
     f.denied(['providers','config','apply'],request,'revision_conflict');assert f.providers.read_bytes()==changed and f.snapshot()==before
-    f.denied(['agent','run','session'],None,'agent-execution-model-route-changed');assert f.snapshot()==before and not (f.root/'model-received.json').exists()
+    f.denied(['agent','run','session'],None,'agent-execution-model-route-changed');assert f.snapshot()==before and not list(f.root.rglob('model-received.json'))
     restored,_=configuration_proposal(f,reference=reference);result=f.ok(['providers','config','apply'],restored)
     assert f.providers.read_bytes()==original and f.snapshot()==before
     assert (f.root/'.swarm'/result['backup_reference']).read_bytes()==changed
@@ -592,7 +616,7 @@ def task_model(binary,output):
     f.denied(['task-model','preview',f.work],clear,'task-model-active-attempt');f.denied(['task-model','apply',f.work],clear,'task-model-active-attempt');assert f.snapshot()==queued
     # Same valid queued intention is the witness for policy-drift injection.
     f.provider['model_policy']['page_level']='standard';f.save_provider()
-    f.denied(['agent','run','session'],None,'agent-model-policy-hash-changed');assert f.snapshot()==queued and not (f.root/'model-received.json').exists()
+    f.denied(['agent','run','session'],None,'agent-model-policy-hash-changed');assert f.snapshot()==queued and not list(f.root.rglob('model-received.json'))
     f.provider=json.loads(good);f.save_provider();assert f.providers.read_bytes()==good_bytes
     actual=f.run_and_assert(prepared,expected_level='simple')
     current=f.ok(['task-model','show',f.work]);history=current['tasks'][0]['attempts']

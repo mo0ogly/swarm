@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 SCRIPT = Path(__file__).resolve().parents[1] / "tools/memory-evaluation/compare.py"
@@ -23,7 +24,7 @@ def response(recoverable):
 
 class MemoryComparison(unittest.TestCase):
     def setUp(self):
-        self.temporary = tempfile.TemporaryDirectory(prefix="swarm-memory-grader-")
+        self.temporary = tempfile.TemporaryDirectory(prefix="swarm-memory-grader-", dir=fixture_area())
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         cases = []

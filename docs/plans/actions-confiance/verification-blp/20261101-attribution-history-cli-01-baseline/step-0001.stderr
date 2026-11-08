@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_attribution_history_cli.py", line 112, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_attribution_history_cli.py", line 102, in main
+    check(f'{label}-downgrade-refuses',code!=0 and error['failure']['code']=='trust-proof-integrity')
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_attribution_history_cli.py", line 72, in check
+    assert condition,name
+           ^^^^^^^^^
+AssertionError: public-downgrade-refuses
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import os,subprocess,sys; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=fixture_root('blp-history-proof-')/'journey'; subprocess.run(['python3','tests/blp_attribution_history_cli.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_HISTORY_CLI_EVIDENCE '+str(out))
+                                                                                                                                                   ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python3', 'tests/blp_attribution_history_cli.py', '--binary', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-2f104936daae347cbe46d21410a49c1485e135da9a2cfba15011e6d4eab39e2b', '--profile', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-gj64thyb/build/profile/result.json', '--output', '/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/blp-history-proof-7im61tuk/journey']' returned non-zero exit status 1.

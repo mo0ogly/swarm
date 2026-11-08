@@ -5,6 +5,7 @@ positive process receipt. The real moved-cache counterexample is retained in170.
 """
 from pathlib import Path
 import tempfile,sys,unittest
+from fixture_area import fixture_area
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools/verification'))
 import verify_native_profile as profile
 
@@ -18,7 +19,7 @@ class ProfileCandidateAuthority(unittest.TestCase):
         Rejected stale paths stay preserved for diagnosis, never silently omitted
         from actual dependencies or admitted merely because an old build used them.
         """
-        with tempfile.TemporaryDirectory(prefix='profile-prior-authority-') as tmp:
+        with tempfile.TemporaryDirectory(prefix='profile-prior-authority-', dir=fixture_area()) as tmp:
             root=Path(tmp);source=root/'rust/crates/example/src';source.mkdir(parents=True)
             for name,body in [('rust/Cargo.toml','[workspace]\n'),('rust/Cargo.lock','# synthetic\n'),('rust/crates/example/Cargo.toml','[package]\nname="example"\nversion="0.1.0"\n'),('rust/crates/example/src/lib.rs','const CONTRACT: &str = include_str!("contract.txt");\n'),('rust/crates/example/src/contract.txt','current declared producer\n')]:
                 (root/name).write_text(body)
@@ -37,7 +38,7 @@ class ProfileCargoConfiguration(unittest.TestCase):
     """Local Cargo config is a real input even when rustc depfiles omit it."""
     def setUp(self):
         """Construct a minimal synthetic workspace; never launch Cargo."""
-        temporary=tempfile.TemporaryDirectory(prefix='profile-config-inputs-')
+        temporary=tempfile.TemporaryDirectory(prefix='profile-config-inputs-', dir=fixture_area())
         self.addCleanup(temporary.cleanup);self.root=Path(temporary.name)
         (self.root/'rust/crates/example/src').mkdir(parents=True)
         for name,body in [('rust/Cargo.toml','[workspace]\n'),('rust/Cargo.lock','# fixture\n'),
@@ -65,6 +66,26 @@ class ProfileCargoConfiguration(unittest.TestCase):
             profile.effective_unchanged(self.root,before,profile.dependencies(self.root,self.depfile))
         self.config.write_bytes(self.config_bytes)
         profile.effective_unchanged(self.root,before,profile.dependencies(self.root,self.depfile))
+
+    def test_admission_tool_and_policy_bound_with_drift_and_removal_refusal(self):
+        """Wrapper/policy bytes survive depfile omissions; changed inputs refuse reuse."""
+        for name in profile.CARGO_SUPPORT_NAMES:
+            path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True)
+            path.write_text('synthetic invocation support\n')
+        before=profile.candidates(self.root)
+        actual=profile.dependencies(self.root,self.depfile)
+        profile.effective_unchanged(self.root,before,actual)
+        for name in profile.CARGO_SUPPORT_NAMES:
+            self.assertIn(name,before)
+            self.assertEqual(profile.config_manifest(actual)[name],before[name])
+            path=self.root/name;raw=path.read_bytes();path.write_bytes(raw+b'changed')
+            with self.assertRaises(ValueError):
+                profile.effective_unchanged(self.root,before,profile.dependencies(self.root,self.depfile))
+            path.unlink()
+            with self.assertRaises(ValueError):
+                profile.effective_unchanged(self.root,before,profile.dependencies(self.root,self.depfile))
+            path.write_bytes(raw)
+            profile.effective_unchanged(self.root,before,profile.dependencies(self.root,self.depfile))
 
     def test_absent_config_legacy_compatible_but_late_appearance_refused(self):
         """Historical no-config builds work; adding config after binding refuses."""

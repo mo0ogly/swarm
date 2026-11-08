@@ -316,9 +316,7 @@ mod tests {
         /// Create a private owned test directory without touching a live Root.
         fn new() -> Self {
             let path =
-                std::env::temp_dir().join(crate::generate_identifier("sqlite-inode-").unwrap());
-            disk::create_dir(&path).unwrap();
-            disk::set_permissions(&path, disk::Permissions::from_mode(0o700)).unwrap();
+                crate::fixture_root("sqlite-inode-");
             Self(path)
         }
         /// Create a named private database and populate ordinary fixture data.

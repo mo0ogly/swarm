@@ -1,0 +1,10 @@
+{
+  "status": 500,
+  "body": {
+    "error": "local-storage",
+    "failure": {
+      "code": "local-storage"
+    },
+    "schema_version": 1
+  }
+}

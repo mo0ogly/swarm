@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "resume-normal",
+  "expected_revision": 18,
+  "reason": "Exercise owned immutable-result publication and recovery"
+}

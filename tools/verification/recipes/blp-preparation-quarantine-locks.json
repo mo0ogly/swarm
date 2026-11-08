@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-quarantine-locks",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/config/**/*",
+    "rust/crates/swarm-engine/tests/confidentiality.rs",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-engine/tests/trust_enrollment.rs",
+    "rust/crates/swarm-enrollment-authority/tests/common/**/*",
+    "rust/crates/swarm-biba-linux/src/**/*",
+    "rust/crates/swarm-confidentiality/src/**/*",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-enrollment-authority/src/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/src/**/*",
+    "rust/crates/swarm-enrollment-config/src/**/*",
+    "rust/crates/swarm-enrollment-proof/src/**/*",
+    "rust/crates/swarm-enrollment-state/src/**/*",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-linux-identity-channel/src/**/*",
+    "rust/crates/swarm-linux-prerequisites/src/**/*",
+    "rust/crates/swarm-protection-contract/src/**/*",
+    "rust/crates/swarm-wire-json/src/**/*",
+    "rust/crates/swarm-engine/examples/preparation_quarantine_fixture.rs"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_BUILD_JOBS": "1"
+  },
+  "steps": [
+    {
+      "id": "release-preserves-observed-effect",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::preparation_confidentiality::tests",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "release_failure_preserves_completed_operation_and_primary_error",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "policy-public-storage-and-actual-lock-order",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "confidentiality",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "preparation_quarantine_preview_reopen_refusal_and_recovery",
+        "preparation_quarantine_corruption_never_falls_back_to_disabled",
+        "preparation_quarantine_activation_serializes_with_engaged_operation",
+        "15 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "enrolled-config-and-business-consumer",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "trust_enrollment",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "enrolled_configuration_uses_egress_control_before_sql",
+        "enrolled_biba_action_current_source_exact_root_bytes_plan_and_replay",
+        "4 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "rebuild-current-separate-pending-fixture-helper",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--features",
+        "test-fixtures",
+        "--example",
+        "preparation_quarantine_fixture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    }
+  ]
+}

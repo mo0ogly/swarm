@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "event_id": "part-7",
+  "expected_revision": 1,
+  "expected_trust_revision": 1,
+  "canonical_digest": "7d0455ba7d7522feff56a168810fb3724a1c6c4191905e60728b7f2fb37252ff",
+  "project_path": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-vvgq7dqb",
+  "classification": {
+    "level": "public",
+    "compartments": [
+      "a"
+    ]
+  },
+  "reason": "Exact recorded fixture slice"
+}

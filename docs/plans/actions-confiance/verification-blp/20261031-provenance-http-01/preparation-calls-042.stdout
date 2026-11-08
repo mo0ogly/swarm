@@ -1,0 +1,22 @@
+{
+  "actual_cost_scope": "Somme des coûts rapportés par les échanges de cette préparation ; couverture indiquée par cost_turns et turns.",
+  "budget": {
+    "limit_usd": 2,
+    "reserve_per_launch_usd": 0.5,
+    "estimate_source": "Synthetic fixture",
+    "reference_date": "2026-10-27",
+    "updated": "2026-10-31T20:44:06.132762644Z",
+    "actor": "fpizzi/uid:1001"
+  },
+  "reserved_usd": 0,
+  "committed_estimate_usd": 2,
+  "remaining_usd": 0,
+  "warning": true,
+  "actual_cost_usd": null,
+  "policy": "Enveloppe estimative, pas une facture. Réservation avant envoi ; estimation engagée dès qu’un appel peut avoir démarré. Le coût rapporté et les jetons ne couvrent que les échanges qui les fournissent.",
+  "turns": 4,
+  "usage_turns": 2,
+  "cost_turns": 0,
+  "input_tokens": 14,
+  "output_tokens": 22
+}

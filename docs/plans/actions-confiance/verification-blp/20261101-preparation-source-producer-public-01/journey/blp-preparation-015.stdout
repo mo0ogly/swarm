@@ -1,0 +1,43 @@
+[
+  {
+    "model_route": {
+      "level": "standard",
+      "model": "fixture-standard",
+      "effort": "",
+      "billing": "external",
+      "policy_hash": "1fe3eaf59e14447dba38882e33056f1c767a93127d00d1b29de54d54c9ea3439",
+      "reason": "Politique fournisseur enregistrée · preparation · sans montée en gamme automatique ; annonce non authentifiée"
+    },
+    "context_mode": "full",
+    "used_in_plan": false,
+    "used_in_brief": false,
+    "id": "pt-5306ceae0f48faf9274e1a1492b9df4e",
+    "preparation_id": "prep-fa8847b0c33183273f594550",
+    "status": "answered",
+    "created_at": "2026-11-01T16:41:38.863839401Z",
+    "ended_at": "2026-11-01T16:41:39.180760369Z",
+    "source_revision": 2,
+    "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+    "provider": "fixture",
+    "provider_digest": "3a3afe862c5500f82760f8a7fff28997796db84ca09de66990b55f24e8306db9",
+    "request_hash": "699bb6f246960409eb10793181e7c260da4fcab9934a74104b01e742bcec8610",
+    "question": "PRIVATE_BLP_SOURCE",
+    "answer": {
+      "message": "Inert BLP answer",
+      "brief": "Inert brief"
+    },
+    "usage": {
+      "input_tokens": 1,
+      "output_tokens": 1,
+      "source": "événement fournisseur turn.completed",
+      "scope": "dernier événement terminal valide, déclaration non authentifiée ; caches séparés, sans somme ni cumul de session",
+      "at": ""
+    },
+    "stale": false,
+    "timeout_seconds": 300,
+    "timeout_maximum_seconds": 600,
+    "supervisor_pid": 2440332,
+    "supervisor_stamp": "10920624",
+    "host": "fpizzi:93ca189a-b565-4bcd-8585-7b98e29f74b1:pid:[4026531836]"
+  }
+]

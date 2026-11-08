@@ -1,0 +1,1125 @@
+warning: unused import: `verify_candidate`
+  --> crates/swarm-engine/src/managed_repository.rs:19:101
+   |
+19 | pub(crate) use worker::{candidate_worker, clean_lane_contention, prepare_worker, prepare_candidate, verify_candidate, pin_candidate,...
+   |                                                                                                     ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `SettingCount`
+  --> crates/swarm-engine/src/validation_run_recovery.rs:29:63
+   |
+29 | use crate::{AgentLaunchError, GitReportError, RootStoreError, SettingCount};
+   |                                                               ^^^^^^^^^^^^
+
+warning: unused import: `process::CommandExt`
+  --> crates/swarm-engine/src/root_store/task_validation/process.rs:20:33
+   |
+20 |     os::unix::{net::UnixStream, process::CommandExt},
+   |                                 ^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `db`
+   --> crates/swarm-engine/src/root_store/preparation_dialogue.rs:118:54
+    |
+118 | pub(super) fn reader_verdict(store:&super::RootStore,db:&Connection,p:&Preparation,turns:&[PreparationTurn],reader_token:Option<&st...
+    |                                                      ^^ help: if this is intentional, prefix it with an underscore: `_db`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `verify_candidate` is never used
+   --> crates/swarm-engine/src/managed_repository_candidate_store.rs:501:15
+    |
+501 | pub(crate) fn verify_candidate(
+    |               ^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `poll_retained_processes` is never used
+  --> crates/swarm-engine/src/validation_run_recovery.rs:38:15
+   |
+38 | pub(crate) fn poll_retained_processes(e: &mut (dyn Error + 'static)) -> Vec<io::Error> {
+   |               ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `ATTRIBUTION_MISMATCH` is never used
+  --> crates/swarm-engine/src/root_store/reader_guard.rs:22:18
+   |
+22 | pub(crate) const ATTRIBUTION_MISMATCH: &str = "paea-reader-attribution-mismatch";
+   |                  ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `inspect_for_effect` is never used
+  --> crates/swarm-engine/src/root_store/paea_git_repository/source.rs:81:19
+   |
+44 | impl PaeaGitSource {
+   | ------------------ method in this implementation
+...
+81 |     pub(super) fn inspect_for_effect(
+   |                   ^^^^^^^^^^^^^^^^^^
+
+warning: fields `failure` and `recovery_errors` are never read
+   --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:117:9
+    |
+115 | pub(crate) struct ClosedTransfer {
+    |                   -------------- fields in this struct
+116 |     pub receipt: Option<TransferReceipt>,
+117 |     pub failure: Option<TransferFailure>,
+    |         ^^^^^^^
+118 |     pub cleanup: Result<(), E>,
+119 |     pub recovery_errors: Vec<io::Error>,
+    |         ^^^^^^^^^^^^^^^
+
+warning: methods `receipt`, `failure`, and `poll_recovery` are never used
+   --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:189:19
+    |
+121 | impl GitTransferJob {
+    | ------------------- methods in this implementation
+...
+189 |     pub(crate) fn receipt(&self) -> Option<&TransferReceipt> {
+    |                   ^^^^^^^
+...
+193 |     pub(crate) fn failure(&self) -> Option<&TransferFailure> {
+    |                   ^^^^^^^
+...
+350 |     pub(crate) fn poll_recovery(&mut self) {
+    |                   ^^^^^^^^^^^^^
+
+warning: function `terminal` is never used
+ --> crates/swarm-engine/src/root_store/cockpit_health.rs:8:4
+  |
+8 | fn terminal(state: &str) -> bool { matches!(state, "completed" | "failed" | "interrupted") }
+  |    ^^^^^^^^
+
+warning: function `known` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_health.rs:10:4
+   |
+10 | fn known(value: &str) -> &str { if value.is_empty() { "unknown" } else { value } }
+   |    ^^^^^
+
+warning: function `project` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_health.rs:20:15
+   |
+20 | pub(super) fn project(agent: &crate::Agent, state: &str, same_host: bool,
+   |               ^^^^^^^
+
+warning: struct `PostDelivery` is never constructed
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:61:19
+   |
+61 | pub(crate) struct PostDelivery {
+   |                   ^^^^^^^^^^^^
+
+warning: variant `MissingFreshness` is never constructed
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:70:5
+   |
+67 | pub(crate) enum PostDeliveryError {
+   |                 ----------------- variant in this enum
+...
+70 |     MissingFreshness {
+   |     ^^^^^^^^^^^^^^^^
+
+warning: function `not_ready` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:98:4
+   |
+98 | fn not_ready() -> PostDelivery {
+   |    ^^^^^^^^^
+
+warning: function `cockpit_post_delivery` is never used
+   --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:188:15
+    |
+188 | pub(crate) fn cockpit_post_delivery(
+    |               ^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `request_level` is never read
+   --> crates/swarm-engine/src/root_store/preparation_call.rs:145:16
+    |
+143 | pub(super) struct TurnCustody {
+    |                   ----------- field in this struct
+144 |     pub(super) turn: PreparationTurn,
+145 |     pub(super) request_level: String,
+    |                ^^^^^^^^^^^^^
+
+warning: `swarm-engine` (lib) generated 18 warnings (run `cargo fix --lib -p swarm-engine` to apply 3 suggestions)
+warning: unused variable: `token`
+   --> crates/swarm-web/src/service/login.rs:252:14
+    |
+252 |         let (token, next) = match parsed {
+    |              ^^^^^ help: if this is intentional, prefix it with an underscore: `_token`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `approval_capability` is never used
+  --> crates/swarm-web/src/service/paea_git_call_approval.rs:94:19
+   |
+18 | impl super::PaeaGitCallAuthority {
+   | -------------------------------- method in this implementation
+...
+94 |     pub(super) fn approval_capability(&self) -> serde_json::Value {
+   |                   ^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `swarm-web` (lib) generated 2 warnings (run `cargo fix --lib -p swarm-web` to apply 1 suggestion)
+warning: variable does not need to be mutable
+   --> crates/swarm-cli/src/agent.rs:374:9
+    |
+374 |     let mut store = swarm_engine::RootStore::open(Path::new(&a.root), false).map_err(root_error)?;
+    |         ----^^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `swarm-cli` (lib) generated 1 warning (run `cargo fix --lib -p swarm-cli` to apply 1 suggestion)
+warning: `swarm-cli` (lib test) generated 1 warning (1 duplicate)
+warning: unused imports: `Response`, `authenticated_control::Context as ExecuteContext`, and `authenticated_startup`
+  --> crates/swarm-cli/tests/../../swarm-enrollment-authority/tests/common/authenticated_fixture.rs:8:5
+   |
+ 8 |     authenticated_control::Context as ExecuteContext,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 9 |     authenticated_startup,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+10 |     control::{self, Request, Response},
+   |                              ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `operation`
+   --> crates/swarm-cli/tests/paea_promote.rs:453:10
+    |
+453 | fn owned(operation: &str) -> Owned {
+    |          ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_operation`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `trust_state`
+    --> crates/swarm-cli/tests/paea_promote.rs:1046:9
+     |
+1046 |     let trust_state = |root: &Path| {
+     |         ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_trust_state`
+
+warning: unused variable: `assert_ref`
+    --> crates/swarm-cli/tests/paea_promote.rs:1075:9
+     |
+1075 |     let assert_ref = |owned: &Owned, expected: &str| assert_eq!(read_ref(owned), expected);
+     |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_assert_ref`
+
+warning: associated functions `new`, `cold`, `build`, `build_with_action`, and `build_for_trust_actions` are never used
+   --> crates/swarm-cli/tests/../../swarm-enrollment-authority/tests/common/authenticated_fixture.rs:73:19
+    |
+ 70 | impl Fixture {
+    | ------------ associated functions in this implementation
+...
+ 73 |     pub(crate) fn new() -> Self {
+    |                   ^^^
+...
+ 77 |     pub(crate) fn cold() -> Self {
+    |                   ^^^^
+...
+ 81 |     pub(crate) fn build(enrolled: bool) -> Self {
+    |                   ^^^^^
+...
+ 85 |     pub(crate) fn build_with_action(
+    |                   ^^^^^^^^^^^^^^^^^
+...
+108 |     pub(crate) fn build_for_trust_actions(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `PathBuf`
+  --> crates/swarm-cli/tests/paea_settlement.rs:16:18
+   |
+16 |     path::{Path, PathBuf},
+   |                  ^^^^^^^
+
+warning: constant `PIN` is never used
+  --> crates/swarm-cli/tests/paea_settlement.rs:23:7
+   |
+23 | const PIN: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+   |       ^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated functions `new`, `cold`, `build`, `build_with_action`, and `build_for_trust_actions` are never used
+   --> crates/swarm-cli/tests/../../swarm-enrollment-authority/tests/common/authenticated_fixture.rs:73:19
+    |
+ 70 | impl Fixture {
+    | ------------ associated functions in this implementation
+...
+ 73 |     pub(crate) fn new() -> Self {
+    |                   ^^^
+...
+ 77 |     pub(crate) fn cold() -> Self {
+    |                   ^^^^
+...
+ 81 |     pub(crate) fn build(enrolled: bool) -> Self {
+    |                   ^^^^^
+...
+ 85 |     pub(crate) fn build_with_action(
+    |                   ^^^^^^^^^^^^^^^^^
+...
+108 |     pub(crate) fn build_for_trust_actions(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_settlement_delivered.rs:1370:9
+     |
+1370 |     let mut recovery = Prepared::prepare(
+     |         ----^^^^^^^^
+     |         |
+     |         help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_settlement_delivered.rs:1434:9
+     |
+1434 |     let mut p1 = Prepared::prepare(
+     |         ----^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_settlement_delivered.rs:1438:9
+     |
+1438 |     let mut p2 = Prepared::prepare(
+     |         ----^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_settlement_delivered.rs:1710:9
+     |
+1710 |     let mut split1 = Prepared::prepare(
+     |         ----^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_settlement_delivered.rs:1739:9
+     |
+1739 |     let mut exact = Prepared::prepare(
+     |         ----^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_settlement_delivered.rs:1761:9
+     |
+1761 |     let mut split2 = Prepared::prepare(
+     |         ----^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_settlement_delivered.rs:1801:9
+     |
+1801 |     let mut renamed = Prepared::prepare(
+     |         ----^^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: `swarm-cli` (test "paea_promote") generated 5 warnings (run `cargo fix --test "paea_promote" -p swarm-cli` to apply 4 suggestions)
+warning: `swarm-cli` (test "paea_settlement") generated 4 warnings (1 duplicate) (run `cargo fix --test "paea_settlement" -p swarm-cli` to apply 1 suggestion)
+warning: `swarm-cli` (test "paea_settlement_delivered") generated 9 warnings (2 duplicates) (run `cargo fix --test "paea_settlement_delivered" -p swarm-cli` to apply 7 suggestions)
+warning: unused import: `PermissionsExt`
+ --> crates/swarm-cli/tests/web_bootstrap.rs:6:33
+  |
+6 |     os::unix::fs::{MetadataExt, PermissionsExt},
+  |                                 ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `swarm-cli` (test "web_bootstrap") generated 1 warning
+warning: `swarm-cli` (test "paea_transfer") generated 2 warnings (2 duplicates)
+warning: associated function `new` is never used
+  --> crates/swarm-cli/tests/../../swarm-enrollment-authority/tests/personal_common/mod.rs:37:12
+   |
+35 | impl Fixture {
+   | ------------ associated function in this implementation
+36 |     /// Independent fixture pins/proof and real signed SQLite journal, never a human enrollment.
+37 |     pub fn new() -> Self {
+   |            ^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `swarm-cli` (test "identity_personal") generated 1 warning
+warning: variable does not need to be mutable
+   --> crates/swarm-cli/tests/common/paea_capture_live.rs:950:9
+    |
+950 |     let mut reader = stream.evidence_reader();
+    |         ----^^^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/common/paea_capture_live.rs:1287:9
+     |
+1287 |     let mut reader = stream.evidence_reader();
+     |         ----^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/common/paea_capture_live.rs:1387:9
+     |
+1387 |     let mut reader = stream.evidence_reader();
+     |         ----^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_approval_web.rs:2511:9
+     |
+2511 |     let mut owned = OwnedChildCapture::start(child, &stdout_evidence, &stderr_evidence)
+     |         ----^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_approval_web.rs:3226:9
+     |
+3226 |     let mut healthy = OwnedChildCapture::start(
+     |         ----^^^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/swarm-cli/tests/paea_approval_web.rs:3559:9
+     |
+3559 |     let mut fault = OwnedChildCapture::start(
+     |         ----^^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: field `error` is never read
+   --> crates/swarm-cli/tests/paea_approval_web.rs:592:33
+    |
+592 |         StdoutEvidenceRefused { error: StreamCaptureError },
+    |         ---------------------   ^^^^^
+    |         |
+    |         field in this variant
+    |
+    = note: `ParentGuardStartCause` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `stdout_artifact_path`, `stderr_path`, and `error` are never read
+   --> crates/swarm-cli/tests/paea_approval_web.rs:594:13
+    |
+593 |         StderrEvidenceRefused {
+    |         --------------------- fields in this variant
+594 |             stdout_artifact_path: std::path::PathBuf,
+    |             ^^^^^^^^^^^^^^^^^^^^
+595 |             stderr_path: std::path::PathBuf,
+    |             ^^^^^^^^^^^
+596 |             error: StreamCaptureError,
+    |             ^^^^^
+    |
+    = note: `ParentGuardStartCause` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `0` is never read
+   --> crates/swarm-cli/tests/paea_approval_web.rs:605:22
+    |
+605 |         CleanupPanic(Box<dyn std::any::Any + Send>),
+    |         ------------ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |         |
+    |         field in this variant
+    |
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+    |
+605 -         CleanupPanic(Box<dyn std::any::Any + Send>),
+605 +         CleanupPanic(()),
+    |
+
+warning: associated functions `new`, `cold`, `build`, `build_with_action`, and `build_for_trust` are never used
+  --> crates/swarm-cli/tests/../../swarm-enrollment-authority/tests/common/authenticated_fixture.rs:73:19
+   |
+70 | impl Fixture {
+   | ------------ associated functions in this implementation
+...
+73 |     pub(crate) fn new() -> Self {
+   |                   ^^^
+...
+77 |     pub(crate) fn cold() -> Self {
+   |                   ^^^^
+...
+81 |     pub(crate) fn build(enrolled: bool) -> Self {
+   |                   ^^^^^
+...
+85 |     pub(crate) fn build_with_action(
+   |                   ^^^^^^^^^^^^^^^^^
+...
+96 |     pub(crate) fn build_for_trust(
+   |                   ^^^^^^^^^^^^^^^
+
+warning: method `stderr_path` is never used
+   --> crates/swarm-cli/tests/common/paea_capture_child.rs:502:12
+    |
+340 | impl OwnedChildCapture {
+    | ---------------------- method in this implementation
+...
+502 |     pub fn stderr_path(&self) -> &Path {
+    |            ^^^^^^^^^^^
+
+warning: unused imports: `Digest` and `Sha256`
+  --> crates/swarm-cli/tests/memory.rs:34:16
+   |
+34 |     use sha2::{Digest, Sha256};
+   |                ^^^^^^  ^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> crates/swarm-cli/tests/memory.rs:384:9
+    |
+384 |     let mut worker = doc
+    |         ----^^^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `swarm-cli` (test "paea_approval_web") generated 12 warnings (1 duplicate) (run `cargo fix --test "paea_approval_web" -p swarm-cli` to apply 6 suggestions)
+warning: `swarm-cli` (test "memory") generated 2 warnings (run `cargo fix --test "memory" -p swarm-cli` to apply 2 suggestions)
+warning: `swarm-cli` (test "trust_enrollment") generated 2 warnings (2 duplicates)
+    Finished `test` profile [unoptimized] target(s) in 0.15s
+     Running unittests src/lib.rs (target/debug/deps/swarm_cli-d9e998967b7d4142)
+
+running 75 tests
+test diagnostic_tests::cli_compound_cleanup_retains_primary_and_secondary_causes ... ok
+test diagnostic_tests::typed_same_address_source_is_not_mistaken_for_a_cycle ... ok
+test diagnostic_tests::nested_guard_causes_are_classified_without_private_text ... ok
+test identity_personal::tests::personal_cli_error_links_keep_primary_secondary_and_custom_io_redacted ... ok
+test identity_personal::tests::personal_cli_shape_validation_is_pure_and_rejects_malformed_transport ... ok
+test identity_personal::tests::personal_cli_output_failure_retains_supplied_known_report_and_safe_phase ... ok
+test diagnostic_tests::unsupported_commands_keep_typed_code_and_both_languages ... ok
+test identity_service::tests::service_cli_closed_shape_rejects_before_input_access ... ok
+test agent_logs::tests::agent_logs_public_secondary_close_cause ... ok
+test identity_service::tests::service_cli_custom_io_wrapper_retains_root_cleanup_without_private_text ... ok
+test identity_service::tests::service_cli_output_failure_retains_original_operation_and_cleanup_branches ... ok
+test identity_service_call::tests::service_call_closed_shape_and_options_refuse_before_io ... ok
+test identity_service::tests::service_cli_output_write_flush_retains_known_durable_report ... ok
+test diagnostic_tests::recorded_cli_control_metadata_reaches_json_without_a_web_error ... ok
+test identity_control::tests::startup_primary_secondary_and_custom_io_reach_safe_cli_diagnostics ... ok
+test mission_status::tests::historical_observation_causes_survive_output_failure ... ok
+test configuration_report_metadata_tests::recorded_configuration_json_survives_non_web_output_and_cleanup_errors ... ok
+test mission_status::tests::native_status_keeps_absence_and_excludes_private_agent_fields ... ok
+test mission_status::tests::insight_transport_and_safe_rendering ... ok
+test mission_status::tests::status_read_close_and_flush_failures_do_not_become_empty_success ... ok
+test mission_status::tests::native_status_supervision_vocabulary_and_text_limits_are_explicit ... ok
+test mission_status::tests::status_historical_uses_root_and_rejects_invalid_native_transport ... ok
+test mission_watch::role_job::tests::concurrent_roles_overlap_and_publish_every_receipt ... ok
+test mission_watch::role_job::tests::multiple_clean_role_receipts_do_not_become_compound_failure ... ok
+test mission_watch::role_job::tests::concurrent_role_failures_drain_siblings_and_preserve_all_causes ... ok
+test mission_watch::role_job::tests::planner_report_keeps_original_and_latest_work_on_output_failure ... ok
+test mission_watch::role_job::tests::role_identities_cover_each_phase_once ... ok
+test mission_watch::role_job::tests::scope_change_adapter_refuses_unmarked_or_compound_failures ... ok
+test mission_watch::role_job::tests::preclaim_revision_observation_defers_without_provider_retry ... ok
+test mission_watch::tests::local_session_stop_and_owner_loss_are_distinct ... ok
+test mission_watch::tests::stale_dispatch_reobservation_requires_exact_no_effect_proof ... ok
+test mission_watch::tests::report_read_withdrawal_preserves_prior_work_and_output_causes ... ok
+test mission_watch::tests::synchronized_withdrawal_stops_only_its_work_and_keeps_commit ... ok
+test mission_watch::tests::watch_admission_preservation_keeps_primary_and_cleanup_causes ... ok
+test mission_watch::tests::watch_adoption_candidates_are_only_unknown_old_nonstopped_queued ... ok
+test mission_watch::tests::watch_cadence_uses_validated_saved_milliseconds ... ok
+test mission_watch::tests::watch_blocked_dispatch_preserves_permission_cause_without_fake_completion ... ok
+test mission_watch::tests::watch_cycle_after_action_keeps_supervision_and_journal_errors ... ok
+test mission_watch::tests::watch_interruption_keeps_newer_session_work ... ok
+test mission_watch::tests::watch_listener_panic_must_wake_owned_role ... ok
+test mission_watch::tests::watch_planning_entry_requires_explicit_controls_and_defers_active_context ... ok
+test mission_watch::tests::watch_planning_projection_keeps_idle_distinct_and_excludes_private_work ... ok
+test mission_watch::tests::watch_retained_intentions_distinguish_owned_pending_children ... ok
+test mission_watch::tests::watch_interrupted_output_keeps_original_and_known_work ... ok
+test mission_watch::tests::watch_worker_argv_uses_existing_private_bootstrap ... ok
+test mission_watch::tests::watch_signal_listener_startup_wait_and_checked_shutdown ... ok
+test mission_worker_entry::tests::bootstrap_after_session_error_keeps_state_cleanup_and_diagnostics ... ok
+test mission_watch::role_job::tests::planner_finish_distinguishes_main_shutdown_and_actual_stop_metadata ... ok
+test mission_worker_entry::tests::bootstrap_dispatch_rejects_help_before_public_help ... ok
+test mission_worker_entry::tests::bootstrap_normalizes_without_inventing_identity_or_authority ... ok
+test mission_watch::tests::withdrawn_preview_stops_session_without_hiding_effects_or_cleanup ... ok
+test mission_worker_entry::tests::bootstrap_refuses_invalid_transport_before_session_or_root ... ok
+test mission_worker_entry::tests::bootstrap_session_refusal_preserves_errno_without_runtime ... ok
+test native_web::ancillary_tests::ancillary_native_causes_reach_cli_after_observation_and_encoding_failure ... ok
+test native_web::conductor::tests::late_conductor_failure_keeps_http_report_and_typed_effects ... ok
+test native_web::conductor::tests::conductor_wrapped_known_work_and_cleanup_reach_cli ... ok
+test native_web::tests::late_web_summary_failure_retains_report_effects_and_safe_causes ... ok
+test identity_provisioning::tests::provisioning_custom_io_wrapper_keeps_complete_cause_matrix_without_private_text ... ok
+test agent_logs::tests::agent_logs_export_and_cause_matrix ... ok
+test recorded_work_tests::cli_configuration_marker_survives_own_io_and_cleanup_wrappers ... ok
+test recorded_work_tests::cli_native_commit_projection_retains_both_causes_without_private_text ... ok
+test recorded_work_tests::cli_preserved_state_wrapped_in_io_keeps_work_and_config_markers ... ok
+test recorded_work_tests::cli_retains_root_recorded_work_through_compound_cleanup ... ok
+test recorded_work_tests::cli_settings_publication_survives_late_close_in_json_and_text ... ok
+test identity_operator::tests::operator_custom_io_output_wrapper_retains_package_and_target_branches ... ok
+test identity_service::tests::service_cli_private_input_pin_mode_and_exact_recovery ... ok
+test identity_service_call::tests::service_call_wrong_target_and_empty_packet_refuse_before_startup ... ok
+test personal_secret_frame::tests::personal_frame_exact_binary_borrow_and_redaction ... ok
+test identity_service_call::tests::service_call_custom_io_keeps_after_use_storage_and_both_close_branches ... ok
+test identity_service_call::tests::service_call_close_failure_is_distinct_from_completed_operation_and_output ... ok
+test personal_secret_frame::tests::personal_frame_existing_transport_bound_stops_after_sentinel ... ok
+test personal_secret_frame::tests::personal_frame_partial_io_cause_and_interrupted_read_are_preserved ... ok
+test identity_service_call::tests::service_call_output_failure_keeps_known_reply_and_independent_close ... ok
+test identity_service_call::tests::service_call_real_lifecycle_control_and_recovery_preserve_exact_state ... ok
+test personal_secret_frame::tests::personal_frame_truncated_header_proof_empty_password_refuse_then_recover ... ok
+
+test result: ok. 75 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.18s
+
+     Running unittests src/main.rs (target/debug/deps/swarm_rust-057ed409efeeece9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/agent_launch.rs (target/debug/deps/agent_launch-01876204106fe9ef)
+
+running 13 tests
+test native_agent_nonzero_exit_settles_failed_attempt_without_inventing_estimate ... FAILED
+test native_agent_pre_exec_refusal_releases_only_confirmed_unstarted_estimate ... FAILED
+test native_agent_run_refuses_prior_stop_without_process_or_mutation ... ok
+test agent_cli_guard_replays_declared_events_without_mutation ... ok
+test agent_cli_manual_prepare_preview_replay_show_and_cancel ... ok
+test agent_cli_prepared_intention_survives_write_and_flush_failure ... ok
+test native_agent_declared_usage_model_invalid_and_recovery_preserve_budget ... FAILED
+test agent_cli_saved_storage_policy_refuses_then_recovers_without_duplicate ... ok
+test native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision ... FAILED
+test native_agent_run_public_stop_term_kill_and_admin_edit_are_owned ... FAILED
+test native_agent_running_facts_refuse_then_recover_in_same_owned_process ... FAILED
+test native_agent_incomplete_drain_keeps_active_lease_and_reserved_estimate ... FAILED
+test native_manual_agent_run_has_real_input_kernel_identity_and_no_task_acceptance ... FAILED
+
+failures:
+
+---- native_agent_nonzero_exit_settles_failed_attempt_without_inventing_estimate stdout ----
+
+thread 'native_agent_nonzero_exit_settles_failed_attempt_without_inventing_estimate' (3819098) panicked at crates/swarm-cli/tests/agent_launch.rs:657:5:
+assertion `left == right` failed
+  left: Null
+ right: 7
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- native_agent_pre_exec_refusal_releases_only_confirmed_unstarted_estimate stdout ----
+
+thread 'native_agent_pre_exec_refusal_releases_only_confirmed_unstarted_estimate' (3819099) panicked at crates/swarm-cli/tests/agent_launch.rs:732:9:
+assertion `left == right` failed
+  left: String("failed")
+ right: "completed"
+
+---- native_agent_declared_usage_model_invalid_and_recovery_preserve_budget stdout ----
+
+thread 'native_agent_declared_usage_model_invalid_and_recovery_preserve_budget' (3819095) panicked at crates/swarm-cli/tests/agent_launch.rs:1072:13:
+assertion `left == right` failed
+  left: String("failed")
+ right: "completed"
+metadata fixture retained: /home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/.tmpUveKyU; variant=valid
+
+---- native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision stdout ----
+
+thread 'native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision' (3819096) panicked at crates/swarm-cli/tests/agent_launch.rs:486:9:
+native CLI exited before actual provider READY
+
+---- native_agent_run_public_stop_term_kill_and_admin_edit_are_owned stdout ----
+
+thread 'native_agent_run_public_stop_term_kill_and_admin_edit_are_owned' (3819100) panicked at crates/swarm-cli/tests/agent_launch.rs:486:9:
+native CLI exited before actual provider READY
+
+---- native_agent_running_facts_refuse_then_recover_in_same_owned_process stdout ----
+
+thread 'native_agent_running_facts_refuse_then_recover_in_same_owned_process' (3819102) panicked at crates/swarm-cli/tests/agent_launch.rs:486:9:
+native CLI exited before actual provider READY
+active metadata fixture retained: /home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/.tmpxUJ8Sl
+
+---- native_agent_incomplete_drain_keeps_active_lease_and_reserved_estimate stdout ----
+
+thread 'native_agent_incomplete_drain_keeps_active_lease_and_reserved_estimate' (3819097) panicked at crates/swarm-cli/tests/agent_launch.rs:486:9:
+native CLI exited before actual provider READY
+
+---- native_manual_agent_run_has_real_input_kernel_identity_and_no_task_acceptance stdout ----
+
+thread 'native_manual_agent_run_has_real_input_kernel_identity_and_no_task_acceptance' (3819485) panicked at crates/swarm-cli/tests/agent_launch.rs:372:5:
+assertion `left == right` failed
+  left: String("failed")
+ right: "completed"
+
+
+failures:
+    native_agent_declared_usage_model_invalid_and_recovery_preserve_budget
+    native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision
+    native_agent_incomplete_drain_keeps_active_lease_and_reserved_estimate
+    native_agent_nonzero_exit_settles_failed_attempt_without_inventing_estimate
+    native_agent_pre_exec_refusal_releases_only_confirmed_unstarted_estimate
+    native_agent_run_public_stop_term_kill_and_admin_edit_are_owned
+    native_agent_running_facts_refuse_then_recover_in_same_owned_process
+    native_manual_agent_run_has_real_input_kernel_identity_and_no_task_acceptance
+
+test result: FAILED. 5 passed; 8 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.15s
+
+error: test failed, to rerun pass `-p swarm-cli --test agent_launch`
+     Running tests/agent_runtime.rs (target/debug/deps/agent_runtime-9d4bb310e99a727a)
+
+running 4 tests
+test agent_cli_show_and_stop_preserve_intent_without_claiming_termination ... ok
+test agent_cli_output_failures_preserve_recorded_stop_and_private_diagnostics ... ok
+test agent_cli_reconcile_cancels_unregistered_launch_once_and_refuses_registered ... ok
+test agent_cli_cancel_output_failures_preserve_settlement_and_replay ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+
+     Running tests/agent_workflow.rs (target/debug/deps/agent_workflow-150e1dcd4b127736)
+
+running 2 tests
+test public_workflow_observation_is_readonly_and_bound_to_compiled_sources ... ok
+test workflow_output_failure_preserves_readonly_state ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running tests/budget.rs (target/debug/deps/budget-a4db5143f2fa291e)
+
+running 3 tests
+test budget_cli_apply_persists_replays_and_does_not_fake_unported_views ... ok
+test budget_cli_invalid_policy_refuses_without_mutation_then_recovers ... ok
+test budget_cli_output_failure_retains_committed_state_and_replays ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+     Running tests/cli.rs (target/debug/deps/cli-39ffa5d6e7b9c93a)
+
+running 17 tests
+test invalid_os_argument_is_refused_and_failed_diagnostic_is_retained ... ok
+test native_bootstrap_cli_rejects_incomplete_identity_without_creating_a_project ... ok
+test language_option_order_and_missing_values_preserve_the_public_parser_contract ... ok
+test diagnostic_write_failure_preserves_both_causes_without_echoing_private_io_data ... ok
+test option_values_are_not_reinterpreted_as_global_flags_and_english_errors_match ... ok
+test output_failure_returns_nonzero_and_reports_the_cause ... ok
+test successful_command_with_output_failure_preserves_os_cause_and_storage_classification ... ok
+test real_native_binary_observes_storage_without_fabricating_human_or_service_readiness ... ok
+test native_evaluate_legacy_is_readonly_and_business_refusal_keeps_json_without_error ... ok
+test native_binary_supports_explicit_finite_stdin_for_settings_without_publishing_preview ... ok
+test settings_catalogue_needs_no_project_and_configuration_errors_keep_safe_reason_codes ... ok
+test quality_profile_cli_is_readonly_and_legacy_configuration_has_no_implicit_bar ... ok
+test settings_publication_survives_lost_cli_output_and_replays_once ... ok
+test project_context_cli_uses_saved_limits_without_writing_or_starting_provider ... ok
+test native_root_settings_cli_persists_reopens_previews_and_replays_without_go ... ok
+test native_evaluate_uses_saved_quality_policy_and_reports_output_failure ... ok
+test settings_file_framing_fifo_device_and_exact_boundary_refuse_or_recover_without_mutation ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.72s
+
+     Running tests/gate.rs (target/debug/deps/gate-be3cd0955a016009)
+
+running 2 tests
+test public_gate_persists_allowed_and_denied_results_without_claiming_acceptance ... ok
+test public_gate_uses_saved_quality_and_refuses_caller_policy ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.43s
+
+     Running tests/graph_batch.rs (target/debug/deps/graph_batch-1d97b407a7b78b78)
+
+running 1 test
+test public_preview_apply_replay_and_undo_are_native_and_persistent ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+
+     Running tests/identity_checkpoint.rs (target/debug/deps/identity_checkpoint-ce7a69104309e942)
+
+running 6 tests
+test checkpoint_read_exact_report_fr_en_without_package ... ok
+test checkpoint_pin_binding_refuses_and_original_recovers ... ok
+test checkpoint_private_metadata_refuses_then_restores ... ok
+test checkpoint_noncanonical_data_refuses_without_mutation ... ok
+test checkpoint_output_failure_keeps_known_read_and_recovers ... ok
+test checkpoint_closed_flags_refuse_before_io ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/identity_control.rs (target/debug/deps/identity_control-1c0a521294fe445a)
+
+running 7 tests
+test current_control_cli_observes_real_signed_enrollment_fr_en_without_authorizing_or_creating_project ... ok
+test pinned_startup_factory_feeds_real_core_without_implicit_activation ... ok
+test control_cli_bad_pin_unsafe_file_and_private_invalid_json_refuse_before_journal_access ... ok
+test identity_cli_closed_options_refuse_default_value_aliases_before_io ... ok
+test control_cli_rejects_extra_runtime_options_and_output_failures_then_recovers ... ok
+test control_cli_revocation_and_real_sqlite_contention_refuse_and_explicit_recovery_works ... ok
+test control_cli_wrong_context_checkpoint_principal_and_expiry_refuse_then_recover ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.26s
+
+     Running tests/identity_initial.rs (target/debug/deps/identity_initial-10e36ddb2055f33f)
+
+running 6 tests
+test initial_cli_existing_slot_refuses_without_overwrite ... ok
+test initial_cli_create_reconcile_exact_fr_en ... ok
+test initial_cli_output_failure_keeps_package_and_reconcile_recovers ... ok
+test initial_cli_private_metadata_and_alias_refuse_then_recover ... ok
+test initial_cli_request_pin_canonical_and_uid_refuse_before_targets ... ok
+test initial_cli_closed_flags_refuse_before_source_or_target_io ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+
+     Running tests/identity_operator.rs (target/debug/deps/identity_operator-04abbb5e7aa3ea5c)
+
+running 6 tests
+test operator_check_pinned_private_package_fr_en_without_export_or_journal ... ok
+test operator_export_preserves_existing_destination_and_refuses_reconciliation ... ok
+test operator_package_pin_and_permissions_refuse_without_output_then_recover ... ok
+test operator_service_export_exact_no_replace_and_explicit_reconcile ... ok
+test operator_export_output_failure_keeps_publication_and_reconcile_recovers ... ok
+test operator_closed_flags_refuse_before_source_io_then_recover ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running tests/identity_personal.rs (target/debug/deps/identity_personal-3812dc4478175a64)
+
+running 7 tests
+test personal_native_terminal_refuses_without_echo_or_bootstrap_use ... ok
+test personal_native_real_input_io_and_oversize_refuse_before_checkpoint ... ok
+test personal_native_private_key_refusal_precedes_checkpoint_then_recovers ... ok
+test personal_native_stdout_loss_keeps_actual_enrollment_and_safe_diagnostic ... ok
+test personal_native_observation_reports_match_closed_schema ... ok
+test personal_native_bad_frame_and_proof_refuse_without_consuming_then_recover ... ok
+test personal_native_cold_enrollment_exact_once_and_recovery_fr_en ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.93s
+
+     Running tests/identity_provisioning.rs (target/debug/deps/identity_provisioning-38a1d27c9f02ef5e)
+
+running 5 tests
+test provisioning_check_closed_flags_refuse_before_input_io ... ok
+test provisioning_check_private_canonical_request_fr_en_without_material_or_target ... ok
+test provisioning_check_output_and_flush_keep_validation_without_material ... ok
+test provisioning_check_unsafe_file_links_parent_and_recovery ... ok
+test provisioning_check_pin_canonical_reserved_roles_and_recovery ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/linux_prerequisites.rs (target/debug/deps/linux_prerequisites-c06e70b23990cae1)
+
+running 2 tests
+test native_prerequisites_cli_output_write_and_flush_preserve_original ... ok
+test native_prerequisites_cli_valid_refusal_and_recovery_without_root ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
+     Running tests/memory.rs (target/debug/deps/memory-2201fa11a593bd61)
+
+running 8 tests
+test memory_admit_preview_refuses_stale_revision ... ok
+test memory_list_reports_empty_catalog_on_fresh_root ... ok
+test memory_list_human_output_adds_localized_heading ... ok
+test memory_rejects_unported_subcommands_and_extra_arguments ... ok
+test memory_list_reports_versions_with_go_reasons_and_folded_query_refusal ... ok
+test memory_select_previews_then_commits_decision_on_executing_task ... ok
+test memory_admit_preview_and_commit_refuse_unfresh_source ... ok
+test memory_summary_source_serves_packet_and_refuses_target_and_stale ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+
+     Running tests/model_policy.rs (target/debug/deps/model_policy-922ca582a18f8eb5)
+
+running 2 tests
+test public_model_check_observes_saved_policy_without_mutation_or_execution ... ok
+test public_model_check_invalid_input_refuses_safely_and_recovers ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s
+
+     Running tests/paea_approval_web.rs (target/debug/deps/paea_approval_web-26f5ece405026c42)
+
+running 27 tests
+test approval_web_cli_binds_and_consumes_exact_preparation_once ... ignored, requires explicit retained native source fixture
+test approval_web_cli_selector_defaults_to_cargo_fixture ... ok
+test approval_web_cli_selector_refuses_incomplete_or_invalid_entries ... ok
+test paea_capture_live::live_stream_consumer_receives_panicking_source_as_error_not_clean_eof ... ok
+test paea_capture_live::live_stream_refuses_existing_evidence_without_mutation_or_ambiguous_start ... ok
+test paea_capture_live::live_stream_renders_first_fragment_before_producer_eof ... ok
+test paea_capture_live::live_stream_reader_prepare_refusal_keeps_empty_artifact_then_recovers_fresh ... ok
+test paea_capture_live::live_stream_consumer_receives_source_fault_as_error_not_clean_eof ... ok
+test paea_capture_live::live_stream_reports_source_fault_and_keeps_prefix_then_recovers_fresh ... ok
+test paea_capture_child::child_capture_handshake_reads_both_prefixes_before_stdin_release ... ok
+test paea_capture_live::live_stream_truncated_evidence_refuses_premature_clean_eof ... ok
+test paea_capture_live::live_stream_reserved_descriptor_survives_path_replacement ... ok
+test paea_capture_live::live_stream_zero_prefix_failure_and_empty_buffer_preserve_error ... ok
+test paea_capture_live::live_stream_zero_prefix_panic_and_empty_buffer_preserve_payload ... ok
+test paea_capture_child::child_capture_owner_collects_exact_raw_streams_and_real_exit ... ok
+test paea_capture_stream::capture_stream_refuses_existing_file_and_dangling_symlink_without_alteration ... ok
+test paea_capture_stream::capture_stream_writes_exact_bytes_to_a_new_file ... ok
+test paea_capture_stream::capture_stream_preserves_prefix_and_cause_on_reader_failure_then_recovers_fresh ... ok
+test paea_capture_child::child_capture_start_refusal_stderr_not_piped_keeps_stdout_pipe_owned ... ok
+test paea_capture_child::child_capture_start_refusal_stdout_evidence_refused_keeps_both_pipes_owned ... ok
+test paea_capture_child::child_capture_controller_panic_keeps_real_finish_and_original_payload ... ok
+test paea_capture_child::child_capture_wait_refusal_preserves_cause_and_returned_ownership ... ok
+test paea_capture_child::child_capture_owned_signal_stops_eof_ignoring_child_and_retains_panic ... ok
+test paea_capture_receipt_temp_create_refusal_keeps_stage_inventory_and_recovers_fresh ... ok
+test paea_capture_startup_eof_retains_actual_exit_and_raw ... ok
+test paea_capture_parent_wait_refusal_retains_owned_handoff ... ok
+test approval_web_cli_selector_refuses_file_evidence_then_accepts_exact ... ok
+
+test result: ok. 26 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.66s
+
+     Running tests/paea_promote.rs (target/debug/deps/paea_promote-090dbd9e04cdbb6f)
+
+running 9 tests
+test composed_git_settlement_stale_preparations_refuse_then_fresh_recover ... ignored, guarded full-root composed two-domain scenario; run explicitly via its recipe
+test delivered_chain_transfer_promote_replay_reconcile_once ... ignored, requires explicit retained native source fixture
+test promote_call_cli_chain_transfer_promote_replay_reconcile_once ... ignored, requires explicit retained native source fixture
+test promote_call_cli_commits_once_and_records_effect ... ignored, requires explicit retained native source fixture
+test promote_call_cli_reconciles_before_commit_reports_not_committed ... ignored, requires explicit retained native source fixture
+test promote_call_cli_refuses_bad_frame_without_consumption ... ignored, requires explicit retained native source fixture
+test promote_call_cli_revoked_current_authority_refuses_without_effect_then_recovers ... ignored, requires explicit retained native source fixture
+test delivered_binary_refuses_wrong_sha256_witness ... ok
+test shared_project_root_guard_admits_one_holder_at_a_time ... ok
+
+test result: ok. 2 passed; 0 failed; 7 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/paea_reconcile.rs (target/debug/deps/paea_reconcile-7511abc23c3d65ff)
+
+running 3 tests
+test paea_reconcile_effects_rejects_runtime_options_without_opening_roots ... ok
+test paea_reconcile_effects_refuses_shared_service_and_ledger_root ... ok
+test paea_reconcile_effects_reports_explicit_uninitialized_without_mutation ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/paea_settlement.rs (target/debug/deps/paea_settlement-91804d21431ef847)
+
+running 4 tests
+test settlement_call_cli_commits_once_and_records_effect ... ignored, requires the retained canonical payment document fixture
+test settlement_call_cli_reconciles_before_commit_reports_not_committed ... ignored, requires the retained canonical payment document fixture
+test settlement_call_cli_refuses_bad_frame_without_consumption ... ignored, requires the retained canonical payment document fixture
+test settlement_call_cli_separated_exact_agreement_and_recovery ... ok
+
+test result: ok. 1 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 2.65s
+
+     Running tests/paea_settlement_delivered.rs (target/debug/deps/paea_settlement_delivered-2ab184c856e31bc0)
+
+running 7 tests
+test delivered_settlement_commit_replay_reconcile_once ... ignored, guarded full-root settlement scenario; run explicitly via its recipe
+test delivered_settlement_lost_stdout_after_commit_replays_without_second_effect ... ignored, guarded full-root lost-response scenario; run explicitly via its recipe
+test delivered_settlement_refuses_bad_frame_without_consumption ... ignored, guarded full-root settlement scenario; run explicitly via its recipe
+test delivered_settlement_revoked_current_authority_refuses_without_effect_then_recovers ... ignored, guarded full-root settlement scenario; run explicitly via its recipe
+test delivered_settlement_split_and_rekey_refuse_without_second_effect ... ignored, guarded full-root settlement splitting scenario; run explicitly via its recipe
+test delivered_settlement_two_cli_instances_same_business_terms_single_effect ... ignored, guarded full-root settlement contention scenario; run explicitly via its recipe
+test delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers ... ignored, guarded full-root settlement agreement-mismatch scenario; run explicitly via its recipe
+
+test result: ok. 0 passed; 0 failed; 7 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/paea_transfer.rs (target/debug/deps/paea_transfer-f240a235ffd8b04a)
+
+running 3 tests
+test transfer_call_cli_consumes_exact_preparation_once ... ignored, requires explicit retained native source fixture
+test transfer_call_cli_refuses_bad_frame_without_consumption ... ignored, requires explicit retained native source fixture
+test usage_shape_is_enforced_without_io ... ok
+
+test result: ok. 1 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/planning.rs (target/debug/deps/planning-3a41faa053303909)
+
+running 5 tests
+test planning_cli_enables_new_work_and_refuses_unported_preparations ... FAILED
+test planning_cli_show_pause_resume_are_native_raw_json_and_replay_safe ... ok
+test planning_cli_preserves_committed_control_on_output_and_flush_failure ... ok
+test planning_cli_saved_reason_policy_and_legacy_adoption_reach_real_consumer ... ok
+test planning_controls_refuse_negative_scope_budget_without_commit_then_recover ... ok
+
+failures:
+
+---- planning_cli_enables_new_work_and_refuses_unported_preparations stdout ----
+
+thread 'planning_cli_enables_new_work_and_refuses_unported_preparations' (3821782) panicked at crates/swarm-cli/tests/planning.rs:417:9:
+assertion `left == right` failed
+  left: String("agent-provider-catalogue-read")
+ right: "command_not_ported"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    planning_cli_enables_new_work_and_refuses_unported_preparations
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+
+error: test failed, to rerun pass `-p swarm-cli --test planning`
+     Running tests/planning_report.rs (target/debug/deps/planning_report-241bcc0c8f999a23)
+
+running 2 tests
+test public_report_read_is_complete_readonly_and_refusals_do_not_become_null ... ok
+test public_report_write_and_flush_errors_keep_cause_and_allow_recovery ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running tests/pricing.rs (target/debug/deps/pricing-4be1c3681ff0ce61)
+
+running 3 tests
+test pricing_cli_invalid_input_and_history_refuse_without_mutation_then_recover ... ok
+test pricing_cli_versions_unknown_cache_and_stale_write ... ok
+test pricing_cli_output_failures_report_preserved_configuration ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+     Running tests/protection.rs (target/debug/deps/protection-b9a2babb81cf4fc7)
+
+running 8 tests
+test protection_output_failure_is_nonzero_without_project_side_effects ... ok
+test protection_refusal_then_recovery_preserves_safe_causes_and_empty_root ... ok
+test protection_comparison_output_failure_then_recovery ... ok
+test protection_both_domains_are_offline_and_context_never_becomes_authority ... ok
+test protection_live_operations_are_not_advertised_as_implemented ... ok
+test protection_comparison_both_domains_preserves_values_and_authority_boundary ... ok
+test protection_comparison_fault_on_either_side_refuses_then_recovers ... ok
+test protection_comparison_rejects_runtime_options_without_project_effects ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running tests/protection_approval.rs (target/debug/deps/protection_approval-facb480927ae92ad)
+
+running 2 tests
+test approval_cli_matches_shared_bytes_for_match_and_mismatch_without_root ... ok
+test approval_cli_refuses_invalid_inputs_and_options_then_recovers_exactly ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/protection_inspection.rs (target/debug/deps/protection_inspection-5024a9b10e2e098c)
+
+running 2 tests
+test inspection_cli_refusal_and_recovery_keep_output_and_root_safe ... ok
+test inspection_cli_matches_pure_report_and_existing_canonicalize ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests/protection_payment.rs (target/debug/deps/protection_payment-966dda7a3cc15df0)
+
+running 3 tests
+test payment_resolution_write_and_flush_causes_and_recovery ... ok
+test payment_resolution_public_aliases_and_both_languages ... ok
+test payment_resolution_public_refusal_and_recovery ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+     Running tests/protection_receipt.rs (target/debug/deps/protection_receipt-2c80d702afee9400)
+
+running 4 tests
+test protection_receipt_write_and_flush_failures_keep_cause_and_recover ... ok
+test protection_receipt_runtime_options_and_framing_refuse_before_reads ... ok
+test protection_receipt_both_domains_and_reconciliation_are_offline ... ok
+test protection_receipt_invalid_inputs_and_bindings_refuse_then_recover ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.37s
+
+     Running tests/protection_receipt_report.rs (target/debug/deps/protection_receipt_report-d63b02a9b4b026c4)
+
+running 3 tests
+test protection_receipt_report_writer_failure_then_recovery ... ok
+test protection_receipt_report_exact_files_and_legacy_shape_in_both_languages ... ok
+test protection_receipt_report_refuses_invalid_inputs_and_runtime_then_recovers ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+     Running tests/provider_configuration.rs (target/debug/deps/provider_configuration-e295da7c48d828bc)
+
+running 4 tests
+test provider_config_output_and_flush_failure_keep_created_state_and_safe_cause ... ok
+test public_provider_config_create_show_reject_invalid_and_preserve_existing_bytes ... ok
+test public_provider_config_update_restore_and_inspect_repair_preserve_exact_history ... ok
+test provider_config_update_output_failures_preserve_new_and_prior_content ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.83s
+
+     Running tests/provider_policy.rs (target/debug/deps/provider_policy-8ad93c7ace084571)
+
+running 2 tests
+test provider_policy_preview_and_readonly_cannot_apply ... ok
+test provider_policy_output_faults_preserve_applied_state_and_original ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.74s
+
+     Running tests/reported_costs.rs (target/debug/deps/reported_costs-37520c5abbc84a55)
+
+running 2 tests
+test reported_costs_cli_write_and_flush_failures_preserve_causes ... ok
+test reported_costs_cli_real_binary_reads_and_refuses_without_mutation ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+     Running tests/run_limits.rs (target/debug/deps/run_limits-c524d5ab0ac515e9)
+
+running 2 tests
+test runtime_limits_cli_output_failures_are_nonzero_and_recover ... ok
+test runtime_limits_cli_uses_saved_policy_and_refuses_invalid_preview ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running tests/settings_output.rs (target/debug/deps/settings_output-f7ed68478c058f79)
+
+running 3 tests
+test initialized_configuration_survives_output_write_and_flush_failure ... ok
+test settings_apply_output_failure_retains_recorded_state_and_replay_in_all_diagnostics ... ok
+test readonly_and_refused_settings_operations_do_not_claim_publication ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.63s
+
+     Running tests/task_model.rs (target/debug/deps/task_model-a47aeed32b699839)
+
+running 2 tests
+test task_model_schema_refusal_preserves_work_then_same_request_recovers ... ok
+test task_model_output_failures_preserve_committed_choice_and_replay ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.72s
+
+     Running tests/task_report.rs (target/debug/deps/task_report-a80185bac51390a2)
+
+running 1 test
+test task_report_output_faults_preserve_submission_and_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.53s
+
+     Running tests/trust_enrollment.rs (target/debug/deps/trust_enrollment-d27b292ff360b067)
+
+running 2 tests
+test enrollment_server_binds_owned_source_and_drains ... ok
+test enrollment_call_provisions_exact_permission_and_refuses_bad_pin ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.26s
+
+     Running tests/version_no_repository.rs (target/debug/deps/version_no_repository-10b5cc32a90bd0fb)
+
+running 4 tests
+test version_cold_root_does_not_initialize ... ok
+test version_initialized_non_git_root_is_explicitly_unavailable ... ok
+test version_broken_git_marker_refuses_and_recovers ... ok
+test version_parent_repository_remains_observed ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests/web_bootstrap.rs (target/debug/deps/web_bootstrap-be3167be4b33443e)
+
+running 2 tests
+test web_cli_invalid_arguments_refuse_without_session_or_saved_policy_change ... ok
+test web_cli_bound_write_and_flush_failures_keep_private_session_and_safe_diagnostics ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.66s
+
+     Running tests/work_list.rs (target/debug/deps/work_list-9cfd88f4607735c1)
+
+running 3 tests
+test public_work_list_rejects_unsupported_arguments_missing_roots_and_failed_output ... ok
+test public_work_list_refuses_unreadable_database_and_recovers_without_losing_original ... ok
+test public_work_list_reads_actual_stored_objects_in_reverse_order_without_mutation ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+
+     Running tests/work_view.rs (target/debug/deps/work_view-4bed810f73b98f30)
+
+running 9 tests
+test flush_failure_after_commit_is_not_reported_as_success ... ok
+test root_view_revision_guard_preserves_existing_view_and_read_only_contract ... ok
+test failed_output_after_mutation_retains_committed_revision_and_io_cause ... ok
+test legacy_manual_phase_policy_requires_explicit_adoption_before_new_creation ... ok
+test public_resume_replaces_link_safely_refuses_directory_and_recovers ... ok
+test public_show_is_read_only_and_resume_publishes_real_fr_en_view ... ok
+test saved_criterion_limit_refusal_keeps_safe_reason_and_recovers_after_policy_change ... ok
+test saved_manual_gate_defaults_apply_to_new_tasks_without_weakening_existing_contracts ... ok
+test public_mutations_replay_recover_after_committed_view_failure ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.61s
+
+error: 2 targets failed:
+    `-p swarm-cli --test agent_launch`
+    `-p swarm-cli --test planning`

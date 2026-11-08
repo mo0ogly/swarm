@@ -1,0 +1,12 @@
+{
+  "error": "preparation-turn-not-found",
+  "failure": {
+    "causes": [
+      "preparation-turn-not-found"
+    ],
+    "code": "preparation-turn-not-found",
+    "message": "preparation-turn-not-found",
+    "retryable": false
+  },
+  "schema_version": 1
+}

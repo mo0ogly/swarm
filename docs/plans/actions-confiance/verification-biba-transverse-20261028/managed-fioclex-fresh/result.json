@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "facts": {
+    "private_read": false,
+    "database_write": false,
+    "private_write": false,
+    "official_write": false
+  },
+  "workspace": "/tmp/swarm-model83-gklfbako/.swarm/managed/w-3fac4614949c776f981ee01f/copies/task-1",
+  "binary_sha256": "909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d",
+  "descendant_denied": true,
+  "prompt_exact": true,
+  "accepted": false,
+  "scope": "One owned managed fixture; before planning then candidate worker, no planning qualification"
+}

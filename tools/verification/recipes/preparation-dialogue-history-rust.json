@@ -48,7 +48,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "DIALOGUE_PASS 35"
+        "DIALOGUE_PASS 41"
       ],
       "required_stderr": []
     },

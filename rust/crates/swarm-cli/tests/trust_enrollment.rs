@@ -13,7 +13,11 @@ use swarm_identity_contract::Scope;
 /// Build a real native plan and map one enrolled human to the administered I3 role.
 fn root() -> (tempfile::TempDir, RootStore, String) {
     use std::os::unix::fs::PermissionsExt;
-    let directory = tempfile::tempdir().unwrap();
+    // The CLI child re-reads the operator declaration through
+    // load_authenticated → open_private_directory, which refuses
+    // group/other-writable ancestors: the checkout is 775, so the fully
+    // private operator fallback area is required here.
+    let directory = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
     std::fs::set_permissions(directory.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
     let mut root = RootStore::initialize(directory.path(), &mut SystemEnvironment).unwrap();
     let work=root.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Identity plan","objective":"Bound action","scope":"Fixture only","criteria":["Exact authority"]}"#,&mut SystemEnvironment).unwrap().result.work.id;

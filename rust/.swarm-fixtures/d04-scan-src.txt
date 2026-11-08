@@ -1,0 +1,182 @@
+crates/swarm-engine/src/mission_status_runtime.rs:57:        ("temporary", std::env::temp_dir()),
+crates/swarm-engine/src/mission_status_runtime.rs-58-    ] {
+crates/swarm-engine/src/mission_status_runtime.rs-59-        let volume = volume(kind, &path, policy, probe(&path), &mut causes);
+crates/swarm-engine/src/mission_status_runtime.rs-60-        if volume.state == "blocked" || volume.state == "unknown" {
+--
+crates/swarm-engine/src/mission_status_runtime.rs:538:            std::env::temp_dir().join(format!("swarm-runtime-empty-root-{}", std::process::id()));
+crates/swarm-engine/src/mission_status_runtime.rs-539-        assert!(!root.exists());
+crates/swarm-engine/src/mission_status_runtime.rs-540-        let settings = EngineSettingsDocument::initial(
+crates/swarm-engine/src/mission_status_runtime.rs-541-            crate::EngineSettingsValues::installation_defaults().unwrap(),
+--
+crates/swarm-engine/src/mission_status_runtime.rs:584:        assert!(probe(&std::env::temp_dir()).is_ok());
+crates/swarm-engine/src/mission_status_runtime.rs-585-        let missing =
+crates/swarm-engine/src/mission_status_runtime.rs:586:            std::env::temp_dir().join(format!("swarm-missing-runtime-{}", std::process::id()));
+crates/swarm-engine/src/mission_status_runtime.rs-587-        assert!(!missing.exists());
+crates/swarm-engine/src/mission_status_runtime.rs-588-        let error = probe(&missing).unwrap_err();
+crates/swarm-engine/src/mission_status_runtime.rs-589-        assert!(std::error::Error::source(&error).is_some());
+--
+crates/swarm-engine/src/managed_repository_candidate.rs:83:            std::env::temp_dir().join(crate::generate_identifier("managed-candidate-").unwrap());
+crates/swarm-engine/src/managed_repository_candidate.rs-84-        std::fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/managed_repository_candidate.rs-85-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/managed_repository_candidate.rs-86-        println!("CANDIDATE_FIXTURE {}", path.display());
+--
+crates/swarm-engine/src/validation_run.rs:997:        let root = std::env::temp_dir().join(crate::generate_identifier("exec78-").unwrap());
+crates/swarm-engine/src/validation_run.rs-998-        fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+crates/swarm-engine/src/validation_run.rs-999-        let script = "import pathlib,sys; root=pathlib.Path(sys.argv[1]); a=root/'valid'; b=root/'invalid'; a.write_bytes(b\"#!/bin/sh\\nprintf 'CONTROL\\\\n'\\n\"); b.write_bytes(b\"printf 'UNEXPECTED_SHELL\\\\n'\\n\"); a.chmod(0o700); b.chmod(0o700)";
+crates/swarm-engine/src/validation_run.rs-1000-        let output = Command::new("/usr/bin/python3")
+--
+crates/swarm-engine/src/agent_reviewer_preflight.rs:101:            std::env::temp_dir().join(crate::generate_identifier("reviewer-runtime-").unwrap());
+crates/swarm-engine/src/agent_reviewer_preflight.rs-102-        fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/agent_reviewer_preflight.rs-103-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/agent_reviewer_preflight.rs-104-        let root = crate::RootStore::initialize(&path, &mut crate::SystemEnvironment).unwrap();
+--
+crates/swarm-engine/src/managed_repository_candidate_store.rs:518:            std::env::temp_dir().join(crate::generate_identifier("candidate-custody-").unwrap());
+crates/swarm-engine/src/managed_repository_candidate_store.rs-519-        std::fs::create_dir(&root).unwrap();
+crates/swarm-engine/src/managed_repository_candidate_store.rs-520-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/managed_repository_candidate_store.rs-521-        let state = root.join(".swarm");
+--
+crates/swarm-engine/src/planning_activation.rs:427:                std::env::temp_dir().join(crate::generate_identifier("scope-claim113-").unwrap());
+crates/swarm-engine/src/planning_activation.rs-428-            std::fs::create_dir(&root).unwrap();
+crates/swarm-engine/src/planning_activation.rs-429-            std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/planning_activation.rs-430-            let settings = EngineSettingsDocument::initial(
+--
+crates/swarm-engine/src/planning_scope_context.rs:49:                std::env::temp_dir().join(crate::generate_identifier("scope-context113-").unwrap());
+crates/swarm-engine/src/planning_scope_context.rs-50-            std::fs::create_dir(&root).unwrap();
+crates/swarm-engine/src/planning_scope_context.rs-51-            std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/planning_scope_context.rs-52-            let mut values = EngineSettingsValues::installation_defaults().unwrap();
+--
+crates/swarm-engine/src/mission_supervision_store.rs:748:        let path=std::env::temp_dir().join(crate::generate_identifier("mission-peer-").unwrap());
+crates/swarm-engine/src/mission_supervision_store.rs-749-        std::fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/mission_supervision_store.rs-750-        std::fs::set_permissions(&path,std::fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/mission_supervision_store.rs-751-        let mut store=RootStore::initialize(&path,&mut crate::SystemEnvironment).unwrap();
+--
+crates/swarm-engine/src/mission_worker_continuation.rs:594:            std::env::temp_dir().join(crate::generate_identifier("continuation126-").unwrap());
+crates/swarm-engine/src/mission_worker_continuation.rs-595-        std::fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/mission_worker_continuation.rs-596-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/mission_worker_continuation.rs-597-        let mut environment = crate::SystemEnvironment;
+--
+crates/swarm-engine/src/mission_supervision_receipts.rs:477:            std::env::temp_dir().join(crate::generate_identifier("swarm-receipt-read-").unwrap());
+crates/swarm-engine/src/mission_supervision_receipts.rs-478-        fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/mission_supervision_receipts.rs-479-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/mission_supervision_receipts.rs-480-        let mut env = crate::SystemEnvironment;
+--
+crates/swarm-engine/src/memory_files.rs:139:        let root = std::env::temp_dir().join(crate::generate_identifier("swarm-memory-").unwrap());
+crates/swarm-engine/src/memory_files.rs-140-        std::fs::create_dir(&root).unwrap();
+crates/swarm-engine/src/memory_files.rs-141-        std::fs::write(root.join("note.md"), b"owned fixture reference").unwrap();
+crates/swarm-engine/src/memory_files.rs-142-        let db = Connection::open_in_memory().unwrap();
+--
+crates/swarm-engine/src/agent_launch.rs:1615:        let directory_path = std::env::temp_dir().join(crate::generate_identifier("replay-instance-").unwrap());
+crates/swarm-engine/src/agent_launch.rs-1616-        std::fs::create_dir(&directory_path).unwrap();
+crates/swarm-engine/src/agent_launch.rs-1617-        use std::os::unix::fs::PermissionsExt;
+crates/swarm-engine/src/agent_launch.rs-1618-        std::fs::set_permissions(&directory_path, std::fs::Permissions::from_mode(0o700)).unwrap();
+--
+crates/swarm-engine/src/fixture_area.rs:8://! swarm-cli that previously used `std::env::temp_dir()` or
+crates/swarm-engine/src/fixture_area.rs-9-//! `tempfile::tempdir()`. Preconditions: run from a workspace checkout
+crates/swarm-engine/src/fixture_area.rs-10-//! (`CARGO_MANIFEST_DIR` locates the repository); the saved setting, when
+crates/swarm-engine/src/fixture_area.rs-11-//! present in `<repo>/.swarm/engine-settings.json`, must pass
+--
+crates/swarm-engine/src/fixture_area.rs:17://! area holds fixture evidence, not a disposable cache; `std::env::temp_dir()`
+crates/swarm-engine/src/fixture_area.rs-18-//! remains legitimate only for read-only probes of the system volume and for
+crates/swarm-engine/src/fixture_area.rs-19-//! paths asserted not to exist.
+crates/swarm-engine/src/fixture_area.rs-20-use crate::engine_settings::EngineSettingsValues;
+--
+crates/swarm-engine/src/fixture_area.rs:105:/// `std::env::temp_dir().join(...)`/`tempfile::tempdir()` fixture allocations
+crates/swarm-engine/src/fixture_area.rs-106-/// that would place project data in `/tmp` on a bare cargo run. The root is
+crates/swarm-engine/src/fixture_area.rs-107-/// `<prefix><random>` (12 random hex chars, like `generate_identifier`), mode
+crates/swarm-engine/src/fixture_area.rs-108-/// 0700 by explicit creation. Callers own retention and cleanup.
+--
+crates/swarm-engine/src/connected_database_identity.rs:319:                std::env::temp_dir().join(crate::generate_identifier("sqlite-inode-").unwrap());
+crates/swarm-engine/src/connected_database_identity.rs-320-            disk::create_dir(&path).unwrap();
+crates/swarm-engine/src/connected_database_identity.rs-321-            disk::set_permissions(&path, disk::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/connected_database_identity.rs-322-            Self(path)
+--
+crates/swarm-engine/src/agent_execution_gate.rs:296:            let path = std::env::temp_dir()
+crates/swarm-engine/src/agent_execution_gate.rs-297-                .join(crate::generate_identifier("gate-telemetry-binding-").unwrap());
+crates/swarm-engine/src/agent_execution_gate.rs-298-            fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/agent_execution_gate.rs-299-            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+--
+crates/swarm-engine/src/reviewer_bootstrap.rs:110:        let root = std::env::temp_dir().join(crate::generate_identifier("reviewer-argv-").unwrap());
+crates/swarm-engine/src/reviewer_bootstrap.rs-111-        fs::DirBuilder::new().mode(0o700).create(&root).unwrap();
+crates/swarm-engine/src/reviewer_bootstrap.rs-112-        let path = root.join("codex");
+crates/swarm-engine/src/reviewer_bootstrap.rs-113-        let mut file = fs::OpenOptions::new()
+--
+crates/swarm-engine/src/web_session.rs:272:            std::env::temp_dir().join(crate::generate_identifier("session-storage91-").unwrap());
+crates/swarm-engine/src/web_session.rs-273-        fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/web_session.rs-274-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/web_session.rs-275-        path
+--
+crates/swarm-engine/src/managed_repository_index.rs:109:        let root = std::env::temp_dir().join(crate::generate_identifier("managed-index-").unwrap());
+crates/swarm-engine/src/managed_repository_index.rs-110-        std::fs::create_dir(&root).unwrap();
+crates/swarm-engine/src/managed_repository_index.rs-111-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/managed_repository_index.rs-112-        println!("INDEX_FIXTURE {}", root.display());
+--
+crates/swarm-engine/src/root_store/preparation_source.rs:83:            let path = std::env::temp_dir().join(crate::generate_identifier("preparation-source-").unwrap());
+crates/swarm-engine/src/root_store/preparation_source.rs-84-            fs::create_dir(&path).unwrap(); Self(path)
+crates/swarm-engine/src/root_store/preparation_source.rs-85-        }
+crates/swarm-engine/src/root_store/preparation_source.rs-86-    }
+--
+crates/swarm-engine/src/root_store/planning_native.rs:1988:        let path=std::env::temp_dir().join(crate::generate_identifier("swarm-gate184-").unwrap());
+crates/swarm-engine/src/root_store/planning_native.rs-1989-        fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/root_store/planning_native.rs-1990-        fs::set_permissions(&path,fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/root_store/planning_native.rs-1991-        eprintln!("Owned provider-gate fixture {}",path.display());
+--
+crates/swarm-engine/src/root_store/paea_git_agreement.rs:366:            let path = std::env::temp_dir()
+crates/swarm-engine/src/root_store/paea_git_agreement.rs-367-                .join(crate::generate_identifier("paea-agreement-").unwrap());
+crates/swarm-engine/src/root_store/paea_git_agreement.rs-368-            std::fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/root_store/paea_git_agreement.rs-369-            use std::os::unix::fs::PermissionsExt;
+--
+crates/swarm-engine/src/root_store/native_transaction.rs:218:            let path = std::env::temp_dir().join(crate::generate_identifier("visit-sql-").unwrap());
+crates/swarm-engine/src/root_store/native_transaction.rs-219-            fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/root_store/native_transaction.rs-220-            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/root_store/native_transaction.rs-221-            let root = RootStore::initialize(&path, &mut SystemEnvironment).unwrap();
+--
+crates/swarm-engine/src/root_store/mission_status_results.rs:199:                std::env::temp_dir().join(crate::generate_identifier("status-results-").unwrap());
+crates/swarm-engine/src/root_store/mission_status_results.rs-200-            fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/root_store/mission_status_results.rs-201-            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/root_store/mission_status_results.rs-202-            Self(path)
+--
+crates/swarm-engine/src/root_store/mission_status_evidence.rs:533:            std::env::temp_dir().join(crate::generate_identifier("status-path-fixture-").unwrap());
+crates/swarm-engine/src/root_store/mission_status_evidence.rs-534-        fs::DirBuilder::new().mode(0o700).create(&parent).unwrap();
+crates/swarm-engine/src/root_store/mission_status_evidence.rs-535-        let path = parent.join("project");
+crates/swarm-engine/src/root_store/mission_status_evidence.rs-536-        fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+--
+crates/swarm-engine/src/root_store/gate_root_channel.rs:177:            let path = std::env::temp_dir().join(crate::generate_identifier("gate-channel100-").unwrap());
+crates/swarm-engine/src/root_store/gate_root_channel.rs-178-            fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+crates/swarm-engine/src/root_store/gate_root_channel.rs-179-            RootStore::initialize(&path, &mut crate::SystemEnvironment).unwrap().close().unwrap();
+crates/swarm-engine/src/root_store/gate_root_channel.rs-180-            Self(path)
+--
+crates/swarm-engine/src/root_store/preparation_call_cli.rs:682:        assert!(!workspace.starts_with(std::env::temp_dir()));
+crates/swarm-engine/src/root_store/preparation_call_cli.rs:683:        assert!(!std::env::temp_dir().starts_with(&workspace));
+crates/swarm-engine/src/root_store/preparation_call_cli.rs-684-        assert_eq!(
+crates/swarm-engine/src/root_store/preparation_call_cli.rs-685-            workspace,
+crates/swarm-engine/src/root_store/preparation_call_cli.rs-686-            Path::new("/owned/project-root/preparation-cli/swarm-preparation-cli-0123456789abcdef01234567")
+--
+crates/swarm-engine/src/root_store/mission_status_historical.rs:766:            let path = std::env::temp_dir()
+crates/swarm-engine/src/root_store/mission_status_historical.rs-767-                .join(crate::generate_identifier("status-historical-").unwrap());
+crates/swarm-engine/src/root_store/mission_status_historical.rs-768-            fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/root_store/mission_status_historical.rs-769-            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+--
+crates/swarm-engine/src/root_store/review_preview/inputs.rs:386:                std::env::temp_dir().join(crate::generate_identifier("review-coherence-").unwrap());
+crates/swarm-engine/src/root_store/review_preview/inputs.rs-387-            fs::create_dir(&root).unwrap();
+crates/swarm-engine/src/root_store/review_preview/inputs.rs-388-            fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/root_store/review_preview/inputs.rs-389-            fs::create_dir(root.join("docs")).unwrap();
+--
+crates/swarm-engine/src/root_store/material_path_tests.rs:34:        let path = std::env::temp_dir().join(crate::generate_identifier("material-path-").unwrap());
+crates/swarm-engine/src/root_store/material_path_tests.rs-35-        fs::create_dir(&path).unwrap();
+crates/swarm-engine/src/root_store/material_path_tests.rs-36-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/root_store/material_path_tests.rs-37-        Self(path)
+--
+crates/swarm-engine/src/telemetry_endpoint.rs:419:        let path = std::env::temp_dir().join(crate::generate_identifier("endpoint-").unwrap());
+crates/swarm-engine/src/telemetry_endpoint.rs-420-        fs::create_dir_all(path.join(".swarm")).unwrap();
+crates/swarm-engine/src/telemetry_endpoint.rs-421-        Scratch(path)
+crates/swarm-engine/src/telemetry_endpoint.rs-422-    }
+--
+crates/swarm-engine/src/native_receipt.rs:110:        let path = std::env::temp_dir().join(crate::generate_identifier("receipt126-").unwrap());
+crates/swarm-engine/src/native_receipt.rs-111-        let mut f = std::fs::OpenOptions::new()
+crates/swarm-engine/src/native_receipt.rs-112-            .write(true)
+crates/swarm-engine/src/native_receipt.rs-113-            .create_new(true)
+--
+crates/swarm-engine/src/agent_supervision.rs:616:        let root=std::env::temp_dir().join(crate::generate_identifier("gate-pulse-").unwrap());
+crates/swarm-engine/src/agent_supervision.rs-617-        fs::create_dir(&root).unwrap();fs::set_permissions(&root,fs::Permissions::from_mode(0o700)).unwrap();
+crates/swarm-engine/src/agent_supervision.rs-618-        let store=crate::RootStore::initialize(&root,&mut SystemEnvironment).unwrap();
+crates/swarm-engine/src/agent_supervision.rs-619-        let settings=store.settings().unwrap();store.close().unwrap();

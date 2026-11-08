@@ -55,7 +55,9 @@ impl RootStore {
     }
     /// Consume only the library's held current authority, matched to this owned
     /// request, Root instance, exact bytes, current SQL plan and Trust revision.
-    /// SQL reservation spans file publication. A late SQL error retains a known
+    /// Identity/BLP changes reserve egress before SQL, avoiding a SQL→egress
+    /// inversion against preparation admission. Business operations keep their
+    /// existing path. SQL reservation spans file publication. A late SQL error retains a known
     /// business reply/publication; no error implies rollback of the Trust file.
     pub fn trust_as_enrolled(
         &self,
@@ -73,6 +75,7 @@ impl RootStore {
         {
             return Err(R::Refused("trust-enrollment-binding"));
         }
+        self.with_preparation_control(actual.operation().as_str(),Source::Enrolled(identity),true,|| {
         let tx = rusqlite::Transaction::new_unchecked(
             &self.db,
             rusqlite::TransactionBehavior::Immediate,
@@ -97,7 +100,7 @@ impl RootStore {
             if !stamp.matches_scope(scope) {
                 return Err(R::Refused("trust-enrollment-plan"));
             }
-            self.trust_scoped(
+            self.trust_scoped_reserved(
                 actual.operation().as_str(),
                 raw,
                 Source::Enrolled(identity),
@@ -114,6 +117,7 @@ impl RootStore {
                 publication,
             },
             None => e,
+        })
         })
     }
 }

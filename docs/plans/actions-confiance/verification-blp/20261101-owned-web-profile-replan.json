@@ -1,0 +1,10 @@
+{
+  "root_pid": 1014054,
+  "interrupted_pids": [
+    1014202,
+    1014054
+  ],
+  "cause": "observed full memory pressure ~25%, own rustc ~1 GiB swapped; full-debug compilation slow",
+  "decision": "serial compilation with debug=0, as in normal delivery; same functional tests; no global watchdog",
+  "scope": "owned web recipe subtree only; service and other processes preserved"
+}

@@ -16,7 +16,7 @@ mod source;
 #[path = "managed_repository_controls.rs"]
 mod controls;
 pub(crate) use controls::{ControlPlan as ManagedControlPlan, plan as managed_control_plan};
-pub(crate) use worker::{candidate_worker, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, ManagedCandidate, retain_result, verify_result, verify_worker, WorkerCheck};
+pub(crate) use worker::{candidate_worker, clean_lane_contention, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, ManagedCandidate, retain_result, verify_result, verify_worker, WorkerCheck};
 use sha2::{Digest, Sha256};
 use std::os::unix::fs::PermissionsExt;
 use std::{
@@ -511,9 +511,7 @@ mod tests {
     /// retaining original files and nonempty list order. No repository grant.
     #[test]
     fn manifest_empty_list_matches_omission_without_rewriting_original_bytes() {
-        let root = std::env::temp_dir().join(crate::generate_identifier("managed-wire-").unwrap());
-        std::fs::create_dir(&root).unwrap();
-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let root = crate::fixture_root("managed-wire-");
         let dir = LocalDirectory::open(&root).unwrap();
         dir.publish("nil.json", b"{}").unwrap();
         dir.publish("empty.json", br#"{"included":[]}"#).unwrap();
@@ -541,9 +539,7 @@ mod tests {
     /// after a pathname rename; fixture permissions express the storage invariant.
     #[test]
     fn directories_pin_inodes_and_refuse_symlink_children() {
-        let root = std::env::temp_dir().join(crate::generate_identifier("managed-dir-").unwrap());
-        std::fs::create_dir(&root).unwrap();
-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let root = crate::fixture_root("managed-dir-");
         let dir = LocalDirectory::open(&root).unwrap();
         let child = dir.child("owned", true).unwrap();
         std::fs::rename(root.join("owned"), root.join("moved")).unwrap();
@@ -564,9 +560,7 @@ mod tests {
     /// removing only the owned fixture conflict permits an actual move/reopen.
     #[test]
     fn repository_rename_never_replaces_a_prior_target() {
-        let root = std::env::temp_dir().join(crate::generate_identifier("managed-move-").unwrap());
-        std::fs::create_dir(&root).unwrap();
-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let root = crate::fixture_root("managed-move-");
         let dir = LocalDirectory::open(&root).unwrap();
         let staging = dir.child("staging", true).unwrap();
         let source = staging.child("repository.git", true).unwrap();

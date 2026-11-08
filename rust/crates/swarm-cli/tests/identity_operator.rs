@@ -30,7 +30,9 @@ impl Case {
     /// Canonical private package under actual controller UID. Service UID is only
     /// distinct synthetic data, not a mapped account. Pin is retained before write.
     fn new() -> Self {
-        let root = tempfile::tempdir().unwrap();
+        // Package/anchor reads walk ancestors with open_private_directory
+        // (checkout is 775): the private fallback area is required here.
+        let root = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
         mode(root.path(), 0o700);
         let operator = root.path().join("operator");
         let handoff = root.path().join("handoff");

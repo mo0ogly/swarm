@@ -6,6 +6,7 @@ exercise archival read guards independently of the lifetime of an actual Root.
 import json
 from pathlib import Path
 import tempfile
+from fixture_area import fixture_area
 import unittest
 import rust_review_required_receipt_guard as guard
 
@@ -14,7 +15,7 @@ class RetainedEvidence(unittest.TestCase):
     """Healthy byte manifests before each corruption, path or missing-input fault."""
     def setUp(self):
         """Create synthetic archival witnesses in a private temporary directory."""
-        self.temp=tempfile.TemporaryDirectory(prefix='review-archive-integrity-')
+        self.temp=tempfile.TemporaryDirectory(prefix='review-archive-integrity-', dir=fixture_area())
         self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)
         names=['owned-review-process-observation.json','owned-review-exec.stdout','owned-review-exec.stderr','reviewer-invoked.json']

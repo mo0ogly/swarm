@@ -1,0 +1,10 @@
+{
+  "status": 400,
+  "body": {
+    "error": "blp-preparation-check-invalid",
+    "failure": {
+      "code": "blp-preparation-check-invalid"
+    },
+    "schema_version": 1
+  }
+}

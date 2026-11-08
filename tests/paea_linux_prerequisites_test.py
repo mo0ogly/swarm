@@ -6,6 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import stat
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from unittest.mock import patch
 SPEC = importlib.util.spec_from_file_location('paea_linux_prerequisites', Path(__file__).resolve().parents[1] / 'tools/paea/linux_prerequisites.py')
@@ -61,7 +62,7 @@ class Contracts(unittest.TestCase):
 
     def test_publish_exact_json_then_existing_directory_refuses(self):
         """A successful observation file roundtrips and is never overwritten."""
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             target = Path(directory) / 'new'
             expected = {'schema_version': 1, 'launch_verified': False}
             MODULE.publish(target, expected)

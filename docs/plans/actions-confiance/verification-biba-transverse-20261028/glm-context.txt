@@ -1,0 +1,651 @@
+
+FILE rust/crates/swarm-biba-linux/src/lib.rs SHA256 ee7964ccc8b7000c4453e1c404d3b8ae60f00d6c02750b4505f2a893c42ae7c9
+//! Mandatory Linux boundary for untrusted I0 provider processes.
+//! This crate grants no identity or launch authority. The engine must validate
+//! its private gate and bind both directories before calling it. No fallback,
+//! provider/account activation, policy timeout or global-system observation.
+#![cfg(target_os="linux")]
+mod kernel;
+use std::{fs::{self,File,OpenOptions},io,os::{fd::{AsRawFd,IntoRawFd},unix::fs::{OpenOptionsExt,MetadataExt}},path::{Path,PathBuf}};
+/// Safe static failure family retaining the original IO cause, never raw paths.
+#[derive(Debug)] pub struct Error {pub stage:&'static str,cause:io::Error,cleanup:Vec<Error>}
+impl std::fmt::Display for Error {fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->std::fmt::Result{f.write_str(self.stage)}}
+impl std::error::Error for Error {fn source(&self)->Option<&(dyn std::error::Error+'static)>{Some(&self.cause)}}
+fn err(stage:&'static str,cause:io::Error)->Error{Error{stage,cause,cleanup:Vec::new()}}
+fn invalid(stage:&'static str)->Error{err(stage,io::Error::from_raw_os_error(libc::EINVAL))}
+fn open(path:&Path)->Result<File,Error>{OpenOptions::new().read(true).custom_flags(libc::O_PATH|libc::O_CLOEXEC|libc::O_NOFOLLOW).open(path).map_err(|e|err("biba-path-open",e))}
+/// Explicitly close an owned FD; preserve close failure rather than retrying it.
+fn close(file:impl IntoRawFd)->Result<(),Error>{let fd=file.into_raw_fd();
+    // SAFETY: consume exactly the owned descriptor once, never a borrowed fd.
+    if unsafe{libc::close(fd)}<0{Err(err("biba-close",io::Error::last_os_error()))}else{Ok(())}
+}
+/// Prepared inode-bound ruleset. Construction does not change this process.
+pub struct Sandbox {rules:std::os::fd::OwnedFd,workspace:PathBuf}
+/// Return the observed kernel ABI, without enforcing or changing any privilege.
+pub fn available()->Result<i32,Error>{let abi=kernel::abi().map_err(|e|err("biba-landlock-unavailable",e))?;if abi<6{return Err(invalid("biba-landlock-abi6-required"))}Ok(abi)}
+/// Build read-only leaves covering the filesystem except the private Root.
+/// Walk only its ancestor chain; no file contents are read and symlinks are not
+/// followed. Rules are inode-bound. A workspace leaf can later allow I0 output.
+fn read_leaves(at:&Path,private:&Path,out:&mut Vec<PathBuf>)->Result<(),Error>{
+    for e in fs::read_dir(at).map_err(|e|err("biba-read-ancestors",e))? {
+        let e=e.map_err(|e|err("biba-read-ancestor-entry",e))?;let p=e.path();
+        if p==private{continue}
+        if private.starts_with(&p){read_leaves(&p,private,out)?;}
+        else if !e.file_type().map_err(|e|err("biba-read-ancestor-type",e))?.is_symlink(){out.push(p);}
+    }Ok(())
+}
+/// Reject existing material aliases in an I0 directory. Symlinks are retained as
+/// data but their targets get no rights; newly-created cross-boundary hardlinks
+/// are blocked by Landlock REFER. Caller must own a fresh isolated workspace.
+fn check_tree(at:&Path)->Result<(),Error>{
+    for e in fs::read_dir(at).map_err(|e|err("biba-workspace-read",e))?{
+        let e=e.map_err(|e|err("biba-workspace-entry",e))?;let m=e.path().symlink_metadata().map_err(|e|err("biba-workspace-metadata",e))?;
+        if m.is_file()&&m.nlink()!=1{return Err(invalid("biba-workspace-hardlink"))}
+        if m.is_dir(){check_tree(&e.path())?;}
+    }Ok(())
+}
+impl Sandbox {
+    /// Prepare the fixed I0 boundary around an engine-owned output directory.
+    /// Root-private authority is unreadable except this exact output leaf. The
+    /// output must be distinct from/not ancestor of Root and contain no hardlinks.
+    /// No enforcement/exec/identity grant occurs here; all IO failures refuse.
+    pub fn prepare(root:&Path,workspace:&Path)->Result<Self,Error>{
+        available()?;
+        let root=root.canonicalize().map_err(|e|err("biba-root",e))?;
+        let workspace=workspace.canonicalize().map_err(|e|err("biba-workspace",e))?;
+        if root.starts_with(&workspace)||!workspace.is_dir(){return Err(invalid("biba-workspace-overlaps-root"))}
+        let private=root.join(".swarm");if private.starts_with(&workspace){return Err(invalid("biba-workspace-overlaps-private-root"))} if !private.is_dir(){return Err(invalid("biba-private-root-required"))}
+        check_tree(&workspace)?;
+        let rules=kernel::ruleset().map_err(|e|err("biba-ruleset",e))?;
+        let result=(||{
+            let mut leaves=Vec::new();read_leaves(Path::new("/"),&private,&mut leaves)?;
+            for p in leaves {
+                let f=open(&p)?;let is_dir=f.metadata().map_err(|e|err("biba-rule-metadata",e))?.is_dir();
+                let access=if is_dir{kernel::READ}else{kernel::READ&!(1<<3)};
+                let added=kernel::add(&rules,&f,access).map_err(|e|err("biba-read-rule",e));
+                finish(added,close(f))?;
+            }
+            let f=open(&workspace)?;let added=kernel::add(&rules,&f,kernel::ALL).map_err(|e|err("biba-output-rule",e));finish(added,close(f))?;
+            Ok(())
+        })();
+        if let Err(e)=result{return finish(Err(e),close(rules))}
+        Ok(Self{rules,workspace})
+    }
+    /// Enter the ruleset only in a single-threaded, unprivileged helper. All
+    /// subsequent descendants inherit it. Failure after restriction remains an
+    /// error; the caller must exit, never execute an unconfined fallback.
+    pub fn enforce(self)->Result<(),Error>{
+        let result=(||{
+            if fs::read_dir("/proc/self/task").map_err(|e|err("biba-thread-check",e))?.count()!=1{return Err(invalid("biba-single-thread-required"))}
+            let status=fs::read_to_string("/proc/self/status").map_err(|e|err("biba-capability-check",e))?;
+            if !status.lines().any(|l|l.strip_prefix("CapEff:").is_some_and(|v|v.trim()=="0000000000000000")){return Err(invalid("biba-unprivileged-helper-required"))}
+            std::env::set_current_dir(&self.workspace).map_err(|e|err("biba-workspace-enter",e))?;
+            kernel::restrict(&self.rules).map_err(|e|err("biba-restrict",e))?;
+            kernel::seccomp().map_err(|e|err("biba-seccomp",e))
+        })();
+        finish(result,close(self.rules))
+    }
+    /// Close an unused prepared profile after another gate check refuses.
+    pub fn close(self)->Result<(),Error>{close(self.rules)}
+}
+/// Retain both a primary failure and a cleanup error without converting to success.
+fn finish<T>(value:Result<T,Error>,cleanup:Result<(),Error>)->Result<T,Error>{
+    match(value,cleanup){(v,Ok(()))=>v,(Ok(_),Err(e))=>Err(e),(Err(mut e),Err(c))=>{e.cleanup.push(c);Err(e)}}
+}
+impl Error {
+    /// Preserve the original IO and every close cause for the engine's wrapper matrix.
+    pub fn into_parts(self)->(&'static str,io::Error,Vec<Error>){(self.stage,self.cause,self.cleanup)}
+}
+
+FILE rust/crates/swarm-biba-linux/src/kernel.rs SHA256 6949a9592675cea6feecbce9f87daee4d32ea0cbd5e15fc371b0bb8b20340514
+//! Narrow Linux ABI adapter. No policy or caller identity is inferred here.
+use std::{io, mem, os::fd::{AsRawFd, FromRawFd, OwnedFd}};
+/// Landlock ABI6 is required: file truncation, device ioctl and signal scopes.
+pub(crate) fn abi() -> io::Result<i32> {
+    // SAFETY: version query has no pointed input and returns an integer only.
+    let v=unsafe {libc::syscall(libc::SYS_landlock_create_ruleset,std::ptr::null::<u8>(),0,1)};
+    if v<0 {Err(io::Error::last_os_error())} else {Ok(v as i32)}
+}
+pub(crate) const READ:u64=(1<<0)|(1<<2)|(1<<3);
+pub(crate) const ALL:u64=(1<<16)-1;
+#[repr(C)] struct Ruleset {fs:u64,net:u64,scoped:u64}
+#[repr(C,packed)] struct Beneath {access:u64,fd:i32}
+/// Create a closed ruleset. Only the caller's later explicit leaves are allowed.
+pub(crate) fn ruleset()->io::Result<OwnedFd>{
+    let attr=Ruleset{fs:ALL,net:0,scoped:3};
+    // SAFETY: initialized C-layout value and exact ABI size live through syscall.
+    let fd=unsafe{libc::syscall(libc::SYS_landlock_create_ruleset,&attr,mem::size_of::<Ruleset>(),0)};
+    if fd<0 {Err(io::Error::last_os_error())} else {
+        // SAFETY: successful syscall transfers a fresh owned descriptor.
+        Ok(unsafe{OwnedFd::from_raw_fd(fd as i32)})
+    }
+}
+/// Add one already-opened inode. Caller chooses only this fixed profile's masks.
+pub(crate) fn add(rules:&OwnedFd,path:&impl AsRawFd,access:u64)->io::Result<()> {
+    let attr=Beneath{access,fd:path.as_raw_fd()};
+    // SAFETY: packed Linux struct has the documented layout; borrowed FDs live.
+    let v=unsafe{libc::syscall(libc::SYS_landlock_add_rule,rules.as_raw_fd(),1,&attr,0)};
+    if v<0 {Err(io::Error::last_os_error())} else {Ok(())}
+}
+/// Irreversibly restrict this single-threaded helper and all future descendants.
+pub(crate) fn restrict(rules:&OwnedFd)->io::Result<()> {
+    // SAFETY: no pointers; no_new_privs can only reduce this thread's authority.
+    if unsafe{libc::prctl(libc::PR_SET_NO_NEW_PRIVS,1,0,0,0)}!=0{return Err(io::Error::last_os_error())}
+    // SAFETY: valid owned ruleset and no optional flags.
+    if unsafe{libc::syscall(libc::SYS_landlock_restrict_self,rules.as_raw_fd(),0)}<0{return Err(io::Error::last_os_error())}
+    // SAFETY: mark inherited non-stdio descriptors close-on-exec, not close-now.
+    if unsafe{libc::syscall(libc::SYS_close_range,3u32,u32::MAX,4u32)}<0{return Err(io::Error::last_os_error())}
+    Ok(())
+}
+/// Install a fixed seccomp deny profile after Landlock. No user filter/program.
+pub(crate) fn seccomp()->io::Result<()> {
+    #[cfg(target_arch="x86_64")] const ARCH:u32=0xc000003e;
+    #[cfg(target_arch="aarch64")] const ARCH:u32=0xc00000b7;
+    #[cfg(not(any(target_arch="x86_64",target_arch="aarch64")))] compile_error!("Biba seccomp requires audited native architecture");
+    fn ins(code:u16,jt:u8,jf:u8,k:u32)->libc::sock_filter{libc::sock_filter{code,jt,jf,k}}
+    let deny=0x00050000|libc::EPERM as u32;
+    let mut f=vec![ins(0x20,0,0,4),ins(0x15,1,0,ARCH),ins(0x06,0,0,0x80000000),ins(0x20,0,0,0)];
+    #[cfg(target_arch="x86_64")] f.extend([ins(0x35,0,1,0x40000000),ins(0x06,0,0,deny)]);
+    // Metadata setters are outside Landlock's filesystem access-right coverage.
+    let denied=[libc::SYS_ptrace,libc::SYS_process_vm_readv,libc::SYS_process_vm_writev,
+        libc::SYS_pidfd_getfd,libc::SYS_mount,libc::SYS_umount2,libc::SYS_pivot_root,
+        libc::SYS_chroot,libc::SYS_setns,libc::SYS_unshare,libc::SYS_open_by_handle_at,
+        libc::SYS_io_uring_setup,libc::SYS_bpf,libc::SYS_perf_event_open,
+        libc::SYS_fchmod,libc::SYS_fchmodat,libc::SYS_fchmodat2,
+        libc::SYS_fchown,libc::SYS_fchownat,libc::SYS_utimensat,
+        libc::SYS_setxattr,libc::SYS_lsetxattr,libc::SYS_fsetxattr,
+        libc::SYS_removexattr,libc::SYS_lremovexattr,libc::SYS_fremovexattr];
+    for n in denied {f.extend([ins(0x15,0,1,n as u32),ins(0x06,0,0,deny)]);}
+    #[cfg(target_arch="x86_64")]
+    for n in [libc::SYS_chmod,libc::SYS_chown,libc::SYS_lchown,libc::SYS_utime,libc::SYS_utimes,libc::SYS_futimesat] {f.extend([ins(0x15,0,1,n as u32),ins(0x06,0,0,deny)]);}
+    // An outside Unix service must not become a same-UID authority bypass.
+    f.extend([ins(0x15,0,3,libc::SYS_socket as u32),ins(0x20,0,0,16),ins(0x15,0,1,libc::AF_UNIX as u32),ins(0x06,0,0,deny),ins(0x20,0,0,0)]);
+    let branch=f.len();f.push(ins(0x15,0,0,libc::SYS_ioctl as u32));f.push(ins(0x20,0,0,24));
+    // FIOCLEX only sets FD_CLOEXEC: CPython requires it to open its script.
+    // It neither clears CLOEXEC nor grants a filesystem/device capability.
+    for request in [libc::FIOCLEX as u32,libc::FIONREAD as u32,libc::FIONBIO as u32,libc::TCGETS as u32,libc::TIOCGWINSZ as u32] {f.extend([ins(0x15,0,1,request),ins(0x06,0,0,0x7fff0000)]);}
+    f.push(ins(0x06,0,0,deny));f[branch].jf=(f.len()-branch-1) as u8;
+    f.push(ins(0x06,0,0,0x7fff0000));
+    let program=libc::sock_fprog{len:f.len() as u16,filter:f.as_mut_ptr()};
+    // SAFETY: initialized finite native BPF instructions remain alive through prctl.
+    if unsafe{libc::prctl(libc::PR_SET_SECCOMP,2,&program)}!=0{Err(io::Error::last_os_error())}else{Ok(())}
+}
+
+FILE rust/crates/swarm-engine/src/native_provider_biba.rs SHA256 6a18800816ff49db882ef472eb548fcbfb7be3946c22b8ddec0f29601a1dae4c
+//! Mandatory I0 filesystem boundary for an already-authorized private helper.
+//! This module grants no identity, labels, launch permission or acceptance.
+use crate::{AgentLaunchError, RootStoreError as E};
+use std::path::Path;
+use swarm_biba_linux::Sandbox;
+
+/// Retain the original kernel/IO cause and every independent close failure.
+/// Static library stages are safe diagnostics; paths and credentials are not
+/// copied into an output message. No failure becomes an unconfined fallback.
+fn convert(error: swarm_biba_linux::Error) -> E {
+    let (stage, cause, cleanup) = error.into_parts();
+    let mut primary = E::Launch(Box::new(AgentLaunchError::caused(stage, cause)));
+    for error in cleanup {
+        primary = E::Cleanup {
+            primary: Some(Box::new(primary)),
+            cleanup: Box::new(convert(error)),
+        };
+    }
+    primary
+}
+
+/// Prepare inode-bound rules for the validated Root and I0 output workspace.
+/// The private gate must have checked ownership/provenance and current rights;
+/// a client path is not such proof. This performs filesystem/kernel observations
+/// but does not restrict the caller yet. Unsupported hosts and unsafe overlaps
+/// refuse with original causes; caller still owes transport/Root cleanup.
+pub(super) fn prepare(root: &Path, workspace: &Path) -> Result<Sandbox, E> {
+    Sandbox::prepare(root, workspace).map_err(convert)
+}
+
+/// Irreversibly restrict this single-threaded, unprivileged helper before exec.
+/// Descendants inherit the boundary. Any returned error requires helper exit;
+/// retrying or executing without the boundary is forbidden. No effect is accepted.
+pub(super) fn enforce(sandbox: Sandbox) -> Result<(), E> {
+    sandbox.enforce().map_err(convert)
+}
+
+/// Explicitly release an unused ruleset after transport setup refuses.
+/// Preserve a close failure alongside the caller's primary error.
+pub(super) fn close(sandbox: Sandbox) -> Result<(), E> {
+    sandbox.close().map_err(convert)
+}
+
+FILE rust/crates/swarm-engine/src/native_provider_exec.rs SHA256 e7ed94b8f4b1cfcc5676f6acf7b7cf2f88dfe5d1e0ca3b56fbf602932ae16078
+//! Shared helper-side exec transport. It supplies no identity or permission.
+#![cfg(target_os = "linux")]
+#[path = "native_provider_biba.rs"]
+mod biba;
+use crate::{root_store::finished as finish, AgentLaunchError, Provider, RootStoreError as E};
+use std::{
+    collections::BTreeSet,
+    convert::Infallible,
+    error::Error,
+    ffi::CString,
+    fs::File,
+    io::{Seek, SeekFrom, Write},
+    os::unix::ffi::OsStrExt,
+    path::{Path, PathBuf},
+};
+
+/// Retain the existing worker transport diagnostic family without exposing
+/// caller paths, arguments, prompt or environment values in rendered failures.
+fn caused(code: &'static str, error: impl Error + Send + Sync + 'static) -> E {
+    E::Launch(Box::new(AgentLaunchError::caused(code, error)))
+}
+
+/// Engine-created C-string vectors and immutable anonymous stdin. Construction
+/// performs no exec and grants no capability. Only a separately verified private
+/// gate may consume it, after Root closure and fresh identity/policy checks.
+pub(crate) struct PreparedExec {
+    input: File,
+    path: CString,
+    args: Vec<CString>,
+    environment: Vec<CString>,
+    workspace: PathBuf,
+}
+impl PreparedExec {
+    /// Encode exact CLI arguments, observe only the supplied validated environment
+    /// names, and seal complete prompt bytes in a CLOEXEC memfd. Requires absolute
+    /// image/workspace paths; duplicate/invalid environment names and embedded NUL
+    /// refuse before allocating stdin. Missing allowed variables remain absent.
+    /// This checks transport shape, not executable ownership, effective isolation,
+    /// model capability, provider health, pricing or authorization. Callers must
+    /// establish and freshly recheck those contracts separately. No policy cap,
+    /// timeout, shell/PATH fallback or inferred default is introduced.
+    /// Codec/kernel/write/seek/seal/close causes survive; failed preparation closes
+    /// its owned descriptor. The legacy memfd label is a technical identifier.
+    pub(crate) fn prepare(
+        provider: &Provider,
+        environment_names: &[String],
+        workspace: &Path,
+        prompt: &[u8],
+    ) -> Result<Self, E> {
+        use rustix::fs::{fcntl_add_seals, memfd_create, MemfdFlags, SealFlags};
+        if !Path::new(&provider.command).is_absolute() || !workspace.is_absolute() {
+            return Err(E::Refused("agent-execution-absolute-path-required"));
+        }
+        let cstring = |bytes: &[u8]| {
+            CString::new(bytes).map_err(|e| caused("agent-execution-argument-invalid", e))
+        };
+        let path = cstring(provider.command.as_bytes())?;
+        cstring(workspace.as_os_str().as_bytes())?;
+        let mut args = vec![path.clone()];
+        for arg in provider.args.as_deref().unwrap_or_default() {
+            args.push(cstring(arg.as_bytes())?);
+        }
+        let mut names = BTreeSet::new();
+        let mut environment = Vec::new();
+        for name in environment_names {
+            if !crate::agent_launch_policy::environment_name(name) || !names.insert(name) {
+                return Err(E::Refused("agent-execution-environment-invalid"));
+            }
+            if let Some(value) = std::env::var_os(name) {
+                let mut entry = name.as_bytes().to_vec();
+                entry.push(b'=');
+                entry.extend_from_slice(value.as_os_str().as_bytes());
+                environment.push(cstring(&entry)?);
+            }
+        }
+        let fd = memfd_create(
+            "swarm-agent-input",
+            MemfdFlags::CLOEXEC | MemfdFlags::ALLOW_SEALING,
+        )
+        .map_err(|e| caused("agent-execution-input-create", e))?;
+        let mut input = File::from(fd);
+        let fill = (|| {
+            input
+                .write_all(prompt)
+                .map_err(|e| caused("agent-execution-input-write", e))?;
+            input
+                .seek(SeekFrom::Start(0))
+                .map_err(|e| caused("agent-execution-input-rewind", e))?;
+            fcntl_add_seals(
+                &input,
+                SealFlags::SEAL | SealFlags::SHRINK | SealFlags::GROW | SealFlags::WRITE,
+            )
+            .map_err(|e| caused("agent-execution-input-seal", e))?;
+            Ok(())
+        })();
+        if let Err(error) = fill {
+            return finish(
+                Err(error),
+                nix::unistd::close(input).map_err(|e| caused("agent-execution-input-close", e)),
+            );
+        }
+        Ok(Self {
+            input,
+            path,
+            args,
+            environment,
+            workspace: workspace.to_owned(),
+        })
+    }
+
+    /// Append engine-computed variables (LIVE-UX-03 telemetry exporter) after all
+    /// gate/freshness checks. Names must be valid environment names and must not
+    /// already be present: an inherited variable is never overridden
+    /// (`agent-execution-environment-conflict`), and duplicates refuse. Values
+    /// may hold a per-attempt secret; they are only kept for `execve`. On
+    /// refusal the prepared stdin descriptor is closed and the cause returned.
+    pub(crate) fn add_environment(mut self, entries: Vec<(String, String)>) -> Result<Self, E> {
+        let check = (|| {
+            for (name, value) in &entries {
+                let prefix = format!("{name}=");
+                if !crate::agent_launch_policy::environment_name(name)
+                    || self.environment.iter().any(|e| e.as_bytes().starts_with(prefix.as_bytes()))
+                {
+                    return Err(E::Refused("agent-execution-environment-conflict"));
+                }
+                self.environment.push(
+                    CString::new(format!("{name}={value}")).map_err(|e| caused("agent-execution-argument-invalid", e))?,
+                );
+            }
+            Ok(())
+        })();
+        match check {
+            Ok(()) => Ok(self),
+            Err(error) => finish(Err(error), self.close()),
+        }
+    }
+
+    /// Insert engine-computed arguments right after the program name (LIVE-UX-03
+    /// Codex telemetry: global `-c otel.…` overrides, which Codex accepts before
+    /// its subcommand), after all gate/freshness checks. They must hold no
+    /// secret (argv is visible to other local processes); embedded NUL refuses
+    /// (`agent-execution-argument-invalid`) and closes the prepared stdin.
+    pub(crate) fn add_leading_arguments(mut self, entries: Vec<String>) -> Result<Self, E> {
+        let encoded = entries
+            .iter()
+            .map(|a| CString::new(a.as_bytes()).map_err(|e| caused("agent-execution-argument-invalid", e)))
+            .collect::<Result<Vec<_>, _>>();
+        match encoded {
+            Ok(encoded) => {
+                self.args.splice(1..1, encoded);
+                Ok(self)
+            }
+            Err(error) => finish(Err(error), self.close()),
+        }
+    }
+
+    /// Explicitly close immutable stdin after a later gate/freshness refusal.
+    /// No exec/release occurs; caller must retain any accompanying primary cause.
+    pub(crate) fn close(self) -> Result<(), E> {
+        nix::unistd::close(self.input).map_err(|e| caused("agent-execution-input-close", e))
+    }
+
+    /// Replace an already authorized private helper with the exact absolute image,
+    /// argv and observed environment. Requires an independently checked committed
+    /// gate, current identity/policy/source receipts and closed Root. This function
+    /// cannot establish those preconditions itself and is never a public JSON API.
+    /// Require the validated Root and an attributed isolated I0 workspace. Prepare
+    /// and enforce the mandatory Linux boundary; no unconfined fallback exists.
+    /// Changes cwd and fd0 only in the consuming helper, then calls execve directly
+    /// without ENOEXEC shell fallback or PATH search. Successful exec never returns.
+    /// All returning paths preserve setup/close/kernel failures; cwd/fd0 changes
+    /// are not restored because the refusing helper must exit. It accepts no task.
+    pub(crate) fn execute(self, root: &Path) -> Result<Infallible, E> {
+        let sandbox = match biba::prepare(root, &self.workspace) {
+            Ok(sandbox) => sandbox,
+            Err(error) => return finish(Err(error), self.close()),
+        };
+        let setup = std::env::set_current_dir(&self.workspace)
+            .map_err(|e| caused("agent-execution-workspace-enter", e))
+            .and_then(|()| {
+                rustix::stdio::dup2_stdin(&self.input)
+                    .map_err(|e| caused("agent-execution-input-attach", e))
+            });
+        let attached = finish(
+            setup,
+            nix::unistd::close(self.input).map_err(|e| caused("agent-execution-input-close", e)),
+        );
+        if let Err(error) = attached {
+            return finish(Err(error), biba::close(sandbox));
+        }
+        biba::enforce(sandbox)?;
+        nix::unistd::execve(&self.path, &self.args, &self.environment)
+            .map_err(|e| caused("agent-provider-exec", e))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Read;
+
+    /// Construct transport only: no filesystem image is executed or trusted.
+    fn provider() -> Provider {
+        Provider {
+            command: "/owned-fixture/provider".into(),
+            args: Some(vec!["--json".into()]),
+            ..Default::default()
+        }
+    }
+
+    /// Engine-computed variables append after a witness; an inherited name is
+    /// never overridden, and invalid or duplicate names refuse.
+    #[test]
+    fn added_environment_appends_and_never_overrides_inherited_names() {
+        let fixture = || PreparedExec::prepare(&provider(), &["PATH".into()], Path::new("/owned-fixture"), b"").unwrap();
+        let p = fixture().add_environment(vec![("OTEL_LOGS_EXPORTER".into(), "otlp".into())]).unwrap();
+        assert!(p.environment.iter().any(|e| e.to_bytes() == b"OTEL_LOGS_EXPORTER=otlp"));
+        p.close().unwrap();
+        assert!(std::env::var_os("PATH").is_some(), "test needs an inherited PATH");
+        for entries in [
+            vec![("PATH".to_owned(), "/evil".to_owned())],
+            vec![("A=B".to_owned(), "x".to_owned())],
+            vec![("OTEL_X".to_owned(), "1".to_owned()), ("OTEL_X".to_owned(), "2".to_owned())],
+            vec![("OTEL_X".to_owned(), "nul\0".to_owned())],
+        ] {
+            let refused = fixture().add_environment(entries).err().unwrap();
+            assert!(matches!(refused.code(), "agent-execution-environment-conflict" | "agent-execution-argument-invalid"), "{}", refused.code());
+        }
+    }
+
+    /// Leading arguments land right after the program name, before the
+    /// provider's own arguments; an embedded NUL refuses.
+    #[test]
+    fn leading_arguments_follow_the_program_and_refuse_nul() {
+        let fixture = || PreparedExec::prepare(&provider(), &[], Path::new("/owned-fixture"), b"").unwrap();
+        let p = fixture().add_leading_arguments(vec!["-c".into(), "otel.log_user_prompt=false".into()]).unwrap();
+        let argv: Vec<_> = p.args.iter().map(|a| a.to_str().unwrap().to_owned()).collect();
+        assert_eq!(argv, ["/owned-fixture/provider", "-c", "otel.log_user_prompt=false", "--json"]);
+        p.close().unwrap();
+        let refused = fixture().add_leading_arguments(vec!["nul\0".into()]).err().unwrap();
+        assert_eq!(refused.code(), "agent-execution-argument-invalid");
+        let unchanged = fixture().add_leading_arguments(Vec::new()).unwrap();
+        assert_eq!(unchanged.args.len(), 2, "nothing added when telemetry is off");
+        unchanged.close().unwrap();
+    }
+
+    /// The actual memfd preserves binary bytes at offset0 and cannot be written,
+    /// resized or unsealed. Empty environment excludes inherited parent secrets.
+    #[test]
+    fn native_exec_input_is_complete_sealed_and_cloexec() {
+        use rustix::fs::{fcntl_get_seals, SealFlags};
+        let input = b"owned\0input\n";
+        let mut p =
+            PreparedExec::prepare(&provider(), &[], Path::new("/owned-fixture"), input).unwrap();
+        assert_eq!(
+            p.args.iter().map(|a| a.to_bytes()).collect::<Vec<_>>(),
+            [b"/owned-fixture/provider".as_slice(), b"--json".as_slice()]
+        );
+        assert!(p.environment.is_empty());
+        let mut read = Vec::new();
+        p.input.read_to_end(&mut read).unwrap();
+        assert_eq!(read, input);
+        assert!(fcntl_get_seals(&p.input)
+            .unwrap()
+            .contains(SealFlags::SEAL | SealFlags::WRITE | SealFlags::GROW | SealFlags::SHRINK));
+        assert!(rustix::io::fcntl_getfd(&p.input)
+            .unwrap()
+            .contains(rustix::io::FdFlags::CLOEXEC));
+        assert_eq!(
+            p.input.write_all(b"mutation").unwrap_err().raw_os_error(),
+            Some(rustix::io::Errno::PERM.raw_os_error())
+        );
+        p.close().unwrap();
+    }
+
+    /// Invalid transport cannot silently become relative PATH lookup, shell argv
+    /// or a successful empty command; diagnostics never include supplied text.
+    #[test]
+    fn native_exec_rejects_relative_paths_and_nul_arguments() {
+        let mut provider = provider();
+        provider.command = "PRIVATE-relative".into();
+        let e = PreparedExec::prepare(&provider, &[], Path::new("/owned-fixture"), b"")
+            .err()
+            .unwrap();
+        assert_eq!(e.code(), "agent-execution-absolute-path-required");
+        assert!(!e.to_string().contains("PRIVATE"));
+        provider = super::tests::provider();
+        assert_eq!(
+            PreparedExec::prepare(&provider, &[], Path::new("PRIVATE-relative"), b"")
+                .err()
+                .unwrap()
+                .code(),
+            "agent-execution-absolute-path-required"
+        );
+        provider.args = Some(vec!["PRIVATE\0argument".into()]);
+        let e = PreparedExec::prepare(&provider, &[], Path::new("/owned-fixture"), b"")
+            .err()
+            .unwrap();
+        assert_eq!(e.code(), "agent-execution-argument-invalid");
+        assert!(!e.to_string().contains("PRIVATE"));
+        assert!(e.source().is_some());
+    }
+
+    /// Duplicate/invalid environment names are refused, not silently ignored or
+    /// converted into child assignments. No global process environment is edited.
+    #[test]
+    fn native_exec_rejects_ambiguous_environment_allowlists() {
+        for names in [
+            vec!["HOME".into(), "HOME".into()],
+            vec!["PRIVATE=value".into()],
+            vec![String::new()],
+        ] {
+            let e = PreparedExec::prepare(&provider(), &names, Path::new("/owned-fixture"), b"")
+                .err()
+                .unwrap();
+            assert_eq!(e.code(), "agent-execution-environment-invalid");
+            assert!(!e.to_string().contains("PRIVATE"));
+        }
+        PreparedExec::prepare(
+            &provider(),
+            &["HOME".into()],
+            Path::new("/owned-fixture"),
+            b"",
+        )
+        .unwrap()
+        .close()
+        .unwrap();
+    }
+    /// Preserve the original public Root cleanup classification when transport
+    /// fails and closing its input also fails. Healthy single-failure control
+    /// precedes compound injection; raw private causes must remain unrendered.
+    #[test]
+    fn native_exec_preserves_root_cleanup_error_contract() {
+        let error = || {
+            caused(
+                "agent-execution-input-write",
+                std::io::Error::other("PRIVATE write cause"),
+            )
+        };
+        let control = finish::<()>(Err(error()), Ok(())).unwrap_err();
+        assert_eq!(control.code(), "agent-execution-input-write");
+        assert!(control.source().is_some());
+        let result = finish::<()>(
+            Err(error()),
+            Err(caused(
+                "agent-execution-input-close",
+                std::io::Error::other("PRIVATE close cause"),
+            )),
+        )
+        .unwrap_err();
+        assert_eq!(result.code(), "root-cleanup");
+        assert!(!result.to_string().contains("PRIVATE"));
+        assert!(result.source().is_some());
+    }
+}
+
+FILE tests/rust_biba_linux_boundary.py SHA256 a4c4dffb6cf05918f81464cb62b412b25a118a36e16570a8e79d492cb345d9c6
+#!/usr/bin/env python3
+"""Verify a supplied Linux boundary driver only on fresh owned synthetic files.
+A real unconfined control precedes the confined write/read/child/socket cases.
+The driver is a separate fixture, never the product binary or acceptance proof.
+No account, live Root, global observation, retry or whole-test watchdog is used.
+"""
+import argparse,hashlib,json,os,subprocess,tempfile
+from pathlib import Path
+import rust_agent_model_route as proof
+
+
+def run(driver,out):
+    """Retain original channels, driver/source hashes and denied/allowed effects.
+    IO, unavailable-kernel and assertion failures propagate without PASS; retain
+    the owned Root for diagnosis rather than deleting it or retrying unchanged.
+    """
+    out.mkdir(parents=True,exist_ok=False)
+    root=Path(tempfile.mkdtemp(prefix='swarm-biba-boundary-'))
+    private=root/'.swarm';private.mkdir();workspace=root/'out';workspace.mkdir()
+    proof.publish(private/'state.synthetic',b'OWNED_SYNTHETIC_NO_SECRET')
+    proof.publish(out/'fixture.json',dict(root=str(root),driver_sha256=proof.digest(driver.read_bytes()),source_sha256=proof.digest(Path(__file__).read_bytes()),global_watchdog=None))
+    script=root/'provider.py'
+    source='''import os,json,socket
+root=ROOT
+facts={}
+for name,path,flags in [('private_read',root+'/.swarm/state.synthetic',os.O_RDONLY),('private_write',root+'/.swarm/canary',os.O_WRONLY|os.O_CREAT|os.O_EXCL),('official_write',root+'/official-canary',os.O_WRONLY|os.O_CREAT|os.O_EXCL)]:
+ try:fd=os.open(path,flags,0o600);os.close(fd);facts[name]=True
+ except OSError:facts[name]=False
+try:s=socket.socket(socket.AF_UNIX);s.close();facts['unix_socket']=True
+except OSError:facts['unix_socket']=False
+pid=os.fork()
+if pid==0:
+ try:fd=os.open(root+'/.swarm/child-canary',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600);os.close(fd);os._exit(11)
+ except OSError:os._exit(0)
+_,status=os.waitpid(pid,0);facts['child_write']=os.waitstatus_to_exitcode(status)==11
+with open('facts.json','x') as f:json.dump(facts,f)
+print('OWNED_PROVIDER_OUTPUT',flush=True)
+'''.replace('ROOT',repr(str(root)))
+    proof.publish(script,source.encode())
+    def invoke(label,argv):
+        """Keep exact argv and original bytes; an exit alone proves no assertion."""
+        proof.publish(out/(label+'-argv.json'),argv)
+        r=subprocess.run(argv,cwd=workspace,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        proof.publish(out/(label+'.stdout'),r.stdout);proof.publish(out/(label+'.stderr'),r.stderr)
+        assert r.returncode==0,(label,r.returncode,r.stderr.decode())
+        assert r.stdout==b'OWNED_PROVIDER_OUTPUT\n',label
+        return json.loads((workspace/'facts.json').read_text())
+    valid=invoke('unconfined-control',['/usr/bin/python3',str(script)])
+    assert all(valid.values()),valid
+    for path in [workspace/'facts.json',private/'canary',private/'child-canary',root/'official-canary']:path.unlink()
+    observed=invoke('confined',[str(driver),str(root),str(workspace),str(script)])
+    assert not any(observed.values()),observed
+    assert not any(p.exists() for p in [private/'canary',private/'child-canary',root/'official-canary'])
+    alias=root/'alias';alias.mkdir();os.link(private/'state.synthetic',alias/'hardlink')
+    r=subprocess.run([str(driver),str(root),str(alias),str(script)],capture_output=True)
+    proof.publish(out/'hardlink.stdout',r.stdout);proof.publish(out/'hardlink.stderr',r.stderr)
+    assert r.returncode!=0 and b'biba-workspace-hardlink' in r.stderr
+    result=dict(status='PASS',scope='Native standalone boundary fixture only',valid_control=valid,confined=observed,workspace_output=True,hardlink_refused=True,product_qualified=False,installed=False)
+    proof.publish(out/'result.json',result);print('PASS native-boundary-private-official-child-unix-and-hardlink',flush=True)
+
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--driver',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    a=p.parse_args();run(a.driver.resolve(),a.output.resolve())
+
+FILE tests/rust_biba_boundary_driver.rs SHA256 5586ee284fef44808f10c8beffa83c940be11c4f8de388dec94fc9eba6aca802
+//! Owned-fixture-only syscall discriminator; no authority or publication.
+use std::{path::Path,os::unix::process::CommandExt};
+fn main(){
+ let a:Vec<_>=std::env::args().collect();assert_eq!(a.len(),4);
+ let profile=swarm_biba_linux::Sandbox::prepare(Path::new(&a[1]),Path::new(&a[2])).unwrap();
+ profile.enforce().unwrap();
+ let error=std::process::Command::new("/usr/bin/python3").arg(&a[3]).exec();
+ panic!("owned fixture exec refused: {error}")
+}

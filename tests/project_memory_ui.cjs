@@ -3,7 +3,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const [binaryArg,bundleArg,outArg,assetsArg]=process.argv.slice(2),binary=path.resolve(binaryArg),bundle=path.resolve(bundleArg),out=path.resolve(outArg);
-fs.mkdirSync(out,{recursive:false});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-memory-ui-'));
+fs.mkdirSync(out,{recursive:false});const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-memory-ui-'));
 const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
 // Optional frontend-only verification against a retained engine; actions use its real API.
 const assetNames=['project-memory.html','project-memory.js','project-memory.css','signals.js','signals.css'];

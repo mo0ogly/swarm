@@ -138,7 +138,8 @@ pub(crate) fn supported_branch(r:&Launch,conductor:Option<&str>)->Result<(),Agen
         || !origin_matches
         || !r.parent.is_empty()
         || !r.previous.is_empty()
-        || r.summary_selection.is_some()
+        // summary_selection is now ported: memorySummaryAttachment covers its
+        // own reserved-branch refusals (memory_summary_selection.rs).
         || r.dialogue_restore.is_some()
         || r.prepared_skill_refresh.is_some()
         || r.skills.as_ref().is_some_and(|v| !v.is_empty())
@@ -552,6 +553,10 @@ struct PromptContext<'a> {
     original_next: &'a str,
     guard_snapshot: &'a crate::AgentGuardSnapshot,
     model: &'a crate::provider_model_route::ModelRoutePreparation,
+    /// Operator extractive attachment (Go `summaryBody`). Go appends it as the
+    /// LAST prompt content (agents_store.go:1006); the before-start receipt
+    /// check requires the prepared prefix to end with these exact bytes.
+    summary_body: &'a str,
 }
 /// Compose from the post-transition candidate and its actual new attempt. The
 /// original next action remains the brief, not the lifecycle's handoff status.
@@ -567,6 +572,7 @@ fn prompt(w: &Work, index: usize, context: PromptContext<'_>) -> Result<String, 
         original_next,
         guard_snapshot,
         model,
+        summary_body,
     } = context;
     let task = &w
         .tasks
@@ -618,6 +624,10 @@ fn prompt(w: &Work, index: usize, context: PromptContext<'_>) -> Result<String, 
     if let Some(route) = model.route() {
         text.push_str(&format!("\nRequested model route (unverified): level={}, model={}, effort={}, billing={}, policy_sha256={}. This request establishes no actual model, account right, price or execution authority.\n",route.level,route.model,route.effort,route.billing,route.policy_hash));
     }
+    // Go appends summaryBody as the very last prompt content in the summary
+    // branch (agents_store.go:1006); the managed delivery instructions cannot
+    // co-occur with a summary selection (reserved-branch refusals).
+    text.push_str(summary_body);
     if policy.context_bytes.is_some_and(|cap| text.len() > cap) {
         return Err(AgentLaunchError::Refused(
             "agent-launch-context-outside-saved-policy",
@@ -644,6 +654,9 @@ struct Admission<'a> {
     model: &'a crate::provider_model_route::ModelRoutePreparation,
     planning: Option<&'a crate::PlanningState>,
     fence: Option<&'a dyn crate::work_engine::MutationFence>,
+    /// Preview rolls the whole staging transaction back; Go's summary branch
+    /// admits an empty context_hash only in that preview-only mode.
+    preview: bool,
 }
 impl Admission<'_> {
     /// Reobserve external scope immediately before persistence and after all
@@ -723,6 +736,7 @@ fn stage<E: WorkEnvironment>(
         fence,
         // Recheck consumes the frozen original planning; staging reloads Work.
         planning: _,
+        preview,
     } = *a;
     if let Some(agent) = existing(tx, work, r, raw)? {
         return Ok(AgentLaunchOutcome {
@@ -741,6 +755,12 @@ fn stage<E: WorkEnvironment>(
     if w.revision != r.expected_revision {
         return Err(AgentLaunchError::Refused("revision_conflict"));
     }
+    // Go stage-side memorySummaryAttachment (agents_store.go:678), right after
+    // the in-transaction revision check: rebuild the operator extracts from the
+    // persisted sources this launch will actually see. The receipt's
+    // prepared_revision stamps the pre-bump revision (request revision).
+    let (summary_body, mut summary_receipt) =
+        crate::memory_summary_selection::memory_summary_attachment(root, &w, r)?;
     let index = w
         .tasks
         .as_deref()
@@ -919,6 +939,7 @@ fn stage<E: WorkEnvironment>(
             original_next: &original_next,
             guard_snapshot,
             model,
+            summary_body: summary_body.as_deref().unwrap_or_default(),
         },
     )?;
     if !r.context_hash.is_empty() && r.context_hash != hash(body.as_bytes()) {
@@ -957,10 +978,64 @@ fn stage<E: WorkEnvironment>(
         sha256: hash(agent.prompt.as_bytes()),
         bytes: i64::try_from(agent.prompt.len())
             .map_err(|e| AgentLaunchError::caused("agent-launch-context-length", e))?,
-        included: Some(vec![r.task_id.clone()]),
+        included: if summary_receipt.is_some() {
+            // Go contextManifest + summary branch: Included/Excluded are
+            // emptied when a summary receipt is present (agents_store.go:1016).
+            Some(Vec::new())
+        } else {
+            Some(vec![r.task_id.clone()])
+        },
         paths: w.memory.clone(),
+        // Go sets manifest.Summary at manifest build, before the preview return
+        // (agents_store.go:1006): a previewed receipt carries no queue fields.
+        summary: summary_receipt.clone().map(Box::new),
         ..Default::default()
     }));
+    if summary_receipt.is_some() {
+        // Go agents_store.go:1015-1021: the summary branch empties
+        // Included/Excluded, keeps only the confirmed dialogue references, and
+        // requires the operator to have reviewed the preview (context_hash)
+        // outside preview-only staging.
+        if !preview && r.context_hash.is_empty() {
+            return Err(AgentLaunchError::Refused(
+                "agent-launch-summary-context-hash-required",
+            ));
+        }
+        let choice = r
+            .summary_selection
+            .as_deref()
+            .ok_or(AgentLaunchError::Refused(
+                "agent-launch-summary-selection-incomplete",
+            ))?;
+        let manifest = agent.context.as_mut().expect("context just set");
+        manifest.included = Some(Vec::new());
+        manifest.excluded = Some(Vec::new());
+        manifest.references = choice.dialogues.clone();
+    }
+    if summary_receipt.is_some() && !preview {
+        // Go queueMemorySummary (memory_summary_selection.go:173), after the
+        // preview return: stamp the queue fields against the sources at the
+        // work's POST-launch revision. The stage bump above already set
+        // w.revision = N+1 (Go re-bumps a local copy to that same revision);
+        // the work is saved at N+1 below, so no second bump here. Previewed
+        // receipts keep the manifest-build stamp without queue fields.
+        let choice = r
+            .summary_selection
+            .as_deref()
+            .ok_or(AgentLaunchError::Refused(
+                "agent-launch-summary-selection-incomplete",
+            ))?;
+        let (packet, _sources_at_queue) =
+            crate::memory_summary_selection::summary_sources(root, &w, &r.task_id, choice)
+                .map_err(|e| AgentLaunchError::caused(e.code(), e))?;
+        let receipt = summary_receipt
+            .as_mut()
+            .expect("receipt present when summary_body present");
+        receipt.queued_revision = w.revision;
+        receipt.queued_source_sha256 = packet.sha256;
+        let manifest = agent.context.as_mut().expect("context just set");
+        manifest.summary = Some(Box::new(receipt.clone()));
+    }
     let event = environment.identifier("launch-")
         .map_err(|e|AgentLaunchError::caused("agent-launch-event-identity",e))?;
     if let Some(fence)=fence {
@@ -1354,6 +1429,16 @@ pub(crate) fn prepare<E: WorkEnvironment>(
         return Err(AgentLaunchError::Refused("revision_conflict"));
     }
     crate::task_model::bind_launch(&chosen_work, &mut r)?;
+    // Go admission-side memorySummaryAttachment (agents_store.go:496): refuse a
+    // stale or invalid extractive selection before interpreting the launch, so
+    // concurrent identical commits between the idempotency read and this
+    // snapshot cannot turn into a recovery of historical work. The staged
+    // attachment below re-resolves on the same transaction.
+    let _admission_summary = crate::memory_summary_selection::memory_summary_attachment(
+        root,
+        &chosen_work,
+        &r,
+    )?;
     if r.role.is_empty() {
         r.role = "worker".into();
     }
@@ -1430,6 +1515,7 @@ pub(crate) fn prepare<E: WorkEnvironment>(
                 model: &model,
                 planning: chosen_work.planning.as_deref(),
                 fence,
+                preview,
             },
             environment,
         )?;
@@ -1612,10 +1698,7 @@ mod dispatch_replay_tests {
             |tx, _| recorded_dispatch_launch(tx, "work", "operation", &mut DispatchReplayObservation::default()));
         assert!(result.unwrap().is_none()); assert_eq!(fence.0.load(Ordering::SeqCst), 2);
         assert_eq!(db.query_row("SELECT count(*) FROM pulses", [], |r| r.get::<_,i64>(0)).unwrap(), 0);
-        let directory_path = std::env::temp_dir().join(crate::generate_identifier("replay-instance-").unwrap());
-        std::fs::create_dir(&directory_path).unwrap();
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&directory_path, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let directory_path = crate::fixture_root("replay-instance-");
         let directory = crate::local_storage::LocalDirectory::open(&directory_path).unwrap();
         let launch = Launch { schema_version:1,event_id:"operation".into(),task_id:"task".into(),provider:"fixture".into(),
             role:"worker".into(),origin:"conducteur".into(),conductor_id:"owner".into(),expected_revision:1,..Default::default() };

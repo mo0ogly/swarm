@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools/memory-evaluation"))
@@ -125,7 +126,7 @@ class StoragePlan(unittest.TestCase):
                 with self.assertRaises(PLAN.InvalidComparison): PLAN.grade(self.pack, answers)
 
     def test_pack_requires_all_six_pairs_and_intact_snapshots(self):
-        with tempfile.TemporaryDirectory(prefix="swarm-storage-plan-") as temporary:
+        with tempfile.TemporaryDirectory(prefix="swarm-storage-plan-", dir=fixture_area()) as temporary:
             root = Path(temporary);pack = copy.deepcopy(self.pack)
             model, store = b"package engine\nconst schemaVersion = 33\n", b"package engine\n// fixture\n"
             (root/"model.go.txt").write_bytes(model);(root/"store.go.txt").write_bytes(store)

@@ -1,0 +1,176 @@
+warning: unused import: `verify_candidate`
+  --> crates/swarm-engine/src/managed_repository.rs:19:78
+   |
+19 | pub(crate) use worker::{candidate_worker, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, Mana...
+   |                                                                              ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `SettingCount`
+  --> crates/swarm-engine/src/validation_run_recovery.rs:29:63
+   |
+29 | use crate::{AgentLaunchError, GitReportError, RootStoreError, SettingCount};
+   |                                                               ^^^^^^^^^^^^
+
+warning: unused import: `process::CommandExt`
+  --> crates/swarm-engine/src/root_store/task_validation/process.rs:20:33
+   |
+20 |     os::unix::{net::UnixStream, process::CommandExt},
+   |                                 ^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_candidate` is never used
+   --> crates/swarm-engine/src/managed_repository_candidate_store.rs:501:15
+    |
+501 | pub(crate) fn verify_candidate(
+    |               ^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `poll_retained_processes` is never used
+  --> crates/swarm-engine/src/validation_run_recovery.rs:38:15
+   |
+38 | pub(crate) fn poll_retained_processes(e: &mut (dyn Error + 'static)) -> Vec<io::Error> {
+   |               ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `ATTRIBUTION_MISMATCH` is never used
+  --> crates/swarm-engine/src/root_store/reader_guard.rs:22:18
+   |
+22 | pub(crate) const ATTRIBUTION_MISMATCH: &str = "paea-reader-attribution-mismatch";
+   |                  ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `inspect_for_effect` is never used
+  --> crates/swarm-engine/src/root_store/paea_git_repository/source.rs:81:19
+   |
+44 | impl PaeaGitSource {
+   | ------------------ method in this implementation
+...
+81 |     pub(super) fn inspect_for_effect(
+   |                   ^^^^^^^^^^^^^^^^^^
+
+warning: fields `failure` and `recovery_errors` are never read
+   --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:117:9
+    |
+115 | pub(crate) struct ClosedTransfer {
+    |                   -------------- fields in this struct
+116 |     pub receipt: Option<TransferReceipt>,
+117 |     pub failure: Option<TransferFailure>,
+    |         ^^^^^^^
+118 |     pub cleanup: Result<(), E>,
+119 |     pub recovery_errors: Vec<io::Error>,
+    |         ^^^^^^^^^^^^^^^
+
+warning: methods `receipt`, `failure`, and `poll_recovery` are never used
+   --> crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs:189:19
+    |
+121 | impl GitTransferJob {
+    | ------------------- methods in this implementation
+...
+189 |     pub(crate) fn receipt(&self) -> Option<&TransferReceipt> {
+    |                   ^^^^^^^
+...
+193 |     pub(crate) fn failure(&self) -> Option<&TransferFailure> {
+    |                   ^^^^^^^
+...
+350 |     pub(crate) fn poll_recovery(&mut self) {
+    |                   ^^^^^^^^^^^^^
+
+warning: function `terminal` is never used
+ --> crates/swarm-engine/src/root_store/cockpit_health.rs:8:4
+  |
+8 | fn terminal(state: &str) -> bool { matches!(state, "completed" | "failed" | "interrupted") }
+  |    ^^^^^^^^
+
+warning: function `known` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_health.rs:10:4
+   |
+10 | fn known(value: &str) -> &str { if value.is_empty() { "unknown" } else { value } }
+   |    ^^^^^
+
+warning: function `project` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_health.rs:20:15
+   |
+20 | pub(super) fn project(agent: &crate::Agent, state: &str, same_host: bool,
+   |               ^^^^^^^
+
+warning: function `sha256_hex` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:30:4
+   |
+30 | fn sha256_hex(raw: &[u8]) -> String {
+   |    ^^^^^^^^^^
+
+warning: struct `AcceptanceSourceBody` is never constructed
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:41:8
+   |
+41 | struct AcceptanceSourceBody<'a> {
+   |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `PostDelivery` is never constructed
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:61:19
+   |
+61 | pub(crate) struct PostDelivery {
+   |                   ^^^^^^^^^^^^
+
+warning: enum `PostDeliveryError` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:67:17
+   |
+67 | pub(crate) enum PostDeliveryError {
+   |                 ^^^^^^^^^^^^^^^^^
+
+warning: function `not_ready` is never used
+  --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:98:4
+   |
+98 | fn not_ready() -> PostDelivery {
+   |    ^^^^^^^^^
+
+warning: function `acceptance_source` is never used
+   --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:121:15
+    |
+121 | pub(crate) fn acceptance_source(
+    |               ^^^^^^^^^^^^^^^^^
+
+warning: function `cockpit_post_delivery` is never used
+   --> crates/swarm-engine/src/root_store/cockpit_post_delivery.rs:188:15
+    |
+188 | pub(crate) fn cockpit_post_delivery(
+    |               ^^^^^^^^^^^^^^^^^^^^^
+
+warning: `swarm-engine` (lib) generated 19 warnings (run `cargo fix --lib -p swarm-engine` to apply 2 suggestions)
+   Compiling swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+warning: unused imports: `Response`, `authenticated_control::Context as ExecuteContext`, and `authenticated_startup`
+  --> crates/swarm-engine/tests/../../swarm-enrollment-authority/tests/common/authenticated_fixture.rs:8:5
+   |
+ 8 |     authenticated_control::Context as ExecuteContext,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 9 |     authenticated_startup,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+10 |     control::{self, Request, Response},
+   |                              ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated functions `new`, `cold`, `build`, `build_with_action`, and `build_for_trust_actions` are never used
+  --> crates/swarm-engine/tests/../../swarm-enrollment-authority/tests/common/authenticated_fixture.rs:52:19
+   |
+49 | impl Fixture {
+   | ------------ associated functions in this implementation
+...
+52 |     pub(crate) fn new() -> Self {
+   |                   ^^^
+...
+56 |     pub(crate) fn cold() -> Self {
+   |                   ^^^^
+...
+60 |     pub(crate) fn build(enrolled: bool) -> Self {
+   |                   ^^^^^
+...
+64 |     pub(crate) fn build_with_action(
+   |                   ^^^^^^^^^^^^^^^^^
+...
+87 |     pub(crate) fn build_for_trust_actions(
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `swarm-engine` (test "trust_enrollment") generated 2 warnings (run `cargo fix --test "trust_enrollment" -p swarm-engine` to apply 1 suggestion)
+    Finished `test` profile [unoptimized] target(s) in 1.18s
+     Running tests/trust_enrollment.rs (.cache/blp-verification-target/debug/deps/trust_enrollment-0a814ba345b82b70)

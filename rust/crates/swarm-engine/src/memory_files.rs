@@ -136,8 +136,7 @@ mod tests {
 
     /// Own a uniquely created test Root and an independent in-memory SQL store.
     fn fixture() -> (std::path::PathBuf, Connection, Work) {
-        let root = std::env::temp_dir().join(crate::generate_identifier("swarm-memory-").unwrap());
-        std::fs::create_dir(&root).unwrap();
+        let root = crate::fixture_root("swarm-memory-");
         std::fs::write(root.join("note.md"), b"owned fixture reference").unwrap();
         let db = Connection::open_in_memory().unwrap();
         db.execute_batch("CREATE TABLE works(id TEXT PRIMARY KEY, revision INTEGER, body BLOB)")

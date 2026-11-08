@@ -5,6 +5,23 @@ use swarm_enrollment_authority::{
 };
 use swarm_enrollment_state::{sign_change, BoundJournal, Context, Head, Journal};
 use swarm_identity_contract::Principal;
+/// Private operator fallback fixture area (0700 chain), replicating
+/// `swarm_engine::fallback_area()` inline: this crate has no swarm-engine
+/// dependency and these fixtures contract private ancestors.
+pub(crate) fn area() -> std::path::PathBuf {
+    use std::os::unix::fs::DirBuilderExt;
+    let home = std::env::var_os("HOME")
+        .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+    let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+    std::fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(&area)
+        .unwrap_or_else(|e| {
+            panic!("fallback fixture area {} cannot be created: {e}", area.display())
+        });
+    area
+}
 /// Disposable independently pinned personal journal fixture, with no live authority.
 pub struct Fixture {
     pub _dir: tempfile::TempDir,
@@ -25,7 +42,7 @@ impl Fixture {
     /// The default fixture remains generation1 for all existing consumers.
     pub fn with_generation(generation: i64) -> Self {
         assert!(generation > 0);
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir_in(area()).unwrap();
         let path = dir.path().join("personal.sqlite");
         let key = SigningKey::from_bytes(&[41; 32]);
         let expected = Expected {

@@ -5,6 +5,10 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 
 spec = importlib.util.spec_from_file_location('snapshot_tool', Path(__file__).with_name('snapshot.py'))
@@ -14,15 +18,22 @@ spec.loader.exec_module(module)
 
 class SnapshotTests(unittest.TestCase):
     def repo(self, tmp):
-        """Fake repo: declared src/a.txt, undeclared src/secret.txt, deps dir, recipe."""
+        """Fake repo: declared src/a.txt, undeclared src/secret.txt, deps dir, recipe.
+
+        Ships tests/fixture_area.py like the real repository, since the runner
+        imports it in every snapshot run.
+        """
         root = Path(tmp) / 'repo'
         (root / 'src').mkdir(parents=True)
         (root / 'deps').mkdir()
         (root / 'tools/verification').mkdir(parents=True)
+        (root / 'tests').mkdir()
         (root / 'src/a.txt').write_text('declared')
         (root / 'src/secret.txt').write_text('undeclared')
         (root / 'deps/lib.js').write_text('dependency')
         (root / 'tools/verification/recipe.py').write_bytes((Path(__file__).with_name('recipe.py')).read_bytes())
+        (root / 'tests/fixture_area.py').write_text(
+            "def configured_area(root):\n    import tempfile\n    return root.parent\n")
         recipe = dict(schema_version=1, id='fake', inputs=['src/a.txt'], environment={},
                       steps=[dict(id='cat', command=['cat', 'src/a.txt'], expected_exit=0, required_stdout=['declared'], required_stderr=[])])
         path = root / 'tools/verification/recipes/fake.json'
@@ -31,7 +42,7 @@ class SnapshotTests(unittest.TestCase):
         return root, path
 
     def test_witness_copies_only_declared_inputs_and_links_dependencies(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root, recipe = self.repo(tmp)
             snap = Path(tmp) / 'snap'
             inventory = module.freeze(root, recipe, snap, ['deps'])
@@ -43,7 +54,7 @@ class SnapshotTests(unittest.TestCase):
             self.assertTrue((snap / '.snapshot-inventory.json').exists())
 
     def test_refusals(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root, recipe = self.repo(tmp)
             existing = Path(tmp) / 'exists'
             existing.mkdir()
@@ -60,7 +71,7 @@ class SnapshotTests(unittest.TestCase):
                 module.freeze(root, recipe, Path(tmp) / 's3', [])
 
     def test_undeclared_embedded_input_is_refused_before_copy(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root, recipe = self.repo(tmp)
             (root / 'src/lib.rs').write_text('const A: &str = include_str!(\n    "a.txt"\n);\n'
                                              'const B: &[u8] = include_bytes!("../deps/lib.js");\n')
@@ -82,12 +93,17 @@ class SnapshotTests(unittest.TestCase):
                 module.freeze(root, recipe, Path(tmp) / 'snap2', [])
 
     def test_end_to_end_run_passes_in_snapshot_and_fails_on_undeclared_read(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as tmp:
             root, recipe = self.repo(tmp)
             tool = Path(__file__).with_name('snapshot.py')
             ok = subprocess.run([sys.executable, str(tool), '--root', str(root), '--recipe', str(recipe),
                                  '--snapshot', str(Path(tmp) / 'run1'), '--output', str(Path(tmp) / 'ev1')], capture_output=True, text=True)
             self.assertEqual(ok.returncode, 0, ok.stdout + ok.stderr)
+            # recipe.py resolves the operator /tmp interdiction area through
+            # tests/fixture_area.py at run time: the snapshot must ship it even
+            # when the recipe does not declare it.
+            self.assertTrue((Path(tmp) / 'run1' / 'tests' / 'fixture_area.py').is_file(),
+                            'snapshot must carry tests/fixture_area.py for the runner')
             data = json.loads(recipe.read_text())
             data['steps'][0]['command'] = ['cat', 'src/secret.txt']
             data['steps'][0]['required_stdout'] = ['undeclared']

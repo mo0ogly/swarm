@@ -26,8 +26,36 @@ Le test unitaire du lanceur d’acceptation Go historique injecte désormais ses
 
 La CI conserve désormais les sorties des étapes de recette cockpit et les erreurs navigateur ciblées. Les racines de travail, bases, entrées de configuration avec jeton, transcriptions privées et captures ne font pas partie de cet artefact. Le premier échec opaque de la recette reste conservé ; un résumé FAIL ne suffit pas à en attribuer la cause.
 
-La recette cockpit attend les19scripts explicitement publiés par le producteur Rust, y compris le client d’instructions natif. Elle refuse scripts manquants, doublons, inline et origines étrangères, puis compare les octets HTTP protégés aux entrées versionnées (quotas natifs : route vers native-quotas.js). La recette permanente et le manifeste du conducteur incluent ce client. Le premier refus d’inventaire est conservé ; ce changement ne crée aucune nouvelle action ni script produit.
+La recette cockpit attend les 21 scripts explicitement publiés par le producteur Rust : les 19 scripts natifs (y compris le client d’instructions natif) plus les deux clients de la console d’autorité injectés inconditionnellement par `cockpit_page` (`rust/crates/swarm-web/src/service/native_admin.rs` : `/native-runtime/authority-admin.js` → `web/native-authority-admin.js` et `/cockpit-authority.js`). Elle refuse scripts manquants, doublons, inline et origines étrangères, puis compare les octets HTTP protégés aux entrées versionnées (quotas natifs : route vers native-quotas.js ; autorité : route vers native-authority-admin.js). La recette permanente et le manifeste du conducteur incluent ce client. Le premier refus d’inventaire est conservé ; ce changement ne crée aucune nouvelle action ni script produit. Réalignement du 8 novembre 2026 : le merge 197d663f6 avait combiné le contrôle strict à 19 entrées de main avec la page à 21 scripts livrée côté branche (commit 3b41131dd, 3 novembre 2026, qui avait ajouté les deux clients d’autorité sans mettre à jour l’inventaire du test) ; l’échec `fr-etat-native-scripts-only` en CI (run 42484108884) et sa reproduction locale (`.cache/existing-cockpit-razju52o`) sont conservés comme témoins ; le test est réaligné sur l’inventaire réel de 21 scripts servis, garanties strictes inchangées (aucun script manquant, doublon, inline ou étranger toléré). Second conflit sémantique du même merge, même cause : f9ff58214 (31 octobre) avait retiré le retour anticipé du graphe vide (le graphe d’un Work sans tâche dessine maintenant un svg vide, le message « Aucune tâche » et monte la barre d’outils avec le contrôle de création `#pilot-add-task` — comportement vérifié par `tests/rust_graph_navigation_ui.cjs` : `empty-graph-has-create-control`), sans mettre à jour l’assertion `actual-empty-graph-after-selection` qui exigeait l’absence de svg ; l’assertion est réalignée sur le contrat livré (message présent, zéro `.graph-noeud`, contrôle de création monté). Aucune CI n’a couru sur la branche entre le 29 octobre et le 8 novembre : ces deux ruptures de contrat n’étaient observables que sur l’arbre mergé.
 
 La recette Version compare l’avertissement de modifications locales au booléen modified réellement publié par le binaire ; elle ne présume plus un build sale. Après ce témoin réel, deux réponses client explicitement marquées vérifient le rendu propre/sale en FR/EN et dans chaque thème. Ces fixtures ne deviennent jamais des métadonnées du binaire ni une comparaison de sources observée. L’échec CI original sur build propre reste conservé.
 
 Le contrôle vise précisément le paragraphe d’avertissement du composant Version, et non le texte entier des notes historiques qui peut légitimement mentionner des modifications non commitées. Les variantes propre/sale reproduisent aussi cette collision de vocabulaire.
+
+Troisième conflit sémantique du même merge, même cause racine : le raccord
+obligatoire de la frontière I0 Biba dans `PreparedExec::execute` (6706e201b,
+30 octobre, conformément à BT02 de `docs/plans/actions-confiance/BIBA-TRANSVERSE-APEX.md`,
+« aucun mode non confiné en repli ») refuse désormais tout workspace chevauchant
+la racine (`biba-workspace-overlaps-root`, `rust/crates/swarm-biba-linux/src/lib.rs` :
+`root.starts_with(&path)` est vrai pour l'égalité). La requête par défaut du
+fixture `tests/rust_agent_model_route.py` ne fixait aucun workspace : le
+preflight (`agent_launch_preflight.rs::workspace`) résout alors un workspace
+vide vers la racine elle-même, que l'exécution sans frontière de main
+(9075649c7 : chdir + execve sans Biba) tolérait. Le contrat livré est ailleurs :
+`preparation_call_cli.rs::workspace_path` place les workspaces plus profonds que
+la racine précisément pour passer les deux gardes Biba, et les tests voisins
+`rust_cockpit_biba_compatibility.py::make_i0_workspace` et
+`rust_mission_worker_dispatch.py` (`workspace='dispatch-shared'`) montent un
+enfant du Root hors `.swarm`. Le fixture est réaligné sur ce contrat : il crée
+désormais un enfant `i0-workspace` (0700) et la requête par défaut le porte ;
+`run_and_assert` lit la preuve fournisseur (`model-received.json`) dans ce
+workspace, et les assertions de refus exigent l'absence de preuve sous tout le
+Root (rglob), contraction fidèle de « aucune exécution nulle part ». Les
+consommateurs du fixture qui lisent encore la preuve à la racine après une
+exécution réussie (neuf fichiers, dont `rust_native_completion_recovery.py`,
+`rust_scoped_worker.py`, `rust_status_accepted.py`) restent en échec sur l'arbre
+mergé — dette BT02 déjà cartographiée, réalignement à faire lors de leur
+requalification documentée (BLP-APEX.md) ; leur échec actuel était déjà le refus
+Biba lui-même, non un passage vert. Témoin de l'échec conservé :
+`.swarm-fixtures/agent-logs-repro1` (refus biba) et
+`.swarm-fixtures/agent-logs-repro2` (parcours complet vert après réalignement).

@@ -4,6 +4,8 @@ pub(crate) mod authentication;
 pub(crate) mod command;
 pub(crate) mod audit;
 pub(crate) mod config;
+pub(crate) mod confidentiality;
+pub(crate) mod data_policy;
 pub(crate) mod extensions;
 pub mod error;
 pub(crate) mod json;
@@ -13,6 +15,7 @@ pub(crate) mod public_evidence;
 pub(crate) mod proof_types;
 pub(crate) mod response;
 pub(crate) mod separation;
+pub(crate) mod security;
 pub(crate) mod state;
 pub use error::TrustError;
 pub use public_evidence::verify as verify_public_trust;
@@ -39,6 +42,17 @@ pub(crate) fn encoded<T: Serialize>(value: &T) -> Result<Vec<u8>, TrustError> {
 /// Digest the complete typed Go preimage, retaining encoding errors.
 pub(crate) fn digest<T: Serialize>(value: &T) -> Result<String, TrustError> {
     encoded(value).map(|raw| hash(&raw))
+}
+/// Public wrapper over `digest` for served projections: the web layer binds a
+/// reader authorization to the EXACT canonical bytes it is about to serve by
+/// digesting the same serialized model here (one encoding+hash domain, no
+/// second implementation). Inputs: any serializable engine model. Output: the
+/// lowercase 64-hex digest of its canonical wire encoding. Errors: encoding
+/// failures propagate typed `TrustError`. Limits: a digest binds bytes, not
+/// meaning — provenance stays the CURRENT `blp-object-attribute` attribution
+/// the reader guard consumes; this helper classifies nothing by itself.
+pub fn digest_trust<T: Serialize>(value: &T) -> Result<String, TrustError> {
+    digest(value)
 }
 /// Pure verification with a separately supplied symmetric key and anchor. No
 /// Root, credentials, clock or provider is consulted; malformed/missing material

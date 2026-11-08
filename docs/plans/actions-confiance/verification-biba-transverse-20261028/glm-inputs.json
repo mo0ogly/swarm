@@ -1,0 +1,8 @@
+{
+  "rust/crates/swarm-biba-linux/src/lib.rs": "ee7964ccc8b7000c4453e1c404d3b8ae60f00d6c02750b4505f2a893c42ae7c9",
+  "rust/crates/swarm-biba-linux/src/kernel.rs": "6949a9592675cea6feecbce9f87daee4d32ea0cbd5e15fc371b0bb8b20340514",
+  "rust/crates/swarm-engine/src/native_provider_biba.rs": "6a18800816ff49db882ef472eb548fcbfb7be3946c22b8ddec0f29601a1dae4c",
+  "rust/crates/swarm-engine/src/native_provider_exec.rs": "e7ed94b8f4b1cfcc5676f6acf7b7cf2f88dfe5d1e0ca3b56fbf602932ae16078",
+  "tests/rust_biba_linux_boundary.py": "a4c4dffb6cf05918f81464cb62b412b25a118a36e16570a8e79d492cb345d9c6",
+  "tests/rust_biba_boundary_driver.rs": "5586ee284fef44808f10c8beffa83c940be11c4f8de388dec94fc9eba6aca802"
+}

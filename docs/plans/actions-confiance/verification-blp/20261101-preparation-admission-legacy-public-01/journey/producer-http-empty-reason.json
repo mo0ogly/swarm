@@ -1,0 +1,10 @@
+{
+  "status": 400,
+  "body": {
+    "error": "blp-preparation-attribute-invalid",
+    "failure": {
+      "code": "blp-preparation-attribute-invalid"
+    },
+    "schema_version": 1
+  }
+}

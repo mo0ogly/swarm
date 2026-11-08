@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-provenance-public",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "public-cli",
+      "command": [
+        "/usr/bin/python3",
+        "tests/rust_preparation_cli_calls.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-vtt3bjzt",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261031-provenance-cli-01"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 11.105707716000325,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "public-http",
+      "command": [
+        "/usr/bin/python3",
+        "tests/rust_preparation_calls.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-vtt3bjzt",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261031-provenance-http-01"
+      ],
+      "expected_exit": 0,
+      "exit": 1,
+      "seconds": 12.635852678999072,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "95d983fff6b523d822a1f45f6abc156c76b798ef2facf899d1aaa00964d3db95",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "f8ad697334c6264fbaf5f6ec363ca67b81b5c574477ae1e397ec225ad24627d3",
+    "declared-inputs.tar.gz": "d24373c663afaab8185bd8562fef497165a61cfe62169ef6d53f2ef92defa1d2",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "1063c4344b65db2d11f50d48ddc3cee090cdd860007ccefd1a2facdd6d4d37ea",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "3b7b2a60f44cab6597a9349a5d443e7961dc592644d5f9b46b138a0812b9ab10",
+    "step-0002.stdout": "a439aeccd286b3a6d8fae28f41689fd7abba6bebeeb0e4d646c5d9c6928baea1",
+    "step-0002.stderr": "9a45d9becde8f15c1ebd736dc0e9c74df52433d20a3122ee2af62927a2580b13",
+    "step-0002.json": "9cc7b42cae519244b393377cb24e3c04a18911de744d18c1fc4b8222813a9838",
+    "inputs.after.json": "f8ad697334c6264fbaf5f6ec363ca67b81b5c574477ae1e397ec225ad24627d3"
+  }
+}

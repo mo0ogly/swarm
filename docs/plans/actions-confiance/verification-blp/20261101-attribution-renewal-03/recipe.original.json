@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "blp-attribution-renewal",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "rust/crates/swarm-engine/tests/confidentiality.rs",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "policy-revision-is-not-declassification",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "confidentiality",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "policy_revision_cannot_lower_or_remove_object_classification",
+        "stored_cross_revision_downgrade_refuses_without_disclosure",
+        "12 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

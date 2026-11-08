@@ -1,0 +1,8 @@
+{
+  "status": "FAIL_DRIVER_PRE_BROWSER",
+  "observed_type": "ValueError",
+  "observed_cause": "observed request unavailable during capture",
+  "cause_contract": "Server.request(observe=True) cannot be combined with capture_async; use observe=False for independent HTTP request",
+  "runtime_changed": false,
+  "superseded_by": "20261101-preparation-admission-ui-02"
+}

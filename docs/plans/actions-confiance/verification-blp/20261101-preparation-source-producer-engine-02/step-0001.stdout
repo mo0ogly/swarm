@@ -1,0 +1,7 @@
+
+running 2 tests
+test root_store::preparation_call::confidentiality_tests::captured_source_reuses_caller_transaction_and_refuses_corruption ... ok
+test root_store::preparation_call::confidentiality_tests::recorded_sources_authentication_join_refusal_and_recovery ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 750 filtered out; finished in 1.91s
+

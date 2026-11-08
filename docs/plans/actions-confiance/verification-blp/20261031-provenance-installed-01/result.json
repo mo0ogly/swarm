@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "binary_sha256": "874feeb290283e464711021f072e92e8973e6ac75be07b2d7994733eaaba954e",
+  "version": "v0.1.1-dev.284",
+  "pid": 2470974,
+  "checks": [
+    "loaded-image",
+    "protected-version",
+    "compiled-current-fr-en-notes",
+    "version-dialog-fr-en"
+  ],
+  "source_profile": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-e4t0j_65",
+  "global_watchdog": null
+}

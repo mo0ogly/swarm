@@ -86,9 +86,12 @@ fn fresh(root: &Path, prepared: &ExecutionPreparation) -> Result<(), RootStoreEr
 /// Preserve the worker-specific argv conflict check before shared immutable
 /// exec transport preparation. The checked model/host supplies argv/environment
 /// and absolute workspace; no authority, freshness or gate check moves here.
+/// `internet_denied` is the engine-read current operator policy frozen at this
+/// gate, never a caller flag; the exec point poses the kernel refusal.
 /// Shared codec/kernel/cleanup failures retain their original typed causes.
 fn prepare_exec(
     prepared: &ExecutionPreparation,
+    internet_denied: bool,
 ) -> Result<crate::native_provider_exec::PreparedExec, RootStoreError> {
     let provider = prepared.model.provider();
     if prepared.agent.command != provider.command || prepared.agent.args != provider.args {
@@ -102,26 +105,37 @@ fn prepare_exec(
         &prepared.host.workspace,
         prepared.agent.prompt.as_bytes(),
     )
+    .map(|command| {
+        command
+            .with_workspace_identity(prepared.host.directory_identity)
+            .with_internet_denied(internet_denied)
+    })
 }
 /// Acquire the actual Root binding before helper-side gate inspection, then
-/// close the preparing store explicitly. On failure both the store and any
-/// acquired binding are closed with the complete primary/cleanup tree retained.
-/// No new grant is created; prepare_agent_gate keeps its existing process,
-/// permission, profile, policy, freshness and transaction checks.
+/// close the preparing store explicitly. The current operator network policy is
+/// read under this same store before closure — the transport decision the exec
+/// point will pose. On failure both the store and any acquired binding are
+/// closed with the complete primary/cleanup tree retained. No new grant is
+/// created; prepare_agent_gate keeps its existing process, permission, profile,
+/// policy, freshness and transaction checks.
 fn prepare_bound_gate(
     root: &Path,
     id: &str,
-) -> Result<(ExecutionPreparation, crate::RootBinding), RootStoreError> {
+) -> Result<(ExecutionPreparation, crate::RootBinding, bool), RootStoreError> {
     let mut store = RootStore::open(root, false)?;
-    let binding = match store.bind_root() {
-        Ok(binding) => binding,
-        Err(error) => return crate::root_store::finished(Err(error), store.close()),
-    };
-    let prepared = crate::root_store::finished(store.prepare_agent_gate(id), store.close());
-    match prepared {
-        Ok(prepared) => Ok((prepared, binding)),
-        Err(error) => crate::root_store::finished(Err(error), binding.close()),
-    }
+    let operation = (|| {
+        let binding = store.bind_root()?;
+        let prepared = match store.prepare_agent_gate(id) {
+            Ok(prepared) => prepared,
+            Err(error) => return crate::root_store::finished(Err(error), binding.close()),
+        };
+        let denied = match store.provider_internet_denied_snapshot() {
+            Ok(denied) => denied,
+            Err(error) => return crate::root_store::finished(Err(error), binding.close()),
+        };
+        Ok((prepared, binding, denied))
+    })();
+    crate::root_store::finished(operation, store.close())
 }
 
 /// Reopen Root only when it matches the preparing store's owned directory and
@@ -202,7 +216,9 @@ fn after_telemetry_error(error: RootStoreError, token_issued: bool) -> RootStore
 /// function cannot report a fabricated normal exit without starting the command.
 /// No task is accepted here. Requires the Swarm CLI host's private gate dispatch,
 /// Linux procfs/memfd/seals and the configured local-root operator authority;
-/// these checks do not provide cryptographic agent identity or OS confinement.
+/// these checks do not provide cryptographic identity. The shared exec transport
+/// additionally requires the mandatory I0 Linux boundary; an unsafe workspace
+/// or unavailable backend refuses before any provider exec.
 pub fn execute_agent_gate(root: &Path, id: &str) -> Result<Infallible, RootStoreError> {
     if !swarm_identity_contract::name(id.as_bytes()) {
         return Err(RootStoreError::Refused("agent-execution-id-invalid"));
@@ -227,10 +243,10 @@ pub fn execute_agent_gate(root: &Path, id: &str) -> Result<Infallible, RootStore
         if grant != [1] {
             return Err(RootStoreError::Refused("agent-gate-release-invalid"));
         }
-        let (prepared, binding) = prepare_bound_gate(root, id)?;
+        let (prepared, binding, internet_denied) = prepare_bound_gate(root, id)?;
         let mut token_issued = false;
         let command = (|| {
-            let command = prepare_exec(&prepared)?;
+            let command = prepare_exec(&prepared, internet_denied)?;
             if let Err(error) = fresh(root, &prepared) {
                 return crate::root_store::finished(Err(error), command.close());
             }
@@ -257,7 +273,7 @@ pub fn execute_agent_gate(root: &Path, id: &str) -> Result<Infallible, RootStore
         }
         .map_err(|error| after_telemetry_error(error, token_issued))?;
         command
-            .execute()
+            .execute(root)
             .map_err(|error| after_telemetry_error(error, token_issued))
     })();
     // Every returning path is a pre-exec refusal. Keep the socket live until exec so
@@ -291,10 +307,7 @@ mod tests {
     impl Fixture {
         /// Create an owned private parent for independently initialized Roots.
         fn new() -> Self {
-            let path = std::env::temp_dir()
-                .join(crate::generate_identifier("gate-telemetry-binding-").unwrap());
-            fs::create_dir(&path).unwrap();
-            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("gate-telemetry-binding-");
             Self(path)
         }
         /// Initialize through the supported Root API; no permission SQL is forged.

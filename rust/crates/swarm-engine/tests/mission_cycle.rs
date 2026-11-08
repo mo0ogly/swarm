@@ -7,10 +7,7 @@ use swarm_engine::{EngineSettingsChange, RootStore, SettingCount, SystemEnvironm
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> (Self, RootStore, String) {
-        let path = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("swarm-cycle184-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+        let path = swarm_engine::fixture_root("swarm-cycle184-");
         let mut store = RootStore::initialize(&path, &mut SystemEnvironment).unwrap();
         let doc = store.settings().unwrap();
         let mut values = doc.values.clone();

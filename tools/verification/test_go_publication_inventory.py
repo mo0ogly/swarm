@@ -7,6 +7,10 @@ import shutil
 import subprocess
 import tarfile
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 from unittest import mock
 import zipfile
@@ -18,7 +22,7 @@ class PublicationInventoryTests(unittest.TestCase):
     def setUp(self):
         """Create an isolated index without inventing an author or committing."""
         audit.require_explicit_git_context()
-        self.root=Path(tempfile.mkdtemp(prefix='swarm-go-publication122-'))
+        self.root=Path(tempfile.mkdtemp(prefix='swarm-go-publication122-', dir=fixture_area()))
         subprocess.run(['git','-c','core.hooksPath=/dev/null','-c','core.fsmonitor=false','init','--quiet',str(self.root)],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 
     def tearDown(self):

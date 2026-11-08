@@ -167,14 +167,24 @@ impl RootStore {
     /// List newest recorded rows by SQLite rowid, with the persisted row bound
     /// and freshly projected plan_ready. Empty/unlimited/zero remain distinct;
     /// typed SQL/codec/material/close errors refuse, no history is changed.
-    pub fn preparation_list(&self) -> Result<PreparationReadObservation<PreparationList>, E> {
+    /// `reader_token` is the caller's local bearer credential (`None` = bare
+    /// session, never authorization), with the BF-16 frontier semantics of
+    /// `preparation_show`: any listed preparation whose recorded turns match
+    /// an admission receipt inherits its source dialogue's classified domain,
+    /// and the whole list refuses before serving any byte.
+    pub fn preparation_list(&self, reader_token: Option<&str>) -> Result<PreparationReadObservation<PreparationList>, E> {
         self.preparation_observed(|db, policy, causes| {
             let mut statement = db.prepare("SELECT id,work_id,revision,body FROM preparations ORDER BY rowid DESC LIMIT ?1").map_err(E::Sql)?;
             let result = (|| {
                 let mut rows = statement.query([sql_limit(policy.list_limit)?]).map_err(E::Sql)?;
                 let mut preparations = Vec::new();
                 while let Some(row) = rows.next().map_err(E::Sql)? {
-                    let mut p = preparation(row)?; self.preparation_project(&mut p, policy, causes)?; preparations.push(p);
+                    let mut p = preparation(row)?; self.preparation_project(&mut p, policy, causes)?;
+                    // BF-16d: each listed row is judged like `preparation_show`;
+                    // the first matched-admission row without a sufficient
+                    // reader refuses the WHOLE list before any byte is served.
+                    super::preparation_dialogue::reader_verdict(self, db, &p, &recorded_turn_keys(db, &p)?, reader_token)?;
+                    preparations.push(p);
                 }
                 Ok(PreparationList { preparations, limit: policy.list_limit })
             })();
@@ -184,20 +194,48 @@ impl RootStore {
     /// Read one retained preparation, recomputing plan_ready from actual method
     /// observations. ID is a query parameter, never a path or default Work.
     /// Missing/malformed/misbound data and all enclosing IO/close errors refuse.
-    pub fn preparation_show(&self, id: &str) -> Result<PreparationReadObservation<Preparation>, E> {
+    /// `reader_token` is the caller's local bearer credential (`None` = bare
+    /// session, never authorization), with the same semantics as
+    /// `preparation_dialogue`. BF-16a presentation frontier (BF-16b): when at
+    /// least one admission receipt matches this preparation's recorded turns,
+    /// the same reader verdict as the dialogue frontier runs BEFORE any byte is
+    /// served — the adopted documents exposed here inherit their source turn's
+    /// classified domain, so an under-cleared reader is refused with the shared
+    /// `blp-dialogue-*` codes. Zero matched receipts keeps the legacy
+    /// bare-session read.
+    pub fn preparation_show(&self, id: &str, reader_token: Option<&str>) -> Result<PreparationReadObservation<Preparation>, E> {
         if !crate::valid_preparation_key(id) { return Err(E::Refused("preparation-id-invalid")); }
         self.preparation_observed(|db, policy, causes| {
-            let mut p = stored(db, id)?; self.preparation_project(&mut p, policy, causes)?; Ok(p)
+            let mut p = stored(db, id)?; self.preparation_project(&mut p, policy, causes)?;
+            super::preparation_dialogue::reader_verdict(self, db, &p, &recorded_turn_keys(db, &p)?, reader_token)?;
+            Ok(p)
         })
     }
-    /// Observe retained dialogue under one readonly SQL/material/settings guard.
-    /// Current method hashes and document source-turn references determine stale/
-    /// used flags. Method failures remain sidecars even on later SQL/refusal/close
-    /// errors. All turns are read without a second history cap. Legacy active turns
-    /// refuse; native active records must bind this physical Root. No stop, timeout heuristic,
-    /// budget/reservation/history mutation or provider call. File observations
-    /// are not an atomic filesystem snapshot or future execution authority.
-    pub fn preparation_dialogue(&self,id:&str)->Result<PreparationReadObservation<Vec<crate::PreparationTurn>>,E>{
+    /// Observe retained dialogue for one reader under one readonly
+    /// SQL/material/settings guard (BF-16a domain inheritance). `reader_token`
+    /// is the caller's local bearer credential (`None` = bare session, never
+    /// authorization). Decision is scan-then-decide: the dialogue rows and the
+    /// admission receipt directory are read first (a data read that discloses
+    /// nothing by itself), and only when at least one receipt matches this
+    /// preparation's recorded turns does the reader verdict run — bare session
+    /// → `blp-dialogue-authentication-required`, absent trust journal →
+    /// `blp-dialogue-policy-required`, unknown/disabled token → typed
+    /// `TrustError::Authorization`, non-current recorded policy →
+    /// `blp-dialogue-policy-stale`, failed capsule re-verification or missing
+    /// clearance → `blp-dialogue-access-denied`. Zero matched receipts serves
+    /// the legacy unclassified read without any Trust state, so existing bare
+    /// session consumers keep working. A refusal discloses no turn byte. All
+    /// other legacy properties hold unchanged: current method hashes and
+    /// document source-turn references determine stale/used flags; method
+    /// failures remain sidecars even on later SQL/refusal/close errors; all
+    /// turns are read without a second history cap; legacy active turns
+    /// refuse; native active records must bind this physical Root. No stop,
+    /// timeout heuristic, budget/reservation/history mutation or provider
+    /// call. Receipt reads are fail-closed: an unreadable or undecodable
+    /// matching candidate refuses rather than authorizes. This is a
+    /// presentation frontier only, no acceptance, dispatch or execution
+    /// authority; producer-internal dialogue reads stay uncontrolled.
+    pub fn preparation_dialogue(&self,id:&str,reader_token:Option<&str>)->Result<PreparationReadObservation<Vec<crate::PreparationTurn>>,E>{
         if !crate::valid_preparation_key(id){return Err(E::Refused("preparation-id-invalid"));}
         self.preparation_observed(|db,policy,causes|{
             let p=stored(db,id)?;
@@ -205,7 +243,7 @@ impl RootStore {
             causes.append(&mut methods.causes);
             let id=if p.method=="audit_pdca"{"audit-pdca"}else{p.method.as_str()};
             let hash=methods.value.iter().find(|m|m.id==id && m.available).map(|m|m.sha256.as_str());
-            super::preparation_dialogue::read(db,&p,hash,&self.instance()?)
+            super::preparation_dialogue::read_controlled(self,db,&p,hash,&self.instance()?,reader_token)
         })
     }
     /// Observe preparation estimates/cost coverage in one read-only SQL snapshot.
@@ -246,13 +284,23 @@ impl RootStore {
     }
     /// Read earlier document snapshots newest revision first. Positive before
     /// is exclusive; absence uses Go's i64 max sentinel, not a product cutoff.
-    /// The saved history row limit is explicit. No visit, write, adoption or launch.
-    pub fn preparation_history(&self, id: &str, kind: &str, before: Option<i64>) -> Result<PreparationReadObservation<Vec<PreparationDocument>>, E> {
+    /// The saved history row limit is explicit. No visit, write, adoption or
+    /// launch. `reader_token` is the caller's local bearer credential (`None`
+    /// = bare session, never authorization), with the same semantics as
+    /// `preparation_dialogue`. BF-16a presentation frontier (BF-16b): when at
+    /// least one admission receipt matches this preparation's recorded turns,
+    /// the same reader verdict as the dialogue frontier runs BEFORE any
+    /// document byte is served — adopted documents inherit their source turn's
+    /// classified domain, so an under-cleared reader is refused with the
+    /// shared `blp-dialogue-*` codes. Zero matched receipts keeps the legacy
+    /// bare-session read.
+    pub fn preparation_history(&self, id: &str, kind: &str, before: Option<i64>, reader_token: Option<&str>) -> Result<PreparationReadObservation<Vec<PreparationDocument>>, E> {
         if !crate::valid_preparation_key(id) { return Err(E::Refused("preparation-id-invalid")); }
         if !matches!(kind, "besoin" | "brief" | "plan") { return Err(E::Refused("preparation-document-kind-invalid")); }
         if before.is_some_and(|value| value < 1) { return Err(E::Refused("preparation-revision-invalid")); }
         self.preparation_observed(|db, policy, causes| {
             let mut p = stored(db, id)?; self.preparation_project(&mut p, policy, causes)?;
+            super::preparation_dialogue::reader_verdict(self, db, &p, &recorded_turn_keys(db, &p)?, reader_token)?;
             let mut statement = db.prepare("SELECT kind,revision,body FROM preparation_documents WHERE preparation_id=?1 AND kind=?2 AND revision<?3 ORDER BY revision DESC LIMIT ?4").map_err(E::Sql)?;
             let result = (|| {
                 let mut rows = statement.query(rusqlite::params![id, kind, before.unwrap_or(i64::MAX), sql_limit(policy.history_limit)?]).map_err(E::Sql)?;
@@ -270,4 +318,35 @@ impl RootStore {
             super::finished(result, statement.finalize().map_err(E::Sql))
         })
     }
+}
+
+/// Read only the (provider, request_hash) pairs recorded for one preparation's
+/// turns, under the caller's read snapshot — the minimal decision input for the
+/// shared reader verdict on the show/history frontiers. Turn bytes ARE read and
+/// decoded here (provider/request_hash live in the recorded turn body) but only
+/// as a decision input: prompts are cleared before the values are returned, and
+/// no turn or document byte is served by this helper. Identity mismatch refuses
+/// like the dialogue frontier's row binding; unlike the dialogue read, no
+/// active-history observation runs (the show/history frontiers observe
+/// documents, not live calls). BF-16c: also consumed by the send/stop
+/// frontiers inside their write transaction — same decision input, same
+/// zero-serve guarantee.
+pub(super) fn recorded_turn_keys(db:&rusqlite::Connection,p:&Preparation)->Result<Vec<crate::PreparationTurn>,E>{
+    let mut statement=db.prepare("SELECT id,preparation_id,status,body FROM preparation_turns WHERE preparation_id=?1 ORDER BY rowid").map_err(E::Sql)?;
+    let result=(||{
+        let mut rows=statement.query([&p.id]).map_err(E::Sql)?;
+        let mut out=Vec::new();
+        while let Some(row)=rows.next().map_err(E::Sql)?{
+            let id:String=row.get(0).map_err(E::Sql)?;
+            let parent:String=row.get(1).map_err(E::Sql)?;
+            let status:String=row.get(2).map_err(E::Sql)?;
+            let mut turn:crate::PreparationTurn=crate::work::decode(&body(row,3)?,crate::preparation_turn::shape_preparation_turn()).map_err(|e|cause("preparation-dialogue-document-invalid",e))?;
+            if turn.id!=id || turn.preparation_id!=parent || parent!=p.id{return Err(E::Refused("preparation-dialogue-row-identity-mismatch"));}
+            turn.status=status;
+            turn.prompt.clear();
+            out.push(turn);
+        }
+        Ok(out)
+    })();
+    super::finished(result,statement.finalize().map_err(E::Sql))
 }

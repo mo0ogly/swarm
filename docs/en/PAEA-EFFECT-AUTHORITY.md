@@ -57,3 +57,18 @@ neighbors, Trust/PAEA namespaces, passwords, callback refusal, revocation,
 after-use cancellation and CAS. It also reruns the three Trust regressions affected
 by the shared gate. Local evidence does not qualify separated effects, protected
 installation, global PAEA invariants or E2/E3.
+
+## Connected approval reply
+
+The two connected web surfaces (`web/paea-approval-form.js` and
+`web/paea-consent.js`) interpret a success of the approval POST consumption
+only on an exact `state:"approved"`: the ordinary full object and the redacted
+`trust-status-ack-v1` acknowledgement (`content_redacted:true`) both carry
+that state and are accepted without imposing the redacted shape. `denied`
+stays a visible refusal with its reason; `admitted`, `pending_approval`,
+`committed`, `unknown`, `reconciled` and any missing, null or empty state
+render fail-closed and are never a success. This is a browser-side
+presentation interpretation, with no producer or server change; it qualifies
+no installation or global acceptance.
+
+Local qualification: permanent recipe `tools/verification/recipes/paea-approval-state-fail-closed.json` — `python3 tools/verification/recipe.py run --recipe tools/verification/recipes/paea-approval-state-fail-closed.json --output FRESH`, then `python3 tools/verification/recipe.py verify --evidence FRESH` on that same FRESH directory produced by the recipe run (run manifest, inputs and raw outputs retained in FRESH); 36 named FR/EN checks expected, 0 diagnostics. The browser separately creates its own private, fresh TMPDIR, printed in the step stdout; `verify` does not consume that TMPDIR. Evidence scope: synthetic API and actual Chrome scripts driven through DOM gestures; no verification of the normal ELF's resource serving, the physical pointer or the UI layout is claimed, and this evidence qualifies neither installation nor global acceptance.

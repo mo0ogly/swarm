@@ -1,0 +1,811 @@
+[
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "init",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543318.6354449,
+    "end": 1793543318.7385893,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "work",
+      "create",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-002.input.json"
+    ],
+    "start": 1793543318.7555256,
+    "end": 1793543319.0589938,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "task",
+      "add",
+      "w-1274bde2d0a15ebc3b57b49d",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-003.input.json"
+    ],
+    "start": 1793543319.0762372,
+    "end": 1793543319.474107,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "budget",
+      "apply",
+      "w-1274bde2d0a15ebc3b57b49d",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-004.input.json"
+    ],
+    "start": 1793543319.4907207,
+    "end": 1793543319.5686402,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "engine-settings",
+      "show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543319.7468011,
+    "end": 1793543319.7935135,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "engine-settings",
+      "preview",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-006.input.json"
+    ],
+    "start": 1793543319.8110707,
+    "end": 1793543319.8740096,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "engine-settings",
+      "apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-007.input.json"
+    ],
+    "start": 1793543319.892421,
+    "end": 1793543319.984979,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "engine-settings",
+      "show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543319.9936807,
+    "end": 1793543320.0509963,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "providers",
+      "connections",
+      "show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543320.0772238,
+    "end": 1793543320.1344435,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "providers",
+      "connections",
+      "preview",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-010.input.json"
+    ],
+    "start": 1793543320.1505835,
+    "end": 1793543320.2191174,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "providers",
+      "connections",
+      "apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-011.input.json"
+    ],
+    "start": 1793543320.236864,
+    "end": 1793543320.3402622,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "trust",
+      "config-apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-012.input.json"
+    ],
+    "start": 1793543320.3579254,
+    "end": 1793543320.438552,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "trust",
+      "blp-policy-apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-013.input.json"
+    ],
+    "start": 1793543320.4580941,
+    "end": 1793543320.5307653,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "create",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-014.input.json"
+    ],
+    "start": 1793543320.5483787,
+    "end": 1793543320.626718,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "budget",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-015.input.json"
+    ],
+    "start": 1793543320.644312,
+    "end": 1793543320.7223067,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "create",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-016.input.json"
+    ],
+    "start": 1793543320.7398393,
+    "end": 1793543320.8167949,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "budget",
+      "prep-d36be6494248ee06ac18f38e",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-017.input.json"
+    ],
+    "start": 1793543320.8338006,
+    "end": 1793543320.9142008,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543320.9232657,
+    "end": 1793543320.9963148,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "send",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-019.input.json"
+    ],
+    "start": 1793543321.0143895,
+    "end": 1793543321.1391335,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543321.1468832,
+    "end": 1793543321.2303815,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543321.3066225,
+    "end": 1793543321.374942,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543321.400933,
+    "end": 1793543321.4690793,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "send",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-023.input.json"
+    ],
+    "start": 1793543321.4880867,
+    "end": 1793543321.606692,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543321.6150618,
+    "end": 1793543321.7130601,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543321.778885,
+    "end": 1793543321.8458936,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543321.9145253,
+    "end": 1793543321.9884744,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543322.062494,
+    "end": 1793543322.132986,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543322.1588001,
+    "end": 1793543322.2334704,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543324.9010503,
+    "end": 1793543324.9802492,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "send",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-030.input.json"
+    ],
+    "start": 1793543324.9991727,
+    "end": 1793543325.1214116,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543325.1308362,
+    "end": 1793543325.2201881,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543325.4266849,
+    "end": 1793543325.4936435,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "trust",
+      "blp-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-033.input.json"
+    ],
+    "start": 1793543325.530733,
+    "end": 1793543325.5880868,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "budget",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543325.609177,
+    "end": 1793543325.685122,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543325.6951177,
+    "end": 1793543325.7678573,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543325.778188,
+    "end": 1793543325.8532193,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "send",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-037.input.json"
+    ],
+    "start": 1793543325.8711014,
+    "end": 1793543325.9335365,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543325.9523246,
+    "end": 1793543326.0296571,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "send",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-039.input.json"
+    ],
+    "start": 1793543326.050532,
+    "end": 1793543326.1180534,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "budget",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543326.1372063,
+    "end": 1793543326.2093425,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543326.2190754,
+    "end": 1793543326.2953575,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "budget",
+      "prep-d36be6494248ee06ac18f38e",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543331.739329,
+    "end": 1793543331.8018434,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543331.9622457,
+    "end": 1793543332.0261557,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "trust",
+      "blp-policy-apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-044.input.json"
+    ],
+    "start": 1793543332.1312962,
+    "end": 1793543332.214226,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "trust",
+      "blp-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-045.input.json"
+    ],
+    "start": 1793543332.232234,
+    "end": 1793543332.2955763,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543332.3151562,
+    "end": 1793543332.3823879,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "send",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-047.input.json"
+    ],
+    "start": 1793543332.4002264,
+    "end": 1793543332.5242097,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543332.5333467,
+    "end": 1793543332.6395652,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543332.7116797,
+    "end": 1793543332.801888,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "capabilities",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543332.830521,
+    "end": 1793543332.899269,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "send",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-051.input.json"
+    ],
+    "start": 1793543332.918064,
+    "end": 1793543333.0515969,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543333.060851,
+    "end": 1793543333.1570628,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543333.219568,
+    "end": 1793543333.3045359,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "prepare",
+      "dialogue",
+      "prep-0d6e4079e36703ebd37c0072",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json"
+    ],
+    "start": 1793543333.5015707,
+    "end": 1793543333.5943367,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "trust",
+      "blp-policy-apply",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-055.input.json"
+    ],
+    "start": 1793543333.628456,
+    "end": 1793543333.6998124,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-xkkd61in",
+      "trust",
+      "blp-show",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-c658lli0",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-01/journey/quarantine-056.input.json"
+    ],
+    "start": 1793543333.718757,
+    "end": 1793543333.7876697,
+    "exit": 0
+  }
+]

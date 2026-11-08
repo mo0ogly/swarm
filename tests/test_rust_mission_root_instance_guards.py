@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import sqlite3
 import tempfile
+from fixture_area import fixture_area
 import unittest
 import types
 from unittest.mock import patch
@@ -20,7 +21,7 @@ class RootInstanceGuards(unittest.TestCase):
 
     def test_wal_backup_is_coherent_and_files_have_new_inodes(self):
         """Committed data still in WAL survives backup without hardlink copying."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root = Path(temporary)
             source = root / 'source'
             source.mkdir(mode=0o700)
@@ -61,7 +62,7 @@ class RootInstanceGuards(unittest.TestCase):
 
     def test_private_copy_rejects_hardlinks_after_valid_witness(self):
         """Valid regular private file passes; same bytes with nlink2 refuse."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root = Path(temporary)
             subject.fixture.publish(root / 'private', b'owned')
             self.assertIn('private', subject.private_files(root))
@@ -80,7 +81,7 @@ class RootInstanceGuards(unittest.TestCase):
 
     def test_restore_refuses_unknown_process_closure_then_preserves_instances(self):
         """Unknown closure makes no rename; known closure preserves both dirs."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root = Path(temporary)
             current = root / '.swarm'
             original = root / 'original'
@@ -95,7 +96,7 @@ class RootInstanceGuards(unittest.TestCase):
             subject.restore_instances(root, original, retained, True)
             self.assertEqual(current.stat().st_ino, original_inode)
             self.assertEqual(retained.stat().st_ino, current_inode)
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root = Path(temporary)
             original = root / 'original'
             original.mkdir(mode=0o700)
@@ -109,7 +110,7 @@ class RootInstanceGuards(unittest.TestCase):
         SQL contains fixture data only, no engine/permission rows or processes.
         Unknown closure must refuse first; known closed state permits restitution.
         """
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root = Path(temporary)
             local = root / '.swarm'
             local.mkdir(mode=0o700)
@@ -157,7 +158,7 @@ class RootInstanceGuards(unittest.TestCase):
 
     def test_database_partial_install_retains_effects_and_restores_after_known_close(self):
         """Injected rename failure preserves original main file and partial state."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root = Path(temporary)
             local = root / '.swarm'
             local.mkdir(mode=0o700)
@@ -188,7 +189,7 @@ class RootInstanceGuards(unittest.TestCase):
 
     def test_current_binding4_observes_directory_and_database_not_only_version(self):
         """Fresh witness then legacy/type/shape/directory/DB mismatches refuse."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root = Path(temporary)
             (root / '.swarm').mkdir(mode=0o700)
             subject.fixture.publish(root / '.swarm/state.db', b'metadata-only fixture')
@@ -296,7 +297,7 @@ class RootInstanceGuards(unittest.TestCase):
     def test_public_recovery_separates_desired_stop_from_reconciled_release(self):
         """Scripted public contract witness, then premature stop-release refuses."""
         for faulty_stop in (False, True):
-            with tempfile.TemporaryDirectory() as temporary:
+            with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
                 out = Path(temporary)
                 agent = dict(id='owned', status='queued', native_mission={'schema_version': 4}, supervisor_pid=0)
                 turn = dict(seq='9', work='work', task='task', workspace='owned', state='acquired', agent='owned',
@@ -392,7 +393,7 @@ class RootInstanceGuards(unittest.TestCase):
         """Mock handshake requires READY before injection; AST guard preserves historical branch order."""
         document, conductor = self.late_observation()
         events = []
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             with patch.object(subject.watch, 'send_command', side_effect=lambda *args: events.append(args[1])), \
                  patch.object(subject.watch, 'wait_json', side_effect=lambda *args: (events.append('ready'), document)[1]), \
                  patch.object(subject.watch, 'observation', return_value=conductor), \

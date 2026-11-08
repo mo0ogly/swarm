@@ -8,7 +8,7 @@
   "environment": {},
   "steps": [
     {
-      "id": "six-runner-regressions",
+      "id": "eight-runner-regressions",
       "command": [
         "python3",
         "-m",
@@ -29,8 +29,10 @@
         "test_relative_executable_is_bound_to_fixture_root",
         "test_tampering_and_missing_hash_table_refuse",
         "test_zero_tests_and_source_mutation_cannot_pass",
-        "Ran 6 tests",
-        "\nOK\n"
+        "Ran 8 tests",
+        "\nOK\n",
+        "test_symlink_launcher_keeps_invocation_name_and_target_identity",
+        "test_tmpdir_pin_falls_back_when_checkout_ancestors_are_group_writable"
       ]
     }
   ]

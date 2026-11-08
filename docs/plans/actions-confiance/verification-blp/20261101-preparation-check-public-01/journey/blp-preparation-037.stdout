@@ -1,0 +1,1 @@
+{"actor":"admin","attributed":true,"canonical_digest":"3a7f006dcbffb597f7b399e20a7c154bf89e788cd23cdf9854b719ccc4644069","classification":{"compartments":["a","b"],"level":"secret"},"policy_revision":"1","reason":"Exact recorded fixture slice","runtime_enforced":false,"schema_version":1,"trust_revision":"1"}

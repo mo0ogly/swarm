@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "trust-data-policy-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/trust/data_policy.rs",
+    "rust/crates/swarm-engine/src/trust/error.rs",
+    "rust/crates/swarm-engine/src/trust/operations.rs",
+    "rust/crates/swarm-engine/src/trust/command.rs",
+    "rust/crates/swarm-engine/src/trust/state.rs",
+    "rust/crates/swarm-engine/src/trust/mod.rs",
+    "rust/crates/swarm-engine/src/trust/config.rs",
+    "rust/crates/swarm-engine/src/trust/extensions.rs",
+    "rust/crates/swarm-engine/src/trust/response.rs",
+    "rust/crates/swarm-engine/src/trust_types.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/config/trust-controls-defaults.json",
+    "rust/crates/swarm-engine/tests/trust_data_policy.rs",
+    "rust/crates/swarm-engine/tests/trust_biba.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "tests/rust_trust_data_policy_unit.py",
+    "tests/fixture_area.py",
+    "internal/engine/trust_data_policy.go",
+    "internal/engine/trust_data_policy_test.go",
+    "docs/actions-confiance-rust.md",
+    "docs/en/actions-confiance-rust.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "data-policy-unit",
+      "command": [
+        "python3",
+        "tests/rust_trust_data_policy_unit.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test result: ok. 7 passed;",
+        "DATA_POLICY_UNIT_PASS 7 named tests",
+        "test data_policy_public_contract ... ok",
+        "test data_policy_admission_rejects_without_capture ... ok",
+        "test data_policy_exact_action_and_recovery ... ok",
+        "test data_policy_strict_validation ... ok",
+        "test data_policy_checks_approval_and_first_effect ... ok",
+        "test data_policy_persistence_and_disabled ... ok",
+        "test data_policy_resource_classification ... ok"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

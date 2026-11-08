@@ -3,13 +3,17 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 
 SOURCE=Path(__file__).with_name('verify.py').resolve()
 
 class VerifierContract(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory()
+        self.temp=tempfile.TemporaryDirectory(dir=fixture_area())
         self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)
         (self.root/'tools/actions-confiance').mkdir(parents=True)

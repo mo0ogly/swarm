@@ -28,6 +28,13 @@ pub struct NativeErrorLinks<'a> {
 fn settlement_outcome_label(outcome:&crate::PaeaSettlementOutcome)->&'static str{
     match outcome {crate::PaeaSettlementOutcome::Recorded{replayed:false,..}=>"paea-settlement-recorded",crate::PaeaSettlementOutcome::Recorded{replayed:true,..}=>"paea-settlement-replayed",crate::PaeaSettlementOutcome::ReconciledNotCommitted{..}=>"paea-settlement-reconciled-not-committed"}
 }
+/// Classify one retained Git promotion observation without rendering receipt or
+/// authority data. ReconciledNotCommitted is the explicit negative, never a
+/// failed publication; these labels grant no retry or current authority.
+#[cfg(target_os="linux")]
+fn promote_outcome_label(outcome:&crate::PaeaGitPromoteOutcome)->&'static str{
+    match outcome {crate::PaeaGitPromoteOutcome::Recorded{replayed:false,..}=>"paea-git-promote-recorded",crate::PaeaGitPromoteOutcome::Recorded{replayed:true,..}=>"paea-git-promote-replayed",crate::PaeaGitPromoteOutcome::ReconciledNotCommitted{..}=>"paea-git-promote-reconciled-not-committed"}
+}
 /// Inspect known compound native families without rendering private messages.
 /// Root/launch/work/storage/process/mission/identity/budget cleanup branches are explicit;
 /// std IO inner errors are visited even when source() skips their wrapper. This
@@ -100,6 +107,23 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
         }.into());
         result.children.push(("primary",error.cause.as_ref()));
         result.children.extend(error.cleanup.iter().map(|cause|("cleanup",cause as &(dyn Error+'static))));explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::TransferFailure>(e,&mut result,&mut explicit){
+        result.labels.push(error.phase.into());
+        if let Some(cause)=std::error::Error::source(error){result.children.push(("source",cause));}explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::PaeaGitTransferCallError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code().into());
+        if error.known_receipt().is_some(){result.labels.push("paea-git-transfer-known-receipt".into());}
+        result.children.extend(error.branches().into_iter().map(|cause|("source",cause)));explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::PaeaGitPromoteCallError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code().into());
+        if let Some(known)=error.known_outcome(){result.labels.push(promote_outcome_label(known).into());}
+        result.children.extend(error.branches().into_iter().map(|cause|("source",cause)));explicit=true;
     }
     #[cfg(target_os="linux")]
     if let Some(error)=native_ref::<crate::PaeaSettlementCallError>(e,&mut result,&mut explicit){
@@ -730,9 +754,7 @@ mod tests {
         let cleanup_errno = rustix::io::Errno::PIPE.raw_os_error();
         let missing_errno = rustix::io::Errno::NOENT.raw_os_error();
         for wrapper in 0..4 {
-            let path = std::env::temp_dir().join(crate::generate_identifier("telemetry-diagnostic-").unwrap());
-            std::fs::create_dir(&path).unwrap();
-            std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+            let path = crate::fixture_root("telemetry-diagnostic-");
             crate::local_storage::LocalDirectory::open(&path).unwrap().close().unwrap();
             let storage = crate::local_storage::LocalDirectory::open(&path.join("PRIVATE_missing_root")).err().unwrap();
             std::fs::remove_dir(&path).unwrap();
@@ -1082,9 +1104,7 @@ mod tests {
     #[test]
     fn native_diagnostics_keep_context_read_reason_through_launch_wrapper() {
         use std::os::unix::fs::PermissionsExt;
-        let root = std::env::temp_dir().join(crate::generate_identifier("native-context-cause-").unwrap());
-        std::fs::create_dir(&root).unwrap();
-        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let root = crate::fixture_root("native-context-cause-");
         std::fs::write(root.join("private.md"), "ok").unwrap();
         let mut limits = crate::ContextPolicyLimits {
             profile_name_bytes: None, profile_sources: None, profile_path_bytes: None,

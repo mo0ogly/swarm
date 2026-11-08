@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "budget",
+  "expected_revision": 2,
+  "budget": {
+    "limit_usd": 10,
+    "reserve_per_launch_usd": 1,
+    "estimate_source": "Local model fixture",
+    "reference_date": "2026-10-19"
+  }
+}

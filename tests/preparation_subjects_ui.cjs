@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-subjects-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-subjects-'));
 function cli(args,input){return JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined})||'null')}
 cli(['init']);const catalog=cli(['prepare','templates']),subjects=catalog.filter(t=>t.subject);assert.equal(subjects.length,6);
 const app=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser;const errors=[],commands=[];

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "cockpit-autonomy",
+  "inputs": [
+    "tests/rust_cockpit_autonomy.py",
+    "tests/rust_cockpit_autonomy_ui.cjs",
+    "tests/engine_settings_admin_choice_ui.cjs",
+    "tests/helpers/engine_settings_admin_state.cjs",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/engine_settings/cockpit_autonomy.rs",
+    "rust/crates/swarm-engine/src/engine_settings_catalog.rs",
+    "rust/crates/swarm-engine/src/mission_controls.rs",
+    "rust/crates/swarm-engine/config/engine-settings*.json",
+    "rust/crates/swarm-web/src/service/cockpit_read.rs",
+    "frontend/engine-settings/admin.js",
+    "frontend/engine-settings/admin.css",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "web/cockpit-native-panels.js",
+    "package.json",
+    "package-lock.json",
+    "docs/architecture/COCKPIT-COMPATIBILITY.md",
+    "docs/en/COCKPIT-COMPATIBILITY.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "scalar-choice-ui-refusal-recovery",
+      "command": [
+        "node",
+        "tests/engine_settings_admin_choice_ui.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS 9 scalar choice Admin UI cases:"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "historical-public-http-and-embedded-browser",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='cockpit-autonomy-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_cockpit_autonomy.py','--binary',os.environ['SWARM_COCKPIT_BINARY'],'--legacy-binary',os.environ['SWARM_COCKPIT_LEGACY_BINARY'],'--profile-inputs',os.environ['SWARM_COCKPIT_PROFILE_INPUTS'],'--browser','--output',str(p)],check=True)\nprint('COCKPIT_AUTONOMY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "COCKPIT_AUTONOMY_HISTORICAL_VERIFIED",
+        "COCKPIT_AUTONOMY_PUBLIC_VERIFIED 20"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

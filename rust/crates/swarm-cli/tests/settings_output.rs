@@ -8,9 +8,7 @@ use std::{
 use swarm_engine::{EngineSettingsChange, RootStore, SettingCount, SystemEnvironment};
 /// Own and initialize a real private Root, retained when a test fails.
 fn fixture() -> PathBuf {
-    let p =
-        std::env::temp_dir().join(swarm_engine::generate_identifier("settings-output92-").unwrap());
-    fs::create_dir(&p).unwrap();
+    let p = swarm_engine::fixture_root("settings-output92-");
     RootStore::initialize(&p, &mut SystemEnvironment)
         .unwrap()
         .close()
@@ -212,9 +210,7 @@ fn initialized_configuration_survives_output_write_and_flush_failure() {
     for lang in ["fr", "en"] {
         for json in [false, true] {
             for flush in [false, true] {
-                let root = std::env::temp_dir()
-                    .join(swarm_engine::generate_identifier("init-output92-").unwrap());
-                fs::create_dir(&root).unwrap();
+                let root = swarm_engine::fixture_root("init-output92-");
                 let witness = root.join("witness");
                 fs::create_dir(&witness).unwrap();
                 let mut out = vec![];

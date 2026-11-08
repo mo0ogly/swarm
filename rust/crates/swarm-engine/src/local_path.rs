@@ -76,7 +76,9 @@ fn io_error(operation: PathOperation, cause: io::Error) -> LocalPathError {
     LocalPathError::Io { operation, cause }
 }
 /// filepath.Clean on an absolute path, before resolving symlinks (Linux qualified).
-fn clean_absolute(path: &Path) -> PathBuf {
+/// Crate-visible for contract checks that compare `filepath.Clean(root) != root`
+/// (memory usage binding); no filesystem access and no policy decision.
+pub(crate) fn clean_absolute(path: &Path) -> PathBuf {
     let mut out = PathBuf::new();
     for component in path.components() {
         match component {

@@ -1,0 +1,16 @@
+{
+  "running": true,
+  "ready": true,
+  "pid": 2890001,
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-ao_r2tox",
+  "url": "http://127.0.0.1:43067/",
+  "binary": {
+    "build_date": "2026-11-01T18:36:06Z",
+    "commit": "6efe2a9f86f6d6169efa8c17578c8eb10a09ac2f",
+    "modified": true,
+    "provenance": "injected",
+    "version": "v0.1.1-dev.309"
+  },
+  "binary_sha256": "c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+  "verification_scope": "owned-fixture-same-production-image"
+}

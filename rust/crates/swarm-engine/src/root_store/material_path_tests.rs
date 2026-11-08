@@ -31,9 +31,7 @@ impl Fixture {
     /// Create a private directory using the existing real identifier producer.
     /// Mode0700 is fixture ownership, not a new product execution policy.
     fn new() -> Self {
-        let path = std::env::temp_dir().join(crate::generate_identifier("material-path-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+        let path = crate::fixture_root("material-path-");
         Self(path)
     }
 }

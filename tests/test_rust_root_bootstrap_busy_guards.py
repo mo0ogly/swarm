@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import sqlite3
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from unittest.mock import Mock, patch
 
@@ -56,7 +57,7 @@ class BootstrapBusyGuards(unittest.TestCase):
 
     def test_exercise_records_typed_capture_phase_in_actual_result(self):
         """Actual exercise consumer records typed Prepare; no subprocess or latency claim is used."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             base = Path(temporary)
             binary = base / 'binary'
             binary.write_bytes(b'owned inert bytes never executed')
@@ -93,7 +94,7 @@ class BootstrapBusyGuards(unittest.TestCase):
 
     def test_snapshot_preserves_database_and_settings_bytes(self):
         """Readonly inspection after valid setup leaves main DB/settings unchanged."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             root = Path(temporary)
             state = root / '.swarm'
             state.mkdir()
@@ -113,7 +114,7 @@ class BootstrapBusyGuards(unittest.TestCase):
         """Controller EOF releases the transaction; READY reflects the real lock call order."""
         db = Mock()
         db.execute.return_value.fetchone.return_value = ('delete',)
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             path = Path(temporary) / 'state.db'
             path.touch()
             output = io.StringIO()
@@ -129,7 +130,7 @@ class BootstrapBusyGuards(unittest.TestCase):
         child = Mock(pid=123)
         child.stdout.readline.return_value = json.dumps(dict(status='READY', pid=123, journal_mode='delete', transaction='BEGIN EXCLUSIVE', dml=False)).encode()+b'\n'
         child.wait.return_value = 0
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             output = Path(temporary)
             with patch.object(subject.subprocess, 'Popen', return_value=child), patch.object(subject, 'publish', side_effect=OSError(28, 'owned simulated full')):
                 with self.assertRaises(BaseExceptionGroup) as captured:
@@ -147,7 +148,7 @@ class BootstrapBusyGuards(unittest.TestCase):
         child.stdout.readline.return_value = json.dumps(dict(status='READY', pid=123, journal_mode='delete', transaction='BEGIN EXCLUSIVE', dml=False)).encode()+b'\n'
         child.wait.return_value = 0
         child.stdin.flush.side_effect = OSError(5, 'owned simulated flush')
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             output = Path(temporary)
             with patch.object(subject.subprocess, 'Popen', return_value=child):
                 with self.assertRaises(BaseExceptionGroup) as captured:
@@ -159,7 +160,7 @@ class BootstrapBusyGuards(unittest.TestCase):
 
     def test_preexisting_output_is_not_owned_or_overwritten(self):
         """Output collision refuses before init and cannot authorize failure.json publication."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             output = Path(temporary)
             marker = output / 'original'
             marker.write_bytes(b'preserve')
@@ -179,7 +180,7 @@ class BootstrapBusyGuards(unittest.TestCase):
             """Close the owned real descriptor before reporting a simulated independent error."""
             real_close(descriptor)
             raise OSError(5, 'owned close observation')
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             path = Path(temporary) / 'proof'
             with patch.object(subject.os, 'fsync', side_effect=[None, OSError(28, 'owned directory sync')]), patch.object(subject.os, 'close', side_effect=close_then_fail):
                 with self.assertRaises(BaseExceptionGroup) as captured:
@@ -194,7 +195,7 @@ class BootstrapBusyGuards(unittest.TestCase):
             """Remove only the actual fixture temporary, then simulate the secondary failure."""
             real_unlink(path, **kwargs)
             raise OSError(5, 'owned unlink observation')
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             path = Path(temporary) / 'proof'
             path.write_bytes(b'original')
             with patch.object(Path, 'unlink', unlink_then_fail):
@@ -206,7 +207,7 @@ class BootstrapBusyGuards(unittest.TestCase):
 
     def test_profiles_bind_normal_bytes_without_boolean_coercion(self):
         """Qualified profile true/hash are strict; fixture or numeric marker refuses."""
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
             binary = Path(temporary) / 'binary'
             binary.write_bytes(b'owned bytes, never executed')
             profile = Path(temporary) / 'profile.json'

@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_admission_public.py", line 181, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_admission_public.py", line 122, in main
+    actual,result,body=http('blp-preparation-admit',value,token)
+                       ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_admission_public.py", line 115, in http
+    conn=http.client.HTTPConnection(web.host,web.port,timeout=None)
+         ^^^^^^^^^^^
+AttributeError: 'function' object has no attribute 'client'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-preparation-proof-')/'journey'; subprocess.run(['python3','tests/blp_admission_public.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_PREPARATION_CLI_HTTP_EVIDENCE '+str(out))
+                                                                                                                                                                                                                                                                           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python3', 'tests/blp_admission_public.py', '--binary', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b', '--profile', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-n_kzq_yh/build/profile/result.json', '--output', '/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-blp/20261101-preparation-admission-public-01/journey']' returned non-zero exit status 1.

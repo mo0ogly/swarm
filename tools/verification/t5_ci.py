@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """Bounded, reproducible T5 checks. Never operates on the live Swarm database."""
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import hashlib, json, os, pathlib, shutil, subprocess, sys, tempfile
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 COMMIT = '7110a0b805caf4be1bb09a57b776176b8dc52a68'
@@ -33,7 +37,7 @@ def ci():
 
 def browser(mutate=False):
     # Copy the current candidate, including new Go files; isolate mutations.
-    with tempfile.TemporaryDirectory(prefix='swarm-t5-check-') as temp:
+    with tempfile.TemporaryDirectory(prefix='swarm-t5-check-', dir=fixture_area()) as temp:
         dst=pathlib.Path(temp)
         for p in ROOT.glob('*.go'): shutil.copy2(p,dst/p.name)
         for name in ['go.mod','go.sum','package.json','version_history.json']: shutil.copy2(ROOT/name,dst/name)

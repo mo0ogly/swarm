@@ -237,7 +237,11 @@ history or force-push without explicit authority.
 ## Local delivery version and release notes
 
 Every delivered change must have an identifiable running version and current
-French/English evolution notes in `version_history.json` (`local_changes`).
+French/English evolution notes in `version_history.json` (`local_changes`),
+entered in the same increment as the announcement — not retro-discovered at a
+later RETEX (lesson from the BLP-03a delivery of 9 November 2026, where the
+plan and RETEX updates held but the registry entry was missing until the
+transversal RETEX found it).
 Use `./swarm.sh build` / `./swarm.sh restart` for a source-managed local server:
 the launcher numbers changed effective build inputs before stopping the previous
 server, and preserves the number for unchanged inputs. Do not leave an old
@@ -334,6 +338,31 @@ rendered surfaces, loading/empty/error/success states, FR/EN, both themes and th
 relevant mobile widths. Inspect console errors, failed requests, overflow and
 actual interaction results. A token scan or screenshot alone is insufficient;
 state explicitly when visual or browser verification is unavailable.
+
+## Concurrent compilation-cache cleanup
+
+A process snapshot does not prevent a new build from starting. Before deleting
+cache outputs, acquire the actual producer lock without waiting, then revalidate
+file identity and live references under that lock; retain busy or uncertain
+candidates. Never delete a lock file to force progress. Qualify the installed
+tool’s protocol and preserve uncoordinated readers. See the bilingual concurrency
+procedure in `tools/verification/README.md`; cleanup does not establish another
+build’s test result or grant broader deletion rights.
+
+## Evidence storage — USB preference (4 November 2026)
+
+Prefer the user’s identified USB drive (currently Lexar at `/media/fpizzi/Lexar`)
+for future evidence when mounted, writable and sufficiently free. Verify the
+actual mounted device; never write into an unmounted mount-point directory.
+Keep a local location/hash/restore index. Preserve Unix metadata in archives and
+split below the filesystem file-size limit when needed; FAT32 is not a Unix
+fixture/executable filesystem. Stage locally when required, sync and read back
+all copied bytes before removing only authorized, unchanged originals. Preserve
+tracked sources, active work, missions and historical failures. If USB is absent
+or unsuitable, report the local fallback and proceed only with adequate space.
+This preference changes no configured fixture directory, running execution,
+publication right or embedded agent context. See the bilingual storage guidance
+in `tools/verification/README.md`.
 
 ## Permanent verification recipes — Claude and Codex
 

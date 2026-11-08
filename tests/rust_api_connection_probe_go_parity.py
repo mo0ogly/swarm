@@ -6,6 +6,7 @@ maximum. Native error codes/receipts/source admission and Go diagnostics/truncat
 are explicit differences. No real provider, mission execution or global deadline.
 """
 import argparse,json,subprocess,tempfile,threading,time,traceback,re
+from fixture_area import fixture_area
 from pathlib import Path
 from http.server import ThreadingHTTPServer,BaseHTTPRequestHandler
 from http.client import HTTPConnection
@@ -20,7 +21,7 @@ def run(native,reference,output):
     output.mkdir(parents=True,exist_ok=False);proof.publish(output/'harness-source.py',Path(__file__).read_bytes());ref=json.loads(reference.read_bytes());assert ref['status']=='QUALIFIED_PROJECT_SOURCE_REFERENCE';go=Path(ref['binary']);assert proof.digest(go.read_bytes())==ref['sha256'];inventory=json.loads((reference.parent/'inputs.before.json').read_bytes())
     for name,sha in inventory.items():
         if name.endswith('.go') or name=='config/provider-wait.json':assert proof.digest(Path(name).read_bytes())==sha,('reference-producer-changed',name)
-    f=proof.Fixture(native,output,'native');before=f.snapshot();go_root=Path(tempfile.mkdtemp(prefix='swarm-go-probe-parity-'));(go_root/'empty-bin').mkdir();env={'PATH':str(go_root/'empty-bin'),'LANG':'C.UTF-8','USER':'fixture','NO_PROXY':'127.0.0.1','no_proxy':'127.0.0.1'};commands=[];events=[];checks=[];mode='ok';primary=None;owned=[];calls=[]
+    f=proof.Fixture(native,output,'native');before=f.snapshot();go_root=Path(tempfile.mkdtemp(prefix='swarm-go-probe-parity-', dir=fixture_area()));(go_root/'empty-bin').mkdir();env={'PATH':str(go_root/'empty-bin'),'LANG':'C.UTF-8','USER':'fixture','NO_PROXY':'127.0.0.1','no_proxy':'127.0.0.1'};commands=[];events=[];checks=[];mode='ok';primary=None;owned=[];calls=[]
     def cli(args):
         """Run only Go init with no executable/model credentials available."""
         argv=[str(go),*args,'--root',str(go_root),'--json'];r=subprocess.run(argv,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE);proof.publish(output/'go-init.stdout',r.stdout);proof.publish(output/'go-init.stderr',r.stderr);commands.append({'argv':argv,'exit':r.returncode});proof.publish(output/'commands.json',commands);assert r.returncode==0

@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "scope": "P0-owned increments and consumed contracts only; selected diff includes inherited dirty work and is not wholly attributed to this lot",
+  "reviewer": "implementing Codex, same context; not independent acceptance",
+  "head": "277e337cb400b81ed3d0beb620006a6ee7bdbcb9",
+  "files": {
+    "tools/swarm_local.py": "926eaa7a81ff81b9b55939939cfb595715f6f15478700b0457b45f08992dc216",
+    "tests/test_local_status_lock.py": "333efef4a528e2da2c8d4a57e476f1e3f3dd713332a5e25849eb213e9f8d5cfc",
+    "tests/test_swarm_local.py": "18949ed56dc22b28fcf27c5994e65ca310b4c65689ae24c2969ef00252a3730a",
+    "tools/verification/test_recipe.py": "01b7a228be5422f3f30c7d21ebe81d61b2fb9abf1b090d118b5414e26ee1c118",
+    "tools/verification/recipes/local-status-lock.json": "961909f290e48152e8d373d3342a154e33ab3c1773f6a1af0ab937c50e390788",
+    "tools/verification/recipes/runner.json": "137cb5fda1073b43d099d2ee538601a98d51ea9a1637c447094a77f1c8be7b9a",
+    "tools/verification/README.md": "bc39866ffb6dbcd83e059b98665409cc9d1098aa1283370126332bec89fac6f0",
+    "rust/crates/swarm-authority/src/lib.rs": "0b516ccb8d1c19bcf77843083f9d9fa26e5b1134f63a15d1dabd0e57c02d7fec",
+    "rust/crates/swarm-authority/src/accounts.rs": "4701d2abc0e0520a9b4495bbcd822ee16896d0dd3383c739674c87b5a015d86a",
+    "rust/crates/swarm-authority/src/policy.rs": "5cc4706230fe74277588f8cf9bb0371ecfdc8e8945752864607789f603b7f8d1",
+    "version_history.json": "6eb50767ae861b594b65c341b3bdf0b3ca5e60ff4e796b5d082ce4fab31ed986",
+    "docs/architecture/NATIVE-LOCAL-LAUNCHER.md": "86f157d21446ec32f71ac256895cc8b1a47f78be233bb16bbd22cabe9d07b58c",
+    "docs/en/NATIVE-LOCAL-LAUNCHER.md": "1fcb6476327ade0bcc9572362d69b55b4c05954a6f55721ffbe8d0c25c256370",
+    "docs/plans/acces-cockpit/PHASE-B-AUTORITE.md": "eb49c4a029c91dfed86c4b4d88cc8ccc780068b8fda7f6edb36532356046cb57",
+    "docs/en/plans/acces-cockpit/PHASE-B-AUTORITE.md": "90650b4165abedf73422fc90a055f44043b74d8d207e73f83b9f52a20bf2ec58",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "16f0c764d0ee68b9036ba16084bcef98af9fd3ef62eb5a0bb6ec53f17f2b35d1",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "09bb5f48f256559696d49846b06e7f99a096b7a21151b20f86a05b81a67d8be5",
+    "docs/plans/actions-confiance/paea/DASHBOARD-T20261101.md": "ebaaf16d474846790bd6a5fa17463c2a6a94a88cfa465353275097f83d6f341c",
+    "docs/plans/actions-confiance/paea/GAP-CLOSURE-PLAN-20261103.md": "0ed642da13663a9e0139441de8661af51e4fde3c69ab03a0a835af2880c747db",
+    "docs/en/plans/actions-confiance/paea/GAP-CLOSURE-PLAN-20261103.md": "ac224653c3f31cf007902e052cca8807adaec1d3ef829302f2f4aff2e5c66dd2",
+    "docs/plans/actions-confiance/paea/P0-G0-20261103.md": "813dbe4942dd0f49a2fbeda92e5ea18442d7dd3b21ecf5efdd75989a0863f9ca",
+    "docs/en/plans/actions-confiance/paea/P0-G0-20261103.md": "732d97509774ce0f3eb538e64597bdcf778ac9a2c1daf4646c2e44fe745ec485",
+    "tests/local_status_installed.py": "7aef0b04feda7ba994e57975539c551d1d005801c9d5b2f175fcf5961dd631f9",
+    "tools/verification/recipes/local-status-installed.json": "d53e66dfb6017bd37fc17cace1022aedd0676da14192379f577ddc18d5570dbc"
+  },
+  "consumed_sources": {
+    "rust/crates/swarm-engine/src/root_store/task_validation/gate.rs": "dae6dc543cd5bf835dbc1e954172b90255f210e5605b79d0b05c9877b171de9e",
+    "rust/crates/swarm-engine/src/root_store/paea_settlement.rs": "9aac92f6695ce9f949fa48159bbc420a1f51a8d19fd4f33d1189014af03c422d",
+    "rust/crates/swarm-engine/src/root_store/paea_settlement/call.rs": "c41900334e838ac3b38dfe2094bca94696c8e56c2764c085e726a391928c8b1b",
+    "rust/crates/swarm-cli/tests/paea_promote.rs": "52255988e33d748b1dabbf7a1dec8bd7a535039c8977f9394a837cc9ce3e4d8d",
+    "rust/crates/swarm-authority/src/sessions.rs": "875f1b6aaba560bb831b2d70c691c9e1218190e7c7cc67ce4de628ff63946cdd",
+    "rust/crates/swarm-authority/src/server.rs": "91519cc0d8780d8d65c089c1961ec5e931a4815c9287c75775788a325b0f2ebb",
+    "rust/crates/swarm-authority/src/assertion.rs": "f6a462be6858130c3bf570fdc7972eb84a1c744a4b0d9e173c86240533902850",
+    "rust/crates/swarm-engine/src/memory_files.rs": "1f69f4d4d0d38a4b4522a64b39bcc65b6369c20d4d683883ce5f5e57770b8de0",
+    "rust/crates/swarm-engine/src/project_memory_source.rs": "7c400a11f3a371402cf56ecd17875d0ac120dade6396eb1c0923719d4eb44b73",
+    "rust/crates/swarm-engine/src/trust/operations.rs": "3fe4d1f7196ab6853a1c6ba8572b34060403091f1b599a93c751c7fe57bd0c01",
+    "rust/crates/swarm-biba-linux/src/kernel.rs": "ab8ca32bddd4e0d06a16ce58de5f07b6244814e5addbc0624b8f3b2438053acd",
+    "rust/crates/swarm-biba-linux/src/lib.rs": "69f680809dbf08b5fc547b749854592b1fb78d8603e00b586363ac4ef7fbfd77",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs": "0a5d31e8669370a9d53626577949dd5689ed3282439e86884c24006640bf5a21",
+    "rust/crates/swarm-engine/src/mission_supervision_receipts.rs": "22f59ab17022b67721db738baba587105d1710e4025236ab98f4137e79ff721d",
+    "rust/crates/swarm-engine/src/agent_supervision.rs": "81ddef6fc09e71b1034261bb04b83e8e5f849984a1720c37df00f033e299d189",
+    "tools/verification/recipe.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "web/cockpit-authority.js": "2193cc30f206ebb4286f76af87267e2936b6a51280e3d0d3e1c9feb4114a371d",
+    "web/native-authority-admin.js": "d010f7029d1a4bd010963d8e7dd2564a89dd69f82ab8d8da7b48725b883124b4",
+    "tests/paea_local_delivery_test.cjs": "cbe23a2bc12e079c7e65ed5765970b66ddcc4e9f61d8dd73bfab75f9012d4641",
+    "tests/blp_admission_ui.py": "f2b1b6c0c7366f1d27d516cd6b45bcf73c6d2f73cee0fac2e157dea45fef1f6d"
+  },
+  "installed": {
+    "build_date": "2026-11-03T09:54:53Z",
+    "commit": "277e337cb400b81ed3d0beb620006a6ee7bdbcb9",
+    "modified": true,
+    "provenance": "injected",
+    "version": "v0.1.1-dev.321"
+  },
+  "installed_sha256": "9fc57db99df1b468e5026a04f379f820997bf67bce15fe8a5209704d0c0b7de3",
+  "effective_profile": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-0o75lv4z/build/profile",
+  "effective_input_count": 755,
+  "effective_inputs_changed_since_build": [],
+  "axes": {
+    "policies": {
+      "result": "PASS_SCOPED",
+      "review": "LOCK_SH/LOCK_NB and exit2/concurrent-operation are protocol/observation semantics, not operator limits. No retry/timeout added; existing mutation LOCK_EX and lifecycle options retained. Fixture address19875 has no listener; fixture .01 sampling only observes kernel wait, no pass deadline. Existing HTTP probe limit unchanged. No Admin/API policy change required. Installed recipe is explicitly an already-dirty source-managed Authority-instance observation (modified=true), not a general release policy; it installs no setting or monitoring."
+    },
+    "function_documentation": {
+      "result": "PASS_SCOPED",
+      "functions": [
+        "swarm_local.main",
+        "StatusLock.setUp/status and five named regression methods",
+        "LocalWeb.test_status_during_lifecycle_mutation_preserves_live_identity",
+        "RecipeTests.test_exit_failure_retains_cause_and_stops_then_recovers",
+        "local_status_installed.status",
+        "local_status_installed.main"
+      ],
+      "review": "Purpose/preconditions, contention unknowns, refusal/no-rewrite, cleanup/recovery and identity limits reviewed. Crate/module Rustdoc corrected without business changes; qualified public links and private reference fixed; cargo doc no warnings. Existing test method now also proves FAIL destination refusal. No Rust function body changed. Final main docstring accurately distinguishes owner-key single-use ticket and Authority login. Installed observer documents ready/free-lock/Authority/latest-image preconditions, safe observations, propagated refusal and no human-session claim."
+    },
+    "errors": {
+      "result": "PASS_SCOPED",
+      "review": "Only BlockingIOError from nonblocking flock becomes explicit contention exit2; other IO/state/HTTP errors still propagate to existing exit2 handler, never empty success. No state read/probe on contention. Identity refusal after readiness publishes no JSON. Context managers release own locks on error. Existing exclusive mutation locking unchanged. Malformed fixture state unchanged on refusal and public recovery tested. FAIL evidence reuse refuses without rewriting artifacts; cleanup runs only on owned fixture server. Installed observer refuses a busy lock without waiting, requires valid control before contention, releases only own lock on exception, compares state/identity before and after all probes, requires expected403 UI refusal and never converts another HTTP result to success."
+    }
+  },
+  "checks": {
+    "R0": "PASS six named tests on final dev321 image in status-run-4-final; integrity VERIFIED",
+    "runner": "PASS eight tests; integrity VERIFIED",
+    "rustdoc": "PASS no warnings, 1.22s final",
+    "runtime": "PASS permanent installed-run-1, exact dev321 image/metadata/notes and refusal; integrity VERIFIED",
+    "browser_fixture": "FAIL retained after20 FR assertions: expected optional endpoint404 is classified as unexpected; no Version/EN checks reached",
+    "protected_live_dialog": "NOT_PERFORMED by explicit final user decision; no sign-in awaited",
+    "independent_review": "NOT_PERFORMED"
+  },
+  "open": [
+    "D02 deleted original FAIL not recovered; requires attributable backup",
+    "D05 optional authority API probe vs strict owner-key fixture recipe; concrete alternatives recorded for Admin maintainer, no third-party receipt verified",
+    "Protected Version dialog retained as NOT_PERFORMED by explicit user decision"
+  ],
+  "retained_proof_hashes": {
+    ".swarm-fixtures/p0-g0-20261103/build.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".swarm-fixtures/p0-g0-20261103/restart.stdout": "ff865606cc7232965bba5e1428fe0c0308575e04c81a8724a6db58e13a732a56",
+    ".swarm-fixtures/p0-g0-20261103/build.stdout": "a65e339215b41f0f32027c15e4ca63a3923f598d76baff0829c967b16b7aabc1",
+    ".swarm-fixtures/p0-g0-20261103/runtime-verification.json": "d45ac1294d2312c93b8105adc12e875e243cd3312a6e387caf6ce6247c57dca0",
+    ".swarm-fixtures/p0-g0-20261103/final-selected-files.diff": "5c192d9d53b10ebc8011bd027ac20740179a2a59a42132f277e6ad691ad3468e",
+    ".swarm-fixtures/p0-g0-20261103/rustdoc.stderr": "4d37854b490ed42ac7f96e966abe98cf11444cf57bdef7081cda50809bceee2e",
+    ".swarm-fixtures/p0-g0-20261103/installed-status.json": "e0bfd121642fbd1a72951fa7620e6a6129357d5c60e0e19d70b8e5b345fc877f",
+    ".swarm-fixtures/p0-g0-20261103/restart.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".swarm-fixtures/p0-g0-20261103/rustdoc.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".swarm-fixtures/p0-g0-20261103/p0-reviewed-sources.tar.gz": "757b8795c3042be019c5f0132dc6ca2df9516ddef501862304d2bf4511ba219d",
+    ".swarm-fixtures/p0-g0-20261103/status-installed-verify.json": "ecc138cad85860cddd0ba6bd6512e9b85ee66bb42a6c859b633d180652cf02ee",
+    ".swarm-fixtures/p0-g0-20261103/runner-verify.json": "0ef3ab76e7302710416461018855cc7a2731a498f9e3b96a7102c8797ca64b5c",
+    ".swarm-fixtures/p0-g0-20261103/runner-run-1/result.json": "32284ef721a1429f2035db1513a347ab8ad446ed2fd22a4d872975f119d9f54f",
+    ".swarm-fixtures/p0-g0-20261103/status-run-2/result.json": "9f3ca8dc29e1c74dce882d52b0f9581e2b4cdb19cfbb611bc95c11e62ed56a30",
+    ".swarm-fixtures/p0-g0-20261103/originals/run13-search.json": "79fdde5633814a3d664722b47057636d88ef2c33af373a9d1ee2e95724750aed",
+    ".swarm-fixtures/p0-g0-20261103/originals/reproducer.json": "14742f232acb6c748a75662f8560ccdd4474119fa777c2fb7c4e31da04910f49",
+    ".swarm-fixtures/p0-g0-20261103/status-run-1/result.json": "3b194b6d894881e3347f67d2ebe900814061b7efd41d1fb8f7c1b84a115d3a8b",
+    ".swarm-fixtures/p0-g0-20261103/status-run-3-installed/result.json": "5e18407858541e3b6135127cc9a770bda5f70b43b4e2458841221d2b52834ddb",
+    ".swarm-fixtures/p0-g0-20261103/production-image-ui/evidence/browser-proof/result.json": "9e4928937b58eb98d5577424c71ae850e4f5fe0e2b6b60a2a93e3337dafe18e5",
+    ".swarm-fixtures/p0-g0-20261103/status-final-verify.json": "ecc138cad85860cddd0ba6bd6512e9b85ee66bb42a6c859b633d180652cf02ee",
+    ".swarm-fixtures/p0-g0-20261103/installed-final-verify.json": "5c5566e46927e2613f435790af1650671a38993f7a2131e5a6c91d71f9edc2d7",
+    ".swarm-fixtures/p0-g0-20261103/p0-reviewed-sources-final.tar.gz": "0121bd01ecaf87b346ece37ad1b3689d9557d6eb4f7d65a6056b1ab13873fd07",
+    ".swarm-fixtures/p0-g0-20261103/build-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".swarm-fixtures/p0-g0-20261103/build-final.stdout": "e1f273ea627a91651faf9891e5537841e786910d8acafef26c7922695405398f",
+    ".swarm-fixtures/p0-g0-20261103/final-p0-selected-files.diff": "a087b2ad57c3be0c19917044cc37e6a68da6c78ea6c40627eb4a5871f863888e",
+    ".swarm-fixtures/p0-g0-20261103/restart-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".swarm-fixtures/p0-g0-20261103/restart-final.stdout": "f93e13530514cf239fdfc289b08dc491e33ebd794cd2b6d1a5ad1fb2c5ffce1e",
+    ".swarm-fixtures/p0-g0-20261103/installed-run-1/result.json": "a82fac7458c23c7e2612b2c2b5fd1dbfe2a4433d6c941c0ae6be138985195978",
+    ".swarm-fixtures/p0-g0-20261103/status-run-4-final/result.json": "7ae59788c53d6695e507b116490d485cdaf57f391b354e24a2e42bb7787a1fd9",
+    ".swarm-fixtures/p0-g0-20261103/p0-reviewed-sources-closure.tar.gz": "89a91b76fe2e299d3dec15d2c7dcbfa86b27c197b78fd1804f6fd39f3faf846b",
+    ".swarm-fixtures/p0-g0-20261103/closure-selected-files.diff": "ecfb1613798c170455bb6b51822e534c587a7b9a1531f93170589a69959e9b92"
+  },
+  "review_manifest_self_hash": "Excluded to avoid recursive hashing; all reviewed source and proof hashes are explicit.",
+  "previous_review_sha256": "a714ee97f9270b929625efe12c836746ebe8a010215ef58fd22973972a991549",
+  "closure": "P0 local scope closed with stated reservations and RETEX; no full protected UI, independent acceptance, E3 or global conformance claim",
+  "link_review_existing_unresolved": [
+    {
+      "file": "tools/verification/README.md",
+      "target": "../../docs/plans/migration-rust/evidence/20261020-104/result.json",
+      "present_in_HEAD": true,
+      "owner": "documentation/evidence custodian",
+      "state": "OPEN inherited reference; target absent in current checkout",
+      "observable": "Restore attributable original or correct link to verified retained location without inventing evidence",
+      "reason_deferred": "Historical evidence-location investigation outside P0 R0; no substitute original inferred"
+    },
+    {
+      "file": "tools/verification/README.md",
+      "target": "../../docs/plans/migration-rust/evidence/20261020-105/result.json",
+      "present_in_HEAD": true,
+      "owner": "documentation/evidence custodian",
+      "state": "OPEN inherited reference; target absent in current checkout",
+      "observable": "Restore attributable original or correct link to verified retained location without inventing evidence",
+      "reason_deferred": "Historical evidence-location investigation outside P0 R0; no substitute original inferred"
+    },
+    {
+      "file": "tools/verification/README.md",
+      "target": "../../docs/plans/migration-rust/evidence/20261020-106/result.json",
+      "present_in_HEAD": true,
+      "owner": "documentation/evidence custodian",
+      "state": "OPEN inherited reference; target absent in current checkout",
+      "observable": "Restore attributable original or correct link to verified retained location without inventing evidence",
+      "reason_deferred": "Historical evidence-location investigation outside P0 R0; no substitute original inferred"
+    },
+    {
+      "file": "tools/verification/README.md",
+      "target": "../../docs/plans/migration-rust/evidence/20261022-root-instance-201/PLAN.md",
+      "present_in_HEAD": true,
+      "owner": "documentation/evidence custodian",
+      "state": "OPEN inherited reference; target absent in current checkout",
+      "observable": "Restore attributable original or correct link to verified retained location without inventing evidence",
+      "reason_deferred": "Historical evidence-location investigation outside P0 R0; no substitute original inferred"
+    }
+  ],
+  "source_archive": ".swarm-fixtures/p0-g0-20261103/p0-reviewed-sources-closure.tar.gz",
+  "link_review_resolved": [
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/DASHBOARD-T20261101.md",
+      "present_in_HEAD": true,
+      "owner": "documentation/evidence custodian",
+      "state": "FIXED and target existence verified",
+      "observable": "Restore attributable original or correct link to verified retained location without inventing evidence",
+      "reason_deferred": "Historical evidence-location investigation outside P0 R0; no substitute original inferred",
+      "new_target": "../../../plans/actions-confiance/paea/DASHBOARD-T20261101.md",
+      "reason": "EN PAEA source/proof pointer must use the existing FR historical dashboard; no new evidence inferred"
+    }
+  ]
+}

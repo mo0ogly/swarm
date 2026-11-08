@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "build-storage",
+  "inputs": [
+    ".cargo/config.toml",
+    ".cargo/storage-policy.json",
+    "tools/verification/cargo_space_guard.py",
+    "tools/verification/test_cargo_space_guard.py",
+    "tools/verification/verify_native_profile.py",
+    "tests/normal_profile_cache_test.py",
+    "tests/normal_profile_archive_test.py",
+    "tests/fixture_area.py",
+    "tools/verification/recipes/build-storage.json"
+  ],
+  "steps": [
+    {
+      "id": "admission-policy-errors-recovery-and-real-cargo",
+      "command": ["python3", "tools/verification/test_cargo_space_guard.py"],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": ["Ran 11 tests", "OK", "test_compact_profile_actual_compiler_and_named_test", "test_refusal_no_compiler_then_recovery", "test_post_replace_sync_failure_does_not_claim_rollback"]
+    },
+    {
+      "id": "effective-wrapper-policy-input-binding",
+      "command": ["python3", "tests/normal_profile_cache_test.py", "-v"],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": ["Ran 6 tests", "OK", "test_admission_tool_and_policy_bound_with_drift_and_removal_refusal"]
+    },
+    {
+      "id": "effective-source-archive-stability",
+      "command": ["python3", "tests/normal_profile_archive_test.py", "-v"],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": ["Ran 4 tests", "OK", "test_source_drift_refuses_without_replacing_witness_then_recovers", "test_admission_support_bytes_survive_source_removal"]
+    }
+  ],
+  "environment": {}
+}

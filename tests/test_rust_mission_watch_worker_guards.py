@@ -15,6 +15,7 @@ from pathlib import Path
 import struct
 import sys
 import tempfile
+from fixture_area import fixture_area
 import types
 import unittest
 from unittest.mock import Mock, patch
@@ -235,7 +236,7 @@ class WatchWorkerGuards(unittest.TestCase):
         subprocess is mocked: this proves harness assertions, not CLI behavior.
         Valid helper entry/setsid is never invoked in this test process.
         """
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             out = Path(directory) / 'refusals'
             with patch.object(subject.subprocess, 'run', return_value=types.SimpleNamespace(returncode=2, stdout=b'', stderr=b'usage')) as run:
                 subject.helper_refusals(Path('/owned-normal'), out)
@@ -246,7 +247,7 @@ class WatchWorkerGuards(unittest.TestCase):
                 self.assertEqual(call.kwargs['cwd'], out / 'cwd')
             self.assertEqual(json.loads((out / 'result.json').read_text())['refused'],
                 ['missing-agent', 'help', 'relative-root', 'without-json'])
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             out = Path(directory) / 'refusals'
             def mutate(argv, cwd, capture_output):
                 """Simulate a refused CLI incorrectly creating a Root directory."""
@@ -263,7 +264,7 @@ class WatchWorkerGuards(unittest.TestCase):
         with identical setup. No process is created and no socket syscall runs.
         """
         for inject in (False, True):
-            with self.subTest(inject=inject), tempfile.TemporaryDirectory() as temporary:
+            with self.subTest(inject=inject), tempfile.TemporaryDirectory(dir=fixture_area()) as temporary:
                 root = Path(temporary) / 'root'
                 (root / '.swarm').mkdir(parents=True)
                 out = Path(temporary) / 'case'

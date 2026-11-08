@@ -1,0 +1,7 @@
+{
+  "root": "/tmp/swarm-biba-syscall-pj47rwk2",
+  "valid_exit": 0,
+  "exit": 2,
+  "stdout": "",
+  "stderr": "/usr/bin/python3: can't open file '/tmp/swarm-biba-syscall-pj47rwk2/probe.py': [Errno 1] Operation not permitted\n"
+}

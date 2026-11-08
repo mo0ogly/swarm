@@ -1,0 +1,6 @@
+{
+  "scope": "Compiler diagnostic only; Rust/manifests declared, dynamic assets and effective features not qualified",
+  "qualification": false,
+  "global_watchdog": null,
+  "prior_refusal": "../check-fd/driver.out"
+}

@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "facts": {
+    "private_read": false,
+    "database_write": false,
+    "private_write": false,
+    "official_write": false
+  },
+  "one_actual_control": true,
+  "replay_without_execution": true,
+  "producer_binary": "9d3346aebb56f76fdb1d58415475aef500e7f569d01258081afcb00f8e7fb272",
+  "control_binary": "a7984af18130910ae413837756aece88157296ca30f41b96ef4e97cc180b2e1d",
+  "accepted": false,
+  "scope": "Owned retained fixture only; no global qualification"
+}

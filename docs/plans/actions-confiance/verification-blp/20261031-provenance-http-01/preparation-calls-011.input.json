@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "expected_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "connection": {
+    "id": "local",
+    "label": "Owned text API",
+    "base_url": "http://127.0.0.1:46007/v1",
+    "model": "fixed-model",
+    "key": "PRIVATE_PREPARATION_FIXTURE",
+    "disabled": false
+  },
+  "replace_key": true,
+  "preview": false,
+  "preview_token": "afb01341d1b63d74a3f4570c6a1ab0bac2d071590b225e6c5f388d2592405324"
+}

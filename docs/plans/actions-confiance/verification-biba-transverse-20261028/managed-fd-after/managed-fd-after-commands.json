@@ -1,0 +1,76 @@
+[
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-bf0e6dc0ffc32ecceccfed7970de33cbf8c7a18efbbac040188e8af21e5d655f",
+      "work",
+      "show",
+      "w-85afc1bc04cf32629e12165b",
+      "--root",
+      "/tmp/swarm-model83-ah8x69sh",
+      "--json"
+    ],
+    "start": 1793209287.28533,
+    "end": 1793209287.410714,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-bf0e6dc0ffc32ecceccfed7970de33cbf8c7a18efbbac040188e8af21e5d655f",
+      "budget",
+      "apply",
+      "w-85afc1bc04cf32629e12165b",
+      "--root",
+      "/tmp/swarm-model83-ah8x69sh",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/managed-fd-after/managed-fd-after-002.input.json"
+    ],
+    "start": 1793209287.4287786,
+    "end": 1793209287.5386891,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-bf0e6dc0ffc32ecceccfed7970de33cbf8c7a18efbbac040188e8af21e5d655f",
+      "agent",
+      "prepare",
+      "w-85afc1bc04cf32629e12165b",
+      "--root",
+      "/tmp/swarm-model83-ah8x69sh",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/managed-fd-after/managed-fd-after-003.input.json"
+    ],
+    "start": 1793209287.5591865,
+    "end": 1793209287.8916981,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-bf0e6dc0ffc32ecceccfed7970de33cbf8c7a18efbbac040188e8af21e5d655f",
+      "agent",
+      "run",
+      "session",
+      "--root",
+      "/tmp/swarm-model83-ah8x69sh",
+      "--json"
+    ],
+    "start": 1793209287.9036543,
+    "end": 1793209289.6117604,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-bf0e6dc0ffc32ecceccfed7970de33cbf8c7a18efbbac040188e8af21e5d655f",
+      "work",
+      "show",
+      "w-85afc1bc04cf32629e12165b",
+      "--root",
+      "/tmp/swarm-model83-ah8x69sh",
+      "--json"
+    ],
+    "start": 1793209289.6415706,
+    "end": 1793209289.857252,
+    "exit": 0
+  }
+]

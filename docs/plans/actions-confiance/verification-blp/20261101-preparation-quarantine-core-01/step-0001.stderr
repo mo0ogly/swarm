@@ -1,0 +1,10 @@
+   Compiling proc-macro2 v1.0.106
+   Compiling quote v1.0.45
+   Compiling serde_core v1.0.228
+   Compiling syn v2.0.118
+   Compiling serde_json v1.0.150
+   Compiling serde_derive v1.0.228
+   Compiling serde v1.0.228
+   Compiling swarm-confidentiality v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-confidentiality)
+    Finished `test` profile [unoptimized] target(s) in 9.49s
+     Running unittests src/lib.rs (.cache/blp-verification-target/debug/deps/swarm_confidentiality-539440ab3d68ee60)

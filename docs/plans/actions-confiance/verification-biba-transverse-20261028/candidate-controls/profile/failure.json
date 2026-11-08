@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "type": "ValueError",
+  "reason": "profile-cargo-failed",
+  "scope": "Build unqualified; inspect original Cargo channels",
+  "global_watchdog": null
+}

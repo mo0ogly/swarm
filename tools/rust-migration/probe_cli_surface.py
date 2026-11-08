@@ -14,6 +14,10 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 
 
 def main():
@@ -44,7 +48,7 @@ def main():
     if not commands or any(not isinstance(c, str) or c.startswith('-') for c in commands):
         raise ValueError('invalid or empty absent-command collection')
     cases = []
-    with tempfile.TemporaryDirectory(prefix='swarm-coverage-cli-') as fixture:
+    with tempfile.TemporaryDirectory(prefix='swarm-coverage-cli-', dir=fixture_area()) as fixture:
         for command in commands:
             completed = subprocess.run([str(binary), command, '--root', fixture, '--json'], capture_output=True, text=True, env={**os.environ, 'SWARM_LANG': 'fr'})
             payload = json.loads(completed.stderr)

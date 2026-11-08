@@ -1,4 +1,5 @@
 #![cfg(target_os = "linux")]
+mod common;
 use std::{
     fs,
     os::unix::fs::{symlink, PermissionsExt},
@@ -13,7 +14,7 @@ use swarm_enrollment_config::{
 use tempfile::TempDir;
 /// Isolated existing private directory; no live service data is used.
 fn fixture() -> (TempDir, Documents) {
-    let root = TempDir::new().unwrap();
+    let root = TempDir::new_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let d = Documents::open(root.path(), rustix::process::geteuid().as_raw()).unwrap();
     (root, d)
@@ -127,7 +128,7 @@ fn private_documents_reservations_are_immediate_and_retained_directory_survives_
     assert_eq!(r.read("checkpoint").unwrap(), b"bound");
     r.finish().unwrap();
     other.close().unwrap();
-    let parent = TempDir::new().unwrap();
+    let parent = TempDir::new_in(common::fixture_area::area()).unwrap();
     let retained = parent.path().join("retained");
     fs::rename(root.path(), &retained).unwrap();
     fs::create_dir(root.path()).unwrap();

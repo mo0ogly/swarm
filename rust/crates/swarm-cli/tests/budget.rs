@@ -16,7 +16,7 @@ fn call(root: &Path, args: &[&str]) -> Output {
 }
 /// Initialize and create Work through supported public native operations.
 fn fixture() -> (tempfile::TempDir, String) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     assert!(Command::new("git")
         .args(["init", "--quiet"])
         .arg(root.path())

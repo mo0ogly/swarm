@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]||'test-results/projects-home');fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-projects-home-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-projects-home-'));
 function cli(args,data){return JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(data?['--input','-']:[])],{input:data?JSON.stringify(data):undefined,encoding:'utf8'})||'null')}
 cli(['init']);const w=cli(['work','create'],{schema_version:1,event_id:'home-create',expected_revision:0,title:'Mon projet français',objective:'Préserver le titre saisi par l’utilisateur.',scope:'UI fixture only',criteria:['Navigation'],next:'Examiner'}).work;
 const app=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser;const errors=[],mutations=[],mutationDetails=[];

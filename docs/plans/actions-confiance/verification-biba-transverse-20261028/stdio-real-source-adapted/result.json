@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "scope": "Sparse real-source transport fixture, no provider exec or engine-profile qualification",
+  "before_exit": 23,
+  "current_exit": 0
+}

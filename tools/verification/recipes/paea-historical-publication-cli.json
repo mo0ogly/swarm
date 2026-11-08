@@ -26,8 +26,6 @@
     "tools/agent-workflows/templates/TRACKING.md",
     "tools/agent-workflows/templates/preparations.json",
     "rust/crates/swarm-linux-prerequisites/**/*",
-    "rust/crates/swarm-biba-linux/Cargo.toml",
-    "rust/crates/swarm-biba-linux/src/lib.rs",
     "rust/crates/swarm-api-client/Cargo.toml",
     "rust/crates/swarm-api-client/src/lib.rs",
     "rust/crates/swarm-cli/Cargo.toml",
@@ -85,7 +83,8 @@
     "tests/paea_historical_publication_test.py",
     "docs/architecture/NATIVE-REVIEWER.md",
     "docs/en/NATIVE-REVIEWER.md",
-    "tools/verification/recipes/paea-historical-publication-cli.json"
+    "tools/verification/recipes/paea-historical-publication-cli.json",
+    "rust/crates/swarm-biba-linux/**/*"
   ],
   "environment": {},
   "steps": [

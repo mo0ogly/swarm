@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "strace",
+    "-f",
+    "-e",
+    "trace=openat,ioctl,execve",
+    "-o",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/managed-trace/syscalls.out",
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-d78b3c22ab989069f5d7ffc5cd7d184ebb5b96b88f9f4250513753c028b96087",
+    "agent",
+    "run",
+    "biba-trace",
+    "--root",
+    "/tmp/swarm-model83-r65c72t0",
+    "--json"
+  ],
+  "scope": "Owned fixture process descendants only"
+}

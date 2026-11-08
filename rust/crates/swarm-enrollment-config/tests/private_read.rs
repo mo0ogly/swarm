@@ -1,5 +1,6 @@
 #![cfg(target_os = "linux")]
 //! Disposable private file reads, no installed seeds, service or live datastore.
+mod common;
 use std::{
     fs,
     os::unix::fs::{symlink, PermissionsExt},
@@ -11,7 +12,7 @@ use swarm_enrollment_config::{
 };
 /// Private child under an owned temporary parent, allowing safe rename witnesses.
 fn fixture() -> (tempfile::TempDir, PathBuf, Documents) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     mode(root.path(), 0o700);
     let path = root.path().join("documents");
     fs::create_dir(&path).unwrap();

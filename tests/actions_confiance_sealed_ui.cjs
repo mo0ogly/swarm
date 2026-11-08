@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('assert'),fs=require('fs'),path=require('path'),os=require('os'),cp=require('child_process'),pup=require('puppeteer');
-const binary=path.resolve(process.argv[2]),outdir=path.resolve(process.argv[3]);fs.mkdirSync(outdir,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-sealed-ui-')),checks=[],errors=[];
+const binary=path.resolve(process.argv[2]),outdir=path.resolve(process.argv[3]);fs.mkdirSync(outdir,{recursive:true});const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-sealed-ui-')),checks=[],errors=[];
 const identities=[{subject:'admin',token:'admin-sealed-ui-fixture-token',integrity:3,roles:['admin']},{subject:'alice',token:'alice-sealed-ui-fixture-token',integrity:1,roles:['requester']},{subject:'bob',token:'bob-sealed-ui-fixture-token',integrity:2,roles:['approver']},{subject:'effect-service',token:'effect-sealed-ui-fixture-token',integrity:2,roles:['effect']}];
 function cli(action,data){return JSON.parse(cp.execFileSync(binary,['--root',root,'--json','trust',action,...(data?['--input','-']:[])],{input:data?JSON.stringify(data):undefined,encoding:'utf8',stdio:['pipe','pipe','pipe']}))}
 cp.execFileSync(binary,['--root',root,'--json','init']);cli('config-apply',{schema_version:1,event_id:'sealed-ui-init',expected_revision:0,policy:{mandate_ttl_seconds:3600,unknown_reconcile_seconds:0,evidence_retention_days:365,require_separation:true},identities,reason:'sealed browser isolated recipe'});

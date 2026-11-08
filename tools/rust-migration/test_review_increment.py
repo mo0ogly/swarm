@@ -3,6 +3,10 @@ import copy
 import json
 from pathlib import Path
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import tarfile
 import unittest
 from review_increment import AXES, check, digest, publish, resolve_baseline, require_review, ReviewRefused, archive_references, retained_parity, go_test_inventory
@@ -21,7 +25,7 @@ class GoInventoryTests(unittest.TestCase):
 class ParityReferenceTests(unittest.TestCase):
     """Explicit references accept a witness then refuse tampering and path escapes."""
     def test_explicit_parity_reference_preserves_original_and_refuses_changes(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root=Path(directory);folder=root/'chosen-parity';folder.mkdir()
             result=folder/'result.json';original=b'{"status":"PASS"}';result.write_bytes(original)
             reference=dict(schema_version=1,path='chosen-parity',result_sha256=digest(result))
@@ -43,7 +47,7 @@ class ReviewIncrementTests(unittest.TestCase):
 
     def setUp(self):
         """Declare two snapshots and a review bound to real source/evidence bytes."""
-        self.temporary = tempfile.TemporaryDirectory()
+        self.temporary = tempfile.TemporaryDirectory(dir=fixture_area())
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         (self.root / 'source.rs').write_text('/// Return a protocol flag.\npub fn flag() -> bool { false }\n')

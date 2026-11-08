@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Public T5 recipe: isolated CLI state and independently built web application."""
 import argparse,hashlib,json,os,signal,subprocess,tempfile
+from fixture_area import fixture_area
 from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--criterion',type=int,choices=range(5),required=True);p.add_argument('--root',type=Path,required=True);p.add_argument('--timeout-seconds',type=int,required=True);p.add_argument('--binary',type=Path);p.add_argument('--evidence-dir',type=Path);a=p.parse_args();assert a.timeout_seconds>0
-repo=a.root.resolve();tmp=tempfile.TemporaryDirectory(prefix='swarm-process-public-');base=Path(tmp.name);binary=a.binary.resolve() if a.binary else base/'swarm';proof=a.evidence_dir.resolve() if a.evidence_dir else base/'proof';proof.mkdir(parents=True,exist_ok=True);cases=[]
+repo=a.root.resolve();tmp=tempfile.TemporaryDirectory(prefix='swarm-process-public-', dir=fixture_area());base=Path(tmp.name);binary=a.binary.resolve() if a.binary else base/'swarm';proof=a.evidence_dir.resolve() if a.evidence_dir else base/'proof';proof.mkdir(parents=True,exist_ok=True);cases=[]
 def execute(argv,**kwargs):
  child=subprocess.Popen(argv,cwd=repo,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True,**kwargs)
  try:out,err=child.communicate(timeout=a.timeout_seconds)

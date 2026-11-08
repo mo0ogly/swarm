@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "paea-review-package",
+  "inputs": [
+    "tools/paea/review_package.py",
+    "tools/verification/recipe.py",
+    "docs/plans/actions-confiance/paea/E3-PROTOCOL.md",
+    "docs/plans/actions-confiance/paea/GUIDE-INTEGRATION.md",
+    "docs/plans/actions-confiance/paea/PILOTE-OPERATIONNEL.md",
+    "docs/plans/actions-confiance/paea/GAP-CLOSURE-PLAN-20261103.md",
+    "docs/plans/actions-confiance/paea/DASHBOARD-T20261101.md",
+    "docs/plans/actions-confiance/paea/G3-INVENTAIRE-VOIES-20261108.md",
+    "docs/plans/actions-confiance/paea/B2-COMPARATOR-20261109.md",
+    "docs/plans/actions-confiance/paea/REVIEW-PACKAGE-20261109.md",
+    "docs/en/plans/actions-confiance/paea/E3-PROTOCOL.md",
+    "docs/en/plans/actions-confiance/paea/GUIDE-INTEGRATION.md",
+    "docs/en/plans/actions-confiance/paea/OPERATIONAL-PILOT.md",
+    "docs/en/plans/actions-confiance/paea/GAP-CLOSURE-PLAN-20261103.md",
+    "docs/en/plans/actions-confiance/paea/G3-INVENTAIRE-VOIES-20261108.md",
+    "docs/en/plans/actions-confiance/paea/B2-COMPARATOR-20261109.md",
+    "docs/en/plans/actions-confiance/paea/REVIEW-PACKAGE-20261109.md",
+    "tools/paea/pilot_lab.py",
+    "tools/paea/pilot_oracle.py",
+    "tools/paea/run_pilot.py",
+    "tools/paea/verify_pilot.py",
+    "tools/paea/lab_evidence.py",
+    "tools/paea/make_contract_vectors.py",
+    "tools/paea/b2_comparator.py",
+    "tests/paea_pilot_lab_test.py",
+    "tests/helpers/paea_pilot_contention.py",
+    "tests/fixtures/paea/contract-v1.json",
+    "tests/fixtures/paea/payment-registry-v1.json",
+    "tests/fixtures/paea/payment-request-v1.json",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "tools/verification/recipes/paea-contract.json",
+    "tools/verification/recipes/paea-pilot-lab.json",
+    "tools/verification/recipes/paea-pilot-contention.json",
+    "tools/verification/recipes/paea-laboratory-evidence.json",
+    "tools/verification/recipes/paea-b2-comparator.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "review-package-assembly",
+      "command": [
+        "python3",
+        "tools/paea/review_package.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_REVIEW_PACKAGE_PUBLISHED deliverables="
+      ],
+      "required_stderr": []
+    }
+  ]
+}

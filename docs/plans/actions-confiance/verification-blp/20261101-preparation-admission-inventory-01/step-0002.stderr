@@ -1,0 +1,15 @@
+test_current_is_readonly (__main__.InventoryChecks.test_current_is_readonly)
+A valid inventory changes neither source bytes nor fixture entries. ... ok
+test_escape_paths_refuse (__main__.InventoryChecks.test_escape_paths_refuse)
+Relative traversal and an outside symlink never become reviewed IO. ... ok
+test_source_mutation_refuses_then_original_recovers (__main__.InventoryChecks.test_source_mutation_refuses_then_original_recovers)
+An unreviewed byte change fails even when its anchor still exists. ... ok
+test_untrusted_graph_and_runtime_claim_refuse (__main__.InventoryChecks.test_untrusted_graph_and_runtime_claim_refuse)
+Missing contracts/refs, duplicate flow IDs and enforcement claims fail. ... ok
+test_wrong_anchor_cannot_be_hidden_by_current_hash (__main__.InventoryChecks.test_wrong_anchor_cannot_be_hidden_by_current_hash)
+A fresh digest alone never admits a missing reviewed boundary. ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.005s
+
+OK

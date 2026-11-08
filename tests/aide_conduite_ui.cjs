@@ -8,7 +8,7 @@ const {spawn,execFileSync}=require('node:child_process');
 const puppeteer=require(process.env.PUPPETEER_MODULE||'puppeteer');
 const binary=path.resolve(process.argv[2]),outDir=path.resolve(process.argv[3]);
 fs.mkdirSync(outDir,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-aide-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-aide-'));
 const checks=[],errors=[],external=[];
 const cli=(...a)=>{const r=execFileSync(binary,['--root',root,'--json',...a],{encoding:'utf8'});return r.startsWith('{')||r.startsWith('[')?JSON.parse(r):null};
 const send=(a,d)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...a,'--input','-'],{encoding:'utf8',input:JSON.stringify(d)}));

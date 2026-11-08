@@ -289,4 +289,27 @@ mod tests {
             assert_eq!(channels, expected);
         }
     }
+    /// Real Child in a synthetic pack failure exercises the exact production
+    /// error envelope; recovery preserves the original failed outcome and never
+    /// changes it into a successful pack or a retry permission.
+    #[test]
+    fn retained_pack_child_recovery_and_close_gate() {
+        let mut error = GitPackError::preflight(
+            "pack-recovery-fixture",
+            crate::validation_run::retained_child_for_owner_test(),
+        );
+        assert!(crate::validation_run::has_unresolved_process(&error));
+        while crate::validation_run::has_unresolved_process(&error) {
+            assert!(crate::validation_run::poll_retained_processes(&mut error).is_empty());
+            std::thread::yield_now();
+        }
+        assert!(error
+            .process_error_mut()
+            .unwrap()
+            .reaped_exit_status()
+            .unwrap()
+            .success());
+        assert_eq!(error.code(), "pack-recovery-fixture");
+        assert!(error.exit_status.is_none());
+    }
 }

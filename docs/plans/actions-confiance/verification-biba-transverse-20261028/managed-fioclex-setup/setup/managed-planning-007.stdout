@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "status": "applied",
+  "accepted": false,
+  "selected_scope": "root",
+  "input_event": "managed-planning-enable",
+  "settings_revision": "1",
+  "lease_seconds": 120,
+  "claim_id": "planning-claim-34c0dbd81b43b5f50bdae47d",
+  "run": {
+    "schema_version": 1,
+    "claim_id": "planning-claim-34c0dbd81b43b5f50bdae47d",
+    "decision_event": "planning-decision-748c96d3e2dfae3034a68375",
+    "decision_applied": true,
+    "accepted": false,
+    "replayed": false,
+    "work": {
+      "planning": {
+        "reviewer_required": true,
+        "reviewer": {
+          "max_context_files": 24,
+          "max_source_bytes": 98304,
+          "max_context_bytes": 131072,
+          "max_files": 100,
+          "provider": "fixture",
+          "provider_digest": "6504ead35ea17ce2802acccfc76d288f6c8896fffc278c0cf36156f9946373b2",
+          "model_route": {
+            "level": "standard",
+            "model": "fixture-standard",
+            "effort": "fixture-medium",
+            "billing": "external",
+            "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+            "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+          },
+          "max_calls": 2,
+          "calls": 0,
+          "authorized": "2026-10-28T16:41:31.822926072Z"
+        },
+        "model_route": {
+          "level": "standard",
+          "model": "fixture-standard",
+          "effort": "fixture-medium",
+          "billing": "external",
+          "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+          "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+        },
+        "checks": {
+          "req-1": [
+            {
+              "inputs": [
+                "handoff.md"
+              ],
+              "id": "actual-handoff",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path; assert Path('handoff.md').read_text().strip()"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Check owned handoff content",
+              "timeout_seconds": 60
+            }
+          ]
+        },
+        "repository": {
+          "source": "/tmp/swarm-model83-gklfbako/source",
+          "storage": "/tmp/swarm-model83-gklfbako/.swarm/managed/w-3fac4614949c776f981ee01f",
+          "base_commit": "41027db5426cf9f748f5bf4943c88b8983a6855b",
+          "candidate_commit": "41027db5426cf9f748f5bf4943c88b8983a6855b",
+          "snapshot_digest": "9438d847aeca8f027fc87b86e0f2359d25b7f2252f0644b7f5136ea49befd39b",
+          "request_digest": "44857e71ce04d382e59eda18dbe1bc3b7cbcace02e4cf93cc2118244ab49ad01"
+        },
+        "provider": "fixture",
+        "provider_digest": "6504ead35ea17ce2802acccfc76d288f6c8896fffc278c0cf36156f9946373b2",
+        "activations": 1,
+        "max_activations": 6,
+        "version": 1,
+        "paused": false,
+        "max_tasks": 2,
+        "max_decisions": 10,
+        "decisions": 1,
+        "scopes": [
+          {
+            "last_model": {
+              "provider": "fixture",
+              "provider_digest": "6504ead35ea17ce2802acccfc76d288f6c8896fffc278c0cf36156f9946373b2",
+              "route": {
+                "level": "standard",
+                "model": "fixture-standard",
+                "effort": "fixture-medium",
+                "billing": "external",
+                "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+                "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+              },
+              "actor": "",
+              "at": "2026-10-28T16:41:32.540855651Z"
+            },
+            "delivery": {
+              "judge_available": true,
+              "judge_cycle": 1,
+              "task_budget": 2,
+              "activation_budget": 6,
+              "closure_unavailable": true,
+              "review_retry_unavailable": true,
+              "production_retry_unavailable": true,
+              "context_sha256": "e3a47737b21b01d70b6cd5f40102ad9ff07f9615c4c59bf3105b99397d934a88",
+              "events": [
+                "managed-planning-enable"
+              ],
+              "decision": "planning-decision-748c96d3e2dfae3034a68375"
+            },
+            "workflow": {
+              "version": 1,
+              "role": "planner",
+              "methods": [
+                "apex",
+                "audit-pdca",
+                "spec-builder",
+                "spec-audit",
+                "replan",
+                "debug",
+                "product-planning"
+              ],
+              "sha256": "0ee8956b70ffdc7971b868f62666fa89f4cd40edeb68fb9211755de537572e55"
+            },
+            "activations": 1,
+            "id": "root",
+            "objective": "Scoped fixture planning",
+            "requirements": [],
+            "revision": 2,
+            "generation": 2,
+            "state": "waiting"
+          },
+          {
+            "max_tasks": 2,
+            "max_activations": 3,
+            "activations": 0,
+            "id": "child",
+            "parent": "root",
+            "objective": "Owned child scope\nPlan the owned requirement",
+            "requirements": [
+              "req-1"
+            ],
+            "revision": 1,
+            "generation": 0,
+            "state": "ready"
+          }
+        ],
+        "inbox": [
+          {
+            "id": "managed-planning-enable",
+            "scope": "root",
+            "kind": "brief",
+            "message": "Scoped fixture planning",
+            "decision": "planning-decision-748c96d3e2dfae3034a68375",
+            "at": "2026-10-28T16:41:31.822926072Z"
+          },
+          {
+            "id": "plan-de5c7895ee993f470d37aafc99148b091aac3c01c1b45eb22e9ede26d16b0aa8",
+            "scope": "child",
+            "kind": "delegation",
+            "message": "Owned child scope",
+            "at": "2026-10-28T16:41:34.744211827Z"
+          }
+        ],
+        "judge": {
+          "cycle": 1,
+          "max_cycles": 0,
+          "closed": false
+        }
+      },
+      "schema_version": 1,
+      "id": "w-3fac4614949c776f981ee01f",
+      "revision": 4,
+      "title": "Public planning bootstrap",
+      "objective": "Scoped fixture planning",
+      "scope": "Owned local bootstrap",
+      "criteria": [
+        "Configuration is persisted without model execution"
+      ],
+      "next": "",
+      "summary": "",
+      "memory": null,
+      "created": "2026-10-28T16:41:31.021763441Z",
+      "updated": "2026-10-28T16:41:34.843099078Z",
+      "git": {
+        "head": "",
+        "branch": "",
+        "changes": ""
+      },
+      "tasks": []
+    }
+  }
+}

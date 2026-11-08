@@ -1,0 +1,38 @@
+'use strict';
+/** Exercise direct manipulation/discovery through real DOM gestures. Proposals
+ * are cancelled: this helper never saves a task, changes Work or grants rights.
+ * The surrounding native journey owns browser diagnostics and binary identity.
+ */
+module.exports=async function directGraph(page,label,cfg,check){
+ const fs=require('node:fs'),path=require('node:path');
+ const frames=()=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ const read=()=>page.evaluate(async work=>(await(await fetch('/api/v1/planning?'+new URLSearchParams({work}))).json()),cfg.work);
+ const original=JSON.stringify(await read());
+ check(label+'-direct-labelled-vector-tools',await page.$$eval('#pilot-zoom-in,#pilot-zoom-out,#pilot-fit,#pilot-tools-toggle',nodes=>nodes.length===4&&nodes.every(e=>e.querySelector('svg[aria-hidden="true"]')&&e.textContent.trim().length>0)));
+ const contrast=await page.evaluate(()=>{const sample=color=>{const c=document.createElement('canvas');c.width=c.height=1;const x=c.getContext('2d');x.fillStyle=color;x.fillRect(0,0,1,1);return [...x.getImageData(0,0,1,1).data].slice(0,3)},lum=color=>sample(color).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);return ['pilot-zoom-in','pilot-fit','pilot-tools-toggle'].map(id=>{const s=getComputedStyle(document.getElementById(id)),a=lum(s.color),b=lum(s.backgroundColor);return {id,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)}})});check(label+'-direct-controls-aa-contrast',contrast.every(value=>value.ratio>=4.5));
+ check(label+'-direct-fit-matches-zoom-color',await page.evaluate(()=>getComputedStyle(document.querySelector('#pilot-fit')).backgroundColor===getComputedStyle(document.querySelector('#pilot-zoom-in')).backgroundColor));
+ check(label+'-direct-semantic-control-color',await page.$eval('#pilot-zoom-in',e=>getComputedStyle(e).backgroundColor!==getComputedStyle(document.querySelector('#pilot-canvas')).backgroundColor));
+ const open='.graph-task-open[data-task="a"]',position=()=>page.$eval(open,e=>e.parentElement.getAttribute('transform'));
+ await page.$eval(open,e=>e.scrollIntoView({block:'center',inline:'center'}));await frames();
+ const before=await position(),box=await page.$eval(open,e=>{const r=e.getBoundingClientRect();return {x:r.x+60,y:r.y+20}});
+ await page.mouse.move(box.x,box.y);await page.mouse.down();await page.mouse.move(box.x+45,box.y+25,{steps:5});await page.mouse.up();await frames();
+ const dragState=await page.evaluate(({box,before})=>({box,before,after:document.querySelector('.graph-task-open[data-task="a"]').parentElement.getAttribute('transform'),hit:document.elementFromPoint(box.x,box.y)?.outerHTML.slice(0,180),viewport:{width:innerWidth,height:innerHeight}}),{box,before});fs.writeFileSync(path.join(cfg.output,label+'-direct-drag.json'),JSON.stringify(dragState,null,2)+'\n');
+ check(label+'-direct-body-drag-moves-card',await position()!==before);
+ check(label+'-direct-drag-does-not-open-editor',!await page.$('.native-graph-editor[open]'));
+ await page.click('#pilot-layout-undo');check(label+'-direct-body-drag-undo',await position()===before);
+ await page.mouse.move(box.x,box.y);await page.mouse.down();await page.mouse.move(box.x+30,box.y+20,{steps:4});await page.keyboard.press('Escape');await page.mouse.up();await frames();check(label+'-direct-escape-restores-card',await position()===before&&!await page.$('.native-graph-editor[open]'));
+ await page.click(open);await page.waitForSelector('.native-graph-editor[open]');check(label+'-direct-click-still-opens-task',!!await page.$('#native-graph-title'));await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('.native-graph-editor[open]'));
+ await page.click('#pilot-graph-help-toggle');check(label+'-direct-help-is-modal',await page.$eval('#pilot-graph-help',e=>e.tagName==='DIALOG'&&e.open&&e.matches(':modal')&&!!e.querySelector('h2')));await page.keyboard.press('Escape');check(label+'-direct-help-restores-focus',await page.evaluate(()=>document.activeElement.id==='pilot-graph-help-toggle'&&!document.querySelector('#pilot-graph-help').open));
+ await page.click('#pilot-fullscreen');await page.click('#pilot-graph-help-toggle');await page.setViewport({width:320,height:844});await frames();await page.screenshot({path:path.join(cfg.output,label+'-direct-help-320.png')});check(label+'-direct-help-mobile-close-visible',await page.$eval('#pilot-graph-help-close',e=>{const r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight}));await page.click('#pilot-graph-help-close');check(label+'-direct-help-preserves-fullscreen',await page.$eval('.native-graph-dialog',e=>e.open));check(label+'-direct-mobile-shows-a-complete-card',await page.evaluate(()=>{const c=document.querySelector('#pilot-canvas').getBoundingClientRect();return [...document.querySelectorAll('.graph-task-open')].some(e=>{const r=e.getBoundingClientRect();return r.top>=Math.max(0,c.top)&&r.bottom<=Math.min(innerHeight,c.bottom)&&r.left>=Math.max(0,c.left)&&r.right<=Math.min(innerWidth,c.right)})}));await page.screenshot({path:path.join(cfg.output,label+'-direct-fullscreen-320.png')});await page.click('#pilot-fullscreen');check(label+'-direct-help-is-not-task-editor',!await page.$('.native-graph-editor'));await page.setViewport({width:1440,height:1000});await frames();
+ // Hit the actual path, not a synthetic .click(): canvas capture must not eat it.
+ await page.click('#pilot-fit');await page.$eval('#pilot-canvas',e=>e.scrollIntoView({block:'center'}));await frames();
+ const edge=await page.$eval('.graph-arete',e=>{const p=e.getPointAtLength(e.getTotalLength()/2),s=e.ownerSVGElement.createSVGPoint();s.x=p.x;s.y=p.y;const q=s.matrixTransform(e.getScreenCTM());return {x:q.x,y:q.y,from:e.dataset.from,to:e.dataset.to}});
+ fs.writeFileSync(path.join(cfg.output,label+'-direct-edge.json'),JSON.stringify(await page.evaluate(edge=>({...edge,hit:document.elementFromPoint(edge.x,edge.y)?.outerHTML.slice(0,220),viewport:{width:innerWidth,height:innerHeight}}),edge),null,2)+'\n');
+ await page.mouse.click(edge.x,edge.y);await frames();check(label+'-direct-path-click-opens-link-modal',!!await page.$('.native-graph-link-editor[open]'));
+ const alternative=await page.$eval('#native-graph-link-source',(e,from)=>[...e.options].find(o=>o.value!==from)?.value,edge.from);await page.select('#native-graph-link-source',alternative);await page.click('#native-graph-link-replace');await page.waitForSelector('#native-graph-depends');check(label+'-direct-replacement-is-proposal',await page.$eval('#native-graph-depends',(e,{alternative,from})=>[...e.selectedOptions].some(o=>o.value===alternative)&&![...e.selectedOptions].some(o=>o.value===from),{alternative,from:edge.from}));await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('.native-graph-editor[open]'));
+ await page.mouse.click(edge.x,edge.y);await page.waitForSelector('#native-graph-link-remove');await page.click('#native-graph-link-remove');await page.waitForSelector('#native-graph-depends');check(label+'-direct-removal-is-proposal',await page.$eval('#native-graph-depends',(e,from)=>![...e.selectedOptions].some(o=>o.value===from),edge.from));await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('.native-graph-editor[open]'));
+ check(label+'-direct-gestures-never-mutate-work',JSON.stringify(await read())===original);
+ await page.screenshot({path:path.join(cfg.output,label+'-direct-desktop.png')});
+ // Restore presentation before the independent analyst scenarios.
+ await page.click('#pilot-layout-reset');
+};

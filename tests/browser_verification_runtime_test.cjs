@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),{tree,launchOptions}=require('./helpers/browser_verification_runtime.cjs');
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-runtime-guard-'));fs.chmodSync(root,0o700);let complete=false;
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-runtime-guard-'));fs.chmodSync(root,0o700);let complete=false;
 try{
  fs.writeFileSync(path.join(root,'module.cjs'),'valid original',{mode:0o600});const control=tree(root);assert.deepEqual(tree(root),control);
  fs.writeFileSync(path.join(root,'module.cjs'),'different code');assert.notDeepEqual(tree(root),control);fs.writeFileSync(path.join(root,'module.cjs'),'valid original');assert.deepEqual(tree(root),control);

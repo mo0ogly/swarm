@@ -1,0 +1,32 @@
+[
+  {
+    "model_route": {
+      "level": "",
+      "model": "fixed-model",
+      "effort": "",
+      "billing": "",
+      "policy_hash": "c1c2d55d795f393d3774580aad8aad187614496b42559e4695c9d63073b7504e",
+      "reason": "configured-api-fixed-model"
+    },
+    "context_mode": "full",
+    "target": "plan",
+    "used_in_plan": false,
+    "used_in_brief": false,
+    "id": "pt-d78ee2eec209310bfbd6b562555d9279",
+    "preparation_id": "prep-b0f3364296da8a02bb4c7164",
+    "status": "running",
+    "created_at": "2026-10-31T20:44:14.890760141Z",
+    "source_revision": 4,
+    "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+    "provider": "api-local",
+    "provider_digest": "43fcbbf8532ed613a00e8fdb9f7ce16687bea5782517309ecf2402903d8ae4eb",
+    "request_hash": "94e5cd157f7ee32deff79e5d67790e66750b762a4620ec4129b29b13498dc21d",
+    "question": "Propose a brief",
+    "stale": false,
+    "timeout_seconds": 300,
+    "timeout_maximum_seconds": 600,
+    "supervisor_pid": 2449785,
+    "supervisor_stamp": "3736229",
+    "host": "fpizzi:93ca189a-b565-4bcd-8585-7b98e29f74b1:pid:[4026531836]"
+  }
+]

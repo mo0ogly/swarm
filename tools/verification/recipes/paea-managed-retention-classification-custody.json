@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "id": "paea-managed-retention-classification-custody",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/Cargo.toml",
+    "rust/crates/**/src/**/*",
+    "rust/crates/**/tests/**/*",
+    "rust/crates/**/config/**/*",
+    "web/**/*",
+    "frontend/**/*",
+    "tools/agent-workflows/**/*",
+    "locales/*.json",
+    ".cargo/config.toml",
+    "version_history.json",
+    "tests/fixture_area.py",
+    "tools/verification/recipes/paea-managed-retention-contention.json",
+    ".claude/commands/ks-feature.md",
+    ".claude/commands/ks-plan.md",
+    ".claude/skills/apex/SKILL.md",
+    ".claude/skills/audit-pdca/SKILL.md",
+    ".claude/skills/code-reviewer/SKILL.md",
+    ".claude/skills/debug/SKILL.md",
+    ".claude/skills/product-delivery/SKILL.md",
+    ".claude/skills/product-planning/SKILL.md",
+    ".claude/skills/product-review/SKILL.md",
+    ".claude/skills/replan/SKILL.md",
+    ".claude/skills/spec-audit/SKILL.md",
+    ".claude/skills/spec-builder/SKILL.md",
+    ".claude/skills/verify-fix/SKILL.md",
+    "config/activity-policy.json",
+    "config/graph-performance.json",
+    "config/log-read-policy.json",
+    "config/provider-wait.json",
+    "config/web-requests.json",
+    "contracts/work-request-fields.v1.json",
+    "tests/fixtures/native-review-public-v1.json",
+    "tests/fixtures/paea_provisioning_request.json",
+    "tests/fixtures/terminal_clip_go047.json",
+    "tools/verification/recipes/paea-managed-retention-classification-custody.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_NET_OFFLINE": "true"
+  },
+  "steps": [
+    {
+      "id": "typed-clean-lock-classification",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--features",
+        "test-fixtures",
+        "--lib",
+        "--message-format=json",
+        "local_storage::tests::clean_lock_contention_classifies_only_typed_again_lock",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test local_storage::tests::clean_lock_contention_classifies_only_typed_again_lock ...",
+        "1 passed; 0 failed; 0 ignored;"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "candidate-witness-lane-custody",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "--message-format=json",
+        "managed_repository::worker::candidate_store::tests::managed_candidate_witness_keeps_workspace_alive_without_holding_git_lane",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test managed_repository::worker::candidate_store::tests::managed_candidate_witness_keeps_workspace_alive_without_holding_git_lane ...",
+        "1 passed; 0 failed; 0 ignored;"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

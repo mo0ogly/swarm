@@ -1,0 +1,23 @@
+{
+  "id": "policy-revision-is-not-declassification",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--test",
+    "confidentiality",
+    "policy_revision_cannot_lower_or_remove_object_classification",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "expected_exit": 0,
+  "exit": 101,
+  "seconds": 49.380567043001065,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

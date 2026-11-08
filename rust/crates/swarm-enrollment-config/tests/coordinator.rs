@@ -11,8 +11,8 @@ fn authorizer() -> Authorizer {
     Arc::new(|_, _, _| Ok(pins().principal))
 }
 fn fixture() -> (TempDir, TempDir, Coordinator) {
-    let a = TempDir::new().unwrap();
-    let b = TempDir::new().unwrap();
+    let a = TempDir::new_in(common::fixture_area::area()).unwrap();
+    let b = TempDir::new_in(common::fixture_area::area()).unwrap();
     for p in [a.path(), b.path()] {
         fs::set_permissions(p, fs::Permissions::from_mode(0o700)).unwrap();
     }
@@ -253,8 +253,8 @@ fn coordinator_reserves_both_handles_and_releases_first_when_second_busy() {
 }
 #[test]
 fn coordinator_preflights_both_lexical_paths_before_creating_locks() {
-    let a = TempDir::new().unwrap();
-    let b = TempDir::new().unwrap();
+    let a = TempDir::new_in(common::fixture_area::area()).unwrap();
+    let b = TempDir::new_in(common::fixture_area::area()).unwrap();
     for p in [a.path(), b.path()] {
         fs::set_permissions(p, fs::Permissions::from_mode(0o700)).unwrap();
     }

@@ -1,0 +1,8 @@
+{
+  "status": "FAIL",
+  "assertions": 0,
+  "checks": [],
+  "errors": [
+    "http-404-fr-sombre-1280"
+  ]
+}

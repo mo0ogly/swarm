@@ -4,9 +4,9 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),http
 const assert=require('node:assert/strict'),crypto=require('node:crypto');
 const {execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const repo=path.resolve(__dirname,'..');let S;
-const out=path.resolve(process.argv[2]||fs.mkdtempSync(path.join(os.tmpdir(),'swarm-signals-evidence-')));
+const out=path.resolve(process.argv[2]||fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-signals-evidence-')));
 if(process.argv[2])fs.mkdirSync(out,{recursive:false});
-const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-signals-build-')),build=path.join(temporary,'catalogue');
+const temporary=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-signals-build-')),build=path.join(temporary,'catalogue');
 const checks=[],errors=[],failed=[],requests=[];let server,browser;
 const hash=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const inputPaths=['frontend/build-signals.mjs','frontend/signals/signals.js','frontend/signals/signals.css','frontend/signals/catalogue.html','frontend/signals/catalogue.js','frontend/signals/catalogue.css','web/wattson_themes.css','web/swarm-design.css','web/swarm-logo.png','tests/semantic_signals_ui.cjs'];

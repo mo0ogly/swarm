@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),asse
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]||'bin/swarm'),out=path.resolve(process.argv[3]||'test-results/design-system');
 fs.mkdirSync(out,{recursive:true});
-const fixtureRoot=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-design-'));
+const fixtureRoot=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-design-'));
 function cli(args,data){const text=execFileSync(binary,['--root',fixtureRoot,'--json',...args,...(data?['--input','-']:[])],{input:data?JSON.stringify(data):undefined,encoding:'utf8'});return text?JSON.parse(text):null}
 let sequence=0;const input=(revision,data)=>({schema_version:1,event_id:'design-'+(++sequence),expected_revision:revision,...data});
 cli(['init']);let w=cli(['work','create'],input(0,{title:'Casa Pizza — Commandes et livraison',objective:'Relier la commande, la cuisine et la livraison dans un parcours accessible.',scope:'Fixture UI isolée. Aucun appel IA.',criteria:['Graphe et navigation lisibles'],next:'Vérifier les parcours.'})).work;

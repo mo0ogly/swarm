@@ -156,13 +156,31 @@ pub(super) fn persist_document(
 
 #[cfg(test)]
 mod tests {
+    /// Private operator fallback fixture area (0700 chain), replicating
+    /// `swarm_engine::fallback_area()` inline: this crate has no swarm-engine
+    /// dependency and these fixtures contract private ancestors.
+    fn area() -> std::path::PathBuf {
+        use std::os::unix::fs::DirBuilderExt;
+        let home = std::env::var_os("HOME")
+            .unwrap_or_else(|| panic!("HOME required for the operator fallback fixture area"));
+        let area = std::path::Path::new(&home).join(".local/state/swarm-fixtures");
+        std::fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(&area)
+            .unwrap_or_else(|e| {
+                panic!("fallback fixture area {} cannot be created: {e}", area.display())
+            });
+        area
+    }
+
     use super::*;
     use std::os::unix::fs::PermissionsExt;
     /// Real NOREPLACE refusal after a valid write: unknown acknowledgement stays
     /// explicit and exact existing bytes remain unchanged. No fault hook needed.
     #[test]
     fn real_noreplace_refusal_keeps_original_and_reports_attempted_publication() {
-        let root = tempfile::TempDir::new().unwrap();
+        let root = tempfile::TempDir::new_in(area()).unwrap();
         std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
         let owner = rustix::process::geteuid().as_raw();
         let dir = open_private_directory(root.path(), owner).unwrap();

@@ -1,0 +1,14 @@
+{
+  "status": 200,
+  "body": {
+    "allowed_by_supplied_labels": true,
+    "diagnostic_only": true,
+    "output_classification": {
+      "compartments": [],
+      "level": "public"
+    },
+    "policy_revision": "1",
+    "runtime_authorized": false,
+    "schema_version": 1
+  }
+}

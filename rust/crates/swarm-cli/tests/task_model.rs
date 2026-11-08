@@ -3,7 +3,7 @@ use std::io::{self, Write};
 use swarm_engine::{RootStore, SystemEnvironment};
 /// Fresh isolated initialized Work/task; no provider is needed to clear choice.
 fn fixture() -> (tempfile::TempDir, String) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(swarm_engine::fixture_area()).unwrap();
     let mut s = RootStore::initialize(root.path(), &mut SystemEnvironment).unwrap();
     let work=s.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Fixture","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap().result.work.id;
     s.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();

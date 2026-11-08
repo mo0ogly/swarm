@@ -1,0 +1,10 @@
+{
+  "status": 404,
+  "body": {
+    "error": "blp-admission-not-found",
+    "failure": {
+      "code": "blp-admission-not-found"
+    },
+    "schema_version": 1
+  }
+}

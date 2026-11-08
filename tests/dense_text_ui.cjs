@@ -3,7 +3,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-dense-reading-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-dense-reading-'));
 const cli=(args,data)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(data?['--input','-']:[])],{encoding:'utf8',input:data?JSON.stringify(data):undefined}));
 const request=(revision,data)=>({schema_version:1,event_id:crypto.randomUUID(),expected_revision:revision,...data});
 const instruction='# Préparer la livraison\r\n\r\n## Objectif\r\nConserver **toutes les preuves** et le fichier `rapport.md`.\r\n\r\nVérifications :\r\n1. Relire le contrat.\r\n2. Vérifier les résultats.\r\n   - Conserver les originaux.\r\n\r\n> [!WARNING]\r\n> Aucune acceptation sans preuve.\r\n\r\n| Contrôle | État |\r\n| --- | --- |\r\n| Tests | À vérifier |\r\n\r\n```json\r\n{"request_id":"dense", "attempts":2, "approved":false}\r\n```\r\n\r\n<img src=x onerror="alert(1)">\r\n[Interdit](javascript:alert)\r\n[Documentation](https://example.org/docs)\r\n';

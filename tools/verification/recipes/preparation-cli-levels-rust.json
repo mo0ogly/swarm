@@ -10,6 +10,7 @@
     "tests/rust_preparation_plan.py",
     "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
     "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
     "rust/crates/swarm-engine/src/preparation_cli_output.rs",
     "rust/crates/swarm-engine/src/agent_launch_preflight.rs",
     "rust/crates/swarm-engine/src/native_provider_exec.rs",
@@ -47,9 +48,8 @@
       "required_stdout": [
         "PREPARATION_CLI_PASS ",
         "PREPARATION_CALLS_BROWSER_PASS ",
-        "PASS explicit-level-private-v2",
-        "PASS older-v1-replay-still-readable",
-        "PASS older-v2-replay-refuses-without-change",
+        "PASS explicit-level-private-v3-provenance",
+        "PASS producer-provenance-matches-provider-stdin",
         "PASS unavailable-auto-does-not-select-another-model",
         "PASS pending-replay-survives-capability-withdrawal"
       ],

@@ -196,9 +196,7 @@ mod tests {
         /// Use the existing identifier source and create only a fresh directory.
         fn new() -> Self {
             let path =
-                std::env::temp_dir().join(crate::generate_identifier("status-results-").unwrap());
-            fs::create_dir(&path).unwrap();
-            fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+                crate::fixture_root("status-results-");
             Self(path)
         }
     }

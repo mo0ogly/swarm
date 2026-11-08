@@ -26,16 +26,21 @@ impl RootStore {
     /// A changed validated draft additionally yields its current policy-checked
     /// comparison; settings are a third sequential observation, not a snapshot.
     /// `id` is validated by `preparation_show`, whose guarded SQL/method/policy
-    /// projection precedes the current `read_work`. An initial target requires
-    /// a current validated plan and explicit nonempty Work association. A
-    /// mismatched Work association refuses. SQL/codec/path/cleanup failures
-    /// propagate and every observed method cause survives a later refusal or
-    /// consumer encoding/output/close failure. Two reads are not atomic; the
-    /// mutation must check both revisions again. No source text is added to
-    /// diagnostics, policy adopted, task released or provider called. A successful
-    /// review neither proves acceptance nor authorizes an agent to start.
-    pub fn preparation_release_review(&self,id:&str)->Result<PreparationReadObservation<PreparationReleaseReview>,E>{
-        let observed=self.preparation_show(id)?;
+    /// projection precedes the current `read_work`. `reader_token` is the
+    /// caller's local bearer credential, forwarded to `preparation_show`'s
+    /// BF-16a/BF-16b presentation-frontier verdict unchanged — a preparation
+    /// carrying admitted classified output refuses an under-cleared reviewer
+    /// with the shared `blp-dialogue-*` codes, zero matched receipts keeps the
+    /// legacy read. An initial target requires a current validated plan and
+    /// explicit nonempty Work association. A mismatched Work association
+    /// refuses. SQL/codec/path/cleanup failures propagate and every observed
+    /// method cause survives a later refusal or consumer encoding/output/close
+    /// failure. Two reads are not atomic; the mutation must check both
+    /// revisions again. No source text is added to diagnostics, policy
+    /// adopted, task released or provider called. A successful review neither
+    /// proves acceptance nor authorizes an agent to start.
+    pub fn preparation_release_review(&self,id:&str,reader_token:Option<&str>)->Result<PreparationReadObservation<PreparationReleaseReview>,E>{
+        let observed=self.preparation_show(id,reader_token)?;
         let preparation=observed.value;
         let causes=observed.causes;
         let result=(||{

@@ -1,0 +1,10 @@
+[
+  {
+    "name": "sentinel-executable-control",
+    "passed": true
+  },
+  {
+    "name": "unclassified-admission-refuses",
+    "passed": false
+  }
+]

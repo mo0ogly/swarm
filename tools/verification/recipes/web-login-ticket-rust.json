@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "id": "web-login-ticket-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/web_login_ticket.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/engine_settings/web_login_ticket.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "rust/crates/swarm-engine/tests/engine_settings_catalog.rs",
+    "rust/crates/swarm-web/src/access.rs",
+    "rust/crates/swarm-web/src/lib.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/login.rs",
+    "rust/crates/swarm-web/tests/access.rs",
+    "rust/crates/swarm-web/tests/login.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/web_ticket.rs",
+    "web/access.html",
+    "tools/swarm_local.py",
+    "swarm.sh",
+    "tests/test_swarm_local.py",
+    "tests/fixture_area.py",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "version_history.json",
+    "docs/architecture/NATIVE-LOCAL-LAUNCHER.md",
+    "docs/en/NATIVE-LOCAL-LAUNCHER.md",
+    "web/live.html",
+    "web/live.js",
+    "web/native-runtime.html",
+    "web/native-runtime.js",
+    "tests/rust_web_signin_ui.cjs",
+    "tests/fixture_area.cjs",
+    "package-lock.json",
+    "rust/crates/swarm-engine/src/web_session.rs",
+    "SECURITY.md",
+    "rust/crates/swarm-engine/src/engine_settings/runtime_temporary.rs",
+    "rust/crates/swarm-engine/tests/runtime_temporary.rs",
+    "rust/crates/swarm-engine/src/environment.rs",
+    "tests/test_fixture_area.py",
+    "tools/verification/recipe.py",
+    "tests/rust_settings_field_ui.cjs",
+    "frontend/engine-settings/admin.js"
+  ],
+  "environment": {
+    "SWARM_TEST_BINARY": "{root}/bin/swarm"
+  },
+  "steps": [
+    {
+      "id": "engine-ticket-and-v50-setting",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "web_login_ticket"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "web_login_ticket::tests::ticket_is_single_use_address_bound_and_expires ... ok",
+        "web_login_ticket::tests::invalid_lifetime_refuses_without_file ... ok",
+        "web_login_ticket::tests::installation_default_is_current_schema ... ok",
+        "web_login_ticket::tests::historical_absence_and_zero_refuse_without_fallback ... ok",
+        "web_login_ticket::tests::rotated_owner_key_orphans_unconsumed_ticket ... ok",
+        "5 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-owner-key-rotation",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "rotate_refuses_running_server_then_replaces_key"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "web_session::tests::rotate_refuses_running_server_then_replaces_key ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settings-catalog-current",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "engine_settings_catalog"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "catalog_covers_all_actual_values_and_nullable_fields_match_authoritative_validation ... ok",
+        "2 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "runtime-temporary-directory",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "runtime_temporary"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "apply_exports_tmpdir_to_children_and_refuses_invalid ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "fixture-area-follows-setting",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-v",
+        "-s",
+        "tests",
+        "-p",
+        "test_fixture_area.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_saved_value_then_default_then_refusals",
+        "OK"
+      ]
+    },
+    {
+      "id": "web-ticket-login-and-principal",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-web",
+        "--test",
+        "login",
+        "--test",
+        "access"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "native_login_single_use_ticket_signs_in_once_without_key_copy ... ok",
+        "native_logout_requires_csrf_and_expires_only_browser_cookies ... ok",
+        "native_login_wrong_origin_key_and_ambiguous_forms_refuse_without_mutation ... ok",
+        "owner_key_yields_owner_principal_without_secret ... ok",
+        "5 passed; 0 failed",
+        "8 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "installed-launcher-open",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-v",
+        "-s",
+        "tests",
+        "-p",
+        "test_swarm_local.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_local_opener_gets_native_login_without_terminal_disclosure",
+        "test_rotate_replaces_key_and_refuses_old_cookie",
+        "Ran 12 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "installed-browser-signin-signout",
+      "command": [
+        "python3",
+        "-c",
+        "import subprocess,time\nfrom pathlib import Path\nout=Path('.swarm-fixtures')/('signin-ui-recipe-%d'%time.time_ns())\nprint('RETAINED_FLOW',out,flush=True)\nsubprocess.run(['node','tests/rust_web_signin_ui.cjs','bin/swarm',str(out)],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "SIGNIN_UI_VERIFIED 80"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "installed-admin-temporary-directory-field",
+      "command": [
+        "python3",
+        "-c",
+        "import subprocess,time\nfrom pathlib import Path\nout=Path('.swarm-fixtures')/('field-ui-recipe-%d'%time.time_ns())\nprint('RETAINED_FLOW',out,flush=True)\nsubprocess.run(['node','tests/rust_settings_field_ui.cjs','bin/swarm','runtime_temporary_directory',str(out)],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "SETTING_FIELD_UI_VERIFIED runtime_temporary_directory 24"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

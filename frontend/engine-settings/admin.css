@@ -1,4 +1,30 @@
 .engine-settings-table{overflow-x:auto;max-width:100%}
+.engine-settings-table-wrap{overflow-x:auto;max-width:100%}
+/* Authority admin (ADM-03/06/07/09/11): section toolbar in the matrix,
+ * KPI cards, local SVG charts, collapsible help, daemon log. */
+.authority-section{justify-content:flex-start;flex-wrap:wrap;gap:.5rem;align-items:center}
+.authority-section strong{margin-right:.75rem}
+.authority-orphans{color:#b3261e;font-weight:400}
+.authority-chart-bar{fill:var(--swarm-cyan)}
+.authority-counter{overflow-wrap:anywhere}
+.authority-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));gap:.75rem;margin-block:.75rem}
+.authority-kpi{border:1px solid var(--wattson-ligne);border-radius:5px;padding:.5rem .75rem;display:flex;flex-direction:column;gap:.25rem}
+.authority-kpi strong{font-size:1.5rem;line-height:1.2}
+.authority-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:1rem;margin-block:.75rem}
+.authority-chart h4{margin-block:.25rem .5rem;overflow-wrap:anywhere}
+.authority-chart-text{font-size:10px;fill:currentColor}
+.authority-help{margin-block:.5rem}
+.authority-help summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+.authority-help p{overflow-wrap:anywhere}
+.authority-pages{align-self:center;overflow-wrap:anywhere}
+.authority-sort{white-space:nowrap}
+.authority-log{max-height:24rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid var(--wattson-ligne);padding:.5rem;border-radius:5px}
+.authority-log-meta{overflow-wrap:anywhere}
+.native-session-user{align-self:center;overflow-wrap:anywhere}
+.authority-roles{display:flex;flex-wrap:wrap;gap:.25rem 1.5rem;border:1px solid var(--swarm-control-border);padding:.5rem 1rem}
+.authority-roles label{display:inline-flex;align-items:center;gap:.5rem;min-height:44px}
+.authority-roles input{width:auto;margin:0}
+.authority-tabs{justify-content:flex-start;flex-wrap:wrap;gap:.5rem}
 .engine-settings-table :is(th,td){overflow-wrap:anywhere;white-space:pre-wrap;vertical-align:top}
 .engine-settings-dialog{width:min(64rem,calc(100vw - 2rem));max-height:calc(100dvh - 2rem)}
 .engine-settings-dialog[open]{display:flex;flex-direction:column;overflow:hidden}
@@ -8,7 +34,9 @@
 .engine-settings-dialog .modal-header h2{margin:0;min-width:0;overflow-wrap:anywhere}
 .engine-settings-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:1rem}
 .engine-settings-field{min-width:0}
-.engine-settings-field :is(input,textarea){max-width:100%;width:100%}
+.engine-settings-field :is(input,select,textarea){max-width:100%;width:100%}
+/* Scalar choice selects share input metrics; focus inherits the shared semantic rule. */
+.engine-settings-field select{font:inherit}
 .engine-settings-unlimited{display:flex;align-items:center;gap:.5rem}
 .engine-settings-unlimited input{width:auto}
 .engine-settings-dialog .modal-footer{flex-wrap:wrap}

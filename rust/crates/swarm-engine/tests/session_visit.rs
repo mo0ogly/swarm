@@ -16,9 +16,7 @@ impl Fixture {
     /// Fresh private inactive Root, preserving failed fixtures for diagnosis.
     fn new() -> Self {
         let p =
-            std::env::temp_dir().join(swarm_engine::generate_identifier("visit-inner-").unwrap());
-        fs::create_dir(&p).unwrap();
-        fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
+            swarm_engine::fixture_root("visit-inner-");
         Self(p)
     }
 }

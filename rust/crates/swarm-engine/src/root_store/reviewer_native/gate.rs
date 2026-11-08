@@ -110,7 +110,7 @@ pub(super) fn permit_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSe
 /// checks before any exec; returned data alone is not execution or confinement.
 /// Missing/EOF/invalid grant or any uncertain identity refuses with typed causes.
 /// Shared raw credential validation rejects PID0/invalid UID-GID before grant or Root use.
-fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Material, Job), E> {
+fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Material, Job, bool), E> {
     if !swarm_identity_contract::name(id.as_bytes()) {
         return Err(E::Refused("review-gate-id-invalid"));
     }
@@ -133,6 +133,10 @@ fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Ma
     }
     let store = RootStore::open(root, false)?;
     let result = (|| {
+    // Frozen engine-read transport decision: the exec point poses the additive
+    // kernel refusal when the operator policy denies Internet sockets. Read
+    // before any other reservation; invalid state refuses, never becomes false.
+    let internet_denied = store.provider_internet_denied_snapshot()?;
     let selected=store::job(&store.db,id).map_err(|e|E::Launch(Box::new(e)))?
         .ok_or(E::Refused("review-gate-job-required"))?;
     super::sources::job(&store,&selected,|source| {
@@ -166,7 +170,7 @@ fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Ma
                 if parent.process_stamp() != job.owner_stamp {
                     return Err(E::Refused("review-gate-parent-changed"));
                 }
-                guard::fresh_using(&store, &tx, settings, &job,source).map(|material| (material, job))
+                guard::fresh_using(&store, &tx, settings, &job,source).map(|material| (material, job, internet_denied))
             })();
             finished(result, tx.rollback().map_err(E::Sql))
         })();
@@ -181,7 +185,7 @@ fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Ma
 /// the production transport must perform its own final freshness/TTL checks.
 #[cfg(test)]
 pub(super) fn admit(root: &Path, id: &str, channel: &mut UnixStream) -> Result<Material, E> {
-    admit_with_job(root, id, channel).map(|(material, _)| material)
+    admit_with_job(root, id, channel).map(|(material, _, _)| material)
 }
 /// Consume the exact admitted private child by sealed-input exec. Requires a
 /// CLOEXEC channel, kernel-owned peer/child/parent and committed grant. Root is
@@ -190,6 +194,8 @@ pub(super) fn admit(root: &Path, id: &str, channel: &mut UnixStream) -> Result<M
 /// typed causes and close sealed stdin; caller must report/close its channel and
 /// exit. This private helper establishes no OS sandbox, model identity,
 /// complete wait, durable result, deadline supervisor or task acceptance.
+/// The shared transport additionally requires an isolated I0 Linux boundary.
+/// Unsafe workspace/backend failure refuses before provider exec, without fallback.
 pub(super) fn execute(
     root: &Path,
     id: &str,
@@ -200,13 +206,14 @@ pub(super) fn execute(
     if !flags.contains(rustix::io::FdFlags::CLOEXEC) {
         return Err(E::Refused("review-gate-channel-cloexec-required"));
     }
-    let (material, job) = admit_with_job(root, id, channel)?;
+    let (material, job, internet_denied) = admit_with_job(root, id, channel)?;
     let transport = crate::native_provider_exec::PreparedExec::prepare(
         material.model.provider(),
         &material.host.environment_names,
         &material.host.workspace,
         material.inputs.prompt.as_bytes(),
-    )?;
+    )?.with_workspace_identity(material.host.directory_identity)
+      .with_internet_denied(internet_denied);
     let fresh = material
         .fresh(root)
         .map_err(|error| E::Launch(Box::new(error)))
@@ -226,7 +233,8 @@ pub(super) fn execute(
         Ok(t) => t,
         Err(error) => return finished(Err(caused("review-telemetry-setup-failed", error)), transport.close()),
     };
-    transport.add_environment(telemetry.environment)?.add_leading_arguments(telemetry.arguments)?.execute()
+    // Shared exec requires the I0 boundary; failure never falls back to raw exec.
+    transport.add_environment(telemetry.environment)?.add_leading_arguments(telemetry.arguments)?.execute(root)
 }
 
 /// Own the private CLOEXEC channel through one exec attempt. Success never

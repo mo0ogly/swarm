@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "recipe": "rust-graph-workbench",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "native-graph-navigation-unchanged-work",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='graph-navigation-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_graph_navigation.py','--binary',os.environ['SWARM_GRAPH_BINARY'],'--output',str(p)],check=True); print('GRAPH_NAVIGATION_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 62.08571357099572,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "native-graph-create-links-refuse-cycle-and-recover",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile; from pathlib import Path; p=Path(tempfile.mkdtemp(prefix='graph-editing-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_graph_navigation.py','--binary',os.environ['SWARM_GRAPH_BINARY'],'--output',str(p),'--editing'],check=True); print('GRAPH_EDITING_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 80.52059467900835,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "0e7a0436e8450eee47230c0a2913bd95d7131466d3a81d17a8e77fd91cd81c66",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "e80f07baef4844da689277b90af3c0adc9bb1358b9467fe6cba4c76a57142945",
+    "declared-inputs.tar.gz": "f6ed8ad4dd860ed5001bc687daa0702e2e0ee1cfbbccc7f4fee0b685607ff8b5",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "ddafb3710fc6a453202d90188354651eba21e1a44e695117f3ca465a20ca1051",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "ab015c8fcea73996c250dc4d1c27ae8c87f42f97f4af3d481b119899becba3c0",
+    "step-0002.stdout": "a418cd2b451d42fc48f6eb3f5b92c9ca0970c662c62ce3cb8bf8c066cd69899b",
+    "step-0002.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0002.json": "ae7bc3c30d0ed8cf441f8468483d64162ec656c56a22e529136da8fe5fc8381a",
+    "inputs.after.json": "e80f07baef4844da689277b90af3c0adc9bb1358b9467fe6cba4c76a57142945"
+  }
+}

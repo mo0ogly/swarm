@@ -1,0 +1,7 @@
+{
+  "status": "PASS_FIXTURE_UI_ONLY",
+  "browser_assertions": 56,
+  "binary_sha256": "c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+  "live_authority_ui_verified": false,
+  "scope": "Actual protected HTTP bytes and FR/EN version UI on owned fixture using the same production image; real Authority session remains unverified"
+}

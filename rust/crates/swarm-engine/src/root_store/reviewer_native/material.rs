@@ -39,7 +39,9 @@ fn launch(error: A) -> E {
 /// observation refuse before any reservation or launch. Legacy provider-wait
 /// state requires adoption rather than bypass. All provider metadata is rechecked;
 /// missing/stale/unsupported/IO/codec/release causes survive without empty success.
-/// No Work, ledger, budget or provider process is changed here. Host preparation
+/// The initial claim creates an engine-labelled I0 output leaf; rechecks only
+/// open the leaf named by the recorded event and bind its host scope. Output
+/// remains untrusted. No Work, ledger, budget or provider process is changed here. Host preparation
 /// creates/syncs/removes a workspace probe; failures include its cleanup causes.
 #[cfg(test)]
 pub(super) fn prepare(
@@ -118,7 +120,12 @@ pub(super) fn prepare_for_job_using(
         artifacts.insert(source.name.clone(), source.sha256.clone());
     }
     let policy = settings.values.agent_launch_policy().map_err(E::Settings)?;
+    let workspace = crate::native_provider_exec::output_workspace(
+        &store.directory, crate::native_provider_exec::OutputRole::Reviewer,
+        &request.event_id, review.is_none(),
+    ).map_err(launch)?;
     let launch_request = Launch {
+        workspace,
         provider: config.provider.clone(),
         level: config
             .model_route

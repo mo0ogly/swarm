@@ -107,7 +107,8 @@ mod tests {
     use std::io::Write;
     /// Owned isolated regular file, never a mission/private runtime database.
     fn fixture(raw: &[u8]) -> (std::path::PathBuf, File) {
-        let path = std::env::temp_dir().join(crate::generate_identifier("receipt126-").unwrap());
+        let dir = crate::fixture_root("receipt126-");
+        let path = dir.join("receipt.json");
         let mut f = std::fs::OpenOptions::new()
             .write(true)
             .create_new(true)

@@ -1,0 +1,36 @@
+[
+  {
+    "event": "mission-watch-started",
+    "generation": 3,
+    "mission_complete": false,
+    "observation_is_permission": false,
+    "poll_interval_ms": "2000",
+    "schema_version": 1,
+    "settings_revision": "1",
+    "work": "w-10fb269432444817aedce668"
+  },
+  {
+    "agent_id": "watch-6f47cbfd98339c6053cca6d1",
+    "automatic_reviewer": false,
+    "automatic_validation": false,
+    "event": "mission-report-submitted",
+    "mission_complete": false,
+    "report": ".swarm/managed/w-10fb269432444817aedce668/results/watch-6f47cbfd98339c6053cca6d1/report.md",
+    "revision": 20,
+    "schema_version": 1,
+    "task_accepted": false,
+    "work": "w-10fb269432444817aedce668"
+  },
+  {
+    "agent_id": "watch-12e525926625c1504db9d47d",
+    "automatic_reviewer": false,
+    "automatic_validation": false,
+    "event": "mission-report-submitted",
+    "mission_complete": false,
+    "report": ".swarm/managed/w-10fb269432444817aedce668/results/watch-12e525926625c1504db9d47d/report.md",
+    "revision": 21,
+    "schema_version": 1,
+    "task_accepted": false,
+    "work": "w-10fb269432444817aedce668"
+  }
+]

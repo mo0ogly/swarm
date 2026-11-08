@@ -1441,6 +1441,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "swarm-authority"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "cookie",
+ "ed25519-dalek",
+ "form_urlencoded",
+ "getrandom 0.4.3",
+ "http",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "rustix",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "swarm-enrollment-authority",
+ "swarm-enrollment-bootstrap",
+ "swarm-enrollment-config",
+ "swarm-enrollment-state",
+ "swarm-identity-contract",
+ "tempfile",
+ "tokio",
+]
+
+[[package]]
 name = "swarm-biba-linux"
 version = "0.1.0"
 dependencies = [
@@ -1475,6 +1501,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "swarm-confidentiality"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "swarm-engine"
 version = "0.1.0"
 dependencies = [
@@ -1493,6 +1527,8 @@ dependencies = [
  "sha2 0.10.9",
  "sha2 0.11.1",
  "subtle",
+ "swarm-biba-linux",
+ "swarm-confidentiality",
  "swarm-enrollment-authority",
  "swarm-enrollment-bootstrap",
  "swarm-enrollment-config",
@@ -1657,6 +1693,7 @@ dependencies = [
  "sha2 0.11.1",
  "subtle",
  "swarm-api-client",
+ "swarm-authority",
  "swarm-engine",
  "swarm-enrollment-authority",
  "swarm-enrollment-bootstrap",

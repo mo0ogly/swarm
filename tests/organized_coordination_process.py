@@ -8,6 +8,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import time
 import uuid
 from organized_fixture import enable_organization, add_owned_tasks
@@ -16,7 +17,7 @@ binary = str(Path(sys.argv[1]).resolve())
 out = Path(sys.argv[2]); out.mkdir(parents=True, exist_ok=True)
 scenario = sys.argv[3] if len(sys.argv) > 3 else 'nominal'
 assert scenario in ('nominal', 'shared', 'restart')
-root = Path(tempfile.mkdtemp(prefix='swarm-team-recipe-'))
+root = Path(tempfile.mkdtemp(prefix='swarm-team-recipe-', dir=fixture_area()))
 (root / 'docs').mkdir()
 
 def cli(args, data=None):

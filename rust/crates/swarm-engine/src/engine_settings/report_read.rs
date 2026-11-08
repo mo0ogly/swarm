@@ -32,6 +32,14 @@ mod tests {
     #[test]
     fn report_read_caps_absence_null_zero_and_invalid_inputs() {
         let mut values = EngineSettingsValues::installation_defaults().unwrap();
+        assert_eq!(values.schema_version(),52);
+        // Isolate the historical report-read group from the later independent
+        // cockpit and ledger-root choices; removing report caps still exposes v46.
+        values.cockpit_default_autonomy = None;
+        values.paea_settlement_ledger_root = None;
+        values.web_login_ticket_seconds = None;
+        values.runtime_temporary_directory = None;
+        values.web_access_mode = None; values.web_authority_public_key = None; values.web_assertion_max_age_seconds = None;
         assert_eq!(values.schema_version(),47);
         assert_eq!(values.report_read_policy().unwrap().preview_max_bytes,Some(262144));
         values.report_preview_max_bytes=None;

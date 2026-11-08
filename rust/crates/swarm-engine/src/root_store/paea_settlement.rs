@@ -3,6 +3,8 @@
 use super::mission_supervision_store as sql;
 mod call;
 mod policy;
+mod agreement;
+pub use agreement::PaeaPaymentAgreement;
 use super::{finished, RootBinding, RootStore, RootStoreError as R};
 pub use call::PaeaSettlementCallError;
 use rusqlite::{params, Transaction, TransactionBehavior};
@@ -35,6 +37,10 @@ pub struct PaeaSettlementReceipt {
     pub authority_head_sequence: i64,
     pub authority_head_digest: String,
     pub trust_revision: i64,
+    /// Exact separated Trust agreement observed at commitment, when required.
+    /// Absent on legacy receipts; absence never establishes a separated approval.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agreement: Option<PaeaPaymentAgreement>,
     /// Clock sampled before the write/COMMIT attempt, not exact publication time.
     pub commit_requested_at: String,
 }
@@ -117,6 +123,11 @@ pub struct PaeaSettlementRequest {
     canonical: CanonicalAction,
 }
 impl PaeaSettlementRequest {
+    /// Derive the Trust resource for an exact durable payment agreement.
+    /// Pure protocol data from retained canonical bytes; grants no authority.
+    pub fn approval_resource(&self) -> String {
+        agreement::resource(self)
+    }
     /// Exact permission data for separately authorized enrollment; no IO or grant.
     pub fn request(&self) -> &Request {
         &self.request
@@ -346,6 +357,7 @@ fn validate_receipt(
             "paea-settlement-receipt-incompatible",
         ));
     }
+    agreement::receipt(receipt)?;
     Ok(())
 }
 
@@ -500,6 +512,8 @@ impl RootStore {
     /// A commit error is uncertain; explicit reconciliation under a fresh grant
     /// is required. Personal/business after-use errors remain outside this result.
     /// No public transport, OS isolation, upstream admission or independent proof.
+    /// Basic separation requires the current exact Trust agreement; its observed
+    /// reference is retained in the receipt. Advanced role separation still refuses.
     pub fn paea_settle(
         &self,
         project: &RootStore,
@@ -537,8 +551,8 @@ impl RootStore {
         };
         let result = (|| {
             current_plan(project, identity)?;
-            policy::current_actor(project, identity, &prepared.context)?;
-            self.settlement_locked(prepared, identity)
+            let agreement = policy::current_actor(project, identity, prepared)?;
+            self.settlement_locked(prepared, identity, agreement)
         })();
         let result = released(result, trust.close().map_err(R::Storage));
         released(result, rollback(project_tx))
@@ -549,6 +563,7 @@ impl RootStore {
         &self,
         prepared: &PaeaSettlementRequest,
         identity: &Identity<'_>,
+        agreement: Option<PaeaPaymentAgreement>,
     ) -> Result<PaeaSettlementOutcome> {
         let tx = Transaction::new_unchecked(&self.db, TransactionBehavior::Immediate)
             .map_err(|e| PaeaSettlementError::caused("paea-settlement-ledger-reservation", e))?;
@@ -598,6 +613,7 @@ impl RootStore {
                 ));
             }
             let now = time::OffsetDateTime::now_utc();
+            agreement::timely(&agreement)?;
             if now >= identity.expires_at() {
                 return Err(PaeaSettlementError::refused(
                     "paea-settlement-authority-expired",
@@ -615,6 +631,7 @@ impl RootStore {
                 authority_head_sequence: identity.authority_head().sequence,
                 authority_head_digest: identity.authority_head().digest.clone(),
                 trust_revision: identity.trust_revision(),
+                agreement: agreement.clone(),
                 commit_requested_at: now
                     .format(&time::format_description::well_known::Rfc3339)
                     .map_err(|e| PaeaSettlementError::caused("paea-settlement-time", e))?,
@@ -642,6 +659,7 @@ impl RootStore {
                     "paea-settlement-authority-expired",
                 ));
             }
+            agreement::timely(&agreement)?;
             commit = true;
             Ok(PaeaSettlementOutcome::Recorded {
                 receipt,

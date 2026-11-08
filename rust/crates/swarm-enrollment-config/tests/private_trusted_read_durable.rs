@@ -1,5 +1,6 @@
 #![cfg(target_os = "linux")]
 //! Explicit trusted-locator FS acknowledgement; no independently pinned claim.
+mod common;
 use std::{
     fs,
     os::unix::fs::{symlink, PermissionsExt},
@@ -13,7 +14,7 @@ use swarm_enrollment_config::{
 };
 /// Synthetic anchor data and actual private directories only; no live identities.
 fn fixture() -> (tempfile::TempDir, Documents) {
-    let root = tempfile::tempdir().unwrap();
+    let root = tempfile::tempdir_in(common::fixture_area::area()).unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let docs = Documents::open(root.path(), rustix::process::geteuid().as_raw()).unwrap();
     let ctx = Context::new();

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "versioned-memory-engine-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/project_memory.rs",
+    "rust/crates/swarm-engine/src/work_engine.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/models.rs",
+    "rust/crates/swarm-engine/src/task_lifecycle.rs",
+    "rust/crates/swarm-engine/src/root_store/cockpit_post_delivery.rs",
+    "rust/crates/swarm-engine/tests/project_memory_engine.rs",
+    "internal/engine/project_memory.go",
+    "internal/engine/project_memory_dialogue.go",
+    "internal/engine/memory_work.go",
+    "docs/actions-confiance-rust.md",
+    "docs/en/actions-confiance-rust.md",
+    "tools/verification/recipes/versioned-memory-engine-rust.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "engine-cycle",
+      "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "-p", "swarm-engine", "--test", "project_memory_engine", "--", "--nocapture"],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 6 tests",
+        "test result: ok. 6 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "pure-projections",
+      "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "-p", "swarm-engine", "--lib", "project_memory", "--", "--nocapture"],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 11 tests",
+        "test result: ok. 11 passed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

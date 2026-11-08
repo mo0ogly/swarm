@@ -1,0 +1,20 @@
+{
+  "id": "prep-90b5e76df052bba38e4699e6",
+  "work_id": "w-0ebe7f740b2acad20d691fe1",
+  "title": "Linked budget fixture",
+  "method": "apex",
+  "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+  "revision": 1,
+  "created_at": "2026-10-31T20:44:10.54927207Z",
+  "updated_at": "2026-10-31T20:44:10.54927207Z",
+  "documents": {
+    "besoin": {
+      "kind": "besoin",
+      "text": "Need linked fixture",
+      "revision": 1,
+      "sha256": "255b568355c8a4622dcaea289734e179f233ce4311a462078ed63d1d858ad00f",
+      "at": "2026-10-31T20:44:10.54927207Z"
+    }
+  },
+  "plan_ready": false
+}

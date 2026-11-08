@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('assert'),fs=require('fs'),path=require('path'),os=require('os'),cp=require('child_process'),pup=require('puppeteer');
 const binary=path.resolve(process.argv[2]),outdir=path.resolve(process.argv[3]);fs.mkdirSync(outdir,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-data-policy-ui-')),checks=[],errors=[],denials=[],requests=[];
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-data-policy-ui-')),checks=[],errors=[],denials=[],requests=[];
 const identities=[{subject:'admin',token:'admin-data-policy-recipe-token',integrity:3,roles:['admin']},{subject:'alice',token:'alice-data-policy-recipe-token',integrity:1,roles:['requester']},{subject:'bob',token:'bob-data-policy-recipe-token',integrity:2,roles:['approver']},{subject:'effect-service',token:'effect-data-policy-recipe-token',integrity:2,roles:['effect']}];
 function cli(action,data,token=''){return JSON.parse(cp.execFileSync(binary,['--root',root,'--json','trust',action,...(data?['--input','-']:[])],{input:data?JSON.stringify(data):undefined,encoding:'utf8',stdio:['pipe','pipe','pipe'],env:{...process.env,SWARM_TRUST_TOKEN:token}}))}
 const command=(event,fields={})=>({schema_version:1,event_id:event,...fields});

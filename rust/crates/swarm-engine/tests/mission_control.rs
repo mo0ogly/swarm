@@ -16,10 +16,7 @@ impl Fixture {
     /// Initialize and create through supported Root methods without SQL seeds,
     /// provider metadata, external calls or a running mission database.
     fn new() -> Self {
-        let path = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("mission-control180-").unwrap());
-        fs::create_dir(&path).unwrap();
-        fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
+        let path = swarm_engine::fixture_root("mission-control180-");
         let mut store = RootStore::initialize(&path, &mut SystemEnvironment).unwrap();
         let raw = serde_json::json!({"schema_version":1,"event_id":"create","expected_revision":0,"title":"Global pause","objective":"Preserve ownership","scope":"Owned fixture","criteria":["Pause is not launch consent"]});
         let work = store

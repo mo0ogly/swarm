@@ -9,6 +9,10 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import time
 import tomllib
 from qualification_inputs import collect
@@ -17,7 +21,7 @@ ROOT=Path(__file__).resolve().parents[2]
 OUTPUT=Path(sys.argv[1]).resolve();REFERENCE=Path(sys.argv[2]).resolve()
 GO_REUSE=Path(sys.argv[3]).resolve()if len(sys.argv)>3 else None
 if OUTPUT.exists()and any(OUTPUT.iterdir()):raise SystemExit('Fresh evidence directory required')
-OUTPUT.mkdir(parents=True,exist_ok=True);WORK=Path(tempfile.mkdtemp(prefix='swarm-rust-bootstrap-'))
+OUTPUT.mkdir(parents=True,exist_ok=True);WORK=Path(tempfile.mkdtemp(prefix='swarm-rust-bootstrap-', dir=fixture_area()))
 ENV=dict(os.environ,CARGO_TARGET_DIR=os.environ.get('CARGO_TARGET_DIR',str(WORK/'target')));commands=[]
 def run(label,args,data=None,expected=0):
  start=datetime.datetime.now(datetime.timezone.utc).isoformat();clock=time.monotonic()

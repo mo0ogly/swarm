@@ -1,0 +1,23 @@
+{
+  "id": "typed-http-refusal-status-and-internal-failure",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--lib",
+    "service::tests::blp_preparation_status_preserves_refusal_and_internal_failures",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 50.05752576800296,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

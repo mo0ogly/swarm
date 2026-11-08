@@ -9,6 +9,7 @@ stderr and exact binary/helper hashes are retained; rejection must be typed and
 must not alter evidence or saved settings. A failed run is never overwritten.
 """
 import argparse,hashlib,json,os,subprocess,tempfile,traceback
+from fixture_area import fixture_area
 from pathlib import Path
 
 
@@ -19,7 +20,7 @@ def run(binary,out):
     acceptance or arbitrary timing claim follows from these local CLI checks.
     """
     out.mkdir(parents=True,exist_ok=False);binary=binary.resolve();before=hashlib.sha256(binary.read_bytes()).hexdigest()
-    root=Path(tempfile.mkdtemp(prefix='gate-nonnegative-'));(root/'proof.txt').write_bytes(b'proof')
+    root=Path(tempfile.mkdtemp(prefix='gate-nonnegative-', dir=fixture_area()));(root/'proof.txt').write_bytes(b'proof')
     def invoke(label,args,document=None):
         """Retain one exact public invocation and both channels; never retry it."""
         request=out/(label+'.input.json')

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "preparation_id": "prep-0d6e4079e36703ebd37c0072",
+  "event_id": "cli-control",
+  "expected_revision": 2,
+  "provider": "fixture",
+  "capability_hash": "828ec8f741854e7aab9d52ba729b9476350729c75f6fbb2f891b099d60728c22",
+  "message": "PRIVATE_QUARANTINE_FIXTURE",
+  "context_mode": "full"
+}

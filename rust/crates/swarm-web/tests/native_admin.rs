@@ -17,8 +17,10 @@ struct Fixture {
 impl Fixture {
     /// Own one private Root and scoped persisted session; never select live data.
     fn new() -> Self {
-        let root = std::env::temp_dir()
-            .join(swarm_engine::generate_identifier("native-admin99-").unwrap());
+        // Operator rule: no test data under /tmp (tmpfs); use the repo fixture area.
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../.swarm-fixtures");
+        fs::create_dir_all(&base).unwrap();
+        let root = base.join(swarm_engine::generate_identifier("native-admin99-").unwrap());
         fs::create_dir(&root).unwrap();
         fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
         let r = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
@@ -80,7 +82,10 @@ fn native_admin_landing_and_assets_are_protected_without_secret_or_path_fallback
             let html = std::str::from_utf8(r.response.body()).unwrap();
             assert!(html.contains(&format!("lang=\"{lang}\"")));
             assert!(html.contains(&format!("data-theme=\"{theme}\"")));
-            assert!(html.contains("/native-runtime/app.js"));
+            // `/` serves the cockpit page (index.html + native adapters); the
+            // native-runtime landing moved to /native-runtime.html in 0aa7335e18.
+            assert!(html.contains("/cockpit-native.js"));
+            assert!(!html.contains("/native-runtime/app.js"));
             assert!(!html.contains(&f.key));
         }
     }
@@ -111,6 +116,7 @@ fn native_admin_landing_and_assets_are_protected_without_secret_or_path_fallback
     assert_eq!(guest.response.status(), StatusCode::OK);
     let html = std::str::from_utf8(guest.response.body()).unwrap();
     assert!(html.contains("Connexion à Swarm"));
+    assert!(!html.contains("/cockpit-native.js"));
     assert!(!html.contains("/native-runtime/app.js"));
     assert!(!html.contains(&f.key));
     assert_eq!(

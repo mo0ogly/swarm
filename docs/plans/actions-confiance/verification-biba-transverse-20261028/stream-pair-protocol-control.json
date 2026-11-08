@@ -1,0 +1,17 @@
+{
+  "root": "/tmp/swarm-biba-stream-cjz7kvgk",
+  "facts": {
+    "connected": 106,
+    "peer_closed": 106,
+    "shutdown": 106,
+    "unspec_result": [
+      -1,
+      22
+    ],
+    "unspec": 106,
+    "listen_allowed": true,
+    "bound_listen": 106,
+    "outside_connection": false
+  },
+  "primary_source": "https://raw.githubusercontent.com/torvalds/linux/v6.17/net/unix/af_unix.c"
+}
