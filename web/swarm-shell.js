@@ -53,7 +53,11 @@
   const open=document.body.dataset.navOpen!=='true';document.body.dataset.navOpen=String(open);toggle.setAttribute('aria-expanded',String(open));
   if(open)document.querySelector('.rail #work')?.focus();
  });
+ // A modal owns Escape until its native cancel/close cycle restores its opener.
+ // Closing the navigation behind it would hide that opener and lose focus.
+ // Already consumed events likewise grant no background navigation action.
  document.addEventListener('keydown',event=>{
+  if(event.defaultPrevented||document.querySelector('dialog:modal'))return;
   if(event.key==='Escape'&&document.body.dataset.navOpen==='true'){closeMobile();toggle?.focus();}
  });
  nav?.addEventListener('click',event=>{

@@ -58,6 +58,12 @@ Une fenêtre d’information longue commence au titre :
 `SwarmShell.focusWindowStart(dialog)` place un focus programmatique sur le titre
 nommé et remet le défilement au début. Les formulaires conservent le focus natif
 sur leur saisie ; Échap et les fermetures rendent le focus au déclencheur.
+Le gestionnaire global de navigation ignore Échap tant qu’un dialogue modal est
+actif (sélecteur natif `dialog:modal`) ou que l’événement est déjà consommé.
+Ainsi le menu portant le déclencheur reste visible pendant la fermeture du dialogue.
+Une seconde touche Échap, sans modal, peut fermer le menu et focaliser son bouton.
+Régression de responsabilité : `version-focus-escape.json` ; elle utilise un double
+DOM et exige une vérification navigateur réelle du retour de focus.
 
 Recette : `node tests/window_identity_ui.cjs CHEMIN_BINAIRE DOSSIER_PREUVES`, puis
 la recette design existante pour les états, formulaires et parcours complets.

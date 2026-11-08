@@ -28,6 +28,12 @@ checks alone do not verify document structure, exact source or log navigation.
 Long informational dialogs start at the title. `SwarmShell.focusWindowStart(dialog)`
 focuses the labelled title programmatically and resets the dialog scroll position.
 Forms keep native input focus. Escape and close actions restore the opener focus.
+The global navigation handler ignores Escape while a modal dialog is active
+(native `dialog:modal` selector) or the event has already been consumed. This keeps
+the opener’s menu visible while the dialog closes. A second Escape without a modal
+can close navigation and focus its toggle. The `version-focus-escape.json` recipe
+checks event ownership using a DOM double; real browser focus verification is
+required separately.
 
 Verify final contrast after actual control CSS animations complete
 (`getAnimations()` and each `animation.finished` promise), then check normal, hover and keyboard-focus states.
