@@ -2,8 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../preview.css">
 <title>Swarm — Administration, sécurité</title>
-<script src="./support.js"></script>
+<script src="../preview.js"></script>
 </head>
 <body>
 <x-dc>
@@ -20,7 +22,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
 
   <nav aria-label="Navigation principale" style="flex: 1 1 240px; max-width: 280px; min-width: 220px; background: #062b49; color: #e5edf0; padding: 22px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
     <div style="display: flex; align-items: center; gap: 12px">
-      <img src="/_blob/2bff2b20ec3b0483720f4946060f97be" alt="" style="width: 44px; height: 44px; object-fit: contain">
+      <img src="../swarm-logo.png" alt="" style="width: 44px; height: 44px; object-fit: contain">
       <span style="font-family: Georgia, serif; font-size: 22px; color: #f6f3e9">Swarm</span>
     </div>
     <div style="display: flex; flex-direction: column; gap: 2px">
@@ -155,7 +157,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
             <details style="border-top: 1px solid {{t.border}}; padding-top: 10px">
               <summary style="min-height: 32px; font-weight: 600; color: {{t.title}}">Attribuer un objet existant (migration)</summary>
               <p style="margin: 6px 0 10px; font-size: 13px; color: {{t.muted}}">Un objet déjà présent n’est lisible par les habilités qu’une fois son empreinte attribuée. Un geste couvre exactement un objet, sans balayage automatique.</p>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 10px">
                 <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Empreinte SHA-256<input style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; font-family: ui-monospace, monospace"></label>
                 <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Chemin absolu du projet<input style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></label>
                 <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Niveau<select style="min-height: 44px; padding: 0 8px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"><option>[niveau]</option></select></label>

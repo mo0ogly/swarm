@@ -2,8 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../preview.css">
 <title>Swarm — Cockpit en couloirs</title>
-<script src="./support.js"></script>
+<script src="../preview.js"></script>
 </head>
 <body>
 <x-dc>
@@ -20,7 +22,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
 
   <header style="background: #062b49; color: #e5edf0; padding: 10px clamp(16px, 3vw, 32px); display: flex; flex-wrap: wrap; align-items: center; gap: 16px">
     <div style="display: flex; align-items: center; gap: 10px">
-      <img src="/_blob/2bff2b20ec3b0483720f4946060f97be" alt="" style="width: 40px; height: 40px; object-fit: contain">
+      <img src="../swarm-logo.png" alt="" style="width: 40px; height: 40px; object-fit: contain">
       <span style="font-family: Georgia, serif; font-size: 20px; color: #f6f3e9">Swarm</span>
     </div>
     <button type="button" style="min-height: 44px; padding: 0 12px; border-radius: 5px; border: 1px solid #24485c; background: #0a3555; color: #f6f3e9; display: flex; align-items: center; gap: 10px; text-align: left">
@@ -48,7 +50,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
         <h1 id="queue-title" style="margin: 0; font-family: Georgia, serif; font-size: 30px; font-weight: 400; color: {{t.title}}">À vous d’agir <span style="font-family: ui-monospace, monospace; font-size: 18px; color: {{t.gold}}">{{queueCount}}</span></h1>
         <span style="font-size: 13px; color: {{t.muted}}">Le reste de la mission avance sans vous.</span>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 12px">
         <sc-for list="{{queue}}" as="q" hint-placeholder-count="3">
           <article style="{{q.style}}">
             <div style="display: flex"><span style="{{q.badge}}"><span style="{{q.mark}}"></span>{{q.kind}}</span></div>

@@ -2,8 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../preview.css">
 <title>Swarm — Préparation avec l’IA</title>
-<script src="./support.js"></script>
+<script src="../preview.js"></script>
 </head>
 <body>
 <x-dc>
@@ -20,34 +22,34 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
 
   <nav aria-label="Navigation principale" style="flex: 1 1 240px; max-width: 280px; min-width: 220px; background: #062b49; color: #e5edf0; padding: 22px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
     <div style="display: flex; align-items: center; gap: 12px">
-      <img src="/_blob/2bff2b20ec3b0483720f4946060f97be" alt="" style="width: 44px; height: 44px; object-fit: contain">
+      <img src="../swarm-logo.png" alt="" style="width: 44px; height: 44px; object-fit: contain">
       <span style="font-family: Georgia, serif; font-size: 22px; color: #f6f3e9">Swarm</span>
     </div>
     <div style="border: 1px solid #24485c; border-radius: 6px; padding: 10px 12px; background: #0a3555">
       <div style="font-size: 12px; color: #a9c3cf">Mission sélectionnée</div>
-      <div style="font-family: Georgia, serif; font-size: 17px; color: #f6f3e9; line-height: 1.3">[Titre de la mission]</div>
-      <div style="font-family: ui-monospace, monospace; font-size: 12px; color: #93d4df">w-[identifiant] · en préparation</div>
+      <div style="font-family: Georgia, serif; font-size: 17px; color: #f6f3e9; line-height: 1.3">Simplifier l’import des données</div>
+      <div style="font-family: ui-monospace, monospace; font-size: 12px; color: #93d4df">w-demo-import · en préparation</div>
     </div>
     <div style="display: flex; flex-direction: column; gap: 2px">
-      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">01</span> Missions</summary></details>
-      <details open style="padding: 4px 0"><summary style="min-height: 32px; color: #f8c650"><span style="font-family: ui-monospace, monospace">02</span> Préparation</summary>
+      <details style="padding: 4px 0"><summary style="min-height: 44px"><span style="font-family: ui-monospace, monospace; color: #93d4df">01</span> Missions</summary></details>
+      <details open style="padding: 4px 0"><summary style="min-height: 44px; color: #f8c650"><span style="font-family: ui-monospace, monospace">02</span> Préparation</summary>
         <div style="display: flex; flex-direction: column; padding: 4px 0 0 26px">
           <a href="#" aria-current="page" style="color: #f8c650; text-decoration: none; padding: 8px 10px; border-radius: 5px; background: #0f3d61; font-weight: 600">Dialogue IA</a>
         </div>
       </details>
-      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">03</span> Conduite</summary></details>
-      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">04</span> Suivi</summary></details>
-      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">05</span> Configuration</summary></details>
+      <details style="padding: 4px 0"><summary style="min-height: 44px"><span style="font-family: ui-monospace, monospace; color: #93d4df">03</span> Conduite</summary></details>
+      <details style="padding: 4px 0"><summary style="min-height: 44px"><span style="font-family: ui-monospace, monospace; color: #93d4df">04</span> Suivi</summary></details>
+      <details style="padding: 4px 0"><summary style="min-height: 44px"><span style="font-family: ui-monospace, monospace; color: #93d4df">05</span> Configuration</summary></details>
     </div>
   </nav>
 
-  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 3vw, 40px); box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+  <main id="main-content" style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 3vw, 40px); box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
 
     <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
       <div style="min-width: 0; max-width: 760px">
         <div style="font-family: ui-monospace, monospace; font-size: 13px; color: {{t.link}}">02 · Préparation</div>
-        <h1 style="margin: 0; font-family: Georgia, serif; font-size: 36px; font-weight: 400; color: {{t.title}}; line-height: 1.15">Préparer les agents avec l’IA</h1>
-        <p style="margin: 6px 0 0; color: {{t.muted}}">Exposez l’idée, répondez aux questions, validez le brief. Les échanges restent conservés.</p>
+        <h1 style="margin: 0; font-family: Georgia, serif; font-size: clamp(28px, 3vw, 36px); font-weight: 400; color: {{t.title}}; line-height: 1.15">Du besoin au brief</h1>
+        <p style="margin: 6px 0 0; color: {{t.muted}}">Précisez votre besoin. Le brief se construit à côté de la conversation.</p>
       </div>
       <div style="display: flex; gap: 8px; flex-wrap: wrap">
         <button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}; display: flex; align-items: center; gap: 8px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4-4"></path></svg>Rechercher</button>
@@ -69,16 +71,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
       <section aria-label="Conversation" style="flex: 999 1 480px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; display: flex; flex-direction: column">
         <div style="padding: 20px; display: flex; flex-direction: column; gap: 18px">
 
-          <article style="align-self: flex-end; max-width: 78%; background: {{t.userBg}}; border: 1px solid {{t.border}}; border-radius: 8px; padding: 12px 14px">
+          <article style="align-self: flex-end; max-width: 90%; background: {{t.userBg}}; border: 1px solid {{t.border}}; border-radius: 8px; padding: 12px 14px">
             <div style="font-size: 12px; color: {{t.muted}}; margin-bottom: 2px">Vous</div>
-            <div>[Votre idée : ce que la mission doit produire, pour qui, et pourquoi maintenant.]</div>
+            <div>Je souhaite importer les fichiers CSV de notre équipe et repérer les lignes rejetées avant leur intégration.</div>
           </article>
 
-          <article style="max-width: 86%; display: flex; gap: 12px">
-            <img src="/_blob/2bff2b20ec3b0483720f4946060f97be" alt="" style="width: 32px; height: 32px; object-fit: contain; flex: 0 0 auto">
+          <article style="max-width: 94%; display: flex; gap: 12px">
+            <img src="../swarm-logo.png" alt="" style="width: 32px; height: 32px; object-fit: contain; flex: 0 0 auto">
             <div style="min-width: 0">
-              <div style="font-size: 12px; color: {{t.muted}}; margin-bottom: 2px">IA de préparation · [fournisseur / modèle]</div>
-              <div>J’ai repris l’objectif dans le brief. Il manque deux points pour planifier les tâches.</div>
+              <div style="font-size: 12px; color: {{t.muted}}; margin-bottom: 2px">IA de préparation · scénario de démonstration</div>
+              <div>{{questionIntro}}</div>
             </div>
           </article>
 
@@ -116,7 +118,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
         </form>
       </section>
 
-      <aside aria-labelledby="brief-title" style="flex: 1 1 320px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+      <aside class="brief-panel" aria-labelledby="brief-title" style="flex: 1 1 320px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
         <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px">
           <h2 id="brief-title" style="margin: 0; font-family: Georgia, serif; font-size: 22px; font-weight: 400; color: {{t.title}}">Brief en cours</h2>
           <span style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">{{readyCount}} / {{sectionCount}} prêts</span>
@@ -133,15 +135,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
           </sc-for>
         </ul>
         <sc-if value="{{ready}}" hint-placeholder-val="{{ false }}">
-          <div role="status" style="border: 1px solid {{t.okBorder}}; background: {{t.okBg}}; border-radius: 6px; padding: 10px 12px; font-size: 14px">Brief complet. Le planificateur peut proposer les tâches, rôles et dépendances.</div>
+          <div role="status" style="border: 1px solid {{t.okBorder}}; background: {{t.okBg}}; border-radius: 6px; padding: 10px 12px; font-size: 14px">Les réponses de cet exemple sont renseignées. Relisez le brief avant la suite.</div>
         </sc-if>
         <sc-if value="{{notReady}}" hint-placeholder-val="{{ true }}">
           <div role="status" style="border: 1px solid {{t.goldBorder}}; background: {{t.goldBg}}; border-radius: 6px; padding: 10px 12px; font-size: 14px">{{missingText}}</div>
         </sc-if>
-        <button type="button" disabled="{{notReady}}" style="min-height: 44px; border-radius: 5px; border: 0; background: {{planBg}}; color: {{planInk}}; font-weight: 600">Valider le brief et planifier</button>
+        <button type="button" disabled="{{notReady}}" style="min-height: 44px; border-radius: 5px; border: 0; background: {{planBg}}; color: {{planInk}}; font-weight: 600">Examiner le brief</button>
         <details>
-          <summary style="min-height: 32px; color: {{t.title}}">Contexte transmis à l’IA</summary>
-          <p style="margin: 6px 0 0; font-size: 13px; color: {{t.muted}}">Consignes du projet, pièces jointes et échanges de ce travail. Rien n’est envoyé avant votre clic sur Envoyer.</p>
+          <summary style="min-height: 44px; color: {{t.title}}">Contexte transmis à l’IA</summary>
+          <p style="margin: 6px 0 0; font-size: 13px; color: {{t.muted}}">Consignes du projet, pièces jointes et échanges de ce travail. Cette maquette ne transmet aucune donnée à un service IA.</p>
         </details>
         <p style="margin: 0; font-size: 12px; color: {{t.muted}}">Contenu d’exemple — questions et sections illustratives.</p>
       </aside>
@@ -155,6 +157,8 @@ class Component extends DCLogic {
     super(props);
     this.state = { answers: {} };
   }
+  /** Build local display values and demo handlers; never calls Swarm or a provider.
+   * Input: selected theme and in-memory scenario state. Returns template bindings. */
   renderVals() {
     var themes = {
       sombre: { bg: '#081b29', surface: '#102b3b', composer: '#0d2636', input: '#0b2232', userBg: '#0f3446', text: '#e5edf0', title: '#f6f3e9', link: '#93d4df', muted: '#a9bcc4', border: '#2a5163', primaryBg: '#f8c650', primaryInk: '#062b49', goldBg: '#2a2a1c', goldBorder: '#f8c650', okBg: '#16352a', okBorder: '#7fd8a4', ok: '#7fd8a4', warn: '#f8c650', todo: '#a9bcc4', okTint: '#173d2b', warnTint: '#3a3216', todoTint: '#1d3442', chipBg: '#0b2232', disabledBg: '#25404f', disabledInk: '#a9bcc4' },
@@ -193,11 +197,11 @@ class Component extends DCLogic {
     };
     var stLabel = { ok: 'prêt', partial: 'à compléter', todo: 'manquant' };
     var secDefs = [
-      { label: 'Objectif', state: 'ok', summary: '[objectif repris de votre idée]' },
-      { label: 'Contraintes', state: ans.scope ? 'ok' : 'partial', summary: ans.scope ? ('Périmètre : ' + ans.scope.toLowerCase()) : 'Périmètre à préciser' },
+      { label: 'Objectif', state: 'ok', summary: 'Importer les CSV et rendre les rejets compréhensibles' },
+      { label: 'Contraintes', state: ans.scope && ans.scope !== 'Je précise' ? 'ok' : 'partial', summary: ans.scope ? ('Périmètre : ' + ans.scope.toLowerCase()) : 'Périmètre à préciser' },
       { label: 'Critères d’acceptation', state: ans.accept ? 'ok' : 'todo', summary: ans.accept ? ans.accept : 'Aucun critère observable' },
       { label: 'Rôles', state: 'ok', summary: 'planner, worker, reviewer' },
-      { label: 'Pièces jointes', state: 'ok', summary: '[n] fichiers' }
+      { label: 'Pièces jointes', state: 'ok', summary: 'Aucun fichier dans cet exemple' }
     ];
     var sections = secDefs.map(function (s) {
       var ink = s.state === 'ok' ? t.ok : (s.state === 'partial' ? t.warn : t.todo);
@@ -215,13 +219,14 @@ class Component extends DCLogic {
       var done = i < currentStep, cur = i === currentStep;
       return {
         num: done ? '✓' : s[0], label: s[1], current: cur ? 'step' : 'false',
-        style: 'display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px 0 6px; border-radius: 999px; border: 1px solid ' + (cur ? t.primaryBg : t.border) + '; color: ' + (cur ? t.title : (done ? t.text : t.muted)) + '; font-weight: ' + (cur ? '600' : '400'),
+        style: 'display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px 0 6px; border-radius: 999px; border: 1px solid ' + (cur ? t.primaryBg : t.border) + '; color: ' + (cur ? t.title : (done ? t.text : t.muted)) + '; font-weight: ' + (cur ? '600' : '400'),
         badge: 'display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-family: ui-monospace, monospace; font-size: 12px; background: ' + (cur ? t.primaryBg : (done ? t.link : 'transparent')) + '; color: ' + (cur ? t.primaryInk : (done ? t.bg : t.muted)) + '; border: ' + (done || cur ? '0' : '1px solid ' + t.border)
       };
     });
 
     return {
       t: t, questions: questions, sections: sections, steps: steps,
+      questionIntro: ready ? 'Les réponses de cet exemple sont réunies. Vous pouvez relire le brief.' : 'J’ai repris l’objectif. Précisez les réponses manquantes pour compléter cet exemple.',
       readyCount: readyCount, sectionCount: secDefs.length, ready: ready, notReady: !ready,
       missingText: 'À compléter avant de planifier : ' + missing.join(', ') + '.',
       planBg: ready ? t.primaryBg : t.disabledBg, planInk: ready ? t.primaryInk : t.disabledInk
