@@ -1,6 +1,6 @@
 # Peter Wilcheck — rapport vérifié R1/R2 et proposition pour X
 
-8 novembre 2026 — brouillon local à utiliser par Fabrice, rien publié.
+8 novembre 2026 — deux messages publiés et vérifiés sur demande explicite de Fabrice ; préparation historique conservée ci-dessous.
 
 ## Ce qui a déclenché le travail
 
@@ -74,3 +74,13 @@ R2 : index local `.cache/peter-preflights-r2-20261108/LOCATION.json`, avec réf�
 vers la copie USB relue. Les sorties brutes et le rapport de revue gardent les
 hashes des sources exercées ; ne pas transformer ce rapport en affirmation plus
 large. État éditorial : brouillon local non publié, sans autorisation d'envoi déduite.
+
+
+## Peter — rapport R1/R2 publié en fil — 2026-11-08T16:01:26.095857+00:00
+
+Autorisation explicite de Fabrice ; deux textes inchangés. Sources relues via /home/fpizzi/workspace/swarm : rapport, source test Trust et sorties brutes R1/R2 (3 variantes dans un test Rust, 23 tests Python). Aucun test relancé.
+
+- Premier message, réponse directe à Peter : https://x.com/fabrice76346592/status/2119459980331844076
+- Suite rattachée au premier : https://x.com/fabrice76346592/status/2119460045901504742
+
+Compte, textes rendus, ordre et parents contrôlés après réouverture. Registre `peter-r1-r2-publication.json`, preuve `peter-r1-r2-publication-proof.json`, capture `peter-r1-r2-published.png`. Portée limitée à fixture Trust et méthode, sans garantie générale ni modèle/humain réel. Replan : contrôle local textuel initial refusé avant écriture du suivi car la mention @gowilcheck est fragmentée dans le snapshot DOM ; rapprochement corrigé sur texte rendu des articles, deux textes exacts retrouvés. Aucun second envoi tenté. Pas de code/build/service/test lancé ; documentation éditoriale seulement, revue fonctions/politiques/erreurs produit sans objet.
