@@ -16,12 +16,47 @@ impl Fixture {
     /// Build actual schema, Work and task through public commands. A harmless
     /// local executable is observed only; it must never be started by admission.
     fn new() -> Self {
+        Self::build(false)
+    }
+    /// Variant with two recorded brainstorm exchanges seeded directly in the
+    /// works body: no public command creates answers, and extractive selections
+    /// quote them. Mirror of the Go memorySeed work shape (old-0/old-1).
+    fn with_summary() -> Self {
+        Self::build(true)
+    }
+    fn build(summary: bool) -> Self {
         let root = swarm_engine::fixture_root("launch75-");
         let mut store = RootStore::initialize(&root, &mut SystemEnvironment).unwrap();
         let created=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Scope","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();
         let work = created.result.work.id;
         store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();
         store.close().unwrap();
+        if summary {
+            let db = Connection::open(root.join(".swarm/state.db")).unwrap();
+            swarm_engine::register_identity_plan_projection(&db).unwrap();
+            let raw: Vec<u8> = db
+                .query_row("SELECT body FROM works WHERE id=?", [&work], |r| r.get(0))
+                .unwrap();
+            let mut w = swarm_engine::decode_work(&raw).unwrap();
+            for (index, id) in ["old-0", "old-1"].iter().enumerate() {
+                let mut brain = swarm_engine::Task::default();
+                brain.id = (*id).into();
+                brain.brainstorm = true;
+                brain.question = format!("Décision numéro {index}");
+                brain.answers = Some(vec![swarm_engine::BrainstormAnswer {
+                    attempt: format!("a{index}"),
+                    text: format!("Réponse {index}"),
+                    at: String::new(),
+                }]);
+                w.tasks.as_mut().unwrap().push(brain);
+            }
+            db.execute(
+                "UPDATE works SET body=? WHERE id=?",
+                rusqlite::params![swarm_engine::encode_model(&w).unwrap(), work],
+            )
+            .unwrap();
+            db.close().unwrap();
+        }
         fs::write(
             root.join(".swarm/providers.json"),
             br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/cat","args":[]}}}"#,
@@ -49,18 +84,65 @@ impl Fixture {
     fn request(&self) -> Launch {
         decode_launch(br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#).unwrap()
     }
+    /// Operator flow on this fixture: resolve the summary packet at the current
+    /// revision, then confirm a selection quoting its resolved identifiers and
+    /// digests (the digest binds question + "\n" + answer, like Go dialogueHits).
+    fn confirmed_selection(&self) -> swarm_engine::MemorySummarySelection {
+        use sha2::{Digest, Sha256};
+        let mut store = RootStore::open(&self.root, true).unwrap();
+        let work = store.read_work(&self.work).unwrap();
+        store.close().unwrap();
+        let digest = |question: &str, answer: &str| {
+            format!("{:x}", Sha256::digest(format!("{question}\n{answer}").as_bytes()))
+        };
+        let dialogues = vec![
+            swarm_engine::DialogueRef { task: "old-0".into(), attempt: "a0".into(), sha256: digest("Décision numéro 0", "Réponse 0") },
+            swarm_engine::DialogueRef { task: "old-1".into(), attempt: "a1".into(), sha256: digest("Décision numéro 1", "Réponse 1") },
+        ];
+        let packet = swarm_engine::summary_source_for_work(
+            &self.root,
+            &work,
+            &swarm_engine::MemorySummarySourceRequest {
+                schema_version: 1,
+                work: self.work.clone(),
+                task: "task".into(),
+                expected_revision: work.revision,
+                dialogues: dialogues.clone(),
+            },
+        )
+        .unwrap();
+        let payload: serde_json::Value = serde_json::from_str(&packet.payload).unwrap();
+        let sources = payload["sources"].as_array().unwrap();
+        let question_id = sources[1]["id"].as_str().unwrap();
+        let answer_id = sources[2]["id"].as_str().unwrap();
+        serde_json::from_value(serde_json::json!({
+            "schema_version":1,
+            "source_sha256":packet.sha256,
+            "dialogues":dialogues,
+            "cutoff":3,
+            "protected":[
+                {"id":"snapshot","message":"current-task-snapshot","kind":"evidence","state":"historical"},
+                {"id":"intention","message":question_id,"kind":"intention","state":"future"},
+                {"id":"incident","message":answer_id,"kind":"incident","state":"open"}
+            ],
+            "reason":"Conserver l'historique attribué avant compactage"
+        }))
+        .unwrap()
+    }
     /// Exercise the same factory preview and real admission both use publicly.
     fn run(
         &self,
         preview: bool,
     ) -> Result<swarm_engine::AgentLaunchOutcome, swarm_engine::RootStoreError> {
+        self.run_with(self.request(), preview)
+    }
+    fn run_with(
+        &self,
+        r: Launch,
+        preview: bool,
+    ) -> Result<swarm_engine::AgentLaunchOutcome, swarm_engine::RootStoreError> {
         let mut store = RootStore::open(&self.root, true).unwrap();
-        let result = store.prepare_agent_launch(
-            &self.work,
-            &self.request(),
-            preview,
-            &mut SystemEnvironment,
-        );
+        let result = store.prepare_agent_launch(&self.work, &r, preview, &mut SystemEnvironment);
         store.close().unwrap();
         result
     }
@@ -1603,4 +1685,242 @@ fn malformed_provider_cooldown_clearance_refuses_public_admission_without_mutati
     fs::remove_file(&path).unwrap();
     assert!(f.run(true).unwrap().preview_only);
     assert_eq!(snapshot(&db), before);
+}
+
+/// Preview builds the extractive attachment from persisted sources, appends it
+/// as the last prompt content, empties Included/Excluded to the confirmed
+/// dialogue references, and mutates nothing. The receipt carries no queue
+/// fields until the real staging stamps them.
+#[test]
+fn summary_preview_appends_extract_without_mutation() {
+    let f = Fixture::with_summary();
+    assert!(f.run(true).is_ok());
+    let before = snapshot(&f.db());
+    let mut r = f.request();
+    r.summary_selection = Some(Box::new(f.confirmed_selection()));
+    let mut store = RootStore::open(&f.root, true).unwrap();
+    let preview = store
+        .prepare_agent_launch(&f.work, &r, true, &mut SystemEnvironment)
+        .unwrap();
+    store.close().unwrap();
+    assert!(preview.preview_only);
+    let manifest = preview.agent.context.as_ref().unwrap();
+    let receipt = manifest.summary.as_ref().expect("previewed receipt");
+    assert!(preview.agent.prompt.contains("EXTRAITS DE CADRAGE"));
+    assert!(preview.agent.prompt.contains("Décision numéro 0"));
+    assert!(preview.agent.prompt.contains("Réponse 1"));
+    // Last prompt content: the attachment body closes the prepared prefix.
+    assert!(preview.agent.prompt.trim_end().ends_with('}'));
+    assert_eq!(receipt.work, f.work);
+    assert_eq!(receipt.task, "task");
+    assert_eq!(receipt.prepared_revision, 2);
+    assert_eq!(receipt.queued_revision, 0);
+    assert!(receipt.queued_source_sha256.is_empty());
+    assert_eq!(receipt.source_message_count, 5);
+    assert_eq!(
+        receipt.selection.source_sha256,
+        r.summary_selection.as_deref().unwrap().source_sha256
+    );
+    assert!(manifest.included.as_ref().unwrap().is_empty());
+    assert!(manifest.excluded.as_ref().unwrap().is_empty());
+    assert_eq!(manifest.references.as_ref().unwrap().len(), 2);
+    assert_eq!(snapshot(&f.db()), before);
+}
+
+/// Real admission without the reviewed context hash refuses before any write:
+/// the operator must examine the extractive preview before sending it.
+#[test]
+fn summary_admission_without_context_hash_refuses_without_mutation() {
+    let f = Fixture::with_summary();
+    assert!(f.run(true).is_ok());
+    let before = snapshot(&f.db());
+    let mut r = f.request();
+    r.summary_selection = Some(Box::new(f.confirmed_selection()));
+    let mut store = RootStore::open(&f.root, true).unwrap();
+    let error = match store
+        .prepare_agent_launch(&f.work, &r, false, &mut SystemEnvironment)
+    {
+        Err(error) => error,
+        Ok(_) => panic!("unreviewed extractive selection admitted"),
+    };
+    store.close().unwrap();
+    assert_eq!(error.code(), "agent-launch-summary-context-hash-required");
+    assert_eq!(snapshot(&f.db()), before);
+}
+
+/// Confirm-then-admit: the context hash from the preview commits the agent at
+/// revision 3 with a stamped receipt (prepared at 2, queued at 3). The queued
+/// source digest matches a fresh resolution at the queued revision.
+#[test]
+fn summary_admission_commits_stamped_receipt() {
+    use sha2::{Digest, Sha256};
+    let f = Fixture::with_summary();
+    assert!(f.run(true).is_ok());
+    let mut r = f.request();
+    let selection = f.confirmed_selection();
+    r.summary_selection = Some(Box::new(selection.clone()));
+    let mut store = RootStore::open(&f.root, true).unwrap();
+    let preview = store
+        .prepare_agent_launch(&f.work, &r, true, &mut SystemEnvironment)
+        .unwrap();
+    r.context_hash = preview.agent.context.as_ref().unwrap().sha256.clone();
+    let launch = store
+        .prepare_agent_launch(&f.work, &r, false, &mut SystemEnvironment)
+        .unwrap();
+    let db = f.db();
+    // Sources at the queued revision: the work is saved at N+1 with the
+    // attempt-transition task body; the summary packet re-resolves there.
+    let queued = swarm_engine::read_recorded_work(&db, &f.work).unwrap();
+    assert_eq!(queued.revision, 3);
+    let packet = swarm_engine::summary_source_for_work(
+        &f.root,
+        &queued,
+        &swarm_engine::MemorySummarySourceRequest {
+            schema_version: 1,
+            work: f.work.clone(),
+            task: "task".into(),
+            expected_revision: 3,
+            dialogues: selection.dialogues.clone().unwrap(),
+        },
+    )
+    .unwrap();
+    let manifest = launch.agent.context.as_ref().unwrap();
+    let receipt = manifest.summary.as_ref().expect("committed receipt");
+    assert_eq!(receipt.work, f.work);
+    assert_eq!(receipt.task, "task");
+    assert_eq!(receipt.prepared_revision, 2);
+    assert_eq!(receipt.queued_revision, 3);
+    assert_eq!(receipt.queued_source_sha256, packet.sha256);
+    assert_eq!(
+        receipt.attachment_sha256,
+        format!("{:x}", Sha256::digest(receipt_attachment(&launch.agent.prompt).as_bytes()))
+    );
+    assert!(launch.agent.prompt.contains("EXTRAITS DE CADRAGE"));
+    assert_eq!(manifest.included.as_ref().unwrap().len(), 0);
+    assert_eq!(manifest.references.as_ref().unwrap().len(), 2);
+    let recorded = snapshot(&db);
+    db.close().unwrap();
+    store.close().unwrap();
+    // Replay after providers removal stays the retained agent, byte-stable.
+    fs::remove_file(f.root.join(".swarm/providers.json")).unwrap();
+    let replay = f.run_with(r.clone(), false).unwrap();
+    assert!(!replay.created);
+    assert_eq!(replay.agent.prompt, launch.agent.prompt);
+    assert_eq!(snapshot(&f.db()), recorded);
+}
+
+/// The attachment bytes inside the committed prompt are exactly the last
+/// `attachment_bytes` bytes of the prepared context prefix (suffix invariant
+/// re-checked at start).
+fn receipt_attachment(prompt: &str) -> String {
+    // The attachment is the prompt tail; only used to re-hash its SHA here.
+    let start = prompt
+        .rfind("EXTRAITS DE CADRAGE")
+        .expect("attachment present")
+        - 1;
+    prompt[start..].to_string()
+}
+
+/// Modified answers after the operator confirmed the selection refuse with the
+/// drift code, before any interpretation of the launch, on the same snapshot.
+#[test]
+fn summary_selection_refuses_drifted_sources_without_mutation() {
+    let f = Fixture::with_summary();
+    assert!(f.run(true).is_ok());
+    let before = snapshot(&f.db());
+    let mut r = f.request();
+    r.summary_selection = Some(Box::new(f.confirmed_selection()));
+    let db = f.db();
+    // Rewrite one answer inside the stored work: the confirmed digest no
+    // longer resolves, and the packet digest changes either way.
+    let raw: Vec<u8> = db
+        .query_row("SELECT body FROM works WHERE id=?", [&f.work], |r| r.get(0))
+        .unwrap();
+    let mut w = swarm_engine::decode_work(&raw).unwrap();
+    let task = w
+        .tasks
+        .as_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|t| t.id == "old-1")
+        .unwrap();
+    task.answers.as_mut().unwrap()[0].text = "Réponse modifiée".into();
+    task.response = "Réponse modifiée".into();
+    db.execute(
+        "UPDATE works SET body=? WHERE id=?",
+        rusqlite::params![swarm_engine::encode_model(&w).unwrap(), f.work],
+    )
+    .unwrap();
+    db.close().unwrap();
+    let after_drift = snapshot(&f.db());
+    let mut store = RootStore::open(&f.root, true).unwrap();
+    for preview in [true, false] {
+        // The modified answer no longer resolves in the stored work: the
+        // dialogue digest misses before any packet comparison, like Go's
+        // resolveDialogue head. Admission is refused either way.
+        let error = match store
+            .prepare_agent_launch(&f.work, &r.clone(), preview, &mut SystemEnvironment)
+        {
+            Err(error) => error,
+            Ok(_) => panic!("drifted selection admitted (preview={preview})"),
+        };
+        assert!(
+            matches!(
+                error.code(),
+                "project-memory-refused" | "agent-launch-summary-sources-changed"
+            ),
+            "unexpected drift code: {error:?}"
+        );
+        assert_eq!(snapshot(&f.db()), after_drift);
+    }
+    store.close().unwrap();
+}
+
+/// The reserved branches (planning work, brainstorm target, non-worker role,
+/// foreign origin, references) refuse the extractive selection instead of
+/// inheriting a partially ported path. Role/mode/origin/references hit the
+/// generic branch guard first (the same layering as Go, whose public path
+/// rejects them before attachment); the attachment's own reserved-branch
+/// check covers the remaining combinations through the module unit tests.
+#[test]
+fn summary_selection_refuses_reserved_branches() {
+    let f = Fixture::with_summary();
+    assert!(f.run(true).is_ok());
+    let before = snapshot(&f.db());
+    for case in 0..5 {
+        let mut r = f.request();
+        r.summary_selection = Some(Box::new(f.confirmed_selection()));
+        match case {
+            0 => r.role = "reviewer".into(),
+            1 => r.origin = "mission".into(),
+            2 => r.mode = "review".into(),
+            3 => {
+                r.references = Some(vec![swarm_engine::DialogueRef {
+                    task: "old-0".into(),
+                    attempt: "a0".into(),
+                    sha256: "0".repeat(64),
+                }])
+            }
+            // Work-level branch the generic guard does not cover: a target
+            // task already carrying attempts reaches the attachment itself,
+            // exercising its own reserved-branch refusal.
+            _ => r.task_id = "old-1".into(),
+        }
+        let mut store = RootStore::open(&f.root, true).unwrap();
+        let error = match store
+            .prepare_agent_launch(&f.work, &r, true, &mut SystemEnvironment)
+        {
+            Err(error) => error,
+            Ok(_) => panic!("reserved branch accepted (case {case})"),
+        };
+        store.close().unwrap();
+        assert!(
+            matches!(
+                error.code(),
+                "agent-launch-request-branch-unported" | "agent-launch-summary-branch-unported"
+            ),
+            "unexpected reserved-branch code (case {case}): {error:?}"
+        );
+        assert_eq!(snapshot(&f.db()), before);
+    }
 }

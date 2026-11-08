@@ -223,6 +223,32 @@ re-run, evidence
 verify VERIFIED). Still closed: read/summarize/transmit/compact rights
 (operator decision, distinct increments).
 
+G2 extractive-consumer tranche (7 November 2026): the selection is now
+**consumed** by the Rust launch chain — `memorySummarySelection`/
+`memorySummaryReceipt` ported to
+`rust/crates/swarm-engine/src/memory_summary_selection.rs`, admission
+`memory_summary_attachment` in `agent_launch.rs` (text rebuilt from persisted
+Work, never an external entry; typed refusals
+`agent-launch-summary-branch-unported/-selection-incomplete/
+-context-hash-required/-sources-changed/-selection-invalid`), attachment as
+the last prompt piece, receipt stamped into `context.summary`, queue fields
+at stage, before-start check `checked_memory_summary_receipt` in
+`record_permission` (`agent_execution_store.rs`:
+`agent-execution-summary-receipt-invalid/-sources-stale/
+-sources-changed-before-start/-reconstruction-failed` — the provider does not
+start). Codes travel as `RootStoreError::Launch(AgentLaunchError)` (the
+`agent_supervision.rs` wrapper); HTTP maps 400 (admission Refused) / 409
+(changed sources and before-start check) and keeps 500 elsewhere (2 guard
+tests in `rust/crates/swarm-web/src/service.rs`), project memory states
+preserved (400/409/404, Row/Sql 500). Evidence: engine `--lib memory_summary`
+9 tests, `--test agent_launch` 31 tests (5 integrations), web `--lib` 51
+tests; permanent recipe
+`tools/verification/recipes/versioned-memory-summary-selection-rust.json`
+(3 steps), evidence
+`.swarm-fixtures/versioned-memory-summary-selection-evidence/run-20261107-1`.
+Still closed: read/summarize/transmit/compact rights (operator decision,
+distinct increments).
+
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
 
 Origin: G2 lineage tranche resumption (6 November 2026). After the operator

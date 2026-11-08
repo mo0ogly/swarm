@@ -257,6 +257,32 @@ web 3 tests (POST paquet exact sans mutation, GET pairage 405) ; recette mise
 verify VERIFIED). Restent fermés : droits lire/résumer/transmettre/compacter
 (décision opérateur, incréments distincts).
 
+Tranche G2 consommateur extractif (7 novembre 2026) : la sélection est
+désormais **consommée** par la chaîne de lancement Rust —
+`memorySummarySelection`/`memorySummaryReceipt` portés dans
+`rust/crates/swarm-engine/src/memory_summary_selection.rs`, admission
+`memory_summary_attachment` dans `agent_launch.rs` (texte reconstruit depuis
+le Work persisté, jamais d'entrée externe ; refus typés
+`agent-launch-summary-branch-unported/-selection-incomplete/
+-context-hash-required/-sources-changed/-selection-invalid`), rattachement en
+dernière pièce du prompt, reçu tamponné dans `context.summary`, champs de file
+d'attente au stage, contrôle avant démarrage `checked_memory_summary_receipt`
+dans `record_permission` (`agent_execution_store.rs` : `agent-execution-
+summary-receipt-invalid/-sources-stale/-sources-changed-before-start/
+-reconstruction-failed` — le provider ne démarre pas). Codes portés par
+`RootStoreError::Launch(AgentLaunchError)` (emballage `agent_supervision.rs`) ;
+HTTP mappe 400 (Refused admission) / 409 (sources modifiées et contrôle avant
+démarrage) et garde 500 ailleurs (2 tests de garde dans
+`rust/crates/swarm-web/src/service.rs`), états mémoire project conservés
+(400/409/404, Row/Sql 500). Preuve : moteur `--lib memory_summary` 9 tests,
+`--test agent_launch` 31 tests (dont 5 intégrations), web `--lib` 51 tests ;
+recette permanente
+`tools/verification/recipes/versioned-memory-summary-selection-rust.json`
+(3 étapes), preuve
+`.swarm-fixtures/versioned-memory-summary-selection-evidence/run-20261107-1`.
+Restent fermés : droits lire/résumer/transmettre/compacter (décision
+opérateur, incréments distincts).
+
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
 Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction

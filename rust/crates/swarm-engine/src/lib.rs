@@ -387,6 +387,7 @@ mod instruction;
 mod instruction_learning;
 mod memory_catalog;
 mod memory_files;
+mod memory_summary_selection;
 mod memory_summary_source;
 pub use memory_summary_source::{
     decode_summary_source_request, summary_source_for_work, MemorySummarySource,
@@ -399,7 +400,7 @@ mod mutation_guard;
 mod project_memory;
 pub use project_memory::{
     decode_project_memory_request, memory_preview_token, memory_source_sha, memory_version_sha,
-    MemoryUse, ProjectMemoryPreview, ProjectMemoryRequest,
+    MemoryError, MemoryUse, ProjectMemoryPreview, ProjectMemoryRequest,
 };
 pub use memory_catalog::{memory_catalog, MemoryCatalog, MemoryCatalogEntry};
 pub use financial_budget::{

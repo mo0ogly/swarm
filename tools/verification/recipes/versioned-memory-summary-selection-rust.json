@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "id": "versioned-memory-summary-selection-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/memory_summary_selection.rs",
+    "rust/crates/swarm-engine/src/memory_summary_source.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/agent_launch_error.rs",
+    "rust/crates/swarm-engine/src/project_memory.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/tests/agent_launch.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/project_memory.rs",
+    "internal/engine/memory_summary_selection.go",
+    "internal/engine/memory_summary_source.go",
+    "internal/engine/memory_summary_receipt.go",
+    "internal/engine/agents_store.go",
+    "internal/engine/agents_process.go",
+    "internal/engine/memory_usage_binding.go",
+    "docs/actions-confiance-rust.md",
+    "docs/en/actions-confiance-rust.md",
+    "tools/verification/recipes/versioned-memory-summary-selection-rust.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "selection-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "memory_summary",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 9 tests",
+        "test result: ok. 9 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "selection-admission",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "agent_launch",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 31 tests",
+        "test result: ok. 31 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "selection-web-status",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-web",
+        "--lib",
+        "--",
+        "--nocapture",
+        "summary_status_preserves_typed_refusals_and_server_failures",
+        "memory_status_preserves_caller_states_and_server_failures"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 2 tests",
+        "test result: ok. 2 passed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

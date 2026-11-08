@@ -768,6 +768,50 @@ evidence `.swarm-fixtures/versioned-memory-catalog-evidence/run-20261107-4`.
 Still closed: read/summarize/transmit/compact rights (M20 operator rights, a
 distinct increment).
 
+**M20 extractive consumer (7 November 2026)** — the extractive selection is
+now consumed by the launch chain, not only produced.
+`memorySummarySelection` (`internal/engine/memory_summary_selection.go`) and
+`memorySummaryReceipt` (`internal/engine/memory_summary_receipt.go`) are
+ported to `rust/crates/swarm-engine/src/memory_summary_selection.rs` and
+wired into the Rust engine. Admission (`memory_summary_attachment` in
+`agent_launch.rs`) rebuilds the text **from persisted Work** — never from an
+external entry — and refuses reserved branches
+(`agent-launch-summary-branch-unported`), an incomplete selection or a
+missing `context_hash` outside preview (`agent-launch-summary-selection-
+incomplete`, `-context-hash-required`), sources changed since the export
+(`agent-launch-summary-sources-changed`, a conflict to re-examine) and an
+invalid boundary (`agent-launch-summary-selection-invalid`, chained cause).
+The text is appended as the last prompt piece, the receipt stamped into
+`context.summary`, and Included/Excluded emptied when it is present; the
+queue fields (`queued_revision`, `queued_source_sha256`) follow the stage
+revision bump. The before-start check (`checked_memory_summary_receipt` in
+`record_permission`, `agent_execution_store.rs`) replays the packet from Work
+and refuses an invalid receipt
+(`agent-execution-summary-receipt-invalid`), stale sources
+(`agent-execution-summary-sources-stale`) or changed sources
+(`-sources-changed-before-start`), or a reconstruction failure
+(`-reconstruction-failed`) — the provider does not start. Codes travel as
+`RootStoreError::Launch(AgentLaunchError)` (the `agent_supervision.rs`
+wrapper), not in the `Agent` family. On HTTP, admission codes map to 400
+(Refused) / 409 (changed sources), the before-start check maps to 409, and
+any other variant/operation combination stays 500
+(`rust/crates/swarm-web/src/service.rs`, two guard tests); project memory
+errors keep their caller states (`project-memory-refused` 400,
+`revision-conflict` 409, `project-memory-missing` 404, Row/Sql 500). No
+translation was ported: Go remains the reference. Evidence: engine
+`cargo test -p swarm-engine --lib memory_summary` (9: attachment/receipt
+construction, invalid-boundary refusals, Go field order) and
+`cargo test -p swarm-engine --test agent_launch` (31 including 5
+integrations: preview without mutation, admission without `context_hash`,
+confirmed receipt, drifted sources, reserved branches), web
+`cargo test -p swarm-web --lib` (51 including 2 status-mapping guards).
+Permanent recipe
+`tools/verification/recipes/versioned-memory-summary-selection-rust.json`
+(3 steps), evidence
+`.swarm-fixtures/versioned-memory-summary-selection-evidence/run-20261107-1`.
+Still closed: read/summarize/transmit/compact rights (M20 operator rights, a
+distinct increment).
+
 The historical interprocess flock serializes writes. One idempotency key creates
 one native entry; conflicting content refuses. `lose_response:true` records
 `unknown` after the simulated effect. Another commit cannot duplicate it;

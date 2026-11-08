@@ -797,6 +797,49 @@ preuve `.swarm-fixtures/versioned-memory-catalog-evidence/run-20261107-4`.
 Restent fermés : les droits lire/résumer/transmettre/compacter (droits
 opérateur M20, incrément distinct).
 
+**Consommateur extractif M20 (7 novembre 2026)** — la sélection extractive est
+désormais consommée par la chaîne de lancement, pas seulement produite.
+`memorySummarySelection` (`internal/engine/memory_summary_selection.go`) et
+`memorySummaryReceipt` (`internal/engine/memory_summary_receipt.go`) sont
+portés dans `rust/crates/swarm-engine/src/memory_summary_selection.rs` et
+raccordés au moteur Rust. L'admission (`memory_summary_attachment` dans
+`agent_launch.rs`) reconstruit le texte **depuis le Work persisté** — jamais
+depuis une entrée externe —, refuse les branches réservées
+(`agent-launch-summary-branch-unported`), une sélection incomplète ou sans
+`context_hash` hors aperçu (`agent-launch-summary-selection-incomplete`,
+`-context-hash-required`), des sources modifiées depuis l'export
+(`agent-launch-summary-sources-changed`, conflit à re-examiner) et une
+frontière invalide (`agent-launch-summary-selection-invalid`, cause chaînée).
+Le texte est ajouté en dernière pièce du prompt, la réception tamponnée dans
+`context.summary` et les échanges inclus/exclus vidés quand elle est présente ;
+les champs de file d'attente (`queued_revision`, `queued_source_sha256`)
+suivent le bump de révision du stage. Le contrôle avant démarrage
+(`checked_memory_summary_receipt` dans `record_permission`,
+`agent_execution_store.rs`) rejoue le paquet depuis le Work et refuse un reçu
+invalide (`agent-execution-summary-receipt-invalid`), des sources périmées
+(`agent-execution-summary-sources-stale`) ou modifiées
+(`-sources-changed-before-start`), ou un échec de reconstruction
+(`-reconstruction-failed`) — le provider ne démarre pas. Les codes voyagent
+en `RootStoreError::Launch(AgentLaunchError)` (emballage
+`agent_supervision.rs`), pas dans la famille `Agent`. Sur HTTP, les codes
+d'admission mappent 400 (Refused) / 409 (sources modifiées), le contrôle
+avant démarrage mappe 409, toute autre combinaison variante/opération reste
+500 (`rust/crates/swarm-web/src/service.rs`, deux tests de garde) et les
+erreurs mémoire project gardent leurs états (`project-memory-refused` 400,
+`revision-conflict` 409, `project-memory-missing` 404,Row/Sql 500). Aucune
+translation n'a été portée : le Go reste la référence. Preuves : moteur
+`cargo test -p swarm-engine --lib memory_summary` (9 : construction du
+rattachement et du reçu, refus de frontières invalides, ordre des champs Go)
+et `cargo test -p swarm-engine --test agent_launch` (31 dont 5 intégrations :
+aperçu sans mutation, admission sans `context_hash`, reçu confirmé, sources
+driftées, branches réservées), web `cargo test -p swarm-web --lib`
+(51 dont 2 gardes de mapping d'état). Recette permanente
+`tools/verification/recipes/versioned-memory-summary-selection-rust.json`
+(3 étapes), preuve
+`.swarm-fixtures/versioned-memory-summary-selection-evidence/run-20261107-1`.
+Restent fermés : les droits lire/résumer/transmettre/compacter (droits
+opérateur M20, incrément distinct).
+
 Le verrou interprocessus historique sérialise les écritures. Une même clé ne
 produit qu’une entrée native ; un autre contenu sous cette clé est refusé.
 `lose_response:true` rend l’état `unknown` après l’effet simulé. Un nouvel

@@ -8,7 +8,7 @@
 //! branch); any unknown action refuses with the typed unported code instead of
 //! inventing its wire behavior here.
 use super::{close, root, HttpServiceError as E, NativeHttpService, RouteBody};
-use http::{Method, Request};
+use http::{Method, Request, StatusCode};
 use swarm_engine::{RootStore, RootStoreError};
 
 /// The POST actions served by this route. Commit names map to engine
@@ -58,6 +58,35 @@ fn post_action(raw: Option<&str>) -> Result<&'static str, E> {
         .find(|candidate| **candidate == action)
         .copied()
         .ok_or(E::Refused("project-memory-operation-unported"))
+}
+
+/// Classify only the typed memory caller states on this route's four Root
+/// operations: caller-invalid refusals are 400, revision conflicts are 409,
+/// unknown work is 404. SQL, row incoherence, identity mismatch and storage
+/// failures return None and keep their server-error default; a matching code
+/// from another operation never inherits this mapping.
+pub(super) fn memory_caller_status(
+    operation: &str,
+    error: &RootStoreError,
+) -> Option<StatusCode> {
+    if !matches!(
+        operation,
+        "project-memory-read"
+            | "project-memory-summary-source"
+            | "project-memory-preview"
+            | "project-memory-mutate"
+    ) {
+        return None;
+    }
+    let RootStoreError::Mutation(swarm_engine::WorkEngineError::Memory(e)) = error else {
+        return None;
+    };
+    Some(match e.code() {
+        "project-memory-refused" => StatusCode::BAD_REQUEST,
+        "revision-conflict" => StatusCode::CONFLICT,
+        "project-memory-missing" => StatusCode::NOT_FOUND,
+        _ => return None,
+    })
 }
 
 impl NativeHttpService {

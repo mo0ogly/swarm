@@ -405,6 +405,28 @@ impl HttpServiceError {
                 // managed canonical guide source is the typed caller refusal
                 // project-source-memory-managed (also 400 here).
                 _ if project_profile::caller_invalid(operation,cause.as_ref())=>StatusCode::BAD_REQUEST,
+                // MemoryError family through Mutation(WorkEngineError::Memory(e)):
+                // caller states only; SQL/row/identity corruption stays server error.
+                _ if project_memory::memory_caller_status(operation,cause.as_ref()).is_some()
+                    => project_memory::memory_caller_status(operation,cause.as_ref()).unwrap(),
+                // Extractive-summary admission and before-start refusals (Launch):
+                // caller/state conflicts; storage, commit and cleanup stay server errors.
+                "agent-launch-summary-branch-unported"
+                | "agent-launch-summary-selection-incomplete"
+                | "agent-launch-summary-context-hash-required"
+                    if matches!(cause.as_ref(),RootStoreError::Launch(e) if matches!(e.as_ref(),swarm_engine::AgentLaunchError::Refused(_)))=>StatusCode::BAD_REQUEST,
+                "agent-launch-summary-sources-changed"
+                    if matches!(cause.as_ref(),RootStoreError::Launch(e) if matches!(e.as_ref(),swarm_engine::AgentLaunchError::Refused(_)))=>StatusCode::CONFLICT,
+                "agent-launch-summary-selection-invalid"
+                    if matches!(cause.as_ref(),RootStoreError::Launch(error) if matches!(error.as_ref(),swarm_engine::AgentLaunchError::Cause{..}))=>StatusCode::BAD_REQUEST,
+                // Before-start receipt refusals surface from the supervision
+                // startup writer as Launch errors (record_permission returns
+                // AgentLaunchError; agent_supervision wraps it in Launch), so
+                // the guard matches Launch, not the Agent store family. Both
+                // are state conflicts the caller resolves by re-examination.
+                "agent-execution-summary-sources-changed-before-start"
+                | "agent-execution-summary-sources-stale"
+                    if matches!(cause.as_ref(),RootStoreError::Launch(_))=>StatusCode::CONFLICT,
                 "settings-context-policy-not-configured" if matches!(*operation,"project-profile-read"|"preparation-call"|"project-profile-catalog"|"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Settings(_))=>StatusCode::NOT_IMPLEMENTED,
                 "settings-revision-conflict"
                 | "settings-event-conflict"
@@ -1780,6 +1802,97 @@ mod tests {
             let error=root("quotas-preview",RootStoreError::Launch(Box::new(swarm_engine::AgentLaunchError::Refused(code))));
             assert_eq!(error.status(),status,"{code}");
         }
+    }
+
+    /// Extractive-summary refusal codes keep their typed caller states: an
+    /// admission refusal invalidates the confirmed request (400), changed
+    /// sources and the before-start receipt state conflicts need a re-examined
+    /// decision (409), and an invalid extractive selection stays caller data
+    /// (400). Storage, commit, cleanup and the Agent store family never inherit
+    /// these mappings, and a matching code from another operation stays a
+    /// server failure — no prefix catch-all disguises an internal fault.
+    #[test]
+    fn summary_status_preserves_typed_refusals_and_server_failures() {
+        // Admission side, produced by attach_summary_selection in
+        // RootStoreError::Launch(Refused) / Launch(Cause) during prepare.
+        let launch_refused = |code: &'static str| {
+            root("trust-command",RootStoreError::Launch(Box::new(swarm_engine::AgentLaunchError::Refused(code))))
+        };
+        assert_eq!(launch_refused("agent-launch-summary-branch-unported").status(),StatusCode::BAD_REQUEST);
+        assert_eq!(launch_refused("agent-launch-summary-selection-incomplete").status(),StatusCode::BAD_REQUEST);
+        assert_eq!(launch_refused("agent-launch-summary-context-hash-required").status(),StatusCode::BAD_REQUEST);
+        assert_eq!(launch_refused("agent-launch-summary-sources-changed").status(),StatusCode::CONFLICT);
+        let selection_invalid=root("trust-command",RootStoreError::Launch(Box::new(
+            swarm_engine::AgentLaunchError::Cause {
+                code:"agent-launch-summary-selection-invalid",
+                cause:Box::new(std::io::Error::other("fixture")),
+            })));
+        assert_eq!(selection_invalid.status(),StatusCode::BAD_REQUEST);
+        // Before-start side, produced by checked_memory_summary_receipt in
+        // record_permission and wrapped Launch by the supervision writer.
+        assert_eq!(launch_refused("agent-execution-summary-sources-changed-before-start").status(),StatusCode::CONFLICT);
+        let sources_stale=root("trust-command",RootStoreError::Launch(Box::new(
+            swarm_engine::AgentLaunchError::Cause {
+                code:"agent-execution-summary-sources-stale",
+                cause:Box::new(std::io::Error::other("fixture")),
+            })));
+        assert_eq!(sources_stale.status(),StatusCode::CONFLICT);
+        // A matching code on another operation stays a server failure only when
+        // it is not Launch-carried: the admission arms guard the variant, not
+        // the operation (no web operation reaches them today — quota precedent).
+        assert_eq!(root("other-operation",RootStoreError::Refused("agent-launch-summary-branch-unported")).status(),
+            StatusCode::INTERNAL_SERVER_ERROR);
+        // Storage-side launch variants and the Agent store family keep server
+        // defaults: no summary code may be synthesized from a non-Refused,
+        // non-Cause variant.
+        let storage=root("trust-command",RootStoreError::Launch(Box::new(
+            swarm_engine::AgentLaunchError::Cleanup {
+                primary:Box::new(swarm_engine::AgentLaunchError::Refused("agent-launch-summary-sources-changed")),
+                cleanup:Box::new(swarm_engine::AgentLaunchError::Refused("fixture-close-failed")),
+            })));
+        assert_eq!(storage.status(),StatusCode::INTERNAL_SERVER_ERROR);
+        let agent_store=root("trust-command",RootStoreError::Agent(
+            swarm_engine::AgentStoreError::Refused("agent-launch-summary-sources-changed")));
+        assert_eq!(agent_store.status(),StatusCode::INTERNAL_SERVER_ERROR);
+        // Cleanup-wrapped primary keeps the server default.
+        let wrapped=root("trust-command",RootStoreError::Cleanup {
+            primary:Some(Box::new(RootStoreError::Launch(Box::new(
+                swarm_engine::AgentLaunchError::Refused("agent-launch-summary-sources-changed"))))),
+            cleanup:Box::new(RootStoreError::Refused("fixture-close-failed")),
+        });
+        assert_eq!(wrapped.status(),StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    /// Memory caller states on the four project-memory operations keep their
+    /// typed client mappings: caller-invalid refusals are 400, revision
+    /// conflicts 409, unknown work 404. SQL, row incoherence and identity
+    /// mismatch stay server errors, and no other operation inherits the
+    /// memory mapping even with the identical code.
+    #[test]
+    fn memory_status_preserves_caller_states_and_server_failures() {
+        use swarm_engine::MemoryError;
+        let memory = |error: MemoryError| root("project-memory-mutate",
+            RootStoreError::Mutation(swarm_engine::WorkEngineError::Memory(error)));
+        assert_eq!(memory(MemoryError::Refused("project-memory-refused")).status(),StatusCode::BAD_REQUEST);
+        assert_eq!(memory(MemoryError::RevisionConflict("revision-conflict")).status(),StatusCode::CONFLICT);
+        assert_eq!(memory(MemoryError::Missing).status(),StatusCode::NOT_FOUND);
+        for (label,error) in [
+            ("row-incoherent",MemoryError::Row(swarm_engine::WorkError::Incoherent)),
+            ("project-memory-storage",MemoryError::Row(swarm_engine::WorkError::Identity)),
+        ] {
+            assert_eq!(memory(error).status(),StatusCode::INTERNAL_SERVER_ERROR,"{label}");
+        }
+        // Identical caller code on a non-memory operation stays server error.
+        let other=root("other-operation",RootStoreError::Mutation(
+            swarm_engine::WorkEngineError::Memory(MemoryError::Refused("project-memory-refused"))));
+        assert_eq!(other.status(),StatusCode::INTERNAL_SERVER_ERROR);
+        // Cleanup-wrapped memory primary keeps the server default.
+        let wrapped=root("project-memory-mutate",RootStoreError::Cleanup {
+            primary:Some(Box::new(RootStoreError::Mutation(swarm_engine::WorkEngineError::Memory(
+                MemoryError::Refused("project-memory-refused"))))),
+            cleanup:Box::new(RootStoreError::Refused("fixture-close-failed")),
+        });
+        assert_eq!(wrapped.status(),StatusCode::INTERNAL_SERVER_ERROR);
     }
 
     /// Reproduce a saved settings update between server-policy read and service
