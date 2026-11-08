@@ -746,3 +746,41 @@ Conséquence de préparation G6 : une matrice régénérée datée sera un livra
 du dossier de revue G6 (au moment de la désignation des tiers) ; en attendant,
 la présente note tient le rôle de delta entre la matrice du 29 octobre et
 l'état courant, et APEX doit être lu avec ce delta.
+
+## Suivi du 8 novembre — requalification du livré après le merge 197d663f6
+
+Le merge de `origin/main` (8532ce05d, arrivé par `197d663f6`) changeait 33
+entrées déclarées hors tests de la recette settlement livrée depuis son
+épinglage run-19 du 7/11 — le PASS run-19 restait valide sur son candidat
+gelé `a0721124…` mais ne qualifiait plus l'arbre courant (delta consigné
+dans BLP-APEX.md, « Delta de requalification des recettes après le merge »).
+Requalification exécutée le même jour :
+
+1. **Candidat reconstruit** : `build_native.py --install-candidate` sur le
+   HEAD courant `77f5a7b37` — `VERIFIED_NATIVE_CANDIDATE`, profil
+   `VERIFIED_DEFAULT_NATIVE_PROFILE` (preuves
+   `.swarm-fixtures/requal-merge-20261108/` et
+   `.cache/local-delivery/rust-z1haax4r/`).
+2. **Livraison par le chemin supporté** : `swarm_local.py start` a reconstruit
+   et livré `v0.1.1-dev.346`, sha256 `84b1e78c…` (même commit `77f5a7b37`,
+   profil `VERIFIED_DEFAULT_NATIVE_PROFILE`) en `bin/swarm`, service moteur
+   38434 redémarré sous le même contrat (PID vérifié par sha256 de
+   `/proc/<pid>/exe` = sha du livré). Un premier arrêt de l'ancienne instance
+   (a166e2b8…) a été fait par kill direct hors opération publique — défaut de
+   méthode corrigé par la reprise via `start` ; l'ancien livré est archivé
+   (`.swarm-fixtures/bin-archives/swarm-a166e2b8-pre-requal-20261108`).
+3. **Repins** : `SWARM_PAEA_DELIVERED_BIN_SHA256` + témoins `required_stdout`
+   mis à jour vers `84b1e78c…` dans les deux recettes (8 + 3 occurrences).
+4. **Rejeux** : **settlement-run-20 PASS 7/7, source_stable:true, VERIFIED**
+   (23 spawns témoins, étape 3 = révocation à la consommation toujours
+   exercée) et **chain-run-12 PASS 4/4, source_stable:true, VERIFIED**
+   (étape 4 = refus de SHA erroné exercé) — preuves
+   `.swarm-fixtures/requal-merge-20261108/{settlement-run-20,chain-run-12}/`,
+   intégrité externe `recipe.py verify` VERIFIED pour les deux.
+
+T17 reste PASS sur le livré courant ; l'écart I17 (révocation à la
+consommation) reste fermé sur le nouveau livré. Le candidat `f8184922…`
+(étape 1, version « devel ») reste en preuve d'arbre ; le livré en service
+est `84b1e78c…` — les deux mêmes sources, deux compilations distinctes.
+Pas de commit/push sans autorisation explicite ; requalification ≠
+acceptation indépendante (I11 0/17 inchangé).

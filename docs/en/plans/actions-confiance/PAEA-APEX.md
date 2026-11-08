@@ -1048,6 +1048,31 @@ Authorized baseline/status/evidence increment: [record and limits](paea/P0-G0-20
 Cockpit daemon UID separation is distinct from PAEA effect authority. Earlier
 observations below remain dated; no G1–G7 or independent acceptance claimed.
 
+### Current state — 8 November 2026
+
+Locally delivered unique candidate: `bin/swarm` SHA-256
+`84b1e78c8dbd9f38c5ebebb7fd48c097f6e7de76805249fd06592730aa5211a8`
+(v0.1.1-dev.346, commit 77f5a7b37 — modified=true, built
+2026-11-08T11:35:04Z, in place 2026-11-08 12:35 — 13th replacement; carries
+merge `197d663f6` of `origin/main` 8532ce05d and the concurrently committed
+lots). The merge had changed 33 non-test declared inputs of the settlement
+recipe since the run-19 pin — delta recorded in
+[BLP-APEX.md](BLP-APEX.md) ("Recipe requalification delta after the
+merge"). Requalification cycle: candidate `f8184922…`
+(`VERIFIED_NATIVE_CANDIDATE` at the same commit, evidence kept), delivery
+through the supported `swarm_local.py start` path (profile
+`VERIFIED_DEFAULT_NATIVE_PROFILE`; a prior stop of the old a166e2b8…
+instance by direct kill was a method fault, corrected by resuming through
+`start`; previous delivery archived), recipes re-pinned to `84b1e78c…`
+(8 + 3 occurrences) then **settlement-run-20 7/7 PASS + chain-run-12 4/4
+PASS, `source_stable: true` on both, VERIFIED by external integrity check** —
+revocation-at-consumption (settlement step 3) and wrong-SHA refusal (chain
+step 4) included (`requal-merge-20261108/{settlement-run-20,chain-run-12}/`).
+Engine service 38434 restarted under the same contract (PID verified by
+sha256 of `/proc/<pid>/exe` = delivered sha). Details in
+[GAP-CLOSURE-PLAN-20261103.md](paea/GAP-CLOSURE-PLAN-20261103.md), section
+"8 November follow-up". Independent acceptance: 0/17, unchanged.
+
 ### Current state — 7 November 2026
 
 Locally delivered unique candidate: `bin/swarm` SHA-256

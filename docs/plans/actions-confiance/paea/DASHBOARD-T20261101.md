@@ -15,14 +15,16 @@ campagnes T01…T22 exécutées.
 ## Candidat et blocage courant
 
 - Binaire désigné : `bin/swarm` SHA-256
-  `a07211247b68cc9fd617a048b05f2bd198097c57bd677f248288f4fef43c94ba`
-  (v0.1.1-dev.343, commit 0e45e4dbd, modified=true, construit
-  2026-11-07T12:57:54Z, posé 2026-11-07 13:57 — 12e remplacement depuis dev.292 ;
-  porte le lot G1 séparation avancée (6261e0fb8) et le chantier fixture_area de
-  la session concurrente ; historique dev.332/00560d87…, dev.322/3146c837…,
-  dev.316/e2f0039a…, dev.315/186cc38b… et dev.292/4164953c… conservés pour
-  contexte). Re-vérification complète du livré courant le 07-11 :
-  settlement-run-19 7/7 + chain-run-11 4/4 VERIFIED (détail ci-dessous).
+  `84b1e78c8dbd9f38c5ebebb7fd48c097f6e7de76805249fd06592730aa5211a8`
+  (v0.1.1-dev.346, commit 77f5a7b37, modified=true, construit
+  2026-11-08T11:35:04Z, posé 2026-11-08 12:35 — 13e remplacement depuis
+  dev.292 ; porte le merge 197d663f6/8532ce05d et les lots concurrents
+  committés ; historique dev.343/a0721124…, dev.332/00560d87…,
+  dev.322/3146c837…, dev.316/e2f0039a…, dev.315/186cc38b… et
+  dev.292/4164953c… conservés pour contexte). Re-vérification complète du
+  livré courant le 08-11 : settlement-run-20 7/7 + chain-run-12 4/4 VERIFIED
+  (détail ci-dessous). Le précédent dev.343 a0721124… avait été re-vérifié
+  le 07-11 : settlement-run-19 7/7 + chain-run-11 4/4 VERIFIED.
   Le précédent dev.322 3146c837… avait été re-vérifié sur l'arbre vivant
   (settlement run-17 7/7 + chaîne chain-run-10 4/4, les deux VERIFIED,
   extension 03-11 ci-dessous). Le précédent dev.316
@@ -61,7 +63,7 @@ campagnes T01…T22 exécutées.
 | T14 | I02/I14 | partielle | `T14-A2A-DESIGN.md` (02-11 : décisions D1–D7) ; portages locaux : `delegation` 75c35fa27 (04-11), `data_policy`/provenance (05-11), audience usage D3 `trust_delegation.rs::delegation_audience_binds_mandate_to_named_subject` 94a0b35 (08-11, 10/10 verts) | Réception A2A réseau (`a2a-*`, reçus liés, canal D6) ; identité réelle (I02) |
 | T15 | I15 | PASS | même preuve que T11 + liaison manifeste settlement (`paea-i15-manifest-binding-rust.json`, preuve conservée `glm-manifest-binding-20261029T224756Z/fresh-recipe-run/`, re-vérifiée VERIFIED 07-11 ; voie A structurellement refusée — settlement ne consomme aucun outil) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
-| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED, étape I17 révocation comprise ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) ; re-vérifié sur livré courant 3146c837… (03-11 : `settlement-run-17` 7/7 + `chain-run-10` 4/4 sur l'arbre vivant) puis dev.343/a0721124… (07-11 : `settlement-run-19` 7/7 + `chain-run-11` 4/4, révocation à la consommation sur settlement-call comprise — écart I17 de la matrice refermé) ; précédent e2f0039a… : `settlement-run-15` 7/7 + `chain-run-8` 4/4 sur gel 562953dba3, puis run-16 + chain-run-9 sur arbre vivant | Propagation production |
+| T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED, étape I17 révocation comprise ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) ; re-vérifié sur livré courant 3146c837… (03-11 : `settlement-run-17` 7/7 + `chain-run-10` 4/4 sur l'arbre vivant) puis dev.343/a0721124… (07-11 : `settlement-run-19` 7/7 + `chain-run-11` 4/4, révocation à la consommation sur settlement-call comprise — écart I17 de la matrice refermé) puis dev.346/84b1e78c… (08-11, après le merge 197d663f6 : `settlement-run-20` 7/7 + `chain-run-12` 4/4 VERIFIED, révocation à la consommation et refus de SHA erroné comprises) ; précédent e2f0039a… : `settlement-run-15` 7/7 + `chain-run-8` 4/4 sur gel 562953dba3, puis run-16 + chain-run-9 sur arbre vivant | Propagation production |
 
 Re-vérification du livré courant dev.322/3146c837 : **complète** (03-11 —
 run-17 settlement 7/7 + chain-run-10 4/4 VERIFIED sur l'arbre vivant,
@@ -255,6 +257,17 @@ gelé 562953dba3, puis run-16 + chain-run-9 sur arbre vivant recompilé).
   du 29-10 (révocation à la consommation sur settlement-call) est refermé** —
   note delta dans [GAP-CLOSURE-PLAN-20261103.md](GAP-CLOSURE-PLAN-20261103.md),
   section « Suivi du 7 novembre (fin) », avec I15 (Incréments101/103).
+- Delta 07-11 → 08-11 — requalification après le merge : **dev.346/
+  `84b1e78c…`** (08-11, 13e remplacement, commit 77f5a7b37 — le merge
+  `197d663f6` de `origin/main` 8532ce05d avait changé 33 entrées déclarées
+  hors tests de la recette settlement depuis le pin run-19). Candidat
+  reconstruit `f8184922…` (`VERIFIED_NATIVE_CANDIDATE`, preuve conservée),
+  livraison par `swarm_local.py start` (profil `VERIFIED_DEFAULT_NATIVE_PROFILE`),
+  recettes re-épinglées vers `84b1e78c…` puis **settlement-run-20 7/7 +
+  chain-run-12 4/4 VERIFIED** sur ce livré. T17 reste PASS ; I17 reste
+  refermé sur le nouveau livré — note delta dans
+  [GAP-CLOSURE-PLAN-20261103.md](GAP-CLOSURE-PLAN-20261103.md),
+  section « Suivi du 8 novembre ».
   T11/T15 conservent PASS ; leurs dossiers de preuve sont re-rattachés aux
   remises GLM conservées (voir Sources). T03, T08, T10, T12, T13, T22
   restent bloquées humain/OS ; acceptation indépendante 0/17 inchangée.
@@ -310,6 +323,14 @@ un pourcentage d'avancement » (invariant-matrix.json, global_limits).
 - `.swarm-fixtures/i17-rerun/chain-run-7/` — 4/4 VERIFIED sur ELF
   186cc38b…7853 (02-11-2026 après-midi, refus de SHA erroné compris,
   `source_stable: true`) — complétion chaîne du livré courant
+- `.swarm-fixtures/requal-merge-20261108/settlement-run-20/` — recette
+  `paea-delivered-settlement-cli-rust` re-épinglée, **7/7 PASS VERIFIED** sur
+  ELF dev.346/`84b1e78c…` (08-11-2026, 23 spawns témoins
+  `delivered-binary-witness`, `source_stable: true`) ; `chain-run-12/` — 4/4
+  VERIFIED sur le même livré (étape 4 = refus de SHA erroné). Détail du cycle
+  de requalification (candidat f8184922…, kill direct corrigé par `start`,
+  repins) dans [GAP-CLOSURE-PLAN-20261103.md](GAP-CLOSURE-PLAN-20261103.md),
+  section « Suivi du 8 novembre »
 - `.swarm-fixtures/g1-livraison-20261107/settlement-run-19/` — recette
   `paea-delivered-settlement-cli-rust` re-épinglée, **7/7 PASS VERIFIED** sur
   ELF dev.343/`a0721124…` (07-11-2026, 23 spawns témoins

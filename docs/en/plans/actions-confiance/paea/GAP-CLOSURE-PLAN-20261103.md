@@ -697,3 +697,42 @@ G6 preparation consequence: a regenerated, dated matrix will be a deliverable
 of the G6 review package (at the time of the tier designation); until then,
 this note serves as the delta between the 29 October matrix and the current
 state, and APEX must be read with this delta.
+
+## 8 November follow-up — delivered binary requalification after merge 197d663f6
+
+The merge of `origin/main` (8532ce05d, arrived through `197d663f6`) changed
+33 non-test declared inputs of the delivered settlement recipe since its
+run-19 pinning of 11/7 — the run-19 PASS remained valid on its frozen
+candidate `a0721124…` but no longer qualified the current tree (delta
+recorded in BLP-APEX.md, "Recipe requalification delta after the merge").
+Requalification executed the same day:
+
+1. **Rebuilt candidate**: `build_native.py --install-candidate` at current
+   HEAD `77f5a7b37` — `VERIFIED_NATIVE_CANDIDATE`, profile
+   `VERIFIED_DEFAULT_NATIVE_PROFILE` (evidence
+   `.swarm-fixtures/requal-merge-20261108/` and
+   `.cache/local-delivery/rust-z1haax4r/`).
+2. **Delivery through the supported path**: `swarm_local.py start` rebuilt
+   and delivered `v0.1.1-dev.346`, sha256 `84b1e78c…` (same commit
+   `77f5a7b37`, profile `VERIFIED_DEFAULT_NATIVE_PROFILE`) as `bin/swarm`;
+   the engine service 38434 restarted under the same contract (PID verified
+   by sha256 of `/proc/<pid>/exe` = delivered sha). A first stop of the
+   previous instance (a166e2b8…) was done by a direct kill outside the
+   public operation — method defect corrected by resuming through `start`;
+   the previous delivery is archived
+   (`.swarm-fixtures/bin-archives/swarm-a166e2b8-pre-requal-20261108`).
+3. **Re-pinning**: `SWARM_PAEA_DELIVERED_BIN_SHA256` + `required_stdout`
+   witnesses updated to `84b1e78c…` in both recipes (8 + 3 occurrences).
+4. **Replays**: **settlement-run-20 PASS 7/7, source_stable:true, VERIFIED**
+   (23 witness spawns, step 3 = revoke-at-consumption still exercised) and
+   **chain-run-12 PASS 4/4, source_stable:true, VERIFIED** (step 4 = wrong
+   SHA refusal exercised) — evidence
+   `.swarm-fixtures/requal-merge-20261108/{settlement-run-20,chain-run-12}/`,
+   external `recipe.py verify` VERIFIED for both.
+
+T17 remains PASS on the current delivery; the I17 gap (revocation at
+consumption) remains closed on the new delivery. The `f8184922…` candidate
+(step 1, "devel" version) remains tree evidence; the serving delivery is
+`84b1e78c…` — same sources, two distinct compilations. No commit/push
+without explicit authorization; requalification ≠ independent acceptance
+(I11 0/17 unchanged).

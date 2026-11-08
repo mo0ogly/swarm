@@ -1041,6 +1041,32 @@ Incrément base/statut/preuves autorisé : [bilan et limites](paea/P0-G0-2026110
 Séparation UID du démon cockpit distincte de l'autorité des effets PAEA. Les
 observations suivantes restent datées ; aucun G1…G7 ni verdict indépendant revendiqué.
 
+### État courant — 8 novembre 2026
+
+Candidat unique livré localement : `bin/swarm` SHA-256
+`84b1e78c8dbd9f38c5ebebb7fd48c097f6e7de76805249fd06592730aa5211a8`
+(v0.1.1-dev.346, commit 77f5a7b37 — modified=true, construit
+2026-11-08T11:35:04Z, posé 2026-11-08 12:35 — 13e remplacement ; porte le
+merge `197d663f6` de `origin/main` 8532ce05d et les lots concurrents
+committés). Le merge avait changé 33 entrées déclarées hors tests de la
+recette settlement depuis le pin run-19 — delta consigné dans
+[BLP-APEX.md](BLP-APEX.md) (« Delta de requalification des recettes après le
+merge »). Cycle de requalification : candidat `f8184922…`
+(`VERIFIED_NATIVE_CANDIDATE` sur le même commit, preuve conservée), livraison
+par le chemin supporté `swarm_local.py start` (profil
+`VERIFIED_DEFAULT_NATIVE_PROFILE` ; un arrêt préalable de l'ancienne instance
+a166e2b8… par kill direct était un défaut de méthode, corrigé par la reprise
+via `start` ; ancien livré archivé), recettes re-épinglées vers `84b1e78c…`
+(8 + 3 occurrences) puis **settlement-run-20 7/7 PASS + chain-run-12 4/4
+PASS, `source_stable: true` aux deux, VERIFIED par intégrité externe** —
+révocation à la consommation (étape 3 settlement) et refus de SHA erroné
+(étape 4 chain) comprises
+(`requal-merge-20261108/{settlement-run-20,chain-run-12}/`). Service moteur
+38434 redémarré sous le même contrat (PID vérifié par sha256 de
+`/proc/<pid>/exe` = sha du livré). Détail dans
+[GAP-CLOSURE-PLAN-20261103.md](paea/GAP-CLOSURE-PLAN-20261103.md), section
+« Suivi du 8 novembre ». Acceptation indépendante : 0/17, inchangée.
+
 ### État courant — 7 novembre 2026
 
 Candidat unique livré localement : `bin/swarm` SHA-256
