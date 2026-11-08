@@ -313,9 +313,50 @@ publique (M20-U01..U10 ouverts, critères P4 requis). Preuve : moteur
 `tools/verification/recipes/versioned-memory-usage-binding-rust.json`
 (3 étapes), preuve
 `.swarm-fixtures/versioned-memory-usage-binding-evidence/run-20261108-1`
-(PASS, verify VERIFIED). Restent fermés : le nœud de décision M25 (noyau
-d'identité), les droits lire/résumer/transmettre/compacter (décision
-opérateur, incréments distincts), tout câblage public.
+(PASS, verify VERIFIED). Restent fermés : les droits lire/résumer/transmettre/
+compacter (décision opérateur, incréments distincts), tout câblage public.
+
+Tranche G2 noyau d'identité IA2.2 + décision d'usage M25 (8 novembre 2026) :
+le noyau pur d'IA2.2 est porté — `agent_identity_contract.go` +
+`agent_identity_authority.go` (~520 lignes) dans
+`rust/crates/swarm-engine/src/agent_identity_kernel.rs`. Types (Principal,
+Actor, Grant, Instance, Snapshot, Request, Decision) avec encodage Go
+canonique, évaluateur `evaluate_agent_identity` (horloge, demande valide,
+appelant frais — `verified_at == at`, révision trust courante —, trame
+d'autorité indépendante non sérialisable en JSON, snapshot ancré par digest,
+chaîne de délégation avec bornes temporelles héritées, droits/délégables
+décroissants, racine ancrée et instance non révoquée, droits exacts,
+expiration agrégée au minimum), `reuse_agent_identity_decision` (re-évaluation complète
+puis comparaison intégrale, refus `agent-identity-decision-stale`) et
+`validate_agent_identity_transition` (révision +1, révocations préservées,
+historique inchangé). Codes de refus kebab-case `agent-identity-*` miroir des
+codes Go snake_case ; snapshot `deny_unknown_fields` (miroir du décodage
+strict Go). Correction du constat M25 : la dépendance réelle du nœud de
+décision est le noyau pur IA2.2 (~520 lignes), pas les 32 fichiers
+d'admission/runtime IA2 — le décodage d'admission JSON, la résolution Trust
+(`resolveAgentIdentityCaller`) et le consommateur applicatif Store restent au
+raccord Go/IA2.3-IA3 ; les tests Go Trust restent Go-only. Huit tests noyau
+portés avec trames fournies par fixtures pures (18+ cas d'autorité invalide
+sans mutation, rejeu exact, snapshot=données, révocation multi-niveaux,
+transition, opacity issuer/subject) : 9/9 verts.
+`evaluateMemorySummaryUsage` (`memory_usage_decision.go`) est porté dans
+`rust/crates/swarm-engine/src/memory_usage_decision.rs` : reconstruction de
+la liaison, contrôles racine/destinataire de la trame, demandes requêteur +
+destinataire (domaine `swarm-memory-receive-event-v1`, ids
+`memory-receive-<hash>`, un `memory.read` par source transmise), expiration
+agrégée au minimum des deux acteurs, preuve précédente comparée intégralement
+avant réutilisation (`memory-usage-decision-stale`), aucun verdict partiel.
+Cinq tests décision portés (13+3 décisions, 19 autorités incomplètes refusées
+sans mutation, preuve éditée/partielle refusée, reconstruction avant
+réutilisation) : 5/5 verts ; liaison M25 inchangée (6/6). Aucun chemin public
+ne consomme le noyau ni la décision (bibliothèque seule, comme en Go) ;
+droits lire/résumer/transmettre/compacter fermés (M20-U01..U10, critères P4).
+Recette permanente
+`tools/verification/recipes/versioned-agent-identity-kernel-rust.json`
+(4 étapes), preuve
+`.swarm-fixtures/evidence/run-20261108-identity-kernel` (PASS, verify
+VERIFIED). Reste fermé : tout câblage public, droits opérateur, raccord
+Trust/admission IA3.
 
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 

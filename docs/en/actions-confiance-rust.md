@@ -838,11 +838,10 @@ projection and one event id hash to the Go program's reference digests
 (recorded in the `projection_digest_matches_go_reference` test; the scratch
 program lived at `.swarm-fixtures/memory-usage-crosscheck` and is preserved
 inside run-20261108-1). No public path consumes the binding — as in Go
-(M24/M25, library only): `evaluateMemorySummaryUsage`
-(`memory_usage_decision.go`) stays unported pending the identity kernel
-(`evaluateAgentIdentity`, 32 Go files), and isolated preparation remains the
-only supported use. No public activation: M20-U01 to U10 open, P4 criteria
-required before any activation. Evidence:
+(M24/M25, library only): at M25 delivery, `evaluateMemorySummaryUsage`
+(`memory_usage_decision.go`) stayed unported pending the identity kernel, and
+isolated preparation remained the only supported use. No public activation:
+M20-U01 to U10 open, P4 criteria required before any activation. Evidence:
 `cargo test -p swarm-engine --lib memory_usage` (6: exact sources and
 transmission, content change under the same projection,
 destination/selection tracking, rejection without partial result,
@@ -852,9 +851,52 @@ parity witness. Permanent recipe
 `tools/verification/recipes/versioned-memory-usage-binding-rust.json`
 (3 steps), evidence
 `.swarm-fixtures/versioned-memory-usage-binding-evidence/run-20261108-1`
-(PASS, `verify` → VERIFIED). Still closed: the M25 decision node (identity
-kernel), read/summarize/transmit/compact rights (M20 operator rights, a
-distinct increment) and any public wiring.
+(PASS, `verify` → VERIFIED). Still closed: read/summarize/transmit/compact
+rights (M20 operator rights, a distinct increment) and any public wiring.
+
+**IA2.2 identity kernel + M25 decision node ported (8 November 2026).** The
+pure IA2.2 kernel is ported in
+`rust/crates/swarm-engine/src/agent_identity_kernel.rs`: the
+Principal/Actor/Grant/Instance/Snapshot/Request/Decision types (canonical Go
+encoding, JSON names, omitempty, RFC3339 instants), the
+`evaluate_agent_identity` evaluator (clock, request, fresh caller,
+independent authority frame, digest-anchored snapshot, parent/child delegation
+chain — inherited time bounds, decreasing rights and delegable sets, anchored
+root, unrevoked instance — exact rights, aggregate expiry at the minimum),
+`reuse_agent_identity_decision` (full re-evaluation then comparison, refusal
+`agent-identity-decision-stale`) and `validate_agent_identity_transition`
+(revision +1, revocations preserved, history unchanged). Kebab-case
+`agent-identity-*` refusal codes mirror Go's snake_case codes. The snapshot
+carries `deny_unknown_fields` (mirroring Go's strict decode); the
+`Authority`/`Caller` frame is not JSON-deserializable — an import cannot
+become its own authority. Ported scope = the pure IA2.2 core
+(`agent_identity_contract.go` + `agent_identity_authority.go`, ~520 lines);
+JSON admission decode (`decodeAgentIdentityRequest/Snapshot` on the Store
+consumer side), Trust resolution (`resolveAgentIdentityCaller`) and the
+application consumer stay at the Go/IA2.3-IA3 raccord — the Go tests
+exercising Trust (`TestAgentIdentityCaller*`,
+`TestAgentIdentityInternalConsumer*`) remain Go-only. Eight kernel tests
+ported (18 invalid-authority cases without mutation, re-authentication and
+exact replay, snapshot=data-not-imported-authority, tampering without
+independent refresh, multilevel delegation revocation, transition with
+history and revocation preserved, opaque issuer/subject): 9/9 green.
+`evaluateMemorySummaryUsage` is now ported in
+`rust/crates/swarm-engine/src/memory_usage_decision.rs`: M25 binding
+rebuild, frame project-root and recipient checks, requester + recipient
+requests (the `swarm-memory-receive-event-v1` event domain, ids
+`memory-receive-<hash>`, one `memory.read` per transmitted source),
+aggregate expiry at the minimum of both actors, complete previous-proof
+comparison before reuse (`memory-usage-decision-stale`) — no partial verdict
+escapes. Five decision tests ported (13+3 decisions, all 19 incomplete
+authorities refused without mutation, edited/partial previous proof refused,
+rebuild and recheck before reuse): 5/5 green. The M25 binding is unchanged
+(6/6). No public path consumes the kernel or the decision (library only, as
+in Go); read/summarize/transmit/compact rights stay closed (M20-U01 to U10,
+P4 criteria). Permanent recipe
+`tools/verification/recipes/versioned-agent-identity-kernel-rust.json`
+(4 steps), evidence
+`.swarm-fixtures/evidence/run-20261108-identity-kernel` (PASS,
+`verify` → VERIFIED).
 
 The historical interprocess flock serializes writes. One idempotency key creates
 one native entry; conflicting content refuses. `lose_response:true` records

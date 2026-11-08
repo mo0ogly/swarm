@@ -867,11 +867,11 @@ fixe et un identifiant d'événement hachent aux empreintes de référence du
 programme Go (mémorisées dans le test `projection_digest_matches_go_reference`,
 ex-évidence `.swarm-fixtures/memory-usage-crosscheck`, conservées dans
 run-20261108-1). Aucun chemin public ne consomme la liaison — comme en Go
-(M24/M25, bibliothèque seule) : `evaluateMemorySummaryUsage`
-(`memory_usage_decision.go`) reste non porté en attendant le noyau
-d'identité (`evaluateAgentIdentity`, 32 fichiers Go), et la préparation
-isolée reste le seul usage supporté. Aucune activation publique : M20-U01 à
-U10 ouverts, critères P4 requis avant toute activation. Preuves :
+(M24/M25, bibliothèque seule) : à la livraison M25, `evaluateMemorySummaryUsage`
+(`memory_usage_decision.go`) restait non porté en attendant le noyau
+d'identité, et la préparation isolée restait le seul usage supporté. Aucune
+activation publique : M20-U01 à U10 ouverts, critères P4 requis avant toute
+activation. Preuves :
 `cargo test -p swarm-engine --lib memory_usage` (6 : sources exactes et
 transmission, changement de contenu sous même projection, suivi de
 destination/sélection, refus sans résultat partiel, portée/grant/digest des
@@ -880,9 +880,55 @@ demandes, parité de digest Go), rappel Go `TestMemoryUsageBinding*` +
 `tools/verification/recipes/versioned-memory-usage-binding-rust.json`
 (3 étapes), preuve
 `.swarm-fixtures/versioned-memory-usage-binding-evidence/run-20261108-1`
-(PASS, `verify` → VERIFIED). Restent fermés : le nœud de décision M25
-(noyau d'identité), les droits lire/résumer/transmettre/compacter (droits
-opérateur M20, incrément distinct) et tout raccord public.
+(PASS, `verify` → VERIFIED). Restent fermés : les droits
+lire/résumer/transmettre/compacter (droits opérateur M20, incrément
+distinct) et tout raccord public.
+
+**Noyau d'identité IA2.2 + nœud de décision M25 portés (8 novembre 2026).**
+Le noyau pur d'IA2.2 est porté dans
+`rust/crates/swarm-engine/src/agent_identity_kernel.rs` : types
+Principal/Actor/Grant/Instance/Snapshot/Request/Decision (encodage Go
+canonique, noms JSON, omitempty, instants RFC3339), évaluateur
+`evaluate_agent_identity` (horloge, demande, appelant frais, trame
+d'autorité indépendante, snapshot ancré par digest, chaîne de délégation
+parent/enfant — bornes temporelles héritées, droits et délégables décroissants,
+racine ancrée, instance non révoquée — droits exacts, expiration agrégée au
+minimum), réutilisation `reuse_agent_identity_decision` (re-évaluation
+complète puis comparaison, refus `agent-identity-decision-stale`) et
+transition `validate_agent_identity_transition` (révision +1, révocations
+préservées, historique inchangé). Codes de refus kebab-case
+`agent-identity-*` miroir des codes Go snake_case. Le snapshot porte
+`deny_unknown_fields` (miroir du décodage strict Go) ; la trame
+`Authority`/`Caller` n'est pas désérialisable en JSON — un import ne peut pas
+devenir sa propre autorité. Périmètre porté = noyau pur IA2.2
+(`agent_identity_contract.go` + `agent_identity_authority.go`, ~520 lignes) ;
+le décodage d'admission JSON (`decodeAgentIdentityRequest/Snapshot` côté
+consommateur Store), la résolution Trust (`resolveAgentIdentityCaller`) et le
+consommateur applicatif restent au raccord Go/IA2.3-IA3 — les tests Go qui
+exercent Trust (`TestAgentIdentityCaller*`,
+`TestAgentIdentityInternalConsumer*`) restent Go-only. Huit tests noyau
+portés (18 cases d'autorité invalide sans mutation, ré-authentification et
+rejeu exact, snapshot=données et non autorité importée, altération sans
+rafraîchissement indépendant, révocation multi-niveaux, transition avec
+historique et révocation préservées, opacity issuer/subject) : 9/9 verts.
+`evaluateMemorySummaryUsage` est maintenant porté dans
+`rust/crates/swarm-engine/src/memory_usage_decision.rs` : reconstruction de
+la liaison M25, contrôle racine projet et destinataire de la trame, demandes
+requêteur + destinataire (domaine d'événement `swarm-memory-receive-event-v1`,
+identifiants `memory-receive-<hash>`, opération `memory.read` par source
+transmise), expiration agrégée au minimum des deux acteurs, comparaison de la
+preuve précédente complète avant réutilisation (`memory-usage-decision-stale`)
+— aucun verdict partiel n'échappe. Cinq tests décision portés (13+3
+décisions, refus des 19 autorités incomplètes sans mutation, preuve précédente
+éditée/partielle refusée, reconstruction et re-contrôle avant réutilisation) :
+5/5 verts. Liaison M25 inchangée (6/6). Aucun chemin public ne consomme le
+noyau ni la décision (bibliothèque seule, comme en Go) ; droits
+lire/résumer/transmettre/compacter toujours fermés (M20-U01 à U10, critères
+P4). Recette permanente
+`tools/verification/recipes/versioned-agent-identity-kernel-rust.json`
+(4 étapes), preuve
+`.swarm-fixtures/evidence/run-20261108-identity-kernel` (PASS,
+`verify` → VERIFIED).
 
 Le verrou interprocessus historique sérialise les écritures. Une même clé ne
 produit qu’une entrée native ; un autre contenu sous cette clé est refusé.

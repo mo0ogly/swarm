@@ -385,11 +385,13 @@ mod identity_plan_rules;
 mod identity_plan_upgrade;
 mod instruction;
 mod instruction_learning;
+pub mod agent_identity_kernel;
 mod memory_catalog;
 mod memory_files;
 mod memory_summary_selection;
 mod memory_summary_source;
 mod memory_usage_binding;
+pub mod memory_usage_decision;
 pub use memory_summary_source::{
     decode_summary_source_request, summary_source_for_work, MemorySummarySource,
     MemorySummarySourcePacket, MemorySummarySourceRequest,
