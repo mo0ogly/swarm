@@ -239,6 +239,10 @@
     "en": "PAEA: owned native Git source/shared-lane guard, checking parent, bare and lock inodes; no transfer or mandate added."
    },
    {
+    "fr": "Intégration de la migration Rust dans main : retrait du moteur Go, installation FR/EN actualisée et contrôle CI des contextes exécuté en Rust. Les preuves Go sont historiques.",
+    "en": "Rust migration integrated into main: Go engine removed, FR/EN installation updated and CI context checks run in Rust. Go evidence is historical."
+   },
+   {
     "fr": "PAEA : les erreurs de synchronisation de pack distinguent stdout et stderr tout en conservant la cause et le processus primaire ; reprise vérifiée. Service protégé encore à raccorder.",
     "en": "PAEA: pack sync errors distinguish stdout and stderr while preserving the cause and primary process; recovery verified. Protected-service integration remains open."
    },

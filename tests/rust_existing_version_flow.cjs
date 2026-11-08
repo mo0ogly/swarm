@@ -10,13 +10,24 @@ module.exports=async function versionFlow({page,cfg,label,lang,check}){
  const text=await page.$eval('#version-dialog-content',e=>e.textContent),binary=actual.binary;
  check(label+'-version-actual-compiled-number',text.includes(binary.version));check(label+'-version-actual-compiled-commit',text.includes(binary.commit.slice(0,12)));
  check(label+'-version-actual-commit-link',await page.$eval('#version-dialog-content a', (e,commit)=>e.href==='https://github.com/mo0ogly/swarm/commit/'+commit&&e.rel.includes('noopener'),binary.commit));
- check(label+'-version-dirty-disclosure',binary.modified===true&&text.includes(lang==='en'?'uncommitted changes':'modifications non commitées'));
+ const disclosure=await page.$$eval('#version-dialog-content .version-local-changes > p.notice.attention',nodes=>nodes.map(e=>e.textContent));
+ check(label+'-version-dirty-disclosure',disclosure.length===(binary.modified===true?1:0)&&disclosure.every(t=>t.includes(lang==='en'?'uncommitted changes':'modifications non commitées')));
  check(label+'-version-actual-local-notes',actual.history.local_changes.items.every(item=>text.includes(item[lang])));
  check(label+'-version-no-invented-source-comparison',text.includes(lang==='en'?'Local sources have not been examined':'Sources locales non examinées')&&!text.includes(lang==='en'?'Comparative diagnostic':'Diagnostic comparatif'));
  for(const width of [1440,390]){await page.setViewport({width,height:1000});check(label+'-version-no-overflow-'+width,await page.evaluate(()=>{const d=document.querySelector('#version-dialog');return d.scrollWidth<=d.clientWidth&&document.documentElement.scrollWidth<=innerWidth}));if(width===390)await page.screenshot({path:require('node:path').join(cfg.output,label+'-version-390.png'),fullPage:true})}
  // Restore the desktop opener visibility after viewport-only layout checks.
  await page.setViewport({width:1440,height:1000});await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#version-dialog').open&&document.activeElement.id==='version-open');check(label+'-version-escape-focus',await page.$eval('#version-open',e=>e===document.activeElement));
  await page.setViewport({width:1440,height:1000});
+ // Explicit response fixtures cover both states after the real compiled witness.
+ // These flags describe client rendering only, never the actual build identity.
+ for(const modified of [false,true]){
+  await page.evaluate(({actual,modified})=>{window.versionStateFetch=window.fetch;window.fetch=async(...args)=>new URL(args[0],location.href).pathname==='/api/v1/native-version'?new Response(JSON.stringify({...actual,binary:{...actual.binary,modified}}),{status:200,headers:{'Content-Type':'application/json'}}):window.versionStateFetch(...args)},{actual,modified});
+  await page.click('#version-open');await page.waitForFunction(flag=>VersionHistoryPanel.value?.binary.modified===flag&&!VersionHistoryPanel.pending,{},modified);
+  const fixtureDisclosure=await page.$$eval('#version-dialog-content .version-local-changes > p.notice.attention',nodes=>nodes.map(e=>e.textContent));
+  check(label+'-version-fixture-modified-'+modified,fixtureDisclosure.length===(modified?1:0)&&fixtureDisclosure.every(t=>t.includes(lang==='en'?'uncommitted changes':'modifications non commitées')));
+  await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#version-dialog').open);
+  await page.evaluate(()=>{window.fetch=window.versionStateFetch;delete window.versionStateFetch});
+ }
  if(lang==='fr'&&label==='fr-etat'){
   await page.evaluate(()=>{window.versionFetch=window.fetch;window.fetch=(...args)=>new URL(args[0],location.href).pathname==='/api/v1/native-version'?new Promise(resolve=>{window.releaseVersion=()=>window.versionFetch(...args).then(resolve)}):window.versionFetch(...args)});
   await page.click('#version-open');await page.waitForFunction(()=>document.querySelector('#version-dialog-content').textContent.includes('Chargement de la version et des nouveautés'));

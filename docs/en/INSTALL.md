@@ -637,4 +637,6 @@ Authentication stays enabled and private browser URLs are not printed.
 Docker uses Compose instead. The [on-premise override guide](../ON-PREMISE-AI.md)
 (French) covers internal CAs, DNS, proxies, mounts and saved connections.
 
+Native SQLite settings are available in **Configure the engine** through `storage_busy_timeout_ms`, `storage_busy_retries` and `storage_busy_retry_delay_ms`. They are persisted and shared by Admin/API/CLI (`swarm engine-settings show|preview|apply`). The [historical SQLite guide](SQLITE-CONTENTION-RECOVERY.md) describes the former Go engine; its `storage-retry` command is not a Rust command.
+
 A project without Git can read compiled version identity: the optional source candidate is explicitly unavailable. Existing/broken repository markers still use the checked Git observer; its errors are not reclassified as absence.

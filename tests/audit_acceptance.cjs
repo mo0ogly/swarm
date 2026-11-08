@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+// Historical Go acceptance harness. Missing Go inputs refuse with code3 on a
+// Rust-only checkout; unit tests inject dependencies, never establish native acceptance.
 const fs=require('node:fs'),path=require('node:path');
 const {spawnSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..');

@@ -2,6 +2,8 @@
 
 <img src="web/swarm-logo.png" alt="Swarm" width="96">
 
+**Rust engine.** The CLI and local server use Rust. Sources are in [rust/](rust/). Capability parity and global acceptance remain open; historical descriptions below are not Rust qualification. See the [Biba contract](docs/en/BIBA-GOVERNANCE-RUST.md) and [active plan](docs/plans/migration-rust/PLAN.md).
+
 [Français](README.md) · English
 
 ### Give an AI team an objective. See who acts. Verify what it delivers.
@@ -57,6 +59,8 @@ control saved. This historical recording does not qualify the Rust port.
 [Watch the MP4](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4) · [Still image](docs/screenshots/graph-tour/graph-tour-en.png)
 
 ### Casa Pizza — four tutorials in English and French
+
+Open **Cockpit help → Casa Pizza training** for four captioned video tutorials, GIF previews, transcripts and a **38-page PDF guide**. Resources follow the selected cockpit language; switching language in the reader updates videos, captions, PDF and kit links. The reader also works offline from the kit, without external services or AI calls.
 
 | Module | Duration | English video | French video |
 | --- | ---: | --- | --- |

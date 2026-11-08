@@ -3,7 +3,7 @@
 
 No Compose configuration, real mission, provider or global watchdog. BuildKit
 caches are derivatives; image identity, original channels and data remain in fresh
-private evidence. Cleanup can remove only this test's uniquely named container.
+private evidence. Missing output parents are created; existing output is refused. Cleanup can remove only this test's uniquely named container.
 """
 import argparse,hashlib,json,os,socket,subprocess,urllib.request,uuid
 from pathlib import Path
@@ -11,13 +11,22 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def main():
     """Check image build, singular JSON output, persistence, API and no Go tool."""
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',required=True,type=Path);a=p.parse_args();out=a.output.resolve();out.mkdir(mode=0o700,exist_ok=False);project=out/'project';project.mkdir();calls=[];checks=[];name='swarm-rust-install-'+uuid.uuid4().hex;image=name+':test';started=False;primary=None
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',required=True,type=Path);a=p.parse_args();out=a.output.resolve();out.mkdir(mode=0o700,parents=True,exist_ok=False);project=out/'project';project.mkdir();calls=[];checks=[];name='swarm-rust-install-'+uuid.uuid4().hex;image=name+':test';started=False;primary=None
     def call(args,value=None):
         """Record exact subprocess channels, propagating every failure without retry."""
         index=len(calls)+1
         with (out/(str(index)+'.stdout')).open('xb') as stdout,(out/(str(index)+'.stderr')).open('xb') as stderr:
             r=subprocess.run(args,cwd=ROOT,input=None if value is None else json.dumps(value).encode(),stdout=stdout,stderr=stderr)
-        calls.append(dict(argv=args,exit=r.returncode));(out/'commands.json').write_text(json.dumps(calls,indent=2));assert r.returncode==0,(index,r.returncode);return (out/(str(index)+'.stdout')).read_bytes()
+        calls.append(dict(argv=args,exit=r.returncode));(out/'commands.json').write_text(json.dumps(calls,indent=2))
+        if r.returncode != 0:
+            # This fixture runs no provider or secret transfer. Preserve full original
+            # channels and expose the failed build/runtime diagnostic to CI.
+            import sys
+            for suffix in ('stdout','stderr'):
+                sys.stderr.buffer.write((out/(str(index)+'.'+suffix)).read_bytes())
+            sys.stderr.flush()
+            raise AssertionError((index,r.returncode))
+        return (out/(str(index)+'.stdout')).read_bytes()
     def check(label,value):
         """Retain distinct observable assertions, never count zero-test success."""
         assert value,label;assert label not in checks;checks.append(label);print('PASS docker-install-'+label,flush=True)

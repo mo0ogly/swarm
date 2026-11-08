@@ -245,7 +245,7 @@ mod tests {
     }
     #[test]
     fn mission_report_settings_absence_is_not_default_adoption() {
-        let mut values = crate::EngineSettingsValues::installation_defaults().unwrap();
+        let mut values = crate::engine_settings::historical_settings_fixture(40);
         assert_eq!(values.schema_version(), 40);
         assert_eq!(values.report_clock_skew_seconds().unwrap(), 2);
         values.agent_report_clock_skew_seconds = None;

@@ -2,6 +2,8 @@
 
 <img src="web/swarm-logo.png" alt="Swarm" width="96">
 
+**Moteur Rust.** La CLI et le serveur local utilisent Rust. Les sources sont dans [rust/](rust/). La parité des capacités et l’acceptation globale restent ouvertes ; les descriptions historiques ci-dessous ne constituent pas une qualification Rust. Voir le [contrat Biba](docs/architecture/BIBA-GOUVERNANCE-RUST.md) et le [plan actif](docs/plans/migration-rust/PLAN.md).
+
 [English](README.en.md) · Français
 
 ### Donner un objectif à une équipe d’agents IA. Comprendre qui agit. Vérifier ce qui est livré.
@@ -59,6 +61,8 @@ et aucun contrôle enregistré. Cette capture historique ne qualifie pas le port
 [Lire le MP4](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4) · [Image fixe](docs/screenshots/graph-tour/graph-tour-fr.png)
 
 ### Casa Pizza — quatre tutoriels en français et en anglais
+
+Ouvrez **Aide du cockpit → Formation Casa Pizza** pour accéder à quatre tutoriels vidéo sous-titrés, leurs aperçus GIF, les transcriptions et un **guide PDF de 38 pages**. Les ressources suivent la langue du cockpit ; changer de langue dans le lecteur actualise les vidéos, légendes, liens PDF et kit. Le lecteur fonctionne aussi hors ligne depuis le kit, sans service externe ni appel IA.
 
 | Module | Durée | Vidéo FR | Vidéo EN |
 | --- | ---: | --- | --- |

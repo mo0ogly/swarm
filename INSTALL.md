@@ -731,4 +731,6 @@ Pour Docker, utilisez Docker Compose, pas ce lanceur. Voir le
 [guide des overrides et des IA sur site](docs/ON-PREMISE-AI.md) pour les
 certificats internes, DNS, proxies, montages et la conservation des connexions.
 
+Les réglages SQLite natifs sont accessibles dans **Régler le moteur**, via `storage_busy_timeout_ms`, `storage_busy_retries` et `storage_busy_retry_delay_ms`. Ils sont persistés et partagés par Admin/API/CLI (`swarm engine-settings show|preview|apply`). Le guide [SQLite historique](docs/SQLITE-CONTENTION-RECOVERY.md) décrit l’ancien moteur Go ; sa commande `storage-retry` ne doit pas être présentée comme une commande Rust.
+
 Un projet sans Git peut consulter l’identité compilée du binaire : le candidat source optionnel est explicitement indisponible. Des marqueurs de dépôt existants ou endommagés restent soumis à la sonde Git ; ses erreurs ne deviennent pas une absence.

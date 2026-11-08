@@ -1,0 +1,33 @@
+# Rust integration into main
+
+Both histories are preserved. The Go engine removed by migration is not restored. Native persisted engine settings provide SQLite controls; Go guides and recipes are historical. Main training/Docker additions are retained. Historical preimages are not blended: the migration version stays at its path, and the main version remains in its parent commit.
+
+The method checker runs the Rust agent_workflow target, requires nine named contracts and refuses empty collection. CI debug/incremental settings match the qualified local profile without removing checks or changing business policies. Local uncommitted work is preserved. CI checks/install remain required before merge; this document establishes neither independent acceptance nor real identity activation.
+
+The first CI exposed two omitted test fixtures and an installation recipe assuming the evidence parent already existed. Referenced synthetic fixtures are published; both recipes create missing parents and still reject an existing output. Literal include review now covers every published Rust source rather than changed files only. No library unit test ran in that failed compilation.
+
+The second CI ran 632 engine tests successfully and exposed six failures: four historical schema-version assertions and two traversals missing the Linux artifact error wrapper. Tests now preserve newer independently adopted settings groups; classification uses the shared typed error graph, still rejecting unknown and cleanup errors without granting access. Docker failures are retained and exposed in CI rather than reduced to an exit code without their cause.
+
+The Docker context explicitly allows the five embedded configuration JSON files (provider wait, log reads, activity, graph performance, web requests). Distribution checks enumerate their literal includes and reject missing publication or Docker allowlisting; this does not replace an actual build. An incorrect module path in the new test was retained as a compilation failure and corrected.
+
+The remaining historical fixtures now derive from catalogue introduced_schema_version: versions 40 then 39 for the report setting removal, and 40 then 41 for preparation-read settings. Newer group dependencies are no longer mixed into old settings; engine validation stays strict. The fixture builder is compiled for tests only.
+
+All 639 engine tests pass; three identity-binding tests need a fixture in a genuinely different namespace. ubuntu-latest refused uid_map (EPERM). In the previous attempt, checks selected Ubuntu 22.04 and checks that prerequisite before compilation, without sudo, AppArmor/sysctl changes or skipped tests; install stays on ubuntu-latest. This does not qualify every Linux deployment. The CI owner must validate a compatible successor before that runner image retires. Sources: [Ubuntu restrictions](https://documentation.ubuntu.com/security/security-features/security-features-tables/), [GitHub Ubuntu 22.04 image](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md).
+
+The candidate also integrates both commits published during this integration (2bec348fc, 9ebb8e393): private Git binding/PAEA pack streams and remaining project files. Three README/release-note conflicts retain the new content and main’s Rust declaration. Method checks include the now-published pricing-discovery skill. Python 3.13 is explicitly selected for build tooling using hashlib.file_digest, absent from Ubuntu 22.04’s default Python 3.10. No private runtime files or executable Go source are restored.
+
+The owner explicitly authorized namespace configuration on the disposable GitHub CI VM only. checks uses Ubuntu24.04 (recent kernel), retains kernel.apparmor_restrict_unprivileged_userns then temporarily sets it to0, requires the unshare fixture and restores the initial value in an always step. No local machine setting or test is removed. Python3.13 remains explicit; install retains its separate environment. The earlier Ubuntu22.04 attempt lacked pidfd namespace ioctls despite available unshare; it is no longer the current runner contract.
+
+CI observed ETXTBSY while directly executing a just-created fixture script. The test now reproduces that condition with a retained writable descriptor, then verifies the same body through its explicit interpreter; the descriptor closes before Git verification. No sleep/retry or engine filter execution is added; marker, mutation refusal and recovery assertions remain required. The descriptor holder in the original failure has not been established.
+
+The ETXTBSY witness uses the existing nix errno type, without adding a direct libc dependency. Its initial compilation failure is retained; it established no executed test.
+
+The historical Go acceptance-runner unit test now injects fixture dependencies just as it already injected Go and DOM results. The real Rust checkout is explicitly checked: absent Go inputs => code3 before any launch. Failed Go, zero tests, DOM failure and unknown-case guards remain; this unit test neither qualifies Rust nor executes Go.
+
+CI now retains cockpit recipe step channels and targeted browser errors. Work Roots, databases, token-bearing configuration, private transcripts and screenshots are excluded from that artifact. The initial opaque recipe failure is retained; a FAIL summary alone does not establish its cause.
+
+The cockpit recipe expects the19scripts explicitly published by the Rust producer, including the native instruction client. It rejects missing/duplicate/inline/foreign-origin scripts, then compares protected HTTP bytes to versioned inputs (native quotas route maps to native-quotas.js). The permanent recipe and driver inventory include that client. The original inventory refusal is retained; no product action or script is added.
+
+The Version recipe compares the local-change disclosure to the binary’s actual published modified flag instead of assuming a dirty build. After that real witness, explicitly marked client responses check clean/dirty rendering in FR/EN and each theme. Those fixtures never become binary metadata or an observed source comparison. The original clean-build CI failure is retained.
+
+The check targets the Version component’s exact disclosure paragraph, not all historical release-note text, which can legitimately mention uncommitted changes. Clean/dirty variants also cover that vocabulary collision.
