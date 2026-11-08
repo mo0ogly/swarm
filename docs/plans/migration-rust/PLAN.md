@@ -1140,7 +1140,12 @@ rust_preparation_sources_admin_ui.cjs, rust_preparation_templates_admin_ui.cjs,
 telemetry-settings). Garde harnais ajouté (telemetry-settings) : avant chaque
 clic confirm, assert `:invalid` vide dans le formulaire, faute nommée
 immédiate au lieu d'attente infinie — ce garde échouera proprement tant que
-le défaut produit (2) subsiste.
+le défaut produit (2) subsiste. Les deux répertoires de preuve attestent des
+runs tués en cours (pas de result.json, kill volontaire après diagnostic) :
+`recipe.py verify` les refuse par conception ; ils prouvent les mécanismes
+(1) et (2), pas un résultat qualifié. Commit ea9d55848 ; push resté bloqué
+par la panne du classifieur de permissions (8+ tentatives), à repousser
+quand la voie le permet.
 
 ## Limites et décisions qui conditionnent la suite
 
