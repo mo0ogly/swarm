@@ -7,7 +7,7 @@ emplacements entre crochets. Aucune inspection visuelle ni recette n’a été f
 
 | Dossier | Canvas claude.ai (privé) | Planches |
 | --- | --- | --- |
-| `swarm/` | https://claude.ai/artifact/P4U3fe9gRnrWAx7Kh1177h | `Main.dc.html` cockpit de conduite ; `Preparation.dc.html` dialogue IA |
+| `swarm/` | https://claude.ai/artifact/P4U3fe9gRnrWAx7Kh1177h | `Main.dc.html` cockpit de conduite, vue Graphe ; `Couloirs.dc.html` même cockpit, vue Couloirs (file « À vous d’agir », rôles × phases) ; `Preparation.dc.html` dialogue IA |
 | `admin/` | https://claude.ai/artifact/8QxgcH2oP1xv7JR9UH9cAM | `Main.dc.html` écran Administration actuel ; `Proposition.dc.html` modale repensée |
 
 Sources lues pour les composer : `docs/UI-DESIGN.md` (palette, rail, navigation
@@ -15,6 +15,11 @@ Sources lues pour les composer : `docs/UI-DESIGN.md` (palette, rail, navigation
 (`runLimitsFieldList`). Les points de la proposition non vérifiés côté moteur :
 valeur effective par limite avec son origine (Admin) et sections structurées du
 brief (Préparation).
+
+Les vues Graphe et Couloirs partagent un sélecteur « Graphe | Couloirs » ; dans
+la maquette il relie les deux planches. Comportement visé dans le produit : une
+seule vue Conduite, choix mémorisé localement sur l’appareil comme les
+préférences `swarm-nav:*`, sans effet sur la mission (non implémenté).
 
 Format : fichiers `.dc.html` du canvas Design (balises `<x-dc>`, `<sc-for>`,
 `<sc-if>`, script `DCLogic`) et index `canvas.json`. Ils ne s’ouvrent pas

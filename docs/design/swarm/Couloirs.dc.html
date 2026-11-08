@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Swarm — Cockpit en couloirs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#93d4df}a:hover{color:#f6f3e9}
+button{font:inherit;cursor:pointer}
+input{font:inherit;font-size:16px}
+button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #f8c650;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.6; display: flex; flex-direction: column">
+
+  <header style="background: #062b49; color: #e5edf0; padding: 10px clamp(16px, 3vw, 32px); display: flex; flex-wrap: wrap; align-items: center; gap: 16px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <img src="/_blob/2bff2b20ec3b0483720f4946060f97be" alt="" style="width: 40px; height: 40px; object-fit: contain">
+      <span style="font-family: Georgia, serif; font-size: 20px; color: #f6f3e9">Swarm</span>
+    </div>
+    <button type="button" style="min-height: 44px; padding: 0 12px; border-radius: 5px; border: 1px solid #24485c; background: #0a3555; color: #f6f3e9; display: flex; align-items: center; gap: 10px; text-align: left">
+      <span style="display: flex; flex-direction: column; line-height: 1.2"><span style="font-family: Georgia, serif">[Titre de la mission]</span><span style="font-family: ui-monospace, monospace; font-size: 11px; color: #93d4df">w-[identifiant]</span></span>
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg>
+    </button>
+    <nav aria-label="Navigation principale" style="flex: 1 1 400px; display: flex; flex-wrap: wrap; gap: 4px">
+      <a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; color: #e5edf0; text-decoration: none"><span style="font-family: ui-monospace, monospace; color: #93d4df; margin-right: 6px">01</span>Missions</a>
+      <a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; color: #e5edf0; text-decoration: none"><span style="font-family: ui-monospace, monospace; color: #93d4df; margin-right: 6px">02</span>Préparation</a>
+      <a href="#" aria-current="page" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; color: #f8c650; text-decoration: none; font-weight: 600; box-shadow: inset 0 -3px 0 #f8c650"><span style="font-family: ui-monospace, monospace; margin-right: 6px">03</span>Conduite</a>
+      <a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; color: #e5edf0; text-decoration: none"><span style="font-family: ui-monospace, monospace; color: #93d4df; margin-right: 6px">04</span>Suivi</a>
+      <a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; color: #e5edf0; text-decoration: none"><span style="font-family: ui-monospace, monospace; color: #93d4df; margin-right: 6px">05</span>Configuration</a>
+    </nav>
+    <label style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid #24485c; background: #0a3555; flex: 0 1 260px">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93d4df" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4-4"></path></svg>
+      <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Aller à une tâche ou une commande</span>
+      <input placeholder="Aller à… (tâche, agent, commande)" style="flex: 1 1 auto; min-width: 0; border: 0; background: transparent; color: #e5edf0; outline: none">
+    </label>
+  </header>
+
+  <main style="flex: 1 1 auto; padding: 24px clamp(16px, 3vw, 32px); display: flex; flex-direction: column; gap: 22px; max-width: 1400px; width: 100%; box-sizing: border-box; margin: 0 auto">
+
+    <section aria-labelledby="queue-title" style="display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+        <h1 id="queue-title" style="margin: 0; font-family: Georgia, serif; font-size: 30px; font-weight: 400; color: {{t.title}}">À vous d’agir <span style="font-family: ui-monospace, monospace; font-size: 18px; color: {{t.gold}}">{{queueCount}}</span></h1>
+        <span style="font-size: 13px; color: {{t.muted}}">Le reste de la mission avance sans vous.</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px">
+        <sc-for list="{{queue}}" as="q" hint-placeholder-count="3">
+          <article style="{{q.style}}">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: {{q.ink}}"><span style="{{q.mark}}"></span>{{q.kind}}</div>
+            <div style="font-weight: 600; color: {{t.title}}">{{q.title}}</div>
+            <div style="font-size: 14px; color: {{t.muted}}">{{q.text}}</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto">
+              <button type="button" onClick="{{q.open}}" style="min-height: 44px; padding: 0 14px; border-radius: 5px; border: 0; background: {{t.primaryBg}}; color: {{t.primaryInk}}; font-weight: 600">{{q.action}}</button>
+              <button type="button" style="min-height: 44px; padding: 0 12px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Plus tard</button>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-labelledby="lanes-title" style="display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+        <h2 id="lanes-title" style="margin: 0; font-family: Georgia, serif; font-size: 22px; font-weight: 400; color: {{t.title}}">Couloirs de la mission</h2>
+        <div role="group" aria-label="Vue de la conduite" style="display: flex; border: 1px solid {{t.border}}; border-radius: 5px; overflow: hidden">
+          <a href="Main.dc.html" style="min-height: 44px; display: flex; align-items: center; gap: 6px; padding: 0 14px; background: transparent; color: {{t.text}}; text-decoration: none"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="2"></circle><circle cx="19" cy="6" r="2"></circle><circle cx="19" cy="18" r="2"></circle><path d="M7 12c6 0 6-6 10-6M7 12c6 0 6 6 10 6"></path></svg>Graphe</a>
+          <a href="Couloirs.dc.html" aria-current="page" style="min-height: 44px; display: flex; align-items: center; gap: 6px; padding: 0 14px; background: {{t.primaryBg}}; color: {{t.primaryInk}}; font-weight: 600; text-decoration: none; border-left: 1px solid {{t.border}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"></path><path d="M9 4v16"></path></svg>Couloirs</a>
+        </div>
+        </div>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: {{t.muted}}">
+          <sc-for list="{{legend}}" as="l" hint-placeholder-count="5"><span style="display: flex; align-items: center; gap: 6px"><span style="{{l.mark}}"></span>{{l.label}}</span></sc-for>
+        </div>
+      </div>
+      <div style="overflow-x: auto; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}">
+        <div style="min-width: 960px; display: grid; grid-template-columns: 150px repeat(4, minmax(0, 1fr))">
+          <div style="padding: 10px 14px; border-bottom: 1px solid {{t.border}}"></div>
+          <sc-for list="{{phases}}" as="p" hint-placeholder-count="4">
+            <div style="padding: 10px 14px; border-bottom: 1px solid {{t.border}}; border-left: 1px solid {{t.border}}; font-family: ui-monospace, monospace; font-size: 12px; color: {{t.link}}">{{p.num}} · <span style="font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; color: {{t.title}}; font-weight: 600">{{p.label}}</span></div>
+          </sc-for>
+          <sc-for list="{{lanes}}" as="lane" hint-placeholder-count="4">
+            <div style="padding: 14px; border-top: 1px solid {{t.border}}; display: flex; flex-direction: column; justify-content: center">
+              <span style="font-weight: 600">{{lane.label}}</span>
+              <span style="font-size: 12px; color: {{t.muted}}">{{lane.agents}}</span>
+            </div>
+            <sc-for list="{{lane.cells}}" as="c" hint-placeholder-count="4">
+              <div style="padding: 10px; border-top: 1px solid {{t.border}}; border-left: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 8px; min-height: 76px; background: {{c.bg}}">
+                <sc-for list="{{c.items}}" as="b" hint-placeholder-count="1">
+                  <button type="button" onClick="{{b.pick}}" aria-pressed="{{b.pressed}}" style="{{b.style}}">
+                    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: {{b.ink}}"><span style="{{b.mark}}"></span>{{b.stateLabel}}<span style="margin-left: auto; font-family: ui-monospace, monospace; font-weight: 400; color: {{t.muted}}">{{b.id}}</span></span>
+                    <span style="font-weight: 600; color: {{t.title}}; text-align: left; line-height: 1.3">{{b.title}}</span>
+                    <span style="display: block; height: 4px; border-radius: 2px; background: {{t.track}}"><span style="display: block; height: 4px; border-radius: 2px; background: {{b.ink}}; width: {{b.progress}}"></span></span>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-for>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Tâche sélectionnée" style="border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px 20px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <div style="flex: 2 1 320px; min-width: 0">
+        <div style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">{{sel.id}} · {{sel.lane}} · {{sel.phase}}</div>
+        <h2 style="margin: 2px 0 6px; font-family: Georgia, serif; font-size: 24px; font-weight: 400; color: {{t.title}}">{{sel.title}}</h2>
+        <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: {{sel.ink}}"><span style="{{sel.mark}}"></span>{{sel.stateLabel}}</div>
+        <p style="margin: 10px 0 0">{{sel.note}}</p>
+      </div>
+      <dl style="flex: 1 1 220px; margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 14px">
+        <dt style="color: {{t.muted}}">Attend</dt><dd style="margin: 0; font-family: ui-monospace, monospace">{{sel.deps}}</dd>
+        <dt style="color: {{t.muted}}">Agent</dt><dd style="margin: 0">[agent]</dd>
+        <dt style="color: {{t.muted}}">Tentative</dt><dd style="margin: 0; font-family: ui-monospace, monospace">[n]</dd>
+      </dl>
+      <div style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px">
+        <button type="button" style="min-height: 44px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Ouvrir la session</button>
+        <button type="button" style="min-height: 44px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Voir les preuves</button>
+        <a href="Main.dc.html" style="min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 1px dashed {{t.border}}; color: {{t.link}}; text-decoration: none">Voir en graphe</a>
+      </div>
+      <p style="flex: 1 1 100%; margin: 0; font-size: 12px; color: {{t.muted}}">Données d’exemple — tâches, phases et états illustratifs.</p>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["sombre","clair"],"default":"sombre"},"$preview":{"width":1440,"height":1080}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { selected: 'R1' };
+  }
+  renderVals() {
+    var themes = {
+      sombre: { bg: '#081b29', surface: '#102b3b', text: '#e5edf0', title: '#f6f3e9', link: '#93d4df', muted: '#a9bcc4', border: '#2a5163', track: '#24485c', primaryBg: '#f8c650', primaryInk: '#062b49', gold: '#f8c650', cellOn: '#0d2636', blockBg: '#0b2232',
+        st: { done: '#7fd8a4', running: '#93d4df', review: '#f8c650', blocked: '#ff8a80', todo: '#a9bcc4' } },
+      clair: { bg: '#f5f3ec', surface: '#fffefa', text: '#243d4a', title: '#062b49', link: '#205e70', muted: '#52656f', border: '#cfcabb', track: '#e4e1d6', primaryBg: '#062b49', primaryInk: '#ffffff', gold: '#926300', cellOn: '#f8f6ef', blockBg: '#ffffff',
+        st: { done: '#1e7a46', running: '#205e70', review: '#926300', blocked: '#b3261e', todo: '#52656f' } }
+    };
+    var t = themes[this.props.theme] || themes.sombre;
+    var self = this;
+    var labels = { done: 'Terminé', running: 'En cours', review: 'Revue attendue', blocked: 'Bloqué', todo: 'À faire' };
+    var mark = function (s) {
+      var c = t.st[s], b = 'display: inline-block; flex: 0 0 auto; width: 10px; height: 10px; box-sizing: border-box; ';
+      if (s === 'todo') return b + 'border-radius: 50%; border: 2px dashed ' + c;
+      if (s === 'blocked') return b + 'background: ' + c + '; transform: rotate(45deg)';
+      if (s === 'review') return b + 'background: ' + c + '; border-radius: 2px';
+      if (s === 'running') return b + 'border-radius: 50%; border: 2px solid ' + c + '; background: linear-gradient(90deg, ' + c + ' 50%, transparent 50%)';
+      return b + 'border-radius: 50%; background: ' + c;
+    };
+    var phases = [{ id: 'cadrage', num: '1', label: 'Cadrage' }, { id: 'real', num: '2', label: 'Réalisation' }, { id: 'revue', num: '3', label: 'Revue' }, { id: 'valid', num: '4', label: 'Validation' }];
+    var laneDefs = [{ id: 'planner', label: 'Planificateur', agents: '1 agent' }, { id: 'worker', label: 'Workers', agents: '[n] agents' }, { id: 'reviewer', label: 'Relecteurs', agents: '1 agent' }, { id: 'super', label: 'Superviseur', agents: 'vous' }];
+    var tasks = [
+      { id: 'P1', lane: 'planner', phase: 'cadrage', title: 'Cadrer le besoin', state: 'done', p: 100, deps: '—', note: 'Brief validé, plan de 7 tâches accepté.' },
+      { id: 'T1', lane: 'worker', phase: 'real', title: 'Modèle de données', state: 'done', p: 100, deps: 'P1', note: 'Livré et accepté.' },
+      { id: 'T2', lane: 'worker', phase: 'real', title: 'API d’import', state: 'running', p: 60, deps: 'P1', note: 'Correction en cours après la première revue.' },
+      { id: 'T3', lane: 'worker', phase: 'real', title: 'Écran de suivi', state: 'todo', p: 0, deps: 'P1', note: 'Démarrera quand un worker sera libre.' },
+      { id: 'T4', lane: 'worker', phase: 'real', title: 'Intégration', state: 'blocked', p: 0, deps: 'T1, R1', note: 'Bloqué : attend l’acceptation de R1. Aucune relance automatique.' },
+      { id: 'R1', lane: 'reviewer', phase: 'revue', title: 'Revue de l’API d’import', state: 'review', p: 100, deps: 'T2', note: 'Avis rendu : [résumé de l’avis]. Votre décision est requise : accepter ou renvoyer au worker.' },
+      { id: 'V1', lane: 'super', phase: 'valid', title: 'Validation finale', state: 'todo', p: 0, deps: 'T3, T4', note: 'Votre acceptation finale, une fois les preuves réunies.' }
+    ];
+    var selId = this.state.selected;
+    var byId = {};
+    tasks.forEach(function (x) { byId[x.id] = x; });
+    var lanes = laneDefs.map(function (l) {
+      return {
+        label: l.label, agents: l.agents,
+        cells: phases.map(function (p) {
+          var items = tasks.filter(function (x) { return x.lane === l.id && x.phase === p.id; }).map(function (x) {
+            var on = x.id === selId, c = t.st[x.state];
+            return {
+              id: x.id, title: x.title, stateLabel: labels[x.state], ink: c, mark: mark(x.state), progress: x.p + '%', pressed: on ? 'true' : 'false',
+              style: 'display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 6px; background: ' + t.blockBg + '; color: ' + t.text + '; border: ' + (x.state === 'todo' ? '1px dashed ' : '1px solid ') + (on ? t.primaryBg : t.border) + '; box-shadow: ' + (on ? '0 0 0 2px ' + t.primaryBg : 'none'),
+              pick: function () { self.setState({ selected: x.id }); }
+            };
+          });
+          return { items: items, bg: items.length ? t.cellOn : 'transparent' };
+        })
+      };
+    });
+    var qDefs = [
+      { id: 'R1', kind: 'Décision', state: 'review', title: 'Accepter la revue de l’API d’import ?', text: 'Le relecteur a rendu son avis. T4 attend votre décision.', action: 'Décider' },
+      { id: 'T4', kind: 'Blocage', state: 'blocked', title: 'Intégration bloquée', text: 'Se débloque dès que R1 est accepté.', action: 'Comprendre' }
+    ];
+    var queue = qDefs.map(function (q) {
+      var c = t.st[q.state];
+      return {
+        kind: q.kind, title: q.title, text: q.text, action: q.action, ink: c, mark: mark(q.state),
+        style: 'display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 8px; background: ' + t.surface + '; border: 1px solid ' + c,
+        open: function () { self.setState({ selected: q.id }); }
+      };
+    });
+    var s = byId[selId];
+    var laneLabel = laneDefs.filter(function (l) { return l.id === s.lane; })[0].label;
+    var phaseLabel = phases.filter(function (p) { return p.id === s.phase; })[0].label;
+    return {
+      t: t, phases: phases, lanes: lanes, queue: queue, queueCount: queue.length,
+      legend: ['done', 'running', 'review', 'blocked', 'todo'].map(function (k) { return { label: labels[k], mark: mark(k) }; }),
+      sel: { id: s.id, title: s.title, lane: laneLabel, phase: phaseLabel, stateLabel: labels[s.state], ink: t.st[s.state], mark: mark(s.state), deps: s.deps, note: s.note }
+    };
+  }
+}
+</script>
+</body>
+</html>
