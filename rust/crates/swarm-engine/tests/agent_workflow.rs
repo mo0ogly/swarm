@@ -63,7 +63,7 @@ impl Drop for Fixture {
 /// Validate one engine-built role: complete body/hash/manifest, worker-only
 /// templates, diagnosis scope and reviewer separation. No provider or authority.
 fn assert_frozen_role(role: &str) {
-    let observed = assemble_agent_workflow(role, Some(32000)).unwrap();
+    let observed = assemble_agent_workflow(role, Some(33000)).unwrap();
     let (header, body) = observed.prompt.split_once('\n').unwrap();
     let body = body.strip_suffix('\n').unwrap();
     let metadata: serde_json::Value =
@@ -230,7 +230,7 @@ fn workflow_legacy_absence_requires_explicit_body_policy_adoption() {
         error.code(),
         "settings-agent-workflow-policy-not-configured"
     );
-    f.policy(Some(32000));
+    f.policy(Some(33000));
     assert!(f.read("worker").is_ok());
 }
 /// Full-prompt freshness refuses forged text even with the old declared metadata
