@@ -1527,7 +1527,38 @@ tests et de leur chaîne identiques à HEAD, preuves diff vides) :
   `AnchoredArtifactError::Path` dans `anchored_error` ou downcaster la
   source transitive.
 
-Vérification swarm-cli (TMPDIR gouverné ; cartographie du 7 novembre sans
+### Clôture des 4 rouges swarm-engine — merge de 8532ce05d, 8 novembre 2026
+
+Les 4 rouges qualifiés ci-dessus sont fermés par le merge de `origin/main`
+8532ce05d (« fix(ci): preserve current settings and traverse typed artifact
+causes », 28 octobre 2026), arrivé dans la branche par le commit de merge
+`197d663f6` du 8 novembre. Le diagnostic indépendant
+consigné ici a été recoupé par ce lot amont, aux mêmes deux causes racines :
+
+- dérive v52 : la cascade `schema_version()` (premier critère de match)
+  conduit au rung 52 (`has_web_access_policy`), et les defaults livrés portent
+  les clés web_access, donc les épinglages absolus 41/40 échouent — le lot
+  amont remplace l'épinglage par `historical_settings_fixture(schema)`
+  (constructeur de test piloté par le catalogue `EngineSettingsCatalog`,
+  retire les champs `introduced_schema_version > schema`) : les documents
+  hérités v40 n'ont légitimement pas les clés v52, les épinglages tiennent ;
+- couche anchored-artifact (2496c031b) : `GateEvaluationError::source()`
+  remonte un `AnchoredArtifactError` en un niveau de plus que le downcast
+  un-niveau des consommateurs — le lot amont introduit
+  `artifact_cause_matches` (parcours BFS générique du graphe d'erreurs, avec
+  déduplication par pointeur ; Linux via `native_error_links`, qui connaît
+  `AnchoredArtifactError` par `primary()`/`direct_cleanup()`), utilisé par
+  `semantic_artifact` et l'assertion du test symlink.
+
+Vérification sur l'arbre mergé (`197d663f6`) : les 4 tests verts
+individuellement, puis suite `swarm-engine --lib` complète
+`TMPDIR=<dépôt>/.swarm-fixtures` : 777 verts / 0 rouge / 29 ignorés,
+confirmé par un second run intégral (preuve
+`.swarm-fixtures/postmerge-197d663f6/lib-run3.log`, sha256
+`54f9292c2f8c…df3966fc` ; un premier run a présenté 1 échec non reproduit en
+deux passages complets, cohérent avec les flakes de concurrence déjà
+qualifiés ci-dessus). Aucun fichier de ce lot n'a été édité localement —
+la correction est celle du merge, la preuve est locale.
 `--no-fail-fast`, complétée le 8 par un run `--no-fail-fast` intégral) :
 suites identity `--lib` 18 verts après correction d'aire (fallback requise —
 cf. répartition ci-dessus) ; `agent_launch` 5 verts / 8 rouges = la dette

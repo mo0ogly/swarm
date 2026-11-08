@@ -1341,6 +1341,39 @@ and their chain's sources are identical to HEAD, empty diffs as proof):
   `LocalPathError` source through `AnchoredArtifactError::Path` in
   `anchored_error`, or downcast the transitive source.
 
+### Closing the 4 swarm-engine reds — merge of 8532ce05d, 8 November 2026
+
+The 4 qualified reds above are closed by the merge of `origin/main`
+8532ce05d ("fix(ci): preserve current settings and traverse typed artifact
+causes", 28 October 2026), which reached this branch through merge commit
+`197d663f6` on 8 November. The independent diagnosis recorded here was
+cross-validated by that upstream batch, on the same two root causes:
+
+- v52 drift: the `schema_version()` cascade (first matching criterion) leads
+  to rung 52 (`has_web_access_policy`) and the shipped defaults carry the
+  web_access keys, so the absolute 41/40 pins fail — the upstream batch
+  replaces pinning with `historical_settings_fixture(schema)` (a test
+  constructor driven by `EngineSettingsCatalog`, removing fields with
+  `introduced_schema_version > schema`): legacy v40 documents legitimately
+  lack the v52 keys, so the pins hold;
+- anchored-artifact layer (2496c031b): `GateEvaluationError::source()` now
+  surfaces an `AnchoredArtifactError` one level beyond the consumers'
+  one-level downcast — the upstream batch introduces `artifact_cause_matches`
+  (generic BFS traversal of the error graph with pointer-based cycle
+  dedup; Linux via `native_error_links`, which knows `AnchoredArtifactError`
+  through `primary()`/`direct_cleanup()`), used by `semantic_artifact` and
+  the symlink test's assertion.
+
+Verification on the merged tree (`197d663f6`): the 4 tests green
+individually, then the full `swarm-engine --lib` suite with
+`TMPDIR=<repo>/.swarm-fixtures`: 777 green / 0 red / 29 ignored, confirmed
+by a second full run (evidence
+`.swarm-fixtures/postmerge-197d663f6/lib-run3.log`, sha256
+`54f9292c2f8c…df3966fc`; one first run showed a single failure not reproduced
+in two full passes, consistent with the concurrency flakes already
+qualified above). No file of that batch was edited locally — the fix is
+the merge's, the evidence is local.
+
 swarm-cli verification (governed TMPDIR; the 7 November cartography ran
 without `--no-fail-fast`, completed on the 8th by a full `--no-fail-fast`
 run): identity `--lib` suites 18 green after the area correction (fallback
