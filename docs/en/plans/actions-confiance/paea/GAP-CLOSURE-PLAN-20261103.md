@@ -369,6 +369,33 @@ mandate. The design guard is kept: future A2A reception must reuse this
 refusal, not invent a second one. Recipe increment only; `trust_delegation.rs`
 moves to 10 tests, 10 green.
 
+Tranche G6 B2 comparator (9 November 2026): lot G6 asks for "review package,
+contracts/vectors, collection and B2 comparator with the same business
+protections". The comparator is delivered:
+[B2-COMPARATOR-20261109.md](B2-COMPARATOR-20261109.md) +
+[`tools/paea/b2_comparator.py`](../../../../../tools/paea/b2_comparator.py) +
+recipe `tools/verification/recipes/paea-b2-comparator.json`. B2 imports the
+qualified pilot file unmodified (pinned-CLI canonicalization with before/after
+hash, epoch authority, intent-stable sinks, separate read-only oracle,
+declared reconciliation, witness before every fault) and scripts the
+deterministic workflow: three scenario families (T04-substitution,
+T06-T21-crash-recovery, T05-T17-revocation-order) × two domains (payment,
+git), fixed order, one fresh sink per trial, comparable per-trial records
+(decision, exit code, measured duration), closed report with the protocol's
+honest labels (`authority='simulated'`, `isolation='same-uid'`,
+`independent_evaluation='not-established'`). The non-weakening guard is
+structural: no admission path is reimplemented, so nothing can be weakened;
+any pilot change changes the comparator. Publication refused on the first
+deviation (never scored, cause kept). Actual execution through the public
+path (recipe PASS, independent verification VERIFIED) on the pinned
+delivered binary (sha256 `a166e2b8…`): six trials, 0 deviations, p50 1.976 s
+/ p95 2.350 s; refusal variants (existing directory, wrong hash, missing
+binary) and the deviation path (replaced `setUpClass` hash) verified;
+evidence under `.swarm-fixtures/`. Remaining for G6: the review package (last
+local object) and preregistration (human gate H3 — evaluator, reserved
+corpus, volumes and order designated by the sponsor before any compared
+campaign).
+
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
 
 Origin: G2 lineage tranche resumption (6 November 2026). After the operator

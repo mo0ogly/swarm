@@ -4001,3 +4001,30 @@ Control7Nov00:30UTC: DNS/proxy/catalogue200unchanged, notupstreamGLMrecoveryproo
 
 
 Control7Nov00:45UTC: upstreamprerequisitesunchanged(DNS/proxy/catalogue200doesnotqualifyGLM). IABinventoryactuallyshows tab1SwarmLogin, butget/markHandoff anddocumentedsamebrowseralternativefail `browser.user is unavailable`; currentturnhandoffnotestablished. Troubleshootingdocsread,noshiddenAPI/toolsourceinspection/authbypass. Methodprecondition: do notrepeatbrokenunchangedget/mark orrecreatetabs; retainusefulmetadataobservation andresumecontrolonlyafteractualcapability/relevantstatechange. Browserruntimeowner distinctfromSKYNETandpendinghumanlogin; no repeatrequest. Evidence: supervisor-authority-capability-blocker-20261107T0045.json incurrentpointer.
+
+
+G6 point of 9 November 2026 — B2 comparator delivered. Lot G6 asks for
+"review package, contracts/vectors, collection and B2 comparator with the
+same business protections"; the comparator is the third delivered object,
+after contracts/vectors (14 vectors) and collection (increments 14-25).
+[B2-COMPARATOR-20261109.md](paea/B2-COMPARATOR-20261109.md) documents the
+design: B2 imports the qualified pilot file (`tests/paea_pilot_lab_test.py`)
+unmodified — pinned-CLI canonicalization with before/after hash re-check,
+epoch authority, intent-stable sinks, separate read-only oracle, declared
+reconciliation, witness before every fault — and scripts three scenario
+families (T04-substitution, T06-T21-crash-recovery, T05-T17-revocation-order)
+across both domains, fixed order, one fresh sink per trial. The "do not
+weaken B2" guard is structural: no admission path is reimplemented. The
+closed report (`paea-b2-report.json`) carries the honest labels
+(`authority='simulated'`, `isolation='same-uid'`,
+`independent_evaluation='not-established'`,
+`protected_invariants='not-established'`); any deviation refuses publication
+and is never scored. Actual execution through the public recipe
+`tools/verification/recipes/paea-b2-comparator.json` on the pinned delivered
+binary (sha256 `a166e2b8…`): six trials, 0 deviations, p50 1.976 s / p95
+2.350 s, independent verification VERIFIED; refusal variants and the
+deviation path verified; evidence under `.swarm-fixtures/`, never under
+/tmp. This concludes neither a Swarm advantage, nor trial independence, nor
+independent evaluation. Remaining for G6: the review package (last local
+object) and preregistration (human gate H3 — the user confirmed having
+neither an independent evaluator nor a third-party team; no invented roles).

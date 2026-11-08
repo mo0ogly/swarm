@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "paea-b2-comparator",
+  "inputs": [
+    "tools/paea/b2_comparator.py",
+    "tools/paea/pilot_lab.py",
+    "tools/paea/pilot_oracle.py",
+    "tests/paea_pilot_lab_test.py",
+    "tests/fixtures/paea/contract-v1.json",
+    "tools/verification/recipe.py",
+    "docs/plans/actions-confiance/paea/E3-PROTOCOL.md",
+    "docs/plans/actions-confiance/paea/PILOTE-OPERATIONNEL.md",
+    "docs/plans/actions-confiance/paea/B2-COMPARATOR-20261109.md",
+    "docs/en/plans/actions-confiance/paea/B2-COMPARATOR-20261109.md",
+    "docs/en/plans/actions-confiance/paea/E3-PROTOCOL.md",
+    "docs/en/plans/actions-confiance/paea/OPERATIONAL-PILOT.md",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-cli/src/protection.rs",
+    "tests/fixtures/paea/payment-*.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "b2-hardened-workflow-six-trials",
+      "command": [
+        "python3",
+        "tools/paea/b2_comparator.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_B2_REPORT_PUBLISHED trials=6",
+        "PAEA_PILOT_BINARY_STABLE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

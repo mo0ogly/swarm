@@ -4885,3 +4885,32 @@ Contrôle7nov00:30UTC : DNS/proxy/catalogue200 inchangés, connexion GLM amont n
 
 
 Contrôle7nov00:45UTC : préconditions amont inchangées (DNS/proxy/catalogue200 ne qualifient pas GLM). Inventaire IAB observe bien tab1 « Connexion à Swarm », mais get/markHandoff et alternative de l’API documentée du même navigateur échouent `browser.user is unavailable` ; la marque ce tour reste non établie. Documentation de dépannage consultée, pas d’API cachée ni inspection du code de l’outil, pas de contournement d’authentification. Nouvelle précondition de méthode : ne pas répéter ces appels cassés/recréer des onglets inchangés ; conserver l’observation metadata utile et reprendre le contrôle seulement après changement réel de capacité/état pertinent. Propriétaire runtime navigateur, distinct du service SKYNET et de la demande de connexion humaine déjà pendante ; aucune demande répétée. Preuve : supervisor-authority-capability-blocker-20261107T0045.json dans le repère courant.
+
+
+Point G6 du 9 novembre 2026 — comparateur B2 livré. Le lot G6 demande
+« paquet de revue, contrats/vecteurs, collecte et comparateur B2 avec mêmes
+protections métier » ; le comparateur est le troisième objet livré, après
+contrats/vecteurs (14 vecteurs) et collecte (incréments 14-25).
+[B2-COMPARATOR-20261109.md](paea/B2-COMPARATOR-20261109.md) documente la
+conception : B2 importe le fichier pilote qualifié
+(`tests/paea_pilot_lab_test.py`) sans modification — canonicalisation CLI
+épinglée avec re-vérification du hash avant/après, autorité d'époque, puits à
+intent stable, oracle séparé en lecture seule, réconciliation déclarée,
+témoin avant chaque faute — et scripte trois familles de scénarios
+(T04-substitution, T06-T21-crash-recovery, T05-T17-revocation-order) sur les
+deux domaines, ordre fixe, un puits neuf par essai. La garde « ne pas
+affaiblir B2 » est structurelle : aucun chemin d'admission n'est réimplémenté.
+Rapport fermé (`paea-b2-report.json`) avec étiquettes honnêtes
+(`authority='simulated'`, `isolation='same-uid'`,
+`independent_evaluation='not-established'`,
+`protected_invariants='not-established'`) ; toute déviation refuse la
+publication et n'est jamais notée. Exécution réelle par la recette publique
+`tools/verification/recipes/paea-b2-comparator.json` sur le binaire livré
+épinglé (sha256 `a166e2b8…`) : six essais, 0 déviation, p50 1,976 s / p95
+2,350 s, vérification indépendante VERIFIED ; variantes de refus et chemin de
+déviation vérifiés ; evidence sous `.swarm-fixtures/`, jamais sous /tmp.
+Cela ne conclut ni avantage de Swarm, ni indépendance des essais, ni
+évaluation indépendante. Restent pour G6 : le paquet de revue (dernier objet
+local) et le préenregistrement (porte humaine H3 — l'utilisateur a confirmé
+ne disposer ni d'évaluateur indépendant ni d'équipe tierce ; aucun rôle
+inventé).

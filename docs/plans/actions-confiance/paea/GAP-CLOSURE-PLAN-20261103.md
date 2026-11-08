@@ -405,6 +405,33 @@ la racine. Le garde du design est conservé : la réception A2A future devra
 réutiliser ce refus, pas en inventer un second. Incrément de recette seul ;
 `trust_delegation.rs` passe à 10 tests, 10 verts.
 
+Tranche G6 comparateur B2 (9 novembre 2026) : le lot G6 demande « paquet de
+revue, contrats/vecteurs, collecte et comparateur B2 avec mêmes protections
+métier ». Le comparateur est livré :
+[B2-COMPARATOR-20261109.md](B2-COMPARATOR-20261109.md) +
+[`tools/paea/b2_comparator.py`](../../../../../tools/paea/b2_comparator.py) +
+recette `tools/verification/recipes/paea-b2-comparator.json`. B2 importe le
+fichier pilote qualifié sans modification (canonicalisation CLI épinglée
+avant/après, autorité d'époque, puits à intent stable, oracle séparé en
+lecture seule, réconciliation déclarée, témoin avant chaque faute) et scripte
+le workflow déterministe : trois familles de scénarios (T04-substitution,
+T06-T21-crash-recovery, T05-T17-revocation-order) × deux domaines (payment,
+git), ordre fixe, un puits neuf par essai, enregistrements comparables
+(décision, code de sortie, durée mesurée), rapport fermé avec les étiquettes
+honnêtes du protocole (`authority='simulated'`, `isolation='same-uid'`,
+`independent_evaluation='not-established'`). La garde de non-affaiblissement
+est structurelle : aucun chemin d'admission n'est réimplémenté, donc rien ne
+peut être affaibli ; toute modification du pilote change le comparateur.
+Publication refusée à la première déviation (jamais notée, cause conservée).
+Exécution réelle par la voie publique (recette PASS, vérification
+indépendante VERIFIED) sur le binaire livré épinglé (sha256 `a166e2b8…`) :
+six essais, 0 déviation, p50 1,976 s / p95 2,350 s ; variantes de refus
+(dossier existant, hash faux, binaire manquant) et chemin de déviation
+(hash `setUpClass` remplacé) vérifiés ; evidence sous `.swarm-fixtures/`.
+Restent pour G6 : le paquet de revue (dernier objet local) et le
+préenregistrement (porte humaine H3 — évaluateur, corpus réservé, volumes et
+ordre désignés par le commanditaire avant toute campagne comparée).
+
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
 Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction
