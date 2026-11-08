@@ -1,5 +1,8 @@
 # Recettes permanentes / Permanent verification recipes
 
+Précontrôles archive/Git en lecture seule : [contrats et commandes](PREFLIGHTS.md).
+Read-only archive/Git preflights: [contracts and commands](PREFLIGHTS.en.md).
+
 Pour les paramètres des prochaines compilations Cargo et le garde d'admission
 disque, voir [Stockage des compilations](BUILD-STORAGE.md).
 For future Cargo settings and the disk admission guard, see
