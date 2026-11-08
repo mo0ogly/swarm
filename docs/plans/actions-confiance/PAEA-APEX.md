@@ -4746,6 +4746,30 @@ périmètre » marque le portage réalisé et précise qu'A2A réseau (audience,
 canal D6, reçus D5) reste entier, bloqué sur l'enrôlement humain IA3 et
 l'intégration G1 réelle.
 
+### Audience côté usage — portion locale T14 G4, session Claude 2026-11-08
+
+La portion G4 localement exécutable restante : le sous-ensemble côté usage de
+l'audience D3. Le refus par sujet nommé existait des deux côtés
+(`trust_actions.go:1020` avant les bornes, miroir
+`rust/crates/swarm-engine/src/trust/operations.rs` « mauvais sujet ») mais
+aucune recette ne l'exerçait — le critère de vérification locale T14
+« B (autre pair) est refusé à la réception (audience) » n'était pas satisfait.
+Nouveau test `rust/crates/swarm-engine/tests/trust_delegation.rs::
+delegation_audience_binds_mandate_to_named_subject` : un pair enrôlé autre
+que le sujet du mandat qui rejoue le mandat délégué (et la racine) est refusé
+à l'admission de lecture avec la raison historique typée, sans mutation ; le
+pair auditeur légitime conserve le parcours complet
+`request`→`approve`→`commit` et le rejeu. `trust_delegation.rs` passe à
+10 tests, 10 verts (racines isolées `.swarm-fixtures/trust-delegation/`,
+jamais `/tmp`). Docs FR/EN (`docs/actions-confiance-rust.md`) et les deux
+miroirs GAP-CLOSURE-PLAN dans le même incrément ; la ligne T14 du tableau
+passe de « conception déposée » à « partielle ». La réception A2A réseau
+(refus typés `a2a-*`, reçus liés D5, canal D6) reste entière, bloquée sur
+l'enrôlement humain IA3 et l'intégration G1 réelle — la réception future
+devra réutiliser ce refus, pas en inventer un second. Commit `94a0b35ec`.
+Pas d'installation (changement test seul, aucune surface produit) ;
+l'acceptation reste à établir.
+
 ### Reprise explicite du 6 novembre 2026
 
 La reprise utilisateur réautorise la continuité GLM seule. Le flux précédent était figé puis son client a disparu au redémarrage, sans résultat final ni exit connu. L’attente ajoutée par le superviseur d’un état terminal fournisseur inaccessible a été retirée : la skill prévoit une récupération bornée après diagnostic. DNS, proxy et catalogue vérifiés, aucun client orphelin, source cible inchangée. Une seule récupération HTTP directe sans outils a été lancée selon le handoff existant ; GLM reste auteur du code, Codex supervise et vérifie. Suivi rétabli toutes les quinze minutes. Réception, protection du bootstrap, régression EOF, reçus et HTTP positif demeurent ouverts ; aucune installation/acceptation nouvelle.

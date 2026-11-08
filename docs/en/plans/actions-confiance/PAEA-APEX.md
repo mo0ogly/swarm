@@ -3862,6 +3862,30 @@ D6 channel, D5 receipts) remains whole, blocked on human IA3 enrolment and the
 G1 real integration.
 
 
+### Use-side audience — T14 G4 local portion, Claude session 2026-11-08
+
+The remaining locally executable G4 portion: the use-side subset of D3
+audience. The named-subject refusal was present on both sides
+(`trust_actions.go:1020` before bounds, mirror `rust/crates/swarm-engine/src/
+trust/operations.rs` « mauvais sujet ») but exercised by no recipe — the T14
+local verification criterion « B (another peer) is refused at reception
+(audience) » was unsatisfied. New test
+`rust/crates/swarm-engine/tests/trust_delegation.rs::
+delegation_audience_binds_mandate_to_named_subject`: an enrolled peer other
+than the mandate's subject replaying the delegated mandate (and the root) is
+refused at read admission with the historical typed reason, without mutation;
+the legitimate audience peer keeps the full `request`→`approve`→`commit` flow
+and replay. `trust_delegation.rs` moves to 10 tests, 10 green (isolated roots
+`.swarm-fixtures/trust-delegation/`, never `/tmp`). FR/EN docs
+(`docs/actions-confiance-rust.md`) and both GAP-CLOSURE-PLAN mirrors in the
+same increment; T14 dashboard row moves « conception déposée » → « partielle ».
+Networked A2A reception (typed `a2a-*` codes, linked receipts D5, channel D6)
+stays open, blocked on human IA3 enrolment and real G1 integration — the
+future reception must reuse this refusal, not invent a second one. Commit
+`94a0b35ec`. No install (test-only change, no product surface); acceptance
+remains to be established.
+
+
 ### Explicit recovery on 6 November 2026
 
 The user resumed GLM-only work. The previous stream stalled, then reboot removed its client without a final answer or known exit. The supervisor-added requirement for an inaccessible upstream terminal state was removed: the skill supports bounded recovery after diagnosis. DNS, proxy and model catalogue checked, no orphan clients, target source unchanged. One tool-free direct HTTP recovery was launched under the existing handoff; GLM authors code and Codex supervises/verifies. Fifteen-minute supervision restored. Reception, startup protection, EOF regression, receipts and positive HTTP flow remain open; no new installation or acceptance.

@@ -58,7 +58,7 @@ campagnes T01…T22 exécutées.
 | T11 | I04/I05/I11/I15 | PASS | `paea-i15-tool-substitution-rust.json` (mutation → réadmission prouvée produit ; preuve conservée `glm-tool-substitution-20261029T221416Z/fresh-recipe-run/`, re-vérifiée VERIFIED 07-11) | Campagne complète non jouée |
 | T12 | I11 | bloquée | — | Évaluateur indépendant E3 (0/17) |
 | T13 | I13 | bloquée | — | Confinement egress absent |
-| T14 | I02/I14 | conception déposée | `T14-A2A-DESIGN.md` (02-11 : décisions D1–D7, chaîne d'admission, critères) | Portage `delegation` + code A2A ; identité réelle (I02) |
+| T14 | I02/I14 | partielle | `T14-A2A-DESIGN.md` (02-11 : décisions D1–D7) ; portages locaux : `delegation` 75c35fa27 (04-11), `data_policy`/provenance (05-11), audience usage D3 `trust_delegation.rs::delegation_audience_binds_mandate_to_named_subject` 94a0b35 (08-11, 10/10 verts) | Réception A2A réseau (`a2a-*`, reçus liés, canal D6) ; identité réelle (I02) |
 | T15 | I15 | PASS | même preuve que T11 + liaison manifeste settlement (`paea-i15-manifest-binding-rust.json`, preuve conservée `glm-manifest-binding-20261029T224756Z/fresh-recipe-run/`, re-vérifiée VERIFIED 07-11 ; voie A structurellement refusée — settlement ne consomme aucun outil) | Inventaire ACS (entrées externes) |
 | T16 | I12/I16 | PASS | `paea-i16-lease-reopen-rust.json` (30-10, bloc 9) + contrat 8 cas (glm-order-receipt-20261030T075024Z) | Limites distribuées séparées |
 | T17 | I05/I07/I17 | PASS | `paea-delivered-settlement-cli-rust` / `i17-run-13` (ELF 186cc38b…, 02-11 midi, 7/7 VERIFIED, étape I17 révocation comprise ; run-12/cdde554a, run-11/41f00bf9 et antérieurs conservés) ; re-vérifié sur livré courant 3146c837… (03-11 : `settlement-run-17` 7/7 + `chain-run-10` 4/4 sur l'arbre vivant) puis dev.343/a0721124… (07-11 : `settlement-run-19` 7/7 + `chain-run-11` 4/4, révocation à la consommation sur settlement-call comprise — écart I17 de la matrice refermé) ; précédent e2f0039a… : `settlement-run-15` 7/7 + `chain-run-8` 4/4 sur gel 562953dba3, puis run-16 + chain-run-9 sur arbre vivant | Propagation production |
@@ -79,11 +79,9 @@ gelé 562953dba3, puis run-16 + chain-run-9 sur arbre vivant recompilé).
 
 - Campagnes formelles E3 exécutées : 0/22 (0 %)
 - Recette locale PASS : 9/22 (41 %) — T01, T04, T05, T06, T09, T11, T15, T16, T17
-- Partielle : 3/22 (14 %) — T02, T07, T21
+- Partielle : 4/22 (18 %) — T02, T07, T14, T21
 - Bloquée humain/OS : 6/22 (27 %) — T03, T08, T10, T12, T13, T22
 - Non exercée E3 : 3/22 (14 %) — T18, T19, T20
-- Conception déposée : 1/22 (5 %) — T14 (design A2A `T14-A2A-DESIGN.md`,
-  non implémenté ; le code et les preuves restent à produire)
 - Invariants en vérification locale partielle : 10/17 (59 %) — I01, I04, I05,
   I08, I09, I12, I16, I17 + partiels I03, I15
 - Acceptation indépendante : 0/17 (0 %)
@@ -220,6 +218,15 @@ gelé 562953dba3, puis run-16 + chain-run-9 sur arbre vivant recompilé).
   compris — toutes deux sur l'arbre vivant, sans gel. Le livré courant porte
   donc une preuve sur chacune des deux surfaces : gel 562953dba3 (run-15 +
   chain-run-8) et arbre vivant (run-16 + chain-run-9).
+- Extension 08-11 — T14 passe de « conception déposée » à « partielle » :
+  les sous-ensembles T14 portés localement s'allongent — mandats délégués
+  (`75c35fa278`, 04-11), `data_policy`/provenance (05-11), et audience côté
+  usage (94a0b35, 08-11) : `trust_delegation.rs` (10/10 verts) épingle le
+  refus « mauvais sujet » d'un pair autre que le sujet du mandat, sans
+  mutation, audience légitime conservant le parcours complet. La réception
+  A2A réseau (refus `a2a-*`, reçus liés D5, canal D6) reste entière, bloquée
+  sur l'enrôlement humain IA3 et l'intégration G1 réelle. Recompte :
+  partielle 4/22 (T02, T07, T14, T21), conception déposée 0.
 - Extension 03-11 — 11e remplacement : e2f0039a… →
   `3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a`
   (v0.1.1-dev.322, commit 277e337cb4 — le lot de re-vérification 02-11 committé
