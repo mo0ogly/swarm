@@ -358,6 +358,21 @@ Recette permanente
 VERIFIED). Reste fermé : tout câblage public, droits opérateur, raccord
 Trust/admission IA3.
 
+Tranche G2 inventaire des chargeurs mémoire (8 novembre 2026) : la clause G2
+« tous chargeurs recensés » est vérifiée par construction et documentée. Côté
+Go, la lecture des travaux enregistrés passe par `internal/engine/memory_work.go`
+(`scanMemoryWork`, `memoryWork`, `memoryWorks`, contextes d'erreur
+« Source mémoire » / « Sources du catalogue mémoire inaccessibles »). Côté Rust,
+un unique lecteur partagé, `rust/crates/swarm-engine/src/recorded_work.rs`
+(`read_recorded_work`, `list_recorded_works` — qualifié en R3e), satisfait les
+cinq chemins de lecture mémoire : `memory_catalog.rs`, `memory_files.rs`
+(`list_recorded_works`), `memory_summary_source.rs` et
+`memory_summary_selection.rs` (`read_recorded_work`),
+`memory_usage_binding.rs` (via `summary_sources`). Aucun chargeur par chemin,
+aucune transformation d'erreur d'inventaire en catalogue vide (R3) : le
+raccord Go↔Rust est sans divergence de chargeur. Incrément documentaire seul,
+aucun code modifié.
+
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
 Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction

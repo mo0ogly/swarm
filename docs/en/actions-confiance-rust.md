@@ -898,6 +898,17 @@ P4 criteria). Permanent recipe
 `.swarm-fixtures/evidence/run-20261108-identity-kernel` (PASS,
 `verify` → VERIFIED).
 
+**Memory-loader inventory (8 November 2026).** The G2 clause "all loaders
+inventoried" is verified by construction. In Go, recorded-work reads go
+through `internal/engine/memory_work.go` (`scanMemoryWork`, `memoryWork`,
+`memoryWorks`, error contexts "Source mémoire" / "Sources du catalogue
+mémoire inaccessibles"). In Rust, a single shared reader, `recorded_work.rs`
+(`read_recorded_work`, `list_recorded_works`, qualified in R3e), satisfies
+all five memory read paths — `memory_catalog.rs`, `memory_files.rs`,
+`memory_summary_source.rs`, `memory_summary_selection.rs`,
+`memory_usage_binding.rs` (via `summary_sources`) — with no per-path loader
+and no inventory-error-to-empty-catalogue transformation (R3).
+
 The historical interprocess flock serializes writes. One idempotency key creates
 one native entry; conflicting content refuses. `lose_response:true` records
 `unknown` after the simulated effect. Another commit cannot duplicate it;

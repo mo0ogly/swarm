@@ -930,6 +930,18 @@ P4). Recette permanente
 `.swarm-fixtures/evidence/run-20261108-identity-kernel` (PASS,
 `verify` → VERIFIED).
 
+**Inventaire des chargeurs mémoire (8 novembre 2026).** La clause G2 « tous
+chargeurs recensés » est vérifiée par construction. En Go, la lecture des
+travaux enregistrés passe par `internal/engine/memory_work.go`
+(`scanMemoryWork`, `memoryWork`, `memoryWorks`, contextes d'erreur « Source
+mémoire » / « Sources du catalogue mémoire inaccessibles »). En Rust, un
+unique lecteur partagé, `recorded_work.rs` (`read_recorded_work`,
+`list_recorded_works`, qualifié en R3e), satisfait les cinq chemins de
+lecture mémoire — `memory_catalog.rs`, `memory_files.rs`,
+`memory_summary_source.rs`, `memory_summary_selection.rs`,
+`memory_usage_binding.rs` (via `summary_sources`) — sans chargeur par chemin
+ni transformation d'une erreur d'inventaire en catalogue vide (R3).
+
 Le verrou interprocessus historique sérialise les écritures. Une même clé ne
 produit qu’une entrée native ; un autre contenu sous cette clé est refusé.
 `lose_response:true` rend l’état `unknown` après l’effet simulé. Un nouvel

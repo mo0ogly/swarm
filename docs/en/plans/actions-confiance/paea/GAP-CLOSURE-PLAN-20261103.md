@@ -323,6 +323,20 @@ stay closed (M20-U01..U10, P4 criteria). Permanent recipe
 VERIFIED). Still closed: any public wiring, operator rights, the
 Trust/admission IA3 raccord.
 
+G2 memory-loader inventory tranche (8 November 2026): the G2 clause "all
+loaders inventoried" is verified by construction and documented. On the Go
+side, recorded-work reads go through `internal/engine/memory_work.go`
+(`scanMemoryWork`, `memoryWork`, `memoryWorks`, error contexts "Source
+mémoire" / "Sources du catalogue mémoire inaccessibles"). On the Rust side, a
+single shared reader, `rust/crates/swarm-engine/src/recorded_work.rs`
+(`read_recorded_work`, `list_recorded_works` — qualified in R3e), satisfies
+all five memory read paths: `memory_catalog.rs`, `memory_files.rs`
+(`list_recorded_works`), `memory_summary_source.rs` and
+`memory_summary_selection.rs` (`read_recorded_work`),
+`memory_usage_binding.rs` (via `summary_sources`). No per-path loader, no
+inventory-error-to-empty-catalogue transformation (R3): the Go↔Rust raccord
+has no loader divergence. Documentation-only increment, no code changed.
+
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
 
 Origin: G2 lineage tranche resumption (6 November 2026). After the operator
