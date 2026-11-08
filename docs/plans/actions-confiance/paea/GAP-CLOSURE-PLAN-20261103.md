@@ -373,6 +373,22 @@ aucune transformation d'erreur d'inventaire en catalogue vide (R3) : le
 raccord Go↔Rust est sans divergence de chargeur. Incrément documentaire seul,
 aucun code modifié.
 
+Tranche G3a inventaire des voies (8 novembre 2026) :
+[G3-INVENTAIRE-VOIES-20261108.md](G3-INVENTAIRE-VOIES-20261108.md) établit
+l'inventaire exigé en tête de G3 — point d'exécution commun des cinq lanceurs
+(`PreparedExec::execute`, frontière I0 committée `6706e201b`), titulaires de
+secrets et leurs voies d'accès, voies résiduelles réelles du helper confiné
+(réseau sortant non médié, descripteurs hérités, `/proc` cmdline, lectures
+générales hors `.swarm`, descendants), worker API `_prepare_turn` hors
+frontière I0 avec clé de connexion en mémoire, transport moteur loopback
+local. Chaque voie de l'inventaire est une cible nommée pour la campagne
+PA-04 « témoin puis contournement » ; aucune n'est déclarée fermée. Le refus
+Internet additif (`provider_internet_denied`/`deny_internet`) est observé
+comme flux concurrent non commité, propriétaire flux G3 barrières — décrit,
+pas repris. Incrément d'analyse seul, aucun code modifié, aucune barrière
+posée ; les tests synthétiques par voie et la qualification restent à venir
+derrière G1+G3a.
+
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
 Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction

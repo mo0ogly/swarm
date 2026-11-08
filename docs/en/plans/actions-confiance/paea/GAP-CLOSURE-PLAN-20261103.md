@@ -337,6 +337,22 @@ all five memory read paths: `memory_catalog.rs`, `memory_files.rs`
 inventory-error-to-empty-catalogue transformation (R3): the Go↔Rust raccord
 has no loader divergence. Documentation-only increment, no code changed.
 
+G3a egress-path inventory tranche (8 November 2026):
+[G3-INVENTAIRE-VOIES-20261108.md](G3-INVENTAIRE-VOIES-20261108.md) establishes
+the inventory required at the head of G3 — the shared exec point of the five
+launchers (`PreparedExec::execute`, I0 boundary committed as `6706e201b`),
+secret holders and their access paths, the confined helper's real residual
+paths (unmediated outbound network, inherited descriptors, `/proc` cmdline,
+general reads outside `.swarm`, descendants), the `_prepare_turn` API worker
+outside the I0 boundary holding the connection key in memory, and the local
+loopback engine transport. Every inventoried path is a named target for the
+PA-04 "valid flow then refused bypass" campaign; none is declared closed. The
+additive Internet refusal (`provider_internet_denied`/`deny_internet`) is
+observed as a concurrent uncommitted stream, owned by the G3 barriers stream —
+described, not taken over. Analysis increment only, no code changed, no
+barrier posed; per-path synthetic tests and qualification remain to come
+behind G1+G3a.
+
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
 
 Origin: G2 lineage tranche resumption (6 November 2026). After the operator
