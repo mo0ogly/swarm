@@ -2422,3 +2422,350 @@ produit avant `cfg(test)` restent identiques (SHA256
 `8ad0a25c28581acc25b7c566ff59e32d708fb923cdf06a2428368ecb31291871`).
 Ces preuves locales ne remplacent pas les contrôles requis sur la tête publiée ;
 leur résultat courant et la décision de fusion sont consultables dans PR #20.
+
+## BF-L0-A — premier lot borné proposé après réalignement (8 novembre 2026)
+
+**État courant : A-1 appliqué, A-2 vérifié, A-3 vérifié en miniatures ; A-4 ouvert.** Voir la mise à jour d’application en fin de section. Le cadrage initial ci-dessous est conservé comme historique.
+
+**Préparation documentaire uniquement, non appliquée et non qualifiée.** Reprise sur
+main `b4e07cb26066cffdb20b36ac2fc9c60f758cb23e` dans le checkout principal réaligné.
+PR #20 et réalignement Git n'ont corrigé aucun des écarts R01–R13. Les modifications
+concurrentes des plans sont conservées ; aucune recette, source, configuration,
+fixture, preuve historique ou version livrée n'est modifiée par cette préparation.
+Codex reste propriétaire ; toute réalisation et tout contrôle exécutable nécessitent
+une autorisation ultérieure. Aucun développement, test, build, fournisseur, paiement,
+navigateur ou service lancé ; aucun commit/push demandé pour ce lot.
+
+### Choix et limite du pilote
+
+Trois options comparées : corriger les 21 manifestes d'emblée élargirait le lot à des
+lecteurs/profils différents ; commencer par les quatre recettes natives du premier
+rapprochement impose le choix de fixtures et les contrats R01/02/07 encore ouverts.
+**Choix proposé : deux recettes de protocole**, sans résultat externe S/C dans leurs
+étapes suivies. Ce choix ne les rend pas exécutables aujourd'hui : les cas créent
+leurs propres dépôts Git et/ou Roots temporaires si on les lance, et le graphe de
+compilation reste à qualifier. Il évite seulement de réutiliser une ancienne fixture
+native pour corriger une omission commune certaine.
+
+Lecture actuelle : les six manifestes initiaux conservent les empreintes du relevé
+BF-L0 ; leurs trois omissions communes ci-dessous sont toujours présentes. Cela ne
+réactualise pas le rapprochement des quinze autres manifestes ni leurs preuves.
+`git_reference_transaction.rs::Fixture::new` construit un dépôt synthétique ;
+`paea_git_intent.rs::root` initialise un Root temporaire. Aucun résultat SOURCE/
+WRITER/CURRENT historique n'est lu dans les cas suivis. Le premier target retient
+son Git sélectionné et ses octets ; cela ne qualifie pas tout l'outillage Cargo.
+
+### Diff futur autorisable : six ajouts, pas une refonte
+
+Seuls les deux manifestes suivants sont candidats à correction dans BF-L0-A :
+
+| Fichier sous `tools/verification/recipes/` | Ajouts exacts à `inputs`, une fois chacun | Portée R01–R13 |
+| --- | --- | --- |
+| `paea-native-git-reference-transaction.json` | `tests/fixture_area.py` ; `tools/verification/cargo_space_guard.py` ; `.cargo/storage-policy.json` | Volet déclaratif de R03 et R04 pour cette recette. |
+| `paea-native-git-intent.json` | Les mêmes trois chemins. | Même portée, distincte de la première recette. |
+
+Les deux déclarent déjà `.cargo/config.toml` et
+`web/paea-examples/v1/payment-document.json` : ne pas les dupliquer, ni inventer une
+omission R05 dans ces deux fichiers. Ne changer ni steps, noms de tests, compteurs,
+assertions, environment, cible Cargo, features, politiques ou répertoires de sortie.
+Ne pas supprimer une entrée supplémentaire au motif qu'elle n'est pas consommée
+par un cas suivi. Les mises à jour documentaires du futur incrément restent dans
+ce plan et son miroir EN ; le contrat public du runner est inchangé. Aucun autre
+manifeste, runner, wrapper, réglage ou code de test n'est prévu dans ce premier diff.
+
+**Pourquoi ces ajouts :** `recipe.py::run_recipe` importe le helper avant les étapes ;
+le helper résout le réglage sauvegardé ou le défaut livré. `.cargo/config.toml`
+sélectionne le wrapper, qui charge sa politique persistée. Retenir ces octets rend
+leur omission/changement observable dans l'inventaire déclaré ; le nom d'une clé
+`inputs` ne prouve ni leur utilisation effective ni leur validation sémantique.
+
+### Prérequis, séquence et critères d'acceptation futurs
+
+| Étape bornée | Action à préparer, non exécutée ici | Critère observable / arrêt |
+| --- | --- | --- |
+| A-0 — protéger la base | Relire HEAD, diff concurrent, deux manifestes et chaîne runner→helper/config→wrapper→politique ; retenir leurs octets avant édition. | Sources différentes de ce relevé : rapprocher de nouveau, sans écraser les travaux ni reconduire leurs anciennes empreintes. Aucun ancien résultat réécrit. |
+| A-1 — appliquer le diff minimal | Après autorisation de correction seulement, ajouter les six entrées et mettre à jour ce suivi FR/EN. | Diff sémantique limité à ces ajouts ; étapes/environment/assertions identiques, aucun élargissement de glob, aucune entrée `.swarm`/node_modules/target. Les deux recettes sont vérifiées séparément. |
+| A-2 — constater l'inventaire | Après autorisation de contrôle, relever pour chaque recette les chemins sélectionnés et leurs empreintes par les fonctions existantes de snapshot/archive ; relire l'archive. Ne pas lancer les commandes Cargo du manifeste pour ce contrôle. | Les trois nouveaux chemins sont sélectionnés et archivés avec les mêmes octets dans chacune des deux recettes. Les autres entrées restent distinguées des dépendances effectivement compilées. Un simple JSON valide ou un motif non vide ne suffit pas. |
+| A-3 — témoin/refus/reprise isolés | Sous autorisation de test distincte, réutiliser les contrats de `test_recipe.py` et une miniature isolée portant les trois fichiers copiés et leurs déclarations. Commandes témoins inertes, jamais le wrapper ni Cargo ; dérivation et portée retenues. Témoin complet avant chaque injection. | Fichier déclaré absent avant snapshot : refus `recipe-input-pattern-empty`, aucune étape lancée. Fichier déclaré modifié après snapshot : échec `recipe-declared-inputs-changed`, étape suivante non lancée. Original restauré dans une nouvelle sortie : témoin à nouveau valide. Les originaux/causes restent disponibles ; aucun fichier du checkout réel modifié pour injecter. |
+| A-4 — fermer seulement ce sous-lot | Relier recette, avant/après, archive, cause, reprise et revue des octets à la même révision ; vérifier l'intégrité des preuves complètes de run via `verify` lorsque le format le permet. | Pas de `verify` présenté comme preuve sur un simple paquet snapshot incomplet ; un FAIL intact reste FAIL. Déclarer « six entrées corrigées et rétention contrôlée » seulement si A-1 à A-3 sont établies. Sinon distinguer préparé, appliqué et non vérifié. |
+
+Les tests existants `RecipeTests.test_pass_verify_and_exclusive_history`,
+`test_zero_tests_and_source_mutation_cannot_pass` et
+`test_exit_failure_retains_cause_and_stops_then_recovers` sont des points de reprise
+lus, **pas exécutés**. Ils couvrent des propriétés génériques du runner, pas
+l'ajout effectif des six entrées : A-2 demeure nécessaire. Le support exact des
+variantes par fichier A-3 reste à préparer sans modifier le runner ; si un nouveau
+support permanent s'avère nécessaire, replan de la liste de fichiers **avant** toute
+extension. Une miniature n'établit pas la réussite des deux recettes de protocole.
+
+Précondition du témoin A-3 : reprendre le montage lu dans `RecipeTests.setUp`
+(helper réel copié dans `tests/fixture_area.py`, réglage explicite valide dans le
+seul faux dépôt), puis ajouter les copies du wrapper et de sa politique. Le réglage
+de test doit désigner l'aire privée possédée ; constater TMPDIR et tout fallback
+réel avant les variantes. Une miniature sans réglage/défaut valide pourrait refuser
+avant l'étape visée et masquer les cas : elle ne constitue pas un témoin. Ni ce
+réglage synthétique ni son succès ne qualifient le réglage sauvegardé du projet.
+
+A-3 vise absence/dérive d'octets déclarés. Un JSON invalide mais hashable n'est pas
+rejeté par le snapshot pour sa seule sémantique : validation de la politique par le
+wrapper et résolution du réglage restent des contrôles distincts, non couverts ici.
+Aucun nouveau timeout, retry, seuil de stockage ou droit n'est proposé. Une erreur
+arrête le travail dépendant ; reprise seulement après précondition corrigée et
+nouvelle preuve, jamais par changement de pin ou réemploi d'une sortie ancienne.
+
+### Reste des treize corrections et condition du lot suivant
+
+| Groupe | Sortie de BF-L0-A / suite conservée | Propriétaire et prérequis de reprise |
+| --- | --- | --- |
+| R01 + R02 | Non traités par ce pilote. Préparer ensuite un lot cohérent liens de résultats et preuves réellement lues pour les consommateurs natifs concernés, y compris les occurrences complémentaires. | Codex ; choisir fixtures admissibles, distinguer ancienne preuve d'analyse et naissance BF-L1 neuve. Ne jamais lancer une recette encore affectée par BF-P2-R1. |
+| R03 + R04 | Deux recettes sur 21 seulement pour les volets déclaratifs. Projection sûre du réglage résolu, provenance, fallback réellement retenu, configs Cargo effectives et validation de politique restent ouverts. | Codex ; résultat A-4 puis revue de chaque consommateur avant extension aux 19 autres. Ne pas réinitialiser les réglages ni modifier le seuil. |
+| R05 | Include certain manquant dans effect-reconcile et targets CLI concernés : candidat à un prochain diff statique ciblé ; graphe effectif encore inconnu. | Codex ; relire chaque include/target et son profil, puis collecter les entrées compilées sous autorisation appropriée. |
+| R06 | Choix runner déclaratif / collecteur non résolu par le pilote. Pas de collecteur lancé ou déclaré applicable par proximité de nom. | Codex ; contrat exact des targets : le collecteur actuel couvre engine lib/repository, pas ces deux targets protocole comme preuve complète. |
+| R07 | Séparation preuves de naissance immuables / état Root mutable toujours requise pour le futur banc natif. | Codex ; identité, état initial, mutations admises et rétention sous barrières avant réutilisation d'un Root historique ; aucun snapshot live ici. |
+| R08 | Outils, environnement pertinent, profils/features unifiées, exécutables et réutilisation de preuve restent à lier. | Codex ; qualification bornée des entrées effectives, sans environnement complet/secrets ni profil « normal » supposé. |
+| R09 | Candidat statique indépendant : script i18n et ressources effectivement lues dans les quatre recettes concernées. Aucun rebuild nécessaire pour préparer ce diff. | Codex ; relire les quatre manifestes et le mode --check, dont les outputs existants sont des inputs de lecture. Pas d'élargissement implicite de BF-L0-A. |
+| R10 | Sélection/pin/profil des images externes hors pilote ; écart historique de bin/swarm conservé, pas réaffirmé comme mesure actuelle. | Codex ; retrouver image historique qualifiée ou qualifier une image actuelle avant d'adapter la recette. Jamais accepter les octets présents en changeant seulement le pin. |
+| R11 + R12 + R13 | Outputs produits distincts des inputs, remplacement du touch et identité navigateur/ressources servies hors pilote. | Codex ; résolution/binding réel des artefacts et revue des parcours navigateur avant lot dédié, sans toucher des sources pour forcer la fraîcheur. |
+
+Fabrice conserve l'autorité de réalisation/exécution de chacun de ces lots. La
+séquence recommandée est : **pilote déclaratif BF-L0-A**, puis définition du lot
+natif R01/02/07 et des compléments statiques R05/R09 ; la qualification R06/R08 et
+les images/parcours R10–R13 ont leurs propres prérequis. Aucun passage automatique
+à BF-L1, BF-L5 ou BF-P3 ; même un pilote réussi ne clôt ni R03/R04 complets ni BF-L0.
+Les scénarios 03-F/03-B gardent leurs contrats d'attribution, absence, réception et
+fencing : aucun effet produit ni capacité financière déduit de cette préparation.
+
+Revue de l'incrément présent : seuls les appendices de plan FR/EN et le registre
+local sont écrits ; aucun choix opérateur, fonction/docstring ou chemin d'erreur
+produit créé/modifié. Les refus décrits sont lus dans le runner actuel et restent
+à observer dans les variantes prévues. Les empreintes ci-dessous lient la décision
+aux passages relus ; elles ne constituent pas un résultat de test.
+
+| Source relue / Read source | SHA-256 |
+| --- | --- |
+| `tools/verification/recipes/paea-native-git-reference-transaction.json` | `09a4a07914cc9c97eb77c766823c09778a4628a9b7d9e096d58512ddb1bbe43c` |
+| `tools/verification/recipes/paea-native-git-intent.json` | `e2d478da120bce223bead78109f427794ef957a05a58cb046c3bb30092e30fdf` |
+| `tools/verification/recipe.py` | `348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b` |
+| `tools/verification/test_recipe.py` | `01b7a228be5422f3f30c7d21ebe81d61b2fb9abf1b090d118b5414e26ee1c118` |
+| `tests/fixture_area.py` | `4ece994bd492dc4e44adf24388ed50073ceeff7e74527cd106b31824c8ce566c` |
+| `.cargo/config.toml` | `31bee734fefe516086f75b642c1ca537e54997d684e4cc5c983951e01157ca72` |
+| `tools/verification/cargo_space_guard.py` | `09b7d45c78c64282dee6265be2d26cea6066505963465e2a50a856f1fe8d5916` |
+| `.cargo/storage-policy.json` | `5e392baf7d475a34bd1c4614636682cd4e01bd21b007a3d4845b1e822c7f26dd` |
+| `rust/crates/swarm-engine/tests/git_reference_transaction.rs` | `fa3ed15210465b128ca2ea0be6aed984034b26367c5932a413f9fe71b211ed3e` |
+| `rust/crates/swarm-engine/tests/paea_git_intent.rs` | `2efc8a7d028a5f0fe815b299997cc642499936cd3fc2e9cc184ffe2741892d2b` |
+
+
+### BF-L0-A — application déclarative autorisée (8 novembre 2026)
+
+Fabrice autorise maintenant les six ajouts aux deux manifestes et la mise à jour
+du plan FR/EN, sans test, compilation, fournisseur ni service. Le cadrage et les
+empreintes antérieures restent historiques ; cet état les complète.
+
+**A-0 réalisé et A-1 appliqué dans leur portée statique.** Trois entrées ajoutées
+une fois par recette : `tests/fixture_area.py`,
+`tools/verification/cargo_space_guard.py`, `.cargo/storage-policy.json`.
+`.cargo/config.toml` et payment-document.json déjà déclarés restent inchangés.
+Relecture du diff et des objets JSON : seules les six entrées inputs sont ajoutées ;
+ordre relatif des anciens inputs, steps, environment, assertions et autres champs
+conservés. Cela constate une modification déclarative, pas sa prise en compte
+pendant une exécution. Aucun appel aux fonctions `snapshot`, `archive_inputs`,
+`run_recipe`, au collecteur ou à `verify`.
+
+| Étape | État réel après cette demande | Condition restante |
+| --- | --- | --- |
+| A-0 | Base b4e07cb26, sources relues, originaux et empreintes conservés avant écriture. | Toute modification ultérieure invalide la réutilisation sans rapprochement. |
+| A-1 | Six entrées appliquées ; revue statique du diff et syntaxe JSON seulement. | Aucun résultat runtime déduit ; pas de commit/push effectué. |
+| A-2 | Non exécutée. | Autorisation de contrôle de sélection/rétention puis archives effectivement lues et empreintes liées. |
+| A-3 | Non exécutée ; témoins/refus/reprise non vérifiés. | Autorisation de tests, montage valide décrit plus haut et support borné des variantes. |
+| A-4 | Non clôturée. | A-2/A-3 établis sur les mêmes entrées ; preuve complète et portée revue. |
+
+R03/R04 sont donc **partiellement appliqués, non qualifiés**, pour ces deux
+manifestes uniquement. Projection des réglages, configuration effective et graphe
+compilateur restent ouverts ; aucune extension aux dix-neuf autres recettes.
+R01/02 et R05–R13 gardent leurs états/prérequis précédents ; BF-L0, BF-L1 et BF-P3
+ne sont pas levés. La prochaine étape prévue est A-2, sous autorisation appropriée,
+puis A-3 ; aucun de ces contrôles n'est implicitement autorisé ici.
+
+Revue liée aux octets : aucun choix opérateur modifié, ni seuil/délai/retry nouveau.
+La politique est désormais déclarée comme input, ses octets et sa validation ne
+changent pas. Aucune fonction/docstring ou branche d'erreur créée/modifiée ; les
+refus du runner actuel sont des contrats lus, pas des résultats rejoués. Le runner,
+helper, wrapper, politiques et sources de test restent intacts. Édition atomique
+après sauvegarde et revalidation des originaux ; changements concurrents conservés.
+Documentation de cet incrément dans ce plan et son miroir EN ; aucune livraison
+produit, version_history ou contexte embarqué à reconstruire pour ces déclarations.
+Les empreintes ci-dessous distinguent l'entrée historique de la correction locale.
+
+| Manifeste / Manifest | SHA-256 avant / before | SHA-256 après / after |
+| --- | --- | --- |
+| `tools/verification/recipes/paea-native-git-reference-transaction.json` | `09a4a07914cc9c97eb77c766823c09778a4628a9b7d9e096d58512ddb1bbe43c` | `cda8d6c60e1624ab63b9ee40c1603c5a411d6695b408df5d3a99e0563abc6ee0` |
+| `tools/verification/recipes/paea-native-git-intent.json` | `e2d478da120bce223bead78109f427794ef957a05a58cb046c3bb30092e30fdf` | `455034b5bf48e98c4573e7673e89cfcaa1855cf37743b2ac146a56716fbb85b2` |
+
+
+### BF-L0-A — A-2 sélection et archivage vérifiés (8 novembre 2026)
+
+Autorisation Fabrice limitée à A-2 et au plan FR/EN, sans test, compilation,
+fournisseur ou service. **A-2 est établi pour les six occurrences : trois chemins
+dans chacune des deux recettes.** A-1 reste appliqué ; A-3 n'est pas exécuté et A-4
+n'est pas clôturé. Les états « A-2 non exécutée » des étapes précédentes sont
+conservés comme historique et remplacés par ce constat pour l'état courant.
+
+Méthode réellement exécutée : chargement du seul module `recipe.py` avec écriture
+de bytecode désactivée ; appels directs aux fonctions existantes `snapshot` puis
+`archive_inputs`, puis second `snapshot`. Aucun appel à `run_recipe`, `main`,
+`verify_evidence`, collecteur, helper de fixtures, wrapper Cargo ou commande d'une
+recette. Aucun import de test. Les manifestes ont les empreintes A-1 ; le runner
+relu et conservé a SHA-256
+`348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b`.
+
+Résultats observés séparément : chaque chemin ajouté est déclaré une seule fois,
+sélectionné et présent dans l'archive ; ses octets archivés égalent les octets lus
+et leur empreinte sélectionnée. Pour les inventaires complets : mêmes ensembles
+et empreintes avant/après, membres d'archive uniques et exactement correspondants,
+tous les membres relus et comparés. Recettes et runner inchangés pendant le contrôle.
+
+| Recette / Recipe | SHA-256 manifeste / manifest | Fichiers sélectionnés et archivés / selected and archived files | SHA-256 declared-inputs.tar.gz |
+| --- | --- | --- | --- |
+| `paea-native-git-reference-transaction` | `cda8d6c60e1624ab63b9ee40c1603c5a411d6695b408df5d3a99e0563abc6ee0` | 866 | `39fc0540b9e9a74252c1b0c359e7264447cfed65b2678059c309483b26c568ac` |
+| `paea-native-git-intent` | `455034b5bf48e98c4573e7673e89cfcaa1855cf37743b2ac146a56716fbb85b2` | 868 | `2e4ce84e8a82b9100d865f8a19cc3dbf86f78f448a7ea7574db4927481966697` |
+
+| Entrée présente dans chacune des deux archives / Entry in both archives | Octets / bytes | SHA-256 sélection = archive / selection = archive |
+| --- | --- | --- |
+| `tests/fixture_area.py` | 3873 | `4ece994bd492dc4e44adf24388ed50073ceeff7e74527cd106b31824c8ce566c` |
+| `tools/verification/cargo_space_guard.py` | 6545 | `09b7d45c78c64282dee6265be2d26cea6066505963465e2a50a856f1fe8d5916` |
+| `.cargo/storage-policy.json` | 63 | `5e392baf7d475a34bd1c4614636682cd4e01bd21b007a3d4845b1e822c7f26dd` |
+
+Les deux premières lignes comptent les inventaires déclaratifs complets, pas six
+fichiers distincts : les six occurrences correspondent à trois fichiers communs.
+Les autres entrées sélectionnées ne deviennent pas des dépendances effectivement
+compilées ou utilisées par la seule présence dans cet inventaire.
+
+Staging Unix local neuf, nécessaire au parcours `publish` qui utilise `os.link` :
+`.cache/bf-l0-a-a2-20261108T202944Z/`. Les originaux de recette/runner, invocation,
+état Git sale, inventaires avant/après, archives et résultats de contrôle sont
+conservés. Ce n'est pas un dossier de run complet du runner : résultat nommé
+`a2-summary.json`, sans PASS de recette ni appel `verify` inapproprié.
+
+Lexar a été constatée montée rw sur `/dev/sda1` (vfat), avec espace disponible pour
+ces preuves. Archive enveloppe préservant les métadonnées du staging :
+`/media/fpizzi/Lexar/swarm-evidence/bf-l0-a-a2-20261108T202944Z/a2-evidence.tar.gz`.
+Chaque fichier du staging a été comparé à la copie après fsync ; les deux archives
+intérieures et les six occurrences ont ensuite été relues depuis cette copie USB.
+SHA-256 enveloppe : `97568e109864434ea6d859922897f10cd4cb2d18a262b5fbec6e5879de010225`.
+Index local des chemins, empreintes et commande de restauration :
+`.cache/bf-l0-a-a2-20261108-index.json`. Le staging reste conservé.
+
+Limites : preuve locale de sélection/rétention d'octets, sur cette révision et cet
+état sale, pas authentification d'auteur, profil livré, environnement effectif ou
+graphe compilateur. L'archive interne `archive_inputs` ne prouve pas les permissions
+exécutables originales ; conserver cette limite pour une restauration de build.
+Réglage sauvegardé, résolution/fallback TMPDIR et validation sémantique de politique
+ne sont pas exercés. Les variantes absence/dérive/reprise A-3 restent non vérifiées ;
+une modification ultérieure des entrées impose un rapprochement avant réutilisation.
+
+Suite : A-3 après autorisation de tests et préparation de son témoin isolé valide,
+puis A-4 sur preuves applicables. R03/R04 restent partiels ; aucun élargissement aux
+autres recettes ni passage BF-L0/BF-L1/BF-P3 déduit. Codex conserve le suivi, Fabrice
+l'autorité restante. Aucun source/recette/réglage modifié pour ce contrôle ; seuls
+plan FR/EN et registre local évoluent. Changements concurrents conservés. Aucun
+nouveau choix opérateur, fonction/docstring ou branche d'erreur produit ; aucun
+service, livraison/version_history, contexte embarqué, commit ou push.
+
+### BF-L0-A — A-3 périmètre de support et exécution autorisés (8 novembre 2026)
+
+Fabrice autorise maintenant A-3 en fixtures isolées, sans compilation, fournisseur
+ou service ; puis commit/push du seul travail BF-L0-A. Replan avant extension du
+support : ajout borné de `tools/verification/bf_l0_a_inputs.py` et de la recette
+permanente `tools/verification/recipes/bf-l0-a-inputs.json`, avec ce plan FR/EN.
+Le runner partagé et ses tests existants ne seront pas modifiés.
+
+Les deux recettes natives restent des sources de déclarations, jamais des argv
+à lancer : leurs trois entrées ajoutées sont extraites, copiées dans des faux
+dépôts privés et exercées par deux sentinelles Python. Matrice prévue : deux
+recettes × trois entrées × deux défauts ; chaque groupe a témoin valide, défaut et
+reprise sur octets restaurés, soit 36 passages. Six absences doivent refuser avant
+étape ; six dérives après snapshot doivent arrêter avant la seconde sentinelle.
+Les 24 témoins/reprises doivent aboutir. Ces nombres dérivent de la matrice, pas
+d'un budget/timeout. Réglage synthétique valide, TMPDIR effectif observé ; aucun
+Root existant, wrapper, Git, Cargo, navigateur ou modèle invoqué.
+
+Décision de publication : branche dédiée sans ouverture de PR, puisque main
+protégée imposerait des CI avec compilation, exclues ici. Le commit exclura les
+modifications concurrentes des plans et du checkout, y compris les lots X voisins.
+A-4 reste distinct ; résultats A-3 à établir ci-dessous.
+
+### BF-L0-A — A-3 replan du témoin initial (8 novembre 2026)
+
+Premier essai conservé : `bf-l0-a-a3-run-20261108T204503Z`, échec du pilote sur
+`a3-unexpected-tmpdir`, avant toute injection. Les deux sentinelles du témoin
+avaient abouti ; son aire intermédiaire créée par mkdir(parents=True) était 0775,
+le runner a donc correctement retenu le fallback privé. Défaut de montage du banc,
+pas preuve de défaut produit. Cause/mode/environnement originaux conservés.
+Correction bornée : créer explicitement le seul `fixture-area` possédé en 0700
+avant le runner ; aucun chmod partagé, réglage produit ou fallback changé.
+Assertion TMPDIR conservée. Codex propriétaire ; nouvel essai dans une sortie
+neuve seulement après ce changement de précondition ; premier FAIL non effacé.
+
+### BF-L0-A — A-3 résultats établis et publication bornée (8 novembre 2026)
+
+**A-3 réalisé sur miniatures isolées, pas sur les argv natifs.** Recette permanente
+`tools/verification/recipes/bf-l0-a-inputs.json`, pilote versionné
+`tools/verification/bf_l0_a_inputs.py`. Le runner partagé est utilisé en copie
+octet-identique ; les deux manifestes A-1 fournissent uniquement les trois chemins
+déclarés. Les commandes Cargo d'origine ne sont jamais transmises au lanceur.
+Deux sentinelles Python et un contrôle d'injection déclaré sont les seules étapes.
+Aire de fixture privée explicite, réglage synthétique et TMPDIR effectivement
+observés ; aucune base/mission ni Root produit initialisé.
+
+| Matrice effectivement exercée | Groupes | Témoins valides | Défauts observés | Reprises réussies |
+| --- | --- | --- | --- | --- |
+| reference-transaction : trois entrées × absence/modification | 6 | 6 | 3 REFUSED + 3 FAIL attendus | 6 |
+| intent : trois entrées × absence/modification | 6 | 6 | 3 REFUSED + 3 FAIL attendus | 6 |
+| Total | 12 | 12 | 6 REFUSED + 6 FAIL | 12 |
+
+36 passages nommés, 24 PASS de miniature, six refus CLI code 2 avant sortie/étape
+avec cause `recipe-input-pattern-empty`, et six FAIL CLI code 1 avec cause
+`recipe-declared-inputs-changed`. Pour chaque dérive : une seule entrée diffère
+dans les inventaires avant/après ; première sentinelle observée, seconde absente.
+Pour chaque absence : delta de sentinelles nul. Les originaux sont rétablis puis
+la même recette miniature reprend dans une sortie neuve. Recette immuable par
+groupe, historique des sentinelles et preuve de défaut préservés. Le drapeau
+d'injection est lui-même déclaré/capturé ; aucune entrée réelle du checkout n'est
+retirée ni modifiée pour injecter. Aucune validation métier de la politique copiée.
+
+Les 30 dossiers internes complets ont été contrôlés par le vrai CLI `verify` :
+24 PASS et six FAIL intègres ; un FAIL ne devient pas PASS. Les six refus initiaux
+n'ont pas de dossier de run fabriqué ni de faux `verify`. L'enveloppe permanente
+aboutit à PASS et son `verify` à code 0. Le premier essai de montage reste FAIL
+intègre, confirmé par `verify` code 1 ; sa précondition corrigée 0775→0700 est
+décrite dans le replan précédent. Aucune relance inchangée ni résultat historique
+écrasé. Compteurs/causes/sorties/argv et octets des sources sont conservés.
+
+Preuve complète sur Lexar montée, 1022 fichiers relus après fsync dans une archive
+préservant les métadonnées Unix (y compris les deux essais et leurs fixtures) :
+`/media/fpizzi/Lexar/swarm-evidence/bf-l0-a-a3-20261108T204601Z/a3-evidence.tar.gz`.
+SHA-256 : `bb9aeb2f296c84a42e92a7f9caf7b5e13d9a91911137dda8b1bcb3ed66305ad2`.
+Index local, sources exactes et restauration : `.cache/bf-l0-a-a3-20261108-index.json`.
+Les deux essais et toutes les fixtures restent aussi locaux, à leurs emplacements
+indexés. Le relevé A-2 reste une preuve historique bornée ; les archives natives
+complètes ne sont pas prétendues requalifiées par ces miniatures.
+
+Revue de l'incrément : la matrice 2×3×2 et ses nombres sont des données de test ;
+0700 et la vérification des ancêtres sont les préconditions privées du témoin,
+pas une nouvelle politique opérateur. Aucun délai/retry/budget ajouté. Docstrings
+du pilote couvrent entrées, sorties, erreurs et effets possédés. Exceptions, sorties
+CLI, causes et intégrité sont vérifiées ; échecs conservés, arrêt des dépendances
+observé. Le défaut initial de montage est corrigé dans le seul support de fixture,
+sans modifier le runner ni assouplir le fallback. Apprentissage : créer les parents
+privés du témoin explicitement ; le mode demandé à la feuille de mkdir(parents=True)
+ne suffit pas à établir le mode des intermédiaires. Le code et le plan transmettent
+ce point aux reprises ; aucun contexte d'agent embarqué ou processus actif rechargé.
+
+A-1/A-2/A-3 établis dans leurs portées déclaratives/miniatures. **A-4 reste ouvert**
+pour revue de clôture du sous-lot sur preuves applicables ; BF-L0, R03/R04 complets
+et les scénarios 03-F/03-B ne sont pas acceptés. Aucun effet financier déduit.
+Aucune compilation, fournisseur, navigateur, service ni livraison produit/version
+lancée. Le commit/push demandé portera uniquement ce travail sur branche dédiée ;
+ni PR/CI compilante ni intégration main supplémentaires autorisées ici. Le checkout
+principal et son index seront préservés ; le commit sera construit avec index
+séparé, en excluant les changements concurrents et les lots X 15/16 voisins.

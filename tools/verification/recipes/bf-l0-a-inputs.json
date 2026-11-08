@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "bf-l0-a-inputs",
+  "inputs": [
+    "tools/verification/bf_l0_a_inputs.py",
+    "tools/verification/recipe.py",
+    "tests/fixture_area.py",
+    "tools/verification/cargo_space_guard.py",
+    ".cargo/storage-policy.json",
+    "tools/verification/recipes/paea-native-git-reference-transaction.json",
+    "tools/verification/recipes/paea-native-git-intent.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "isolated-declared-input-control-refusal-and-recovery",
+      "command": ["python3", "-B", "tools/verification/bf_l0_a_inputs.py"],
+      "expected_exit": 0,
+      "required_stdout": [
+        "A3_GROUPS_OK 12",
+        "A3_PHASES_OK 36",
+        "A3_CONTROLS_AND_RECOVERIES_OK 24",
+        "A3_MISSING_REFUSALS_OK 6",
+        "A3_DRIFT_FAILURES_OK 6",
+        "A3_FULL_RUN_EVIDENCE_VERIFIED 30",
+        "A3_SOURCE_UNCHANGED"
+      ],
+      "required_stderr": []
+    }
+  ]
+}
