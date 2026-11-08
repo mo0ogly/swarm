@@ -3,7 +3,7 @@ use super::HttpServiceError;
 use http::Request;
 
 /// Render the trusted body from prepare.html with native, locally embedded
-/// dependencies. Query values select only FR/EN and the two known themes. No
+/// dependencies, including the shared integrated workbench design. Query values select only FR/EN and the two known themes. No
 /// provider, filesystem routing or launch authority is introduced. A changed
 /// template boundary refuses instead of serving a partly wired legacy page.
 pub(super) fn page(request: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
@@ -29,7 +29,7 @@ pub(super) fn page(request: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceErr
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="/swarm-logo.png" type="image/png"><title>Préparer — Swarm</title>
 <link rel="stylesheet" href="/wattson_themes.css"><link rel="stylesheet" href="/prephase.css">
-<link rel="stylesheet" href="/swarm-design.css"><link rel="stylesheet" href="/preparation-work-model.css">
+<link rel="stylesheet" href="/swarm-design.css"><link rel="stylesheet" href="/preparation-work-model.css"><link rel="stylesheet" href="/swarm-workbench.css">
 <script src="/lib/dagre.min.js" defer></script><script src="/i18n-en.js" defer></script>
 <script src="/i18n.js" defer></script><script src="/swarm-shell.js" defer></script>
 <script type="module" src="/preparation-native.js"></script></head><body {body}"#).into_bytes())

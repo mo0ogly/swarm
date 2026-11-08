@@ -276,3 +276,10 @@ ni version active ne constitue une signature ou une autorisation.
 Le cockpit natif de lecture du24octobre et ses limites sont décrits dans
 [Rust — parcours UX](architecture/RUST-MIGRATION.md#cockpit-natif--parcours-ux-du24octobre2026)
 et [en anglais](en/RUST-MIGRATION.md#native-cockpit--ux-journey24october2026).
+
+## Intégration des maquettes du 8 novembre 2026
+
+Le [design intégré](WORKBENCH-DESIGN.md) et sa [version anglaise](en/WORKBENCH-DESIGN.md)
+décrivent les Couloirs sur données réelles, la composition de préparation, les
+réglages et la réorganisation Sécurité/Audit. Les maquettes de docs/design restent
+les références visuelles ; leurs valeurs et verdicts d’exemple ne sont pas livrés.

@@ -1,5 +1,7 @@
 /* Swarm visual system. See docs/UI-DESIGN.md. Loaded after feature styles. */
 :root {
+  --swarm-rail-text: #e5edf0;
+  --swarm-rail-selected: #0f3d61;
   color-scheme: dark;
   --swarm-marine: #062b49;
   --swarm-gold: #f8c650;

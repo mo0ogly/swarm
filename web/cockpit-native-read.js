@@ -133,6 +133,7 @@
     }
 
     renderConduite(mission, missionError);
+    globalThis.SwarmWorkbench?.render(data);
 
     // Reuse canonical graph helpers/CSS with actual stored dependencies only.
     // The caller supplies an explicit Work; failures stay visible, no empty pass.
