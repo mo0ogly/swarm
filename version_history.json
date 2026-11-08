@@ -7,6 +7,14 @@
     },
     "items": [
       {
+        "fr": "Lecture historique explicite des missions en pause : tous les champs enregistrés des tâches, tentatives et revues restent consultables sans exiger une qualification actuelle. Un bouton séparé demande le statut actuel et conserve son refus ; aucune relance ni acceptation ne découle de la lecture.",
+        "en": "Explicit recorded-history reads for paused missions: all saved task, attempt and review fields remain readable without requiring current qualification. A separate button requests current status and preserves its refusal; reading grants no restart or acceptance."
+      },
+      {
+        "fr": "Lecture des missions historiques : un ancien chemin de stockage reste utilisable lorsqu’il désigne le même état privé et le même dossier de mission, vérifiés par descripteurs ouverts. Historique conservé, sans relance ; les stockages différents restent refusés. Les verrous historiques Go et Rust existants sont respectés, sans création lors de la lecture.",
+        "en": "Historical mission reads: an old storage path remains usable when open descriptors verify the same private state and mission directory. History is preserved without restarting agents; different stores remain refused. Existing historical Go and Rust locks are honored, without creating locks during reads."
+      },
+      {
         "fr": "Agents : badges des états enregistrés avec le même code couleur que les tâches en clair et sombre. Une tentative terminée reste distincte de l’acceptation de sa tâche ; états inconnus neutres.",
         "en": "Agents: recorded-state badges use the same color scheme as tasks in light and dark themes. A completed attempt remains distinct from task acceptance; unknown states stay neutral."
       },

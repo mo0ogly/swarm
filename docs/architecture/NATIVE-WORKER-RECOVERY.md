@@ -342,3 +342,45 @@ refus d’attribution/copie avant départ, reprise, perte de Git après départ 
 annulation avec workspace manquant). Vérification locale sans installation,
 revue indépendante ou acceptation globale :
 [preuves1390](../plans/migration-rust/evidence/20261024-managed-manual1390/PLAN.md).
+
+
+## Alias historiques du stockage géré
+
+Une référence conservée peut garder un ancien chemin du Root, par exemple un lien
+de compatibilité vers le même projet. La lecture et le garde commun du stockage
+ouvrent séparément l’état privé `.swarm` puis `managed/<work>` : les identités
+dev/inode doivent correspondre aux répertoires canoniques déjà ouverts. Les
+descripteurs restent possédés pendant l’opération ; une égalité de chemin, de
+contenu de manifeste ou d’UID ne suffit pas. Les enfants sont ouverts sans suivre
+de symlink. Un autre datastore, un alias absent ou une forme de chemin invalide
+refuse ; les causes IO et de fermeture restent conservées.
+
+La référence, les manifestes, reçus, copies, événements, tentatives et compteurs ne
+sont pas réécrits. Le lien ne remplace aucun contrôle de manifeste, commit ou
+attribution du worker. Lire une mission ne la reprend pas et n’accepte rien.
+Une vraie copie/délocalisation ayant changé les identités physiques ne bénéficie
+pas de cette équivalence : restaurer la référence exacte ou préparer une migration
+explicite autorisée avec ses propres preuves. Pas de confinement contre un acteur
+hostile de même UID. Le cas de référence et les limites d’exécution sont dans
+[le suivi de lecture historique](../reports/historical-mission-read-20261108.md).
+
+Le verrou de stockage géré respecte les deux formats existants : `operation.lock`
+(producteur Go) et `.engine-settings.lock` (producteur Rust). Si les deux existent,
+ils restent détenus dans cet ordre pendant l’opération. Seul ENOENT typé permet
+de rechercher l’autre format ; contention, permissions, liens ou fermeture refusent.
+La lecture ne crée rien et refuse si aucun verrou n’existe. La préparation neuve
+conserve le format Rust. Cela ne couvre pas un ancien writer qui créerait un
+nouveau nom de verrou en concurrence après cette observation.
+
+Le cockpit distingue la lecture des enregistrements (`read=history`) de la
+qualification actuelle (`read=current`). Les missions dont le contrôle enregistré
+est en pause ouvrent l’historique par défaut ; le bouton près d’Actualiser permet
+de choisir explicitement l’autre vue. Ce choix est une présentation, aucune
+politique d’exécution. L’historique consomme les Work et panneaux publics protégés
+existants : chaque tâche est dépliable avec tous ses champs enregistrés, dont les
+tentatives et revues antérieures. Aucun calcul de fraîcheur ni d’activité n’est
+déduit : leurs compteurs restent inconnus. La qualification actuelle utilise
+toujours le lecteur strict et expose ses refus ; elle n’est pas remplacée par
+l’historique. Les erreurs de lecture Work/contrôles/panneaux restent bloquantes.
+Les journaux gardent leur parcours public séparé. Ce n’est pas une qualification
+actuelle des anciennes preuves Go ni une relance ou migration de données.

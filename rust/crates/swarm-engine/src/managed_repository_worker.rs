@@ -46,9 +46,7 @@ fn with_storage<T>(
         .ok_or(E::Refused("managed-repository-required"))?;
     let canonical =
         crate::canonical_project_root(root).map_err(|e| E::caused("managed-project-path", e))?;
-    if !swarm_identity_contract::name(work.id.as_bytes())
-        || Path::new(&repo.storage) != canonical.join(".swarm/managed").join(&work.id)
-    {
+    if !swarm_identity_contract::name(work.id.as_bytes()) {
         return Err(E::Refused("managed-storage-binding-mismatch"));
     }
     inside(
@@ -64,16 +62,16 @@ fn with_storage<T>(
                         parent
                             .child(&work.id, false)
                             .map_err(|e| E::caused("managed-work-directory", e))?,
-                        |dir| {
+                        |dir| super::with_storage_binding(state, dir, &work.id, &repo.storage, || {
                             let lock = dir
-                                .reserve(exclusive, false)
+                                .reserve_managed(exclusive, false)
                                 .map_err(|e| E::caused("managed-operation-busy", e))?;
                             let result = run(dir);
                             crate::agent_launch_error::finish(
                                 result,
                                 lock.close().map_err(|e| E::caused("managed-lock-close", e)),
                             )
-                        },
+                        }),
                     )
                 },
             )

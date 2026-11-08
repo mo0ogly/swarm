@@ -129,6 +129,60 @@ fn inside<T>(
             .map_err(|e| E::caused("managed-directory-close", e)),
     )
 }
+
+/// Bind a retained managed-storage locator to the already opened datastore and
+/// Work directory. Historical root aliases are accepted only when both private
+/// directories have the same device/inode as the canonical traversal; every
+/// descriptor stays owned through `run`, preventing inode reuse during the check.
+/// The stored layout must remain absolute `.swarm/managed/<work>`, with no parent
+/// traversal or symlink children below the state directory. Operation IO uses
+/// the caller's canonical directory, never an alias-derived replacement.
+/// No locator/manifest/history is rewritten and no execution or acceptance is
+/// granted. IO, identity and independent close failures propagate with causes;
+/// this is not confinement against another process with the same UID.
+fn with_storage_binding<T>(
+    state: &LocalDirectory,
+    directory: &LocalDirectory,
+    work: &str,
+    storage: &str,
+    run: impl FnOnce() -> Result<T, E>,
+) -> Result<T, E> {
+    let path = Path::new(storage);
+    let managed = path.parent().ok_or(E::Refused("managed-storage-binding-mismatch"))?;
+    let state_path = managed.parent().ok_or(E::Refused("managed-storage-binding-mismatch"))?;
+    if !path.is_absolute()
+        || path.components().any(|c| matches!(c, std::path::Component::ParentDir))
+        || path.file_name().and_then(|s| s.to_str()) != Some(work)
+        || managed.file_name().and_then(|s| s.to_str()) != Some("managed")
+        || state_path.file_name().and_then(|s| s.to_str()) != Some(".swarm")
+    {
+        return Err(E::Refused("managed-storage-binding-mismatch"));
+    }
+    inside(
+        LocalDirectory::open(state_path).map_err(|e| E::caused("managed-storage-alias-state", e))?,
+        |alias_state| {
+            let identity = |dir: &LocalDirectory| dir.owned_identity()
+                .map_err(|e| E::caused("managed-storage-alias-identity", e));
+            if identity(alias_state)? != identity(state)? {
+                return Err(E::Refused("managed-storage-binding-mismatch"));
+            }
+            inside(
+                alias_state.child("managed", false)
+                    .map_err(|e| E::caused("managed-storage-alias-parent", e))?,
+                |parent| inside(
+                    parent.child(work, false)
+                        .map_err(|e| E::caused("managed-storage-alias-work", e))?,
+                    |alias_directory| {
+                        if identity(alias_directory)? != identity(directory)? {
+                            return Err(E::Refused("managed-storage-binding-mismatch"));
+                        }
+                        run()
+                    },
+                ),
+            )
+        },
+    )
+}
 /// Decode retained manifest strictly; normalize only Go omitempty's empty list.
 /// Nil/[] included lists have identical Go wire/selection semantics. Original
 /// file bytes and nonempty ordering remain untouched; this is not adoption.
@@ -271,7 +325,7 @@ pub(crate) fn prepare(
                                     .map_err(|e| E::caused("managed-work-directory", e))?,
                                 |dir| {
                                     let lock = dir
-                                        .reserve(true, true)
+                                        .reserve_managed(true, true)
                                         .map_err(|e| E::caused("managed-operation-busy", e))?;
                                     let result = locked(dir, &top, &expected, settings);
                                     finish(
@@ -445,9 +499,6 @@ pub(crate) fn observe(
     }
     let root =
         crate::canonical_project_root(root).map_err(|e| E::caused("managed-project-path", e))?;
-    if Path::new(&repo.storage) != root.join(".swarm/managed").join(&work.id) {
-        return Err(E::Refused("managed-storage-binding-mismatch"));
-    }
     inside(
         LocalDirectory::open(&root.join(".swarm"))
             .map_err(|e| E::caused("managed-state-directory", e))?,
@@ -461,9 +512,9 @@ pub(crate) fn observe(
                         parent
                             .child(&work.id, false)
                             .map_err(|e| E::caused("managed-work-directory", e))?,
-                        |dir| {
+                        |dir| with_storage_binding(state, dir, &work.id, &repo.storage, || {
                             let lock = dir
-                                .reserve(false, false)
+                                .reserve_managed(false, false)
                                 .map_err(|e| E::caused("managed-operation-busy", e))?;
                             let result = (|| {
                                 let retained = read_manifest(dir, "repository.json")?
@@ -495,7 +546,7 @@ pub(crate) fn observe(
                                 result,
                                 lock.close().map_err(|e| E::caused("managed-lock-close", e)),
                             )
-                        },
+                        }),
                     )
                 },
             )
@@ -506,6 +557,64 @@ pub(crate) fn observe(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Real committed bootstrap is the valid control. Historical root aliases
+    /// keep their original manifest bytes; another datastore with the same Work
+    /// name, a missing alias and divergent originals refuse, then recover.
+    /// No agent, provider, database migration or live Root is involved.
+    #[test]
+    fn historical_root_alias_reads_without_rebinding_or_losing_refusals() {
+        use std::os::unix::fs::{symlink, DirBuilderExt};
+        let base=crate::fixture_root("managed-root-alias-");
+        println!("ALIAS_FIXTURE {}",base.display());
+        let root=base.join("canonical");
+        std::fs::DirBuilder::new().recursive(true).mode(0o700).create(root.join(".swarm")).unwrap();
+        let source=root.join("source");std::fs::create_dir(&source).unwrap();
+        let settings=EngineSettingsDocument::initial(crate::EngineSettingsValues::installation_defaults().unwrap(),"owned-fixture".into(),"2026-11-08T00:00:00Z".into()).unwrap();
+        git(&source,&["init","--quiet"],&settings).unwrap();
+        std::fs::write(source.join("tracked.txt"),b"valid committed control\n").unwrap();
+        git(&source,&["add","tracked.txt"],&settings).unwrap();
+        let checkout=Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
+        // The product Git helper deliberately disables global config. This
+        // fixture-only read uses the user's actual configured identity instead.
+        let configured=|key:&str| {let output=Command::new("git").arg("-C").arg(&checkout).args(["config","--get",key]).output().unwrap();assert!(output.status.success());text(output.stdout).unwrap()};
+        let name=configured("user.name");
+        let email=configured("user.email");
+        assert!(!name.is_empty()&&!email.is_empty());
+        git(&source,&["-c",&format!("user.name={name}"),"-c",&format!("user.email={email}"),"-c","core.hooksPath=/dev/null","-c","commit.gpgsign=false","commit","--quiet","-m","Owned alias observation fixture"],&settings).unwrap();
+        let id="w-alias-test";
+        let mut repo=prepare(&root,id,&ManagedRepositoryRequest{path:"source".into(),committed_only:true,..Default::default()},&settings).unwrap();
+        let mut work=crate::Work{id:id.into(),planning:Some(Box::new(crate::PlanningState{repository:Some(Box::new(repo.clone())),..Default::default()})),..Default::default()};
+        observe(&root,&work,&settings).unwrap();
+        let alias=base.join("historical");symlink(&root,&alias).unwrap();
+        repo.storage=alias.join(".swarm/managed").join(id).to_str().unwrap().into();
+        let storage=root.join(".swarm/managed").join(id);
+        let raw=crate::encode_model(&repo).unwrap();
+        for file in ["repository.json","repository.json.pending"] {std::fs::write(storage.join(file),&raw).unwrap();}
+        work.planning.as_mut().unwrap().repository=Some(Box::new(repo));
+        observe(&root,&work,&settings).unwrap();
+        assert_eq!(std::fs::read(storage.join("repository.json")).unwrap(),raw);
+        // The Go producer used operation.lock. Reading that historical layout
+        // must retain its lane without creating a competing Rust lock file.
+        std::fs::rename(storage.join(".engine-settings.lock"),storage.join("operation.lock")).unwrap();
+        observe(&root,&work,&settings).unwrap();
+        assert!(!storage.join(".engine-settings.lock").exists());
+        assert_eq!(std::fs::read(storage.join("repository.json")).unwrap(),raw);
+        let other=base.join("other");
+        std::fs::DirBuilder::new().recursive(true).mode(0o700).create(other.join(".swarm/managed").join(id)).unwrap();
+        for file in ["repository.json","repository.json.pending"] {std::fs::write(other.join(".swarm/managed").join(id).join(file),&raw).unwrap();}
+        std::fs::remove_file(&alias).unwrap();symlink(&other,&alias).unwrap();
+        assert_eq!(observe(&root,&work,&settings).unwrap_err().code(),"managed-storage-binding-mismatch");
+        std::fs::remove_file(&alias).unwrap();symlink(&root,&alias).unwrap();
+        observe(&root,&work,&settings).unwrap();
+        std::fs::remove_file(&alias).unwrap();assert!(observe(&root,&work,&settings).is_err());
+        symlink(&root,&alias).unwrap();observe(&root,&work,&settings).unwrap();
+        std::fs::write(storage.join("repository.json.pending"),b"{}").unwrap();
+        assert_eq!(observe(&root,&work,&settings).unwrap_err().code(),"managed-manifest-divergence");
+        std::fs::write(storage.join("repository.json.pending"),&raw).unwrap();
+        observe(&root,&work,&settings).unwrap();
+        assert_eq!(std::fs::read(storage.join("repository.json")).unwrap(),raw);
+    }
 
     /// Actual wire decoding treats omitted/empty included lists identically,
     /// retaining original files and nonempty list order. No repository grant.

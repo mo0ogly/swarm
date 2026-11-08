@@ -7006,5 +7006,10 @@ globalThis.SwarmEnglish = {
   "Politiques d’intégrité et de confidentialité, rôles, identités et clés de preuve.": "Integrity and confidentiality policies, roles, identities and evidence keys.",
   "Retracer une action de confiance et vérifier ses preuves.": "Trace a trusted action and verify its evidence.",
   "0 = hérité du niveau englobant": "0 = inherited from the enclosing scope",
-  "Graphe": "Graph"
+  "Graphe": "Graph",
+  "Historique enregistré : tâches, tentatives et revues. La validité actuelle des preuves n’est pas évaluée ; aucune relance ne découle de cette lecture.": "Recorded history: tasks, attempts and reviews. Current evidence validity is not evaluated; this read does not restart anything.",
+  "Lecture de l’historique enregistré. Les compteurs de validation actuelle et d’activité restent inconnus.": "Reading recorded history. Current validation and activity counts remain unknown.",
+  "Vérifier le statut actuel": "Check current status",
+  "Lire l’historique enregistré": "Read recorded history",
+  "Historique reçu — qualification actuelle non évaluée.": "History received \u2014 current qualification not evaluated."
 };

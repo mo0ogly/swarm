@@ -31,7 +31,7 @@
    return;
   }
   for(const section of document.querySelectorAll('.view'))section.hidden=section.id!==name;for(const button of document.querySelectorAll('#tabs [data-view]')){if(button.dataset.view===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')}
-  $('assistant').hidden=true;globalThis.SwarmShell?.navigate(name);const u=new URL(location.href);u.searchParams.set('view',name);history.replaceState(null,'',u);if(focus)$('main-content').focus();if(name==='manage')renderManager();if(name==='resume')resumePanel?.refresh();if(name==='logs')logsPanel?.refresh();if(name!=='logs'&&current?.statusObserved===false)select(selected);
+  $('assistant').hidden=true;globalThis.SwarmShell?.navigate(name);const u=new URL(location.href);u.searchParams.set('view',name);history.replaceState(null,'',u);if(focus)$('main-content').focus();if(name==='manage')renderManager();if(name==='resume')resumePanel?.refresh();if(name==='logs')logsPanel?.refresh();if(name!=='logs'&&current?.readMode!=='history'&&current?.statusObserved===false)select(selected);
  }
  /** Filter the original mission manager with actual Work rows. No lifecycle
   * state is inferred from this list, so only the all-missions filter is enabled. */
@@ -51,15 +51,21 @@
   $('title').textContent=work.title;$('objective').textContent=work.objective;$('connection').textContent=tr('Lecture de la mission…');$('main-content').setAttribute('aria-busy','true');
   // Clear the previous mission before starting a potentially failing read.
   SwarmRustCockpitRead.render({work,mission:null,missionError:'web-native-read-pending',control:null});
-  let control=null,mission=null,error=null,panelsObserved=false;const statusObserved=$('logs').hidden;
+  let control=null,mission=null,error=null,panelsObserved=false,readMode='current';let statusObserved=false;
   try{control=await read('/api/v1/mission?'+new URLSearchParams({work:id}));if(!control||!Number.isSafeInteger(control.revision)||typeof control.archived!=='boolean')throw failure('web-native-control-invalid')}catch(cause){error=cause.code||'web-native-control-invalid'}
   if(ticket!==generation)return;
+  // A saved history read consumes public records, not execution qualification.
+  // Paused missions default to that view; an explicit URL/button chooses either.
+  readMode=new URL(location.href).searchParams.get('read')||(control?.paused===true?'history':'current');
+  if(!['history','current'].includes(readMode))readMode='current';
+  const switcher=$('mission-read-mode');switcher.textContent=tr(readMode==='history'?'Vérifier le statut actuel':'Lire l’historique enregistré');
+  statusObserved=readMode==='current'&&$('logs').hidden;
   if(statusObserved){
   try{const value=await read('/api/v1/mission?'+new URLSearchParams({work:id,action:'status'}));if(!value||!Object.hasOwn(value,'tasks')||typeof value.summary!=='string'||typeof value.next!=='string'||!(value.tasks===null||Array.isArray(value.tasks)&&value.tasks.every(t=>t&&typeof t.id==='string')))throw failure('web-native-status-invalid');mission=value}catch(cause){error=cause.code||'web-native-status-invalid'}
-  }else error='web-native-status-not-observed';
+  }else if(readMode!=='history')error='web-native-status-not-observed';
   if(ticket!==generation)return;
   try{const observation=await read('/api/v1/cockpit-read?'+new URLSearchParams({work:id}));if(ticket!==generation)return;if(observation?.work_id!==id)throw failure('web-native-observation-invalid');SwarmRustCockpitPanels.render(observation);panelsObserved=true}catch(cause){if(ticket!==generation)return;error=cause.code||'web-native-observation-invalid';SwarmRustCockpitPanels.clear(tr('Lecture impossible. Actualisez pour reprendre.')+' ('+error+')')}
-  current={work,mission,missionError:error,control,panelsObserved,statusObserved};SwarmNativeInstructions.render(instructions,work,rejectInstruction,true);SwarmRustCockpitRead.render(current);$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr(error?'Lecture partielle — actualisez pour reprendre.':'Lecture reçue — actualisation manuelle.');
+  current={work,mission,missionError:error,control,panelsObserved,statusObserved,readMode};SwarmNativeInstructions.render(instructions,work,rejectInstruction,true);SwarmRustCockpitRead.render(current);$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr(error?'Lecture partielle — actualisez pour reprendre.':readMode==='history'?'Historique reçu — qualification actuelle non évaluée.':'Lecture reçue — actualisation manuelle.');
  }
  /** Reject only the explicitly selected, observed instruction revision. CSRF
   * is freshly read; the server owns authorization/CAS/active-task checks. Lost
@@ -119,6 +125,8 @@
   SwarmRustDependencyGraph.setRefreshHandler(async(id,revision)=>{if(selected!==id)return;const observed=await load();if(selected===id&&(!observed||!current||!Number.isSafeInteger(current.work.revision)||current.work.revision<revision))throw failure('web-native-graph-refresh-unconfirmed')});
   $('tabs').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view,true)});$('work').addEventListener('change',()=>select($('work').value));$('refresh').addEventListener('click',load);
   $('theme').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat';document.documentElement.dataset.theme=theme;$('theme').textContent=tr(theme==='etat'?'Passer au thème sombre':'Passer au thème clair');link.href=url('/native-runtime.html?view=admin');limits.href=url('/native-runtime.html?view=admin#native-run-limits')});
+  const readModeButton=document.createElement('button');readModeButton.type='button';readModeButton.id='mission-read-mode';readModeButton.textContent=tr('Lire l’historique enregistré');$('refresh').after(readModeButton);
+  readModeButton.addEventListener('click',()=>{const u=new URL(location.href);u.searchParams.set('read',current?.readMode==='history'?'current':'history');history.replaceState(null,'',u);select(selected)});
   globalThis.SwarmWorkbench?.mount();
   instructions=document.createElement('div');instructions.id='native-instruction-history';$('conduite-plan').after(instructions);
   resumePanel=SwarmNativeResume.mount();

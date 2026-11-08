@@ -325,3 +325,40 @@ covering normal/subproject paths, prelaunch attribution/copy refusal and recover
 Git loss after launch, and cancellation with an unavailable workspace. Local
 verification grants no installation, independent approval or global acceptance:
 [evidence1390](../plans/migration-rust/evidence/20261024-managed-manual1390/PLAN.md).
+
+
+## Historical managed-storage aliases
+
+A retained reference can keep an old Root path, such as a compatibility link to
+the same project. Reading and the shared storage guard separately open the private
+`.swarm` state and `managed/<work>` directories. Their device/inode identities
+must match the already opened canonical directories; descriptors stay owned
+throughout the operation. Equal paths, manifest contents or UIDs alone do not
+suffice. Child symlinks are not followed. Another datastore, missing alias or
+invalid path shape refuses; IO and independent close causes remain preserved.
+
+References, manifests, receipts, copies, events, attempts and counters are never
+rewritten. Alias equivalence replaces no manifest, commit or worker-attribution
+check. A mission read neither resumes it nor accepts anything. A real copy/move
+that changes physical identities does not qualify: restore the exact reference
+or prepare an explicitly authorized migration with its own evidence. This is not
+confinement against a hostile same-UID process. See the
+[historical-read report (FR)](../reports/historical-mission-read-20261108.md).
+
+Managed storage locking honors both existing formats: `operation.lock` (Go
+producer) and `.engine-settings.lock` (Rust producer). Both are held in that order
+when present. Only typed ENOENT permits checking the other format; contention,
+permissions, links and close errors refuse. Reads create nothing and refuse when
+neither lock exists. Fresh preparation retains the Rust format. This does not
+cover an older writer concurrently creating a new lock name after observation.
+
+The cockpit separates recorded reads (`read=history`) from current qualification
+(`read=current`). Missions whose saved control is paused open history by default;
+the button beside Refresh explicitly selects the other view. This is presentation,
+not execution policy. History consumes the existing protected public Work and
+panel readers. Each task expands to every saved field, including attempts and
+previous reviews. No freshness or activity is inferred; their counts remain
+unknown. Current qualification still uses the strict reader and exposes refusals;
+history never substitutes for it. Work/control/panel read failures remain blocking.
+Logs retain their separate public path. This neither qualifies historical Go
+evidence nor restarts agents or migrates data.
