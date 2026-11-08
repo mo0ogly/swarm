@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Swarm — Administration, proposition</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#93d4df}a:hover{color:#f6f3e9}
+input,select,textarea{font:inherit;font-size:16px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid #f8c650;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: {{t.backdrop}}; color: {{t.text}}; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.6; padding: 40px 16px; box-sizing: border-box; display: flex; justify-content: center; align-items: flex-start">
+
+  <section role="dialog" aria-modal="true" aria-labelledby="adm-title" style="width: 100%; max-width: 1080px; background: {{t.bg}}; border: 1px solid {{t.border}}; border-radius: 8px; box-shadow: 0 24px 64px rgba(0,0,0,0.35); display: flex; flex-direction: column; overflow: hidden">
+
+    <header style="display: flex; align-items: center; gap: 14px; padding: 20px 24px; border-bottom: 1px solid {{t.border}}">
+      <img src="/_blob/b63acc488f16dc465ba8dada6b032c6c" alt="" style="width: 44px; height: 44px; object-fit: contain">
+      <div style="flex: 1 1 auto; min-width: 0">
+        <h2 id="adm-title" style="margin: 0; font-family: Georgia, serif; font-size: 28px; font-weight: 400; color: {{t.title}}; line-height: 1.2">Limites d’exécution</h2>
+        <div style="font-size: 13px; color: {{t.muted}}">S’appliquent aux prochains départs d’agents. Aucune tentative en cours n’est modifiée.</div>
+      </div>
+      <button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Tarifs des modèles</button>
+      <button type="button" aria-label="Fermer" style="width: 44px; height: 44px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </header>
+
+    <nav aria-label="Portée et héritage" style="padding: 18px 24px; border-bottom: 1px solid {{t.border}}; background: {{t.surface}}">
+      <div style="font-size: 13px; color: {{t.muted}}; margin-bottom: 10px">Portée — chaque niveau hérite du précédent</div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+        <sc-for list="{{scopes}}" as="s" hint-placeholder-count="4">
+          <button type="button" onClick="{{s.pick}}" aria-pressed="{{s.active}}" style="{{s.style}}">
+            <span style="font-family: ui-monospace, monospace; font-size: 12px; opacity: 0.85">{{s.num}}</span>
+            <span>{{s.label}}</span>
+            <span style="font-family: ui-monospace, monospace; font-size: 12px; opacity: 0.85">{{s.detail}}</span>
+          </button>
+          <sc-if value="{{s.arrow}}" hint-placeholder-val="{{ true }}">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.link}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h12M13 7l5 5-5 5"></path></svg>
+          </sc-if>
+        </sc-for>
+      </div>
+    </nav>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 0">
+
+      <div style="flex: 999 1 560px; min-width: 0; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+
+        <fieldset style="border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px">
+          <legend style="font-weight: 600; color: {{t.title}}; margin-bottom: 10px">Mode d’exécution</legend>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px">
+            <sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+              <label style="{{m.style}}">
+                <input type="radio" name="mode" checked="{{m.checked}}" onChange="{{m.pick}}" style="width: 20px; height: 20px; margin: 2px 0 0; accent-color: {{t.accent}}">
+                <span style="display: flex; flex-direction: column; gap: 2px">
+                  <strong style="color: {{t.title}}">{{m.label}}</strong>
+                  <span style="font-size: 13px; color: {{t.muted}}">{{m.hint}}</span>
+                </span>
+              </label>
+            </sc-for>
+          </div>
+        </fieldset>
+
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <div style="font-weight: 600; color: {{t.title}}">Plafonds et seuils</div>
+          <div style="font-size: 13px; color: {{t.muted}}">Valeur effective affichée pour chaque limite, avec son origine. Définir une valeur ici remplace l’héritage pour cette portée seulement.</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; border: 1px solid {{t.border}}; border-radius: 8px; overflow: hidden; background: {{t.surface}}">
+          <sc-for list="{{fields}}" as="f" hint-placeholder-count="5">
+            <div style="{{f.rowStyle}}">
+              <div style="flex: 1 1 240px; min-width: 0">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+                  <span style="font-weight: 600">{{f.label}}</span>
+                  <sc-if value="{{f.changed}}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: {{t.accentSoft}}; color: {{t.accentInk}}">modifié</span>
+                  </sc-if>
+                </div>
+                <div style="font-size: 13px; color: {{t.muted}}">{{f.originText}}</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+                <sc-if value="{{f.local}}" hint-placeholder-val="{{ false }}">
+                  <label style="display: flex; align-items: center; gap: 8px">
+                    <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">{{f.label}}</span>
+                    <input type="number" min="1" value="{{f.value}}" onChange="{{f.set}}" style="min-height: 44px; width: 110px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.accent}}; background: {{t.input}}; color: {{t.text}}; font-family: ui-monospace, monospace">
+                    <span style="font-size: 13px; color: {{t.muted}}">{{f.unit}}</span>
+                  </label>
+                </sc-if>
+                <sc-if value="{{f.inherits}}" hint-placeholder-val="{{ true }}">
+                  <span style="font-family: ui-monospace, monospace; font-size: 15px; color: {{t.muted}}; min-width: 110px">{{f.inherited}} {{f.unit}}</span>
+                </sc-if>
+                <button type="button" onClick="{{f.toggle}}" style="min-height: 44px; min-width: 120px; padding: 0 14px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">{{f.toggleLabel}}</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <label style="display: flex; flex-direction: column; gap: 6px">
+          <span style="font-weight: 600; color: {{t.title}}">Motif <span style="font-weight: 400; color: {{t.muted}}">— obligatoire, conservé dans l’historique</span></span>
+          <textarea rows="2" placeholder="Pourquoi ce changement ?" style="padding: 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; resize: vertical"></textarea>
+        </label>
+      </div>
+
+      <aside aria-label="Historique et contrôle" style="flex: 1 1 300px; min-width: 0; padding: 24px; box-sizing: border-box; border-left: 1px solid {{t.border}}; background: {{t.surface}}; display: flex; flex-direction: column; gap: 22px">
+        <div>
+          <div style="font-weight: 600; color: {{t.title}}; margin-bottom: 12px">Historique de la portée</div>
+          <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0">
+            <sc-for list="{{history}}" as="h" hint-placeholder-count="3">
+              <li style="display: flex; gap: 12px">
+                <div style="display: flex; flex-direction: column; align-items: center">
+                  <span style="{{h.dot}}"></span>
+                  <span style="flex: 1 1 auto; width: 2px; background: {{t.border}}"></span>
+                </div>
+                <div style="padding-bottom: 16px; min-width: 0">
+                  <div style="display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap">
+                    <span style="font-family: ui-monospace, monospace; color: {{t.link}}">{{h.rev}}</span>
+                    <span style="font-size: 12px; color: {{t.muted}}">[auteur] · [date]</span>
+                  </div>
+                  <div style="font-family: ui-monospace, monospace; font-size: 12px">{{h.diff}}</div>
+                  <div style="font-size: 13px; color: {{t.muted}}">[motif]</div>
+                  <sc-if value="{{h.restorable}}" hint-placeholder-val="{{ true }}">
+                    <button type="button" style="margin-top: 6px; min-height: 36px; padding: 0 12px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}; font-size: 13px">Restaurer cette révision</button>
+                  </sc-if>
+                  <sc-if value="{{h.current}}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top: 4px; font-size: 12px; font-weight: 600; color: {{t.accent}}">● Révision active</div>
+                  </sc-if>
+                </div>
+              </li>
+            </sc-for>
+          </ol>
+        </div>
+        <details style="border-top: 1px solid {{t.border}}; padding-top: 14px">
+          <summary style="min-height: 32px; font-weight: 600; color: {{t.title}}">Tester l’effectif d’un départ</summary>
+          <p style="margin: 8px 0; font-size: 13px; color: {{t.muted}}">Résout projet → mission → rôle → tâche pour un départ précis, sans rien lancer.</p>
+          <label style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px">Rôle ou tâche<input placeholder="worker ou plan-…-T4" style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></label>
+          <button type="button" style="min-height: 44px; padding: 0 16px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Calculer l’effectif</button>
+        </details>
+      </aside>
+    </div>
+
+    <footer style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px; border-top: 1px solid {{t.border}}; background: {{t.bg}}">
+      <div role="status" style="font-size: 14px">
+        <strong style="color: {{t.title}}">{{summary}}</strong>
+        <span style="color: {{t.muted}}"> · révision attendue r3 · valeurs d’exemple</span>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <button type="button" onClick="{{reset}}" style="min-height: 44px; padding: 0 18px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Annuler les modifications</button>
+        <button type="button" disabled="{{saveDisabled}}" style="min-height: 44px; padding: 0 22px; border-radius: 5px; border: 0; background: {{saveBg}}; color: {{saveInk}}; font-weight: 600">{{saveLabel}}</button>
+      </div>
+    </footer>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["sombre","clair"],"default":"sombre"},"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = this.initial();
+  }
+  initial() {
+    return {
+      scope: 'mission',
+      mode: 'caps',
+      local: { silence_seconds: null, tool_seconds: null, max_tool_calls: 400, max_repeated_calls: null, max_consecutive_errors: null }
+    };
+  }
+  renderVals() {
+    var themes = {
+      sombre: { backdrop: '#04121c', bg: '#081b29', surface: '#102b3b', input: '#0b2232', text: '#e5edf0', title: '#f6f3e9', link: '#93d4df', muted: '#a9bcc4', border: '#2a5163', accent: '#f8c650', accentSoft: '#f8c650', accentInk: '#062b49', rowChanged: '#1a3646', primaryBg: '#f8c650', primaryInk: '#062b49', disabledBg: '#25404f', disabledInk: '#a9bcc4', chipBg: '#0b2232' },
+      clair: { backdrop: '#d9d5c8', bg: '#f5f3ec', surface: '#fffefa', input: '#ffffff', text: '#243d4a', title: '#062b49', link: '#205e70', muted: '#52656f', border: '#cfcabb', accent: '#926300', accentSoft: '#f6e3b0', accentInk: '#4a3200', rowChanged: '#fbf3dc', primaryBg: '#062b49', primaryInk: '#ffffff', disabledBg: '#e4e1d6', disabledInk: '#52656f', chipBg: '#f5f3ec' }
+    };
+    var t = themes[this.props.theme] || themes.sombre;
+    var st = this.state;
+    var base = this.initial();
+    var self = this;
+
+    var defs = [
+      { key: 'silence_seconds', label: 'Seuil d’observation du silence', unit: 's', inherited: 600, source: 'projet' },
+      { key: 'tool_seconds', label: 'Seuil d’observation d’un outil', unit: 's', inherited: 900, source: 'projet' },
+      { key: 'max_tool_calls', label: 'Appels d’outil maximum', unit: 'appels', inherited: 250, source: 'projet' },
+      { key: 'max_repeated_calls', label: 'Répétitions identiques tolérées', unit: 'appels', inherited: 3, source: 'projet' },
+      { key: 'max_consecutive_errors', label: 'Erreurs consécutives tolérées', unit: 'erreurs', inherited: 4, source: 'projet' }
+    ];
+    var changes = 0;
+    if (st.mode !== base.mode) changes++;
+    var fields = defs.map(function (d) {
+      var v = st.local[d.key];
+      var changed = v !== base.local[d.key];
+      if (changed) changes++;
+      var local = v !== null;
+      return {
+        label: d.label, unit: d.unit, inherited: d.inherited,
+        local: local, inherits: !local, value: local ? v : d.inherited, changed: changed,
+        originText: local ? ('Défini pour cette mission · hérité serait ' + d.inherited + ' ' + d.unit + ' (' + d.source + ')') : ('Hérité du ' + d.source),
+        toggleLabel: local ? 'Hériter' : 'Définir ici',
+        rowStyle: 'display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-top: 1px solid ' + t.border + '; background: ' + (changed ? t.rowChanged : 'transparent'),
+        toggle: function () { var l = Object.assign({}, self.state.local); l[d.key] = local ? null : d.inherited; self.setState({ local: l }); },
+        set: function (e) { var n = parseInt(e.target.value, 10); var l = Object.assign({}, self.state.local); l[d.key] = isNaN(n) ? d.inherited : n; self.setState({ local: l }); }
+      };
+    });
+
+    var scopeDefs = [
+      { id: 'project', num: '1', label: 'Projet', detail: '' },
+      { id: 'mission', num: '2', label: 'Mission', detail: 'w-[id]' },
+      { id: 'role', num: '3', label: 'Rôle', detail: '—' },
+      { id: 'task', num: '4', label: 'Tâche', detail: '—' }
+    ];
+    var scopes = scopeDefs.map(function (s, i) {
+      var active = s.id === st.scope;
+      return {
+        num: s.num, label: s.label, detail: s.detail, active: active ? 'true' : 'false', arrow: i < scopeDefs.length - 1,
+        style: 'min-height: 44px; padding: 0 14px; border-radius: 5px; display: flex; align-items: center; gap: 8px; border: 1px solid ' + (active ? t.accent : t.border) + '; background: ' + (active ? t.primaryBg : t.chipBg) + '; color: ' + (active ? t.primaryInk : t.text) + '; font-weight: ' + (active ? '600' : '400'),
+        pick: function () { self.setState({ scope: s.id }); }
+      };
+    });
+
+    var modeDefs = [
+      { id: 'caps', label: 'Plafonds actifs', hint: 'Un agent qui dépasse une limite est arrêté et l’incident remonte au superviseur.' },
+      { id: 'observe', label: 'Observation', hint: 'Tout reste mesuré, sans arrêt sur plafond. Dépendances, validations et arrêts manuels restent actifs.' }
+    ];
+    var modes = modeDefs.map(function (m) {
+      var on = m.id === st.mode;
+      return {
+        label: m.label, hint: m.hint, checked: on,
+        style: 'display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 8px; cursor: pointer; border: ' + (on ? '2px solid ' + t.accent : '1px solid ' + t.border) + '; background: ' + t.surface,
+        pick: function () { self.setState({ mode: m.id }); }
+      };
+    });
+
+    var has = changes > 0;
+    return {
+      t: t, fields: fields, scopes: scopes, modes: modes,
+      history: [
+        { rev: 'r3', diff: 'max_tool_calls 250 → 400', current: true, restorable: false, dot: 'width: 12px; height: 12px; border-radius: 50%; background: ' + t.accent + '; margin-top: 6px' },
+        { rev: 'r2', diff: 'observation → plafonds actifs', current: false, restorable: true, dot: 'width: 12px; height: 12px; border-radius: 50%; border: 2px solid ' + t.link + '; box-sizing: border-box; margin-top: 6px' },
+        { rev: 'r1', diff: 'création de la portée', current: false, restorable: true, dot: 'width: 12px; height: 12px; border-radius: 50%; border: 2px solid ' + t.link + '; box-sizing: border-box; margin-top: 6px' }
+      ],
+      summary: has ? (changes + (changes > 1 ? ' modifications non enregistrées' : ' modification non enregistrée')) : 'Aucune modification',
+      saveDisabled: !has,
+      saveLabel: has ? ('Enregistrer ' + changes + (changes > 1 ? ' changements' : ' changement')) : 'Enregistrer',
+      saveBg: has ? t.primaryBg : t.disabledBg,
+      saveInk: has ? t.primaryInk : t.disabledInk,
+      reset: function () { self.setState(self.initial()); }
+    };
+  }
+}
+</script>
+</body>
+</html>
