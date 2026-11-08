@@ -34,7 +34,9 @@
   }
 
   /**
-   * Build one task row (5 columns, plain text).
+   * Build one task row (5 columns, text-only content and shared status badge).
+   * The badge reflects the recorded task status, never inferred validation or
+   * projection authority. DOM/translation errors propagate without an empty pass.
    * @param {{id:string,title:string,status?:string,owner?:string,depends?:Array}} task
    * @param {object|null} proj matching projection (id,state,label,reason,attempt)
    * @returns {HTMLTableRowElement}
@@ -48,9 +50,10 @@
       Array.isArray(task.depends) ? task.depends.join(', ') : t('Aucune dépendance enregistrée'),
       t('Commandes non raccordées')
     ];
-    for (const c of cells) {
+    for (const [index,c] of cells.entries()) {
       const td = document.createElement('td');
-      td.textContent = c; // plain text, no HTML interpolation
+      if(index===1)td.appendChild(globalThis.SwarmWorkbench.statusBadge(task.status));
+      else td.textContent = c; // plain text, no HTML interpolation
       tr.appendChild(td);
     }
     return tr;

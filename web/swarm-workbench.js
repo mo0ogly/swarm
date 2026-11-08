@@ -8,17 +8,31 @@
  function el(tag,text,cls){const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(cls)node.className=cls;return node}
  /** Choose a visual signal for an exact recorded state, without deriving rights
   * or inferring execution from a title/reason. Unknown states remain neutral. */
- function signal(state){if(['validated','accepted','done','completed'].includes(state))return 'success';if(['blocked','failed','error','rejected'].includes(state))return 'alert';if(['review','in_review','awaiting_review'].includes(state))return 'warn';if(['running','active','in_progress'].includes(state))return 'info';return 'neutral'}
+ function signal(state){if(['validated','accepted','done','completed'].includes(state))return 'success';if(['blocked','failed','error','rejected'].includes(state))return 'alert';if(['review','in_review','awaiting_review','submitted','stale','waived'].includes(state))return 'warn';if(['running','active','in_progress'].includes(state))return 'info';return 'neutral'}
  /** Translate exact recorded state codes when a detailed status label is absent.
   * Input is an engine string, output a local UI label; unknown values keep the
   * existing engine translator. No state, validation or permission is inferred. */
- function stateLabel(value){const known={accepted:'Acceptée',blocked:'Bloquée',todo:'À faire'};return Object.hasOwn(known,value)?t(known[value]):engine(value)}
+ function stateLabel(value){const known={accepted:'Acceptée',blocked:'Bloquée',todo:'À faire',running:'En cours',submitted:'À vérifier',stale:'À vérifier',waived:'Dérogation',abandoned:'Abandonnée',failed:'Échec'};return Object.hasOwn(known,value)?t(known[value]):engine(value)}
+ /** Build a detached text-only status badge for an exact recorded state and
+  * optional display label. Tone depends only on state; unknown states stay
+  * neutral and missing labels explicit. No DOM insertion, writes or authority;
+  * DOM/translation errors propagate to the rendering caller. */
+ function statusBadge(state,label=state){const badge=el('span',label?stateLabel(label):t('État non disponible.'),'workbench-badge '+signal(state));badge.dataset.taskState=state??'';return badge}
+ /** Build a detached badge from an exact recorded agent state. Unlike task
+  * acceptance, completed means only that the attempt ended. Unconfirmed and
+  * interrupted observations warn; unknown codes remain neutral literal text.
+  * No liveness probe, task validation, network or write; DOM errors propagate. */
+ function agentStatusBadge(state){
+  const names={queued:'En attente',starting:'Démarrage',running:'En cours',stopping:'Arrêt demandé',completed:'Terminé',failed:'Échec',interrupted:'Interrompu','queued/unconfirmed':'En attente — processus non confirmé','starting/unconfirmed':'Démarrage — processus non confirmé','running/unconfirmed':'En cours — processus non confirmé','unknown/other-host':'Inconnu — autre poste','unknown/supervisor-lost':'Inconnu — superviseur perdu'};
+  const tone=state==='completed'?'success':state==='failed'?'alert':['queued','starting','running'].includes(state)?'info':['stopping','interrupted','queued/unconfirmed','starting/unconfirmed','running/unconfirmed','unknown/other-host','unknown/supervisor-lost'].includes(state)?'warn':'neutral';
+  const badge=el('span',Object.hasOwn(names,state)?t(names[state]):state?engine(state):t('État non disponible.'),'workbench-badge '+tone);badge.dataset.agentState=state??'';return badge;
+ }
  /** Select an in-memory presentation. Storage contains only the enum, never Work
   * data; refused storage reports loss of persistence and does not block reading. */
  function choose(next,persist=true){view=next;const graph=document.getElementById('graph');if(graph)graph.hidden=view!=='graph';lanes.hidden=view!=='lanes';for(const [key,button]of Object.entries(buttons))button.setAttribute('aria-pressed',String(key===view));if(persist)try{localStorage.setItem(preference,view)}catch{feedback.textContent=t('Préférence d’affichage non mémorisée sur cet appareil.')}if(view==='graph')graph?.graphRestoreView?.()}
  /** Render the selected recorded task; dependencies come from Work, observations
   * from its matching projection. No task mutation, acceptance or agent launch. */
- function inspect(){detail.replaceChildren();const task=model?.work.tasks.find(task=>task.id===selected);if(!task){detail.append(el('h3',t('Choisissez une tâche')),el('p',t('Sélectionnez une fiche pour consulter son état et ses dépendances.')));return}const projection=model.projections.get(task.id),heading=el('h3',task.title||task.id);heading.tabIndex=-1;detail.append(el('p',task.id,'eyebrow'),heading);const state=projection?.label||projection?.state||task.status;detail.append(el('span',state?stateLabel(state):t('État non disponible.'),'workbench-badge '+signal(projection?.state||task.status)));
+ function inspect(){detail.replaceChildren();const task=model?.work.tasks.find(task=>task.id===selected);if(!task){detail.append(el('h3',t('Choisissez une tâche')),el('p',t('Sélectionnez une fiche pour consulter son état et ses dépendances.')));return}const projection=model.projections.get(task.id),heading=el('h3',task.title||task.id);heading.tabIndex=-1;detail.append(el('p',task.id,'eyebrow'),heading);const state=projection?.label||projection?.state||task.status;detail.append(statusBadge(projection?.state||task.status,state));
   const facts=el('dl',undefined,'native-facts');for(const [label,value]of [[t('Rôle'),task.plan_role||task.owner||t('Non attribué')],[t('Dépend de'),task.depends?.join(', ')||t('Aucune dépendance enregistrée')],[t('Débloque'),model.work.tasks.filter(item=>item.depends?.includes(task.id)).map(item=>item.id).join(', ')||'—']])facts.append(el('dt',label),el('dd',value));detail.append(facts);if(projection?.reason)detail.append(el('p',engine(projection.reason),'notice warn'));if(task.deliverable)detail.append(el('p',task.deliverable));const graph=el('button',t('Voir dans le graphe'));graph.type='button';graph.addEventListener('click',()=>{choose('graph');const target=[...document.querySelectorAll('#graph [data-task]')].find(node=>node.dataset.task===task.id);target?.scrollIntoView({block:'nearest',inline:'center'});target?.querySelector('.graph-task-open')?.focus()});detail.append(graph);
  }
  /** Rebuild role × recorded-state lanes from the current model. Search and role
@@ -27,7 +41,7 @@
   if(!shown.length){grid.append(el('p',t(all.length?'Aucune tâche ne correspond à votre recherche.':'Aucune tâche enregistrée.')));inspect();return}
   const stateOf=task=>{const p=model.projections.get(task.id);return p?.state||task.status||''};const states=[...new Set(shown.map(stateOf))],roles=[...new Set(shown.map(task=>task.plan_role||task.owner||''))];
   const table=el('table',undefined,'workbench-table'),caption=el('caption',t('Rôles et états enregistrés'));table.append(caption);const head=el('thead'),row=el('tr');row.append(el('th',t('Rôle')));for(const state of states){const sample=shown.find(task=>stateOf(task)===state),label=model.projections.get(sample?.id)?.label||state;const th=el('th',label?stateLabel(label):t('État non disponible.'));th.scope='col';row.append(th)}head.append(row);table.append(head);const body=el('tbody');
-  for(const lane of roles){const tr=el('tr'),label=el('th',lane||t('Non attribué'));label.scope='row';tr.append(label);for(const state of states){const cell=el('td');for(const task of shown.filter(task=>(task.plan_role||task.owner||'')===lane&&stateOf(task)===state)){const p=model.projections.get(task.id),button=el('button',undefined,'workbench-task');button.type='button';button.dataset.laneTask=task.id;button.setAttribute('aria-pressed',String(task.id===selected));button.append(el('span',task.id,'eyebrow'),el('strong',task.title||task.id),el('span',stateLabel(p?.label||state||t('État non disponible.')),'workbench-badge '+signal(state)));button.addEventListener('click',()=>{selected=task.id;for(const peer of grid.querySelectorAll('[data-lane-task]'))peer.setAttribute('aria-pressed',String(peer.dataset.laneTask===selected));inspect()});cell.append(button)}tr.append(cell)}body.append(tr)}table.append(body);grid.append(table);inspect();
+  for(const lane of roles){const tr=el('tr'),label=el('th',lane||t('Non attribué'));label.scope='row';tr.append(label);for(const state of states){const cell=el('td');for(const task of shown.filter(task=>(task.plan_role||task.owner||'')===lane&&stateOf(task)===state)){const p=model.projections.get(task.id),button=el('button',undefined,'workbench-task');button.type='button';button.dataset.laneTask=task.id;button.setAttribute('aria-pressed',String(task.id===selected));button.append(el('span',task.id,'eyebrow'),el('strong',task.title||task.id),statusBadge(state,p?.label||state));button.addEventListener('click',()=>{selected=task.id;for(const peer of grid.querySelectorAll('[data-lane-task]'))peer.setAttribute('aria-pressed',String(peer.dataset.laneTask===selected));inspect()});cell.append(button)}tr.append(cell)}body.append(tr)}table.append(body);grid.append(table);inspect();
  }
  /** Mount once into the canonical cockpit. A missing host is a harmless non-
   * cockpit page. The component owns only its controls, lanes and inspector. */
@@ -41,5 +55,5 @@
  /** Clear the old mission immediately, including inspector and filters. Called
   * before new reads; never exposes previous-Work data while loading fails. */
  function clear(message){if(!mounted)return;model=null;selected='';workId='';query='';role='';search.value='';roleSelect.replaceChildren(new Option(t('Tous les rôles'),''));lanes.querySelector('.workbench-matrix').replaceChildren(el('p',message));detail.replaceChildren();delete lanes.dataset.work}
- globalThis.SwarmWorkbench=Object.freeze({mount,render,clear});
+ globalThis.SwarmWorkbench=Object.freeze({mount,render,clear,statusBadge,agentStatusBadge});
 })();

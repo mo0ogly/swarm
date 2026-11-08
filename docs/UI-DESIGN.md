@@ -283,9 +283,45 @@ Le cockpit natif de lecture du24octobre et ses limites sont décrits dans
 [Rust — parcours UX](architecture/RUST-MIGRATION.md#cockpit-natif--parcours-ux-du24octobre2026)
 et [en anglais](en/RUST-MIGRATION.md#native-cockpit--ux-journey24october2026).
 
+
+### Badges des indicateurs
+
+Les valeurs KPI portent un badge compact coloré, sans colorer toute la carte :
+information en bleu/cyan (`info`), validation en vert (`success`), décision ou
+examen en ambre (`attention`), alerte en rouge (`alert`). Les badges sans tonalité
+restent neutres. Utiliser les paires fond/encre sémantiques existantes dans les
+thèmes clair et sombre, pour les métriques d’en-tête et les KPI de mission.
+Conserver les libellés et les valeurs exacts, y compris « — » quand aucune donnée
+n’est disponible ; la couleur ne constitue ni un état moteur ni une validation.
+
+Vérification visuelle : ouvrir le cockpit, comparer les quatre badges aux libellés,
+basculer clair/sombre et FR/EN, vérifier contraste et absence de débordement.
+Sans mission, conserver les tirets ; sur une mission existante, conserver les
+valeurs du producteur. La coloration ne nécessite aucun lancement de tâche.
+
 ## Intégration des maquettes du 8 novembre 2026
 
 Le [design intégré](WORKBENCH-DESIGN.md) et sa [version anglaise](en/WORKBENCH-DESIGN.md)
 décrivent les Couloirs sur données réelles, la composition de préparation, les
 réglages et la réorganisation Sécurité/Audit. Les maquettes de docs/design restent
 les références visuelles ; leurs valeurs et verdicts d’exemple ne sont pas livrés.
+
+
+Les statuts de tâches du tableau natif, des couloirs et de leur inspecteur utilisent
+le même producteur de badge (`SwarmWorkbench.statusBadge`) : vert accepté, bleu
+en cours, rouge bloqué/échec, ambre soumis/à revalider/dérogation, gris à faire ou
+code inconnu. Ces familles de couleur sont stables dans les deux thèmes, avec
+leurs paires fond/encre adaptées au contraste. La tonalité dépend du code reçu,
+pas du libellé ; un état inconnu reste visible et neutre, jamais accepté par sa
+présentation. Texte uniquement, aucun HTML de statut interprété. Régression
+`task-status-badges.json` (double DOM) puis parcours réel FR/EN clair/sombre.
+
+
+Les agents utilisent les mêmes familles de badge, avec leur vocabulaire distinct :
+bleu queued/starting/running, vert completed, rouge failed, ambre stopping,
+interrupted et observations explicitement non confirmées ; inconnu neutre.
+Le producteur SwarmWorkbench.agentStatusBadge ne transforme jamais completed en
+acceptation de tâche. Garder « État enregistré », les identifiants et les avis
+d’autonomie existants. Paires de couleurs adaptées aux deux thèmes ; textes FR/EN.
+Recette agent-status-badges.json, puis fixture navigateur dédiée pour toutes les
+variantes sans lancer d’agent ; vérifier séparément la page installée.

@@ -61,3 +61,34 @@ test selects the engine snapshot when present, rather than the UI parent alone.
 Run `go test ./internal/engine -run TestGraphDeliveryD03QualificationManifest -count=1 -timeout=0`
 to check the selected snapshot. Regeneration records current inputs, including
 existing unrelated edits; it never renews historical acceptance.
+
+
+KPI values use compact colored badges rather than full colored cards: blue/cyan
+for information, green for validation, amber for decisions or review, and red
+for alerts. Untoned values stay neutral. Header metrics and mission KPIs reuse
+the existing semantic background/foreground pairs in both themes. Labels and
+exact values remain visible, including “—” for unavailable data; color grants
+no engine status or acceptance.
+
+Visual verification: open the cockpit, compare the four badges with their labels,
+switch both themes and FR/EN, and check contrast and overflow. Keep dashes without
+a selected mission and preserve producer values on an existing mission. No task
+launch is needed to verify this presentation.
+
+
+Native task-table, lane and inspector status badges share
+`SwarmWorkbench.statusBadge`: green accepted, blue running, red blocked/failed,
+amber submitted/stale/waived, gray todo or unknown. Color families remain the
+same in both themes, with contrast-adjusted semantic background/foreground pairs.
+Tone depends on the received code, never its display label. Unknown states remain
+visible and neutral; status text is never parsed as HTML. Verify the
+`task-status-badges.json` DOM-double regression and real FR/EN light/dark flows.
+
+
+Agent badges use the same color families with a separate state vocabulary: blue
+queued/starting/running, green completed, red failed, amber stopping/interrupted
+and explicitly unconfirmed observations; unknown codes stay neutral.
+SwarmWorkbench.agentStatusBadge never turns agent completion into task acceptance.
+Keep “Recorded state”, identifiers and existing autonomy observations. Reuse both
+theme palettes and FR/EN labels. Run agent-status-badges.json, then the dedicated
+browser fixture without launching agents; check the installed page separately.

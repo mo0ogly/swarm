@@ -7,6 +7,14 @@
     },
     "items": [
       {
+        "fr": "Agents : badges des états enregistrés avec le même code couleur que les tâches en clair et sombre. Une tentative terminée reste distincte de l’acceptation de sa tâche ; états inconnus neutres.",
+        "en": "Agents: recorded-state badges use the same color scheme as tasks in light and dark themes. A completed attempt remains distinct from task acceptance; unknown states stay neutral."
+      },
+      {
+        "fr": "Tâches : badges de statut communs au tableau, aux couloirs et à l’inspecteur, avec les mêmes familles de couleur en clair et sombre. Codes inconnus neutres et libellés conservés comme texte.",
+        "en": "Tasks: shared status badges for the table, lanes and inspector, using the same color families in light and dark themes. Unknown codes stay neutral and labels remain plain text."
+      },
+      {
         "fr": "Navigation du cockpit : langue et thème conservés vers Sécurité, Audit, preuves et PAEA ; le lien des limites d’exécution conserve son ancre vers les vrais réglages. Aucune politique ni permission n’est modifiée. Le lien des limites ne passe plus par la garde des anciennes destinations ; le thème courant est relu au clic. Les écrans Sécurité/Audit appliquent le thème transmis et leurs liens relisent le thème au clic.",
         "en": "Cockpit navigation: language and theme are preserved for Security, Audit, evidence and PAEA; the execution-limits link retains its fragment to the real settings. No policy or permission changes. The limits link no longer goes through the legacy destination guard; navigation rereads the current theme on click. Security/Audit screens apply the incoming theme and their links reread it on click."
       },
@@ -17,6 +25,10 @@
       {
         "fr": "Design des maquettes intégré au cockpit Rust : sélecteur Graphe/Couloirs et inspection des tâches sur données enregistrées, préparation en deux panneaux, dialogues de réglages harmonisés, accès Sécurité et Audit regroupés avec les contrôles Trust existants. Aucune valeur d’exemple ni permission n’est reprise des maquettes ; les valeurs et aperçus restent soumis aux opérations du moteur.",
         "en": "Mockup design integrated into the Rust cockpit: Graph/Lanes switch and recorded task inspection, two-panel preparation, consistent settings dialogs, and grouped Security/Audit access retaining existing Trust controls. No sample value or permission is copied from the mockups; values and previews remain governed by engine operations."
+      },
+      {
+        "fr": "Indicateurs : valeurs affichées dans des badges colorés selon leur tonalité, avec les paires de couleurs partagées des thèmes clair et sombre ; libellés et valeurs conservés.",
+        "en": "Metrics: values displayed in badges colored by their tone, using the shared light and dark theme color pairs; labels and values preserved."
       },
       {
         "fr": "Dialogue Version : Échap ferme uniquement le dialogue modal et rend le focus au bouton Version resté visible. Le menu de navigation conserve sa propre action Échap une fois le dialogue fermé.",
