@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../preview.css">
+<title>Swarm — Administration des limites d’exécution</title>
+<script src="../preview.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#93d4df}a:hover{color:#f6f3e9}
+input,select,textarea{font:inherit;font-size:16px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid #f8c650;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.6; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav aria-label="Navigation principale" style="flex: 1 1 260px; max-width: 300px; min-width: 240px; background: #062b49; color: #e5edf0; padding: 24px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <img src="../swarm-logo.png" alt="" style="width: 44px; height: 44px; object-fit: contain">
+      <span style="font-family: Georgia, serif; font-size: 22px; color: #f6f3e9">Swarm</span>
+    </div>
+    <div style="border: 1px solid #24485c; border-radius: 6px; padding: 10px 12px; background: #0a3555">
+      <div style="font-size: 12px; color: #a9c3cf">Mission sélectionnée</div>
+      <div style="font-family: Georgia, serif; font-size: 17px; color: #f6f3e9">[Titre de la mission]</div>
+      <div style="font-family: ui-monospace, monospace; font-size: 12px; color: #93d4df">w-[identifiant]</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <details style="padding: 6px 0"><summary style="color: #e5edf0; min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">01</span> Missions</summary></details>
+      <details style="padding: 6px 0"><summary style="color: #e5edf0; min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">02</span> Préparation</summary></details>
+      <details style="padding: 6px 0"><summary style="color: #e5edf0; min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">03</span> Conduite</summary></details>
+      <details style="padding: 6px 0"><summary style="color: #e5edf0; min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">04</span> Suivi</summary></details>
+      <details open style="padding: 6px 0"><summary style="color: #f8c650; min-height: 32px"><span style="font-family: ui-monospace, monospace">05</span> Configuration</summary>
+        <div style="display: flex; flex-direction: column; gap: 2px; padding: 6px 0 0 26px">
+          <a href="#" style="color: #e5edf0; text-decoration: none; padding: 8px 0">Programmes</a>
+          <a href="#" style="color: #e5edf0; text-decoration: none; padding: 8px 0">IA et connexions</a>
+          <a href="#" aria-current="page" style="color: #f8c650; text-decoration: none; padding: 8px 10px; border-radius: 5px; background: #0f3d61; font-weight: 600">Administration</a>
+        </div>
+      </details>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px clamp(16px, 4vw, 56px); box-sizing: border-box">
+    <div style="max-width: 1040px; display: flex; flex-direction: column; gap: 24px">
+
+      <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+        <div style="display: flex; align-items: center; gap: 14px">
+          <img src="../swarm-logo.png" alt="" style="width: 44px; height: 44px; object-fit: contain">
+          <div>
+            <div style="font-family: ui-monospace, monospace; font-size: 13px; color: {{t.link}}">05 · Configuration</div>
+            <h1 style="margin: 0; font-family: Georgia, serif; font-size: 36px; font-weight: 400; color: {{t.title}}; line-height: 1.2">Administration</h1>
+          </div>
+        </div>
+        <button type="button" style="min-height: 44px; padding: 0 18px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}">Tarifs des modèles</button>
+      </header>
+
+      <p style="margin: 0; max-width: 72ch; line-height: 1.7">Limites d’exécution des agents par portée : projet, mission, rôle ou tâche. Une valeur à 0 est héritée du niveau englobant. Un changement n’affecte que les prochains départs, jamais une tentative déjà lancée.</p>
+
+      <form aria-label="Choisir la portée" style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 8px; padding: 20px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end">
+        <label style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 160px">Portée
+          <select style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}">
+            <option>Projet</option><option selected>Mission</option><option>Rôle</option><option>Tâche</option>
+          </select>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 200px">Identifiant de mission
+          <input value="w-[identifiant]" style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; font-family: ui-monospace, monospace">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 220px">Clé de portée — rôle ou tâche
+          <input disabled placeholder="worker ou plan-…-T4" style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px dashed {{t.border}}; background: transparent; color: {{t.muted}}">
+        </label>
+        <button type="submit" style="min-height: 44px; padding: 0 20px; border-radius: 5px; border: 0; background: {{t.primaryBg}}; color: {{t.primaryInk}}; font-weight: 600">Charger cette portée</button>
+      </form>
+
+      <section aria-labelledby="current-title" style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 8px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
+          <h2 id="current-title" style="margin: 0; font-family: Georgia, serif; font-size: 24px; font-weight: 400; color: {{t.title}}">Mission <span style="font-family: ui-monospace, monospace; font-size: 16px; color: {{t.link}}">w-[identifiant]</span></h2>
+          <span style="font-family: ui-monospace, monospace; font-size: 13px; color: {{t.muted}}">révision 3 · valeurs d’exemple</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 18px">
+          <label style="display: flex; flex-direction: column; gap: 6px; grid-column: 1 / -1">Mode d’exécution
+            <select style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; max-width: 440px">
+              <option selected>Plafonds actifs</option><option>Observation — sans plafonds d’exécution</option>
+            </select>
+            <span style="font-size: 13px; color: {{t.muted}}">En observation, appels, erreurs et durées restent mesurés, sans arrêt sur leurs plafonds. Dépendances, validations et arrêts manuels restent applicables.</span>
+          </label>
+          <sc-for list="{{fields}}" as="f" hint-placeholder-count="5">
+            <label style="display: flex; flex-direction: column; gap: 6px">{{f.label}}
+              <div style="display: flex; align-items: center; gap: 8px">
+                <input type="number" min="0" value="{{f.value}}" style="min-height: 44px; width: 140px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; font-family: ui-monospace, monospace">
+                <span style="font-size: 13px; color: {{t.muted}}">{{f.unit}}</span>
+              </div>
+              <span style="font-size: 13px; color: {{t.muted}}">{{f.hint}}</span>
+            </label>
+          </sc-for>
+        </div>
+
+        <label style="display: flex; flex-direction: column; gap: 6px">Motif du changement
+          <textarea rows="2" style="padding: 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; resize: vertical">[Motif obligatoire, conservé dans l’historique]</textarea>
+        </label>
+
+        <sc-if value="{{previewed}}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="border: 1px solid {{t.infoBorder}}; background: {{t.infoBg}}; border-radius: 6px; padding: 14px 16px">
+            <strong style="color: {{t.title}}">Aperçu — 2 changements</strong>
+            <div style="font-family: ui-monospace, monospace; font-size: 13px; margin-top: 6px">max_tool_calls : 0 (hérité) → 400<br>max_consecutive_errors : 0 (hérité) → 5</div>
+            <div style="font-size: 13px; margin-top: 6px">S’appliquera aux prochains départs ; révision attendue : 3.</div>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 12px">
+          <button type="button" onClick="{{preview}}" style="min-height: 44px; padding: 0 20px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Prévisualiser</button>
+          <button type="button" disabled="{{saveDisabled}}" style="min-height: 44px; padding: 0 20px; border-radius: 5px; border: 0; background: {{saveBg}}; color: {{saveInk}}; font-weight: 600">Enregistrer</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="history-title" style="display: flex; flex-direction: column; gap: 12px">
+        <h2 id="history-title" style="margin: 0; font-family: Georgia, serif; font-size: 22px; font-weight: 400; color: {{t.title}}">Historique de cette portée</h2>
+        <div style="overflow-x: auto; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}">
+          <div role="table" style="display: table; width: 100%; min-width: 720px; border-collapse: collapse; font-size: 14px">
+            <div role="rowgroup" style="display: table-header-group">
+              <div role="row" style="display: table-row; text-align: left; color: {{t.muted}}">
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Révision</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Valeurs</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Motif</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Auteur</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Date</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Action</div>
+              </div>
+            </div>
+            <div role="rowgroup" style="display: table-row-group">
+              <sc-for list="{{history}}" as="h" hint-placeholder-count="3">
+                <div role="row" style="display: table-row; border-top: 1px solid {{t.border}}">
+                  <div role="cell" style="display: table-cell; padding: 12px 16px; font-family: ui-monospace, monospace; color: {{t.link}}">{{h.rev}}</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px; font-family: ui-monospace, monospace; font-size: 13px">{{h.values}}</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px">{{h.reason}}</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px">[auteur]</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px; font-family: ui-monospace, monospace; font-size: 13px">[date]</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px">
+                    <sc-if value="{{h.current}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: {{t.accent}}; font-weight: 600">● Active</span></sc-if>
+                    <sc-if value="{{h.restorable}}" hint-placeholder-val="{{ true }}"><button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Restaurer</button></sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <details style="border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 14px 18px">
+        <summary style="min-height: 32px; color: {{t.title}}; font-weight: 600">Voir l’effectif d’un futur départ</summary>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 12px">
+          <label style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 160px">Mission<input placeholder="w-…" style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 140px">Rôle<input placeholder="worker" style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 160px">Tâche<input placeholder="plan-…-T4" style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></label>
+          <button type="button" style="min-height: 44px; padding: 0 18px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Voir l’effectif</button>
+        </div>
+      </details>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["sombre","clair"],"default":"sombre"},"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { previewed: false };
+  }
+  renderVals() {
+    var themes = {
+      sombre: { bg: '#081b29', surface: '#102b3b', input: '#0b2232', text: '#e5edf0', title: '#f6f3e9', link: '#93d4df', muted: '#a9bcc4', border: '#2a5163', primaryBg: '#f8c650', primaryInk: '#062b49', accent: '#f8c650', infoBg: '#0f3446', infoBorder: '#93d4df', disabledBg: '#25404f', disabledInk: '#a9bcc4' },
+      clair: { bg: '#f5f3ec', surface: '#fffefa', input: '#ffffff', text: '#243d4a', title: '#062b49', link: '#205e70', muted: '#52656f', border: '#cfcabb', primaryBg: '#062b49', primaryInk: '#ffffff', accent: '#926300', infoBg: '#e8f2f4', infoBorder: '#205e70', disabledBg: '#e4e1d6', disabledInk: '#52656f' }
+    };
+    var t = themes[this.props.theme] || themes.sombre;
+    var on = this.state.previewed;
+    return {
+      t: t,
+      previewed: on,
+      saveDisabled: !on,
+      saveBg: on ? t.primaryBg : t.disabledBg,
+      saveInk: on ? t.primaryInk : t.disabledInk,
+      preview: () => this.setState({ previewed: true }),
+      fields: [
+        { label: 'Seuil d’observation du silence', value: 0, unit: 'secondes', hint: '0 = hérité du projet' },
+        { label: 'Seuil d’observation d’un outil', value: 0, unit: 'secondes', hint: '0 = hérité du projet' },
+        { label: 'Nombre maximal d’appels d’outil', value: 400, unit: 'appels', hint: 'Valeur d’exemple' },
+        { label: 'Répétitions identiques tolérées', value: 0, unit: 'appels', hint: '0 = hérité du projet' },
+        { label: 'Erreurs consécutives tolérées', value: 5, unit: 'erreurs', hint: 'Valeur d’exemple' }
+      ],
+      history: [
+        { rev: 'r3', values: 'tous hérités (0)', reason: '[motif]', current: true, restorable: false },
+        { rev: 'r2', values: 'max_tool_calls 250', reason: '[motif]', current: false, restorable: true },
+        { rev: 'r1', values: 'observation_mode 1', reason: '[motif]', current: false, restorable: true }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
