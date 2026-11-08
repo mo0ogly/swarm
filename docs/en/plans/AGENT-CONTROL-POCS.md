@@ -1,5 +1,24 @@
 # Swarm — agent-control PoCs retained for later execution
 
+Real-model qualification requested on 8 November 2026:
+[actual Codex under unchanged native profile](../../plans/actions-confiance/REAL-MODEL-TOOL-QUALIFICATION.md#english-handoff).
+**Not qualified**: four failures retained; actual CLI reaches a Tokio UnixStream
+refusal before any model/tool execution. An unchanged target is not a PASS.
+Alternative tool-enabled GLM harness awaits explicit authorization.
+
+Native qualification authorized on 8 November 2026:
+[actual worker and Python child tool](../../plans/actions-confiance/NATIVE-AGENT-TOOL-QUALIFICATION.md#english-handoff).
+Healthy control, kernel refusal before out-of-workspace write, then identical
+tool/source/target under a new public same-task intention: PASS, 13 assertions.
+Deterministic provider, no real model; actual file effect, no Trust business
+mandate or global conformance. Initial harness failure retained.
+
+Qualification authorized on 8 November 2026:
+[installed Trust CLI path](../../plans/actions-confiance/TRUST-ACTION-PATH-QUALIFICATION.md#english-handoff)
+PASS on a synthetic ledger: three R1 variants, twelve controls, 118 calls and
+67 assertions; recipe integrity verified. Target substitution and lost-response
+recovery covered only within this scope; no universal native-tool mediation.
+
 Additional study, 8 November 2026:
 [TechOnlineNews article and action-path qualification](../../plans/actions-confiance/TECHONLINENEWS-CONTROLE-ACTIONS-ETUDE.md#english-handoff).
 Static comparison with R1, Trust, Biba and POC-06; TN-01–05 remain proposed/not
@@ -1474,3 +1493,561 @@ Static qualification hashes, not compiler inventory or execution proof:
 | `tools/verification/recipes/paea-native-git-intent.json` | `e2d478da120bce223bead78109f427794ef957a05a58cb046c3bb30092e30fdf` |
 | `docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b/result.json` | `bc58ae6b3492da38697f45d438f116f79c545ad8f0236ad4c5de9ddbea779218` |
 | `docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-current-pub-regen-20261031/result.json` | `f79644bc4a6fcb3f0d1b508d8e9a9dd293a12f6ecaafa879a46b5144b4bec020` |
+
+
+## BF-P2 — bounded blocker-removal plan, 8 November 2026
+
+**Current request: planning only.** No development, test, compilation, provider
+call, payment, fixture creation or service started. Codex sole owner, no delegation.
+BF-L0–L5 below are **PROPOSED / NOT IMPLEMENTED**, not execution authority or an
+engine-adopted/validated plan. Documentary BF-P2 remains complete; BF-P3 requires
+future gates and authorization.
+
+Read HEAD `9d64cb33d09a0285abae8975aa6fcdd2268e8e4d`, with concurrent native-review work present. All 22 targeted
+BF-P2 source/evidence hashes still match. Reuses their bounded static observations,
+not qualification of modified shared modules, compiler graph or current binary.
+Other work preserved; replan/spec-builder and verified-claims rule applied.
+
+### Bounded objective and profile
+
+Future deliverable: isolated attribution/recovery harness reusing public PAEA
+operations, fresh controls, A/B observations, causal ref→receipt interruption,
+closed A1 emission paths and faithful evidence inventory. Harness readiness is
+not success of 03-F/B; distinguish harness defects from product defects.
+
+Explicit reference fixture profile remains require_separation=false, exact
+agreement/current controls preserved. Full separation profile still refused by
+current consumer and outside this lot; separately address admission if required.
+No live policy lowering, new business endpoint, receipt signature, generic retry,
+compensation/finance integration or general OS confinement. Declare harness threat
+model: supervised A/B writers, identified native tools and all inventoried fixture
+mutation paths. Malicious outside writer remains a limitation, not covered actor.
+
+### Proposed lots and observable future gates
+
+All checks mentioned require **later execution authority**. File areas are proposed
+ownership boundaries; new helpers/manifests remain to name, none created here.
+
+| Lot | Dependency / proposed scope | Deliverable and future gate | Failure and resumption |
+| --- | --- | --- | --- |
+| BF-L0 inputs/profile | Future authority; current consumers/recipes, BF-C01–08 and BF-P2-R1. Inspect effective external paths/validation before change. | Parameter/env → actual consumed file → validation → consumer map. Promotion/dependent recipes declare the actual result.json. Pin required sources/helpers/declarations/tools; no run before R1 resolved. | Missing/ambiguous input stops before run, no historical-fixture fallback. Codex verification; corrected attributed inputs required. |
+| BF-L1 new birth/distinct identities | L0; promotion harness, native first-publication producers, authority fixture. | Fresh native project/service/repository/journals/accounts per control/variant, birth/current physical binding, O≠N and supported candidate import. Distinct observed A/B identities/exact separate decisions. Both controls succeed without writable reuse of old root. | If native birth/qualification cannot work without provider or original modification, isolate prerequisite. No copied inode-bound root, fabricated PASS or positive SQL acceptance. Codex fixtures; resume only with genuine birth/qualified fixture. |
+| BF-L2 oracle/reception | L1; harness outside agent and existing native observations. | Append-only harness history binds instance/action/attempt/observed identity/emission/transition/receipt/error/completion. Causal local barriers, separate request/COMMIT/publication/journal/read counters. Oracle truth and originals actually delivered to decider are separate projections with distinct receipt. | Mixed identities, capture gaps, hidden-proof leak or agent-writable oracle refuse coverage; unknown attribution/absence and zero mutating recovery. Codex observation; discriminating corrected control required. |
+| BF-L3 ref→receipt cut | L2 and profile design settled before edits; actual private commit/record path and Git primitive. | Causal point after observed ref publication before receipt write. No-fault control then cut leaves N, durable intent and no fabricated success receipt; exercise same reconciliation consumer. Retain prepare ACK/refusal and whether already callback reached with OLD=O≠N. | Unreached barrier or harness-forged effect state is not PASS. No expansion into signature/retry. Codex engine/harness; correct barrier and retain exact profile first. |
+| BF-L4 scoped fencing | L2; L3 phases for in-flight emission, real Child ownership/errors. | Harness supervisor closes new A1 dispatch, tracks delivered operations, retains owners to resolution, final observation barrier; late A1 send refused without effect. Unresolved Child/lost ownership forbids declaring A1 finished. | Cancellation/signal/timeout/PID/absent lock insufficient; gate stays closed and outcome unknown while emission possible. No lock removal. Codex owned execution; actual resolution proof, not new timeout. |
+| BF-L5 final recipe/harness qualification | L1–L4 then refresh L0 after changes; permanent recipes/collectors and FR/EN docs. | Final consumed-byte inventory, normal/instrumented artifacts/profiles separate, named controls/refusals/recovery, original FAIL retained. Qualify harness against BF-Q gates; only ready cases eligible for BF-P3. | Changed input/missing assertion/zero executed cases/stale proof blocks passage. Codex verification; return to responsible lot and requalify affected dependents only. |
+
+Read tests/rust_native_first_publication.py:14–40,132–163 shows existing native
+birth/publication composition and no-reuse branch, not proof of successful current
+regeneration. It also contains negative SQL faults/review dependencies: **do not
+run entire recipe for convenience**. L1 must qualify necessary birth subpath,
+provider-free behavior and prerequisites without unrelated faults or positive
+SQL acceptance seeding.
+
+### Design choices to bound before L2/L3
+
+**B actor:** do not assume second PAEA call can publish A's already-reserved intent;
+uniqueness/conflict may prevent it. Plan B as an **explicitly authorized external
+fixture writer**, distinct local identity verified by harness controller, then an
+owned native Git operation on target. B authority is a harness fact, not a PAEA
+permission enforced by product or separate OS right if same UID. If criteria
+require two PAEA producers on same target, stop for scoped qualification rather
+than relabel A. B positive control must use its actual injection path.
+
+**Oracle:** transition events must bind actual owned native execution and sink
+observation while controlling every permitted writer in interval. Dispatch-A log
+then R=N is insufficient if B could write between. Retain that negative control;
+if causality relies on exclusivity, demonstrate it within closed harness, never
+all processes owned by the user.
+
+**Injection alternatives before implementation:** existing committed-hook protocol
+harness characterizes lost ACK but cannot lift PAEA ref→receipt blocker. Recommended
+full-harness route is fixture-only instrumentation on actual commit→record path,
+without a second publication implementation. Harness owns barrier/observation/fault;
+no failure option through normal Admin/API/CLI, no substituted authority/checks/journal.
+
+Settle precise test cfg/fixture feature/internal adapter at L3 with compiler graph.
+**Integration tests normally compile library without cfg(test)**; do not assume
+that gate exposes the barrier. If test-fixtures is needed, fault ELF differs from
+normal: retain separate graphs/hashes, normal control and effective business-source
+comparison. Instrumented harness evidence is **not fault injection proven in
+normal shipped ELF**. If that stronger level is required, qualify compatible
+additional method before closure, never weaken hardening.
+
+Existing tests/paea_source_acquisition_inventory.py:20–42 rejects test-fixtures/
+test-util features. Preserve that refusal; use separate retention for instrumented
+artifacts and distinct normal qualification. No Git wrapper/production hook/timed
+kill/live DB modification/manual receipt deletion substitutes for L3.
+
+### Dependencies and scoped fencing
+
+```mermaid
+flowchart LR
+  L0[BF-L0 Inputs and profile] --> L1[BF-L1 Fresh fixtures and identities]
+  L1 --> L2[BF-L2 Oracle and reception]
+  L2 --> L3[BF-L3 Ref to receipt cut]
+  L2 --> L4[BF-L4 Harness fencing]
+  L3 --> L4
+  L3 --> L5[BF-L5 Final inventory and qualification]
+  L4 --> L5
+  L5 --> P3[BF-P3 Only after gates and authority]
+```
+
+Proposed single-owner order L0→L1→L2→L3→L4→L5, no delegation. Reversible lots;
+changed shared contracts require affected dependent-proof reexamination.
+
+L4 separates admission closure, owned-emission completion and observed effect.
+Harness gate is not new product policy: refuses closed attempt, grants nothing,
+no ceiling or automatic timed release. Preserve in-flight operations and known/
+unknown results. Channel closure cannot recall a sent command. Escaped children/
+uninventoried writers exceed proved scope: absence unestablished, no re-emission.
+Existing contractual deadline remains, expiry proves no fencing. After unknown
+COMMIT, close gate then observe; finished leader does not establish no effect.
+
+### Future harness qualification / BF-P3 gates
+
+| Gate | Requirements/scenarios | Evidence after authorization |
+| --- | --- | --- |
+| BF-Q1 independent fixtures | L1, F-T/B-T | Distinct births/physical instances, no old root mutated, actual candidate transfer and authorized positive controls; proof-copy or wrong-attempt root reuse visible/refused. |
+| BF-Q2 discriminating attribution | C01/02/06, B-1/2/4 | Authorized A/B through declared paths, distinct publications despite N equality; wrong actor/attempt/target proof refused/unknown. Withheld B truth stays in oracle, no invented decider attribution. |
+| BF-Q3 actual ref→receipt interval | C03/07, F-2/4 | Control then reached barrier, one counted publication, receipt absent due to cut, intent retained; journal-negative never broader no-effect. Second recovery publication FAIL; unreached already callback explicit. |
+| BF-Q4 bounded absence/fencing | C04/05/08, F-1/6 | Pre/post barrier distinguished, late A1 send refused without mutation, in-flight result retained through resolution; unresolved/lost ownership forbids new emission. Only conditional F-1 permits one fresh authorized A2 publication. |
+| BF-Q5 history beyond endpoints | F-5/B-3/5 | O→N→O and two effects behind identical endpoint retained with authors; two no-op requests not counted as two publications, recovery delta zero. |
+| BF-Q6 receipt/decision/application | C06/07, F-3/B-2 | Originals, actually delivered/withheld content, decider receipt, authorized decision and application linked. Disconnect/read error is neither empty success nor re-emission authority. |
+| BF-Q7 bytes/profiles/recipe | P2-R1, L0/L5 | Actual external inputs declared, source archives/hashes checked, source stable, named cases actually run, separate normal/instrumented builds. Fixture PASS qualifies neither normal nor protected separation profile. |
+
+Future contract only, no recipe/test created now. Valid control before each fault,
+original causes and before/after state required. Harness failure diagnosed/fixed
+before product inference. Confirmed BF-C violation with qualified harness retains
+FAIL and opens BF-P4; **no silent business-product correction inside harness lots**.
+Reuse scoped permanent recipes, no global suite/watchdog/convenience quota added.
+
+### Change/evidence bounds and current closure
+
+Candidate areas: promotion/protocol harness, authority fixture helper, only chosen
+commit/record instrumentation junction and necessary recipes/collectors for separate
+retention. Future new/changed nontrivial functions need current documentation plus
+byte-bound policy/error review in same increment; keep relevant FR/EN docs current.
+Old archives/missions/retained fixtures intact. No arbitrary tools/network/real
+accounts, publication/commit/push authority granted here.
+
+Future evidence: governed Unix staging, Lexar only after actual mount/space check,
+verified readback/local hash index. Do not move execution onto FAT32 by changing
+fixture setting. Resource failure retains state/resumption prerequisite, no
+unrelated cleanup/destruction/unchanged retry.
+
+**Current closure: bounded plan prepared, blockers not removed.** Five requested
+areas have Codex owner, dependencies/deliverables/BF-Q gates. Implementation/BF-P3
+not authorized by this request. No new schedule/monitor/budget. No version_history
+entry or build/install. Persistent FR/EN plan and local X index only; no embedded
+context/service reloaded.
+
+Planning fingerprints, no execution/global qualification:
+
+| Source relue / source read | SHA-256 |
+| --- | --- |
+| `rust/crates/swarm-engine/src/root_store/paea_git_promote_call.rs` | `1255d665e4ef6b7183253bbca39193904519466850e75d66c501593ccb9fd6e2` |
+| `rust/crates/swarm-engine/tests/paea_git_promote_call.rs` | `ef4e847c8edc68a6ac1793959e906177d8ac1fceef2859fc40c74c4d226424a5` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_intent.rs` | `2aef44210363e5aec5b96d88e1990828744dc6b84828c0e0dc15b0ddd2c82652` |
+| `rust/crates/swarm-engine/src/managed_repository.rs` | `6e6a87c8eb6fa6cf207f581a8bc85784e3598a875fb5427ce696c55af396bae3` |
+| `rust/crates/swarm-engine/src/validation_run.rs` | `1c843fdfcafea7962d079198eb74fe163b81d2d3c10f9e54dea8e10b7f5399c2` |
+| `rust/crates/swarm-engine/src/validation_run_recovery.rs` | `548966ca99e07b62c6d672f70cf2cab9e73f5af18537f54cf67447f637cbd554` |
+| `rust/crates/swarm-enrollment-authority/src/authenticated_control.rs` | `cf502d4b735137d4c2a830ddfadaa3afefb5630241bb1fab40a3c7894eb0256a` |
+| `rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs` | `0c0f3635a8c9cfa2b4afa3a88c38baf71e8b0a8f48f89a2992bd9724586df6d2` |
+| `rust/crates/swarm-engine/tests/git_reference_transaction.rs` | `fa3ed15210465b128ca2ea0be6aed984034b26367c5932a413f9fe71b211ed3e` |
+| `rust/crates/swarm-engine/Cargo.toml` | `513a0d0b17756cd31e08e9f6d2fb1872df41dcb3bf8cc1b11d4830aa4a692f89` |
+| `tools/verification/recipes/paea-owned-git-promote.json` | `7ee5855ce0ef3b1c74836a0968e2da3031db882d8954e7dfe2e1b79a3db3e656` |
+| `tools/verification/recipe.py` | `348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b` |
+| `tests/rust_native_first_publication.py` | `7ec401919b0ab744d0086728a7b102fd5f24e09a9dfb8bc1c0cd077f2825ea5d` |
+| `tests/paea_source_acquisition_inventory.py` | `431036aac49b6077f02d0231da3f4530a5baa10c9d12b16cd08493577f9b10fa` |
+
+
+### Gi.eth — GI-T3/GI-T4 closure, 8 November 2026
+
+Local fix v0.1.1-dev.347 binds the candidate copy’s initial regular files, including
+undeclared ones, to evidence. V2 with unchanged tracked files is refused under R1.
+`task review-refresh` preserves R1, history and consumption and requires new controls
+and R2. A safe V2 variant resumes through publication/replay; dangerous V2 remains
+refused. gieth-review-refresh and gieth-legacy-refresh recipes PASS, retained proofs
+verified; inert reviewers do not establish an independent security audit. Normal
+profile, active binary identity and actual FR/EN Version dialog verified. Escape
+focus restoration remains open; no universal external dependency inventory claimed.
+[Sources, results, evidence, unknowns and retrospective (FR)](../../plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).
+
+
+### POC-03 — additive reconciliation, 2026-11-08T17:19:01.705556+00:00
+
+Mikhail sources: https://x.com/i_mika_el/status/2119459613724578163 et https://x.com/i_mika_el/status/2119462379687997652. Preserve the original timeout and append a linked reconciliation event. Examine a consumer-side durable receipt binding key/request/target/committed version/actor. Proposed authorized control, lost response, third-party writer and mutation/log interruption; attribution unknown without reliable evidence, recovery without duplicate effects. See X-IDEE-07 for full scenario/provenance. Code/runtime coverage unknown for this variant; no distributed guarantee, development or test established. Owner Fabrice; explicit deferred resumption.
+
+
+## BF-L0 — declared-versus-consumed inputs and required corrections, 8 November 2026
+
+**Authorized analysis performed; no code/recipe correction or execution.** No
+test, compilation, provider call, payment, service or fixture started/created.
+Read HEAD `1fec07d4874cc469c5a3905abb9bb64f855b2d26`, concurrent work preserved. Replan/claim-to-source control.
+BF-L0 remains **open**: bounded documentary mapping established, corrections and
+observed-effect qualification not done. No BF-L1/BF-P3 passage inferred.
+
+### Scope and actual input semantics
+
+Six recipes: paea-owned-git-promote, paea-owned-source-acquisition,
+paea-owned-git-transfer-reconcile, paea-effect-reconcile,
+paea-native-git-reference-transaction, paea-native-git-intent. Read step/env and
+corresponding Rust/Python consumers; no recipe argv executed.
+
+recipe.py:130–173,185–208,247–281 requires each input glob to match a file and adds
+invoked recipe automatically. Excludes .swarm/.git/node_modules/rust/target/current
+output, rejects resolved paths outside checkout, hashes **declared** bytes and
+compares before/after. An input recipe is hashed, not automatically run as a
+dependency. Environment variable presence proves no actual read. Inherited
+environment is not fully recorded; overrides only. Cargo launcher hash proves no
+rustc/Git identity.
+
+Static glob enumeration with read exclusions, no snapshot/run/collector invocation:
+**738/867/738/947/863/865 selected files**, recipe included, zero empty patterns
+or escaping resolved paths found. Includes untracked source files then present;
+sets may change. Not compiler graph or completeness proof; omissions below coexist
+with nonempty globs.
+
+Notation: D = docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/;
+S = D+source-fixture-writer78b-regen-20261031b/; O = D+source-fixture-writer78b-regen/;
+C = D+source-fixture-current-pub-regen-20261031/. Names prove no freshness.
+Both O/result.json and S/result.json exist, so wrong declaration does not fail
+empty-glob validation here.
+
+### Recipe-to-consumer mapping
+
+| Recipe / steps | Consumption traced in current source | Declaration / correction |
+| --- | --- | --- |
+| owned-git-promote, integration target then Rustdoc | tests/paea_git_promote_call.rs:53–105,154–160,347–365 reads SOURCE→S/result, birth records, opens root writable, reads current publication/Trust. Configured WRITER/CURRENT not read in traced promotion steps. | O/result and C/result declared, not S or its birth. Correct actual source link and consumed proofs. Variable existence is not WRITER consumption; C is extra retained input. |
+| owned-source-acquisition, transfer/source units and repository integration | barrier_tests.rs:20–61 via source.rs:317/transfer.rs:405/596 reads WRITER→S and birth; tests/paea_git_repository.rs:110–128,467–485 reads CURRENT→C and SOURCE→S, then Roots. | Neither S/C results nor birth files declared. Add both actual proof sources and birth chain; deduplicate identical S path without merging source/writer roles. |
+| owned-git-transfer-reconcile | Transfer units read WRITER→S; paea_git_transfer_call.rs:96–111 reads SOURCE→S, writable root/Trust. CURRENT configured but not consumed by traced steps. | Same wrong O/result; S and birth missing, existing C/result does not cover them. Correct actual links, preserve originals. |
+| effect-reconcile, engine/CLI/web/settings | paea_effect_reconcile.rs:135–160,183–197,218–222 reads SOURCE→S/birth/writable root/Trust; :95–97 compiles include_bytes web/paea-examples/v1/payment-document.json. Configured WRITER/CURRENT not read by traced fixture paths. | Wrong O/result, S birth missing, direct payment-document include not selected. Add actual proofs/embed. Other targets' effective inputs still need depfiles. |
+| native-git-reference-transaction | Synthetic protocol data; no SWARM_PAEA fixture variable or external birth root used by these cases. | No S/C discrepancy. Declared sample JSON is extra, not evidence this target reads it. Shared runner/compiler gaps still apply. |
+| native-git-intent | Intent/protocol targets without S/C fixtures in traced parameters/cases. | No external birth dependency to invent; address shared inputs/effective compilation. |
+
+Birth files actually located, absent from consuming recipes' inputs:
+S+native/inspection/workers/planning/setup/owned-root-a418069ad56f41e99ee2c5c8e9e74e9bf0f80545d48a0f714ee60e2baebfe3ff.json;
+C+baseline/setup/publication/native/inspection/workers/planning/setup/owned-root-5b232fa9582229588e2fd97dcbe2ea920cc4999afad37d6dc0e48ca83c66bd3c.json.
+Born scans candidate files and compares root, not a result signature. Retain
+actually examined files/inventory, not just declared PASS. No RootStore/database
+opened during this mapping, only proof bytes/existence inspected.
+
+### Transitive inputs and corrections required
+
+| ID | Cause / source read | Required future correction |
+| --- | --- | --- |
+| L0-R01 refines BF-P2-R1 | S result consumed, O result declared in three recipes. | Replace stale declaration with validated actual input; assess extra inputs separately. Do not switch env back to O to satisfy manifest. Delete no historic files. |
+| L0-R02 | Missing results/birth records in native-fixture recipes. | Declare immutable consumed proof and result→birth→physical-instance link. For new L1 fixtures, generate fresh birth inventory then freeze adapted recipe; random old filename is no new invariant. |
+| L0-R03 | Runner imports tests/fixture_area.py (215–220), absent from all six manifests; helper reads saved .swarm engine setting or shipped default (34–58). | Add helper; retain relevant resolved setting/provenance/revision projection as invocation evidence. Engine glob covers shipped default, not saved choice. Preserve live-state exclusion, no unnecessary private-state dump. |
+| L0-R04 | Declared .cargo/config.toml invokes cargo_space_guard.py, which reads .cargo/storage-policy.json (17–37); both exist, neither selected in six inputs. | Retain effective Cargo config/wrapper/persisted policy hashes, preserve validation/storage refusal without threshold change. Inspect other effective configs at future build. |
+| L0-R05 | Direct payment-document include missing from effect-reconcile; Rust globs do not establish other resources/Cargo inputs. | Add certain embed, discover/retain actual compilation inputs through appropriate collector/depfiles. Unused files stay candidates; no broad docs/live-state capture as substitute. |
+| L0-R06 | Acquisition declares collector script but no recipe step calls it. Collector imports PROFILE/RECIPE; profiler candidates can add config/wrapper/policy. | Explicitly select future declarative runner versus collector. Collector path needs argv, both modules and enriched inventory retained. Declared script does not imply invocation; collector compiles/tests, not invoked now. Enrichment alone does not cover S/C or missing Python helper. |
+| L0-R07 | result.root leads to mutable Root; managed_git_current.rs:48–58,88–145 reads settings/Work/chain/controls; promotion/transfer applies Trust. | Separate immutable birth proof inputs from initial runtime identity/versions/objects and allowed state transitions under barriers. Do not require whole DB unchanged in mutating scenario or hide unexpected mutation. No live SQLite snapshot created now. |
+| L0-R08 | Inherited env/tools via PATH; runner records step launcher (247–281), tests later resolve Git. | Retain safe relevant actual config/options/tool identities, unified profiles/features/executable hashes, not secret/full environment. Rebind changed inputs; proof obligation, not new policy. |
+
+### Collector and dependent recipes
+
+Mentioning acquisition.json in promotion/transfer/reconcile inputs does not execute
+acquisition or apply its inventory. paea_source_acquisition_inventory.py:65–118
+itself compiles no-run, reads depfiles, freezes recipe then invokes runner. Its
+preinventory adds profiler/runner and profiler covers web/frontend/local Cargo
+configuration. Distinct from recipe.py run; neither route executed here.
+
+Collector refuses test-fixtures/test-util and targets engine units plus repository
+integration outside unit-only. Not a compiler binding for arbitrary promotion,
+CLI/web or instrumented targets. Qualify future target coverage separately without
+weakening normal refusals.
+
+### Status, next steps and future evidence
+
+**No correction applied.** Codex owns R01–08; Fabrice retains later modification/
+execution authority. Recommended sequence:
+
+1. Set retention mode and immutable/dynamic boundary; correct R01/02 and shared
+   R03/04 retention without changing product behavior/policies.
+2. After authorization, effective compilation reconciliation R05/06/08 with
+   explicitly separate normal/instrumented profiles. Saved PASS result alone
+   cannot admit BF-L1.
+3. Future valid control then different consumed path, missing/changed birth,
+   removed/changed input, setting/wrapper drift, malformed config and corrected
+   recovery. Require refusal before dependent work, retained cause, no old-proof
+   fallback. No such regression or recipe created here.
+4. After L1–L4 refresh L5 inventory with actual new helpers/barrier/oracle/projections/profiles.
+
+Bounded impact search found **19 manifests** defining SWARM_PAEA_*_FIXTURE,
+four within six traced recipes. Other fifteen are candidates, **not semantically
+reviewed or declared corrected/conformant**: approval-form-rust,
+approval-web-positive, consent-ui-rust, delivered-chain-cli-rust,
+git-call-agreement-last-use-rust, git-call-agreement-rust,
+git-call-agreement-terms-rust, git-call-approval-rust, git-call-preview-rust,
+git-call-web-rust, native-git-source-context, owned-git-transfer,
+payment-agreement, promote-cli-suite-regression-rust, transfer-call-cli-rust
+(all paea- prefixed). Codex owns follow-up: trace steps/consumers before reuse,
+preserve historical verdicts and reassess their exact inventory scope when needed.
+
+**BF-L0 outcome:** mapping and eight required corrections documented in stated
+scope; no global conformance or inventory blocker lifted. Current analytical
+request handled, lot open for authorized corrections/qualification. No budget,
+timer/test/right/monitor created. Only FR/EN plan and local X index changed;
+recipes/functions/docstrings/retained fixtures/original proof/version_history
+unchanged by this lot.
+
+Static mapping fingerprints; no compiler graph executed:
+
+| Source relue / source read | SHA-256 |
+| --- | --- |
+| `tools/verification/recipe.py` | `348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b` |
+| `tests/fixture_area.py` | `4ece994bd492dc4e44adf24388ed50073ceeff7e74527cd106b31824c8ce566c` |
+| `tools/verification/cargo_space_guard.py` | `09b7d45c78c64282dee6265be2d26cea6066505963465e2a50a856f1fe8d5916` |
+| `.cargo/storage-policy.json` | `5e392baf7d475a34bd1c4614636682cd4e01bd21b007a3d4845b1e822c7f26dd` |
+| `.cargo/config.toml` | `31bee734fefe516086f75b642c1ca537e54997d684e4cc5c983951e01157ca72` |
+| `tests/paea_source_acquisition_inventory.py` | `431036aac49b6077f02d0231da3f4530a5baa10c9d12b16cd08493577f9b10fa` |
+| `tools/verification/verify_native_profile.py` | `d40d2b32f756eb0454c6dbd25cff6358d56e59bfae3d7e71fc7a33741693ac1f` |
+| `rust/crates/swarm-engine/tests/paea_git_promote_call.rs` | `ef4e847c8edc68a6ac1793959e906177d8ac1fceef2859fc40c74c4d226424a5` |
+| `rust/crates/swarm-engine/tests/paea_git_transfer_call.rs` | `2d077bd5719d2858dd03cf110bf97c7ee966af903d1c191a3757b9dec2834451` |
+| `rust/crates/swarm-engine/tests/paea_git_repository.rs` | `cbcfd28ee30c3ed7955685c242d9b14fbae59a49120ce622b8fa630ba7fe1a91` |
+| `rust/crates/swarm-engine/tests/paea_effect_reconcile.rs` | `63effcd53fe74a1d6c65aeede621432a424d9075b7cfbc528431252671078365` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_repository/barrier_tests.rs` | `e9a4ce1c6d01905c20f87b62b46073c9e00d56ee02eaa221fa17202026d1af10` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_repository/source.rs` | `77ae638b3832bf0ae63939516787580955906269d70f3c5875a3b12b72d63490` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs` | `5f85d5eb71556fc8da0fb1a56892901a7574d2338e6288a7c8c50398ae0625f9` |
+| `rust/crates/swarm-engine/src/root_store/managed_git_current.rs` | `b57f1a5be938b22af769ad49748ae6017707e4ac0aa1780b943402b8a8e9e54b` |
+| `tools/verification/recipes/paea-owned-git-promote.json` | `7ee5855ce0ef3b1c74836a0968e2da3031db882d8954e7dfe2e1b79a3db3e656` |
+| `tools/verification/recipes/paea-owned-source-acquisition.json` | `2eb35de6b2851f8ed957701e3d21ce311477eb97eb0c8c5df5e34cff97517866` |
+| `tools/verification/recipes/paea-owned-git-transfer-reconcile.json` | `11c2b873e8981d7f1139bf38f26800cf12de12d8a93f840624095b47efe0ff2f` |
+| `tools/verification/recipes/paea-effect-reconcile.json` | `56396fbb4f41b6da44cddc8f69ce3dd676a9a40296077ea1c38e0cc74f25e6b1` |
+| `tools/verification/recipes/paea-native-git-reference-transaction.json` | `09a4a07914cc9c97eb77c766823c09778a4628a9b7d9e096d58512ddb1bbe43c` |
+| `tools/verification/recipes/paea-native-git-intent.json` | `e2d478da120bce223bead78109f427794ef957a05a58cb046c3bb30092e30fdf` |
+
+
+## BF-L0 — fifteen additional manifests mapped, 8 November 2026
+
+**Analysis/documentation only; Fabrice authorized commit/push to main.** No recipe
+or product source modified/executed, no test/build/provider/payment/browser/service
+started. Read HEAD `1fec07d4874cc469c5a3905abb9bb64f855b2d26` in canonical checkout resolved from workspace/swarm;
+concurrent uncommitted native work excluded. Replan/verified-claims rules applied.
+
+All fifteen previous candidates now mapped through steps/env/consumers/input globs.
+Completes the **documentary mapping of 21 selected recipes**, six earlier plus
+fifteen here, not complete compiler graph, execution or global conformance. All
+fifteen input sets have matches; nonempty globs do not detect omissions below.
+
+### Actual readers and birth-proof distinction
+
+Web paea_git_call.rs:487–514, consent browser:73–103; CLI paea_transfer.rs:36–54,
+paea_promote.rs:202–218, paea_approval_web.rs:1884–1906 (under rust/crates/*/tests)
+read SOURCE/result, check markers, open Root writable and read current publication/
+Trust. **These project functions do not scan owned-root**. Undeclared birth file
+is not an omitted actual read there; future fresh-harness BF-Q1 still requires
+explicit birth provenance, not an imagined current validation.
+
+Engine promote/last-use scans born; source/transfer units and repository tests
+read corresponding S/C birth chains as previously traced. Explicit no-source
+cases do not consume a fixture just because environment contains SOURCE.
+
+### Fifteen-recipe matrix
+
+Names below have paea- prefix and .json suffix in tools/verification/recipes.
+Declared result does not qualify authenticity/freshness/availability/profile.
+
+| Manifest | Actual traced consumer/input | State / necessary correction |
+| --- | --- | --- |
+| approval-form-rust | SOURCE .swarm-fixtures/source-fixture-fresh-regen-20261031; web presentation plus Python→paea_git_call→paea-approval-form-ui.cjs. | Result present/declared, no wrong path. Direct scripts/JS harness declared; i18n script/Trust resources missing R09. fixture_area.py included. Built/bound ELF is output, not immutable input; prebuild native_admin.rs touch R12. |
+| approval-web-positive | SOURCE docs/.../20261028-acquisition81-mvfdts57/glm-direct-held-lock-guard-review-repair-20261105T104154Z/supervisor-source-normal334-20261105T105919Z; CLI paea_approval_web. | Result and inputs.json declared; traced project reads result/Root, not inputs.json, which is supplementary. Shared helper declared; external pinned image R10. No missing-result finding. |
+| consent-ui-rust | SOURCE .../claude-tmp-fix-e2e-20261031T173021Z/consent-fixture-regen-20261031c passed via driver to paea_consent_browser. | Result present **not declared**; driver/JS declared, shared Python helper absent; incomplete i18n, linked outputs separate, prebuild source touch R12. |
+| delivered-chain-cli-rust | SOURCE .../chain-fixture-regen-20261031b; paea_promote, designated bin/swarm. | Result present/declared, no born scan. Current bytes differ from pinned SHA: image prerequisite unsatisfied R10, never fix by blindly updating pin. |
+| git-call-agreement-last-use-rust | SOURCE .swarm-fixtures/source-fixture-lastuse-regen-20261031b; engine promotion/agreements. | Result present/declared; actual birth scan input omitted. Agreement unit does not substitute. Shared R03/04. |
+| git-call-agreement-rust | SOURCE .swarm-fixtures/source-fixture-status-minimal-regen-20261101; agreement units/web. | Result present/declared; web reader no birth scan. No invented path defect; shared R03/04 and mutable Root boundary. |
+| git-call-agreement-terms-rust | SOURCE .swarm-fixtures/source-fixture-terms-api-regen-20261031; engine/web/i18n --check. | Result declared; i18n script and both sources/both compared outputs omitted. R09. |
+| git-call-approval-rust | SOURCE .swarm-fixtures/source-fixture-approval-fresh-regen-20261031; engine agreement/web approval. | Result declared, no project web birth read. Shared R03/04 and effective compilation inventory pending, no runtime validation. |
+| git-call-preview-rust | SOURCE status-minimal as above; web previews/i18n --check. | Result declared; en source/output covered, i18n script and Trust pair omitted R09. |
+| git-call-web-rust | SOURCE .../source-fixture-writer78b-regen-20261031b; paea_git_call. | Result exists but old .../source-fixture-writer78b-regen/result declared instead: R01. No born scan by web reader; do not confuse gaps. |
+| native-git-source-context | WRITER/SOURCE .../writer78b-regen-20261031b, CURRENT .../current-pub-regen-20261031, source units/repository target. | Two unique results present, none declared; actual birth reads omitted. Deduplicate same path without merging roles, R02. |
+| owned-git-transfer | WRITER .../writer78b-regen-20261031b via barrier_tests; Child/pack controls precede transfer units. | Result/actual birth input missing. Child/pack checks do not prove native-source result, R02. |
+| payment-agreement | SOURCE .../chain-fixture-regen-20261031b for engine last-use; engine/CLI settlement and pinned image. | Result declared; birth needed by promotion omitted. External CLI pin matches read bytes, not profile qualification or finance capability. |
+| promote-cli-suite-regression-rust | SOURCE .swarm-fixtures/source-fixture-lastuse-regen-20261031b; entire CLI paea_promote include-ignored. | Result declared, CLI project no born. Compiled payment-document include absent from inputs R05. Default Cargo binary selection is not implicitly delivered image. |
+| transfer-call-cli-rust | SOURCE .../chain-fixture-regen-20261031b; CLI transfer then promote. | Result declared, no birth scan. Same compiled payment-document include omitted R05; filtered case does not mean uncompiled rest of target. |
+
+Ellipses for legacy source roots use docs/plans/actions-confiance/paea/evidence/
+claude-tmp-fix-e2e-20261031T173021Z/. Exact env paths remain in retained manifests.
+Birth files exist in examined proof directories but count as consumed only when
+actual readers open them.
+
+### Additional corrections and deliberate output distinctions
+
+| ID | Read fact / scope | Required correction before reuse |
+| --- | --- | --- |
+| R09 i18n | build.cjs:1–23 --check reads locales/en.json, locales/trust-actions-en.json, web/i18n-en.js, web/trust-actions-en.js. Script missing in approval-form/consent/terms/preview; Trust pair absent in all four, terms retains none of four resources. | Declare script/missing resources. Existing generated --check files are immutable read inputs, unlike ELF produced by current run. No i18n build now. |
+| R10 external image | CLI promote:171–198, settlement:379–395 and approval-web selector:2160–2177 read selected image and expected SHA before spawn. | Retain selected path/pin and bytes/profile provenance. No Cargo fallback for invalid designated image; matching hash proves bytes only, mismatch blocks recipe. |
+| R11 build/browser outputs | bind_cargo_test_binary resolves produced ELF through Cargo, binds then rechecks; browser drivers read server/phase/result files produced during run. Relevant binding scripts declared. | Do not make run-produced outputs immutable inputs. Retain linked outputs/initial-final identity/causes. --binary may denote a spec to resolve, not an existing file. Existing countertests not executed. |
+| R12 forced source touch | Both browser recipes touch web/src/service/native_admin.rs via sh -c before cargo no-run. | Mtime/launch mutation is neither byte change nor ref→receipt fault. Future procedure must use supported artifact resolution/binding, preserve shared builds, not touch sources to manufacture freshness. No change/run now. |
+| R13 browser dependencies | JS uses Puppeteer from node_modules and configured Chrome; drivers pass SOURCE and spawn Rust/Node. Runner excludes node_modules. | Retain needed package manifests/lockfiles and actual tool identity/served resources/outputs, not wholesale node_modules/private sessions. Workspace web bytes do not prove served assets. No browser/service run. |
+
+Shared R03/04 remain: Cargo wrapper/storage policy absent from **all fifteen**;
+fixture_area.py declared in approval-form/approval-web-positive, absent in thirteen.
+Every recipe uses runner importing that helper; neighboring declaration does not
+transfer. Nonempty inputs are no validation of actual dependencies/tools.
+
+### Read-only checks of designated external images
+
+| Recipe | Expected SHA | SHA of bytes read | Bounded conclusion |
+| --- | --- | --- | --- |
+| approval-web-positive | 23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c | 23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c | Present/matching bytes, no execution/profile qualification. |
+| delivered-chain-cli-rust, bin/swarm | 84b1e78c8dbd9f38c5ebebb7fd48c097f6e7de76805249fd06592730aa5211a8 | 3512fdaed47a9f111959de2cfd8186276d1d32d073da510e0dd8e86913b0735f | Observed mismatch, image prerequisite unsatisfied at read; no failed test or pin rewrite. |
+| payment-agreement | 3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a | 3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a | Present/matching bytes only, no financial capability. |
+
+Future alternatives: recover qualified historical image/profile/evidence, or
+select independently qualified current image with adapted recipe. Updating pin
+alone does not qualify found bytes. Codex verification owns diagnosis, Fabrice
+authority; no selection/restart/requalification done here.
+
+### BF-L0 state and remaining passage
+
+Fifteen candidates now semantically traced within above input chains; earlier
+unreviewed status remains historical. R01–08 plus R09–13 retained, apply only to
+actual consumer. Future BF-Q1 births still needed even where current web reader
+does not read them: explicit requirement/integration, not presumed validation.
+
+**BF-L0 open: no correction applied or execution proof obtained.** Before L1:
+select proper fixtures/images, correct actual links/helper/wrapper/config/embeds,
+separate Root state and outputs, qualify effective targets/profiles under later
+authority. No normal collector refusal weakened for fixture instrumentation.
+Negative/freshness/recovery checks remain future work.
+
+Git: current request authorizes documentation commit/push on main. Push includes
+main's two pre-existing local commits 50f587e57 and 1fec07d48, inspected as retained
+design/history, excluding uncommitted native work. Campaign X index remains local/
+Git-ignored, no force-add or X publication. No version_history modification by
+this documentary work, installation or embedded-context reload.
+
+Targeted read fingerprints, no compiler graph or execution:
+
+| Source / manifeste relu | SHA-256 |
+| --- | --- |
+| `tools/verification/recipe.py` | `348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b` |
+| `scripts/i18n/build.cjs` | `868b3ffd89ec3232ad045e1b97ceb5ef2f6dab770a3a74f8a1f416bbefa64f19` |
+| `tools/verification/bind_cargo_test_binary.py` | `fe67a8265048459a4e2d355558a807eb58faa7c0ed801242848d4f1037ac72de` |
+| `tools/verification/test_bind_cargo_test_binary.py` | `9f1f6c308538660551bb78496aa3f4a7be349048c452e0b0d44675595d908ecc` |
+| `tests/paea_approval_form_ui_recipe.py` | `89d208d00a834521516973607e28bfe83264e319ed430ddf63a74ae9e83b92f1` |
+| `tests/paea_consent_ui_recipe.py` | `48640a6a806c5337b59b083c12c2eb9dcfbd026a5f589ca047f26e8d728e3a8d` |
+| `tests/test_approval_resolution_raw_evidence.py` | `116bac6f48ce163145fab2451d7f87756727b940fba3477bbd8094e5d66a4394` |
+| `tests/test_approval_driver_stream_drain.py` | `403a1091fc664c5b95f366747611ed5ad7e207507337d30d9892265c9e35960a` |
+| `tests/paea_consent_driver_control.py` | `68c8e73e5f6600ec077685ffeff222fffd97e4c2e0b5456a41046deb26a68e88` |
+| `tests/paea-approval-form-ui.cjs` | `e5769979c36c5adc0ab55b1ab9765c744da45612fc6751f00ddd069ce5e7832a` |
+| `tests/paea_consent_ui.cjs` | `7c3ae408519b28f8ff0ecaa769836bc35b03c72ffe27ab586236a2a7efd7fbc6` |
+| `tests/paea-reader-credential-erasure.cjs` | `ec275c9a0cd6bbbab8c8f03a3833c67c2dfac0e3a8fa7cabecb58adaa3082f37` |
+| `tests/paea-consent-projection-erasure.cjs` | `eb2f6df808ff31271f1d9062a5623039b979f211035dab1c73effa9d67d79629` |
+| `rust/crates/swarm-web/tests/paea_git_call.rs` | `181881ac0c5f2ad9ebd3e7d146bce0dd35358ada862b2bfe2d0bde5853760b75` |
+| `rust/crates/swarm-web/tests/paea_consent_browser.rs` | `21770cf4ab1b716f21ae8ebd700c4e4aefa0c70cb6626235a37b377a5f1adb60` |
+| `rust/crates/swarm-cli/tests/paea_approval_web.rs` | `60ba4a8ca969f73715e6cd555ba9cc97bcc4c4ceb4d230513cc0f29e593fe4c0` |
+| `rust/crates/swarm-cli/tests/paea_promote.rs` | `fe1a9f7a6e3e1536f42c33c9a1445260dd0bc6c816a7ceb4d3a9f2ff8c928883` |
+| `rust/crates/swarm-cli/tests/paea_transfer.rs` | `36c24aa26d2b03328ce976c8d3e67434def64ff46dd2baf5c7dd142b8ac87eeb` |
+| `rust/crates/swarm-cli/tests/paea_settlement.rs` | `ac258f0a640e0477d16f57d3d998281a80b89174882b0572e14d3eda0acc9bc6` |
+| `rust/crates/swarm-engine/tests/paea_git_promote_call.rs` | `ef4e847c8edc68a6ac1793959e906177d8ac1fceef2859fc40c74c4d226424a5` |
+| `rust/crates/swarm-engine/tests/paea_git_repository.rs` | `cbcfd28ee30c3ed7955685c242d9b14fbae59a49120ce622b8fa630ba7fe1a91` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_repository/barrier_tests.rs` | `e9a4ce1c6d01905c20f87b62b46073c9e00d56ee02eaa221fa17202026d1af10` |
+| `tools/verification/recipes/paea-approval-form-rust.json` | `01f269b6f3f7a0e7da79e52e644885917880f631b909f0760fbc754bb3cc3caa` |
+| `tools/verification/recipes/paea-approval-web-positive.json` | `cd500c649195bd51635b7d63aa90d10a6c21ccbebf878d90ab65d1371c8e47e6` |
+| `tools/verification/recipes/paea-consent-ui-rust.json` | `f5cc8eb21873d1ae2a4ca4819300d58f708e576b4aae98d482a9cef721bc1cde` |
+| `tools/verification/recipes/paea-delivered-chain-cli-rust.json` | `87ff5d326930efcdcaf2da0547e8604a1cded3bdd55e4180d0cf6698395ce3ce` |
+| `tools/verification/recipes/paea-git-call-agreement-last-use-rust.json` | `125a1b1fa493881e3c35b375b98e6107a838b96e370a67936dc27bfae101d3ed` |
+| `tools/verification/recipes/paea-git-call-agreement-rust.json` | `3167b0fc0ec3448577a575f64fd28b03a38e1cf94179d5aad63f5ed7e39d8aad` |
+| `tools/verification/recipes/paea-git-call-agreement-terms-rust.json` | `323d43149ffe756f8e8a8fd805971986875c9cecd6968625b08b031db842794b` |
+| `tools/verification/recipes/paea-git-call-approval-rust.json` | `ea8d353ab70d07595bd6e90a94ab8c2f6b1fea8fafd9d974c36df8c13b370b11` |
+| `tools/verification/recipes/paea-git-call-preview-rust.json` | `fc0c156d85a5f4639e29a045230d31b525a27960d6a1437417abe774e7aa28ac` |
+| `tools/verification/recipes/paea-git-call-web-rust.json` | `869ef72a0e4c5e24d757a16c847e690cd42d0b87187854bf9e69ab128a9aaa41` |
+| `tools/verification/recipes/paea-native-git-source-context.json` | `f5444fe972909ebb948456d9020d859b85b29af22de544a4114b78f098f1a9c2` |
+| `tools/verification/recipes/paea-owned-git-transfer.json` | `7e0dc77b8f8e229e86d6c23505b6b7c40a84f33f2ea8f438a0a7bf8f206025e9` |
+| `tools/verification/recipes/paea-payment-agreement.json` | `e0e6024b48a546ab75cfcdb85ab050ac087b592b7de9116cd770aaa15372d54d` |
+| `tools/verification/recipes/paea-promote-cli-suite-regression-rust.json` | `9f0dc5c619426b04c512f8c98eadb892e48177f8b34ff999862d1b58f592ff7e` |
+| `tools/verification/recipes/paea-transfer-call-cli-rust.json` | `3ad8afeaa1071396eba837c83249e7ad0848a0edbeed1f1960a923cb0e2268e8` |
+
+
+### Git replan — protected main publication refused, 8 November 2026
+
+Documentation commit created: `19b1e948125a9521389b33d6ef46c97ae187b651`, only the
+two FR/EN plans, 1036 added lines including prior work. Direct main push **rejected
+GH006**: PR required and two expected checks. Read protection: enforce_admins=true,
+strict=true, contexts checks/install, zero minimum human approvals. Local commit
+preserved; no successful main push claimed.
+
+.github/workflows/ci.yml matches HEAD/origin/main, Git blob
+`329f4f498d2ed958316785c49444eec65f004505`. Push trigger main only, pull_request
+without documentation filter; checks/install run Cargo/npm/install tests. Opening
+a documentary PR would therefore run tests forbidden by current request. No
+workflow/check/protection/history changed to bypass; no PR opened.
+
+Preservation route within push objective: remote target
+`codex/bf-l0-input-audit-19b1e9481` from documentary HEAD, no checkout switch or
+uncommitted native work included. This branch push does not trigger read workflow;
+actual push/ref success must be observed through Git. Main remains unintegrated.
+
+Resumption owner: Fabrice for authority to run PR-required CI; Codex then uses
+protected flow. No unchanged main-push retry. Prepared PR title
+`docs(poc03): map BF-L0 recipe inputs and remaining blockers`; body describes
+fifteen additional static recipe mappings, R09–13 and retained limits, documentary
+hash/diff validation only, no local tests. No product capability, BF-L0 clearance
+or independent acceptance claimed.
+
+
+### PR #20 — CI recovery and rotation-fixture isolation (8 November 2026)
+
+Fabrice now authorizes the PR, required checks, diagnosis and correction of their
+blocker; merge into main only after required checks pass. This neither clears
+BF-L0 nor authorizes provider calls or other development. Concurrent primary
+checkout changes are excluded: correction uses the exact PR revision in an
+isolated worktree. No product service delivery/restart applies: only `cfg(test)`
+code and this FR/EN record change.
+
+Original proof: [CI 42506071897](https://github.com/mo0ogly/swarm/actions/runs/42506071897),
+head `f7d090f13f2a28699abc77bfc36af08bc21ae996`, install passed, checks failed.
+`web_session::tests::rotate_refuses_running_server_then_replaces_key` panicked at
+web_session.rs:427 after `drop(listener)`: `web-rotate-server-running`. The engine
+binary reported 776 passed, 1 failed, 29 ignored; later steps were skipped. This
+file matches base main. The same targeted test passes alone before correction
+(1 named test), without reproducing the historical port holder.
+
+Controlled counterexample: fork inherits a CLOEXEC listener; after parent close,
+bind still returns EADDRINUSE while the child waits before exec. After observed
+exec/exit, the same address binds. Valid control precedes injection; pipes and
+waitpid replace sleeps, retries or a global deadline. This establishes that drop
+in a concurrent test process does not establish release of every copy. CI did
+not capture the port-holder PID: pre-exec inheritance is a corroborated possible
+isolation defect; the exact historical cause versus independent port reuse
+remains unresolved.
+
+Decision: re-exec only this case in a dedicated libtest process with `--exact`
+and `--test-threads=1`, before creating its listener. Forks by sibling tests in
+the parent cannot inherit that child's socket. A local mutex would not coordinate
+all forks; retries would mask the refusal. The parent requires successful exit,
+one passing test and a terminal marker; child errors stay visible. The original
+scenario retains its witness, refusal with unchanged key, rotation/readback,
+permissions, forbidden address and redaction; checked close and removal of only
+its own fixture are added. Product rotate is unchanged. Reservation against
+unrelated external processes remains unestablished.
+
+Planned checks: all named `web_session::tests::` cases in the targeted profile,
+then required checks/install on the new
+[PR #20](https://github.com/mo0ogly/swarm/pull/20) head. Historical results do not
+replace these checks. Results and limits are retained below and in the local
+register. Originals on mounted Lexar: `swarm-evidence/pr20-ci-42506071897/`; diagnosis
+and fresh evidence: `swarm-evidence/pr20-ci-fix-20261108/`, with a local restoration
+index under `.cache/`. Codex owns the authorized correction/checks/integration.
+
+Diff review: child selector, exact filter and single-test execution are fixture
+mechanisms, not operator policy; no product deadline/ceiling added. The changed
+test's docstring explains isolation, failures and the external limit. Spawn,
+decoding, exit status and assertions refuse errors; close and cleanup are checked.
+No other product error producer/consumer changes. Lesson: a CLOEXEC descriptor
+can remain held between fork and exec; a fixture requiring its exclusive close
+must own its process, without retrying an observed refusal into success. Prior
+BF-L0 results remain historical; these tests and CI do not qualify 03-F/03-B.
+
+Observed local result: Cargo/Rust 1.96.0, default test profile, command
+`cargo test --manifest-path rust/Cargo.toml --locked --offline -p swarm-engine --lib web_session::tests:: -- --nocapture`:
+3 named tests passed; rotation child: 1 test passed with marker
+`WEB_ROTATION_ISOLATED_PASS`. `git diff --check` passed. Product-section bytes
+before `cfg(test)` remain identical (SHA256
+`8ad0a25c28581acc25b7c566ff59e32d708fb923cdf06a2428368ecb31291871`).
+Local proof does not replace required checks on the published head; PR #20
+retains their current outcome and the merge decision.

@@ -1,5 +1,24 @@
 # Swarm — scénarios de PoC et de tests à reprendre après avancement du code
 
+Qualification avec vrai modèle demandée le 8 novembre 2026 :
+[client Codex réel sous profil inchangé](actions-confiance/REAL-MODEL-TOOL-QUALIFICATION.md).
+**Non qualifiée** : quatre échecs conservés ; dernier blocage observé dans le
+vrai CLI, UnixStream Tokio refusé avant modèle et outil. Aucun faux PASS déduit
+de la cible intacte. Alternative GLM outillée en attente d’autorisation explicite.
+
+Qualification native autorisée le 8 novembre 2026 :
+[worker réel et outil Python enfant](actions-confiance/NATIVE-AGENT-TOOL-QUALIFICATION.md).
+Témoin, refus kernel avant écriture hors workspace, puis même outil/source/cible
+sous nouvelle intention publique sur la même tâche : PASS, 13 assertions.
+Fournisseur déterministe sans modèle réel ; écriture de fichier réelle, pas de
+mandat métier Trust ni de conformité générale. Échec initial du banc conservé.
+
+Qualification autorisée le 8 novembre 2026 :
+[parcours CLI Trust installé](actions-confiance/TRUST-ACTION-PATH-QUALIFICATION.md)
+PASS sur registre fictif : trois variantes R1, douze témoins, 118 appels et
+67 assertions ; recette vérifiée. Substitution de cible et réponse perdue/reprise
+couvertes dans ce périmètre seulement ; aucun raccord général aux outils natifs.
+
 Étude complémentaire du 8 novembre 2026 :
 [article TechOnlineNews et qualification des chemins d’action](actions-confiance/TECHONLINENEWS-CONTROLE-ACTIONS-ETUDE.md).
 Rapprochement statique avec R1, Trust, Biba et POC-06 ; TN-01–05 proposés/non
@@ -1778,3 +1797,628 @@ Empreintes de la qualification statique, pas inventaire de compilation ni preuve
 | `tools/verification/recipes/paea-native-git-intent.json` | `e2d478da120bce223bead78109f427794ef957a05a58cb046c3bb30092e30fdf` |
 | `docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b/result.json` | `bc58ae6b3492da38697f45d438f116f79c545ad8f0236ad4c5de9ddbea779218` |
 | `docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-current-pub-regen-20261031/result.json` | `f79644bc4a6fcb3f0d1b508d8e9a9dd293a12f6ecaafa879a46b5144b4bec020` |
+
+
+## BF-P2 — plan borné de levée des blocages, 8 novembre 2026
+
+**Demande actuelle : préparer le plan seulement.** Aucun développement, test,
+compilation, appel fournisseur, paiement, fixture créée ou service lancé. Codex
+reste propriétaire unique ; aucune délégation. Les lots BF-L0 à BF-L5 ci-dessous
+sont **PROPOSÉS / NON RÉALISÉS**. Ils ne constituent ni un mandat d’exécution ni
+un plan adopté/validé par le moteur. BF-P2 documentaire reste terminé ; BF-P3
+reste conditionné à leurs preuves de passage et à une autorisation ultérieure.
+
+Reprise sur HEAD `9d64cb33d09a0285abae8975aa6fcdd2268e8e4d` avec travaux concurrents présents dans les modules
+de revue native et leurs consommateurs. Les 22 empreintes ciblées BF-P2 ont été
+comparées aux fichiers actuels : inchangées lors de cette lecture. Cela préserve
+leur portée statique, sans qualifier les modules partagés modifiés, le graphe de
+compilation ni le binaire courant. Aucune modification étrangère intégrée/revertée.
+Méthodes replan/spec-builder et contrôle des affirmations appliqués.
+
+### Objectif borné, profil et limites
+
+Livrable futur : un **banc isolé d’attribution/reprise** réutilisant les opérations
+publiques PAEA, capable de produire des témoins neufs, observer A/B, interrompre
+causalement entre publication et reçu, fermer les émissions d’A1 et retenir un
+inventaire fidèle. Il doit permettre de distinguer un défaut produit d’un défaut
+du banc ; lever un prérequis ne vaut pas réussite de 03-F/03-B.
+
+Le profil de référence conserve `require_separation=false` explicitement déclaré,
+avec accord exact et contrôles courants inchangés. Le profil avec séparation reste
+refusé par le consommateur actuel ; son admission complète est **hors de ce lot**,
+à traiter séparément si elle devient exigible. Aucun abaissement de politique
+réelle, aucun endpoint métier nouveau, signature de reçu, retry automatique,
+compensation, intégration financière ou confinement OS général n’est prévu.
+Le modèle de menace du banc doit être écrit : écrivains A/B supervisés, outils
+natifs identifiés, tous chemins de mutation de la fixture inventoriés. Un écrivain
+malveillant hors de ce périmètre reste une limite explicite, pas un acteur couvert.
+
+### Lots, frontières et critères de passage futurs
+
+Toutes les validations mentionnées sont **à réaliser après autorisation**.
+Les fichiers cités sont des zones de travail candidates ; les nouveaux helpers et
+manifestes éventuels restent à nommer avant édition, aucun n’est créé ici.
+
+| Lot | Dépendance / périmètre de réalisation proposé | Livrable et passage observable | Échec, propriétaire et reprise |
+| --- | --- | --- | --- |
+| BF-L0 — contrat d’entrée et inventaire initial | Autorisation future ; sources/recettes courantes, BF-C01–08 et BF-P2-R1. Lire consommateurs réels, profil, chemins externes, fixtures et preuves disponibles avant modification. | Une correspondance paramètre/env → fichier effectivement lu → validation → utilisateur du résultat ; pointer le même result.json consommé dans les inputs de la recette promotion et de ses dépendances. Épingler sources, helpers, déclarations et outils nécessaires. Aucune recette ne démarre avant résolution de R1. | Chemin absent/ambigu ou inventaire incomplet : arrêt préalable, preuve conservée, pas de fallback vers ancienne fixture. Codex vérification ; reprise seulement sur entrées corrigées/attribuées. |
+| BF-L1 — naissance neuve et deux identités | BF-L0 ; harnais `paea_git_promote_call.rs`, producteurs natifs de première publication, fixture d’autorité. Séparer données constructeur et données d’exécution. | Projet natif, service, dépôt, journaux et comptes **neufs par témoin/variante**, preuve de naissance et liens physiques courants ; O≠N disponibles, transfert de N effectué par parcours existant. A/B ont des identités observées distinctes et décisions d’autorisation exactes distinctes. Témoins A et B aboutissent avant injections ; références conservées sans réouvrir le root historique en écriture. | Si naissance/qualification native ne passe pas sans fournisseur ni modification d’original, arrêter et isoler ce prérequis ; ne pas copier un inode-bound root, fabriquer un PASS ou semer une acceptation SQL. Codex fixtures ; reprise sur naissance authentique et qualification de la fixture corrigées. |
+| BF-L2 — oracle et réception | BF-L1 ; banc externe à l’agent et lectures de ref/journal existantes. Réutiliser les primitives Git, pas une assertion du worker comme preuve du sink. | Historique append-only du banc liant instance, action, tentative, identité observée, émission, transition O→N, reçu/erreur et fin d’opération ; séquence/barrières locales, sans ordre distribué inféré des horloges. Compteurs demandes/COMMIT/publications/journal/lectures distincts. Deux projections : vérité oracle et originaux réellement remis au décideur, avec accusé de réception distinct. | Identités confondues, perte/gap d’observation, reçu caché lisible par une autre voie ou oracle modifiable par l’agent : couverture refusée, attribution/absence inconnues, zéro reprise mutante. Codex observation ; reprise seulement après correction et témoin discriminant. |
+| BF-L3 — coupure ref→reçu | BF-L2 et conception de profil approuvée avant code ; module `paea_git_promote_call.rs`, fonctions privées commit/record, primitive Git existante. | Point causal **après publication/ref observée et avant écriture du reçu**, témoin sans faute puis rupture laissant ref=N, intention conservée et aucun reçu de succès fabriqué. Le même consommateur de réconciliation est exercé ensuite. Conserver aussi le refus/ACK prepare et l’atteinte ou non du callback already avec OLD=O≠N. | Si le point n’est pas atteint ou que le banc écrit lui-même le résultat métier, scénario non discriminant, pas PASS. Ne pas élargir en signature ou retry. Codex moteur/banc ; reprendre après correction de la barrière, avec profil exact retenu. |
+| BF-L4 — fencing borné et observation finale | BF-L2 ; utilise les phases de BF-L3 pour les émissions en vol, la possession Child et les erreurs réelles. | Le superviseur du banc ferme l’admission de nouveaux envois d’A1, suit chaque émission déjà délivrée, conserve les owners jusqu’à résolution et établit une barrière finale avant observation. Nouvel envoi tardif refusé sans effet. Un Child non résolu ou une perte d’ownership interdit de déclarer A1 finie. | Annulation, signal, timeout, PID ou disparition d’un lock ne suffisent pas. Garde fermée et inconnu conservé si un chemin/enfant peut encore agir. Aucun verrou supprimé. Codex exécution possédée ; reprise sur preuve effective de résolution, jamais changement de délai seul. |
+| BF-L5 — recette finale et qualification du banc | BF-L1–L4, puis rafraîchissement BF-L0 après toute modification ; recettes permanentes, collecteurs et documentation FR/EN. | Inventaire final des octets réellement consommés, profils/exécutables de fixture et normaux séparés, étapes nommées avec témoins/refus/reprise, échecs originaux conservés. Qualification du **banc** sur chaque critère ci-dessous ; seuls les cas dont les prérequis passent deviennent éligibles à BF-P3. | Source/manifest/outillage changé, zéro cas exécuté, assertion manquante ou preuve périmée : pas de passage. Codex vérification ; revenir au lot responsable, conserver la provenance et requalifier seulement les dépendances affectées. |
+
+Les sources `tests/rust_native_first_publication.py:14–40,132–163` montrent une
+composition existante de naissance/publication native avec preuves retenues et
+branche sans reuse. Elles ne prouvent pas que l’ensemble se régénère aujourd’hui.
+Cette recette contient aussi des injections SQL négatives et des dépendances de
+revue : **ne pas la lancer en bloc par commodité**. BF-L1 doit qualifier le
+sous-parcours nécessaire, son absence d’appel fournisseur et ses prérequis, sans
+reprendre des fautes hors du besoin ni créer une acceptation positive par SQL.
+
+### Choix de conception à borner avant BF-L2/BF-L3
+
+**Acteur B :** ne pas présumer qu’un second appel PAEA peut publier la même
+intention déjà réservée par A ; une unicité/conflit peut l’empêcher. Prévoir dans
+le banc B comme **écrivain externe explicitement autorisé de la fixture**, identité
+locale distincte vérifiée au contrôleur du banc, puis opération Git native
+possédée sur la cible. L’autorité de cette émission B est celle du banc : ne pas
+la présenter comme une permission PAEA contrôlée par le produit ni comme un droit
+OS séparé si les processus ont le même UID. Si BF-C exige finalement deux
+producteurs PAEA sur cette même cible, arrêter au choix de périmètre et qualifier
+ce parcours séparément ; ne pas remplacer B par une étiquette sur l’instance A.
+Le témoin de B doit porter sur la même voie effectivement utilisée en injection.
+
+**Oracle :** les événements de transition doivent être reliés à l’exécution
+native effectivement possédée et à la cible, avec observation du sink et contrôle
+de tous les écrivains permis pendant l’intervalle. Un log « dispatch A » suivi
+d’un R=N ne suffit pas si B a pu écrire entre les deux. Le banc doit conserver
+ce cas contradictoire comme témoin négatif ; si sa liaison causale repose sur
+l’exclusivité, prouver cette exclusivité dans le périmètre fermé du banc. Ne pas
+étendre cette preuve à tout processus du compte utilisateur.
+
+**Injection :** comparer explicitement ces deux options avant implémentation :
+- réutiliser d’abord le test protocole avec hook committed existant pour étudier
+  l’ACK perdu ; utile, mais ne lève pas le blocage ref→reçu du consommateur PAEA ;
+- recommandation pour le banc complet : une instrumentation réservée aux fixtures,
+  placée sur le chemin réel commit→record, sans réimplémenter une seconde logique
+  de publication. La barrière, l’observation et le défaut restent contrôlés par
+  le banc ; aucun paramètre de panne ne doit devenir accessible via Admin/API/CLI
+  du produit normal, ni remplacer l’autorité, les contrôles ou la journalisation.
+
+Le mécanisme précis (cfg de test/feature de fixture/adaptateur interne) reste à
+figer au début de BF-L3, avec son graphe de compilation. **Un test d’intégration
+compile normalement la bibliothèque sans cfg(test)** ; ne pas supposer qu’ajouter
+ce cfg rendra une barrière accessible. Si `test-fixtures` est requis, l’ELF de
+faute diffère du profil normal : conserver les deux graphes et empreintes ; témoin
+normal séparé et comparaison des sources métier effectives obligatoires. Cela
+établira la portée d’un banc instrumenté, **pas une injection prouvée dans l’ELF
+normal livré**. Si ce dernier niveau devient un critère, une méthode compatible
+supplémentaire devra être qualifiée avant clôture, sans contourner le hardening.
+
+Le collecteur existant `tests/paea_source_acquisition_inventory.py:20–42` refuse
+les features test-fixtures/test-util. Ne pas desserrer ce refus pour faire passer
+le banc : voie de rétention séparée pour les artefacts instrumentés, qualification
+normale distincte. Aucun wrapper Git, hook de production, kill temporisé,
+modification de base live ou effacement manuel du reçu ne remplace BF-L3.
+
+### Dépendances et périmètre du fencing proposé
+
+```mermaid
+flowchart LR
+  L0[BF-L0 Entrées et profil] --> L1[BF-L1 Fixtures neuves et identités]
+  L1 --> L2[BF-L2 Oracle et réception]
+  L2 --> L3[BF-L3 Injection ref vers reçu]
+  L2 --> L4[BF-L4 Fencing du banc]
+  L3 --> L4
+  L3 --> L5[BF-L5 Inventaire final et qualification]
+  L4 --> L5
+  L5 --> P3[BF-P3 Seulement après critères et autorisation]
+```
+
+Ordre de travail proposé, sans délégation : L0 → L1 → L2 → L3 → L4 → L5. La
+séparation des lots garde chaque changement réversible ; les contrats communs
+modifiés obligent à réexaminer leurs dépendants avant réutilisation des preuves.
+
+BF-L4 doit distinguer **fin d’admission**, **fin d’émission possédée** et **effet
+observé**. La garde proposée appartient au banc, pas à une nouvelle politique
+produit : elle refuse une tentative fermée, n’accorde aucun droit nouveau et n’a
+ni plafond ni délai de libération automatique. Elle garde les émissions déjà en
+vol et leurs résultats connus/inconnus. Une fermeture de canal ne rappelle pas
+une commande déjà envoyée. Des descendants échappés ou writers non inventoriés
+sortent du périmètre démontré : absence non établie et aucune réémission.
+Un délai contractuel existant reste en vigueur ; son expiration n’est pas une
+preuve de fencing. Pour un COMMIT inconnu, fermer la garde puis observer avant
+toute décision ; ne pas déclarer « aucun effet » parce que le leader est terminé.
+
+### Critères futurs de qualification du banc et passage vers BF-P3
+
+| Critère | Exigences/scénarios reliés | Preuve à exiger après autorisation |
+| --- | --- | --- |
+| BF-Q1 — indépendance des fixtures | BF-L1, F-T/B-T | Naissances et instances physiques distinctes, aucun root ancien modifié, candidat réellement transféré, contrôles positifs avec droits applicables. Substituer une copie de preuve ou réutiliser un root fermé par une autre tentative doit être visible/refusé. |
+| BF-Q2 — attribution discriminante | BF-C01/02/06, B-1/B-2/B-4 | A et B autorisés dans leur voie déclarée, publications distinguées malgré N identique, reçu d’un autre acteur/tentative/cible rejeté ou inconnu. Preuve B cachée : vérité oracle conservée, décideur sans attribution inventée. |
+| BF-Q3 — vrai intervalle ref→reçu | BF-C03/07, F-2/F-4 | Témoin sans défaut puis barrière atteinte ; une publication comptée, reçu absent à cause de la rupture, intention conservée ; aucun négatif journal élargi à absence d’effet. Deuxième publication pendant reprise = FAIL. Si callback already n’est pas atteint, l’indiquer comme tel. |
+| BF-Q4 — non-effet et fencing bornés | BF-C04/05/08, F-1/F-6 | Avant-barrière et après-barrière distingués ; demande A1 tardive refusée sans mutation, émission en vol conservée jusqu’à résolution ; ownership perdu/non résolu interdit nouvelle émission. Seul F-1 avec absence établie, préconditions fraîches et autorité explicite peut viser une publication A2 unique. |
+| BF-Q5 — historique malgré même état | F-5/B-3/B-5 | O→N→O et deux effets sous état final identique restent visibles avec leurs auteurs ; ne pas compter deux commandes no-op comme deux publications. Delta de reprise zéro dans ces cas. |
+| BF-Q6 — preuve reçue et décision appliquée | BF-C06/07, F-3/B-2 | Originaux, contenu effectivement transmis/retiré, reçu du décideur, décision autorisée et application reliés. Déconnexion/erreur de lecture ne devient ni succès vide ni mandat de réémission. |
+| BF-Q7 — octets, profils et recette | BF-P2-R1, BF-L0/L5 | Entrées externes réelles déclarées, archives/empreintes recontrôlées, source stable, tests nommés réellement exécutés, builds normaux et instrumentés séparés. PASS de fixture ne qualifie pas le profil normal ou la séparation protégée. |
+
+Cette matrice est un contrat de qualification **à exécuter ultérieurement**, pas
+une recette ou des tests créés dans cette demande. Témoin valide avant chaque
+faute, causes originales et états avant/après requis. Défaut de banc : diagnostic
+et correction du banc avant d’en déduire un défaut produit. Si le comportement
+métier violant BF-C est alors reproduit par un banc qualifié, conserver le FAIL et
+ouvrir BF-P4 ; **ne pas corriger silencieusement le produit dans ces lots de banc**.
+Réutiliser les recettes permanentes ciblées seulement dans leur portée ; aucun
+go test/cargo test global, watchdog ou quota de commodité ajouté par ce plan.
+
+### Bornes de changement, preuve et clôture de la présente demande
+
+Fichiers candidats : harnais de promotion et protocole, helper d’autorité, module
+commit/record pour le seul raccord d’instrumentation s’il est retenu, et recettes/
+collecteurs nécessaires à la rétention séparée. Toute fonction nouvelle/modifiée
+exigera son contrat documenté et revue erreurs/politiques liée aux octets, dans
+le même incrément futur ; docs concernées FR/EN à maintenir. Les anciennes archives,
+missions et fixtures conservées restent intactes. Aucune ouverture à des outils
+arbitraires, réseau ou comptes réels, aucune publication/commit/push autorisés ici.
+
+Pour les futures preuves : staging Unix gouverné ; Lexar seulement après contrôle
+montage/espace et copie relue, index local et empreintes. Ne pas modifier le réglage
+des fixtures pour les exécuter sur FAT32. En cas de manque de ressource, conserver
+état et précondition de reprise, pas de nettoyage/destruction ou relance inchangée.
+
+**Clôture actuelle : plan borné préparé dans les documents existants, pas blocages
+levés.** Les cinq thèmes ont propriétaire (Codex), dépendances, livrables et critères
+BF-Q explicites ; réalisation et BF-P3 restent non autorisés par cette demande.
+Aucun calendrier, surveillance récurrente ou budget nouveau. Pas de note de livraison
+version_history.json : aucun changement produit construit/installé. Transmission
+par plans FR/EN et registre X local ; aucun contexte embarqué ou service rechargé.
+
+Empreintes de cadrage, sans exécution ni qualification globale :
+
+| Source relue / source read | SHA-256 |
+| --- | --- |
+| `rust/crates/swarm-engine/src/root_store/paea_git_promote_call.rs` | `1255d665e4ef6b7183253bbca39193904519466850e75d66c501593ccb9fd6e2` |
+| `rust/crates/swarm-engine/tests/paea_git_promote_call.rs` | `ef4e847c8edc68a6ac1793959e906177d8ac1fceef2859fc40c74c4d226424a5` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_intent.rs` | `2aef44210363e5aec5b96d88e1990828744dc6b84828c0e0dc15b0ddd2c82652` |
+| `rust/crates/swarm-engine/src/managed_repository.rs` | `6e6a87c8eb6fa6cf207f581a8bc85784e3598a875fb5427ce696c55af396bae3` |
+| `rust/crates/swarm-engine/src/validation_run.rs` | `1c843fdfcafea7962d079198eb74fe163b81d2d3c10f9e54dea8e10b7f5399c2` |
+| `rust/crates/swarm-engine/src/validation_run_recovery.rs` | `548966ca99e07b62c6d672f70cf2cab9e73f5af18537f54cf67447f637cbd554` |
+| `rust/crates/swarm-enrollment-authority/src/authenticated_control.rs` | `cf502d4b735137d4c2a830ddfadaa3afefb5630241bb1fab40a3c7894eb0256a` |
+| `rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs` | `0c0f3635a8c9cfa2b4afa3a88c38baf71e8b0a8f48f89a2992bd9724586df6d2` |
+| `rust/crates/swarm-engine/tests/git_reference_transaction.rs` | `fa3ed15210465b128ca2ea0be6aed984034b26367c5932a413f9fe71b211ed3e` |
+| `rust/crates/swarm-engine/Cargo.toml` | `513a0d0b17756cd31e08e9f6d2fb1872df41dcb3bf8cc1b11d4830aa4a692f89` |
+| `tools/verification/recipes/paea-owned-git-promote.json` | `7ee5855ce0ef3b1c74836a0968e2da3031db882d8954e7dfe2e1b79a3db3e656` |
+| `tools/verification/recipe.py` | `348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b` |
+| `tests/rust_native_first_publication.py` | `7ec401919b0ab744d0086728a7b102fd5f24e09a9dfb8bc1c0cd077f2825ea5d` |
+| `tests/paea_source_acquisition_inventory.py` | `431036aac49b6077f02d0231da3f4530a5baa10c9d12b16cd08493577f9b10fa` |
+
+
+### Gi.eth — clôture GI-T3/GI-T4 du 8 novembre 2026
+
+Correctif local v0.1.1-dev.347 : fichiers réguliers initiaux de la copie candidate
+liés aux preuves, y compris non déclarés ; V2 à fichiers suivis inchangés refusé sous
+R1. `task review-refresh` conserve R1/historique/consommation, exige de nouveaux
+contrôles et R2. Reprise vérifiée sur variante V2 sûre, publication/rejeu acceptés ;
+le V2 dangereux reste refusé. Recettes gieth-review-refresh et gieth-legacy-refresh
+PASS et preuves revérifiées ; reviewers inertes, pas d’audit indépendant.
+Profil normal, identité active et dialogue Version FR/EN vérifiés. Limite ouverte :
+focus après Échap ; pas d’inventaire universel des dépendances externes.
+[Résultats, sources, preuves, inconnues et RETEX](actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).
+
+
+### POC-03 — réconciliation additive, 2026-11-08T17:19:01.705556+00:00
+
+Mikhail : https://x.com/i_mika_el/status/2119459613724578163 et https://x.com/i_mika_el/status/2119462379687997652. Conserver timeout initial puis événement de réconciliation ; examiner reçu durable côté consommateur liant clé/requête/cible/version/acteur. Scénario témoin autorisé puis réponse perdue, tiers et interruption mutation/trace ; attribution inconnue sans preuve fiable, reprise sans double effet. Voir X-IDEE-07 pour scénario détaillé/provenance. Couverture code/runtime inconnue sur cette variante ; pas de garantie distribuée, aucun développement/test lancé. Propriétaire Fabrice, reprise différée explicite.
+
+
+## BF-L0 — rapprochement des entrées et corrections requises, 8 novembre 2026
+
+**Analyse autorisée réalisée ; aucune correction de code/recette ni exécution.**
+Pas de test, compilation, fournisseur, paiement, service ou fixture lancé/créé.
+Lecture sur HEAD `1fec07d4874cc469c5a3905abb9bb64f855b2d26`, travaux concurrents préservés. Méthode replan et
+contrôle affirmation→source. BF-L0 reste **ouvert** : son rapprochement documentaire
+est établi dans la portée ci-dessous, ses corrections et contrôles d’effet ne
+sont pas réalisés. Aucun passage BF-L1/BF-P3 déduit.
+
+### Portée du rapprochement et sémantique réelle des inputs
+
+Six recettes examinées : `paea-owned-git-promote`, `paea-owned-source-acquisition`,
+`paea-owned-git-transfer-reconcile`, `paea-effect-reconcile`,
+`paea-native-git-reference-transaction`, `paea-native-git-intent`, sous
+`tools/verification/recipes/`. Lecture de leurs étapes/env et des consommateurs
+Rust/Python correspondants ; aucun argv de recette exécuté.
+
+`tools/verification/recipe.py:130–173,185–208,247–281` : chaque motif inputs doit
+sélectionner au moins un fichier ; la recette appelée est ajoutée automatiquement.
+Le snapshot exclut `.swarm`, `.git`, node_modules, rust/target et son output courant ;
+il refuse les chemins résolus hors du dépôt. Il conserve ensuite uniquement les
+octets **déclarés**, avec comparaison avant/après. Un fichier de recette simplement
+mentionné dans inputs est hashé, **pas exécuté comme dépendance**. Une variable
+présente dans environment n’est pas la preuve qu’une étape la lit. Le runner
+hérite aussi de l’environnement et ne conserve dans environment.json que ses
+overrides ; le hash du lanceur cargo ne prouve pas celui de rustc/Git.
+
+Énumération statique des motifs, conforme aux exclusions lues, sans invoquer
+snapshot/run/collecteur : respectivement **738 / 867 / 738 / 947 / 863 / 865 fichiers**
+au relevé, recette appelée comprise ; zéro motif vide et zéro chemin résolu hors
+checkout trouvés. Ces ensembles comprennent des sources non versionnées présentes
+et peuvent changer ; **ce ne sont ni des graphes compilateur ni une attestation de
+complétude**. Les omissions ci-dessous existent malgré ces motifs non vides.
+
+Notations pour éviter toute ambiguïté :
+- D = `docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/` ;
+- S = D + `source-fixture-writer78b-regen-20261031b/` ;
+- O = D + `source-fixture-writer78b-regen/` (ancien chemin encore déclaré) ;
+- C = D + `source-fixture-current-pub-regen-20261031/`.
+Les noms O/S ne prouvent pas leur fraîcheur. O/result.json et S/result.json existent,
+donc le mauvais chemin déclaré ne provoque pas ici un motif vide.
+
+### Consommation suivie par recette et écart établi
+
+| Recette / étapes | Consommation suivie dans le code actuel | Déclaration actuelle et correction nécessaire |
+| --- | --- | --- |
+| owned-git-promote : target `paea_git_promote_call`, puis Rustdoc | `tests/paea_git_promote_call.rs:53–105,154–160,347–365` lit SOURCE→S/result.json, parcourt les owned-root, ouvre le root désigné writable et lit publication/Trust. WRITER/CURRENT configurés ne sont pas lus par les étapes de promotion suivies. | O/result et C/result déclarés, S/result absent ; aucun owned-root de S déclaré. Corriger SOURCE→S, ajouter ses preuves effectivement lues. Ne pas déclarer WRITER consommé par la seule présence de sa variable ; C est une entrée supplémentaire conservée, pas une preuve de consommation. |
+| owned-source-acquisition : unités transfer/source, intégrations repository | `src/root_store/paea_git_repository/barrier_tests.rs:20–61`, appelé par source.rs:317 et transfer.rs:405/596, lit WRITER→S/result et naissance ; `tests/paea_git_repository.rs:110–128,467–485` lit CURRENT→C/result et SOURCE→S/result, puis leurs roots. | Aucun S/result, C/result ou owned-root déclaré dans cette recette. Ajouter les deux sources de preuve réellement consommées et leurs liens de naissance. Dédupliquer S puisque WRITER/SOURCE partagent ce chemin, sans fusionner leurs rôles. |
+| owned-git-transfer-reconcile : unités transfer et target `paea_git_transfer_call` | Unités : WRITER→S via barrier_tests ; intégration `paea_git_transfer_call.rs:96–111` : SOURCE→S puis root writable/Trust. CURRENT configuré non consommé par ces étapes suivies. | Même mauvais O/result que promotion ; S/result et naissance absents. C/result déjà déclaré ne couvre ni S ni sa naissance. Corriger les liens réellement utilisés, préserver les originaux. |
+| effect-reconcile : targets engine/CLI/web + réglages | `tests/paea_effect_reconcile.rs:135–160,183–197,218–222` lit SOURCE→S/result, naissance, root writable/Trust ; `:95–97` compile **include_bytes de web/paea-examples/v1/payment-document.json**. WRITER/CURRENT non consommés par les chemins de fixture suivis. | O/result au lieu de S/result ; naissance absente ; payment-document.json non sélectionné par inputs. Ajouter S/preuves et l’include effectif. Un autre fichier JSON sous Rust ne couvre pas cet embed. Les sources effectives des autres targets restent à rapprocher par leurs depfiles. |
+| native-git-reference-transaction | Target protocole crée ses données synthétiques ; aucune variable SWARM_PAEA_*_FIXTURE définie, aucun root externe de naissance consommé par ces cas. | Pas d’écart S/C à lui attribuer. JSON d’exemple déclaré est une entrée supplémentaire, pas une preuve qu’il est lu par ce target. Helpers du runner et compilation restent concernés par les écarts communs. |
+| native-git-intent | Targets intention/protocole, sans fixtures S/C dans leurs paramètres/cas suivis. | Même limite : ne pas ajouter de naissance externe inutile ; traiter les entrées communes et compiler effectif, sans inventer une dépendance de fixture. |
+
+**Fichiers de naissance effectivement retrouvés, non inclus dans les inputs des
+recettes qui les utilisent :**
+- S + `native/inspection/workers/planning/setup/owned-root-a418069ad56f41e99ee2c5c8e9e74e9bf0f80545d48a0f714ee60e2baebfe3ff.json` ;
+- C + `baseline/setup/publication/native/inspection/workers/planning/setup/owned-root-5b232fa9582229588e2fd97dcbe2ea920cc4999afad37d6dc0e48ca83c66bd3c.json`.
+Les scanners born() lisent les owned-root candidats puis comparent root, pas une
+signature du résultat. Il faut conserver les fichiers réellement examinés et leur
+inventaire, pas seulement un PASS déclaré. Aucun RootStore ni base n’a été ouvert
+pour ce rapprochement ; existence et octets de ces preuves seulement relus.
+
+### Entrées transitives communes : corrections requises
+
+| ID | Cause / fichier consommé et passage lu | Correction à préparer, sans la réaliser ici |
+| --- | --- | --- |
+| L0-R01, précise BF-P2-R1 | S/result réellement lu, O/result déclaré dans trois recettes ci-dessus. | Remplacer le lien obsolète par l’entrée validée effectivement consommée ; évaluer séparément toute entrée supplémentaire. Ne pas basculer environment vers O pour satisfaire artificiellement le manifeste. Aucun ancien fichier supprimé. |
+| L0-R02 | Résultats et owned-root manquants dans les recettes de fixtures natives. | Déclarer les preuves immuables consommées, conserver leurs contenus/empreintes et lien résultat→naissance→instance. Pour BF-L1 neuf, ne pas figer le nom aléatoire de cette ancienne preuve comme nouvel invariant : produire un inventaire de naissance frais puis figer la recette adaptée. |
+| L0-R03 | Le runner importe `tests/fixture_area.py` (`recipe.py:215–220`), absent des six inputs. Ce helper lit `.swarm/engine-settings.json` ou le défaut livré pour runtime_temporary_directory (`fixture_area.py:34–58`). | Ajouter le helper ; retenir une projection pertinente du réglage réellement résolu et sa provenance/révision dans les preuves d’invocation. Le défaut livré est couvert par les motifs swarm-engine, mais ne remplace pas le réglage sauvegardé. Ne pas retirer l’exclusion de tout `.swarm` ni archiver des données privées inutiles pour cette correction. |
+| L0-R04 | `.cargo/config.toml` sélectionné appelle `tools/verification/cargo_space_guard.py`; ce wrapper lit `.cargo/storage-policy.json` (`cargo_space_guard.py:17–37`). Aucun des deux dans les six inputs ; les deux fichiers existent. | Retenir config Cargo effective, wrapper et politique persistée avec empreintes ; préserver la validation et le refus de stockage, sans changer son seuil. Examiner les autres configs effectives au futur build ; ne pas assimiler la présence du seul config.toml à une couverture du wrapper. |
+| L0-R05 | payment-document include direct absent d’effect-reconcile ; autres ressources/dépendances Cargo non déduites du glob Rust. | Ajouter cet include certain ; découvrir/retenir les autres entrées réellement compilées par les collecteurs appropriés et depfiles sous profil visé. Les fichiers présents mais non utilisés restent candidats, pas dépendances effectives. Aucun ajout massif de tout docs/.swarm comme faux remède. |
+| L0-R06 | `tests/paea_source_acquisition_inventory.py` est déclaré par acquisition, mais aucune étape de sa recette ne l’appelle. Le collecteur importe PROFILE et RECIPE et peut ajouter configs/wrapper/politique aux candidats (`verify_native_profile.py:57–76,115–140`). | Choisir explicitement le mode futur : runner déclaratif seul ou collecteur. Si collecteur retenu, capturer son argv, ses deux modules et inventaire enrichi ; ne pas lui attribuer une exécution parce que son chemin est dans inputs. Son invocation compile/teste : non effectuée ici. Son enrichissement ne résout pas à lui seul les preuves S/C ni le helper Python non ajouté. |
+| L0-R07 | `result.root` mène à un Root mutable : publication courante relit settings, Work, chaîne et contrôles (`src/root_store/managed_git_current.rs:48–58,88–145`) ; le harnais promotion/transfer y applique Trust. | Rétention séparée : preuves de naissance immuables dans inputs ; état initial/identité/versions/objets réellement consommés et transitions autorisées dans preuves de fixture, sous barrières appropriées. Ne pas exiger que la DB entière reste identique pendant un scénario qui doit la modifier ; ne pas masquer une mutation non prévue. Aucun snapshot SQLite live fabriqué ici. |
+| L0-R08 | Environnement hérité non conservé intégralement, outils lancés via PATH ; le runner vérifie seulement le lanceur de l’étape (`recipe.py:247–281`), les tests Git résolvent ensuite leur Git. | Retenir à l’invocation une liste pertinente et sûre d’options/configs/outils réellement utilisés, profils/features unifiées et empreintes des exécutables, sans enregistrer secrets/environnement complet. Refaire les liens dès changement des entrées effectives. Ce sont des obligations de preuve, pas une nouvelle politique opérateur. |
+
+### Rôle précis du collecteur et des recettes dépendantes
+
+Une mention de `paea-owned-source-acquisition.json` dans inputs d’une recette de
+promotion/transfert/rapprochement **ne lance pas** acquisition et n’en applique
+pas l’inventaire. `tests/paea_source_acquisition_inventory.py:65–118` lance lui-même
+les compilations no-run, lit leurs depfiles et fabrique une recette figée avant
+d’appeler le runner. Son pré-inventaire ajoute aussi `verify_native_profile.py` et
+recipe.py, et PROFILE.candidates couvre notamment les ressources web/frontend et
+les configs locales de compilation. Cette voie est distincte de
+`recipe.py run --recipe ...`; aucun de ces parcours exécuté ici.
+
+Le collecteur refuse les features test-fixtures/test-util et ne qualifie pas tous
+les targets d’une recette quelconque : son contrat cible unités engine et, hors
+unit-only, l’intégration paea_git_repository. Ne pas l’appliquer à la promotion,
+aux targets CLI/web ou au banc instrumenté en prétendant leur ELF couvert. Définir
+la couverture des cibles futures séparément, sans desserrer les refus normaux.
+
+### État des corrections, suites et preuve attendue
+
+**Pas de correction réalisée.** Codex porte L0-R01–08 ; Fabrice garde l’autorité
+sur les modifications et exécutions ultérieures. Suite recommandée :
+1. Valider le mode de rétention et les entrées immuables/dynamiques ; corriger R01/02
+   dans les consommateurs concernés et R03/04 dans la rétention commune, sans
+   changer le comportement du produit ni les politiques existantes.
+2. Réaliser le rapprochement effectif de compilation R05/06/08 après autorisation,
+   sous profil normal ou instrumenté explicitement séparé ; ne jamais démarrer
+   BF-L1 sur la seule présence d’un result.json déclarant PASS.
+3. Avant passage, vérifier futur témoin cohérent puis chemin consommé différent,
+   naissance manquante/modifiée, input supprimé/changé, réglage/wrapper modifié,
+   configuration invalide et reprise sur correction. Exiger refus avant le travail
+   dépendant, cause conservée et aucun fallback vers preuve ancienne. Les variantes
+   de contrôle et leur recette sont à concevoir/réaliser, non créées ici.
+4. Après BF-L1–L4, rafraîchir l’inventaire final BF-L5 : nouveaux helpers, barrière,
+   oracle, projections et profils deviennent eux-mêmes des entrées à retenir.
+
+Recherche complémentaire bornée : **19 manifestes** définissent une variable
+SWARM_PAEA_*_FIXTURE dans tools/verification/recipes (dont quatre dans les six
+recettes suivies ici). Les quinze autres sont des candidats d’impact, **pas revus
+sémantiquement ni déclarés corrigés/conformes** : approval-form-rust,
+approval-web-positive, consent-ui-rust, delivered-chain-cli-rust,
+git-call-agreement-last-use-rust, git-call-agreement-rust,
+git-call-agreement-terms-rust, git-call-approval-rust, git-call-preview-rust,
+git-call-web-rust, native-git-source-context, owned-git-transfer,
+payment-agreement, promote-cli-suite-regression-rust, transfer-call-cli-rust
+(tous préfixés paea-). Propriétaire Codex ; reprise : suivre leurs étapes et
+consommateurs avant réutilisation. Ne pas réécrire les verdicts historiques ;
+examiner la portée de leurs inventaires si une preuve est réutilisée.
+
+**Bilan BF-L0 :** correspondances et huit corrections nécessaires documentées pour
+le périmètre annoncé ; aucune conformité globale ni levée du blocage d’inventaire.
+La présente demande analytique est traitée ; le lot reste ouvert pour corrections
+et qualification autorisées. Aucun budget, timer, test, droit ou surveillant créé.
+Seuls plan FR/EN et registre X mis à jour ; aucune recette, fonction/docstring,
+fixture conservée, preuve originale ou version_history.json modifiée par ce lot.
+
+Empreintes du rapprochement statique ; aucun graphe compilateur exécuté :
+
+| Source relue / source read | SHA-256 |
+| --- | --- |
+| `tools/verification/recipe.py` | `348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b` |
+| `tests/fixture_area.py` | `4ece994bd492dc4e44adf24388ed50073ceeff7e74527cd106b31824c8ce566c` |
+| `tools/verification/cargo_space_guard.py` | `09b7d45c78c64282dee6265be2d26cea6066505963465e2a50a856f1fe8d5916` |
+| `.cargo/storage-policy.json` | `5e392baf7d475a34bd1c4614636682cd4e01bd21b007a3d4845b1e822c7f26dd` |
+| `.cargo/config.toml` | `31bee734fefe516086f75b642c1ca537e54997d684e4cc5c983951e01157ca72` |
+| `tests/paea_source_acquisition_inventory.py` | `431036aac49b6077f02d0231da3f4530a5baa10c9d12b16cd08493577f9b10fa` |
+| `tools/verification/verify_native_profile.py` | `d40d2b32f756eb0454c6dbd25cff6358d56e59bfae3d7e71fc7a33741693ac1f` |
+| `rust/crates/swarm-engine/tests/paea_git_promote_call.rs` | `ef4e847c8edc68a6ac1793959e906177d8ac1fceef2859fc40c74c4d226424a5` |
+| `rust/crates/swarm-engine/tests/paea_git_transfer_call.rs` | `2d077bd5719d2858dd03cf110bf97c7ee966af903d1c191a3757b9dec2834451` |
+| `rust/crates/swarm-engine/tests/paea_git_repository.rs` | `cbcfd28ee30c3ed7955685c242d9b14fbae59a49120ce622b8fa630ba7fe1a91` |
+| `rust/crates/swarm-engine/tests/paea_effect_reconcile.rs` | `63effcd53fe74a1d6c65aeede621432a424d9075b7cfbc528431252671078365` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_repository/barrier_tests.rs` | `e9a4ce1c6d01905c20f87b62b46073c9e00d56ee02eaa221fa17202026d1af10` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_repository/source.rs` | `77ae638b3832bf0ae63939516787580955906269d70f3c5875a3b12b72d63490` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs` | `5f85d5eb71556fc8da0fb1a56892901a7574d2338e6288a7c8c50398ae0625f9` |
+| `rust/crates/swarm-engine/src/root_store/managed_git_current.rs` | `b57f1a5be938b22af769ad49748ae6017707e4ac0aa1780b943402b8a8e9e54b` |
+| `tools/verification/recipes/paea-owned-git-promote.json` | `7ee5855ce0ef3b1c74836a0968e2da3031db882d8954e7dfe2e1b79a3db3e656` |
+| `tools/verification/recipes/paea-owned-source-acquisition.json` | `2eb35de6b2851f8ed957701e3d21ce311477eb97eb0c8c5df5e34cff97517866` |
+| `tools/verification/recipes/paea-owned-git-transfer-reconcile.json` | `11c2b873e8981d7f1139bf38f26800cf12de12d8a93f840624095b47efe0ff2f` |
+| `tools/verification/recipes/paea-effect-reconcile.json` | `56396fbb4f41b6da44cddc8f69ce3dd676a9a40296077ea1c38e0cc74f25e6b1` |
+| `tools/verification/recipes/paea-native-git-reference-transaction.json` | `09a4a07914cc9c97eb77c766823c09778a4628a9b7d9e096d58512ddb1bbe43c` |
+| `tools/verification/recipes/paea-native-git-intent.json` | `e2d478da120bce223bead78109f427794ef957a05a58cb046c3bb30092e30fdf` |
+
+
+## BF-L0 — quinze manifestes complémentaires rapprochés, 8 novembre 2026
+
+**Analyse et documentation seulement ; commit/push sur main autorisés par Fabrice.**
+Aucune recette ni source produit modifiée/exécutée ; aucun test, build, fournisseur,
+paiement, navigateur ou service lancé. Lecture sur HEAD `1fec07d4874cc469c5a3905abb9bb64f855b2d26`, checkout
+canonique résolu par `/home/fpizzi/workspace/swarm`. Les travaux natifs concurrents
+non committés sont hors de cet incrément. Replan et contrôle des affirmations appliqués.
+
+Les quinze candidats de la section précédente sont maintenant rapprochés de leurs
+étapes, environnements, sources de consommateurs et motifs inputs. Cela complète
+le **rapprochement documentaire des 21 recettes retenues** (six précédentes et ces
+quinze), sans établir un graphe compilateur complet, une exécution ou une conformité
+globale. Tous les motifs inputs de ces quinze manifestes trouvent des fichiers au
+relevé ; cette condition ne détecte pas les omissions décrites ci-dessous.
+
+### Consommateurs réellement suivis et précaution sur les naissances
+
+- Web : `swarm-web/tests/paea_git_call.rs:487–514` ; navigateur consent :
+  `swarm-web/tests/paea_consent_browser.rs:73–103` ; CLI transfer/promote :
+  `swarm-cli/tests/paea_transfer.rs:36–54`, `paea_promote.rs:202–218` ; CLI approval :
+  `paea_approval_web.rs:1884–1906` (chemins sous `rust/crates/`). Ils lisent
+  SOURCE/result.json, vérifient ses marqueurs, ouvrent le root indiqué writable,
+  puis lisent sa publication courante et/ou Trust. **Ces fonctions ne parcourent
+  pas owned-root.** Une naissance présente mais non déclarée n’est donc pas une
+  omission de fichier effectivement lu par ces fonctions ; son exigence pour le
+  futur banc neuf reste BF-Q1, sans inventer une validation actuelle.
+- Engine promotion/last-use lit aussi born(), déjà suivi ; source/transfer unités
+  utilisent `paea_git_repository/barrier_tests.rs:20–61` et le target repository
+  utilise les lecteurs SOURCE/CURRENT décrits dans le premier rapprochement.
+  Pour ces consommateurs, les preuves de naissance sont bien des entrées lues.
+- Les cas qui démontrent explicitement « absence de source » n’en consomment pas
+  une du seul fait que SOURCE existe dans environment. Le rapprochement retient
+  uniquement les autres cas/étapes de la recette qui l’utilisent réellement.
+
+### Matrice des quinze recettes
+
+Tous les noms ci-dessous sont préfixés `paea-` et suffixés `.json` sous
+`tools/verification/recipes/`. « résultat déclaré » ne valide ni authenticité,
+fraîcheur du root, profil, disponibilité d’usage ou acceptation produit.
+
+| Manifeste | Entrée et consommateur suivis | État / correction à conserver |
+| --- | --- | --- |
+| approval-form-rust | SOURCE=`.swarm-fixtures/source-fixture-fresh-regen-20261031` ; présentation et driver Python→target web `paea_git_call`, puis `tests/paea-approval-form-ui.cjs`. | result.json **présent et déclaré**, pas d’écart de chemin établi. Scripts directs et harness `.cjs` déclarés. i18n : script et ressources Trust manquants, voir R09. Helper fixture_area.py déclaré. Binaire de test produit/liés = sorties, pas inputs immuables ; toucher native_admin.rs avant build est une mutation de métadonnées à retirer de la future procédure, R12. |
+| approval-web-positive | SOURCE=`docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-direct-held-lock-guard-review-repair-20261105T104154Z/supervisor-source-normal334-20261105T105919Z` ; target CLI `paea_approval_web`. | result.json et inputs.json déclarés ; project() lit result et Root, **pas inputs.json dans ce chemin suivi**. L’autre fichier est un supplément, pas un contrôle implicite. Helper commun déclaré ; image externe sélectionnée/pinnée, R10. Aucun manque de result déclaré. |
+| consent-ui-rust | SOURCE=`docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/consent-fixture-regen-20261031c` transmis par driver au target `paea_consent_browser`. | result présent **non déclaré**. Driver et harness consent `.cjs` déclarés, helper Python commun absent. i18n incomplet ; outputs liés distincts. Même touch préalable de source Rust à supprimer de la procédure future. |
+| delivered-chain-cli-rust | SOURCE=`.../claude-tmp-fix-e2e-20261031T173021Z/chain-fixture-regen-20261031b` ; target CLI `paea_promote`, image désignée `bin/swarm`. | result présent/déclaré. Pas de scan born dans project(). La lecture des octets de bin/swarm ne correspond plus au SHA attendu par le manifeste : **prérequis image non satisfait**, R10. Ne pas remplacer son pin par le hash trouvé sans qualification. |
+| git-call-agreement-last-use-rust | SOURCE=`.swarm-fixtures/source-fixture-lastuse-regen-20261031b` ; promotion engine puis unités d’accord. | result présent/déclaré ; naissance born réellement lue par promotion mais non déclarée. Le test d’accord pur ne remplace pas ce lien. Helpers communs manquants selon R03/04. |
+| git-call-agreement-rust | SOURCE=`.swarm-fixtures/source-fixture-status-minimal-regen-20261101` ; unités accord et cas web `paea_git_call`. | result présent/déclaré ; lecteur web sans scan naissance. Aucun écart de chemin à inventer ; conserver R03/04 et la distinction état mutable/preuve déclarée. |
+| git-call-agreement-terms-rust | SOURCE=`.swarm-fixtures/source-fixture-terms-api-regen-20261031` ; accord/terms engine puis présentation web et i18n --check. | result présent/déclaré. Script i18n et ses deux sources/deux sorties comparées tous absents des inputs. Ajouter les entrées certaines R09, pas seulement les Rust. |
+| git-call-approval-rust | SOURCE=`.swarm-fixtures/source-fixture-approval-fresh-regen-20261031` ; unités accord et routes d’approbation web. | result présent/déclaré, pas de naissance lue par project() web. Garder écarts communs R03/04 et inventaire effectif de compilation à établir ; aucune validation runtime. |
+| git-call-preview-rust | SOURCE identique à status-minimal ; routes preview web et i18n --check. | result présent/déclaré ; locales/en.json et web/i18n-en.js retenus, mais script i18n et paire Trust omis. R09 applicable. |
+| git-call-web-rust | SOURCE=`.../source-fixture-writer78b-regen-20261031b` ; appels web `paea_git_call`. | result présent mais ancien `.../source-fixture-writer78b-regen/result.json` déclaré à sa place : nouvelle occurrence de R01. Le lecteur web ne consomme pas born ; ne pas confondre ces deux écarts. |
+| native-git-source-context | WRITER/SOURCE=`.../source-fixture-writer78b-regen-20261031b` et CURRENT=`.../source-fixture-current-pub-regen-20261031` ; unités source et intégration repository. | Les deux result uniques existent, **aucun déclaré**. Naissances réellement lues également absentes. Dédupliquer le chemin partagé WRITER/SOURCE sans fusionner leurs fonctions ; R02. |
+| owned-git-transfer | WRITER=`.../source-fixture-writer78b-regen-20261031b` ; unités transfer via barrier_tests, précédées de contrôles de reprise Child/pack. | result présent non déclaré, naissance effectivement lue non déclarée ; R02. Les contrôles Child/pack ne prouvent pas le résultat de la fixture source. |
+| payment-agreement | SOURCE=`.../chain-fixture-regen-20261031b` pour la régression last-use engine ; targets settlement engine/CLI et image externe épinglée. | result présent/déclaré ; naissance requise par le chemin promotion non déclarée. L’image CLI externe existe et son pin correspond aux octets lus, sans qualification de profil actuelle. Aucun effet/paiement financier déduit. |
+| promote-cli-suite-regression-rust | SOURCE=`.swarm-fixtures/source-fixture-lastuse-regen-20261031b` ; ensemble du target CLI `paea_promote`, include-ignored. | result présent/déclaré ; lecteur CLI sans born. include_bytes payment-document.json compilé dans ce target mais absent des inputs ; R05. La sélection Cargo de binaire par défaut n’est pas une image livrée implicitement. |
+| transfer-call-cli-rust | SOURCE=`.../chain-fixture-regen-20261031b` ; `paea_transfer` puis cas `paea_promote`. | result présent/déclaré ; pas de naissance lue par ces project(). Même include payment-document.json absent pour le target promote compilé ; R05. Ne pas confondre test filtré et source non compilée. |
+
+Les points `.../` du tableau partent de
+`docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/`.
+Les marqueurs de naissance existent sous les dossiers examinés, mais ils ne sont
+comptés comme **consommés** que pour les lecteurs qui les ouvrent réellement.
+
+### Corrections complémentaires et cas qui ne sont pas des défauts d’inputs
+
+| ID | Fait lu / portée | Correction nécessaire avant réutilisation |
+| --- | --- | --- |
+| R09 — i18n | `scripts/i18n/build.cjs:1–23` lit locales/en.json, locales/trust-actions-en.json, web/i18n-en.js et web/trust-actions-en.js en mode --check. Script absent dans approval-form, consent-ui, agreement-terms et preview. La paire Trust manque aux quatre ; terms ne retient aucune des quatre ressources. | Déclarer script et les ressources manquantes par recette. Ici --check **lit** les outputs générés existants : ce sont des entrées immuables de cette étape, contrairement à l’ELF créé par le run. Aucun rebuild i18n effectué. |
+| R10 — image externe | `swarm-cli/tests/paea_promote.rs:171–198`, `paea_settlement.rs:379–395` et sélection dans `paea_approval_web.rs:2160–2177` lisent le binaire désigné et son SHA attendu avant spawn. | Retenir chemin sélectionné, pin et octets/liaison au profil qualifié ; ne jamais adopter le binaire Cargo en fallback si une image désignée est invalide. Une empreinte égale prouve les octets, pas le profil ou l’installation. Une différence bloque cette recette avant son run. |
+| R11 — artefacts de build et preuves navigateur | `bind_cargo_test_binary.py` résout par Cargo un ELF produit, retient un lien puis le revérifie ; les drivers lisent server.json, phases et sorties du banc créées pendant le run. Les scripts liés sont déclarés dans approval-form/consent. | **Ne pas ajouter ces outputs produits par le run aux inputs immuables** : conserver comme sorties liées, identité initiale/finale et causes. Les tests de liaison existants restent en source ; non exécutés ici. Le fichier --binary donné au driver peut être une spécification à résoudre, pas un fichier préalable à hasher. |
+| R12 — build forcé par touch | Les deux recettes navigateur ont une étape `sh -c` qui touche `rust/crates/swarm-web/src/service/native_admin.rs` avant cargo test --no-run. | Mutation de mtime/configuration de lancement, pas preuve d’un changement des octets ni injection ref→reçu. Pour une reprise future, remplacer ce forçage par résolution/binding pris en charge du bon artefact ; inventorier le fichier, préserver les compilations concurrentes et ne pas toucher des sources pour fabriquer la fraîcheur. Aucune étape exécutée/modifiée ici. |
+| R13 — dépendances navigateur | Les harness JS lus chargent Puppeteer depuis node_modules et sélectionnent Chrome via configuration/chemin ; les drivers transmettent SOURCE et lancent le target Rust puis Node. node_modules est exclu par le runner. | Retenir manifests/lockfiles nécessaires et identité des outils réellement chargés/exécutés, ressources effectivement servies et outputs ; ne pas archiver indistinctement node_modules ou les sessions privées. Une source web présente ne prouve pas les assets servis. Aucun navigateur ni service lancé pour cette analyse. |
+
+R03/04 communs restent ouverts : **wrapper Cargo et storage-policy absents des
+quinze** ; fixture_area.py déclaré dans approval-form et approval-web-positive,
+absent dans les treize autres. Les quinze utilisent le runner qui importe ce
+helper. Une déclaration correcte dans une recette voisine ne se transmet pas.
+Aucun motif vide n’a été observé pour ces quinze : ne pas prendre cette absence
+d’erreur pour la validation des dépendances et outils réels.
+
+### Lecture seule des trois images externes désignées
+
+| Recette | Pin attendu dans environment | SHA-256 des octets lus pendant le rapprochement | Conclusion bornée |
+| --- | --- | --- | --- |
+| approval-web-positive, SWARM_PAEA_APPROVAL_WEB_CLI | `23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c` | `23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c` | Fichier présent, correspondance d’octets ; ni exécution ni profil validés ici. |
+| delivered-chain-cli-rust, bin/swarm | `84b1e78c8dbd9f38c5ebebb7fd48c097f6e7de76805249fd06592730aa5211a8` | `3512fdaed47a9f111959de2cfd8186276d1d32d073da510e0dd8e86913b0735f` | Écart observé, précondition image de cette recette non satisfaite à cette lecture. Aucun test exécuté et aucun pin réécrit. |
+| payment-agreement, SWARM_PAEA_DELIVERED_BIN | `3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a` | `3146c83791e9cd5e98f264d3d4af0bdf2fc6ee9fb246d145dcc88fd8c4cc313a` | Fichier présent, correspondance d’octets seulement ; aucune capacité financière. |
+
+Pour l’écart de bin/swarm, choix futurs à comparer : retrouver l’image historique
+avec son profil/preuves, ou sélectionner une image actuelle séparément qualifiée
+avec une recette adaptée. **Changer seulement le pin pour accepter les octets
+trouvés n’est pas une qualification.** Propriétaire Codex vérification, autorité
+Fabrice ; aucune sélection/redémarrage ni requalification effectuée ici.
+
+### Mise à jour de BF-L0 et passage restant
+
+Les quinze candidats ne sont plus « non examinés » dans leur portée de chaînes
+d’entrée ci-dessus. Les anciens états restent historiques. BF-L0 retient désormais
+R01–R08 du premier rapprochement et R09–R13 ici ; appliquer chaque correction
+uniquement au consommateur concerné. Les preuves de naissance de BF-Q1 restent
+nécessaires au futur banc, même si un lecteur web actuel ne les lit pas : cela
+doit être une exigence/raccord explicite, pas un contrôle supposé existant.
+
+**BF-L0 reste ouvert : aucune correction appliquée ni preuve d’exécution obtenue.**
+Avant BF-L1 : décider les bonnes fixtures et images, corriger les liens réels,
+retenir helper/wrapper/configs/embeds, conserver séparément état Root et outputs,
+puis qualifier les targets/profils effectifs sous autorisation appropriée. Aucun
+collecteur normal n’est desserré pour accepter une instrumentation de fixture.
+Les contrôles négatifs/fraîcheur/reprise du plan restent à réaliser ultérieurement.
+
+Git : cette demande autorise commit et push sur main du suivi documentaire.
+Le push de main inclut aussi ses deux commits locaux préexistants (50f587e57 et
+1fec07d48), examinés comme historique/design, sans embarquer les changements
+natifs non committés. Le registre de campagne X reste local et ignoré par Git ;
+aucun ajout forcé de ce dossier ni publication X. Pas de version_history modifié
+par ce travail documentaire, aucune installation ni contexte embarqué rechargé.
+
+Empreintes de lecture ciblée, sans graphe compilateur ni exécution :
+
+| Source / manifeste relu | SHA-256 |
+| --- | --- |
+| `tools/verification/recipe.py` | `348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b` |
+| `scripts/i18n/build.cjs` | `868b3ffd89ec3232ad045e1b97ceb5ef2f6dab770a3a74f8a1f416bbefa64f19` |
+| `tools/verification/bind_cargo_test_binary.py` | `fe67a8265048459a4e2d355558a807eb58faa7c0ed801242848d4f1037ac72de` |
+| `tools/verification/test_bind_cargo_test_binary.py` | `9f1f6c308538660551bb78496aa3f4a7be349048c452e0b0d44675595d908ecc` |
+| `tests/paea_approval_form_ui_recipe.py` | `89d208d00a834521516973607e28bfe83264e319ed430ddf63a74ae9e83b92f1` |
+| `tests/paea_consent_ui_recipe.py` | `48640a6a806c5337b59b083c12c2eb9dcfbd026a5f589ca047f26e8d728e3a8d` |
+| `tests/test_approval_resolution_raw_evidence.py` | `116bac6f48ce163145fab2451d7f87756727b940fba3477bbd8094e5d66a4394` |
+| `tests/test_approval_driver_stream_drain.py` | `403a1091fc664c5b95f366747611ed5ad7e207507337d30d9892265c9e35960a` |
+| `tests/paea_consent_driver_control.py` | `68c8e73e5f6600ec077685ffeff222fffd97e4c2e0b5456a41046deb26a68e88` |
+| `tests/paea-approval-form-ui.cjs` | `e5769979c36c5adc0ab55b1ab9765c744da45612fc6751f00ddd069ce5e7832a` |
+| `tests/paea_consent_ui.cjs` | `7c3ae408519b28f8ff0ecaa769836bc35b03c72ffe27ab586236a2a7efd7fbc6` |
+| `tests/paea-reader-credential-erasure.cjs` | `ec275c9a0cd6bbbab8c8f03a3833c67c2dfac0e3a8fa7cabecb58adaa3082f37` |
+| `tests/paea-consent-projection-erasure.cjs` | `eb2f6df808ff31271f1d9062a5623039b979f211035dab1c73effa9d67d79629` |
+| `rust/crates/swarm-web/tests/paea_git_call.rs` | `181881ac0c5f2ad9ebd3e7d146bce0dd35358ada862b2bfe2d0bde5853760b75` |
+| `rust/crates/swarm-web/tests/paea_consent_browser.rs` | `21770cf4ab1b716f21ae8ebd700c4e4aefa0c70cb6626235a37b377a5f1adb60` |
+| `rust/crates/swarm-cli/tests/paea_approval_web.rs` | `60ba4a8ca969f73715e6cd555ba9cc97bcc4c4ceb4d230513cc0f29e593fe4c0` |
+| `rust/crates/swarm-cli/tests/paea_promote.rs` | `fe1a9f7a6e3e1536f42c33c9a1445260dd0bc6c816a7ceb4d3a9f2ff8c928883` |
+| `rust/crates/swarm-cli/tests/paea_transfer.rs` | `36c24aa26d2b03328ce976c8d3e67434def64ff46dd2baf5c7dd142b8ac87eeb` |
+| `rust/crates/swarm-cli/tests/paea_settlement.rs` | `ac258f0a640e0477d16f57d3d998281a80b89174882b0572e14d3eda0acc9bc6` |
+| `rust/crates/swarm-engine/tests/paea_git_promote_call.rs` | `ef4e847c8edc68a6ac1793959e906177d8ac1fceef2859fc40c74c4d226424a5` |
+| `rust/crates/swarm-engine/tests/paea_git_repository.rs` | `cbcfd28ee30c3ed7955685c242d9b14fbae59a49120ce622b8fa630ba7fe1a91` |
+| `rust/crates/swarm-engine/src/root_store/paea_git_repository/barrier_tests.rs` | `e9a4ce1c6d01905c20f87b62b46073c9e00d56ee02eaa221fa17202026d1af10` |
+| `tools/verification/recipes/paea-approval-form-rust.json` | `01f269b6f3f7a0e7da79e52e644885917880f631b909f0760fbc754bb3cc3caa` |
+| `tools/verification/recipes/paea-approval-web-positive.json` | `cd500c649195bd51635b7d63aa90d10a6c21ccbebf878d90ab65d1371c8e47e6` |
+| `tools/verification/recipes/paea-consent-ui-rust.json` | `f5cc8eb21873d1ae2a4ca4819300d58f708e576b4aae98d482a9cef721bc1cde` |
+| `tools/verification/recipes/paea-delivered-chain-cli-rust.json` | `87ff5d326930efcdcaf2da0547e8604a1cded3bdd55e4180d0cf6698395ce3ce` |
+| `tools/verification/recipes/paea-git-call-agreement-last-use-rust.json` | `125a1b1fa493881e3c35b375b98e6107a838b96e370a67936dc27bfae101d3ed` |
+| `tools/verification/recipes/paea-git-call-agreement-rust.json` | `3167b0fc0ec3448577a575f64fd28b03a38e1cf94179d5aad63f5ed7e39d8aad` |
+| `tools/verification/recipes/paea-git-call-agreement-terms-rust.json` | `323d43149ffe756f8e8a8fd805971986875c9cecd6968625b08b031db842794b` |
+| `tools/verification/recipes/paea-git-call-approval-rust.json` | `ea8d353ab70d07595bd6e90a94ab8c2f6b1fea8fafd9d974c36df8c13b370b11` |
+| `tools/verification/recipes/paea-git-call-preview-rust.json` | `fc0c156d85a5f4639e29a045230d31b525a27960d6a1437417abe774e7aa28ac` |
+| `tools/verification/recipes/paea-git-call-web-rust.json` | `869ef72a0e4c5e24d757a16c847e690cd42d0b87187854bf9e69ab128a9aaa41` |
+| `tools/verification/recipes/paea-native-git-source-context.json` | `f5444fe972909ebb948456d9020d859b85b29af22de544a4114b78f098f1a9c2` |
+| `tools/verification/recipes/paea-owned-git-transfer.json` | `7e0dc77b8f8e229e86d6c23505b6b7c40a84f33f2ea8f438a0a7bf8f206025e9` |
+| `tools/verification/recipes/paea-payment-agreement.json` | `e0e6024b48a546ab75cfcdb85ab050ac087b592b7de9116cd770aaa15372d54d` |
+| `tools/verification/recipes/paea-promote-cli-suite-regression-rust.json` | `9f0dc5c619426b04c512f8c98eadb892e48177f8b34ff999862d1b58f592ff7e` |
+| `tools/verification/recipes/paea-transfer-call-cli-rust.json` | `3ad8afeaa1071396eba837c83249e7ad0848a0edbeed1f1960a923cb0e2268e8` |
+
+
+### Replan Git — publication main refusée par protection, 8 novembre 2026
+
+Commit documentaire créé : `19b1e948125a9521389b33d6ef46c97ae187b651`, deux plans
+FR/EN seulement, 1036 lignes ajoutées avec leurs travaux précédents. Le push direct
+sur main a été **refusé GH006** : PR obligatoire, deux checks attendus. Lecture
+GitHub de la protection : enforce_admins=true, strict=true, contextes `checks` et
+`install`, aucun approbateur humain minimum requis. Le refus ne remet pas en cause
+le commit local ; aucun push main réussi n’est déclaré.
+
+`.github/workflows/ci.yml` relu dans HEAD et origin/main : mêmes octets Git
+`329f4f498d2ed958316785c49444eec65f004505`. Push déclenché seulement sur main,
+pull_request sans filtre documentaire ; jobs checks/install exécutent notamment
+cargo test, npm test et tests d’installation. Ouvrir même une PR documentaire
+lancerait donc des tests, interdits par la demande actuelle. Aucun workflow, check,
+protection ou historique modifié pour contourner cette règle ; aucune PR ouverte.
+
+Voie de conservation autorisée dans la continuité du push : branche distante cible
+`codex/bf-l0-input-audit-19b1e9481`, depuis le HEAD documentaire, sans changer le
+checkout principal ni embarquer les modifications natives non committées. Le push
+sur cette branche n’est pas un déclencheur du workflow lu ; sa réussite et les refs
+réelles sont à constater par le parcours Git. La cible main reste non intégrée.
+
+Propriétaire de la condition de reprise : Fabrice pour l’autorisation des contrôles
+CI nécessaires à une PR/intégration ; Codex pour appliquer alors le parcours protégé.
+Ne pas relancer le même push main inchangé. Préparation de PR : titre
+`docs(poc03): map BF-L0 recipe inputs and remaining blockers` ; corps : rapprochement
+statique des quinze recettes complémentaires, R09–13 et limites conservées ;
+validation documentaire/empreintes seulement, aucun test local exécuté. Aucune
+capacité produit, levée BF-L0 ou acceptation indépendante revendiquée.
+
+
+### PR #20 — reprise CI et isolation de la fixture de rotation (8 novembre 2026)
+
+Fabrice autorise désormais la PR, ses contrôles requis, puis le diagnostic et la
+correction de leur blocage ; fusion dans main seulement si les contrôles passent.
+Cette autorisation ne lève pas BF-L0 et n'autorise aucun appel fournisseur ni autre
+développement. Travaux concurrents du checkout principal exclus : correction sur
+la révision exacte dans un worktree isolé. Aucun service produit à installer ou
+redémarrer : seuls le code `cfg(test)` et ce suivi FR/EN sont concernés.
+
+Preuve originale : [CI 42506071897](https://github.com/mo0ogly/swarm/actions/runs/42506071897),
+head `f7d090f13f2a28699abc77bfc36af08bc21ae996`, install réussi, checks échoué.
+`web_session::tests::rotate_refuses_running_server_then_replaces_key` panique à
+web_session.rs:427 après `drop(listener)` : `web-rotate-server-running`. Le binaire
+engine compte 776 réussites, 1 échec, 29 ignorés ; les étapes suivantes sont sautées.
+Le fichier est identique à la base main. Le même test ciblé seul passe avant
+correction (1 test nommé), sans reproduire le détenteur historique du port.
+
+Contre-exemple contrôlé : un listener CLOEXEC est hérité par fork ; après fermeture
+dans le parent, bind retourne encore EADDRINUSE tant que l'enfant attend avant
+exec. Après exec/sortie observés, la même adresse accepte bind. Témoin valide avant
+injection ; pipes et waitpid, sans sommeil, retry ou borne globale. Cela démontre
+que drop dans un processus de tests concurrent n'établit pas la libération de
+toutes les copies. Le PID/détenteur du port en CI n'a pas été capturé : héritage
+pré-exec corroboré comme défaut d'isolation possible, cause historique exacte et
+réallocation indépendante du port non départagées.
+
+Décision : réexécuter seulement ce cas dans son propre processus libtest, avec
+`--exact` et `--test-threads=1`, avant création du listener. Les forks des tests
+frères du parent ne peuvent alors hériter de ce socket enfant. Un simple mutex
+local ne coordonnerait pas tous les forks ; un retry masquerait le refus. Le
+parent vérifie sortie réussie, un test réussi et marqueur terminal ; les erreurs
+du fils restent visibles. Le scénario original garde témoin, refus sans changement
+de clé, rotation, lecture, permissions, adresse interdite et redaction ; fermeture
+et suppression de sa seule fixture ajoutées. Aucun changement de rotate produit.
+La réservation contre un processus extérieur reste non établie.
+
+Contrôles prévus : tous les tests nommés `web_session::tests::` dans le profil
+ciblé, puis checks/install requis sur la nouvelle tête de
+[PR #20](https://github.com/mo0ogly/swarm/pull/20). Aucun résultat hérité ne remplace
+ces contrôles. Résultats et limites conservés ci-dessous et dans le registre local.
+Originaux sur Lexar montée : `swarm-evidence/pr20-ci-42506071897/` ; diagnostic et
+nouvelles preuves : `swarm-evidence/pr20-ci-fix-20261108/`, index local de restauration
+sous `.cache/`. Propriétaire Codex pour correction/contrôles/intégration autorisés.
+
+Revue du diff : sélecteur enfant, filtre exact et mono-test sont des mécanismes
+de fixture, pas des politiques opérateur ; aucun délai/plafond produit ajouté.
+Docstring du seul test modifié explicite isolation, erreurs et limite externe.
+Spawn, décodage, statut et assertions refusent les erreurs ; close et nettoyage
+sont vérifiés. Aucun autre producteur/consommateur d'erreur produit modifié.
+Apprentissage : un descripteur CLOEXEC peut rester détenu entre fork et exec ;
+une fixture exigeant sa fermeture exclusive doit posséder son processus, sans
+transformer un refus observé en succès par retry. Les anciens résultats BF-L0
+restent historiques ; ni ces tests ni la CI ne qualifient les scénarios 03-F/03-B.
+
+Résultat local observé : Cargo/Rust 1.96.0, profil test par défaut, commande
+`cargo test --manifest-path rust/Cargo.toml --locked --offline -p swarm-engine --lib web_session::tests:: -- --nocapture` :
+3 tests nommés réussis ; rotation dans le fils : 1 test réussi et marqueur
+`WEB_ROTATION_ISOLATED_PASS`. `git diff --check` réussi. Les octets de la section
+produit avant `cfg(test)` restent identiques (SHA256
+`8ad0a25c28581acc25b7c566ff59e32d708fb923cdf06a2428368ecb31291871`).
+Ces preuves locales ne remplacent pas les contrôles requis sur la tête publiée ;
+leur résultat courant et la décision de fusion sont consultables dans PR #20.
