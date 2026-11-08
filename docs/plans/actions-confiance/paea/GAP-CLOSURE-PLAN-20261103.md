@@ -389,6 +389,22 @@ pas repris. Incrément d'analyse seul, aucun code modifié, aucune barrière
 posée ; les tests synthétiques par voie et la qualification restent à venir
 derrière G1+G3a.
 
+Tranche G4 audience — portion locale de T14 (8 novembre 2026) : le lot G4
+demande « mandats enfants, audience, provenance, révocation et rejeu ». Le
+bilan : mandats enfants portés (`75c35fa278`), provenance/data_policy portés
+(5 novembre), révocation d'ancêtre et rejeu couverts par la recette existante
+; la réception A2A en réseau (D3 à l'arrivée, refus `a2a-*`, reçus liés D5,
+canal D6) reste entière, bloquée sur l'enrôlement humain IA3 et l'intégration
+G1 réelle. La portion locale restante est l'audience côté usage : la recette
+`trust_delegation.rs::delegation_audience_binds_mandate_to_named_subject`
+épingle qu'un pair autre que le sujet du mandat est refusé à l'admission de
+lecture avec « mauvais sujet » (ordre historique Go : sujet avant bornes),
+sans mutation, pendant que l'audience légitime conserve le parcours complet
+(`request`→`approve`→`commit`) et le rejeu — sur le mandat enfant comme sur
+la racine. Le garde du design est conservé : la réception A2A future devra
+réutiliser ce refus, pas en inventer un second. Incrément de recette seul ;
+`trust_delegation.rs` passe à 10 tests, 10 verts.
+
 ## Découverte D03 — fixtures de tests Rust sous /tmp (interdiction opérateur)
 
 Origine : reprise tranche G2 filiation (6 novembre 2026). Après l'interdiction

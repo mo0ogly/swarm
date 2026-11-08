@@ -353,6 +353,22 @@ described, not taken over. Analysis increment only, no code changed, no
 barrier posed; per-path synthetic tests and qualification remain to come
 behind G1+G3a.
 
+G4 audience tranche — local T14 portion (8 November 2026): lot G4 asks for
+"child mandates, audience, provenance, revocation and replay". Status: child
+mandates ported (`75c35fa278`), provenance/data_policy ported (5 November),
+ancestor revocation and replay covered by the existing recipe; networked A2A
+reception (D3 on arrival, `a2a-*` refusals, linked receipts D5, channel D6)
+stays open, blocked on human enrollment IA3 and real G1 integration. The
+remaining local portion is use-side audience: the recipe
+`trust_delegation.rs::delegation_audience_binds_mandate_to_named_subject`
+pins that a peer other than the mandate's subject is refused at read
+admission with « mauvais sujet » (historical Go order: subject before bounds),
+without mutation, while the legitimate audience peer keeps the full flow
+(`request`→`approve`→`commit`) and replay — on both the child and the root
+mandate. The design guard is kept: future A2A reception must reuse this
+refusal, not invent a second one. Recipe increment only; `trust_delegation.rs`
+moves to 10 tests, 10 green.
+
 ## Discovery D03 — Rust test fixtures under /tmp (operator interdiction)
 
 Origin: G2 lineage tranche resumption (6 November 2026). After the operator

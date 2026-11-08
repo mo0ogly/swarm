@@ -624,10 +624,24 @@ chaque mandat (`mandate_status`) et propage typée une erreur technique de l'ét
 stocké. Le digest racine historique (sans connecteur ni ascendance) est épinglé
 par un test unitaire : `17749c31acf37938ebabe43b794adf5726fbc565905e6c0eb059afdae9ab5ad3`.
 Régression miroir du contrat Go :
-`rust/crates/swarm-engine/tests/trust_delegation.rs` (7 tests, racines isolées
+`rust/crates/swarm-engine/tests/trust_delegation.rs` (10 tests, racines isolées
 dans `.swarm-fixtures/trust-delegation/`, jamais `/tmp`). Restent fermés : la
 création distante A2A et le `data_context` — toute commande qui les porte
 refuse encore.
+
+**Audience du mandat délégué (portion locale de T14 D3, 8 novembre 2026)** —
+le sujet nommé du mandat vaut audience côté usage : un pair enrôlé autre que
+le sujet rejoue le mandat délégué et est refusé à l'admission de lecture avec
+la raison historique typée « mauvais sujet » (`trust_actions.go:1020`, miroir
+`trust/operations.rs`), avant tout effet et sans mutation ; le pair auditeur
+légitime conserve le parcours `request`→`approve`→`commit` complet et le
+rejeu. La recette
+`rust/crates/swarm-engine/tests/trust_delegation.rs::delegation_audience_binds_mandate_to_named_subject`
+épingle ce refus sur le mandat enfant et sur la racine (10/10 verts, racines
+isolées). La réception A2A en réseau (vérification à l'arrivée, code typé
+`a2a-*`, reçus liés) reste entière, bloquée sur l'enrôlement humain IA3 et
+l'intégration G1 réelle — la réception devra réutiliser ce refus, pas en
+inventer un second.
 
 **Contexte de données / provenance (porté, 5 novembre 2026)** — le bloc
 `data_policy` (ressources classifiées, listes explicites

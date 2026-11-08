@@ -167,6 +167,76 @@ fn delegation_depth_zero_and_authority_boundary() {
     assert_eq!(v["reason"], "délégations désactivées");
 }
 
+/// Explicit audience (T14 D3, local use-side subset): a delegated mandate
+/// names its audience by the mandate subject, and a message arriving at any
+/// other peer refuses at read admission with the historical typed reason
+/// before any state or freshness check mutates, while the legitimate audience
+/// peer keeps working and replaying the same mandate. The networked A2A
+/// reception itself stays closed (human enrollment IA3); this pins the
+/// refusal the reception must reuse.
+#[test]
+fn delegation_audience_binds_mandate_to_named_subject() {
+    let f = Fixture::new();
+    f.call("config-apply", &config("configure", 0, Some(1)), "");
+    root_mandate(&f, "root-mandate");
+    let child = f.call(
+        "mandate-create",
+        &delegated("child", "del-audience-child", "root", "carol"),
+        "fixture-admin-token",
+    );
+    assert_eq!(child["state"], "admitted");
+    let before = f.call("show", &json!({}), "");
+    // Another enrolled peer replaying the delegated mandate: audience refusal
+    // at use, ahead of the mandate's own bounds — no action, no ledger entry.
+    let v = f.call(
+        "request",
+        &delegated_request("audience-wrong", "child"),
+        "fixture-dave-delegation-token",
+    );
+    assert_eq!(v["state"], "denied");
+    assert_eq!(v["reason"], "mauvais sujet");
+    // The root mandate's subject is `requester`; dave on the root also refuses
+    // by audience, not by any other label.
+    let v = f.call(
+        "request",
+        &delegated_request("audience-root-wrong", "root"),
+        "fixture-dave-delegation-token",
+    );
+    assert_eq!(v["state"], "denied");
+    assert_eq!(v["reason"], "mauvais sujet");
+    // The named audience peer still engages the child normally end to end.
+    let a = f.call(
+        "request",
+        &delegated_request("audience-right", "child"),
+        "fixture-carol-delegation-token",
+    );
+    assert_eq!(a["state"], "pending_approval");
+    assert_eq!(
+        f.call("approve", &approval_for("audience-approve", &a), "fixture-approver-token")["state"],
+        "approved"
+    );
+    assert_eq!(
+        f.call("commit", &cmd("audience-commit", json!({"action_id":a["id"]})), "fixture-executor-token")["state"],
+        "committed"
+    );
+    // The refusals left no protected business state behind: same mandates and
+    // ledger as before the wrong-peer attempts, plus exactly one admitted
+    // action from the legitimate audience request.
+    let after = f.call("show", &json!({}), "");
+    assert_eq!(
+        after["mandates"].as_object().unwrap().len(),
+        before["mandates"].as_object().unwrap().len()
+    );
+    assert_eq!(
+        after["actions"].as_object().unwrap().len(),
+        before["actions"].as_object().unwrap().len() + 1
+    );
+    assert_eq!(
+        after["ledger"].as_array().map(Vec::len),
+        before["ledger"].as_array().map(|l| l.len() + 1)
+    );
+}
+
 /// The full chain works: a one-link child admits, serves its subject through
 /// request, approval and commit, and the depth ceiling refuses a second link.
 #[test]

@@ -596,9 +596,22 @@ stored-state technical error typed. The historical root digest (no connector, no
 ancestry) is pinned by a unit test:
 `17749c31acf37938ebabe43b794adf5726fbc565905e6c0eb059afdae9ab5ad3`. Mirror
 regression of the Go contract:
-`rust/crates/swarm-engine/tests/trust_delegation.rs` (7 tests, isolated roots in
+`rust/crates/swarm-engine/tests/trust_delegation.rs` (10 tests, isolated roots in
 `.swarm-fixtures/trust-delegation/`, never `/tmp`). Still closed: remote A2A
 creation and `data_context` — any command carrying them keeps refusing.
+
+**Delegated-mandate audience (local T14 D3 subset, 8 November 2026)** — a
+mandate's named subject is its use-side audience: an enrolled peer other than
+the subject replaying the delegated mandate is refused at read admission with
+the historical typed reason « mauvais sujet » (`trust_actions.go:1020`, mirror
+`trust/operations.rs`), before any effect and without mutation; the legitimate
+audience peer keeps the full `request`→`approve`→`commit` flow and replay. The
+recipe
+`rust/crates/swarm-engine/tests/trust_delegation.rs::delegation_audience_binds_mandate_to_named_subject`
+pins this refusal on both the child and the root mandate (10/10 green, isolated
+roots). Networked A2A reception (verification on arrival, typed `a2a-*` code,
+linked receipts) stays open, blocked on human enrollment IA3 and real G1
+integration — the reception must reuse this refusal, not invent a second one.
 
 **Data context / provenance (ported, 5 November 2026)** — the `data_policy`
 block (classified resources, explicit
