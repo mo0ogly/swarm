@@ -1,13 +1,18 @@
 {
-  "updated_at": "2026-11-08T22:50:53.781617+00:00",
+  "updated_at": "2026-11-08T23:37:13.318717+00:00",
   "authorization": "Fabrice : orchestration cette nuit, lancer sans carambolage, sérialiser sur main, commits et push ; pas de nouvelle branche",
   "window_end": "2026-11-09T08:00:00+01:00",
   "status": "publication_blocked_independent_analysis",
-  "main_observed": "d084c1487726f0d240de84d521d19d14d7938250",
-  "tracking_comparison": "main contient un commit supplémentaire ; ls-remote origin main confirme b4e07cb26066cffdb20b36ac2fc9c60f758cb23e",
+  "main_observed": "a547d8e0519e4bf5620842e991b535889e59be85",
+  "tracking_comparison": "main contient d084c1487726 puis 5efab9fcbcbe ; pas nouveau push, distant connu b4e07cb26",
   "git_publication": "push_attempt_rejected_PR_checks_install",
   "active_owners_to_release": [],
-  "worker": null,
+  "worker": {
+    "thread_id": "01a1b540-a5ad-76c2-b0e5-ac4187f04fd4",
+    "scope": "Cinq commits intégrés ;365 active, empreinte vérifiée ; aucun nouveau lot moteur attribué",
+    "state": "code_integration_delivered_visual_check_waiting_login",
+    "billing": "deferred"
+  },
   "tasks": [
     {
       "id": "N0",
@@ -16,8 +21,12 @@
     },
     {
       "id": "N1",
-      "state": "waiting_owner_hunk_inventory_publication_blocked",
-      "need": "Rapprocher commits/dirty et preuves des lots déjà faits ; préparer livraison propre sur main, sans absorber travail non vérifié. Protection Git : garder refus et demander décision de publication si nécessaire."
+      "state": "code_integrated_runtime365_active_ui_and_push_open",
+      "need": "Rapprocher commits/dirty et preuves des lots déjà faits ; préparer livraison propre sur main, sans absorber travail non vérifié. Protection Git : garder refus et demander décision de publication si nécessaire.",
+      "documentation_commit": "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
+      "scope": "36 documents coordination/plan directeur seulement, octets commit vérifiés ; sources produit et dirty étrangers exclus.",
+      "remaining": "Connexion pour contrôle visuel365 ; autorisation branche de livraison/PR pour GitHub. Aucun nouveau lot derrière publication bloquée.",
+      "integration_manifest": ".cache/integration-code-20261109/state.json"
     },
     {
       "id": "N2",
@@ -120,11 +129,45 @@
       "N4_received": "aadfe16f8317d4dc8c006f07ba6f535eaf9beea76f028586db987ad7d677dd11",
       "N5": "Pas remise nocturne, preuves anciennes rapprochées seulement",
       "N6": "Bilan et brouillon finalisés documentairement, réserves ouvertes, zéro test/build/modèle/publication"
+    },
+    {
+      "at": "2026-11-08T23:14:56.390142+00:00",
+      "kind": "bounded_documentation_commit",
+      "commit": "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
+      "files": 36,
+      "product_sources": 0,
+      "push_attempted": false,
+      "reason": "Préserver plan/RETEX/reprises sans absorber dirty produit ; index initial vide, noms et octets committés vérifiés.",
+      "n4_cursor": "8c5ea3c1-c9fb-4820-a503-0c3fdeb22e82:8"
+    },
+    {
+      "at": "2026-11-08T23:33:30.612958+00:00",
+      "kind": "user_authorized_code_integration",
+      "lot_commits": [
+        "7e8cca69076a60a7671d2179eec0f0f536392e8e",
+        "9d40b7e60648756ed1082b7991f6288e0063bf51",
+        "8549dcc42f8e924db76685a8d0d0d7292cefafca",
+        "1d69f956b7201f6266e773831700f3fb3b1da005",
+        "a547d8e0519e4bf5620842e991b535889e59be85"
+      ],
+      "delta364": [
+        "CLI HELP_EN",
+        "version_history notes"
+      ],
+      "protected_main": "API relue : PR obligatoire, checks/install stricts, admins soumis, 0 approbation humaine requise. Branche de livraison unique à autoriser ; aucune créée."
+    },
+    {
+      "at": "2026-11-08T23:37:13.318717+00:00",
+      "kind": "integration365_active",
+      "manifest": "INTEGRATION-CODE-20261109.json",
+      "ui": "login_required",
+      "push_attempted": false,
+      "new_worker": false
     }
   ],
   "automation_id": "swarm-orchestration-s-quentielle-cette-nuit",
   "automation_verified_active": true,
-  "last_owner_observation": "Qualification Go364 remise ; image active SHA vérifiée par coordinateur, recette SDK PASS/stable relue. N3 remis, conclusion aucun nouveau lot Mark/Brandon. N4 propriétaire Gi.eth actif pour rapprochement et inventaire de remise seulement.",
+  "last_owner_observation": "N4 reçu/clos dans sa portée ; N6 documentaire livré ; Peter actif sur sa demande directe publication/graphes, pas attribué par nuit. Aucun nouveau worker moteur. 36 documents de plan directeur/reprises committés localement, sources produit exclues.",
   "shared_automation_coordination": [
     "suivi-paea-glm-uniquement",
     "suivre-la-r-plication-compl-te-de-facturation"
@@ -147,5 +190,12 @@
     "source": "/proc/2171843/exe + active-process-final + rapport qualification + recipe-sdk-03/result.json",
     "scope": "Image active comparée, preuve SDK PASS/stable lue ; pas nouveau replay ni acceptation indépendante",
     "git": "d084c1487726 main local, pas nouveau commit GQ"
+  },
+  "integration365": {
+    "manifest": "INTEGRATION-CODE-20261109.json",
+    "version": "v0.1.1-dev.365",
+    "sha256": "77a26af00a792d0090cd220306468e26e6f1fde5caa0b1f1641ba44a65c9fa6c",
+    "ui": "login_required",
+    "push": "branch_PR_decision_required"
   }
 }
