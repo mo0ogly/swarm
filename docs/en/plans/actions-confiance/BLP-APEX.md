@@ -1341,6 +1341,25 @@ and their chain's sources are identical to HEAD, empty diffs as proof):
   `LocalPathError` source through `AnchoredArtifactError::Path` in
   `anchored_error`, or downcast the transitive source.
 
+swarm-cli verification (governed TMPDIR; the 7 November cartography ran
+without `--no-fail-fast`, completed on the 8th by a full `--no-fail-fast`
+run): identity `--lib` suites 18 green after the area correction (fallback
+required — see the distribution above); `agent_launch` 5 green / 8 red =
+the mapped BT02 Biba debt (workspace==root →
+`biba-workspace-overlaps-root`, CLI dead before READY), owner Codex,
+BIBA-TRANSVERSE-APEX.md dossier; final full run: 258 green / 9 red /
+20 ignored — the 9 = the 8 agent_launch + 1 planning
+`agent-provider-catalogue-read` (the "never green" debt, reconstructed at
+the creating commit 174b89106; red-run evidence:
+`.swarm-fixtures/d05-cli-final-noff.txt`, final full run; the
+reconstruction diagnosis belongs to the Codex lot — no verifiable
+evidence file as of 8 Nov, owner Codex); the 20 ignored = canonical-fixture/recipe guards for dedicated
+recipes; with the canonical `SWARM_PAEA_SOURCE_FIXTURE` the 5 paea suites
+add 29 green. The first full-pass cli.rs/paea_settlement reds were
+introduced by this batch (repository area under declaration-bearing suites)
+and then withdrawn — trust_enrollment was green in the 7 November BF-16b
+cartography, so were the first-pass integration reds.
+
 ### Closing the 4 swarm-engine reds — merge of 8532ce05d, 8 November 2026
 
 The 4 qualified reds above are closed by the merge of `origin/main`
@@ -1374,24 +1393,47 @@ in two full passes, consistent with the concurrency flakes already
 qualified above). No file of that batch was edited locally — the fix is
 the merge's, the evidence is local.
 
-swarm-cli verification (governed TMPDIR; the 7 November cartography ran
-without `--no-fail-fast`, completed on the 8th by a full `--no-fail-fast`
-run): identity `--lib` suites 18 green after the area correction (fallback
-required — see the distribution above); `agent_launch` 5 green / 8 red =
-the mapped BT02 Biba debt (workspace==root →
-`biba-workspace-overlaps-root`, CLI dead before READY), owner Codex,
-BIBA-TRANSVERSE-APEX.md dossier; final full run: 258 green / 9 red /
-20 ignored — the 9 = the 8 agent_launch + 1 planning
-`agent-provider-catalogue-read` (the "never green" debt, reconstructed at
-the creating commit 174b89106; red-run evidence:
-`.swarm-fixtures/d05-cli-final-noff.txt`, final full run; the
-reconstruction diagnosis belongs to the Codex lot — no verifiable
-evidence file as of 8 Nov, owner Codex); the 20 ignored = canonical-fixture/recipe guards for dedicated
-recipes; with the canonical `SWARM_PAEA_SOURCE_FIXTURE` the 5 paea suites
-add 29 green. The first full-pass cli.rs/paea_settlement reds were
-introduced by this batch (repository area under declaration-bearing suites)
-and then withdrawn — trust_enrollment was green in the 7 November BF-16b
-cartography, so were the first-pass integration reds.
+### Recipe requalification delta after the merge — 8 November 2026
+
+Continuous review of merge `197d663f6`: every permanent recipe with frozen
+declared inputs (`inputs.before.json`, one sha256 per file) was re-hashed
+against the blobs of HEAD `fe2c293d3`. Two classes, numbers re-verified at
+writing time:
+
+- **Public BLP recipes — remain VERIFIED on the current tree.** The 7
+  evidence trees of 9/11 (`global-1`, `global-2`, `global-3`, `global-4`,
+  `global-5`, `global-6`, `global-agg-1`, under
+  `~/.local/state/swarm-fixtures/objattr-profile/`) total 182 declared
+  entries: **0 mismatch** against HEAD, including files changed by the
+  merge — their content at freeze time (09:07–09:47) is identical to what
+  the concurrent batch `2d9fe4652` committed (11:45) and to HEAD. The 6
+  VERIFIED recipes of 9/11 and the `blp-aggregate-public` aggregate
+  (PASS 6/6, VERIFIED) therefore remain citable on the current tree,
+  without replay.
+- **Delivered settlement recipe — not qualified on the current tree.** The
+  run-19 freeze of 11/7 (`.swarm-fixtures/g1-livraison-20261107/
+  settlement-run-19/`, 572 entries, pinned candidate `a0721124…`) shows
+  **45 mismatches** at current HEAD: 33 outside tests
+  (`.cargo/config.toml`, `bin/swarm`, Biba, preparation_*, mission_status_*,
+  engine_settings, trust/confidentiality, enrollment-*) + 12 test sources.
+  The run-19 PASS verdict remains valid **on its frozen candidate**
+  (source_stable:true) but no longer qualifies the merged tree; the
+  currently-delivered binary `a166e2b8…` (12th replacement, 9/11) is not
+  requalified after the merge for the settlement path — the BLP aggregate
+  covers only its declared surface. Requalification: replay of
+  `paea-delivered-settlement-cli-rust` + `paea-delivered-chain-cli-rust`
+  on the merged tree with a rebuilt candidate and an updated pin
+  (contract: 7 steps, `SWARM_PAEA_DELIVERED_BIN_SHA256`).
+
+Also to be replayed before any citation: the 11 cargo-test/UI recipes whose
+declared inputs changed since their freeze (87 files total —
+managed-auto-worker 21, lifecycle-inventory-rust 12, agent-logs-status-rust
+11, existing-cockpit-rust 11, activity-read-rust 7, log-query-rust 7,
+agent-exchanges-read-rust 6, managed-candidate-custody 4,
+agent-log-history 4, cockpit-autonomy 3, exchange-status-compat-rust 1) —
+same class as the already-recorded "concurrent engine WIP" debt. The
+modified working-tree note `docs/plans/AGENT-CONTROL-POCS.md` is a declared
+input of none of these recipes.
 
 
 ## Administration and qualification — 5 November 2026
