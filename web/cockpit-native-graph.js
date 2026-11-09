@@ -626,13 +626,14 @@
     const searchStatus=document.createElement('output');searchStatus.id='pilot-search-status';searchStatus.setAttribute('role','status');searchStatus.setAttribute('aria-live','polite');
     let matches=[],matchIndex=-1;
     /** Refresh local matches without hiding nodes/edges or changing layout.
+     * A non-empty query dims non-matching cards (visual only, still focusable).
      * Empty queries clear highlights; no match disables navigation and reports
      * it visibly. Query/matches are not persisted and reset with this renderer.
      * @returns {void} updates classes, output and navigation control only
      */
     function findMatches(){
       const query=searchKey(searchInput.value.trim());matches=query?work.tasks.filter(task=>isVisible(task.id)&&(searchKey(task.id).includes(query)||searchKey(task.title).includes(query))):[];matchIndex=-1;
-      const ids=new Set(matches.map(task=>task.id));for(const [id,u]of units)u.group.classList.toggle('graph-search-match',ids.has(id));
+      const ids=new Set(matches.map(task=>task.id));for(const [id,u]of units){u.group.classList.toggle('graph-search-match',ids.has(id));u.group.classList.toggle('graph-search-dim',!!query&&!ids.has(id))}
       nextMatch.disabled=matches.length===0;previousMatch.disabled=matches.length===0;clearSearch.disabled=!searchInput.value;
       searchStatus.textContent=!query?'':matches.length===0?t('Aucune tâche correspondante.'):matches.length===1?t('Une tâche trouvée.'):matches.length+' '+t('tâches trouvées.');
     }

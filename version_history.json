@@ -1629,6 +1629,10 @@
       {
         "fr": "Conduite alignée sur la maquette (lot 2) : cartes de synthèse « À vérifier », « Bloquées » et « Avancement » calculées uniquement à partir des états enregistrés (projection puis statut du travail), avec pastille pleine, première tâche concernée et bouton « Voir » qui ouvre les Couloirs sur cette tâche sans action moteur ; « — » sans mission. Le triangle de dépliage de l’historique du plan est rétabli. Aucun producteur de décisions n’existe côté moteur natif : aucune carte de décision n’est inventée.",
         "en": "Conduite aligned with the design board (batch 2): “Needs review”, “Blocked” and “Progress” summary cards computed only from recorded states (projection, then Work status), with a solid badge, the first matching task and a “View” button opening Lanes on that task without any engine action; “—” without a mission. The plan history disclosure triangle is restored. The native engine has no decisions producer, so no decision card is invented."
+      },
+      {
+        "fr": "Conduite alignée sur la maquette (lot 3) : pastilles de filtre « Toutes », « À traiter », « En cours », « Acceptées » avec compteur, calculées sur les états enregistrés ; elles filtrent les Couloirs et estompent dans le graphe les cartes hors filtre, sans les masquer ni rien enregistrer. La recherche du graphe passe en tête de barre et estompe les tâches non trouvées. Zoom, plein écran et navigation de recherche deviennent des boutons icônes (libellé conservé comme nom accessible et infobulle). Titres des cartes de synthèse en casse normale.",
+        "en": "Conduite aligned with the design board (batch 3): “All”, “Needs attention”, “In progress”, “Accepted” filter chips with counts computed from recorded states; they filter Lanes and dim out-of-filter graph cards without hiding them or saving anything. Graph search now leads the bar and dims non-matching tasks. Zoom, full screen and search navigation become icon buttons (label kept as accessible name and tooltip). Summary card titles use normal case."
       }
     ]
   },

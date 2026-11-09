@@ -39,3 +39,12 @@
 @media(max-width:760px){.workbench-summary{grid-template-columns:1fr}}
 .history-task>summary::before{content:'▸';color:var(--wattson-lien)}
 .history-task[open]>summary::before{content:'▾'}
+/* State filter chips: pressed chip uses the gold action fill of the board. */
+.workbench-filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.workbench-chip{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:4px 12px;border:1px solid var(--wattson-ligne);border-radius:999px;background:var(--wattson-carte);color:var(--wattson-texte);font-size:13px;font-weight:600}
+.workbench-chip[aria-pressed=true]{background:var(--swarm-gold);border-color:var(--swarm-gold);color:var(--swarm-marine)}
+.workbench-chip-count{padding:0 8px;border-radius:999px;background:var(--wattson-carte-appuyee);font:700 12px/1.6 ui-monospace,monospace}
+.workbench-chip[aria-pressed=true] .workbench-chip-count{background:var(--swarm-marine);color:var(--swarm-gold)}
+#graph .graph-state-dim{opacity:.3}
+.workbench-summary-card h3{text-transform:none;letter-spacing:0;font-size:15px}
+@media(max-width:760px){.workbench-chip{min-height:44px}}

@@ -7015,5 +7015,8 @@ globalThis.SwarmEnglish = {
   "Synthèse des états enregistrés": "Recorded state summary",
   "Bloquées": "Blocked",
   "Avancement": "Progress",
-  "Aucune tâche dans cet état.": "No task in this state."
+  "Aucune tâche dans cet état.": "No task in this state.",
+  "Toutes": "All",
+  "Acceptées": "Accepted",
+  "Filtrer par état enregistré": "Filter by recorded state"
 };
