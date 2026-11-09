@@ -1,0 +1,133 @@
+{
+  "at": "2026-11-09T13:39:23.042946+00:00",
+  "pr": 22,
+  "merge_commit": "efafb54cdaf8d013431a330be97007ddc9ceeaf6",
+  "tested_pr_head": "5d34d499fe38683c45a26a4b97a204aa631688df",
+  "merge": "normal merge, no admin/bypass/force",
+  "source": "/home/fpizzi/.codex/worktrees/pr22-main-delivery/swarm",
+  "source_detached_clean": true,
+  "candidate_version": "v0.1.1-dev.368",
+  "binary_sha256": "dc14744a7b07a2bfd8a017ba0d2b888910326079a2fa89b23b41be1779d64968",
+  "binary_metadata": {
+    "schema_version": 1,
+    "version": "v0.1.1-dev.368",
+    "commit": "efafb54cdaf8d013431a330be97007ddc9ceeaf6",
+    "modified": false,
+    "build_date": "2026-11-09T13:35:23Z"
+  },
+  "profile": "VERIFIED_DEFAULT_NATIVE_PROFILE",
+  "all_782_effective_inputs_equal_merge": true,
+  "pid": 753774,
+  "runtime_root": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "ready": true,
+  "mission_history_unchanged": true,
+  "cli_fr_en": "PASS, 8 tasks,1current/1historical/0stale, unknown opinion not accepted",
+  "ui": "PARTIAL: authenticated Version/resume/history observed; complete protected JS bytes comparison OPEN",
+  "foreign_dirty_snapshot_paths": 108,
+  "foreign_dirty_changed_by_other_activity": [
+    "docs/plans/actions-confiance/reprises-veille-x-20261108/NUIT-QUEUE.json",
+    "tests/native_task_mandate.py"
+  ],
+  "common_staged_paths": [],
+  "proof_area": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/pr22-main-delivery-20261109",
+  "profile_evidence": "/home/fpizzi/.codex/worktrees/pr22-main-delivery/swarm/.cache/local-delivery/rust-chesmqui",
+  "storage": "Local fallback; Lexar nearly full and coordinator reported read-only earlier; no cleanup/remount or proof deletion",
+  "worktree_retained": "Required by active source-managed executable/profile/proofs. Do not archive or remove while active. Canonical checkout main contains foreign dirty; its next normal build would include them, not this isolated main candidate.",
+  "retex": {
+    "cause": "Shared hot checkout cannot prove exact merged main while other chats modify effective inputs.",
+    "decision": "One detached sparse managed source workspace, default production profile, supported source-managed build and prepared restart against existing runtime Root. No global stash/reset, no change to foreign source.",
+    "proof": "782effective hashes equal merge, modified=false, builder/profile valid, /proc exact hash, publicCLI FR_EN,49tables unchanged.",
+    "limits": [
+      "Browser FR_EN Version/notes/Git link and actual served assets remain pending authenticated session; existing365 proof not reused as368",
+      "No new independent acceptance/provider/agent launch",
+      "PR head CI success does not alone establish merge runtime; exact tree comparison plus local build supplied"
+    ],
+    "method_incidents": [
+      "Concurrent-operation status during own build lock retained, not classified as stopped server",
+      "Summary parser list-slice on map failed, corrected by reading retained outputs, no rerun or state mutation"
+    ]
+  },
+  "storage_receipt": {
+    "originals_retained": true,
+    "status": "LOCAL_FALLBACK",
+    "error_type": "AssertionError",
+    "error": "('space', 84049920, 113716473)",
+    "partial_archive_preserved": false
+  },
+  "retention_index": ".cache/pr22-main-delivery-20261109/retention-index.json",
+  "ui_resume_observation": {
+    "at": "2026-11-09T13:42:48.068897+00:00",
+    "runtime": {
+      "running": true,
+      "pid": 753774,
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "url": "http://127.0.0.1:38434/",
+      "ready": true,
+      "engine": "rust",
+      "binary": {
+        "build_date": "2026-11-09T13:35:23Z",
+        "commit": "efafb54cdaf8d013431a330be97007ddc9ceeaf6",
+        "modified": false,
+        "provenance": "injected",
+        "version": "v0.1.1-dev.368"
+      },
+      "binary_sha256": "dc14744a7b07a2bfd8a017ba0d2b888910326079a2fa89b23b41be1779d64968"
+    },
+    "browser": "IAB browser1 tab2 observed from fresh inventory; old JS binding absent, URL acquisition did not resolve fullURL, exactID succeeded",
+    "ui": "Login displayed; known cockpit navigation redirects to login. User reported connected but session not observed in this tab. User asked to authenticate exact visible tab or name other browser.",
+    "authority": "No credential read, auth workaround, agent/provider/mission action, source edit, build or restart.",
+    "status": "PENDING_AUTHENTICATION",
+    "limits": "No authenticated Version368/FR_EN/assets claim."
+  },
+  "ui_final_observation": {
+    "observed_at": "2026-11-09T13:51:10.083721+00:00",
+    "method": "Interactive CUA on authenticated real frontdoor38433, read-only mission operations; manual observations from retained tool outputs, not an automated browser recipe or independent acceptance.",
+    "runtime": {
+      "running": true,
+      "pid": 753774,
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "url": "http://127.0.0.1:38434/",
+      "ready": true,
+      "engine": "rust",
+      "binary": {
+        "build_date": "2026-11-09T13:35:23Z",
+        "commit": "efafb54cdaf8d013431a330be97007ddc9ceeaf6",
+        "modified": false,
+        "provenance": "injected",
+        "version": "v0.1.1-dev.368"
+      },
+      "binary_sha256": "dc14744a7b07a2bfd8a017ba0d2b888910326079a2fa89b23b41be1779d64968"
+    },
+    "criteria": {
+      "version_fr": "PASS v0.1.1-dev.368, build2026-11-09T13:35:23Z, link commit efafb54cdaf8d013431a330be97007ddc9ceeaf6",
+      "version_en": "PASS same version/date/exact GitHub link",
+      "selected_notes_fr_en": "PASS rendered GI input inventory/review-refresh, historical read and Go qualification notes. Their displayed text does not prove every capability in the release registry.",
+      "dirty_disclosure": "Binary modified=false; identity has no asterisk or noncommitted binary notice as expected. Local source inspection explicitly says unexamined. A broad English regex matched uncommitted inside historical notes, so that regex result is NOT treated as disclosure evidence. Runtime-health paintDialog contract read.",
+      "escape_fr": "PASS modal closed, focus returned to visible Version button, nav remained open",
+      "escape_en": "PASS modal closed and focus returned to Version button",
+      "calculated_resume_fr_en": "PASS actual calculated summary revision881, T1 fresh/passed/accepted and T2 unknown/not_accepted visible; original business text and retained proof field labels are not asserted to be fully translated",
+      "recorded_history_fr_en": "PASS8task original JSON surfaces in real visible graph/history section; English first disclosure expanded, T1 accepted/passed, T2 blocked/unknown, other task states preserved; no launch authority inferred",
+      "css": "PASS19protected page CSS bodies exported with CUA, retained and matched to exact368 effective-source archive",
+      "javascript_http_bytes": "OPEN required byte comparison:22script URLs inventoried, exporter refuses script kind; anonymous GETi18n-en.js returns401. No secret extraction or auth bypass; cannot infer JS byte equality from CSS or DOM alone.",
+      "viewport": "Observed609px: English dark dialog571client/571scroll, page609client/609scroll; final French light page609/609. No exhaustive widths or fulltheme/language cross product claimed.",
+      "console": "No warn/error observed in captured last20console records; no complete network capture claimed",
+      "mission_preservation": "PASS49tables/Work/manifests equal initial snapshot; no agent/provider/acceptance action",
+      "preferences": "Restored French/light with history view, modal closed"
+    },
+    "tool_incidents": [
+      "browser.user unavailable at two boundaries: REPL reset and exact existing-tab reacquisition, no new login/restart or duplicate action",
+      "Script asset bundle refused before subsequent Escape action; stylesheet-only export succeeded",
+      "Theme restoration initially targeted closed mobile drawer; no-match retained, reopened actual menu then restored",
+      "Summary English literal search used English labels although retained evidence labels remain French; false predicates not treated as product failure or pass"
+    ],
+    "screenshots": "French Version368 screenshot emitted and preserved in chat tool output; no local screenshot filename claimed",
+    "proofs": [
+      "served-css/manifest.json",
+      "served-css-comparison.json",
+      "runtime.json",
+      "live-after-ui.json"
+    ],
+    "overall": "PARTIAL: runtime/Version/notes/focus/calculated resume/recorded reader observed; complete protected JavaScript byte comparison remains open; no global or independent acceptance"
+  },
+  "project_requirement": "Separate X project candidate/control authority framing; POC02/GI reused, no new execution or reproduced gap."
+}

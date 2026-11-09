@@ -146,6 +146,143 @@
           "at": "2026-11-08T22:39:52.219239+00:00"
         }
       ]
+    },
+    {
+      "thread_id": "01a14672-8c2d-71d3-82ac-5aa9b18eb062",
+      "host_id": "local",
+      "previous_title": "Swarm 04 — Identités et autorisations · APEX",
+      "new_title": "Swarm 04 — Oryh.ai · Identités et autorisations · APEX",
+      "role": "existing-identities-oryh",
+      "context": "../POC06-TASK-MANDATE.md",
+      "idea_ids": [
+        "X-IDEE-06",
+        "X-IDEE-04"
+      ],
+      "plan_cards": [
+        "ID-C0",
+        "ID-C1",
+        "ID-C5"
+      ],
+      "observed_activity": "active; owner safe-point receipt, no Cargo/build/test/GLM active at that instant only",
+      "work_status": "Native integration active; source reservation explicitly NOT released at safe point",
+      "source": "https://x.com/OryhAI/status/2119696640114389360",
+      "authority": "Fabrice explicit transmission/rename; no tests now",
+      "recorded_at": "2026-11-09T10:53:08.459867+00:00",
+      "transmission_status": "acknowledged_no_tools_no_execution",
+      "strategy_ack": "received",
+      "acknowledged_at": "2026-11-09T10:53:53.976020+00:00",
+      "ack_turn": "01a1bff1-1d35-7183-af25-3db750b31054",
+      "title_verified": true,
+      "resource_handoff": {
+        "at": "2026-11-09T14:17:43.997841+00:00",
+        "source": "Owner message + POC06-TASK-MANDATE.md Point sûr natif read",
+        "released": false,
+        "modifications": [
+          "agent_execution_gate/store",
+          "agent_native_stream",
+          "agent_supervision",
+          "native_provider_exec/proxy",
+          "native_task_scope",
+          "validation_run",
+          "root_store and native_task_scope",
+          "trust_types",
+          "trust/{authentication,command,config,operations,proof_types,state,response}",
+          "engine lib",
+          "CLI agent/main/lib",
+          "web resources",
+          "version_history",
+          "POC06 recipe/docs"
+        ],
+        "read_inputs_not_to_mutate": [
+          "agent_launch.rs",
+          "biba.rs",
+          "native_provider_biba.rs",
+          "swarm-biba-linux",
+          "task_validation/*",
+          "PAEA"
+        ],
+        "release_condition": "Targeted workflows/compatibility, final image, native recipe, review and local delivery handed back, or explicit bounded sequencing agreed before shared edits",
+        "intermediate": "367 prepared only, does not qualify latest corrections",
+        "runtime_reported": "368PID753774/dc14744a.../port38434 remains, revalidate before authorized restart",
+        "CI_scope": "Native Trust simulated effects, not CI file-write authority. Baseline368 counterexample not fixed by this lot.",
+        "coordinator_actions": "No concurrent shared source mutation/build/restart; frozen private368 diagnostic already complete"
+      }
+    },
+    {
+      "thread_id": "01a1c096-b8c5-7f83-958c-067e5e3df101",
+      "host_id": "local",
+      "new_title": "Swarm — CI des projets · Autorité des agents",
+      "role": "project-ci-authority-owner",
+      "context": "../PROJECT-CI-AUTHORITY.md",
+      "source_threads": [
+        "01a1bbe3-cea2-7413-998e-6a27656acd69"
+      ],
+      "source_plans": [
+        "docs/plans/AGENT-CONTROL-POCS.md POC-02",
+        "docs/plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md"
+      ],
+      "observed_checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "authority": "Fabrice explicit dedicated chat and fixture witness/refusal/recovery/correction; phase sequencing by coordinator",
+      "assignment": "CI-A2 design only in two owned FR_EN notes; implementation awaiting exact source reservation after Oryh handoff",
+      "allowed_owned_files": [
+        "docs/plans/actions-confiance/PROJECT-CI-AUTHORITY.md",
+        "docs/plans/actions-confiance/PROJECT-CI-AUTHORITY.en.md",
+        ".cache/project-ci-authority/<fresh> diagnostic evidence/pilot and fresh fixture roots only"
+      ],
+      "execution_reservation": "Baseline368 only, no activeRoot/image or shared service, private frozen helper graph, no production source changes. Permanent tests/recipes proposed not reserved.",
+      "existing_dirty": "Mikhail recipe.py/fixture_area.py preserved; owner last completed23controls not a guarantee of all resources free",
+      "strategy_ack": "CI-A0 handoff received/read; not runtime proof",
+      "created_at": "2026-11-09T13:55:31.749178+00:00",
+      "creation_owner": "Gi.eth on explicit user request; no additional worktree/branch",
+      "work_status": "Baseline368 private native counterexample confirmed, CIA1PASS/CIA2-CIA3FAIL/CIA4NOTTESTED; CI-A2 proposed only; source correction awaits safe reservation",
+      "observed_activity": "idle after documentary followup, no active CI pilot claimed",
+      "handoff_at": "2026-11-09T14:00:06.066006+00:00",
+      "resume_condition": "Private immutable binary/profile/archive and helper imports/consumptions bound; supported real agent public admission; no live/shared resources or paid/external provider. Else bounded preflight refusal/report.",
+      "future_files_requested_not_reserved": [
+        "tests/project_ci_authority.py",
+        "tools/verification/recipes/project-ci-authority.json"
+      ],
+      "execution_status": "Private native agent and child tool, controls/review/publication exercised; no production source/runtime modified",
+      "assignment_at": "2026-11-09T14:02:27.432344+00:00",
+      "shared_source_owner": "Oryh explicit NOT RELEASED safe-point receipt now retained; absence of Cargo at instant is not release",
+      "result": {
+        "path": ".cache/project-ci-authority/a1-kqejlpp0/result.json",
+        "sha256": "948a5b25f62b0d0502ebd0ab8524d2800f73f01fe539ca0efe89d0162f577f53",
+        "scope": "baseline368 only",
+        "criteria": {
+          "CIA-1": "PASS in fixture with deterministic reviewer",
+          "CIA-2": "FAIL direct truncation/write; secondary paths NOT TESTED",
+          "CIA-3": "FAIL mutated CI actually executed and candidate published",
+          "CIA-4": "NOT TESTED; no repair authority, accepted unsafe fixture preserved"
+        },
+        "limits": [
+          "Sister fixtures use same executable authority class, different agent identities",
+          "No real model/security reviewer/external CI",
+          "No source correction or installation",
+          "Historical freshness GI coverage not replayed",
+          "No claim future Oryh sources affected or protected"
+        ]
+      },
+      "human_authority": "Original correction-if-necessary request already covers correction; source reservation/safety prerequisite pending, not new user permission",
+      "retention": {
+        "path": ".cache/project-ci-authority/a1-kqejlpp0/retention-index.json",
+        "files_reported": 833,
+        "bytes": 107014279,
+        "scope": "owner reports all SHA reread; coordinator read result and index, no duplicate run"
+      },
+      "last_handoff": {
+        "turn": "01a1c09c-3236-7e01-83ce-60c5b4b7eebe",
+        "status": "completed",
+        "boundary": "Private fixtures only, no activeRoot/service or shared source modification",
+        "next": "Oryh native source handoff or narrower stable ownership evidence, exact fix contract and file reservations, then regression/refusal/recovery on fresh fixture",
+        "authority": "Correction-if-necessary user authority retained; no source reservation granted yet"
+      },
+      "documentation_followup": "verified completed turn01a1c0a9; current banner/history clarified FR_EN, no runtime/proof changes",
+      "next_source_preconditions": [
+        "Safe Oryh handoff and exact source reservations",
+        "Canonical persistent native schema/DTO production contract before added fields",
+        "Minimal independent-method authority contract and public consumer chain, operator choices persisted where applicable"
+      ]
     }
   ],
   "strategy_transmitted_at": "2026-11-08T21:06:16.245221+00:00"

@@ -65,3 +65,32 @@ Autorisation explicite reçue : une seule branche de livraison et une PR, sans c
 Connexion désormais disponible : fenêtre Version365 réellement observée FR/EN, notes correspondant au binaire, commit a547d8e0519e et lien GitHub exact, disclosure modifié visible. Lecture mission historique w-ca937edf4e0abd85f8d3d67b : résumé révision881 avec T1 fresh/passed/accepted, T2 unknown/not_accepted ; passage historique explicite affiche « Historique reçu — statut opérationnel non évalué » avec bouton distinct Vérifier le statut actuel. Aucune tâche/agent/provider relancé. Observation de lecture, pas nouvelle acceptation indépendante, conformité globale ou test sur le datastore actif. Ces nouvelles observations lèvent seulement l'ancien blocage de connexion, sans effacer son historique. Preuves UI locales avec empreintes dans le record ; Lexar presque pleine, repli local conservé.
 
 Suivi automatique existant actualisé et relu pour cette unique PR, sans autorité de merge. Aucun code ou contrat produit modifié par la publication ; documentation de livraison/coordination uniquement, pas nouveau build/test justifié. Anciennes recherches de noms supposés checks.yml/install.yml corrigées par inventaire réel .github/workflows/ci.yml ; contrôles nommés jobs, pas fichiers distincts. Les sélecteurs sémantiques absents ont été remplacés par ID observé/AX natif, sans prétendre à une correction produit.
+
+
+## Fin de fenêtre nocturne — 2026-11-09T08:23:10.640557+00:00
+
+Aucun nouveau lot attribué après08h Paris. Réparation de livraison déjà engagée terminée et poussée normalement : 477c26060e9c86fa8907136b5b5a72cf0a372720, même branche/PR22. Sur le précédent fe49 : moteur780PASS/30ignorés et installPASS, puis échec npm de parité catalogue. Cinq traductions sources réconciliées avec le web généré ; contrôles ciblés PASS. npm complet local échoue sur les anciens fichiers Go ignorés encore présents, absents du candidat Git ; témoin isolé et six contrôles suivants PASS. Ce n'est pas un PASS npm global. Nouvelle CI42585429911 checks/install IN_PROGRESS à la lecture, pas réussite revendiquée. Voir CI-PR22-20261109.md. Image365 inchangée, complément source non déclaré installé, garde espace respecté. Pas merge ni modification des protections.
+
+Remise Mikhail B-2 reçue : tour terminé, revue REVUE-B2.md lue ;739 contenus sélectionnés/archivés et relus selon cette revue, preuve SOURCE incluse et copie Lexar vérifiée par son auteur. Aucun test/build/provider/service/commit annoncé. Cela ne clôt pas B-4 ni BF-L0-B. Pas nouvelle attribution ni absorption de ses fichiers partagés. Facturation reste différée. Le suivi restant est limité au résultat CI du candidat exact, puis arrêt de l'automatisation nocturne après remise sûre.
+
+
+## Clôture du suivi nocturne — 2026-11-09T09:39:49.506523+01:00
+
+Lecture directe GitHub : PR22 toujours OPEN, non fusionnée, tête477c26060e9c86fa8907136b5b5a72cf0a372720 ; run42585429911 terminé SUCCESS. Jobs checks SUCCESS à09h28min21s Paris et install SUCCESS à09h29min42s Paris le9novembre2026. État mergeStateStatus CLEAN observé ; ceci n'autorise aucune fusion. Reçus bruts locaux pr22-final-checks.json et ci477-final.json sous .cache/integration-code-20261109. Cette preuve clôt la vérification CI du candidat, sans convertir npm local en PASS ni déclarer le complément catalogue installé dans l'image365.
+
+Automatisation swarm-orchestration-s-quentielle-cette-nuit supprimée via automation_update ; reçu deleteStatus=deleted. Aucune attribution nocturne en attente dans la file. Gi.eth reste terminé. Le chat Mikhail est actif sur une nouvelle demande utilisateur B-4 (tour01a1bf72-3817-7e00-9147-a1acc4d77451), distincte de l'orchestration nocturne ; elle est préservée, sans interruption ni duplication. Aucune autre automation modifiée, aucun merge ou nouvelle branche, facturation toujours différée.
+
+La remise nocturne est close dans cette portée. Les critères généraux, BF-L0-B et l'installation du complément catalogue gardent leur état propre ; ils ne sont pas déclarés terminés par la réussite CI. Bilan/file/registre actualisés atomiquement, historiques et dirty d'autrui préservés. Incrément documentaire uniquement : aucune fonction, politique ou gestion d'erreur produit modifiée ; pas de nouveau build/test requis. Aucun commit/push supplémentaire pour ce bilan de suivi local.
+
+
+## Fusion PR22 et livraison main — 2026-11-09T13:39:23.042946+00:00
+
+PR fusionnée normalement `efafb54cdaf8d013431a330be97007ddc9ceeaf6` ; v0.1.1-dev.368 active, SHA `dc14744a7b07a2bfd8a017ba0d2b888910326079a2fa89b23b41be1779d64968`,782entrées identiques au commit. Source détachée nécessaire pour exclure les travaux dirty. CLI FR/EN et49tables inchangées vérifiés. Dialogue Version/parcours réel368 en attente de connexion ; anciennes preuves365 ne le remplacent pas. [Livraison et RETEX](PR22-MAIN-DELIVERY-20261109.md). Originaux et travaux des autres chats préservés, pas de contournement GitHub.
+
+
+Reprise UI368 2026-11-09T13:42:48.068897+00:00 : image toujours vérifiée, session intégrée encore au login après navigation. Connexion de cet onglet requise ; critère visuel non clos. Voir PR22-MAIN-DELIVERY-20261109.md et reçu ui-resume-auth-refusal-01.json ; aucune nouvelle installation.
+
+
+## Remise368 et retour au périmètre projet — 2026-11-09T13:51:10.083721+00:00
+
+Version/focus/résumé/historique FR/EN observés ;19CSS conformes à archive368. ComparaisonJSprotégés ouverte (exportunsupported,401anonyme), pas de clôtureglobale. Les sourcesX visent candidat/contrôles du projet produit ; preuveGI existante conservée, autoritéCI externe à examiner sans nouveau lot. Voir PR22-MAIN-DELIVERY-20261109.md et ui368-final/observations.json.

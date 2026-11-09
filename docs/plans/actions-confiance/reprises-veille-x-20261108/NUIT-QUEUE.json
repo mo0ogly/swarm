@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-11-09T06:16:26.696693+00:00",
+  "updated_at": "2026-11-09T13:53:06.344022+00:00",
   "authorization": "Fabrice : orchestration cette nuit, lancer sans carambolage, sérialiser sur main, commits et push ; pas de nouvelle branche",
   "window_end": "2026-11-09T08:00:00+01:00",
-  "status": "publication_blocked_independent_analysis",
-  "main_observed": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
-  "tracking_comparison": "main contient d084c1487726 puis 5efab9fcbcbe ; pas nouveau push, distant connu b4e07cb26",
-  "git_publication": "PR22_checks_failure_fixture_correction_in_progress",
+  "status": "night_handoff_complete_automation_deleted",
+  "main_observed": "477c26060e9c86fa8907136b5b5a72cf0a372720",
+  "tracking_comparison": "Exception livraison unique autorisée et poussée ; main local conservé, aucune fusion.",
+  "git_publication": "PR22_477c2606_checks_install_SUCCESS_not_merged",
   "active_owners_to_release": [],
   "worker": {
     "thread_id": "01a1b540-a5ad-76c2-b0e5-ac4187f04fd4",
-    "scope": "Branche livraison unique publiée, PR22 ; checkout main préservé ; contrôle visuel365 FR/EN et lecture historique observés",
-    "state": "PR22_CI_fixture_fix_integration",
+    "scope": "CI remise terminée ; automatisation supprimée ; pas de nouveau lot, aucune action sur demande B-4 ultérieure",
+    "state": "night_assignment_released",
     "billing": "deferred"
   },
   "tasks": [
@@ -21,12 +21,71 @@
     },
     {
       "id": "N1",
-      "state": "PR22_fixture_correction_waits_exact_head_CI",
+      "state": "merged368_active_UI_observed_CSS_verified_required_JS_open",
       "need": "Rapprocher commits/dirty et preuves des lots déjà faits ; préparer livraison propre sur main, sans absorber travail non vérifié. Protection Git : garder refus et demander décision de publication si nécessaire.",
       "documentation_commit": "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
       "scope": "36 documents coordination/plan directeur seulement, octets commit vérifiés ; sources produit et dirty étrangers exclus.",
-      "remaining": "Pousser correctif fixture borné, puis checks/install CI sur SHA exact ; pas merge.",
-      "integration_manifest": ".cache/integration-code-20261109/state.json"
+      "remaining": "Contrat assets complet non clos :22JS inventoriés, exporteur refuse script, GETanonyme401. Moyen autorisé d’export des réponses JS authentifiées requis, pas bypass/secret. Contrôles Version FR_EN/focus/résumé881/historique8Task et19CSS établis dans leur portée. Besoin projetX distinct à cadrer via planGI/POC02.",
+      "integration_manifest": ".cache/integration-code-20261109/state.json",
+      "delivery_owner": {
+        "thread_id": "01a1bbe3-cea2-7413-998e-6a27656acd69",
+        "authority_turn": "01a1c081-47c1-70b3-a8f9-c9534f7e61e1",
+        "acknowledged": "Attribution reçue; exécution unique fusion/build/install, no NUIT-QUEUE write",
+        "head_reported_by_owner": "5d34d499fe38683c45a26a4b97a204aa631688df",
+        "checks_reported": "checks/install SUCCESS; historical477c proof retained",
+        "coordinator_mutations": "none Git/build/service; owner handles delivery records",
+        "merge_receipt": {
+          "source": ".cache/pr22-main-delivery-20261109/merge.json",
+          "head": "5d34d499fe38683c45a26a4b97a204aa631688df",
+          "merge": "efafb54cdaf8d013431a330be97007ddc9ceeaf6",
+          "merged_at": "2026-11-09T13:34:18Z",
+          "read_by_coordinator": true
+        }
+      },
+      "delivery_handoff": {
+        "path": ".cache/pr22-main-delivery-20261109/handoff.json",
+        "report": "PR22-MAIN-DELIVERY-20261109.md",
+        "merge": "efafb54cdaf8d013431a330be97007ddc9ceeaf6",
+        "version": "v0.1.1-dev.368",
+        "binary_sha256": "dc14744a7b07a2bfd8a017ba0d2b888910326079a2fa89b23b41be1779d64968",
+        "status": "ready,modified=false,782hashes match merge; profile/builderverified; CLI FR_ENPASS;49tables/workmanifestsunchanged",
+        "owner_turn": "01a1c081-47c1-70b3-a8f9-c9534f7e61e1 completed/idle",
+        "active_source_retention": "/home/fpizzi/.codex/worktrees/pr22-main-delivery/swarm; do not archive/remove while active",
+        "UI": "pending authentication; user question arranged; not inherited from365"
+      },
+      "ui_resume": {
+        "owner_thread": "01a1bbe3-cea2-7413-998e-6a27656acd69",
+        "turn": "01a1c08a-f8ee-70d0-a060-87cc0913114e",
+        "reported_state": "active, browser1/tab2 login; formerly attached browser unavailable",
+        "cause": "Authenticated session not observable in currently accessible browser; origin of session difference not established",
+        "runtime": "owner reports same368readyPID753774/hash/merge/modifiedfalse",
+        "authority": "user requested verification after connection, not proof of auth",
+        "next": "Authorized JS response export capability; no repeated unchanged anonymous requests/build/restart",
+        "coordinator_actions": "Read handoff/observations/CSSreceipt; no duplicate browser or product action",
+        "handoff": "final bounded handoff received; owner resources released, no active UI operation",
+        "proofs": [
+          ".cache/pr22-main-delivery-20261109/ui368-final/observations.json",
+          ".cache/pr22-main-delivery-20261109/ui368-final/served-css-comparison.json"
+        ],
+        "status": "authenticated UI observations obtained; earlier login refusal historical",
+        "verified": "Version368FR_EN exactmerge link/date/selectednotes,focusEscapeFR_EN,calculatedresume881 and8historicalTasksFR_EN,19protectedCSS bytes equalarchive",
+        "open": "Required protected22JavaScriptbyte comparison not established; no completeassetconformance/globalclosure"
+      },
+      "project_requirement": {
+        "scope": "Review and CI of the project produced by agents, distinct from Swarm Version dialog/tool delivery",
+        "sources": "Gi.eth/Jackson/Efi historical originals reread by owner; x-originals-index in ui368-final",
+        "existing_plan": [
+          "docs/plans/AGENT-CONTROL-POCS.md POC-02",
+          "docs/plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md"
+        ],
+        "known_scope": "GI-T1–T4 managed fixture candidate evidence as described in owner report; not external CI control authority",
+        "not_established": "Root current_git self.root alone does not demonstrate wrong mission-repository binding or bug; external CI write protections not proven",
+        "proposal": "Distinct fictitious Root A/projectB, control producer-review-verdict-integration chain and independent A/B changes, no execution",
+        "owner": "Fabrice/coordinator for chosen repository/CI/authority, candidate reviewer/control owner for inspection",
+        "state": "cadrage only, no new counterexample reproduced, code/campaign not decided",
+        "resume_condition": "Name actual project repo, CI/connector and reachable write authority; reconcile existing coverage first",
+        "report": "PR22-MAIN-DELIVERY-20261109.md final scope sections"
+      }
     },
     {
       "id": "N2",
@@ -60,22 +119,43 @@
     },
     {
       "id": "N5",
-      "state": "existing_evidence_reconciled_owner_night_handoff_absent",
+      "state": "historical_B4_and_P0_confirmed_subsequent_owner_work_active",
       "thread_id": "01a1bbe6-9e55-7150-a909-5734cdca43d4",
       "need": "Mikhail/Aiden : rapprochement sur main des lots de preuve déjà réalisés ; analyse puis complément borné si indépendance acquise. Ne pas redévelopper PAEA par Codex ni relancer un provider hors ses droits propres.",
       "output": "03-resultats-inconnus/RAPPROCHEMENT-N5-COORDINATEUR.md",
-      "remaining": "Complément documentaire propriétaire borné ; BF-L0 global et R03/R04 ouverts ; pas exécution attribuée."
+      "remaining": "BF-L0-C/global et C-D01/qualification native non clos. Attendre remise du tour propriétaire plus récent01a1c083, sans duplication ; ne pas présenter le non-autorisé du rapportP0 comme état actuel absolu.",
+      "latest_handoff": {
+        "thread": "01a1bbe6-9e55-7150-a909-5734cdca43d4",
+        "B4_turn": "01a1bf72-3817-7e00-9147-a1acc4d77451",
+        "reports_read": [
+          "03-resultats-inconnus/REVUE-B4.md",
+          "03-resultats-inconnus/ETAT-BF-L0-C.md",
+          "03-resultats-inconnus/ARBITRAGE-CD01-C3P.md",
+          "03-resultats-inconnus/REVUE-C3P-P0.md"
+        ],
+        "scope": "B739 historical retained-input closure; C742 retention, target decisions adopted, P0documentation only; no runtime qualification inferred",
+        "owner": "Mikhail; Fabrice for authorization/priority",
+        "new_execution_assigned": false
+      },
+      "subsequent_owner_activity": {
+        "thread": "01a1bbe6-9e55-7150-a909-5734cdca43d4",
+        "turn": "01a1c083-8e03-7d83-9d97-257e1c2ad3f6",
+        "observed": "inProgress; user OK FAIS after P0 report",
+        "latest_commentary": "19 controls then present pass; criteria strengthened and recipe update still required",
+        "scope_limit": "Owner progress report, not complete verification, acceptance or global closure; no work assigned by coordinator",
+        "historical_note": "P1–P4 non-authorized in REVUE-C3P-P0 is preserved as historical, superseding owner request observed"
+      }
     },
     {
       "id": "N6",
-      "state": "documentary_consolidation_delivered_with_open_N1_N5",
+      "state": "night_handoff_documented_with_explicit_remaining_scope",
       "need": "Consolider bilan, preuves, commits/push réels et un brouillon de petit article fondé sur preuves ; aucune publication X/LinkedIn/site.",
       "taken_in_charge_at": "2026-11-08T22:47:02.652323+00:00",
       "output": [
         "BILAN-N6.md",
         "ARTICLE-N6-EN-BROUILLON.md"
       ],
-      "remaining": "N1 publication/intégration ouverte ; N5 propriétaire non remis. Pas attente bloquant le bilan, pas clôture globale.",
+      "remaining": "Recherche générale et critères ouverts conservés ; B-4 ultérieur appartient à sa demande distincte, pas à cette automation.",
       "finalized_at": "2026-11-08T22:50:53.781617+00:00"
     }
   ],
@@ -181,6 +261,67 @@
       "correction": "cfg(test) synthetic identity, same assertions and hermetic recipe",
       "local_build": "space guard refused before test, no bypass",
       "report": "CI-PR22-20261109.md"
+    },
+    {
+      "at": "2026-11-09T06:18:42.430913+00:00",
+      "kind": "fixture_only_fix_pushed_same_PR",
+      "commit": "fe49bd4e49c4124f6c1c80e1919bb4b41ab2f083",
+      "run": "42572106701",
+      "local_tests_after": "not_executed_space_guard",
+      "independent_acceptance": false
+    },
+    {
+      "at": "2026-11-09T08:23:10.640557+00:00",
+      "event": "Night window ended; existing catalogue CI repair pushed on single branch; no new worker/lot. New B-2 owner report read without reopening execution.",
+      "head": "477c26060e9c86fa8907136b5b5a72cf0a372720"
+    },
+    {
+      "observed_at": "2026-11-09T09:39:49.506523+01:00",
+      "head": "477c26060e9c86fa8907136b5b5a72cf0a372720",
+      "run": "https://github.com/mo0ogly/swarm/actions/runs/42585429911",
+      "checks": "SUCCESS",
+      "install": "SUCCESS",
+      "pr_state": "OPEN",
+      "merged": false,
+      "automation": {
+        "id": "swarm-orchestration-s-quentielle-cette-nuit",
+        "deleteStatus": "deleted",
+        "receipt": "Codex automation_update mode delete: Deleted automation in the app."
+      },
+      "billing": "deferred",
+      "scope": "Night CI handoff complete only; no global project closure or new installation claim",
+      "separate_activity": {
+        "thread": "01a1bbe6-9e55-7150-a909-5734cdca43d4",
+        "turn": "01a1bf72-3817-7e00-9147-a1acc4d77451",
+        "state": "inProgress",
+        "source": "read_thread latest user request: B-4 verification/closure, no test/build/provider/service",
+        "handling": "Separate subsequent user request, not interrupted or reassigned"
+      }
+    },
+    {
+      "at": "2026-11-09T13:33:40.019630+00:00",
+      "event": "Read-only reconciliation for Peter status; B4/P0 current documentary scope; subsequent Gieth merge/install authority verified and unique execution handed off. Night automation remains deleted, no new night assignment.",
+      "scope": "NUIT-QUEUE only; delivery records reserved to Gieth"
+    },
+    {
+      "at": "2026-11-09T13:36:10.630228+00:00",
+      "event": "PR22 merge receipt read; isolated exact-main build reported active, previous runtime preserved. N1 not closed, no root Git/build/service mutation."
+    },
+    {
+      "at": "2026-11-09T13:41:10.888868+00:00",
+      "event": "Gieth delivery handoff read; main368active and CLIverified, authenticated UI pending. Mikhail new OKFAIS turn active beyond historicalP0, not closed. Peter status updated without duplicate execution."
+    },
+    {
+      "at": "2026-11-09T13:43:04.362073+00:00",
+      "event": "Visual resume owned by Gieth; runtime368unchanged; accessible browser redirectslogin despite reportedconnection, explicit auth precondition kept open, question at owner no duplicate."
+    },
+    {
+      "at": "2026-11-09T13:43:58.549272+00:00",
+      "event": "UI-auth refusal receipts read; runtime368ready same identity; bounded handoff received, visual acceptance remains open pending exact-session user action."
+    },
+    {
+      "at": "2026-11-09T13:53:06.344022+00:00",
+      "event": "Gieth final UI/cadrage handoff read; Version/FR_EN/history/CSS observed, requiredJScomparison open, login issue historical. ProjectXcandidate/CI authority separated from toolVersion. No duplicate execution, owner files returned."
     }
   ],
   "automation_id": "swarm-orchestration-s-quentielle-cette-nuit",
@@ -219,20 +360,43 @@
   "github_delivery": {
     "branch": "codex/delivery-swarm-20261109",
     "pr": "https://github.com/mo0ogly/swarm/pull/22",
-    "head": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
+    "head": "fe49bd4e49c4124f6c1c80e1919bb4b41ab2f083",
     "record": "PUBLICATION-GITHUB-20261109.json",
     "checks": [
       {
-        "link": "https://github.com/mo0ogly/swarm/actions/runs/42570757206/job/129007326327",
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/mo0ogly/swarm/actions/runs/42572106701/job/129011578893",
         "name": "checks",
-        "state": "IN_PROGRESS"
+        "startedAt": "2026-11-09T06:17:14Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
       },
       {
-        "link": "https://github.com/mo0ogly/swarm/actions/runs/42570757206/job/129007326605",
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/mo0ogly/swarm/actions/runs/42572106701/job/129011579166",
         "name": "install",
-        "state": "IN_PROGRESS"
+        "startedAt": "2026-11-09T06:17:15Z",
+        "status": "IN_PROGRESS",
+        "workflowName": "CI"
       }
     ],
-    "merge_authorized": false
+    "merge_authorized": false,
+    "runtime_receipt": ".cache/integration-code-20261109/github-ci-latest.json"
+  },
+  "automation_final": {
+    "id": "swarm-orchestration-s-quentielle-cette-nuit",
+    "deleteStatus": "deleted",
+    "receipt": "Codex automation_update mode delete: Deleted automation in the app."
+  },
+  "separate_user_activity": {
+    "thread": "01a1bbe6-9e55-7150-a909-5734cdca43d4",
+    "turn": "01a1bf72-3817-7e00-9147-a1acc4d77451",
+    "state": "inProgress",
+    "source": "read_thread latest user request: B-4 verification/closure, no test/build/provider/service",
+    "handling": "Separate subsequent user request, not interrupted or reassigned"
   }
 }
