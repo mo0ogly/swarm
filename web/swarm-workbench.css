@@ -20,3 +20,22 @@
 
 /* Public recorded task objects stay readable without changing semantic colors. */
 .history-task .history-original { white-space:pre-wrap; overflow-wrap:anywhere; max-inline-size:100%; }
+/* Summary cards (docs/design/swarm/Main.dc.html): to-check, blocked, progress.
+ * Counts are solid badges; text labels carry the meaning, colour only reinforces it. */
+.workbench-summary{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:12px;margin:0 0 18px}
+.workbench-summary-card{display:flex;align-items:center;gap:14px;min-width:0;padding:14px 16px;border:1px solid var(--wattson-ligne);border-radius:8px;background:var(--wattson-carte)}
+.workbench-summary-card.warn{background:var(--wattson-attention-fond);border-color:var(--wattson-attention);color:var(--wattson-attention-encre)}
+.workbench-summary-card.alert{background:var(--wattson-alerte-fond);border-color:var(--wattson-alerte);color:var(--wattson-alerte-encre)}
+.workbench-summary-card>div{flex:1;min-width:0}
+.workbench-summary-card h3{margin:0 0 2px;font-size:14px;color:inherit}
+.workbench-summary-card p{margin:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workbench-summary-card button{flex:none}
+.workbench-count{display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:2.4ch;padding:2px 12px;border-radius:999px;font:700 22px/1.4 ui-monospace,monospace;background:var(--wattson-texte-discret);color:var(--swarm-badge-encre,#062b49)}
+.workbench-count.warn{background:var(--wattson-attention)}
+.workbench-count.alert{background:var(--wattson-alerte)}
+.workbench-ratio strong{font:600 20px/1.4 ui-monospace,monospace;color:var(--wattson-titre)}
+.workbench-ratio span{color:var(--wattson-texte-discret)}
+.workbench-summary progress{width:100%;height:6px;margin-top:6px;accent-color:var(--wattson-succes)}
+@media(max-width:760px){.workbench-summary{grid-template-columns:1fr}}
+.history-task>summary::before{content:'▸';color:var(--wattson-lien)}
+.history-task[open]>summary::before{content:'▾'}

@@ -1625,6 +1625,10 @@
       {
         "fr": "Conduite alignée sur la maquette (lot 1) : compteurs en pastilles pleines colorées avec chiffre contrasté selon le thème, bouton « Décisions à traiter » or/marine, cercles décoratifs retirés, message d’état vide masqué, actions d’en-tête sans mot coupé, états de l’historique du plan affichés en badges traduits (Acceptée, Bloquée, À faire) au lieu des codes moteur.",
         "en": "Conduite aligned with the design board (batch 1): counters shown as solid coloured badges with theme-contrasted numbers, gold/navy “Decisions to handle” button, decorative circles removed, empty status notice hidden, header actions no longer split words, plan history states shown as translated badges (Accepted, Blocked, To do) instead of engine codes."
+      },
+      {
+        "fr": "Conduite alignée sur la maquette (lot 2) : cartes de synthèse « À vérifier », « Bloquées » et « Avancement » calculées uniquement à partir des états enregistrés (projection puis statut du travail), avec pastille pleine, première tâche concernée et bouton « Voir » qui ouvre les Couloirs sur cette tâche sans action moteur ; « — » sans mission. Le triangle de dépliage de l’historique du plan est rétabli. Aucun producteur de décisions n’existe côté moteur natif : aucune carte de décision n’est inventée.",
+        "en": "Conduite aligned with the design board (batch 2): “Needs review”, “Blocked” and “Progress” summary cards computed only from recorded states (projection, then Work status), with a solid badge, the first matching task and a “View” button opening Lanes on that task without any engine action; “—” without a mission. The plan history disclosure triangle is restored. The native engine has no decisions producer, so no decision card is invented."
       }
     ]
   },
