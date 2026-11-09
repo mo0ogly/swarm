@@ -63,6 +63,9 @@
    * Fill conduite plan and state sections.
    * Current mode preserves calculation failures. History mode renders public
    * recorded task objects verbatim as safe text; it infers no validity or activity.
+   * Each history summary shows the exact status through the shared workbench
+   * badge (translated label + shape + tone), falling back to engine text when
+   * the workbench module is absent.
    * @param {object|null} mission @param {string|null} missionError
    * @param {object} work @param {string} readMode @returns {void}
    */
@@ -80,7 +83,11 @@
           const details = document.createElement('details');
           details.className = 'history-task';
           const summary = document.createElement('summary');
-          summary.textContent = `${task.title || task.id} — ${engine(task.status || '')}`;
+          // Same recorded-state badge as lanes/inspector: translated label,
+          // shape and tone from the exact status code; unknown codes stay neutral.
+          const badge = globalThis.SwarmWorkbench?.statusBadge;
+          if (badge) summary.append(document.createTextNode(task.title || task.id), badge(task.status || '', task.status || ''));
+          else summary.textContent = `${task.title || task.id} — ${engine(task.status || '')}`;
           const original = document.createElement('pre');
           original.className = 'history-original';
           original.textContent = JSON.stringify(task, null, 2);

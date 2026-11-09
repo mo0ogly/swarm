@@ -529,3 +529,26 @@ body.graph-studio-open .pilot-inspector { z-index:91; }
 .graph-studio .graph-minimap { pointer-events:none; }
 
 .graph-studio.is-fullscreen #pilot-list { overflow:auto; }
+
+/* Conduite alignment with docs/design/swarm/Main.dc.html (9 Nov 2026).
+ * Counters use solid semantic badges: a saturated tone token as fill and a
+ * contrasting ink per theme, so a number reads as a badge, not a pale tint.
+ * Text labels stay next to every badge; colour is never the only signal. */
+:root { --swarm-badge-encre: #062b49; --swarm-badge-info: var(--swarm-cyan); }
+:root[data-theme="etat"] { --swarm-badge-encre: #ffffff; --swarm-badge-info: #287888; }
+.metric::after { content: none; }
+.metric strong,.mission-kpi strong { font-weight: 700; background: var(--wattson-texte-discret); color: var(--swarm-badge-encre); }
+.metric.info strong,.mission-kpi[data-tone="info"] strong { background: var(--swarm-badge-info); color: var(--swarm-badge-encre); }
+.metric.success strong,.mission-kpi[data-tone="success"] strong { background: var(--wattson-succes); color: var(--swarm-badge-encre); }
+.metric.attention strong,.mission-kpi[data-tone="attention"] strong { background: var(--wattson-attention); color: var(--swarm-badge-encre); }
+.metric.alert strong,.mission-kpi[data-tone="alert"] strong { background: var(--wattson-alerte); color: var(--swarm-badge-encre); }
+.rail .nav-interventions { min-height: 44px; padding: 0 12px; border: 0; border-radius: 5px; background: var(--swarm-gold); color: var(--swarm-marine); font-size: 14px; font-weight: 600; }
+.rail .nav-interventions:hover { background: #ffd56e; }
+.nav-interventions strong { padding: 0 8px; border-radius: 999px; background: var(--swarm-marine); color: var(--swarm-gold); }
+/* An empty status paragraph has nothing to announce: never paint an empty bar. */
+.notice:empty { display: none; }
+/* Header actions never split a word; they wrap as whole controls instead. */
+.cockpit-page .page-header { flex-wrap: wrap; align-items: center; gap: 10px 12px; }
+.cockpit-page .page-header>div:first-child { flex: 1 1 420px; min-width: 0; }
+.cockpit-page .page-header>:not(div:first-child) { flex: none; white-space: nowrap; }
+.history-task>summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
