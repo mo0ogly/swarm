@@ -1,0 +1,238 @@
+{
+  "updated_at": "2026-11-09T06:16:26.696693+00:00",
+  "authorization": "Fabrice : orchestration cette nuit, lancer sans carambolage, sérialiser sur main, commits et push ; pas de nouvelle branche",
+  "window_end": "2026-11-09T08:00:00+01:00",
+  "status": "publication_blocked_independent_analysis",
+  "main_observed": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
+  "tracking_comparison": "main contient d084c1487726 puis 5efab9fcbcbe ; pas nouveau push, distant connu b4e07cb26",
+  "git_publication": "PR22_checks_failure_fixture_correction_in_progress",
+  "active_owners_to_release": [],
+  "worker": {
+    "thread_id": "01a1b540-a5ad-76c2-b0e5-ac4187f04fd4",
+    "scope": "Branche livraison unique publiée, PR22 ; checkout main préservé ; contrôle visuel365 FR/EN et lecture historique observés",
+    "state": "PR22_CI_fixture_fix_integration",
+    "billing": "deferred"
+  },
+  "tasks": [
+    {
+      "id": "N0",
+      "state": "owner_handoffs_received_with_bounded_resource_limits",
+      "need": "Recevoir remises des propriétaires existants et coordonner autres automations avant mutation partagée."
+    },
+    {
+      "id": "N1",
+      "state": "PR22_fixture_correction_waits_exact_head_CI",
+      "need": "Rapprocher commits/dirty et preuves des lots déjà faits ; préparer livraison propre sur main, sans absorber travail non vérifié. Protection Git : garder refus et demander décision de publication si nécessaire.",
+      "documentation_commit": "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
+      "scope": "36 documents coordination/plan directeur seulement, octets commit vérifiés ; sources produit et dirty étrangers exclus.",
+      "remaining": "Pousser correctif fixture borné, puis checks/install CI sur SHA exact ; pas merge.",
+      "integration_manifest": ".cache/integration-code-20261109/state.json"
+    },
+    {
+      "id": "N2",
+      "state": "analysis_reviewed_implementation_deferred",
+      "thread_id": "01a1bcf7-55ee-7c02-90fb-b12f77a4da99",
+      "need": "X-IDEE-12 : cadrage ciblé transmission/arrêt A via relais, témoin A/B ; réaliser seulement écart borné démontré, si pas migration transversale ou nouvelle autorité.",
+      "implementation": "not_assigned_pending_delivery_and_scope",
+      "output": "04-transmission-supervision/ANALYSE-NUIT.md",
+      "result": "Cadrage rendu ; scénario deux relais A/B non établi, pas défaut moteur démontré.",
+      "report_sha256": "242b268886deff74d3c3e06e838fa7066b9ed1dddc2f6a12219ea400395d6f83"
+    },
+    {
+      "id": "N3",
+      "state": "analysis_reviewed_no_new_implementation",
+      "thread_id": "01a1bbb6-ef86-7471-9025-fba8d1edd81d",
+      "need": "Mark/Brandon : examiner couverture mandats/effets déjà qualifiée, proposer/réaliser plus petit complément isolé manquant, sans refaire R1/R2 ni lancer vrai modèle.",
+      "implementation": "not_assigned",
+      "output": "01-mandats-effets/ANALYSE-N3-NUIT.md",
+      "report_sha256": "f66e1370dd4644105d929446deddd0e94290e384762b39d6d62528d6358568d2",
+      "result": "Preuves R1/Trust et enfant natif déterministe déjà disponibles ; vrai modèle reste bloqué chez propriétaire. MCP/humain inconnus, pas absents."
+    },
+    {
+      "id": "N4",
+      "state": "analysis_reviewed_no_new_implementation",
+      "thread_id": "01a1bbe3-cea2-7413-998e-6a27656acd69",
+      "need": "Après remise actuelle, rapprochement Jackson/Gi.eth ; réutiliser GI-T1–T4 et preuves, cibler éventuel écart restant sans nouvelle refonte.",
+      "implementation": "not_assigned",
+      "output": "02-revues-candidats/ANALYSE-N4-NUIT.md",
+      "report_sha256": "aadfe16f8317d4dc8c006f07ba6f535eaf9beea76f028586db987ad7d677dd11",
+      "result": "Inventaire/hunks remis ; limites CI explicites ; aucun écart borné nouveau démontré."
+    },
+    {
+      "id": "N5",
+      "state": "existing_evidence_reconciled_owner_night_handoff_absent",
+      "thread_id": "01a1bbe6-9e55-7150-a909-5734cdca43d4",
+      "need": "Mikhail/Aiden : rapprochement sur main des lots de preuve déjà réalisés ; analyse puis complément borné si indépendance acquise. Ne pas redévelopper PAEA par Codex ni relancer un provider hors ses droits propres.",
+      "output": "03-resultats-inconnus/RAPPROCHEMENT-N5-COORDINATEUR.md",
+      "remaining": "Complément documentaire propriétaire borné ; BF-L0 global et R03/R04 ouverts ; pas exécution attribuée."
+    },
+    {
+      "id": "N6",
+      "state": "documentary_consolidation_delivered_with_open_N1_N5",
+      "need": "Consolider bilan, preuves, commits/push réels et un brouillon de petit article fondé sur preuves ; aucune publication X/LinkedIn/site.",
+      "taken_in_charge_at": "2026-11-08T22:47:02.652323+00:00",
+      "output": [
+        "BILAN-N6.md",
+        "ARTICLE-N6-EN-BROUILLON.md"
+      ],
+      "remaining": "N1 publication/intégration ouverte ; N5 propriétaire non remis. Pas attente bloquant le bilan, pas clôture globale.",
+      "finalized_at": "2026-11-08T22:50:53.781617+00:00"
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-11-08T21:30:10.776669+00:00",
+      "kind": "user_requested_status_read_only",
+      "new_workers_started": 0,
+      "observation": "Design UX inactif, commit d084c1487726 sur main, push refusé. Gi.eth actif : formats copy-*.json et fragments Go examinés dans producteurs historiques ; correction et recette pas encore déclarées vérifiées. Sept autres chats de recherche inactifs. Aucun nouveau lot nocturne attribué.",
+      "automation": "ACTIVE toutes les 30 min ; configuration vérifiée, aucune attribution nocturne démontrée dans la file."
+    },
+    {
+      "at": "2026-11-08T21:39:16.678573+00:00",
+      "kind": "heartbeat_coordination",
+      "gieth_cursor": "8c5ea3c1-c9fb-4820-a503-0c3fdeb22e82:4",
+      "new_mutating_workers": 0,
+      "analysis_only_assignment": "N2 reserve A4, sortie séparée, pas de source partagée modifiée",
+      "publication": "Refus PR/checks/install déjà signalé, aucune nouvelle tentative inchangée."
+    },
+    {
+      "at": "2026-11-08T22:09:13.245205+00:00",
+      "kind": "heartbeat",
+      "gieth_cursor": "8c5ea3c1-c9fb-4820-a503-0c3fdeb22e82:5",
+      "N2": "cadrage relu, 22 empreintes vérifiées sans dérive, pas scénario exécuté",
+      "N3": "attribution analyse seulement au propriétaire Peter inactif",
+      "new_mutating_workers": 0
+    },
+    {
+      "at": "2026-11-08T22:40:56.941139+00:00",
+      "kind": "human_project_organization",
+      "action": "19 chats renommés, file APEX + cartes des cinq programmes, facturation différée, aucune nouvelle exécution"
+    },
+    {
+      "at": "2026-11-08T22:44:12.793416+00:00",
+      "kind": "heartbeat",
+      "N3": "Revue bornée terminée, aucun doublon développé",
+      "GQ": "364 image active comparée, rapport et résultat SDK lus",
+      "N4": "attribution analyse et remise seulement, pas nouveau lot moteur",
+      "automation": "Prompt actualisé avec plan directeur, cartes courtes et facturation différée"
+    },
+    {
+      "at": "2026-11-08T22:47:02.652323+00:00",
+      "kind": "N6_explicit_now_received",
+      "N3_sha256": "f66e1370dd4644105d929446deddd0e94290e384762b39d6d62528d6358568d2",
+      "N6": "Bilan intermédiaire et brouillon sourcé réellement écrits, attente N4/N5 pour consolidation finale",
+      "method_error": "Premier appel orchestration JS refusé SyntaxError avant toute exécution ; aucune étape dépendante lancée, création reprise via apply_patch puis lectures et index atomiques."
+    },
+    {
+      "at": "2026-11-08T22:50:53.781617+00:00",
+      "kind": "N6_final_documentary_snapshot",
+      "N4_received": "aadfe16f8317d4dc8c006f07ba6f535eaf9beea76f028586db987ad7d677dd11",
+      "N5": "Pas remise nocturne, preuves anciennes rapprochées seulement",
+      "N6": "Bilan et brouillon finalisés documentairement, réserves ouvertes, zéro test/build/modèle/publication"
+    },
+    {
+      "at": "2026-11-08T23:14:56.390142+00:00",
+      "kind": "bounded_documentation_commit",
+      "commit": "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
+      "files": 36,
+      "product_sources": 0,
+      "push_attempted": false,
+      "reason": "Préserver plan/RETEX/reprises sans absorber dirty produit ; index initial vide, noms et octets committés vérifiés.",
+      "n4_cursor": "8c5ea3c1-c9fb-4820-a503-0c3fdeb22e82:8"
+    },
+    {
+      "at": "2026-11-08T23:33:30.612958+00:00",
+      "kind": "user_authorized_code_integration",
+      "lot_commits": [
+        "7e8cca69076a60a7671d2179eec0f0f536392e8e",
+        "9d40b7e60648756ed1082b7991f6288e0063bf51",
+        "8549dcc42f8e924db76685a8d0d0d7292cefafca",
+        "1d69f956b7201f6266e773831700f3fb3b1da005",
+        "a547d8e0519e4bf5620842e991b535889e59be85"
+      ],
+      "delta364": [
+        "CLI HELP_EN",
+        "version_history notes"
+      ],
+      "protected_main": "API relue : PR obligatoire, checks/install stricts, admins soumis, 0 approbation humaine requise. Branche de livraison unique à autoriser ; aucune créée."
+    },
+    {
+      "at": "2026-11-08T23:37:13.318717+00:00",
+      "kind": "integration365_active",
+      "manifest": "INTEGRATION-CODE-20261109.json",
+      "ui": "login_required",
+      "push_attempted": false,
+      "new_worker": false
+    },
+    {
+      "at": "2026-11-09T06:06:30.523227+00:00",
+      "kind": "explicit_user_delivery_branch_and_PR_authorized_and_applied",
+      "pr": "https://github.com/mo0ogly/swarm/pull/22",
+      "head": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
+      "ui365": "FR_EN and recorded/calculated mission read observed",
+      "billing": "deferred"
+    },
+    {
+      "at": "2026-11-09T06:16:26.696693+00:00",
+      "kind": "CI254e_failed_and_diagnosed",
+      "checks": "FAILURE 779passed1failed30ignored",
+      "install": "SUCCESS",
+      "cause": "fixture reads unconfigured operator Git identity",
+      "correction": "cfg(test) synthetic identity, same assertions and hermetic recipe",
+      "local_build": "space guard refused before test, no bypass",
+      "report": "CI-PR22-20261109.md"
+    }
+  ],
+  "automation_id": "swarm-orchestration-s-quentielle-cette-nuit",
+  "automation_verified_active": true,
+  "last_owner_observation": "N4 reçu/clos dans sa portée ; N6 documentaire livré ; Peter actif sur sa demande directe publication/graphes, pas attribué par nuit. Aucun nouveau worker moteur. 36 documents de plan directeur/reprises committés localement, sources produit exclues.",
+  "shared_automation_coordination": [
+    "suivi-paea-glm-uniquement",
+    "suivre-la-r-plication-compl-te-de-facturation"
+  ],
+  "analysis_worker": null,
+  "master_plan": "docs/plans/FILE-APEX.md",
+  "bounded_cards": "docs/plans/REPRISES-PAR-LOTS.md",
+  "billing_deferral": {
+    "decision": "Fabrice : fin, plus tard",
+    "monitor": "PAUSED",
+    "night_dispatch": "forbidden",
+    "preserve": "candidat, échec SQLite, 950/1700 et historique",
+    "resume": "demande explicite dédiée"
+  },
+  "gq_delivery_observed": {
+    "version": "v0.1.1-dev.364",
+    "sha256": "aed1422210080ceae550cdc7133f242134bfa4eb0b7088a44c40b37d3c9414f8",
+    "pid": 2171843,
+    "checked_at": "2026-11-08T22:44:12.793416+00:00",
+    "source": "/proc/2171843/exe + active-process-final + rapport qualification + recipe-sdk-03/result.json",
+    "scope": "Image active comparée, preuve SDK PASS/stable lue ; pas nouveau replay ni acceptation indépendante",
+    "git": "d084c1487726 main local, pas nouveau commit GQ"
+  },
+  "integration365": {
+    "manifest": "INTEGRATION-CODE-20261109.json",
+    "version": "v0.1.1-dev.365",
+    "sha256": "77a26af00a792d0090cd220306468e26e6f1fde5caa0b1f1641ba44a65c9fa6c",
+    "ui": "FR_EN_version_and_recorded_calculated_reads_observed",
+    "push": "branch_published_PR22_open"
+  },
+  "github_delivery": {
+    "branch": "codex/delivery-swarm-20261109",
+    "pr": "https://github.com/mo0ogly/swarm/pull/22",
+    "head": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
+    "record": "PUBLICATION-GITHUB-20261109.json",
+    "checks": [
+      {
+        "link": "https://github.com/mo0ogly/swarm/actions/runs/42570757206/job/129007326327",
+        "name": "checks",
+        "state": "IN_PROGRESS"
+      },
+      {
+        "link": "https://github.com/mo0ogly/swarm/actions/runs/42570757206/job/129007326605",
+        "name": "install",
+        "state": "IN_PROGRESS"
+      }
+    ],
+    "merge_authorized": false
+  }
+}

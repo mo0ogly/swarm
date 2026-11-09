@@ -407,11 +407,39 @@ mod tests {
             fs::remove_dir_all(path).unwrap();
         }
     }
+    /// Re-exec this exact case before opening its listener: concurrent parent
+    /// tests may fork and retain a CLOEXEC socket until exec, so dropping the
+    /// parent's copy would not establish that the address is free. The child
+    /// runs one test without sibling tests; failures/output remain observable.
+    /// This does not reserve the port against unrelated processes or add retries.
     /// Rotation: refused while a listener holds the address (witness first:
     /// key exists), then replaces the key once stopped; non-loopback refuses;
     /// the file stays private and the old key is gone.
     #[test]
     fn rotate_refuses_running_server_then_replaces_key() {
+        const CHILD: &str = "SWARM_WEB_ROTATION_TEST_CHILD";
+        if std::env::var_os(CHILD).is_none() {
+            let name = format!(
+                "{}::rotate_refuses_running_server_then_replaces_key",
+                module_path!().split_once("::").unwrap().1
+            );
+            let output = std::process::Command::new(std::env::current_exe().unwrap())
+                .args(["--exact", &name, "--nocapture", "--test-threads=1"])
+                .env(CHILD, "owned-fixture")
+                .output()
+                .unwrap();
+            assert!(
+                output.status.success(),
+                "{}\n{}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+            let text = String::from_utf8(output.stdout).unwrap();
+            assert!(text.contains("1 passed; 0 failed;"), "{text}");
+            assert!(text.contains("WEB_ROTATION_ISOLATED_PASS"), "{text}");
+            print!("{text}");
+            return;
+        }
         let base = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../.swarm-fixtures");
         fs::create_dir_all(&base).unwrap();
         let path = base.join(crate::generate_identifier("rotate-").unwrap());
@@ -434,5 +462,8 @@ mod tests {
             "web-listener-loopback-required"
         );
         assert!(!format!("{new:?}").contains(new.secret()));
+        directory.close().unwrap();
+        fs::remove_dir_all(path).unwrap();
+        println!("WEB_ROTATION_ISOLATED_PASS");
     }
 }

@@ -1,5 +1,55 @@
 # File des projets APEX de Swarm
 
+## Plan directeur — consolidation du 8 novembre 2026
+
+Ce chat **Swarm 00 — Plan directeur et coordination** porte le suivi transversal.
+Les chats numérotés sont les lots du même programme, pas des copies de sources ni
+un ordonnanceur natif. Les numéros sont des repères de priorité, pas une preuve de
+tri physique de la barre latérale. Les détails et exigences restent dans les plans
+sources ; l’historique du 24 octobre ci-dessous est conservé, pas réputé courant.
+
+[Lots courts et portes de clôture](REPRISES-PAR-LOTS.md) · [Index des RETEX](RETEX-INDEX.md)
+· [Mémoire : 63 documents et reprises à rattacher](deepagents-integration/INDEX-REPRISE.md)
+· [Chats renommés et provenance](DISCUSSIONS-PLAN-DIRECTEUR.json)
+
+| Repère | Périmètre | État observé/documenté | Prochaine action / fin du lot | Source |
+| --- | --- | --- | --- | --- |
+| 01 | Qualification historique | Qualification Go364 et remise N4 reçues ; aucun nouveau manque borné démontré | Image active comparée ; inventaire reçu, intégration par hunks et publication encore ouverts, pas refaire le correctif. | [Source](actions-confiance/reprises-veille-x-20261108/NUIT-QUEUE.json) |
+| 02 | PAEA | Programme ouvert, développement GLM uniquement ; dernier suivi DNS/amont bloqué | Une carte bornée à la fois ; voir découpage, pas recommencer tout PA00–13. | [Source](actions-confiance/PAEA-APEX.md) |
+| 03 | Sécurité et preuves | SP-L02 local vérifié ; SP-L03 partiel, L04–06 à faire dans le plan lu | Session humaine pour L03 ; administration puis recettes puis dossier ; L07 accompagne chaque lot. | [Source](actions-confiance/SECURITY-PROOFS-APEX.md) |
+| 04 | Identités / Biba / BLP / Mémoire | Programmes à rapprocher des acquis ; ne pas fermer les dépendances par héritage | Cartes courtes par frontière ; IA3 → MEM-P2/P3/P4 → IA4 ; Biba et BLP distincts. | [Source](REPRISES-PAR-LOTS.md) |
+| 05 | Règlement / P1 | Dernier tour interrompu, régression écrite/compilée selon session | Relire le résultat réel et la séparation des rôles ; pas de second propriétaire PAEA. | [Source](actions-confiance/paea/P1-G1-20261103.md) |
+| 07 | Design UX / Git | Commit local d084c1487726 ; push refusé PR/checks/install | Ne pas recommencer le design ; publication exige un parcours autorisé compatible avec les protections. | [Source](DESIGN-INTEGRATION-20261108.md) |
+| 08–12 | Observation et recherches X | A4 cadré ; N3 conclut pas de nouveau lot Mark/Brandon justifié ; vrai modèle bloqué | Réutiliser les propriétaires et preuves, pas les réserves comme nouveaux développements. | [Source](actions-confiance/reprises-veille-x-20261108/README.md) |
+| Repères | Télémétrie, LangWatch, graphe, AC-02, juge L4 | Conservés dans la file historique ci-dessous ; états courants non requalifiés | Retenir seulement les écarts après comparaison Rust ; AC-02 non démarré, L4 non adopté. | [Source](RETEX-INDEX.md) |
+| 99 | Recette de facturation | REPORT EXPLICITE de Fabrice, en dernier pour plus tard ; suivi PAUSED | Aucune attribution nocturne/reprise de campagne ; conserver 950/1700, candidat et refus SQLite. Reprise dédiée explicite. | [Source](REPRISES-PAR-LOTS.md) |
+
+Ordre logique proposé : remise des travaux actifs et inventaire du candidat →
+petites cartes d’autorité/effets → usages mémoire et composition → preuves de bout
+en bout et revue → RETEX du périmètre. Les préconditions externes bloquées n’arrêtent
+pas les cadrages indépendants. Chaque mutation commune reste attribuée et sérialisée.
+La facturation 99 est différée, hors attributions nocturnes. Le cloud est de côté.
+
+Avant chaque attribution : lire le dernier état du propriétaire, le plan source,
+les preuves et les conflits. Un seul lot mutateur à la fois ; état réalisé/vérifié/
+installé/committé/poussé distinct. Fin d’une carte : preuve de sortie ou blocage
+nommé + propriétaire + précondition de reprise. Ne pas y ajouter un nouvel objectif
+avant remise. Retex court dans chaque carte, RETEX final seulement à son périmètre.
+Un changement de carte n’efface ni un critère rouge ni les droits historiques.
+
+Cette consolidation n’autorise aucun nouveau développement, fournisseur, achat,
+scan, test ou déploiement. Elle ne relance aucun chat. L’autorisation nocturne
+existante garde son périmètre et sa fenêtre ; les reports explicites priment.
+
+Portée d’inventaire : 50 chats récents et tous épinglés, archives Codex locales
+(2 résultats, dont un ancien PAEA), plans et rapports ciblés du dépôt. Pas un audit
+exhaustif des anciens chats non renvoyés par l’outil. Deux historiques non lisibles
+par read_thread (source rollout manquante) : Mémoire et Modèles ; leurs titres
+sont repérés, leur état de travail demeure inconnu. Retraite est hors Swarm ; après un refus initial de l’outil pour accès source,
+la lecture suivante montre son rattachement à « toulouse vente ». Aucun accès
+supplémentaire n’a été accordé par le coordinateur.
+
+
 [English](../en/APEX-QUEUE.md) · [Méthode APEX](../../.claude/skills/apex/SKILL.md)
 
 Actualisation du 24 octobre 2026 : onze entrées après les vagues 2 et 3 ;

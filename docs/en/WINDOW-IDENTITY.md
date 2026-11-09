@@ -74,3 +74,21 @@ Visual verification: open the cockpit, compare the four badges with their labels
 switch both themes and FR/EN, and check contrast and overflow. Keep dashes without
 a selected mission and preserve producer values on an existing mission. No task
 launch is needed to verify this presentation.
+
+
+Native task-table, lane and inspector status badges share
+`SwarmWorkbench.statusBadge`: green accepted, blue running, red blocked/failed,
+amber submitted/stale/waived, gray todo or unknown. Color families remain the
+same in both themes, with contrast-adjusted semantic background/foreground pairs.
+Tone depends on the received code, never its display label. Unknown states remain
+visible and neutral; status text is never parsed as HTML. Verify the
+`task-status-badges.json` DOM-double regression and real FR/EN light/dark flows.
+
+
+Agent badges use the same color families with a separate state vocabulary: blue
+queued/starting/running, green completed, red failed, amber stopping/interrupted
+and explicitly unconfirmed observations; unknown codes stay neutral.
+SwarmWorkbench.agentStatusBadge never turns agent completion into task acceptance.
+Keep “Recorded state”, identifiers and existing autonomy observations. Reuse both
+theme palettes and FR/EN labels. Run agent-status-badges.json, then the dedicated
+browser fixture without launching agents; check the installed page separately.

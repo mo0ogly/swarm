@@ -1338,3 +1338,5 @@ Cette commande CLI n'ajoute pas de bouton UX ou de parcours HTTP de mutation.
 
 Recette maintenue : `tools/verification/recipes/gieth-review-refresh.json` ; suivi,
 preuves et limites : [cadrage et résultats Gi.eth](../plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).
+
+La commande `task review-refresh` figure dans l’aide CLI française et anglaise. Ce renvoi décrit le renouvellement explicite des preuves ; l’aide n’accorde aucun droit de revue, publication ou acceptation.

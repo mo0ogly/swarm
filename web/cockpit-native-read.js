@@ -34,7 +34,9 @@
   }
 
   /**
-   * Build one task row (5 columns, plain text).
+   * Build one task row (5 columns, text-only content and shared status badge).
+   * The badge reflects the recorded task status, never inferred validation or
+   * projection authority. DOM/translation errors propagate without an empty pass.
    * @param {{id:string,title:string,status?:string,owner?:string,depends?:Array}} task
    * @param {object|null} proj matching projection (id,state,label,reason,attempt)
    * @returns {HTMLTableRowElement}
@@ -48,9 +50,10 @@
       Array.isArray(task.depends) ? task.depends.join(', ') : t('Aucune dépendance enregistrée'),
       t('Commandes non raccordées')
     ];
-    for (const c of cells) {
+    for (const [index,c] of cells.entries()) {
       const td = document.createElement('td');
-      td.textContent = c; // plain text, no HTML interpolation
+      if(index===1)td.appendChild(globalThis.SwarmWorkbench.statusBadge(task.status));
+      else td.textContent = c; // plain text, no HTML interpolation
       tr.appendChild(td);
     }
     return tr;
@@ -58,14 +61,33 @@
 
   /**
    * Fill conduite plan and state sections.
-   * @param {object|null} mission @param {string|null} missionError @returns {void}
+   * Current mode preserves calculation failures. History mode renders public
+   * recorded task objects verbatim as safe text; it infers no validity or activity.
+   * @param {object|null} mission @param {string|null} missionError
+   * @param {object} work @param {string} readMode @returns {void}
    */
-  function renderConduite(mission, missionError) {
+  function renderConduite(mission, missionError, work, readMode) {
     const plan = document.getElementById('conduite-plan');
     const state = document.getElementById('conduite-state');
     if (plan) {
       plan.textContent = '';
-      if (missionError) {
+      if (readMode === 'history' && !missionError) {
+        const note = document.createElement('p');
+        note.className = 'notice info';
+        note.textContent = t('Historique enregistré : tâches, tentatives et revues. La validité actuelle des preuves n’est pas évaluée ; aucune relance ne découle de cette lecture.');
+        plan.appendChild(note);
+        for (const task of work.tasks) {
+          const details = document.createElement('details');
+          details.className = 'history-task';
+          const summary = document.createElement('summary');
+          summary.textContent = `${task.title || task.id} — ${engine(task.status || '')}`;
+          const original = document.createElement('pre');
+          original.className = 'history-original';
+          original.textContent = JSON.stringify(task, null, 2);
+          details.append(summary, original);
+          plan.appendChild(details);
+        }
+      } else if (missionError) {
         plan.textContent = engine(missionError);
       } else if (mission && Array.isArray(mission.tasks)) {
         for (const p of mission.tasks) {
@@ -85,7 +107,9 @@
       }
     }
     if (state) {
-      state.textContent = missionError
+      state.textContent = readMode === 'history' && !missionError
+        ? t('Lecture de l’historique enregistré. Les compteurs de validation actuelle et d’activité restent inconnus.')
+        : missionError
         ? engine(missionError)
         : mission && (mission.summary != null || mission.next != null)
           ? [mission.summary != null ? engine(mission.summary) : '', mission.next != null ? engine(mission.next) : ''].filter(Boolean).join(' — ')
@@ -95,7 +119,10 @@
 
   /**
    * Render cockpit read-only view from validated inputs.
-   * @param {{work?:object,mission?:object|null,missionError?:string|null,control?:object|null}} data
+   * History displays all task fields already returned by the protected public
+   * Work reader, as inert text. It does not qualify their contents, scan files,
+   * hide read failures or turn saved acceptance into current validation.
+   * @param {{work?:object,mission?:object|null,missionError?:string|null,control?:object|null,readMode?:string}} data
    * @returns {void} @throws {Error} on unexpected DOM failures
    */
   function render(data) {
@@ -132,7 +159,8 @@
       }
     }
 
-    renderConduite(mission, missionError);
+    renderConduite(mission, missionError, work, data.readMode);
+    globalThis.SwarmWorkbench?.render(data);
 
     // Reuse canonical graph helpers/CSS with actual stored dependencies only.
     // The caller supplies an explicit Work; failures stay visible, no empty pass.

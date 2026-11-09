@@ -2,8 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../preview.css">
 <title>Swarm — Administration des limites d’exécution</title>
-<script src="./support.js"></script>
+<script src="../preview.js"></script>
 </head>
 <body>
 <x-dc>
@@ -20,7 +22,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
 
   <nav aria-label="Navigation principale" style="flex: 1 1 260px; max-width: 300px; min-width: 240px; background: #062b49; color: #e5edf0; padding: 24px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
     <div style="display: flex; align-items: center; gap: 12px">
-      <img src="/_blob/b63acc488f16dc465ba8dada6b032c6c" alt="" style="width: 44px; height: 44px; object-fit: contain">
+      <img src="../swarm-logo.png" alt="" style="width: 44px; height: 44px; object-fit: contain">
       <span style="font-family: Georgia, serif; font-size: 22px; color: #f6f3e9">Swarm</span>
     </div>
     <div style="border: 1px solid #24485c; border-radius: 6px; padding: 10px 12px; background: #0a3555">
@@ -48,7 +50,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
 
       <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
         <div style="display: flex; align-items: center; gap: 14px">
-          <img src="/_blob/b63acc488f16dc465ba8dada6b032c6c" alt="" style="width: 44px; height: 44px; object-fit: contain">
+          <img src="../swarm-logo.png" alt="" style="width: 44px; height: 44px; object-fit: contain">
           <div>
             <div style="font-family: ui-monospace, monospace; font-size: 13px; color: {{t.link}}">05 · Configuration</div>
             <h1 style="margin: 0; font-family: Georgia, serif; font-size: 36px; font-weight: 400; color: {{t.title}}; line-height: 1.2">Administration</h1>
@@ -80,7 +82,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
           <span style="font-family: ui-monospace, monospace; font-size: 13px; color: {{t.muted}}">révision 3 · valeurs d’exemple</span>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 18px">
           <label style="display: flex; flex-direction: column; gap: 6px; grid-column: 1 / -1">Mode d’exécution
             <select style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; max-width: 440px">
               <option selected>Plafonds actifs</option><option>Observation — sans plafonds d’exécution</option>
@@ -119,33 +121,33 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,su
       <section aria-labelledby="history-title" style="display: flex; flex-direction: column; gap: 12px">
         <h2 id="history-title" style="margin: 0; font-family: Georgia, serif; font-size: 22px; font-weight: 400; color: {{t.title}}">Historique de cette portée</h2>
         <div style="overflow-x: auto; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}">
-          <table style="width: 100%; min-width: 720px; border-collapse: collapse; font-size: 14px">
-            <thead>
-              <tr style="text-align: left; color: {{t.muted}}">
-                <th style="padding: 12px 16px; font-weight: 600">Révision</th>
-                <th style="padding: 12px 16px; font-weight: 600">Valeurs</th>
-                <th style="padding: 12px 16px; font-weight: 600">Motif</th>
-                <th style="padding: 12px 16px; font-weight: 600">Auteur</th>
-                <th style="padding: 12px 16px; font-weight: 600">Date</th>
-                <th style="padding: 12px 16px; font-weight: 600">Action</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div role="table" style="display: table; width: 100%; min-width: 720px; border-collapse: collapse; font-size: 14px">
+            <div role="rowgroup" style="display: table-header-group">
+              <div role="row" style="display: table-row; text-align: left; color: {{t.muted}}">
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Révision</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Valeurs</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Motif</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Auteur</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Date</div>
+                <div role="columnheader" style="display: table-cell; padding: 12px 16px; font-weight: 600">Action</div>
+              </div>
+            </div>
+            <div role="rowgroup" style="display: table-row-group">
               <sc-for list="{{history}}" as="h" hint-placeholder-count="3">
-                <tr style="border-top: 1px solid {{t.border}}">
-                  <td style="padding: 12px 16px; font-family: ui-monospace, monospace; color: {{t.link}}">{{h.rev}}</td>
-                  <td style="padding: 12px 16px; font-family: ui-monospace, monospace; font-size: 13px">{{h.values}}</td>
-                  <td style="padding: 12px 16px">{{h.reason}}</td>
-                  <td style="padding: 12px 16px">[auteur]</td>
-                  <td style="padding: 12px 16px; font-family: ui-monospace, monospace; font-size: 13px">[date]</td>
-                  <td style="padding: 12px 16px">
+                <div role="row" style="display: table-row; border-top: 1px solid {{t.border}}">
+                  <div role="cell" style="display: table-cell; padding: 12px 16px; font-family: ui-monospace, monospace; color: {{t.link}}">{{h.rev}}</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px; font-family: ui-monospace, monospace; font-size: 13px">{{h.values}}</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px">{{h.reason}}</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px">[auteur]</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px; font-family: ui-monospace, monospace; font-size: 13px">[date]</div>
+                  <div role="cell" style="display: table-cell; padding: 12px 16px">
                     <sc-if value="{{h.current}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: {{t.accent}}; font-weight: 600">● Active</span></sc-if>
                     <sc-if value="{{h.restorable}}" hint-placeholder-val="{{ true }}"><button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Restaurer</button></sc-if>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               </sc-for>
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
       </section>
 

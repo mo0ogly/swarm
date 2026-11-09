@@ -2361,3 +2361,67 @@ Ne pas relancer le même push main inchangé. Préparation de PR : titre
 statique des quinze recettes complémentaires, R09–13 et limites conservées ;
 validation documentaire/empreintes seulement, aucun test local exécuté. Aucune
 capacité produit, levée BF-L0 ou acceptation indépendante revendiquée.
+
+
+### PR #20 — reprise CI et isolation de la fixture de rotation (8 novembre 2026)
+
+Fabrice autorise désormais la PR, ses contrôles requis, puis le diagnostic et la
+correction de leur blocage ; fusion dans main seulement si les contrôles passent.
+Cette autorisation ne lève pas BF-L0 et n'autorise aucun appel fournisseur ni autre
+développement. Travaux concurrents du checkout principal exclus : correction sur
+la révision exacte dans un worktree isolé. Aucun service produit à installer ou
+redémarrer : seuls le code `cfg(test)` et ce suivi FR/EN sont concernés.
+
+Preuve originale : [CI 42506071897](https://github.com/mo0ogly/swarm/actions/runs/42506071897),
+head `f7d090f13f2a28699abc77bfc36af08bc21ae996`, install réussi, checks échoué.
+`web_session::tests::rotate_refuses_running_server_then_replaces_key` panique à
+web_session.rs:427 après `drop(listener)` : `web-rotate-server-running`. Le binaire
+engine compte 776 réussites, 1 échec, 29 ignorés ; les étapes suivantes sont sautées.
+Le fichier est identique à la base main. Le même test ciblé seul passe avant
+correction (1 test nommé), sans reproduire le détenteur historique du port.
+
+Contre-exemple contrôlé : un listener CLOEXEC est hérité par fork ; après fermeture
+dans le parent, bind retourne encore EADDRINUSE tant que l'enfant attend avant
+exec. Après exec/sortie observés, la même adresse accepte bind. Témoin valide avant
+injection ; pipes et waitpid, sans sommeil, retry ou borne globale. Cela démontre
+que drop dans un processus de tests concurrent n'établit pas la libération de
+toutes les copies. Le PID/détenteur du port en CI n'a pas été capturé : héritage
+pré-exec corroboré comme défaut d'isolation possible, cause historique exacte et
+réallocation indépendante du port non départagées.
+
+Décision : réexécuter seulement ce cas dans son propre processus libtest, avec
+`--exact` et `--test-threads=1`, avant création du listener. Les forks des tests
+frères du parent ne peuvent alors hériter de ce socket enfant. Un simple mutex
+local ne coordonnerait pas tous les forks ; un retry masquerait le refus. Le
+parent vérifie sortie réussie, un test réussi et marqueur terminal ; les erreurs
+du fils restent visibles. Le scénario original garde témoin, refus sans changement
+de clé, rotation, lecture, permissions, adresse interdite et redaction ; fermeture
+et suppression de sa seule fixture ajoutées. Aucun changement de rotate produit.
+La réservation contre un processus extérieur reste non établie.
+
+Contrôles prévus : tous les tests nommés `web_session::tests::` dans le profil
+ciblé, puis checks/install requis sur la nouvelle tête de
+[PR #20](https://github.com/mo0ogly/swarm/pull/20). Aucun résultat hérité ne remplace
+ces contrôles. Résultats et limites conservés ci-dessous et dans le registre local.
+Originaux sur Lexar montée : `swarm-evidence/pr20-ci-42506071897/` ; diagnostic et
+nouvelles preuves : `swarm-evidence/pr20-ci-fix-20261108/`, index local de restauration
+sous `.cache/`. Propriétaire Codex pour correction/contrôles/intégration autorisés.
+
+Revue du diff : sélecteur enfant, filtre exact et mono-test sont des mécanismes
+de fixture, pas des politiques opérateur ; aucun délai/plafond produit ajouté.
+Docstring du seul test modifié explicite isolation, erreurs et limite externe.
+Spawn, décodage, statut et assertions refusent les erreurs ; close et nettoyage
+sont vérifiés. Aucun autre producteur/consommateur d'erreur produit modifié.
+Apprentissage : un descripteur CLOEXEC peut rester détenu entre fork et exec ;
+une fixture exigeant sa fermeture exclusive doit posséder son processus, sans
+transformer un refus observé en succès par retry. Les anciens résultats BF-L0
+restent historiques ; ni ces tests ni la CI ne qualifient les scénarios 03-F/03-B.
+
+Résultat local observé : Cargo/Rust 1.96.0, profil test par défaut, commande
+`cargo test --manifest-path rust/Cargo.toml --locked --offline -p swarm-engine --lib web_session::tests:: -- --nocapture` :
+3 tests nommés réussis ; rotation dans le fils : 1 test réussi et marqueur
+`WEB_ROTATION_ISOLATED_PASS`. `git diff --check` réussi. Les octets de la section
+produit avant `cfg(test)` restent identiques (SHA256
+`8ad0a25c28581acc25b7c566ff59e32d708fb923cdf06a2428368ecb31291871`).
+Ces preuves locales ne remplacent pas les contrôles requis sur la tête publiée ;
+leur résultat courant et la décision de fusion sont consultables dans PR #20.

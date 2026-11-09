@@ -325,3 +325,80 @@ covering normal/subproject paths, prelaunch attribution/copy refusal and recover
 Git loss after launch, and cancellation with an unavailable workspace. Local
 verification grants no installation, independent approval or global acceptance:
 [evidence1390](../plans/migration-rust/evidence/20261024-managed-manual1390/PLAN.md).
+
+
+## Historical managed-storage aliases
+
+A retained reference can keep an old Root path, such as a compatibility link to
+the same project. Reading and the shared storage guard separately open the private
+`.swarm` state and `managed/<work>` directories. Their device/inode identities
+must match the already opened canonical directories; descriptors stay owned
+throughout the operation. Equal paths, manifest contents or UIDs alone do not
+suffice. Child symlinks are not followed. Another datastore, missing alias or
+invalid path shape refuses; IO and independent close causes remain preserved.
+
+References, manifests, receipts, copies, events, attempts and counters are never
+rewritten. Alias equivalence replaces no manifest, commit or worker-attribution
+check. A mission read neither resumes it nor accepts anything. A real copy/move
+that changes physical identities does not qualify: restore the exact reference
+or prepare an explicitly authorized migration with its own evidence. This is not
+confinement against a hostile same-UID process. See the
+[historical-read report (FR)](../reports/historical-mission-read-20261108.md).
+
+Managed storage locking honors both existing formats: `operation.lock` (Go
+producer) and `.engine-settings.lock` (Rust producer). Both are held in that order
+when present. Only typed ENOENT permits checking the other format; contention,
+permissions, links and close errors refuse. Reads create nothing and refuse when
+neither lock exists. Fresh preparation retains the Rust format. This does not
+cover an older writer concurrently creating a new lock name after observation.
+
+The cockpit separates recorded reads (`read=history`) from current qualification
+(`read=current`). Missions whose saved control is paused open history by default;
+the button beside Refresh explicitly selects the other view. This is presentation,
+not execution policy. History consumes the existing protected public Work and
+panel readers. Each task expands to every saved field, including attempts and
+previous reviews. No freshness or activity is inferred; their counts remain
+unknown. Current qualification still uses the strict reader and exposes refusals;
+history never substitutes for it. Work/control/panel read failures remain blocking.
+Logs retain their separate public path. This neither qualifies historical Go
+evidence nor restarts agents or migrates data.
+
+## Current qualification and historical Go opinions
+
+Use `work show` or the calculated resume in Resume and OODA
+(`/api/v1/work-resume?work=ID&lang=en`). These readers inspect current evidence
+through `inspect_work_view` and its validation projection. They remain separate
+from recorded summaries and the global operational mission status. Favorable
+simple Go reviews retain context, contract, candidate, file and Git-report guards.
+An unknown/unfavorable opinion using an unported batch/fragment protocol remains
+explicitly unqualified on its task; its receipt fallback is not consumed and it
+does not suppress neighboring simple reviews. A favorable opinion using an
+unported protocol still refuses. Unknown never becomes PASS, missing evidence
+is never repaired, and reading starts no agent. IO failures on consumed evidence
+still refuse; restoring originals allows inspection again without rewriting history.
+See [Go qualification tracking](../reports/historical-go-qualification-20261108.md).
+
+The recorded-read banner says “operational status not evaluated”: it does not
+contradict evidence qualification separately requested in the calculated Resume
+and OODA summary. Global status and evidence qualification are different
+observations; neither grants execution authority.
+
+The Git review reader also uses the shared binding guard for historical absolute
+Go locators through a root alias. Standard .swarm/managed/Work shape, matching
+private State/Work identities and the existing shared lane are required; owned
+descriptors stay open during Git inspection of the canonical contained path.
+No file or stored locator is rewritten. Another state, missing alias, contention
+or Git failure refuses; restoring originals permits the next read. Independent
+review and close causes survive together through Root Cleanup. Observations
+protocol_verified/authority_verified stay false: this is data consistency, not
+acceptance authority or same-UID confinement.
+
+
+### Historical fixture commit attribution
+
+The root-alias control uses synthetic attribution local to its inert repository (`Fixture`, `fixture@invalid`), matching existing Git fixtures. It neither reads nor changes operator identity or production Git attribution. The `historical-mission-recorded-read` recipe hides global/system Git configuration to check this independence. Alias control/refusal/recovery assertions remain required; a retained SDK must contain the corrected test. This fixture contract establishes neither external-CI qualification nor new product acceptance.
+
+
+### English catalogue for historical reading
+
+The five historical-read and current-status labels are defined in `locales/en.json`, then generated into `web/i18n-en.js` by `node scripts/i18n/build.cjs`. The Rust `work_view.rs` reader also embeds the source catalogue: changing only the web artifact does not update the engine translation. `node scripts/i18n/build.cjs --check` and `node tests/i18n_test.cjs` check generated bytes and parity. They establish neither an installed rebuild nor validity of the evidence in the mission being read.

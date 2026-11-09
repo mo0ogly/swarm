@@ -1272,3 +1272,5 @@ This CLI command adds no UX button or HTTP mutation journey.
 
 Maintained recipe: `tools/verification/recipes/gieth-review-refresh.json`; scoped
 plan, evidence and limits: [Gi.eth report (French)](../plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).
+
+The `task review-refresh` command is listed in both French and English CLI help. This reference describes explicit proof renewal; help grants no review, publication or acceptance authority.

@@ -1,0 +1,362 @@
+{
+  "checked_at": "2026-11-08T23:37:13.318717+00:00",
+  "base": "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
+  "lots": [
+    {
+      "label": "01-focus",
+      "base": "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
+      "commit": "7e8cca69076a60a7671d2179eec0f0f536392e8e",
+      "paths": [
+        "web/swarm-shell.js",
+        "tests/swarm_shell_escape_test.cjs",
+        "tools/verification/recipes/version-focus-escape.json",
+        "docs/UI-DESIGN.md",
+        "docs/en/WINDOW-IDENTITY.md",
+        "version_history.json"
+      ],
+      "committed_blobs": {
+        "web/swarm-shell.js": "2d1d0a1d3c96167b87c25697786fc2bcd64b131b",
+        "tests/swarm_shell_escape_test.cjs": "009030d1ed115c6b589c6b8dee522f4e741d8b10",
+        "tools/verification/recipes/version-focus-escape.json": "c2b99d309f680f6de04444a66200f5291707f37f",
+        "docs/UI-DESIGN.md": "b00be957cffc7da10e867765dde3f86075ff37fa",
+        "docs/en/WINDOW-IDENTITY.md": "6d977d7412462cb359f5ac956305b7e54ced0222",
+        "version_history.json": "96658eb010330cdf7cb6ad74f381ab1a775a12a8"
+      },
+      "working_sha256": {
+        "web/swarm-shell.js": "593f179e1521ae53867a7a5771e4ffeedf17bcafdbe78a1a794ff6d28b0b3b44",
+        "tests/swarm_shell_escape_test.cjs": "a2c68b258d25bfa797b3d5b6621d591b6246761209249535194b39d230f5655f",
+        "tools/verification/recipes/version-focus-escape.json": "4d88175520e2bfe3269c39a28084810d7c633dde71179560458132d3b22661ba",
+        "docs/UI-DESIGN.md": "5754b02b24e742e4a38069180c2c000cf8222e296fc4116a2b0d4272e924a604",
+        "docs/en/WINDOW-IDENTITY.md": "e335248923cc4c69d402d997af991dc7f98550bfc538eba57fbb27a98d3a1532",
+        "version_history.json": "419fa54e5d9cb9b8b04d329267cf699791f6f3137fce17a33cfbdaf778c78d18"
+      },
+      "proofs": [
+        ".cache/integration-code-20261109/focus-02/result.json",
+        ".cache/integration-code-20261109/focus-02/step-0001.stdout"
+      ],
+      "scope": "Retained exact-input checks; no isolated intermediate-tree build claimed"
+    },
+    {
+      "label": "02-badges",
+      "base": "7e8cca69076a60a7671d2179eec0f0f536392e8e",
+      "commit": "9d40b7e60648756ed1082b7991f6288e0063bf51",
+      "paths": [
+        "web/swarm-workbench.js",
+        "web/swarm-design.css",
+        "web/cockpit-native-panels.js",
+        "tests/task_status_badges_test.cjs",
+        "tests/agent_status_badges_test.cjs",
+        "tests/agent_status_badges_fixture.py",
+        "tests/fixtures/agent-status-badges/fixture.js",
+        "tests/fixtures/agent-status-badges/index.html",
+        "tools/verification/recipes/task-status-badges.json",
+        "tools/verification/recipes/agent-status-badges.json",
+        "docs/reports/kpi-badges-20261108.md",
+        "docs/reports/task-status-badges-20261108.md",
+        "docs/reports/agent-status-badges-20261108.md",
+        "docs/UI-DESIGN.md",
+        "docs/en/WINDOW-IDENTITY.md",
+        "web/cockpit-native-read.js",
+        "version_history.json"
+      ],
+      "committed_blobs": {
+        "web/swarm-workbench.js": "9e63563e24f68ab42e49f21b713b6e250f53863a",
+        "web/swarm-design.css": "205f6fe81f242a8109e09a04c6d4a1885d20092c",
+        "web/cockpit-native-panels.js": "1d6d333956f08c4f8f5bc2ab9d5cdcfdff386ccf",
+        "tests/task_status_badges_test.cjs": "f2e5394e565cfe6837585f2a6100164f6121a7de",
+        "tests/agent_status_badges_test.cjs": "163d76e31b06d658004539f60540aaf19032ab3b",
+        "tests/agent_status_badges_fixture.py": "445ecd16da3db3117634212e9d0ae5ab4c3b4291",
+        "tests/fixtures/agent-status-badges/fixture.js": "3526c8e96e8c191cc0194d7be9e8904d76e6ade0",
+        "tests/fixtures/agent-status-badges/index.html": "e91fa68345bf6a7c817c322cee3a6e3e374d53d7",
+        "tools/verification/recipes/task-status-badges.json": "99c5a6327b943621de43da7fa02723a4ec8d74d4",
+        "tools/verification/recipes/agent-status-badges.json": "52156f5d7c1078736b3920ca2b2169f2157f3a19",
+        "docs/reports/kpi-badges-20261108.md": "63562d9b650b3e3494adbb856abba9aa064f9563",
+        "docs/reports/task-status-badges-20261108.md": "b74f7d9bcc7f92786e38781c10af62a9b2707f06",
+        "docs/reports/agent-status-badges-20261108.md": "b611c94ff56b35b28165cbb671b4afaf9024083a",
+        "docs/UI-DESIGN.md": "ca7c579b590d49e2e38de489c0434e3af58d600d",
+        "docs/en/WINDOW-IDENTITY.md": "a122d0a1b7e97bf845dd5a7ece2a639ad133a001",
+        "web/cockpit-native-read.js": "d5a3180b5040e99038bc37623f478979d9fc5306",
+        "version_history.json": "16c70c8d4908172f099f2639085732fe1e4230e0"
+      },
+      "working_sha256": {
+        "web/swarm-workbench.js": "fc75e69292044e414f29fbbbefa30e3d683c02ce6a420aee17ff09bb8c1c4a15",
+        "web/swarm-design.css": "2db8b9b99e97c28706dee90870d102e6914e423926bb55ab4854aa69a60d43b8",
+        "web/cockpit-native-panels.js": "1cb55f37c7647aa975d15a3b980e37ebcf168744ee35d9f9c43bc5c40e854848",
+        "tests/task_status_badges_test.cjs": "427f695a7fc5a2720a21080104b12219e7152f970f4244f5028ebe94939c724f",
+        "tests/agent_status_badges_test.cjs": "83e221d543e1e384b0eef46aeadc301c079b5909be357df4217c12c76b3e2f70",
+        "tests/agent_status_badges_fixture.py": "2494b7061a594b7000bcda88bc6d7d9e74e29bfa30af51ae927c437d78bc8f39",
+        "tests/fixtures/agent-status-badges/fixture.js": "7d7ff666ac37a4d2eac4ecfd77103897ad3b9df7b9bc021dfe0c8e5b30b5c419",
+        "tests/fixtures/agent-status-badges/index.html": "471b575e2a344e7cff296bce6f6da852a71e22809affb378a4ad9cea8a623dc7",
+        "tools/verification/recipes/task-status-badges.json": "34643b0cdb521b7cb2c15d8c1832e96bb23d063168712e673dec58e1b7d8d6db",
+        "tools/verification/recipes/agent-status-badges.json": "6cb40b4c7e4f1fefbe1357909aa57b5bd7f906ce0e2150b8f0252e01abe9a029",
+        "docs/reports/kpi-badges-20261108.md": "01358e45b828a7411fe6f3ed45a37425571d48d54cb99f6dd9997f2ddd867faf",
+        "docs/reports/task-status-badges-20261108.md": "f195dc2d93006ca0efdca4a0895aee080b81b5e5ec07419877933587e7cf9516",
+        "docs/reports/agent-status-badges-20261108.md": "fc21d06ba747d1d9ada968c8dcfdb08b5683e42fcfb139ccf9d26b5664166e21",
+        "docs/UI-DESIGN.md": "5754b02b24e742e4a38069180c2c000cf8222e296fc4116a2b0d4272e924a604",
+        "docs/en/WINDOW-IDENTITY.md": "e335248923cc4c69d402d997af991dc7f98550bfc538eba57fbb27a98d3a1532",
+        "web/cockpit-native-read.js": "a42912994d18b036509e975463f54488e7511f43859f6c4f58c42967e8ef8f10",
+        "version_history.json": "419fa54e5d9cb9b8b04d329267cf699791f6f3137fce17a33cfbdaf778c78d18"
+      },
+      "proofs": [
+        ".cache/integration-code-20261109/badges-01/result.json",
+        "docs/reports/kpi-badges-20261108.md",
+        "docs/reports/task-status-badges-20261108.md",
+        "docs/reports/agent-status-badges-20261108.md"
+      ],
+      "scope": "Retained exact-input checks; no isolated intermediate-tree build claimed"
+    },
+    {
+      "label": "03-gi",
+      "base": "9d40b7e60648756ed1082b7991f6288e0063bf51",
+      "commit": "8549dcc42f8e924db76685a8d0d0d7292cefafca",
+      "paths": [
+        "rust/crates/swarm-cli/src/lib.rs",
+        "rust/crates/swarm-cli/src/task_validation.rs",
+        "rust/crates/swarm-engine/src/lib.rs",
+        "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+        "rust/crates/swarm-engine/src/root_store/task_validation/managed_execution.rs",
+        "rust/crates/swarm-engine/src/root_store/task_validation/review_candidate.rs",
+        "rust/crates/swarm-engine/src/root_store/task_validation/input_inventory.rs",
+        "rust/crates/swarm-engine/src/root_store/task_validation/review_refresh.rs",
+        "tests/rust_native_managed_review_inputs.py",
+        "tests/rust_gieth_review_refresh.py",
+        "tools/verification/recipes/gieth-review-refresh.json",
+        "tools/verification/recipes/gieth-legacy-refresh.json",
+        "docs/architecture/NATIVE-REVIEWER.md",
+        "docs/en/NATIVE-REVIEWER.md",
+        "docs/plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md",
+        "rust/crates/swarm-engine/src/root_store.rs",
+        "version_history.json"
+      ],
+      "committed_blobs": {
+        "rust/crates/swarm-cli/src/lib.rs": "398b4699cc0de78ef3e22a1adf9025d2adaba17b",
+        "rust/crates/swarm-cli/src/task_validation.rs": "693f15f7474ae3831421496238b9f78e2232ba77",
+        "rust/crates/swarm-engine/src/lib.rs": "0e28a692766faf68980d8c6b1f57c4024b8e2ddc",
+        "rust/crates/swarm-engine/src/root_store/task_validation.rs": "bceb197da3ac89f6efcf6a228829752def4d6ce3",
+        "rust/crates/swarm-engine/src/root_store/task_validation/managed_execution.rs": "60fd8d5c85b8e46d1ea081fb3ade0dea730f32b0",
+        "rust/crates/swarm-engine/src/root_store/task_validation/review_candidate.rs": "6d8e519803fa0b2ca33109a0779bd51bd3cf1446",
+        "rust/crates/swarm-engine/src/root_store/task_validation/input_inventory.rs": "56a7cc62863b67e1c4e8e9132da4dd2382d3d00e",
+        "rust/crates/swarm-engine/src/root_store/task_validation/review_refresh.rs": "dce954ef0b1b2facd35e87b2791815f108c9ed1f",
+        "tests/rust_native_managed_review_inputs.py": "80049f20080e6d7d1b91b273739ead048fa39833",
+        "tests/rust_gieth_review_refresh.py": "852a3bb1c6ec2001c86c9d872dae6de3088c5d48",
+        "tools/verification/recipes/gieth-review-refresh.json": "09015dea29dd22d45cf31eaa68ea0c6825d390ae",
+        "tools/verification/recipes/gieth-legacy-refresh.json": "86dadeee76736fbf857764308125d6466b54eaf4",
+        "docs/architecture/NATIVE-REVIEWER.md": "ecc6a345caf60ba0f36c7812a78f960703a6fffd",
+        "docs/en/NATIVE-REVIEWER.md": "8ebd108437077ce773f7b4c791f2ce63881af5ec",
+        "docs/plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md": "47de8b9a0e4cc9ec8166af4d525b45916f7b88a4",
+        "rust/crates/swarm-engine/src/root_store.rs": "ae6ce103beef689e15cab6f569aa05d8de5ebe5c",
+        "version_history.json": "2704cb701a61c82c475471c3bc82227737cb7808"
+      },
+      "working_sha256": {
+        "rust/crates/swarm-cli/src/lib.rs": "734e9ed958f8e6dab79b6160953a2808c48ca459517c73cecbb0f1b641a77dc9",
+        "rust/crates/swarm-cli/src/task_validation.rs": "8d5182b0d9fc9c870480a7ea353f4ad2cd5024b6cc256d07f30d8b2976c32546",
+        "rust/crates/swarm-engine/src/lib.rs": "b0b69f24dbd63654c1d204e27da707547ecb32d274492ba9464ef7ea87db5210",
+        "rust/crates/swarm-engine/src/root_store/task_validation.rs": "f4a1dce53a5cbd9314cb676a17b09635754a78648970d9ca5e0925ce6afa6cae",
+        "rust/crates/swarm-engine/src/root_store/task_validation/managed_execution.rs": "68af46019492648d54e4b0e6291980e01ef925dc87a43330cba45d34d369bbcb",
+        "rust/crates/swarm-engine/src/root_store/task_validation/review_candidate.rs": "d805fac095ee2b84142939560cc961ebf0132bccb8c6e5d8ca5f18352b8463d2",
+        "rust/crates/swarm-engine/src/root_store/task_validation/input_inventory.rs": "ec5a5e9ff93502ed5ca9c8a02c60e6cddaaa60bbfb30155339324b14f160e0c5",
+        "rust/crates/swarm-engine/src/root_store/task_validation/review_refresh.rs": "bc96e376b9e7e504d50aae9a2a9c08044650d6bb6b843d94a5e6241e5095fbf2",
+        "tests/rust_native_managed_review_inputs.py": "352b02df62ee69b8f4479f8b9940ef0ca31c40bbf9caa6acdad706670386a142",
+        "tests/rust_gieth_review_refresh.py": "29f2e638844a23c1c21af34df548e767d97f41601b9037f2865b4186d6f5f768",
+        "tools/verification/recipes/gieth-review-refresh.json": "e1d31850388a8f9c700f18961955b867ffebfb51402e9ae0b412e13496e74c50",
+        "tools/verification/recipes/gieth-legacy-refresh.json": "670105b673a69d89b8263d234adfe93e2dca5ed372278648e514baa84de160d7",
+        "docs/architecture/NATIVE-REVIEWER.md": "11c0e7278fa029a5b317947674cd75e233b9e0a61ce1f22751d65b35616c1202",
+        "docs/en/NATIVE-REVIEWER.md": "3488fa9274ee0e14ae4161a0e35ede14b2cdd051381847565b4e3727421d5106",
+        "docs/plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md": "13065b01239967b80faafb3a1b527dc48bd51ab2e83bf49b5d808a5396bfea1c",
+        "rust/crates/swarm-engine/src/root_store.rs": "49ba554065187ac1d097c6fd19fe005c8f3f05b6dcfdb73d58ae4d927a31cbcc",
+        "version_history.json": "765358650127cd493de4998244bc2601115dbfbb0d1f62de9481ea3dc6c4603d"
+      },
+      "proofs": [
+        ".cache/gieth-fix-20261108/run-03/result.json",
+        ".cache/gieth-fix-20261108/flow-03/result.json",
+        ".cache/gieth-fix-20261108/legacy-run/result.json",
+        ".cache/integration-code-20261109/help-en-before.stdout",
+        "Final normal build/help FR/EN pending for HELP_EN correction"
+      ],
+      "scope": "Retained exact-input checks; no isolated intermediate-tree build claimed"
+    },
+    {
+      "label": "04-history",
+      "base": "8549dcc42f8e924db76685a8d0d0d7292cefafca",
+      "commit": "1d69f956b7201f6266e773831700f3fb3b1da005",
+      "paths": [
+        "rust/crates/swarm-engine/src/local_storage.rs",
+        "web/cockpit-native-read.js",
+        "web/swarm-workbench.css",
+        "tests/historical_mission_read_ui.cjs",
+        "tools/verification/recipes/historical-mission-recorded-read.json",
+        "docs/reports/historical-mission-read-20261108.md",
+        "rust/crates/swarm-engine/src/managed_repository.rs",
+        "rust/crates/swarm-engine/src/managed_repository_worker.rs",
+        "web/cockpit-native.js",
+        "web/i18n-en.js",
+        "docs/architecture/NATIVE-WORKER-RECOVERY.md",
+        "docs/en/NATIVE-WORKER-RECOVERY.md",
+        "version_history.json"
+      ],
+      "committed_blobs": {
+        "rust/crates/swarm-engine/src/local_storage.rs": "7b5785509521944533a995c70709e331f813b07a",
+        "web/cockpit-native-read.js": "572e75c5f5f2f9ff6b13dfef4e93fada4c5c42e5",
+        "web/swarm-workbench.css": "ded1da187e8aa1359e9cf1f24131834d34efb676",
+        "tests/historical_mission_read_ui.cjs": "c8169e3aa30ea17f1f7216b4946e54e75b3f958b",
+        "tools/verification/recipes/historical-mission-recorded-read.json": "de396f160f68cdb87f004d71dac6b2350838cb19",
+        "docs/reports/historical-mission-read-20261108.md": "454b127c2332385c07f96bc374bc4c884c21774a",
+        "rust/crates/swarm-engine/src/managed_repository.rs": "9c5e26334ade88c16c79e200b5b4109abf4adc10",
+        "rust/crates/swarm-engine/src/managed_repository_worker.rs": "a55cdc64453c6a73e0a72d897ebb13016eb9a90e",
+        "web/cockpit-native.js": "08f4fd5148954c8c49172fa446b45b6b06b61da0",
+        "web/i18n-en.js": "3ed324d5308dcaca3b5c9c149ba5ba53eb04176b",
+        "docs/architecture/NATIVE-WORKER-RECOVERY.md": "10f064d9f2816dc8c13329166de55d0803b43a4d",
+        "docs/en/NATIVE-WORKER-RECOVERY.md": "8a366a80570bc029627543f939b96a4ddea5dae7",
+        "version_history.json": "ec7d8a9c328cd61b68af6656ab775541d08abef8"
+      },
+      "working_sha256": {
+        "rust/crates/swarm-engine/src/local_storage.rs": "d1d19a830612dc78bb140877a110a99826a69025ec8ac309cb54f90687510c1b",
+        "web/cockpit-native-read.js": "a42912994d18b036509e975463f54488e7511f43859f6c4f58c42967e8ef8f10",
+        "web/swarm-workbench.css": "f49ba198cc7861a2f4cf604fe46d036c7f98dfdafe5568cd109e12885689247f",
+        "tests/historical_mission_read_ui.cjs": "2c1e54efe29b1753e7c5e5bd2e82883909a5efb5385f75fd92d3aa08d5437ca9",
+        "tools/verification/recipes/historical-mission-recorded-read.json": "fe721f1c056400de488ab8518cd535c3700566c71f8b146148735f3cde4e20b2",
+        "docs/reports/historical-mission-read-20261108.md": "23df77c85cca8e38a28947304111e512946e2f1046a37ddd3a567769c192c6aa",
+        "rust/crates/swarm-engine/src/managed_repository.rs": "942a233dbe07fe2019dba9bb618299952172addb250d6690110ffecb08a1a95c",
+        "rust/crates/swarm-engine/src/managed_repository_worker.rs": "e6390bcf15c5f07e3629c98c54a5fbe3e6180f87149254e51fcf38cddd87e61c",
+        "web/cockpit-native.js": "5f399ee00f0a19ec322c888d07e08e2cae3c85635fb2ed750fae95dbb2deba6c",
+        "web/i18n-en.js": "88e0d631fe67fa6ce016c43ec2dc7365d47b930645c241fb96f22fae8e9b2d8b",
+        "docs/architecture/NATIVE-WORKER-RECOVERY.md": "252a3c1b3eba783a8a8debf1af32d6ca71d35790a0056079790acfc842aa5af8",
+        "docs/en/NATIVE-WORKER-RECOVERY.md": "699bb12b76b972c1b931ae5d19804ac3ecdf4b9e905f7f6c0e1c4cc5b6905097",
+        "version_history.json": "765358650127cd493de4998244bc2601115dbfbb0d1f62de9481ea3dc6c4603d"
+      },
+      "proofs": [
+        ".cache/historical-mission-read-20261108/recipe-history/result.json",
+        "docs/reports/historical-mission-read-20261108.md",
+        "Inherited exact engine inputs364; intermediate tree not rebuilt"
+      ],
+      "scope": "Retained exact-input checks; no isolated intermediate-tree build claimed"
+    },
+    {
+      "label": "05-qualification",
+      "base": "1d69f956b7201f6266e773831700f3fb3b1da005",
+      "commit": "a547d8e0519e4bf5620842e991b535889e59be85",
+      "paths": [
+        "rust/crates/swarm-engine/src/work_projection.rs",
+        "rust/crates/swarm-engine/src/managed_review_git.rs",
+        "rust/crates/swarm-engine/src/root_store.rs",
+        "rust/crates/swarm-engine/src/managed_repository.rs",
+        "rust/crates/swarm-engine/src/managed_repository_worker.rs",
+        "rust/crates/swarm-engine/tests/work_projection.rs",
+        "rust/crates/swarm-engine/tests/root_review_evidence.rs",
+        "tools/verification/recipes/historical-go-qualification.json",
+        "docs/architecture/RUST-MIGRATION.md",
+        "docs/en/RUST-MIGRATION.md",
+        "docs/architecture/NATIVE-WORKER-RECOVERY.md",
+        "docs/en/NATIVE-WORKER-RECOVERY.md",
+        "docs/reports/historical-go-qualification-20261108.md",
+        "web/cockpit-native.js",
+        "web/i18n-en.js",
+        "version_history.json"
+      ],
+      "committed_blobs": {
+        "rust/crates/swarm-engine/src/work_projection.rs": "6dca974483fadfaa0182a5a94eb3fb1bf0267fe7",
+        "rust/crates/swarm-engine/src/managed_review_git.rs": "eda171ef393d6c74ed28e06657ac1ffd294ee0c6",
+        "rust/crates/swarm-engine/src/root_store.rs": "38a1dc4dfda2442e8aad30daaa8a207390bb3633",
+        "rust/crates/swarm-engine/src/managed_repository.rs": "b337952d6d84cb3d49c09238388a92af0b0d263a",
+        "rust/crates/swarm-engine/src/managed_repository_worker.rs": "ed57337abee96e7a0ba7f34ef812d83604432041",
+        "rust/crates/swarm-engine/tests/work_projection.rs": "3d5aad64f73550a13a9d65003427799dd3c98ac4",
+        "rust/crates/swarm-engine/tests/root_review_evidence.rs": "91b8d31bc07cc39bcca15d8dab39147c1ec825a1",
+        "tools/verification/recipes/historical-go-qualification.json": "7cb8df31f8a88beb1178869c4e54158f712d33be",
+        "docs/architecture/RUST-MIGRATION.md": "8288d0132734be74e17b28cb8d5d8f6a2a9c1dab",
+        "docs/en/RUST-MIGRATION.md": "bcd5b10a35fe0867c2ec24d709dd3c5e74aca282",
+        "docs/architecture/NATIVE-WORKER-RECOVERY.md": "6f24e509929e0984e15736bda5b7438b6c1fa521",
+        "docs/en/NATIVE-WORKER-RECOVERY.md": "6bb58ba0d6eeefc9cbc0a22480174382ad01fa41",
+        "docs/reports/historical-go-qualification-20261108.md": "a0248a012501a652f355b1e59d13e718bd320d68",
+        "web/cockpit-native.js": "20115bef9895266e573002f47817774994fc78bc",
+        "web/i18n-en.js": "6602f4600c0ce42f58f68678cf4616ad77b4ba6d",
+        "version_history.json": "47cb6fe0ccb69aff23df45b797236c4b8fa3aab2"
+      },
+      "working_sha256": {
+        "rust/crates/swarm-engine/src/work_projection.rs": "0db26b3e5ff8851bc5099523904a5cadd3b47330bc9b1346a6b0ab5be293cf55",
+        "rust/crates/swarm-engine/src/managed_review_git.rs": "d585fc360783a26f07f35966250a3d2496e565edadce3d4426b7bff24075025e",
+        "rust/crates/swarm-engine/src/root_store.rs": "49ba554065187ac1d097c6fd19fe005c8f3f05b6dcfdb73d58ae4d927a31cbcc",
+        "rust/crates/swarm-engine/src/managed_repository.rs": "942a233dbe07fe2019dba9bb618299952172addb250d6690110ffecb08a1a95c",
+        "rust/crates/swarm-engine/src/managed_repository_worker.rs": "e6390bcf15c5f07e3629c98c54a5fbe3e6180f87149254e51fcf38cddd87e61c",
+        "rust/crates/swarm-engine/tests/work_projection.rs": "234fad4e03ef482b3db6d8c9352de600df1ef3ccb9df3eb4ed86849e3b110b65",
+        "rust/crates/swarm-engine/tests/root_review_evidence.rs": "253ab1b44d5bb47d42ea887f96043bbd30319023442333e09c8c492b5ffdc27a",
+        "tools/verification/recipes/historical-go-qualification.json": "a750c6350952f0ba4dfd4ea3deebd45e038d995a3a7ca472ba411c93bcb01d70",
+        "docs/architecture/RUST-MIGRATION.md": "9b170f677c36cb877175f2990df45010565dc432b745346422698fa37b8b69fb",
+        "docs/en/RUST-MIGRATION.md": "e2de0b1c40a341b2726ee29a04c9d03c90025b40bce5fd8624e71bb4cc0fc28f",
+        "docs/architecture/NATIVE-WORKER-RECOVERY.md": "252a3c1b3eba783a8a8debf1af32d6ca71d35790a0056079790acfc842aa5af8",
+        "docs/en/NATIVE-WORKER-RECOVERY.md": "699bb12b76b972c1b931ae5d19804ac3ecdf4b9e905f7f6c0e1c4cc5b6905097",
+        "docs/reports/historical-go-qualification-20261108.md": "ec4773979baef83a4d49484ab05ac56d5af4cfbd531f7abe90cdca3af098b977",
+        "web/cockpit-native.js": "5f399ee00f0a19ec322c888d07e08e2cae3c85635fb2ed750fae95dbb2deba6c",
+        "web/i18n-en.js": "88e0d631fe67fa6ce016c43ec2dc7365d47b930645c241fb96f22fae8e9b2d8b",
+        "version_history.json": "765358650127cd493de4998244bc2601115dbfbb0d1f62de9481ea3dc6c4603d"
+      },
+      "proofs": [
+        ".cache/historical-go-qualification-20261108/recipe-sdk-03/result.json",
+        ".cache/historical-go-qualification-20261108/source-review-final-364.json",
+        ".cache/historical-go-qualification-20261108/delivery-record-03.json"
+      ],
+      "scope": "Retained exact-input checks; no isolated intermediate-tree build claimed"
+    }
+  ],
+  "active": {
+    "running": true,
+    "pid": 2400907,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38434/",
+    "ready": true,
+    "engine": "rust",
+    "binary": {
+      "build_date": "2026-11-08T23:32:40Z",
+      "commit": "a547d8e0519e4bf5620842e991b535889e59be85",
+      "modified": true,
+      "provenance": "injected",
+      "version": "v0.1.1-dev.365"
+    },
+    "binary_sha256": "77a26af00a792d0090cd220306468e26e6f1fde5caa0b1f1641ba44a65c9fa6c"
+  },
+  "proc_exe_sha256": "77a26af00a792d0090cd220306468e26e6f1fde5caa0b1f1641ba44a65c9fa6c",
+  "working_drift_on_integrated_paths": [],
+  "candidate_evidence": ".cache/local-delivery/rust-tm0ucj0m",
+  "builder_status": "VERIFIED_NATIVE_CANDIDATE",
+  "source_review": {
+    "scope": "Integration of retained reviewed hunks; new behavioral code limited to prior lots. Only fresh source correction: HELP_EN inventory.",
+    "policies": "HELP_EN command list is UI presentation, not an execution policy; engine inputs unchanged versus364. Reuse bounded N4/361/364 reviews, no global conformance claimed.",
+    "functions": "No new product function in the help correction; existing function contracts and bilingual documents retained with each code lot.",
+    "errors": "No execution error branch changed by help correction. Initial focus recipe prerequisite refusal preserved, then parent created and fresh successful run. Login blocks visual acceptance; no auth bypass.",
+    "baseline_delta": {
+      "baseline364_effective_inputs": 782,
+      "changed": [
+        "rust/crates/swarm-cli/src/lib.rs",
+        "version_history.json"
+      ],
+      "scope": "CLI help FR/EN and existing local-change notes only; all other declared effective inputs unchanged"
+    }
+  },
+  "ui": {
+    "state": "login_required",
+    "url": "http://127.0.0.1:38433/",
+    "version_dialog_fr_en": "not_observed_on365",
+    "calculated_summary_history": "not_replayed_on365",
+    "cause": "Current IAB session redirected to login; no credential or ticket extraction"
+  },
+  "storage": {
+    "preferred": "Lexar mounted /dev/sda1 vfat; only149MiB available observed",
+    "fallback": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/integration-code-20261109",
+    "local_available": "21GiB observed",
+    "originals_removed": false
+  },
+  "publication": {
+    "pushed": false,
+    "new_push_attempt": false,
+    "required_decision": "Authorize one delivery branch and PR; main protection requires strict checks/install and applies to admins",
+    "protection_changed": false
+  },
+  "billing": "deferred",
+  "chat_recovery": {
+    "memory": "01a140e0-27e4-7aa3-b5f9-2bbbd60a7220",
+    "models": "01a12662-be7b-7de0-b1cf-78298477f50a",
+    "observed_error": "missing source rollout",
+    "usb_causality": "not established",
+    "usb_filename_search": "incomplete; owned rg process stopped after no progress; not evidence of absence",
+    "m33": "Archive pointer and exact recovered copy retained in deepagents-integration; not a chat-history restoration"
+  }
+}

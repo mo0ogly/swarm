@@ -1256,9 +1256,11 @@ neither process termination nor agent authentication.
 The candidate composition combines the existing current review/Git guard with
 controls read from a managed receipt when no automatic record is present.
 This fallback is display data only: it does not change Work or repair freshness,
-whose guard still requires the original automatic record. Batch and fragment
-protocols explicitly refuse in every task state; managed Git reads remain
-Linux-only. Receipt/policy/IO failures reach the consumer without empty success. The native
+whose guard still requires the original automatic record. Favorable batch and
+fragment opinions explicitly refuse in every task state. Non-favorable opinions
+using these protocols remain explicitly unqualified per task: no receipt fallback
+is consumed and neighboring simple reviews can still be examined. Unknown never
+becomes favorable. Managed Git reads remain Linux-only. Receipt/policy/IO failures reach the consumer without empty success. The native
 receipt codec requires UTF-8; unlike Go replacement of invalid bytes, it refuses
 invalid UTF-8 with its cause preserved.
 No new identity proof or task acceptance is established.
@@ -1266,7 +1268,9 @@ No new identity proof or task acceptance is established.
 ```mermaid
 flowchart LR
   A[Root Work and saved settings] --> B{Supported simple managed protocol}
-  B -->|no| C[Explicit refusal]
+  B -->|no| J{Favorable opinion}
+  J -->|yes| C[Explicit refusal]
+  J -->|no| K[Unqualified per task without receipt fallback]
   B -->|yes| D[Current review and Git then dependencies]
   B -->|yes| E{Automatic record present}
   E -->|yes| F[Stored controls]

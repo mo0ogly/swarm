@@ -1,0 +1,128 @@
+{
+  "observed_at": "2026-11-08T21:08:39.672Z",
+  "creation_ids": [
+    {
+      "folder": "01-mandats-effets",
+      "title": "Swarm 1 — Mandats et effets",
+      "threadId": "01a1bcf7-294d-7212-aa7e-d00dc65623d9",
+      "hostId": "local"
+    },
+    {
+      "folder": "02-revues-candidats",
+      "title": "Swarm 2 — Revues et candidat livré",
+      "threadId": "01a1bcf7-35c7-7943-8079-52ef453912ff",
+      "hostId": "local"
+    },
+    {
+      "folder": "03-resultats-inconnus",
+      "title": "Swarm 3 — Timeouts et réconciliation",
+      "threadId": "01a1bcf7-471c-7a51-82bc-f98a1dd52648",
+      "hostId": "local"
+    },
+    {
+      "folder": "04-transmission-supervision",
+      "title": "Swarm 4 — Consignes et supervision",
+      "threadId": "01a1bcf7-55ee-7c02-90fb-b12f77a4da99",
+      "hostId": "local"
+    }
+  ],
+  "titles_verified": true,
+  "strategy_receptions": [
+    {
+      "thread_id": "01a1bbb6-ef86-7471-9025-fba8d1edd81d",
+      "status": {
+        "type": "idle"
+      },
+      "turn_status": "completed",
+      "message": "Stratégie reçue. Aucun conflit identifié avec l’état courant : travail terminé, textes X conservés en brouillon, rien publié. Aucun travail ni outil relancé ; j’attends Fabrice.",
+      "cursor": "8ba7d5a8-6634-4a7b-8b9f-8cfca27a05f2:1"
+    },
+    {
+      "thread_id": "01a1bbe3-cea2-7413-998e-6a27656acd69",
+      "status": {
+        "type": "active",
+        "activeFlags": []
+      },
+      "turn_status": "inProgress",
+      "message": "Le candidat franchit la liaison de chemin, mais la lecture révèle un second obstacle : un fichier de verrou attendu n’existe pas dans le stockage historique. Je conserve ce nouvel échec et vérifie le protocole de verrouillage avant de corriger la suite.",
+      "cursor": "8c5ea3c1-c9fb-4820-a503-0c3fdeb22e82:1"
+    },
+    {
+      "thread_id": "01a1bbe6-9e55-7150-a909-5734cdca43d4",
+      "status": {
+        "type": "idle"
+      },
+      "turn_status": "completed",
+      "message": "Stratégie reçue. Aucun conflit identifié avec mon état inactif. Je ne reprends aucun travail et attendrai Fabrice avant de lire les références ou d’utiliser des outils.",
+      "cursor": "1839af1c-8d01-478e-b7bd-0f93aa4765e4:1"
+    },
+    {
+      "thread_id": "01a1bbe9-3264-7d81-a648-c1b0e14d42da",
+      "status": {
+        "type": "idle"
+      },
+      "turn_status": "completed",
+      "message": "Stratégie reçue. Aucun conflit identifié avec l’état arrêté : qualification vrai modèle toujours bloquée, preuves conservées. Aucun travail relancé ; j’attends Fabrice.",
+      "cursor": "8697cc2c-f63c-48f3-916f-95d782b8b921:1"
+    },
+    {
+      "thread_id": "01a1bcf7-294d-7212-aa7e-d00dc65623d9",
+      "status": {
+        "type": "idle"
+      },
+      "turn_status": "completed",
+      "message": "Stratégie commune reçue. Aucun conflit avec l’état courant : cette discussion reste en réserve, sans travail lancé, en attente de Fabrice. Son application sera à vérifier lors d’une reprise autorisée.",
+      "cursor": "03b40658-dd40-437c-a26b-19a8c7e365bf:2"
+    },
+    {
+      "thread_id": "01a1bcf7-35c7-7943-8079-52ef453912ff",
+      "status": {
+        "type": "idle"
+      },
+      "turn_status": "completed",
+      "message": "Stratégie reçue pour « Swarm Recherche — Réserve A2 · Revues et candidat ». Aucun conflit avec l’état courant : cette discussion reste en attente de Fabrice, sans travail lancé. Son application sera à vérifier lors d’une reprise autorisée.",
+      "cursor": "88bdd44b-a78c-4093-8093-53f706c7b2ce:1"
+    },
+    {
+      "thread_id": "01a1bcf7-471c-7a51-82bc-f98a1dd52648",
+      "status": {
+        "type": "idle"
+      },
+      "turn_status": "completed",
+      "message": "Stratégie reçue pour « Swarm Recherche — Réserve A3 · Timeouts ». Aucun travail actif ni conflit à signaler. Aucun outil ou chantier lancé ; j’attends ta reprise explicite.",
+      "cursor": "d95d5408-ed8f-4919-9f18-7eadcaeebce2:1"
+    },
+    {
+      "thread_id": "01a1bcf7-55ee-7c02-90fb-b12f77a4da99",
+      "status": {
+        "type": "idle"
+      },
+      "turn_status": "completed",
+      "message": "Stratégie reçue pour « Swarm Recherche — Réserve A4 · Consignes et supervision ». Aucun conflit avec l’état courant : aucun travail n’est actif. J’attends la reprise explicite de Fabrice ; cette réception ne prouve pas encore l’application future.",
+      "cursor": "4059991d-48c1-49ab-930c-3511104d6034:1"
+    }
+  ],
+  "night_owner_observations": [
+    {
+      "thread_id": "01a1bbe3-cea2-7413-998e-6a27656acd69",
+      "status": {
+        "type": "active",
+        "activeFlags": []
+      },
+      "turn_status": "inProgress",
+      "message": "État du lot : correction des alias réalisée et testée ; compatibilité des verrous Go/Rust en cours dans trois fichiers Rust. Une insertion de test a échoué, mais la compilation suivante a démarré : je l’arrête et je ne retiendrai pas son résultat. Je prends aussi en compte la coordination séquentielle : je ne lancerai pas de nouvelle livraison commune avant clarification des ressources partagées. La remise de ce lot exige encore les tests de verrouillage, la lecture complète réelle et la preuve de conservation de l’historique.",
+      "cursor": "8c5ea3c1-c9fb-4820-a503-0c3fdeb22e82:2"
+    },
+    {
+      "thread_id": "01a1bc26-25d3-7331-af39-e47db73ab083",
+      "status": {
+        "type": "active",
+        "activeFlags": []
+      },
+      "turn_status": "inProgress",
+      "message": "La consigne de coordination transmise depuis ton autre chat impose désormais main, sans nouvelle branche ; je l’ai vérifiée et je l’applique. GitHub exige toutefois une PR et les contrôles checks/install. Je vais créer le commit isolé sur main, puis tenter le push sans contourner cette protection.",
+      "cursor": "8184b77e-94b0-4008-b068-bfce16008622:1"
+    }
+  ],
+  "limits": "Réception/état des chats seulement ; aucune exécution de la nouvelle méthode ni efficacité générale prouvée. Deux propriétaires nocturnes encore actifs lors des observations."
+}

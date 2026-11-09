@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../preview.css">
+<title>Swarm — Administration, sécurité</title>
+<script src="../preview.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#93d4df}a:hover{color:#f6f3e9}
+input,select,textarea{font:inherit;font-size:16px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid #f8c650;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.6; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav aria-label="Navigation principale" style="flex: 1 1 240px; max-width: 280px; min-width: 220px; background: #062b49; color: #e5edf0; padding: 22px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <img src="../swarm-logo.png" alt="" style="width: 44px; height: 44px; object-fit: contain">
+      <span style="font-family: Georgia, serif; font-size: 22px; color: #f6f3e9">Swarm</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">01</span> Missions</summary></details>
+      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">02</span> Préparation</summary></details>
+      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">03</span> Conduite</summary></details>
+      <details style="padding: 4px 0"><summary style="min-height: 32px"><span style="font-family: ui-monospace, monospace; color: #93d4df">04</span> Suivi</summary>
+        <div style="display: flex; flex-direction: column; padding: 4px 0 0 26px">
+          <a href="Audit.dc.html" style="color: #e5edf0; text-decoration: none; padding: 8px 10px">Audit et preuves</a>
+        </div>
+      </details>
+      <details open style="padding: 4px 0"><summary style="min-height: 32px; color: #f8c650"><span style="font-family: ui-monospace, monospace">05</span> Configuration</summary>
+        <div style="display: flex; flex-direction: column; padding: 4px 0 0 26px">
+          <a href="#" style="color: #e5edf0; text-decoration: none; padding: 8px 10px">Programmes</a>
+          <a href="#" style="color: #e5edf0; text-decoration: none; padding: 8px 10px">IA et connexions</a>
+          <a href="#" style="color: #e5edf0; text-decoration: none; padding: 8px 10px">Administration</a>
+          <a href="#" aria-current="page" style="color: #f8c650; text-decoration: none; padding: 8px 10px 8px 22px; border-radius: 5px; background: #0f3d61; font-weight: 600">Sécurité</a>
+          <a href="#" style="color: #e5edf0; text-decoration: none; padding: 8px 10px">Laboratoire</a>
+        </div>
+      </details>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 3vw, 40px); box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+      <div style="min-width: 0; max-width: 760px">
+        <div style="font-family: ui-monospace, monospace; font-size: 13px; color: {{t.link}}">05 · Configuration · Administration</div>
+        <h1 style="margin: 0; font-family: Georgia, serif; font-size: 36px; font-weight: 400; color: {{t.title}}; line-height: 1.15">Sécurité</h1>
+        <p style="margin: 6px 0 0; color: {{t.muted}}">Politiques d’intégrité et de confidentialité, rôles, identités et clés de preuve. Chaque changement passe par un aperçu et un motif, et reste dans l’historique.</p>
+      </div>
+      <a href="Audit.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 16px; border-radius: 5px; border: 1px solid {{t.border}}; color: {{t.text}}; text-decoration: none">Voir l’audit et les preuves</a>
+    </header>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 8px; border: 1px solid {{t.goldBorder}}; background: {{t.goldBg}}">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{t.gold}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 018 0v3"></path></svg>
+      <div style="flex: 1 1 300px; font-size: 14px"><strong style="color: {{t.title}}">Jeton administrateur I3 requis pour modifier.</strong> Il reste en mémoire de la page et s’efface à la fermeture. La session seule ne suffit pas.</div>
+      <label style="display: flex; align-items: center; gap: 8px">
+        <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Jeton administrateur I3</span>
+        <input type="password" autocomplete="off" placeholder="Jeton I3" style="min-height: 44px; width: 200px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}">
+      </label>
+    </div>
+
+    <div role="tablist" aria-label="Domaines de sécurité" style="display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid {{t.border}}">
+      <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="5">
+        <button type="button" role="tab" aria-selected="{{tb.selected}}" onClick="{{tb.pick}}" style="{{tb.style}}">
+          <span>{{tb.label}}</span>
+          <span style="font-size: 12px; font-weight: 400; color: {{t.muted}}">{{tb.sub}}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{isBiba}}" hint-placeholder-val="{{ true }}">
+      <section role="tabpanel" aria-label="Intégrité — Biba" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+        <div style="flex: 1 1 340px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px">
+          <h2 style="margin: 0 0 4px; font-family: Georgia, serif; font-size: 22px; font-weight: 400; color: {{t.title}}">Niveaux d’intégrité</h2>
+          <p style="margin: 0 0 12px; font-size: 13px; color: {{t.muted}}">Chaque identité porte un niveau. Les agents travaillent en I0 ; l’administration exige I3.</p>
+          <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+            <sc-for list="{{levels}}" as="lv" hint-placeholder-count="4">
+              <li style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 6px; border: 1px solid {{t.border}}; background: {{lv.bg}}">
+                <span style="{{lv.badge}}">{{lv.id}}</span>
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div style="font-weight: 600">{{lv.who}}</div>
+                  <div style="font-size: 12px; color: {{t.muted}}">{{lv.note}}</div>
+                </div>
+                <span style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">[n] identités</span>
+              </li>
+            </sc-for>
+          </ol>
+        </div>
+        <div style="flex: 1 1 340px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+          <h2 style="margin: 0; font-family: Georgia, serif; font-size: 22px; font-weight: 400; color: {{t.title}}">Politique des actions de confiance</h2>
+          <label style="display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 6px; border: 1px solid {{t.border}}">
+            <input type="checkbox" checked onChange="{{touch}}" style="width: 20px; height: 20px; margin-top: 2px; accent-color: {{t.accent}}">
+            <span><strong>Séparer demande et approbation</strong><br><span style="font-size: 13px; color: {{t.muted}}">Celui qui demande une action ne peut pas l’approuver.</span></span>
+          </label>
+          <sc-for list="{{bibaFields}}" as="f" hint-placeholder-count="3">
+            <label style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px">
+              <span style="flex: 1 1 200px"><span style="font-weight: 600">{{f.label}}</span><br><span style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">{{f.key}}</span></span>
+              <span style="display: flex; align-items: center; gap: 8px"><input inputmode="numeric" placeholder="[valeur]" onChange="{{touch}}" style="min-height: 44px; width: 120px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; font-family: ui-monospace, monospace"><span style="font-size: 13px; color: {{t.muted}}; width: 56px">{{f.unit}}</span></span>
+            </label>
+          </sc-for>
+          <p style="margin: 0; font-size: 12px; color: {{t.muted}}">Bornes techniques : durées 9223372036 s ; conservation 9007199254740991 jours.</p>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isBlp}}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" aria-label="Confidentialité — Bell-LaPadula" style="display: flex; flex-direction: column; gap: 16px">
+        <div role="status" style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 16px; border-radius: 8px; border: 1px solid {{t.infoBorder}}; background: {{t.infoBg}}; font-size: 14px">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{t.link}}" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v.5M12 11v5"></path></svg>
+          <span><strong style="color: {{t.title}}">Préparation des habilitations.</strong> La politique enregistrée prépare les habilitations. Le contrôle transversal des données et des fournisseurs n’est pas encore actif.</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+          <div style="flex: 1 1 340px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+            <div>
+              <h2 style="margin: 0; font-family: Georgia, serif; font-size: 22px; font-weight: 400; color: {{t.title}}">Niveaux de classification</h2>
+              <p style="margin: 2px 0 0; font-size: 13px; color: {{t.muted}}">Du moins au plus sensible. Exemple de niveaux.</p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+              <sc-for list="{{classes}}" as="c" hint-placeholder-count="3">
+                <span style="{{c.style}}">{{c.label}}</span>
+                <sc-if value="{{c.more}}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="color: {{t.muted}}">&lt;</span></sc-if>
+              </sc-for>
+              <button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px dashed {{t.border}}; background: transparent; color: {{t.text}}">+ Niveau</button>
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 16px; color: {{t.title}}">Compartiments</h3>
+              <p style="margin: 2px 0 8px; font-size: 13px; color: {{t.muted}}">Séparent les dossiers, quel que soit le niveau. Exemples.</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                <span style="padding: 2px 12px; border-radius: 999px; border: 1px solid {{t.link}}; background: {{t.infoBg}}; color: {{t.link}}; font-size: 13px; font-weight: 600">[Finance]</span>
+                <span style="padding: 2px 12px; border-radius: 999px; border: 1px solid {{t.link}}; background: {{t.infoBg}}; color: {{t.link}}; font-size: 13px; font-weight: 600">[Ressources humaines]</span>
+                <button type="button" style="min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px dashed {{t.border}}; background: transparent; color: {{t.text}}">+ Compartiment</button>
+              </div>
+            </div>
+            <label style="display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 6px; border: 1px solid {{t.border}}">
+              <input type="checkbox" onChange="{{touch}}" style="width: 20px; height: 20px; margin-top: 2px; accent-color: {{t.accent}}">
+              <span><strong>Quarantaine de la préparation</strong> <span style="font-family: ui-monospace, monospace; font-size: 12px; color: {{t.muted}}">preparation_quarantine</span><br><span style="font-size: 13px; color: {{t.muted}}">Bloque les envois de préparation par API et CLI. Désactivée : fonctionnement historique, sans garantie BLP. L’application attend la fin des émissions engagées.</span></span>
+            </label>
+          </div>
+          <div style="flex: 1 1 380px; min-width: 0; border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-family: Georgia, serif; font-size: 22px; font-weight: 400; color: {{t.title}}">Habilitations</h2>
+            <p style="margin: 0; font-size: 13px; color: {{t.muted}}">Une habilitation ne prouve pas l’identité.</p>
+            <div style="overflow-x: auto">
+              <table style="width: 100%; min-width: 420px; border-collapse: collapse; font-size: 14px">
+                <thead><tr style="text-align: left; color: {{t.muted}}"><th style="padding: 8px 6px; font-weight: 600">Sujet</th><th style="padding: 8px 6px; font-weight: 600">Niveau</th><th style="padding: 8px 6px; font-weight: 600">Compartiments</th><th style="padding: 8px 6px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th></tr></thead>
+                <tbody>
+                  <tr style="border-top: 1px solid {{t.border}}"><td style="padding: 8px 6px; font-family: ui-monospace, monospace">[sujet]</td><td style="padding: 8px 6px">[niveau]</td><td style="padding: 8px 6px">[compartiments]</td><td style="padding: 8px 6px"><button type="button" style="min-height: 36px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Modifier</button></td></tr>
+                  <tr style="border-top: 1px solid {{t.border}}"><td style="padding: 8px 6px; font-family: ui-monospace, monospace">[sujet]</td><td style="padding: 8px 6px">[niveau]</td><td style="padding: 8px 6px">—</td><td style="padding: 8px 6px"><button type="button" style="min-height: 36px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Modifier</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <details style="border-top: 1px solid {{t.border}}; padding-top: 10px">
+              <summary style="min-height: 32px; font-weight: 600; color: {{t.title}}">Attribuer un objet existant (migration)</summary>
+              <p style="margin: 6px 0 10px; font-size: 13px; color: {{t.muted}}">Un objet déjà présent n’est lisible par les habilités qu’une fois son empreinte attribuée. Un geste couvre exactement un objet, sans balayage automatique.</p>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 10px">
+                <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Empreinte SHA-256<input style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; font-family: ui-monospace, monospace"></label>
+                <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Chemin absolu du projet<input style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"></label>
+                <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">Niveau<select style="min-height: 44px; padding: 0 8px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}"><option>[niveau]</option></select></label>
+              </div>
+            </details>
+            <details>
+              <summary style="min-height: 32px; color: {{t.muted}}">Politique en JSON (experts)</summary>
+              <pre style="margin: 6px 0 0; padding: 10px; border-radius: 5px; background: {{t.input}}; font-size: 12px; overflow-x: auto">{ "levels": […], "compartments": […], "clearances": […], "preparation_quarantine": false }</pre>
+            </details>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isRoles}}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" aria-label="Conflits de rôles" style="border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; display: flex; flex-direction: column; gap: 12px; max-width: 760px">
+        <label style="display: flex; gap: 12px; align-items: flex-start"><input type="checkbox" onChange="{{touch}}" style="width: 20px; height: 20px; margin-top: 2px; accent-color: {{t.accent}}"><span><strong>Appliquer la matrice de conflits</strong><br><span style="font-size: 13px; color: {{t.muted}}">Un même principal ne peut pas tenir deux rôles incompatibles sur une transaction.</span></span></label>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid {{t.border}}; border-radius: 6px"><span style="font-weight: 600">[rôle A]</span><span aria-hidden="true" style="color: {{t.errInk}}">✕</span><span style="font-weight: 600">[rôle B]</span><span style="margin-left: auto; font-size: 13px; color: {{t.muted}}">incompatibles</span></div>
+          <button type="button" style="align-self: flex-start; min-height: 44px; padding: 0 14px; border-radius: 5px; border: 1px dashed {{t.border}}; background: transparent; color: {{t.text}}">+ Paire incompatible</button>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: {{t.muted}}">Les groupes sont déclarés par l’administrateur ; ils ne prouvent pas l’identité d’une personne.</p>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isIds}}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" aria-label="Identités" style="border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+        <div style="overflow-x: auto">
+          <table style="width: 100%; min-width: 620px; border-collapse: collapse; font-size: 14px">
+            <thead><tr style="text-align: left; color: {{t.muted}}"><th style="padding: 8px 6px; font-weight: 600">Sujet</th><th style="padding: 8px 6px; font-weight: 600">Intégrité</th><th style="padding: 8px 6px; font-weight: 600">Rôles</th><th style="padding: 8px 6px; font-weight: 600">Authentification</th></tr></thead>
+            <tbody>
+              <tr style="border-top: 1px solid {{t.border}}"><td style="padding: 8px 6px; font-family: ui-monospace, monospace">[sujet]</td><td style="padding: 8px 6px"><span style="{{lvBadge3}}">I3</span></td><td style="padding: 8px 6px">[rôles]</td><td style="padding: 8px 6px">Jeton local</td></tr>
+              <tr style="border-top: 1px solid {{t.border}}"><td style="padding: 8px 6px; font-family: ui-monospace, monospace">[sujet]</td><td style="padding: 8px 6px"><span style="{{lvBadge1}}">I1</span></td><td style="padding: 8px 6px">[rôles]</td><td style="padding: 8px 6px">Compte enrôlé (enrollment_principal)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: {{t.muted}}">Une identité locale exige un jeton ; un rattachement à un compte enrôlé interdit tout jeton local. Le rattachement seul n’authentifie personne.</p>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isKeys}}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" aria-label="Clés de signature" style="border: 1px solid {{t.border}}; border-radius: 8px; background: {{t.surface}}; padding: 18px; display: flex; flex-direction: column; gap: 14px; max-width: 820px">
+        <label style="display: flex; gap: 12px; align-items: flex-start"><input type="checkbox" onChange="{{touch}}" style="width: 20px; height: 20px; margin-top: 2px; accent-color: {{t.accent}}"><span><strong>Autoriser la signature publique des preuves</strong><br><span style="font-size: 13px; color: {{t.muted}}">Clé privée en mémoire du service seulement ; après un arrêt, préparer et activer une nouvelle clé.</span></span></label>
+        <label style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px"><span style="flex: 1 1 200px; font-weight: 600">Durée de vie d’une clé</span><input inputmode="numeric" placeholder="[valeur]" style="min-height: 44px; width: 120px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}; font-family: ui-monospace, monospace"><span style="font-size: 13px; color: {{t.muted}}">secondes</span></label>
+        <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+          <li style="padding: 6px 12px; border-radius: 999px; border: 1px solid {{t.border}}">1 · Préparer une clé</li>
+          <li aria-hidden="true" style="color: {{t.muted}}">→</li>
+          <li style="padding: 6px 12px; border-radius: 999px; border: 1px solid {{t.goldBorder}}; background: {{t.goldBg}}">2 · Activer avec un autre administrateur</li>
+          <li aria-hidden="true" style="color: {{t.muted}}">→</li>
+          <li style="padding: 6px 12px; border-radius: 999px; border: 1px solid {{t.border}}">3 · Signer l’ancre publique</li>
+        </ol>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Préparer une clé</button>
+          <button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Révoquer la clé</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <footer style="position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; border: 1px solid {{t.border}}; background: {{t.surface}}">
+      <label style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 13px; color: {{t.muted}}">Motif du changement — obligatoire</span>
+        <input placeholder="Pourquoi ce changement ?" style="min-height: 44px; padding: 0 10px; border-radius: 5px; border: 1px solid {{t.border}}; background: {{t.input}}; color: {{t.text}}">
+      </label>
+      <span role="status" style="font-size: 14px; color: {{statusInk}}">{{status}}</span>
+      <button type="button" onClick="{{preview}}" style="min-height: 44px; padding: 0 16px; border-radius: 5px; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}">Prévisualiser</button>
+      <button type="button" disabled="{{saveDisabled}}" style="min-height: 44px; padding: 0 18px; border-radius: 5px; border: 0; background: {{saveBg}}; color: {{saveInk}}; font-weight: 600">Enregistrer</button>
+    </footer>
+    <p style="margin: 0; font-size: 12px; color: {{t.muted}}">Maquette — champs repris de la page Biba actuelle ; valeurs et niveaux d’exemple.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["sombre","clair"],"default":"sombre"},"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'biba', dirty: false, previewed: false };
+  }
+  renderVals() {
+    var themes = {
+      sombre: { bg: '#081b29', surface: '#102b3b', input: '#0b2232', text: '#e5edf0', title: '#f6f3e9', link: '#93d4df', muted: '#a9bcc4', border: '#2a5163', accent: '#f8c650', gold: '#f8c650', goldBg: '#2a2a1c', goldBorder: '#f8c650', infoBg: '#0f3446', infoBorder: '#93d4df', errInk: '#ff8a80', primaryBg: '#f8c650', primaryInk: '#062b49', disabledBg: '#25404f', disabledInk: '#a9bcc4', rowOn: '#0d2636',
+        lv: ['#93d4df', '#7fd8a4', '#f8c650', '#ff8a80'], lvTint: ['#12384a', '#173d2b', '#3a3216', '#45232a'] },
+      clair: { bg: '#f5f3ec', surface: '#fffefa', input: '#ffffff', text: '#243d4a', title: '#062b49', link: '#205e70', muted: '#52656f', border: '#cfcabb', accent: '#926300', gold: '#926300', goldBg: '#fbf3dc', goldBorder: '#926300', infoBg: '#e2eff3', infoBorder: '#205e70', errInk: '#b3261e', primaryBg: '#062b49', primaryInk: '#ffffff', disabledBg: '#e4e1d6', disabledInk: '#52656f', rowOn: '#f8f6ef',
+        lv: ['#205e70', '#1e7a46', '#926300', '#b3261e'], lvTint: ['#e2eff3', '#e3f3e8', '#fbf3dc', '#fbe3e1'] }
+    };
+    var t = themes[this.props.theme] || themes.sombre;
+    var self = this;
+    var st = this.state;
+    var pill = function (i) { return 'display: inline-flex; align-items: center; justify-content: center; min-width: 40px; padding: 2px 10px; border-radius: 999px; font-family: ui-monospace, monospace; font-size: 13px; font-weight: 700; background: ' + t.lvTint[i] + '; color: ' + t.lv[i] + '; border: 1px solid ' + t.lv[i]; };
+    var tabDefs = [
+      { id: 'biba', label: 'Intégrité', sub: 'Biba' },
+      { id: 'blp', label: 'Confidentialité', sub: 'Bell-LaPadula' },
+      { id: 'roles', label: 'Conflits de rôles', sub: 'séparation' },
+      { id: 'ids', label: 'Identités', sub: 'sujets' },
+      { id: 'keys', label: 'Clés de preuve', sub: 'signature' }
+    ];
+    var tabs = tabDefs.map(function (x) {
+      var on = x.id === st.tab;
+      return {
+        label: x.label, sub: x.sub, selected: on ? 'true' : 'false',
+        style: 'min-height: 52px; padding: 6px 16px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; line-height: 1.3; border: 0; border-bottom: 3px solid ' + (on ? t.accent : 'transparent') + '; background: transparent; color: ' + (on ? t.title : t.text) + '; font-weight: ' + (on ? '600' : '400'),
+        pick: function () { self.setState({ tab: x.id }); }
+      };
+    });
+    var levels = [
+      { i: 3, who: 'Administration', note: 'Jeton administrateur I3' },
+      { i: 2, who: '[sujets de niveau I2]', note: '[rôle du niveau]' },
+      { i: 1, who: '[sujets de niveau I1]', note: '[rôle du niveau]' },
+      { i: 0, who: 'Agents', note: 'Sorties et espace de travail des agents' }
+    ].map(function (l) { return { id: 'I' + l.i, who: l.who, note: l.note, badge: pill(l.i), bg: l.i === 3 ? t.rowOn : 'transparent' }; });
+    var classNames = ['[Public]', '[Interne]', '[Confidentiel]'];
+    var classes = classNames.map(function (c, i) {
+      return { label: c, more: i < classNames.length - 1, style: 'padding: 4px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; background: ' + t.lvTint[i + 1] + '; color: ' + t.lv[i + 1] + '; border: 1px solid ' + t.lv[i + 1] };
+    });
+    var status = st.previewed ? 'Aperçu prêt — vérifiez puis enregistrez.' : (st.dirty ? 'Modifications non prévisualisées' : 'Aucune modification');
+    return {
+      t: t, tabs: tabs, levels: levels, classes: classes,
+      lvBadge3: pill(3), lvBadge1: pill(1),
+      isBiba: st.tab === 'biba', isBlp: st.tab === 'blp', isRoles: st.tab === 'roles', isIds: st.tab === 'ids', isKeys: st.tab === 'keys',
+      bibaFields: [
+        { label: 'Durée d’un mandat', key: 'mandate_ttl_seconds', unit: 'secondes' },
+        { label: 'Réconciliation d’un résultat inconnu', key: 'unknown_reconcile_seconds', unit: 'secondes' },
+        { label: 'Conservation des preuves', key: 'evidence_retention_days', unit: 'jours' }
+      ],
+      touch: function () { self.setState({ dirty: true, previewed: false }); },
+      preview: function () { self.setState({ previewed: true }); },
+      status: status, statusInk: st.previewed ? t.link : (st.dirty ? t.gold : t.muted),
+      saveDisabled: !st.previewed, saveBg: st.previewed ? t.primaryBg : t.disabledBg, saveInk: st.previewed ? t.primaryInk : t.disabledInk
+    };
+  }
+}
+</script>
+</body>
+</html>

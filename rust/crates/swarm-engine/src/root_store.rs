@@ -2483,7 +2483,10 @@ impl RootStore {
     /// files, retained history and saved settings under a shared reservation.
     /// Current review data is required for hierarchical freshness, even waivers.
     /// Simple managed reads compose saved receipt policy and current Git review;
-    /// batches/fragments/platform limitations refuse. Unexpected review IO/codec, SQL,
+    /// favorable batch/fragment and platform limitations refuse. Non-favorable
+    /// unsupported opinions stay explicitly unqualified per task; their receipt
+    /// fallback is not consumed and cannot suppress unrelated simple reviews.
+    /// Unexpected review IO/codec, SQL,
     /// settings and checked-release failures preserve their causes and refuse.
     /// No supplied freshness, mutation, identity/authority, agent launch,
     /// execution provenance or acceptance follows from this read.

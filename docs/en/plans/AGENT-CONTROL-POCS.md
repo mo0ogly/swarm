@@ -1991,3 +1991,66 @@ protected flow. No unchanged main-push retry. Prepared PR title
 fifteen additional static recipe mappings, R09–13 and retained limits, documentary
 hash/diff validation only, no local tests. No product capability, BF-L0 clearance
 or independent acceptance claimed.
+
+
+### PR #20 — CI recovery and rotation-fixture isolation (8 November 2026)
+
+Fabrice now authorizes the PR, required checks, diagnosis and correction of their
+blocker; merge into main only after required checks pass. This neither clears
+BF-L0 nor authorizes provider calls or other development. Concurrent primary
+checkout changes are excluded: correction uses the exact PR revision in an
+isolated worktree. No product service delivery/restart applies: only `cfg(test)`
+code and this FR/EN record change.
+
+Original proof: [CI 42506071897](https://github.com/mo0ogly/swarm/actions/runs/42506071897),
+head `f7d090f13f2a28699abc77bfc36af08bc21ae996`, install passed, checks failed.
+`web_session::tests::rotate_refuses_running_server_then_replaces_key` panicked at
+web_session.rs:427 after `drop(listener)`: `web-rotate-server-running`. The engine
+binary reported 776 passed, 1 failed, 29 ignored; later steps were skipped. This
+file matches base main. The same targeted test passes alone before correction
+(1 named test), without reproducing the historical port holder.
+
+Controlled counterexample: fork inherits a CLOEXEC listener; after parent close,
+bind still returns EADDRINUSE while the child waits before exec. After observed
+exec/exit, the same address binds. Valid control precedes injection; pipes and
+waitpid replace sleeps, retries or a global deadline. This establishes that drop
+in a concurrent test process does not establish release of every copy. CI did
+not capture the port-holder PID: pre-exec inheritance is a corroborated possible
+isolation defect; the exact historical cause versus independent port reuse
+remains unresolved.
+
+Decision: re-exec only this case in a dedicated libtest process with `--exact`
+and `--test-threads=1`, before creating its listener. Forks by sibling tests in
+the parent cannot inherit that child's socket. A local mutex would not coordinate
+all forks; retries would mask the refusal. The parent requires successful exit,
+one passing test and a terminal marker; child errors stay visible. The original
+scenario retains its witness, refusal with unchanged key, rotation/readback,
+permissions, forbidden address and redaction; checked close and removal of only
+its own fixture are added. Product rotate is unchanged. Reservation against
+unrelated external processes remains unestablished.
+
+Planned checks: all named `web_session::tests::` cases in the targeted profile,
+then required checks/install on the new
+[PR #20](https://github.com/mo0ogly/swarm/pull/20) head. Historical results do not
+replace these checks. Results and limits are retained below and in the local
+register. Originals on mounted Lexar: `swarm-evidence/pr20-ci-42506071897/`; diagnosis
+and fresh evidence: `swarm-evidence/pr20-ci-fix-20261108/`, with a local restoration
+index under `.cache/`. Codex owns the authorized correction/checks/integration.
+
+Diff review: child selector, exact filter and single-test execution are fixture
+mechanisms, not operator policy; no product deadline/ceiling added. The changed
+test's docstring explains isolation, failures and the external limit. Spawn,
+decoding, exit status and assertions refuse errors; close and cleanup are checked.
+No other product error producer/consumer changes. Lesson: a CLOEXEC descriptor
+can remain held between fork and exec; a fixture requiring its exclusive close
+must own its process, without retrying an observed refusal into success. Prior
+BF-L0 results remain historical; these tests and CI do not qualify 03-F/03-B.
+
+Observed local result: Cargo/Rust 1.96.0, default test profile, command
+`cargo test --manifest-path rust/Cargo.toml --locked --offline -p swarm-engine --lib web_session::tests:: -- --nocapture`:
+3 named tests passed; rotation child: 1 test passed with marker
+`WEB_ROTATION_ISOLATED_PASS`. `git diff --check` passed. Product-section bytes
+before `cfg(test)` remain identical (SHA256
+`8ad0a25c28581acc25b7c566ff59e32d708fb923cdf06a2428368ecb31291871`).
+Local proof does not replace required checks on the published head; PR #20
+retains their current outcome and the merge decision.

@@ -777,8 +777,54 @@ impl LocalDirectory {
         exclusive: bool,
         create: bool,
     ) -> Result<LocalReservation, LocalStorageError> {
+        self.reserve_file(".engine-settings.lock", exclusive, create)
+    }
+    /// Lock the existing Go managed lane and/or retained Rust lane, in fixed
+    /// order, without waiting. Only a clean typed missing-file error permits
+    /// checking the other known format; corruption, access and contention refuse.
+    /// Readers create nothing. Preparation with neither file retains Rust's
+    /// original lock creation. All existing locks stay owned until explicit close;
+    /// errors preserve prior unlock/close causes. No arbitrary mixed-version
+    /// writer creating a new namespace or same-UID confinement is established.
+    pub(crate) fn reserve_managed(
+        &self,
+        exclusive: bool,
+        create: bool,
+    ) -> Result<ManagedReservation, LocalStorageError> {
+        let mut held = ManagedReservation { locks: Vec::new() };
+        let mut missing = None;
+        for name in ["operation.lock", ".engine-settings.lock"] {
+            match self.reserve_file(name, exclusive, false) {
+                Ok(lock) => held.locks.push(lock),
+                Err(error) if error.operation == LocalStorageOperation::OpenFile
+                    && error.publication == PublicationState::NotPublished
+                    && error.cleanup.is_none()
+                    && error.cause.downcast_ref::<rustix::io::Errno>()
+                        == Some(&rustix::io::Errno::NOENT) => {
+                    if missing.is_none() { missing = Some(error); }
+                }
+                Err(mut error) => {
+                    if let Err(cleanup) = held.close() { error.append_cleanup(cleanup); }
+                    return Err(error);
+                }
+            }
+        }
+        if held.locks.is_empty() {
+            if !create { return Err(missing.expect("both fixed managed lock names were absent")); }
+            held.locks.push(self.reserve(exclusive, true)?);
+        }
+        Ok(held)
+    }
+    /// Acquire a caller-owned fixed protocol lock. Opens are private, regular,
+    /// single-link and no-follow; nonblocking flock and close causes are retained.
+    fn reserve_file(
+        &self,
+        name: &str,
+        exclusive: bool,
+        create: bool,
+    ) -> Result<LocalReservation, LocalStorageError> {
         let file = self.open_file(
-            ".engine-settings.lock",
+            name,
             OFlags::RDWR
                 | if create {
                     OFlags::CREATE
@@ -957,6 +1003,24 @@ impl LocalDirectory {
 pub(crate) struct LocalReservation {
     file: File,
 }
+/// Owned set of known managed-lane locks; no namespace or policy authority.
+pub(crate) struct ManagedReservation {
+    locks: Vec<LocalReservation>,
+}
+impl ManagedReservation {
+    /// Release every lock in reverse order, retaining all independent failures.
+    /// A failure does not imply another lock was not already released.
+    pub(crate) fn close(self) -> Result<(), LocalStorageError> {
+        let mut failure: Option<LocalStorageError> = None;
+        for lock in self.locks.into_iter().rev() {
+            if let Err(error) = lock.close() {
+                if let Some(primary) = failure.as_mut() { primary.append_cleanup(error); }
+                else { failure = Some(error); }
+            }
+        }
+        failure.map_or(Ok(()), Err)
+    }
+}
 impl LocalReservation {
     /// Observe the actual retained private lock inode, not its current pathname.
     /// This checks ownership/regular/single-link metadata but does not acquire a
@@ -984,6 +1048,43 @@ impl LocalReservation {
 #[cfg(all(test, target_os = "linux"))]
 mod binding_tests {
     use super::*;
+    /// Positive Rust/Go layouts precede real flock contention and malformed
+    /// file faults. Readers create nothing; a failed second lock releases the
+    /// first, and restoration resumes. Only owned inert directories are used.
+    #[test]
+    fn managed_locks_honor_go_and_rust_without_creating_on_read() {
+        let path=crate::fixture_root("managed-lock-formats-");
+        println!("MANAGED_LOCK_FIXTURE {}",path.display());
+        let dir=LocalDirectory::open(&path).unwrap();
+        assert!(dir.reserve_managed(false,false).is_err());
+        assert_eq!(std::fs::read_dir(&path).unwrap().count(),0);
+        let initial=dir.reserve_managed(true,true).unwrap();
+        assert!(dir.reserve(true,false).err().unwrap().is_clean_lock_contention());
+        initial.close().unwrap();
+        dir.reserve_managed(false,false).unwrap().close().unwrap();
+        let go=dir.child("go",true).unwrap();
+        go.publish("operation.lock",b"").unwrap();
+        go.reserve_managed(false,false).unwrap().close().unwrap();
+        assert!(!path.join("go/.engine-settings.lock").exists());
+        let held=go.reserve_file("operation.lock",true,false).unwrap();
+        assert!(go.reserve_managed(false,false).err().unwrap().is_clean_lock_contention());
+        held.close().unwrap();
+        go.publish(".engine-settings.lock",b"").unwrap();
+        go.reserve_managed(false,false).unwrap().close().unwrap();
+        let held=go.reserve(true,false).unwrap();
+        assert!(go.reserve_managed(false,false).err().unwrap().is_clean_lock_contention());
+        // Failed acquisition of the Rust lock must have released the Go lock.
+        go.reserve_file("operation.lock",true,false).unwrap().close().unwrap();
+        held.close().unwrap();
+        go.reserve_managed(false,false).unwrap().close().unwrap();
+        std::fs::remove_file(path.join("go/operation.lock")).unwrap();
+        std::os::unix::fs::symlink(".engine-settings.lock",path.join("go/operation.lock")).unwrap();
+        assert_eq!(go.reserve_managed(false,false).err().unwrap().operation,LocalStorageOperation::OpenFile);
+        std::fs::remove_file(path.join("go/operation.lock")).unwrap();
+        go.publish("operation.lock",b"").unwrap();
+        go.reserve_managed(false,false).unwrap().close().unwrap();
+        go.close().unwrap();dir.close().unwrap();
+    }
     /// Real directory/descriptor witness in the default image's unit suite.
     /// No fixture feature, inherited provider, policy or live Root is required.
     /// Failure retains the owned directory for diagnosis; success closes both FDs.

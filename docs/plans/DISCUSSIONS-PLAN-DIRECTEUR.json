@@ -1,0 +1,103 @@
+{
+  "updated_at": "2026-11-08T22:39:52.219239+00:00",
+  "scope": "50 recent + pinned chats; local Codex archives 2 entries; targeted repository plans",
+  "titles_verified": [
+    [
+      "01a1b540-a5ad-76c2-b0e5-ac4187f04fd4",
+      "Swarm 00 — Plan directeur et coordination"
+    ],
+    [
+      "01a1bbe3-cea2-7413-998e-6a27656acd69",
+      "Swarm 01 — Gi.eth · Qualification historique"
+    ],
+    [
+      "01a174ed-ad75-74e0-a6c4-a60288166b66",
+      "Swarm 02 — PAEA · GLM et approbation"
+    ],
+    [
+      "01a19337-ab68-7f61-82b4-526497378f48",
+      "Swarm 03 — Sécurité et preuves · APEX"
+    ],
+    [
+      "01a14672-8c2d-71d3-82ac-5aa9b18eb062",
+      "Swarm 04 — Identités et autorisations · APEX"
+    ],
+    [
+      "01a1a0a0-6f5c-76d3-82b5-85069d987828",
+      "Swarm 05 — Règlement et séparation des rôles"
+    ],
+    [
+      "01a0a419-fb6e-74f0-ae67-02ef89563bbc",
+      "Swarm 99 — Facturation · Projet différé"
+    ],
+    [
+      "01a1bc26-25d3-7331-af39-e47db73ab083",
+      "Swarm 07 — Design UX · Livraison Git"
+    ],
+    [
+      "01a1ab36-faaa-7711-8434-876f9b9ddc58",
+      "Swarm 08 — Observateur externe · Cadrage"
+    ],
+    [
+      "01a1a0c9-d811-71c2-8dad-c2d5d714d04f",
+      "Swarm 09 — P0/G0 · Lecteur et approbation"
+    ],
+    [
+      "01a1bbb6-ef86-7471-9025-fba8d1edd81d",
+      "Swarm 10 — Peter · Mandats et faux accords"
+    ],
+    [
+      "01a1bbe6-9e55-7150-a909-5734cdca43d4",
+      "Swarm 11 — Mikhail · Effets et réconciliation"
+    ],
+    [
+      "01a1bbe9-3264-7d81-a648-c1b0e14d42da",
+      "Swarm 12 — Qualification avec un vrai modèle"
+    ],
+    [
+      "01a1bcf7-294d-7212-aa7e-d00dc65623d9",
+      "Swarm Réserve A1 — Mandats et effets"
+    ],
+    [
+      "01a1bcf7-35c7-7943-8079-52ef453912ff",
+      "Swarm Réserve A2 — Revues et candidat"
+    ],
+    [
+      "01a1bcf7-471c-7a51-82bc-f98a1dd52648",
+      "Swarm Réserve A3 — Timeouts"
+    ],
+    [
+      "01a1bcf7-55ee-7c02-90fb-b12f77a4da99",
+      "Swarm Réserve A4 — Consignes et supervision"
+    ],
+    [
+      "01a140e0-27e4-7aa3-b5f9-2bbbd60a7220",
+      "Swarm Repère — Mémoire · Historique à vérifier"
+    ],
+    [
+      "01a12662-be7b-7de0-b1cf-78298477f50a",
+      "Swarm Repère — Modèles · Historique à vérifier"
+    ]
+  ],
+  "current_thread": "01a1b540-a5ad-76c2-b0e5-ac4187f04fd4",
+  "billing": "LAST/LATER, monitoring PAUSED, no night dispatch",
+  "cloud": "deferred",
+  "retirement_move": {
+    "thread_id": "01a1b796-44c4-7851-adb6-e70fa0f3844b",
+    "target_project": "5b6e6a7a-3d63-4571-93d5-e10ca9a16985",
+    "state": "target_membership_observed_after_user_intervention",
+    "action": "user sidebar move required",
+    "observation": "list_threads après refus initial montre projectId toulouse vente ; outil coordinateur n’avait pas réalisé le déplacement."
+  },
+  "unreadable_history": [
+    "01a140e0-27e4-7aa3-b5f9-2bbbd60a7220",
+    "01a12662-be7b-7de0-b1cf-78298477f50a"
+  ],
+  "execution_started": false,
+  "project_membership_updated": [
+    "01a1bbe3-cea2-7413-998e-6a27656acd69",
+    "01a1bbb6-ef86-7471-9025-fba8d1edd81d",
+    "01a1bbe9-3264-7d81-a648-c1b0e14d42da",
+    "01a1bc26-25d3-7331-af39-e47db73ab083"
+  ]
+}

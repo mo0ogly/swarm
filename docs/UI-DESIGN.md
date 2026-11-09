@@ -298,3 +298,30 @@ Vérification visuelle : ouvrir le cockpit, comparer les quatre badges aux libel
 basculer clair/sombre et FR/EN, vérifier contraste et absence de débordement.
 Sans mission, conserver les tirets ; sur une mission existante, conserver les
 valeurs du producteur. La coloration ne nécessite aucun lancement de tâche.
+
+## Intégration des maquettes du 8 novembre 2026
+
+Le [design intégré](WORKBENCH-DESIGN.md) et sa [version anglaise](en/WORKBENCH-DESIGN.md)
+décrivent les Couloirs sur données réelles, la composition de préparation, les
+réglages et la réorganisation Sécurité/Audit. Les maquettes de docs/design restent
+les références visuelles ; leurs valeurs et verdicts d’exemple ne sont pas livrés.
+
+
+Les statuts de tâches du tableau natif, des couloirs et de leur inspecteur utilisent
+le même producteur de badge (`SwarmWorkbench.statusBadge`) : vert accepté, bleu
+en cours, rouge bloqué/échec, ambre soumis/à revalider/dérogation, gris à faire ou
+code inconnu. Ces familles de couleur sont stables dans les deux thèmes, avec
+leurs paires fond/encre adaptées au contraste. La tonalité dépend du code reçu,
+pas du libellé ; un état inconnu reste visible et neutre, jamais accepté par sa
+présentation. Texte uniquement, aucun HTML de statut interprété. Régression
+`task-status-badges.json` (double DOM) puis parcours réel FR/EN clair/sombre.
+
+
+Les agents utilisent les mêmes familles de badge, avec leur vocabulaire distinct :
+bleu queued/starting/running, vert completed, rouge failed, ambre stopping,
+interrupted et observations explicitement non confirmées ; inconnu neutre.
+Le producteur SwarmWorkbench.agentStatusBadge ne transforme jamais completed en
+acceptation de tâche. Garder « État enregistré », les identifiants et les avis
+d’autonomie existants. Paires de couleurs adaptées aux deux thèmes ; textes FR/EN.
+Recette agent-status-badges.json, puis fixture navigateur dédiée pour toutes les
+variantes sans lancer d’agent ; vérifier séparément la page installée.
