@@ -71,5 +71,15 @@
     "method_diagnostics": "Semantic Langue and Appearance selectors did not match; observed explicit ID/native AX routes used after fresh state. No authority or product code changed."
   },
   "automation": "Existing heartbeat updated and reread; PR22 only, no other delivery branch, no merge authority inferred, billing deferred",
-  "next": "Follow checks/install for exact head, diagnose failures within owned scope; no merge implicitly authorized"
+  "next": "Follow checks/install for exact head, diagnose failures within owned scope; no merge implicitly authorized",
+  "CI_history": [
+    {
+      "at": "2026-11-09T06:16:26.696693+00:00",
+      "head": "254e1bc8b7eb77b99d3847e66ce1db2a1b7c852d",
+      "checks": "FAILURE",
+      "install": "SUCCESS",
+      "report": "CI-PR22-20261109.md",
+      "fix": "pending new exact head verification"
+    }
+  ]
 }

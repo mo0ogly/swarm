@@ -392,3 +392,8 @@ or Git failure refuses; restoring originals permits the next read. Independent
 review and close causes survive together through Root Cleanup. Observations
 protocol_verified/authority_verified stay false: this is data consistency, not
 acceptance authority or same-UID confinement.
+
+
+### Historical fixture commit attribution
+
+The root-alias control uses synthetic attribution local to its inert repository (`Fixture`, `fixture@invalid`), matching existing Git fixtures. It neither reads nor changes operator identity or production Git attribution. The `historical-mission-recorded-read` recipe hides global/system Git configuration to check this independence. Alias control/refusal/recovery assertions remain required; a retained SDK must contain the corrected test. This fixture contract establishes neither external-CI qualification nor new product acceptance.

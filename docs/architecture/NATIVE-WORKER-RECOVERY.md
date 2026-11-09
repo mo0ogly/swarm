@@ -416,3 +416,8 @@ restauration des originaux permet la lecture suivante. Les causes de revue et
 de fermeture indépendantes sont conservées ensemble via Root Cleanup. Les
 observations protocol_verified/authority_verified restent fausses : il s’agit de
 concordance de données, pas d’un droit d’acceptation ni de confinement same-UID.
+
+
+### Attribution des commits de fixture historique
+
+Le témoin d'alias de racine utilise uniquement une identité synthétique locale à son dépôt fictif (`Fixture`, `fixture@invalid`), comme les fixtures Git existantes. Il ne lit ni n'écrit l'identité personnelle de l'opérateur et ne change pas l'attribution Git du produit. La recette `historical-mission-recorded-read` masque les configurations Git globale/système pour vérifier cette indépendance. Les témoins/refus/reprises d'alias restent requis ; un SDK retenu doit contenir le test corrigé. Ce contrat de fixture n'établit ni qualification d'une CI externe ni nouvelle acceptation produit.

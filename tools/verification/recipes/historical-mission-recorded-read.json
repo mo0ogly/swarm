@@ -15,7 +15,10 @@
     "docs/architecture/NATIVE-WORKER-RECOVERY.md",
     "docs/en/NATIVE-WORKER-RECOVERY.md"
   ],
-  "environment": {},
+  "environment": {
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_CONFIG_GLOBAL": "/dev/null"
+  },
   "steps": [
     {
       "id": "recorded-history-dom",

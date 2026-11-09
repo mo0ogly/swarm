@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-11-09T06:06:30.523227+00:00",
+  "updated_at": "2026-11-09T06:16:26.696693+00:00",
   "authorization": "Fabrice : orchestration cette nuit, lancer sans carambolage, sérialiser sur main, commits et push ; pas de nouvelle branche",
   "window_end": "2026-11-09T08:00:00+01:00",
   "status": "publication_blocked_independent_analysis",
   "main_observed": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
   "tracking_comparison": "main contient d084c1487726 puis 5efab9fcbcbe ; pas nouveau push, distant connu b4e07cb26",
-  "git_publication": "delivery_branch_pushed_PR22_open_checks_running",
+  "git_publication": "PR22_checks_failure_fixture_correction_in_progress",
   "active_owners_to_release": [],
   "worker": {
     "thread_id": "01a1b540-a5ad-76c2-b0e5-ac4187f04fd4",
     "scope": "Branche livraison unique publiée, PR22 ; checkout main préservé ; contrôle visuel365 FR/EN et lecture historique observés",
-    "state": "delivery_PR22_open_CI_pending",
+    "state": "PR22_CI_fixture_fix_integration",
     "billing": "deferred"
   },
   "tasks": [
@@ -21,11 +21,11 @@
     },
     {
       "id": "N1",
-      "state": "commits_pushed_PR22_checks_pending",
+      "state": "PR22_fixture_correction_waits_exact_head_CI",
       "need": "Rapprocher commits/dirty et preuves des lots déjà faits ; préparer livraison propre sur main, sans absorber travail non vérifié. Protection Git : garder refus et demander décision de publication si nécessaire.",
       "documentation_commit": "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
       "scope": "36 documents coordination/plan directeur seulement, octets commit vérifiés ; sources produit et dirty étrangers exclus.",
-      "remaining": "CI checks/install sur tête exacte ; merge non autorisé implicitement, protections inchangées.",
+      "remaining": "Pousser correctif fixture borné, puis checks/install CI sur SHA exact ; pas merge.",
       "integration_manifest": ".cache/integration-code-20261109/state.json"
     },
     {
@@ -171,6 +171,16 @@
       "head": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
       "ui365": "FR_EN and recorded/calculated mission read observed",
       "billing": "deferred"
+    },
+    {
+      "at": "2026-11-09T06:16:26.696693+00:00",
+      "kind": "CI254e_failed_and_diagnosed",
+      "checks": "FAILURE 779passed1failed30ignored",
+      "install": "SUCCESS",
+      "cause": "fixture reads unconfigured operator Git identity",
+      "correction": "cfg(test) synthetic identity, same assertions and hermetic recipe",
+      "local_build": "space guard refused before test, no bypass",
+      "report": "CI-PR22-20261109.md"
     }
   ],
   "automation_id": "swarm-orchestration-s-quentielle-cette-nuit",

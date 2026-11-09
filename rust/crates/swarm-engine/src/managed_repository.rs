@@ -562,7 +562,9 @@ mod tests {
     /// Real committed bootstrap is the valid control. Historical root aliases
     /// keep their original manifest bytes; another datastore with the same Work
     /// name, a missing alias and divergent originals refuse, then recover.
-    /// No agent, provider, database migration or live Root is involved.
+    /// Uses synthetic fixture-only Git attribution, independent of personal or
+    /// CI-runner configuration. No operator config, production Git attribution,
+    /// agent, provider, database migration or live Root is changed.
     #[test]
     fn historical_root_alias_reads_without_rebinding_or_losing_refusals() {
         use std::os::unix::fs::{symlink, DirBuilderExt};
@@ -575,14 +577,10 @@ mod tests {
         git(&source,&["init","--quiet"],&settings).unwrap();
         std::fs::write(source.join("tracked.txt"),b"valid committed control\n").unwrap();
         git(&source,&["add","tracked.txt"],&settings).unwrap();
-        let checkout=Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
-        // The product Git helper deliberately disables global config. This
-        // fixture-only read uses the user's actual configured identity instead.
-        let configured=|key:&str| {let output=Command::new("git").arg("-C").arg(&checkout).args(["config","--get",key]).output().unwrap();assert!(output.status.success());text(output.stdout).unwrap()};
-        let name=configured("user.name");
-        let email=configured("user.email");
-        assert!(!name.is_empty()&&!email.is_empty());
-        git(&source,&["-c",&format!("user.name={name}"),"-c",&format!("user.email={email}"),"-c","core.hooksPath=/dev/null","-c","commit.gpgsign=false","commit","--quiet","-m","Owned alias observation fixture"],&settings).unwrap();
+        // Synthetic fixture attribution matches the existing git_pack fixture.
+        // Keep it local to this inert commit: never read or change the operator's
+        // identity, repository config or production Git command contract.
+        git(&source,&["-c","user.name=Fixture","-c","user.email=fixture@invalid","-c","core.hooksPath=/dev/null","-c","commit.gpgsign=false","commit","--quiet","-m","Owned alias observation fixture"],&settings).expect("synthetic alias fixture commit");
         let id="w-alias-test";
         let mut repo=prepare(&root,id,&ManagedRepositoryRequest{path:"source".into(),committed_only:true,..Default::default()},&settings).unwrap();
         let mut work=crate::Work{id:id.into(),planning:Some(Box::new(crate::PlanningState{repository:Some(Box::new(repo.clone())),..Default::default()})),..Default::default()};
