@@ -92,3 +92,22 @@ SwarmWorkbench.agentStatusBadge never turns agent completion into task acceptanc
 Keep “Recorded state”, identifiers and existing autonomy observations. Reuse both
 theme palettes and FR/EN labels. Run agent-status-badges.json, then the dedicated
 browser fixture without launching agents; check the installed page separately.
+
+
+### Version lists and presentation preferences
+
+Dialog paragraphs, lists and descriptions use `overflow-wrap: anywhere`: full
+technical identifiers may wrap without forcing horizontal scrolling of the
+content. Do not clip/hide prose or widen the dialog to conceal the cause. The
+cockpit theme button updates only the URL `theme` parameter, consumed on reload
+and language navigation, preserving other query parameters and history position.
+No engine setting or Work storage is changed. Permanent regression:
+`version-dialog-preferences.json`, using `SWARM_STATUS_CONTRACT_BINARY` and a
+private Rust Root, FR/EN × both themes at624/390px, exact complete notes, title
+focus/Escape/reopening, language/reload and invalid-theme fallback. Source asset
+overlays are diagnostic evidence, not compiled or installed delivery evidence.
+
+If replaceState refuses the theme update, the cockpit keeps the previous DOM and
+URL, displays a safe diagnostic and propagates a typed error retaining its cause.
+A new action after recovery may save the preference; color alone never proves
+persistence.

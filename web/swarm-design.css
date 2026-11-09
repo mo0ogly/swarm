@@ -291,7 +291,8 @@ dialog > header h2::before,dialog > form > header h2::before {
   background: url('/swarm-logo.png') center / contain no-repeat;
 }
 dialog :is(.modal-body,section) { line-height: 1.65; }
-dialog :is(.modal-body,section) :is(p,li,dd) { line-height: 1.7; }
+/* Preserve full prose and technical identifiers in narrow dialog lists. */
+dialog :is(.modal-body,section) :is(p,li,dd) { line-height: 1.7; overflow-wrap: anywhere; }
 dialog :is(.modal-body,section) :is(h3,h4) { color: var(--wattson-lien); line-height: 1.4; }
 dialog :is(.modal-body,section) h3 { font-size: 17px; margin-block: 1.25em .55em; }
 dialog :is(.modal-body,section) strong { font-weight: 750; }
