@@ -7011,5 +7011,6 @@ globalThis.SwarmEnglish = {
   "Lecture de l’historique enregistré. Les compteurs de validation actuelle et d’activité restent inconnus.": "Reading recorded history. Current validation and activity counts remain unknown.",
   "Vérifier le statut actuel": "Check current status",
   "Lire l’historique enregistré": "Read recorded history",
-  "Historique reçu — statut opérationnel non évalué.": "History received — operational status not evaluated."
+  "Historique reçu — statut opérationnel non évalué.": "History received — operational status not evaluated.",
+  "Préférence de thème non enregistrée. Le thème précédent est conservé.": "Theme preference was not saved. The previous theme is preserved."
 };

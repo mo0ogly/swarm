@@ -124,7 +124,13 @@
   // owns error display and duplicate-submit protection; preserve changed views.
   SwarmRustDependencyGraph.setRefreshHandler(async(id,revision)=>{if(selected!==id)return;const observed=await load();if(selected===id&&(!observed||!current||!Number.isSafeInteger(current.work.revision)||current.work.revision<revision))throw failure('web-native-graph-refresh-unconfirmed')});
   $('tabs').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view,true)});$('work').addEventListener('change',()=>select($('work').value));$('refresh').addEventListener('click',load);
-  $('theme').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat';document.documentElement.dataset.theme=theme;$('theme').textContent=tr(theme==='etat'?'Passer au thème sombre':'Passer au thème clair');link.href=url('/native-runtime.html?view=admin');limits.href=url('/native-runtime.html?view=admin#native-run-limits')});
+  /** Change only the known presentation enum and its authoritative URL value.
+   * Language navigation and reload consume that URL; unrelated query data and
+   * history position remain intact. No local storage, mission or policy write;
+   * URL/history refusal keeps the old DOM/URL, shows a safe diagnostic and
+   * propagates a typed error retaining its original cause. */
+  function toggleTheme(){const theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat';const currentUrl=new URL(location.href);currentUrl.searchParams.set('theme',theme);try{history.replaceState(null,'',currentUrl)}catch(cause){$('message').hidden=false;$('message').className='notice alert';$('message').textContent=tr('Préférence de thème non enregistrée. Le thème précédent est conservé.');throw failure('web-native-theme-update-refused',cause)}document.documentElement.dataset.theme=theme;$('theme').textContent=tr(theme==='etat'?'Passer au thème sombre':'Passer au thème clair');link.href=url('/native-runtime.html?view=admin');limits.href=url('/native-runtime.html?view=admin#native-run-limits')}
+  $('theme').addEventListener('click',toggleTheme);
   const readModeButton=document.createElement('button');readModeButton.type='button';readModeButton.id='mission-read-mode';readModeButton.textContent=tr('Lire l’historique enregistré');$('refresh').after(readModeButton);
   readModeButton.addEventListener('click',()=>{const u=new URL(location.href);u.searchParams.set('read',current?.readMode==='history'?'current':'history');history.replaceState(null,'',u);select(selected)});
   globalThis.SwarmWorkbench?.mount();
