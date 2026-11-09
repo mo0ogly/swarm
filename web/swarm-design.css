@@ -552,3 +552,8 @@ body.graph-studio-open .pilot-inspector { z-index:91; }
 .cockpit-page .page-header>div:first-child { flex: 1 1 420px; min-width: 0; }
 .cockpit-page .page-header>:not(div:first-child) { flex: none; white-space: nowrap; }
 .history-task>summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+/* Section titles in Conduite use sentence case, as on the board. */
+#conduite h3{text-transform:none;letter-spacing:0}
+/* A counter without a producer reads as unavailable, not as a pending gold item. */
+.metric[data-unavailable=true] strong{background:var(--wattson-carte-appuyee);color:var(--wattson-texte-discret)}
+.metric-hint{display:block;margin-top:4px;font-size:11px;line-height:1.4;color:var(--wattson-texte-discret)}

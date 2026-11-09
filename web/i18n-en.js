@@ -7019,5 +7019,8 @@ globalThis.SwarmEnglish = {
   "Toutes": "All",
   "Acceptées": "Accepted",
   "Filtrer par état enregistré": "Filter by recorded state",
-  "Rechercher une tâche ou un identifiant": "Search a task or an identifier"
+  "Rechercher une tâche ou un identifiant": "Search a task or an identifier",
+  "Non fourni par le moteur natif.": "Not provided by the native engine.",
+  "Validation courante non évaluée dans cette lecture.": "Current validation not evaluated in this read.",
+  "Détails de la mission": "Mission details"
 };

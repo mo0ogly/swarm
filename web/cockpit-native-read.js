@@ -26,6 +26,21 @@
    * Toggle a notice element with explanation text.
    * @param {string} id @param {boolean} show @param {string} text @returns {void}
    */
+  /**
+   * Show or remove the small explanation line under one metric counter.
+   * @param {string} id counter element id inside a `.metric` card
+   * @param {string|null} text translated hint, or null to remove it
+   * @returns {void} DOM-only; missing elements are ignored, nothing is written
+   */
+  function setMetricHint(id, text) {
+    const card = document.getElementById(id)?.closest('.metric');
+    if (!card) return;
+    let hint = card.querySelector('.metric-hint');
+    if (!text) { hint?.remove(); return; }
+    if (!hint) { hint = document.createElement('small'); hint.className = 'metric-hint'; card.appendChild(hint); }
+    hint.textContent = text;
+  }
+
   function setNotice(id, show, text) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -145,6 +160,12 @@
     setText('accepted-count', mission && isSafeCount(mission.validated) ? String(mission.validated) : '—');
     setText('active-count', mission && isSafeCount(mission.active_agents) ? String(mission.active_agents) : '—');
     setText('decision-count', '—'); // no decisions producer available
+    // Say why the counters stay empty instead of showing a bare dash: the native
+    // engine has no decision producer, and history reads do not evaluate current
+    // validation. No count is inferred from recorded task states.
+    document.getElementById('decision-count')?.closest('.metric')?.setAttribute('data-unavailable', 'true');
+    setMetricHint('decision-count', t('Non fourni par le moteur natif.'));
+    setMetricHint('accepted-count', mission && isSafeCount(mission.validated) ? null : t('Validation courante non évaluée dans cette lecture.'));
 
     setNotice('validation-status', true,
       t('Les états enregistrés ne prouvent ni une activité en cours ni une validation indépendante.'));
