@@ -421,3 +421,8 @@ concordance de données, pas d’un droit d’acceptation ni de confinement same
 ### Attribution des commits de fixture historique
 
 Le témoin d'alias de racine utilise uniquement une identité synthétique locale à son dépôt fictif (`Fixture`, `fixture@invalid`), comme les fixtures Git existantes. Il ne lit ni n'écrit l'identité personnelle de l'opérateur et ne change pas l'attribution Git du produit. La recette `historical-mission-recorded-read` masque les configurations Git globale/système pour vérifier cette indépendance. Les témoins/refus/reprises d'alias restent requis ; un SDK retenu doit contenir le test corrigé. Ce contrat de fixture n'établit ni qualification d'une CI externe ni nouvelle acceptation produit.
+
+
+### Catalogue anglais de la lecture historique
+
+Les cinq libellés de lecture historique et de vérification du statut actuel sont définis dans `locales/en.json`, puis générés dans `web/i18n-en.js` par `node scripts/i18n/build.cjs`. Le catalogue source est également embarqué par le lecteur Rust `work_view.rs` : un fichier web modifié seul ne met pas à jour cette traduction côté moteur. `node scripts/i18n/build.cjs --check` et `node tests/i18n_test.cjs` contrôlent les octets générés et la parité. Ils ne prouvent ni un rebuild installé, ni la validité des preuves de la mission lue.

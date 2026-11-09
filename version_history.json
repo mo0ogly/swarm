@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Catalogue historique anglais : cinq traductions réconciliées dans la source et son artefact généré ; installation de ce complément à vérifier.",
+        "en": "Historical English catalogue: five translations reconciled in source and generated artifact; installation of this increment remains to be verified."
+      },
+      {
         "fr": "Qualification des preuves Go : un avis inconnu ou défavorable utilisant un protocole de revue non porté est signalé non qualifié sur sa tâche ; il ne bloque plus l’examen des revues simples des autres tâches. Les avis favorables gardent les contrôles stricts de contexte, candidat, fichiers et Git. Aucun historique n’est réécrit et aucun agent n’est relancé. Le bandeau de lecture historique distingue le statut opérationnel global de la qualification calculée dans Reprise et OODA. Un ancien alias de stockage Go reste applicable à la lecture Git uniquement si les descripteurs ouverts désignent le même état privé et le même dossier de mission ; autre stockage, alias absent et contention restent refusés.",
         "en": "Go evidence qualification: an unknown or unfavorable opinion using an unported review protocol is reported as unqualified on its task; it no longer blocks inspection of other tasks’ simple reviews. Favorable opinions retain strict context, candidate, file and Git checks. No history is rewritten and no agent is restarted. The recorded-read banner distinguishes global operational status from the qualification calculated in Resume and OODA. A historical Go storage alias remains usable for Git inspection only when open descriptors identify the same private state and mission directory; another store, a missing alias and contention remain refused."
       },
