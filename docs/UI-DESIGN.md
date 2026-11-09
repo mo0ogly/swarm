@@ -325,3 +325,23 @@ acceptation de tâche. Garder « État enregistré », les identifiants et les a
 d’autonomie existants. Paires de couleurs adaptées aux deux thèmes ; textes FR/EN.
 Recette agent-status-badges.json, puis fixture navigateur dédiée pour toutes les
 variantes sans lancer d’agent ; vérifier séparément la page installée.
+
+
+### Version : listes longues et préférences de présentation
+
+Les paragraphes, listes et descriptions des dialogues utilisent `overflow-wrap:
+anywhere` : les identifiants techniques restent intégraux et peuvent se répartir
+sur plusieurs lignes sans imposer une barre horizontale au contenu. Ne pas
+masquer/couper le texte ni agrandir artificiellement le dialogue. Le bouton de
+thème du cockpit met à jour le seul paramètre `theme` de l’URL, source consommée
+au rechargement et au changement de langue ; les autres paramètres et l’historique
+de navigation sont conservés. Aucun réglage moteur ni stockage de mission.
+Régression permanente : `version-dialog-preferences.json`, binaire Rust fourni via
+`SWARM_STATUS_CONTRACT_BINARY`, fixture privée, FR/EN × clair/sombre,624/390px,
+textes complets, titre/Échap/réouverture, langue/reload et thème invalide. Les
+overlays de sources sont réservés au diagnostic et ne prouvent pas la livraison.
+
+Si replaceState refuse la mise à jour du thème, le cockpit conserve le DOM et
+l’URL précédents, affiche un diagnostic sûr et propage un code typé avec sa cause.
+Une nouvelle action après rétablissement peut enregistrer la préférence ; aucun
+succès de persistance n’est inféré du seul changement de couleur.
