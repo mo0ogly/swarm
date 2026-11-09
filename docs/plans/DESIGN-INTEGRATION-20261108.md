@@ -233,3 +233,285 @@ Consigne utilisateur relue dans le chat de coordination : séquencer sur main sa
 nouvelle branche. Protection GitHub relue : PR obligatoire, checks/install exigés,
 enforce_admins actif. Aucun contournement ; le push peut être refusé, auquel cas
 ce commit reste local et une décision sur le parcours PR sera nécessaire.
+
+
+## JS-UI-372-01/02 — reprise bornée du 9 novembre
+
+Attribution du coordinateur : Swarm07 est le seul mutateur UI ; root consolide
+les index partagés, Gi conserve la session humaine. Aucun Git, provider, mission,
+branche, worktree ou sous-agent dans ce lot. Service courant372/PID1880842,
+SHA4977c71b2f5da940cec84fcb45cd438d34b10034b5f2f4c08f6f08e7d05a0e99.
+Les preuves356/368 ne sont pas réutilisées pour qualifier372.
+
+01 : reçu Gi ui-003, Version contenu556/604 EN,556/601 FR à viewport624.
+02 : observation EN sombre vers FR relisant état ; défaut encore à reproduire.
+Sources examinées : swarm-design.css ligne114 et293–304 (retours de lignes,
+listes) ; cockpit-native.js bouton thème (DOM/liens sans URL) ; i18n.js sélecteur
+(recharge URL+lang) ; native_admin.rs (thème cockpit consommé depuis URL, défaut
+état) ; runtime-health.js (notes en LI textContent). Contrats et état propriétaire :
+CSS commune, langue/thème de présentation, renderer non modifié ; les autres dirty
+moteur sont hors correction. Pas de build/redémarrage en parallèle autorisé ici.
+
+Plan : témoin372 isolé, mêmes notes et transitions,4combinaisons ×624/390 ; corriger
+seulement une cause reproduite, rejouer avec overlays explicitement marqués des
+sources ciblées, puis recette permanente/profile et remise exacte au coordinateur
+avant compilation/livraison mêlant d’autres dirty. Vérifier contenu intégral,
+focus/Échap/réouverture, reload/langue/thème et entrée de thème invalide.
+Preuves neuves locales `.cache/ui-version-20261109` ; Lexar480KiB libre, aucun
+nettoyage ni écriture de nouvelles preuves sur ce support.
+
+Premier banc interrompu : recette copiée du serveur historique Go attendait une
+URLsession que Rust ne produit pas. Replan : lecture du vrai contrat Server dans
+rust_native_http_cli.py ; banc corrigé sur web-bound JSON + session du seul Root
+fixture. Aucun secret humain lu/transmis. L’essai initial reste incomplet, jamais
+PASS. Le serveur372 actif n’a pas été arrêté.
+
+
+### Diagnostic et correction source vérifiés — image non livrée
+
+Témoin `.cache/ui-version-20261109/baseline372-protocol/result.json` : les huit
+contextes (FR/EN × thèmes ×624/390) débordent dans Version, sans débordement du
+document. BF16b LI long sans overflow-wrap. La transition EN sombre→FR et le
+rechargement échouent aussi ; bouton sombre témoin passant. Cause02 : le bouton
+modifiait le DOM, mais pas l’URL ; i18n recharge l’URL ; native_admin consomme son
+thème et retombe sur état si absent. Le défaut est maintenant reproduit, pas inféré.
+
+Correction01 : même règle partagée des paragraphes/listes/descriptions de dialogue,
+`overflow-wrap:anywhere`, aucun texte coupé ou caché, aucune largeur augmentée.
+Correction02 : toggleTheme documenté, enum existant vers DOM+URL replaceState,
+conservation des autres paramètres et des liens Admin. Aucun localStorage de thème
+ni règle moteur ajouté. Shell/i18n/renderer natif restent inchangés.
+
+Replay final source, overlays explicitement marqués des seuls deux fichiers :
+`source-final/result.json`,56/56 PASS. Comparaison intégrale des LI avec tous les
+items FR/EN du producteur Version, non simplement recherche d’un token ; focus
+au titre, Échap/opener, réouverture, reload, transition inverse et thème invalide.
+Recette compilée maintenue : version-dialog-preferences.json (sans overlay).
+Ces résultats sources ne prouvent pas l’image installée. Les fixtures sont privées,
+aucun fournisseur/mission/POST ; processus de ces essais remis après fermeture.
+
+Blocage de livraison explicite :8entrées effectives différentes de372, dont cinq
+hors correction. pending-build-inputs.json et foreign-inputs.patch remis. Quatre
+sources de l’inspecteur/placeholder sont dans3eeeaef8e ; message annonce14checks,
+reçu original non établi par cette session. i18n test échoue : la clé générée
+« Agent natif — exécution et mandat courants requis » est absente du catalogue
+source. i18n-mismatch.json conserve le discriminant. Aucun retrait/reset de ce
+travail ; root coordonne gel/qualification et génération avant décision de build.
+Ne pas répéter le test inchangé ni installer un composite sur la base des overlays.
+
+Revue politiques/fonctions/erreurs/doc liée aux SHA : HANDOFF.json. Source stable,
+aucun build/redémarrage/Git ;372 reste active. Conditions de reprise : décision
+root sur les cinq entrées étrangères et le catalogue, gel des sources, build
+pris en charge/profil qualifié, recette sur l’image exacte, puis remise Gi pour
+contrôle humain protégé et rapprochement des octets. Aucun login38434 demandé.
+RETEX intermédiaire : suivre le producteur ET le consommateur des préférences ;
+mesurer le contenu interne en plus du document ; préférer une vraie condition DOM
+aux frames hors écran ; les doublons source n’établissent jamais une livraison.
+
+
+### Prérequis complémentaires autorisés par root
+
+Le coordinateur autorise explicitement le contrôle existant de l’inspecteur et
+le rétablissement canonique de la traduction d’Oryh, sans changer son consommateur.
+`workbench-summary.stdout` :14/14 PASS nommés. Revue follow/mount, placeholder et
+stageCSS de3eeea : id connu dans modèle validé requis, sélection de présentation
+seule ; HTML textuel conservé, erreur DOM propagée ; dimensions/breakpoint1024 sont
+un choix de géométrie UI, pas une politique d’exécution. Cette revue/test double
+reste distincte d’une preuve de l’image composite ou d’une revue indépendante.
+
+Catalogue : phrase utilisée trust-native.js:51, traduction anglaise déjà existante
+dans i18n-en.js rétablie exactement dans locales/en.json, autres entrées dont
+placeholder conservées. Générateur existant repassé ; i18n-after.stdout PASS.
+Aucune nouvelle capacité native ni droit n’est déduite de cette phrase UI.
+
+Root a relevé un cas d’erreur dans toggleTheme : le DOM pouvait changer avant un
+refus de replaceState. Tests marqués d’injection locale dans history-refusal-before
+et history-refusal-observed montrent cinq échecs (ancien DOM/URL, visibilité,
+cause et reprise). Ces essais ne sont pas PASS. Nouvelle correction générale :
+enregistrer URL d’abord ; en refus conserver ancien DOM/URL, afficher une phrase
+FR/EN sûre, propager web-native-theme-update-refused avec cause originale. Le test
+restaure sa méthode historique originale puis vérifie une nouvelle action +reload.
+Un catalogue source neuf est nécessaire à ce diagnostic traduit ; overlays finaux
+explicitement trois assets (CSS, cockpit-native.js, i18n-en.js), toujours non livrés.
+
+HANDOFF.json initial complet est conservé ; sa duplication des notes a tronqué
+une lecture du coordinateur. Replan de la transmission : un reçu compact séparé
+avec chemins, SHA, comptes et noms de défauts, sans corps de notes. Ne pas recycler
+le test source pour fabriquer une preuve runtime ; prochaine image unique après
+inventaire final/gel coordonné et recette compilée, puis contrôle Gi.
+
+
+### Gel source remis avant compilation
+
+`READY.json` est le reçu compact (chemins/SHA/comptes, pas les corps des notes).
+source-ready-load/result.json :63/63 PASS, overlays marqués trois assets seulement.
+14/14 workbench-summary et i18n-after PASS ; cinq tests shell Échap conservés.
+Les63 incluent cause/refus/reprise, console et requêtes échouées. Aucun échec
+silencieusement filtré : source-refusal-fixed conserve4GETnative-version annulés
+par navigation prématurée ; source-network-settled garde ReferenceError (lang
+observé avant scripts chargés). Correction du banc : événement load de navigation
+attendu avant composants, puis promesse réelle Version attendue avant départ.
+Les diagnostics antérieurs ne prouvent pas une panne moteur. Le premier témoin de
+refus avait effectivement terminé en FAIL ; ne pas qualifier sa simple progression
+lente de blocage produit ou affirmer qu’une interruption l’a produit.
+
+Les fichiers de production et tests du reçu sont maintenant stables ; aucun
+processus des fixtures restantes (processes-final.json). Root décide gel et
+créneau avant build unique ; pas de nouveau build, restart ou demande de login.
+La phase installation/réexamen runtime/RETEX final reste ouverte.
+
+
+### Candidat373 qualifié — redémarrage non exécuté
+
+Créneau unique build attribué explicitement par root après revalidation de READY
+sans écart et absence de cargo/rustc concurrents. Préflight : huit écarts connus
+et aucun nouveau depuis372, inventaire complet dans build-preflight.json.
+`./swarm.sh build` a produit une seule image373, sans redémarrage du serveur372.
+Sources gelées durant compilation et tests ; aucun Git, fournisseur ou mission.
+
+Image : v0.1.1-dev.373, SHA256
+`9ba81aa1ca94baa743c063957a1e0cfe90ed744588385922b7589bde977330d4`.
+Profil `.cache/local-delivery/rust-cpvqgcfk/build/profile/result.json` :
+VERIFIED_DEFAULT_NATIVE_PROFILE, core features vides, core non-test, aucune feature
+fixture, dépendances effectives stables. Archive effective SHA256
+`5f716959f9f4112533b026ae31d7e1b4d2fc042aac3cbb4188546e848410780a`.
+Le record candidat et tous les effective_inputs ont été rapprochés des sources
+après les vérifications : zéro écart. Pas de nouvelle compilation des14 contrôles
+inspecteur inchangés ; preuves exactes réutilisées dans leur portée source.
+
+Recette permanente version-dialog-preferences sur cette image, SANS OVERLAY :
+63/63 PASS, recipe.py verify VERIFIED, originaux dans compiled-recipe373.
+Une exception JS est intentionnellement injectée/typée/cause vérifiée pour le
+refus historique ; aucune autre erreur JS, aucun warn/error console ni requête
+échouée, aucun POST dans la fixture. Le résultat ne prouve pas une session humaine.
+Six assets protégés servis par un autre Root privé du même binaire comparés aux
+membres de l’archive : CSS partagé, cockpit-native.js, catalogueEN, workbenchJS/CSS
+et graphJS. Tous identiques ; empreinte /proc de l’enfant égale à celle du candidat
+avant/après lectures. Version/commit/modified et l’intégralité des notes FR/EN
+servis correspondent au record et au JSON compilé. served373/result.json conserve
+les chemins, statuts et empreintes ; pas de cookie humain exporté.
+
+Remise compacte : `.cache/ui-version-20261109/READY-CANDIDATE373.json`.
+372/PID1880842 et son SHA4977… sont encore actifs après le build. Redémarrage non
+exécuté : root coordonne la suite et la recette Gi dans sa session normale.
+Commande préparée (pas lancée) : swarm.sh restart --prepared-build SHA373 --no-open.
+RETEX final après activation et observation humaine reste ouvert ; ne pas annoncer
+« installé/corrigé sur instance » à partir de la recette de fixture.
+
+
+### Activation373 — remise à root avant navigateur Gi
+
+Créneau unique restart attribué explicitement après rapprochement par root des
+hashes du candidat, profil, archive, recette et octets servis. Préflight renouvelé :
+record373 identique, image candidate exacte, source sans entrée compilée nouvelle,
+instance372/PID1880842 identifiée. Cinq Work lus via CLI publique avant arrêt,
+corps non conservés ; seulement compte et empreintes. La commande préparée avec
+le SHA complet a sélectionné373 sans nouvelle compilation et annoncé zéro entrée
+plus récente non installée. Aucun autre service interrompu, aucune mission lancée.
+
+Image active vérifiée par /proc de l’exécutable et API native-version :
+v0.1.1-dev.373, PID2336522, SHA256
+9ba81aa1ca94baa743c063957a1e0cfe90ed744588385922b7589bde977330d4,
+commit3eeeaef8ea62e2165613d75b2c7714708885db80, modified=true,
+builddate2026-11-09T21:57:09Z. Status running/ready true. Cinq Work après activation,
+même SHA de leur liste publique et de engine-settings show ; aucun corps privé
+écrit dans les preuves. ACTIVATION373.json est le reçu compact de cette remise ;
+activation-before373 et activation-after373 gardent les snapshots originaux.
+
+Défaut du collecteur de reçu conservé dans activation-receipt-contract-failure :
+comparaison erronée de l’objet binary API à l’enveloppe build incluant schema_version.
+Les champs communs étaient déjà exacts ; reprise par comparaison explicite des
+quatre champs et de provenance injected. Aucun redémarrage/test répété pour cela.
+Une namespace de métadonnées différente n’est pas une divergence d’exécutable.
+
+RETEX local : UI01 venait d’une règle de prose qui oubliait les LI contenant des
+identifiants longs ; UI02 du producteur de préférence DOM sans mise à jour de
+l’URL que consommaient langue/reload. Correction aux contrats communs et preuve
+avant/après conservée. En erreur, commettre l’URL avant affichage et conserver
+l’ancien état/diagnostic/cause ; le test de refus/reprise est permanent. Attendre
+les lectures Version avant navigation évite d’attribuer les annulations du banc
+au produit. Le partage d’un workspace exige un gel explicite et le rapprochement
+des octets étrangers, pas leur retrait ni une requalification implicite par un
+commit. Reçus compacts et liens SHA transmettent les preuves sans tronquer les
+notes ; les originaux restent intacts et locaux car Lexar presque pleine.
+
+La vérification authentifiée n’est PAS close par cette activation. Prochaine remise
+root→Gi : recharger373 dans sa session normale38433, vérifier Version FR/EN × thèmes,
+624 et largeur mobile pertinente, contenu interne sans coupure/défilement injustifié,
+Échap/focus/réouverture ; EN sombre→FR puis reload garde sombre ; restaurer les
+préférences initiales, aucune mission. Rapprocher les ressources protégées observées
+avec l’archive373 si demandé. Ce chat ne redemande pas de connexion/API et n’accède
+pas à la session distincte de Gi. Les preuves fixture63/profil/exe/API/CLI sont
+établies ; observation humaine, acceptation globale et conformité WCAG restent
+hors de leur portée. Root coordonne ce dernier témoin avant clôture des deux constats.
+
+
+## Clôture bornée JS-UI-372-01/02 — observation authentifiée373
+
+**Les deux constats sont clos dans le périmètre ci-dessous.** Reçu final de Gi
+relu le9novembre : `.cache/ui-version-20261109/gi-final373/result.json`, statut
+PASS_BOUNDED_AUTHENTICATED_373. SHA256
+6dba6b0d0db97bdadb880ceb76a49452b46ec718ce256c0f9a8e51c3e48500a5.
+Reçu de comparaison lié : comparison.json, SHA256
+377a12e4024dd4248290c09e4e734978f539029efb8df982702f9a847fbdb52c.
+Liaison image373/SHA9ba81aa1… vers activation, profil/archive et ressources conservée.
+
+Gi est l’exécutant navigateur ; root compare les corps téléchargés et les octets
+de l’archive ; Swarm07 finalise ici documentation/RETEX, sans nouvelle exécution.
+Huit cas uniques FR/EN × état/sombre ×624/390 : version373, commit/date et disclosure,
+modal/titre et huit fermetures Échap avec retour au déclencheur visible. À624,
+contenu556/556 ; à390,322/322. Le LI long BF16b est intégral,434/434 puis200/200,
+hauteur client égale à scrollHeight, overflow-wrap:anywhere et aucun line-clamp.
+Égalité du texte complet par rapport au DOM initial de chaque langue conservée ;
+ce n’est pas une nouvelle revue sémantique de tout le catalogue historique.
+
+**UI01 : corrigé et vérifié sur l’instance.** Le débordement interne mesuré372
+556/604 EN et556/601 FR ne se reproduit plus dans ces huit cas, sans masquer ni
+couper le texte ni élargir artificiellement le dialogue. **UI02 : corrigé et vérifié
+sur l’instance.** Deux transitions EN sombre→FR avec vrai reload restent sombres
+(624 et390) ; les transitions claires et reload gardent état. Préférences initiales
+FR/état/624×684 restaurées et overrideviewport réinitialisé ; aucune mission choisie.
+
+Six ressources authentifiées ciblées comparées par root à l’archive373 : six
+concordances exactes, hash de comparaison revérifié ici. L’API d’export ne fournit
+ni statutHTTP ni en-têtes : aucun200 n’est déduit de cette remise. Ce contrôle
+n’est pas un rejeu des22assets de372 ni une requalification368/372. Console warn/error
+avant/après vide dans la collecte limitée100 ; univers réseau non exhaustivement
+mesuré. Captures dans le transcript Gi, aucun fichierimage nouveau annoncé.
+
+RETEX final du lot : deux causes différentes (retour à la ligne des LI ; préférence
+DOM non reportée dans l’URL consommée par langue/reload) ont eu chacune un témoin
+négatif puis la même vérification après correction. Le cas d’erreur replaceState
+conserve ancien état et cause, avec diagnostic FR/EN et reprise ; il reste une
+injection de fixture, jamais présentée comme incident de la session humaine.
+63assertions compilées sansoverlay,14du composant inspecteur et catalogue cohérent,
+un seul build373 et une activation du prepared-build exact précèdent la remise
+humaine. Les cinq Work et réglages publics sont conservés selon leurs empreintes.
+Les originaux des échecs du banc, du catalogue et du collecteur restent distincts
+des preuves produit. Les règles/contrats FR/EN et la recette permanente transmettent
+le retour d’expérience ; cela ne garantit pas l’absence d’un autre défaut futur.
+
+Observation séparée à conserver : à390, le libellé français de fermeture apparaît
+« Ferme/r » sur deux lignes ; texte accessible et bouton fonctionnel. **Cause et
+régression non établies**, aucun nouveau correctif ni test lancé ici. Propriétaire
+Swarm00/UI ; condition future : triage explicitement attribué, comparaison à une
+baseline390 pertinente et lecture des règles de bouton. Cette observation ne
+rouvre pas implicitement les deux contrats vérifiés et ne vaut pas acceptation
+globale ni conformité WCAG/BLP. Root maintient le suivi commun.
+
+Reçu compact de clôture : `.cache/ui-version-20261109/CLOSURE373.json`. Cette
+finalisation modifie seulement ce plan et produit le reçu ; aucun test/build/
+restart/Git supplémentaire, aucune action métier, aucun transfert de secret.
+
+
+### Publication isolée des corrections UI01/02
+
+La demande de commit/push porte sur ce seul lot. Commit préparé sur la base publique
+origin/main, sans les commits Conduite locaux ultérieurs ni les dirty des autres
+agents. Aucun checkout, reset ou réécriture de main. Le rétablissement du libellé
+natif d’Oryh est conservé localement avec son consommateur non publié : le commit
+retient uniquement le nouveau diagnostic de refus de thème dans les catalogues.
+Les preuves373 incluent le contexte local qualifié de cette date ; elles ne
+requalifient pas implicitement une future image du commit isolé. GitHub exige PR
+et checks/install ; la publication reste conditionnée au parcours autorisé,
+sans contourner la protection ni créer une branche sans autorité applicable.

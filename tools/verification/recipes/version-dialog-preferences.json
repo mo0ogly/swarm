@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "version-dialog-preferences",
+  "inputs": [
+    "web/swarm-design.css",
+    "web/cockpit.css",
+    "web/swarm-workbench.css",
+    "web/cockpit-native.js",
+    "web/i18n.js",
+    "web/i18n-en.js",
+    "web/swarm-shell.js",
+    "web/runtime-health.js",
+    "web/cockpit-native-version.js",
+    "version_history.json",
+    "tests/version_dialog_preferences_ui.cjs",
+    "docs/UI-DESIGN.md",
+    "docs/en/WINDOW-IDENTITY.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "compiled-version-layout-and-preferences",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='version-dialog-',dir='.cache')).resolve()\nprint('RETAINED_VERSION_UI',p,flush=True)\nsubprocess.run(['node','tests/version_dialog_preferences_ui.cjs',os.environ['SWARM_STATUS_CONTRACT_BINARY'],str(p)],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS en-sombre-624-internal-content-fits",
+        "PASS fr-etat-390-internal-content-fits",
+        "PASS EN-dark-to-FR-retains-dark",
+        "PASS reload-retains-language-and-dark",
+        "PASS no-JS-errors",
+        "PASS no-POST",
+        "PASS history-refusal-keeps-old-presentation",
+        "PASS history-refusal-visible",
+        "PASS history-refusal-preserves-cause",
+        "PASS history-refusal-recovery-persists",
+        "PASS no-console-warnings-errors",
+        "PASS no-failed-requests"
+      ],
+      "required_stderr": []
+    }
+  ]
+}
