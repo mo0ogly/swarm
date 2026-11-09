@@ -342,3 +342,87 @@ refus d’attribution/copie avant départ, reprise, perte de Git après départ 
 annulation avec workspace manquant). Vérification locale sans installation,
 revue indépendante ou acceptation globale :
 [preuves1390](../plans/migration-rust/evidence/20261024-managed-manual1390/PLAN.md).
+
+
+## Alias historiques du stockage géré
+
+Une référence conservée peut garder un ancien chemin du Root, par exemple un lien
+de compatibilité vers le même projet. La lecture et le garde commun du stockage
+ouvrent séparément l’état privé `.swarm` puis `managed/<work>` : les identités
+dev/inode doivent correspondre aux répertoires canoniques déjà ouverts. Les
+descripteurs restent possédés pendant l’opération ; une égalité de chemin, de
+contenu de manifeste ou d’UID ne suffit pas. Les enfants sont ouverts sans suivre
+de symlink. Un autre datastore, un alias absent ou une forme de chemin invalide
+refuse ; les causes IO et de fermeture restent conservées.
+
+La référence, les manifestes, reçus, copies, événements, tentatives et compteurs ne
+sont pas réécrits. Le lien ne remplace aucun contrôle de manifeste, commit ou
+attribution du worker. Lire une mission ne la reprend pas et n’accepte rien.
+Une vraie copie/délocalisation ayant changé les identités physiques ne bénéficie
+pas de cette équivalence : restaurer la référence exacte ou préparer une migration
+explicite autorisée avec ses propres preuves. Pas de confinement contre un acteur
+hostile de même UID. Le cas de référence et les limites d’exécution sont dans
+[le suivi de lecture historique](../reports/historical-mission-read-20261108.md).
+
+Le verrou de stockage géré respecte les deux formats existants : `operation.lock`
+(producteur Go) et `.engine-settings.lock` (producteur Rust). Si les deux existent,
+ils restent détenus dans cet ordre pendant l’opération. Seul ENOENT typé permet
+de rechercher l’autre format ; contention, permissions, liens ou fermeture refusent.
+La lecture ne crée rien et refuse si aucun verrou n’existe. La préparation neuve
+conserve le format Rust. Cela ne couvre pas un ancien writer qui créerait un
+nouveau nom de verrou en concurrence après cette observation.
+
+Le cockpit distingue la lecture des enregistrements (`read=history`) de la
+qualification actuelle (`read=current`). Les missions dont le contrôle enregistré
+est en pause ouvrent l’historique par défaut ; le bouton près d’Actualiser permet
+de choisir explicitement l’autre vue. Ce choix est une présentation, aucune
+politique d’exécution. L’historique consomme les Work et panneaux publics protégés
+existants : chaque tâche est dépliable avec tous ses champs enregistrés, dont les
+tentatives et revues antérieures. Aucun calcul de fraîcheur ni d’activité n’est
+déduit : leurs compteurs restent inconnus. La qualification actuelle utilise
+toujours le lecteur strict et expose ses refus ; elle n’est pas remplacée par
+l’historique. Les erreurs de lecture Work/contrôles/panneaux restent bloquantes.
+Les journaux gardent leur parcours public séparé. Ce n’est pas une qualification
+actuelle des anciennes preuves Go ni une relance ou migration de données.
+
+## Qualification courante et anciens avis Go
+
+La qualification se consulte avec `work show` ou le résumé calculé de Reprise et
+OODA (`/api/v1/work-resume?work=ID&lang=fr`). Ces parcours lisent les preuves
+actuelles via `inspect_work_view` et sa projection de validation ; ils restent
+distincts du résumé enregistré et du statut opérationnel global de mission.
+Une revue Go simple favorable conserve les gardes de contexte, contrat, candidat,
+fichiers et rapport Git. Une revue unknown/défavorable en protocole batch/fragment
+non porté est explicitement non qualifiée sur sa tâche ; son reçu de remplacement
+n’est pas consommé et elle ne bloque pas les revues simples voisines. Un avis
+favorable utilisant un protocole non porté refuse toujours. Aucun résultat
+unknown ne devient PASS, aucune preuve manquante n’est réparée et aucun agent
+n’est lancé par la lecture. Les erreurs IO des preuves consommées restent des
+refus ; restaurer les originaux permet de les réexaminer, sans réécrire l’histoire.
+Voir [le suivi de qualification Go](../reports/historical-go-qualification-20261108.md).
+
+Le bandeau de consultation historique indique « statut opérationnel non évalué » :
+il ne contredit pas la qualification des preuves demandée séparément dans le
+résumé calculé de Reprise et OODA. Le statut global et cette qualification sont
+deux observations différentes ; aucune n’accorde de droit d’exécution.
+
+Le lecteur de revue Git applique également la garde commune aux anciens chemins
+Go absolus passant par un alias racine. La forme standard .swarm/managed/Work,
+l’identité des états privés et des dossiers Work et le verrou partagé existant
+sont exigés ; les descripteurs restent ouverts pendant le calcul Git sur le
+chemin canonique contenu. Aucun fichier ni chemin enregistré n’est réécrit.
+Un autre état, un alias absent, une contention ou une erreur Git refuse ; la
+restauration des originaux permet la lecture suivante. Les causes de revue et
+de fermeture indépendantes sont conservées ensemble via Root Cleanup. Les
+observations protocol_verified/authority_verified restent fausses : il s’agit de
+concordance de données, pas d’un droit d’acceptation ni de confinement same-UID.
+
+
+### Attribution des commits de fixture historique
+
+Le témoin d'alias de racine utilise uniquement une identité synthétique locale à son dépôt fictif (`Fixture`, `fixture@invalid`), comme les fixtures Git existantes. Il ne lit ni n'écrit l'identité personnelle de l'opérateur et ne change pas l'attribution Git du produit. La recette `historical-mission-recorded-read` masque les configurations Git globale/système pour vérifier cette indépendance. Les témoins/refus/reprises d'alias restent requis ; un SDK retenu doit contenir le test corrigé. Ce contrat de fixture n'établit ni qualification d'une CI externe ni nouvelle acceptation produit.
+
+
+### Catalogue anglais de la lecture historique
+
+Les cinq libellés de lecture historique et de vérification du statut actuel sont définis dans `locales/en.json`, puis générés dans `web/i18n-en.js` par `node scripts/i18n/build.cjs`. Le catalogue source est également embarqué par le lecteur Rust `work_view.rs` : un fichier web modifié seul ne met pas à jour cette traduction côté moteur. `node scripts/i18n/build.cjs --check` et `node tests/i18n_test.cjs` contrôlent les octets générés et la parité. Ils ne prouvent ni un rebuild installé, ni la validité des preuves de la mission lue.

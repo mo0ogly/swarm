@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "task-status-badges",
+  "inputs": [
+    "web/swarm-workbench.js",
+    "web/cockpit-native-read.js",
+    "web/swarm-workbench.css",
+    "web/swarm-design.css",
+    "tests/task_status_badges_test.cjs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-task-status-badge-consumers",
+      "command": [
+        "node",
+        "tests/task_status_badges_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native-table-uses-colored-recorded-status-badges",
+        "PASS unknown-state-is-plain-text-and-neutral",
+        "PASS label-does-not-grant-success-tone",
+        "PASS missing-state-remains-explicit",
+        "PASS table-refresh-replaces-old-status-and-empty-state",
+        "5/5 task status badge checks passed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

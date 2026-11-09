@@ -1,5 +1,7 @@
 /* Swarm visual system. See docs/UI-DESIGN.md. Loaded after feature styles. */
 :root {
+  --swarm-rail-text: #e5edf0;
+  --swarm-rail-selected: #0f3d61;
   color-scheme: dark;
   --swarm-marine: #062b49;
   --swarm-gold: #f8c650;
@@ -184,12 +186,24 @@ button:disabled { opacity: .6; }
 .metric { background: transparent; border: 0; border-right: 1px solid var(--wattson-ligne); border-radius: 0; padding: 14px 18px; color: var(--wattson-texte); }
 .metric:last-child { border-right: 0; }
 .metric strong { font: 28px/1.4 ui-monospace,monospace; }
+.metric strong,.mission-kpi strong {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: fit-content; min-width: 2.5ch; padding: 2px 12px; border-radius: 999px;
+  background: var(--wattson-carte-appuyee); color: var(--wattson-texte);
+}
+.metric.info strong,.mission-kpi[data-tone="info"] strong { background: var(--wattson-info-fond); color: var(--wattson-info-encre); }
+.metric.success strong,.mission-kpi[data-tone="success"] strong { background: var(--wattson-succes-fond); color: var(--wattson-succes-encre); }
+.metric.attention strong,.mission-kpi[data-tone="attention"] strong { background: var(--wattson-attention-fond); color: var(--wattson-attention-encre); }
+.metric.alert strong,.mission-kpi[data-tone="alert"] strong { background: var(--wattson-alerte-fond); color: var(--wattson-alerte-encre); }
 .metric span { color: var(--wattson-texte-discret); font-weight: 500; }
 .notice { padding: 10px 14px; border: 0; border-left: 3px solid currentColor; border-radius: 0 4px 4px 0; font-size: 13px; line-height: 1.6; }
 .card { border: 0; border-top: 1px solid var(--wattson-ligne); border-radius: 0; padding: 18px 16px; background: var(--wattson-carte); }
 .card>button { margin-top: 8px; }
 .cards { gap: 1px; }
 .badge,.status { border-radius: 3px; font-size: 11px; font-weight: 600; }
+/* Task table, lanes and inspector share the same semantic badge palette. */
+.workbench-badge { border-color: currentColor; }
+.agent-status-line { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .table-scroll { margin: 0; border: 1px solid var(--wattson-ligne); border-radius: 5px; }
 th { font-size: 11px; letter-spacing: .04em; padding-block: 12px; }
 td { font-size: 13px; }

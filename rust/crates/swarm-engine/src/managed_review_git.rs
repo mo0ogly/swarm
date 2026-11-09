@@ -5,6 +5,38 @@ use crate::{
 };
 use std::path::Path;
 
+/// Inspect through the shared private State/Work alias binding and read lane.
+/// The callback runs while both canonical and stored directory descriptors are
+/// retained. Its original review failure and any independent binding/lock/close
+/// failures survive together in the established Root cleanup wrapper. Nothing
+/// is created or rewritten; the caller still owns Root/material/settings guards.
+/// Only standard managed locators can pass this alias branch. No identity,
+/// acceptance, snapshot or same-UID confinement follows from the observation.
+fn with_legacy_alias<T>(
+    root: &Path,
+    work: &Work,
+    run: impl FnOnce() -> Result<T, ReviewEvidenceError>,
+) -> Result<T, ReviewEvidenceError> {
+    use crate::RootStoreError as R;
+    use ReviewEvidenceError as E;
+    let mut observed = None;
+    let binding = crate::managed_repository::with_bound_storage(root, work, false, |_| {
+        observed = Some(run());
+        Ok(())
+    });
+    match (observed, binding) {
+        (Some(result), Ok(())) => result,
+        (None, Ok(())) => Err(E::Native(Box::new(R::Refused(
+            "managed-review-alias-observation-missing",
+        )))),
+        (Some(Err(primary)), Err(cleanup)) => Err(E::Native(Box::new(R::Cleanup {
+            primary: Some(Box::new(R::Review(primary))),
+            cleanup: Box::new(R::Launch(Box::new(cleanup))),
+        }))),
+        (_, Err(error)) => Err(E::Native(Box::new(R::Launch(Box::new(error))))),
+    }
+}
+
 /// Candidate/file/Git consistency only. Protocol, current identity and acceptance remain unproven.
 #[derive(Debug, serde::Serialize)]
 pub struct ManagedReviewGitObservation {
@@ -23,7 +55,11 @@ pub struct ManagedReviewGitObservation {
 /// That verified context selects the Git citation semantics. Its candidate must
 /// also match the review. The report blob digest must equal the observed file
 /// digest. Repository storage may be relative or absolute beneath `root`; it
-/// must be local and resolve inside the root. Settings must explicitly adopt v5.
+/// must be local and resolve inside the root. An absolute historical root alias
+/// uses the shared standard managed-storage descriptor binding and existing read
+/// lane; the stored private State/Work must match the canonical ones. Git still
+/// reads the canonical contained path, without rewriting stored locators.
+/// Settings must explicitly adopt v5.
 ///
 /// Historical baseline files follow their configured iterative guard. Batches
 /// and fragment journals still refuse until their full protocols are ported. It neither authenticates reviewer nor
@@ -71,36 +107,42 @@ pub fn inspect_managed_review_git(
     let canonical =
         crate::canonical_project_root(root).map_err(|e| E::Git(crate::GitReportError::Path(e)))?;
     let storage = Path::new(&repository.storage);
-    let relative = if storage.is_absolute() {
-        storage
-            .strip_prefix(&canonical)
-            .map_err(|_| E::Refused("managed-review-storage-outside-root"))?
-    } else {
-        storage
+    let inspect = |relative: &Path| {
+        let git_dir = relative.join("repository.git");
+        let git_dir = git_dir
+            .to_str()
+            .ok_or(E::Refused("managed-review-storage-encoding"))?;
+        let git = crate::hash_git_report(
+            root,
+            git_dir,
+            &anchor.candidate_commit,
+            &review.git_report,
+            context.citation_contract_version,
+            settings,
+        )
+        .map_err(E::Git)?;
+        if git.sha256 != anchor.report_sha256 {
+            return Err(E::Refused("managed-review-git-report-stale"));
+        }
+        Ok(ManagedReviewGitObservation {
+            scope: "candidate-files-and-git-only",
+            anchor,
+            git,
+            baseline_reviews_checked: files.reviews_checked,
+            baseline_max_depth: files.max_depth,
+            protocol_verified: false,
+            authority_verified: false,
+        })
     };
-    let git_dir = relative.join("repository.git");
-    let git_dir = git_dir
-        .to_str()
-        .ok_or(E::Refused("managed-review-storage-encoding"))?;
-    let git = crate::hash_git_report(
-        root,
-        git_dir,
-        &anchor.candidate_commit,
-        &review.git_report,
-        context.citation_contract_version,
-        settings,
-    )
-    .map_err(E::Git)?;
-    if git.sha256 != anchor.report_sha256 {
-        return Err(E::Refused("managed-review-git-report-stale"));
+    if storage.is_absolute() {
+        match storage.strip_prefix(&canonical) {
+            Ok(relative) => inspect(relative),
+            Err(_) => {
+                let relative = Path::new(".swarm").join("managed").join(&work.id);
+                with_legacy_alias(&canonical, work, || inspect(&relative))
+            }
+        }
+    } else {
+        inspect(storage)
     }
-    Ok(ManagedReviewGitObservation {
-        scope: "candidate-files-and-git-only",
-        anchor,
-        git,
-        baseline_reviews_checked: files.reviews_checked,
-        baseline_max_depth: files.max_depth,
-        protocol_verified: false,
-        authority_verified: false,
-    })
 }

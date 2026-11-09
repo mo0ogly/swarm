@@ -26,7 +26,8 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context
     source-reading controls before initial authorization;
     saved production policies and historical originals are never edited.
     Every injected refusal follows a valid applicable witness and restores exact
-    bytes/settings. A successful read grants no provider call or verdict.
+    bytes/settings. A successful read grants no provider call or verdict. Reused inspection
+    preserves prior review calls and opinions instead of assuming fresh counters.
     """
     out.mkdir(mode=0o700,parents=True,exist_ok=False);fixture=native.fixture
     qualification=json.loads(profile.read_bytes());assert qualification['no_fixture_feature'] and qualification['sha256']==fixture.digest(binary.read_bytes())
@@ -117,7 +118,7 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context
         assert inspect('report-restored')['prompt_sha256']==inputs['prompt_sha256'];checks.append('missing-report-refuses-and-restores')
         zero_fields=['review_context_files','review_source_bytes','review_context_bytes','review_delivery_files'];old=set_quotas('zero-caps',**dict.fromkeys(zero_fields,0));assert inspect('zero-caps-read')['prompt_sha256']==inputs['prompt_sha256'];set_quotas('restore-caps',**{k:old[k] for k in zero_fields});inspect('caps-restored');checks.append('saved-zero-caps-mean-no-additional-limit')
     state=show('before-native-guard');code,wire=call('actual-review-guard',['task','review',work],dict(schema_version=1,event_id='native-review-stale-revision',expected_revision=state['revision']+1,task_id='task'));assert code!=0 and 'review-revision-conflict' in json.dumps(wire),wire
-    after=show('after-native-guard');assert after==state and after['planning']['reviewer'].get('calls',0)==0 and not any(t.get('independent_review') for t in after['tasks'])
+    after=show('after-native-guard');assert after==state and after['planning']['reviewer'].get('calls',0)==state['planning']['reviewer'].get('calls',0)
     checks.append('actual-native-review-requires-current-revision-without-call-or-acceptance')
     result=dict(status='PASS',root=str(root),work=work,binary_source=binary_source,checks=checks,reviewer_started=False,accepted=False,global_watchdog=None)
     fixture.publish(out/'result.json',result);print('MANAGED_REVIEW_INPUTS_PASS '+str(len(checks))+' assertions')

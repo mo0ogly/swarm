@@ -157,8 +157,9 @@
   /**
    * renderAgents(data) — Fill #agents-list with the textual autonomy observation
    * lines first, then one card per agent showing literal IDs,
-   * recorded status via engine(), provider, role. No live probing implied.
-   * Throws if container missing.
+   * recorded status via the shared agent badge, provider, role. No live probing
+   * or task acceptance implied. Missing containers/producer and DOM/translation
+   * errors propagate to the existing visible read-failure consumer.
    */
   function renderAgents(data) {
     const c = box('agents-list');
@@ -171,7 +172,9 @@
       const card = el('div', 'card');
       card.appendChild(el('div', 'notice info', t("Agent") + ': ' + a.id));
       card.appendChild(el('div', 'notice info', t("Tâche") + ': ' + a.task_id + ' / ' + t("Tentative") + ': ' + a.attempt_id));
-      card.appendChild(el('div', 'notice info', t("État enregistré") + ': ' + engine(a.status)));
+      const stateLine=el('p','agent-status-line',t("État enregistré")+': ');
+      stateLine.appendChild(globalThis.SwarmWorkbench.agentStatusBadge(a.status));
+      card.appendChild(stateLine);
       card.appendChild(el('div', 'notice info', t("Fournisseur") + ': ' + a.provider + ' — ' + t("Rôle") + ': ' + a.role));
       card.appendChild(el('div', 'notice info', t("Début enregistré") + ': ' + (a.started || t("Non enregistré")) + ' — ' + t("Fin enregistrée") + ': ' + (a.ended || t("Non enregistré"))));
       c.appendChild(card);

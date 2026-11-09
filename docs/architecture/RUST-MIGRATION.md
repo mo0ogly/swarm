@@ -1319,8 +1319,11 @@ Le raccord candidat compose le garde de revue/Git existant avec les contrôles
 lus depuis un reçu géré lorsqu'aucun enregistrement automatique n'est présent.
 Ce remplacement sert uniquement à l'affichage : il ne modifie pas le Work et ne
 répare pas le garde de fraîcheur, qui exige toujours l'enregistrement original.
-Les protocoles batch/fragment restent explicitement refusés dans tous les états ;
-la lecture Git gérée reste limitée à Linux. Les erreurs de reçu/politique/IO sont
+Les avis favorables batch/fragment restent explicitement refusés dans tous les
+états de tâche. Les avis non favorables de ces protocoles sont signalés non
+qualifiés par tâche : aucun reçu de remplacement n’est consommé et ils ne bloquent
+pas la qualification des revues simples voisines. Aucun résultat unknown ne
+devient favorable. La lecture Git gérée reste limitée à Linux. Les erreurs de reçu/politique/IO sont
 propagées au consommateur, sans succès vide. Le codec natif exige UTF-8 et
 refuse les octets invalides avec leur cause ; Go peut les remplacer. Aucune
 identité ou acceptation nouvelle.
@@ -1328,7 +1331,9 @@ identité ou acceptation nouvelle.
 ```mermaid
 flowchart LR
   A[Work et réglages Root] --> B{Protocole géré simple supporté}
-  B -->|non| C[Refus explicite]
+  B -->|non| J{Avis favorable}
+  J -->|oui| C[Refus explicite]
+  J -->|non| K[Non qualifié par tâche sans reçu de remplacement]
   B -->|oui| D[Revue et Git actuels puis dépendances]
   B -->|oui| E{Enregistrement automatique présent}
   E -->|oui| F[Contrôles stockés]

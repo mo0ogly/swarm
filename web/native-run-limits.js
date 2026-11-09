@@ -14,7 +14,8 @@
   return '{'+fields.join(',')+'}';
  }
  /** Mount a read-only summary plus an explicit scope modal. Source reload,
-  * preview and apply are separate actions; no automatic mutation or retry. */
+  * preview and apply are separate actions; zero-inheritance hints describe the
+  * existing wire contract and do not resolve invented effective origins; no automatic mutation or retry. */
  function mount(host,transport,{translate:tr=x=>x}={}){
   const el=(tag,text,cls,literal=false)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=literal?text:tr(text);if(cls)e.className=cls;return e};
   const card=el('article',undefined,'engine-settings-admin'),status=el('p','Chargement…','notice info'),open=el('button','Régler les limites d’exécution'),refresh=el('button','Recharger'),toolbar=el('div',undefined,'toolbar');open.type=refresh.type='button';open.disabled=true;open.dataset.limitsOpen='';status.setAttribute('role','status');toolbar.append(open,refresh);card.append(el('h3','Limites des prochains départs'),el('p','Projet, mission, rôle et tâche. Les tentatives déjà lancées gardent leurs limites gelées.'),status,toolbar);host.append(card);let dialog,last,busy=false;
@@ -32,7 +33,7 @@
    for(const [value,label]of [['project','Projet'],['mission','Mission'],['role','Rôle'],['task','Tâche']]){const option=el('option',label);option.value=value;scope.append(option)}
    for(const [node,label]of [[scope,'Portée'],[mission,'Identifiant de mission'],[key,'Clé de rôle ou de tâche']]){const wrap=el('label',label);wrap.append(node);context.append(wrap)}context.prepend(legend);context.append(read);
    const grid=el('div',undefined,'engine-settings-fields');
-   for(const name of names){const input=el('input');input.type='text';input.inputMode='numeric';input.dataset.limitsField=name;const wrap=el('label',labels[name]);wrap.append(input);grid.append(wrap);fields[name]=input}
+   for(const name of names){const input=el('input');input.type='text';input.inputMode='numeric';input.dataset.limitsField=name;const wrap=el('label',labels[name]);wrap.append(input,el('small','0 = hérité du niveau englobant'));grid.append(wrap);fields[name]=input}
    const observation=el('input');observation.type='checkbox';observation.dataset.limitsObservation='';const observeLabel=el('label','Mode observation (mission avec motif explicite)');observeLabel.prepend(observation);grid.append(observeLabel);
    const reason=el('textarea');reason.dataset.limitsReason='';const reasonLabel=el('label','Motif du changement');reasonLabel.append(reason);
    const source=el('p'),policy=el('details'),policyBody=el('div'),history=el('details'),historyBody=el('div'),diff=el('pre');policy.append(el('summary','Plafonds et défauts enregistrés'),policyBody);history.append(el('summary','Historique'),historyBody);diff.hidden=true;diff.dataset.limitsDiff='';

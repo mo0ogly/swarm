@@ -64,7 +64,7 @@ pub use planning_native::{execute_planning_gate, PlanningRunOutcome};
 #[cfg(target_os = "linux")]
 pub use planning_step::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
-pub use task_validation::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, NativeValidationEvidence};
+pub use task_validation::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, NativeValidationEvidence, ReviewRefreshOutcome};
 #[cfg(target_os = "linux")]
 pub(crate) use task_validation::require_validation_idle;
 #[cfg(target_os = "linux")]
@@ -2483,7 +2483,10 @@ impl RootStore {
     /// files, retained history and saved settings under a shared reservation.
     /// Current review data is required for hierarchical freshness, even waivers.
     /// Simple managed reads compose saved receipt policy and current Git review;
-    /// batches/fragments/platform limitations refuse. Unexpected review IO/codec, SQL,
+    /// favorable batch/fragment and platform limitations refuse. Non-favorable
+    /// unsupported opinions stay explicitly unqualified per task; their receipt
+    /// fallback is not consumed and cannot suppress unrelated simple reviews.
+    /// Unexpected review IO/codec, SQL,
     /// settings and checked-release failures preserve their causes and refuse.
     /// No supplied freshness, mutation, identity/authority, agent launch,
     /// execution provenance or acceptance follows from this read.

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "historical-mission-recorded-read",
+  "inputs": [
+    "rust/crates/swarm-engine/src/managed_repository.rs",
+    "rust/crates/swarm-engine/src/managed_repository_worker.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "web/cockpit-native.js",
+    "web/cockpit-native-read.js",
+    "web/swarm-workbench.css",
+    "web/i18n-en.js",
+    "tests/historical_mission_read_ui.cjs",
+    "docs/architecture/NATIVE-WORKER-RECOVERY.md",
+    "docs/en/NATIVE-WORKER-RECOVERY.md"
+  ],
+  "environment": {
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_CONFIG_GLOBAL": "/dev/null"
+  },
+  "steps": [
+    {
+      "id": "recorded-history-dom",
+      "command": [
+        "node",
+        "tests/historical_mission_read_ui.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS recorded-history-retains-attempts-reviews-and-safe-text-without-current-validation",
+        "PASS current-status-refusal-remains-visible-and-clears-history"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "retained-default-unit-sdk",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,hashlib\nfrom pathlib import Path\np=Path(os.environ['SWARM_HISTORY_UNIT_BINARY']).resolve()\nprint('UNIT_SDK_SHA256 '+hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)\nfor n in ['managed_repository::tests::historical_root_alias_reads_without_rebinding_or_losing_refusals','local_storage::binding_tests::managed_locks_honor_go_and_rust_without_creating_on_read']:\n subprocess.run([str(p),'--exact',n,'--nocapture'],check=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "UNIT_SDK_SHA256",
+        "test managed_repository::tests::historical_root_alias_reads_without_rebinding_or_losing_refusals ... ok",
+        "test local_storage::binding_tests::managed_locks_honor_go_and_rust_without_creating_on_read ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

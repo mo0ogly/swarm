@@ -76,6 +76,9 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/i18n-en.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/i18n-en.js"))),
         "/i18n.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/i18n.js"))),
         "/swarm-shell.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/swarm-shell.js"))),
+        "/swarm-workbench.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/swarm-workbench.js"))),
+        "/swarm-workbench.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/swarm-workbench.css"))),
+        "/trust-workbench.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/trust-workbench.js"))),
         "/cockpit-native-read.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-read.js"))),
         "/cockpit-native-instructions.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-instructions.js"))),
         "/cockpit-native-panels.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-panels.js"))),
@@ -174,7 +177,9 @@ fn page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
 }
 /// Reopen the canonical product HTML, retaining its existing structure/styles.
 /// Legacy scripts require the full Go snapshot and mutation contracts; select
-/// explicit native adapters instead, never feed them fabricated snapshots.
+/// explicit native adapters and the adopted workbench/lanes presentation instead,
+/// never feed them fabricated snapshots. Security and audit links reuse the
+/// authenticated Trust UI; their query selects presentation, not authority.
 /// Only trusted source tags are parsed. Missing/unterminated tags refuse the
 /// entire page; no filesystem lookup, user HTML or command is involved.
 fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
@@ -187,10 +192,12 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
     if source.matches("</head>").count() != 1 {
         return Err(HttpServiceError::Refused("web-cockpit-template-invalid"));
     }
-    source=source.replacen("</nav>","<a href=\"/trust-actions.html\" data-i18n>Biba — Actions de confiance</a><a href=\"/security-proofs.html\" data-i18n>Sécurité et preuves</a><a href=\"/paea.html\" data-i18n>Vérifications PAEA</a></nav>",1);
+    source=source.replacen("<div class=\"nav-items\"><button data-view=\"logs\">", "<div class=\"nav-items\"><a href=\"/trust-actions.html?view=audit\" data-i18n>Audit et preuves</a><button data-view=\"logs\">",1);
+    source=source.replacen("<button data-view=\"admin\">Administration</button>","<button data-view=\"admin\">Administration</button><a href=\"/trust-actions.html?view=security\" data-i18n>Sécurité</a>",1);
     // Wattson-style "Utilisateurs et accès" view next to Administration
     // (accounts, permissions, access logs from the authority daemon; the
     // entry hides itself outside authority mode).
+    source=source.replacen("<button data-view=\"brainstorm\">Préparer avec l’IA</button>","<a href=\"/prepare.html\" data-i18n>Préparer avec l’IA</a>",1);
     let admin_button = "<button data-view=\"admin\">Administration</button>";
     let admin_section = "<section id=\"admin\" class=\"view\"";
     if source.matches(admin_button).count() != 1 || source.matches(admin_section).count() != 1 {
@@ -198,7 +205,7 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
     }
     source = source.replacen(admin_button, "<button data-view=\"admin\">Administration</button><button data-view=\"authority\">Utilisateurs et accès</button>", 1);
     source = source.replacen(admin_section, "<section id=\"authority\" class=\"view\" hidden aria-labelledby=\"authority-title\"><h2 id=\"authority-title\">Utilisateurs et accès</h2><div id=\"native-authority-admin\" hidden></div></section><section id=\"admin\" class=\"view\"", 1);
-    let scripts = "<link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native-resume.js\" defer></script><script src=\"/cockpit-native-logs.js\" defer></script><script src=\"/cockpit-native-instructions.js\" defer></script><script src=\"/native-runtime/authority-admin.js\" defer></script><script src=\"/cockpit-authority.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
+    let scripts = "<link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><link rel=\"stylesheet\" href=\"/swarm-workbench.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/swarm-workbench.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native-resume.js\" defer></script><script src=\"/cockpit-native-logs.js\" defer></script><script src=\"/cockpit-native-instructions.js\" defer></script><script src=\"/native-runtime/authority-admin.js\" defer></script><script src=\"/cockpit-authority.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
     source = source.replacen("</head>", scripts, 1);
     let tag = "<html lang=\"fr\" data-theme=\"etat\">";
     if source.matches(tag).count() != 1 {

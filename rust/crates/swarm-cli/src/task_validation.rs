@@ -10,6 +10,8 @@ use std::io::{self, Write};
 /// blockers; it grants no acceptance. publish performs the protected initial
 /// publication and acceptance atomically; cumulative accepted baselines refuse.
 /// Control/reviewer previews have no mutation or reviewer invocation grant;
+/// review-refresh archives an original stale managed opinion and clears current
+/// controls for explicit requalification, preserving history and consumption.
 /// review-check validates supplied managed JSONL against fresh held sources and
 /// saved limits, without authenticating its sender, recording a review or exec;
 /// validation-candidate retains a managed Git candidate outside Root locks and
@@ -33,7 +35,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     let action = a.pos[1].as_str();
     if !matches!(
         action,
-        "review-preview" | "review-inputs" | "review-check" | "baseline-preview" | "publication-preview" | "publish"
+        "review-refresh" | "review-preview" | "review-inputs" | "review-check" | "baseline-preview" | "publication-preview" | "publish"
             | "validation-preview"
             | "validation-candidate"
             | "validate"
@@ -56,6 +58,11 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     .map_err(root_error)?;
     let mut known = None;
     let result = (|| {
+        if action == "review-refresh" {
+            let value=store.refresh_task_review(&a.pos[2],&raw).map_err(root_error)?;
+            known=Some((value.work.id.clone(),value.work.revision));
+            return json_bytes(&value).map_err(CliError::Output);
+        }
         if action == "publish" {
             let value = store.publish_managed_candidate(&a.pos[2], &raw).map_err(root_error)?;
             known = Some((value.work.id.clone(),value.work.revision));

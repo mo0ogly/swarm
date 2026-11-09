@@ -1,0 +1,70 @@
+{
+  "recorded_at": "2026-11-08T22:41:50.758976+00:00",
+  "archive": "/media/fpizzi/Lexar/swarm-evidence/x-veille/plan-directeur-20261108.tar.gz",
+  "sha256": "32b1980259045455a0b292093bf5fda042202c5f9708eb244503308481c72a42",
+  "readback_verified": true,
+  "originals_retained": true,
+  "restore_command": "tar -xzf /media/fpizzi/Lexar/swarm-evidence/x-veille/plan-directeur-20261108.tar.gz -C /path/to/empty-restore",
+  "members": [
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/REPRISES-PAR-LOTS.md",
+      "sha256": "1276fbdcc5857cb334e13de8ebd86086cd7fe097e08b55386b98eeefade6984b"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/en/REPRISES-PAR-LOTS.md",
+      "sha256": "147aba06c574638897b7cc249829093fe894824b07afecdd2ea2cf0c773957de"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/RETEX-INDEX.md",
+      "sha256": "fb7f06e9ebc83f0df28b4fc6d7b2a489811fd395355cb4789de8e9a037f6e629"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/en/RETEX-INDEX.md",
+      "sha256": "15cae3eb734972c51a701b628cc980c31dcbb4b92c928f41898ffae3fb97c9ed"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/INDEX-REPRISE.md",
+      "sha256": "86809928d9a89538c74331035dcf0dfa0678e5135c452bb6aee8732c1043c9de"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/FILE-APEX.md",
+      "sha256": "e2f09ff8b08eb15e9929e4e951c3f9776f9543c267b9f6cbc42f49dfaea8eb58"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/en/APEX-QUEUE.md",
+      "sha256": "6a6d95db0ce01a38cdf0b0f108cf95607c938118f29b0065229c74f60a496b15"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/DISCUSSIONS-PLAN-DIRECTEUR.json",
+      "sha256": "c6827e0211ab8cb45e04dda0cecea5aec137d5a17107021faa6936b5290f7594"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/PLAN.md",
+      "sha256": "27f4785e01d97a27983a696d991be09bec6551b4c149aa0371464fbc996c305f"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/AUDIT-REPRISE-M33-ARCHIVE-20261108.md",
+      "sha256": "adcaeffbb1ecd9346d65ccf6402de5ccf6e3199c825560ed0fe67679d6f05295"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/AUDIT-REPRISE-M33-ARCHIVE-20261108.provenance.json",
+      "sha256": "461b7f583c0becca48d03513debc883322a1a506b1b64f255ce63aa820e7f650"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/NUIT.md",
+      "sha256": "73711146aa1817c756e71aac29fbaa38e85d69f27215fdb3bd145b60345fe7b1"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/DISCUSSIONS.json",
+      "sha256": "e1bd9eeb0403c52e9c6c02312e6fae3d673b85dcb6119bbdad0c34e986bfab3e"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/NUIT-QUEUE.json",
+      "sha256": "dcf9aa866722da4433c4d36298f932d060010e4abe23c0bcbd6be35663558a19"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/communication/x-swarm-20261107/SUIVI.md",
+      "sha256": "7c84b1f6cb8523bc644cbab768454758abd573593e597652e2bb0808f6468399"
+    }
+  ]
+}
