@@ -12,7 +12,8 @@
     "rust/crates/swarm-engine/**/*",
     "tools/verification/recipe.py",
     "tools/verification/recipes/paea-owned-source-acquisition.json",
-    "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen/result.json",
+    "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b/result.json",
+    "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b/**/owned-root-*.json",
     "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-current-pub-regen-20261031/result.json"
   ],
   "environment": {

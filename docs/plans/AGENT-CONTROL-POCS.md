@@ -2823,3 +2823,264 @@ Plans FR/EN mis à jour ensemble et changements concurrents conservés. Pas de
 livraison produit/version_history ou contexte embarqué à reconstruire. Le commit
 documentaire de clôture utilisera un index séparé et la branche BF-L0-A existante ;
 main/index principal restent en place, sans PR ni CI compilante.
+
+## BF-L0-B — B-0/B-1 et rédaction B-3 autorisés (9 novembre 2026)
+
+**État courant : B-0/B-1/B-2 établis dans leur portée, B-3 documenté, B-4 établi ; BF-L0-B clôturé dans sa portée déclarative/rétention/spécification R07.
+BF-L0 global reste ouvert.**
+Autorisation explicite de Fabrice transmise depuis le chat A3 : B-0/B-1 et rédaction
+B-3, sans test, build, fournisseur, service, commit/push ni publication. La
+proposition locale `actions-confiance/reprises-veille-x-20261108/03-resultats-inconnus/LOT-BF-L0-B.md`
+et son inventaire daté restent historiques. BF-L0-A conserve sa clôture bornée.
+
+### B-0 — base, chaîne lue et limites
+
+Travail poursuivi dans le checkout canonique utilisé par les incréments A,
+`/home/fpizzi/Documents/ChatGPT/swarm` (également résolu via
+`/home/fpizzi/workspace/swarm`). Le worktree d'accueil
+`/home/fpizzi/.codex/worktrees/pr20-ci-rotation/swarm` est conservé propre et détaché,
+sans réalignement. HEAD de préparation `79b8d854a8e1aab4cc5d6f896b6cdb116918a34a`,
+HEAD du relevé B-0 `fe49bd4e49c4124f6c1c80e1919bb4b41ab2f083` ; main concurrent a avancé pendant la lecture.
+Les 16 empreintes du relevé de préparation concordent au relevé B-0, y compris
+recette, plans et données historiques. Cela n'est pas une photographie atomique
+du checkout ni une qualification du graphe compilateur. Avant édition, comparaison
+des octets pertinents ; ajouts documentaires à la suite des contenus existants,
+index/branche et changements concurrents préservés. Aucune exclusion technique
+entre chats n'est prétendue ; si les octets changent, suspendre l'écriture
+concernée et refaire le rapprochement, sans supprimer de verrou.
+
+S, O et C gardent les chemins définis au diagnostic BF-L0. Lecture statique :
+
+| Liaison / fait effectivement lu | Source et portée |
+| --- | --- |
+| `SWARM_PAEA_SOURCE_FIXTURE=S` → S/result → `result.root` et `work` → `born(S, root)` → `RootStore::open(root, true)` → publication courante | `rust/crates/swarm-engine/tests/paea_git_promote_call.rs:54–107`. Le harnais exige PASS/task_accepted/paid_provider=false ; ces champs ne certifient pas l'état courant. Seul SOURCE est lu par cette chaîne ; WRITER et CURRENT restent configurés sans consommation directe dans ce target. |
+| Résultat historique | S/result SHA-256 `bc58ae6b3492da38697f45d438f116f79c545ad8f0236ad4c5de9ddbea779218` ; annonce work `w-fa7924d3b377d750cc855fc0`, Root `.swarm-fixtures/swarm-model83-u5rvobb_` dans le canonique. Annonce PASS, pas une nouvelle observation native. |
+| Recherche de naissance | Parcours manuel en lecture des répertoires réels de S, sans suivre les symlinks : huit dossiers, zéro symlink, un candidat `native/inspection/workers/planning/setup/owned-root-a418069ad56f41e99ee2c5c8e9e74e9bf0f80545d48a0f714ee60e2baebfe3ff.json`, SHA-256 `4b9e81d0231d6d940b2a78caf03377c246f81f951dbcb0318270ca9bdedbe1a3`. Son champ root égale celui du résultat ; `actor_authenticated=false`, `runtime_permission=false`. `born` ne valide que la correspondance root après lecture JSON, pas l'authenticité de ces autres champs. |
+| Producteurs lus | `tests/rust_agent_model_route.py:68–91` publie le marqueur avant init CLI ; `tests/rust_native_first_publication.py:159` publie le résultat après ses assertions. Sources actuelles seulement : filiation exacte du run historique non nouvellement authentifiée. Le marqueur ne contient pas work ; liaison via résultat et racine, pas un lien work inventé dans la naissance. |
+| Entrée du Root mutable | `owned_with` applique Trust puis lit révision et scope (`paea_git_promote_call.rs:347–365`). `src/root_store/managed_git_current.rs:48–145` relit settings, Work, chaîne, originaux/cohorte et contrôles. Aucun Root/base ouvert ici, aucun état courant ou droit d'écriture validé. |
+
+Inventaire de recherche sous S : `.`, `native`, `native/inspection`,
+`native/inspection/workers`, `native/inspection/workers/report-continuation`,
+`native/inspection/workers/report-continuation/normal`,
+`native/inspection/workers/planning`, `native/inspection/workers/planning/setup`.
+Ne pas confondre cet inventaire documentaire avec la sélection du runner.
+Le parcours Rust peut s'arrêter au premier candidat correspondant, dans un ordre
+non garanti : la déclaration retient donc le périmètre des candidats, pas seulement
+le nom du candidat aujourd'hui observé.
+
+### B-1 — diff effectivement appliqué, rétention non vérifiée
+
+Seul `tools/verification/recipes/paea-owned-git-promote.json` est modifié hors
+plans. Dans `inputs`, remplacer O/result.json par S/result.json, puis ajouter
+`S/**/owned-root-*.json` (chemin S développé dans le manifeste). Conserver C/result
+et toutes les autres entrées dans leur ordre. Aucun changement de steps,
+environment, assertions, features ou compteurs. Le chemin daté reste une donnée
+historique de cette recette, jamais une politique ou un nom imposé à BF-L1 neuf.
+
+Comparaison JSON avant/après : seulement ces deux changements déclaratifs.
+Le résultat et l'unique candidat actuellement recensé sont couverts par l'intention
+du motif ; **aucun appel à snapshot/archive_inputs/run_recipe/verify, aucun
+runner/collecteur importé ou exécuté**. Sélection et rétention B-2 restent non
+vérifiées. Le glob et `born` ne constituent pas le même contrat de parcours :
+`born` ignore les symlinks ; le runner contrôle le confinement des fichiers
+résolus mais ne retient pas l'inventaire des dossiers et liens. B-2 devra comparer
+le catalogue archivé à une énumération fraîche du périmètre et conserver les
+liens/ajouts/retraits, sans croire que les seuls fichiers positifs prouvent
+l'exhaustivité historique. Aucun helper supplémentaire introduit.
+
+### B-3 — contrat R07 spécifié, aucune collecte dynamique réalisée
+
+Contrat pour une **future fixture neuve possédée**, pas une permission d'ouvrir
+l'ancien Root. Séparer I (octets immuables), M0 (état initial), Δ (mutations
+admises et événements réellement observés) et M1 (état final et incertitudes).
+Les points M0/M1 ci-dessous sont des exigences proposées ; leurs moyens de
+collecte et barrières communes ne sont pas qualifiés par cette rédaction.
+
+| Preuve / producteur futur → lecteur | Contenu et barrière exigés / moyen actuel / manque restant |
+| --- | --- |
+| I — producteur résultat et naissance → `project`/`born`, puis lecteur d'acceptation | Conserver résultat, tous candidats, inventaire de recherche, empreintes, liens root/work et provenance du binaire producteur. B-2 peut utiliser les fonctions existantes de `recipe.py:136–173` pour les octets déclarés, pas pour authentifier la naissance ni retenir automatiquement l'inventaire négatif. Copie du Root ou hash du chemin ne recrée pas son identité. |
+| M0-identité — propriétaire de fixture → appel protégé/observateur | Lier résultat et naissance à l'instance projet effectivement connectée et au service frais ; témoins maintenus ouverts pour dossier .swarm et fichier DB connecté, identité dépôt/service et work exact. `RootBinding` (`src/root_store.rs:668–688,757…`) conserve les descripteurs ; `binding_matches` compare les Roots réels avant consommation. Un tuple sérialisé device/inode seul ne retient pas ces témoins. Aucun export sûr de ce lot n'est réalisé ; acquisition/restitution des témoins et reçu de l'observateur restent à qualifier. |
+| M0-état — lecteurs settings/Work/Trust/publication → observateur et décideur | Retenir révisions settings et Work, scope/génération/digest du plan, révision/politique Trust, candidat/événement et chaîne/cohorte/objets réellement lus ; pour le service, association dépôt, OLD et objets importés, intention/journal initiaux. `current_managed_git_publication` offre une observation locale sous snapshot SQL et gardes settings/matériaux, pas une barrière globale durable. `scope` et `current_trust_revision` du harnais sont des lectures séparées. Manque : collecteur qualifié pour le target exact, capture cohérente et sûre de ces données entre projet/service/autorité/Git. |
+| Δ — harnais/projet/service/autorité/Git → observateur indépendant A/B | Déclarer avant chaque phase l'application initiale Trust, préparation du service et import pack sans ref, puis les seules opérations du cas nommé : commit autorisé, rejeu/réconciliation sans nouvelle publication, révocation/réadmission dans le cas dédié ; isoler les Roots entre témoins/variantes. Garder révisions avant/après, action/intention/tentative, OLD→N, accord courant et reçu, événements/refus/fermetures. Le code `call_paea_git_promote` tient writer projet IMMEDIATE + réservation Trust et vérifie les bindings ; Git prepare et OLD protègent la transition visée. Ce ne sont ni un fencing de tous acteurs A/B ni une transaction atomique Git+journal. Instrumentation et observation indépendante requises, non fournies ici. |
+| M1 — observateurs projet/service/Git et fermeture → décideur | Relire sous barrières identifiées révisions/scope/publication, ref/objets, intention et journal/reçu ; comparer aux seuls deltas autorisés, conserver original timeout/erreurs primaires et cleanup/close, libération des témoins et état connu/inconnu. Le harnais a assertions nommées et close explicites ; `effect::commit` observe ref après protocole puis enregistre (`src/root_store/paea_git_promote_call.rs:1030–1072`). Pas de collecteur M0/Δ/M1 transversal qualifié, ni de preuve d'attribution ou de non-effet acquise. |
+
+Ordre futur exigé : I et identité fraîche → M0 avant toute mutation du cas → Δ
+avec contrôles d'autorité au dernier usage → M1 sous barrières adaptées, puis
+fermetures vérifiées. Pour une capture après setup, nommer ce point explicitement
+et conserver aussi le delta de setup ; ne pas déplacer silencieusement M0 après
+un effet. M0/M1 doivent préciser portée et instant de chaque barrière ; aucun
+snapshot live de SQLite ni hash de DB mutable utilisé comme oracle d'absence
+d'effet. Aucun contenu sensible, token ou matériau d'autorité sérialisé dans
+les projections ; garder les causes utiles sans secrets. Si une capture sûre
+manque, refuser la qualification, conserver l'inconnu et proposer un lot séparé
+avant tout nouveau collecteur ou harnais.
+
+Règle d'acceptation future : attribution exige un événement reliant acteur,
+tentative/intention et transition observée ; ref=N seule n'attribue pas A plutôt
+que B. Absence d'effet exige observer toute la fenêtre pertinente et établir que
+l'ancienne tentative ne peut plus agir. Une réponse perdue, un Err, un journal
+vide ou `ReconciledNotCommitted` ne suffisent pas. Les commentaires de récupération
+`already` ne prouvent ni atteinte du callback ni attribution. Réconciliation en
+lecture et réexécution restent des décisions distinctes ; aucun retry implicite,
+aucune capacité financière déduite des booléens de fixture.
+
+### Revue des octets, suite et transmission
+
+Revue politiques : deux chemins d'inputs historiques, pas de nouveau choix
+opérateur, délai, retry, fallback ou borne. Documentation des fonctions : aucune
+fonction créée/modifiée, aucun moteur/harnais changé ; pas de compilation de doc.
+Erreurs : aucun chemin produit modifié. Le runner existant refuse motif vide,
+évasion et dérive des inputs ; ces propriétés sont lues dans le code, pas
+revérifiées dans B. Les exceptions JSON/IO et arrêt anticipé de `born` restent
+à prendre en compte par l'inventaire ; aucun échec converti en succès.
+
+Empreintes et préimages locales : `.cache/bf-l0-b-20261109T061711Z/baseline.json` et `before-0…2` ; ce relevé
+ne remplace pas B-2. Source recette avant `7ee5855ce0ef3b1c74836a0968e2da3031db882d8954e7dfe2e1b79a3db3e656`, après `61fd3db892141e38c49e6ac843990ed9fda3831d4b15a095f0a168893afd3c99`.
+Revue finale : comparaison des seuls ajouts et du diff déclaratif, concordance
+FR/EN et `git diff --check` ; aucun test. Relevé non atomique des autres travaux,
+conservés sans stage, stash, reset, changement de branche ou écrasement d'index.
+Les diagnostics de lecture `.git` comme fichier (c'est un dossier ici) et d'un
+chemin RootBinding supposé absent ont été résolus par recherche des définitions
+réelles dans `src/root_store.rs`, sans action produit ni répétition inchangée.
+
+Propriétaire : chantier historique Mikhail/Codex ; Fabrice décide l'autorisation
+B-2. Condition de reprise : nouvelle lecture des sources/entrées, énumération de
+naissance fraîche, puis sélection/archive seule dans une sortie neuve avec les
+fonctions existantes, sans steps Cargo ; relire tous membres/empreintes et
+conserver séparément inventaire et paquet d'inputs. Tout nouveau helper demande
+un périmètre distinct. B-4 exige B-2 et sa revue : aucune clôture B ici. R01/R02
+restent ouverts sur les autres recettes ; R07 seulement spécifié, R03/R04/R06/R08
+et BF-L1…L5/BF-P3/03-B/03-F demeurent ouverts. Aucun changement produit livré,
+version_history, installation, contexte embarqué ou publication à annoncer.
+
+
+### BF-L0-B — B-2 sélection et rétention établies (9 novembre 2026)
+
+Autorisation explicite de Fabrice transmise depuis A3 : sélection/archive et
+relecture, sans test, build, fournisseur ou service. Elle remplace le report de
+B-2 pour cette étape seulement ; les mentions de report ci-dessus sont historiques.
+**B-2 établi dans la portée du paquet d'inputs ; B-4 non réalisé et BF-L0-B ouvert.**
+
+Replan : checkout canonique inchangé, HEAD `fe49bd4e49c4124f6c1c80e1919bb4b41ab2f083`, main sale avec travaux
+concurrents. Worktree d'accueil conservé propre/détaché. Recette promotion
+SHA-256 `61fd3db892141e38c49e6ac843990ed9fda3831d4b15a095f0a168893afd3c99`,
+identique à B-1 ; runner lu et conservé, SHA-256
+`348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b`.
+Le relevé HEAD/diff et les octets de travail ne qualifient aucun binaire natif.
+
+| Contrôle effectivement réalisé | Résultat et portée |
+| --- | --- |
+| Énumération SOURCE avant/après, dossiers réels et candidats, sans suivre les liens | Huit dossiers, un candidat owned-root, zéro symlink ; mêmes listes et mêmes empreintes avant/après. Même résultat, naissance et lien root qu'en B-0. Les inventaires séparés `birth-search.before.json`/`birth-search.after.json` retiennent les dossiers et liens, dont l'absence à ces deux observations ; pas d'exhaustivité historique de toute la fenêtre. |
+| Rapprochement born/glob | Le catalogue de fichiers du motif `S/**/owned-root-*.json` correspond exactement à l'unique candidat du parcours sans symlink à ces observations. Lecture JSON root correspondante. Aucun appel au Rust born : son ordre/arrêt anticipé et la différence de traitement des symlinks restent ceux du code lu ; pas de preuve d'équivalence générale. |
+| Fonctions existantes, import Python sans invocation CLI | `load_recipe`, puis `snapshot` avant, `archive_inputs`, `snapshot` après et final. Trois inventaires égaux : **739 fichiers**, recette comprise. Le résultat SOURCE et le candidat de naissance sont chacun présents avec les empreintes B-0. Aucun run_recipe/verify/step/collecteur ni import du helper de fixtures. |
+| Archive relue sans extraction | **739 membres réguliers uniques**, catalogue égal à la sélection ; chaque contenu et SHA-256 concorde avec l'inventaire et les octets source relus. Archive `declared-inputs.tar.gz`, 2 385 198 octets ; SHA-256 `43300907ad5414bc1da3534c6341dffd71e9e2f68701a5f0d951eeaf5e7257e1`. Recette et runner inchangés pendant l'opération. |
+
+Preuves locales : `.cache/bf-l0-b-b2-20261109T064002Z/`, notamment `summary.json`, les trois inventaires
+`inputs.before/after/final.json`, `archive-members.json`, méthode et sources de
+méthode conservées, recette/diff et préimages documentaires. Copie conservée et
+relue sur `/media/fpizzi/Lexar/swarm-evidence/bf-l0-b-b2-20261109T064002Z/` ; montage réel Lexar `/dev/sda1`, vfat rw, place disponible
+contrôlée avant copie. `location-index.json` local et sur clé donne les fichiers,
+empreintes, portée et restauration dans un dossier neuf ; ne pas restaurer sur
+les sources actives. Pas de suppression des originaux. Le staging Unix local est
+utilisé car la publication du runner utilise des hardlinks, non disponibles sur
+vfat. La copie USB est relue fichier par fichier, archive entière comprise.
+
+Le paquet n'est **pas un run complet** : aucun result.json de run fabriqué,
+aucun appel verify sur ce paquet, aucune assertion de recette exécutée, aucun
+nouveau témoin/injection ou test. Aucun refus ni dérive observé dans cette
+opération ; cela ne prouve pas les chemins de refus. Aucun Root historique ouvert,
+aucune capture M0/Δ/M1. Rétention déclarée seulement : dépendances transitives,
+features, environnement effectif, outils et binaire livré restent hors preuve.
+
+Revue de l'incrément : seuls les plans FR/EN changent, avec état courant et
+résultat B-2 ; comparaison des octets avant écriture et conservation des ajouts
+concurrents. Recette, runner, moteur, harnais et fichiers A3 inchangés par B-2.
+Aucune politique/délai/borne/retry/fallback, fonction/docstring ou issue d'erreur
+produit modifiée ; la méthode existante est réutilisée. Diff final et espaces
+contrôlés, sans compilation/documentation compilée ni release note produit.
+
+Suite réservée à une autorisation distincte de Fabrice : **B-4**, rapprocher les
+sources finales, le diff B-1, ce paquet et les preuves de recherche, puis revue
+FR/EN et politiques/fonctions/erreurs ; décider la clôture bornée seulement si
+les critères sont établis. B-2 ne réalise pas B-4 et ne clôt ni BF-L0-B ni BF-L0.
+R07 reste spécifié sans collecte dynamique ; aucune qualification native,
+BF-L1/BF-P3, attribution 03-B/03-F, installation, commit/push ou publication.
+
+
+### BF-L0-B — B-4 établi et clôture bornée (9 novembre 2026)
+
+**B-4 établi ; BF-L0-B clôturé dans sa portée : déclaration des preuves immuables
+corrigée pour la seule promotion, sélection/rétention vérifiée, contrat R07
+I/M0/Δ/M1 documenté. BF-L0 global reste ouvert.** Les mentions antérieures de
+B-2 différé ou B-4 non réalisé conservent l'état historique de leurs incréments.
+
+Autorisation Fabrice : vérifier B-0 à B-3 et décider cette clôture si les critères
+sont établis, sans test, compilation, fournisseur ou service. Replan : même
+checkout canonique, main sale, HEAD du relevé `477c26060e9c86fa8907136b5b5a72cf0a372720` ; aucune normalisation du
+worktree d'accueil ni opération Git de mutation. La progression concurrente du
+HEAD ne vaut ni dérive des consommateurs ni qualification d'un binaire.
+
+| Critère relu | Preuve effectivement rapprochée / décision bornée |
+| --- | --- |
+| B-0 — base/consommation | Préimages et inventaire du relevé 061711Z, recette courante, `project/born` et `owned_with` relus : SOURCE→résultat→naissance→Root/work. Aucun consommateur recensé B-0 n'a changé d'empreinte. Recherche manuelle actuelle : huit dossiers, un candidat, zéro symlink, mêmes octets et mêmes liens documentaires que B-2. Établi statiquement ; aucun Root ouvert. |
+| B-1 — seul diff inputs | Avant `7ee5855ce0ef3b1c74836a0968e2da3031db882d8954e7dfe2e1b79a3db3e656`, après/courant `61fd3db892141e38c49e6ac843990ed9fda3831d4b15a095f0a168893afd3c99`. Comparaison JSON : seulement O/result→S/result et ajout S/**/owned-root-*.json, anciens extras et ordre conservés, tous champs hors inputs égaux. Recette courante égale aux octets B-1 et B-2. Établi pour cette seule recette. |
+| B-2 — rétention | Les 20 fichiers indexés B-2 concordent entre USB, local et empreintes ; les neuf fichiers indexés B-0/B-1/B-3 aussi. Trois inventaires B-2 égaux ; archive SHA-256 `43300907ad5414bc1da3534c6341dffd71e9e2f68701a5f0d951eeaf5e7257e1` relue : 739 membres réguliers uniques, noms sûrs, catalogue/tailles/octets/empreintes concordants. Tous les fichiers courants correspondent aux 739 empreintes ; expansion manuelle des motifs actuelle : ni ajout ni retrait. Résultat et naissance explicitement inclus. Établi comme paquet d'octets déclarés, sans refaire B-2. |
+| B-3 — contrat R07 | Tables FR/EN I, M0-identité, M0-état, Δ et M1 relues avec `RootBinding::matches/close`, lecteur de publication, writer/réservation Trust, observation ref puis record. Producteurs, lecteurs, barrières, fermetures, contenu sûr et manques de collecte sont distingués. Établi comme spécification ; aucune collecte M0/Δ/M1 ni garantie causale acquise. |
+| B-4 — documentation/revue | Chaîne préimage B-0 + ajout B-1/B-3 = préimage B-2 vérifiée pour FR et EN ; documents au début de B-4 égaux aux empreintes finales B-2. Résultats et limites cohérents entre langues. Revue ci-dessous liée aux sources et préimages retenues ; clôture documentaire locale, sans acceptation moteur ni nouvelle revue indépendante. |
+
+Revue des trois axes : **politiques**, seuls deux chemins historiques changent
+au manifeste B-1, données de fixture sans choix opérateur, délai, retry, fallback,
+borne ou feature nouveau ; aucune politique modifiée en B-2/B-4. **Fonctions et
+documentation**, aucune fonction/docstring créée ou modifiée ; le contrat des
+lecteurs relus correspond à la portée documentée, sans compilation de doc.
+**Erreurs**, aucun chemin produit modifié ; motif vide/évasion/dérive et erreurs
+JSON/IO/close restent ceux des sources lues. Aucun refus ni reprise fautive
+nouvellement exercé : les preuves ne sont pas reclassées en tests de refus.
+
+Cette revue lit seulement les preuves existantes et des fichiers courants :
+aucun import/appel runner, snapshot, archive_inputs, run_recipe ou verify en B-4,
+aucun code archivé exécuté. Le paquet B-2 n'est pas présenté comme un run ; les
+revues A3 existantes sont des corroborations, pas des preuves de runtime ni une
+acceptation moteur. Comparaisons non atomiques, bornées aux octets et inventaires
+nommés ; pas de garantie sur tout processus externe ou toute l'histoire des liens.
+
+Index d'audit, préimages, empreintes des sources et catalogue relu : `.cache/bf-l0-b-b4-20261109T084046Z/`.
+Copie sur Lexar vérifiée après contrôle du montage réel et de la capacité :
+`/media/fpizzi/Lexar/swarm-evidence/bf-l0-b-b4-20261109T084046Z/`. `location-index.json` local/USB conserve portée, empreintes et restauration
+dans un dossier neuf, sans écraser les sources. Originaux B-0/B-2 conservés.
+Seuls les plans FR/EN changent en B-4, par statut courant et ajout de cette revue ;
+comparaison avant remplacement, diff final/espaces vérifiés. Travaux concurrents
+préservés, sans stage/reset/stash, changement de branche, commit ou push. Aucune
+livraison produit, version_history, installation ou contexte embarqué modifié.
+
+Restent ouverts : BF-L0 global ; R01/R02 dans les autres recettes ; R03/R04
+complets, R06/R08 et autres obligations applicables ; réalisation/qualification
+de la capture dynamique R07 ; BF-L1…L5/BF-P3 et 03-B/03-F. Ni absence d'effet,
+ni attribution A/B, ni fencing d'une ancienne tentative ne sont acquis par cette
+clôture. Aucune capacité financière déduite des marqueurs historiques.
+
+Suite recommandée au propriétaire historique Codex, sous périmètre futur décidé
+par Fabrice : cadrer les réglages effectifs R03/R04 et le profil/graphe/outils
+R06/R08 du target exact avant tout banc natif ; définir ensuite le lot du
+collecteur R07 manquant et ses barrières, puis fixture neuve possédée et témoins
+valides. Aucun développement ou contrôle supplémentaire lancé ici.
+Leçon réutilisable conservée : relier preuve de consommation, déclaration,
+rétention d'octets et identité mutable par des critères distincts ; ne pas
+transformer une clôture déclarative en preuve d'effet. Transmission persistante
+dans les plans FR/EN, sans présumer sa réception par les contextes déjà démarrés.
+
+
+### BF-L0-B — publication Git bornée (9 novembre 2026)
+
+Autorisation Fabrice : commit/push sans test, compilation, fournisseur ou service.
+Le commit est préparé depuis `fa6a530df03126edd235e44cd4c46525e726fe9d`
+(branche BF-L0-A déjà publiée), avec seulement le manifeste promotion et les
+sections BF-L0-B FR/EN. Les commits locaux de main et les autres modifications
+des plans ne sont pas embarqués ; checkout et index principal restent en place.
+La proposition et les revues A3 citées restent des références locales, hors commit.
+Les sources du paquet B-2 restent liées à son inventaire et au relevé historique
+`fe49bd4e49c4124f6c1c80e1919bb4b41ab2f083` : cette branche n'est pas un profil
+natif qualifié. Push de branche seulement, sans PR ni intégration main ; aucun
+contrôle CI compilant déclenché par le workflow push configuré sur main.
+La revue du candidat compare son arbre au parent explicite BF-L0-A, pas au HEAD
+concurrent de main ; les différences avec main ne sont pas des suppressions livrées.

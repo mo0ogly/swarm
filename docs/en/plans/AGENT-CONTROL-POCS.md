@@ -2428,3 +2428,251 @@ changes; only evidence-backed scope conclusion changes. FR/EN plans updated
 together, concurrent work preserved. No product delivery/version_history or
 embedded-context rebuild. Closure docs commit uses a separate index and existing
 BF-L0-A branch; primary main/index remain in place, with no PR or compilation CI.
+
+## BF-L0-B — authorized B-0/B-1 and B-3 drafting (9 November 2026)
+
+**Current status: B-0/B-1/B-2 established within scope, B-3 documented, B-4 established; BF-L0-B closed within its declaration/retention/R07 specification scope.
+Overall BF-L0 remains open.**
+Fabrice's explicit authorization relayed from A3 covers B-0/B-1 and B-3 drafting,
+without tests, builds, providers, services, commit/push or publication. The
+local proposal `docs/plans/actions-confiance/reprises-veille-x-20261108/03-resultats-inconnus/LOT-BF-L0-B.md`
+and dated inventory remain historical. BF-L0-A retains its bounded closure.
+
+### B-0 — baseline, inspected chain and limits
+
+Work continues in the canonical checkout used for increments A,
+`/home/fpizzi/Documents/ChatGPT/swarm`, also resolved through
+`/home/fpizzi/workspace/swarm`. The welcoming worktree
+`/home/fpizzi/.codex/worktrees/pr20-ci-rotation/swarm` remains clean and detached,
+without realignment. Preparation HEAD `79b8d854a8e1aab4cc5d6f896b6cdb116918a34a`;
+B-0 reading HEAD `fe49bd4e49c4124f6c1c80e1919bb4b41ab2f083`; concurrent main advanced during inspection.
+All 16 preparation hashes match at B-0, including recipe, plans and historical
+data. This is neither an atomic checkout snapshot nor compiler-graph
+qualification. Relevant bytes are compared before editing; documentation is
+appended to existing content, preserving index/branch and concurrent changes.
+No technical exclusion between chats is claimed: changed bytes require stopping
+the affected write and refreshing inspection, never deleting a lock.
+
+S, O and C retain the paths defined in the BF-L0 diagnosis. Static inspection:
+
+| Link / fact actually read | Source and scope |
+| --- | --- |
+| `SWARM_PAEA_SOURCE_FIXTURE=S` → S/result → result.root and work → born(S, root) → RootStore::open(root, true) → current publication | `rust/crates/swarm-engine/tests/paea_git_promote_call.rs:54–107`. Harness requires PASS/task_accepted/paid_provider=false; these fields do not certify current state. Only SOURCE is read by this chain; WRITER and CURRENT remain configured without direct consumption in this target. |
+| Historical result | S/result SHA-256 `bc58ae6b3492da38697f45d438f116f79c545ad8f0236ad4c5de9ddbea779218`; reports work `w-fa7924d3b377d750cc855fc0`, canonical Root `.swarm-fixtures/swarm-model83-u5rvobb_`. Reports PASS, no new native observation. |
+| Birth search | Manual read-only traversal of S real directories, no symlink following: eight directories, zero symlinks, one candidate `native/inspection/workers/planning/setup/owned-root-a418069ad56f41e99ee2c5c8e9e74e9bf0f80545d48a0f714ee60e2baebfe3ff.json`, SHA-256 `4b9e81d0231d6d940b2a78caf03377c246f81f951dbcb0318270ca9bdedbe1a3`. Its root matches result.root; actor_authenticated=false, runtime_permission=false. born checks the root match after JSON parsing, not authenticity of these other fields. |
+| Inspected producers | `tests/rust_agent_model_route.py:68–91` publishes birth before CLI init; `tests/rust_native_first_publication.py:159` publishes result after assertions. Current source only: exact historical run lineage not newly authenticated. Birth has no work field: linkage uses result and root, no invented work link in birth. |
+| Mutable Root entry | owned_with applies Trust then reads revision and scope (`paea_git_promote_call.rs:347–365`). `src/root_store/managed_git_current.rs:48–145` reads settings, Work, chain, originals/cohort and controls. No Root/database opened here; no current state or write permission validated. |
+
+Search inventory beneath S: `.`, `native`, `native/inspection`,
+`native/inspection/workers`, `native/inspection/workers/report-continuation`,
+`native/inspection/workers/report-continuation/normal`,
+`native/inspection/workers/planning`, `native/inspection/workers/planning/setup`.
+This documentary inventory is not runner selection. Rust traversal can stop at
+the first matching candidate in unspecified order: declaration therefore covers
+the candidate scope rather than only today's observed filename.
+
+### B-1 — applied diff, retention unverified
+
+Only `tools/verification/recipes/paea-owned-git-promote.json` changes outside the
+plans. In inputs, replace O/result.json with S/result.json, then add
+`S/**/owned-root-*.json` (S expanded in the manifest). Keep C/result and all other
+entries in order. No steps, environment, assertions, features or counters change.
+The dated path is historical recipe data, never a policy or required fresh BF-L1
+name.
+
+Before/after JSON comparison establishes only these two declarative changes.
+The result and sole currently inventoried candidate fall within the intended
+pattern; **no snapshot/archive_inputs/run_recipe/verify calls and no runner or
+collector imports/execution**. B-2 selection and retention remain unverified.
+The glob and born have different traversal contracts: born ignores symlinks;
+the runner checks resolved-file containment but does not retain directory/link
+inventory. B-2 must compare archived catalog against fresh scope enumeration,
+retaining links/additions/removals; positive files alone cannot prove historical
+completeness. No additional helper introduced.
+
+### B-3 — specified R07 contract, no dynamic collection performed
+
+Contract for a **future freshly owned fixture**, not permission to open the old
+Root. Separate I (immutable bytes), M0 (initial state), Δ (admitted mutations and
+observed events) and M1 (final state and uncertainty). The M0/M1 points below are
+proposed requirements; collection and shared barriers are not qualified by this
+document.
+
+| Evidence / future producer → reader | Required content and barrier / current mechanism / remaining gap |
+| --- | --- |
+| I — result/birth producer → project/born, then acceptance reader | Retain result, all candidates, search inventory, hashes, root/work links and producer binary provenance. B-2 may use existing recipe.py:136–173 functions for declared bytes, not birth authentication or automatic negative inventory. Copying a Root or hashing its path does not recreate physical identity. |
+| M0-identity — fixture owner → protected call/observer | Bind result/birth to the actual connected project instance and fresh service; retain open witnesses for .swarm directory and connected DB, repository/service identity and exact work. RootBinding (`src/root_store.rs:668–688,757…`) retains descriptors; binding_matches compares real Roots before consumption. A serialized device/inode tuple alone retains no witnesses. No safe export performed here; witness acquisition/release and observer receipt remain to qualify. |
+| M0-state — settings/Work/Trust/publication readers → observer/decision maker | Retain settings and Work revisions, plan scope/generation/digest, Trust revision/policy, actual candidate/event, chain/cohort/objects read; service repository association, OLD, imported objects and initial intent/journal. current_managed_git_publication provides a traversal-local SQL snapshot with settings/material guards, not a durable global barrier. Harness scope and current_trust_revision are separate reads. Missing: target-specific qualified collector and coherent safe capture across project/service/authority/Git. |
+| Δ — harness/project/service/authority/Git → independent A/B observer | Predetermine initial Trust application, service setup and pack import without ref, then only named-case operations: authorized commit, replay/reconcile without new publication, revocation/readmission for its dedicated case; isolate Roots between controls/variants. Retain before/after revisions, action/intent/attempt, OLD→N, current agreement/receipt, events/refusals/closes. call_paea_git_promote holds project IMMEDIATE writer + Trust reservation and checks bindings; Git prepare and OLD guard the intended transition. These are neither fencing of every A/B actor nor an atomic Git+journal transaction. Instrumentation and independent observation are required, not supplied here. |
+| M1 — project/service/Git observers and close → decision maker | Under identified barriers reread revisions/scope/publication, ref/objects, intent/journal/receipt; compare only admitted deltas, preserve original timeout/primary errors and cleanup/close, witness release and known/unknown state. Harness has named assertions and explicit closes; effect::commit observes ref after protocol then records (`src/root_store/paea_git_promote_call.rs:1030–1072`). No qualified cross-store M0/Δ/M1 collector, attribution or absence-of-effect evidence acquired. |
+
+Required future order: I and fresh identity → M0 before any case mutation → Δ
+with last-use authority checks → M1 under appropriate barriers, then checked
+closes. A post-setup capture must be explicitly named and retain setup delta;
+never silently move M0 after an effect. M0/M1 name each barrier's scope/time;
+no live SQLite snapshot or mutable DB hash used as an absence-of-effect oracle.
+Projections contain no secrets, tokens or serialized authority material; preserve
+useful causes without secrets. Missing safe capture blocks qualification: retain
+unknown state and propose a separate lot before adding a collector or harness.
+
+Future acceptance: attribution requires an event linking actor, attempt/intent
+and observed transition; ref=N alone does not attribute A rather than B. Absence
+of effect requires observing the relevant whole window and proving the previous
+attempt can no longer act. Lost response, Err, empty journal or
+ReconciledNotCommitted are insufficient. Recovery comments around already prove
+neither callback reachability nor attribution. Read-only reconciliation and
+reexecution remain distinct decisions; no implicit retry or financial capability
+inferred from fixture booleans.
+
+### Byte review, follow-up and transmission
+
+Policy review: two historical input paths, no new operator choice, timeout,
+retry, fallback or bound. Function documentation: no function created/modified,
+no engine/harness change; no documentation compilation. Errors: no product error
+path changed. Existing runner rejects empty patterns, escapes and input drift;
+these properties were read in source, not reverified in B. born JSON/IO exceptions
+and early stop remain inventory concerns; no failure converted to success.
+
+Local hashes/preimages: `.cache/bf-l0-b-20261109T061711Z/baseline.json` and before-0…2; this reading does not
+replace B-2. Recipe before `7ee5855ce0ef3b1c74836a0968e2da3031db882d8954e7dfe2e1b79a3db3e656`, after `61fd3db892141e38c49e6ac843990ed9fda3831d4b15a095f0a168893afd3c99`.
+Final review: only added documentation/declarative diff, FR/EN consistency and
+git diff --check; no tests. Non-atomic reading of other work, preserved without
+stage/stash/reset/branch change/index overwrite. Reading .git as a file (a
+directory here) and a guessed missing RootBinding path were resolved by finding
+actual definitions in src/root_store.rs; no product action or unchanged retry.
+
+Owner: historical Mikhail/Codex work; Fabrice authorizes B-2. Resumption requires
+fresh source/input reading and birth enumeration, then selection/archive only
+into a new output with existing functions and no Cargo steps; reread every
+member/hash and retain inventory separately from the input package. Any new
+helper needs separate scope. B-4 requires B-2 and its review: no B closure here.
+R01/R02 remain open for other recipes; R07 specified only; R03/R04/R06/R08 and
+BF-L1…L5/BF-P3/03-B/03-F remain open. No delivered product change,
+version_history, installation, embedded context or publication to announce.
+
+
+### BF-L0-B — B-2 selection and retention established (9 November 2026)
+
+Fabrice's explicit authorization relayed from A3 covers selection/archive and
+reinspection without tests, builds, providers or services. It supersedes B-2
+deferral for this step only; earlier deferral statements are historical.
+**B-2 established within the input-package scope; B-4 not performed, BF-L0-B open.**
+
+Replan: same canonical checkout, HEAD `fe49bd4e49c4124f6c1c80e1919bb4b41ab2f083`, dirty main with concurrent work.
+Welcoming worktree remains clean/detached. Promotion recipe SHA-256
+`61fd3db892141e38c49e6ac843990ed9fda3831d4b15a095f0a168893afd3c99`, unchanged
+from B-1; runner inspected and retained, SHA-256
+`348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b`.
+HEAD/diff and working bytes qualify no native binary.
+
+| Check actually performed | Result and scope |
+| --- | --- |
+| SOURCE enumeration before/after: real directories and candidates, no symlink following | Eight directories, one owned-root candidate, zero symlinks; identical lists/hashes before/after. Same result, birth and root link as B-0. Separate birth-search.before.json/birth-search.after.json retain directories/links, including their absence at those observations; no historical completeness across the whole window. |
+| born/glob reconciliation | File catalog of S/**/owned-root-*.json exactly matches the sole candidate from non-symlink traversal at these observations. Parsed JSON root matches. No Rust born invocation: traversal order/early stop and symlink differences remain as read in source; no general equivalence established. |
+| Existing functions, Python import without CLI invocation | load_recipe, then snapshot before, archive_inputs, snapshot after and final. Three equal inventories: **739 files**, including recipe. SOURCE result and birth candidate each included with B-0 hashes. No run_recipe/verify/step/collector or fixture-helper import. |
+| Archive reread without extraction | **739 unique regular members**, catalog equal to selection; every content/hash matches inventory and reread source bytes. declared-inputs.tar.gz, 2,385,198 bytes; SHA-256 `43300907ad5414bc1da3534c6341dffd71e9e2f68701a5f0d951eeaf5e7257e1`. Recipe and runner unchanged during the operation. |
+
+Local evidence: `.cache/bf-l0-b-b2-20261109T064002Z/`, including summary.json, three inventories
+inputs.before/after/final.json, archive-members.json, retained method and method
+source, recipe/diff and documentary preimages. Preserved/reread copy at
+`/media/fpizzi/Lexar/swarm-evidence/bf-l0-b-b2-20261109T064002Z/`; actual Lexar mount /dev/sda1, vfat rw, available capacity checked before
+copy. Local and USB location-index.json record files, hashes, scope and restoration
+into a fresh directory, never over active sources. Originals retained. Local
+Unix staging is used because runner publication relies on hardlinks unavailable
+on vfat. USB copy reread file by file, including the complete archive.
+
+The package is **not a complete run**: no fabricated run result.json, no verify
+call against this package, no recipe assertions executed, no new control/injection
+or test. No refusal/drift observed in this operation; refusal paths remain
+unproven here. No historical Root opened, no M0/Δ/M1 capture. Declared retention
+only: transitive dependencies, effective features/environment, tools and delivered
+binary remain outside this evidence.
+
+Increment review: only FR/EN plans change, with current status and B-2 outcome;
+compare bytes before writing and preserve concurrent additions. Recipe, runner,
+engine, harness and A3 files unchanged by B-2. No product policy/deadline/bound,
+retry/fallback, function/docstring or error path change; existing method reused.
+Final diff/whitespace inspected, no compilation/compiled documentation or product
+release note.
+
+Next step requires separate Fabrice authorization: **B-4**, reconcile final
+sources, B-1 diff, this package and search evidence, then review FR/EN and
+policies/functions/errors; decide bounded closure only if criteria are established.
+B-2 does not perform B-4 or close BF-L0-B/overall BF-L0. R07 remains specified
+without dynamic collection; no native qualification, BF-L1/BF-P3, 03-B/03-F
+attribution, installation, commit/push or publication.
+
+
+### BF-L0-B — B-4 established and bounded closure (9 November 2026)
+
+**B-4 established; BF-L0-B closed within scope: immutable-proof declarations
+corrected for promotion only, selection/retention verified, R07 I/M0/Δ/M1
+contract documented. Overall BF-L0 remains open.** Earlier B-2 deferral and
+B-4-not-performed statements retain each increment's historical state.
+
+Fabrice authorizes B-0 through B-3 verification and closure if criteria are
+established, without tests, compilation, providers or services. Replan: same
+canonical checkout, dirty main, reading HEAD `477c26060e9c86fa8907136b5b5a72cf0a372720`; no welcoming-worktree
+normalization or mutating Git operations. Concurrent HEAD advancement proves
+neither consumer drift nor binary qualification.
+
+| Reviewed criterion | Actually reconciled evidence / bounded decision |
+| --- | --- |
+| B-0 — baseline/consumption | 061711Z preimages/inventory, current recipe, reread project/born and owned_with: SOURCE→result→birth→Root/work. No inventoried B-0 consumer hash changed. Current manual search: eight directories, one candidate, zero symlinks, same bytes/documentary links as B-2. Statically established; no Root opened. |
+| B-1 — inputs-only diff | Before `7ee5855ce0ef3b1c74836a0968e2da3031db882d8954e7dfe2e1b79a3db3e656`, after/current `61fd3db892141e38c49e6ac843990ed9fda3831d4b15a095f0a168893afd3c99`. JSON comparison: only O/result→S/result and S/**/owned-root-*.json addition; previous extras/order preserved, all non-input fields equal. Current recipe equals B-1/B-2 bytes. Established for this recipe only. |
+| B-2 — retention | All 20 indexed B-2 files match USB/local copies/hashes, as do nine B-0/B-1/B-3 files. Three equal B-2 inventories; archive SHA-256 `43300907ad5414bc1da3534c6341dffd71e9e2f68701a5f0d951eeaf5e7257e1` reread: 739 unique regular members, safe names, matching catalog/sizes/bytes/hashes. Current files match all 739 hashes; manual current pattern expansion has no added/removed paths. Result/birth explicitly included. Established as declared-byte package, without repeating B-2. |
+| B-3 — R07 contract | FR/EN I, M0-identity, M0-state, Δ and M1 tables reread alongside RootBinding::matches/close, publication reader, writer/Trust reservation, ref observation then record. Producers/readers/barriers/closes/safe content and collection gaps distinguished. Established as specification; no M0/Δ/M1 collection or causal guarantee acquired. |
+| B-4 — documentation/review | B-0 preimage + B-1/B-3 addition = B-2 preimage verified in both languages; documents at B-4 start match final B-2 hashes. Outcomes/limits consistent across languages. Review below bound to retained sources/preimages; local documentary closure, no engine acceptance or new independent review. |
+
+Three-axis review: **policies**, only two historical paths change in B-1,
+fixture data without new operator choice, deadline, retry, fallback, bound or
+feature; no policy change in B-2/B-4. **Functions/documentation**, no function or
+docstring created/modified; reread reader contracts match documented scope,
+without documentation compilation. **Errors**, no product error path modified;
+empty-pattern/escape/drift and JSON/IO/close errors remain as read in sources.
+No new refusal/fault-recovery execution: evidence is not recast as refusal tests.
+
+This review only reads existing evidence/current files: no runner import/call,
+snapshot, archive_inputs, run_recipe or verify in B-4; no archived code executed.
+B-2 package is not a run; existing A3 reviews corroborate evidence, not runtime or
+engine acceptance. Comparisons are non-atomic and limited to named bytes and
+inventories; no guarantee over every external process or historical link state.
+
+Audit index, preimages, source hashes and reread catalog: `.cache/bf-l0-b-b4-20261109T084046Z/`.
+Lexar copy verified after actual-mount/capacity checks: `/media/fpizzi/Lexar/swarm-evidence/bf-l0-b-b4-20261109T084046Z/`.
+Local/USB location-index.json retains scope, hashes and restoration into a fresh
+directory, never over active sources. B-0/B-2 originals retained. B-4 changes
+only current status and this review in FR/EN plans; compare before replacement,
+inspect final diff/whitespace. Concurrent work preserved without staging,
+reset/stash, branch change, commit or push. No product delivery, version_history,
+installation or embedded context change.
+
+Still open: overall BF-L0; R01/R02 in other recipes; full R03/R04, R06/R08 and
+other applicable obligations; dynamic R07 capture implementation/qualification;
+BF-L1…L5/BF-P3 and 03-B/03-F. This closure proves neither absence of effect,
+A/B attribution nor fencing of a previous attempt. No financial capability
+inferred from historical markers.
+
+Recommended next work for historical Codex owner, within future scope decided by
+Fabrice: frame effective R03/R04 settings and exact target R06/R08
+profile/graph/tools before a native bench; then define missing R07 collector and
+barriers, followed by freshly owned fixture and valid controls. No further
+implementation or checks launched here. Retained reusable lesson: give
+consumption, declaration, byte retention and mutable identity separate criteria;
+never turn declarative closure into effect evidence. Persistent transmission in
+FR/EN plans does not establish reception by already running contexts.
+
+
+### BF-L0-B — bounded Git publication (9 November 2026)
+
+Fabrice authorizes commit/push without tests, compilation, providers or services.
+Commit is prepared from `fa6a530df03126edd235e44cd4c46525e726fe9d`
+(already published BF-L0-A branch), with only the promotion manifest and FR/EN
+BF-L0-B sections. Local main commits and other plan changes are excluded;
+checkout and primary index remain in place. Referenced A3 proposal/reviews remain
+local references, outside the commit. B-2 package sources remain bound to its
+inventory and historical `fe49bd4e49c4124f6c1c80e1919bb4b41ab2f083` reading;
+this branch is not a qualified native profile. Branch push only, no PR or main
+integration; configured main-only push workflow triggers no compiling CI.
+Candidate review compares its tree to the explicit BF-L0-A parent, not concurrent
+main HEAD; differences from main are not delivered deletions.
