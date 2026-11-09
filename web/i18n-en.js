@@ -7018,5 +7018,6 @@ globalThis.SwarmEnglish = {
   "Aucune tâche dans cet état.": "No task in this state.",
   "Toutes": "All",
   "Acceptées": "Accepted",
-  "Filtrer par état enregistré": "Filter by recorded state"
+  "Filtrer par état enregistré": "Filter by recorded state",
+  "Rechercher une tâche ou un identifiant": "Search a task or an identifier"
 };

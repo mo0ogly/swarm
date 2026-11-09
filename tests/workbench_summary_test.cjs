@@ -2,13 +2,14 @@
 /** Run the real workbench module with a small DOM double and check the Conduite
  * summary cards: counts come only from recorded states, no model shows "—",
  * "Voir" selects locally and switches to lanes, mission change resets cards,
- * state chips filter lanes and dim graph cards without any write.
+ * state chips filter lanes and dim graph cards without any write, and the
+ * shared inspector follows graph focus.
  * No browser, network, provider, storage write of Work data or mission operation. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 class Element{
  constructor(tag){this.tagName=tag.toUpperCase();this.children=[];this.dataset={};this.className='';this._text='';this.attributes={};this.listeners={};this.parent=null;this.hidden=false}
  set textContent(v){this._text=String(v);this.children=[]}get textContent(){return this._text+this.children.map(c=>c.textContent).join('')}
- append(...els){for(const e of els){if(typeof e==='string'){const n=new Element('#text');n._text=e;this.children.push(n);continue}e.parent=this;this.children.push(e)}}
+ append(...els){for(const e of els){if(typeof e==='string'){const n=new Element('#text');n._text=e;this.children.push(n);continue}if(e.parent){const s=e.parent.children,i=s.indexOf(e);if(i>=0)s.splice(i,1)}e.parent=this;this.children.push(e)}}
  appendChild(e){this.append(e);return e}
  replaceChildren(...els){this.children=[];this._text='';this.append(...els)}
  before(e){const s=this.parent.children;e.parent=this.parent;s.splice(s.indexOf(this),0,e)}
@@ -18,7 +19,9 @@ class Element{
  click(){for(const f of this.listeners.click||[])f()}
  focus(){focused=this}
  get classList(){const set=()=>new Set(this.className.split(/\s+/).filter(Boolean)),write=v=>{this.className=[...v].join(' ')};return{add:c=>{const v=set();v.add(c);write(v)},toggle:(c,on)=>{const v=set();if(on===undefined?!v.has(c):on)v.add(c);else v.delete(c);write(v)}}}
- matches(sel){if(sel.startsWith('.'))return this.className.split(/\s+/).includes(sel.slice(1));if(sel.startsWith('#'))return this.id===sel.slice(1);return this.tagName===sel.toUpperCase()}
+ closest(sel){let n=this;while(n){if(n.matches(sel))return n;n=n.parent}return null}
+ fire(kind,target){for(const f of this.listeners[kind]||[])f({target})}
+ matches(sel){const attr=/^\[data-([a-z-]+)\]$/.exec(sel);if(attr)return this.dataset[attr[1].replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]!==undefined;if(sel.startsWith('.'))return this.className.split(/\s+/).includes(sel.slice(1));if(sel.startsWith('#'))return this.id===sel.slice(1);return this.tagName===sel.toUpperCase()}
  *walk(){for(const c of this.children){yield c;yield*c.walk()}}
  querySelector(sel){for(const n of this.walk())if(n.matches(sel))return n;return null}
  querySelectorAll(sel){return[...this.walk()].filter(n=>n.matches(sel))}
@@ -56,4 +59,7 @@ check('filter-chips-count-recorded-states',()=>{W.render({work});assert.equal(ch
 check('chip-filters-lanes-and-dims-graph-only',()=>{writes.length=0;chip('act').click();assert.equal(chip('act').getAttribute('aria-pressed'),'true');assert.equal(laneIds(),'b,c,e');assert.equal(dimmed(),'a,d');assert.deepEqual(writes,[]);chip('').click();assert.equal(laneIds(),'a,b,c,d,e');assert.equal(dimmed(),'')});
 check('mission-change-resets-filter',()=>{W.render({work});chip('success').click();assert.equal(dimmed(),'b,c,d,e');W.render({work:{id:'w-9',title:'W9',tasks:[{id:'a',title:'A',status:'blocked'}]}});assert.equal(chip('').getAttribute('aria-pressed'),'true');assert.equal(dimmed(),'')});
 check('clear-resets-filter-and-shows-dashes',()=>{W.render({work});chip('act').click();W.clear('Lecture…');assert.equal(chip('').getAttribute('aria-pressed'),'true');assert.match(chip('act').textContent,/—$/);assert.equal(dimmed(),'')});
-console.log(`${count}/11 workbench summary checks passed`);
+check('stage-shares-one-inspector-for-graph-and-lanes',()=>{const stage=host.querySelector('.workbench-stage');assert(stage);const main=stage.children[0],aside=stage.children[1];assert.equal(main.className,'workbench-stage-main');assert.equal(main.children[0],graph);assert.equal(main.children[1].id,'workbench-lanes');assert.equal(aside.className,'workbench-inspector');assert.equal(host.children.filter(c=>c===graph).length,0)});
+check('graph-focus-follows-into-inspector',()=>{W.render({work});chip('').click();const card=graph.querySelectorAll('.graph-noeud').find(n=>n.dataset.task==='c'),inner=new Element('g');card.append(inner);writes.length=0;graph.fire('focusin',inner);assert.match(host.querySelector('.workbench-inspector').textContent,/Submitted one/);assert.deepEqual(writes,[]);const lane=host.querySelectorAll('.workbench-task').find(b=>b.dataset.laneTask==='c');assert.equal(lane.getAttribute('aria-pressed'),'true')});
+check('graph-focus-ignores-unknown-or-outside-ids',()=>{const before=host.querySelector('.workbench-inspector').textContent;const stray=new Element('g');stray.dataset.task='zzz';graph.append(stray);graph.fire('focusin',stray);graph.fire('focusin',new Element('g'));assert.equal(host.querySelector('.workbench-inspector').textContent,before)});
+console.log(`${count}/14 workbench summary checks passed`);

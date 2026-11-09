@@ -1633,6 +1633,10 @@
       {
         "fr": "Conduite alignée sur la maquette (lot 3) : pastilles de filtre « Toutes », « À traiter », « En cours », « Acceptées » avec compteur, calculées sur les états enregistrés ; elles filtrent les Couloirs et estompent dans le graphe les cartes hors filtre, sans les masquer ni rien enregistrer. La recherche du graphe passe en tête de barre et estompe les tâches non trouvées. Zoom, plein écran et navigation de recherche deviennent des boutons icônes (libellé conservé comme nom accessible et infobulle). Titres des cartes de synthèse en casse normale.",
         "en": "Conduite aligned with the design board (batch 3): “All”, “Needs attention”, “In progress”, “Accepted” filter chips with counts computed from recorded states; they filter Lanes and dim out-of-filter graph cards without hiding them or saving anything. Graph search now leads the bar and dims non-matching tasks. Zoom, full screen and search navigation become icon buttons (label kept as accessible name and tooltip). Summary card titles use normal case."
+      },
+      {
+        "fr": "Conduite alignée sur la maquette (lot 4) : le détail de tâche est un panneau latéral partagé par le Graphe et les Couloirs (rôle, état, dépendances, tâches débloquées), qui suit la carte du graphe ayant le focus, au clavier comme à la souris, sans changer l’ouverture de la carte ni rien enregistrer ; empilé sous 1024 px. Le champ de recherche du graphe affiche l’indice « Rechercher une tâche ou un identifiant ».",
+        "en": "Conduite aligned with the design board (batch 4): the task detail is a side panel shared by Graph and Lanes (role, state, dependencies, unblocked tasks) that follows the focused graph card, by keyboard or pointer, without changing how the card opens or saving anything; stacked below 1024px. The graph search field shows the hint “Search a task or an identifier”."
       }
     ]
   },

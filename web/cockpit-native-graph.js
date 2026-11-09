@@ -622,7 +622,7 @@
     direction.addEventListener('change',()=>{host.dataset.orientation=direction.value;render(work)});toolbar.append(direction);
     const search=document.createElement('div');search.className='native-graph-search';search.setAttribute('role','search');search.setAttribute('aria-label',t('Rechercher une tâche'));
     const searchLabel=document.createElement('label');searchLabel.htmlFor='pilot-search';searchLabel.textContent=t('Rechercher une tâche');
-    const searchInput=document.createElement('input');searchInput.id='pilot-search';searchInput.type='search';searchInput.autocomplete='off';searchInput.setAttribute('aria-controls','pilot-canvas');
+    const searchInput=document.createElement('input');searchInput.id='pilot-search';searchInput.type='search';searchInput.autocomplete='off';searchInput.setAttribute('aria-controls','pilot-canvas');searchInput.placeholder=t('Rechercher une tâche ou un identifiant');
     const searchStatus=document.createElement('output');searchStatus.id='pilot-search-status';searchStatus.setAttribute('role','status');searchStatus.setAttribute('aria-live','polite');
     let matches=[],matchIndex=-1;
     /** Refresh local matches without hiding nodes/edges or changing layout.

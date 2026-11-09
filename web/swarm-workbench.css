@@ -48,3 +48,10 @@
 #graph .graph-state-dim{opacity:.3}
 .workbench-summary-card h3{text-transform:none;letter-spacing:0;font-size:15px}
 @media(max-width:760px){.workbench-chip{min-height:44px}}
+/* Shared stage (board layout): graph or lanes on the left, one task inspector
+ * on the right for both views; stacked below 1024px. */
+.workbench-stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,300px);gap:16px;align-items:start}
+.workbench-stage-main{min-width:0}
+.workbench-stage>.workbench-inspector{position:sticky;top:16px;max-height:calc(100dvh - 32px);overflow:auto}
+.workbench-lanes-content{grid-template-columns:minmax(0,1fr)}
+@media(max-width:1024px){.workbench-stage{grid-template-columns:1fr}.workbench-stage>.workbench-inspector{position:static;max-height:none}}
