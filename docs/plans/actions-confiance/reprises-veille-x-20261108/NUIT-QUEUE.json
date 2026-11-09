@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-11-08T23:37:13.318717+00:00",
+  "updated_at": "2026-11-09T06:06:30.523227+00:00",
   "authorization": "Fabrice : orchestration cette nuit, lancer sans carambolage, sérialiser sur main, commits et push ; pas de nouvelle branche",
   "window_end": "2026-11-09T08:00:00+01:00",
   "status": "publication_blocked_independent_analysis",
-  "main_observed": "a547d8e0519e4bf5620842e991b535889e59be85",
+  "main_observed": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
   "tracking_comparison": "main contient d084c1487726 puis 5efab9fcbcbe ; pas nouveau push, distant connu b4e07cb26",
-  "git_publication": "push_attempt_rejected_PR_checks_install",
+  "git_publication": "delivery_branch_pushed_PR22_open_checks_running",
   "active_owners_to_release": [],
   "worker": {
     "thread_id": "01a1b540-a5ad-76c2-b0e5-ac4187f04fd4",
-    "scope": "Cinq commits intégrés ;365 active, empreinte vérifiée ; aucun nouveau lot moteur attribué",
-    "state": "code_integration_delivered_visual_check_waiting_login",
+    "scope": "Branche livraison unique publiée, PR22 ; checkout main préservé ; contrôle visuel365 FR/EN et lecture historique observés",
+    "state": "delivery_PR22_open_CI_pending",
     "billing": "deferred"
   },
   "tasks": [
@@ -21,11 +21,11 @@
     },
     {
       "id": "N1",
-      "state": "code_integrated_runtime365_active_ui_and_push_open",
+      "state": "commits_pushed_PR22_checks_pending",
       "need": "Rapprocher commits/dirty et preuves des lots déjà faits ; préparer livraison propre sur main, sans absorber travail non vérifié. Protection Git : garder refus et demander décision de publication si nécessaire.",
       "documentation_commit": "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
       "scope": "36 documents coordination/plan directeur seulement, octets commit vérifiés ; sources produit et dirty étrangers exclus.",
-      "remaining": "Connexion pour contrôle visuel365 ; autorisation branche de livraison/PR pour GitHub. Aucun nouveau lot derrière publication bloquée.",
+      "remaining": "CI checks/install sur tête exacte ; merge non autorisé implicitement, protections inchangées.",
       "integration_manifest": ".cache/integration-code-20261109/state.json"
     },
     {
@@ -163,6 +163,14 @@
       "ui": "login_required",
       "push_attempted": false,
       "new_worker": false
+    },
+    {
+      "at": "2026-11-09T06:06:30.523227+00:00",
+      "kind": "explicit_user_delivery_branch_and_PR_authorized_and_applied",
+      "pr": "https://github.com/mo0ogly/swarm/pull/22",
+      "head": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
+      "ui365": "FR_EN and recorded/calculated mission read observed",
+      "billing": "deferred"
     }
   ],
   "automation_id": "swarm-orchestration-s-quentielle-cette-nuit",
@@ -195,7 +203,26 @@
     "manifest": "INTEGRATION-CODE-20261109.json",
     "version": "v0.1.1-dev.365",
     "sha256": "77a26af00a792d0090cd220306468e26e6f1fde5caa0b1f1641ba44a65c9fa6c",
-    "ui": "login_required",
-    "push": "branch_PR_decision_required"
+    "ui": "FR_EN_version_and_recorded_calculated_reads_observed",
+    "push": "branch_published_PR22_open"
+  },
+  "github_delivery": {
+    "branch": "codex/delivery-swarm-20261109",
+    "pr": "https://github.com/mo0ogly/swarm/pull/22",
+    "head": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
+    "record": "PUBLICATION-GITHUB-20261109.json",
+    "checks": [
+      {
+        "link": "https://github.com/mo0ogly/swarm/actions/runs/42570757206/job/129007326327",
+        "name": "checks",
+        "state": "IN_PROGRESS"
+      },
+      {
+        "link": "https://github.com/mo0ogly/swarm/actions/runs/42570757206/job/129007326605",
+        "name": "install",
+        "state": "IN_PROGRESS"
+      }
+    ],
+    "merge_authorized": false
   }
 }

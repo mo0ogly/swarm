@@ -11,3 +11,10 @@ Real-session Version-dialog FR/EN, Git link, notes, calculated summary and histo
 GitHub publication needs authorization for one delivery branch and PR, since current instructions prohibit new branches while protection requires strict checks/install and applies to admins. No repeated push or weakened protection. N5 remains open; billing is deferred.
 
 Lexar was mounted but had only149MiB free; evidence remains under the local .cache/integration-code-20261109 directory with21GiB locally available. No originals removed. Two missing-source-rollout chat errors have no established causal link to USB moves. The incomplete USB filename search proves no absence. M33 archive recovery is distinct from chat-history restoration.
+
+
+## Delivery publication — 2026-11-09T06:06:30.523227+00:00
+
+Fabrice explicitly authorized one delivery branch and PR. Existing commits through79b8d854a8e1aab4cc5d6f896b6cdb116918a34a were pushed to codex/delivery-swarm-20261109; PR https://github.com/mo0ogly/swarm/pull/22 is open. Local development checkout remains main; unrelated uncommitted work excluded. Existing strict checks/install and admin enforcement unchanged; CI still running, no PASS or merge claimed. No implicit merge or second-branch authority. Billing deferred.
+
+The authenticated365 Version dialog was observed in French and English: exact build version/commit link/local-change disclosure and current notes. Recorded mission read and calculated revision881 summary were observed, T1 fresh/passed/accepted, T2 unknown/not_accepted. Explicit history mode separates recorded history from operational evaluation. No task or provider launched; this is bounded read observation, not independent acceptance. Earlier login failure remains historical. Exact receipts/hashes: PUBLICATION-GITHUB-20261109.json. Existing heartbeat updated for this PR only. Delivery/coordination documentation, no changed product function/policy/error contract or new build/test.
