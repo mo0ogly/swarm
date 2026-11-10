@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Sécurité suit la maquette : formulaire de configuration posé dans la page, bandeau du jeton I3, onglets, niveaux d’intégrité et tableau des identités tirés des identités déclarées, barre Prévisualiser/Enregistrer.",
+        "en": "Security follows the design board: configuration form in the page, I3 token banner, tabs, integrity levels and identity table from declared identities, Preview/Save bar."
+      },
+      {
         "fr": "Audit et preuves : mise en page de la maquette (compteurs depuis les états enregistrés, liste des transactions avec badges, chaîne de preuve en étapes depuis le rapport d’audit, vérificateur public à droite) ; Actualiser recharge aussi la liste d’audit. Archives protégées de la maquette non affichées (fonction absente). Aucun changement moteur.",
         "en": "Audit and evidence: board layout (counters from recorded states, transaction list with badges, step-by-step proof chain from the audit report, public verifier on the right); Refresh also refills the audit list. The board's protected archives are not shown (no such function). No engine change."
       },
