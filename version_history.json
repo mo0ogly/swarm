@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Cockpit : le rail de navigation suit désormais le thème choisi (marine en sombre, clair en thème clair) au lieu de rester marine ; couleurs regroupées en jetons --rail-*. En-tête mobile, préparation et accès inchangés. Aucun changement moteur.",
+        "en": "Cockpit: the navigation rail now follows the selected theme (marine in dark, light in the light theme) instead of staying marine; colours grouped as --rail-* tokens. Mobile header, preparation and access pages unchanged. No engine change."
+      },
+      {
         "fr": "Dialogue Version : les identifiants longs des notes restent lisibles sans défilement horizontal interne ; le thème choisi au bouton du cockpit est conservé dans l’URL lors du changement de langue et du rechargement. Aucun réglage moteur modifié.",
         "en": "Version dialog: long identifiers in notes wrap without internal horizontal scrolling; the cockpit theme button preserves its choice in the URL across language changes and reload. No engine setting changed."
       },

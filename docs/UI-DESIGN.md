@@ -90,7 +90,11 @@ Palette UI dérivée du logo (valeurs de travail, pas prétention à une extract
 | Action principale | Doré `#f8c650`, encre marine | Marine `#062b49`, encre blanche |
 | Accent lisible | Doré `#f8c650` | Ocre `#926300` |
 
-Le rail reste marine dans les deux thèmes, avec ses propres paires de texte/fond.
+Le rail du cockpit suit le thème (décision utilisateur du 10 novembre 2026) :
+marine en sombre, fond `#eceae1` et texte `#355565` en clair, sélection sur carte
+`#fffefa` et repère ocre `#785200`. Toutes ses couleurs passent par les jetons
+locaux `--rail-*` de `.cockpit-page .rail` dans `web/swarm-design.css`. L’en-tête
+mobile, l’en-tête de préparation et la page d’accès restent marine.
 Le doré signale la sélection et les moments clés. Le cyan accompagne les connexions.
 Les états utilisent les paires succès, attention, alerte et information ; ne pas
 remplacer le rouge d’erreur par la couleur de marque. Toujours doubler la couleur
