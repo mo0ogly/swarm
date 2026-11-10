@@ -78,3 +78,24 @@ Les liens du cockpit vers Sécurité/Audit et les deux liens Admin conservent la
 langue, le thème et le fragment local des limites. La page Trust applique le thème
 entrant uniquement pour `etat` ou `sombre` ; ses liens relisent la préférence au
 clic. Ces paramètres de présentation ne transportent aucun jeton.
+
+
+## Conduite intégrée et défaut de présentation
+
+Le cockpit démarre en sombre ; `?theme=etat` demande explicitement le clair. Le
+choix au bouton reste porté par l’URL pour la langue et le rechargement. Les
+commandes secondaires du graphe restent repliées au premier affichage ; leur choix
+local est conservé, un élargissement seul ne les rouvre pas. Graphe et Couloirs
+partagent un inspecteur : seul un identifiant du modèle reçu peut y être suivi.
+
+La carte de mission du rail suit le Work reçu. État, boîte à traiter, assistant
+et activité sont réunis sous « Détails de mission », sans clonage de contrôles.
+Les compteurs sans producteur restent indisponibles avec explication ; les tâches
+enregistrées ne deviennent pas une validation courante. La légende utilise les
+badges d’état communs. Un nom identique au login n’est affiché qu’une fois, sans
+modifier identité, habilitations ou authentification.
+
+La recette Version compare aussi le thème invalide au défaut natif observé et
+vérifie explicitement le défaut sombre de ce cockpit. Les contrôles du composant
+(`workbench_summary_test.cjs`) restent des doubles DOM ; ils ne remplacent pas la
+recette HTTP/browser ni la vérification de l’image réellement activée.
