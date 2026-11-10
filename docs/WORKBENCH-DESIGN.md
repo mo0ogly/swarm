@@ -48,8 +48,17 @@ Bell-LaPadula, conflits de rôles, identités et clés. Clavier : flèches, Déb
 Tab et Échap natif du dialogue. Les champs, identifiants et écouteurs restent ceux
 de `trust-native.js` ; aperçu, application et contrôles I3 restent côté moteur.
 
-Audit présente les champs d’identité, la chaîne de transaction et le vérificateur
-public existants. Les données et verdicts viennent des opérations réelles. Une
+Audit suit la maquette `docs/design/swarm/Audit.dc.html` (10 novembre 2026) :
+en-tête avec Exporter les preuves et Lire l’ancre HMAC, bandeau des jetons,
+compteurs (transactions, résultats incertains, approbations attendues, refusées)
+calculés depuis les états enregistrés de la projection `show`, puis trois colonnes :
+transactions filtrables avec badge d’état, chaîne de preuve dessinée depuis les
+événements du dernier rapport d’audit de la transaction choisie, vérificateur
+public. Choisir une transaction n’appelle pas l’API ; la consulter reste un clic
+explicite, car chaque consultation est enregistrée. Actualiser recharge aussi la
+liste d’audit. Les « Archives protégées » de la maquette ne sont pas affichées :
+la page n’a pas cette fonction. Audit présente les champs d’identité, la chaîne
+de transaction et le vérificateur public existants. Les données et verdicts viennent des opérations réelles. Une
 entrée de preuve vide ou refusée n’affiche pas un verdict favorable. Aucune clé,
 identité ou transaction d’exemple n’est introduite. Les limites BLP et la portée
 simulée des effets Trust restent celles indiquées par l’interface existante.

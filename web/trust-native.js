@@ -18,6 +18,20 @@ function syncGovernance(){
 }
 const roleNames={requester:'Demandeur',approver:'Approbateur',effect:'Exécuteur',admin:'Administrateur'};
 const rolePairs=[['requester','approver'],['requester','effect'],['requester','admin'],['approver','effect'],['approver','admin'],['effect','admin']];
+/** Refill the audit transaction list from the last public `show` projection.
+ * Each option keeps the exact recorded state, resource, amount text and
+ * currency as data attributes so the audit workbench can draw its list and
+ * counters without reading `state` itself, and marks the list as read
+ * (`data-loaded`), so zero transactions differs from "not read yet". Clears
+ * any previous audit report.
+ * Reads only `state.actions`/`state.amount_minor_text`; no request, no write.
+ * @returns {void} */
+function auditChoices(){
+ const choices=$('trust-audit-action');choices.replaceChildren();for(const a of Object.values(state.actions)){const o=document.createElement('option');o.value=a.id;o.textContent=a.id+' · '+t(statusLabels[a.state]||a.state);o.dataset.state=String(a.state);o.dataset.resource=String(a.resource??'');o.dataset.amount=String(state.amount_minor_text?.[a.id]??'');o.dataset.currency=String(a.currency??'');choices.append(o);}
+ choices.dataset.loaded='true';
+ $('trust-audit-read').disabled=!choices.options.length;
+ $('trust-audit-summary').textContent='';$('trust-audit-report').textContent='';
+}
 /** Display the persisted matrix without inventing principal groups. The private
  * identity form supplies only subjects; its tokens never enter this projection. */
 function roleSettings(){
@@ -25,9 +39,7 @@ function roleSettings(){
  $('trust-role-pairs').replaceChildren();
  for(const pair of rolePairs){const label=document.createElement('label'),input=document.createElement('input'),span=document.createElement('span');input.type='checkbox';input.dataset.roles=pair.join(':');input.checked=!!p?.incompatible_roles.some(v=>v.includes(pair[0])&&v.includes(pair[1]));span.textContent=t(roleNames[pair[0]])+' / '+t(roleNames[pair[1]]);label.append(input,span);$('trust-role-pairs').append(label);}
  roleGroups(state.identities,p?.principals||{});roleTouched=false;
- const choices=$('trust-audit-action');choices.replaceChildren();for(const a of Object.values(state.actions)){const o=document.createElement('option');o.value=a.id;o.textContent=a.id+' · '+t(statusLabels[a.state]||a.state);choices.append(o);}
- $('trust-audit-read').disabled=!choices.options.length;
- $('trust-audit-summary').textContent='';$('trust-audit-report').textContent='';
+ auditChoices();
  identitySettings();
  signingSettings();
 }
@@ -93,7 +105,7 @@ function result(v){$('result').textContent=v.raw;}
  * controls unavailable; stored values never become an agent-selected label. */
 async function load(){const v=await api('show');if(v.result.schema_version!==1||!Number.isSafeInteger(v.result.revision)||!v.result.policy||!v.result.actions)throw Error(t('Réponse invalide'));state=v.result;render();}
 /** Render only text and explicit action buttons; user fields never become HTML. */
-function render(){const box=$('actions');box.replaceChildren();for(const a of Object.values(state.actions)){const item=document.createElement('article'),text=document.createElement('p');text.textContent=a.id+' · '+t(statusLabels[a.state]||a.state)+' · '+(state.amount_minor_text[a.id]||'0')+' '+a.currency+' · '+a.resource;item.append(text);for(const op of ['approve','commit','reconcile']){const b=document.createElement('button');b.type='button';b.textContent=t(opLabels[op]||op);b.addEventListener('click',()=>{$('operation').value=op;fields('fields',shapes[op],'f-',{...a,amount_minor:state.amount_minor_text[a.id],action_id:a.id});$('token').focus();});item.append(b);}box.append(item);}}
+function render(){auditChoices();const box=$('actions');box.replaceChildren();for(const a of Object.values(state.actions)){const item=document.createElement('article'),text=document.createElement('p');text.textContent=a.id+' · '+t(statusLabels[a.state]||a.state)+' · '+(state.amount_minor_text[a.id]||'0')+' '+a.currency+' · '+a.resource;item.append(text);for(const op of ['approve','commit','reconcile']){const b=document.createElement('button');b.type='button';b.textContent=t(opLabels[op]||op);b.addEventListener('click',()=>{$('operation').value=op;fields('fields',shapes[op],'f-',{...a,amount_minor:state.amount_minor_text[a.id],action_id:a.id});$('token').focus();});item.append(b);}box.append(item);}}
 /** Disable duplicate gestures during one request, surface failures in the active
  * dialog, and retain the requirement for readback after uncertain responses. */
 async function guarded(action){if(busy)return;busy=true;for(const b of document.querySelectorAll('button'))b.disabled=true;try{await action();}catch(e){($('settings').open?$('admin-message'):$('message')).textContent=e.message+' — '+t('Vérifier l’état avant reprise');}finally{busy=false;for(const b of document.querySelectorAll('button'))b.disabled=false;$('save').disabled=!proposal;syncGovernance();syncEnrolledAvailability();confidentiality?.sync();}}

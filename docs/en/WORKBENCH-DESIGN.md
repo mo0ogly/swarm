@@ -26,8 +26,16 @@ Security belongs to Configuration; Audit and evidence belongs to Follow-up.
 page. Security tabs group actual Biba, Bell-LaPadula, role conflict, identity and
 key controls. Arrow/Home/End keys select tabs; Escape retains native dialog
 behavior. Existing IDs/listeners, I3 gates and actual preview/application APIs stay
-in force. Audit presents existing identity inputs, transaction audit and public
-verification. Empty/refused input never becomes a favorable example verdict.
+in force. Audit follows `docs/design/swarm/Audit.dc.html` (10 November 2026):
+heading with Export evidence and Read the HMAC anchor, a token strip, counters
+(transactions, unknown outcomes, pending approvals, denied) computed from the
+recorded states of the `show` projection, then three columns: filterable
+transactions with state badges, a proof chain drawn from the events of the chosen
+transaction's last audit report, and public verification. Selecting a transaction
+calls no API; reading its chain stays an explicit click because each reading is
+recorded. Refresh also refills the audit list. The board's "Protected archives"
+are not shown: the page has no such function. Audit presents existing identity
+inputs, transaction audit and public verification. Empty/refused input never becomes a favorable example verdict.
 Tokens never enter navigation links; existing BLP limits and simulated Trust
 effects remain explicit. No sample identity, key or transaction is introduced.
 
