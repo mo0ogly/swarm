@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "native-agent-tool-path",
+  "inputs": [
+    "tests/native_agent_tool_path.py",
+    "tests/rust_agent_model_route.py",
+    "tests/fixture_area.py",
+    "tools/verification/recipe.py",
+    "bin/swarm",
+    "deploy/local-build.json",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/native_provider_exec.rs",
+    "rust/crates/swarm-engine/src/native_provider_biba.rs",
+    "rust/crates/swarm-engine/src/agent_native_stream.rs",
+    "rust/crates/swarm-biba-linux/src/**/*.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-native-worker-tool-and-authorized-recovery",
+      "command": ["python3", "tests/native_agent_tool_path.py", "--binary", "{root}/bin/swarm", "--build-record", "{root}/deploy/local-build.json"],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native-witness-real-write",
+        "PASS native-tool-launched-and-denied",
+        "PASS denial-before-target-effect",
+        "PASS authorized-same-target-write",
+        "PASS same-tool-and-source-on-recovery",
+        "PASS same-task-history-preserved",
+        "NATIVE_TOOL_PATH_PASS real worker child refusal and same-target authorized recovery"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

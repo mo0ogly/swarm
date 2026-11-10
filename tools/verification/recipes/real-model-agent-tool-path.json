@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "real-model-agent-tool-path",
+  "inputs": [
+    "tests/real_model_agent_tool_path.py",
+    "tests/native_agent_tool_path.py",
+    "tests/rust_agent_model_route.py",
+    "tests/fixture_area.py",
+    "tools/verification/recipe.py",
+    "deploy/local-build.json",
+    "rust/crates/swarm-engine/src/native_provider_exec.rs",
+    "rust/crates/swarm-engine/src/native_provider_biba.rs",
+    "rust/crates/swarm-biba-linux/src/**/*.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "real-model-control-before-native-refusal-and-recovery",
+      "command": ["python3", "tests/real_model_agent_tool_path.py", "--binary", "{root}/bin/swarm", "--build-record", "{root}/deploy/local-build.json", "--provider-config", "{root}/.swarm/providers.json", "--isolate-runtime", "--focus-model-cache", "--pinned-provider"],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS real-model-native-tool-control",
+        "PASS real-model-native-tool-denied-before-effect",
+        "REAL_MODEL_TOOL_PATH_PASS real model refusal and authorized same-target recovery"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

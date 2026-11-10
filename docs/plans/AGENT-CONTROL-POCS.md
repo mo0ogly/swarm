@@ -4,7 +4,9 @@ Qualification avec vrai modèle demandée le 8 novembre 2026 :
 [client Codex réel sous profil inchangé](actions-confiance/REAL-MODEL-TOOL-QUALIFICATION.md).
 **Non qualifiée** : quatre échecs conservés ; dernier blocage observé dans le
 vrai CLI, UnixStream Tokio refusé avant modèle et outil. Aucun faux PASS déduit
-de la cible intacte. Alternative GLM outillée en attente d’autorisation explicite.
+de la cible intacte. Fabrice conserve uniquement Codex ; GLM non retenu. Passage
+instrumenté confirmant le refus conservé ; reprise conditionnée à un raccord
+Codex compatible sans assouplissement du profil.
 
 Qualification native autorisée le 8 novembre 2026 :
 [worker réel et outil Python enfant](actions-confiance/NATIVE-AGENT-TOOL-QUALIFICATION.md).
@@ -2003,7 +2005,8 @@ contrôles et R2. Reprise vérifiée sur variante V2 sûre, publication/rejeu ac
 le V2 dangereux reste refusé. Recettes gieth-review-refresh et gieth-legacy-refresh
 PASS et preuves revérifiées ; reviewers inertes, pas d’audit indépendant.
 Profil normal, identité active et dialogue Version FR/EN vérifiés. Limite ouverte :
-focus après Échap ; pas d’inventaire universel des dépendances externes.
+focus après Échap lors du témoin 347, corrigé et vérifié FR/EN clair/sombre
+en version locale 348 (GI-UI-1, voir suivi). Pas d’inventaire universel des dépendances externes.
 [Résultats, sources, preuves, inconnues et RETEX](actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).
 
 

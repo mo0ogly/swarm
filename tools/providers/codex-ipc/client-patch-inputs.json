@@ -1,0 +1,8 @@
+{
+  "codex_tag": "rust-v0.166.0",
+  "source_tar_sha256": "718c86dcd7104919f2820aa79db0fa0083b5f240aa16da704f43e4acf7b544e5",
+  "file": "codex-rs/arg0/src/lib.rs",
+  "before": "53a895afa62b2febcd9a32b8562d15ad049bf7d1be18168e4409a11c3a43c422",
+  "after": "ec892cf8972f5c9fd6bfdbea8a2f306e7595432c1ece3cc07cb9af7a3553a7f9",
+  "contract": "create private dirs 0700; exact mode required; redundant chmod skipped; repair/error kept for wrong existing mode"
+}

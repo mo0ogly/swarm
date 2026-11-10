@@ -1,5 +1,14 @@
 # Étude — contrôler les actions face à l’injection indirecte
 
+Deuxième suite autorisée : [outil enfant d’un agent natif](NATIVE-AGENT-TOOL-QUALIFICATION.md),
+refus kernel avant effet puis reprise même cible sous intention opérateur.
+PASS avec fournisseur déterministe ; modèle réel non testé. L’état initial de
+l’étude ci-dessous reste historique.
+
+Suite autorisée par Fabrice : [qualification CLI Trust](TRUST-ACTION-PATH-QUALIFICATION.md),
+PASS limité au parcours public installé et registre fictif ; matrice TN-01–05
+mise à jour dans ce rapport. L’état initial de l’étude ci-dessous reste historique.
+
 8 novembre 2026. Étude documentaire demandée par Fabrice ; aucune exécution
 de scénario, modification moteur, délégation, installation ou publication.
 

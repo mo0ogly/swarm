@@ -1,0 +1,107 @@
+--- a/src/signal/unix.rs
++++ b/src/signal/unix.rs
+@@ -12,7 +12,7 @@
+ use crate::signal::RxFuture;
+ use crate::sync::watch;
+ 
+-use mio::net::UnixStream;
++use mio::unix::pipe::{self, Receiver, Sender};
+ use std::io::{self, Error, ErrorKind, Write};
+ use std::sync::OnceLock;
+ use std::task::{Context, Poll};
+@@ -62,13 +62,15 @@
+ 
+ #[derive(Debug)]
+ pub(crate) struct OsExtraData {
+-    sender: UnixStream,
+-    pub(crate) receiver: UnixStream,
+-}
+-
++    sender: Sender,
++    pub(crate) receiver: Receiver,
++}
++
++// Private wakeups need a nonblocking CLOEXEC pipe, not a Unix service channel.
++// Signal flags and async-signal-safe writes retain the upstream semantics.
+ impl Default for OsExtraData {
+     fn default() -> Self {
+-        let (receiver, sender) = UnixStream::pair().expect("failed to create UnixStream");
++        let (sender, receiver) = pipe::new().expect("failed to create private signal pipe");
+ 
+         Self { sender, receiver }
+     }
+--- a/src/runtime/signal/mod.rs
++++ b/src/runtime/signal/mod.rs
+@@ -5,7 +5,7 @@
+ use crate::runtime::{driver, io};
+ use crate::signal::registry::globals;
+ 
+-use mio::net::UnixStream;
++use mio::unix::pipe::Receiver;
+ use std::io::{self as std_io, Read};
+ use std::sync::{Arc, Weak};
+ use std::time::Duration;
+@@ -21,7 +21,7 @@
+     io: io::Driver,
+ 
+     /// A pipe for receiving wake events from the signal handler
+-    receiver: UnixStream,
++    receiver: Receiver,
+ 
+     /// Shared state. The driver keeps a strong ref and the handle keeps a weak
+     /// ref. The weak ref is used to check if the driver is still active before
+@@ -41,8 +41,7 @@
+ impl Driver {
+     /// Creates a new signal `Driver` instance that delegates wakeups to `park`.
+     pub(crate) fn new(io: io::Driver, io_handle: &io::Handle) -> std_io::Result<Self> {
+-        use std::mem::ManuallyDrop;
+-        use std::os::unix::io::{AsRawFd, FromRawFd};
++        use std::os::fd::{AsRawFd, BorrowedFd, FromRawFd, IntoRawFd};
+ 
+         // NB: We give each driver a "fresh" receiver file descriptor to avoid
+         // the issues described in alexcrichton/tokio-process#42.
+@@ -54,7 +53,7 @@
+         // condition when consuming readiness events, but having distinct
+         // descriptors appears to mitigate this.
+         //
+-        // Unfortunately we cannot just use a single global UnixStream instance
++        // Unfortunately we cannot just use a single global pipe receiver instance
+         // either, since we can't assume they will always be registered with the
+         // exact same reactor.
+         //
+@@ -63,13 +62,13 @@
+         // safe as each dup is registered with separate reactors **and** we
+         // only expect at least one dup to receive the notification.
+ 
+-        // Manually drop as we don't actually own this instance of UnixStream.
+-        let receiver_fd = globals().receiver.as_raw_fd();
+-
+-        // safety: there is nothing unsafe about this, but the `from_raw_fd` fn is marked as unsafe.
+-        let original =
+-            ManuallyDrop::new(unsafe { std::os::unix::net::UnixStream::from_raw_fd(receiver_fd) });
+-        let mut receiver = UnixStream::from_std(original.try_clone()?);
++        // SAFETY: the global receiver owns this live pipe descriptor for the
++        // process lifetime. Clone to an owned CLOEXEC fd for this reactor only.
++        let original = unsafe { BorrowedFd::borrow_raw(globals().receiver.as_raw_fd()) };
++        let duplicated = original.try_clone_to_owned()?;
++        // SAFETY: consume exactly the newly duplicated read end, once. Mio owns
++        // deregistration and close; nonblocking status belongs to the pipe.
++        let mut receiver = unsafe { Receiver::from_raw_fd(duplicated.into_raw_fd()) };
+ 
+         io_handle.register_signal_receiver(&mut receiver)?;
+ 
+--- a/src/runtime/io/driver/signal.rs
++++ b/src/runtime/io/driver/signal.rs
+@@ -3,9 +3,11 @@
+ use std::io;
+ 
+ impl Handle {
++    /// Register the owned private pipe read end with this reactor. The caller
++    /// retains it until deregistration/drop; registration errors propagate.
+     pub(crate) fn register_signal_receiver(
+         &self,
+-        receiver: &mut mio::net::UnixStream,
++        receiver: &mut mio::unix::pipe::Receiver,
+     ) -> io::Result<()> {
+         self.registry
+             .register(receiver, TOKEN_SIGNAL, mio::Interest::READABLE)?;
