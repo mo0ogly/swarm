@@ -515,3 +515,111 @@ Les preuves373 incluent le contexte local qualifié de cette date ; elles ne
 requalifient pas implicitement une future image du commit isolé. GitHub exige PR
 et checks/install ; la publication reste conditionnée au parcours autorisé,
 sans contourner la protection ni créer une branche sans autorité applicable.
+
+
+## Livraison locale intégrée après PR24 — demande utilisateur
+
+Fabrice demande maintenant d’installer la version fusionnée en intégrant les
+travaux des autres agents. HEADa28bade23 contient origin/main2829ec90e et les six
+commits Conduite locaux, sans réécriture. Service encore373/PID2336522. Depuis son
+archive qualifiée, onze entrées effectives différentes, toutes UI (liste conservée
+au gel) ; les nombreuses sources moteur dirty correspondent déjà aux entrées373.
+Aucun cargo/rustc observé au préflight.32Gio libres localement ; Lexar480KiB,
+repli de preuve `.cache/integration-merged-20261109`, aucun nettoyage.
+
+Contrats du commit427 lus : thème sombre par défaut (`?theme=etat` explicite),
+contrôles de graphe repliés avec choix local conservé, inspecteur/mission partagés,
+sections secondaires groupées, compteurs indisponibles explicités sans production
+inventée, nom de connexion dédupliqué uniquement à l’affichage. Aucun nouveau
+budget, politique d’exécution, droit ou transport. Les ajouts du commit427 ne sont pas
+présumés installés par leur commit : qualifier cette image intégrée neuve.
+
+Recette Version adaptée au contrat nouveau : défaut sombre vérifié explicitement,
+paramètre invalide comparé au même défaut observé, sans conserver l’ancienne
+attente claire de373. Les autres assertions/refus/reprises restent en place.
+La docstring de setNotice déplacée par l’insertion de setMetricHint est rattachée
+à son véritable consommateur, sans changement de comportement. Documentation FR/EN
+du cockpit intégrée ; notes version_history des lots fusionnés déjà présentes en
+FR/EN, pas de nouvelle capacité à leur ajouter.
+
+Plan borné :16contrôles summary et cohérencei18n sur les sources, lecture du contrat
+rapide Conduite, gel inventaire, build pris en charge sans arrêter373, recette
+Version64 et cockpit natif existant sur l’image exacte (nouvelles dépendances
+reader/graphe/accordéons justifient ce parcours). Diagnostiquer tout échec plutôt
+que masquer les erreurs. Puis restart prepared-build exact, conservation des cinq
+Work/réglages, identité réelle et vérification authentifiée dans ce chat si session
+valide. La session normale38433 vient d’être ouverte avec identitéFabrice visible ;
+aucun mot de passe, clé ou cookie extrait. Maquette file:// conservée.
+
+
+### Livraison intégrée374 effectuée et vérifiée
+
+Demande utilisateur exécutée : version fusionnée et travaux Conduite des autres
+agents intégrés dans l’image locale, sans stash/reset/rebase ni nouveau Git/push.
+Une seule construction puis restart prepared-build exact, zéro entrée plus récente
+non installée au moment de l’activation. Image v0.1.1-dev.374, PID2516827,
+SHA256d4caa771eefebe0d404b3767b7c413a2207cfd034071008475ec83982a354822,
+baseGita28bade231bd41f48a4ba264aa1f8b24f241f399, modified=true.
+Profilproductionnormal VERIFIED_DEFAULT_NATIVE_PROFILE, core features vides,
+non-test, sans fixture et dépendances observées stables. Sources moteur dirty
+identiques à celles déjà qualifiées373 ; cela ne constitue pas leur nouvelle
+acceptation métier globale. Tous les inputs compilés restent égaux à l’inventaire
+après le contrôle final.
+
+Résultats conservés dans `.cache/integration-merged-20261109/RESULT.json` :
+16assertions DOM du composant,64Version sur l’image sans overlay,416cockpit natif
+existant : PASS ; intégrité de recette Version VERIFIED, i18n cohérent. La sélection
+des416 est motivée par les changements graphe/reader/sections/identité, pas un rejeu
+global arbitraire. Aucun test workspace/moteur inchangé répété sans raison.
+
+Session humaine normale38433 réutilisée ici, sans nouvelle connexion ni clé :
+Version374 FR/EN × thèmes ×624/390 (huit cas), texte long complet et hash stable par
+langue, aucune largeur interne excessive ni line-clamp, huit Échap avec focus
+opener. Transition EN sombre→FR suivie d’un vrai reload conserve sombre ; défaut
+sombre confirmé sans paramètre. Métadonnées et disclosure local/noncommité visibles.
+Le lien de baseGit est le hash réel locala28b ; aucun statutHTTPGitHub n’est inféré
+pour ce commit local non publié par cette opération.
+
+Lecture réelle d’une mission existante : sept tâches, carte de mission du rail,
+validation/activité courantes explicitement inconnues, absence de compteur de
+décisions expliquée. Inspecteur R5 avec dépendances R4/R6 puis retour Graphe ;
+outils fermés initialement, ouverture volontaire conservée après reload et choix
+restauré fermé. Un seul groupe Détails de mission, fermé par défaut ; identité
+Fabrice sans login redondant. Aucun départ d’agent, modèle/fournisseur ou action
+métier déclenché dans l’instance ; les écritures des recettes cockpit restent dans
+leurs Roots privés isolés, jamais le datastore actif.
+
+42ressources authentifiées du cockpit (22JS,19CSS,logo) rapprochées octet par octet
+avec l’archive effective374 : toutes exactes ; copies relues dans assets374 et
+reçu live-assets.json. API d’export sans statuts/en-têtes, aucun200 inventé.
+Console capturée warn/error limitée100 : vide. Les diagnostics réseau exhaustifs
+sont ceux des fixtures ; ne pas les attribuer implicitement à toute la session.
+Cinq Work et engine-settings publics ont exactement les mêmes empreintes avant
+activation et après les interactions ; /proc/exe et APIversion attestent374 prête.
+
+RETEX : l’ancienne recette attendait encore le défaut clair ; elle vérifie désormais
+le défaut natif sombre explicite et le repli invalide vers ce même défaut observé,
+sans changer une politique produit pour satisfaire un test. Rattachement de la
+docstring setNotice réparé, pas de changement de comportement. La première boucle
+visuelle a essayé un bouton dans le volet refermé par la navigation de langue :
+incident original conservé dans live-method-incident.json, aucun cas alors validé.
+Reprise par précondition réelle du nouveau document (langue cible ET sélecteur de
+Work peuplé/activé), puis huit cas passants ; aucun sleep arbitraire, code produit
+inchangé pour cet incident. Les fichiers/commits d’autrui ont été conservés et
+leurs entrées ont été qualifiées dans le périmètre compilé, pas assimilées à une
+acceptation indépendante. Les preuves restent localement, Lexar presque pleine.
+
+Onglet livré en FR/sombre, sans mission sélectionnée, taille navigateur normale
+restaurée (1280), même préférence Couloirs et outils de mission refermés. Maquette
+file:// originale non modifiée. Capture installed374.jpg montre le dialogue réel.
+Documentation FR/EN du cockpit mise à jour avant build ; les notes bilingues des
+lots sont effectivement embarquées. Aucun nouveau comportement produit hors de
+ces lots n’a été introduit par l’adaptation de recette/docstring.
+
+Portée de clôture : installation et parcours ci-dessus vérifiés ; aucune conformité
+WCAG/BLP globale ni acceptation de tous les scénarios moteur/fournisseur. Les notes
+historiques « à vérifier » d’autres lots ne sont pas utilisées comme état courant.
+Suite documentaire conservée : leur rapprochement avec les reçus actuels relève
+du suivi transversal/root, sans effacer les preuves historiques ni réécrire les
+notes d’autrui dans cette livraison. L’observation cosmétique Ferme/r390 reste
+séparée/non qualifiée, aucun nouveau correctif implicite.
