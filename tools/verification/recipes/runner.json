@@ -3,14 +3,18 @@
   "id": "permanent-recipe-runner-regressions",
   "inputs": [
     "tools/verification/*.py",
-    "tools/verification/README.md"
+    "tools/verification/README.md",
+    "tests/fixture_area.py",
+    "tests/test_fixture_area.py",
+    "rust/crates/swarm-engine/config/engine-settings.json"
   ],
   "environment": {},
   "steps": [
     {
-      "id": "eight-runner-regressions",
+      "id": "fourteen-runner-regressions",
       "command": [
         "python3",
+        "-B",
         "-m",
         "unittest",
         "discover",
@@ -29,10 +33,58 @@
         "test_relative_executable_is_bound_to_fixture_root",
         "test_tampering_and_missing_hash_table_refuse",
         "test_zero_tests_and_source_mutation_cannot_pass",
-        "Ran 8 tests",
+        "Ran 14 tests",
         "\nOK\n",
         "test_symlink_launcher_keeps_invocation_name_and_target_identity",
-        "test_tmpdir_pin_falls_back_when_checkout_ancestors_are_group_writable"
+        "test_tmpdir_pin_falls_back_when_checkout_ancestors_are_group_writable",
+        "test_resolution_proof_receipt_and_child_tmpdir",
+        "test_import_failure_retains_unobserved_proof_then_recovers",
+        "test_proof_publication_failure_stops_and_retains_primary",
+        "test_receipt_relation_and_missing_receipt_refuse",
+        "test_bad_fallback_retains_mkdir_effect_then_recovers",
+        "test_import_cache_is_not_explicit_resolution"
+      ]
+    },
+    {
+      "id": "five-fixture-area-regressions",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_fixture_area.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 5 tests",
+        "\nOK\n"
+      ]
+    },
+    {
+      "id": "four-snapshot-regressions",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/verification",
+        "-p",
+        "test_snapshot.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 4 tests",
+        "\nOK\n"
       ]
     }
   ]

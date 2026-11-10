@@ -13,6 +13,7 @@ from pathlib import Path as _fa_Path
 _fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
 from fixture_area import fixture_area
 import unittest
+from unittest.mock import patch
 
 _REAL_TESTS = Path(__file__).resolve().parents[2] / 'tests'
 
@@ -70,6 +71,139 @@ class RecipeTests(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             recipe.publish(output/'result.json', b'overwrite')
         self.assertEqual((output/'result.json').read_bytes(), original)
+
+    def test_resolution_proof_receipt_and_child_tmpdir(self):
+        """Exact consumed resolution, readback receipt and inert child agree."""
+        self.value['steps'] = [self.step("import os; print('TMPDIR_RECEIVED '+os.environ['TMPDIR']); print('named-test PASS')")]
+        self.write()
+        result, output = self.run_fixture('observed')
+        self.assertEqual(result['status'], 'PASS')
+        proof = json.loads((output/'fixture-area-proof.json').read_bytes())
+        receipt = json.loads((output/'fixture-area-proof.receipt.json').read_bytes())
+        self.assertEqual(receipt['sha256'], recipe.digest((output/'fixture-area-proof.json').read_bytes()))
+        self.assertEqual(receipt['bytes'], (output/'fixture-area-proof.json').stat().st_size)
+        self.assertEqual(receipt['invocation'], proof['invocation'])
+        self.assertEqual(proof['import']['internal_resolution'], 'not_observed')
+        resolved = [e for e in proof['resolution'] if e['kind']=='resolved']
+        self.assertEqual(resolved[-1]['path'], str(self.root/'.swarm-fixtures'))
+        self.assertIn('TMPDIR_RECEIVED '+proof['placement'][-1]['tmpdir'], (output/'step-0001.stdout').read_text())
+        self.assertEqual(recipe.verify_evidence(output)['recorded_status'], 'PASS')
+
+    def test_receipt_relation_and_missing_receipt_refuse(self):
+        """Rehashing a false receipt cannot bypass semantic binding to its proof."""
+        result, output = self.run_fixture('receipt-control')
+        self.assertEqual(recipe.verify_evidence(output)['recorded_status'], 'PASS')
+        receipt_path = output/'fixture-area-proof.receipt.json'
+        original_receipt = receipt_path.read_bytes()
+        original_result = (output/'result.json').read_bytes()
+        receipt = json.loads(original_receipt)
+        receipt['sha256'] = '0' * 64
+        receipt_path.write_text(json.dumps(receipt))
+        result['artifacts'][receipt_path.name] = recipe.digest(receipt_path.read_bytes())
+        (output/'result.json').write_text(json.dumps(result))
+        with self.assertRaisesRegex(ValueError, 'recipe-fixture-proof-incoherent'):
+            recipe.verify_evidence(output)
+        receipt_path.write_bytes(original_receipt)
+        (output/'result.json').write_bytes(original_result)
+        result = json.loads(original_result)
+        result['artifacts'].pop(receipt_path.name)
+        receipt_path.unlink()
+        (output/'result.json').write_text(json.dumps(result))
+        with self.assertRaisesRegex(ValueError, 'recipe-fixture-proof-incomplete'):
+            recipe.verify_evidence(output)
+        receipt_path.write_bytes(original_receipt)
+        (output/'result.json').write_bytes(original_result)
+        self.assertEqual(recipe.verify_evidence(output)['recorded_status'], 'PASS')
+        self.assertEqual(self.run_fixture('receipt-recovered')[0]['status'], 'PASS')
+
+    def test_bad_fallback_retains_mkdir_effect_then_recovers(self):
+        """A placement refusal records created directories and starts no child."""
+        self.assertEqual(self.run_fixture('placement-control')[0]['status'], 'PASS')
+        original_mode = self.root.stat().st_mode & 0o777
+        self.root.chmod(0o775)
+        home = self.root/'owned-home'
+        home.mkdir()
+        try:
+            with patch.object(Path, 'home', return_value=home):
+                result, output = self.run_fixture('placement-refused')
+            self.assertEqual(result['status'], 'FAIL')
+            self.assertIn('recipe-tmpdir-ancestors-not-private', result['failure']['cause'])
+            self.assertFalse(result['steps'])
+            created = home/'.local/state/swarm-fixtures/runner-tmp'
+            self.assertTrue(created.is_dir())
+            proof = json.loads((output/'fixture-area-proof.json').read_bytes())
+            self.assertIn({'kind':'mkdir_completed','path':str(created)}, proof['placement'])
+        finally:
+            self.root.chmod(original_mode)
+        self.assertEqual(self.run_fixture('placement-recovered')[0]['status'], 'PASS')
+
+    def test_import_failure_retains_unobserved_proof_then_recovers(self):
+        """Known import failure never fabricates internal provenance or runs a step."""
+        self.assertEqual(self.run_fixture('import-control')[0]['status'], 'PASS')
+        source = self.root/'tests/fixture_area.py'
+        original = source.read_bytes()
+        source.write_text("raise ValueError('owned import refused')\n")
+        result, output = self.run_fixture('import-refused')
+        self.assertEqual(result['status'], 'FAIL')
+        self.assertEqual(result['failure']['cause'], 'owned import refused')
+        proof = json.loads((output/'fixture-area-proof.json').read_bytes())
+        self.assertEqual(proof['import']['status'], 'failed')
+        self.assertEqual(proof['import']['internal_resolution'], 'not_observed')
+        self.assertEqual(proof['resolution'], [])
+        self.assertFalse((output/'step-0001.stdout').exists())
+        source.write_bytes(original)
+        self.assertEqual(self.run_fixture('import-recovered')[0]['status'], 'PASS')
+
+    def test_import_cache_is_not_explicit_resolution(self):
+        """A controlled between-phase change is not misattributed to import cache."""
+        self.assertEqual(self.run_fixture('cache-control')[0]['status'], 'PASS')
+        source = self.root/'tests/fixture_area.py'
+        original = source.read_bytes()
+        source.write_bytes(original + b"\n(_REPO/'.swarm/engine-settings.json').write_text(json.dumps({'values':{'runtime_temporary_directory':'second'}}))\n")
+        result, output = self.run_fixture('cache-changed')
+        self.assertEqual(result['status'], 'PASS')
+        proof = json.loads((output/'fixture-area-proof.json').read_bytes())
+        self.assertEqual(proof['import']['internal_resolution'], 'not_observed')
+        self.assertEqual(proof['resolution'][-1]['path'], str(self.root/'second'))
+        source.write_bytes(original)
+        (self.root/'.swarm/engine-settings.json').write_text(json.dumps({'values':{'runtime_temporary_directory':str(self.root/'.swarm-fixtures')}}))
+        self.assertEqual(self.run_fixture('cache-restored')[0]['status'], 'PASS')
+
+    def test_proof_publication_failure_stops_and_retains_primary(self):
+        """A valid control precedes publication refusal and a fresh recovery."""
+        self.assertEqual(self.run_fixture('proof-control')[0]['status'], 'PASS')
+        publish = recipe.publish
+        def refuse(path, raw):
+            """Refuse only the owned proof output, preserving other diagnostics."""
+            if Path(path).name == 'fixture-area-proof.json':
+                raise OSError(28, 'owned proof volume full')
+            return publish(path, raw)
+        with patch.object(recipe, 'publish', refuse):
+            result, output = self.run_fixture('proof-refused')
+        self.assertEqual(result['status'], 'FAIL')
+        self.assertTrue(result['evidence_failures'])
+        self.assertFalse(result['steps'])
+        self.assertFalse((output/'fixture-area-proof.receipt.json').exists())
+        source = self.root/'tests/fixture_area.py'
+        original = source.read_bytes()
+        source.write_text("raise ValueError('primary import')\n")
+        with patch.object(recipe, 'publish', refuse):
+            result, _ = self.run_fixture('both-refused')
+        self.assertEqual(result['failure']['cause'], 'primary import')
+        self.assertEqual(result['evidence_failures'][0]['errno'], 28)
+        source.write_bytes(original)
+        def refuse_receipt(path, raw):
+            """Retain an already published proof when its receipt cannot publish."""
+            if Path(path).name == 'fixture-area-proof.receipt.json':
+                raise OSError(28, 'owned receipt volume full')
+            return publish(path, raw)
+        with patch.object(recipe, 'publish', refuse_receipt):
+            result, output = self.run_fixture('receipt-publication-refused')
+        self.assertEqual(result['status'], 'FAIL')
+        self.assertFalse(result['steps'])
+        self.assertTrue((output/'fixture-area-proof.json').is_file())
+        self.assertFalse((output/'fixture-area-proof.receipt.json').exists())
+        self.assertEqual(self.run_fixture('proof-recovered')[0]['status'], 'PASS')
 
     def test_exit_failure_retains_cause_and_stops_then_recovers(self):
         """A valid witness precedes refusal; stderr survives and later steps stay idle."""

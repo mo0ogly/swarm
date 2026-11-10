@@ -4996,3 +4996,56 @@ arbitraire. Cette fixture unitaire ne prouve ni fournisseur natif, ni approbatio
 E2E, ni acceptation indépendante. Garder le rouge original et un vert frais ;
 `recipe.py verify` contrôle l’intégrité, pas la livraison. Publication source
 complète et approbation protégée restent des vérifications distinctes.
+
+### C3-P — observation Python du résolveur et du placement / Python resolution and placement observation
+
+`fixture_area.configured_area(repo, observer=...)` conserve le Path et les
+choix historiques du helper ; l'observation optionnelle provient des mêmes
+accès/buffers. Ce lot **ne corrige pas C-D01** : champ absent/null peut encore
+prendre le défaut et les règles Python restent distinctes de Rust. Sans
+observer, les callers gardent leur contrat. Une panne d'observer ne masque pas
+une erreur de résolution : les erreurs secondaires sont retenues dans
+`fixture_observation_errors` ; sans erreur primaire, elle refuse le retour.
+
+Le runner conserve `fixture-area-proof.json` et
+`fixture-area-proof.receipt.json` dans sa sortie neuve. Le premier distingue
+l'import (provenance interne non observée), l'appel explicite et le placement ;
+le second lie relecture interne, taille/empreinte et invocation. Les données
+comprennent seulement types/métadonnées pertinentes, chemin validé, modes examinés
+et événements mkdir/repli. Le TMPDIR préparé n'est pas un reçu d'enfant ; un
+contrôle avec enfant inerte vérifie séparément sa réception. Aucun historique de
+réglages ou environnement hérité complet n'est ajouté. Ce reçu n'est ni
+indépendant, ni une authentification, ni une preuve de Rust/R04/acceptation.
+
+Un échec de publication de cette preuve arrête les étapes et reste distinct de
+la cause primaire, dans `evidence_failures`. Les effets mkdir précédents ne sont
+pas annulés. Une panne des écritures finales peut encore laisser un dossier
+incomplet, jamais qualifié par l'absence d'erreur. Corriger la précondition puis
+prendre une sortie neuve ; ne pas réessayer automatiquement ni écraser l'ancien
+lot. `verify` exige les preuves/liens pour les nouveaux PASS et accepte le format
+historique sans attribuer rétroactivement une projection aux anciens dossiers.
+La recette `recipes/runner.json` couvre les 14 tests runner, 5 helper et 4 snapshot,
+avec témoins, refus et reprises Python uniquement, sans compilation/fournisseur.
+
+`fixture_area.configured_area(repo, observer=...)` preserves the Path and historical
+helper choices, with optional events from the same accesses/buffers. It **does
+not fix C-D01**: missing/null fields may still select default, Python and Rust
+rules remain distinct. Observer-free callers retain their contract. Observer
+failures cannot replace resolution errors: secondary errors are retained in
+`fixture_observation_errors`; without a primary error, observer failure refuses
+return rather than silently losing evidence.
+
+Runner retains `fixture-area-proof.json` and `fixture-area-proof.receipt.json`.
+The first separates import (internal provenance unobserved), explicit resolution
+and placement; the second binds internal readback, size/hash and invocation.
+Only relevant types/metadata, validated path, examined modes and mkdir/fallback
+events are added, not full settings history or inherited environment. Prepared
+TMPDIR is not child reception; an inert-child check proves that separately.
+Receipt is neither independent/authenticated nor Rust/R04/engine acceptance.
+Proof-publication failure stops steps, separately retaining the primary cause
+and `evidence_failures`; previous mkdir effects remain. Final writes can still
+leave incomplete evidence. Recover the prerequisite and use new output; never
+automatically retry/overwrite a failed lot. `verify` requires coherent proof for
+new PASS while preserving historical evidence compatibility without inventing
+old projections. `recipes/runner.json` covers 14 runner, 5 helper and 4 snapshot
+tests, Python-only controls/refusals/recovery, no compilation/provider.

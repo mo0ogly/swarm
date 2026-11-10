@@ -2676,3 +2676,574 @@ this branch is not a qualified native profile. Branch push only, no PR or main
 integration; configured main-only push workflow triggers no compiling CI.
 Candidate review compares its tree to the explicit BF-L0-A parent, not concurrent
 main HEAD; differences from main are not delivered deletions.
+
+## BF-L0-C — next bounded R03/R04 batch and R06/R08 prerequisites (9 November 2026)
+
+**Current status: historical C-1/C-2; D1…D5 adopted; initial Python→runner C3-P implemented and locally verified (23 checks), P-4 handed off. No C-D01 correction or full C-3/C-4/R06/R08/C-5/BF-L0-C/overall BF-L0 closure.** Recommended
+scope: continue with `tools/verification/recipes/paea-owned-git-promote.json`
+only, separating declarations, effective-value evidence and native qualification.
+BF-L0-A/B remain closed within historical scope; overall BF-L0 and full R03/R04
+remain open. Current authority: FR/EN drafting without tests, compilation,
+providers or services; no commit/push or new execution authority inferred.
+
+### C-0 — baseline and scope choice
+
+Same canonical checkout `/home/fpizzi/Documents/ChatGPT/swarm`, also accessible
+through `/home/fpizzi/workspace/swarm`, dirty main, HEAD `5d34d499fe38683c45a26a4b97a204aa631688df`. Welcoming
+pr20-ci-rotation worktree retained clean/detached. Previously verified B push:
+`23d53781f97c54c9ce03d25b8c1642715be2214d`, branch codex/bf-l0-b-20261109; no
+realignment or main integration performed here. Reading hashes/preimages:
+`.cache/bf-l0-c-plan-20261109T085045Z/sources.json`; non-atomic reading, not a compiler graph.
+
+Options: adding three paths to all nineteen recipes outside pilot A would multiply
+consumers without resolving provenance; immediate native qualification already
+requires missing R06/R08 mechanisms. Recommend one promotion pilot, three future
+input additions and precise evidence contracts, followed by separate decisions
+for instrumentation/compilation. This draft neither adopts future development
+nor authorizes C-1/C-2 execution.
+
+| Inspected fact / boundary | Current source and consequence for C |
+| --- | --- |
+| Python helper missing from promotion inputs; saved setting or shipped default read | tests/fixture_area.py:29–54, recipe.py:215–250. Runner imports helper after archive; import evaluates _AREA, then runner calls configured_area again. Source-only archive does not freeze resolved setting. |
+| Exported TMPDIR may differ from configured path | recipe.py:219–250: runner-tmp, ancestor-mode inspection, private fallback or refusal. environment.json records overrides including TMPDIR, not structured source/revision/fallback provenance. Historical A-3 0775/0700 proofs are not automatically rerun. |
+| Direct Rust path is distinct | swarm-engine/src/fixture_area.rs:50–104 resolves from compiled repo, cached by OnceLock at first use; fixture_area creates there, fallback_area is separate. Runner TMPDIR does not prove service destination from tempdir_in(swarm_engine::fixture_area()) in promotion harness. |
+| Wrapper/policy absent from promotion inputs | .cargo/config.toml selects cargo_space_guard.py, reading .cargo/storage-policy.json and checking checkout/output volumes for rustc with --out-dir before exec. dev/test debug=0 and incremental=false are declared, not proof of effective profile. |
+| Existing collection limits | verify_native_profile.py:61–103 retains local configs/support, not all ancestor/CARGO_HOME configs or effective C flags; run:197… builds swarm-cli/swarm-rust. paea_source_acquisition_inventory.py:65–114 compiles engine lib and paea_git_repository, then runs recipe; rustdoc remains declared-source-bound only. Neither qualifies promotion target by name. |
+
+### C-1/C-2 — proposed declarative diff and future retention
+
+Add once each after .cargo/config.toml in promotion inputs:
+`tests/fixture_area.py`, `tools/verification/cargo_space_guard.py`,
+`.cargo/storage-policy.json`. Preserve B results/births, C/result and other inputs;
+no steps/environment/assertions/features/counter changes. Shipped default is
+already covered by swarm-engine/**/*; no whole .swarm, mutable Root, policy or
+threshold changes. The two A recipes need neither correction nor rerun for this.
+
+Under future C-2 authority: fresh directory, existing snapshot/archive_inputs
+functions only, no run_recipe or verify as if package were a run. Reread every
+member/hash and specifically these three inputs, before/after catalogs and fresh
+B birth inventory. Preserve original refusal/drift and stop dependent work; use
+new output after diagnosis/corrected prerequisite. Success establishes only
+promotion declarations, not full R03/R04 or native graph. No new helper needed
+for this portion.
+
+### C-3 — proposed effective R03/R04 evidence contract
+
+The following projection is **unimplemented collection need**, not an existing
+DTO or command. Produce it at the actual consumer, bound to invocation/source;
+independent later recomputation does not prove the choice consumed. Any
+instrumentation needs a separately authorized development lot with functions,
+errors/docstrings and permitted checks defined first.
+
+| Future evidence / producer → reader | Safe fields, observable criteria and limits |
+| --- | --- |
+| R03-Python resolution/fallback → recipe reader | Identify resolution repo, phase/process, helper/runner version, saved/default/missing/error source, field presence/type, relevant value, resolved absolute path, schema_version/revision where present. Distinguish read metadata from full document validation: helper does not decode EngineSettingsDocument. Retain relevant ancestor modes, runner-tmp candidate, fallback branch/cause and transmitted TMPDIR. Do not invent saved revision for default. Exclude full .swarm content/history/secrets; hash relevant projection and retain provenance/before-after stability. |
+| R03-Rust first use/direct calls → bench reader | Identify binary/profile, repo embedded through CARGO_MANIFEST_DIR, process/first OnceLock call, read source/outcome, actually used path and distinct fallback destinations. Compare with passed TMPDIR without assuming equality. Saved change after first use distinguishes reread from cached value, never retroactive adoption evidence. |
+| Product setting chain → evidence reader | EngineSettingsDocument has schema_version/revision/values/history (engine_settings.rs:2446…); runtime_temporary_directory/path validator, then RootStore read/apply_runtime_temporary_directory (1855–1903). Generic Admin settings.rs API and CLI engine-settings (lib.rs:1634…) inspected; rendered save/reopen and each consumer's application remain to qualify on owned fixture. Runner repo setting is not automatically historical SOURCE Root setting. No real setting changed here. |
+| R04 effective configuration/guard → qualification reader | Bind cwd, exact commands, effective configs and resolved precedence, launcher argv0/path/resolved target/hash for Cargo/wrappers, consumed policy/hash/schema/threshold, outputs/volumes and admission-space observation. Separate existing threshold from consumption; never lower it to manufacture success. Preflight guard is no reservation/quota or coverage for rustdoc/build scripts/direct rustc without --out-dir. Retain refusal/cause/nonstarted stage; resume only after corrected prerequisite. |
+
+**C-D01 discovery, static, to qualify before claiming parity:** Rust maps every
+saved-file read error to absence (Err(_)) and non-string fields to absence via
+as_str; Python uses is_file then read_text and retains a non-null non-string
+field until refusal. Outcomes may differ by filesystem/type branch; runtime not
+reproduced. Path validation must not be presumed identical either, including
+separators/trailing separator. Value: avoid certifying saved choice when default
+was consumed. Owner Codex; resume with decided contract and authorized isolated
+control/refusal/recovery for each consumer, then separate corrective lot if
+needed. No silent alignment or rewriting A/B closure; full R03 stays open until
+required discrepancy is resolved and verified.
+
+### C-4 — R06/R08 prerequisites before native qualification
+
+| Gate / present state | Required evidence and resumption condition |
+| --- | --- |
+| R06-declarative — available, limited | Explicitly select runner for C-2 retention only; an input file is not its invocation. B proofs are not a build. |
+| R06-target — promotion mechanism unqualified | For --test paea_git_promote_call: prebind cross-crate sources, path-imported authority fixture module, resources/producers; future exact-target compilation only under authorization, raw Cargo events/depfiles and actual produced/used executable. Do not run existing acquisition collector to fill gap: it chains other compilation/tests. First define dedicated/adapted collector contract, files and authority; no tool added now. |
+| R06-rustdoc — separate evidence | Second promotion step is cargo doc swarm-engine --no-deps. Decide its own effective inventory/evidence; test depfile or “bound” comment cannot qualify it. Keep open if method missing. |
+| R08-config/env — not collected here | Retain relevant safe cwd, manifest/lock, source tree+diff, actually selected toolchain, local/ancestor/CARGO_HOME config, relevant Cargo/Rust/C/link flags/env, wrappers, target-dir, debug/incremental, offline/locked and feature options. Distinguish absent/effective/unknown; no complete environment/credentials, no omission-as-absence. Unresolved config inventory leaves gate open. |
+| R08-graph/binary — unestablished | Cargo events, transitively unified features (not merely no --features flag), actual artifact profiles, depfiles and prebound source hashes, generators/resources outside depfiles; bind actual Git and subprocesses, not only Cargo launcher recorded by recipe.py. Separate fixture/production targets/executables; do not add test-fixtures/test-util to manufacture delivered-profile qualification. Test code presence != execution; compile-only != effect evidence. |
+| R07/fixtures/resources — independent prerequisites | Before native execution: barrier-bound M0/Δ/M1 capture, fresh birth/ownership and A/B controls/fencing per existing lots; no historical writable Root. Future measured sufficient space under unchanged policy, real build lock available without deletion/bypass, stable inputs/fresh outputs. No arbitrary global watchdog or invented attempt limit. C grants none of these rights. |
+
+### Proposed sequence, acceptance and resumption
+
+| Step | Deliverable / criterion / remaining authority |
+| --- | --- |
+| C-0, current preparation | Inspected sources/hashes, scope and risks retained FR/EN; plan implicitly executes no C step. |
+| C-1, future declaration | Only three promotion inputs added; non-input JSON equal, preimages/concurrent work preserved; explicit application request required. |
+| C-2, future retention | Matching catalogs/members/bytes, valid input witnesses and stable sources; selection/archive-only authority required, no steps. |
+| C-3, projection | Finalize contract above, then separately authorize instrumentation/checks; valid saved/default controls before absent/null/non-string field, malformed JSON, read refusal, forbidden path, modes/fallback and between-read/first-use change variants. Recover only owned fixture and retain fresh evidence, no real setting mutation. Policy: valid existing control, missing/invalid policy/simulated insufficient-space refusals, restore/recover; no injections now. |
+| C-4, R06/R08 qualification | Validate target/profile/config/env/rustdoc matrix before launch; current documentary coverage only, graph/binary unestablished. Future compilation/tests need separate authority. |
+| C-5, future closure review | Reconcile C-1/C-2 bytes and actually available contracts/projections; distinguish established declarations, documented specification and verified/unverified dynamic collection. No open criterion promoted to conformance; possible closure only of ready scope, never automatic BF-L0/03-F/03-B. |
+
+Immediate recommendation: authorize C-1 separately, then C-2 without steps if
+desired; reserve projection/collector development and behavioral checks for
+explicit scope after C-D01 decision. Codex retains work; Fabrice arbitrates rights
+and shared-file sequencing. Other recipes/R01/R02/R05/R09 and remaining BF-L0 keep
+prior state, no bulk rollout.
+
+Preparation review: only two plans changed by append; no product
+policy/constant/fallback, function/docstring or error path modified. Missing
+guessed toolchain/settings paths during reading were resolved through actual
+path discovery, without toolchain commands or version inference. FR/EN consistent,
+diff/whitespace inspected, preimages/other work preserved. No runner/helper
+imports, C selection/archive, tests, compilation, provider, service, commit/push,
+installation, version_history or embedded-context changes. Reading/restoration
+index: `.cache/bf-l0-c-plan-20261109T085045Z/location-index.json`, Lexar copy after actual-mount check.
+
+
+### BF-L0-C — C-1 applied, declaration only (9 November 2026)
+
+Fabrice authorizes the three planned promotion-manifest entries, FR/EN plans and
+concurrent-work preservation, without tests, compilation, providers or services.
+**C-1 applied and static diff verified; C-2 not performed, BF-L0-C and overall
+BF-L0 open.** Initial framing above remains historical; current request
+authorizes only its declarative step.
+
+Replan: same canonical checkout, dirty main, HEAD `5d34d499fe38683c45a26a4b97a204aa631688df`; HEAD advanced since
+framing, without realignment here. Before editing, recipe equals B-1/B-2/B-4
+bytes, SHA-256
+`61fd3db892141e38c49e6ac843990ed9fda3831d4b15a095f0a168893afd3c99`.
+
+In `tools/verification/recipes/paea-owned-git-promote.json`, added after
+.cargo/config.toml once each, in order:
+
+- `tests/fixture_area.py`;
+- `tools/verification/cargo_space_guard.py`;
+- `.cargo/storage-policy.json`.
+
+Before/after JSON comparison: only these three input additions; prior order and
+other entries preserved, including B results/births and C/result. All non-input
+fields equal: steps/environment/assertions/counters unchanged, no feature option
+added. Text comparison: three added lines, no deleted manifest line. After SHA-256:
+`e7e12af94528ae00b68949912603f9b024af2781f99d29c557582e5e8360d6a7`. Three files exist and inspected hashes are retained in baseline.json;
+**their C-2 selection/archive has not been executed**.
+
+Byte review: policies — existing support paths only, no new operator choice,
+threshold, deadline, retry, fallback or bound; local Cargo policy/runtime settings
+unchanged. Functions/documentation — no function/docstring created/modified,
+FR/EN plan updated, no documentation compilation. Errors — no product path
+modified, no new refusal/recovery exercised; runner limitations and C-D01 stay
+documented, without claiming correction.
+
+Preimages, hashes, C-1-only diff and local review: `.cache/bf-l0-c-c1-20261109T085237Z/`; local/USB copy and
+restoration index in location-index.json after actual Lexar mount/capacity check
+and copy readback. Compare current bytes before replacement; preserve other plan
+additions, no index/branch change, staging/reset/stash, commit/push or A3 file
+changes. Only manifest and FR/EN plans change. git diff --check and diff review,
+without tests.
+
+Separate next step: obtain C-2 selection/retention-only authority on fresh inputs
+and new output, no Cargo steps. Earlier B-2 evidence remains historical and does
+not archive these new inputs. C-3, C-D01 and C-4/R06/R08 prerequisites stay open;
+no effective projection, Python/Rust parity, native qualification or R07 capture
+acquired. A/B retain historical bounded closure. No installation, version_history
+or embedded context change for this undelivered declarative increment.
+
+
+### BF-L0-C — C-2 selection and archiving verified (9 November 2026)
+
+Fabrice authorizes selection/archive of three C-1 entries and member/hash
+reinspection, FR/EN update and concurrent-work preservation, without tests,
+compilation, providers or services. **C-2 established for declared-byte retention;
+C-3/C-D01 and C-4/R06/R08 remain open, C-5 not performed, BF-L0-C and overall
+BF-L0 not closed.** Earlier C-2-not-performed statements retain C-1 history;
+current authority supersedes deferral for C-2 only.
+
+Replan: same canonical checkout, dirty main, HEAD `5d34d499fe38683c45a26a4b97a204aa631688df`. Current recipe equals
+C-1, SHA-256
+`e7e12af94528ae00b68949912603f9b024af2781f99d29c557582e5e8360d6a7`; runner
+retained/unchanged, SHA-256
+`348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b`.
+Three target source hashes match C-1 inspection.
+
+| Target entry, included once | Archived/reread bytes | Recomputed SHA-256, equal to source/inventory |
+| --- | --- | --- |
+| tests/fixture_area.py | 3,873 | `4ece994bd492dc4e44adf24388ed50073ceeff7e74527cd106b31824c8ce566c` |
+| tools/verification/cargo_space_guard.py | 6,545 | `09b7d45c78c64282dee6265be2d26cea6066505963465e2a50a856f1fe8d5916` |
+| .cargo/storage-policy.json | 63 | `5e392baf7d475a34bd1c4614636682cd4e01bd21b007a3d4845b1e822c7f26dd` |
+
+Actual method: import recipe.py only, load_recipe, snapshot before →
+archive_inputs → snapshot after → tar reinspection without extraction → final
+snapshot. No run_recipe, verify, Cargo step, fixture_area import, wrapper call
+or collector. **742 paths in each inventory, 742 unique regular members**;
+exact catalog, safe names, sizes/content/SHA-256 compared for every member to
+inventory/reread sources. Three equal inventories; recipe/runner stable during
+operation. Three rows above are not the complete catalog, retained separately
+in archive-members.json.
+
+Archive declared-inputs.tar.gz: **2,388,551 bytes**, SHA-256
+`96c5172f1aa1b79340855c59167e14d37eea0cf8c6f33ba853f3e295becc7417`.
+Manual SOURCE/birth search without symlink following before/after: eight
+directories, one owned-root candidate linked to same result.root, zero symlinks;
+equal inventories/hashes. B SOURCE result/birth remain selected. Birth-pattern
+catalog agrees at these observations, not general born/glob equivalence or
+completeness across the entire window.
+
+Fresh evidence: `.cache/bf-l0-c-c2-20261109T093535Z/`: retained recipe/method, baseline/plan preimages,
+inputs.before/after/final.json, archive-members.json, three-target-inputs.json,
+birth-search.before/after.json, archive and summary.json. Copy at `/media/fpizzi/Lexar/swarm-evidence/bf-l0-c-c2-20261109T093535Z/`, after
+actual Lexar /dev/sda1 vfat rw mount/write/capacity check, then reread every file
+and complete archive. Local/USB location-index.json records scope, hashes and
+restoration into a fresh directory, never over active sources. Local Unix staging
+supports runner hardlink publication; no FAT execution or original deletion.
+Input package is not a complete run; no fabricated run result.json or assertion
+PASS, no historical B/C-1 evidence modified.
+
+Increment review: only FR/EN plans change, current status plus outcome addition.
+Compare before replacement, preserve other additions, inspect diff/whitespace.
+Recipe/helper/wrapper/policy/engine/harness/A3 files unchanged. Policies: no
+threshold/default/fallback/deadline/retry/bound changed; functions/docstrings:
+none created/modified; errors: no product path modified, no refusal observed or
+exercised here. No tests or documentation compilation. Comparisons prove neither
+global exclusion of concurrent processes nor unexercised refusal paths.
+
+Scope: declared-input retention only, not resolved setting/provenance, actually
+consumed TMPDIR, guard invocation, Python/Rust parity, compilation/graph/features/
+binary, dynamic R07, attribution or absence of effect. C-D01 remains static and
+unreproduced. No setting change, historical writable Root opening, new rights,
+commit/push, installation, version_history or embedded-context modification.
+Next: frame and separately authorize C-3 projection and C-4/R06/R08 mechanisms;
+C-5 may close only scope with all applicable criteria established. A/B retain
+historical closure, no automatic rollout to other recipes.
+
+
+### BF-L0-C — C-3 preparation: projection and C-D01 handling (9 November 2026)
+
+**C-3 refined as proposed contract only: no projection produced, instrumentation
+or C-D01 correction performed.** C-1/C-2 retain declarative evidence; C-D01,
+C-4/R06/R08 and C-5 remain open. This preparation supplements initial C-3 framing
+without adopting product behavior or changing previous A/B/C evidence.
+
+Replan: same canonical checkout, dirty main, HEAD `5d34d499fe38683c45a26a4b97a204aa631688df`; inspected sources and
+preimages in `.cache/bf-l0-c-c3-plan-20261109T105530Z/sources.json`. Reread Python configured_area (29–54), Rust
+configured_area/fixture_area/fallback_area (src/fixture_area.rs),
+engine_settings/runtime_temporary.rs validator, runner (recipe.py:195–250),
+settings document and Cargo wrapper. No module imports, live .swarm settings
+reading or Root opening. Future actually consumed values remain unobserved here.
+
+#### C3-P — proposed evidence schema, no implemented interface
+
+Names below are planning vocabulary, **not an existing API**. One projection
+envelope belongs to a specific invocation/consumption point; it replaces neither
+admission nor effect-attribution evidence.
+
+| Proposed group / types | Required content and future producer → reader |
+| --- | --- |
+| Envelope | Evidence-schema version, unique dossier/invocation/read ID, consumer/phase, process linked to executable/hash, observation sequence, HEAD+diff and producer hashes, original-evidence links. Recipe reader then qualification reader; PID/timestamp alone proves no identity/global order. |
+| Per-observation state | observed, not_observed or not_applicable with reason; typed value only when obtained. Missing/null/wrong type/error/default selection are distinct. Unknown is neither false, default nor absence. No invented saved schema_version/revision for shipped default/unreadable source. |
+| R03 source/read | Runner repo, binary-embedded repo or application Root role; explicit resolution base/candidate source. Access outcome read/absent/not_file/io_error/not_observed, document/values/field presence/type; actually selected origin saved/shipped_default/none/unknown. Separate is_file outcome from actual read; false alone does not prove ENOENT. Retain safe IO cause/chain, not full document. |
+| Value/validation | Relevant safe value and exact type; schema_version/revision metadata marked read_only or actually validated. Exact validator/version/result, relevant raw path and consumed resolved path/base; observed presence/symlink/identity where available. Helpers' partial JSON parsing is not EngineSettingsDocument::decode/history validation. |
+| Cache/coherence | First-resolution logical point, cache initialized or unobserved, reuse and link to originating evidence. Python import _AREA, later runner configured_area call and Rust OnceLock are separate records. Current read is not old-cache provenance. Bind projection/value to the same consumed access/buffer, not a reconstruction read; before/after stability is observation, not global atomicity. Drift suspends qualification, never replaces old evidence retroactively. |
+| Placement/local effects | Runner producer: configured/runner-tmp candidate, examined ancestor modes, fallback branch/cause and child TMPDIR. Rust helper: actual fixture_area path or explicit fallback_area call; distinguish returned path from created directory. Retain completed/failed/unknown creations even if later step refuses; refusal after mkdir is not zero filesystem effect. HOME may resolve fallback without dumping environment. |
+| R04 at guard decision | Wrapper invocation/phase, cwd and launcher/target/hash, actual --out-dir, policy actually read (schema/hash/threshold), checkout/output observations and admission/refusal/not_checked. Without --out-dir current code does not call load_policy/check_space: not_applicable with reason, not “policy validated.” --status attests only observed read/measurement, not compilation admission. No path invoked here. |
+| Evidence publication/reception | Fresh owned output; original size/hash, publication/sync/readback outcomes, then reader receipt bound to exact dossier/invocation/hash. Missing publication/reception means unavailable evidence, retaining prior known/unknown effects. No action reexecution to repair missing evidence. Production/reception mechanism remains to design/qualify before development. |
+
+Retain only targeted setting, relevant metadata, safe causes/references; no full
+history/values, tokens, credentials or authority material. Projection hash binds
+retained bytes, not omitted private content. Define exact serialization/comparison
+before implementation; no synthetic digest replaces missing source/reception.
+Escape invalid values/diagnostics. Unsafe necessary data remains unavailable and
+criterion open. Invent no existing export, command or collector.
+
+#### C-D01 — inspected facts, hypotheses and recommended target contract
+
+| Family / current source | Code-derived outcome, not rerun / evidence requirement |
+| --- | --- |
+| Saved source missing | Python is_file can skip reading; Rust groups read errors including NotFound. Both may read default. Record actual path, not certain absence without observation. |
+| Read failure, source present | If Python reaches read_text, error propagates; Rust Err(_) selects default. If is_file fails/returns false, distinguish that Python branch. Static divergence confirmed; actual filesystem cause/state not reproduced. |
+| Invalid JSON/structure/type | Invalid JSON may raise Python parser error, Rust expect panics; no runtime result observed. Non-null non-string field: Python refuses, Rust as_str returns None and may select default. Non-object values/document: Python .get may fail, optional Rust lookup may select default. Missing/null can select helper defaults; this is not explicit adoption of an old product document. |
+| Path/cache | Read validators: Python strip('/') permits a trailing separator for an otherwise valid non-/tmp path; Rust rejects raw.ends_with('/'). Python configured_area reevaluates on call but fixture_area uses import _AREA; Rust configured_area reuses OnceLock. “Mirror” proves no parity, reread-after-change or shared destination. |
+
+Two approaches: faithfully observing differences without behavior changes can
+qualify consumption provenance, not parity; aligning a decided refusal/absence
+contract then correcting consumers addresses the cause and requires further
+non-regression evidence. Recommend first retaining diagnosis/target contract,
+then a separate corrective lot before any parity claim. Observer must not change
+values while measuring or relabel current Rust default selection as a refusal
+that did not occur.
+
+**Target contract awaiting decision, not adopted here:** distinguish proven
+absence from access failure; IO error, malformed JSON or invalid type must not
+silently become default-backed success. Preserve cause, refuse qualification and
+avoid dependent stages under false evidence. Explicitly decide default permission
+for missing source/missing/null field, separating fixture helper from unadopted
+old product settings; no silent migration-policy change. Choose common path
+validator/base and cache/reread rules. Projection reports existing fallback with
+unknown cause honestly but grants neither conformity nor retry. Full R03 stays
+open pending decision, authorized correction and actual consumer verification.
+
+#### C3-A — future controls, variants and recovery, not executed
+
+| Group | Prior valid control / variant / observable criterion |
+| --- | --- |
+| Saved/default source | Same consumer/preconditions, valid saved setting differing from valid default, then default with actually established absence. Distinguish source/value/base/revision/destination; equal values cannot discriminate choices. |
+| Errors/structure | After control: read denial under known fixture identity, directory instead of file, link under decided contract, malformed JSON, non-object document/values, absent/null/bool/number/list/object field. Require exact cause/consumed branch and dependent-stage stop under target contract; privileges permitting read invalidate EACCES scenario. No live .swarm injection. |
+| Paths | Valid relative/absolute controls; empty, /tmp/descendants, NUL, dot/traversal components, repeated separators/trailing separator. Retain safe raw bytes, verdict/consumed path; record pre-fix differences, no normalization hiding counterexample. |
+| Cache/read race | Change between Python import/runner call and Rust first/later resolution; fresh process/cache for control, explicit linkage for cache case. Observe consumed access, drift or cached value without arbitrary sleeps/post-hoc reread alone. Restoration does not mean initialized process adopted new setting. |
+| Placement | Private-ancestor control before writable ancestor, valid private fallback then inadmissible fallback/create error. Observe distinct runner/direct Rust paths, applied mkdir steps, passed TMPDIR and actual created destination; no universally shared fallback assumption. |
+| Cargo guard/evidence | Valid policy/admission observation on fixture --out-dir path; missing/invalid policy/simulated insufficient space; path without --out-dir marked unchecked. Missing/divergent publication/receipt blocks qualification, not grounds to reexecute for evidence. Restore owned fixture only, new output/original cause retained; zero real compilation in any explicitly authorized miniature. |
+
+Future C-3 acceptance: each exercised actual consumer emits projection linked
+to consumed source/bytes/value and verifiable reception; every decided applicable
+case has control, expected refusal/difference and recovery. Separate specified,
+implemented, observed, received and accepted. One helper proves neither the other
+nor runtime startup. Close C-D01 only after decided contract, pre-fix reproducer,
+authorized general correction/non-regression, FR/EN documentation and actual
+consumer flows exercised. Preserve original refusals/failures and bounded
+A/B/C-1/C-2 closure.
+
+Owner Codex for preparation/future correction; Fabrice decides contract/authority,
+no delegation. Recommended next increment: C-D01 decision and C3-P instrumentation
+scope/files below; reproduction/development/checks require separate authority.
+Future candidate files, unchanged here: tests/fixture_area.py;
+swarm-engine/src/fixture_area.rs, engine_settings/runtime_temporary.rs and
+RootStore contract under rust/crates/swarm-engine; recipe.py for resolution/
+placement/evidence linkage, cargo_space_guard.py for decision observation.
+Reinspect callers before extending to other helpers/crates/runtime; R06/R08
+collection/compilation and dynamic R07 remain separate, unestablished lots.
+
+Byte-bound review: only FR/EN plans change (status/addition), source hashes in
+sources.json, preimages/diff/review at `.cache/bf-l0-c-c3-plan-20261109T105530Z/`. No operator choice, threshold,
+timeout, retry, product fallback, function/docstring or error path modified.
+Semantic review and git diff --check only, no imports/helpers, tests,
+compilation, live collection, provider, service, commit/push, installation,
+version_history or embedded-context changes. Lexar provenance copy after
+mount/capacity/readback checks, local/USB location-index.json; no A3 report changes
+or deletion of original evidence.
+
+
+### BF-L0-C — D1…D5 adopted, C3-P P-0 formalized (9 November 2026)
+
+**Fabrice adopted D1…D5 as target contract; documentary P-0 completed.
+P-1…P-4 unauthorized, no instrumentation/correction performed. C-D01, full C-3,
+C-4/R06/R08, C-5 and overall BF-L0 remain open.** Relayed human decision
+supersedes historical “awaiting decision” wording, not current code. A/B and
+C-1/C-2 retain exactly their historical scope.
+
+Resume: canonical checkout used since A, dirty main, HEAD `5d34d499fe38683c45a26a4b97a204aa631688df`; welcoming
+pr20-ci-rotation worktree retained without realignment. Concurrent engine/POC-06,
+README and other work excluded from our writes. A3 local proposal
+ARBITRAGE-CD01-C3P.md, inventory and ETAT-BF-L0-C.md reread; detailed adopted
+wording governs, originals untouched. Dated hashes are not presumed current:
+comparison at `.cache/bf-l0-c-c3p-p0-20261109T132800Z/sources.json`, retaining any differences. Current targeted
+Python/runner passages read; no live collection.
+
+#### Adopted target decisions, separate from implementation
+
+| ID | Adopted decision / scope | Bounded current state |
+| --- | --- | --- |
+| D1 | Checkout fixture helper: shipped default only after absence established at actual access, then successful default validation. is_file=false/unresolved link/unknown origin insufficient. Product/old-adoption contract distinct. | Python may default after is_file=false, Rust after Err(_); no actual access qualified here. |
+| D2 | Present unreadable source or invalid JSON/structure/type: safe cause retained, no implicit default/dependent launch under invalid resolution. | Static differences remain; no fix. Future observer reports actual default selection, never fictional target refusal. |
+| D3 | Present document with missing/null field: unconfigured, no silent migration/completion/adoption. Old product document uses its adoption procedure; fixture is explicitly configured through supported setup. | Current helpers may default on None; reproduce/verify target discrepancy under separate authority, not hidden in P. |
+| D4 | Reference grammar EngineSettingsValues::runtime_temporary_directory, explicit relative base, no trim/normalization admitting rejected input. Symlink/permission rules stay at placement boundaries. | Distinct Python/Rust validation remains; initial observation P does not align it. |
+| D5 | Retained resolution immutable per invocation, exact access/cache/generation; each new call observable, no silent process-cache adoption. Fresh resolution context/process needed to claim new adoption. | Import _AREA, explicit runner call and OnceLock stay separate; P observes without altering lifetimes. |
+
+D1 and D3 are different kinds of absence. Adoption supplies the future corrective
+contract, **not** development/test authority. Preserve completed local effects,
+primary/secondary causes and corrected prerequisite for fresh owned-fixture
+recovery; no automatic retry.
+
+#### P0-F — exact proposed file list, no new code file
+
+| Existing file | Proposed future work / boundary |
+| --- | --- |
+| tests/fixture_area.py | Observe branches of same configured_area computing Path. Preserve current selection/grammar during P, no early D1…D5 correction. Docstring observation option/causes/import limits. |
+| tools/verification/recipe.py | Bind explicit call/Path/placement to invocation; publish proof/receipt using existing fresh-output mechanisms, evidence causes separate from resolution causes. No declared steps/env, fallback decision/modes/policy-selection change. |
+| tools/verification/test_recipe.py | Future P-1/P-3 support in existing RecipeTests, isolated repo/inert Python child; reread final setup/contract before launch. No tests written now. |
+| tests/test_fixture_area.py | Future compatibility checks without observer and same-access events with observer; retain pre-fix behavior expectations before separate C-D01 correction. |
+| tools/verification/test_snapshot.py | Synthetic repo writes one-argument configured_area(root) today, around 35–36. Explicitly adapt this labeled double to future observation contract; do not alter snapshot.py to hide missing interface or treat double as real resolution. |
+| tools/verification/README.md | Existing FR/EN runner documentation sections: artifacts/scope, errors/recovery, no Rust/R04 guarantee. Concurrently dirty now; sequence/compare before future edit. |
+| docs/plans/AGENT-CONTROL-POCS.md and docs/en/plans/AGENT-CONTROL-POCS.md | FR/EN tracking/evidence each future increment; only files modified now. |
+
+No new helper/manifest/endpoint/flag/dependency/environment variable for P-0.
+snapshot.py, bf_l0_a_inputs.py and rust_agent_model_route.py are inspected
+readers/copies, not default edit targets. Rust/Cargo wrapper/policy/runtime/R07
+collector remain outside initial P; expanding list requires replan and authorized
+scope before editing.
+
+#### P0-I — precise proposed interfaces, not delivered
+
+Planning choice: additive existing-function extension
+`configured_area(repo=_REPO, *, observer=None) -> Path`. observer would be a
+callable receiving safe versioned event, enabled by runner for **its explicit
+call** only. None preserves Path return, exception type/cause and existing access
+count/order. No second resolver or post-hoc source read. Events come from
+variables/buffer already consumed by is_file/read_text/json.loads/validation;
+unobtained state stays unobserved, no added syscall manufacturing ENOENT.
+
+Runner retains exec_module import then passes local collector to
+configured_area(root, observer=…). Each event has invocation/phase/sequence and
+resolution ID; returned Path used for runner-tmp binds same resolution. Import
+success proves no shared _AREA provenance: internal import is **not** instrumented
+in first P. On import failure retain available runner cause/internal-unobserved
+fields, never reread file to reconstruct _AREA. Visible _AREA value may be recorded
+as observed cache with unknown origin, not authenticated historical resolution.
+
+Proposed events: candidate access/branch, parse/type/safe target value, validation,
+final resolution/error, then separate placement (actual mkdir/checks, fallback,
+destination/TMPDIR). Revision read from same document is not full settings
+validation. Do not replace resolver exception with observer exception. Future
+collector preserves primary cause and independent observation/publication failure;
+publication-only failure retains resolution result/prior known or unknown local
+effects and cannot allow a stage under fictional qualified evidence. Error
+contract remains unimplemented/unverified; no new exception signature/recovery
+routine claimed available.
+
+Proposed fresh-output artifacts: fixture-area-proof.json (resolver/placement
+events and observed/not_observed/not_applicable states) and
+fixture-area-proof.receipt.json (runner reader, invocation ID, exact first-file
+size/hash/readback result). Names reserved in plan, **neither produced by current
+runner**. Reuse publish/save and existing files inventory after contract inspection;
+no self-containing digest. Internal receipt/readback is not independent reception
+or engine acceptance. P-3 inert child may report received TMPDIR through
+invocation-bound stdout; native/arbitrary steps gain no such capability from
+runner receipt.
+
+#### P0-M — access → consumption → evidence / limits
+
+| Current inspected point | P consumption link / future observation | Limit and qualification refusal |
+| --- | --- | --- |
+| Helper import: _AREA = configured_area() (fixture_area.py:54) | Runner records exec_module start/success/failure and known cause. | Internal/cache provenance unobserved if not exposed; may fail before explicit call. No reread/import instrumentation in first lot. |
+| area.configured_area(root) (recipe.py:222) | Observer events and returned Path from same access, explicit repo base. | Missing helper/double interface or evidence is visible incompatibility, no silent reconstructive fallback. |
+| saved.is_file/read_text/JSON/value | Only reached branches/relevant same-buffer data, current rule and target verdict separate. | False is not proven absence; no hidden D1/D2/D3 correction; no full values/history dump. |
+| fixture_area()/fixture_root() | Observer-free callers retain _AREA/current effects; compatibility checked later. | No invocation here or allocation observation inferred from runner receipt. |
+| runner-tmp mkdir/_ancestor_modes_private | Events around existing operations and actually examined modes, prior effects retained on refusal. | Ancestor measurement is no lock/confinement; no ownership/mode changes manufacturing control. |
+| Fallback/environment.update/child launch | Final TMPDIR bound to explicit call/selected branch; P-3 inert child reads passed value. | TMPDIR proves no direct Rust placement; no real command executed in preparation. |
+| save/publish then reader | Runner receipt bound to reread bytes, publication/sync failures distinct. | publish may leave incomplete lot; final save is no infallible error channel. Define primary/secondary preservation before P-2, never fabricate PASS with inaccessible proof. |
+
+Inspected caller inventory: explicit runner, tests/test_fixture_area.py,
+RecipeTests and SnapshotTests double; rust_agent_model_route imports fixture_root,
+bf_l0_a_inputs copies sources, snapshot.py retains helper/runner. Retained RG
+search supplies candidates, not proof of no other dynamic calls. Preserve Path
+signature without observer for other callers; prebind every new dependency before
+qualification, no automatic scope expansion.
+
+#### P0-A — criteria, remaining authority and transmission
+
+P-0 established when adopted D1…D5, proposed file/interface/artifact list, matrix,
+limits/remaining authority persist in both languages with current byte-linked
+sources. Documentary criterion validates neither proposed API by execution nor
+any effective setting observation.
+
+P-1 requires separate isolated-control/reproducer authority: distinct saved/
+default witnesses before IO/JSON/type/cache/fallback variants, actual denied
+fixture identity (not privileged false EACCES), originals retained. Initial P
+expectations describe current behavior including defaults divergent from D1…D5,
+not fabricated target refusals. P-2 needs development authority on listed files,
+shared-file ownership/sequencing, docstrings and cause/publication contract.
+P-3 needs separately authorized targeted checks, same controls, controlled
+between-read change, inert child, missing publication/reception and recovery
+without double effect; no Cargo/Rust/provider. P-4 requires frozen sources,
+received evidence, policy/function/error review and new-candidate retention:
+C-2 becomes historical after helper/runner edits. No arbitrary test count/time
+limit set before final contract.
+
+Explicit remaining gaps: internal import/cache observation, implemented events/
+receipt, verified proof-failure handling; Python/Rust C-D01 correction, Rust/R04
+projection, R06/R08 qualification/dynamic R07. Codex owns historical work, Fabrice
+rights/arbitration, coordinator overlaps. No other chat/agent/outbound message.
+D1…D5 adopted, P-0 prepared; only a verified future correction can make consumers
+conformant/close C-D01. BF-L0-C and overall BF-L0 remain open.
+
+Increment review: two plans only, status/addition; source/preimage hashes at
+`.cache/bf-l0-c-c3p-p0-20261109T132800Z/`, compare before replacement, concurrent work retained. No product
+policy/constant/default/fallback, function/docstring or error path change;
+interfaces/errors specified only. FR/EN semantic and git diff --check, no tests,
+live collection/helper import, runner, development/build, provider/service,
+commit/push/installation, version_history or embedded-context change. Lexar copy
+after actual mount/capacity/write/readback checks, local/USB location-index.json.
+A3 reports left at read bytes except changes by their owner, no writes here.
+
+
+### BF-L0-C / C3-P — P-1 through P-4 local Python→runner handoff (9 November 2026)
+
+**Initial Python→runner C3-P implemented, verified and handed off locally.
+P-1/P-2/P-3 established within scope, P-4 documentary handoff; no independent or
+engine acceptance. C-D01/full C-3, C-4/R06/R08, dynamic R07, C-5, BF-L0-C and
+overall BF-L0 remain open.** Fabrice replied “OK FAIS” after P-0; resumption was
+announced/scoped to P-1…P-4 and isolated Python checks. No D1…D5 correction,
+Rust compilation, installation/service/provider or publication/commit/push.
+Earlier unauthorized-P statements retain their historical scope.
+
+APEX/replan, actual CLI verification and same-context code review, not independent.
+Reading HEAD `efafb54cdaf8d013431a330be97007ddc9ceeaf6`, dirty canonical checkout retained, no mutating Git operation.
+Nine-file preimages/initial inventory at `.cache/bf-l0-c-c3p-20261109T133439Z/baseline.json` and before/.
+
+| Step / criterion | Observed result / evidence and limits |
+| --- | --- |
+| P-1 historical control | Existing 13 checks passed before instrumentation: 8 runner, 4 snapshot, 1 helper. Private bootstrap/helper preload and synthetic source/settings, no live .swarm setting read. p1-baseline/, raw p1 outputs and argv retained. |
+| P-1 missing observation | Six new criteria refused pre-instrumentation (19 checks: 1 failure, 5 errors): missing observer option/proof/receipt. p1-new.* retained diagnostically; exact intermediate test sources were not all frozen then. Not acceptance evidence or C-D01-fix reproducer; final candidate has its complete inventory. |
+| P-2 same access | configured_area(repo, *, observer=None) preserves Path/accesses/historical decisions. Optional observer receives same-buffer source/branches/types, field presence distinct from null, read but unvalidated integer metadata, validated path/safe errors, no reconstructive read. Primary error preserved; observer errors separately attached as fixture_observation_errors. |
+| P-2 runner/internal reception | Invocation/resolution IDs and sequence; known import but internal provenance unobserved; placement/examined modes/mkdir/fallback and prepared TMPDIR, not invented child reception. fixture-area-proof.json/receipt.json published/bound/reread, retained runner hash and declared-helper hash or explicit undeclared helper. Publication failure stops next steps without retry, keeps primary/evidence_failures distinct and prior mkdir effects. |
+| P-3 final candidate | Permanent CLI recipe over frozen copied sources: **14 runner + 5 helper + 4 snapshot = 23 named checks, all passed, none skipped**. p3-final/ has three PASS steps, stable sources, verify_evidence VERIFIED/PASS. Seven exercised production/support/test/documentation files byte-match qualified copy; plans tracked separately. No Cargo graph qualified. |
+| P-3 discriminating assertions | Saved/default and missing/null fields, invalid types/structure/JSON, after-read and import/call changes, cache not reattributed, inert child TMPDIR reception, valid fallback/refusal after mkdir, false/missing receipt despite rehash, proof then receipt publication failures, primary plus proof error, restoration/new output. Actual EACCES under UID 1001 after readable control; separate injected IO for secondary observer cause. No real settings chmod/write. |
+| P-4 retention/handoff | Function docstrings, bilingual README, permanent recipe and FR/EN plans updated; three-axis review below. Complete final source archive, before sources/original diagnostics retained. New targeted cases also copied 17 scenario results before fixture teardown; these predate final additive metadata fields and do not replace p3-final. |
+
+Changed files: tests/fixture_area.py, tests/test_fixture_area.py;
+tools/verification/recipe.py, test_recipe.py, test_snapshot.py, recipes/runner.json,
+README.md; two FR/EN plans. No new maintained source file. One-argument
+SnapshotTests double explicitly adapted and labeled synthetic, not real setting IO.
+
+P-4 scope replan: runner.json expected eight tests and omitted helper/check
+sources. Maintaining it is necessary for verifiable delivery; now retains helper,
+helper test and shipped default, and runs three targeted Python suites (14/5/4).
+Counts are recipe assertions, not operator policy. Promotion/other recipes unchanged
+by P. C-2 package remains historical and does not qualify new helper/runner.
+
+Method replan: guarded substitution refused similar indentation blocks; prerequisite
+stopped, boundaries reread/reanchored before dependent work. Review restored
+exclusivity/error assertions to original test methods after method insertion.
+Final named checks cover corrected structure. Initial results, diagnostic red,
+first 19-PASS candidate and targeted/final runs retained, never rewritten.
+
+Byte review: **policies**, no new limit/timeout/retry/threshold/setting value or
+fallback choice; schema versions/event labels are evidence invariants, incomplete
+proof refusal is qualification condition, not budget policy. **Functions/docs**,
+configured_area, _ancestor_modes_private, run_recipe and verify_evidence reader
+reviewed with callers/docstrings/README; function inventory retained. No claim of
+C-D01 correction/Rust coverage. **Errors**, read/parse/validation and observation/
+publication/sync retained without turning failure into PASS; missing proof/receipt
+blocks stages. Final writes may still fail leaving incomplete output, never
+qualified. Import FAIL may lack environment.json and is not a complete verifiable
+run under historical mandatory artifacts; retain partial causes/proof, do not
+reclassify. Only complete final run is claimed VERIFIED.
+
+Evidence limitations: recipe stdout/assertions/archive prove no authenticated
+author, independent reception or physical restored-Root identity. Import _AREA,
+Rust OnceLock, R04, profiles/graphs/binaries/R07 and attribution/no-effect scenarios
+remain outside initial P. Verifier preserves old format without making it current
+evidence. Tests preserve divergent behavior: incomplete document may still default
+and Python grammar is unaligned. D1…D5 adopted targets, **not achieved conformity**.
+No live service/settings/embedded context changed, no delivered product binary or
+version_history change needed for source-invoked tools qualified in isolation.
+
+Evidence/index: `.cache/bf-l0-c-c3p-20261109T133439Z/`, exact argv, frozen copies/internal archives/raw outputs
+and source review. Envelope copied to Lexar after actual mount/capacity check,
+sync/readback/member inventory; local location-index.json gives archive/hashes and
+fresh-directory restoration. Originals retained. Concurrent README/plan edits
+preserved by append/compare; no other files/commits/index changed by this lot.
+
+Recommended next scope: authorize separate Python/Rust C-D01 correction under
+D1…D5 with its own reproducers/non-regression (Rust compilation authority separate),
+then Rust/R04 projection and C-4 prerequisites. Honest historical fallback
+observation cannot close C-D01. C-5 may decide only proven scope; no BF-L0 closure
+or implicit native resume. No further work launched.
+
+
+### BF-L0-C/C3-P — bounded Git publication (10 November 2026)
+
+Fabrice authorizes this lot's commit/push without rerunning tests, Rust compilation,
+providers or services. Dedicated branch prepared from already-pushed BF-L0-B
+commit `23d53781f97c54c9ce03d25b8c1642715be2214d`; includes only C-1/C3-P and our
+documentary sections. Local main commits, concurrent plan/README additions and
+A3 reports excluded, retained in primary checkout. Six code/test/recipe files
+byte-match those verified by 23 checks on 9 November; branch documents assembled
+separately. Evidence remains tied to original inventories, not a native graph or
+the whole new branch. No tests rerun, PR/main integration or installation.
+Current push workflow targets main, not this branch. Review against explicit
+parent using separate index; primary HEAD/index preserved. Configured Git identity
+used, no added attribution. Lexar mounted but full: new publication evidence at
+`.cache/bf-l0-c-c3p-commit-20261110T014213Z/` locally, no cleanup or relocation of original USB data.
+P-1 authorizations retransmitted during publication are historical and trigger no
+replay; current direct human instruction prohibits reruns. BF-L0-C/C-D01 and
+overall BF-L0 remain open.

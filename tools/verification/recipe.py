@@ -27,7 +27,7 @@ def digest(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
-def _ancestor_modes_private(path):
+def _ancestor_modes_private(path, *, observer=None):
     """Report whether every ancestor component of an existing directory is
     private to group and other (no group/other write bit).
 
@@ -39,11 +39,14 @@ def _ancestor_modes_private(path):
     Errors: OSError from os.stat propagates (unreadable ancestor is not
     proven private). Limits: checks write bits only — a later change of
     ownership or mode invalidates a past result; not a security boundary,
-    a run-local placement decision.
+    a run-local placement decision. Optional observer receives only examined
+    ancestor path/mode pairs without changing the checks; callback errors propagate.
     """
     resolved = Path(path).resolve()
     for candidate in (resolved, *resolved.parents):
         mode = os.stat(candidate).st_mode
+        if observer is not None:
+            observer({'path': str(candidate), 'mode': mode & 0o7777})
         if mode & 0o022:
             return False
     return True
@@ -178,6 +181,10 @@ def run_recipe(root, recipe_path, output):
     Fresh output only. Preserve original stdout/stderr, launcher identity, declared
     environment and source bytes. Unexpected exit/assertion/source change stops
     later steps. FAIL retains cause and evidence; interruption never becomes PASS.
+    The explicit Python fixture resolution/placement is retained with an internal
+    readback receipt. Import/cache internals stay unobserved; C-D01 behavior is
+    unchanged. Proof publication failure stops steps, preserving any primary error.
+    Complete evidence publication can still fail: that output remains incomplete.
     Preserve the invoked launcher name and symlink path (including relative PATH
     directories) because multicall tools/virtual environments consume argv0.
     The separately recorded resolved target/hash is provenance, not a replacement
@@ -194,6 +201,41 @@ def run_recipe(root, recipe_path, output):
     steps = []
     failure = None
     after = None
+    evidence_failures = []
+    proof_attempted = False
+    proof = dict(schema_version=1, invocation=digest(str(output).encode()),
+                 base=str(root), scope='Python runner explicit resolution only',
+                 import_={'status': 'not_started', 'internal_resolution': 'not_observed'},
+                 resolution=[], placement=[])
+    proof['import'] = proof.pop('import_')
+    def observe(event):
+        """Bind a safe helper event to this invocation without extra setting IO."""
+        proof['resolution'].append(dict(event, invocation=proof['invocation'],
+                                        resolution_id=proof['invocation'] + ':explicit:0',
+                                        sequence=len(proof['resolution']), phase='explicit'))
+    def placement(kind, **details):
+        """Retain reached placement operations, including effects before refusal."""
+        proof['placement'].append(dict(kind=kind, **details))
+    def publish_proof():
+        """Publish once and reread proof/receipt; retain secondary failures safely.
+
+        Internal readback is no independent reception. Failure stops dependent
+        steps but does not erase a resolver failure or claim rollback of mkdir.
+        An incomplete output stays incomplete; no implicit publication retry.
+        """
+        nonlocal proof_attempted
+        proof_attempted = True
+        try:
+            save('fixture-area-proof.json', proof)
+            raw_proof = (output/'fixture-area-proof.json').read_bytes()
+            save('fixture-area-proof.receipt.json', dict(schema_version=1,
+                 invocation=proof['invocation'], reader='runner-readback',
+                 sha256=digest(raw_proof), bytes=len(raw_proof)))
+        except Exception as error:
+            evidence_failures.append({'type': type(error).__name__,
+                                      'errno': getattr(error, 'errno', None),
+                                      'phase': 'fixture-proof-publication'})
+            raise
     def save(name, value):
         """Publish one owned immutable artifact and retain its hash for verification."""
         publish(output / name, value)
@@ -201,6 +243,9 @@ def run_recipe(root, recipe_path, output):
     try:
         save('recipe.original.json', original)
         save('runner.py', Path(__file__).read_bytes())
+        proof['producer'] = {'runner_sha256': digest((output/'runner.py').read_bytes()),
+                             'helper_sha256': before.get('tests/fixture_area.py'),
+                             'helper_binding': 'declared' if 'tests/fixture_area.py' in before else 'not_declared'}
         save('inputs.before.json', before)
         archive_inputs(root, before, output)
         tracked.append('declared-inputs.tar.gz')
@@ -218,10 +263,24 @@ def run_recipe(root, recipe_path, output):
         # shipped installation default), resolved by tests/fixture_area.py.
         import importlib.util
         spec = importlib.util.spec_from_file_location('fixture_area', root / 'tests' / 'fixture_area.py')
-        area = importlib.util.module_from_spec(spec); spec.loader.exec_module(area)
-        interdiction_dir = area.configured_area(root) / 'runner-tmp'
+        area = importlib.util.module_from_spec(spec)
+        proof['import']['status'] = 'started'
+        try:
+            spec.loader.exec_module(area)
+        except BaseException as error:
+            proof['import'].update(status='failed', error_type=type(error).__name__,
+                                   errno=getattr(error, 'errno', None))
+            raise
+        proof['import']['status'] = 'succeeded'
+        resolved = area.configured_area(root, observer=observe)
+        if not proof['resolution'] or proof['resolution'][-1].get('kind') != 'resolved' \
+                or proof['resolution'][-1].get('path') != str(resolved):
+            raise ValueError('recipe-fixture-resolution-proof-missing')
+        interdiction_dir = resolved / 'runner-tmp'
+        placement('mkdir_requested', path=str(interdiction_dir))
         interdiction_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
-        if not _ancestor_modes_private(interdiction_dir):
+        placement('mkdir_completed', path=str(interdiction_dir))
+        if not _ancestor_modes_private(interdiction_dir, observer=lambda e: placement('ancestor', **e)):
             # The configured area may sit under a group/other-writable ancestor
             # (typical checkouts are 775). Fixtures that verify private-directory
             # contracts (swarm-enrollment-config store.rs refuses any
@@ -238,14 +297,21 @@ def run_recipe(root, recipe_path, output):
             # swarm-recipe-fallback-fixtures (67 + 49 = 116 bytes) killed every
             # browser qualification run; swarm-fixtures (51 + 49 = 93 bytes,
             # <project>-fixtures/ per the operator rule) keeps a safe margin.
+            placement('fallback_selected', reason='ancestor-modes-not-private')
             fallback = Path.home() / '.local/state/swarm-fixtures'
+            placement('mkdir_requested', path=str(fallback))
             fallback.mkdir(mode=0o700, parents=True, exist_ok=True)
+            placement('mkdir_completed', path=str(fallback))
             interdiction_dir = fallback / 'runner-tmp'
+            placement('mkdir_requested', path=str(interdiction_dir))
             interdiction_dir.mkdir(mode=0o700, exist_ok=True)
-            if not _ancestor_modes_private(interdiction_dir):
+            placement('mkdir_completed', path=str(interdiction_dir))
+            if not _ancestor_modes_private(interdiction_dir, observer=lambda e: placement('ancestor', **e)):
                 raise ValueError('recipe-tmpdir-ancestors-not-private: ' + str(interdiction_dir))
         overrides['TMPDIR'] = str(interdiction_dir)
         environment.update(overrides)
+        placement('tmpdir_prepared', tmpdir=overrides['TMPDIR'])
+        publish_proof()
         save('environment.json', {'overrides': overrides, 'scope': 'Inherited environment not logged; compiler graph/profile needs separate qualification; TMPDIR pinned under the configured fixture area (Admin setting runtime_temporary_directory) per the 2026-10-31 operator interdiction, with fallback to the operator private state area when checkout ancestors are group-writable (private-directory contracts)'})
         for number, step in enumerate(recipe['steps'], 1):
             args = [arg.replace('{root}', str(root)) for arg in step['command']]
@@ -280,6 +346,16 @@ def run_recipe(root, recipe_path, output):
             print(json.dumps({'state': 'PASS', 'step': step['id']}), flush=True)
     except BaseException as error:
         failure = {'type': type(error).__name__, 'cause': str(error), 'errno': getattr(error, 'errno', None)}
+        evidence_failures.extend({'type': type(secondary).__name__,
+                                  'errno': getattr(secondary, 'errno', None),
+                                  'phase': 'fixture-resolution-observation'}
+                                 for secondary in getattr(error, 'fixture_observation_errors', ()))
+    if not proof_attempted:
+        try:
+            publish_proof()
+        except Exception:
+            # Publication failure was retained; keep the resolver/import primary.
+            pass
     if after is None:
         try:
             after = snapshot(root, recipe['inputs'], output, recipe_path)
@@ -288,7 +364,7 @@ def run_recipe(root, recipe_path, output):
     save('inputs.after.json', after)
     status = 'PASS' if failure is None else 'FAIL'
     artifacts = {name: digest((output/name).read_bytes()) for name in tracked}
-    result = dict(schema_version=1, recipe=recipe['id'], status=status, scope='Declared recipe checks only; not independent/effective-graph qualification or acceptance', global_watchdog=None, source_stable=before==after, steps=steps, failure=failure, artifacts=artifacts)
+    result = dict(schema_version=1, recipe=recipe['id'], status=status, scope='Declared recipe checks only; not independent/effective-graph qualification or acceptance', global_watchdog=None, source_stable=before==after, steps=steps, failure=failure, evidence_failures=evidence_failures, fixture_area_proof_required=True, artifacts=artifacts)
     publish(output/'result.json', result)
     return result
 
@@ -323,6 +399,28 @@ def verify_evidence(output):
             if Path(name).is_absolute() or '..' in Path(name).parts or digest(archive.extractfile(name).read()) != expected:
                 raise ValueError('recipe-source-archive-invalid')
     if result['status'] == 'PASS':
+        if result.get('fixture_area_proof_required'):
+            required = {'fixture-area-proof.json', 'fixture-area-proof.receipt.json'}
+            if not required.issubset(result['artifacts']) or result.get('evidence_failures'):
+                raise ValueError('recipe-fixture-proof-incomplete')
+            raw_proof = (output/'fixture-area-proof.json').read_bytes()
+            proof = json.loads(raw_proof)
+            receipt = json.loads((output/'fixture-area-proof.receipt.json').read_bytes())
+            environment = json.loads((output/'environment.json').read_bytes())
+            if receipt.get('sha256') != digest(raw_proof) or receipt.get('bytes') != len(raw_proof) \
+                    or receipt.get('invocation') != proof.get('invocation') \
+                    or proof.get('schema_version') != 1 or receipt.get('schema_version') != 1 \
+                    or receipt.get('reader') != 'runner-readback' \
+                    or proof.get('producer', {}).get('runner_sha256') != result['artifacts']['runner.py'] \
+                    or proof.get('producer', {}).get('helper_sha256') != before.get('tests/fixture_area.py') \
+                    or proof.get('producer', {}).get('helper_binding') != ('declared' if 'tests/fixture_area.py' in before else 'not_declared') \
+                    or proof.get('import', {}).get('status') != 'succeeded' \
+                    or not proof.get('resolution') \
+                    or proof['resolution'][-1].get('kind') != 'resolved' \
+                    or not proof.get('placement') \
+                    or proof['placement'][0].get('path') != str(Path(proof['resolution'][-1]['path'])/'runner-tmp') \
+                    or proof['placement'][-1].get('tmpdir') != environment['overrides'].get('TMPDIR'):
+                raise ValueError('recipe-fixture-proof-incoherent')
         if before != after or not result['source_stable'] or len(result['steps']) != len(recipe['steps']) or result['failure'] is not None:
             raise ValueError('recipe-pass-incoherent')
         for number, (declared, actual) in enumerate(zip(recipe['steps'], result['steps']), 1):
