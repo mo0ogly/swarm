@@ -23,10 +23,6 @@
   }
 
   /**
-   * Toggle a notice element with explanation text.
-   * @param {string} id @param {boolean} show @param {string} text @returns {void}
-   */
-  /**
    * Show or remove the small explanation line under one metric counter.
    * @param {string} id counter element id inside a `.metric` card
    * @param {string|null} text translated hint, or null to remove it
@@ -41,6 +37,10 @@
     hint.textContent = text;
   }
 
+  /**
+   * Toggle a notice element with explanation text.
+   * @param {string} id @param {boolean} show @param {string} text @returns {void}
+   */
   function setNotice(id, show, text) {
     const el = document.getElementById(id);
     if (!el) return;

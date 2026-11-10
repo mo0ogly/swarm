@@ -48,3 +48,24 @@ Cockpit links to Security/Audit and both Admin links retain language, theme and
 the local limits fragment. Trust applies the incoming theme only for `etat` or
 `sombre`; outgoing links reread the preference on click. These presentation
 parameters carry no token.
+
+
+## Integrated Conduite presentation
+
+The cockpit defaults to dark; `?theme=etat` explicitly requests light. Its theme
+button keeps the choice in the URL for language navigation and reload. Secondary
+graph tools start collapsed and retain their local choice; widening alone does
+not reopen them. Graph and Lanes share one inspector, following only identifiers
+present in the received model.
+
+The rail mission card follows the received Work. Work state, inbox, assistant and
+activity share a collapsed Mission details disclosure, without cloning controls.
+Metrics without a producer remain unavailable with an explanation; recorded
+tasks never establish current validation. The legend reuses shared state badges.
+An identical display name/login is shown once, without changing identity, access
+or authentication.
+
+The Version recipe compares invalid theme input to the observed native default
+and explicitly checks this cockpit's dark default. The component's sixteen DOM
+double checks (`workbench_summary_test.cjs`) do not replace the real HTTP/browser
+recipe or verification of the activated image.
