@@ -1,0 +1,15 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   '/api/v1/snapshot: net::ERR_ABORTED'\n+ ]\n- []\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/dense_text_ui.cjs:123:98",
+  "checks": [
+    "fr/etat: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, common/prepared projections, log navigation, pause, find, responsive and empty",
+    "fr/sombre: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, common/prepared projections, log navigation, pause, find, responsive and empty",
+    "en/etat: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, common/prepared projections, log navigation, pause, find, responsive and empty",
+    "en/sombre: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, common/prepared projections, log navigation, pause, find, responsive and empty"
+  ],
+  "errors": [],
+  "httpErrors": [],
+  "failed": [
+    "/api/v1/snapshot: net::ERR_ABORTED"
+  ],
+  "root": "/tmp/swarm-dense-reading-MhxrPR"
+}

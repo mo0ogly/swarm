@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "reviewer": "Root semantic self-review, not independent acceptance",
+  "baseline_sha256": "afd20c617d2a4472ee232eebb055cbbdf3132a969667d682fd44aeaa1d387ff1",
+  "current_sha256": "cb17d819da5abe804200cd91325fb1d27179a33d16fd2d703b16b027b76346ae",
+  "files": {
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs": {
+      "sha256": "61527754ded1c7b450b7d3f0e1124d5b7d1607ec8ca969da4967460cf40aa8c8",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs": {
+      "sha256": "049df87e150a3121ad9ba469f664533290e52883a23a0ccaa69bcd0cfb8856f2",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        }
+      }
+    },
+    "version_history.json": {
+      "sha256": "81458ba4ca19409b8df87bdf3cd75d9596d7453d81573716d7a6f8e31bcc2655",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Exact changed source: file-specific configuration/functions/errors/documentation review and explicit limits in retained notes.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1275/review-notes.md",
+              "sha256": "361ce33105f27c09a211fbcd59e8298ad459fa2f45795d3a08b8759ba6eb60ca"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

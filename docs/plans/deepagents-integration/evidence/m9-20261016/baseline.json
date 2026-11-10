@@ -1,0 +1,12 @@
+{
+  "git_head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "source_sha256": {
+    "internal/engine/agents_store.go": "9421457380bafcb4945bf30747204c5506e3dde2b0f255b0ba2a700e9d60caf8",
+    "internal/engine/agents_process.go": "e23cf1cc816f9f229bf842bcb7275ac5312d1f76ea8cf5fea474e99ff8ff6537",
+    "internal/engine/dialogue_context.go": "e4d5da03d1cfbb3b6dd58daecf18f55ab8415c6f83f21a7675d6c1abbdbd84d6",
+    "internal/engine/worker_recovery_context.go": "b9993b698462b8138c7b5349ea809cf2fdead033341c0e5c53b4e33200e15459",
+    "docs/PROJECT-MEMORY.md": "f0824d74b34850399f5e29048c079551995fdaf24e4479b3840d54b6afc11106",
+    "docs/en/PROJECT-MEMORY.md": "b38504ac6fbabe5976fad868b457cd37ce477e7d2bc2bfaac491cc093b8792a4"
+  },
+  "scope": "M9 owned contract before correction; pre-existing dirty engine work preserved"
+}

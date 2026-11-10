@@ -1,0 +1,31 @@
+{
+  "verified_at_utc": "2026-10-15T12:27:09.578969+00:00",
+  "canonical_checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "go_race": {
+    "named": 126,
+    "main": 33,
+    "passed": 126,
+    "package_pass": true
+  },
+  "public_recipe": {
+    "cases": 7,
+    "passed": 7,
+    "browser_checks": 21,
+    "unexpected_diagnostics": []
+  },
+  "i18n": "pass",
+  "workflows": "12 contexts pass",
+  "vet": "pass",
+  "build": "pass",
+  "binary_path": "bin/swarm-actions-confiance-pilot",
+  "binary_sha256": "99243cbb491bda4828f73fc9f24a75182bccec4b8e291b4554bacc3260aae0b7",
+  "native_mission": "paused; no acceptance fabricated",
+  "preview_process": "preview-process.json",
+  "limits": [
+    "simulated business effect",
+    "local identities",
+    "local proof key",
+    "enterprise extensions remain open",
+    "Codex panel opening queued, not confirmed visible"
+  ]
+}

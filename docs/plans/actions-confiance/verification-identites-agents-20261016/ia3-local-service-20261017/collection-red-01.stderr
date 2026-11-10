@@ -1,0 +1,15 @@
+test_rejects_empty_success (test_check.WorkflowCheckerEvidenceTests.test_rejects_empty_success) ... FAIL
+
+======================================================================
+FAIL: test_rejects_empty_success (test_check.WorkflowCheckerEvidenceTests.test_rejects_empty_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/agent-workflows/test_check.py", line 38, in test_rejects_empty_success
+    self.assertNotEqual(code, 0, (stdout, stderr))
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0 : ('OK: 12 shared Claude/Codex skills, preparation commands, contract and engine-built role contexts\n', '')
+
+----------------------------------------------------------------------
+Ran 1 test in 0.033s
+
+FAILED (failures=1)

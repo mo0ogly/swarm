@@ -1,0 +1,58 @@
+=== RUN   TestPublicProviderReplyOnly
+--- PASS: TestPublicProviderReplyOnly (0.00s)
+=== RUN   TestStructuredReviewImagesContainsActualBytesAndNoTools
+--- PASS: TestStructuredReviewImagesContainsActualBytesAndNoTools (0.01s)
+=== RUN   TestStructuredProviderFailurePreservesSafeCause
+=== RUN   TestStructuredProviderFailurePreservesSafeCause/message
+=== RUN   TestStructuredProviderFailurePreservesSafeCause/nested
+=== RUN   TestStructuredProviderFailurePreservesSafeCause/code
+=== RUN   TestStructuredProviderFailurePreservesSafeCause/unknown
+--- PASS: TestStructuredProviderFailurePreservesSafeCause (0.01s)
+    --- PASS: TestStructuredProviderFailurePreservesSafeCause/message (0.00s)
+    --- PASS: TestStructuredProviderFailurePreservesSafeCause/nested (0.00s)
+    --- PASS: TestStructuredProviderFailurePreservesSafeCause/code (0.00s)
+    --- PASS: TestStructuredProviderFailurePreservesSafeCause/unknown (0.00s)
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/15999
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/16000
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/16001
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/65536
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/65537
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/15999
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/16000
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/16001
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/65536
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/65537
+--- PASS: TestStructuredProviderPreservesCompleteOriginalJSON (0.15s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/codex/15999 (0.01s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/codex/16000 (0.01s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/codex/16001 (0.01s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/codex/65536 (0.02s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/codex/65537 (0.02s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/claude/15999 (0.01s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/claude/16000 (0.01s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/claude/16001 (0.01s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/claude/65536 (0.03s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/claude/65537 (0.03s)
+=== RUN   TestPublicReplyProjectionRemainsBoundedAndExcludesReasoning
+--- PASS: TestPublicReplyProjectionRemainsBoundedAndExcludesReasoning (0.00s)
+=== RUN   TestStructuredProviderProgressCounters
+--- PASS: TestStructuredProviderProgressCounters (0.00s)
+=== RUN   TestStructuredProviderTimeoutProgress
+=== RUN   TestStructuredProviderTimeoutProgress/silent
+=== RUN   TestStructuredProviderTimeoutProgress/retry
+=== RUN   TestStructuredProviderTimeoutProgress/active
+--- PASS: TestStructuredProviderTimeoutProgress (0.46s)
+    --- PASS: TestStructuredProviderTimeoutProgress/silent (0.15s)
+    --- PASS: TestStructuredProviderTimeoutProgress/retry (0.15s)
+    --- PASS: TestStructuredProviderTimeoutProgress/active (0.15s)
+=== RUN   TestStructuredProviderDistinguishesSystemActivity
+--- PASS: TestStructuredProviderDistinguishesSystemActivity (0.00s)
+=== RUN   TestStructuredProviderDeadlineIncludesSuspend
+--- PASS: TestStructuredProviderDeadlineIncludesSuspend (0.20s)
+=== RUN   TestStructuredProviderSystemSubtypeHistogramIsBoundedAndPrivate
+--- PASS: TestStructuredProviderSystemSubtypeHistogramIsBoundedAndPrivate (0.00s)
+=== RUN   TestStructuredSchemaRejectionDiagnostic
+--- PASS: TestStructuredSchemaRejectionDiagnostic (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	2.006s

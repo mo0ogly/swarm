@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestDialogueRestorePublicOperationExists$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "started_at_utc": "2026-10-16T17:31:49.926804+00:00",
+  "duration_seconds": 26.527,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "TestDialogueRestorePublicOperationExists"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "7f6b0d1c165d824c908aad3d77d3da46f46a7926c5b3d7e6b66886ad5d2d6fe6",
+  "real_model_calls": 0
+}

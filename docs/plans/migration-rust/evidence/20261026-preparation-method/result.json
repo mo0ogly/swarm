@@ -1,0 +1,32 @@
+{
+  "status": "DELIVERED_LOCAL",
+  "version": "v0.1.1-dev.82",
+  "binary_sha256": "2a328c56775fad8c9715d1c0bc2ca22b9d60fdbf258a25484f1b3f0cf2154e0d",
+  "effective_input_count": 441,
+  "checks": {
+    "writes": 50,
+    "method": 37,
+    "keys": 8,
+    "sdk": 3,
+    "codec": 3,
+    "launcher": 3,
+    "admin_ui": 45,
+    "installed_http": 10,
+    "installed_version_ui": 14
+  },
+  "missions": {
+    "portal": {
+      "paused": true,
+      "revision": 50
+    },
+    "trust": {
+      "paused": true,
+      "revision": 469
+    }
+  },
+  "provider_calls": 0,
+  "independent_runtime_acceptance": false,
+  "global_migration_complete": false,
+  "recipe": "private/campaign/qualified-recipe",
+  "private_evidence": true
+}

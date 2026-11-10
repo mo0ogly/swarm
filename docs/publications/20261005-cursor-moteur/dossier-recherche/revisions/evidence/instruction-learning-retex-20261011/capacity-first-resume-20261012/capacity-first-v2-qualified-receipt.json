@@ -1,0 +1,81 @@
+{
+  "checks": [
+    {
+      "name": "anchors",
+      "argv": [
+        "go",
+        "test",
+        "./internal/engine",
+        "-run",
+        "^(TestFreshReserveRejectsUnbudgetedHistoricalArray|TestManagedFragmentSelection|TestManagedFragmentRejectsTampering|TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal)$",
+        "-count=1",
+        "-timeout=90s"
+      ],
+      "started": "2026-10-12T18:53:36.643854+00:00",
+      "exit": 0,
+      "seconds": 29.51421604999996,
+      "output_sha256": "87fda9192e05414844bce5daf188cfa3aad65027d33ed7ee0a0e79c7c2ede3e1",
+      "drift": []
+    },
+    {
+      "name": "vet",
+      "argv": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "started": "2026-10-12T18:54:06.158660+00:00",
+      "exit": 0,
+      "seconds": 14.76800583899967,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": []
+    },
+    {
+      "name": "methods",
+      "argv": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "started": "2026-10-12T18:54:20.927435+00:00",
+      "exit": 0,
+      "seconds": 4.10274344499976,
+      "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "drift": []
+    },
+    {
+      "name": "build",
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-qualified-capacity-first-v2",
+        "./cmd/swarm"
+      ],
+      "started": "2026-10-12T18:54:25.030717+00:00",
+      "exit": 0,
+      "seconds": 2.640119304000109,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": []
+    }
+  ],
+  "owned_source_hashes": {
+    "internal/engine/managed_review_capacity_first.go": "d094003bdaf2a845542a4d7c27be905c964ec54d339ce24c936703e592d8c275",
+    "internal/engine/managed_review_capacity_first_test.go": "459343a04dd5d6864836e3d28c3262ae14b6740b2f287442a906c9138deab841",
+    "internal/engine/managed_review_capacity_reserve_test.go": "831081468355ee8aae3811a54041553f321cfcbeeca769e6a53ae2dec839fdc7",
+    "internal/engine/managed_review_input_budget.go": "cf735165be79cff8a5f6ac1cf40da2a416a6970c0b9a71801e02c5245d64255f",
+    "internal/engine/managed_review_input_provider.go": "e56486f586476ade5a3af30f0be0a8f8901b4818deed83f36d68c5b380ae19a4",
+    "internal/engine/managed_review_fragment_capacity.go": "a86160ffcaf772160fb8e43afb0021762a9fdf3bd6aadd1d37960231bee86047",
+    "internal/engine/managed_review_fragment_plan.go": "66a87a389ad8e0ca5a6d1b7eea0f8cc962c12143459b38e573f814f26837855a",
+    "internal/engine/managed_review_fragment_tokens_store_test.go": "60cb662e91e6478cb8ecacc6c6ab0231a367d94d1bcb316ad6330db32d2f0413",
+    "docs/REVIEW-FRAGMENTS.md": "58a060d8a7b7c27e17a8ff844e0f033ada36cea1085a2f3e1a639cdd93099c02",
+    "docs/en/REVIEW-FRAGMENTS.md": "c4f73d56c41d9ed2c7de6fa9978230702b262e919b7cd5cc6f9efbc5b1ab8a3a",
+    "docs/engine-cursor-source-inputs-001.json": "00083528e8c3cf6c82711abc856a6da9f72eea591176a5edce275348b933d4e4",
+    "docs/engine-cursor-source-inputs-003.json": "e48161ed095d9f8efbf4b667da7c9192955b87211a0dbe8c282632598114e463",
+    "docs/engine-cursor-source-inputs-004.json": "ae51111b1ce1155cf6089e7076eaad18024ab68e6f4ba8d8367bac9fe2300f60",
+    "docs/engine-cursor-source-inputs-005.json": "966ad43b74fb9a7cf904fbc06367e287d62fa82a96765217ade88a2c9c2c95c4",
+    "docs/engine-cursor-source-manifest.json": "ce20374a92661d129a396f8f3d647e01221ba5639af229f4f91cdf3485b67cfc",
+    "internal/engine/managed_review_fragment_reply.go": "8bbf3a39698a7de428413ce2416a5481cebcb4180b4a58c82af6734d9035aa0e"
+  },
+  "binary_sha256": "203c98e2660c2ab31791015df3c3e13dc47f74502393d879987fd29023be8e89",
+  "limitations": "No full suite; no new shared-state algorithm or schema. Native installation/review/acceptance not inferred."
+}

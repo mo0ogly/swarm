@@ -1,0 +1,231 @@
+{
+  "version": 1,
+  "foundation": "F2",
+  "title": "Decrire parcours et fonctionnalites",
+  "depends_on": "F1",
+  "journeys": [
+    {
+      "id": "J-prospect",
+      "role": "prospect",
+      "stories": ["decouverte", "catalogue"],
+      "steps": [
+        "Arrivee page publique : enonce moteur deterministe vs agents IA, lien graphe/preuves exemple.",
+        "Consultation graphe/preuves (lecture seule, aucune ressource privee).",
+        "Lecture explication cinq fondations / six etapes par fonctionnalite.",
+        "Catalogue des modeles : liste, comparaison, fiche modele detaillee.",
+        "Choix d'un modele -> invite a creer un compte ou se connecter pour la suite (story sessions)."
+      ],
+      "exit": "Compte cree/connecte (-> J-client) ou depart sans compte (parcours public complet, aucun blocage)."
+    },
+    {
+      "id": "J-client",
+      "role": "client",
+      "stories": ["sessions", "ressources", "demarrage"],
+      "steps": [
+        "Connexion (identifiant/mot de passe local, cf. D1 F1 ouverte) -> session creee avec expiration.",
+        "Espace personnel : recapitulatif compte, modele choisi, etat d'avancement.",
+        "Liste des ressources autorisees pour CE compte uniquement (filtrage serveur, pas seulement UI).",
+        "Guide de demarrage : installation locale -> choix fournisseur IA -> configuration projet.",
+        "Preparation effective dans Swarm local : decisions/autorisations appliquees par le moteur, pas par le portail.",
+        "Deconnexion ou revocation -> acces immediatement refuse (story revocation, verifie cote serveur)."
+      ],
+      "exit": "Preparation Swarm local terminee, ou session expiree/revoquee avec refus serveur verifie."
+    },
+    {
+      "id": "J-admin",
+      "role": "administrateur",
+      "stories": ["administration", "revocation"],
+      "steps": [
+        "Connexion admin (role distinct, pas le meme flux que client, cf. S-ADM-1).",
+        "Recherche d'un compte (identifiant, email, nom).",
+        "Consultation des droits actuels du compte et de son journal d'actions.",
+        "Attribution ou retrait de droit -> horodate, trace, applique immediatement par le moteur backend.",
+        "Revocation de session ou d'acces -> verification explicite du refus serveur (rejouer un appel precedemment valide).",
+        "Consultation du journal d'audit global (toutes actions administrateur, horodatees)."
+      ],
+      "exit": "Droit modifie et verifie refuse/accepte cote serveur ; journal a jour."
+    }
+  ],
+  "stories": [
+    {
+      "id": "decouverte",
+      "journey": "J-prospect",
+      "criteria": [
+        "Enonce moteur deterministe vs agents IA comprehensible en moins de deux ecrans, sans jargon interne.",
+        "Exemple de graphe/preuves visible sans compte.",
+        "FR/EN, mobile/bureau, clavier, quatre etats (chargement/vide/erreur/succes)."
+      ],
+      "depends_on": [],
+      "states": {
+        "loading": "Squelette de page pendant chargement du graphe exemple.",
+        "empty": "Aucun graphe exemple disponible -> message explicatif + lien catalogue.",
+        "error": "Echec chargement graphe -> message erreur + reessai, aucune donnee privee exposee.",
+        "success": "Page complete avec texte, graphe/preuves exemple, liens vers catalogue et fondations."
+      }
+    },
+    {
+      "id": "catalogue",
+      "journey": "J-prospect",
+      "criteria": [
+        "Liste des modeles avec cinq fondations et six etapes resumees par modele.",
+        "Comparaison d'au moins deux modeles possible.",
+        "Choix d'un modele n'engage aucune action moteur reelle avant creation de compte/connexion."
+      ],
+      "depends_on": ["decouverte"],
+      "states": {
+        "loading": "Squelette de liste pendant chargement du catalogue.",
+        "empty": "Aucun modele publie -> message explicatif, pas d'erreur.",
+        "error": "Catalogue indisponible -> message erreur + reessai.",
+        "success": "Liste/fiche modele affichee avec action choisir -> redirection sessions."
+      }
+    },
+    {
+      "id": "sessions",
+      "journey": "J-client",
+      "criteria": [
+        "Authentification reussie cree une session avec expiration (politique a fixer en F3/F4, cf. D4 F1).",
+        "Deconnexion explicite invalide la session cote serveur immediatement.",
+        "Echec d'authentification ne cree aucune session ni indice sur l'existence du compte (anti enumeration)."
+      ],
+      "depends_on": [],
+      "states": {
+        "loading": "Indicateur pendant verification des identifiants.",
+        "empty": "Sans objet (formulaire toujours affichable).",
+        "error": "Identifiants invalides -> message generique, pas de distinction compte inexistant/mot de passe faux.",
+        "success": "Session creee, redirection espace personnel."
+      }
+    },
+    {
+      "id": "ressources",
+      "journey": "J-client",
+      "criteria": [
+        "Acces en lecture limite aux ressources dont le compte connecte est proprietaire/autorise.",
+        "Refus serveur effectif pour : URL directe vers ressource d'un autre compte, identifiant de ressource devine, requete anonyme, requete apres revocation.",
+        "Le filtrage se fait cote serveur (controle d'autorisation), jamais seulement par masquage dans l'UI."
+      ],
+      "depends_on": ["sessions"],
+      "states": {
+        "loading": "Squelette de liste pendant chargement des ressources autorisees.",
+        "empty": "Aucune ressource autorisee encore -> message + lien vers demarrage.",
+        "error": "Echec chargement -> message erreur + reessai ; une erreur d'autorisation n'affiche jamais le contenu demande.",
+        "success": "Liste des ressources autorisees affichee, acces direct a chaque ressource re-verifie serveur."
+      }
+    },
+    {
+      "id": "demarrage",
+      "journey": "J-client",
+      "criteria": [
+        "Guide sequentiel installation -> fournisseur IA -> configuration projet, chaque etape validee avant la suivante.",
+        "Preparation finale declenche une action cote Swarm local, pas une simulation portail.",
+        "Abandon en cours de guide reprend a l'etape atteinte lors du retour."
+      ],
+      "depends_on": ["sessions", "ressources"],
+      "states": {
+        "loading": "Indicateur pendant verification d'une etape (ex. detection installation).",
+        "empty": "Aucune configuration projet encore -> ecran de demarrage initial.",
+        "error": "Etape en echec (ex. fournisseur injoignable) -> message specifique + action corrective, pas de blocage silencieux.",
+        "success": "Guide complete, preparation Swarm local confirmee par le moteur."
+      }
+    },
+    {
+      "id": "administration",
+      "journey": "J-admin",
+      "criteria": [
+        "Recherche de compte fonctionnelle par identifiant/email/nom.",
+        "Attribution/retrait de droit horodate et trace dans le journal d'audit.",
+        "Seul un compte avec role administrateur accede a ces ecrans ; refus serveur sinon."
+      ],
+      "depends_on": ["sessions"],
+      "states": {
+        "loading": "Indicateur pendant recherche de compte ou application d'un changement de droit.",
+        "empty": "Aucun resultat de recherche -> message explicatif.",
+        "error": "Echec application du droit -> message erreur, aucune modification partielle silencieuse.",
+        "success": "Droit modifie, confirmation affichee, entree journal visible."
+      }
+    },
+    {
+      "id": "revocation",
+      "journey": "J-admin",
+      "criteria": [
+        "Revocation (session ou droit) produit un refus serveur verifiable immediatement.",
+        "Rejouer un appel API precedemment valide apres revocation renvoie un refus explicite (pas un succes degrade).",
+        "Revocation visible dans le journal d'audit avec horodatage exact."
+      ],
+      "depends_on": ["administration", "sessions"],
+      "states": {
+        "loading": "Indicateur pendant application de la revocation.",
+        "empty": "Sans objet (action toujours disponible sur compte existant).",
+        "error": "Echec technique de revocation -> message erreur explicite ; ne jamais afficher 'revoque' si le refus serveur n'est pas confirme.",
+        "success": "Revocation confirmee et verifiee par un controle serveur immediat (rejouer un appel)."
+      }
+    }
+  ],
+  "dependencies": [
+    {"from": "catalogue", "to": "decouverte", "reason": "Le catalogue suppose que le visiteur a deja le cadre moteur/agents de la decouverte."},
+    {"from": "ressources", "to": "sessions", "reason": "Aucun acces ressource sans session authentifiee valide."},
+    {"from": "demarrage", "to": "ressources", "reason": "Le guide de demarrage s'appuie sur les ressources autorisees deja listees (config, docs fournisseur)."},
+    {"from": "demarrage", "to": "sessions", "reason": "Le guide est un parcours client connecte, jamais anonyme."},
+    {"from": "administration", "to": "sessions", "reason": "L'administration reutilise l'authentification mais exige un role distinct verifie serveur."},
+    {"from": "revocation", "to": "administration", "reason": "La revocation est declenchee depuis l'ecran de gestion de compte administrateur."},
+    {"from": "revocation", "to": "sessions", "reason": "La revocation agit directement sur le modele de session defini par la story sessions."}
+  ],
+  "error_states": [
+    {
+      "id": "E1",
+      "case": "Deux comptes distincts : compte A tente de lire une ressource appartenant au compte B.",
+      "expected": "Refus serveur (403/404 generique), aucune fuite de metadonnee sur l'existence de la ressource pour B.",
+      "stories": ["ressources"]
+    },
+    {
+      "id": "E2",
+      "case": "URL directe vers une ressource privee sans passer par la liste autorisee.",
+      "expected": "Meme controle d'autorisation que l'acces liste ; refus serveur identique, pas de contournement par URL.",
+      "stories": ["ressources"]
+    },
+    {
+      "id": "E3",
+      "case": "Identifiant de ressource devine/enumere (sequentiel ou pattern previsible).",
+      "expected": "Refus serveur sans distinguer 'existe mais interdit' de 'inexistant' (anti enumeration).",
+      "stories": ["ressources"]
+    },
+    {
+      "id": "E4",
+      "case": "Requete anonyme (aucune session) sur un endpoint protege.",
+      "expected": "Refus serveur explicite (401), aucune donnee partielle renvoyee.",
+      "stories": ["ressources", "demarrage", "administration"]
+    },
+    {
+      "id": "E5",
+      "case": "Session revoquee rejoue un appel precedemment valide (jeton ou cookie encore present cote client).",
+      "expected": "Refus serveur immediat (401/403), independant de tout cache ou etat client residuel.",
+      "stories": ["sessions", "revocation", "ressources"]
+    },
+    {
+      "id": "E6",
+      "case": "Compte client tente d'acceder a un ecran administrateur.",
+      "expected": "Refus serveur (403), role insuffisant trace dans le journal si pertinent.",
+      "stories": ["administration"]
+    },
+    {
+      "id": "E7",
+      "case": "Echec reseau/fournisseur pendant le guide de demarrage (ex. installation locale injoignable).",
+      "expected": "Message d'erreur specifique a l'etape, etat du guide preserve, pas de perte de progression.",
+      "stories": ["demarrage"]
+    },
+    {
+      "id": "E8",
+      "case": "Authentification echouee (mauvais identifiant ou mot de passe).",
+      "expected": "Message generique identique dans les deux cas, aucune session creee, pas de verrouillage d'information sur l'existence du compte.",
+      "stories": ["sessions"]
+    }
+  ],
+  "open_decisions_inherited": [
+    "D1 (authentification locale/OAuth), D4 (politique expiration session) doivent etre tranchees avant F3 (contrats API) : F2 decrit sessions/revocation sans presumer la reponse.",
+    "D5 (visibilite journal d'audit au client) reste ouverte ; F2 ne donne acces au journal qu'a l'administrateur par defaut, a confirmer en F5."
+  ],
+  "limits": [
+    "F2 decrit parcours et fonctionnalites fonctionnelles ; les contrats API precis (endpoints, schemas, codes) sont renvoyes a F3.",
+    "Les politiques exactes de session (duree, renouvellement) dependent de D4 non tranchee ; F2 fixe seulement le comportement observable attendu (expiration + revocation effective).",
+    "Pertinence semantique de ces champs verifiee par revue independante ; les controles locaux ne verifient que la structure et la longueur du rapport."
+  ]
+}

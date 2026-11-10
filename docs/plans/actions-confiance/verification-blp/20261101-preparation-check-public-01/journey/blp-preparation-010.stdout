@@ -1,0 +1,27 @@
+{
+  "budget": {
+    "limit_usd": 10,
+    "reserve_per_launch_usd": 0.5,
+    "estimate_source": "Inert local fixture",
+    "reference_date": "2026-11-01",
+    "updated": "2026-11-01T11:47:33.990995407Z",
+    "actor": "fpizzi/uid:1001"
+  },
+  "id": "prep-fa8847b0c33183273f594550",
+  "title": "BLP source fixture",
+  "method": "apex",
+  "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+  "revision": 2,
+  "created_at": "2026-11-01T11:47:33.88813478Z",
+  "updated_at": "2026-11-01T11:47:33.990995407Z",
+  "documents": {
+    "besoin": {
+      "kind": "besoin",
+      "text": "Fixture need",
+      "revision": 1,
+      "sha256": "cd4602e53642203e4021e7abde12f2b6a2d806cd841aacdd27294231b16eafa4",
+      "at": "2026-11-01T11:47:33.88813478Z"
+    }
+  },
+  "plan_ready": false
+}

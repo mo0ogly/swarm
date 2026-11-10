@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "mission-status-submitted-window",
+  "inputs": [
+    "tests/rust_status_submitted_window.py",
+    "tests/rust_mission_status_contract.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/agent_storage_retry.rs",
+    "rust/crates/swarm-engine/src/agent_supervision.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "version_history.json",
+    "tools/verification/recipes/mission-status-submitted-window.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "submitted-window-public-costs-and-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='submitted-window-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_submitted_window.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public completed local worker submitted report pending review missing gate and output recovery",
+        "PASS actual submitted result outside Agent window, full costs and restoration",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

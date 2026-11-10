@@ -1,0 +1,28 @@
+{
+  "status": "DELIVERED_LOCAL_HISTORICAL_AGENT_LOGS",
+  "version": "v0.1.1-dev.42",
+  "binary_sha256": "cc433e99aa90d4dc9373c7b5c56ab7aff983b403c87eca569b69d574f3ad0a50",
+  "browser_assertions": 464,
+  "logs_browser_assertions": 60,
+  "logs_HTTP_assertions": 22,
+  "codec_named_tests": 1,
+  "installed_logs_assertions": 24,
+  "installed_version_assertions": 14,
+  "served_assets_verified": 46,
+  "recipe_integrity": "VERIFIED",
+  "archive_sha256": "147d201441c2453378a20f8bd42a9a8e42e6fcff59f24503041b338714ecedfa",
+  "GLM_calls": 3,
+  "GLM_usable_responses": 2,
+  "GLM_declared_tokens": 8605,
+  "automatic_retry": false,
+  "business_provider_execution": false,
+  "live_business_mutations": false,
+  "limits": [
+    "1472-BATCH full managed batch projection remains refused",
+    "1472-STATUS legacy mission agent provenance remains missing",
+    "1473 terminal-task mission status branch remains unported/refused",
+    "No automatic repair of old interrupted execution receipts",
+    "Output transcript/live following and browser download-manager persistence not established by this slice",
+    "No global migration or full independent engine acceptance"
+  ]
+}

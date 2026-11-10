@@ -1,0 +1,5 @@
+--- FAIL: TestPlanningRejectionWaitAllowsOtherScopeInference (0.03s)
+    planning_rejection_test.go:292: périmètre invalide
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.951s
+FAIL

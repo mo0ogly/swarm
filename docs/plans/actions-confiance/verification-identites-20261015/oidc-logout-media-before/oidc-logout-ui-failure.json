@@ -1,0 +1,10 @@
+{
+  "message": "400 == 200",
+  "stack": "AssertionError [ERR_ASSERTION]: 400 == 200\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_oidc_logout_ui.cjs:27:364\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)",
+  "checks": [
+    "fr: provider logout policy previews without network or mutation and persists exact values",
+    "fr: saved freshness and unlimited retention reopen with callback address, focus and no mobile overflow"
+  ],
+  "errors": [],
+  "root": "/tmp/swarm-oidc-logout-ui-bXIsnH"
+}

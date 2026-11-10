@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "project-memory-source-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/project_context.rs",
+    "rust/crates/swarm-engine/src/project_memory_source.rs",
+    "rust/crates/swarm-engine/src/project_memory_guide.rs",
+    "rust/crates/swarm-engine/src/memory_files.rs",
+    "tests/rust_project_memory_source.py",
+    "tests/rust_project_memory_guide_differential.py",
+    "tests/rust_project_profile_read.py",
+    "tests/rust_preparation_calls.py",
+    "tests/rust_preparation_calls_ui.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "rust/crates/swarm-engine/examples/memory_source_fixture.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "guide",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='memory-source-'+'guide',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_project_memory_guide_differential.py']+['--output',str(p)],check=True)\nprint('PROJECT_MEMORY_GUIDE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROJECT_MEMORY_GUIDE_DIFFERENTIAL_PASS 824"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "source",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='memory-source-'+'source',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_project_memory_source.py']+['--binary',os.environ['SWARM_PROJECT_MEMORY_BINARY']]+['--output',str(p)],check=True)\nprint('PROJECT_MEMORY_SOURCE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROJECT_MEMORY_SOURCE_PASS ",
+        "PASS withdrawn-lesson-remains-managed",
+        "PASS unmanaged-guide-applies-under-exclusive-settings-lock",
+        "PASS http-managed-refusal-safe"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "profile",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='memory-source-'+'profile',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_project_profile_read.py']+['--binary',os.environ['SWARM_PROJECT_MEMORY_BINARY']]+['--output',str(p)],check=True)\nprint('PROJECT_MEMORY_PROFILE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROJECT_PROFILE_READ_PASS "
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "api",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='memory-source-'+'api',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_calls.py']+['--binary',os.environ['SWARM_PROJECT_MEMORY_BINARY']]+['--output',str(p)]+['--browser'],check=True)\nprint('PROJECT_MEMORY_API_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CALLS_PASS 35",
+        "PREPARATION_CALLS_BROWSER_PASS 48",
+        "PASS memory-guard-safe-no-contact"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "binary_sha256": "d175d62d85ab8dfdaff57818ec9ee06b429d85c5271eaa81563499e9d603fa37",
+  "overlay": {
+    "Replace": {
+      "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning.go": "/tmp/swarm-actions-confiance-launch/unchanged-head-0.go",
+      "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/recovered_result.go": "/tmp/swarm-actions-confiance-launch/unchanged-head-1.go",
+      "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/recovered_result_evidence_test.go": "/tmp/swarm-actions-confiance-launch/unchanged-head-2.go"
+    }
+  },
+  "owned_sources": {
+    "internal/engine/prephase_conversion.go": "2129488a6c22418cd404dc21042305b255c9b5821062885f0b534c0290040112",
+    "internal/engine/prephase_organization.go": "ae6bdb7ee1faa2da05ef294337f3b6df66f75498d89454031a40fede6e77672a",
+    "internal/engine/prephase_repository.go": "e386c133b695a2f4e4aa7fd727748e296bb66f51b0c1fa1cb5fee7d2984057b7",
+    "internal/engine/prephase_contract.go": "07cd35ad5d554cfc501c627ab4159a0156d5bf6b8a3721bd2a4818055afddbf5",
+    "internal/engine/prephase_store.go": "dd8bc57857bbc691c53b3753c350f2cc998192953cf51a5358ee18ea41da2e6d",
+    "internal/engine/managed_git.go": "91009d2c8955b2c267027fe169357d605ca3f84aba862f394f3c1f8fc3fa0bce",
+    "internal/engine/prephase_organization_test.go": "2bc7d936ac0ff0b44f5d051147726192887b6e8b4d9a773b9938bc950c9a9020",
+    "docs/PREPARATION-TEMPLATES.md": "fb90d36c15b12bd66b7a96c74ce6c49b199c5faeafd4616cb734f1b293b78583",
+    "docs/en/PREPARATION-TEMPLATES.md": "afb447e9e7ab34c0634e7cc37cd0f871219e9a76d4c41ce9b4a195b3fdf18041",
+    "internal/engine/plan_store.go": "befc144f32a059bb921bd31e5d0e6e6dad4266db7536783eda7fb770b13542ed",
+    "internal/engine/organization.go": "b1bda71fbf5f9caff756e9e236cd068412f450555ea45e8207316b45fcc8e701",
+    "internal/engine/model.go": "5c619dc7757aa314a268887d28c1204efb742994b4ae86392d1a0adea00b5021",
+    "internal/engine/prephase_conversion_test.go": "a1320824b880d5b0ec75acaddfb3a63ad664b7ac59c1a56d0ac704ebd5848b16"
+  },
+  "excluded_dirty": {
+    "internal/engine/planning.go": {
+      "head_sha256": "540ba68838db0666d9c2897924265bea4c9fed556ad5e5bea03c46652cffe86b",
+      "working_sha256": "820c802cb94aefd460cae03de307bc3e3af9e2bcb97ccac4cbd90ff95cd6aea9"
+    },
+    "internal/engine/recovered_result.go": {
+      "head_sha256": "a3935f8f83445aff256aba58899baf478ee284ff8e5fcc1423ea15f3792cd436",
+      "working_sha256": "979825c4fb555065cbbdd0e85398a94a21adb0e0ce87683e62b19dc916abe573"
+    },
+    "internal/engine/recovered_result_evidence_test.go": {
+      "head_sha256": "ca6c03b7d3b46e29f1b9bdcabf9ead5770ae69d62ec13db2ea3341a1c3453954",
+      "working_sha256": "59edc706e4b666b12758302a67c2d3b438eec81f960face35f933b5cd2aec34d"
+    }
+  },
+  "version": {
+    "version": "devel",
+    "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+    "modified": true,
+    "build_date": "2026-10-14T19:57:58Z",
+    "provenance": "injected"
+  }
+}

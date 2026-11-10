@@ -1,0 +1,23 @@
+{
+  "decoder_source_sha256": "5c97519bc562639fdafb5c336c6da49a0abf4f675e423e421a2bdc7ea6f00073",
+  "binary_sha256": "c0030271a0c2108a6d872b954b0be7556f69642463e28e3070f6bde1edfd8ec8",
+  "scope": "updated decoder source with preceding binary Go verifier; not a final rebuilt browser candidate",
+  "checks": [
+    "fractional invalid pasted token remains unchanged",
+    "Go rejects decoded invalid token with exit2",
+    "absence of reviver source refuses explicitly"
+  ],
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+    "--root",
+    "/tmp/swarm-actions-review-client-20261016-wnjUHLcT/fixture",
+    "--json",
+    "trust",
+    "verify",
+    "--input",
+    "-"
+  ],
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "{\n  \"error\": \"json: cannot unmarshal number 1.00000000000000001 into Go struct field TrustEvidence.export.evidence.sequence of type int\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"json: cannot unmarshal number 1.00000000000000001 into Go struct field TrustEvidence.export.evidence.sequence of type int\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+}

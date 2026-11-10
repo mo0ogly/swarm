@@ -1,0 +1,10 @@
+[
+  "git-runner",
+  "manifest",
+  "directory",
+  "prepare",
+  "root-hook",
+  "public-test",
+  "negative-test",
+  "review"
+]

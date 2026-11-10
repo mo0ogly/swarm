@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-source-producer-public",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "captured-source-producer-cli-http",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-preparation-proof-')/'journey'; subprocess.run(['python3','tests/blp_preparation_check.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out),'--producer-attribution'],check=True); print('BLP_PREPARATION_CLI_HTTP_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "exit": 1,
+      "seconds": 10.564669918996515,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "5e7fcb92f13003aaa13ea552543d54796b2a3e352ef7175f9d48970666384fdc",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "ead8b582cf7a9b03317de574539b9ddd98a375ea1ca158e539901be2f42c182f",
+    "declared-inputs.tar.gz": "54fcb90515f32b44554ee4a8fa08a0ec7d6d3140a4a68bf619d18aee22a77d1d",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "5f7d598282584c516d641bfe2ec40681b45f8c5c4beaabb064c9b475c6b5afb5",
+    "step-0001.stderr": "5b47bb4b1bc326f72d33efc631c95c2827d6575e5cb8f1f301783924af0c35b4",
+    "step-0001.json": "46172251d972bdc744f4398cec2b02a9eb386e140c3722eabd3cb6ffa4a260c2",
+    "inputs.after.json": "ead8b582cf7a9b03317de574539b9ddd98a375ea1ca158e539901be2f42c182f"
+  }
+}

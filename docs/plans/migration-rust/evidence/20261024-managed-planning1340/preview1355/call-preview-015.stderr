@@ -1,0 +1,14 @@
+{
+  "error": "planning-call-request-format",
+  "failure": {
+    "causes": [
+      "planning-call-request-format",
+      "planning-call-request-format",
+      "json-category:Data"
+    ],
+    "code": "planning-call-request-format",
+    "message": "planning-call-request-format",
+    "retryable": false
+  },
+  "schema_version": 1
+}

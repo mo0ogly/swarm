@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{spawn,spawnSync}=require('child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-planning-ui-'));
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-planning-ui-'));
 function run(cmd,args,opts={}){const r=spawnSync(cmd,args,{encoding:'utf8',...opts});if(r.status!==0)throw Error(r.stderr);return r.stdout}
 function cli(args,data){const result=JSON.parse(run(binary,['--root',root,'--json',...args,...(data?['--input','-']:[])],{input:data?JSON.stringify(data):undefined}));return result.work||result}
 cli(['init']);run('git',['init'],{cwd:root});fs.writeFileSync(path.join(root,'readme.txt'),'fixture');run('git',['add','readme.txt'],{cwd:root});run('git',['-c','user.name=Test','-c','user.email=test@local','commit','-m','base'],{cwd:root});fs.writeFileSync(path.join(root,'.swarm/providers.json'),JSON.stringify({schema_version:1,providers:{claude:{command:'/home/fpizzi/.config/nvm/versions/node/v22.23.2/bin/claude',args:['-p','--output-format','stream-json','--verbose'],env_allow:[]}}}));

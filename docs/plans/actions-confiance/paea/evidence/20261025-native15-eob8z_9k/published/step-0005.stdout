@@ -1,0 +1,13 @@
+
+running 8 tests
+test protection_output_failure_is_nonzero_without_project_side_effects ... ok
+test protection_refusal_then_recovery_preserves_safe_causes_and_empty_root ... ok
+test protection_comparison_output_failure_then_recovery ... ok
+test protection_both_domains_are_offline_and_context_never_becomes_authority ... ok
+test protection_live_operations_are_not_advertised_as_implemented ... ok
+test protection_comparison_both_domains_preserves_values_and_authority_boundary ... ok
+test protection_comparison_fault_on_either_side_refuses_then_recovers ... ok
+test protection_comparison_rejects_runtime_options_without_project_effects ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+

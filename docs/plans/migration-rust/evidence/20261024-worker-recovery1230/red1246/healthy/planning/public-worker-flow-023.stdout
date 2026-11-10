@@ -1,0 +1,8 @@
+{
+  "revision": 11,
+  "paused": true,
+  "autonomy": "autonome",
+  "slots": 1,
+  "consent_enabled": false,
+  "archived": false
+}

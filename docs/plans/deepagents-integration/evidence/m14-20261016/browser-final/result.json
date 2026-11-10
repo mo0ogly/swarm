@@ -1,0 +1,96 @@
+{
+  "status": "PASS",
+  "root": "/tmp/swarm-dr-ui-yz4TQM",
+  "checks": [
+    "Actual provider boundary and stopped process inspected through recovery-preview; no provider restart",
+    "FR/EN, both themes, 1440/760/390/320 widths, Escape and semantic action focus restoration",
+    "Two unknown checks remain visible, verified checks expand on demand and confirmation is hidden",
+    "Rendered diagnostic text contrast is at least 4.5:1",
+    "Untrusted diagnostic text is rendered as text without executable nodes",
+    "Inconsistent answered session rejected through the actual button: HTTP 400, FR/EN error, both themes, desktop/mobile, Escape/focus, no confirmation, no read mutation; exact isolated fixture repaired for positive reread",
+    "Explicit restoration form in FR/EN, both themes and desktop/mobile; checkbox, Escape/focus and errors preserve entered values",
+    "Actual UI refuses invalid input and exhausted estimate without mutation; public budget change preserves history; fresh confirmed request resumes the same session",
+    "Request replay creates no duplicate; execution usage and historical estimates stay separate; actual CLI preview/restore preserves the cumulative tool guard and stops the fourth invocation"
+  ],
+  "errors": [],
+  "failures": [],
+  "expectedFailures": [
+    {
+      "url": "http://127.0.0.1:42867/api/v1/recovery-preview?work=w-ada0908b0973958ea57cfcc4&task=t1",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/recovery-preview?work=w-ada0908b0973958ea57cfcc4&task=t1",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/recovery-preview?work=w-ada0908b0973958ea57cfcc4&task=t1",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/recovery-preview?work=w-ada0908b0973958ea57cfcc4&task=t1",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/dialogue-resume?work=w-ada0908b0973958ea57cfcc4&agent=3e16a97f-9f34-439f-89c9-90a2ba9dfddc",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/dialogue-resume?work=w-ada0908b0973958ea57cfcc4&agent=3e16a97f-9f34-439f-89c9-90a2ba9dfddc",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/dialogue-resume?work=w-ada0908b0973958ea57cfcc4&agent=a1fb9a34-2808-4089-aea3-b47770362c9e",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    }
+  ],
+  "navigationAborts": [
+    {
+      "url": "http://127.0.0.1:42867/api/v1/snapshot?work=w-ada0908b0973958ea57cfcc4",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/snapshot?work=w-ada0908b0973958ea57cfcc4",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/snapshot?work=w-ada0908b0973958ea57cfcc4",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/assist/turns?work=w-ada0908b0973958ea57cfcc4",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/activity?work=w-ada0908b0973958ea57cfcc4&limit=50",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:42867/api/v1/runtime-health",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "provider_invocations": 4,
+  "model_calls": 0
+}

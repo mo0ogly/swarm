@@ -1,0 +1,387 @@
+{
+  "source_candidate": "61693d4413607770cfff22508236f3986c20bd33",
+  "accepted_base": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "binary_paths": [
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-en-etat.png",
+      "bytes": 163013,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-en-sombre.png",
+      "bytes": 161082,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-fr-etat.png",
+      "bytes": 161142,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-fr-sombre.png",
+      "bytes": 159216,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-en-etat.png",
+      "bytes": 52503,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-en-sombre.png",
+      "bytes": 52831,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-fr-etat.png",
+      "bytes": 53944,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-fr-sombre.png",
+      "bytes": 53817,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/product-visible.png",
+      "bytes": 52169,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-en-etat.png",
+      "bytes": 112835,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-en-sombre.png",
+      "bytes": 113102,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-fr-etat.png",
+      "bytes": 113723,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-fr-sombre.png",
+      "bytes": 113611,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/check-error-en.png",
+      "bytes": 228904,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat-mobile.png",
+      "bytes": 74204,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat.png",
+      "bytes": 185128,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre-mobile.png",
+      "bytes": 74154,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre.png",
+      "bytes": 182656,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat-mobile.png",
+      "bytes": 72449,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat.png",
+      "bytes": 183178,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre-mobile.png",
+      "bytes": 72422,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre.png",
+      "bytes": 180602,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-etat-mobile.png",
+      "bytes": 258227,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-etat.png",
+      "bytes": 246603,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-sombre-mobile.png",
+      "bytes": 258944,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-sombre.png",
+      "bytes": 251566,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-etat-mobile.png",
+      "bytes": 265646,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-etat.png",
+      "bytes": 264396,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-sombre-mobile.png",
+      "bytes": 266692,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-sombre.png",
+      "bytes": 259799,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-deliver.png",
+      "bytes": 185879,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-mobile-foundation.png",
+      "bytes": 66326,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-mobile.png",
+      "bytes": 50036,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-plan.png",
+      "bytes": 184323,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-deliver.png",
+      "bytes": 185098,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile-foundation.png",
+      "bytes": 67768,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile.png",
+      "bytes": 50255,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-plan.png",
+      "bytes": 183405,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-deliver.png",
+      "bytes": 193489,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile-foundation.png",
+      "bytes": 64524,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile.png",
+      "bytes": 54313,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-plan.png",
+      "bytes": 194036,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-deliver.png",
+      "bytes": 192995,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile-foundation.png",
+      "bytes": 65261,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile.png",
+      "bytes": 54950,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-plan.png",
+      "bytes": 193296,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/screenshots/ui-redesign-20261010/training-copy-fr.png",
+      "bytes": 123643,
+      "accepted_base_contains_path": false,
+      "category": "ux_evidence"
+    },
+    {
+      "path": "docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip",
+      "bytes": 12681654,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip",
+      "bytes": 12650443,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en-poster.jpg",
+      "bytes": 63626,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.gif",
+      "bytes": 128379,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4",
+      "bytes": 208648,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr-poster.jpg",
+      "bytes": 64285,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.gif",
+      "bytes": 130254,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4",
+      "bytes": 214137,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en-poster.jpg",
+      "bytes": 60423,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.gif",
+      "bytes": 89460,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4",
+      "bytes": 164381,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr-poster.jpg",
+      "bytes": 61004,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.gif",
+      "bytes": 91507,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4",
+      "bytes": 172360,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/graph-overview-fr-poster.png",
+      "bytes": 127625,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/graph-overview-fr.mp4",
+      "bytes": 438261,
+      "accepted_base_contains_path": true,
+      "category": "training_asset"
+    }
+  ],
+  "read_only_source_git": true,
+  "native_database_or_private_receipt_read": false,
+  "limit": "Metadata proves scope and type/volume, not visual correctness or independent review."
+}

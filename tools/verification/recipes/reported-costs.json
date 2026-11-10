@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "reported-costs",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/src/**/*.rs",
+    "rust/crates/swarm-engine/config/*.json",
+    "rust/crates/swarm-cli/src/*.rs",
+    "rust/crates/swarm-engine/tests/reported_costs.rs",
+    "rust/crates/swarm-cli/tests/reported_costs.rs",
+    "docs/architecture/REPORTED-COSTS.md",
+    "docs/en/REPORTED-COSTS.md",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-engine/tests/engine_settings_catalog.rs"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r97",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "retained-costs-and-public-cli-refusal-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,sys,json,hashlib,subprocess\nfrom pathlib import Path\ndef require(condition,reason):\n \"\"\"Refuse missing provenance even with Python optimization; no mutation or retry.\"\"\"\n if not condition:raise ValueError(reason)\nroot=Path.cwd().resolve();source=Path(os.environ['SWARM_REPORTED_COSTS_SOURCE']).resolve()\nrequire(source.is_relative_to(root) and source!=root,'cost-source-outside-fixture')\nraw=(source/'sdk-source-snapshot.json').read_bytes();snapshot=json.loads(raw);require(snapshot['snapshot']==str(source),'cost-snapshot-path-mismatch')\nrequire(not any(os.environ.get(k) for k in ['RUSTFLAGS','CARGO_ENCODED_RUSTFLAGS','RUSTC_WRAPPER','RUSTC_WORKSPACE_WRAPPER','CARGO_BUILD_TARGET','RUSTUP_TOOLCHAIN','CARGO_HOME']),'cost-ambient-compiler-override')\ndef stable():\n \"\"\"Refuse snapshot drift before/after Cargo; read only and propagate IO errors.\"\"\"\n for name,sha in snapshot['files'].items():\n  actual=(source/name).resolve();require(actual.is_relative_to(source),'cost-snapshot-path-escape')\n  require(hashlib.sha256(actual.read_bytes()).hexdigest()==sha,'cost-snapshot-source-changed:'+name)\nstable();print('SOURCE_SNAPSHOT '+str(source)+' '+hashlib.sha256(raw).hexdigest(),flush=True)\nfor package,selection in [('swarm-engine',['--test','reported_costs']),('swarm-engine',['--lib','reported_costs_scalar']),('swarm-engine',['--lib','reported_cost_threshold']),('swarm-engine',['--test','engine_settings_catalog']),('swarm-cli',['--test','reported_costs'])]:\n command=['cargo','test','--manifest-path',str(source/'rust/Cargo.toml'),'--offline','--locked','-p',package]+selection+['--','--nocapture']\n print('ARGV '+json.dumps(command),flush=True);subprocess.run(command,check=True)\nstable();print('PASS retained reported costs, complete history, refusal/recovery and CLI output',flush=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "reported_costs_empty_zero_unknown_and_groups_are_distinct ... ok",
+        "reported_costs_include_complete_history_beyond_recent_window ... ok",
+        "reported_costs_refuse_negative_corrupt_foreign_rows_and_sql_then_recover ... ok",
+        "reported_costs_scalar_invalid_overflow_and_zero_remain_distinct ... ok",
+        "reported_costs_cli_real_binary_reads_and_refuses_without_mutation ... ok",
+        "reported_costs_cli_write_and_flush_failures_preserve_causes ... ok",
+        "PASS retained reported costs, complete history, refusal/recovery and CLI output",
+        "reported_cost_threshold_exact_numeric_boundaries ... ok",
+        "reported_cost_policy_preserves_legacy_absence_null_and_exact_counts ... ok",
+        "catalog_covers_all_actual_values_and_nullable_fields_match_authoritative_validation ... ok"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

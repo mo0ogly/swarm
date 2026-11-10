@@ -1,0 +1,23 @@
+{
+  "review": "same-session self-review only",
+  "checked": [
+    "pinned primary catalog/reference/control IDs",
+    "strict matrix schema and unsupported assurance claims",
+    "historical receipt hashes and relevant source bindings",
+    "contained no-follow regular file reads",
+    "typed version regression",
+    "read-only CLI and unchanged business state",
+    "rendered languages/themes/mobile and inert labels"
+  ],
+  "independent_acceptance": false,
+  "limits": [
+    "illustrative subset, no baseline",
+    "no current runtime or organizational qualification",
+    "real providers and eBPF unqualified"
+  ],
+  "originals_retained": [
+    "mapping-before-test.out",
+    "mapping-guards-first.out",
+    "mapping-stale-receipt-before.json"
+  ]
+}

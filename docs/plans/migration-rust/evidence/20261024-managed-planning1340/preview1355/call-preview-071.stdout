@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "work_id": "w-a52113ea02ad279fb0be1be8",
+  "scope_id": "root",
+  "claim_id": "preview-claim",
+  "work_revision": 4,
+  "original_claim_revision": 3,
+  "generation": 1,
+  "context_sha256": "f00fa060baf6482d00f8d78c4245aa79e6e1876ea85a3750a5e02d6a5d9dd2a9",
+  "workflow_sha256": "97edc37b630828c58fd907ec7cf8597fdef78f5344bcf6cabcafc82eae80dccb",
+  "workflow_prompt_sha256": "e04fca45bc94bbc078732d2f6b1d6d806bea68a0ff00b34221ed29e5b317adda",
+  "context_bytes": 569,
+  "workflow_bytes": 31979,
+  "provider": "fixture",
+  "model_route": {
+    "level": "standard",
+    "model": "fixture-standard",
+    "effort": "fixture-medium",
+    "billing": "external",
+    "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+    "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+  },
+  "historical_acknowledgement_only": false,
+  "observed_at": "2026-10-24T11:34:59.98452553Z",
+  "lease_until": "2026-10-24T11:36:58.330397508Z",
+  "prepared_inputs_verified": true,
+  "process_started": false,
+  "execution_available": true
+}

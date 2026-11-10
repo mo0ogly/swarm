@@ -1,0 +1,11 @@
+flowchart TD
+  A["Controller-supplied authority<br/>real enrollment still requires integration"] --> M["Authenticated issuance<br/>session and fresh time"]
+  M --> R["Historical receipt<br/>authority, session digest, dates"]
+  R --> H["Version 2 head<br/>digest binds exact candidate and receipt"]
+  H --> T["Durable Trust intent"]
+  T --> Q["SQLite journal COMMIT"]
+  Q --> F["Trust head finalization"]
+  T -.-> X["Exact recovery after interruption<br/>same receipt, no new authorization"]
+  Q -.-> X
+  X --> F
+  F --> V["Read: independent checkpoint<br/>receipt consistency and historical chain"]

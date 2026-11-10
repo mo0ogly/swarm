@@ -1,0 +1,2 @@
+{"stage": "data-policy-pilot-regression", "exit_code": 0, "passed_cases": 126}
+{"stage": "data-policy-identities-regression", "exit_code": 0, "passed_cases": 278}

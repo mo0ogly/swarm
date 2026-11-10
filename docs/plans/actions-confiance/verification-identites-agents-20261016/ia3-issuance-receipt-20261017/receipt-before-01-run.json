@@ -1,0 +1,38 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-overlay=/tmp/swarm-identity-issuer-embed-hdn1ucjp/overlay.json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityIssuanceReceiptSurvivesReopen$",
+    "-count=1",
+    "-v",
+    "-timeout=30s",
+    "-json"
+  ],
+  "overlay": "/tmp/swarm-identity-issuer-embed-hdn1ucjp/overlay.json",
+  "start": "2026-10-17T08:55:33.176560+00:00",
+  "end": "2026-10-17T08:57:26.970992+00:00",
+  "elapsed_seconds": 113.79657745800796,
+  "exit": 1,
+  "input_count": 1061,
+  "changed_inputs": [
+    "internal/engine/memory_usage_binding.go",
+    "internal/engine/memory_usage_binding_test.go"
+  ],
+  "counts": {
+    "pass": 0,
+    "fail": 1,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [
+      "TestAgentIdentityIssuanceReceiptSurvivesReopen"
+    ],
+    "skip": []
+  },
+  "binary_sha256": null,
+  "binary_unchanged": true
+}

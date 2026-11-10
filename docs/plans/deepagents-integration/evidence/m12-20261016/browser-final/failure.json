@@ -1,0 +1,11 @@
+{
+  "error": "TimeoutError: Waiting for selector `[data-mission-action=\"recovery-preview-t1\"]` failed\n    at CSSQueryHandler.waitFor (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/common/QueryHandler.js:214:46)\n    at async CdpFrame.waitForSelector (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:544:21)\n    at async CdpPage.waitForSelector (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:1385:20)\n    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/dialogue_recovery_ui.cjs:37:4",
+  "errors": [],
+  "failures": [],
+  "focus": {
+    "active": {
+      "id": ""
+    },
+    "returnTarget": {}
+  }
+}

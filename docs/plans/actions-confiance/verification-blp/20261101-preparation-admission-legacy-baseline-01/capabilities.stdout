@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "policy": {
+    "message_max_bytes": 8000,
+    "context_max_bytes": 96000,
+    "turn_limit": 20,
+    "response_max_bytes": 1048576,
+    "timeout_seconds": 300,
+    "timeout_maximum_seconds": 600,
+    "refresh_ms": 2000,
+    "transport": "json"
+  },
+  "providers": [
+    {
+      "name": "api-local",
+      "model": "fixed-model",
+      "digest": "0d8e6db809c0e1c603146580dfc76da8e52569b1735eab498df1d9c1360e8655"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+=== RUN   TestActionsConfianceT2RevocationBindsUpdatedMandate
+--- PASS: TestActionsConfianceT2RevocationBindsUpdatedMandate (0.02s)
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/revoked
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/expired
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/missing
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/not_started
+    trust_actions_operator_regression_test.go:1216: approval admitted despite not started mandate: engine.TrustAction{ID:"act-c55f895648abf064b56c", MandateID:"current-mandate", Requester:"alice", Approver:"bob", Resource:"invoice/acme", Amount:100, Currency:"EUR", Beneficiary:"ACME", IdempotencyKey:"current-key", ContentHash:"c55f895648abf064b56c6bde11d8ef5a449a80758d92c972621ee2c287023e78", OriginalHash:"932448bd87b5f9bb86c37c84671ce028b7a481e87d782507f6505ba200924461", State:"approved", Reason:"", NextAction:"engager le connecteur simulé", CreatedAt:"2026-10-14T12:00:00Z", UpdatedAt:"2026-10-14T11:59:59Z"}
+--- FAIL: TestActionsConfianceT2ApprovalRequiresLiveMandate (0.10s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/revoked (0.03s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/expired (0.02s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/missing (0.02s)
+    --- FAIL: TestActionsConfianceT2ApprovalRequiresLiveMandate/not_started (0.02s)
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked
+--- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba (0.06s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent (0.00s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired (0.00s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked (0.01s)
+=== RUN   TestActionsConfianceT2IdempotencyRestartAndReconciliation
+--- PASS: TestActionsConfianceT2IdempotencyRestartAndReconciliation (0.16s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.369s
+FAIL

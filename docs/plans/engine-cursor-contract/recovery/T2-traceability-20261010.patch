@@ -1,0 +1,410 @@
+diff --git a/docs/plan-ca937edf4e-T2.delivery.json b/docs/plan-ca937edf4e-T2.delivery.json
+index bfbc63b..9708f66 100644
+--- a/docs/plan-ca937edf4e-T2.delivery.json
++++ b/docs/plan-ca937edf4e-T2.delivery.json
+@@ -8,30 +8,84 @@
+     {
+       "index": 1,
+       "status": "pass",
+-      "reason": "`judge-verdict finish` exige le périmètre racine déjà clos par le mécanisme existant et une preuve fraîche indépendante (`judgeMissingProofs`), sans jamais lire ni modifier `Task.IndependentReview` ; la clôture globale (`PlanningState.Finished`) est un champ distinct de l'état de revue du candidat. Vérifié par `go test ./internal/engine -run TestJudgeVerdictDistinctFromIndependentReview -count=1 -v` (PASS, code de sortie 0).",
+-      "controls": ["plan-entry", "plan-validation", "plan-delivery", "plan-criterion-1"],
+-      "evidence": ["internal/engine/planning_judge.go", "internal/engine/planning.go", "internal/engine/planning_judge_test.go"]
++      "reason": "`judge-verdict finish` exige le périmètre racine déjà clos par le mécanisme existant et une preuve fraîche indépendante (`judgeMissingProofs`), sans jamais lire ni modifier `Task.IndependentReview` ; la clôture globale (`PlanningState.Finished`) est un champ distinct de l'état de revue du candidat. Vérifié par `go test ./internal/engine -run TestJudgeVerdictDistinctFromIndependentReview -count=1 -v` (PASS, code de sortie 0). Correction externe : sorties originales du rejeu opérateur attribué jointes ; elles corroborent les tests du juge sur les mêmes blobs de code et ne constituent pas un reçu moteur.",
++      "controls": [
++        "plan-entry",
++        "plan-validation",
++        "plan-delivery",
++        "plan-criterion-1"
++      ],
++      "evidence": [
++        "internal/engine/planning_judge.go",
++        "internal/engine/planning.go",
++        "internal/engine/planning_judge_test.go",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/index.json",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl"
++      ]
+     },
+     {
+       "index": 2,
+       "status": "pass",
+-      "reason": "Un verdict `continue` incrémente `PlanningState.Cycle`, révoque les baux de périmètre (génération/holder/échéance) et consigne un événement `cycle_renewed`, en laissant inchangés `Objective`, les exigences du périmètre racine, `Tasks`, `MaxTasks`/`MaxDecisions`/`MaxActivations` et `Decisions`/`Activations` (assertions explicites avant/après dans le test). Vérifié par `go test ./internal/engine -run TestJudgeVerdictContinuePreservesStateAndRenewsCycle -count=1 -v` (PASS, code de sortie 0).",
+-      "controls": ["plan-entry", "plan-validation", "plan-delivery", "plan-criterion-2"],
+-      "evidence": ["internal/engine/planning_judge.go", "internal/engine/planning.go", "internal/engine/planning_judge_test.go"]
++      "reason": "Un verdict `continue` incrémente `PlanningState.Cycle`, révoque les baux de périmètre (génération/holder/échéance) et consigne un événement `cycle_renewed`, en laissant inchangés `Objective`, les exigences du périmètre racine, `Tasks`, `MaxTasks`/`MaxDecisions`/`MaxActivations` et `Decisions`/`Activations` (assertions explicites avant/après dans le test). Vérifié par `go test ./internal/engine -run TestJudgeVerdictContinuePreservesStateAndRenewsCycle -count=1 -v` (PASS, code de sortie 0). Correction externe : sorties originales du rejeu opérateur attribué jointes ; elles corroborent les tests du juge sur les mêmes blobs de code et ne constituent pas un reçu moteur.",
++      "controls": [
++        "plan-entry",
++        "plan-validation",
++        "plan-delivery",
++        "plan-criterion-2"
++      ],
++      "evidence": [
++        "internal/engine/planning_judge.go",
++        "internal/engine/planning.go",
++        "internal/engine/planning_judge_test.go",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/index.json",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl"
++      ]
+     },
+     {
+       "index": 3,
+       "status": "pass",
+-      "reason": "Rejeu d'un événement identique renvoie l'état courant sans second effet (compteurs et révision inchangés) ; une révision attendue périmée est refusée (`revision_conflict`) ; un quota de jugements épuisé refuse l'appel (`judge_quota`) ; une panne ouverte (`PlanningState.Failure` non vide) refuse `continue`/`finish` mais laisse `blocked` disponible sans altérer la panne enregistrée ; un verdict après clôture globale est refusé (`mission_finished`) ; une échéance périodique (`period_decisions`) due refuse une nouvelle activation (`judge_due`) jusqu'à un verdict frais. Vérifié par `go test ./internal/engine -run 'TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects|TestJudgePeriodGatesClaimUntilVerdictRendered' -count=1 -v` (PASS, 6 sous-tests, code de sortie 0).",
+-      "controls": ["plan-entry", "plan-validation", "plan-delivery", "plan-criterion-3"],
+-      "evidence": ["internal/engine/planning_judge.go", "internal/engine/planning.go", "internal/engine/planning_judge_test.go"]
++      "reason": "Rejeu d'un événement identique renvoie l'état courant sans second effet (compteurs et révision inchangés) ; une révision attendue périmée est refusée (`revision_conflict`) ; un quota de jugements épuisé refuse l'appel (`judge_quota`) ; une panne ouverte (`PlanningState.Failure` non vide) refuse `continue`/`finish` mais laisse `blocked` disponible sans altérer la panne enregistrée ; un verdict après clôture globale est refusé (`mission_finished`) ; une échéance périodique (`period_decisions`) due refuse une nouvelle activation (`judge_due`) jusqu'à un verdict frais. Vérifié par `go test ./internal/engine -run 'TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects|TestJudgePeriodGatesClaimUntilVerdictRendered' -count=1 -v` (PASS, 6 sous-tests, code de sortie 0). Correction externe : sorties originales du rejeu opérateur attribué jointes ; elles corroborent les tests du juge sur les mêmes blobs de code et ne constituent pas un reçu moteur.",
++      "controls": [
++        "plan-entry",
++        "plan-validation",
++        "plan-delivery",
++        "plan-criterion-3"
++      ],
++      "evidence": [
++        "internal/engine/planning_judge.go",
++        "internal/engine/planning.go",
++        "internal/engine/planning_judge_test.go",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/index.json",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl"
++      ]
+     },
+     {
+       "index": 4,
+       "status": "pass",
+-      "reason": "`judge-verdict finish` est refusé tant que le périmètre racine n'est pas `closed` (y compris avant toute tâche) et tant qu'une exigence ne dispose pas d'une preuve `acceptedFresh` recalculée au moment du verdict, même si `Scope.State` affiche encore « closed » faute de réconciliation préalable (`evidence_stale`). L'architecture (états, identités de cycle, persistance sans nouvelle migration, garanties de rejeu) est documentée au même candidat dans les quatre fichiers listés en preuve, en séparant explicitement cible et comportement vérifié. Vérifié par `go test ./internal/engine -run TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence -count=1 -v` (PASS, 2 sous-tests, code de sortie 0) et `python3 docs/plans/engine-cursor-contract/check-evolution-docs.py T2` (sortie : « T2: architecture/evidence structure verified; semantic review still required », code de sortie 0).",
+-      "controls": ["plan-entry", "plan-validation", "plan-delivery", "plan-criterion-4"],
+-      "evidence": ["internal/engine/planning_judge.go", "internal/engine/planning.go", "internal/engine/planning_judge_test.go", "docs/architecture/CURSOR-ENGINE-CONTRACT.md", "docs/en/CURSOR-ENGINE-CONTRACT.md", "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md", "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md", "docs/plans/engine-cursor-contract/evidence/T2-handoff.md"]
++      "reason": "`judge-verdict finish` est refusé tant que le périmètre racine n'est pas `closed` (y compris avant toute tâche) et tant qu'une exigence ne dispose pas d'une preuve `acceptedFresh` recalculée au moment du verdict, même si `Scope.State` affiche encore « closed » faute de réconciliation préalable (`evidence_stale`). L'architecture (états, identités de cycle, persistance sans nouvelle migration, garanties de rejeu) est documentée au même candidat dans les quatre fichiers d’architecture (FR joints intégralement ; ajouts EN conservés dans le diff candidat), en séparant explicitement cible et comportement vérifié. Vérifié par `go test ./internal/engine -run TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence -count=1 -v` (PASS, 2 sous-tests, code de sortie 0) et `python3 docs/plans/engine-cursor-contract/check-evolution-docs.py T2` (sortie : « T2: architecture/evidence structure verified; semantic review still required », code de sortie 0). Correction externe : sorties originales du rejeu opérateur attribué jointes ; elles corroborent les tests du juge sur les mêmes blobs de code et ne constituent pas un reçu moteur.",
++      "controls": [
++        "plan-entry",
++        "plan-validation",
++        "plan-delivery",
++        "plan-criterion-4"
++      ],
++      "evidence": [
++        "internal/engine/planning_judge.go",
++        "internal/engine/planning.go",
++        "internal/engine/planning_judge_test.go",
++        "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
++        "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
++        "docs/plans/engine-cursor-contract/evidence/T2-handoff.md",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/index.json",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/interrupted-suite-observation.json",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/suite-failure-events.jsonl",
++        "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.stderr"
++      ]
+     }
+   ]
+ }
+diff --git a/docs/plan-ca937edf4e-T2.md b/docs/plan-ca937edf4e-T2.md
+index 5d1632e..346b946 100644
+--- a/docs/plan-ca937edf4e-T2.md
++++ b/docs/plan-ca937edf4e-T2.md
+@@ -63,3 +63,34 @@ Responsable : lancer la revue indépendante sur ce même candidat (base
+ `e32388fda21e7c225c3b2416d230d6f5450230cd` + diff listé ci-dessus), puis, si
+ acceptée, T3 (exploration en lecture, périmètres, concurrence, réservations et
+ budgets partagés) et T5 (réglages persistés, Admin FR/EN de `JudgePolicy`).
++
++
++## Correction externe du dossier de preuve — 10 octobre 2026
++
++Les résultats de tests annoncés plus haut restent des déclarations historiques
++du producteur. Les originaux de ces exécutions n’étaient pas joints au dossier ;
++ils ne sont pas réattribués au contrôleur ni reconstruits rétroactivement.
++Une reproduction opérateur, distincte, est conservée dans
++`docs/plans/engine-cursor-contract/evidence/T2-execution/index.json` avec les
++arguments, dates, codes et stdout/stderr originaux, et les blobs de code testés.
++
++Sur le candidat source `a27e175eb4f3e38f9cede1c888956a5ca5a0310f`,
++`go test ./internal/engine -run ^Test(Judge|ConfigureJudge) -json -count=1 -timeout 60s`
++retourne 0 : six tests de premier niveau, 13 PASS avec sous-cas. Le code du juge
++et ses tests sont inchangés par cette réparation du dossier. L’origine est
++opérateur en clone isolé ; cette preuve ne constitue pas un reçu moteur.
++
++La suite `go test ./... -json -count=1 -timeout 15m` s’interrompt avec code du
++lanceur 143 et code Go inconnu. Ses traces partielles ont 979 PASS, huit SKIP
++et un FAIL de premier niveau (`TestGraphDeliveryD03QualificationManifest`).
++Aucun bilan de suite complète n’est établi par cette reproduction. Les originaux
++volumineux restent hors du candidat, avec chemin et empreinte ; l’extrait joint
++de l’échec est explicitement borné et ne remplace pas leur intégralité.
++La cause de l’interruption reste inconnue.
++
++Cette réparation apporte une précondition nouvelle : des originaux attribués
++réellement disponibles pour juger les six tests, au lieu d’une déclaration seule.
++Nouveaux contrôles et revue du candidat corrigé restent requis. Aucun critère
++n’est accepté par cette note, aucune tentative ou consommation n’est remboursée.
++
++Sélection des sources jointes : originaux du juge, observation de suite partielle, événements du manifeste et sources FR complets. Les ajouts des deux miroirs EN restent dans le diff candidat ; leur texte complet préexistant est couvert par T1. Aucun critère ni code n’est supprimé pour tenir la capacité de contexte.
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/index.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/index.json
+new file mode 100644
+index 0000000..db97dfc
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/index.json
+@@ -0,0 +1,56 @@
++{
++  "schema_version": 1,
++  "actor": "external operator",
++  "source_candidate": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
++  "observed_at": "2026-10-10T19:42:48.130046+00:00",
++  "origin": "Local reproduction in isolated clone; NOT controller receipt, NOT independent acceptance",
++  "judge_execution": {
++    "metadata": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json",
++    "stdout": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl",
++    "stderr": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.stderr",
++    "exit_code": 0,
++    "top_level_pass": 6,
++    "including_subtests_pass": 13
++  },
++  "source_code": [
++    {
++      "path": "internal/engine/planning.go",
++      "git_blob": "caea4ac780794b1244e10e1b549848e02ad1fead",
++      "sha256": "247c7456ef6073e26b66ae59fad01c240b3b9c631510ad22c170b544d33966cb"
++    },
++    {
++      "path": "internal/engine/planning_judge.go",
++      "git_blob": "358cf40a58ceceb4d8dc83d31e51b96e785e6df5",
++      "sha256": "02bfd68ac3cb4e9b1845931bdc8e8696723f8ce1e04bda84e994112f43b67dcb"
++    },
++    {
++      "path": "internal/engine/planning_judge_test.go",
++      "git_blob": "bf76d1ab3c5de7399a1c88f3dce4620e908bf8a6",
++      "sha256": "63c9f4e6ac8d493a634bc8f40785606412c4dd81bbed68632bbe94ff020699d0"
++    }
++  ],
++  "full_suite": {
++    "observation": "docs/plans/engine-cursor-contract/evidence/T2-execution/interrupted-suite-observation.json",
++    "retained_failure_events": "docs/plans/engine-cursor-contract/evidence/T2-execution/suite-failure-events.jsonl",
++    "complete": false,
++    "runner_exit_code": 143,
++    "go_exit_code": null,
++    "partial_top_level": {
++      "pass": 979,
++      "skip": 8,
++      "fail": 1
++    },
++    "full_output_attached": false,
++    "full_output_location": "/tmp/swarm-T2-traceability-c1hvvch0/go-suite-corrected.jsonl",
++    "full_output_sha256": "ab5489dcc72feb6c707cf948c11fe35e9aba90c9ae8eff470d54020a35c43242",
++    "limit": "Full 1.5 MB output retained externally; attached events are an explicit selection for the failed manifest test, not full output"
++  },
++  "supersedes": "Producer test counts remain historical self-report; this attributed execution corroborates judge behavior only and does not establish a complete suite result",
++  "attachment_selection": {
++    "reason": "Avoid duplicate full English architecture mirrors already covered by accepted T1 and candidate T2 diff; keep full FR sources, original judge execution, empty stderr and explicit partial-suite originals. No code or acceptance criterion removed.",
++    "english_mirrors_available_in_candidate_diff": [
++      "docs/en/CURSOR-ENGINE-CONTRACT.md",
++      "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md"
++    ]
++  }
++}
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/interrupted-suite-observation.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/interrupted-suite-observation.json
+new file mode 100644
+index 0000000..a2fb62a
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/interrupted-suite-observation.json
+@@ -0,0 +1,50 @@
++{
++  "schema_version": 1,
++  "observation_kind": "host operator report of interrupted execution; not subprocess completion metadata",
++  "candidate": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
++  "command": [
++    "go",
++    "test",
++    "./...",
++    "-json",
++    "-count=1",
++    "-timeout",
++    "15m"
++  ],
++  "observed_at": "2026-10-10T19:33:28.786275+00:00",
++  "runner_exit_code": 143,
++  "go_exit_code": null,
++  "completion_metadata_present": false,
++  "complete": false,
++  "cause": "unknown; last started test is correlation, not attribution",
++  "first_output_event_at": "2026-10-10T21:24:15.984876808+02:00",
++  "last_output_event_at": "2026-10-10T21:32:16.190025194+02:00",
++  "last_started_test": "TestSupervisionR3TotalTimeoutStillBoundsSilence",
++  "partial_top_level_outcomes": {
++    "pass": 979,
++    "skip": 8,
++    "fail": 1
++  },
++  "partial_outcomes_including_subtests": {
++    "pass": 1667,
++    "skip": 8,
++    "fail": 1
++  },
++  "failed_tests": [
++    "TestGraphDeliveryD03QualificationManifest"
++  ],
++  "artifacts": [
++    {
++      "path": "/tmp/swarm-T2-traceability-c1hvvch0/go-suite-corrected.jsonl",
++      "bytes": 1533239,
++      "sha256": "ab5489dcc72feb6c707cf948c11fe35e9aba90c9ae8eff470d54020a35c43242",
++      "versioned": false
++    },
++    {
++      "path": "/tmp/swarm-T2-traceability-c1hvvch0/go-suite-corrected.stderr",
++      "bytes": 0,
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++      "versioned": false
++    }
++  ]
++}
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json
+new file mode 100644
+index 0000000..6a19f6c
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json
+@@ -0,0 +1,31 @@
++{
++  "schema_version": 1,
++  "executor": "host operator; isolated clone; NOT engine receipt",
++  "candidate": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
++  "command": [
++    "go",
++    "test",
++    "./internal/engine",
++    "-run",
++    "^Test(Judge|ConfigureJudge)",
++    "-json",
++    "-count=1",
++    "-timeout",
++    "60s"
++  ],
++  "started_at": "2026-10-10T19:28:49.550427+00:00",
++  "finished_at": "2026-10-10T19:29:06.521421+00:00",
++  "exit_code": 0,
++  "artifacts": [
++    {
++      "path": "/tmp/swarm-T2-traceability-c1hvvch0/judge-tests.jsonl",
++      "bytes": 13181,
++      "sha256": "1d7a3e77b4b20f1542224c50d4264a1daef0b970612815367d9cbd0020c0d362"
++    },
++    {
++      "path": "/tmp/swarm-T2-traceability-c1hvvch0/judge-tests.stderr",
++      "bytes": 0,
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++    }
++  ]
++}
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl
+new file mode 100644
+index 0000000..4debd91
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl
+@@ -0,0 +1,56 @@
++{"Time":"2026-10-10T21:29:05.766045134+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
++{"Time":"2026-10-10T21:29:05.794567174+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictDistinctFromIndependentReview"}
++{"Time":"2026-10-10T21:29:05.794597982+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictDistinctFromIndependentReview","Output":"=== RUN   TestJudgeVerdictDistinctFromIndependentReview\n"}
++{"Time":"2026-10-10T21:29:05.879266154+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictDistinctFromIndependentReview","Output":"--- PASS: TestJudgeVerdictDistinctFromIndependentReview (0.08s)\n"}
++{"Time":"2026-10-10T21:29:05.87949281+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictDistinctFromIndependentReview","Elapsed":0.08}
++{"Time":"2026-10-10T21:29:05.879512918+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence"}
++{"Time":"2026-10-10T21:29:05.87951926+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence","Output":"=== RUN   TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence\n"}
++{"Time":"2026-10-10T21:29:05.879543445+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/root-not-closed"}
++{"Time":"2026-10-10T21:29:05.879555297+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/root-not-closed","Output":"=== RUN   TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/root-not-closed\n"}
++{"Time":"2026-10-10T21:29:05.926962481+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/root-not-closed","Output":"--- PASS: TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/root-not-closed (0.05s)\n"}
++{"Time":"2026-10-10T21:29:05.927015681+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/root-not-closed","Elapsed":0.05}
++{"Time":"2026-10-10T21:29:05.927044205+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/stale-proof"}
++{"Time":"2026-10-10T21:29:05.927067609+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/stale-proof","Output":"=== RUN   TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/stale-proof\n"}
++{"Time":"2026-10-10T21:29:05.985711619+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/stale-proof","Output":"--- PASS: TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/stale-proof (0.06s)\n"}
++{"Time":"2026-10-10T21:29:05.985756222+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence/stale-proof","Elapsed":0.06}
++{"Time":"2026-10-10T21:29:05.985768255+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence","Output":"--- PASS: TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence (0.11s)\n"}
++{"Time":"2026-10-10T21:29:05.98577616+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictFinishRequiresRootClosedAndFreshEvidence","Elapsed":0.11}
++{"Time":"2026-10-10T21:29:05.985795266+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictContinuePreservesStateAndRenewsCycle"}
++{"Time":"2026-10-10T21:29:05.985802119+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictContinuePreservesStateAndRenewsCycle","Output":"=== RUN   TestJudgeVerdictContinuePreservesStateAndRenewsCycle\n"}
++{"Time":"2026-10-10T21:29:06.024153097+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictContinuePreservesStateAndRenewsCycle","Output":"--- PASS: TestJudgeVerdictContinuePreservesStateAndRenewsCycle (0.04s)\n"}
++{"Time":"2026-10-10T21:29:06.024181851+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictContinuePreservesStateAndRenewsCycle","Elapsed":0.04}
++{"Time":"2026-10-10T21:29:06.024193764+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects"}
++{"Time":"2026-10-10T21:29:06.024199234+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects","Output":"=== RUN   TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects\n"}
++{"Time":"2026-10-10T21:29:06.024211257+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/replay-is-idempotent"}
++{"Time":"2026-10-10T21:29:06.024216707+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/replay-is-idempotent","Output":"=== RUN   TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/replay-is-idempotent\n"}
++{"Time":"2026-10-10T21:29:06.070152302+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/replay-is-idempotent","Output":"--- PASS: TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/replay-is-idempotent (0.05s)\n"}
++{"Time":"2026-10-10T21:29:06.070184483+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/replay-is-idempotent","Elapsed":0.05}
++{"Time":"2026-10-10T21:29:06.070197387+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/stale-revision-refused"}
++{"Time":"2026-10-10T21:29:06.070202737+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/stale-revision-refused","Output":"=== RUN   TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/stale-revision-refused\n"}
++{"Time":"2026-10-10T21:29:06.119462205+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/stale-revision-refused","Output":"--- PASS: TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/stale-revision-refused (0.05s)\n"}
++{"Time":"2026-10-10T21:29:06.119505676+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/stale-revision-refused","Elapsed":0.05}
++{"Time":"2026-10-10T21:29:06.119517208+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/quota-exhausted-refused"}
++{"Time":"2026-10-10T21:29:06.11952346+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/quota-exhausted-refused","Output":"=== RUN   TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/quota-exhausted-refused\n"}
++{"Time":"2026-10-10T21:29:06.163028934+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/quota-exhausted-refused","Output":"--- PASS: TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/quota-exhausted-refused (0.04s)\n"}
++{"Time":"2026-10-10T21:29:06.163066204+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/quota-exhausted-refused","Elapsed":0.04}
++{"Time":"2026-10-10T21:29:06.163081022+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/open-failure-refuses-continue-but-not-blocked"}
++{"Time":"2026-10-10T21:29:06.163098545+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/open-failure-refuses-continue-but-not-blocked","Output":"=== RUN   TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/open-failure-refuses-continue-but-not-blocked\n"}
++{"Time":"2026-10-10T21:29:06.217572561+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/open-failure-refuses-continue-but-not-blocked","Output":"--- PASS: TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/open-failure-refuses-continue-but-not-blocked (0.05s)\n"}
++{"Time":"2026-10-10T21:29:06.217659525+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/open-failure-refuses-continue-but-not-blocked","Elapsed":0.05}
++{"Time":"2026-10-10T21:29:06.217679112+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/already-finished-refuses-another-verdict"}
++{"Time":"2026-10-10T21:29:06.217692497+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/already-finished-refuses-another-verdict","Output":"=== RUN   TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/already-finished-refuses-another-verdict\n"}
++{"Time":"2026-10-10T21:29:06.311714744+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/already-finished-refuses-another-verdict","Output":"--- PASS: TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/already-finished-refuses-another-verdict (0.09s)\n"}
++{"Time":"2026-10-10T21:29:06.31181355+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects/already-finished-refuses-another-verdict","Elapsed":0.09}
++{"Time":"2026-10-10T21:29:06.311871008+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects","Output":"--- PASS: TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects (0.29s)\n"}
++{"Time":"2026-10-10T21:29:06.311882119+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgeVerdictReplayStaleQuotaFailureRefuseEffects","Elapsed":0.29}
++{"Time":"2026-10-10T21:29:06.311897237+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestJudgePeriodGatesClaimUntilVerdictRendered"}
++{"Time":"2026-10-10T21:29:06.311905282+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgePeriodGatesClaimUntilVerdictRendered","Output":"=== RUN   TestJudgePeriodGatesClaimUntilVerdictRendered\n"}
++{"Time":"2026-10-10T21:29:06.365219807+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestJudgePeriodGatesClaimUntilVerdictRendered","Output":"--- PASS: TestJudgePeriodGatesClaimUntilVerdictRendered (0.05s)\n"}
++{"Time":"2026-10-10T21:29:06.365257097+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestJudgePeriodGatesClaimUntilVerdictRendered","Elapsed":0.05}
++{"Time":"2026-10-10T21:29:06.365268789+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestConfigureJudgePreservesCountersAndRejectsLoweringMaxVerdictsBelowUsage"}
++{"Time":"2026-10-10T21:29:06.365275753+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestConfigureJudgePreservesCountersAndRejectsLoweringMaxVerdictsBelowUsage","Output":"=== RUN   TestConfigureJudgePreservesCountersAndRejectsLoweringMaxVerdictsBelowUsage\n"}
++{"Time":"2026-10-10T21:29:06.460072937+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestConfigureJudgePreservesCountersAndRejectsLoweringMaxVerdictsBelowUsage","Output":"--- PASS: TestConfigureJudgePreservesCountersAndRejectsLoweringMaxVerdictsBelowUsage (0.09s)\n"}
++{"Time":"2026-10-10T21:29:06.460540747+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestConfigureJudgePreservesCountersAndRejectsLoweringMaxVerdictsBelowUsage","Elapsed":0.09}
++{"Time":"2026-10-10T21:29:06.460564662+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
++{"Time":"2026-10-10T21:29:06.465840666+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t0.699s\n"}
++{"Time":"2026-10-10T21:29:06.465884689+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":0.7}
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.stderr b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.stderr
+new file mode 100644
+index 0000000..e69de29
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/suite-failure-events.jsonl b/docs/plans/engine-cursor-contract/evidence/T2-execution/suite-failure-events.jsonl
+new file mode 100644
+index 0000000..b75ff02
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/suite-failure-events.jsonl
+@@ -0,0 +1,5 @@
++{"Time":"2026-10-10T21:25:30.722253405+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest"}
++{"Time":"2026-10-10T21:25:30.722257463+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Output":"=== RUN   TestGraphDeliveryD03QualificationManifest\n"}
++{"Time":"2026-10-10T21:25:30.729853299+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Output":"    graph_delivery_qualification_test.go:256: stale input: AGENTS.md\n"}
++{"Time":"2026-10-10T21:25:30.729889327+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Output":"--- FAIL: TestGraphDeliveryD03QualificationManifest (0.01s)\n"}
++{"Time":"2026-10-10T21:25:30.729904085+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Elapsed":0.01}
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-handoff.md b/docs/plans/engine-cursor-contract/evidence/T2-handoff.md
+index f2d6f36..3637b7c 100644
+--- a/docs/plans/engine-cursor-contract/evidence/T2-handoff.md
++++ b/docs/plans/engine-cursor-contract/evidence/T2-handoff.md
+@@ -70,3 +70,34 @@ Tests du juge exécutés (fichier `internal/engine/planning_judge_test.go`) :
+ - `TestGraphDeliveryD03QualificationManifest` échoue sur l'exécution complète de la suite `internal/engine`, pour une cause (`AGENTS.md`) sans rapport avec ce diff ; non corrigé car hors périmètre de la tâche T2 (`internal/engine/planning*.go`), conservé visible conformément au contrat partagé.
+ - Revue indépendante de ce même candidat requise avant toute acceptation ; ce bilan local ne vaut pas acceptation.
+ - Prochaine action recommandée au responsable : lancer T3 (exploration en lecture, périmètres, concurrence, réservations et budgets partagés) sur la base de la persistance et des garde-fous ajoutés ici, puis T5 pour l'exposition Admin FR/EN de `JudgePolicy` (API/CLI déjà disponibles via le dispatch générique `planning configure-judge|judge-verdict WORK --input requête.json`, mais l'interface Admin web reste dans le périmètre explicite de T5, pas de T2).
++
++
++## Correction externe du dossier de preuve — 10 octobre 2026
++
++Les résultats de tests annoncés plus haut restent des déclarations historiques
++du producteur. Les originaux de ces exécutions n’étaient pas joints au dossier ;
++ils ne sont pas réattribués au contrôleur ni reconstruits rétroactivement.
++Une reproduction opérateur, distincte, est conservée dans
++`docs/plans/engine-cursor-contract/evidence/T2-execution/index.json` avec les
++arguments, dates, codes et stdout/stderr originaux, et les blobs de code testés.
++
++Sur le candidat source `a27e175eb4f3e38f9cede1c888956a5ca5a0310f`,
++`go test ./internal/engine -run ^Test(Judge|ConfigureJudge) -json -count=1 -timeout 60s`
++retourne 0 : six tests de premier niveau, 13 PASS avec sous-cas. Le code du juge
++et ses tests sont inchangés par cette réparation du dossier. L’origine est
++opérateur en clone isolé ; cette preuve ne constitue pas un reçu moteur.
++
++La suite `go test ./... -json -count=1 -timeout 15m` s’interrompt avec code du
++lanceur 143 et code Go inconnu. Ses traces partielles ont 979 PASS, huit SKIP
++et un FAIL de premier niveau (`TestGraphDeliveryD03QualificationManifest`).
++Aucun bilan de suite complète n’est établi par cette reproduction. Les originaux
++volumineux restent hors du candidat, avec chemin et empreinte ; l’extrait joint
++de l’échec est explicitement borné et ne remplace pas leur intégralité.
++La cause de l’interruption reste inconnue.
++
++Cette réparation apporte une précondition nouvelle : des originaux attribués
++réellement disponibles pour juger les six tests, au lieu d’une déclaration seule.
++Nouveaux contrôles et revue du candidat corrigé restent requis. Aucun critère
++n’est accepté par cette note, aucune tentative ou consommation n’est remboursée.
++
++Sélection des sources jointes : originaux du juge, observation de suite partielle, événements du manifeste et sources FR complets. Les ajouts des deux miroirs EN restent dans le diff candidat ; leur texte complet préexistant est couvert par T1. Aucun critère ni code n’est supprimé pour tenir la capacité de contexte.

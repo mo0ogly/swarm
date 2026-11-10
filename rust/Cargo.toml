@@ -1,0 +1,7 @@
+[workspace]
+members = ["crates/swarm-linux-prerequisites", "crates/swarm-biba-linux", "crates/swarm-linux-identity-channel", "crates/swarm-api-client", "crates/swarm-identity-contract", "crates/swarm-protection-contract", "crates/swarm-enrollment-proof", "crates/swarm-wire-json", "crates/swarm-enrollment-state", "crates/swarm-enrollment-authority", "crates/swarm-enrollment-config", "crates/swarm-enrollment-bootstrap", "crates/swarm-cli", "crates/swarm-engine", "crates/swarm-web", "crates/swarm-authority"]
+resolver = "2"
+
+# Shared data-only confidentiality contract; runtime authorities remain in engine.
+[workspace.dependencies]
+swarm-confidentiality = { path = "crates/swarm-confidentiality" }

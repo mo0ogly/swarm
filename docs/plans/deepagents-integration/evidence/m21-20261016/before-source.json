@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_memory_swarm_source.py",
+    "-v"
+  ],
+  "started_at": "2026-10-16T21:01:19.356951+00:00",
+  "finished_at": "2026-10-16T21:01:19.864387+00:00",
+  "exit_code": 1,
+  "expected": "new source identity regression cases fail before correction"
+}

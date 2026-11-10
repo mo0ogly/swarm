@@ -1,0 +1,36 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityIssuer",
+    "-count=1",
+    "-timeout",
+    "60s",
+    "-json"
+  ],
+  "executor": "Codex alone; isolated fixture stores; local OIDC signed-token fixture, no real provider",
+  "start": "2026-10-17T08:10:27.697157+00:00",
+  "end": "2026-10-17T08:11:05.304682+00:00",
+  "elapsed_seconds": 37.60750748901046,
+  "exit": 1,
+  "input_count": 1058,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 2,
+    "fail": 2,
+    "skip": 0
+  },
+  "names": {
+    "pass": [
+      "TestAgentIdentityIssuerAuthenticatedHumanExactPermit",
+      "TestAgentIdentityIssuerAuthorityCannotComeFromJSON"
+    ],
+    "fail": [
+      "TestAgentIdentityIssuerExpirationDuringPublicationWait",
+      "TestAgentIdentityIssuerPublicationRejectsDifferentHumanSession"
+    ],
+    "skip": []
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "packages": {
+    "swarm.local/companion/internal/engine": 0
+  },
+  "command": [
+    "go",
+    "test",
+    "-overlay",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/overlay.json",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityConfigClient(FailedSendClosesServerChannel|UnavailableDoesNotInventStorageCause)$",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 1,
+  "start": "2026-10-17T13:52:32.830244+00:00",
+  "end": "2026-10-17T13:53:22.099558+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 2,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [
+      "TestAgentIdentityConfigClientFailedSendClosesServerChannel",
+      "TestAgentIdentityConfigClientUnavailableDoesNotInventStorageCause"
+    ],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 832,
+  "overlay": {
+    "Replace": {
+      "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/work_row.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/work_row.go.overlay.txt",
+      "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/work_row_test.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/work_row_test.go.overlay.txt"
+    }
+  }
+}

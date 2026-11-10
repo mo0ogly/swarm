@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "paea-laboratory-evidence",
+  "inputs": [
+    "tools/paea/pilot_lab.py",
+    "tools/paea/pilot_oracle.py",
+    "tests/paea_pilot_lab_test.py",
+    "tests/fixtures/paea/contract-v1.json",
+    "docs/plans/actions-confiance/paea/PILOTE-OPERATIONNEL.md",
+    "docs/en/plans/actions-confiance/paea/OPERATIONAL-PILOT.md",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-cli/src/protection.rs",
+    "tests/fixtures/paea/payment-*.json",
+    "tools/paea/run_pilot.py",
+    "tests/helpers/paea_pilot_contention.py",
+    "tools/paea/lab_evidence.py",
+    "tools/paea/verify_pilot.py",
+    "tools/verification/recipes/paea-pilot-lab.json",
+    "tools/verification/recipe.py",
+    "tests/paea_lab_runner_test.py",
+    "tests/paea_lab_evidence_test.py",
+    "schemas/paea/laboratory-report-v1.schema.json",
+    "schemas/paea/laboratory-evidence-v1.schema.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "actual-campaign-export-and-refusals",
+      "command": [
+        "python3",
+        "tests/paea_lab_runner_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_LAB_COMMAND_EXPORT_AND_REFUSALS_PASS",
+        "\"tests\": 8",
+        "\"evidence_inventory_sha256\""
+      ],
+      "required_stderr": [
+        "test_actual_campaign_export_then_hash_and_existing_output_refusals",
+        "Ran 1 test",
+        "OK"
+      ]
+    },
+    {
+      "id": "original-file-verifier-refusals-recovery-and-counterexample",
+      "command": [
+        "python3",
+        "tests/paea_lab_evidence_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_EVIDENCE_AUTHENTICITY_NOT_ESTABLISHED counterexample retained",
+        "PAEA_ARTIFACT_PUBLICATION_UNKNOWN_RECONCILED retained-copy replay, no extra campaign run"
+      ],
+      "required_stderr": [
+        "test_actual_campaign_schema_repeat_and_no_original_mutation",
+        "test_export_refuses_missing_oracle_before_publication",
+        "test_pre_publication_failure_never_creates_a_success_report",
+        "test_links_fifo_and_directory_substitution_refuse_without_disclosure",
+        "Ran 11 tests",
+        "OK"
+      ]
+    }
+  ]
+}

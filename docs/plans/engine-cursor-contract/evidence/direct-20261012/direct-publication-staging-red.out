@@ -1,0 +1,5 @@
+--- FAIL: TestManagedPublicationLaneRetainsSiblingWithoutPaidReview (0.67s)
+    managed_publication_lane_test.go:56: completed sibling could not freeze its result while the publication lane was occupied {<nil>  agent-second w-5c5d0798fb4d73620652af7d second 03e0565305ef6211b93931c89247321751ae7bd8 /tmp/TestManagedPublicationLaneRetainsSiblingWithoutPaidReview3836729805/001/.swarm/managed/w-5c5d0798fb4d73620652af7d/copies/second-1 ready  } <nil>
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.705s
+FAIL

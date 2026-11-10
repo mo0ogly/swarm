@@ -1,0 +1,13 @@
+{
+  "error": "revision_conflict",
+  "failure": {
+    "causes": [
+      "revision_conflict",
+      "revision_conflict"
+    ],
+    "code": "revision_conflict",
+    "message": "revision_conflict",
+    "retryable": false
+  },
+  "schema_version": 1
+}

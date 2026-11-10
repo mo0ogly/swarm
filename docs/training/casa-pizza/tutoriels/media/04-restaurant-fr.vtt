@@ -1,0 +1,29 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.000
+Ouvrir Espace restaurant
+Une connexion est nécessaire pour consulter et faire avancer les commandes.
+
+00:00:06.000 --> 00:00:12.000
+Essayer un mot de passe incorrect
+L’accès est refusé ; le catalogue public reste distinct de l’espace restaurant.
+
+00:00:12.000 --> 00:00:18.000
+Se connecter avec atelier dans cette démo
+La même commande et le même total sont affichés côté restaurant.
+
+00:00:18.000 --> 00:00:24.000
+Passer à En préparation
+Le restaurant avance manuellement le statut ; aucune autonomie IA n’est démontrée.
+
+00:00:24.000 --> 00:00:30.000
+Actualiser le suivi côté client
+Le statut En préparation correspond à l’action du restaurant.
+
+00:00:30.000 --> 00:00:36.000
+Passer à En livraison
+Les étapes sont parcourues dans l’ordre.
+
+00:00:36.000 --> 00:00:42.000
+Passer à Livrée puis actualiser le client
+Le suivi confirme la livraison fictive du même numéro de commande.

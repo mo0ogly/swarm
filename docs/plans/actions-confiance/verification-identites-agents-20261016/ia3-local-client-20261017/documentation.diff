@@ -1,0 +1,531 @@
+--- before/INSTALL.md
++++ after/INSTALL.md
+@@ -44,6 +44,13 @@
+ Il ne fournit encore ni commande d’installation ni service lancé. Les chemins,
+ pins et droits doivent venir du bootstrap protégé ; aucun compte, cookie cockpit
+ ou premier appelant ne devient automatiquement l’autorité.
++
++Le client interne vérifie maintenant le processus serveur depuis un pidfd fourni
++indépendamment par le lanceur et lie la réponse à un challenge et à la demande
++exacte (transport version 2). Cette étape ne désigne pas l’humain initial et ne
++crée toujours aucun service système ni réglage Admin. La configuration sur disque
++reste au schéma 1 ; aucune réinitialisation d’historique n’est nécessaire. Voir
++le contrat d’identité pour les préconditions Linux et les limites de transport.
+ 
+ ## Formation embarquée et identité visuelle
+ 
+--- before/docs/architecture/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/architecture/AGENT-IDENTITY-CONTRACT.md
+@@ -1116,11 +1116,11 @@
+ libération de l’émetteur. Aucun listener, commande CLI, route HTTP, compte ou
+ service système n’est créé ; le binaire du serveur en cours n’est pas remplacé.
+ 
+-La requête canonique version 1 comporte exactement schema_version, operation et
+-change. read exige change:null ; preview, create et apply exigent le Change strict
+-existant. Acteur, date, extensions, clés dupliquées ou de casse différente, version
+-inconnue et octets non canoniques sont refusés. Exemple de lecture :
+-`{"schema_version":1,"operation":"read","change":null}`.
++Le prototype 03a initial utilisait le schéma 1. Depuis 03b, la demande canonique
++utilise le schéma 2 avec challenge et pins indépendants, décrit ci-dessous ;
++l’ancienne version 1 est refusée. read exige change:null ; preview, create et
++apply exigent le Change strict existant. Acteur, date, champs inconnus, dupliqués
++ou de casse différente et octets non canoniques sont refusés.
+ 
+ Le bootstrap de confiance fournit chemins, propriétaire, pins et contrôleur
+ d’autorité indépendamment du projet. Ce contrôleur reçoit le message attribué et
+@@ -1148,7 +1148,8 @@
+ Le contrôleur doit exécuter synchroniquement et maintenir ses protections ; ces
+ gardes ne remplacent pas son implémentation et sa vérification indépendante.
+ 
+-La réponse comporte schema_version, operation, view, projection et error, avec
++La réponse comporte schema_version, request_digest, operation, view, projection
++et error, avec
+ null pour les résultats absents. Une erreur n’expose aucun résultat ; seuls des
+ codes limités traversent le canal : invalid_request, denied, conflict, busy,
+ pending, not_configured, indeterminate ou unavailable. Les causes Go originales
+@@ -1199,3 +1200,115 @@
+ et la fin du paquet ; un sélecteur vide, un skip ou une preuve incomplète ne peut
+ plus produire OK. Les doubles de sortie Go et le contrôle réel sont deux preuves
+ distinctes, conservées dans le rapport de raccord.
++
++
++## Client local IA3c.2f-03b — paire serveur et réponse vérifiées en fixture
++
++Le client privé complète le raccord de contrôle ; il n’installe aucun service.
++Son constructeur reçoit les pins d’installation, l’UID attendu et un pidfd du
++serveur fourni indépendamment par le lanceur de confiance. Il duplique et détient
++ce descripteur. Il ne l’ouvre jamais à partir d’un PID reçu dans une réponse et
++n’apprend ni racine ni principal depuis le serveur. Chaque message retour est
++attribué par le même canal Linux que la demande ; son UID et son objet processus
++sont comparés à ces éléments indépendants avant de lire le résultat métier.
++
++L’identifiant comparé est le couple périphérique/inode du pidfd sur pidfs, sous
++Linux 64 bits. Le type de système de fichiers est contrôlé ; un fichier ordinaire,
++un ancien pidfd à inode anonyme ou une architecture 32 bits est refusé, sans
++repli vers un PID numérique. L’objet est lié au processus dans le démarrage hôte
++courant, pas à une identité persistante ou à son exécutable. Cette vérification
++ne prouve ni le confinement ni l’identité humaine ; une exécution différente
++dans le même processus conserve ce besoin de protection. Le contrat noyau est
++vérifié dans [Linux v6.17, pidfs](https://raw.githubusercontent.com/torvalds/linux/v6.17/fs/pidfs.c).
++
++Le transport passe explicitement au schéma 2. La configuration persistée, son
++journal et ses empreintes restent au schéma 1 ; aucune histoire n’est réinitialisée.
++Le client crée un challenge aléatoire de 32 octets pour chaque nouvel échange et
++fournit les pins attendus dans la demande. Le service compare ces pins aux siens
++avant le contrôle d’autorité ; leur égalité ne donne aucun droit. La réponse porte
++request_digest, SHA-256 avec domaine `swarm-installation-control-v2` sur les octets
++canoniques de la demande complète : challenge, pins, opération et Change exact.
++Un ancien paquet version 1, même émis par le bon processus, n’est pas réinterprété.
++
++| Cadre | Champs exacts de version 2 |
++| --- | --- |
++| Demande | schema_version, challenge, pins, operation, change |
++| Réponse | schema_version, request_digest, operation, view, projection, error |
++
++Après contrôle du processus, le client refuse version/opération/empreinte autres,
++formats non canoniques ou champs inconnus, résultat absent, mélange View/Projection,
++code inconnu et erreur accompagnée de données. Le paquet enrollmentconfig fournit
++ValidateView/ValidateProjection : schéma, historique complet, tête recalculée et
++base/replay sont contrôlés au même endroit que le stockage. Le client compare
++les pins du résultat et le dernier Change à sa demande. Ces vérifications ne
++font pas d’une configuration souhaitée une capacité d’agent ou un service actif.
++
++Le client possède sa connexion et son pidfd dupliqué ; un seul échange y est
++admis, puis les deux sont fermés. Le descripteur original du lanceur n’est pas
++fermé par le client. Une annulation avant l’envoi reste une absence d’envoi ;
++après tentative de mutation, toute réponse non authentifiée, tronquée ou perdue
++retourne un résultat nul et une issue incertaine. Une erreur métier authentifiée
++reste son refus explicite. La connexion propre au client est fermée pour
++interrompre réception/envoi lors de l’annulation ; aucun délai fixe ni répétition
++automatique. Reprise métier avec le même EventID/base sur un nouveau canal et
++un nouveau challenge, après réautorisation du service.
++
++La fixture de taille réduit uniquement le buffer d’émission de son socket et
++relit SO_SNDBUF pour construire une réponse au-delà de la capacité observée.
++EMSGSIZE doit être constaté, distinct d’un timeout ; l’effet déjà confirmé est
++relu au retry exact sans second événement. Cette expérience ne choisit pas une
++politique de volume produit. Une réponse trop grande reste une limite du
++transport paquet, sans découpage automatique : transfert paginé ou autre cadrage
++reste à concevoir avant d’en faire un parcours public à historique arbitraire.
++Le propriétaire contrôle aussi le buffer de réception ; un préfixe tronqué est
++refusé, jamais traité comme une réponse valide.
++
++```mermaid
++sequenceDiagram
++  participant B as Lanceur de confiance (raccord restant)
++  participant C as Client privé
++  participant S as Service privé
++  participant W as Coordinateur et témoin
++  B->>C: pidfd serveur indépendant, UID et pins
++  C->>S: V2, challenge frais, pins, opération et Change
++  S->>S: Comparer pins et autoriser l’émetteur de la demande
++  S->>W: Exécuter sous contrôle d’autorité maintenu
++  W-->>S: État confirmé ou refus
++  S-->>C: V2 et empreinte de demande, résultat ou code
++  S->>S: Fermer le canal sur toute issue
++  C->>C: Comparer processus noyau, UID et demande exacte
++  C->>C: Valider tête, projection, pins et Change puis fermer
++  Note over C,W: Réponse perdue après mutation : résultat nul, issue incertaine
++  Note over C,W: Retry métier exact sur nouveau canal, challenge frais et nouvelle autorisation
++```
++
++Le [rapport client](../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/RAPPORT-IA3c2f03b.md)
++conserve les résultats et conditions de la preuve. Le lanceur public fournissant
++le pidfd indépendant, l’autorité humaine, le compte séparé, le confinement et
++Admin restent à raccorder. Un client vérifié en fixture ne clôt pas EP-01/04/05/07,
++F01–F07, IA3 ou l’acceptation globale. Pas de bascule locale/distance permissive.
++
++
++Le canal serveur est lui aussi possédé pour un seul échange et fermé sur succès,
++refus ou erreur ; un second serve est refusé. La garde EMSGSIZE ne ferme plus le
++socket à sa place : elle observe directement POLLHUP sans attente (poll à zéro),
++puis l’échange client constate la fin du canal. Cela corrige une attente possible
++après réponse non envoyée sans inventer de timeout. Le code unavailable demeure
++une indisponibilité générale du service ; il ne prouve pas une faute de stockage.
++Les deux contre-exemples avant correction et leurs reprises sont conservés.
++
++Le canal doit provenir du lanceur de confiance et être remis au serveur attendu
++sans fuite de descripteur ; le client vérifie ici l’émetteur du retour, après
++l’envoi de la demande. Ce contrôle seul ne prouve pas le destinataire avant
++l’envoi et ne chiffre pas le contenu. Un simple chemin de socket non établi ne
++remplace pas cette précondition ; le raccord public doit prouver cette remise
++ou établir le serveur avant tout contenu sensible. Cette obligation reste
++ouverte avec la protection du compte et des descripteurs (EP-07).
++
++Encodage du challenge : base64url canonique sans padding, représentant exactement
++32 octets. L’empreinte est l’hexadécimal minuscule de SHA-256 sur le préfixe
++`swarm-installation-control-v2\x00request\x00` suivi de la demande canonique ;
++chaque `\x00` représente un octet NUL. Le format canonique est celui du codec Go
++partagé, pas une promesse que JSON.stringify produit les mêmes octets. Un futur
++client d’un autre langage devra vérifier cet encodage, notamment les échappements,
++ou consommer le codec via l’adaptateur Go. Cette interopérabilité n’est pas prouvée.
+--- before/docs/en/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/en/AGENT-IDENTITY-CONTRACT.md
+@@ -1061,11 +1061,11 @@
+ command, HTTP route, account or system service is created; the running server's
+ binary is not replaced.
+ 
+-The canonical version 1 request contains exactly schema_version, operation and
+-change. read requires change:null; preview, create and apply require the existing
+-strict Change. Client actors, dates, extensions, duplicate or case-folded keys,
+-unknown versions and noncanonical bytes are rejected. Example read:
+-`{"schema_version":1,"operation":"read","change":null}`.
++The initial 03a prototype used schema 1. Since 03b the canonical request uses
++schema 2 with challenge and independent pins, described below; old version 1 is
++rejected. read requires change:null; preview, create and apply require the existing
++strict Change. Client actors, dates, unknown/duplicate/case-folded fields and
++noncanonical bytes are rejected.
+ 
+ Trusted bootstrap supplies paths, owner, pins and the authority controller
+ independently of project data. This controller receives the attributed message
+@@ -1093,7 +1093,8 @@
+ its protections; these guards do not replace its implementation or independent
+ verification.
+ 
+-Replies contain schema_version, operation, view, projection and error, with null
++Replies contain schema_version, request_digest, operation, view, projection and
++error, with null
+ for absent results. Errors expose no result; only limited codes cross the channel:
+ invalid_request, denied, conflict, busy, pending, not_configured, indeterminate or
+ unavailable. Original Go causes remain service-side, without sending private
+@@ -1143,3 +1144,112 @@
+ completion; an empty selector, skip or incomplete evidence can no longer produce
+ OK. Controlled Go-output doubles and the actual check are distinct proofs, both
+ retained in the adapter report.
++
++
++## Local client IA3c.2f-03b — service peer and reply checked in fixtures
++
++The private client completes the control adapter; it installs no service. Its
++constructor receives installation pins, expected UID and an independently held
++server pidfd from trusted bootstrap. It duplicates and holds that descriptor. It
++never opens it from a PID in a reply or learns its trust root or principal from
++the service. Each reply is attributed using the same Linux channel as requests;
++its UID and process object are compared with these independent inputs before
++interpreting the business result.
++
++The comparison uses the pidfd device/inode on pidfs under 64-bit Linux. Filesystem
++type is checked; ordinary files, older anonymous-inode pidfds and 32-bit builds
++are rejected without numeric-PID fallback. The object identifies a process within
++the current host boot, not a persistent identity or its executable. This proves
++neither confinement nor human identity; executing different code in the same
++process still requires protection. The kernel contract is checked against
++[Linux v6.17 pidfs](https://raw.githubusercontent.com/torvalds/linux/v6.17/fs/pidfs.c).
++
++Transport moves explicitly to schema 2. Persisted configuration, journal and head
++digests retain schema 1; no history is reset. The client generates a fresh random
++32-byte challenge for each new exchange and includes expected pins in the request.
++The service compares them with its own before authority control; equality grants
++no right. Replies carry request_digest, domain-separated SHA-256 with
++`swarm-installation-control-v2` over the complete canonical request bytes: challenge,
++pins, operation and exact Change. Version 1 packets are rejected even if attributed
++to the correct process.
++
++| Envelope | Exact version 2 fields |
++| --- | --- |
++| Request | schema_version, challenge, pins, operation, change |
++| Reply | schema_version, request_digest, operation, view, projection, error |
++
++After process verification the client rejects wrong version, operation or request
++digest, noncanonical/unknown fields, missing results, mixed View/Projection,
++unknown error codes and errors accompanied by data. enrollmentconfig provides
++ValidateView/ValidateProjection, sharing schema, full history, recomputed head
++and base/replay checks with storage. The client compares result pins and the last
++Change against its request. None of these checks turns desired configuration into
++an agent capability or an active service.
++
++The client owns its connection and duplicated pidfd; one exchange is admitted,
++then both are closed. The launcher's original descriptor remains independently
++owned. Cancellation before send means nothing was sent; after a mutation attempt,
++unattributed, truncated or lost replies produce no result and an uncertain outcome.
++An authenticated business error remains its explicit refusal. Cancellation closes
++the client's own connection to interrupt send/receive, without a fixed deadline
++or automatic retry. Retry the same business EventID/base on a new channel with a
++fresh challenge and renewed service authorization.
++
++The size fixture reduces only its socket send buffer and reads SO_SNDBUF back to
++construct a reply beyond the observed capacity. It must observe EMSGSIZE rather
++than a timeout; an already committed effect is observed through exact retry without
++an extra event. This experiment sets no product volume policy. Oversized replies
++remain a packet-transport limitation with no implicit chunking: pagination or
++another framing protocol must be designed before exposing arbitrary histories in
++a public flow. The owner also supplies the receive buffer; truncated prefixes are
++rejected rather than interpreted as valid replies.
++
++```mermaid
++sequenceDiagram
++  participant B as Trusted bootstrap (unwired)
++  participant C as Private client
++  participant S as Private service
++  participant W as Coordinator and witness
++  B->>C: Independent server pidfd, UID and pins
++  C->>S: V2, fresh challenge, pins, operation and Change
++  S->>S: Compare pins and authorize the request sender
++  S->>W: Execute under maintained authority control
++  W-->>S: Confirmed state or refusal
++  S-->>C: V2 and request digest, result or error code
++  S->>S: Close the channel on every terminal outcome
++  C->>C: Compare kernel process, UID and exact request
++  C->>C: Validate head, projection, pins and Change then close
++  Note over C,W: Reply lost after mutation: no result, uncertain outcome
++  Note over C,W: Exact business retry on a new channel, fresh challenge and renewed authorization
++```
++
++The [client report](../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/RAPPORT-IA3c2f03b.md)
++retains results and evidence conditions. Public bootstrap supplying the independent
++pidfd, human authority, separate account, confinement and Admin remain unwired.
++Fixture-verified clients do not close EP-01/04/05/07, F01–F07, IA3 or overall
++acceptance. No permissive local/remote fallback.
++
++
++The service channel is also owned for one exchange and closed on success, refusal
++or error; a second serve is rejected. The EMSGSIZE guard no longer closes the
++socket on its behalf: it directly observes POLLHUP without waiting (zero-time
++poll), then the client exchange observes channel termination. This fixes possible
++waiting after an unsent reply without inventing a timeout. unavailable remains a
++general service-unavailability error; it does not establish a storage failure.
++Both pre-fix counterexamples and their recovery are retained.
++
++The channel must come from trusted bootstrap and be delivered to the expected
++service without descriptor leakage; this client verifies the reply sender after
++sending its request. This check alone proves neither the recipient before send
++nor confidentiality. An unestablished socket path does not replace that
++precondition; public bootstrap must prove delivery or establish the service
++before sensitive content. This remains open with account and descriptor
++protection under EP-07.
++
++Challenge encoding is canonical unpadded base64url representing exactly 32 bytes.
++The digest is lowercase hexadecimal SHA-256 over the prefix
++`swarm-installation-control-v2\x00request\x00` followed by the canonical request;
++each `\x00` represents one NUL byte. Canonical format is defined by the shared Go
++codec, without claiming JSON.stringify produces identical bytes. A future client
++in another language must verify this encoding, including escaping, or consume
++the codec through the Go adapter. Such interoperability has not been verified.
+--- before/docs/en/INSTALL.md
++++ after/docs/en/INSTALL.md
+@@ -44,6 +44,13 @@
+ pins and rights must come from protected bootstrap; no account, cockpit cookie
+ or first caller automatically becomes the authority.
+ 
++The private client now verifies the service process from an independently
++supplied launcher pidfd and binds replies to a challenge and the exact request
++(transport version 2). This neither designates the initial human nor creates a
++system service or Admin setting. On-disk configuration retains schema 1; no
++history reset is required. See the identity contract for Linux prerequisites and
++transport limits.
++
+ ## Included training resources and branding
+ 
+ After opening the cockpit, choose **Cockpit help → Casa Pizza training**. The reader provides videos, GIF previews, transcripts, a 38-page PDF and a downloadable offline kit. The selected cockpit language chooses French or English resources; the reader language control updates every resource link. Word files remain editable sources.
+--- before/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
++++ after/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
+@@ -3,7 +3,8 @@
+ 17 octobre 2026 — protocole d’authenticité IA3c.2a, journal IA3c.2b, schéma
+ d’autorité IA3c.2c, demande complète IA3c.2d, lecture versionnée IA3c.2e
+ et noyau de configuration IA3c.2f-02a/02b vérifiés en fixtures ; adaptateur
+-interne IA3c.2f-03a vérifié en fixtures ; service protégé,
++interne IA3c.2f-03a vérifié en fixtures ; client IA3c.2f-03b vérifié en fixtures ;
++service protégé,
+ bootstrap et consommateur moteur
+ **non réalisés**. Frontière adoptée le 17 octobre : service local isolé pour
+ développement/pilote ; autorité distante prévue pour une évolution. Principal
+@@ -345,3 +346,27 @@
+ compte, principal humain ou contrôle réel de fournisseur. Le client public doit
+ encore authentifier le service. EP-01/04/05/07 et F01–F07 restent ouverts ; le
+ service système, ses commandes et Admin ne sont pas livrés par cet adaptateur.
++
++
++## IA3c.2f-03b — client privé et format de contrôle version 2
++
++Le client reçoit du bootstrap un pidfd serveur indépendant et les pins ; il
++compare l’UID et l’objet processus pidfs de chaque réponse, sans apprendre cette
++référence depuis le paquet. Linux 64 bits/pidfs exigé, refus sans repli numérique.
++Une connexion à usage unique, challenge aléatoire 32 octets et empreinte de la
++demande complète lient réponse et contexte ; le service compare les pins avant
++contrôle d’autorité. La version transport 1 est explicitement refusée ; config
++persistée et historique restent en version 1.
++
++ValidateView/ValidateProjection partagent l’algorithme de tête/historique du
++stockage ; le client compare aussi dernier Change et pins. Pas de succès partiel,
++réponse tronquée ou mélange preview/sauvegarde. Une annulation ferme la connexion
++propre au client ; absence d’acquittement après tentative de mutation = résultat
++nul et issue incertaine, retry métier exact sur un nouveau canal réautorisé.
++La taille SO_SNDBUF est observée en fixture pour provoquer EMSGSIZE après effet,
++pas choisie comme plafond produit ; transport d’historique arbitraire reste ouvert.
++
++Le [rapport](verification-identites-agents-20261016/ia3-local-client-20261017/RAPPORT-IA3c2f03b.md)
++conserve résultats et limites. Aucun lanceur/service public ou compte créé, aucun
++humain authentifié réellement, aucun déploiement ou revue indépendante. Les
++préconditions d’activation, EP-01/04/05/07 et F01–F07 ne sont pas closes.
+--- before/docs/plans/actions-confiance/identites-agents-replan.md
++++ after/docs/plans/actions-confiance/identites-agents-replan.md
+@@ -1741,3 +1741,133 @@
+ remplacent pas. I2f03a-01 à -06 conservent valeur, origine, propriétaire et reprise
+ dans le rapport ; la taille effective d’une réponse EMSGSIZE reste à mesurer lors
+ du client public. F01–F07, EP-01/04/05/07, IDA, IA3–IA5 et RETEX restent ouverts.
++
++
++## IA3c.2f-03b — client local et liaison demande/réponse
++
++Reprise replan/APEX : 03a vérifie le service privé, pas son client. Comparer un
++client qui croit la connexion/UID et un client qui compare le pidfd du message à
++un processus serveur épinglé indépendamment. Retenir le second : inode pidfs sur
++Linux 64 bits, vérification de type de FS et descripteur détenu ; anciens noyaux
++ou 32 bits refusés sans repli PID numérique. Le contrat est vérifié dans le code
++primaire Linux v6.17 fs/pidfs.c et dans des fixtures ; il n’authentifie ni le code
++exécuté ni un humain et reste limité au même démarrage hôte. Les premières URL
++kernel.googlesource/freedesktop inaccessibles sont remplacées par le miroir
++primaire GitHub versionné, sans considérer une absence de source comme preuve.
++
++Évolution de protocole explicite version 2 avant activation : requête avec pins
++publics et challenge aléatoire 32 octets ; réponse liée par empreinte domaine 2
++aux octets exacts de cette demande. Refuser la version 1, réponses d’autres
++opérations, racines, événements ou bases ; valider View/Projection par le contrat
++commun, pas par un booléen/HTTP 200. Les pins du corps ne confèrent aucun droit.
++
++Codex possède deux nouveaux fichiers agent_identity_config_client_linux.go et
++son test ; modifie les deux fichiers du service 03a et config.go/config_test.go
++dans enrollmentconfig. Aucun lanceur, méthode, mémoire ou service en cours modifié.
++Docs FR/EN, schémas, installation, cible et note scientifique dans cet incrément.
++Preuves au même niveau que 03a, dans ia3-local-client-20261017.
++
++Client à usage unique, contrôle contexte avant envoi ; fermeture de sa connexion
++pour interrompre une attente annulée, sans délai arbitraire. Après tentative de
++mutation et sans réponse authentifiée valide, issue incertaine et résultat nul ;
++retry métier exact sur nouveau canal, pas de répétition de transport automatique.
++Mesurer la limite réelle du socket via SO_SNDBUF en fixture et provoquer EMSGSIZE,
++puis vérifier état sauvé et retry sans doublon. Ne pas introduire un plafond métier.
++
++Tests avant code du nouveau contrat : validation partagée des têtes/projections,
++format et downgrade, substitution de pins/demande/réponse, serveur exact/rogue
++même UID, paire de processus réelle, annulation avant/après envoi, canal réutilisé,
++troncature et réponse trop grande, fermeture et non-fuite des descripteurs.
++Rejouer les anciens tests service/canal et les 101 gardes config car le contrat
++commun change ; normal/race, vet/build ciblés, watchdogs désactivés. Overlay borné
++aux deux fichiers mémoire déjà identifiés, entrées effectives vérifiées et état
++courant comparé. L’autorité humaine réelle, service système et Admin restent
++ouverts ; aucune preuve d’isolement de comptes/fournisseur n’est déduite.
++
++
++### Reprise du lanceur 03b avant compilation
++
++Le script de préparation de preuve contient une parenthèse excédentaire et
++échoue SyntaxError avant écriture ; l’appel suivant échoue faute de run_checks.py.
++Aucun test exécuté, aucun résultat PASS. Corriger la syntaxe, compiler le texte
++Python avant sauvegarde, puis vérifier le code de sortie et l’existence du
++lanceur avant tout appel dépendant. Cause de notre orchestration, pas du client
++Go ; les originaux restent dans les sorties d’outils, et la reprise modifie
++explicitement la précondition. Pas de relance d’un Go inchangé après timeout.
++
++
++### Replan IA3c.2f-03b — test qui gérait la fin d’échange à la place du serveur
++
++Le lot 01 passe 69 noms moteur et 106 config en normal/race, vet/build stables.
++Le cas EMSGSIZE réduit SO_SNDBUF en fixture : valeur observée 8192 octets, raison
++16384 octets, effet confirmé puis retry sans doublon. Mais son goroutine ferme
++explicitement le socket après serve : l’adaptateur lui-même ne le ferme pas.
++Cela peut laisser le client attendre après une réponse non envoyée, sans timeout
++qui diagnostiquerait la cause. Nouvelle garde non bloquante : après le vrai échec
++EMSGSIZE, constater POLLHUP via poll(0), sans ajouter de délai de test.
++
++Second diagnostic du candidat : le code public unavailable était converti en
++ErrStorage, alors que cette indisponibilité peut provenir de l’autorité ou d’un
++autre contrat. Garde ciblée : refuser cette cause inventée. Deux contre-exemples
++sont lancés avant toute correction ; ne pas confondre compiler et reproduire.
++
++Options : laisser chaque appelant fermer le socket, ajouter un watchdog, ou
++rendre le canal serveur à usage unique et possédé jusqu’à fermeture. Retenir la
++troisième, cohérente avec le client : une opération, fermeture sur succès/refus/
++erreur, réemploi refusé, causes préservées. Le contrôleur réel conserve ses
++obligations d’autorité ; pas de timeout ni retry de transport pour masquer l’échec.
++Unavailable devient une erreur générale explicite sans prétendre une faute disque.
++Conserver les sources avant correction et le FAIL comportemental ; rejouer les
++cas moteur, pas les 106 config tant que leurs douze entrées restent identiques.
++Ajouter stale challenge, pins avant autorité et propriété des descripteurs pour
++vérifier la frontière nouvelle, puis reprendre le besoin initial de service.
++
++
++### Deux contre-exemples 03b établis, puis correction
++
++closure-red-01 exécute deux tests, deux FAIL, sources stables : socket encore
++ouvert après EMSGSIZE et cause disque inventée pour unavailable. Les sources
++originales sont archivées. Correction générale : canal serveur consommé une fois,
++fermé par defer sur toute issue ; le test de taille ne ferme plus à sa place.
++Unavailable conserve une erreur de service générale. Rejeu final moteur avec
++stale challenge, pins avant autorité, double usage serveur, propriété/fermeture
++et CLOEXEC des descripteurs ; cas v1, version inconnue et challenge invalide
++explicitement distingués. Réutiliser les 106 config normal/race-01 : leurs douze
++entrées propres sont inchangées, comparaison enregistrée.
++
++
++### Précondition de remise du canal conservée
++
++Le client attribue le retour après envoi ; ne pas transformer cette preuve en
++confidentialité ou en preuve du destinataire avant envoi. Le canal privé doit
++venir d’un lanceur de confiance, lié au pidfd attendu et non divulgué. Comparer
++remise privée vérifiée et établissement authentifié avant contenu : retenir la
++remise privée pour le raccord local prévu, vérifier confinement et descripteurs
++avant activation ; une connexion par chemin seul exige encore cet établissement.
++Aucune donnée secrète ou session humaine dans ce protocole de fixture. Conserver
++cette condition EP-07, propriétaire Codex pour lanceur/protocole et opérateur
++pour compte/confinement ; ne pas annoncer une authentification mutuelle publique.
++
++
++### Résultat IA3c.2f-03b — retour attribué et demande liée en fixtures
++
++77 noms moteur PASS normal/race-02, zéro FAIL/SKIP, vet/build PASS avec 832 entrées
++effectives stables. 106 noms config normal/race-01 incluent les 101 précédents ;
++leurs douze entrées propres inchangées permettent la réutilisation après correction
++moteur seule. Deux défauts du candidat ont leurs FAIL avant/PASS après, sans
++attendre un timeout : fermeture après EMSGSIZE et cause disque inventée.
++Le contrôleur commun des méthodes passe avec cinq tests/sous-tests et les mêmes
++entrées d’overlay ; aucun fichier de méthode modifié dans cet incrément.
++
++Le protocole transport devient explicitement version 2 ; configuration/journal
++restent en version 1 et préservent leur historique. Deux ajouts et quatre
++modifications de source annoncés, 34 autres entrées de référence inchangées.
++Contrats/schémas FR/EN, installation, cible et note scientifique actualisés.
++Les schémas rendus sont inspectés, pas une validation UX ou un déploiement.
++Lire le [rapport](verification-identites-agents-20261016/ia3-local-client-20261017/RAPPORT-IA3c2f03b.md),
++ses sources/diffs et checks-final avant intégration ; les processus en cours ne
++reçoivent pas automatiquement ces changements. I2f03a-03 est maintenant vérifié
++pour EMSGSIZE/retry ; le transfert d’historique arbitraire reste ouvert (I2f03b-04).
++Le retour authentifié après envoi ne prouve pas la remise privée avant envoi :
++conserver I2f03b-05 et EP-07 avant toute activation publique. Service système,
++humain initial, confinement, Admin et admission/révocation réelles restent ouverts.
+--- before/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
++++ after/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
+@@ -630,3 +630,33 @@
+ ne constitue pas une panne réelle. Ces techniques et cette séparation de preuves
+ ne démontrent aucune priorité scientifique ni supériorité sur un produit tiers.
+ La comparaison d’état de l’art doit conserver ses sources et protocoles propres.
++
++
++### IA3c.2f-03b — vérifier aussi le retour et l’incertitude
++
++Le [client de contrôle local](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/RAPPORT-IA3c2f03b.md)
++vérifie l’émetteur du retour contre un descripteur serveur obtenu indépendamment,
++puis lie le résultat au challenge, aux pins et aux octets exacts de la demande.
++Le schéma transport passe à 2 sans changer le schéma 1 de persistance. Le contrat
++du processus et celui de la réponse restent distincts du contrôle humain.
++La comparaison pidfs vérifiée dans Linux 64 bits reste locale au démarrage hôte,
++pas une identité persistante d’agent ou une preuve de son code exécuté.
++
++La fixture de transport mesure SO_SNDBUF puis provoque une réponse EMSGSIZE après
++écriture confirmée ; le retry exact relit sans second événement. Cela sépare
++limite technique et seuil métier, ainsi que refus connu et résultat incertain.
++Un ancien paquet, un autre processus du même compte, une autre demande ou une
++réponse avec tête incohérente ne doivent produire aucun résultat valide. Les
++callbacks et processus enfants de fixture ne démontrent pas l’authentification
++humaine, la protection d’un fournisseur réel ou une révocation sur tous les
++nœuds d’un workflow. Aucun résultat de priorité ou de supériorité scientifique
++n’est déduit ; l’expérience intégrée et la comparaison restent à conduire.
++
++
++La revue du test a découvert qu’il fermait lui-même le canal après EMSGSIZE,
++masquant une responsabilité encore laissée à l’appelant. Une garde non bloquante
++échoue avant correction sur l’absence de POLLHUP ; l’adaptateur devient propriétaire
++d’un échange unique et ferme lui-même sur toute issue. Un second contre-exemple
++refuse la cause disque inventée pour une indisponibilité générale. Ces défauts
++du candidat et leurs gardes sont distingués de la valeur scientifique supposée :
++ils vérifient notre méthode et ce raccord, pas une propriété globale du moteur.

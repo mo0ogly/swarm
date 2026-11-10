@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-traceability-repair-20261010",
+  "expected_revision": 80,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-0f7f61a183068fd63528",
+  "attempt_id": "a-5fff6319655d0b5b9b34413a",
+  "review_id": "review-8a5b4d26457e4456353da385",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "result_tree": "4ac77f1d127cf3b410c362201bd6ea2bc971aa44",
+  "reason": "Correction externe explicite après interruption fournisseur 429, sans prétendre à un refus sémantique : joindre les originaux attribués du rejeu juge (6 tests / 13 PASS, exit 0), les limites de la suite interrompue et une sélection de sources examinable. Code inchangé, tentative et budgets conservés. Les nouveaux contrôles doivent être reçus ; aucune acceptation ni nouvel appel pendant le délai fournisseur."
+}

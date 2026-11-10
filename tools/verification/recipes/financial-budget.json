@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "id": "financial-budget-admission-and-configuration",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "*.go",
+    "go.mod",
+    "go.sum",
+    "internal/**/*.go",
+    "tools/agent-workflows/templates/*.md",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "tools/agent-workflows/CONTRACT.md"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r25",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "eight-financial-engine-regressions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "financial_budget",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "financial_budget_codec_and_validation_preserve_canonical_contract ... ok",
+        "financial_budget_combines_four_ledgers_and_reserves_without_reset ... ok",
+        "financial_budget_configuration_is_atomic_engine_owned_and_replay_safe ... ok",
+        "financial_budget_ignored_sql_writes_refuse_rollback_and_recover ... ok",
+        "financial_budget_two_connections_cannot_reserve_the_same_remaining_estimate ... ok",
+        "financial_budget_operator_failure_preserves_cause_and_recovers_same_intent ... ok",
+        "financial_budget_refuses_invalid_policy_and_ledger_then_recovers ... ok",
+        "financial_budget_unlimited_has_zero_planning_estimate_and_checked_duplicates ... ok",
+        "8 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "three-public-financial-cli-regressions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "budget",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "budget_cli_apply_persists_replays_and_does_not_fake_unported_views ... ok",
+        "budget_cli_invalid_policy_refuses_without_mutation_then_recovers ... ok",
+        "budget_cli_output_failure_retains_committed_state_and_replays ... ok",
+        "3 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

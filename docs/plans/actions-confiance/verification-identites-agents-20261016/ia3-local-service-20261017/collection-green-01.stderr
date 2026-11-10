@@ -1,0 +1,9 @@
+test_accepts_named_completed_evidence (test_check.WorkflowCheckerEvidenceTests.test_accepts_named_completed_evidence) ... ok
+test_preserves_go_failure (test_check.WorkflowCheckerEvidenceTests.test_preserves_go_failure) ... ok
+test_rejects_empty_success (test_check.WorkflowCheckerEvidenceTests.test_rejects_empty_success) ... ok
+test_rejects_incomplete_or_wrong_evidence (test_check.WorkflowCheckerEvidenceTests.test_rejects_incomplete_or_wrong_evidence) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.064s
+
+OK

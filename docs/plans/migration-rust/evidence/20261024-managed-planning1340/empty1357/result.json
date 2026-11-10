@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "recipe": "managed-repository-bootstrap",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "committed-source-copy-replay-and-recovery",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='managed-bootstrap-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_managed_repository_bootstrap.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "exit": 1,
+      "seconds": 3.336536057991907,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "b37d0fd99fa83810c770f33814d77cf238e6d9f2d500dd08f32b59f91e96472b",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "5bac8f76eafc218ba7c38d6178d2cbe946a7d240a71475d6bf3d817e541cdee5",
+    "declared-inputs.tar.gz": "2d63b47d591db4ee6b4f93795bd67ab874323ed236a5d6468528ffb87bd7fac2",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "d069093a880ff94df74b0572feabbe30704bbd45393f201a735155e902e3727e",
+    "step-0001.stderr": "66ae9daed13cdb3987ca72a6fb09b5293cd2a7e1b422afaaf3ee67872f862061",
+    "step-0001.json": "c5e914109c2259cdea7ba3c359ad6bc0950fc354f96829db96be0a32d4e489c6",
+    "inputs.after.json": "5bac8f76eafc218ba7c38d6178d2cbe946a7d240a71475d6bf3d817e541cdee5"
+  }
+}

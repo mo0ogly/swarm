@@ -1,0 +1,12 @@
+{
+  "reviews": 3,
+  "transport": "SSE",
+  "automatic_retry": false,
+  "implicit_output_cap": false,
+  "global_timeout": false,
+  "declared_tokens": 111577,
+  "effects": "static findings triaged and discriminating browser regressions maintained; last focus/policy/translation changes reviewed by principal",
+  "limits": "No GLM execution against repository, no independent final acceptance, no demonstrated exclusive cause of earlier504 failures; original failures preserved",
+  "tooling": "local persistent canonical skill plus gitignored Dremio copy;13 offline tests and3 byte-exact real replays",
+  "already_running_contexts_updated": false
+}

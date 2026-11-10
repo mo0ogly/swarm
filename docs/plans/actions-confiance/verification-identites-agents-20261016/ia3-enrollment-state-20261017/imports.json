@@ -1,0 +1,14 @@
+{
+  "command": [
+    "rg",
+    "-n",
+    "\"swarm.local/companion/internal/enrollmentstate\"",
+    "--glob",
+    "*.go",
+    "."
+  ],
+  "exit": 1,
+  "matches": "",
+  "stderr": "",
+  "meaning": "exit 1 with no stderr means no consumer import"
+}

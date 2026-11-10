@@ -1,0 +1,43 @@
+{
+  "revision": 305,
+  "blocker": "sources de contexte supérieures à 128 Kio ; aucun contenu tronqué",
+  "next": "Le responsable doit proposer une correction sur la révision actuelle.",
+  "auto_validation": null,
+  "corrective_recovery": null,
+  "recovered_result": {
+    "proof_key": "auto-f2abbcfe6bed66fd1a5e-repair-93d91c4070c4e039",
+    "replaces_result": "92271ad707fb3902a0680798c771233354c1853a",
+    "prior_review_id": "review-f5cb258178e80a4bdc4778d3",
+    "event_id": "T2-local-status-and-test-scope-repair-20261011",
+    "request_sha256": "93d91c4070c4e039226810653b4bc1026577b0d6b90e5006fae9f34c8586e488",
+    "agent_id": "auto-f2abbcfe6bed66fd1a5e",
+    "attempt_id": "a-a349f9134d355713576b7166",
+    "result_commit": "736460f60459595c61df1d953dec77ac132db9e5",
+    "tree": "b5b49c7b16ef7409257302cc92d39a8aa22a0024",
+    "actor": "fpizzi/uid:1001",
+    "at": "2026-10-11T13:34:14.788410243Z",
+    "reason": "Refus sémantique f5 valide conservé avec19appels. Correction de portée:pass/complete sont bilans locaux, pas acceptation; fournir argv exact du contrôle filtré plan-validation rejouéexit0 à13:12:05, commande et original de suite canonique1096/19 distincts des FAIL historiques conservés. Cinq sourcesGo identiques au candidat1ce2; docs/source-integrité ciblés PASS,18sources130304octets sous131072 sans troncature. Réparation opérateur attribuée en copie indépendante, patch de six fichiers docs appliqué seulement à copie native inactive, HEADaccepted e323 conservé; treeb5b49c7. Moteur qualifié60441875 installé et protocole partagé de revue vérifié; nouvelle recette/revue indépendante exigées, aucune acceptation, tentative ou coût remboursé.",
+    "original_process_status": "interrupted"
+  },
+  "attempts": [
+    {
+      "id": "a-5fff6319655d0b5b9b34413a",
+      "status": "completed",
+      "started": "2026-10-10T18:40:16.176230641Z",
+      "ended": "2026-10-10T19:07:59.148427197Z"
+    },
+    {
+      "id": "a-a349f9134d355713576b7166",
+      "status": "interrupted",
+      "started": "2026-10-11T08:06:25.430669861Z",
+      "ended": "2026-10-11T08:36:27.528395766Z"
+    },
+    {
+      "id": "a-2f9e1debb1548be96273f0d3",
+      "status": "completed",
+      "started": "2026-10-11T14:12:02.469298849Z",
+      "ended": "2026-10-11T14:21:56.981332827Z"
+    }
+  ],
+  "independent_review": null
+}

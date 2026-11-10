@@ -1,0 +1,12 @@
+{
+  "exit": 1,
+  "result": "FAIL final capacity refusal",
+  "active_seconds": 29.63,
+  "pieces": 281,
+  "packets": 7,
+  "inspection_plus_final_calls": 9,
+  "available_calls": 18,
+  "budget_shortfall": "not review call budget; final evidence capacity calculation",
+  "output_sha256": "0f22644e853129e9e59fb425f0ffcf7d32fc750425d23702e2456a5110230831",
+  "native_effect": "none"
+}

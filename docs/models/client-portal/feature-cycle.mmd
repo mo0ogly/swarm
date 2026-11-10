@@ -1,0 +1,16 @@
+flowchart TD
+  S6["6 · Examiner l’existant / Research<br/>Code, données, APIs, composants, preuves"] --> S7["7 · Concevoir / Design<br/>Écrans et contrats backend de la story"]
+  S7 --> S8["8 · Planifier / Plan<br/>Tâches bornées, dépendances, critères, rollback"]
+  S8 --> A{"Plan adapté et adopté ?<br/>Adapted plan adopted?"}
+  A -->|"Non / No"| S8
+  A -->|"Oui + départ autorisé / Yes + authorized launch"| S9["9 · Réaliser / Implement<br/>Design, backend, intégration dans le périmètre"]
+  S9 --> S10["10 · Vérifier / Review<br/>Contrôles déterministes + revue indépendante<br/>Même révision du candidat"]
+  S10 --> V{"Critères remplis ?<br/>Criteria satisfied?"}
+  V -->|"Défaut borné / Scoped defect"| S9
+  V -->|"Contrat ou périmètre changé / Changed contract or scope"| S8
+  V -->|"Oui / Yes"| S11["11 · Préparer la livraison / Prepare delivery<br/>Preuves, migration, rollback, décision humaine"]
+  S11 --> H{"Publication autorisée ?<br/>Publication authorized?"}
+  H -->|"Non / No"| W["Livraison préparée, en attente / Prepared, waiting"]
+  H -->|"Oui / Yes"| P["Publier puis confirmer l’effet / Publish and confirm effect"]
+  S9 -.->|"Erreur, budget épuisé ou précondition absente"| X["Arrêt et diagnostic / Stop and diagnose<br/>Conserver tentatives, refus et preuves"]
+  X -.->|"Précondition corrigée, reprise autorisée, limites restantes"| S9

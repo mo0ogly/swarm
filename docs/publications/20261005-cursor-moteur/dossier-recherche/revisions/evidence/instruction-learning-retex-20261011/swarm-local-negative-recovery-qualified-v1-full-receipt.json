@@ -1,0 +1,44 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T18:06:58.673274+00:00",
+  "end": "2026-10-11T18:07:48.177811+00:00",
+  "seconds": 49.50452882999525,
+  "exit": 1,
+  "output": "/tmp/swarm-local-negative-recovery-qualified-v1-full.out",
+  "output_sha256": "c8d5284ac6cec55ec624d8f029488705ec6ce925d8ecf3c10288a95b7d802be7",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "02c7bd5f66ee63f70e5a3d302e374ecac7b566a812d5c4cb9b9d052c02f0b728",
+  "candidate_digest": "afc079ad08db70a1c0f18a0e53e6a3081054ecd55e432d0dab965c6099d85690",
+  "paths": 1179,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T18:06:58.673274+00:00",
+    "driver_pid": 2494053,
+    "pgid": 2494053,
+    "sid": 2494053,
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "manifest_sha256": "02c7bd5f66ee63f70e5a3d302e374ecac7b566a812d5c4cb9b9d052c02f0b728",
+    "source_digest": "afc079ad08db70a1c0f18a0e53e6a3081054ecd55e432d0dab965c6099d85690",
+    "paths": 1179,
+    "precondition": "Replan19: retain and reuse completed local negative after later transport error, resume exact missing calls, preserve original journal and global independent rejection; needs mismatch gets exact diagnostic.18 full had a nil-review historical fixture panic; original retained, strengthened diagnostic passes alone/preceding sequence/20 runs but original missing-review cause is unproved. New immutable cumulative1179 snapshot, no native mission DB. Fresh full mandatory before installation.",
+    "go_pid": 2494068
+  }
+}

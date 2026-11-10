@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "repair-bound-authority-and-private-proof-key-ffbeffaaa3354a1d",
+  "expected_revision": 155,
+  "task_id": "plan-68b50cc82e-T2",
+  "agent_id": "auto-c8053557575a81bb6164",
+  "attempt_id": "a-b4669e24bbfb91f7a9686499",
+  "review_id": "review-481aead2af7d5e3314889c6e",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "result_tree": "e206c4fbb7d9d42c1e7e49e452039701e71d40ee",
+  "reason": "Réparation opérateur liée aux deux hypothèses indépendantes reproduites : rejeu lié au sujet/rôles/intégrité, refus des attributions historiques absentes, rotation privée compatible ; clé HMAC exclusive, sans suivi de lien ni adoption initiale d’une clé connue, refus des types/permissions/formats invalides et de la régénération historique. 24 tests et 34 sous-cas avec race, 58 cas Go et sept cas publics passent, incluant refus CLI sans mutation. Mesures transportées sans perte ; contrôles moteur et revue indépendante frais requis. Ancien avis, réservations et dépenses conservés."
+}

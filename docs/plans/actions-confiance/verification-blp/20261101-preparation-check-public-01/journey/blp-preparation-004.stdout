@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "w-444af24acb4bfb3c70c0984a",
+  "revision": 3,
+  "title": "Requested model fixture",
+  "objective": "Observe route",
+  "scope": "Owned local program",
+  "criteria": [
+    "Observed, not accepted"
+  ],
+  "next": "",
+  "summary": "",
+  "memory": null,
+  "created": "2026-11-01T11:47:32.788493524Z",
+  "updated": "2026-11-01T11:47:33.282355971Z",
+  "git": {
+    "head": "b4cbfa22552140fe9a7bcf46ac91165b0abe120d",
+    "branch": "codex/clear-product-method-names",
+    "changes": "M docs/architecture/BIBA-RUST.md\n M docs/architecture/GRAPH-STUDIO.md\n M docs/en/BIBA-RUST.md\n M docs/en/GRAPH-STUDIO.md\n M docs/en/plans/actions-confiance/BLP-APEX.md\n M docs/plans/actions-confiance/BLP-APEX.md\n M docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/step-0001.stderr\n M docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/step-0001.stdout\n M docs/plans/migration-rust/GRAPH-REGRESSION-20261031.md\n M rust/crates/swarm-web/src/service.rs\n M rust/crates/swarm-web/tests/authority_access.rs\n M tests/blp_preparation_check.py\n M tests/rust_graph_navigation_ui.cjs\n M tools/verification/README.md\n M tools/verification/recipes/blp-preparation-check-public.json\n M tools/verification/recipes/rust-graph-workbench.json\n M version_history.json\n M web/cockpit-native-graph.js\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-build-interrupted-02/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-build-refusal-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/inputs.after.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/result.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/step-0001.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-public-before-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-check-source-review.json\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-http-status-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-http-status-before-01/\n?? docs/plans/actions-confiance/verification-blp/20261101-preparation-resource-decision.json\n?? tools/verification/recipes/blp-preparation-http-status.json"
+  },
+  "tasks": [
+    {
+      "plan_checks": {
+        "plan-criterion-1": "validation",
+        "plan-delivery": "delivery",
+        "plan-entry": "entry",
+        "plan-validation": "validation"
+      },
+      "id": "task",
+      "title": "Run",
+      "owner": "",
+      "deliverable": "Evidence",
+      "criteria": [
+        "Observed, not accepted"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "",
+      "attempts": []
+    }
+  ]
+}

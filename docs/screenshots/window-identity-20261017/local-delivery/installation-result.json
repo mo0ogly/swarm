@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "version": "v0.1.1-dev.3",
+  "binary_sha256": "7b72f4ab3ae44bef730098aa9a99a00d50f84dbaada05164bf610d7d784a1455",
+  "boundary": "Authenticated existing-server public API; verification browser closed, no additional CLI Store opener",
+  "works_retained": 5,
+  "tasks_retained": 35,
+  "agents_retained": 30,
+  "mission_policies_preserved": true,
+  "paused_missions_preserved": 2,
+  "unrelated_watch_and_preview_alive": true
+}

@@ -1,0 +1,13 @@
+{
+  "Replace": {
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_registry_store.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__agent_identity_registry_store.go.txt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_registry_publish.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__agent_identity_registry_publish.go.txt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_registry_test.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__agent_identity_registry_test.go.txt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/model.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__model.go.txt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/store.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/preimages/internal__engine__store.go.txt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_plan_linux.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/baseline-neutral.go.txt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_plan_schema_linux.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/baseline-neutral.go.txt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_plan_linux_test.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/baseline-neutral.go.txt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_plan_freshness_linux_test.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/baseline-neutral.go.txt"
+  }
+}

@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_admission_public.py", line 168, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_admission_public.py", line 68, in main
+    check('unclassified-admission-refuses',no_source['failure']['code']=='blp-classification-required')
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_admission_public.py", line 31, in check
+    checks.append(dict(name=name,passed=bool(value)));publish(out/'checks.json',checks);assert value,name;print('PASS '+name,flush=True)
+                                                                                               ^^^^^
+AssertionError: unclassified-admission-refuses

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-user-rebaseline-pause-20261015-1207",
+  "expected_revision": 467,
+  "reason": "Demande utilisateur : reprendre les Actions de confiance depuis le cadrage initial et vérifier les réalisations. Suspendre les relances pendant cet état des lieux, préserver sources, preuves, identités et consommations ; aucune suppression ni nouvelle acceptation."
+}

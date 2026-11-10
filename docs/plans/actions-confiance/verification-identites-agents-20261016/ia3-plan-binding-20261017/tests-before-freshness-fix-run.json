@@ -1,0 +1,19 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^(TestAgentIdentity.*|TestLaunchAtomicIdempotentAndWorkspaceExclusive|TestLaunchRejectsEscapeAndUnsatisfiedDependencies|TestActionsConfianceT3IdentityContextPublicReadOnly|TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation|TestActionsConfianceT3OIDCLogoutSessionAndSubject|TestInspection.*|TestGraphDeliveryD02Migration|TestDialogueCheckpointMigrationPreservesLegacyAndBackup|TestProjectMemoryStoragePlanContexts|TestResumeDurableAndNoAutostart|TestPlan[A-Z].*|TestPlanningAtomicDecisionReplayAndRestart|TestPlanningArchiveAndMigration|TestPreparationConversionAtomicLocksRelease|TestPreparationAuthorizePlanIsOneAtomicExplicitCommand|TestPreparationConversionRollbackStaleAndConcurrency|TestPreparationV8LockMigrationBackup|TestMigrationOnePreservesWork|TestMigrationBackupCanRestoreAndResume|TestRejectHostileArchive|TestGraphDeliveryD02ArchiveCompatibility|TestEngineContractRevisionKillsInferenceOnContractMutation|TestHierarchicalContractRevisionArchivesRefusalAndInvalidatesEvidence)$",
+    "-count=1",
+    "-timeout",
+    "120s"
+  ],
+  "start": "2026-10-17T07:51:10.817584+00:00",
+  "end": "2026-10-17T07:51:55.900797+00:00",
+  "exit_code": 0,
+  "input_files": 1055,
+  "changed_inputs": [],
+  "coverage_reason": "Shared Work triggers in schema 37: previous 181-name selection plus real plan adoption, preparation conversion, hierarchical decisions, archive/migration and contract revisions. TestPlan[A-Z] selects legacy plan tests without unintentionally selecting every TestPlanning*. Known baseline review-retry failure remains OPEN separately."
+}

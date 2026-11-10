@@ -1,0 +1,17 @@
+{
+  "request": {
+    "schema_version": 1,
+    "event_id": "diagnose-preview",
+    "expected_revision": 6,
+    "work": "w-46aae122c06b0a9b2139d182",
+    "id": "diagnose-lesson",
+    "source_retex": "memory-source",
+    "kind": "procedure",
+    "body": "Vérifier le résultat <img src=x onerror=alert(1)> et sa source.",
+    "conditions": "Même parcours ; vérifier les preuves actuelles.",
+    "reason": "Retour vérifié utile"
+  },
+  "exit": 2,
+  "stdout": "",
+  "stderr": "{\n  \"error\": \"Un fait sourcé et une tâche APEX acceptée avec des preuves fraîches sont requis.\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"Un fait sourcé et une tâche APEX acceptée avec des preuves fraîches sont requis.\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+}

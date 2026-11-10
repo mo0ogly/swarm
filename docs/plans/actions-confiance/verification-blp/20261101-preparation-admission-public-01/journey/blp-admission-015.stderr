@@ -1,0 +1,12 @@
+{
+  "error": "authorization_required",
+  "failure": {
+    "causes": [
+      "authorization_required"
+    ],
+    "code": "authorization_required",
+    "message": "authorization_required",
+    "retryable": false
+  },
+  "schema_version": 1
+}

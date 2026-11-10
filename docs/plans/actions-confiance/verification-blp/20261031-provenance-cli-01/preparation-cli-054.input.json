@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "preparation_id": "prep-688350fb6dec4e0d4b1bb93f",
+  "event_id": "recovery",
+  "expected_revision": 3,
+  "provider": "fixture",
+  "capability_hash": "2fe5a2b4aaac9211293bf7785e6e2f05f0b98d670edd4ea972ceccd7dbfa5139",
+  "model_policy_hash": "",
+  "level": "auto",
+  "message": "Propose brief",
+  "context_mode": "full"
+}

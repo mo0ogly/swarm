@@ -1,0 +1,47 @@
+{
+  "at_utc": "2026-10-15T10:35:25.428135+00:00",
+  "revision": 436,
+  "review": "review-d72990dcae28daba8c80b86c",
+  "candidate": "2b0694d693872bf1c0e674060ebd42094e8e58f6",
+  "calls": 85,
+  "packets": 2,
+  "reused_inspections": 0,
+  "input_budget": {
+    "default_context_tokens": 272000,
+    "max_context_tokens": 872000,
+    "client_executable_stamp": "c1c4d2b651f5d27532ba7865ad9bd0a2e7652051f3e76b1febf7c4ce6dcf6f98",
+    "provider_sha256": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+    "client_version": "codex-cli 0.159.2",
+    "capability_sha256": "3bcf3e8970291c8cd7bc3b0022d9f90cce83f507e04c8dd23864eb0b075a803c",
+    "version": 2,
+    "model": "gpt-5.6-sol",
+    "tokenizer": "o200k_base/tiktoken-go-v0.6.2",
+    "context_tokens": 400000,
+    "effective_percent": 95,
+    "client_reserve_tokens": 32768,
+    "output_reserve_tokens": 65536,
+    "max_utf8_bytes": 1048576
+  },
+  "checked_artifacts": {
+    "plan": {
+      "sha256": "e7d061fc43cb6494c944bd27981fa30d019a54218780721098f2be3b4714af01",
+      "bytes": 1020882
+    },
+    "workflow_prompt": {
+      "sha256": "85fa3096a53fbcc1df8286b7b5e99e07f2f4f34af70d8b05d25362cc16db6fdf",
+      "bytes": 41185
+    }
+  },
+  "observed_provider_processes": [
+    {
+      "pid": 428007,
+      "command": "codex",
+      "context_override": "model_context_window=400000",
+      "tool_free_flags": {
+        "--ignore-user-config": true,
+        "--ignore-rules": true,
+        "--ephemeral": true
+      }
+    }
+  ]
+}

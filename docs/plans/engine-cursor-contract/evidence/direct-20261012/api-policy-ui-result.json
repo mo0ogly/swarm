@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "checks": [
+    "fr/etat: Admin preview/save, frozen page preview, real local HTTP expiry and no-limit result, diagnostics, no retry, reload, no agent",
+    "fr/sombre: Admin preview/save, frozen page preview, real local HTTP expiry and no-limit result, diagnostics, no retry, reload, no agent",
+    "en/etat: Admin preview/save, frozen page preview, real local HTTP expiry and no-limit result, diagnostics, no retry, reload, no agent",
+    "en/sombre: Admin preview/save, frozen page preview, real local HTTP expiry and no-limit result, diagnostics, no retry, reload, no agent"
+  ],
+  "errors": [],
+  "failed": [],
+  "calls": 8,
+  "cancelled": 4,
+  "real_model_calls": 0,
+  "root": "/tmp/swarm-api-wait-ui-MiUzwg"
+}

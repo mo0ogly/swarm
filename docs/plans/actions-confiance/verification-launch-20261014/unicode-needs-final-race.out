@@ -1,0 +1,22 @@
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/accent_boundary
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/astral_boundary
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/minimum
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/overlong
+=== RUN   TestFragmentUnicodeNeedsMatchesPublishedSchema/underlength
+--- PASS: TestFragmentUnicodeNeedsMatchesPublishedSchema (0.01s)
+    --- PASS: TestFragmentUnicodeNeedsMatchesPublishedSchema/accent_boundary (0.00s)
+    --- PASS: TestFragmentUnicodeNeedsMatchesPublishedSchema/astral_boundary (0.00s)
+    --- PASS: TestFragmentUnicodeNeedsMatchesPublishedSchema/minimum (0.00s)
+    --- PASS: TestFragmentUnicodeNeedsMatchesPublishedSchema/overlong (0.00s)
+    --- PASS: TestFragmentUnicodeNeedsMatchesPublishedSchema/underlength (0.00s)
+=== RUN   TestFragmentUnicodeNeedsPreservesHistoricalWire
+--- PASS: TestFragmentUnicodeNeedsPreservesHistoricalWire (0.00s)
+=== RUN   TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection
+=== RUN   TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection/repack
+=== RUN   TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection/fresh
+--- PASS: TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection (41.29s)
+    --- PASS: TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection/repack (24.30s)
+    --- PASS: TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection/fresh (15.19s)
+PASS
+ok  	swarm.local/companion/internal/engine	42.455s

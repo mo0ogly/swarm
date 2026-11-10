@@ -1,0 +1,12 @@
+{
+  "error": "preparation-budget-exhausted",
+  "failure": {
+    "causes": [
+      "preparation-budget-exhausted"
+    ],
+    "code": "preparation-budget-exhausted",
+    "message": "preparation-budget-exhausted",
+    "retryable": false
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "Path": "github.com/cilium/ebpf",
+    "Version": "v0.19.0",
+    "Time": "2025-06-24T17:11:07Z",
+    "Dir": "/home/fpizzi/go/pkg/mod/github.com/cilium/ebpf@v0.19.0",
+    "GoMod": "/home/fpizzi/go/pkg/mod/cache/download/github.com/cilium/ebpf/@v/v0.19.0.mod",
+    "GoVersion": "1.23.0",
+    "Sum": "h1:Ro/rE64RmFBeA9FGjcTc+KmCeY6jXmryu6FfnzPRIao=",
+    "GoModSum": "h1:fLCgMo3l8tZmAdM3B2XqdFzXBpwkcSTroaVqN08OWVY="
+  },
+  {
+    "Path": "golang.org/x/sys",
+    "Version": "v0.31.0",
+    "Time": "2025-02-14T21:48:03Z",
+    "Dir": "/home/fpizzi/go/pkg/mod/golang.org/x/sys@v0.31.0",
+    "GoMod": "/home/fpizzi/go/pkg/mod/cache/download/golang.org/x/sys/@v/v0.31.0.mod",
+    "GoVersion": "1.23.0",
+    "Sum": "h1:ioabZlmFYtWhL+TRYpcnNlLwhyxaM9kWTDEmfnprqik=",
+    "GoModSum": "h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k="
+  }
+]

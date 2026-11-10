@@ -1,0 +1,297 @@
+=== RUN   TestKernelAttemptSourceRegisteredInput
+--- PASS: TestKernelAttemptSourceRegisteredInput (1.72s)
+=== RUN   TestKernelAttemptSourceInvalid
+=== RUN   TestKernelAttemptSourceInvalid/mode
+=== RUN   TestKernelAttemptSourceInvalid/role
+=== RUN   TestKernelAttemptSourceInvalid/command
+=== RUN   TestKernelAttemptSourceInvalid/directory
+=== RUN   TestKernelAttemptSourceInvalid/provider
+=== RUN   TestKernelAttemptSourceInvalid/prompt
+=== RUN   TestKernelAttemptSourceInvalid/context
+=== RUN   TestKernelAttemptSourceInvalid/workflow
+=== RUN   TestKernelAttemptSourceInvalid/status
+=== RUN   TestKernelAttemptSourceInvalid/desired
+=== RUN   TestKernelAttemptSourceInvalid/host
+=== RUN   TestKernelAttemptSourceInvalid/pid
+=== RUN   TestKernelAttemptSourceInvalid/start
+=== RUN   TestKernelAttemptSourceInvalid/agent
+=== RUN   TestKernelAttemptSourceInvalid/work
+=== RUN   TestKernelAttemptSourceInvalid/task
+=== RUN   TestKernelAttemptSourceInvalid/attempt
+=== RUN   TestKernelAttemptSourceInvalid/paused
+=== RUN   TestKernelAttemptSourceInvalid/missing
+--- PASS: TestKernelAttemptSourceInvalid (29.65s)
+    --- PASS: TestKernelAttemptSourceInvalid/mode (1.57s)
+    --- PASS: TestKernelAttemptSourceInvalid/role (1.55s)
+    --- PASS: TestKernelAttemptSourceInvalid/command (1.18s)
+    --- PASS: TestKernelAttemptSourceInvalid/directory (1.38s)
+    --- PASS: TestKernelAttemptSourceInvalid/provider (1.53s)
+    --- PASS: TestKernelAttemptSourceInvalid/prompt (1.66s)
+    --- PASS: TestKernelAttemptSourceInvalid/context (1.39s)
+    --- PASS: TestKernelAttemptSourceInvalid/workflow (2.54s)
+    --- PASS: TestKernelAttemptSourceInvalid/status (1.45s)
+    --- PASS: TestKernelAttemptSourceInvalid/desired (1.56s)
+    --- PASS: TestKernelAttemptSourceInvalid/host (1.41s)
+    --- PASS: TestKernelAttemptSourceInvalid/pid (1.64s)
+    --- PASS: TestKernelAttemptSourceInvalid/start (1.66s)
+    --- PASS: TestKernelAttemptSourceInvalid/agent (1.44s)
+    --- PASS: TestKernelAttemptSourceInvalid/work (1.52s)
+    --- PASS: TestKernelAttemptSourceInvalid/task (1.26s)
+    --- PASS: TestKernelAttemptSourceInvalid/attempt (1.49s)
+    --- PASS: TestKernelAttemptSourceInvalid/paused (1.68s)
+    --- PASS: TestKernelAttemptSourceInvalid/missing (1.72s)
+=== RUN   TestKernelAttemptSourceActualSupervisor
+--- PASS: TestKernelAttemptSourceActualSupervisor (2.83s)
+=== RUN   TestKernelAttemptReceiverFreshSource
+=== RUN   TestKernelAttemptReceiverFreshSource/none
+=== RUN   TestKernelAttemptReceiverFreshSource/prompt
+=== RUN   TestKernelAttemptReceiverFreshSource/stop
+=== RUN   TestKernelAttemptReceiverFreshSource/pause
+=== RUN   TestKernelAttemptReceiverFreshSource/superseded
+=== RUN   TestKernelAttemptReceiverFreshSource/wrong-digest
+--- PASS: TestKernelAttemptReceiverFreshSource (8.26s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/none (1.50s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/prompt (1.39s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/stop (1.26s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/pause (1.47s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/superseded (1.51s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/wrong-digest (1.12s)
+=== RUN   TestKernelAttemptDigestBindsRegisteredFields
+=== RUN   TestKernelAttemptDigestBindsRegisteredFields/prompt
+=== RUN   TestKernelAttemptDigestBindsRegisteredFields/command
+=== RUN   TestKernelAttemptDigestBindsRegisteredFields/args
+=== RUN   TestKernelAttemptDigestBindsRegisteredFields/directory
+=== RUN   TestKernelAttemptDigestBindsRegisteredFields/provider
+=== RUN   TestKernelAttemptDigestBindsRegisteredFields/role
+=== RUN   TestKernelAttemptDigestBindsRegisteredFields/context
+=== RUN   TestKernelAttemptDigestBindsRegisteredFields/workflow
+--- PASS: TestKernelAttemptDigestBindsRegisteredFields (0.99s)
+    --- PASS: TestKernelAttemptDigestBindsRegisteredFields/prompt (0.00s)
+    --- PASS: TestKernelAttemptDigestBindsRegisteredFields/command (0.00s)
+    --- PASS: TestKernelAttemptDigestBindsRegisteredFields/args (0.00s)
+    --- PASS: TestKernelAttemptDigestBindsRegisteredFields/directory (0.00s)
+    --- PASS: TestKernelAttemptDigestBindsRegisteredFields/provider (0.00s)
+    --- PASS: TestKernelAttemptDigestBindsRegisteredFields/role (0.00s)
+    --- PASS: TestKernelAttemptDigestBindsRegisteredFields/context (0.00s)
+    --- PASS: TestKernelAttemptDigestBindsRegisteredFields/workflow (0.00s)
+=== RUN   TestKernelBackendRecord
+=== RUN   TestKernelBackendRecord/short
+=== RUN   TestKernelBackendRecord/foreign
+=== RUN   TestKernelBackendRecord/unknown
+=== RUN   TestKernelBackendRecord/zero_sequence
+=== RUN   TestKernelBackendRecord/zero_clock
+--- PASS: TestKernelBackendRecord (0.00s)
+    --- PASS: TestKernelBackendRecord/short (0.00s)
+    --- PASS: TestKernelBackendRecord/foreign (0.00s)
+    --- PASS: TestKernelBackendRecord/unknown (0.00s)
+    --- PASS: TestKernelBackendRecord/zero_sequence (0.00s)
+    --- PASS: TestKernelBackendRecord/zero_clock (0.00s)
+=== RUN   TestKernelBackendAcquisitionCleanup
+=== RUN   TestKernelBackendAcquisitionCleanup/0
+=== RUN   TestKernelBackendAcquisitionCleanup/1
+=== RUN   TestKernelBackendAcquisitionCleanup/2
+=== RUN   TestKernelBackendAcquisitionCleanup/3
+=== RUN   TestKernelBackendAcquisitionCleanup/4
+--- PASS: TestKernelBackendAcquisitionCleanup (0.00s)
+    --- PASS: TestKernelBackendAcquisitionCleanup/0 (0.00s)
+    --- PASS: TestKernelBackendAcquisitionCleanup/1 (0.00s)
+    --- PASS: TestKernelBackendAcquisitionCleanup/2 (0.00s)
+    --- PASS: TestKernelBackendAcquisitionCleanup/3 (0.00s)
+    --- PASS: TestKernelBackendAcquisitionCleanup/4 (0.00s)
+=== RUN   TestKernelBackendLossCounters
+--- PASS: TestKernelBackendLossCounters (0.00s)
+=== RUN   TestKernelBackendRefusesBeforeAcquisition
+=== RUN   TestKernelBackendRefusesBeforeAcquisition/ring_zero
+=== RUN   TestKernelBackendRefusesBeforeAcquisition/ring_unaligned
+=== RUN   TestKernelBackendRefusesBeforeAcquisition/missing_source
+=== RUN   TestKernelBackendRefusesBeforeAcquisition/stale_source
+=== RUN   TestKernelBackendRefusesBeforeAcquisition/source_error
+=== RUN   TestKernelBackendRefusesBeforeAcquisition/stale_pid
+--- PASS: TestKernelBackendRefusesBeforeAcquisition (0.00s)
+    --- PASS: TestKernelBackendRefusesBeforeAcquisition/ring_zero (0.00s)
+    --- PASS: TestKernelBackendRefusesBeforeAcquisition/ring_unaligned (0.00s)
+    --- PASS: TestKernelBackendRefusesBeforeAcquisition/missing_source (0.00s)
+    --- PASS: TestKernelBackendRefusesBeforeAcquisition/stale_source (0.00s)
+    --- PASS: TestKernelBackendRefusesBeforeAcquisition/source_error (0.00s)
+    --- PASS: TestKernelBackendRefusesBeforeAcquisition/stale_pid (0.00s)
+=== RUN   TestKernelBackendProgramScope
+--- PASS: TestKernelBackendProgramScope (0.00s)
+=== RUN   TestKernelObservationStrictFrame
+=== RUN   TestKernelObservationStrictFrame/duplicate
+=== RUN   TestKernelObservationStrictFrame/missing
+=== RUN   TestKernelObservationStrictFrame/trailing
+=== RUN   TestKernelObservationStrictFrame/oversize
+=== RUN   TestKernelObservationStrictFrame/invalid_utf8
+=== RUN   TestKernelObservationStrictFrame/boolean
+=== RUN   TestKernelObservationStrictFrame/unknown
+=== RUN   TestKernelObservationStrictFrame/null
+=== RUN   TestKernelObservationStrictFrame/noncanonical
+--- PASS: TestKernelObservationStrictFrame (0.01s)
+    --- PASS: TestKernelObservationStrictFrame/duplicate (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/missing (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/trailing (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/oversize (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/invalid_utf8 (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/boolean (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/unknown (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/null (0.00s)
+    --- PASS: TestKernelObservationStrictFrame/noncanonical (0.00s)
+=== RUN   TestKernelObservationAttributionAndLoss
+--- PASS: TestKernelObservationAttributionAndLoss (0.00s)
+=== RUN   TestKernelObservationPeerHelper
+    kernel_observation_linux_test.go:95: owned subprocess fixture only
+--- SKIP: TestKernelObservationPeerHelper (0.00s)
+=== RUN   TestKernelObservationUnixPeer
+=== RUN   TestKernelObservationUnixPeer/same_uid_other_pid
+=== RUN   TestKernelObservationUnixPeer/wrong_uid
+=== RUN   TestKernelObservationUnixPeer/reused_pid
+--- PASS: TestKernelObservationUnixPeer (1.49s)
+    --- PASS: TestKernelObservationUnixPeer/same_uid_other_pid (0.00s)
+    --- PASS: TestKernelObservationUnixPeer/wrong_uid (0.00s)
+    --- PASS: TestKernelObservationUnixPeer/reused_pid (0.00s)
+=== RUN   TestKernelObservationRefusesStaleSource
+=== RUN   TestKernelObservationRefusesStaleSource/mission
+=== RUN   TestKernelObservationRefusesStaleSource/task
+=== RUN   TestKernelObservationRefusesStaleSource/attempt
+=== RUN   TestKernelObservationRefusesStaleSource/digest
+=== RUN   TestKernelObservationRefusesStaleSource/pid
+=== RUN   TestKernelObservationRefusesStaleSource/start
+=== RUN   TestKernelObservationRefusesStaleSource/boot
+=== RUN   TestKernelObservationRefusesStaleSource/probe
+=== RUN   TestKernelObservationRefusesStaleSource/clock
+=== RUN   TestKernelObservationRefusesStaleSource/gap
+=== RUN   TestKernelObservationRefusesStaleSource/overflow
+=== RUN   TestKernelObservationRefusesStaleSource/changed
+=== RUN   TestKernelObservationRefusesStaleSource/read_error
+--- PASS: TestKernelObservationRefusesStaleSource (2.92s)
+    --- PASS: TestKernelObservationRefusesStaleSource/mission (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/task (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/attempt (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/digest (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/pid (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/start (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/boot (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/probe (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/clock (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/gap (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/overflow (0.00s)
+    --- PASS: TestKernelObservationRefusesStaleSource/changed (1.42s)
+    --- PASS: TestKernelObservationRefusesStaleSource/read_error (1.49s)
+=== RUN   TestKernelObservationConcurrentReplay
+--- PASS: TestKernelObservationConcurrentReplay (0.01s)
+=== RUN   TestKernelObservationProcessIdentity
+    kernel_observation_linux_test.go:276: owned PID identity checked; no kernel collection
+--- PASS: TestKernelObservationProcessIdentity (0.00s)
+=== RUN   TestKernelObservationAgentLifecycle
+=== RUN   TestKernelObservationAgentLifecycle/stop
+=== RUN   TestKernelObservationAgentLifecycle/invalid
+=== RUN   TestKernelObservationAgentLifecycle/running
+--- PASS: TestKernelObservationAgentLifecycle (1.22s)
+    --- PASS: TestKernelObservationAgentLifecycle/stop (0.00s)
+    --- PASS: TestKernelObservationAgentLifecycle/invalid (0.00s)
+    --- PASS: TestKernelObservationAgentLifecycle/running (0.00s)
+=== RUN   TestKernelObservationUnixLossAndCancellation
+--- PASS: TestKernelObservationUnixLossAndCancellation (1.42s)
+=== RUN   TestKernelObservationUnixMalformedFrame
+--- PASS: TestKernelObservationUnixMalformedFrame (3.00s)
+=== RUN   TestKernelObserveFailedAcquisitionCleanup
+--- PASS: TestKernelObserveFailedAcquisitionCleanup (0.00s)
+=== RUN   TestKernelObserveCounterAndCleanup
+=== RUN   TestKernelObserveCounterAndCleanup/limit
+=== RUN   TestKernelObserveCounterAndCleanup/window
+=== RUN   TestKernelObserveCounterAndCleanup/quiet
+=== RUN   TestKernelObserveCounterAndCleanup/read
+=== RUN   TestKernelObserveCounterAndCleanup/stop
+=== RUN   TestKernelObserveCounterAndCleanup/stats
+=== RUN   TestKernelObserveCounterAndCleanup/close
+=== RUN   TestKernelObserveCounterAndCleanup/emit
+=== RUN   TestKernelObserveCounterAndCleanup/sequence
+=== RUN   TestKernelObserveCounterAndCleanup/counters
+--- PASS: TestKernelObserveCounterAndCleanup (0.01s)
+    --- PASS: TestKernelObserveCounterAndCleanup/limit (0.00s)
+    --- PASS: TestKernelObserveCounterAndCleanup/window (0.00s)
+    --- PASS: TestKernelObserveCounterAndCleanup/quiet (0.00s)
+    --- PASS: TestKernelObserveCounterAndCleanup/read (0.00s)
+    --- PASS: TestKernelObserveCounterAndCleanup/stop (0.00s)
+    --- PASS: TestKernelObserveCounterAndCleanup/stats (0.00s)
+    --- PASS: TestKernelObserveCounterAndCleanup/close (0.00s)
+    --- PASS: TestKernelObserveCounterAndCleanup/emit (0.00s)
+    --- PASS: TestKernelObserveCounterAndCleanup/sequence (0.00s)
+    --- PASS: TestKernelObserveCounterAndCleanup/counters (0.00s)
+=== RUN   TestKernelObserveHelper
+    kernel_observe_process_linux_test.go:38: owned protocol fixture; no BPF
+--- SKIP: TestKernelObserveHelper (0.00s)
+=== RUN   TestKernelObserveOwnedProtocol
+=== RUN   TestKernelObserveOwnedProtocol/unavailable
+=== RUN   TestKernelObserveOwnedProtocol/event
+=== RUN   TestKernelObserveOwnedProtocol/bad
+--- PASS: TestKernelObserveOwnedProtocol (8.18s)
+    --- PASS: TestKernelObserveOwnedProtocol/unavailable (3.20s)
+    --- PASS: TestKernelObserveOwnedProtocol/event (2.81s)
+    --- PASS: TestKernelObserveOwnedProtocol/bad (2.17s)
+=== RUN   TestKernelObserveCancellation
+--- PASS: TestKernelObserveCancellation (1.56s)
+=== RUN   TestKernelObserveParentDeath
+--- PASS: TestKernelObserveParentDeath (0.93s)
+=== RUN   TestKernelObservePublicOwnedSource
+    kernel_observe_public_linux_test.go:21: requires explicitly built public binary; one owned-source native availability check
+--- SKIP: TestKernelObservePublicOwnedSource (0.00s)
+=== RUN   TestKernelCheckHelper
+    trust_kernel_check_test.go:62: owned helper fixture only
+--- SKIP: TestKernelCheckHelper (0.00s)
+=== RUN   TestKernelCheckProcessCancellation
+--- PASS: TestKernelCheckProcessCancellation (0.49s)
+=== RUN   TestKernelCheckParentDeathStopsHelper
+--- PASS: TestKernelCheckParentDeathStopsHelper (1.00s)
+=== RUN   TestKernelCheckRealProcessProtocol
+--- PASS: TestKernelCheckRealProcessProtocol (1.51s)
+=== RUN   TestKernelCheckPolicyInvalid
+--- PASS: TestKernelCheckPolicyInvalid (0.00s)
+=== RUN   TestKernelCheckFreshAuthorityAndRevision
+--- PASS: TestKernelCheckFreshAuthorityAndRevision (0.98s)
+=== RUN   TestKernelCheckCLIRejectsEmptyVerdict
+--- PASS: TestKernelCheckCLIRejectsEmptyVerdict (0.00s)
+=== RUN   TestKernelCheckProtocolInvalid
+--- PASS: TestKernelCheckProtocolInvalid (0.00s)
+=== RUN   TestKernelCheckUnavailableCLI
+--- PASS: TestKernelCheckUnavailableCLI (0.00s)
+=== RUN   TestKernelCheckPolicy
+--- PASS: TestKernelCheckPolicy (1.00s)
+=== RUN   TestKernelCheckInactiveRefusesBeforeRunner
+--- PASS: TestKernelCheckInactiveRefusesBeforeRunner (0.83s)
+=== RUN   TestKernelObservePolicyDefault
+--- PASS: TestKernelObservePolicyDefault (0.00s)
+=== RUN   TestKernelObservePolicyInvalid
+--- PASS: TestKernelObservePolicyInvalid (0.00s)
+=== RUN   TestKernelObservePolicyPersists
+--- PASS: TestKernelObservePolicyPersists (1.16s)
+=== RUN   TestKernelObserveRefusesBeforeRunner
+=== RUN   TestKernelObserveRefusesBeforeRunner/inactive
+=== RUN   TestKernelObserveRefusesBeforeRunner/token
+=== RUN   TestKernelObserveRefusesBeforeRunner/body
+=== RUN   TestKernelObserveRefusesBeforeRunner/missing
+--- PASS: TestKernelObserveRefusesBeforeRunner (4.39s)
+    --- PASS: TestKernelObserveRefusesBeforeRunner/inactive (1.14s)
+    --- PASS: TestKernelObserveRefusesBeforeRunner/token (1.11s)
+    --- PASS: TestKernelObserveRefusesBeforeRunner/body (1.14s)
+    --- PASS: TestKernelObserveRefusesBeforeRunner/missing (1.00s)
+=== RUN   TestKernelObserveFreshRevision
+--- PASS: TestKernelObserveFreshRevision (1.18s)
+=== RUN   TestKernelObserveCLIResultGuards
+=== RUN   TestKernelObserveCLIResultGuards/available
+=== RUN   TestKernelObserveCLIResultGuards/events
+=== RUN   TestKernelObserveCLIResultGuards/cleanup_verified
+=== RUN   TestKernelObserveCLIResultGuards/effective_policy
+=== RUN   TestKernelObserveCLIResultGuards/attribution
+=== RUN   TestKernelObserveCLIResultGuards/attempts
+=== RUN   TestKernelObserveCLIResultGuards/complete
+--- PASS: TestKernelObserveCLIResultGuards (0.03s)
+    --- PASS: TestKernelObserveCLIResultGuards/available (0.00s)
+    --- PASS: TestKernelObserveCLIResultGuards/events (0.00s)
+    --- PASS: TestKernelObserveCLIResultGuards/cleanup_verified (0.01s)
+    --- PASS: TestKernelObserveCLIResultGuards/effective_policy (0.00s)
+    --- PASS: TestKernelObserveCLIResultGuards/attribution (0.00s)
+    --- PASS: TestKernelObserveCLIResultGuards/attempts (0.00s)
+    --- PASS: TestKernelObserveCLIResultGuards/complete (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	78.588s

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "kind": "owned_inert_fixture_birth",
+  "root": "/tmp/swarm-model83-mg0klzim",
+  "binary_sha256": "47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+  "label": "call-preview",
+  "actor_authenticated": false,
+  "runtime_permission": false
+}

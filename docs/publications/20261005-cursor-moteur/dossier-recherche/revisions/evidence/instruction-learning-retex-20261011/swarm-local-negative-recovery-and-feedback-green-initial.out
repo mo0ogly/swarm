@@ -1,0 +1,7 @@
+=== RUN   TestManagedLocalNegativeTransportRecoveryRetainsOpinionAndConsumption
+    managed_review_local_negative_resume_test.go:14: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedLocalNegativeTransportRecoveryRetainsOpinionAndConsumption (2.76s)
+=== RUN   TestFragmentRetryFeedbackSeparatesNeedsMismatchFromWrongQuote
+--- PASS: TestFragmentRetryFeedbackSeparatesNeedsMismatchFromWrongQuote (0.02s)
+PASS
+ok  	swarm.local/companion/internal/engine	2.842s

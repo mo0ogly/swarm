@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "id": "web-request-policy-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/web_request_policy.rs",
+    "rust/crates/swarm-engine/src/web_request_policy_store.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/agent_launch_policy.rs",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "rust/crates/swarm-engine/src/model_wire.rs",
+    "rust/crates/swarm-engine/src/work.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-cli/src/web_request_policy.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-web/src/service/web_request_policy.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "web/native-web-requests.js",
+    "web/web-requests.js",
+    "web/native-runtime.js",
+    "web/native-runtime.html",
+    "web/native-runtime.css",
+    "frontend/engine-settings/admin.css",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "config/web-requests.json",
+    "tests/rust_web_request_policy.py",
+    "tests/rust_web_request_policy_go_parity.py",
+    "tests/rust_web_request_policy_browser.py",
+    "tests/rust_web_request_policy_ui.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tests/helpers/verification_cleanup.cjs",
+    "docs/architecture/NATIVE-WEB-REQUEST-POLICY.md",
+    "docs/en/NATIVE-WEB-REQUEST-POLICY.md",
+    "tests/rust_web_request_preview_cap.py",
+    "web/native-policy-receipt.js",
+    "tests/rust_policy_receipt_unicode.py",
+    "docs/architecture/NATIVE-POLICY-RECEIPTS.md",
+    "docs/en/NATIVE-POLICY-RECEIPTS.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public",
+      "expected_exit": 0,
+      "required_stdout": [
+        "WEB_REQUEST_POLICY_PUBLIC_VERIFIED 8"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='web-request-final-',dir='.cache')).resolve()/'public'\nargs=['python3','tests/rust_web_request_policy.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nprint('RETAINED_FLOW',p,flush=True)\nsubprocess.run(args,check=True)"
+      ]
+    },
+    {
+      "id": "preview-metadata-cap",
+      "expected_exit": 0,
+      "required_stdout": [
+        "WEB_REQUEST_PREVIEW_CAP_VERIFIED 3"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='web-request-cap-final-',dir='.cache')).resolve()/'cap'\nprint('RETAINED_FLOW',p,flush=True)\nsubprocess.run(['python3','tests/rust_web_request_preview_cap.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)],check=True)"
+      ]
+    },
+    {
+      "id": "go-wire-unicode",
+      "expected_exit": 0,
+      "required_stdout": [
+        "POLICY_RECEIPT_UNICODE_VERIFIED 2"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='policy-unicode-final-',dir='.cache')).resolve()/'flow'\nprint('RETAINED_FLOW',p,flush=True)\nsubprocess.run(['python3','tests/rust_policy_receipt_unicode.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--go-binary',os.environ['SWARM_GO_REFERENCE_BINARY'],'--output',str(p)],check=True)"
+      ]
+    },
+    {
+      "id": "go-parity",
+      "expected_exit": 0,
+      "required_stdout": [
+        "WEB_REQUEST_POLICY_GO_PARITY_VERIFIED 6 WIRE16"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='web-request-final-',dir='.cache')).resolve()/'go-parity'\nargs=['python3','tests/rust_web_request_policy_go_parity.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nargs+=['--go-binary',os.environ['SWARM_GO_REFERENCE_BINARY']]\nprint('RETAINED_FLOW',p,flush=True)\nsubprocess.run(args,check=True)"
+      ]
+    },
+    {
+      "id": "browser",
+      "expected_exit": 0,
+      "required_stdout": [
+        "WEB_REQUEST_POLICY_BROWSER_VERIFIED 4"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='web-request-final-',dir='.cache')).resolve()/'browser'\nargs=['python3','tests/rust_web_request_policy_browser.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nprint('RETAINED_FLOW',p,flush=True)\nsubprocess.run(args,check=True)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "review": "review-2d04785fe3141f8224439317",
+  "candidate": "aee4912e14c203077e9906f56644d5f29708ad0e",
+  "artifact": 17,
+  "artifact_name": "diff --git a/tests/actions_confiance_t2_ui.cjs b/tests/actions_confiance_t2_ui.cjs",
+  "source_digest": "6c2ce9acba5bce5f4746d47ab875b63085211133a87dac195c1feec7f4955ca0",
+  "actual_contiguous_source": "assert(value.height>=44&&value.width>=44,theme+' touch target '+JSON.stringify(value));",
+  "rejected_operator_absent": true,
+  "other_quotes": "Artifact 2 and 4 are diffs: their multiline quotations omitted the original + prefixes. Full physical originals remain supplied separately.",
+  "native_controls_passed": true
+}

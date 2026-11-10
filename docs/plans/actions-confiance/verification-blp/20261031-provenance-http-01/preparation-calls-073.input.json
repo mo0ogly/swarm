@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "action": "save",
+  "preparation_id": "prep-b0f3364296da8a02bb4c7164",
+  "event_id": "prior-plan",
+  "expected_revision": 3,
+  "document": "plan",
+  "text": "{\"version\": 1, \"objective\": \"A valid plan\", \"assumptions\": [], \"questions\": [{\"question\": \"Keep decision?\", \"answer\": \"OPERATOR_ONLY\"}, {\"question\": \"New decision?\", \"answer\": \"\"}], \"tasks\": [{\"id\": \"t1\", \"title\": \"Task\", \"role\": \"worker\", \"scope\": \"scope\", \"deliverable\": \"delivery\", \"depends\": [], \"criteria\": [\"proof\"], \"proof\": \"evidence\", \"entry\": \"entry\", \"validation\": \"validation\", \"delivery\": \"delivery\", \"stop\": \"stop\", \"max_attempts\": 1, \"max_tool_calls\": 1}, {\"id\": \"t2\", \"title\": \"Task\", \"role\": \"worker\", \"scope\": \"scope\", \"deliverable\": \"delivery\", \"depends\": [\"t1\"], \"criteria\": [\"proof\"], \"proof\": \"evidence\", \"entry\": \"entry\", \"validation\": \"validation\", \"delivery\": \"delivery\", \"stop\": \"stop\", \"max_attempts\": 1, \"max_tool_calls\": 1}]}"
+}

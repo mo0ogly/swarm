@@ -50,3 +50,14 @@ The restaurant advances statuses manually. Confirmation clears the basket while
 tracking remains in the tab. Listening on 127.0.0.1 confines the demo to the
 computer running the server. This is not a production deployment.
 The kit excludes credentials, private sessions, SQLite databases and Git history.
+
+ANIMATED TUTORIALS — 9 OCTOBER 2026 EDITION
+The guides now contain 38 chapters; the previous 36 are preserved.
+Fully extract the kit, open tutoriels/index.html and select English.
+Choose a module, advance step by step or play a short video, then answer
+the exercise. Updated cockpit: Cockpit help → Casa Pizza training.
+Captioned FR/EN videos without audio, GIF previews, transcripts and full images.
+Videos edit real screenshots; they are not continuous screencasts.
+None of the six teaching tasks was executed during this capture.
+
+PDF guides: Formation_Swarm_Casa_Pizza.pdf (FR), Swarm_Casa_Pizza_Training_EN.pdf (EN), 38 pages each. Available from the reader and included in both kits; Word files retained as editable sources.

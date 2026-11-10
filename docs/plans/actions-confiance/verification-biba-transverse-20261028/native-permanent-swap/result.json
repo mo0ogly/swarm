@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recipe": "biba-linux-boundary",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "native-boundary",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import pathlib,subprocess,tempfile; p=pathlib.Path(tempfile.mkdtemp(prefix='biba-boundary-',dir='.cache')).resolve(); subprocess.run(['python3','tests/rust_biba_linux_boundary_build.py','--target-dir',str(p/'target'),'--output',str(p/'proof')],check=True); print('BIBA_BOUNDARY_EVIDENCE '+str(p/'proof'))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 11.339903700980358,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "660dd67f4f26d74c08a0bd4fb461577d264b76ae458880d7b3b108fda9eab79f",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "28b3969d79a1c325fd4c4931579dc5d4a0e6b3110f5584d53bb34735afe5fcee",
+    "declared-inputs.tar.gz": "eb96d3d80c6ba6245ac96c823b9830370e4f3059e695beb274e6fa735abef64b",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "4b3bb09a68b1f39992782214d036a245b64b04b2c4221ab9cfbc8071b47c2c6d",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "65014ca17f6f59eb717703890ca8bb932658698f8fd9e3c60bff573cdeac7d80",
+    "inputs.after.json": "28b3969d79a1c325fd4c4931579dc5d4a0e6b3110f5584d53bb34735afe5fcee"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "build.sh",
+    "bin/swarm-actions-confiance-effect-proof-qualified"
+  ],
+  "pid": 433442,
+  "start_ticks": "6928382",
+  "started_unix": 1792134859.6837192,
+  "status": "passed",
+  "exit_code": 0,
+  "ended_unix": 1792134901.5478752,
+  "inputs_unchanged": true,
+  "changed_inputs": [],
+  "binary": "bin/swarm-actions-confiance-effect-proof-qualified",
+  "binary_sha256": "c0030271a0c2108a6d872b954b0be7556f69642463e28e3070f6bde1edfd8ec8"
+}

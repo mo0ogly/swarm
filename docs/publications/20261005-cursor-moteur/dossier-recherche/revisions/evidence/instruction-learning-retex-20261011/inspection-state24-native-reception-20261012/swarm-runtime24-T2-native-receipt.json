@@ -1,0 +1,305 @@
+{
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "base_commit": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "candidate_commit": "4af006a35e56d799a26eae29dd197326bf6288f5",
+  "controller": "controller://swarm-validation",
+  "controls": {
+    "plan-ca937edf4e-T1": [
+      {
+        "review_output": "T1: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-entry",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T1"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:03.217566522Z",
+        "finished_at": "2026-10-11T22:31:03.248049049Z",
+        "wall_duration_ms": 30,
+        "cpu_duration_ms": 30
+      },
+      {
+        "review_output": "ok  \tswarm.local/companion/internal/engine\t4.236s\n",
+        "output_bytes": 50,
+        "id": "plan-validation",
+        "command": [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff",
+          "-count=1",
+          "-timeout",
+          "25s"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "dacba2125e5dcc41f0a1b06348a2d7c8bb68fefc7cbe5e6281583dfdc5ca8943",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:03.248311022Z",
+        "finished_at": "2026-10-11T22:31:17.347835866Z",
+        "wall_duration_ms": 14099,
+        "cpu_duration_ms": 34076
+      },
+      {
+        "review_output": "T1: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-delivery",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T1"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:17.34808226Z",
+        "finished_at": "2026-10-11T22:31:17.379265206Z",
+        "wall_duration_ms": 31,
+        "cpu_duration_ms": 30
+      },
+      {
+        "review_output": "T1: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-criterion-1",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T1"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:17.379754447Z",
+        "finished_at": "2026-10-11T22:31:17.407466177Z",
+        "wall_duration_ms": 27,
+        "cpu_duration_ms": 27
+      },
+      {
+        "review_output": "T1: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-criterion-2",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T1"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:17.407856352Z",
+        "finished_at": "2026-10-11T22:31:17.436865826Z",
+        "wall_duration_ms": 29,
+        "cpu_duration_ms": 28
+      },
+      {
+        "review_output": "T1: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-criterion-3",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T1"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:17.437324609Z",
+        "finished_at": "2026-10-11T22:31:17.464635465Z",
+        "wall_duration_ms": 27,
+        "cpu_duration_ms": 26
+      },
+      {
+        "review_output": "T1: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-criterion-4",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T1"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:17.465111321Z",
+        "finished_at": "2026-10-11T22:31:17.502857713Z",
+        "wall_duration_ms": 37,
+        "cpu_duration_ms": 37
+      }
+    ],
+    "plan-ca937edf4e-T2": [
+      {
+        "review_output": "T2: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-entry",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T2"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:17.503213523Z",
+        "finished_at": "2026-10-11T22:31:17.537341262Z",
+        "wall_duration_ms": 34,
+        "cpu_duration_ms": 33
+      },
+      {
+        "review_output": "ok  \tswarm.local/companion/internal/engine\t7.811s\n",
+        "output_bytes": 50,
+        "id": "plan-validation",
+        "command": [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestPlanningJudge",
+          "-count=1",
+          "-timeout",
+          "25s"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "0dbcaf77cf5eda3eac15c82310488526c24311ba7b3685401c749dba94e33398",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:17.537884996Z",
+        "finished_at": "2026-10-11T22:31:26.887086925Z",
+        "wall_duration_ms": 9349,
+        "cpu_duration_ms": 12947
+      },
+      {
+        "review_output": "T2: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-delivery",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T2"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:26.887379115Z",
+        "finished_at": "2026-10-11T22:31:26.914589402Z",
+        "wall_duration_ms": 27,
+        "cpu_duration_ms": 26
+      },
+      {
+        "review_output": "T2: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-criterion-1",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T2"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:26.914943208Z",
+        "finished_at": "2026-10-11T22:31:26.943549412Z",
+        "wall_duration_ms": 28,
+        "cpu_duration_ms": 28
+      },
+      {
+        "review_output": "T2: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-criterion-2",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T2"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:26.944006302Z",
+        "finished_at": "2026-10-11T22:31:26.973099954Z",
+        "wall_duration_ms": 29,
+        "cpu_duration_ms": 28
+      },
+      {
+        "review_output": "T2: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-criterion-3",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T2"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:26.973600096Z",
+        "finished_at": "2026-10-11T22:31:27.000619714Z",
+        "wall_duration_ms": 27,
+        "cpu_duration_ms": 26
+      },
+      {
+        "review_output": "T2: architecture/evidence structure verified; semantic review still required\n",
+        "output_bytes": 77,
+        "id": "plan-criterion-4",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T2"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee",
+        "summary": "contrôle réussi",
+        "started_at": "2026-10-11T22:31:27.000999939Z",
+        "finished_at": "2026-10-11T22:31:27.02692713Z",
+        "wall_duration_ms": 25,
+        "cpu_duration_ms": 25
+      }
+    ]
+  },
+  "external_repair": {
+    "proof_key": "auto-a23c60f03a732c02841f-repair-09384746d4a1a8a1",
+    "replaces_result": "9dcf9d92d5507861d747e6a2f0ac6dca9335b0a9",
+    "prior_review_id": "review-aac9c2070e72abe2a655eb12",
+    "event_id": "T2-finding-contract-proof-repair-d01bfde6ef8c4f2ab844453832c4c20b",
+    "request_sha256": "09384746d4a1a8a1c2a747a984f1fee10606f2b885975ae6fabd70201884cf2b",
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "attempt_id": "a-2f9e1debb1548be96273f0d3",
+    "result_commit": "7bfc163eef748ef321e3e80f8de02cc4b2b669f7",
+    "tree": "52b15c9e3c3bd900fae81ef0b5716e592cd03ab4",
+    "actor": "fpizzi/uid:1001",
+    "at": "2026-10-11T22:31:00.297512156Z",
+    "reason": "Replan : la revue6 reçoit les originaux mais sa sixième inspection déclare inspected avec besoins de preuve ; aucun verdict final. Le défaut général du schéma est corrigé dans runtime24 qualifié : nouveaux paquets finding_contract_version=1 avec formes distinctes, ancienne revue et tous appels conservés. Rapport corrigé pour attribuer cette cause et séparer effet local de verdict natif. Le code Go519fichiers, helper original et preuves entières demeurent inchangés ; aucun pass réutilisé ni avis favorable déduit de métadonnées. Nouvelle remise explicite du candidat documentaire corrigé sous contrôles frais et nouveau contrat, puis véritable décision indépendante. Cette réparation externe ne constitue pas une production autonome ni une fin du besoin.",
+    "original_process_status": "completed"
+  },
+  "previous_candidate": "e32388fda21e7c225c3b2416d230d6f5450230cd"
+}

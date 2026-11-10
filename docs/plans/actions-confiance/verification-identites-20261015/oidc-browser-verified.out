@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: {"lang":"fr","width":390,"dimensions":[{"height":38,"width":178.296875},{"height":38,"width":190.546875}]}
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_oidc_ui.cjs:32:374 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

@@ -1,0 +1,40 @@
+## Proposal: `archive_provider_fixture` helper (bounded, integrable)
+
+**Missing evidence (stated, not assumed):** the exact second-provider launch sequence and whether `release-worker.json` is removed by the engine are not shown in the supplied sources; this helper only archives and clears the three named fixture files in the known `watch-worker` directory and refuses anything unexpected. No product files, no production edits, no execution performed.
+
+**Behavior:** snapshot original bytes + sha256 into a JSON manifest under the test output; require exactly the owned set (`model-received.json`, `handoff.md`, `release-worker.json` — any subset may exist, unknown files refuse); copy originals to an archive directory preserving hashes; then delete the originals so the next inert provider's `'x'`-mode creates (per `provider_program`) succeed cleanly.
+
+**Placement:** local helper in the test recipe's launch script (e.g. alongside the second `attach_provider` step in `rust_native_web_conductor.py`-style flow), called only between providers within one owned `Root`.
+
+```python
+def archive_provider_fixture(root, out, digest=fixture.digest, expected=frozenset(
+        {'model-received.json', 'handoff.md', 'release-worker.json'})):
+    """Archive owned fixture files between two sequential providers, same workspace.
+
+    Refuses unknown files, preserves original bytes and sha256 manifest,
+    then removes originals so the inert provider's exclusive writes succeed.
+    """
+    import json, shutil
+    from pathlib import Path
+    worker_dir = Path(root) / 'watch-worker'
+    present = {p.name for p in worker_dir.iterdir()}
+    unknown = present - expected
+    assert not unknown, 'unknown fixture files refuse: %s' % sorted(unknown)
+    found = present & expected
+    archive = Path(out) / 'provider-fixture-archive'
+    archive.mkdir(parents=True, mode=0o700, exist_ok=False)
+    manifest = {}
+    for name in sorted(found):
+        source = worker_dir / name
+        raw = source.read_bytes()
+        manifest[name] = dict(sha256=digest(raw), size=len(raw))
+        shutil.copyfile(source, archive / name)
+        assert digest((archive / name).read_bytes()) == manifest[name]['sha256']
+        source.unlink()
+    fixture.publish(archive / 'manifest.json', dict(
+        status='archived', root=str(root), files=manifest,
+        missing=sorted(expected - found), unknown_refused=sorted(unknown)))
+    return manifest
+```
+
+**Notes:** `missing` is recorded (e.g. first turn has no `release-worker.json` yet); `out` must be fresh (aligns with the harness's `mkdir(exist_ok=False)` convention). Caller retains the returned manifest to assert the second provider produced new, differently-hashed files.

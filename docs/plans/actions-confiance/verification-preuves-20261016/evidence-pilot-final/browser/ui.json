@@ -1,0 +1,2199 @@
+{
+  "checks": [
+    "actual loading state observed while the initial API response is held",
+    "loading-empty-success states and real GET API",
+    "first keyboard skip link moves focus to main",
+    "touch targets >=44px and input fonts >=16px",
+    "real public request renders a localized French action state",
+    "exact amount above 2^53 renders without numeric rounding",
+    "labelled Admin dialog and initial keyboard focus",
+    "Admin explains mandate renewal before applying configuration in French",
+    "Admin identity template contains no usable preset credentials",
+    "Admin refuses blank credentials before preview without mutation",
+    "Escape closes and restores focus",
+    "in-flight previews preserve newer input and ignore reordered or closed responses",
+    "Admin preview is non-mutating",
+    "Admin apply persists, reopens and exposes actual technical bounds without arbitrary ceilings",
+    "État and sombre themes rendered with measured button contrast >= 4.5",
+    "FR/EN layouts at 1440,1024,760,390,320px in both themes with long data, touch sizes and no overflow",
+    "Admin explains mandate renewal before applying configuration in English",
+    "English locale includes the Admin fields and labels",
+    "checkbox label target is measured and actually clickable in French and English at mobile widths",
+    "identity suspension and reactivation via Admin in fr preserve actions, reject suspended requests and redact preview",
+    "identity suspension and reactivation via Admin in en preserve actions, reject suspended requests and redact preview",
+    "visible network error state"
+  ],
+  "errors": [],
+  "failedRequests": [
+    {
+      "url": "http://127.0.0.1:45177/api/v1/trust-actions",
+      "error": "net::ERR_FAILED",
+      "negativePhase": true
+    }
+  ],
+  "expectedNetworkErrors": [
+    {
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "http://127.0.0.1:45177/api/v1/trust-actions"
+    }
+  ],
+  "contrastMeasurements": [
+    {
+      "theme": "etat",
+      "controls": [
+        {
+          "id": "trust-theme",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 181.90625
+        },
+        {
+          "id": "Retour au cockpit",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "ratio": 14.487732305657662,
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "pe-show",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 241.859375
+        }
+      ]
+    },
+    {
+      "theme": "sombre",
+      "controls": [
+        {
+          "id": "trust-theme",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 159.515625
+        },
+        {
+          "id": "Retour au cockpit",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "ratio": 9.096062373277045,
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "pe-show",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 241.859375
+        }
+      ]
+    }
+  ],
+  "viewportMeasurements": [
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "width": 1440,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 181.90625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "width": 1440,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 159.515625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "width": 1024,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 181.90625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "width": 1024,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 159.515625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "width": 760,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 181.90625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "width": 760,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 159.515625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "width": 390,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 181.90625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 1
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "width": 390,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 159.515625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 1
+    },
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "width": 320,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 181.90625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 1
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "width": 320,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 159.515625
+        },
+        {
+          "id": "Retour au cockpit",
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 185.171875
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 195.65625
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 206.390625
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 156.625
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 129.890625
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 170.34375
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 206.46875
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 171.796875
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 241.859375
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 208.625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 1
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "width": 1440,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 158.75
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "width": 1440,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 163.078125
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 536
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "width": 1024,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 158.75
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "width": 1024,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 163.078125
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 472
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "width": 760,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 158.75
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "width": 760,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 163.078125
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 340
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 4
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "width": 390,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 158.75
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 1
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "width": 390,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 163.078125
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 326
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 1
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "width": 320,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 158.75
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 1
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "width": 320,
+      "overflow": false,
+      "controls": [
+        {
+          "id": "trust-theme",
+          "height": 44,
+          "width": 163.078125
+        },
+        {
+          "id": "Back to cockpit",
+          "height": 44,
+          "width": 140.3125
+        },
+        {
+          "id": "trust-refresh",
+          "height": 44,
+          "width": 76.421875
+        },
+        {
+          "id": "trust-config-open",
+          "height": 44,
+          "width": 112.015625
+        },
+        {
+          "id": "trust-sealed-check",
+          "height": 44,
+          "width": 187.703125
+        },
+        {
+          "id": "trust-secret-load-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-grant-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-consume-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-revoke-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "trust-secret-status-button",
+          "height": 44,
+          "width": 256
+        },
+        {
+          "id": "pe-policy-open",
+          "height": 44,
+          "width": 177.5
+        },
+        {
+          "id": "pe-show",
+          "height": 44,
+          "width": 127.71875
+        },
+        {
+          "id": "pe-prepare",
+          "height": 44,
+          "width": 112.578125
+        },
+        {
+          "id": "pe-activate",
+          "height": 44,
+          "width": 166.71875
+        },
+        {
+          "id": "pe-revoke",
+          "height": 44,
+          "width": 155.203125
+        },
+        {
+          "id": "pe-anchor",
+          "height": 44,
+          "width": 160.9375
+        },
+        {
+          "id": "pe-verify-open",
+          "height": 44,
+          "width": 218
+        },
+        {
+          "id": "pe-download",
+          "height": 44,
+          "width": 175.390625
+        }
+      ],
+      "inputFont": 16,
+      "columns": 1
+    }
+  ],
+  "toggleMeasurements": [
+    {
+      "lang": "fr",
+      "width": 800,
+      "target_width": 356,
+      "target_height": 71.59375,
+      "actual_label_click": true
+    },
+    {
+      "lang": "en",
+      "width": 390,
+      "target_width": 326,
+      "target_height": 46.59375,
+      "actual_label_click": true
+    },
+    {
+      "lang": "en",
+      "width": 320,
+      "target_width": 256,
+      "target_height": 46.59375,
+      "actual_label_click": true
+    }
+  ],
+  "root": "/tmp/swarm-t2-ui-581eMW",
+  "at": "2026-10-15T23:41:59.930Z"
+}

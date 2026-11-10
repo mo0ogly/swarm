@@ -1,0 +1,116 @@
+{
+  "paths": [
+    "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+    "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-full-suite.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-race.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-semantic-refusal.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-targeted.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out",
+    "internal/engine/planning.go",
+    "internal/engine/planning_api.go",
+    "internal/engine/planning_context.go",
+    "internal/engine/planning_judge.go",
+    "internal/engine/planning_judge_test.go",
+    "internal/engine/score.go"
+  ],
+  "bytes": 130304,
+  "limit": 131072,
+  "files": [
+    {
+      "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+      "bytes": 10096,
+      "sha256": "afe4e55b44f552537ca01aff13ac9e4bcdd1fc8ce559745825142f866fe781a6"
+    },
+    {
+      "path": "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md",
+      "bytes": 9282,
+      "sha256": "10ac147726e3a88b776d392c9a9c4d12302f72efbbc56d64b74a168b853d86ec"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+      "bytes": 14773,
+      "sha256": "1aacdd4729ca4ab72d0c4979955451e7c82cf1003e9a32cf5ecf75172e8f5d57"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out",
+      "bytes": 1537,
+      "sha256": "98d922727149c2b525168eba16dd5ca1c59b5dd57c458e7002c0e09bf593a652"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+      "bytes": 1537,
+      "sha256": "ea31ccf421957ef4ad4083e39db850792ab1f89c3032e3b9609f2ece71d9c44e"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json",
+      "bytes": 2368,
+      "sha256": "a6e4f4982c0c6a7ff59425893f1b28434daf2785f9baff846acd711d2b3777e3"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-full-suite.out",
+      "bytes": 6785,
+      "sha256": "14ac1d7a7423f8ca394e653013cc60ba07bae85bedf3ff8d443b3ca336308675"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-race.out",
+      "bytes": 50,
+      "sha256": "b7f0a8a51fc1706f41dc399bb8dc0e53d38dbdbdcfaef9ff97504effccaa0618"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-semantic-refusal.json",
+      "bytes": 1652,
+      "sha256": "65f2a77c1da5c28ba1ca1d57771076849218c771d51aedf94f91de626cb0edfd"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-targeted.out",
+      "bytes": 50,
+      "sha256": "1c47ae5625372b5aac5b782483ddf944e6db53e980839dc2e81d6889068e9dfd"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out",
+      "bytes": 50,
+      "sha256": "4aa00edbabbb2be14f82c1a21b7f79bfa46e4f787abb1f6df4983feba204e34c"
+    },
+    {
+      "path": "internal/engine/planning.go",
+      "bytes": 39763,
+      "sha256": "c3d8ac967e7b800ca5c8124da586f33afee83d967d4370e608a8b27ffab97fa6"
+    },
+    {
+      "path": "internal/engine/planning_api.go",
+      "bytes": 6018,
+      "sha256": "9004ed00bfb31b5209972516dddf53c85cea6ebcfcb9385a45c0cd49e29b9d94"
+    },
+    {
+      "path": "internal/engine/planning_context.go",
+      "bytes": 4376,
+      "sha256": "66176ec869f60bded108597cd81b18549a370b7c4dd11cc9903881ac8c605cc9"
+    },
+    {
+      "path": "internal/engine/planning_judge.go",
+      "bytes": 6462,
+      "sha256": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b"
+    },
+    {
+      "path": "internal/engine/planning_judge_test.go",
+      "bytes": 13517,
+      "sha256": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd"
+    },
+    {
+      "path": "internal/engine/score.go",
+      "bytes": 11988,
+      "sha256": "449fd157d53cc656f103984a997ec8d11297c660df5aaf6f32f1a3e94f1df62d"
+    }
+  ]
+}

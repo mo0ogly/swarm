@@ -1,0 +1,27 @@
+--- tests/rust_existing_cockpit_ui.cjs@tested
++++ tests/rust_existing_cockpit_ui.cjs@documented
+@@ -1,7 +1,8 @@
+ 'use strict';
+ /** End-of-slice verification of the existing product HTML/CSS on real Rust HTTP.
+  * Private fixture Work/task reads precede marked client-response faults. Browser
+- * issues only explicit budget preview/apply requests on owned fixtures, no provider/visit; global/CDP/page watchdogs disabled.
++ * issues explicit budget/quota edits, price appends and simulations on owned
++ * fixtures, no provider/visit; global/CDP/page watchdogs disabled.
+  * Only supplied credentials in stdin are used, never logged or persisted here. */
+ const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto'),puppeteer=require('puppeteer');
+ const cfg=JSON.parse(fs.readFileSync(0,'utf8')),checks=[],errors=[],failedRequests=[],consoleErrors=[],httpErrors=[];let browser;
+--- tests/rust_native_cockpit_browser.py@tested
++++ tests/rust_native_cockpit_browser.py@documented
+@@ -11,8 +11,10 @@
+ 
+ 
+ def main():
+-    """Create two fixtures via public CLI, exercise the selected native pilot or existing product DOM through real HTTP reads and isolated
+-    UI faults, then close only the owned server. Preserve primary/cleanup causes,
++    """Create private Work/task fixtures via public CLI (plus one planning Work in
++    existing mode). Exercise real reads and explicit isolated budget/quota/price
++    operations and marked client faults, then close only the owned server.
++    Preserve primary/cleanup causes,
+     exact binary/source hashes and browser outputs; never start a provider."""
+     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--binary',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--existing',action='store_true');a=p.parse_args();binary=a.binary.resolve();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
+     root=native.owned_root(binary);works=[];title='Alpha <img src=x onerror=alert(1)>'

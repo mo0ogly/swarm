@@ -1,0 +1,7 @@
+{
+  "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs": "ce07821f8ddeeb462bcdfbd041d100911ea8f3f5b7d33c36e2f992758ed97501",
+  "rust/crates/swarm-engine/src/mission_status_tasks.rs": "7ed613f526b159c4700f1209ff1b2aa2c54c62a147fcedf449a968a0479f7aac",
+  "rust/crates/swarm-engine/src/root_store/mission_status_review.rs": "0a41768ae2f91c503366342a965634f415b36c69632b7595755fe13ed5fe5d3c",
+  "rust/crates/swarm-engine/src/root_store/mission_report_relay.rs": "9d67ddfb07dc0d22d51d357a37c89a9a4bef34ceb46e573ac578ffb0600dffee",
+  "rust/crates/swarm-engine/src/mission_status_tasks/tests.rs": "4bd34bc8d8cbac33db77492d76e5ea1efeae6b9e4ed0636204cb6c7f711dfe02"
+}

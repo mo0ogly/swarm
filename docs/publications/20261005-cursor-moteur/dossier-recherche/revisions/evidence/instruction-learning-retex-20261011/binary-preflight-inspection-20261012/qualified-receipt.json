@@ -1,0 +1,71 @@
+{
+  "at": "2026-10-12T15:05:45.502129+00:00",
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/binary-preflight-inspection-ypkxu18q",
+  "candidate_digest": "55ca089bb9b8d6986593cd401c898d8194ad3a493eb2407dbe544230bc748300",
+  "checks": [
+    {
+      "name": "targeted",
+      "exit": 0,
+      "drift": [],
+      "output": "/tmp/swarm-binary-preflight-inspection-targeted.out",
+      "output_sha256": "4c169696e823b76c6b6193937ed3bf5cfcb46d7793922f453ba8ac1cab1a5799",
+      "reused_passing_result": true,
+      "source_hashes_verified": {
+        "internal/engine/managed_review.go": "9fe00c135d1dbff86cf1a829e4c0e0863c53d6181411ce67ba813e5fa5e7044f",
+        "internal/engine/managed_review_preflight_retry.go": "d42fd3644bc2659252b1f0ba387326d4db9c092c2c80aef87e98751896f08b4d",
+        "internal/engine/managed_scope.go": "502d3eaea01ba0e087aa53b798490a09a46bac53d3abe5438dab8ccf9a1823d2",
+        "internal/engine/managed_binary_preflight_inspection_test.go": "af3359990793dd9e2d929d0ebfaafd6bba10b194d2e51baebd75733060bec5d5"
+      },
+      "selection": "Read-only binary scope inventory and interrupted-result correction; unchanged refusal/spending, altered receipt/candidate/attempt rejection, and directly affected scope/text-review guards. No source or runtime execution input relevant to these isolated fixtures changed since passing runs."
+    },
+    {
+      "name": "vet",
+      "argv": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "started": "2026-10-12T15:04:37.873250+00:00",
+      "finished": "2026-10-12T15:05:16.908223+00:00",
+      "exit": 0,
+      "wall_seconds": 39.03495485399617,
+      "output": "/tmp/swarm-binary-preflight-inspection-vet.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": []
+    },
+    {
+      "name": "methods",
+      "argv": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "started": "2026-10-12T15:05:18.935033+00:00",
+      "finished": "2026-10-12T15:05:31.545491+00:00",
+      "exit": 0,
+      "wall_seconds": 12.610459767005523,
+      "output": "/tmp/swarm-binary-preflight-inspection-methods.out",
+      "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "drift": []
+    },
+    {
+      "name": "build",
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/swarm-qualified-binary-preflight-inspection-build",
+        "./cmd/swarm"
+      ],
+      "started": "2026-10-12T15:05:34.072300+00:00",
+      "finished": "2026-10-12T15:05:43.525165+00:00",
+      "exit": 0,
+      "wall_seconds": 9.452879225995275,
+      "output": "/tmp/swarm-binary-preflight-inspection-build.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "drift": [],
+      "binary_sha256": "476e602235d5f631eba521f6ab12e3f3dcd574b7d583a391018985c2d7c55b94"
+    }
+  ],
+  "result": "PASS proportionate targeted qualification",
+  "limits": "Full suite not rerun by explicit user instruction. No persisted Work authority or synchronization change; storage31 unchanged. Attributed read-only inventory does not authorize binary text review. Native installation/configuration/retry/acceptance remain unproved."
+}

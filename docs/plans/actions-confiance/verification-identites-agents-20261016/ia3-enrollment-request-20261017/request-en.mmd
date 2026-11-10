@@ -1,0 +1,14 @@
+flowchart TD
+  T["Trust: verified caller<br/>retained session digest"] --> P["Private engine projection<br/>principal, session, scope and full candidate"]
+  C["Control: authority and checkpoint<br/>protected freshness: prerequisite"] -.-> P
+  P --> D["Canonical version 1 publication<br/>whole snapshot and exact roots"]
+  D --> H["Immutable Prepared<br/>domain and version separated SHA-256"]
+  H --> N["NewChallenge<br/>exact project and request digest"]
+  D -.-> S["Service: receive full envelope<br/>Bind then verify current source: target"]
+  N -.-> S
+  S -.-> R["Authenticated response<br/>protected source and transport: target"]
+  R --> V["enrollmentproof.Verify"]
+  H --> A["CheckActive<br/>expected context, dates and document digest"]
+  V --> A
+  A --> O["Validated authority data<br/>no execution permit"]
+  O -.-> E["Reauthentication and current state<br/>final-use linearization: not implemented"]

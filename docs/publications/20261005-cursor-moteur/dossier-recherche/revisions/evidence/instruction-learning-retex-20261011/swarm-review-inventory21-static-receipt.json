@@ -1,0 +1,27 @@
+[
+  {
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "start": "2026-10-11T19:11:04.406016+00:00",
+    "end": "2026-10-11T19:11:12.741486+00:00",
+    "seconds": 8.335465844000282,
+    "exit": 0,
+    "output": "/tmp/swarm-review-inventory21-static-0.out",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/agent-workflows/check.py"
+    ],
+    "start": "2026-10-11T19:11:12.741674+00:00",
+    "end": "2026-10-11T19:11:14.903161+00:00",
+    "seconds": 2.1615031299952534,
+    "exit": 0,
+    "output": "/tmp/swarm-review-inventory21-static-1.out",
+    "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+  }
+]

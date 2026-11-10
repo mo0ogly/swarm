@@ -1,0 +1,14 @@
+{
+  "preview": "/tmp/swarm-T2-complement9-runtime-preview-20261011-graijm4m",
+  "primary1172_digest": "981af32b469a52a5efbe392a3bbb50dbd23b30519faf237857bb31774c16d6ac",
+  "different_primary_inputs": [
+    "internal/engine/planning.go",
+    "internal/engine/planning_api.go",
+    "internal/engine/planning_context.go"
+  ],
+  "additional_go": [
+    "internal/engine/planning_judge_test.go",
+    "internal/engine/planning_judge.go"
+  ],
+  "limit": "Isolated merged code and snapshots only, not native acceptance or installed runtime"
+}

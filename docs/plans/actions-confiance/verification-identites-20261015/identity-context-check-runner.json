@@ -1,0 +1,10 @@
+{
+  "pid": 1066920,
+  "proc_start_ticks": "2626467",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-identity-context-checks.py",
+    "run"
+  ],
+  "at": "2026-10-15T19:17:20.529677+00:00"
+}

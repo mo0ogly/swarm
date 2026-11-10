@@ -1,0 +1,125 @@
+diff --git a/AGENTS.md b/AGENTS.md
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -3,6 +3,9 @@
+ Read `tools/agent-workflows/CONTRACT.md` before planning or changing this repository.
+ It defines the scope, role boundaries, evidence and recovery rules shared by Codex,
+ Claude and Swarm preparation. User instructions and runtime permissions take precedence.
++
++Continue the authorized objective after status requests and intermediate milestones;
++apply the continuity and closure rules in section 3 of the shared contract.
+ 
+ ## Methods
+ 
+diff --git a/.claude/skills/replan/SKILL.md b/.claude/skills/replan/SKILL.md
+--- a/.claude/skills/replan/SKILL.md
++++ b/.claude/skills/replan/SKILL.md
+@@ -5,13 +5,9 @@
+ 
+ # Replan without hiding the failure
+ 
+-Read `tools/agent-workflows/CONTRACT.md`. Load the canonical plan, public runtime
+-state, last attempt and relevant evidence. In preparation, propose a revision only;
+-do not invoke recovery operations or claim live state not supplied in the context.
+-This method is required on resume, failure, blockage, insufficient evidence or
+-changed assumptions. Unless the user explicitly asks to stop or defer, do not
+-end at a log entry: pursue authorized diagnosis/correction and verify the effect,
+-or identify the concrete external dependency and continue independent work.
++Read `tools/agent-workflows/CONTRACT.md`; apply its required recursive diagnosis,
++continuity and closure rules. Load canonical plan, public state, last attempt and
++evidence. In preparation, only propose from supplied context; no recovery operations.
+ 
+ 1. State expected versus observed behavior and identify the first failed precondition.
+    Classify the cause: code, environment, unavailable provider, quota, workspace,
+@@ -32,12 +28,10 @@
+    do not supply the original; do not edit an unchanged source just to create a diff.
+ 6. Continue independent authorized work. If the blocked path requires a new decision
+    or authorization, give one precise question and explain why it changes the outcome.
+-7. Reassess the original requirement after the correction. If the diagnostic,
+-   supplied context, control or public recovery fails, diagnose that failure with
+-   the same bounded loop and link it to its parent problem. Check your own method
+-   and the engine as possible causes. Verify the recipient's supplied context,
+-   then the recorded decision and actual state. A repeated unchanged failure
+-   requires a different discriminating check or escalation, not another retry.
++7. Reassess the original requirement. Diagnose failed diagnosis/context/control/
++   recovery recursively, linked to its parent; consider your method and the engine.
++   Verify received context, recorded decision and public effect. An unchanged failure
++   needs a different discriminating check or escalation, not another retry.
+ 
+ Deliver cause/evidence, options/decision, old-to-new task mapping, affected acceptance
+ checks, next allowed action and who owns it. Distinguish proposed revision from one
+diff --git a/tools/agent-workflows/CONTRACT.md b/tools/agent-workflows/CONTRACT.md
+--- a/tools/agent-workflows/CONTRACT.md
++++ b/tools/agent-workflows/CONTRACT.md
+@@ -56,6 +56,13 @@
+ Apply the same loop to failures of diagnosis, transmission, verification, one's
+ own method and the engine; link each to its parent problem and return to the need.
+ 
++Status/milestones do not close the objective: answer then continue without another
++prompt. Within role/tools, follow delegated work/review and act on its result;
++do not end with only "running" or promise unarranged follow-up. Close on verified
++completion, explicit stop/defer, or no useful authorized action with cause,
++evidence, owner and resumption condition. Questions steer ongoing work. No extra
++calls, delegation or recurring monitoring are authorized.
++
+ Record cause/hypothesis, owner, originals, changed precondition, public operation
+ and resulting state in the existing report. Each resumption needs new evidence
+ or a changed precondition; wording/docs alone prove no progress. Compare options
+@@ -69,15 +76,13 @@
+ calls, tasks or delegation. Route cross-scope decisions to the root and request
+ only truly missing authority, with a concrete diagnosis.
+ 
+-For review `unknown`, distinguish defective code from missing context. Use
+-`review_evidence_inventory`: it attests candidate-bound sources supplied, not
+-understanding. Name the missing original, its declaration and the check that will
+-resolve it. A producer quotation is not that original. Before handing back, check
+-what the recipient actually receives: diagnosis and next action first in bounded
+-projections, attributable originals explicitly declared. Verify routed decision
+-and public effect after action. See AUTORECURSIVE-RECOVERY.md and
+-AGENT-ENGINE-PROTOCOL.md under docs/architecture (EN available); methods and
+-docs prove no autonomous runtime behavior.
++For review `unknown`, separate code defects from absent context using
++`review_evidence_inventory` (candidate sources supplied, not understanding).
++Name missing original, declaration and resolving check; a quote is not the original.
++Check actual received context: diagnosis/action first in bounded projections,
++attributed originals declared; then routed decision and public effect.
++See docs/architecture/AUTORECURSIVE-RECOVERY.md and AGENT-ENGINE-PROTOCOL.md
++(EN available). Methods/docs prove no autonomous runtime behavior.
+ 
+ ## 4. Delivery, evidence and verification
+ 
+diff --git a/docs/architecture/AUTORECURSIVE-RECOVERY.md b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+--- a/docs/architecture/AUTORECURSIVE-RECOVERY.md
++++ b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+@@ -112,6 +112,14 @@
+ 
+ ## Arrêts et escalades justifiés
+ 
++Une demande de statut ou un jalon terminé ne clôt pas le besoin initial : répondre
++puis poursuivre l’action utile autorisée, sans attendre une relance. Pendant une
++exécution ou une revue native, observer son état public, traiter les travaux
++indépendants et exploiter son résultat. Clore sur le besoin vérifié, un arrêt ou
++report explicite, ou l’absence d’action utile autorisée en indiquant cause, preuve,
++propriétaire et condition concrète de reprise. Ne pas promettre un suivi futur
++non organisé. Ces consignes ne créent ni appels payants ni surveillance récurrente.
++
+ ```mermaid
+ flowchart TD
+     A[Prochaine action proposee] --> D{Droits et parcours public disponibles ?}
+diff --git a/docs/en/AUTORECURSIVE-RECOVERY.md b/docs/en/AUTORECURSIVE-RECOVERY.md
+--- a/docs/en/AUTORECURSIVE-RECOVERY.md
++++ b/docs/en/AUTORECURSIVE-RECOVERY.md
+@@ -99,6 +99,13 @@
+ 
+ ## Stopping and escalation
+ 
++A status request or completed milestone does not close the objective: answer and
++continue useful authorized work without another prompt. During native execution
++or review, observe public state, do independent work and act on the result. Close
++on verified completion, explicit stop/defer, or no useful authorized action with
++cause, evidence, owner and a concrete resumption condition. Do not promise future
++follow-up that has not been arranged. This grants no paid calls or recurring monitoring.
++
+ ```mermaid
+ flowchart TD
+     A[Proposed next action] --> D{Rights and public operation available?}

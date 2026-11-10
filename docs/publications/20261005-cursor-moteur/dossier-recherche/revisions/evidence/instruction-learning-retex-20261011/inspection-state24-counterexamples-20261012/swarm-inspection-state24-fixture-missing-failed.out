@@ -1,0 +1,9 @@
+=== RUN   TestFragmentFindingContractNativeInspectedNeeds
+    managed_review_fragment_finding_contract_test.go:53: open testdata/fragment-inspected-needs-native-packet.json: no such file or directory
+--- FAIL: TestFragmentFindingContractNativeInspectedNeeds (0.00s)
+=== RUN   TestFragmentFindingContractSchemaOracle
+    managed_review_fragment_finding_contract_test.go:95: open testdata/fragment-inspected-needs-native-packet.json: no such file or directory
+--- FAIL: TestFragmentFindingContractSchemaOracle (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.018s
+FAIL

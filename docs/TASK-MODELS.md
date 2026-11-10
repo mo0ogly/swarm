@@ -51,6 +51,19 @@ vérificateur : ces rôles ont un contrat distinct. Leurs modèles se règlent d
 Les propositions automatiques du planificateur ne sont pas livrées. Le choix d’un modèle exact ou de son effort se règle dans
 **IA et connexions → Configurer les niveaux** ; la tâche choisit ensuite un niveau.
 
+Pour Sonnet et Opus, l’Admin permet de choisir explicitement l’effort Claude
+`low`, `medium`, `high`, `xhigh` ou `max`. Le choix reste une politique enregistrée,
+prévisualisée et versionnée ; le moteur ne remplace pas automatiquement un effort
+vide. **Réglage hérité de Claude Code** signifie que le client résout son propre
+réglage, éventuellement personnel, et non qu’un effort précis a été observé.
+Un choix explicite est transmis avec `--effort` aux prochains appels. La CLI peut
+l’abaisser selon le modèle effectivement résolu ou une limite administrée ; la
+route conservée indique l’effort demandé, pas une attestation de l’effort appliqué.
+Voir la [documentation Claude](https://code.claude.com/docs/en/model-config#adjust-effort-level).
+L’ancien alias Haiku et les modèles personnalisés sans capacités vérifiées
+conservent un effort vide. Un changement d’effort ne rembourse pas les appels
+et ne permet pas de réutiliser des avis produits sous une autre configuration.
+
 
 ## Planificateur, sous-planificateurs et vérificateur
 
@@ -89,3 +102,24 @@ par lots non terminée interdit le changement. Aucun rôle ni vérificateur abse
 n’est créé par cette action. Quotas, consommations, résultats acceptés, traces
 et avis précédents sont conservés ; une nouvelle sélection ne constitue pas
 une reprise ni une validation.
+
+## Profils réutilisables dans le candidat Rust — lot188
+
+L’admission conserve le niveau demandé dans le profil de la tâche et, pour un
+départ manuel, dans le profil réutilisable de la mission. Si la tâche possède une
+sélection de modèle explicite, le moteur lie d’abord cette sélection à la demande
+puis conserve son niveau. Un niveau absent reste absent : il signifie hériter de
+la politique fournisseur au prochain lancement, pas figer son défaut actuel.
+L’aperçu ne sauvegarde rien ; le rejeu identique ne réécrit ni profil ni réservation.
+Le niveau retenu n’authentifie pas le modèle réellement exécuté. Les anciens profils
+qui ont déjà perdu ce niveau ne sont pas reconstruits par supposition : choisir et
+enregistrer explicitement le niveau voulu pour les prochains départs.
+
+Lot188 vérifié localement sur un candidat figé, non installé. La recette permanente launch-profile-level couvre héritage,
+niveau explicite et modèle propre à la tâche via la CLI, sans lancer de fournisseur.
+Le lot ne porte pas encore le sélecteur complet ni la priorité task.launch_profile
+dans la factory automatique ; cette dernière exige un contrat de preuve versionné.
+
+Contrôle des ressources embarquées : embedded-settings-locale utilise SWARM_EMBEDDED_LOCALE_BINARY et SWARM_EMBEDDED_LOCALE_PROFILE (result.json du profil qualifié). Après un témoin API protégé valide, la recette lit le vrai script anglais servi, compare son empreinte à after.json et exige les traductions du label et de l’aide du réglage de coût. Un fichier workspace à jour ne suffit pas. L’ancien candidat188/normal03 échoue sur ce contrôle, preuve conservée ; aucune installation n’est revendiquée.
+
+Limite native actuelle : swarm-rust task-model show renvoie le Work seul ; le champ available_models décrit plus haut n’y est pas encore porté. La recette native obtient une empreinte de politique depuis une vraie prévisualisation agent valide. La découverte complète des options CLI reste ouverte dans le plan de migration.

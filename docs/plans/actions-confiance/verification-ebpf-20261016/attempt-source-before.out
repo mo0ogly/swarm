@@ -1,0 +1,6 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/kernel_attempt_source_linux_test.go:34:14: s.kernelAttemptObservationSource undefined (type *Store has no field or method kernelAttemptObservationSource)
+internal/engine/kernel_attempt_source_linux_test.go:55:19: s.kernelAttemptObservationSource undefined (type *Store has no field or method kernelAttemptObservationSource)
+internal/engine/kernel_attempt_source_linux_test.go:63:20: s.kernelAttemptObservationSource undefined (type *Store has no field or method kernelAttemptObservationSource)
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

@@ -1,0 +1,187 @@
+{
+  "status": "REVIEWED",
+  "files": {
+    "docs/architecture/BELL-LAPADULA.md": "bb787ed0618b43186e5499f5a58bf92659efb0371d1d0e29a2df3e5c3d31f1bb",
+    "docs/en/BELL-LAPADULA.md": "52498e0ee3ed255a4228bc7abf38108a541a41736ae975a955f20d1634ae2271",
+    "docs/architecture/BIBA-RUST.md": "60d6fa6330bc3091f3715bcf4df3e9a392798a7e86a8bfd6909b76b0cb0b6e12",
+    "docs/en/BIBA-RUST.md": "a1dee90503f7218b0cc464891501186b980caaceb78059e055db0cd01667ed73",
+    "docs/architecture/BLP-FLOWS.md": "8f337335e612a80ae5d10afcba421c2e948ad9879d115693e8a619c5591c95f2",
+    "docs/en/BLP-FLOWS.md": "f807afe31afb775510d95d911d6d9237d0742ceec19ff723e9e5c67f9ee6b7a4",
+    "docs/plans/actions-confiance/BLP-APEX.md": "b0b49d4c28eae861e7b886a2fc38cd0b57bb2801897ad61ae61b2700a460f5e4",
+    "docs/en/plans/actions-confiance/BLP-APEX.md": "f57cfe13bc29898e0bdd8b8b0c6057508685100cc9c511cd39e0191e88a0e286",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "4a16fd949c1cd63aa880420f7f7df83097bc787af6f4c35da8481b76b8537f22",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "6f9e6d5cb9d3a1a81e38c70c9731673f9b5cc330894b4e102599ba52cfcd5a7a"
+  },
+  "overview_links_verified": [
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../en/BELL-LAPADULA.md"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "BIBA-RUST.md#diagnostic-des-sources-de-préparation"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "BIBA-RUST.md#quarantaine-explicite-des-envois-de-préparation"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-installed-01/delivery-scope.json"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/result.json"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/result.json"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-http-status-01/result.json"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-check-installed-01/delivery-scope.json"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-flow-inventory-01/result.json"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/BLP-APEX.md"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "BLP-FLOWS.md"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../SECURITY-POSITIONING.md"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../../rust/crates/swarm-confidentiality/src/lib.rs"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../../rust/crates/swarm-engine/src/trust/confidentiality.rs"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../../rust/crates/swarm-engine/src/root_store/preparation_call.rs"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../../rust/crates/swarm-engine/src/root_store/reader_guard.rs"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../../web/trust-confidentiality.js"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-locks-03/result.json"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-02/result.json"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "BIBA-RUST.md#attribution-depuis-une-source-de-préparation-capturée"
+    },
+    {
+      "source": "docs/architecture/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/BLP-APEX.md#livraison-du-producteur-de-sources-capturées--1er-novembre-2026"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../architecture/BELL-LAPADULA.md"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "BIBA-RUST.md#preparation-source-diagnostic"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "BIBA-RUST.md#explicit-preparation-send-quarantine"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-installed-01/delivery-scope.json"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/result.json"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-check-engine-02/result.json"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-http-status-01/result.json"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-check-installed-01/delivery-scope.json"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-flow-inventory-01/result.json"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "plans/actions-confiance/BLP-APEX.md"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "BLP-FLOWS.md"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "SECURITY-POSITIONING.md"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../../rust/crates/swarm-confidentiality/src/lib.rs"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../../rust/crates/swarm-engine/src/trust/confidentiality.rs"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../../rust/crates/swarm-engine/src/root_store/preparation_call.rs"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../../rust/crates/swarm-engine/src/root_store/reader_guard.rs"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../../web/trust-confidentiality.js"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-locks-03/result.json"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "../plans/actions-confiance/verification-blp/20261101-preparation-quarantine-public-02/result.json"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "BIBA-RUST.md#attribution-from-a-captured-preparation-source"
+    },
+    {
+      "source": "docs/en/BELL-LAPADULA.md",
+      "target": "plans/actions-confiance/BLP-APEX.md#captured-source-producer-delivery--1-november-2026"
+    }
+  ],
+  "scope": "FR/EN current delivered304 contract, exact evidence counts and open criteria; no global acceptance or embedded-context update claim",
+  "final_conflict_review": "Historical299 and delivered304 retained in both PAEA plans; no acceptance inferred"
+}

@@ -1,0 +1,8 @@
+--- FAIL: TestAgentWorkflowRolesAreBounded (0.00s)
+    --- FAIL: TestAgentWorkflowRolesAreBounded/planner (0.00s)
+        agent_workflow_test.go:32: cadrage des méthodes supérieur à 32000 octets : 32056 octets mesurés ; aucun envoi tronqué
+    --- FAIL: TestAgentWorkflowRolesAreBounded/subplanner (0.00s)
+        agent_workflow_test.go:32: cadrage des méthodes supérieur à 32000 octets : 32059 octets mesurés ; aucun envoi tronqué
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.043s
+FAIL

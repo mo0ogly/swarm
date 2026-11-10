@@ -1,0 +1,25 @@
+{
+  "kind": "same-session self-review",
+  "independent": false,
+  "at": "2026-10-16T02:57:00.232216+00:00",
+  "scope": "fixed native backend only; no public activation",
+  "checked": [
+    "per-thread perf, no inherit, PID/TID filter before maps",
+    "gate inactive until source/pidfd revalidation",
+    "no syscall arguments or payload read",
+    "nil/partial resource failure and reverse close errors",
+    "strict sample/loss counters and negative validation cases",
+    "native refusal before attachment; no memlock/capability change"
+  ],
+  "open": [
+    "kernel verifier and real event exclusion/cleanup/overhead not exercised",
+    "separate launcher/Unix integration and public policies/exit3 absent",
+    "other threads, descendants and real providers outside this scope"
+  ],
+  "sources": {
+    "internal/engine/kernel_backend_resources_linux.go": "dc99cdad8ac09e65b47533de90356fa627d2b0923c3006b435beebaaf1e76f18",
+    "internal/engine/kernel_backend_linux_amd64.go": "0a77d0f2555a450c48f131863ab24a1cee6ccd568c993419062c5ea86e21efaf",
+    "internal/engine/kernel_backend_native_linux_amd64.go": "40bb1ba4204cdf4ef78e8fb64c3c15bbf40c184426bf14563cf17a2a88ce9d2c",
+    "internal/engine/kernel_backend_linux_amd64_test.go": "f7be30522e95f519f7873f4e4a8208246a833d52b953c773957ab42f01455d56"
+  }
+}

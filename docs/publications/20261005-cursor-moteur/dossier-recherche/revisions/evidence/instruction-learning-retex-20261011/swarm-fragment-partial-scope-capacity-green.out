@@ -1,0 +1,6 @@
+=== RUN   TestManagedFragmentDecisionCapacityBoundsActual
+--- PASS: TestManagedFragmentDecisionCapacityBoundsActual (0.26s)
+=== RUN   TestManagedFragmentDecisionCapacityCoversSerializedLocalDefects
+--- PASS: TestManagedFragmentDecisionCapacityCoversSerializedLocalDefects (0.25s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.524s

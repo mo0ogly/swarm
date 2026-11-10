@@ -1,0 +1,286 @@
+[
+  {
+    "element": "A",
+    "ratio": 13.048588636844263
+  },
+  {
+    "element": "memory-back",
+    "ratio": 6.530009659611892
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.167924822556492
+  },
+  {
+    "element": "P",
+    "ratio": 10.271546225261547
+  },
+  {
+    "element": "memory-message",
+    "ratio": 6.688935548806072
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.167924822556492
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "memory-query",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "SPAN",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "SUMMARY",
+    "ratio": 7.184321201851732
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 14.356066358942192
+  },
+  {
+    "element": "SPAN",
+    "ratio": 6.688935548806072
+  },
+  {
+    "element": "SPAN",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "SPAN",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "SPAN",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "SUMMARY",
+    "ratio": 7.184321201851732
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 14.356066358942192
+  },
+  {
+    "element": "SPAN",
+    "ratio": 6.688935548806072
+  },
+  {
+    "element": "SPAN",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "SPAN",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "SPAN",
+    "ratio": 6.314109990723454
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "SUMMARY",
+    "ratio": 7.184321201851732
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 14.356066358942192
+  },
+  {
+    "element": "SPAN",
+    "ratio": 6.688935548806072
+  },
+  {
+    "element": "SPAN",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "SPAN",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 5.750614836508003
+  },
+  {
+    "element": "P",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "memory-selection-reason",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "memory-selection-state",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "memory-id",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "memory-source-state",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "memory-body",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "memory-conditions",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "LABEL",
+    "ratio": 7.886155910990276
+  },
+  {
+    "element": "memory-reason",
+    "ratio": 11.300762352368798
+  },
+  {
+    "element": "SUMMARY",
+    "ratio": 6.530009659611892
+  },
+  {
+    "element": "P",
+    "ratio": 10.271546225261547
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-12T18:50:10.468008+00:00",
+  "outputs": [
+    {
+      "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/capacity-reserve-red.out",
+      "sha256": "9aece7e59cfa1ca7cbb43a9022e606e468e17bac23493e3610e78186656d4f17",
+      "bytes": 50,
+      "contains_fail": false,
+      "contains_pass": false
+    },
+    {
+      "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/capacity-reserve-red-constrained.out",
+      "sha256": "7f731d48f3ce3e01a636e30ef361e035a0372d0a82c9ba8e157e519d781c9040",
+      "bytes": 276,
+      "contains_fail": true,
+      "contains_pass": false
+    },
+    {
+      "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/capacity-reserve-green.out",
+      "sha256": "9c11f7006d80ade2021c1e9e057da5625172051b1b9c492dab1b7f8091fba3c7",
+      "bytes": 237,
+      "contains_fail": true,
+      "contains_pass": false
+    },
+    {
+      "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/capacity-reserve-green-repaired.out",
+      "sha256": "d154172e0cb0849f342d41ed369a731b6c7037302a6f20a99a840ada225c3395",
+      "bytes": 1876,
+      "contains_fail": true,
+      "contains_pass": true
+    },
+    {
+      "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/capacity-reserve-diagnostic.out",
+      "sha256": "ba427dd4214cc368346cfc83bf00ac9a89ef5f71a12547e88bce3c12a2d76bc3",
+      "bytes": 666,
+      "contains_fail": true,
+      "contains_pass": true
+    },
+    {
+      "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/capacity-reserve-targeted.out",
+      "sha256": "356329089275a81d92f10ec3aaa25154635aeb12bc228b4024a039f9933938e3",
+      "bytes": 3316,
+      "contains_fail": false,
+      "contains_pass": true
+    },
+    {
+      "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/capacity-first-runtime.out",
+      "sha256": "5bc95904c062d31b7205e42e1d46162bf65cf6749fbafef3067c928f9e8d5e1b",
+      "bytes": 1881,
+      "contains_fail": false,
+      "contains_pass": true
+    }
+  ],
+  "qualification": "targeted20.451s and runtime26.610s pass; earlier failures preserved",
+  "real_dossier": "281 complete pieces/7packets/9calls;9.44s pass",
+  "limits": "fresh-capacity extra variant validates exact messages and parsed deterministic replies; existing subprocess runtime variants cover protocol4; no real AI semantic verdict yet"
+}

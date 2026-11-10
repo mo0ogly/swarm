@@ -1,0 +1,54 @@
+{
+  "status": "DELIVERED_LOCAL",
+  "version": "v0.1.1-dev.92",
+  "binary_sha256": "4bce925735d788fb76fb80c8501922b1870e851f3ab6add08ecae3742ec18645",
+  "effective_input_count": 446,
+  "settings_document_schema": 43,
+  "live_settings_preserved_schema": 41,
+  "live_policy_adoption_pending": true,
+  "checks": {
+    "writes": 50,
+    "method": 37,
+    "adoption": 44,
+    "plan": 98,
+    "integrity": 29,
+    "keys": 8,
+    "previous_sdk": 4,
+    "plan_sdk": 1,
+    "catalog": 2,
+    "previous_reads": 58,
+    "admin_per_journey": 54,
+    "upgrade42_to43": 9,
+    "upgrade41_to43": 6,
+    "installed_http": 13,
+    "installed_version_ui": 14
+  },
+  "missions": {
+    "portal": {
+      "revision": 50,
+      "paused": true,
+      "autonomy": "autonome",
+      "slots": 2,
+      "consent_enabled": true,
+      "archived": false
+    },
+    "trust": {
+      "revision": 469,
+      "paused": true,
+      "autonomy": "autonome",
+      "slots": 2,
+      "consent_enabled": true,
+      "archived": false
+    }
+  },
+  "glm_usable_responses": 2,
+  "glm_reported_total_tokens": 86894,
+  "provider_business_calls": 0,
+  "global_migration_complete": false,
+  "independent_runtime_acceptance": false,
+  "recipes": [
+    "preparation-writes-rust",
+    "preparation-plan-upgrade-rust",
+    "preparation-upgrade-rust"
+  ]
+}

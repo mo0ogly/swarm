@@ -1,0 +1,19 @@
+{
+  "status": "MERGED_BOTH_DOCUMENTATION_BLOCKS",
+  "cause": "concurrent stash restore",
+  "files": {
+    "docs/plans/actions-confiance/PAEA-APEX.md": {
+      "original_sha256": "6715d0d0107202e4b823c75d12c1fa1766e8ed4ad61ab89eca0970b37c324eb6",
+      "merged_sha256": "4a16fd949c1cd63aa880420f7f7df83097bc787af6f4c35da8481b76b8537f22",
+      "preserved": "entire historical299 and new304 blocks, existing surrounding text"
+    },
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": {
+      "original_sha256": "3ed7fd124d13fec0e7ec09db8439800ca6ebbd01cc368e288800524b326b2791",
+      "merged_sha256": "6f9e6d5cb9d3a1a81e38c70c9731673f9b5cc330894b4e102599ba52cfcd5a7a",
+      "preserved": "entire historical299 and new304 blocks, existing surrounding text"
+    }
+  },
+  "runtime_code_changed": false,
+  "commit_created": false,
+  "original_storage": "gzip; decompression reproduces original_sha256 byte for byte"
+}

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "pause-normal",
+  "expected_revision": 21,
+  "reason": "Preserve immutable-result fixture and original failures"
+}

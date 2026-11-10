@@ -1,0 +1,364 @@
+{
+  "at_utc": "2026-10-16T14:27:38.325803+00:00",
+  "git_head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "source_sha256": {
+    "internal/engine/dialogue_recovery.go": "0557c1135c8dfc2fd41e4163eb36fff106d0fca2ed95c44c34f1daa3449d1652",
+    "internal/engine/dialogue_recovery_test.go": "8b0f881f28f88782bf3463ae2e1f09c707c60809cb0f7ec263b919dc0139b2f7",
+    "internal/engine/dialogue_checkpoint_store.go": "7880c508d784fde7e33ac8f960414e1f61cb319ad37795a2b90a29174160b2c1",
+    "internal/engine/mission_insights.go": "31a24ad2b66ea09163f1bcb69a962922ce6997bb773ed04bf2e63804ac086efe",
+    "web/mission-insights.js": "c4d1953651d756c2570cae1834cc21a16385e76ce65a00a9e1507f115159c130",
+    "locales/en.json": "1fcd348bca1ff55626d75998fe496656db63ce669612bb76182cbdd39fcc123a",
+    "web/i18n-en.js": "698a65cf7c531ad625f3a5a913da3b055d1a0abd4c6ca27e6ab0369e84f8b777",
+    "tests/recovery_evidence_test.cjs": "214bf9712f1d8f5561166eb3370bef2525cb662ba3fad42b42fcfc904b34c49d",
+    "tests/dialogue_recovery_ui.cjs": "8fc94bd7f86e478eea30e411e820f0c8b512cced7f07d68de553014dc7ae162a",
+    "docs/PROJECT-MEMORY.md": "06dbd3ca5c73f904efb2e54d5f81c22a3a3d97fac985ef992f62d7e5abfc4cc9",
+    "docs/en/PROJECT-MEMORY.md": "49006c0f0e60367ba293e5e54d52082f66d2c487768350a5d120f8d723cfb784",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-08.md": "47934d016fcbbf4626881a4f375f488a203de7ef89b601098e3df57ba43ccf49",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-08.md": "020ffc2989b6ba18098dac801e8ec768a632a4b4eac7a9f401c680d272015935",
+    "docs/plans/deepagents-integration/PLAN.md": "f437e2f1dae2bf9e48990744a71db2e97e89cb54dbc7b73583aa98939245d7c7",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "fb62e996d9a922f384ff6548c21ec5003eaa1e28d205f218b27e6ee595d0f56e"
+  },
+  "compilation_input_count": 1009,
+  "changed_final_inputs": [],
+  "race_resource_delta": [
+    "locales/en.json",
+    "web/i18n-en.js",
+    "web/mission-insights.js"
+  ],
+  "race_go_sources_unchanged": true,
+  "checks": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "gofmt",
+        "-l",
+        "internal/engine/dialogue_recovery.go",
+        "internal/engine/dialogue_recovery_test.go",
+        "internal/engine/dialogue_checkpoint_store.go",
+        "internal/engine/mission_insights.go"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "node",
+        "tests/recovery_evidence_test.cjs"
+      ],
+      "exit_code": 0,
+      "output": "PASS FR/EN recovery delta, changed/unknown inputs and remaining criteria without approval\n"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "test:i18n"
+      ],
+      "exit_code": 0,
+      "output": "\n> test:i18n\n> node tests/i18n_test.cjs\n\nPASS i18n locale, fallback, interpolation, engine formats and catalogue parity\nPASS i18n build check accepts current output and refuses stale output without mutation\n"
+    },
+    {
+      "argv": [
+        "node",
+        "--check",
+        "tests/dialogue_recovery_ui.cjs"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "./internal/engine"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_recovery.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_recovery_test.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_checkpoint_store.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "tests/dialogue_recovery_ui.cjs"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/PROJECT-MEMORY.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/en/PROJECT-MEMORY.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-08.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-08.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/PLAN.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/cas-evaluation.json"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    }
+  ],
+  "local_links_checked": 5,
+  "missing_links": [],
+  "receipts": {
+    "recovery-final-ui": {
+      "receipt_sha256": "296b6e2acdf1bde653876d1f1f59f574adb776d062bed439362f930d47dfb1a9",
+      "log_sha256": "654f1838e80890903428f1b25d2b539c445ca1e3d05e89874c4a493248790fa3",
+      "named_tests": [
+        "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+        "TestDialogueCheckpointRejectsInvalidOrForeignState",
+        "TestDialogueCheckpointProgressUsesStoredBoundaryTime",
+        "TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority",
+        "TestDialogueRecoveryCLIAPIReadOnlyAndScoped",
+        "TestDialogueRecoveryQualifiesIncompleteAndChangedContracts",
+        "TestDialogueRecoverySelectionIgnoresRecentHistoryWindow",
+        "TestRecoveryPreviewScopesAttemptAndPreservesState",
+        "TestRecoveryEvidenceChangedUnknownAndUnchanged",
+        "TestRecoveryPreviewRefusalDoesNotUseVisitOrOtherTasks",
+        "TestRecoveryEvidenceBoundedAndInvalidInputUnknown"
+      ],
+      "subtests": 17
+    },
+    "recovery-race": {
+      "receipt_sha256": "1c08d770ace4123fc40d3fed7ecbfac0fa1603ace4c4dc5d9dd9040c0ed470b9",
+      "log_sha256": "4bc2e0f8ee77ddefd7e17c789b47eed25bd963f089f8c5859efd1235073648f8",
+      "named_tests": [
+        "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+        "TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority",
+        "TestDialogueRecoveryCLIAPIReadOnlyAndScoped",
+        "TestDialogueRecoveryQualifiesIncompleteAndChangedContracts",
+        "TestDialogueRecoverySelectionIgnoresRecentHistoryWindow"
+      ],
+      "subtests": 8
+    },
+    "browser-flow": {
+      "receipt_sha256": "fe353650d65b2bccb6780724f30a3d41ce87fdb16cdab6f6c83ab6697557d07d",
+      "log_sha256": "b8df55086912d07b407e778a31b9c0621fa9e51f37824a245bf19f839f42e029",
+      "named_tests": [],
+      "subtests": 0
+    },
+    "build-final": {
+      "receipt_sha256": "4f9c6841b7fdc2f3c9b90c8124abccd21c71a5a8ade95fc23a218d4d5224aaa0",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "named_tests": [],
+      "subtests": 0
+    },
+    "engine-vet": {
+      "receipt_sha256": "233062f15803625fa380561a7aa40dbe58531551363abcbf28ec0b7fd7bae0d6",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "named_tests": [],
+      "subtests": 0
+    }
+  },
+  "distinct_named_tests": [
+    "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+    "TestDialogueCheckpointProgressUsesStoredBoundaryTime",
+    "TestDialogueCheckpointRejectsInvalidOrForeignState",
+    "TestDialogueRecoveryCLIAPIReadOnlyAndScoped",
+    "TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority",
+    "TestDialogueRecoveryQualifiesIncompleteAndChangedContracts",
+    "TestDialogueRecoverySelectionIgnoresRecentHistoryWindow",
+    "TestRecoveryEvidenceBoundedAndInvalidInputUnknown",
+    "TestRecoveryEvidenceChangedUnknownAndUnchanged",
+    "TestRecoveryPreviewRefusalDoesNotUseVisitOrOtherTasks",
+    "TestRecoveryPreviewScopesAttemptAndPreservesState"
+  ],
+  "original_red_source_bound": true,
+  "first_suite_source_recovered_by_original_digest": true,
+  "second_browser_source_recovered_by_original_digest": true,
+  "evidence_sha256": {
+    "baseline.json": "78547211d8f64322a60b8a3549fa10ac649ab7ea589be4e19da4f621873cbeec",
+    "browser/dialogue-fr-etat-mobile.png": "7f9f1a8290ffe42143fc578910ea3bd30791bab634c7f3faada1d98d99edeed1",
+    "browser/dialogue-fr-etat.png": "49d5d9a0d6fbd2bb9477837d077d7ed56a66ca7482828491f7d665a8eb27f1ff",
+    "browser/failure.json": "0adb233e91a0c768efd563b90e3dd6e194a5b2fe603155c1da16a151a782ae17",
+    "browser/failure.png": "2bec690e95fc69cb6d1259ec73bb06ce15f4c37fad3f92aebf8ea921f3c8a09a",
+    "browser-final/failure.json": "054c4e106d76fbd3d37cdccaf88238127b788004a89cbfd8b96ffbe4ad68d2ab",
+    "browser-final/failure.png": "4cc6728b10182462fc993649df4283d5c1eadc5abe2355eb227fad12b6f07582",
+    "browser-final.json": "0f0e054be90ff5034223ff67fef325c26192e5e5f8396ce5f601a6b9765a0a45",
+    "browser-final.log": "04cac997532bffdddb73d439fe7862def11c1a2e31f6617eecf570c4778f923f",
+    "browser-flow/dialogue-en-etat-mobile.png": "b161bb9e0ebc9f4a8b6ed4eafabe10d92f7e4be8dce2f96afce1b29c787ec2e1",
+    "browser-flow/dialogue-en-etat.png": "7815864e6e650fd95f7615f6adcb5bb5e5fd8d07666ae0215ba0f302f86c1bea",
+    "browser-flow/dialogue-en-sombre-mobile.png": "6868df3836b52532bb07b2f1193a7ad1979df76d6c9025c145292a2da702b9a0",
+    "browser-flow/dialogue-en-sombre.png": "c3a6c73ae45790f5c8a4c80350274880f5fa797c4334a6d337f9cd59a614f460",
+    "browser-flow/dialogue-fr-etat-mobile.png": "372ab38ce4ec8326efdf9aea4cc93676a86c87809747f7c1b9421e4ddf42b979",
+    "browser-flow/dialogue-fr-etat.png": "822213fe5013496bca326a72a851e7840f4b6a5ba59a1ebfb4211829bb463774",
+    "browser-flow/dialogue-fr-sombre-mobile.png": "c2fb3dc69f05705b6abd0f5f78793a557e11fc56226d37596fafc96f606b5187",
+    "browser-flow/dialogue-fr-sombre.png": "8495bd19c973b01ceb377d7a333ff97e3c91dcef62576bcf6146fd58c276f7ed",
+    "browser-flow/result.json": "24f8596139adb4277733affb5ceb3f1f90f4864657640a7f647ec249da1d984f",
+    "browser-flow.json": "fe353650d65b2bccb6780724f30a3d41ce87fdb16cdab6f6c83ab6697557d07d",
+    "browser-flow.log": "b8df55086912d07b407e778a31b9c0621fa9e51f37824a245bf19f839f42e029",
+    "browser-syntax.json": "e95cc040efc3cdfacf8daaae2d656df80b149e549aee23edc0eac8f8454a1e15",
+    "browser-syntax.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "browser.json": "3c5c3dbb7a18cec0ceed6881a2ec62d05072a293e7bb75236b2b4ef14ba35f5f",
+    "browser.log": "8e2b761160e66722fe557716543173ce7c6ccdf313c512ba73c10ae546f49c05",
+    "build-final.json": "4f9c6841b7fdc2f3c9b90c8124abccd21c71a5a8ade95fc23a218d4d5224aaa0",
+    "build-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.json": "abddecd0f072e7397e3e47de1bf7c5c11d95022fb597fd09096ac73d892d9436",
+    "build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "built-binary-final.json": "cc7c3f13cd24f7b2845d0ccb89c9fddf068231b9b184a412ed0cf3dd72d74e5a",
+    "built-binary.json": "8ee3583c64c0c58e17f44717b77d0bd0b8343bd4b478d26d9460b635379cea44",
+    "candidate-inputs-before-browser-final.json": "703075fb128d8c918876194ffcc5298acee3f10dbcf82715cd5bca52fcec77c8",
+    "candidate-inputs-before-final.json": "0cc6b6923c3e3017a2328ca85bd1b03c8b2ffe01b739098d7e93d20a658b1770",
+    "candidate-inputs-before-green.json": "7d9f1fc3096e4370af0fc6b0c5986fc0ab46f826ba86a8624da21b4626fcc089",
+    "engine-vet.json": "233062f15803625fa380561a7aa40dbe58531551363abcbf28ec0b7fd7bae0d6",
+    "engine-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "i18n.json": "77a76bfd7c819af8e78d7f458eb9fb784b87ef8912aef645a472885e2e292d99",
+    "i18n.log": "23d0852b273fc311a94c30acddc4f7e897ac4e8f2782cabdb417754737419987",
+    "m12-changes.patch": "4720a4a012c53589efa6d2fa95192e18795b945db9b3e6456ca506ec59d99eff",
+    "method-observations.json": "811d96ea0dec7eb3f56c001cf53ccbcc929079cd3f8a967a58a516c6e8920569",
+    "preimages/dialogue_recovery_first_suite_test.go.txt": "a6e9b82319fdcecae572a6e25c41f90216226a9b27bec4da04d8a8f33492ab7a",
+    "preimages/dialogue_recovery_red_test.go.txt": "726be522f23f5fb0409251db0940239c63ae0593a1effc0380b2fe6238389819",
+    "preimages/dialogue_recovery_second_browser.cjs.txt": "6f20edff6c42d20b3657d95fb546aaec7c32eb85b33a82d52ae004b28d33aa2b",
+    "preimages/docs__PROJECT-MEMORY.md.txt": "de7e0edc7e0cc31f984f182a62564f3d77f1db050a6b0b8c898b73952159652a",
+    "preimages/docs__en__PROJECT-MEMORY.md.txt": "62faff3276f1365638278d50674a69be9bdf3a42952fc098d210e6fdba83f5b8",
+    "preimages/docs__plans__deepagents-integration__PLAN.md.txt": "b1821172918dd5f370613e075fd30d0a2a0520b8d28ff1740bb3aa6aad7ac6bf",
+    "preimages/docs__plans__deepagents-integration__cas-evaluation.json.txt": "3e8044d653f10217a2542c1d3e9e15b14f5cd265b597a3f00c2a117f02b5627d",
+    "preimages/internal__engine__dialogue_checkpoint_store.go.txt": "cb8241a597a1b33cf59449234353207290e99ff42c3e0a42e2c345c2a23da35d",
+    "preimages/internal__engine__mission_insights.go.txt": "1e98afcf0fc899e719165eae0b480d43d3e469ab7fd858d4d85bc96ed1b788d2",
+    "preimages/locales__en.json.txt": "78190a1d2656bc714c9e61a1d7c578640a3baba72f4e6a2f34176d7927aca4a1",
+    "preimages/tests__recovery_evidence_test.cjs.txt": "e0533384f58427e567976ece438cce9328b9fb99c5ca8e91908930fb6596290d",
+    "preimages/web__i18n-en.js.txt": "6470d7766ea3f86ed7106d681f4620512eb6c8655e01a7ab0b283518500d78fa",
+    "preimages/web__mission-insights.js.txt": "d291a341b41a7292efab5b93457282bf8ee282f07fc978f39c99ae5ea7cf306f",
+    "public-read-final/preview.json": "8e690f9ede1c1e747445f1db1c38975a8966e9770843e129b3ea82952e430361",
+    "recovery-final-ui.json": "296b6e2acdf1bde653876d1f1f59f574adb776d062bed439362f930d47dfb1a9",
+    "recovery-final-ui.log": "654f1838e80890903428f1b25d2b539c445ca1e3d05e89874c4a493248790fa3",
+    "recovery-final.json": "3d740193281e22c3d46b79ddf025ca35efe0778a138d9fcf97a142a8c383ddf0",
+    "recovery-final.log": "5b12cd9d4507d2f1b8252b2624ff03a6e3dee2a6a4ccfa2a4ca6b3d595c3a3ba",
+    "recovery-green.json": "f6f1e1672bee04632438323a530f2c1f3f0206da6b5ebc387a211b9cd2db2eff",
+    "recovery-green.log": "0c0aadc6b942570a73e903c94480bec1642be4f21980a531bd71afc84a174dba",
+    "recovery-race.json": "1c08d770ace4123fc40d3fed7ecbfac0fa1603ace4c4dc5d9dd9040c0ed470b9",
+    "recovery-race.log": "4bc2e0f8ee77ddefd7e17c789b47eed25bd963f089f8c5859efd1235073648f8",
+    "recovery-red.json": "9add096af3bfefc97b56d2934abb6be2590e48c24b861f9f0925e9a82c7d8757",
+    "recovery-red.log": "56e793ff8b22ad13e4b0711ac54846b0577e3fb79acd2747eee4506024c1f298",
+    "unchanged-live-runtime.json": "b049154a4c37b2959bc4d9de16a5d2f9574f6d189948f36dd814e89ea56c033a",
+    "web-unit.json": "89497cb37e9a51874b5e1933eea4c06035b8b483a59ed712f1bcd127e01e181b",
+    "web-unit.log": "14c09f4b7fe1f40d52d235789d9487e62fe11d29655e6bb39e4f9e486f07109f"
+  },
+  "runtime": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "review": "Local implementation-context review, not independent acceptance",
+  "real_model_calls": 0,
+  "deployed": false,
+  "provider_restart": "NOT IMPLEMENTED / NOT TESTED"
+}

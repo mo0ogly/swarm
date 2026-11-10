@@ -1,0 +1,5 @@
+=== RUN   TestKernelObservePublicOwnedSource
+    kernel_observe_public_linux_test.go:96: actual remote CLI and HTTP: code3, registry-derived owned source, no synthetic events, unchanged state
+--- PASS: TestKernelObservePublicOwnedSource (2.06s)
+PASS
+ok  	swarm.local/companion/internal/engine	4.055s

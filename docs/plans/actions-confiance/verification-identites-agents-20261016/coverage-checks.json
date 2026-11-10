@@ -1,0 +1,26 @@
+{
+  "result": "PASS",
+  "scope": "Document coverage only; no new runtime validation",
+  "at_unix": 1792183926.593075,
+  "scenario_counts": {
+    "FAIL": 4,
+    "PARTIAL": 4,
+    "NOT TESTED": 10
+  },
+  "scenarios": 18,
+  "spec_findings": 6,
+  "git_diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "source_sha256": {
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md": "c60d32e3e2a6df5833c436d661ed4a72cb7cdf78a03de11a3262cafaa7738fbf",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/COUVERTURE-RISQUES.md": "8b4df462eecc27956a88b2db0eba53499f190cf5484409d934626dabda49bdab",
+    "docs/plans/actions-confiance/identites-agents-replan.md": "909d6771eb808235d2c7c48cae0d5aa28c88f61822a94e72110669703153f7bf",
+    "docs/plans/actions-confiance/identites-r13-coverage.md": "dc59f94094f114f58452eeccaacd8aed3c478e707d72fbd9c0bb509e0d012397",
+    "docs/plans/actions-confiance/identites-entreprise.md": "2f3535ffc07ea3eecb11ee5fae2ef5dccb82b6cd47a5e1a3bc24649bd088c48a",
+    "docs/plans/actions-confiance/group-mapping-replan.md": "b0c5b4103374c6076418cc036fe52ca414ec5e92c5769a8ef23add91295e323f",
+    "docs/plans/actions-confiance/identity-context-replan.md": "0ce87f824d5e376f7ce1899e9515ce4bc9e9f00b026cb2980c09505dd0a05dec"
+  }
+}

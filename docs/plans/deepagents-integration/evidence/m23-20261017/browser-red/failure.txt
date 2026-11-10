@@ -1,0 +1,6 @@
+AssertionError [ERR_ASSERTION]: Each memory card must contain its shared context seal
+
+0 !== 1
+
+    at seals (/home/fpizzi/Documents/ChatGPT/swarm/tests/project_memory_ui.cjs:34:27)
+    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/project_memory_ui.cjs:77:2

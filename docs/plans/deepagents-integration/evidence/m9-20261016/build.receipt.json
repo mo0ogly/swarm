@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "go",
+    "build",
+    "-o",
+    "/tmp/swarm-memory-m9-build-ry_lbhep/swarm",
+    "./cmd/swarm"
+  ],
+  "started_at_utc": "2026-10-16T09:20:58.736915+00:00",
+  "ended_at_utc": "2026-10-16T09:21:08.441271+00:00",
+  "elapsed_seconds": 9.704380408998986,
+  "exit_code": 0,
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

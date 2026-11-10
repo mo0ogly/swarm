@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-admission-ui",
+  "inputs": [
+    "tests/blp_attribution_history_cli.py",
+    "tests/fixture_area.py",
+    "tests/rust_agent_model_route.py",
+    "tools/verification/recipe.py",
+    "tests/blp_preparation_check.py",
+    "tests/rust_native_http_cli.py",
+    "tests/blp_admission_public.py",
+    "tests/blp_admission_ui.py",
+    "tests/paea_local_delivery_test.cjs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "same-production-image-fixture-ui-not-live-authority",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess; subprocess.run(['python3','tests/blp_admission_ui.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',os.environ['SWARM_BLP_PROOF_OUTPUT']],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "BLP_ADMISSION_FIXTURE_UI_PASS 56; LIVE_AUTHORITY_UI_OPEN"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

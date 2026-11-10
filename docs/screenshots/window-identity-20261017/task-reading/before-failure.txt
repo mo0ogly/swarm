@@ -1,0 +1,5 @@
+AssertionError [ERR_ASSERTION]: facts have bold labels
+
+false !== true
+
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/pilot_readability_ui.cjs:33:10

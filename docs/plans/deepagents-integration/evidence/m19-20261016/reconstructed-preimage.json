@@ -1,0 +1,6 @@
+{
+  "path": "preimages/selection-red-reconstructed-test.go.txt",
+  "sha256": "80515d253da8d003806603bb29e433776ea70d60ed4eddcd6cc871cc8ac5b39f",
+  "matches_original_input_manifest": "selection-red-inputs.json",
+  "method": "Reassembled unchanged first test/helper bodies with original imports; exact hash verified against original execution manifest, without changing the original log."
+}

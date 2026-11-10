@@ -1,0 +1,9 @@
+flowchart TD
+  E[Attributed feedback] --> S[Owning supervisor receives frozen event]
+  S --> D[revise-instructions and rationale]
+  D --> C{Engine checks rights and future task}
+  C -->|Refused| R[Diagnose and replan]
+  C -->|Allowed| U[Cyan frame, validated by default]
+  U -->|Reject before reservation| H[Retain rejected addition and restore composition]
+  U -->|Keep| A[Reserve attempt and freeze composed instructions]
+  A --> L[Worker receives additions, rejection locked]

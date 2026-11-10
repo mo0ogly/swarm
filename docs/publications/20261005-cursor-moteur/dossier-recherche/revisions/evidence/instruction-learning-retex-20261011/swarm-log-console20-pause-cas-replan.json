@@ -1,0 +1,6 @@
+{
+  "at": "2026-10-11T18:49:41.576275+00:00",
+  "observed": "API pause returned409 because maintenance helper omitted expected_revision, leaving revision0 instead of current473. Public CAS guard correctly rejected the mutation before replacement.",
+  "correction": "Read current public snapshot revision immediately before authenticated action; include it and preserve any HTTP error body. Same final source/binary qualification unchanged.",
+  "scope": "No server stopped or binary replaced on failed precheck; no native acceptance."
+}

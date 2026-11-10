@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "paea-initial-creation-cli-native",
+  "inputs": [
+    "tests/paea_initial_creation_cli_test.py",
+    "schemas/paea/initial-creation-cli-v1.schema.json",
+    "tests/paea_fixture_binding_check.py",
+    "rust/crates/swarm-enrollment-authority/examples/initial_request_fixture.rs",
+    "tools/verification/recipes/paea-initial-creation-cli-native.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "verify-frozen-controller-request-role-source-and-elf",
+      "command": [
+        "python3",
+        "tests/paea_fixture_binding_check.py",
+        "initial_request"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "FIXTURE_BINDING_PASS role=initial_request"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-default-initial-create-and-pinned-reconciliation",
+      "command": [
+        "python3",
+        "tests/paea_initial_creation_cli_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS fr-en-create-exact-read-recovery-and-help",
+        "PASS source-pin-canonical-uid-metadata-refusal-and-recovery",
+        "PASS private-target-alias-existing-slot-refusal-and-recovery",
+        "PASS existing-and-orphan-intent-never-regenerate",
+        "PASS closed-flags-before-source-or-target-io",
+        "PASS stdout-enospc-keeps-pinned-material-and-reconciles",
+        "INITIAL_CREATION_NATIVE_PASS cases=6"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

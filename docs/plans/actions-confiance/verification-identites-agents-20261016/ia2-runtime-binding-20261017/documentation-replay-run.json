@@ -1,0 +1,19 @@
+{
+  "purpose": "Verify the documented recipe using a new absent result subdirectory; earlier draft would have reused an existing mktemp directory and was corrected before execution",
+  "command": [
+    "bash",
+    "-e",
+    "-c",
+    "preuve_identite=$(mktemp -d /tmp/swarm-ia2-canal-XXXXXX)\npython3 docs/plans/actions-confiance/verification-identites-agents-20261016/ia2_runtime_binding.py \"$preuve_identite/resultats\"\n"
+  ],
+  "start": "2026-10-17T06:16:01.137386+00:00",
+  "end": "2026-10-17T06:16:01.560119+00:00",
+  "exit_code": 0,
+  "stdout": "{\"result\": \"PASS_ISOLATED_CHANNEL_EXPERIMENT\", \"checks\": 13, \"failure\": null, \"cleanup\": [{\"id\": \"A\", \"exit_code\": 0, \"stdout\": \"\", \"stderr\": \"\"}, {\"id\": \"B\", \"exit_code\": 0, \"stdout\": \"\", \"stderr\": \"\"}]}\nREPLAY_OUTPUT=/tmp/swarm-ia2-canal-fmmrNe/resultats\n",
+  "stderr": "",
+  "script_sha256": "9253af47218b7fe8edddd4ca954b49f4856904c7a054a222e6193efc16c1f065",
+  "frozen_output": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/documentation-replay",
+  "checks": 13,
+  "passed": 13,
+  "result": "PASS_ISOLATED_CHANNEL_EXPERIMENT"
+}

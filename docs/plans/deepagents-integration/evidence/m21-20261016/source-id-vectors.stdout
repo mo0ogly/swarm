@@ -1,0 +1,38 @@
+[
+  {
+    "go_json": "{\"task\":\"b1\",\"attempt\":\"a1\",\"sha256\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}",
+    "ref": {
+      "task": "b1",
+      "attempt": "a1",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "source_id": "dialogue-42a5392e5842a9d030654f74e7528c79615f977113d3ba0ba6dc50fac944f64e"
+  },
+  {
+    "go_json": "{\"task\":\"legacy\",\"attempt\":\"\",\"sha256\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"}",
+    "ref": {
+      "task": "legacy",
+      "attempt": "",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "source_id": "dialogue-b7f02c7478f9d33d694ceb8de414b57154b7ab9dae0d3eb35590925b28fb5416"
+  },
+  {
+    "go_json": "{\"task\":\"cadrage-é\\u003c\\u0026\\u003e\",\"attempt\":\"a\\u2028b\\u2029c\",\"sha256\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\"}",
+    "ref": {
+      "task": "cadrage-é\u003c\u0026\u003e",
+      "attempt": "a\u2028b\u2029c",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    "source_id": "dialogue-cfa99e843a5fabac1906827504057a0feb1aee31d389a84bd0d622e5796c35a9"
+  },
+  {
+    "go_json": "{\"task\":\"b\\\\quoted\\\"\",\"attempt\":\"tab\\tline\\n\",\"sha256\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\"}",
+    "ref": {
+      "task": "b\\quoted\"",
+      "attempt": "tab\tline\n",
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    "source_id": "dialogue-efc5da503a75f4b075bfc30c57914b901db2939141f2f027ad28be2e373950b9"
+  }
+]

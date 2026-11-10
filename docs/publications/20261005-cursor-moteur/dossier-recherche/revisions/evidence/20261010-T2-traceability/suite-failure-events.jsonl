@@ -1,0 +1,5 @@
+{"Time":"2026-10-10T21:25:30.722253405+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest"}
+{"Time":"2026-10-10T21:25:30.722257463+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Output":"=== RUN   TestGraphDeliveryD03QualificationManifest\n"}
+{"Time":"2026-10-10T21:25:30.729853299+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Output":"    graph_delivery_qualification_test.go:256: stale input: AGENTS.md\n"}
+{"Time":"2026-10-10T21:25:30.729889327+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Output":"--- FAIL: TestGraphDeliveryD03QualificationManifest (0.01s)\n"}
+{"Time":"2026-10-10T21:25:30.729904085+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Elapsed":0.01}

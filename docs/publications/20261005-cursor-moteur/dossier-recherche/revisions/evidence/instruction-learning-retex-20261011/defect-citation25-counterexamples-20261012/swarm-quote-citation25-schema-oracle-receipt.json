@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-12T06:23:11.516303+00:00",
+  "validator": "jsonschema Draft202012Validator",
+  "checks": {
+    "legacy_admits_native_wrong_line": true,
+    "current_admits_quote_only_shadow": true,
+    "current_rejects_supplied_line": true,
+    "current_rejects_missing_quote": true,
+    "current_rejects_unknown_defect_field": true
+  },
+  "schema_hashes": {
+    "legacy-schema.json": "ff7294a91632461eeb71d1717f0398c78786f51690ab4ce187e69f75c113c3b2",
+    "current-schema.json": "de3f6caa7d2c5e78cd4158241e5bf7ac765947d6ddf04b8e2c3013e21038bc54"
+  },
+  "limits": "Schema shape only. Byte identity, unique occurrence, physical line and opinion attribution remain separately checked by engine; diagnostic shadow never replaces native opinion."
+}

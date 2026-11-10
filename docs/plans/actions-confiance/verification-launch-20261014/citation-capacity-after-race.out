@@ -1,0 +1,24 @@
+=== RUN   TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen
+=== RUN   TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/operator
+    managed_review_citation_feedback_test.go:182: sizes 164551 168222 21899 parts 1
+=== RUN   TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/supervisor
+    managed_review_citation_feedback_test.go:182: sizes 164551 168226 21899 parts 1
+--- PASS: TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen (52.06s)
+    --- PASS: TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/operator (26.25s)
+    --- PASS: TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/supervisor (25.81s)
+=== RUN   TestCurrentReviewCitationConventionsBeforeFirstCall
+--- PASS: TestCurrentReviewCitationConventionsBeforeFirstCall (1.76s)
+=== RUN   TestCitationDiagnosticCapturedReplyIntegrityBlocksRecovery
+    managed_review_citation_feedback_test.go:274: sizes 164551 168226 21899 parts 1
+--- PASS: TestCitationDiagnosticCapturedReplyIntegrityBlocksRecovery (17.94s)
+=== RUN   TestFinalCitationRetryMeasuresRemainingMessage
+    managed_review_citation_feedback_test.go:315: sizes 164551 168226 21899 parts 1
+--- PASS: TestFinalCitationRetryMeasuresRemainingMessage (7.05s)
+=== RUN   TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen
+    managed_review_retry_delivery_test.go:16: sizes 164551 168226 21899 parts 1
+--- PASS: TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen (15.93s)
+=== RUN   TestReviewRetryDirectiveForeignCandidateCannotReserve
+    managed_review_retry_delivery_test.go:98: sizes 164551 168224 21899 parts 1
+--- PASS: TestReviewRetryDirectiveForeignCandidateCannotReserve (2.33s)
+PASS
+ok  	swarm.local/companion/internal/engine	98.242s

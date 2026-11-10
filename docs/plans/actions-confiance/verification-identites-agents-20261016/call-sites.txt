@@ -1,0 +1,64 @@
+internal/engine/mission_status.go:225:		if _, _, err := s.prepareLaunch(work, launch, true); err != nil {
+internal/engine/managed_git.go:59:	cmd := exec.CommandContext(ctx, "git", append([]string{"-c", "core.hooksPath=/dev/null", "-c", "commit.gpgsign=false", "-c", "protocol.file.allow=always"}, args...)...)
+internal/engine/planning_runner.go:153:	reply, err := s.runStructuredProvider(provider, route, prompt, planningSchemaForDelivery(*scope.Delivery), 0, func() bool {
+internal/engine/planning_runner.go:289:	return runStructuredProvider(provider, route, prompt, planningSchemaForDelivery(PlanningDelivery{}), deadline, valid, record, observers...)
+internal/engine/planning_runner.go:291:func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema string, deadline time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
+internal/engine/planning_runner.go:292:	return runStructuredProviderClock(provider, route, prompt, schema, deadline, valid, record, suspendAwareNow, observers...)
+internal/engine/planning_runner.go:295:func runStructuredProviderClock(provider Provider, route *ModelRoute, prompt, schema string, deadline time.Duration, valid func() bool, record func(*Usage), now func() time.Duration, observers ...func(*ProviderCooldown) error) (string, error) {
+internal/engine/planning_runner.go:296:	return runStructuredProviderImagesClock(provider, route, prompt, schema, nil, deadline, valid, record, now, observers...)
+internal/engine/planning_runner.go:299:func runStructuredProviderImagesClock(provider Provider, route *ModelRoute, prompt, schema string, images []reviewImage, deadline time.Duration, valid func() bool, record func(*Usage), now func() time.Duration, observers ...func(*ProviderCooldown) error) (string, error) {
+internal/engine/planning_runner.go:300:	return runStructuredProviderPolicyClock(provider, route, prompt, schema, images, 0, deadline, valid, record, now, observers...)
+internal/engine/planning_runner.go:303:func (s *Store) runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema string, maximum time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
+internal/engine/planning_runner.go:304:	return s.runStructuredProviderImages(provider, route, prompt, schema, nil, maximum, valid, record, observers...)
+internal/engine/planning_runner.go:307:func (s *Store) runStructuredProviderImages(provider Provider, route *ModelRoute, prompt, schema string, images []reviewImage, maximum time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
+internal/engine/planning_runner.go:315:	return runStructuredProviderPolicyClock(provider, route, prompt, schema, images, time.Duration(config.Values.Silence)*time.Second, maximum, valid, record, suspendAwareNow, observers...)
+internal/engine/planning_runner.go:320:func runStructuredProviderPolicyClock(provider Provider, route *ModelRoute, prompt, schema string, images []reviewImage, silence, maximum time.Duration, valid func() bool, record func(*Usage), now func() time.Duration, observers ...func(*ProviderCooldown) error) (string, error) {
+internal/engine/planning_runner.go:353:	cmd := exec.Command(p.Command, p.Args...)
+internal/engine/prephase_external_editor.go:88:	cmd := exec.Command(args[0], append(args[1:], file)...)
+internal/engine/managed_review_sources.go:100:	content, err := exec.Command("git", "--git-dir", bare, "cat-file", "blob", meta[2]).Output()
+internal/engine/kernel_observe_process_linux.go:91:	p.cmd = exec.CommandContext(ctx, "/proc/self/fd/3", args...)
+internal/engine/trust_kernel_check_native_linux_amd64.go:103:	child := exec.Command("/proc/self/fd/3", kernelCheckExitArgs()...)
+internal/engine/managed_scope.go:48:	cmd := exec.CommandContext(ctx, "git", append([]string{"--literal-pathspecs", "-C", bare}, args...)...)
+internal/engine/managed_review_input_provider.go:207:	cmd := exec.CommandContext(ctx, p.Command, args...)
+internal/engine/independent_review_runtime.go:236:		reply, callErr := s.runStructuredProviderImages(provider, route, prompt, independentReviewSchema, images, time.Duration(record.TimeoutSeconds)*time.Second, func() bool {
+internal/engine/managed_review_batch_runtime.go:211:		reply, callErr := s.runStructuredProvider(provider, route, child.RetryFeedback+b.Prompt, schema, time.Duration(timeout)*time.Second, func() bool {
+internal/engine/assist_run.go:85:	cmd := exec.Command(p.Command, p.Args...)
+internal/engine/assist_run.go:335:	cmd := exec.Command(exe, "--root", s.root, "_assist", turn.ID)
+internal/engine/trust_secret_consumer.go:74:	cmd := exec.CommandContext(childCtx, exe, "_trust_secret")
+internal/engine/store.go:566:		c := exec.Command("git", append([]string{"-C", root}, args...)...)
+internal/engine/console.go:297:		a, created, e := s.prepare(work, r)
+internal/engine/automatic_validation.go:222:	cmd := exec.CommandContext(ctx, c.Command[0], c.Command[1:]...)
+internal/engine/managed_review_fragment_runtime.go:83:		reply, e := s.runStructuredProvider(provider, route, prompt, schema, time.Duration(r.TimeoutSeconds)*time.Second, valid, func(u *Usage) { _ = s.savePlanningUsage(id, u) }, s.providerCooldownObserver(cfg.Provider, id))
+internal/engine/prephase_runtime.go:26:	cmd := exec.Command(exe, "--root", s.root, "_prepare_turn", t.ID)
+internal/engine/prephase_runtime.go:125:	cmd := exec.Command(p.Command, p.Args...)
+internal/engine/preflight.go:186:		cmd := exec.CommandContext(ctx, p.Command, preflightArgs(p)...)
+internal/engine/pilotage.go:148:	_, _, e := s.prepareLaunch(r.Work, Launch{Skills: r.Skills, Mode: r.Mode, Schema: 1, EventID: newID("preview-"), Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Workspace: r.Workspace, Role: r.Role, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Instruction: r.Instruction}, true)
+internal/engine/agent_dialogue.go:149:		cmd := exec.Command(a.Command, args...)
+internal/engine/managed_preparation.go:155:func (s *Store) resumePreparedLaunch(work, id string, revision int, refresh ...PreparedSkillRefresh) (Agent, bool, error) {
+internal/engine/managed_preparation.go:269:	return s.prepare(work, r)
+internal/engine/agent_terminal_process.go:208:	cmd := exec.Command(a.Command, args...)
+internal/engine/agent_terminal_process.go:214:		cmd = exec.Command(exe, "--root", s.root, "_dialogue_agent", a.ID)
+internal/engine/agents_process.go:63:	cmd := exec.Command(exe, "--root", s.root, "_supervise", a.ID)
+internal/engine/agents_process.go:382:	cmd := exec.Command(a.Command, args...)
+internal/engine/trust_sealed.go:160:	cmd := exec.CommandContext(childCtx, argv[0], argv[1:]...)
+internal/engine/console_cli.go:342:			a, created, e := s.resumePreparedLaunch(arg(2), r.ID, r.Revision, refresh...)
+internal/engine/console_cli.go:411:				a, _, err := s.prepareLaunch(arg(2), r, true)
+internal/engine/console_cli.go:417:			a, created, e := s.prepare(arg(2), r)
+internal/engine/trust_kernel_check_process.go:168:	cmd := exec.CommandContext(ctx, argv[0], argv[1:]...)
+internal/engine/dispatcher.go:437:		a, created, e := s.prepare(work, r)
+internal/engine/web_server.go:74:		a, _, err := s.prepareLaunch(r.Work, Launch{Summary: r.Summary, Skills: r.Skills, Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, References: r.References, ContextHash: r.ContextHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture}, true)
+internal/engine/web_server.go:206:		a, created, e := s.resumePreparedLaunch(r.Work, r.Agent, r.Revision)
+internal/engine/web_server.go:243:		a, _, e := s.prepareLaunch(r.Work, Launch{Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, Brainstorm: true, Schema: 1, EventID: r.Event, Revision: r.Revision, Provider: r.Provider, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture, References: r.References}, true)
+internal/engine/web_server.go:250:		a, created, e := s.prepare(r.Work, Launch{Summary: r.Summary, Skills: r.Skills, Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
+internal/engine/web_server.go:272:		next, created, e := s.prepare(r.Work, Launch{Skills: r.Skills, PreconditionEvidence: r.PreconditionEvidence, Mode: a.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
+internal/engine/trust_laboratory_child.go:76:	cmd := exec.CommandContext(ctx, argv[0], argv[1:]...)
+internal/engine/managed_review_diagnostic.go:185:	reply, callErr := s.runStructuredProvider(provider, r.ModelRoute, prompt, fragmentDiagnosticSchema, time.Duration(timeout)*time.Second, valid, func(u *Usage) { _ = s.savePlanningUsage(callID, u) }, s.providerCooldownObserver(cfg.Provider, callID))
+internal/engine/assist_action.go:133:		if _, _, e = s.prepareLaunch(work, *p.Launch, true); e != nil {
+internal/engine/assist_action.go:187:		a, created, e = s.prepare(work, *p.Launch)
+internal/engine/dialogue_restore.go:68:		return s.prepareLaunch(a.WorkID, launch, true)
+internal/engine/dialogue_restore.go:70:	return s.prepare(a.WorkID, launch)
+internal/engine/agents_store.go:430:		a, created, e := s.prepareLaunch(work, r, false)
+internal/engine/agents_store.go:439:func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, bool, error) {
+internal/engine/managed_review.go:516:	reply, callErr := s.runStructuredProvider(provider, route, prompt, schema, time.Duration(record.TimeoutSeconds)*time.Second, func() bool {
+internal/engine/console_dialog.go:634:			a, created, e := s.resumePreparedLaunch(work, d.prepared.ID, d.preparedRevision)
+internal/engine/console_dialog.go:781:	a, created, e := s.prepare(work, r)

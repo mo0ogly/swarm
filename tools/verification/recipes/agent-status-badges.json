@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "agent-status-badges",
+  "inputs": [
+    "web/swarm-workbench.js",
+    "web/cockpit-native-panels.js",
+    "web/swarm-design.css",
+    "web/swarm-workbench.css",
+    "tests/agent_status_badges_test.cjs",
+    "tests/task_status_badges_test.cjs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "agent-status-consumer",
+      "command": [
+        "node",
+        "tests/agent_status_badges_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS actual-agent-card-consumer-has-state-badges",
+        "PASS unknown-agent-code-is-neutral-plain-text",
+        "PASS invalid-payload-refuses-before-replacing-agent-cards",
+        "PASS agent-refresh-and-empty-recover-without-ghost-badges",
+        "4/4 agent badge checks passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "task-status-regression",
+      "command": [
+        "node",
+        "tests/task_status_badges_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5/5 task status badge checks passed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

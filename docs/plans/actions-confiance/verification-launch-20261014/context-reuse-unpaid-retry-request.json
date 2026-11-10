@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "corrected-method-unpaid-preflight-retry-20261015",
+  "expected_revision": 433,
+  "task_id": "plan-68b50cc82e-T2",
+  "reason": "Précontrôle sans appel : nouveau candidat 2b0694d et contrôles natifs frais conservés. Le prédicat de réutilisation a été corrigé et vérifié ; demander des inspections entièrement fraîches sous la méthode actuelle, sans réutiliser R19 ni effacer les consommations."
+}

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "paea-operator-package-cli-native",
+  "inputs": [
+    "tests/paea_operator_package_cli_test.py",
+    "schemas/paea/operator-package-cli-v1.schema.json",
+    "tests/paea_fixture_binding_check.py",
+    "tools/verification/recipes/paea-operator-package-cli-native.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "verify-frozen-fixture-role-source-and-bytes",
+      "command": [
+        "python3",
+        "tests/paea_fixture_binding_check.py",
+        "operator"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "FIXTURE_BINDING_PASS role=operator"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-default-operator-package-export-refusal-and-recovery",
+      "command": [
+        "python3",
+        "tests/paea_operator_package_cli_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS fr-en-operator-observation-and-help",
+        "PASS service-only-export-no-replace-and-reconcile",
+        "PASS source-pin-role-permissions-and-recovery",
+        "PASS target-pin-name-permissions-and-recovery",
+        "PASS closed-flags-before-source-io",
+        "PASS stdout-enospc-retains-artifact-and-reconciles",
+        "OPERATOR_PACKAGE_NATIVE_PASS cases=6"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

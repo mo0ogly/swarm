@@ -1,0 +1,6 @@
+=== RUN   TestDefectCitationDiagnosticFitsOwnerContext
+    managed_review_fragment_defect_citation_test.go:266: diagnostic cannot reach its owner intact 8252
+--- FAIL: TestDefectCitationDiagnosticFitsOwnerContext (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.025s
+FAIL

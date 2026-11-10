@@ -1,0 +1,39 @@
+--- FAIL: TestInstructionRevisionPublicDecision (0.04s)
+    instruction_revision_test.go:17: claim cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestInstructionRevisionRejectPersistenceReplayAndCounters (0.03s)
+    instruction_revision_test.go:43: claim cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestInstructionRevisionRollbackRightsAndStaleInput (0.16s)
+    --- FAIL: TestInstructionRevisionRollbackRightsAndStaleInput/foreign-scope (0.03s)
+        instruction_revision_test.go:75: claim cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+    --- FAIL: TestInstructionRevisionRollbackRightsAndStaleInput/contract (0.03s)
+        instruction_revision_test.go:75: claim cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+    --- FAIL: TestInstructionRevisionRollbackRightsAndStaleInput/not-received (0.03s)
+        instruction_revision_test.go:75: claim cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+    --- FAIL: TestInstructionRevisionRollbackRightsAndStaleInput/duplicate (0.04s)
+        instruction_revision_test.go:75: claim cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+    --- FAIL: TestInstructionRevisionRollbackRightsAndStaleInput/active (0.03s)
+        instruction_revision_test.go:75: claim cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestInstructionRevisionLaunchFreezesAndRejectRace (0.06s)
+    --- FAIL: TestInstructionRevisionLaunchFreezesAndRejectRace/false (0.03s)
+        instruction_revision_test.go:108: claim cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+    --- FAIL: TestInstructionRevisionLaunchFreezesAndRejectRace/true (0.03s)
+        instruction_revision_test.go:108: claim cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestPreparationTemplatesCLIIsReadOnlyAndRejectsUnknown (0.01s)
+    preparation_templates_test.go:21: cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestPreparationTemplateGuidanceCompletenessAndBoundaries (0.00s)
+    preparation_templates_test.go:61: cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestPreparationTemplateMethodsMatchActualAgentFraming (0.00s)
+    preparation_templates_test.go:142: cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestPreparationTemplateReadableIDsAndLegacyLookup (0.00s)
+    preparation_templates_test.go:169: cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestPreparationWorkModelProjectionAndBoundaries (0.01s)
+    preparation_work_model_test.go:12: cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestPreparationWorkModelRejectsInvalidGraphAndRequest (0.01s)
+    preparation_work_model_test.go:61: cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestProductAdoptedPlanPersistsMappingsAndWorkerContext (0.05s)
+    product_plan_test.go:92: cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+--- FAIL: TestProductRoleMethodsAreCompleteAndEmbedded (0.03s)
+    product_plan_test.go:135: subplanner cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.615s
+FAIL

@@ -1,0 +1,1 @@
+{"pid": 3582409, "ppid": 3582408, "stdin_sha256": "904cd291441f3bac19fb099fa4084f06d9f05dbf9fb2d595147fdc79749b9833", "stdin_bytes": 34425, "argv": ["exec", "--json", "--safe-fixture", "--model", "fixture-standard", "-c", "model_reasoning_effort=\"fixture-medium\"", "-"]}

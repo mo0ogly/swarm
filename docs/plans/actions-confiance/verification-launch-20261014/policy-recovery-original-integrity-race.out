@@ -1,0 +1,4 @@
+=== RUN   TestRecoveredResultCorrectionAfterPublicPolicyChange
+--- PASS: TestRecoveredResultCorrectionAfterPublicPolicyChange (1.83s)
+PASS
+ok  	swarm.local/companion/internal/engine	2.980s

@@ -1,0 +1,14 @@
+
+running 4 tests
+test root_store::preparation_prompt::tests::new_or_missing_producer_inputs_require_schema_review ... ok
+test root_store::preparation_prompt::tests::mutated_prompt_refuses_and_original_recovers ... ok
+test root_store::preparation_prompt::tests::gaps_overlap_truncation_and_false_origins_refuse ... FAILED
+test root_store::preparation_prompt::tests::actual_wire_bytes_and_all_sources_are_preserved ... ok
+
+failures:
+
+failures:
+    root_store::preparation_prompt::tests::gaps_overlap_truncation_and_false_origins_refuse
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 743 filtered out; finished in 0.01s
+

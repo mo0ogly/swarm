@@ -1,0 +1,59 @@
+{
+  "status": "PASS",
+  "checks": [
+    "w-a77d9f4799712a6c6d96c662-fr-explicit-agent-required",
+    "w-a77d9f4799712a6c6d96c662-fr-exact-installed-history",
+    "w-a77d9f4799712a6c6d96c662-fr-literal-text",
+    "w-a77d9f4799712a6c6d96c662-fr-keyboard-focus",
+    "w-a77d9f4799712a6c6d96c662-fr-live-disabled",
+    "w-a77d9f4799712a6c6d96c662-en-explicit-agent-required",
+    "w-a77d9f4799712a6c6d96c662-en-exact-installed-history",
+    "w-a77d9f4799712a6c6d96c662-en-literal-text",
+    "w-a77d9f4799712a6c6d96c662-en-keyboard-focus",
+    "w-a77d9f4799712a6c6d96c662-en-live-disabled",
+    "w-68b50cc82ec3fe55624f9549-fr-explicit-agent-required",
+    "w-68b50cc82ec3fe55624f9549-fr-exact-installed-history",
+    "w-68b50cc82ec3fe55624f9549-fr-literal-text",
+    "w-68b50cc82ec3fe55624f9549-fr-keyboard-focus",
+    "w-68b50cc82ec3fe55624f9549-fr-live-disabled",
+    "w-68b50cc82ec3fe55624f9549-en-explicit-agent-required",
+    "w-68b50cc82ec3fe55624f9549-en-exact-installed-history",
+    "w-68b50cc82ec3fe55624f9549-en-literal-text",
+    "w-68b50cc82ec3fe55624f9549-en-keyboard-focus",
+    "w-68b50cc82ec3fe55624f9549-en-live-disabled",
+    "no-read-HTTP-errors",
+    "no-browser-errors",
+    "no-failed-requests",
+    "no-writes"
+  ],
+  "observations": [
+    {
+      "work_id": "w-a77d9f4799712a6c6d96c662",
+      "language": "fr",
+      "rows": 34,
+      "text_sha256": "4db474559fe84113a4fb79c47319b15c160ec21307eed808b08bdab3ea11b4cc"
+    },
+    {
+      "work_id": "w-a77d9f4799712a6c6d96c662",
+      "language": "en",
+      "rows": 34,
+      "text_sha256": "4db474559fe84113a4fb79c47319b15c160ec21307eed808b08bdab3ea11b4cc"
+    },
+    {
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "language": "fr",
+      "rows": 200,
+      "text_sha256": "814c58218953a337b106fc36666c1491425006bf4d36f1b470669f600f304717"
+    },
+    {
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "language": "en",
+      "rows": 200,
+      "text_sha256": "814c58218953a337b106fc36666c1491425006bf4d36f1b470669f600f304717"
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "httpErrors": [],
+  "writes": []
+}

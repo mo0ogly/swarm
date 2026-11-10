@@ -1,0 +1,27 @@
+{
+  "compiler_success": true,
+  "rust_inputs_stable": true,
+  "changed": [],
+  "engine_features": [
+    []
+  ],
+  "qualification": false,
+  "binary_built": false,
+  "dynamic_assets_qualified": false,
+  "argv": [
+    "cargo",
+    "check",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--lib",
+    "--message-format=json"
+  ],
+  "environment": {
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0"
+  }
+}

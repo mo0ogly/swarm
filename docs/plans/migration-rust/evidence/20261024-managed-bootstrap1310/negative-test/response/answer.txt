@@ -1,0 +1,42 @@
+# Public Negative Cases After Healthy Witness Bootstrap
+
+All cases below are exercised through the supported CLI only (`planning enable`, `work show`, `work create`), against a repository request supplied via the existing `repository` field of `PlanningRequest` (which already carries `ManagedRepositoryRequest` on the wire). Each fault follows a healthy witness bootstrap that proved `committed_only=true` with empty `include_dirty` succeeds, and each refusal is verified non-mutating via `refused()` semantics (Work/events/agent/reservation unchanged, no `PRIVATE` leakage).
+
+## Proposed cases
+
+1. **Dirty source with committed-only default**
+   - Witness bootstrap succeeds. Then introduce an untracked/modified file in the source worktree and send `repository={path, committed_only:true, include_dirty:[]}` with a *changed dirty state* beyond the recorded manifest.
+   - Expected: refusal (`managed-repository-dirty-source`) — Go contract: `dirty != "" && !CommittedOnly && len(Include)==0` rejects; committed-only ignores dirty, so the true fault is a dirty tree when `committed_only` is absent/false. Two sub-cases:
+     - `committed_only:false` → refused.
+     - `committed_only:true` + non-empty `include_dirty` → refused (`committed-only excludes include_dirty`), matching `CommittedOnly && len(Include)>0`.
+
+2. **Include-dirty path refused outright**
+   - `repository={path, committed_only:false, include_dirty:["allowed.txt"]}` after a healthy committed-only witness: public bootstrap only accepts `committed_only=true` with empty include list, so this is refused at the request gate (`planning-repository-include-dirty-not-allowed`) regardless of path validity.
+
+3. **Malformed prepared manifest**
+   - Witness succeeds; then corrupt `.swarm/managed/<work>/repository.json` with invalid JSON and replay the identical request.
+   - Expected: `manifeste préparé invalide` refusal — preserved for diagnostics, no rewrite, no overwrite.
+
+4. **Mismatched prepared manifest**
+   - Tamper a valid manifest's `request_digest` (or `source`/`subdir`/`included`) so `validatePreparedRepository` fails on digest/path equality.
+   - Expected: refusal citing incompatible manifest; original bytes retained.
+
+5. **Orphan prepared manifest**
+   - Delete `repository.git` (or its `swarm-result` commit) while leaving the manifest. `rev-parse --verify <oid>^{commit}` fails.
+   - Expected: `objet Git préparé absent` refusal; no re-clone, no overwrite of the orphan manifest.
+
+6. **Absent commit in replay**
+   - Remove the referenced base/candidate object (e.g., prune the bare repo) before a replay request.
+   - Expected: same verify-refusal path; Work state unchanged.
+
+7. **Restore/recover**
+   - After each fault, restore the original manifest/repo bytes (as the fixture does for `f.providers`) and confirm the next identical request returns the original healthy result byte-for-byte (`replay == result`), proving refusal left no residue and recovery needs no private repair.
+
+## Verification notes
+
+- Every refusal asserts `work show` and full snapshot equality before/after.
+- No case triggers a provider process (`model-received.json` absent).
+- Timeout uses the persisted `git_command_timeout_seconds`, never a literal.
+- Source tree digests are re-checked at end (existing `inputs.json` pattern), confirming zero mutation outside `.swarm/managed`.
+
+Not verified (no tools here): actual refusal code strings beyond those mirroring the Go messages, and cross-platform symlink-parent detection; these need the real fixture run.

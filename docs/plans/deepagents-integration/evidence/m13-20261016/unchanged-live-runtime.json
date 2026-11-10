@@ -1,0 +1,17 @@
+{
+  "before": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "after": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "deployed": false
+}

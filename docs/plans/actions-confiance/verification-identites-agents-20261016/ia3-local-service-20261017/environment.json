@@ -1,0 +1,8 @@
+{
+  "go": "go1.24.3 linux/amd64",
+  "kernel": "6.17.0-41-generic",
+  "date": "2026-10-17T13:25:56.974190+00:00",
+  "actual_service_activated": false,
+  "public_api_wired": false,
+  "independent_review": false
+}

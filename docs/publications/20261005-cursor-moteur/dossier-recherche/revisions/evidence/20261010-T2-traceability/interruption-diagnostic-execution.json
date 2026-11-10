@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "executor": "host operator; isolated clone; NOT engine receipt",
+  "candidate": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestSupervisionR3TotalTimeoutStillBoundsSilence$",
+    "-json",
+    "-count=1",
+    "-timeout",
+    "20s"
+  ],
+  "started_at": "2026-10-10T19:33:11.394910+00:00",
+  "finished_at": "2026-10-10T19:33:14.826815+00:00",
+  "exit_code": 0,
+  "changed_precondition": "Restricted to last started test; child Go process in separate session; no full-suite retry",
+  "artifacts": [
+    {
+      "path": "/tmp/swarm-T2-traceability-c1hvvch0/interruption-diagnostic.jsonl",
+      "bytes": 1414,
+      "sha256": "241cdff3c43f5c580a2f7fb7083f0dd98a3ea901bd780137e824e57e58451876"
+    },
+    {
+      "path": "/tmp/swarm-T2-traceability-c1hvvch0/interruption-diagnostic.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

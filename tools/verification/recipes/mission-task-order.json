@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "mission-task-order",
+  "inputs": [
+    "rust/crates/swarm-engine/src/**/*.rs",
+    "rust/crates/swarm-cli/src/*.rs",
+    "tools/verification/recipe.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_mission_task_order.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "complete-order-refusal-recovery-no-dispatch",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-task-order-',dir='.cache')).resolve()\nargs=['python3','tests/rust_mission_task_order.py']\nfor key,var in [('binary','SWARM_TASK_ORDER_BINARY'),('profile','SWARM_TASK_ORDER_PROFILE')]:\n value=Path(os.environ[var]).resolve()\n if not value.is_file():raise ValueError('order-input-missing:'+var)\n args+=['--'+key,str(value)]\nsubprocess.run(args+['--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native complete task order, graph depth, exact priorities, refusals and recovery",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

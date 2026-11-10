@@ -1,0 +1,620 @@
+--- tools/memory-evaluation/swarm_source.py before
++++ tools/memory-evaluation/swarm_source.py after
+@@ -20,6 +20,17 @@
+     def invalid(_):
+         raise ValueError("Non-finite JSON value")
+     return json.loads(text, object_pairs_hook=unique_object, parse_constant=invalid)
++
++
++def dialogue_source_id(ref):
++    # Match json.Marshal(DialogueRef) in memory_summary_source.go, independent
++    # of input object key order. Go also escapes HTML and the two JS separators.
++    value = {key: ref[key] for key in ["task", "attempt", "sha256"]}
++    raw = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
++    for char, escaped in [("&", "\\u0026"), ("<", "\\u003c"), (">", "\\u003e"),
++                          ("\u2028", "\\u2028"), ("\u2029", "\\u2029")]:
++        raw = raw.replace(char, escaped)
++    return "dialogue-" + digest(raw.encode())
+ 
+ 
+ def prepare(packet, annotations):
+@@ -46,11 +57,18 @@
+     snapshot = parse(sources[0]["text"])
+     require(S.exact(snapshot, ["project_sha256", "work_title", "work_objective", "work_scope", "work_criteria", "task"]) and isinstance(snapshot["task"], dict), "Invalid task snapshot")
+     require(snapshot["project_sha256"] == payload["project_sha256"] and snapshot["task"].get("id") == scope["task"] and snapshot["task"].get("brainstorm", False) is False, "Task snapshot scope mismatch")
++    dialogues = set()
+     for index in range(1, len(sources), 2):
+         question, answer = sources[index:index+2]
+         ref = question["dialogue"]
+         require(S.exact(ref, ["task", "attempt", "sha256"]) and S.label(ref["task"]) and isinstance(ref["attempt"], str) and S.hash_reference(ref["sha256"]), "Invalid stored dialogue reference")
+         require(ref == answer["dialogue"] and ref["sha256"] == digest((question["text"] + "\n" + answer["text"]).encode()), "Selected dialogue changed or pair mismatched")
++        identity = (ref["task"], ref["attempt"], ref["sha256"])
++        require(identity not in dialogues, "Stored dialogue selected more than once")
++        dialogues.add(identity)
++        source_id = dialogue_source_id(ref)
++        require(question["id"] == source_id + "-question" and answer["id"] == source_id + "-answer",
++                "Stored dialogue source identity mismatch")
+     require(S.exact(annotations, ["schema_version", "source_sha256", "protected"]) and type(annotations["schema_version"]) is int and annotations["schema_version"] == 1 and annotations["source_sha256"] == packet["sha256"], "Annotations missing or stale for this source packet")
+     history = {"schema_version": 1, "scope": copy.deepcopy(scope), "messages": messages, "protected": copy.deepcopy(annotations["protected"])}
+     S.validate_history(history)
+--- tests/test_memory_swarm_source.py before
++++ tests/test_memory_swarm_source.py after
+@@ -18,15 +18,18 @@
+     snapshot = {"project_sha256": "a" * 64, "work_title": "Source fixture", "work_objective": "Keep evidence", "work_scope": "Owned fixture", "work_criteria": ["Verified sources"], "task": {"id": "t1", "criteria": ["Recheck current evidence"], "status": "todo"}}
+     question, answer = "Vérifier avant de déployer <source>.", "Résultat historique, pas preuve courante."
+     ref = {"task": "b1", "attempt": "a1", "sha256": B.digest((question + "\n" + answer).encode())}
++    # Match memorySummarySourceForWork: Go marshals DialogueRef in this field
++    # order before hashing. These ASCII fixture fields need no HTML escaping.
++    dialogue_id = "dialogue-" + B.digest(json.dumps(ref, separators=(",", ":")).encode())
+     sources = [{"id": "current-task-snapshot", "kind": "task_snapshot", "role": "user", "text": json.dumps(snapshot, ensure_ascii=False)}]
+-    for suffix, kind, role, text in [("q", "operator_question", "user", question), ("a", "historical_answer", "assistant", answer)]:
+-        sources.append({"id": suffix, "kind": kind, "role": role, "text": text, "dialogue": ref})
++    for suffix, kind, role, text in [("question", "operator_question", "user", question), ("answer", "historical_answer", "assistant", answer)]:
++        sources.append({"id": dialogue_id + "-" + suffix, "kind": kind, "role": role, "text": text, "dialogue": ref})
+     for source in sources:
+         source["sha256"] = B.digest(source["text"].encode())
+     payload = {"scope": {"work": "w1", "task": "t1"}, "work_revision": 4, "project_sha256": "a" * 64, "audience": "local_operator", "provider_history_complete": False, "sources": sources}
+     raw = json.dumps(payload, ensure_ascii=False)
+     value = {"schema_version": 1, "kind": "swarm_summary_source_v1", "payload": raw, "sha256": B.digest(raw.encode())}
+-    annotations = {"schema_version": 1, "source_sha256": value["sha256"], "protected": [{"id": "task", "message": "current-task-snapshot", "kind": "requirement", "state": "open"}, {"id": "intent", "message": "q", "kind": "intention", "state": "future"}]}
++    annotations = {"schema_version": 1, "source_sha256": value["sha256"], "protected": [{"id": "task", "message": "current-task-snapshot", "kind": "requirement", "state": "open"}, {"id": "intent", "message": dialogue_id + "-question", "kind": "intention", "state": "future"}]}
+     return value, annotations
+ 
+ 
+@@ -71,10 +74,85 @@
+             with self.assertRaises(ValueError): B.prepare(self.packet, value)
+ 
+     def test_refuses_wrong_scope_roles_duplicates_and_completeness(self):
+-        for mutate in [lambda p: p["scope"].update(task="other"), lambda p: p["sources"][2].update(role="user"), lambda p: p["sources"][2].update(id="q"), lambda p: p.update(provider_history_complete=True), lambda p: p.update(work_revision=True)]:
++        for mutate in [lambda p: p["scope"].update(task="other"), lambda p: p["sources"][2].update(role="user"), lambda p: p["sources"][2].update(id=p["sources"][1]["id"]), lambda p: p.update(provider_history_complete=True), lambda p: p.update(work_revision=True)]:
+             self.packet, self.annotations = packet()
+             self.mutate_payload(mutate)
+             with self.assertRaises(ValueError): B.prepare(self.packet, self.annotations)
++
++    def test_rejects_relabelled_sources_after_all_hashes_and_annotations_change(self):
++        for which in [(1,), (2,), (1, 2)]:
++            with self.subTest(sources=which):
++                self.packet, self.annotations = packet()
++                renamed = {}
++                def change(payload):
++                    for index in which:
++                        source = payload["sources"][index]
++                        renamed[source["id"]] = source["id"] + "-renamed"
++                        source["id"] = renamed[source["id"]]
++                self.mutate_payload(change)
++                for anchor in self.annotations["protected"]:
++                    anchor["message"] = renamed.get(anchor["message"], anchor["message"])
++                with self.assertRaisesRegex(ValueError, "source.*identit|identit.*source"):
++                    B.prepare(self.packet, self.annotations)
++
++    def test_rejects_duplicate_dialogue_under_distinct_message_ids(self):
++        def duplicate(payload):
++            pair = copy.deepcopy(payload["sources"][1:3])
++            for source in pair:
++                source["id"] += "-duplicate"
++            payload["sources"].extend(pair)
++        self.mutate_payload(duplicate)
++        with self.assertRaises(ValueError):
++            B.prepare(self.packet, self.annotations)
++
++    def test_dialogue_reference_object_order_is_not_source_identity(self):
++        def reverse_keys(payload):
++            for source in payload["sources"][1:]:
++                source["dialogue"] = dict(reversed(list(source["dialogue"].items())))
++        self.mutate_payload(reverse_keys)
++        history, _ = B.prepare(self.packet, self.annotations)
++        self.assertEqual(len(history["messages"]), 3)
++
++    def test_source_ids_match_retained_go_json_vectors(self):
++        vectors = json.loads((ROOT / "tests/memory_summary_source_id_vectors.json").read_text())
++        self.assertEqual(len(vectors), 4)
++        for vector in vectors:
++            with self.subTest(ref=vector["ref"]):
++                self.assertEqual(B.dialogue_source_id(vector["ref"]), vector["source_id"])
++                self.assertEqual("dialogue-" + B.digest(vector["go_json"].encode()), vector["source_id"])
++
++    def test_legacy_empty_attempt_preserves_content_binding_without_authority(self):
++        renamed = {}
++        def change(payload):
++            for source in payload["sources"][1:]:
++                source["dialogue"]["attempt"] = ""
++                suffix = "-question" if source["kind"] == "operator_question" else "-answer"
++                ref = source["dialogue"]
++                prefix = "dialogue-" + B.digest(json.dumps(ref, separators=(",", ":")).encode())
++                renamed[source["id"]] = prefix + suffix
++                source["id"] = prefix + suffix
++        self.mutate_payload(change)
++        for anchor in self.annotations["protected"]:
++            anchor["message"] = renamed.get(anchor["message"], anchor["message"])
++        history, provenance = B.prepare(self.packet, self.annotations)
++        self.assertEqual(history["messages"][1]["content"], "Vérifier avant de déployer <source>.")
++        self.assertFalse(provenance["engine_admission"])
++        self.assertFalse(provenance["provider_history_complete"])
++
++    def test_cli_refuses_relabelled_source_without_creating_output(self):
++        self.mutate_payload(lambda p: p["sources"][2].update(id="invented-answer-id"))
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory)
++            source, annotations = root / "source.json", root / "annotations.json"
++            source.write_text(json.dumps(self.packet)); annotations.write_text(json.dumps(self.annotations))
++            before = (source.read_bytes(), annotations.read_bytes())
++            result = subprocess.run([sys.executable, str(ROOT / "tools/memory-evaluation/swarm_source.py"),
++                                     "--source", str(source), "--annotations", str(annotations),
++                                     "--output-dir", str(root / "prepared")], capture_output=True, text=True)
++            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
++            self.assertFalse((root / "prepared").exists())
++            self.assertEqual(before, (source.read_bytes(), annotations.read_bytes()))
++            self.assertNotIn("Traceback", result.stderr)
+ 
+     def test_new_current_task_snapshot_invalidates_previous_reference(self):
+         history, _ = B.prepare(self.packet, self.annotations)
+--- tests/test_memory_summary_admission.py before
++++ tests/test_memory_summary_admission.py after
+@@ -78,5 +78,37 @@
+             self.assertFalse((root/"output").exists())
+             self.assertNotIn("Traceback",result.stderr)
+ 
++    def relabelled_source(self):
++        source, annotations, history = copy.deepcopy((self.source, self.annotations, self.history))
++        payload = B.parse(source["payload"])
++        payload["sources"][2]["id"] = "invented-answer-id"
++        source["payload"] = json.dumps(payload, ensure_ascii=False)
++        source["sha256"] = B.digest(source["payload"].encode())
++        annotations["source_sha256"] = source["sha256"]
++        history["messages"][2]["id"] = "invented-answer-id"
++        reference = S.project(history, S.reference_candidate(history, 2))
++        return source, annotations, reference
++
++    def test_selection_refuses_relabelled_source_even_with_matching_reference(self):
++        with self.assertRaises(ValueError):
++            A.selection(*self.relabelled_source(), "Operator choice")
++
++    def test_cli_refuses_relabelled_source_without_output_or_input_changes(self):
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory)
++            names = ["source", "annotations", "reference"]
++            for name, value in zip(names, self.relabelled_source()):
++                (root / name).write_text(json.dumps(value))
++            before = {name: (root / name).read_bytes() for name in names}
++            command = [sys.executable, str(ROOT / "tools/memory-evaluation/admission.py")]
++            for name in names:
++                command += ["--" + name, str(root / name)]
++            command += ["--reason", "Operator choice", "--output", str(root / "choice")]
++            result = subprocess.run(command, capture_output=True, text=True)
++            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
++            self.assertFalse((root / "choice").exists())
++            self.assertEqual(before, {name: (root / name).read_bytes() for name in names})
++            self.assertNotIn("Traceback", result.stderr)
++
+ 
+ if __name__ == "__main__":unittest.main(verbosity=2)
+--- tools/memory-evaluation/README.md before
++++ tools/memory-evaluation/README.md after
+@@ -361,6 +361,28 @@
+ utilise le format M17 et un identifiant de source lu dans le paquet ;
+ `current-task-snapshot` doit être protégé. Aucun état sémantique n'est deviné.
+ 
++Les identifiants de citation doivent aussi correspondre au producteur Go :
++`dialogue-` suivi du SHA-256 du JSON Go de la référence `task`, `attempt`, `sha256`,
++puis `-question` ou `-answer`. Le convertisseur reconstruit cet encodage, y compris
++l'échappement HTML et U+2028/U+2029, indépendamment de l'ordre des clés reçues.
++Il refuse le renommage et la répétition d'un échange sous des identifiants
++distincts, même si contenu, empreintes, annotations et reçu M17 concordent.
++`admission.py` consomme le même validateur ; aucune sortie n'est créée en cas de
++refus. Reprendre les identifiants du paquet Swarm original pour préparer un
++nouveau choix, sans modifier les preuves anciennes. Un ancien `attempt` vide
++reste permis par ce contrat de référence.
++
++Ces empreintes vérifient la cohérence des données, pas leur authenticité.
++Elles ne donnent ni identité humaine ou d'agent, ni propriété, ni autorisation
++de consultation, résumé, transmission ou lancement. Ces droits restent à
++raccorder au contrat commun d'identité dans M20/IA2–IA3.
++
++Régression locale du convertisseur, du choix et de leur référence commune :
++`python3 -m unittest discover -s tests -p 'test_memory_s*.py' -v`.
++`tests/memory_summary_source_id_vectors.json` conserve quatre vecteurs issus de
++la sérialisation Go, dont ancien `attempt` vide et caractères échappés. Ce test
++d'encodage ne constitue pas une preuve d'admission d'agent.
++
+ ```sh
+ python3 tools/memory-evaluation/swarm_source.py \
+   --source export.json --annotations annotations.json \
+--- docs/PROJECT-MEMORY.md before
++++ docs/PROJECT-MEMORY.md after
+@@ -293,6 +293,16 @@
+ n'est inféré ni résumé admis ; la fraîcheur devra être recontrôlée avant un
+ futur emploi moteur. Les détails et la recette isolée figurent dans la
+ [documentation du convertisseur](../tools/memory-evaluation/README.md#préparer-la-référence-depuis-des-sources-swarm).
++
++Le convertisseur vérifie aussi que les identifiants de question/réponse sont
++ceux dérivés par le producteur Go de leur référence `task`, `attempt`, `sha256`.
++Renommer une citation ou répéter le même échange sous un autre identifiant est
++refusé, même avec des empreintes et annotations recalculées. Ce refus s'applique
++également à `admission.py`, avant création de sortie. Repartir du paquet Swarm
++original et de ses identifiants pour corriger la sélection ; ne pas réécrire les
++reçus historiques. Une ancienne référence avec `attempt` vide reste compatible.
++Cette liaison de contenu ne prouve ni l'identité de l'auteur, ni la propriété,
++ni un droit d'usage : leur contrôle effectif reste au chantier M20 et identité.
+ 
+ ```mermaid
+ flowchart LR
+--- docs/en/PROJECT-MEMORY.md before
++++ docs/en/PROJECT-MEMORY.md after
+@@ -263,6 +263,16 @@
+ directory. The task snapshot must remain protected. It infers no business state
+ and admits no summary; freshness must be rechecked before future engine use.
+ See the [converter and isolated recipe](../../tools/memory-evaluation/README.md#préparer-la-référence-depuis-des-sources-swarm).
++
++The converter also checks that question/answer IDs match the Go producer's
++derivation from their `task`, `attempt`, `sha256` reference. Renaming a citation
++or repeating the same exchange under different IDs is refused even after
++recomputing hashes and annotations. `admission.py` shares this check before
++creating output. Recover from the original Swarm packet and its source IDs;
++do not rewrite historical receipts. Legacy references with an empty `attempt`
++remain compatible. This content binding proves neither author identity,
++ownership nor usage permission; enforcement remains in the M20 and identity
++workstreams.
+ 
+ ```mermaid
+ flowchart LR
+--- docs/plans/deepagents-integration/PLAN.md before
++++ docs/plans/deepagents-integration/PLAN.md after
+@@ -52,6 +52,7 @@
+ | M18 Sources Swarm pour la référence | Réalisé et vérifié localement | Export commun CLI/API des échanges choisis et de la tâche courante, conversion avec annotations et provenance ; 10 tests Go, 32 tests Python et cinq contrôles applicatifs. Docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-14.md`. Aucun résumé admis dans le moteur ni modèle réel. |
+ | M19 Sélection extractive pour un lancement explicite | Réalisé et vérifié localement | Aperçu et confirmation CLI/API, citations reconstruites dans le moteur et sources revérifiées avant départ ; 21 tests Go dont deux avec `-race`, 49 tests Python, cinq contrôles applicatifs M19 et cinq M18. Docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-15.md`. Qualité LLM, hiérarchie et progression générale restent ouvertes. |
+ | M20 Propriété et droits du cadrage | Replan : identité et autorité préalables à l’extension hiérarchique | Attribution technique distinguée de la responsabilité et des droits ; ordre révisé dans `INCREMENT-MEMOIRE-16.md`, lié à R01/R13 et aux 18 scénarios IDA de `../actions-confiance/identites-agents-replan.md`. Création hors plan bloquée avec explication et décision humaine : exigence à réaliser, aucun code M20 ni partage activé. |
++| M21 Liaison des citations et références | Correction vérifiée dans la préparation mémoire | Alias et doublons reproduits puis refusés par le validateur partagé, y compris le choix extractif ; 57 tests Python et parcours source → référence → worker scripté sur binaire M19 conservé. Voir `INCREMENT-MEMOIRE-17.md` et `RESULTATS-MEMOIRE-17.md`. M20/IA2–IA3 restent ouverts ; aucune identité ou autorisation déduite des empreintes. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -202,6 +203,17 @@
+ restant à réaliser. Ne pas inférer un propriétaire pour l'historique ni fabriquer
+ un dialogue hiérarchique dans une fixture privée. M19 reste inchangé et vérifié ;
+ aucune attribution, migration ou ouverture de partage n'est appliquée par ce replan.
++
++Après ouverture par l'utilisateur d'une session identité dédiée, M21 reprend un
++travail mémoire indépendant. IA1 a reproduit sept défauts sans corriger les
++contrôles ; les sources communes restent en lecture seule dans ce lot. Un
++défaut du convertisseur, qui acceptait les identifiants de citation renommés et
++les échanges dupliqués, est reproduit puis corrigé au validateur partagé avec
++le préparateur de choix. Les 57 tests Python passent ; la chaîne CLI/API réelle
++passe cinq contrôles M19 et cinq M18 avec trois invocations scriptées sur le
++binaire M19 conservé, sans modèle réel. Voir `RESULTATS-MEMOIRE-17.md` pour les
++preuves et les limites. Les identités, propriétaires et droits restent à
++appliquer avec le contrat IA2/IA3 ; M21 n'ouvre aucun partage supplémentaire.
+ 
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+@@ -342,6 +354,7 @@
+ | 2026-10-16 | M19, reprise « ok next » : admission extractive et contexte reçu. | Choix explicite reconstruit par le moteur, aperçu confirmé CLI/API et contrôle avant sous-processus ; 21 tests Go, dont deux avec `-race`, 49 tests Python, cinq contrôles M19 et cinq M18. Confirmation du motif et garde des sources corrigées après reproduction ; docs FR/EN et RETEX. Zéro modèle réel, serveur conservé. |
+ | 2026-10-16 | M20, reprise « la suite ? », puis question sur la propriété des échanges. | Replan avant extension : distinguer responsable logique, auteur attesté et droits de transmission. `Task.Owner` désigne le fournisseur ; contrat de propriété à construire, anciens échanges non réattribués implicitement. Aucun code applicatif ou appel fournisseur. |
+ | 2026-10-16 | Exigence explicite de propriété/auteur/usages, puis scénarios d'usurpation et de création non autorisée, confirmés comme gestion des identités de l'application. | R01/R13 étendu aux agents : 18 scénarios IDA, refus par défaut, demande hors plan expliquée et décision humaine authentifiée sur le contenu exact, protection du contrôle et des données. Plan IA1–IA5 relié à M20 ; architecture FR/EN actualisée comme cible, garanties non déclarées implémentées. |
++| 2026-10-16 | Reprise mémoire après lancement de la session identité dédiée. | M21 : deux familles de défauts de liaison source reproduites, puis refus commun dans préparation et choix. 57 tests Python, quatre vecteurs Go, recette CLI/API avec trois invocations scriptées et zéro modèle. Documentation FR/EN et RETEX ; M20 et autorisations IA2/IA3 restent ouverts. |
+ 
+ ## Réalisation M3 — décision technique et critères
+ 
+--- docs/plans/deepagents-integration/INCREMENT-MEMOIRE-16.md before
++++ docs/plans/deepagents-integration/INCREMENT-MEMOIRE-16.md after
+@@ -59,7 +59,7 @@
+ 
+ | Lot | Propriétaire / dépendance | Critère observable |
+ | --- | --- | --- |
+-| M20.1 | Codex ; M19 | Audit des producteurs, lecteurs, import/export et identité réellement attestée ; responsabilités et droits distincts. Audit initial effectué, autres voies à inspecter. |
++| M20.1 | Codex ; M19 | Inventaire de code consolidé dans `AUDIT-PROVENANCE-M20.md` : producteurs, treize voies de consommation, import/export et limites d'attribution. Recette de droits non réalisée ; dépend du contrat IA2/IA3. |
+ | M20.2 | Codex ; M20.1 | Contrat testable de création, attribution/réattribution, portée et historique ; compatibilité/migration décidée depuis le stockage réel. Non réalisé. |
+ | M20.3 | Codex ; M20.2 | Opérations publiques communes, refus sans mutation et visibilité CLI/API/UI pertinente, tests de non-régression avant correction. Non réalisé. |
+ | M20.4 | Codex ; M20.3 | Création → attribution → autorisation de transmission → réception vérifiée, docs FR/EN et RETEX. Non réalisé. |
+@@ -88,3 +88,17 @@
+ la chaîne complète et le RETEX. Les échanges existants ne reçoivent aucun droit
+ implicite et l'extension hiérarchique reste fermée. L'audit initial est réutilisé,
+ mais les 18 nouveaux scénarios ne sont pas déclarés testés ni implémentés.
++
++## Reprise après ouverture de la session identité
++
++La conversation dédiée a livré l'audit IA1 et sept contre-exemples, sans
++modifier les sources applicatives. Son rapport a été consulté en lecture seule ;
++le chantier mémoire conserve ses sources et son suivi. L'état IA2/IA3 et les
++droits effectifs restent ouverts. Aucun message inter-chat n'a été envoyé.
++
++Le travail indépendant [M21](INCREMENT-MEMOIRE-17.md) vérifie la liaison de
++contenu des citations dans les outils de préparation ; il ne remplace ni
++l'attribution métier ni le contrôle d'usage de M20. Les producteurs et
++consommateurs à raccorder sont consolidés dans
++[l'inventaire M20](AUDIT-PROVENANCE-M20.md), sans inventer de nouvelle identité
++ou de permission.
+--- tests/memory_summary_source_id_vectors.json before
++++ tests/memory_summary_source_id_vectors.json after
+@@ -0,0 +1,38 @@
++[
++  {
++    "go_json": "{\"task\":\"b1\",\"attempt\":\"a1\",\"sha256\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}",
++    "ref": {
++      "task": "b1",
++      "attempt": "a1",
++      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
++    },
++    "source_id": "dialogue-42a5392e5842a9d030654f74e7528c79615f977113d3ba0ba6dc50fac944f64e"
++  },
++  {
++    "go_json": "{\"task\":\"legacy\",\"attempt\":\"\",\"sha256\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"}",
++    "ref": {
++      "task": "legacy",
++      "attempt": "",
++      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
++    },
++    "source_id": "dialogue-b7f02c7478f9d33d694ceb8de414b57154b7ab9dae0d3eb35590925b28fb5416"
++  },
++  {
++    "go_json": "{\"task\":\"cadrage-é\\u003c\\u0026\\u003e\",\"attempt\":\"a\\u2028b\\u2029c\",\"sha256\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\"}",
++    "ref": {
++      "task": "cadrage-é\u003c\u0026\u003e",
++      "attempt": "a\u2028b\u2029c",
++      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
++    },
++    "source_id": "dialogue-cfa99e843a5fabac1906827504057a0feb1aee31d389a84bd0d622e5796c35a9"
++  },
++  {
++    "go_json": "{\"task\":\"b\\\\quoted\\\"\",\"attempt\":\"tab\\tline\\n\",\"sha256\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\"}",
++    "ref": {
++      "task": "b\\quoted\"",
++      "attempt": "tab\tline\n",
++      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
++    },
++    "source_id": "dialogue-efc5da503a75f4b075bfc30c57914b901db2939141f2f027ad28be2e373950b9"
++  }
++]
+--- docs/plans/deepagents-integration/INCREMENT-MEMOIRE-17.md before
++++ docs/plans/deepagents-integration/INCREMENT-MEMOIRE-17.md after
+@@ -0,0 +1,62 @@
++# M21 — vérifier la liaison des citations à leur échange source
++
++Reprise du 16 octobre 2026 : l'utilisateur a ouvert la conversation dédiée aux
++identités. Codex seul ; `replan`, puis correction bornée avec APEX.
++
++## État réel et séparation des responsabilités
++
++La session « l'audit des identités » a livré IA1 : sept contre-exemples, aucune
++correction applicative. Son rapport et son plan ont été consultés en lecture
++seule. Aucun message inter-chat, agent délégué, appel de modèle ou lancement
++Swarm natif n'est autorisé ou nécessaire pour M21.
++
++Le chantier identité conserve IA2/IA3 et les sources communes de lancement,
++stockage et Trust. Cette reprise possède les outils de préparation mémoire,
++leurs tests Python, `docs/PROJECT-MEMORY.md`, son équivalent anglais et le suivi
++`deepagents-integration`. Les 13 contrats Go lus sont empreintés et restent
++inchangés. M20, attribution et droits effectifs, reste ouvert jusqu'à un contrat
++d'identité/d'autorisation réellement opérationnel.
++
++## Découverte et décision
++
++Origine : vérification du contrat entre `memorySummarySourceForWork` et
++`swarm_source.prepare`. Le producteur Go dérive chaque identifiant de citation
++de la référence JSON `task`, `attempt`, `sha256`, avec le suffixe question/réponse.
++Le convertisseur vérifie contenu, rôles et empreintes, mais ne contrôle pas cette
++liaison. Il accepte des identifiants renommés et un échange dupliqué sous des
++identifiants distincts. Le préparateur `admission.selection` consomme le même
++validateur et accepte aussi une référence extractive reconstruite sur ces alias.
++
++Preuve avant correction : douze tests du convertisseur, dont trois méthodes en
++échec pour cinq variantes ; sept tests du choix, dont deux nouvelles méthodes en
++échec. Les originaux sont dans `evidence/m21-20261016/before-*`. Ce sont des
++défauts de cohérence de préparation hors moteur, pas une preuve d'usurpation
++d'agent réussie ni de contournement de l'admission Go.
++
++Deux options : ajouter des contrôles indépendants à chaque CLI, ou corriger le
++validateur partagé depuis le contrat Go. La seconde est retenue : même refus
++pour la préparation et le choix, sans changer le schéma d'export ni les droits.
++Les fixtures Python doivent utiliser les identifiants réellement produits par
++Go ; leurs anciens alias `q` / `a` masquaient le défaut.
++
++## Réalisation et critères
++
++| Lot | Propriétaire / dépendance | Effet observable / vérification |
++| --- | --- | --- |
++| M21.1 | Codex ; M19 conservé | Reproduire le renommage, le doublon et leur propagation au choix, avant toute correction. Réalisé, échecs conservés. |
++| M21.2 | Codex ; M21.1 | Recalculer la liaison depuis les champs de la référence, avec la sérialisation Go ; refuser alias et répétition avant toute écriture. Compatibilité avec ordre JSON différent et ancien `attempt` vide. |
++| M21.3 | Codex ; M21.2 | Tests Python ciblés, mêmes sources préparées via les deux CLI et parcours source Go → référence → choix. Aucun modèle réel ; données et reçus historiques conservés. |
++| M21.4 | Codex ; M21.3 | Documentation FR/EN, recette, rapport et RETEX ; vérifier les empreintes des fichiers communs et distinguer les preuves sur binaire figé d'un déploiement. |
++
++Résultat de réalisation : M21.1–M21.4 réalisés et vérifiés dans leur périmètre
++local ; [rapport et RETEX](RESULTATS-MEMOIRE-17.md). Les 57 tests Python passent,
++les quatre vecteurs concordent et la recette publique passe cinq contrôles M19
++et cinq M18 sur le binaire M19 conservé, avec trois invocations scriptées et
++zéro modèle réel. L'inventaire M20 consolide les treize consommateurs ; leurs
++droits effectifs restent ouverts, ainsi que les identités IA2/IA3.
++
++Aucun champ propriétaire/auteur/principal n'est fabriqué. Une empreinte correcte
++établit une liaison de contenu ; elle n'établit ni authenticité, ni droit d'usage,
++ni autorisation de lancement. La protection demandée en M20 dépend toujours
++d'IA2/IA3. Les nouvelles découvertes utiles rejoignent ce suivi avec leur preuve,
++propriétaire et condition de reprise.
+--- docs/plans/deepagents-integration/RESULTATS-MEMOIRE-17.md before
++++ docs/plans/deepagents-integration/RESULTATS-MEMOIRE-17.md after
+@@ -0,0 +1,105 @@
++# M21 — liaison des citations vérifiée, relais identité conservé
++
++16 octobre 2026. Codex seul ; développement direct, `replan` et correction APEX
++bornée. **PASS local pour M21 ; M20 et IA2/IA3 restent ouverts.**
++
++## Résultat et périmètre
++
++Le convertisseur mémoire refusait les textes altérés, mais acceptait une citation
++renommée après recalcul des annotations et un échange répété sous d'autres
++identifiants. Le préparateur de choix acceptait aussi ces alias si le reçu
++extractif était reconstruit. Le validateur partagé vérifie désormais la liaison
++de chaque identifiant au JSON de référence émis par Go et refuse la répétition.
++Les deux CLI refusent avant création de sortie et conservent les entrées.
++
++Les fixtures Python utilisaient des identifiants `q` / `a` non produits par Go.
++Elles utilisent désormais le même format que le producteur réel. Quatre vecteurs
++retenus depuis la bibliothèque JSON Go vérifient encodage, échappement et ancien
++`attempt` vide. L'ordre des clés dans le paquet reçu ne change pas l'identité de
++source reconstruite. L'ancien échange sans clé de réponse reste compatible ;
++aucun auteur ou droit ne lui est inventé.
++
++Fichiers applicatifs modifiés dans ce lot :
++`tools/memory-evaluation/swarm_source.py` uniquement. Les deux modules de tests
++Python, le fichier de vecteurs et la documentation/suivi associés sont actualisés.
++Le préparateur `admission.py` reçoit la correction par son appel existant au
++validateur partagé ; son code reste inchangé. Aucune source Go, politique,
++configuration Admin, base de mission ou identité n'est modifiée par ce lot.
++
++## Preuves et contrôles
++
++Paquet : [`evidence/m21-20261016/`](evidence/m21-20261016/). HEAD
++`4e58f7cbf8200a58f69f1f4d03d657c3313fb642`, branche
++`codex/clear-product-method-names`, avec changements existants conservés.
++`baseline.json` conserve les dix préimages et les empreintes des treize sources
++communes lues ; le SHA Git seul ne décrit pas les modifications locales.
++
++| Critère | Vérification effectivement exécutée | Résultat / preuve |
++| --- | --- | --- |
++| Défaut avant correction | Douze tests convertisseur : trois méthodes nouvelles échouent sur cinq variantes ; sept tests de choix : deux nouvelles méthodes échouent. Les contrôles précédents restent verts. | Échec attendu conservé dans `before-source.*` et `before-selection.*` ; pas un PASS de protection. |
++| Refus partagé et non-régression | `python3 -m unittest discover -s tests -p 'test_memory_s*.py' -v` | 57 méthodes nommées passent : 49 précédentes et huit nouvelles ; première sortie dans `python-targeted.*`, résultat final lié aux empreintes dans `python-final.*`. |
++| Concordance Go/Python | Quatre vecteurs sérialisés/hachés par `encoding/json` et `crypto/sha256`, puis testés côté Python. | `source-id-vectors.*` et `tests/memory_summary_source_id_vectors.json`. Ce sont des vecteurs d'encodage, pas des admissions d'agents. |
++| Parcours public de bout en bout | `python3 tests/memory_summary_admission.py BINAIRE_M19 SORTIE_NOUVELLE` | Cinq contrôles M19 et cinq contrôles M18 passent, trois invocations scriptées, zéro appel de modèle ; `native.json`, `native/result.json`, `native/source-flow/result.json`. |
++| Sortie et refus | Les deux CLI rejettent une citation renommée avec sortie 2, sans fichier/dossier de sortie, sans modification des entrées et sans traceback. | Deux tests CLI nommés dans le groupe Python ; les sorties valides restent privées et ne remplacent pas un fichier existant. |
++| Diff, documentation et séparation | Contrôle global `git diff --check`, fins de ligne des fichiers possédés, liens relatifs et empreintes des contrats Go. | PASS : 19 liens locaux résolus, 13 contrats communs inchangés ; `owned-changes.patch` / `.json` et `audit-final.json`. Aucun fichier du chantier identité modifié. |
++
++Le parcours public utilise le binaire M19 conservé
++`/tmp/swarm-m19-bin-o0uuhvjr/swarm`, SHA-256
++`026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2`.
++La correction est dans les outils Python réellement exécutés par la recette.
++Les sources Go concernées restent inchangées ; aucune nouvelle compilation Go
++n'est requise pour cette correction hors moteur. Cette recette ne qualifie pas
++les changements de consignes embarquées intervenus depuis M19, ni un nouveau
++binaire, ni un déploiement du serveur utilisateur.
++
++Les reçus détaillés lient les entrées Python, la recette et le binaire à leurs
++empreintes avant/après. Les fixtures sont des racines temporaires isolées ; les
++fournisseurs et le serveur démarrés par la recette sont ceux de cette fixture.
++Les résultats M19 et IA1 historiques ne sont ni remplacés ni renotés.
++Le serveur utilisateur est encore prêt sous le PID 2186583, à
++`http://127.0.0.1:38433/`, lors du contrôle final en lecture seule ; il n'a pas été
++redémarré ni remplacé par cette reprise.
++
++## RETEX et améliorations conservées
++
++La cause était une validation incomplète du format réellement produit, masquée
++par des fixtures plus permissives. Corriger chaque CLI aurait dupliqué la règle.
++La correction du validateur commun garde le même schéma et atteint les deux
++consommateurs existants. Les nouvelles régressions incluent les alias malgré
++empreintes concordantes, la répétition, le refus sans sortie, l'ordre des clés,
++l'ancienne clé vide et l'encodage Go.
++
++Incident de méthode conservé : certaines lectures terminal trop larges ont été
++tronquées et une recherche a cité un nom de fichier inexistant. Aucune de ces
++sorties n'est utilisée comme inventaire complet ni comme preuve PASS. Les
++contrats utiles sont lus par symboles/fichiers existants ; les sorties de tests
++et de recettes sont conservées intégralement. Un premier wrapper de tests
++n'affichait que la sortie immédiate et perdait l'identifiant du processus ; le
++reçu final a été relu avant toute annonce de réussite ou modification des sources.
++Le premier reçu Python PASS ne liait pas les empreintes des entrées. Une dernière
++exécution ciblée est donc justifiée par cette preuve manquante et enregistrée
++séparément dans `python-final.*`, avec empreintes avant/après identiques ; la
++sortie initiale est préservée. Aucun élargissement des tests Go n'est effectué.
++
++L'[inventaire M20](AUDIT-PROVENANCE-M20.md) consolide treize voies de consommation,
++dont historique automatique, assistant, brief, RETEX et import. Une empreinte
++cohérente ne rend pas le texte authentique ou autorisé. L'identité de projet ne
++doit pas être déduite du seul hash de chemin racine ; ce point est conservé pour
++IA2/M20, sans inventer maintenant un nouvel identifiant ni une autorisation.
++
++## État du besoin initial et condition de reprise
++
++M21 est une correction indépendante du convertisseur, pas l'application du
++propriétaire, de l'auteur et du droit d'usage demandée en M20. La conversation
++« l'audit des identités » a livré sept contre-exemples IA1 sans correction des
++droits. Ses sources communes restent en lecture seule dans cette reprise ;
++aucun message inter-chat ni sous-agent n'est lancé.
++
++Reste à recevoir d'IA2/IA3 : un principal et un destinataire authentifiés, une
++décision d'usage applicable au contenu exact, des règles de délégation/révocation
++et une frontière de contrôle protégée. Le chantier mémoire pourra alors appliquer
++ces contrôles aux treize consommateurs et vérifier demande → décision → application
++→ réception. Les questions de raccordement sont dans l'inventaire M20.
++Le propriétaire du socle est le chantier identité ; celui des consommateurs est
++ce chantier mémoire. Aucune permission implicite, ouverture hiérarchique,
++qualification LLM, revue indépendante ou acceptation globale n'est revendiquée.
+--- docs/plans/deepagents-integration/AUDIT-PROVENANCE-M20.md before
++++ docs/plans/deepagents-integration/AUDIT-PROVENANCE-M20.md after
+@@ -0,0 +1,79 @@
++# M20 — producteurs, provenance et consommateurs du cadrage
++
++16 octobre 2026. Codex seul, inspection du code du checkout direct. Inventaire
++de contrat, distinct d'une recette de permissions ; les références ci-dessous
++sont des chemins réellement lus. Le [plan M20](INCREMENT-MEMOIRE-16.md) reste
++ouvert pour l'identité, l'attribution métier et les droits. La correction
++[M21](RESULTATS-MEMOIRE-17.md) ne couvre que la liaison de contenu hors moteur.
++
++## Ce que l'on peut effectivement attribuer aujourd'hui
++
++| Élément | Producteur réel | Fait conservé et limite |
++| --- | --- | --- |
++| Question | `agents_store.go`, `prepareLaunch` | `Task.Question` reçoit `Launch.Instruction` lors de la création de la tâche Brainstorm. Le contenu ne porte pas une identité humaine authentifiée. |
++| Réponse | `agents_store.go`, `settleAgentTask` | Préfère `Agent.Reply`, sinon relit le rapport de cadrage borné ; renseigne `Task.Response` et ajoute `BrainstormAnswer`. Une réponse conservée ne prouve ni succès actuel ni acceptation. |
++| Référence de réponse | `model.go`, `BrainstormAnswer` ; producteur ci-dessus | `attempt` contient **Agent.ID**, pas `Agent.Attempt`. `At` date la conservation. Sans ligne d'agent cohérente et autorité attestée, ce lien ne devient pas une identité authentifiée. |
++| Ancienne réponse | `dialogue_context.go`, `dialogueHits` | Sans `Answers`, utilise `Response` avec `attempt` vide. Ne pas inventer un auteur ni éliminer cette histoire par migration silencieuse. |
++| Propriétaire courant de tâche | `agents_store.go`, `prepareLaunch` | `Task.Owner` est mis au fournisseur au lancement. Ce champ mutable ne représente pas la propriété stable du cadrage. |
++| Brief adopté | `brainstorm.go`, `adoptBrief` | Gèle tâche, texte, empreinte et date après comparaison du texte relu. `PlanningBrief` ne porte ni auteur humain, ni propriétaire métier, ni référence exacte `DialogueRef` de la version adoptée. |
++| Référence de contenu | `dialogue_context.go`, `DialogueRef` / `resolveDialogue` | Résout tâche, clé de réponse et SHA-256 de question + saut de ligne + réponse dans le même `Work`. Cette résolution prouve une concordance, pas un droit de lecture ou de partage. |
++| Paquet de résumé | `memory_summary_source.go`, `memorySummarySourceForWork` | Lie un instantané opérateur, la révision et les échanges sélectionnés. `project_sha256` est le hash du chemin racine : liaison locale, pas identité globale du projet ni racine cryptographique de confiance. |
++
++La provenance technique disponible doit rester distincte de la propriété, de
++l'auteur attesté et des permissions. La session identité a confirmé dans IA1
++que les contrôles Trust ne gouvernent pas encore l'admission générale des agents
++et que le processus fournisseur scripté peut accéder au contrôle sous le même
++compte système. Ne pas traiter une ligne d'agent actuelle comme preuve complète
++d'authenticité. Aucun nouveau nom d'utilisateur, principal ou propriétaire n'a
++été ajouté par cet audit.
++
++## Où les textes sont consommés
++
++| Voie | Source inspectée | Contrôle existant | Raccord d'usage à prévoir |
++| --- | --- | --- | --- |
++| Lecture opérateur, recherche | `console_cli.go`, affichage d'agent ; `web_server.go`, `dialogue-search` ; `dialogue_context.go`, `searchDialogue` ; `web/brainstorm.js` | Travail courant, recherche bornée, session web/origine/CSRF selon parcours. | Distinguer une inspection administrateur autorisée d'une lecture par un agent ; la session partagée n'identifie pas une personne. |
++| Historique automatique de cadrage/plan | `brainstorm.go`, `brainstormHistory` ; `agents_store.go`, assemblage du prompt | Quatre derniers échanges hors échange courant. | Contrôler l'usage de chaque question/réponse ; une absence de sélection explicite n'autorise pas leur diffusion automatique. |
++| Brief commun hors hiérarchie | `agents_store.go`, assemblage du prompt | Copie `PlanningBrief.Text` quand `Planning == nil`. | Droits sur la version adoptée et sur la tâche destinataire, indépendants de l'auteur. |
++| Brief pour worker racine | `worker_context.go`, `workerExecutionContext` | En hiérarchie, le brief racine reste réservé au périmètre racine ; les enfants gardent leur contrat propre. | Ne pas contourner cette séparation avec une référence ou un résumé ; vérifier aussi le droit d'usage dans le périmètre racine. |
++| Citations explicites intégrales | `dialogue_context.go`, `dialogueAttachments` ; `agents_store.go` | Références résolues dans le travail, dédoublonnage et capacité des pièces jointes. | Autorisation de transmission à la tâche/instance destinataire ; hash correct insuffisant. |
++| Assistant de page | `assist_context.go`, `brainstormContext` | Échanges sélectionnés, sinon six derniers ; question/réponse et brief marqués comme texte non fiable. | C'est une transmission à une IA, même si l'écran est consulté par un opérateur ; contrôler destination et usage. |
++| Export opérateur pour résumé | `memory_summary_source.go`, `memorySummarySource` | Même lecture de ligne/révision, sélection explicite, champs et sources vérifiés. | Le contrat `local_operator` n'est pas un contexte délégué autorisé ; vérifier l'autorité de l'exporteur et les usages des sources. |
++| Préparation locale de résumé/choix | `tools/memory-evaluation/swarm_source.py`, `admission.py` | Liaison des octets, des citations, des annotations et du reçu ; M21 refuse alias et répétition. | Outils hors moteur : aucun droit créé, aucune identité authentifiée par une empreinte. |
++| Résumé transmis au worker | `memory_summary_selection.go`, `memorySummaryAttachment` et contrôle avant départ | M19 reconstruit les textes et exclut l'instantané opérateur ; sélection explicite, confirmation et fraîcheur avant processus. | Contrôler le droit sur les sources lors de l'aperçu, de la réservation et du départ, avec révocation et effet observé. |
++| Plan structuré depuis brief/cadrage | `plan_store.go`, `planSource`, `readPlan`, `commitPlan` | Lien au brief courant, réponse finale et empreinte, décisions conservées, validation du plan. | Le plan proposé ne crée ni droits de création d'agent ni permission implicite d'utiliser les textes sources. |
++| RETEX et export de leçon | `retex.go`, `retexAction`, `retexMarkdown`, `retexGuide` | Source dialogue ou recette résolue ; contrôles de qualification et de preuve pour les étapes concernées. | Distinguer citation d'origine, reformulation, publication et droits de réutilisation. |
++| Mémoire de projet réutilisée | `project_memory.go`, `verifiedMemorySource`, `validateMemoryVersion` | RETEX vérifié et source courante, version/hash/projet, retrait et import contrôlés. | Un RETEX vérifié n'établit pas à lui seul l'autorité de diffuser l'échange d'origine. |
++| Archives et contextes reçus | `archive.go`, `export` / `importBundle` ; `dialogue_context.go`, `SavedContext` | État/historique exportés ensemble ; projet mémoire importé et sélections marqués non admis localement. | Garder les textes et décisions historiques sans activer de nouveaux droits. Définir l'origine importée du cadrage/brief dans le futur contrat, sans réécriture des auteurs passés. |
++
++Cet inventaire vient de lectures de code. Le parcours M21 observe réellement
++export CLI/API, préparation et réception de citations par un worker scripté ; il
++ne teste pas l'autorisation des treize voies. L'audit ne déclare donc pas
++IDA-13 conforme, ni M20.3/4 réalisés.
++
++## Raccordement à IA2/IA3 et critères de reprise
++
++Le chantier mémoire doit recevoir un contrat d'autorité utilisable pour :
++
++1. identifier le demandeur et l'instance destinataire depuis une preuve courante,
++   sans accepter ces qualités sur simple déclaration du texte ou du fournisseur ;
++2. désigner le propriétaire logique du cadrage et les versions de contenu, tout
++   en gardant séparés auteur original et responsable actuel ;
++3. décider lecture, résumé et transmission vers un destinataire précis, y compris
++   les voies automatiques et l'assistant ; ne pas faire d'un droit de lecture un
++   droit général de rediffusion ;
++4. revalider cette décision lors de l'application, avec révocation, changements de
++   périmètre et reprise après panne ; enregistrer refus, décision et effet réel ;
++5. traiter anciens échanges, réattribution explicite, import et contexte déjà reçu
++   sans inventer une identité ou effacer l'historique.
++
++Ce sont des besoins d'interface, pas des champs JSON, endpoints ou rôles nouveaux
++déclarés disponibles. Propriétaire du contrat d'identité : conversation dédiée,
++IA2/IA3 ; propriétaire des consommateurs et des tests d'usage : chantier mémoire,
++M20. La reprise des contrôles effectifs exige ce contrat puis sa preuve publique
++de refus/application. La documentation seule ne satisfait pas cette dépendance.
++
++Améliorations retenues : valider les fixtures contre le producteur réel (M21,
++vérifié) ; ne pas confondre hash de racine et identité de projet (IA2/M20,
++contrat à définir) ; couvrir les copies indirectes et les archives (M20.3/4,
++à réaliser après IA2/IA3). Leur valeur est d'éviter qu'une bonne garde du résumé
++laisse subsister un autre chemin de diffusion non contrôlé.

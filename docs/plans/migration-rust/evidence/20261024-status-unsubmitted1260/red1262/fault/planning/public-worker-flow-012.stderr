@@ -1,0 +1,14 @@
+{
+  "error": "root-database-identity",
+  "failure": {
+    "causes": [
+      "root-database-identity",
+      "database-identity-operation:Prepare",
+      "sqlite-code:5"
+    ],
+    "code": "root-database-identity",
+    "message": "root-database-identity",
+    "retryable": false
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "argv": [
+      "/tmp/swarm-actions-confiance-launch/t2-final-authority-key-binary",
+      "--root",
+      "/tmp/swarm-authenticated-refusal-7o3u08y5",
+      "--json",
+      "trust",
+      "config-apply",
+      "--input",
+      "-"
+    ],
+    "input_sha256": "76c52eed0390fc08accf438c6ef7406c589c21700c5951709ce640214473c688",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "{\n  \"error\": \"au moins trois identités séparées sont requises\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"au moins trois identités séparées sont requises\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+  }
+]

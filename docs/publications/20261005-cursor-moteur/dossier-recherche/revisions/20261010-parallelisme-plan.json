@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "observed_at": "2026-10-10T18:57:23.015766+00:00",
+  "operation": "task update",
+  "decision": "Préciser les preuves de parallélisme dans les remises existantes ; graphe et contrats conservés",
+  "events": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "event_id": "parallelism-handoff-6a0ff2fb5a98440cb3d07fe9c68b62c0",
+      "before_revision": 51,
+      "after_revision": 52,
+      "fields_changed": [
+        "next"
+      ],
+      "instructions": "Précision opérateur autorisée le 10 octobre 2026 : traiter le parallélisme des superviseurs ET les dépendances du plan. Pour les critères existants de découverte/adaptation et de sous-planification concurrente, démontrer deux sous-planificateurs actifs simultanément sur des périmètres distincts et une découverte conduisant à une adaptation persistée par les opérations publiques réellement disponibles. Justifier chaque dépendance par les entrées, écritures communes et preuves nécessaires ; conserver les dépendances réelles. Documenter les refus du contrat hiérarchique géré et des modifications pendant une tâche active. Utiliser des racines isolées pour les tests, aucune mutation directe de la base active. La mission actuelle reste séquentielle ; ne pas prétendre que ces instructions changent son graphe. Consulter dans le dépôt source /home/fpizzi/workspace/swarm la note docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-parallelisme-plan.md et reporter l’architecture pertinente dans votre candidat. Configuration réglable persistée et Admin FR/EN avec T5, aucune constante arbitraire ni hausse de plafond."
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "event_id": "parallelism-handoff-ace3dbefd24d4de0902250461f8edb2b",
+      "before_revision": 52,
+      "after_revision": 53,
+      "fields_changed": [
+        "next"
+      ],
+      "instructions": "Précision opérateur autorisée le 10 octobre 2026 pour les mesures de débit/contexte/coût : comparer le même scénario séquentiel et concurrent en racines temporaires ; prouver le chevauchement de travaux indépendants par leurs identités et événements, mesurer temps total, attente centrale, livraisons acceptées, coût connu/inconnu, conflits et reprise. Ne pas déduire un gain de débit du nombre d’appels d’outils. Documenter les dépendances restantes et toute intervention humaine. Consulter la note source docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-parallelisme-plan.md dans /home/fpizzi/workspace/swarm. Consulter aussi 20261010-audit-suite-go.md et .json : suite Go complète observée en 504.624s, 1090 pass/8 skip/1 fail manifeste historique, sans timeout avec -timeout15m. Ces résultats sont ceux de la révision source auditée, pas de votre candidat. Préserver la qualification historique, séparer le défaut de manifeste et les régressions ; un timeout est celui du paquet, pas la preuve d’un test individuel bloqué. Rejouer les contrôles autorisés et remettre commandes/options/codes de sortie exacts."
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "event_id": "parallelism-handoff-10da67fa6bf1458ea3a8a6345575d231",
+      "before_revision": 53,
+      "after_revision": 54,
+      "fields_changed": [
+        "next"
+      ],
+      "instructions": "Précision opérateur autorisée le 10 octobre 2026 pour le critère de délégation parallèle avec fournisseur réel : observer deux travaux indépendants réellement simultanés, leur supervision et leurs remises au propriétaire ; citer identités, événements et chevauchement temporel. Une simulation, deux rôles déclarés ou un nombre de créneaux ne prouvent pas ce résultat. Examiner la justification des dépendances et les décisions persistées d’adaptation du plan. Distinguer l’intervention humaine ayant précisé les remises de l’autonomie effectivement observée ; aucun PASS sans preuve sur votre candidat exact. Consulter docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-parallelisme-plan.md dans le dépôt source /home/fpizzi/workspace/swarm. Conserver la revue indépendante, les contrôles et les limites existantes."
+    }
+  ],
+  "autonomous_replanning_demonstrated": false,
+  "dependencies_changed": false,
+  "budgets_changed": false,
+  "documentation_handoff": {
+    "task": "plan-ca937edf4e-T3",
+    "observed_at": "2026-10-10T19:29:48.140084+00:00",
+    "operation": "task update",
+    "event_id": "traceability-development-b00ac913c84448d79fb54e713e6816c1",
+    "before_revision": 65,
+    "after_revision": 66,
+    "fields_changed": [
+      "next"
+    ],
+    "work": "w-ca937edf4e0abd85f8d3d67b",
+    "sources": [
+      {
+        "path": "docs/architecture/AGENT-PARALLELISM.md",
+        "sha256": "c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d"
+      },
+      {
+        "path": "docs/en/AGENT-PARALLELISM.md",
+        "sha256": "83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40"
+      }
+    ],
+    "reason": "Renvoi vers le contrat de traçabilité et exigences de développement ; consignes publiques T3 actualisées"
+  },
+  "documentation_verification": {
+    "mermaid_diagrams": 12,
+    "languages": [
+      "fr",
+      "en"
+    ],
+    "parser_and_svg_render": "pass",
+    "browser_errors": [],
+    "local_links": "pass",
+    "diff_check": "pass",
+    "functional_parallelism": "not_measured",
+    "command": "node /tmp/swarm-agent-parallelism-check.cjs",
+    "artifacts": "/tmp/swarm-agent-parallelism-mermaid-check.json"
+  },
+  "documentation_handoff_history": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "task": "plan-ca937edf4e-T3",
+      "sources": [
+        {
+          "path": "docs/architecture/AGENT-PARALLELISM.md",
+          "sha256": "20c6a6fe0ea9e909383d203f606198df03d87c7f3081c165f90662fcaddf61f4"
+        },
+        {
+          "path": "docs/en/AGENT-PARALLELISM.md",
+          "sha256": "0edca8e991a009983345c204ff58cdcc350d328ae5a5cc42c4819f6984b08059"
+        }
+      ],
+      "observed_at": "2026-10-10T19:04:05.791454+00:00",
+      "operation": "task update",
+      "event_id": "parallelism-documentation-3ae56380e0374a84b86e92c0ba584a33",
+      "before_revision": 54,
+      "after_revision": 55,
+      "fields_changed": [
+        "next"
+      ]
+    },
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "task": "plan-ca937edf4e-T3",
+      "sources": [
+        {
+          "path": "docs/architecture/AGENT-PARALLELISM.md",
+          "sha256": "a12a9d1230524e86590f0bdf9c4665d08b6ad70621e49fa77206d390ce1103f0"
+        },
+        {
+          "path": "docs/en/AGENT-PARALLELISM.md",
+          "sha256": "cfc18e92c33fb8fe100889c4481ad07541621404208d68e731863b6e876db33c"
+        }
+      ],
+      "observed_at": "2026-10-10T19:04:50.784914+00:00",
+      "operation": "task update",
+      "event_id": "parallelism-diagram-layout-fd358a8855614ee0b3d6ee9b85a4800d",
+      "before_revision": 55,
+      "after_revision": 56,
+      "fields_changed": [
+        "next"
+      ],
+      "reason": "Titres Mermaid raccourcis après inspection visuelle ; consignes et contrats conservés"
+    }
+  ]
+}

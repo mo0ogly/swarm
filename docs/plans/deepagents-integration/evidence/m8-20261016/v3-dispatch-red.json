@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "tests/test_memory_codex_events.py",
+    "CodexEvents.test_v3_pack_selects_conditional_schema_without_calling_provider",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T08:07:20.227713+00:00",
+  "ended_at_utc": "2026-10-16T08:07:21.185308+00:00",
+  "exit_code": 1,
+  "expected_for_reproducer": 1,
+  "cause": "V3 dispatch not implemented; old protocols retain their intentionally narrower scope",
+  "test_count": 1,
+  "real_model_calls": 0,
+  "log_sha256": "35849ad5da523d87df9c774ab88f9cf6913807d13ed5614f83468b5157d6345f"
+}

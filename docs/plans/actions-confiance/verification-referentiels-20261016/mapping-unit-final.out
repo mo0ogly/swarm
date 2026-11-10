@@ -1,0 +1,15 @@
+test_false_claims_explicit (__main__.MappingClaims.test_false_claims_explicit) ... ok
+test_unsupported_claims (__main__.MappingClaims.test_unsupported_claims) ... ok
+test_duplicate_json (__main__.MappingValidation.test_duplicate_json) ... ok
+test_evidence_and_source_integrity (__main__.MappingValidation.test_evidence_and_source_integrity) ... ok
+test_invalid_matrix_contracts (__main__.MappingValidation.test_invalid_matrix_contracts) ... ok
+test_non_regular_file (__main__.MappingValidation.test_non_regular_file) ... ok
+test_reference_bool_schema (__main__.MappingValidation.test_reference_bool_schema) ... ok
+test_symlink_and_escape (__main__.MappingValidation.test_symlink_and_escape) ... ok
+test_unbound_source (__main__.MappingValidation.test_unbound_source) ... ok
+test_valid_is_not_compliance (__main__.MappingValidation.test_valid_is_not_compliance) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.170s
+
+OK

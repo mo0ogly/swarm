@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "work": "w-32ec0b728851684bad4cbf71",
+  "revision": 8,
+  "controls": {
+    "revision": 8,
+    "paused": null,
+    "autonomy": null,
+    "slots": null,
+    "consent_enabled": null,
+    "archived": false
+  },
+  "supervision": null,
+  "agents": [],
+  "limitations": [
+    "native-status-is-not-historical-json",
+    "sequential-native-read-observations",
+    "stored-registration-is-not-process-liveness",
+    "no-task-acceptance-derived",
+    "read-only-no-conductor-action"
+  ]
+}

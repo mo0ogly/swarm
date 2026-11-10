@@ -1,0 +1,15 @@
+=== RUN   TestFinalCitationRecoveryReplacesLegacyContractAfterReopen
+=== RUN   TestFinalCitationRecoveryReplacesLegacyContractAfterReopen/operator
+    managed_review_citation_feedback_test.go:196: sizes 164551 168226 22007 parts 1
+=== RUN   TestFinalCitationRecoveryReplacesLegacyContractAfterReopen/supervisor
+    managed_review_citation_feedback_test.go:196: sizes 164551 168226 22007 parts 1
+--- PASS: TestFinalCitationRecoveryReplacesLegacyContractAfterReopen (5.96s)
+    --- PASS: TestFinalCitationRecoveryReplacesLegacyContractAfterReopen/operator (3.10s)
+    --- PASS: TestFinalCitationRecoveryReplacesLegacyContractAfterReopen/supervisor (2.86s)
+=== RUN   TestReferencedCitationInstructionsAloneCannotRestart
+--- PASS: TestReferencedCitationInstructionsAloneCannotRestart (0.35s)
+=== RUN   TestReviewMethodRestartRequiresExplicitCorrectionAndKeepsHistory
+    managed_review_method_restart_test.go:28: sizes 164551 168226 22007 parts 1
+--- PASS: TestReviewMethodRestartRequiresExplicitCorrectionAndKeepsHistory (1.30s)
+PASS
+ok  	swarm.local/companion/internal/engine	7.639s

@@ -1,0 +1,21 @@
+[
+  "rustc",
+  "--edition=2021",
+  "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/stdio-after-shared-workspace/before/main.rs",
+  "-L",
+  "dependency=/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps",
+  "-L",
+  "dependency=/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug",
+  "-o",
+  "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/stdio-after-shared-workspace/before/probe",
+  "--extern",
+  "swarm_engine=/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libswarm_engine-8ee5b2515d0e3fad.rlib",
+  "--extern",
+  "nix=/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libnix-d5cd711d197fb0e3.rlib",
+  "--extern",
+  "rustix=/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/librustix-772a604bba6979b1.rlib",
+  "--extern",
+  "rusqlite=/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/librusqlite-2955c29bdc19ef05.rlib",
+  "--extern",
+  "swarm_biba_linux=/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/libswarm_biba_linux.rlib"
+]

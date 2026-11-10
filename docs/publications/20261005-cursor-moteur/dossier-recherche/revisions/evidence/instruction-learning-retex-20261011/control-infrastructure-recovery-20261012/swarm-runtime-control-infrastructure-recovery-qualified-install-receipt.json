@@ -1,0 +1,69 @@
+{
+  "at": "2026-10-12T13:06:36.763572+00:00",
+  "old_pid": 3850942,
+  "new_pid": 2833959,
+  "old_sha256": "d76af56bffc1b7864c5455e109f054716c4a4b218b58c23521e10747880faf74",
+  "installed_sha256": "ca75c3b3c6c0176cec4411a10fb27d5dbf6643a587e6e0174f7c904540dd9c83",
+  "executed_sha256": "ca75c3b3c6c0176cec4411a10fb27d5dbf6643a587e6e0174f7c904540dd9c83",
+  "source_digest": "21b1e7fe8a43f2e7f43929273e174dd2c27f296495b59faa3ddc008629de38e5",
+  "schema": 30,
+  "idle_before": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 763,
+      "paused": false,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "idle_after": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 765,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "public_work_post_pause_bodies_exact": true,
+  "public_cli_init_for_contract_upgrade": true,
+  "direct_storage_operation_or_copy": false,
+  "private_log_mode": "0600",
+  "health": "ready",
+  "launch_allowed": true,
+  "scope": "Qualified control/infrastructure recovery installed quiescent; mission paused for immutable future-input routing. No native acceptance inferred."
+}

@@ -1,7 +1,7 @@
 """R2 targeted engine proof; never runs the full suite or paid providers."""
 import json
 import subprocess
-command = ['go', 'test', '-v', '-count=1', '-run', 'Test(ReviewOutput|IndependentReviewPreflightUsesLiteralObservationBeforeReservation|IndependentReviewStepGatesDossierBeforeProviderCall|ControlsPrecedeReviewAndAreNotRepeated|ReviewEvidenceRejectsImportedStaleAndWrongAttempt|ChangedPendingReportRechecksOnceWithoutNewWorker|ResumeValidationUsesAttemptWorkspace)', '.']
+command = ['go', 'test', '-v', '-count=1', '-run', 'Test(ReviewOutput|IndependentReviewPreflightUsesLiteralObservationBeforeReservation|IndependentReviewStepGatesDossierBeforeProviderCall|ControlsPrecedeReviewAndAreNotRepeated|ReviewEvidenceRejectsImportedStaleAndWrongAttempt|ChangedPendingReportRechecksOnceWithoutNewWorker|ResumeValidationUsesAttemptWorkspace)', './internal/engine']
 print('COMMAND ' + json.dumps(command), flush=True)
 result = subprocess.run(command, capture_output=True, text=True)
 print(result.stdout, flush=True)

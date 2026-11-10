@@ -1,0 +1,12 @@
+{
+  "error": "trust-proof-integrity",
+  "failure": {
+    "causes": [
+      "trust-proof-integrity"
+    ],
+    "code": "trust-proof-integrity",
+    "message": "trust-proof-integrity",
+    "retryable": false
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,37 @@
+{
+  "test_environment": {
+    "SWARM_MEMORY_RECIPE_BUNDLE": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m27-20261017/recipe-bundle.zip"
+  },
+  "status": "PASS",
+  "steps": [
+    {
+      "kind": "tests",
+      "command": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "./internal/engine",
+        "-run",
+        "^TestProjectMemoryRecipeBundle$",
+        "-count=1",
+        "-timeout=0",
+        "-json"
+      ],
+      "start": "2026-10-17T12:58:25.288069+00:00",
+      "end": "2026-10-17T12:58:31.243864+00:00",
+      "exit_code": 0,
+      "log": "recipe-tests.jsonl"
+    }
+  ],
+  "passed": [
+    "TestProjectMemoryRecipeBundle"
+  ],
+  "failed": [],
+  "skipped": [],
+  "inputs_unchanged": true,
+  "changed_inputs": [],
+  "binary": null,
+  "binary_sha256": null,
+  "global_watchdog": "disabled: go test -timeout=0, subprocess without timeout",
+  "toolchain": "go version go1.24.3 linux/amd64"
+}

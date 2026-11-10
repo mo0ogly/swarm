@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "id": "paea-private-guarded-read",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-protected-signer.json",
+    "tests/fixtures/paea_provisioning_request.json",
+    "tools/verification/recipes/paea-private-guarded-read.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "private-owned-file-read",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-config",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "private_read",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "private_read_actual_close_error_refuses_bytes_then_recovery_reads_exact"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "guarded-read-stream-and-physical-faults",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-config",
+        "--lib",
+        "store::guarded_read::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed",
+        "guarded_read_actual_named_substitution_before_and_after_read_refuses",
+        "guarded_read_primary_and_actual_close_hook_causes_both_survive"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "old-documents-publication-contract",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-config",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "private_documents",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed",
+        "private_documents_partial_enospc_sync_close_failures_preserve_original_and_recover"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "current-control-writes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "control::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "16 passed; 0 failed",
+        "both_authority_and_storage_failures_survive_pending_exact_event_recovery",
+        "authenticated_composition_holds_both_real_authorities_through_one_effect",
+        "authenticated_composition_posteffect_errors_keep_inner_storage_and_outer_outcome",
+        "error_debug_keeps_private_after_storage_response_structured_and_redacts_text",
+        "authenticated_composition_close_keeps_both_independent_failures_and_recovers_idempotently"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "current-personal-coordinator-writes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "personal_coordinator",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed",
+        "personal_coordinator_actual_process_exit_after_each_durable_phase_recovers_once"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "initial-material-private-startup",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "provisioning",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "provisioning_material_drives_actual_cold_lifecycle_without_business_key"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

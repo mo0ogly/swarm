@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-a7984af18130910ae413837756aece88157296ca30f41b96ef4e97cc180b2e1d",
+    "work",
+    "show",
+    "w-10fb269432444817aedce668",
+    "--root",
+    "/tmp/swarm-model83-74_5nz19",
+    "--json"
+  ],
+  "global_watchdog": null,
+  "explicit_fixture_cache": {
+    "CODEX_HOME": "/tmp/swarm-model83-74_5nz19/codex-home"
+  }
+}

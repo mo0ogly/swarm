@@ -1,0 +1,9 @@
+=== RUN   TestManagedFragmentEveryInspectionReceivesCurrentCriteria
+    managed_review_scope_test.go:46: packet 0 receives no current criterion
+--- FAIL: TestManagedFragmentEveryInspectionReceivesCurrentCriteria (0.29s)
+=== RUN   TestManagedFragmentRejectsUnknownScopeVersion
+    managed_review_scope_test.go:86: unknown scope contract accepted
+--- FAIL: TestManagedFragmentRejectsUnknownScopeVersion (0.34s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.664s
+FAIL

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/run-controls-after.py", line 23, in <module>
+    prepared=call('candidate',['task','validation-candidate',work],r);assert not prepared['process_started'] and not prepared['job_created']
+                                                                                 ~~~~~~~~^^^^^^^^^^^^^^^^^^^
+KeyError: 'process_started'

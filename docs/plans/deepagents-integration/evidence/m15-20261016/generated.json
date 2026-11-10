@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "scripts/i18n/build.cjs",
+    "--check"
+  ],
+  "started_at_utc": "2026-10-16T18:21:24.377831+00:00",
+  "duration_seconds": 1.219,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "42f25ec250d14d807d41d870178e5161cb7170b1e6ab1537e57f1361d08a4431",
+  "real_model_calls": 0
+}

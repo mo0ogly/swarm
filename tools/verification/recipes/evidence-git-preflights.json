@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "evidence-git-preflights",
+  "inputs": [
+    "tools/verification/archive_preflight.py",
+    "tools/verification/git_preflight.py",
+    "tools/verification/test_preflights.py",
+    "tools/verification/PREFLIGHTS*.md",
+    "tests/fixture_area.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "isolated-public-cli-regressions",
+      "command": [
+        "python3",
+        "tools/verification/test_preflights.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREFLIGHT_TESTS_PASS",
+        "\"status\": \"PASS\""
+      ],
+      "required_stderr": [
+        "test_archive_read_only_exact_control",
+        "test_archive_split_crosses_header_and_payload",
+        "test_archive_directory_only_pointer_has_no_original",
+        "test_archive_selected_non_regular_refuses",
+        "test_archive_late_duplicate_refuses",
+        "test_archive_wrong_digest_refuses",
+        "test_archive_truncated_selected_payload_refuses",
+        "test_archive_bad_manifests_refuse",
+        "test_archive_missing_or_alias_part_refuses",
+        "test_archive_bad_terminator_or_trailing_data_refuses",
+        "test_archive_descriptor_detects_changed_source",
+        "test_git_equal_and_dirty_work_are_observed_without_writes",
+        "test_git_ahead_contains_source",
+        "test_git_behind_refuses_then_local_tracking_recovery",
+        "test_git_divergence_refuses",
+        "test_git_missing_source_refuses",
+        "test_git_source_not_in_head_refuses",
+        "test_git_missing_tracking_refuses",
+        "test_git_wrong_branch_refuses",
+        "test_git_detached_refuses",
+        "test_git_changed_observation_refuses",
+        "test_git_wrong_root_refuses",
+        "test_git_renamed_paths_and_injected_repository_env",
+        "Ran 23 tests",
+        "\nOK\n"
+      ]
+    }
+  ]
+}

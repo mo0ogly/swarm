@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-preauth-publication-resume-20261015-1100",
+  "expected_revision": 460,
+  "reason": "Replan : publication préauth corrigée, refus sans mutation et reprise opérateur exacte vérifiés par 126 cas Go race et sept recettes publiques. Reprendre avant nouvelle remise corrective liée à R21 ; aucun avis réutilisé."
+}

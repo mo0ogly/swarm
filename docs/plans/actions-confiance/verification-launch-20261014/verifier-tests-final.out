@@ -1,0 +1,9 @@
+test_content_and_rejection (__main__.VerifierContract.test_content_and_rejection) ... ok
+test_ebpf_absence_is_environment_failure (__main__.VerifierContract.test_ebpf_absence_is_environment_failure) ... ok
+test_missing_recipe_fails (__main__.VerifierContract.test_missing_recipe_fails) ... ok
+test_operator_copy_and_containment (__main__.VerifierContract.test_operator_copy_and_containment) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.436s
+
+OK

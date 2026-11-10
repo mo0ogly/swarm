@@ -1,0 +1,2449 @@
+{
+  "schema_version": 1,
+  "scope": "Documented internal architecture contracts. Edges describe required relationships, not global Rust delivery/qualification. Dashed links mark explicitly pending integration; solid links do not establish runtime qualification.",
+  "sources": {
+    "engine": {
+      "path": "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+      "section": "Protocole entre les IA et le moteur déterministe",
+      "line": 1,
+      "anchor": "protocole-entre-les-ia-et-le-moteur-déterministe",
+      "sha256": "3d47b29e40df99d5a9c775e50e67e2c450b3d145fee7c9e3ab05b4d057fd66b3"
+    },
+    "trace": {
+      "path": "docs/architecture/TRACEABILITY.md",
+      "section": "La chaîne de preuve",
+      "line": 28,
+      "anchor": "la-chaîne-de-preuve",
+      "sha256": "b8849982a56455d1289dc8f6558b63e0c6b522e81381c8cea62008a91a5cea3e"
+    },
+    "review": {
+      "path": "docs/architecture/REVIEW-EVIDENCE.md",
+      "section": "Comportement global du moteur",
+      "line": 48,
+      "anchor": "comportement-global-du-moteur",
+      "sha256": "e6f7cc6b0fb87bbdc5f7664642bdfe871d3e6c69882d97afee5d978bec9194f7"
+    },
+    "scope": {
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "section": "Répartition des responsabilités",
+      "line": 50,
+      "anchor": "répartition-des-responsabilités",
+      "sha256": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e"
+    },
+    "run": {
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "section": "Contrat réellement implémenté",
+      "line": 82,
+      "anchor": "contrat-réellement-implémenté",
+      "sha256": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e"
+    },
+    "wait": {
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "section": "Plusieurs agents, propriétaires et indisponibilité",
+      "line": 131,
+      "anchor": "plusieurs-agents-propriétaires-et-indisponibilité",
+      "sha256": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e"
+    },
+    "identity": {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Données et sources d'autorité",
+      "line": 35,
+      "anchor": "données-et-sources-dautorité",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    "registry": {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Source durable et publication récupérable — IA2.3b",
+      "line": 207,
+      "anchor": "source-durable-et-publication-récupérable--ia23b",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    "journal": {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Journal durable de l’enrôlement — IA3c.2b",
+      "line": 533,
+      "anchor": "journal-durable-de-lenrôlement--ia3c2b",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    "attribution": {
+      "path": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+      "section": "Attribution, propriété et permission",
+      "line": 27,
+      "anchor": "attribution-propriété-et-permission",
+      "sha256": "5103687bb52f19ab08eaabde219965651ca65fc88dc0c23961648a5be324cda2"
+    },
+    "planid": {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Liaison au contrat courant du plan — IA3a",
+      "line": 279,
+      "anchor": "liaison-au-contrat-courant-du-plan--ia3a",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    "human": {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Authentification locale par défaut et réglage UX",
+      "line": 884,
+      "anchor": "authentification-locale-par-défaut-et-réglage-ux",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    "enroll": {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Authentifier une réponse du futur service d’enrôlement — IA3c.2a",
+      "line": 478,
+      "anchor": "authentifier-une-réponse-du-futur-service-denrôlement--ia3c2a",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    "configid": {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Témoin local et reprise coordonnée — IA3c.2f-02b",
+      "line": 1057,
+      "anchor": "témoin-local-et-reprise-coordonnée--ia3c2f-02b",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    "channel": {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Remise privée IA3c.2f-03c — preuve avant demande métier",
+      "line": 1354,
+      "anchor": "remise-privée-ia3c2f-03c--preuve-avant-demande-métier",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    "authority": {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Émettre un permis depuis une autorité humaine explicite — IA3b",
+      "line": 354,
+      "anchor": "émettre-un-permis-depuis-une-autorité-humaine-explicite--ia3b",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    "mem": {
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Utilisation",
+      "line": 81,
+      "anchor": "utilisation",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    "memstore": {
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Stockage, reprise et limites",
+      "line": 162,
+      "anchor": "stockage-reprise-et-limites",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    "memcontext": {
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Contexte préparé et contexte de départ",
+      "line": 235,
+      "anchor": "contexte-préparé-et-contexte-de-départ",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    "memextract": {
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Sélection extractive pour un lancement explicite",
+      "line": 419,
+      "anchor": "sélection-extractive-pour-un-lancement-explicite",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    "dialogue": {
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Fin confirmée d’un tour de dialogue",
+      "line": 485,
+      "anchor": "fin-confirmée-dun-tour-de-dialogue",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    "boundary": {
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "État durable aux frontières du dialogue",
+      "line": 537,
+      "anchor": "état-durable-aux-frontières-du-dialogue",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    "resumemem": {
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Reprise explicite d'une conversation arrêtée",
+      "line": 672,
+      "anchor": "reprise-explicite-dune-conversation-arrêtée",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    "usage": {
+      "path": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+      "section": "Contrat du consommateur à réaliser",
+      "line": 44,
+      "anchor": "contrat-du-consommateur-à-réaliser",
+      "sha256": "5103687bb52f19ab08eaabde219965651ca65fc88dc0c23961648a5be324cda2"
+    },
+    "preplan": {
+      "path": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+      "section": "Le cadrage précède l'adoption du plan",
+      "line": 84,
+      "anchor": "le-cadrage-précède-ladoption-du-plan",
+      "sha256": "5103687bb52f19ab08eaabde219965651ca65fc88dc0c23961648a5be324cda2"
+    },
+    "learn": {
+      "path": "docs/architecture/INSTRUCTION-LEARNING.md",
+      "section": "Historique et transmission",
+      "line": 33,
+      "anchor": "historique-et-transmission",
+      "sha256": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038"
+    },
+    "logs": {
+      "path": "docs/architecture/LOG-CONSOLE.md",
+      "section": "Console des journaux",
+      "line": 1,
+      "anchor": "console-des-journaux",
+      "sha256": "3f786b9e3f9b5f01fe279df22944f3972d6ab006d2a67bf12818cf23d5a96477"
+    },
+    "calls": {
+      "path": "docs/architecture/CALL-ACCOUNTING.md",
+      "section": "Contrat et provenance",
+      "line": 19,
+      "anchor": "contrat-et-provenance",
+      "sha256": "e5dcd236a63900fdc375923428b515dcd676381bbcf96ffd4155de4a9611ba08"
+    },
+    "live": {
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "section": "Observation en direct des agents — LIVE-UX-01 (lecture seule)",
+      "line": 181,
+      "anchor": "observation-en-direct-des-agents--live-ux-01-lecture-seule",
+      "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+    },
+    "otel": {
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "section": "Télémétrie fournisseur — LIVE-UX-03, incrément E2E-1 (local, vérifié)",
+      "line": 248,
+      "anchor": "télémétrie-fournisseur--live-ux-03-incrément-e2e-1-local-vérifié",
+      "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+    },
+    "liveness": {
+      "path": "docs/architecture/PROVIDER-LIVENESS.md",
+      "section": "Configuration persistée et opérations publiques",
+      "line": 45,
+      "anchor": "configuration-persistée-et-opérations-publiques",
+      "sha256": "364f81dabf8ac064ebead09dd4700432898674147bbdbbc862e7f82f2c52c48c"
+    },
+    "judgment": {
+      "path": "docs/architecture/JUDGMENT-CYCLES.md",
+      "section": "Fin et refus",
+      "line": 71,
+      "anchor": "fin-et-refus",
+      "sha256": "1c5e855fd68a66e4451bf3d408b3ef17224087c356d9aaa85a58c4c97eba800d"
+    },
+    "nativejudge": {
+      "path": "docs/architecture/NATIVE-GLOBAL-JUDGE.md",
+      "section": "Juge global natif : cycles, quotas et histoire",
+      "line": 1,
+      "anchor": "juge-global-natif--cycles-quotas-et-histoire",
+      "sha256": "6a90926bdc8f3531ebbb9daa8cab4e691e5c0f7c6f390bc7bcd3a8a3141980ff"
+    },
+    "ac02": {
+      "path": "docs/plans/actions-confiance/securite-execution-apex.md",
+      "section": "AC-02 — Plan APEX consolidé avec spécification des menus de sécurité",
+      "line": 1,
+      "anchor": "ac-02--plan-apex-consolidé-avec-spécification-des-menus-de-sécurité",
+      "sha256": "07a3b77b0fb8b72a0e51e0074fdb82121491707fc0b4efd5dcd7d7041e6bfafb"
+    },
+    "rust": {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "section": "Pilotage par parcours",
+      "line": 39,
+      "anchor": "pilotage-par-parcours",
+      "sha256": "9df7f33d40ff725aaf8e0de85e1b8b8657a5f683793bcdbb152fff9e55f5224c"
+    },
+    "humanvalidation": {
+      "path": "docs/ENGINE-ACCEPTANCE.md",
+      "section": "Contrôles comme preuves d’une revue humaine",
+      "line": 41,
+      "anchor": "contrôles-comme-preuves-dune-revue-humaine",
+      "sha256": "a43377f1f1ffe9f146467f4e63390a1c3cd587629a95256264f74357a7c653cd"
+    },
+    "nativevalidation": {
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "section": "Tâches ordinaires et validation humaine — raccord139 en qualification",
+      "line": 7515,
+      "anchor": "tâches-ordinaires-et-validation-humaine--raccord139-en-qualification",
+      "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+    },
+    "learnrules": {
+      "path": "docs/architecture/INSTRUCTION-LEARNING.md",
+      "section": "Amélioration récursive des consignes",
+      "line": 1,
+      "anchor": "amélioration-récursive-des-consignes",
+      "sha256": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038"
+    }
+  },
+  "views": [
+    {
+      "name": "architecture-overview",
+      "titles": {
+        "fr": "Architecture interne Swarm : moteur, responsabilités et preuves",
+        "en": "Swarm internal architecture: engine, responsibilities and evidence"
+      },
+      "descriptions": {
+        "fr": "Le moteur déterministe Rust relie contrats, identité, politiques, réservations, contextes, contrôles, revue et validation humaine selon la politique. La qualification Rust est suivie séparément.",
+        "en": "The deterministic Rust engine connects contracts, identity, policy, reservations, context, checks, review and policy-required human validation. Rust qualification is tracked separately."
+      },
+      "nodes": [
+        {
+          "id": "A_INPUT",
+          "labels": {
+            "fr": "Humain · CLI · API · cockpit",
+            "en": "Human · CLI · API · cockpit"
+          },
+          "source": "engine",
+          "group": "ENTRÉES / INPUTS",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "A_PLAN",
+          "labels": {
+            "fr": "Besoin adopté · exigences\nPlan · tâches · dépendances",
+            "en": "Adopted need · requirements\nPlan · tasks · dependencies"
+          },
+          "source": "planid",
+          "group": "ENTRÉES / INPUTS",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "A_ROOT",
+          "labels": {
+            "fr": "Superviseur racine\nObjectif global · arbitrages",
+            "en": "Root supervisor\nOverall objective · arbitration"
+          },
+          "source": "scope",
+          "group": "SUPERVISION",
+          "kind": "supervisor",
+          "shape": "rect"
+        },
+        {
+          "id": "A_SCOPE",
+          "labels": {
+            "fr": "Sous-superviseurs\nPropriétaires de périmètre",
+            "en": "Scope supervisors\nAssigned scope ownership"
+          },
+          "source": "scope",
+          "group": "SUPERVISION",
+          "kind": "supervisor",
+          "shape": "rect"
+        },
+        {
+          "id": "A_CYCLE",
+          "labels": {
+            "fr": "Juge global\ncontinue · renew · fin sous preuves",
+            "en": "Global cycle judge\ncontinue · renew · evidence-bound end"
+          },
+          "source": "judgment",
+          "group": "SUPERVISION",
+          "kind": "supervisor",
+          "shape": "rect"
+        },
+        {
+          "id": "A_ENGINE",
+          "labels": {
+            "fr": "MOTEUR DÉTERMINISTE RUST\nswarm-engine · RootStore\nContrats · transitions · attribution",
+            "en": "DETERMINISTIC RUST ENGINE\nswarm-engine · RootStore\nContracts · transitions · attribution"
+          },
+          "source": "engine",
+          "group": "CŒUR RUST / RUST CORE",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "A_ID",
+          "labels": {
+            "fr": "Identité · autorité · délégation\nVoir vue I",
+            "en": "Identity · authority · delegation\nSee view I"
+          },
+          "source": "identity",
+          "group": "CŒUR RUST / RUST CORE",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "A_POLICY",
+          "labels": {
+            "fr": "Politiques persistées\nAdmin · preview · validation commune",
+            "en": "Persisted policies\nAdmin · preview · shared validation"
+          },
+          "source": "liveness",
+          "group": "CŒUR RUST / RUST CORE",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "A_SCHEDULE",
+          "labels": {
+            "fr": "Admissibilité · réservations\nBaux · budgets · espaces de travail",
+            "en": "Eligibility · reservations\nLeases · budgets · workspaces"
+          },
+          "source": "engine",
+          "group": "CŒUR RUST / RUST CORE",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "A_CONTEXT",
+          "labels": {
+            "fr": "Composition du contexte\nMéthodes · mémoire · contrat · SHA",
+            "en": "Context composition\nMethods · memory · contract · SHA"
+          },
+          "source": "memcontext",
+          "group": "CŒUR RUST / RUST CORE",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "A_WORK",
+          "labels": {
+            "fr": "Conducteur et superviseur technique\nTentative · processus · fournisseur",
+            "en": "Conductor and process supervisor\nAttempt · process · provider"
+          },
+          "source": "run",
+          "group": "PRODUCTION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "A_DELIVERY",
+          "labels": {
+            "fr": "Remise du worker\nCandidat Git · rapport · originaux",
+            "en": "Worker handoff\nGit candidate · report · originals"
+          },
+          "source": "review",
+          "group": "PRODUCTION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "A_GATE",
+          "labels": {
+            "fr": "Contrôles autorisés\nCommandes · entrées · sorties · reçus",
+            "en": "Authorized checks\nCommands · inputs · outputs · receipts"
+          },
+          "source": "trace",
+          "group": "PREUVES / EVIDENCE",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "A_REVIEW",
+          "labels": {
+            "fr": "Revue IA indépendante\nMême candidat · sources reçues",
+            "en": "Independent AI review\nSame candidate · received sources"
+          },
+          "source": "review",
+          "group": "PREUVES / EVIDENCE",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "A_ACCEPT",
+          "labels": {
+            "fr": "Fraîcheur · critères · validations\nTransition d’acceptation contrôlée",
+            "en": "Freshness · criteria · validation\nChecked acceptance transition"
+          },
+          "source": "trace",
+          "group": "PREUVES / EVIDENCE",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "A_STATE",
+          "labels": {
+            "fr": "État durable du projet\nWork · tâches · décisions · événements",
+            "en": "Durable project state\nWork · tasks · decisions · events"
+          },
+          "source": "trace",
+          "group": "PERSISTANCE / PERSISTENCE",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "A_MEMORY",
+          "labels": {
+            "fr": "Mémoire et contexte Swarm\nRETEX · dialogues · consignes · vue M",
+            "en": "Swarm memory and context\nLessons · dialogue · instructions · view M"
+          },
+          "source": "mem",
+          "group": "PERSISTANCE / PERSISTENCE",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "A_LOG",
+          "labels": {
+            "fr": "Journaux · télémétrie · registre\nObservabilité et attribution · vue L",
+            "en": "Logs · telemetry · call ledger\nObservation and attribution · view L"
+          },
+          "source": "logs",
+          "group": "PERSISTANCE / PERSISTENCE",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "A_AC02",
+          "labels": {
+            "fr": "AC-02 · futur non démarré\nConfinement · réseau · secrets",
+            "en": "AC-02 · future, not started\nConfinement · network · secrets"
+          },
+          "source": "ac02",
+          "group": "SUITE / FUTURE",
+          "kind": "pending",
+          "shape": "rect"
+        },
+        {
+          "id": "A_HUMAN",
+          "labels": {
+            "fr": "Validation humaine · mode human\nRésultat et preuves à examiner\nEn attente : aval bloqué",
+            "en": "Human validation · human mode\nExamine result and evidence\nPending decision blocks downstream work"
+          },
+          "source": "humanvalidation",
+          "group": "PREUVES / EVIDENCE",
+          "kind": "ordinary",
+          "shape": "rect"
+        }
+      ],
+      "edges": [
+        {
+          "from": "A_INPUT",
+          "to": "A_PLAN",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_PLAN",
+          "to": "A_ROOT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_ROOT",
+          "to": "A_SCOPE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_ROOT",
+          "to": "A_ENGINE",
+          "labels": {
+            "fr": "Décisions proposées",
+            "en": "Proposed decisions"
+          },
+          "pending": false
+        },
+        {
+          "from": "A_ID",
+          "to": "A_ENGINE",
+          "labels": {
+            "fr": "Contrat d’autorité",
+            "en": "Authority contract"
+          },
+          "pending": false
+        },
+        {
+          "from": "A_POLICY",
+          "to": "A_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_ENGINE",
+          "to": "A_SCHEDULE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_SCHEDULE",
+          "to": "A_CONTEXT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_MEMORY",
+          "to": "A_CONTEXT",
+          "labels": {
+            "fr": "Sources et usages à contrôler",
+            "en": "Sources and usage to check"
+          },
+          "pending": false
+        },
+        {
+          "from": "A_CONTEXT",
+          "to": "A_WORK",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_WORK",
+          "to": "A_DELIVERY",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_DELIVERY",
+          "to": "A_GATE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_GATE",
+          "to": "A_REVIEW",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_REVIEW",
+          "to": "A_ACCEPT",
+          "labels": {
+            "fr": "Mode automatic",
+            "en": "Automatic mode"
+          },
+          "pending": false
+        },
+        {
+          "from": "A_ACCEPT",
+          "to": "A_STATE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_ENGINE",
+          "to": "A_STATE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_WORK",
+          "to": "A_LOG",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_STATE",
+          "to": "A_LOG",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "A_LOG",
+          "to": "A_ENGINE",
+          "labels": {
+            "fr": "Faits attribués",
+            "en": "Attributed facts"
+          },
+          "pending": false
+        },
+        {
+          "from": "A_REVIEW",
+          "to": "A_SCOPE",
+          "labels": {
+            "fr": "Écart ou preuve manquante",
+            "en": "Defect or missing evidence"
+          },
+          "pending": false
+        },
+        {
+          "from": "A_ACCEPT",
+          "to": "A_MEMORY",
+          "labels": {
+            "fr": "RETEX et admission distincte",
+            "en": "Lessons and separate admission"
+          },
+          "pending": false
+        },
+        {
+          "from": "A_AC02",
+          "to": "A_WORK",
+          "labels": {
+            "fr": "Frontière d’accès à réaliser",
+            "en": "Access boundary to implement"
+          },
+          "pending": true
+        },
+        {
+          "from": "A_ENGINE",
+          "to": "A_SCOPE",
+          "labels": {
+            "fr": "Événements / décisions",
+            "en": "Events / decisions"
+          },
+          "pending": false,
+          "bidirectional": true
+        },
+        {
+          "from": "A_ENGINE",
+          "to": "A_CYCLE",
+          "labels": {
+            "fr": "État / verdict de cycle",
+            "en": "Cycle state / verdict"
+          },
+          "pending": false,
+          "bidirectional": true
+        },
+        {
+          "from": "A_REVIEW",
+          "to": "A_HUMAN",
+          "labels": {
+            "fr": "Mode human",
+            "en": "Human mode"
+          },
+          "pending": false
+        },
+        {
+          "from": "A_HUMAN",
+          "to": "A_ACCEPT",
+          "labels": {
+            "fr": "Décision humaine requise",
+            "en": "Required human decision"
+          },
+          "pending": false
+        }
+      ]
+    },
+    {
+      "name": "identity-authority",
+      "titles": {
+        "fr": "Identité Swarm : source d’autorité, registre et usage exact",
+        "en": "Swarm identity: authority source, registry and exact use"
+      },
+      "descriptions": {
+        "fr": "Identité humaine, principal, instance, octrois, registre, checkpoint Trust et demande exacte restent distincts. Les transports et protocoles internes sont séparés des raccords publics non achevés.",
+        "en": "Human identity, principal, instance, grants, registry, Trust checkpoint and exact request remain distinct. Internal transport/protocol components are separate from unfinished public integrations."
+      },
+      "nodes": [
+        {
+          "id": "I_HUMAN",
+          "labels": {
+            "fr": "Source humaine protégée · cible\nCompte personnel local / entreprise optionnelle",
+            "en": "Protected human source · target\nPersonal local account / optional enterprise"
+          },
+          "source": "human",
+          "group": "ORIGINE / ORIGIN",
+          "kind": "pending",
+          "shape": "rect"
+        },
+        {
+          "id": "I_PINS",
+          "labels": {
+            "fr": "Bootstrap indépendant\nInstallation · clé épinglée · principal",
+            "en": "Independent bootstrap\nInstallation · pinned key · principal"
+          },
+          "source": "enroll",
+          "group": "ORIGINE / ORIGIN",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "I_ENROLL",
+          "labels": {
+            "fr": "Challenge de demande · nonce\nRéponse signée Ed25519",
+            "en": "Request challenge · nonce\nEd25519 signed response"
+          },
+          "source": "enroll",
+          "group": "ENRÔLEMENT / ENROLLMENT",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "I_JOURNAL",
+          "labels": {
+            "fr": "Journal d’enrôlement signé\nHead · pins indépendants · révocation\nSignature ≠ vérité du contenu",
+            "en": "Signed enrollment journal\nHead · independent pins · revocation\nSignature ≠ truth of content"
+          },
+          "source": "journal",
+          "group": "ENRÔLEMENT / ENROLLMENT",
+          "kind": "data",
+          "shape": "rect",
+          "editorial_limit": "Content origin/integrity does not establish semantic truth or grant authority. No graph relationship or runtime maturity changed."
+        },
+        {
+          "id": "I_AUTH",
+          "labels": {
+            "fr": "Autorité humaine courante\nIssuer · sujet · portée · droits · dates",
+            "en": "Current human authority\nIssuer · subject · scope · rights · dates"
+          },
+          "source": "authority",
+          "group": "ENRÔLEMENT / ENROLLMENT",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "I_CONFIG",
+          "labels": {
+            "fr": "Configuration protégée et témoin\npending · committed · recover",
+            "en": "Protected configuration and witness\npending · committed · recover"
+          },
+          "source": "configid",
+          "group": "CONFIGURATION",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "I_CHANNEL",
+          "labels": {
+            "fr": "Canal local interne contrôlé\nImage épinglée · UID · pidfd · handshake",
+            "en": "Checked internal local channel\nPinned image · UID · pidfd · handshake"
+          },
+          "source": "channel",
+          "group": "CONFIGURATION",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "I_PLAN",
+          "labels": {
+            "fr": "Contrat courant du plan\nProjet · génération · empreinte",
+            "en": "Current plan contract\nProject · generation · digest"
+          },
+          "source": "planid",
+          "group": "REGISTRE / REGISTRY",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "I_PERMIT",
+          "labels": {
+            "fr": "Permis privé de publication\nInstantané exact · événement · racines",
+            "en": "Private publication permit\nExact snapshot · event · roots"
+          },
+          "source": "authority",
+          "group": "REGISTRE / REGISTRY",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "I_REGISTRY",
+          "labels": {
+            "fr": "Registre identité SQLite\nInstantanés · octrois · instances\nPublications et reçus chaînés",
+            "en": "SQLite identity registry\nSnapshots · grants · instances\nPublications and chained receipts"
+          },
+          "source": "registry",
+          "group": "REGISTRE / REGISTRY",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "I_HEAD",
+          "labels": {
+            "fr": "Tête Trust indépendante\nIntention · COMMIT · checkpoint",
+            "en": "Independent Trust head\nIntent · COMMIT · checkpoint"
+          },
+          "source": "registry",
+          "group": "REGISTRE / REGISTRY",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "I_ACTOR",
+          "labels": {
+            "fr": "Principal et acteur\nAgent logique · instance d’exécution",
+            "en": "Principal and actor\nLogical agent · execution instance"
+          },
+          "source": "identity",
+          "group": "DÉCISION / DECISION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "I_GRANT",
+          "labels": {
+            "fr": "Octrois et délégation\nDroits exacts · expiration · révocation",
+            "en": "Grants and delegation\nExact rights · expiry · revocation"
+          },
+          "source": "identity",
+          "group": "DÉCISION / DECISION",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "I_REQUEST",
+          "labels": {
+            "fr": "Demande canonique exacte\nOpération · ressource · contenu · destination",
+            "en": "Exact canonical request\nOperation · resource · content · destination"
+          },
+          "source": "usage",
+          "group": "DÉCISION / DECISION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "I_ENGINE",
+          "labels": {
+            "fr": "MOTEUR DÉTERMINISTE RUST\nContrôle actuel · portée · révisions\nOrdre Trust → SQLite → runtime",
+            "en": "DETERMINISTIC RUST ENGINE\nCurrent checks · scope · revisions\nTrust → SQLite → runtime ordering"
+          },
+          "source": "usage",
+          "group": "DÉCISION / DECISION",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "I_RECEIPT",
+          "labels": {
+            "fr": "Décision liée aux octets exacts\nAccord ou refus · aucun droit implicite",
+            "en": "Decision bound to exact bytes\nAllow or refuse · no implicit authority"
+          },
+          "source": "identity",
+          "group": "EFFET / EFFECT",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "I_COMMIT",
+          "labels": {
+            "fr": "Engagement au dernier usage\nAdmission / lancement · raccord restant",
+            "en": "Commit at final use\nAdmission / launch · integration pending"
+          },
+          "source": "identity",
+          "group": "EFFET / EFFECT",
+          "kind": "pending",
+          "shape": "rect"
+        },
+        {
+          "id": "I_OPS",
+          "labels": {
+            "fr": "agent.create · tool.invoke · effect.execute\nmemory.read / summarize / transmit",
+            "en": "agent.create · tool.invoke · effect.execute\nmemory.read / summarize / transmit"
+          },
+          "source": "identity",
+          "group": "EFFET / EFFECT",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "I_PROOF",
+          "labels": {
+            "fr": "Demande → décision → application\nRéception et effet à prouver",
+            "en": "Request → decision → application\nReception and effect to prove"
+          },
+          "source": "usage",
+          "group": "EFFET / EFFECT",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "I_PREPLAN",
+          "labels": {
+            "fr": "Autorité de préparation avant plan\nExigence explicite encore ouverte",
+            "en": "Preparation authority before a plan\nExplicit requirement still open"
+          },
+          "source": "preplan",
+          "group": "ORIGINE / ORIGIN",
+          "kind": "pending",
+          "shape": "rect"
+        }
+      ],
+      "edges": [
+        {
+          "from": "I_PINS",
+          "to": "I_ENROLL",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_HUMAN",
+          "to": "I_AUTH",
+          "labels": {
+            "fr": "Source effective à raccorder",
+            "en": "Effective source to integrate"
+          },
+          "pending": true
+        },
+        {
+          "from": "I_ENROLL",
+          "to": "I_JOURNAL",
+          "labels": {
+            "fr": "Octets authentifiés",
+            "en": "Authenticated bytes"
+          },
+          "pending": false
+        },
+        {
+          "from": "I_JOURNAL",
+          "to": "I_AUTH",
+          "labels": {
+            "fr": "Fraîcheur et révocation à contrôler",
+            "en": "Freshness and revocation to check"
+          },
+          "pending": false
+        },
+        {
+          "from": "I_CHANNEL",
+          "to": "I_CONFIG",
+          "labels": {
+            "fr": "Canal de configuration interne",
+            "en": "Internal configuration channel"
+          },
+          "pending": false
+        },
+        {
+          "from": "I_CONFIG",
+          "to": "I_ENROLL",
+          "labels": {
+            "fr": "Pins et état configurés",
+            "en": "Configured pins and state"
+          },
+          "pending": false
+        },
+        {
+          "from": "I_AUTH",
+          "to": "I_PERMIT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_PLAN",
+          "to": "I_PERMIT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_PERMIT",
+          "to": "I_REGISTRY",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_REGISTRY",
+          "to": "I_HEAD",
+          "labels": {
+            "fr": "Publication récupérable",
+            "en": "Recoverable publication"
+          },
+          "pending": false
+        },
+        {
+          "from": "I_HEAD",
+          "to": "I_ENGINE",
+          "labels": {
+            "fr": "Checkpoint courant requis",
+            "en": "Current checkpoint required"
+          },
+          "pending": false
+        },
+        {
+          "from": "I_ACTOR",
+          "to": "I_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_GRANT",
+          "to": "I_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_PLAN",
+          "to": "I_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_REQUEST",
+          "to": "I_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_ENGINE",
+          "to": "I_RECEIPT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_RECEIPT",
+          "to": "I_COMMIT",
+          "labels": {
+            "fr": "Raccord consommateur restant",
+            "en": "Consumer integration pending"
+          },
+          "pending": true
+        },
+        {
+          "from": "I_COMMIT",
+          "to": "I_OPS",
+          "labels": {
+            "fr": "Même contenu et état courant",
+            "en": "Same content and current state"
+          },
+          "pending": true
+        },
+        {
+          "from": "I_OPS",
+          "to": "I_PROOF",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "I_PREPLAN",
+          "to": "I_ENGINE",
+          "labels": {
+            "fr": "Aucune autorité implicite sans plan",
+            "en": "No implicit authority without a plan"
+          },
+          "pending": true
+        },
+        {
+          "from": "I_REGISTRY",
+          "to": "I_ENGINE",
+          "labels": {
+            "fr": "Instantané courant",
+            "en": "Current snapshot"
+          },
+          "pending": false
+        }
+      ]
+    },
+    {
+      "name": "memory-context",
+      "titles": {
+        "fr": "Mémoire Swarm : connaissances, contexte et reprise de conversation",
+        "en": "Swarm memory: knowledge, context and conversation recovery"
+      },
+      "descriptions": {
+        "fr": "La mémoire de projet, les révisions de consigne, les références extractives, le contexte préparé/final et les frontières de dialogue sont des objets distincts. Les droits d’usage portent sur les sources et destinataires exacts.",
+        "en": "Project memory, instruction revisions, extractive references, prepared/final context and dialogue boundaries are distinct objects. Usage rights bind exact sources and recipients."
+      },
+      "nodes": [
+        {
+          "id": "M_RETEX",
+          "labels": {
+            "fr": "RETEX vérifié et tâche acceptée\nSources et preuves fraîches",
+            "en": "Verified lessons and accepted task\nFresh sources and evidence"
+          },
+          "source": "mem",
+          "group": "CONNAISSANCES / KNOWLEDGE",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "M_ADMIT",
+          "labels": {
+            "fr": "Admission · preview puis apply\nRévision · événement · token",
+            "en": "Admission · preview then apply\nRevision · event · token"
+          },
+          "source": "mem",
+          "group": "CONNAISSANCES / KNOWLEDGE",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "M_VERSION",
+          "labels": {
+            "fr": "Mémoire de projet versionnée\nExpérience / procédure · provenance\nUn souvenir ne crée aucun droit",
+            "en": "Versioned project memory\nExperience / procedure · provenance\nA memory grants no authority"
+          },
+          "source": "mem",
+          "group": "CONNAISSANCES / KNOWLEDGE",
+          "kind": "data",
+          "shape": "rect",
+          "editorial_limit": "Content origin/integrity does not establish semantic truth or grant authority. No graph relationship or runtime maturity changed."
+        },
+        {
+          "id": "M_SELECT",
+          "labels": {
+            "fr": "Sélection explicite pour une tâche\nVersion · empreinte · conditions",
+            "en": "Explicit task selection\nVersion · digest · conditions"
+          },
+          "source": "mem",
+          "group": "CONNAISSANCES / KNOWLEDGE",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "M_REPLACE",
+          "labels": {
+            "fr": "Remplacement · retrait · import\nHistoire et contextes reçus conservés",
+            "en": "Replacement · withdrawal · import\nHistory and received contexts retained"
+          },
+          "source": "memstore",
+          "group": "CONNAISSANCES / KNOWLEDGE",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "M_RIGHTS",
+          "labels": {
+            "fr": "Contrat d’usage identité · raccord ouvert\nread ≠ summarize ≠ transmit\nSource et destinataire exacts",
+            "en": "Identity usage contract · integration open\nread ≠ summarize ≠ transmit\nExact source and recipient"
+          },
+          "source": "usage",
+          "group": "AUTORITÉ / AUTHORITY",
+          "kind": "pending",
+          "shape": "rect"
+        },
+        {
+          "id": "M_ATTRIB",
+          "labels": {
+            "fr": "Propriétaire · auteur · récepteur\nTrois faits distincts à attester",
+            "en": "Owner · author · recipient\nThree distinct facts to attest"
+          },
+          "source": "attribution",
+          "group": "AUTORITÉ / AUTHORITY",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "M_EXTRACT",
+          "labels": {
+            "fr": "Sélection extractive confirmée\nCitations reconstruites · context_hash",
+            "en": "Confirmed extractive selection\nRebuilt quotations · context_hash"
+          },
+          "source": "memextract",
+          "group": "CONTEXTE / CONTEXT",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "M_HISTORY",
+          "labels": {
+            "fr": "Historique de la même tâche\nActivités attribuées · extraits et omissions",
+            "en": "Same-task history\nAttributed activity · excerpts and omissions"
+          },
+          "source": "memcontext",
+          "group": "CONTEXTE / CONTEXT",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "M_INSTRUCT",
+          "labels": {
+            "fr": "Révisions de consigne attribuées\nrevise-instructions · base conservée\nAjouts actifs par défaut\nRejet avant réservation",
+            "en": "Attributed instruction revisions\nrevise-instructions · retained base\nAdditions active by default\nReject before reservation"
+          },
+          "source": "learnrules",
+          "group": "CONTEXTE / CONTEXT",
+          "kind": "ordinary",
+          "shape": "rect",
+          "additional_sources": [
+            "learn"
+          ]
+        },
+        {
+          "id": "M_METHODS",
+          "labels": {
+            "fr": "Consignes et contrat de tâche\nMéthodes sélectionnées · références",
+            "en": "Instructions and task contract\nSelected methods · references"
+          },
+          "source": "memcontext",
+          "group": "CONTEXTE / CONTEXT",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "M_ENGINE",
+          "labels": {
+            "fr": "MOTEUR DÉTERMINISTE RUST\nRésoudre sources et usages\nComposer puis contrôler le prompt",
+            "en": "DETERMINISTIC RUST ENGINE\nResolve sources and usage\nCompose and check the prompt"
+          },
+          "source": "usage",
+          "group": "CONTEXTE / CONTEXT",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "M_MANIFEST",
+          "labels": {
+            "fr": "prepared_context et context final\nTexte · octets · SHA · sources reçues",
+            "en": "prepared_context and final context\nText · bytes · SHA · received sources"
+          },
+          "source": "memcontext",
+          "group": "CONTEXTE / CONTEXT",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "M_CHECK",
+          "labels": {
+            "fr": "Relecture avant départ\nFraîcheur · capacité · reçu enregistré",
+            "en": "Read again before launch\nFreshness · capacity · recorded receipt"
+          },
+          "source": "memextract",
+          "group": "CONTEXTE / CONTEXT",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "M_PROVIDER",
+          "labels": {
+            "fr": "Contexte transmis à la tentative\nRéception distincte de conformité IA",
+            "en": "Context sent to the attempt\nReception distinct from AI compliance"
+          },
+          "source": "memcontext",
+          "group": "DIALOGUE",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "M_BOUNDARY",
+          "labels": {
+            "fr": "Frontière durable du dialogue\nTour · session · usage · confirmation",
+            "en": "Durable dialogue boundary\nTurn · session · usage · confirmation"
+          },
+          "source": "boundary",
+          "group": "DIALOGUE",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "M_RECOVERY",
+          "labels": {
+            "fr": "Diagnostic de reprise en lecture seule\ncheckpoint_sha256 · facts_sha256",
+            "en": "Read-only recovery diagnosis\ncheckpoint_sha256 · facts_sha256"
+          },
+          "source": "resumemem",
+          "group": "DIALOGUE",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "M_RECONCILE",
+          "labels": {
+            "fr": "Effets incertains à réconcilier\nPas de rejeu implicite",
+            "en": "Reconcile uncertain effects\nNo implicit replay"
+          },
+          "source": "dialogue",
+          "group": "DIALOGUE",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "M_RESUME",
+          "labels": {
+            "fr": "Reprise explicitement autorisée\nNouvelle tentative · même conversation",
+            "en": "Explicitly authorized resume\nNew attempt · same conversation"
+          },
+          "source": "resumemem",
+          "group": "DIALOGUE",
+          "kind": "control",
+          "shape": "rect"
+        }
+      ],
+      "edges": [
+        {
+          "from": "M_RETEX",
+          "to": "M_ADMIT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_ADMIT",
+          "to": "M_VERSION",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_VERSION",
+          "to": "M_SELECT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_VERSION",
+          "to": "M_REPLACE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_REPLACE",
+          "to": "M_SELECT",
+          "labels": {
+            "fr": "Revalider les sélections futures",
+            "en": "Revalidate future selections"
+          },
+          "pending": false
+        },
+        {
+          "from": "M_ATTRIB",
+          "to": "M_RIGHTS",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_RIGHTS",
+          "to": "M_ENGINE",
+          "labels": {
+            "fr": "Raccord global restant",
+            "en": "Global integration pending"
+          },
+          "pending": true
+        },
+        {
+          "from": "M_SELECT",
+          "to": "M_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_EXTRACT",
+          "to": "M_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_HISTORY",
+          "to": "M_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_INSTRUCT",
+          "to": "M_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_METHODS",
+          "to": "M_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_ENGINE",
+          "to": "M_MANIFEST",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_MANIFEST",
+          "to": "M_CHECK",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_CHECK",
+          "to": "M_PROVIDER",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_PROVIDER",
+          "to": "M_BOUNDARY",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_BOUNDARY",
+          "to": "M_RECOVERY",
+          "labels": {
+            "fr": "Frontière confirmée",
+            "en": "Confirmed boundary"
+          },
+          "pending": false
+        },
+        {
+          "from": "M_BOUNDARY",
+          "to": "M_RECONCILE",
+          "labels": {
+            "fr": "Fin non confirmée",
+            "en": "Unconfirmed end"
+          },
+          "pending": false
+        },
+        {
+          "from": "M_RECONCILE",
+          "to": "M_RECOVERY",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_RECOVERY",
+          "to": "M_RESUME",
+          "labels": {
+            "fr": "Décision et précontrôle distincts",
+            "en": "Separate decision and preflight"
+          },
+          "pending": false
+        },
+        {
+          "from": "M_RESUME",
+          "to": "M_CHECK",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        }
+      ]
+    },
+    {
+      "name": "run-supervision",
+      "titles": {
+        "fr": "Supervision Swarm : observation, décision, application et reprise",
+        "en": "Swarm supervision: observation, decision, application and recovery"
+      },
+      "descriptions": {
+        "fr": "Les observations sont remises au superviseur IA propriétaire. Le moteur contrôle puis applique la conduite ; l’acceptation du résultat conserve la validation humaine requise par la politique.",
+        "en": "Observations reach the owning AI supervisor. The engine checks and applies process decisions; result acceptance retains policy-required human validation."
+      },
+      "nodes": [
+        {
+          "id": "S_WORKER",
+          "labels": {
+            "fr": "Tentative en cours\nOutils · sorties · erreurs · processus",
+            "en": "Running attempt\nTools · output · errors · process"
+          },
+          "source": "run",
+          "group": "OBSERVATION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "S_OBSERVE",
+          "labels": {
+            "fr": "Observation déterministe\nDurée · attente outil · silence\nInfrastructure · erreurs et compteurs",
+            "en": "Deterministic observation\nDuration · tool wait · silence\nInfrastructure · errors and counters"
+          },
+          "source": "run",
+          "group": "OBSERVATION",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "S_EVENT",
+          "labels": {
+            "fr": "run_observation durable\nscope · task · agent · attempt",
+            "en": "Durable run_observation\nscope · task · agent · attempt"
+          },
+          "source": "run",
+          "group": "OBSERVATION",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "S_INBOX",
+          "labels": {
+            "fr": "Boîte du propriétaire\nÉvénements courants / historiques",
+            "en": "Owner inbox\nCurrent / historical events"
+          },
+          "source": "engine",
+          "group": "DÉCISION IA / AI DECISION",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "S_SCOPE",
+          "labels": {
+            "fr": "Sous-superviseur propriétaire\nDiagnostic et décision du périmètre",
+            "en": "Owning scope supervisor\nScope diagnosis and decision"
+          },
+          "source": "scope",
+          "group": "DÉCISION IA / AI DECISION",
+          "kind": "supervisor",
+          "shape": "rect"
+        },
+        {
+          "id": "S_ROOT",
+          "labels": {
+            "fr": "Superviseur racine\nTâches propres · arbitrages transversaux",
+            "en": "Root supervisor\nOwn tasks · cross-scope arbitration"
+          },
+          "source": "scope",
+          "group": "DÉCISION IA / AI DECISION",
+          "kind": "supervisor",
+          "shape": "rect"
+        },
+        {
+          "id": "S_WAIT",
+          "labels": {
+            "fr": "Propriétaire indisponible\nSignal conservé · aucun budget inventé",
+            "en": "Unavailable owner\nSignal retained · no invented budget"
+          },
+          "source": "wait",
+          "group": "DÉCISION IA / AI DECISION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "S_DECIDE",
+          "labels": {
+            "fr": "planning decide\ncontinue-run / stop-run · motif\ninput_events effectivement reçus",
+            "en": "planning decide\ncontinue-run / stop-run · reason\ninput_events actually received"
+          },
+          "source": "run",
+          "group": "DÉCISION IA / AI DECISION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "S_ENGINE",
+          "labels": {
+            "fr": "MOTEUR DÉTERMINISTE RUST\nDroits · propriété · révision\nBail · génération · tentative · budgets",
+            "en": "DETERMINISTIC RUST ENGINE\nRights · ownership · revision\nLease · generation · attempt · budgets"
+          },
+          "source": "run",
+          "group": "APPLICATION",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "S_RECORD",
+          "labels": {
+            "fr": "Décision et motif persistés\nRejeu idempotent · compteurs conservés",
+            "en": "Decision and reason persisted\nIdempotent replay · counters retained"
+          },
+          "source": "run",
+          "group": "APPLICATION",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "S_CONTINUE",
+          "labels": {
+            "fr": "continue-run\nProcessus et compteurs conservés",
+            "en": "continue-run\nProcess and counters retained"
+          },
+          "source": "run",
+          "group": "APPLICATION",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "S_STOP",
+          "labels": {
+            "fr": "stop-run\nDemande au processus possédé",
+            "en": "stop-run\nRequest to the owned process"
+          },
+          "source": "run",
+          "group": "APPLICATION",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "S_END",
+          "labels": {
+            "fr": "Fin réelle confirmée\nAvant libération et règlement",
+            "en": "Actual process end confirmed\nBefore release and settlement"
+          },
+          "source": "run",
+          "group": "APPLICATION",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "S_EFFECT",
+          "labels": {
+            "fr": "Effet et résultat à constater\nIncident / correction / remise",
+            "en": "Observe effect and result\nIncident / correction / handoff"
+          },
+          "source": "trace",
+          "group": "REPRISE / RECOVERY",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "S_REVIEW",
+          "labels": {
+            "fr": "Contrôles et revue IA du candidat\nPreuves fraîches · politique requise",
+            "en": "Candidate checks and AI review\nFresh evidence · required policy"
+          },
+          "source": "review",
+          "group": "REPRISE / RECOVERY",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "S_LEARN",
+          "labels": {
+            "fr": "Réviser les consignes futures\nAttribution · réception · RETEX",
+            "en": "Revise future instructions\nAttribution · reception · lessons learned"
+          },
+          "source": "learn",
+          "group": "REPRISE / RECOVERY",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "S_POLICY",
+          "labels": {
+            "fr": "Politiques sauvegardées et Admin\nSeuils d’observation ≠ budgets",
+            "en": "Saved policies and Admin\nObservation thresholds ≠ budgets"
+          },
+          "source": "run",
+          "group": "POLITIQUES / POLICIES",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "S_CALL",
+          "labels": {
+            "fr": "Attente d’inférence structurée\nVitalité · bail renouvelé · limites propres",
+            "en": "Structured inference wait\nLiveness · renewed lease · own limits"
+          },
+          "source": "liveness",
+          "group": "POLITIQUES / POLICIES",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "S_JUDGE",
+          "labels": {
+            "fr": "Juge du cycle racine\ncontinue → renew · fin distincte",
+            "en": "Root cycle judge\ncontinue → renew · separate end"
+          },
+          "source": "judgment",
+          "group": "POLITIQUES / POLICIES",
+          "kind": "supervisor",
+          "shape": "rect"
+        },
+        {
+          "id": "S_HUMAN",
+          "labels": {
+            "fr": "Validation humaine · mode human\nUn PASS ne libère pas l’aval",
+            "en": "Human validation · human mode\nA PASS does not release downstream work"
+          },
+          "source": "humanvalidation",
+          "group": "REPRISE / RECOVERY",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "S_ACCEPT",
+          "labels": {
+            "fr": "Acceptation contrôlée du résultat\nCritères · fraîcheur · décisions requises",
+            "en": "Checked result acceptance\nCriteria · freshness · required decisions"
+          },
+          "source": "humanvalidation",
+          "group": "REPRISE / RECOVERY",
+          "kind": "control",
+          "shape": "rect",
+          "additional_sources": [
+            "review"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": "S_WORKER",
+          "to": "S_OBSERVE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_POLICY",
+          "to": "S_OBSERVE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_OBSERVE",
+          "to": "S_EVENT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_EVENT",
+          "to": "S_INBOX",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_INBOX",
+          "to": "S_SCOPE",
+          "labels": {
+            "fr": "Périmètre enfant",
+            "en": "Child scope"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_INBOX",
+          "to": "S_ROOT",
+          "labels": {
+            "fr": "Périmètre racine",
+            "en": "Root scope"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_SCOPE",
+          "to": "S_ROOT",
+          "labels": {
+            "fr": "Dépendance hors périmètre",
+            "en": "Cross-scope dependency"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_INBOX",
+          "to": "S_WAIT",
+          "labels": {
+            "fr": "Pas de décision disponible",
+            "en": "No available decision"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_SCOPE",
+          "to": "S_DECIDE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_ROOT",
+          "to": "S_DECIDE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_DECIDE",
+          "to": "S_ENGINE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_ENGINE",
+          "to": "S_RECORD",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_RECORD",
+          "to": "S_CONTINUE",
+          "labels": {
+            "fr": "Continuer",
+            "en": "Continue"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_CONTINUE",
+          "to": "S_WORKER",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_RECORD",
+          "to": "S_STOP",
+          "labels": {
+            "fr": "Arrêter",
+            "en": "Stop"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_STOP",
+          "to": "S_END",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_END",
+          "to": "S_EFFECT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_EFFECT",
+          "to": "S_INBOX",
+          "labels": {
+            "fr": "Nouveaux faits",
+            "en": "New facts"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_EFFECT",
+          "to": "S_REVIEW",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_EFFECT",
+          "to": "S_LEARN",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_ROOT",
+          "to": "S_JUDGE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "S_JUDGE",
+          "to": "S_ENGINE",
+          "labels": {
+            "fr": "Opération globale séparée",
+            "en": "Separate global operation"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_CALL",
+          "to": "S_ENGINE",
+          "labels": {
+            "fr": "Limites et réservation d’appel",
+            "en": "Call limits and reservation"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_REVIEW",
+          "to": "S_HUMAN",
+          "labels": {
+            "fr": "Mode human",
+            "en": "Human mode"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_REVIEW",
+          "to": "S_ACCEPT",
+          "labels": {
+            "fr": "Mode automatic",
+            "en": "Automatic mode"
+          },
+          "pending": false
+        },
+        {
+          "from": "S_HUMAN",
+          "to": "S_ACCEPT",
+          "labels": {
+            "fr": "Décision humaine requise",
+            "en": "Required human decision"
+          },
+          "pending": false
+        }
+      ]
+    },
+    {
+      "name": "logs-observability",
+      "titles": {
+        "fr": "Observabilité Swarm : logs, direct, télémétrie et preuves",
+        "en": "Swarm observability: logs, live views, telemetry and evidence"
+      },
+      "descriptions": {
+        "fr": "Les sorties agent, événements du moteur, incidents, décisions, registre d’appels, mesures système et OTLP gardent leurs sources. Les vues sont en lecture seule ; l’export de données ne constitue pas une preuve d’acceptation.",
+        "en": "Agent output, engine events, incidents, decisions, call ledger, system measurements and OTLP retain their sources. Views are read-only; data export is not acceptance evidence."
+      },
+      "nodes": [
+        {
+          "id": "L_AGENT",
+          "labels": {
+            "fr": "Sorties de tentative\nagent_logs · terminal_events",
+            "en": "Attempt output\nagent_logs · terminal_events"
+          },
+          "source": "live",
+          "group": "SOURCES",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "L_ENGINE",
+          "labels": {
+            "fr": "MOTEUR DÉTERMINISTE RUST\nActivités · décisions · incidents\nMission · tâche · tentative · révision",
+            "en": "DETERMINISTIC RUST ENGINE\nActivity · decisions · incidents\nMission · task · attempt · revision"
+          },
+          "source": "trace",
+          "group": "SOURCES",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "L_CALLS",
+          "labels": {
+            "fr": "Registre des appels\nRéservé ≠ envoyé ≠ facturé\nUsage connu / inconnu",
+            "en": "Call ledger\nReserved ≠ sent ≠ billed\nKnown / unknown usage"
+          },
+          "source": "calls",
+          "group": "SOURCES",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "L_PROC",
+          "labels": {
+            "fr": "Mesures Linux /proc\nHôte · PID · starttime vérifiés",
+            "en": "Linux /proc measurements\nChecked host · PID · starttime"
+          },
+          "source": "live",
+          "group": "SOURCES",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "L_OTLP",
+          "labels": {
+            "fr": "OTLP HTTP JSON\nJeton exportateur lié à l’agent actif",
+            "en": "OTLP HTTP JSON\nExporter token bound to active agent"
+          },
+          "source": "otel",
+          "group": "TÉLÉMÉTRIE / TELEMETRY",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "L_NORMAL",
+          "labels": {
+            "fr": "Normaliser et attribuer\nChamps permis · rejets comptés",
+            "en": "Normalize and attribute\nAllowed fields · counted rejections"
+          },
+          "source": "otel",
+          "group": "TÉLÉMÉTRIE / TELEMETRY",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "L_TELEMETRY",
+          "labels": {
+            "fr": "telemetry.db séparée\nDigest de jeton · séries · dédoublonnage",
+            "en": "Separate telemetry.db\nToken digest · series · deduplication"
+          },
+          "source": "otel",
+          "group": "TÉLÉMÉTRIE / TELEMETRY",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "L_ORIGINAL",
+          "labels": {
+            "fr": "État et originaux conservés\nCurseurs · séquences · empreintes",
+            "en": "Retained state and originals\nCursors · sequences · digests"
+          },
+          "source": "logs",
+          "group": "PROJECTIONS",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "L_API",
+          "labels": {
+            "fr": "API publique authentifiée\nMission · source · filtres · pagination",
+            "en": "Authenticated public API\nMission · source · filters · pagination"
+          },
+          "source": "logs",
+          "group": "PROJECTIONS",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "L_PUSH",
+          "labels": {
+            "fr": "Direct SSE par empreinte\nReprise / refus · repli interrogation",
+            "en": "Fingerprint-based SSE live updates\nResume / refusal · polling fallback"
+          },
+          "source": "live",
+          "group": "PROJECTIONS",
+          "kind": "control",
+          "shape": "rect"
+        },
+        {
+          "id": "L_CONSOLE",
+          "labels": {
+            "fr": "Suivi → Journaux\nMonaco lecture seule · repli texte\nRecherche serveur / page distinguée",
+            "en": "Tracking → Logs\nRead-only Monaco · text fallback\nServer / page search distinguished"
+          },
+          "source": "logs",
+          "group": "CONSULTATION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "L_LIVE",
+          "labels": {
+            "fr": "Agents en direct et harnais\nActivité · limites · contexte · usage",
+            "en": "Live agents and harness\nActivity · limits · context · usage"
+          },
+          "source": "live",
+          "group": "CONSULTATION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "L_EXPORT",
+          "labels": {
+            "fr": "Export de la réponse originale\nFiltres et limites conservés",
+            "en": "Original response export\nFilters and limitations retained"
+          },
+          "source": "logs",
+          "group": "CONSULTATION",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "L_CHAIN",
+          "labels": {
+            "fr": "Chaîne de preuve reconstructible\nObjectif → décision → tentative\nCandidat → contrôle → revue",
+            "en": "Reconstructible evidence chain\nObjective → decision → attempt\nCandidate → check → review"
+          },
+          "source": "trace",
+          "group": "PREUVES / EVIDENCE",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "L_ACCEPT",
+          "labels": {
+            "fr": "Acceptation contrôlée séparément\nMême candidat · droits · fraîcheur\nValidation humaine si mode human",
+            "en": "Separately checked acceptance\nSame candidate · rights · freshness\nHuman validation in human mode"
+          },
+          "source": "humanvalidation",
+          "group": "PREUVES / EVIDENCE",
+          "kind": "control",
+          "shape": "rect",
+          "additional_sources": [
+            "review"
+          ]
+        },
+        {
+          "id": "L_SECURITY",
+          "labels": {
+            "fr": "AC-02 · futur non démarré\nFiliation réseau et timeline sécurité",
+            "en": "AC-02 · future, not started\nNetwork lineage and security timeline"
+          },
+          "source": "ac02",
+          "group": "SUITE / FUTURE",
+          "kind": "pending",
+          "shape": "rect"
+        }
+      ],
+      "edges": [
+        {
+          "from": "L_AGENT",
+          "to": "L_ORIGINAL",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_ENGINE",
+          "to": "L_ORIGINAL",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_CALLS",
+          "to": "L_ORIGINAL",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_OTLP",
+          "to": "L_NORMAL",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_NORMAL",
+          "to": "L_TELEMETRY",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_ORIGINAL",
+          "to": "L_API",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_TELEMETRY",
+          "to": "L_API",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_PROC",
+          "to": "L_API",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_API",
+          "to": "L_CONSOLE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_API",
+          "to": "L_PUSH",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_PUSH",
+          "to": "L_LIVE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_API",
+          "to": "L_LIVE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_CONSOLE",
+          "to": "L_EXPORT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_ORIGINAL",
+          "to": "L_CHAIN",
+          "labels": {
+            "fr": "Originaux attribués",
+            "en": "Attributed originals"
+          },
+          "pending": false
+        },
+        {
+          "from": "L_ENGINE",
+          "to": "L_CHAIN",
+          "labels": {
+            "fr": "Décisions et reçus",
+            "en": "Decisions and receipts"
+          },
+          "pending": false
+        },
+        {
+          "from": "L_CHAIN",
+          "to": "L_ACCEPT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "L_SECURITY",
+          "to": "L_CHAIN",
+          "labels": {
+            "fr": "Extension à réaliser",
+            "en": "Extension to implement"
+          },
+          "pending": true
+        }
+      ]
+    }
+  ],
+  "native_source_observations": [
+    {
+      "path": "rust/crates/swarm-engine/src/lib.rs",
+      "sha256": "c50ff9f25e9acec81be37b17910f4f7b070641d921555046d8a11f1265e9c064",
+      "observed_symbol_or_contract": null
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store.rs",
+      "sha256": "b4923f65f5eb05cccc11e4d6247551e8ac90450f3ca36c8137d23b644aa238a7",
+      "observed_symbol_or_contract": "pub struct RootStore"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/work_engine.rs",
+      "sha256": "e9190ac30bfa591a984adcf0cc22429d4daf5e03ec3fd83043ebd30e85034555",
+      "observed_symbol_or_contract": "pub struct WorkEngine"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/project_context.rs",
+      "sha256": "3a11d34a311386a6e9e073d9efeb89c6370475ee6d1b2a405cbf50ec83705a1a",
+      "observed_symbol_or_contract": "Managed field-guide memory is refused"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/live.rs",
+      "sha256": "49dfa788d769177d4a876e86a96f0a9f3eb2de0a5b6bbbdcb6460e0e6fa73c6d",
+      "observed_symbol_or_contract": null
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/task_validation/gate.rs",
+      "sha256": "dae6dc543cd5bf835dbc1e954172b90255f210e5605b79d0b05c9877b171de9e",
+      "observed_symbol_or_contract": "Human apply preserves manual gates/checks and human-validation-required; it does not accept the task."
+    }
+  ]
+}

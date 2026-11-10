@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestMemorySummarySelectionConfirmationBindsReason$",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T20:11:17.627821+00:00",
+  "duration_seconds": 16.351,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "TestMemorySummarySelectionConfirmationBindsReason"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "7b5e304a38a676b8e2e9db5e55c7599fe7bf4a42c031f067e22e8c0369c3c3b8",
+  "real_model_calls": 0
+}

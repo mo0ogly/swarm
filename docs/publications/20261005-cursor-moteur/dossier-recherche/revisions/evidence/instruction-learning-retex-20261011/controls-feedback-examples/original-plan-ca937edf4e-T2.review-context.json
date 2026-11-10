@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "files": [
+    "internal/engine/planning.go",
+    "internal/engine/planning_api.go",
+    "internal/engine/score.go",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-targeted.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-race.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out"
+  ]
+}

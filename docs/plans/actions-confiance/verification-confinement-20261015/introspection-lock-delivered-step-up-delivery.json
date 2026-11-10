@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "node",
+    "tests/actions_confiance_step_up_ui.cjs",
+    "bin/swarm-actions-confiance-introspection",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-confinement-20261015/introspection-lock-delivered-step-up-browser"
+  ],
+  "started_at": "2026-10-15T22:29:20.949168+00:00",
+  "ended_at": "2026-10-15T22:29:39.326010+00:00",
+  "exit_code": 0,
+  "sources_unchanged": true,
+  "output_sha256": "f44e2026d64227d41ecae008c5ab1625f4f4daaf0f47c428bf65527d85bc8c66",
+  "input_sha256": {
+    "bin/swarm-actions-confiance-introspection": "e8754bd6ea01614224f72ce8448f4fbc8c4c82d991475f05a97ee70e94514278",
+    "web/trust-actions.js": "c0b891ec0df3e80b3329cf6033f8c3cad4cfce2cf8900de4d180692417b982c3",
+    "web/trust-actions.html": "e7dc6d17b078a0d7a08dcc8ecf385f0388326d6121c0653ac945b521b493e642",
+    "web/trust-actions-en.js": "3db7bd09aec75c9dc8f21bfd1459edec907e293c2b25d41f2386a08226182eb5",
+    "web/trust-secrets.js": "132532e28f08bca6099e029bb992e9f403aaa37f67cc8395d34bc8476b0e5fbd",
+    "tests/actions_confiance_secret_ui.cjs": "c43832cf9d10ff8241fb227f8d904ecc231b14a5b866f1ade4db21d1b5824c29",
+    "tests/actions_confiance_sealed_ui.cjs": "199673093ef27fcfd8b57662e963c25b012d0b5d2c723de8d2131fd78ab87a74",
+    "tests/actions_confiance_recipe_timeout_test.py": "1473d71f8cc854e8da33baf93c6e228839e5e3c172196ced968bbf858572b9d4",
+    "tests/actions_confiance_t2_ui.cjs": "adb38ef648422ff9fa7c0bfe2b3e646f544ef5c2bfab5abbbeae96cc454c8c7c",
+    "tests/actions_confiance_data_policy_ui.cjs": "4c876784c3db9554572c3134fafa84a8228cb7e26890daf02e5f32d7ce27b868",
+    "tests/actions_confiance_secret_readiness.py": "f894f3603fbffbd74445eeeb2804890d39b1a6e7b0e56ad532552b63c05e83a5",
+    "tests/actions_confiance_oidc_logout_ui.cjs": "aee0403c173d9d0ed18c11e917d8e603f5172e4fc0126d85d48982a6ef3712fa",
+    "tests/actions_confiance_step_up_ui.cjs": "f82eb939289dadac0e3954a5ccf2ca05041a33d4dfa610765214f4754f86b653",
+    "tests/actions_confiance_delegation_ui.cjs": "ac5650ba6e4e63f548bea0d138085a97b1a316543fcee3d69d8b5cf8aab11abb",
+    "tests/actions_confiance_oidc_ui.cjs": "8b3c273a6f3b97bdde48761f88c84fd7dc12a29633bf9d2d84c179ce6486034d",
+    "tests/actions_confiance_remote.py": "84797458c5bc3f50fc2cbe056953315e196ea72e17a4b940ddc90113492ec00c",
+    "tests/actions_confiance_t2.py": "70c68059fcfadcc1dfd115c29daee6eea38995f404548cad84e85c80bb1a1d53",
+    "tests/actions_confiance_workload_ui.cjs": "f4cbfa0d2ec0a6309cbaeba055b510c5d978b7e4f006c390c6b761e6761d83ce"
+  }
+}

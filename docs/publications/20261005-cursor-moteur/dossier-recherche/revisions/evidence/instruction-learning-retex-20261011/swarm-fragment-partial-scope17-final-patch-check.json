@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T17:58:05.382327+00:00",
+  "parent": "storage-future-version-fixture-20261011.patch",
+  "parent_tree": "25646eed0154e4b475688177bb4667f8deb3346b",
+  "preimage_tree": "918cd39067e15906dfac12e15e0ae6b5a75a1624",
+  "preimage_extensions": [
+    {
+      "path": "docs/REVIEW-FRAGMENTS.md",
+      "sha256": "d17aba830a40798440f99b09d9f7509dce7cc3c2eff7883f0360d60565a7acb5",
+      "blob": "28e0479670c49e69bde54af521f889a68546b481"
+    },
+    {
+      "path": "docs/en/REVIEW-FRAGMENTS.md",
+      "sha256": "da035c79be884594bddf4b21f9ca6381446eed74be7c365a3e0651ac5ada0012",
+      "blob": "cce9def3b0dfd72ded81f49f400af08b35d54157"
+    },
+    {
+      "path": "internal/engine/managed_review_diagnostic_test.go",
+      "sha256": "b32c1e30d1cd6b2c4f1ca164d16d16190c754236f2c5caa47fad492a2df8a6d6",
+      "blob": "7eb7d96ad2cfb666dea66eba57ab2324c543029d"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_capacity.go",
+      "sha256": "d407e285ff29dfa281d4200b8dd84d98d63475ddb5423e98cb08cd961e1066c2",
+      "blob": "acd8f6ad8f5f593dcfcf069e097c8bb09b86a561"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_capacity_test.go",
+      "sha256": "0973f27870ae4b7530124ee62c612b942d6b10e8c494a54257adb3df8fad8a93",
+      "blob": "74867a10beacaf62912952458e320115168af846"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_decision.go",
+      "sha256": "6522fb96e02f5cf5523bacdfc19fb921c0b533163a66995c83c50b7b1d6e4565",
+      "blob": "51f67f9fda309f81ee6ec3f697e9f332aee8f035"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_final.go",
+      "sha256": "f6507fc6a5bb66921c426af4a7de58afe5c7eef56bb31a5bf57bc62326366097",
+      "blob": "aabb919b36760a6228d421eea9212b29affefd36"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_final_test.go",
+      "sha256": "85850914876b1ee3616f394c1c0370a1e8037db161972286c8accaa305e526d3",
+      "blob": "17143f50918f4e27e3eaabf9b7457c894b8b7073"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_questions.go",
+      "sha256": "5fb1b70dce371a713fe7bc7c3d425710da6bf6c2716b815d7ea15d385565daba",
+      "blob": "7e9ec0b4a5323f8c792cc368b4c5f00cafda91a6"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_reuse_test.go",
+      "sha256": "956826e6fe893593d906b4a198920534df71abebb1a6ef4485048367ff8b3d2a",
+      "blob": "82a5f97eef0946bbace06719e714363f1fc355b6"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_runtime_test.go",
+      "sha256": "b6055628b7c9d6ae953b95908b37cd91deeaec52ab896e56d6f6fa29fde738e0",
+      "blob": "44625bf2f727e86f625797db4ad99650e9fb9ffe"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_tokens_store_test.go",
+      "sha256": "ebd1c8a3336a2db64e4a99fa77bf8e2e324a7521c96bff3c054e5a40a1c20c3c",
+      "blob": "e39c395ecda143a15f40ae006c7d8144bd0c960f"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_transport.go",
+      "sha256": "ca8bd781d8bc6f9ab7a31e787d7412177eaccfca674f11bb476c51d65521943a",
+      "blob": "3fccd0562caa15a7987163e13d06673f77610534"
+    }
+  ],
+  "preimages": {
+    "docs/REVIEW-FRAGMENTS.md": "d17aba830a40798440f99b09d9f7509dce7cc3c2eff7883f0360d60565a7acb5",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "b2e905069f67e5132b947a5f9f8f7f3c121a1cc6794813551e37c3176559fb7e",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "5b6b4f1b670f19fd4e5b660ec90162c5cd35a31d90881f1958a5bd843dd2250c",
+    "docs/en/REVIEW-FRAGMENTS.md": "da035c79be884594bddf4b21f9ca6381446eed74be7c365a3e0651ac5ada0012",
+    "internal/engine/managed_review_diagnostic_test.go": "b32c1e30d1cd6b2c4f1ca164d16d16190c754236f2c5caa47fad492a2df8a6d6",
+    "internal/engine/managed_review_fragment_capacity.go": "d407e285ff29dfa281d4200b8dd84d98d63475ddb5423e98cb08cd961e1066c2",
+    "internal/engine/managed_review_fragment_capacity_test.go": "0973f27870ae4b7530124ee62c612b942d6b10e8c494a54257adb3df8fad8a93",
+    "internal/engine/managed_review_fragment_decision.go": "6522fb96e02f5cf5523bacdfc19fb921c0b533163a66995c83c50b7b1d6e4565",
+    "internal/engine/managed_review_fragment_final.go": "f6507fc6a5bb66921c426af4a7de58afe5c7eef56bb31a5bf57bc62326366097",
+    "internal/engine/managed_review_fragment_final_test.go": "85850914876b1ee3616f394c1c0370a1e8037db161972286c8accaa305e526d3",
+    "internal/engine/managed_review_fragment_finish.go": "c582629a74a97b3694dadb7e238948d2945062bb6b7d74e45b051ac9d0be2750",
+    "internal/engine/managed_review_fragment_finish_test.go": "57cf8599d11803624796f8bb3eeaf30795fb282a990f6fb64802e6720e973ef6",
+    "internal/engine/managed_review_fragment_journal.go": "42f91903c8ebf7c1c24ef4a380a08d6e18fb26ffb306cb77833691e10c89d43a",
+    "internal/engine/managed_review_fragment_partial_scope_test.go": null,
+    "internal/engine/managed_review_fragment_questions.go": "5fb1b70dce371a713fe7bc7c3d425710da6bf6c2716b815d7ea15d385565daba",
+    "internal/engine/managed_review_fragment_reuse_test.go": "956826e6fe893593d906b4a198920534df71abebb1a6ef4485048367ff8b3d2a",
+    "internal/engine/managed_review_fragment_runtime.go": "de3e14dbdee13e795e4ca262b1abec59ffba931646bd2a11bb41540de46d26ac",
+    "internal/engine/managed_review_fragment_runtime_test.go": "b6055628b7c9d6ae953b95908b37cd91deeaec52ab896e56d6f6fa29fde738e0",
+    "internal/engine/managed_review_fragment_store.go": "cfbde1c04257f2907a7218b6ed2efb8180e8bf927941b50b7bc8c6acb0518a56",
+    "internal/engine/managed_review_fragment_tokens_store_test.go": "ebd1c8a3336a2db64e4a99fa77bf8e2e324a7521c96bff3c054e5a40a1c20c3c",
+    "internal/engine/managed_review_fragment_transport.go": "ca8bd781d8bc6f9ab7a31e787d7412177eaccfca674f11bb476c51d65521943a"
+  },
+  "postimages": {
+    "docs/REVIEW-FRAGMENTS.md": "6195eef0456f1c022020878ad345d4793b0d18f58f76d62055b82b91c57b970c",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "837dfbb62ec246782b2978948238da41997c9bdd37796469254897ea76026541",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "c81821cccd9ff4bcd6de5b716e36454a7f944fd15d1640dfcfdbe75ca225b053",
+    "docs/en/REVIEW-FRAGMENTS.md": "d3fd0fbf66e44de9891d617bb7e5aafea25653a29763a8668fd55f27c0570960",
+    "internal/engine/managed_review_diagnostic_test.go": "47906e036ab7f8f530755a07d70951031e7b6084bda234a11383a2dee8b11ea6",
+    "internal/engine/managed_review_fragment_capacity.go": "6a06bb4c9539da513d788f3d71fa42d7afad3b2e8fb1a3638388875e59a6fd87",
+    "internal/engine/managed_review_fragment_capacity_test.go": "f7e9b76adecdf88e9765480756aee8699f90bad80028c2b75cebfcfe3e05697b",
+    "internal/engine/managed_review_fragment_decision.go": "9607bd43a4e8e38a6369d6d18c89b00d42185c04cd83080d1110c02c68df30de",
+    "internal/engine/managed_review_fragment_final.go": "3a227e0cb5579ddd6827f8c1c98ea2f98316d3896e81a5beefb0e58406e01676",
+    "internal/engine/managed_review_fragment_final_test.go": "4c0b507fd87c30a7d2e0574ed71e0acc222afdaa9d7f849e5d49ff7131f3525b",
+    "internal/engine/managed_review_fragment_finish.go": "8aac461c7f976ca4a824e97a2e62c33bdbba24028335ef8f5c8deb91cd492140",
+    "internal/engine/managed_review_fragment_finish_test.go": "722ae4a116d4b5d07498353d0a5e417d03785df958702f0ea058ae3b92de49cc",
+    "internal/engine/managed_review_fragment_journal.go": "48b7d6b9e0d9c5206e35c39cc26d1caca8f595a701c9bdef0d9e90fffd3965e5",
+    "internal/engine/managed_review_fragment_partial_scope_test.go": "bb5ef1ab7daea09e299dae229a7f2e60c6301de83b833d3c3ebf894e36151830",
+    "internal/engine/managed_review_fragment_questions.go": "21ae032bf44bbf1b9d5d72a18f8d6126e9d87f696a742d7b631c43fb70c4cb47",
+    "internal/engine/managed_review_fragment_reuse_test.go": "c6bdf2dd84cbb3e006bbe790cf46e1cea47315f6ee3ad5a332c3c21608b6c13b",
+    "internal/engine/managed_review_fragment_runtime.go": "aca77e340822192d09f9f6bbaee19154db7657767e1b3d9965494945bb29a937",
+    "internal/engine/managed_review_fragment_runtime_test.go": "c5c7fa83fc3fb550b804658cce9237e6979671fe8d8acc7c805656a5c330bf40",
+    "internal/engine/managed_review_fragment_store.go": "1bc3ac7838d5f03dbc251638180a6511d1005b7ae1039b496adb83a095f0e6ba",
+    "internal/engine/managed_review_fragment_tokens_store_test.go": "fe33828ac04b8bc8139bc2183818dd14055718b394dafc80d6f567d116bd9053",
+    "internal/engine/managed_review_fragment_transport.go": "188f105cb2be949bbb80fe51c7aaef766e8e45cf616b2beb909f07820090372d"
+  },
+  "result_tree": "1bc775235322df196225b3f4a73f83c06f086d2e",
+  "patch": "docs/plans/engine-cursor-contract/recovery/review-fragment-global-decision-20261011.patch",
+  "patch_sha256": "0f33294e9b46397ab11258683cca0233e40d07c26c82eb85442dba3a447aa178",
+  "paths": [
+    "docs/REVIEW-FRAGMENTS.md",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/REVIEW-FRAGMENTS.md",
+    "internal/engine/managed_review_diagnostic_test.go",
+    "internal/engine/managed_review_fragment_capacity.go",
+    "internal/engine/managed_review_fragment_capacity_test.go",
+    "internal/engine/managed_review_fragment_decision.go",
+    "internal/engine/managed_review_fragment_final.go",
+    "internal/engine/managed_review_fragment_final_test.go",
+    "internal/engine/managed_review_fragment_finish.go",
+    "internal/engine/managed_review_fragment_finish_test.go",
+    "internal/engine/managed_review_fragment_journal.go",
+    "internal/engine/managed_review_fragment_partial_scope_test.go",
+    "internal/engine/managed_review_fragment_questions.go",
+    "internal/engine/managed_review_fragment_reuse_test.go",
+    "internal/engine/managed_review_fragment_runtime.go",
+    "internal/engine/managed_review_fragment_runtime_test.go",
+    "internal/engine/managed_review_fragment_store.go",
+    "internal/engine/managed_review_fragment_tokens_store_test.go",
+    "internal/engine/managed_review_fragment_transport.go"
+  ],
+  "check": "PASS isolated original bytes, refreshed index, apply--check/apply and exact result tree",
+  "qualification": {
+    "full": {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./...",
+        "-count=1",
+        "-timeout=12m"
+      ],
+      "start": "2026-10-11T17:50:14.971672+00:00",
+      "end": "2026-10-11T18:00:12.291143+00:00",
+      "seconds": 597.32148762,
+      "exit": 0,
+      "output": "/tmp/swarm-fragment-partial-scope-qualified-v1-full.out",
+      "output_sha256": "dabf178beab4e494e4f6cdf09d0f3c1f03a7025b5d3656362e321313a2010fa4",
+      "qualification_environment": {
+        "TMPDIR": "/tmp",
+        "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+      },
+      "source_manifest_sha256": "3d6df956da8789b64cbb1a63e2f45d70ca690315be3e698fbfa4c04939cf0582",
+      "candidate_digest": "6e5d70a75c09b33779958665c2efe1177551cee6369cc0fde0e247292e3bd655",
+      "paths": 1176,
+      "source_drift": [],
+      "manifest_changed": false,
+      "driver": {
+        "start": "2026-10-11T17:50:14.971672+00:00",
+        "driver_pid": 2247460,
+        "pgid": 2247460,
+        "sid": 2247460,
+        "command": [
+          "go",
+          "test",
+          "-json",
+          "./...",
+          "-count=1",
+          "-timeout=12m"
+        ],
+        "manifest_sha256": "3d6df956da8789b64cbb1a63e2f45d70ca690315be3e698fbfa4c04939cf0582",
+        "source_digest": "6e5d70a75c09b33779958665c2efe1177551cee6369cc0fde0e247292e3bd655",
+        "paths": 1176,
+        "precondition": "Replan17: adverse local inspection must preserve findings and inspect all packets before independent global decision. Original RED and legacy expectation FAIL retained; complete negative, refuted-original receipt, transport and UTF-8 capacity boundaries targeted PASS. Immutable isolated1176 snapshot; no native mission DB.",
+        "go_pid": 2247477
+      }
+    },
+    "extended": {
+      "output": "/tmp/swarm-fragment-partial-scope-qualified-extended.out",
+      "exit": 0,
+      "seconds": 232.825
+    },
+    "race": {
+      "output": "/tmp/swarm-fragment-partial-scope-qualified-race.out",
+      "exit": 0,
+      "seconds": 172.977
+    },
+    "vet": "PASS",
+    "workflow": "PASS",
+    "build": "PASS",
+    "diff": "PASS",
+    "mermaid": "Rendered and visually checked",
+    "scope_limits": "Provider doubles, no native acceptance; transport after negative is retained but resumed-path compatibility follow-up19 still open. Original failures retained."
+  },
+  "parent_sha256": "acb2abba2769cb9da40064c9e5307b30506cddf2a38f2976947c99d4283f9cb7",
+  "purpose": "Adverse partial findings are original local opinions. All packets and independent global final decision/resolutions are required; actual transport errors retained, original defects and call consumption preserved. Current partial-to-transport resumption needs separate follow-up19; no global incident/AI acceptance claim."
+}

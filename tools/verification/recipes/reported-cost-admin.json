@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "reported-cost-admin",
+  "inputs": [
+    "tests/reported_cost_admin_ui.cjs",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tests/helpers/engine_settings_admin_state.cjs",
+    "frontend/engine-settings/admin.js",
+    "frontend/engine-settings/admin.css",
+    "web/i18n-en.js",
+    "web/wattson_themes.css",
+    "web/processes.css",
+    "web/swarm-design.css",
+    "locales/en.json",
+    "package.json",
+    "package-lock.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "browser-error-after-valid-witness",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,tempfile,subprocess\nfrom pathlib import Path\nbinary=Path(os.environ['SWARM_REPORTED_COSTS_BINARY']).resolve()\nbase=Path(tempfile.mkdtemp(prefix='reported-cost-admin-fault-',dir='.cache')).resolve()\noutput=base/'run'\nr=subprocess.run(['node','tests/reported_cost_admin_ui.cjs',str(binary),str(output)],env={**os.environ,'SWARM_REPORTED_COST_ADMIN_INJECT_PAGE_ERROR':'1'})\nif r.returncode!=1:raise ValueError('browser fault did not refuse')\nwitness=json.loads((output/'valid-witness.json').read_bytes())\nif not witness['loaded'] or witness['schema_version']!=32:raise ValueError('missing valid same-flow witness')\nfailure=json.loads((output/'failure.json').read_bytes())\nif 'fixture page fault' not in failure['message'] or not failure['errors']:raise ValueError('missing browser failure cause')\nif (output/'result.json').exists():raise ValueError('fault became pass')\nprint('PASS browser error interrupts pending Admin verification without watchdog',flush=True)\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS browser error interrupts pending Admin verification without watchdog",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "shared-admin-real-cli",
+      "command": [
+        "python3",
+        "-c",
+        "import os,sys,tempfile,subprocess\nfrom pathlib import Path\nbinary=Path(os.environ['SWARM_REPORTED_COSTS_BINARY']).resolve()\nif not binary.is_file():raise ValueError('reported-cost-admin-binary-missing')\nbase=Path(tempfile.mkdtemp(prefix='reported-cost-admin-',dir='.cache')).resolve()\nsubprocess.run(['node','tests/reported_cost_admin_ui.cjs',str(binary),str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "CHECK fr-etat-390",
+        "CHECK fr-etat-1280",
+        "CHECK fr-sombre-390",
+        "CHECK fr-sombre-1280",
+        "CHECK en-etat-390",
+        "CHECK en-etat-1280",
+        "CHECK en-sombre-390",
+        "CHECK en-sombre-1280",
+        "PASS Admin reported-cost policy FR/EN themes widths save reopen help",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

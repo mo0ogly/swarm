@@ -1,0 +1,23 @@
+{
+  "id": "preview_reader_guard_enforces_produced_attribution",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "preview_reader_guard_enforces_produced_attribution",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "expected_exit": 0,
+  "exit": 101,
+  "seconds": 0.23573659799876623,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

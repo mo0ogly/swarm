@@ -1,0 +1,254 @@
+{
+  "current": {
+    "revision": 750,
+    "limits": {
+      "planning_activations": 84,
+      "planning_decisions": 67,
+      "review_calls": 100
+    },
+    "consumed": {
+      "planning_activations": 73,
+      "planning_decisions": 55,
+      "review_calls": 82
+    },
+    "remaining": {
+      "planning_activations": 11,
+      "planning_decisions": 12,
+      "review_calls": 18
+    },
+    "last_authorization": {
+      "before": {
+        "planning_activations": 79,
+        "planning_decisions": 62,
+        "review_calls": 100
+      },
+      "after": {
+        "planning_activations": 84,
+        "planning_decisions": 67,
+        "review_calls": 100
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-12T10:39:48.465535583Z",
+      "reason": "Autorisation utilisateur existante. Réserve restante de deux activations/décisions par tâche non acceptée plus clôture, recalculée après replans ; consommation intégralement conservée."
+    },
+    "scopes": [
+      {
+        "model_selection": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "fpizzi/uid:1001",
+          "at": "2026-10-12T10:38:49.40994174Z"
+        },
+        "last_model": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-12T11:09:00.263657438Z"
+        },
+        "delivery": {
+          "exploration_available": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "2d7e913163adcd12135bd34e538af7fda4e0ba77cbf5a49bd79e96c012dc9f07",
+          "events": [
+            "plan-2c7c5eb3e484e829e0b632bae092512e7a252ce5806fbe5b13b3e17b6db9b2bb"
+          ],
+          "decision": "planning-claim-063df32988bba44c9bc182d8-decision"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e537da8f3a71fb180c5eb65db1ef8ade5b4354414aa555c7f6dd95f4e498360b"
+        },
+        "activations": 73,
+        "id": "root",
+        "objective": "Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29"
+        ],
+        "revision": 69,
+        "generation": 197,
+        "state": "waiting"
+      }
+    ]
+  },
+  "proposed": {
+    "revision": 750,
+    "limits": {
+      "planning_activations": 88,
+      "planning_decisions": 70,
+      "review_calls": 100
+    },
+    "consumed": {
+      "planning_activations": 73,
+      "planning_decisions": 55,
+      "review_calls": 82
+    },
+    "remaining": {
+      "planning_activations": 15,
+      "planning_decisions": 15,
+      "review_calls": 18
+    },
+    "last_authorization": {
+      "before": {
+        "planning_activations": 84,
+        "planning_decisions": 67,
+        "review_calls": 100
+      },
+      "after": {
+        "planning_activations": 88,
+        "planning_decisions": 70,
+        "review_calls": 100
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-12T11:20:34.01840419Z",
+      "reason": "Autorisation utilisateur existante. Recalcul après incidents/réservations de la réserve de deux décisions/activations par tâche restante plus clôture ; aucune consommation remboursée."
+    },
+    "scopes": [
+      {
+        "model_selection": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "fpizzi/uid:1001",
+          "at": "2026-10-12T10:38:49.40994174Z"
+        },
+        "last_model": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-12T11:09:00.263657438Z"
+        },
+        "delivery": {
+          "exploration_available": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "2d7e913163adcd12135bd34e538af7fda4e0ba77cbf5a49bd79e96c012dc9f07",
+          "events": [
+            "plan-2c7c5eb3e484e829e0b632bae092512e7a252ce5806fbe5b13b3e17b6db9b2bb"
+          ],
+          "decision": "planning-claim-063df32988bba44c9bc182d8-decision"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e537da8f3a71fb180c5eb65db1ef8ade5b4354414aa555c7f6dd95f4e498360b"
+        },
+        "activations": 73,
+        "id": "root",
+        "objective": "Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29"
+        ],
+        "revision": 69,
+        "generation": 197,
+        "state": "waiting"
+      }
+    ]
+  }
+}

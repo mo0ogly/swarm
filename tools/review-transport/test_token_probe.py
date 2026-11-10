@@ -4,6 +4,10 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 import unittest
 
 from token_probe import measure
@@ -33,7 +37,7 @@ class TokenProbeTests(unittest.TestCase):
             measure(b"\xff", "gpt-5.6-sol")
 
     def test_cli_does_not_emit_evidence(self):
-        with tempfile.TemporaryDirectory() as folder:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as folder:
             path = Path(folder) / "input.txt"
             path.write_text("private-evidence-marker\n")
             result = subprocess.run(
@@ -44,7 +48,7 @@ class TokenProbeTests(unittest.TestCase):
             self.assertFalse(json.loads(result.stdout)["provider_admission_authorized"])
 
     def test_cli_refuses_invalid_text_without_echoing_it(self):
-        with tempfile.TemporaryDirectory() as folder:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as folder:
             path = Path(folder) / "input.txt"
             path.write_bytes(b"private-evidence-marker\xff")
             result = subprocess.run(

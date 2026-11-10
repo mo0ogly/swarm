@@ -1,0 +1,7 @@
+=== RUN   TestCorrectiveFragmentPlanDoesNotReuseAChangedMethod
+    managed_review_context_policy_test.go:324: sizes 164551 168226 22003 parts 1
+    managed_review_context_policy_test.go:351: changed corrective candidate must get a fresh plan méthode de revue des fragments modifiée
+--- FAIL: TestCorrectiveFragmentPlanDoesNotReuseAChangedMethod (3.04s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	3.064s
+FAIL

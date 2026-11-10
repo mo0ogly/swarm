@@ -1,0 +1,12 @@
+{
+  "message": "'adm' == 'admin-kernel-browser-fixture-token'",
+  "stack": "AssertionError [ERR_ASSERTION]: 'adm' == 'admin-kernel-browser-fixture-token'\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_kernel_ui.cjs:22:108",
+  "checks": [
+    "inactive diagnostic is explained and cannot launch",
+    "fr: preview read-only and Admin persists non-default policy",
+    "fr: saved values reopen and keyboard focus restores"
+  ],
+  "errors": [],
+  "root": "/tmp/swarm-kernel-ui-7lNGYB",
+  "kernelDiagnostic": {}
+}

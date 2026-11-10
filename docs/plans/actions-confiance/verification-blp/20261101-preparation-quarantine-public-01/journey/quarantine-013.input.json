@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "event_id": "quarantine-0",
+  "expected_revision": 0,
+  "expected_trust_revision": 1,
+  "reason": "Owned quarantine receiver fixture",
+  "policy": {
+    "schema_version": 1,
+    "levels": [
+      {
+        "id": "public",
+        "name_fr": "Public",
+        "name_en": "Public"
+      }
+    ],
+    "compartments": [],
+    "clearances": {},
+    "preparation_quarantine": false
+  }
+}

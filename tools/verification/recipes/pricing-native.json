@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "native-pricing-catalogue-and-cli",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "tools/verification/recipes/pricing-native.json",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/*.md"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r25",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "swarm-engine-pricing",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "pricing",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "pricing_catalogue_preserves_go_initialized_defaults_and_explicit_null ... ok",
+        "pricing_explicit_categories_unknown_free_and_numeric_limits ... ok",
+        "pricing_strict_codec_and_validation_preserve_safe_causes ... ok",
+        "storage::pricing_root_clock_failure_recovers_and_concurrent_writes_are_serialized ... ok",
+        "storage::pricing_root_corruption_symlink_and_oversize_refuse_then_recover ... ok",
+        "storage::pricing_root_persists_versions_and_preserves_history_without_count_policy ... ok",
+        "storage::pricing_root_storage_failures_preserve_history_and_expose_uncertain_commit ... ok",
+        "8 passed; 0 failed",
+        "pricing_quote_keeps_legacy_finite_arithmetic_and_rescales_only_overflow ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "swarm-cli-pricing",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "pricing",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "pricing_cli_versions_unknown_cache_and_stale_write ... ok",
+        "pricing_cli_invalid_input_and_history_refuse_without_mutation_then_recover ... ok",
+        "pricing_cli_output_failures_report_preserved_configuration ... ok",
+        "3 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

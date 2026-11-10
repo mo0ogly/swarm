@@ -1,0 +1,113 @@
+# Window identity and text hierarchy
+
+The [shared design system](../UI-DESIGN.md) uses the unchanged canonical asset
+`web/swarm-logo.png`. Dialog header titles show this decorative logo through
+`swarm-design.css`, including dialogs created on demand for help, version and
+settings. New dialogs must retain `dialog > header` or `dialog > form > header`
+with an `h2`, an `aria-labelledby` reference, content and an accessible close action.
+The logo does not replace the title or add a redundant accessible name. Its
+reserved space is 44 px, reduced to 34 px on narrow screens.
+
+Processes, trusted actions and agent sessions also show the brand. The cockpit
+keeps it visible in its mobile header and when the desktop navigation is
+collapsed. HTML tabs use only the canonical PNG favicon. The embedded log editor
+keeps its full height; its containing window carries the identity. The transient
+OIDC window retains its waiting message and shows the logo.
+
+Dialog titles use local Georgia, subheadings use the readable link token, and
+body text uses 1.65–1.7 line spacing. Bold text, quotations, inline code and
+highlights use existing semantic pairs. Notices retain their information,
+success, warning or error meaning, written labels and borders. Headings within
+notices inherit the state color. Do not arbitrarily color user text or render
+untrusted AI HTML to provide rich text.
+
+Dense instructions and logs have their own [reading contract](DENSE-TEXT.md),
+shared source/reading controls and dedicated interaction recipe. Window identity
+checks alone do not verify document structure, exact source or log navigation.
+
+Long informational dialogs start at the title. `SwarmShell.focusWindowStart(dialog)`
+focuses the labelled title programmatically and resets the dialog scroll position.
+Forms keep native input focus. Escape and close actions restore the opener focus.
+The global navigation handler ignores Escape while a modal dialog is active
+(native `dialog:modal` selector) or the event has already been consumed. This keeps
+the opener’s menu visible while the dialog closes. A second Escape without a modal
+can close navigation and focus its toggle. The `version-focus-escape.json` recipe
+checks event ownership using a DOM double; real browser focus verification is
+required separately.
+
+Verify final contrast after actual control CSS animations complete
+(`getAnimations()` and each `animation.finished` promise), then check normal, hover and keyboard-focus states.
+A theme transition's intermediate color can hide an unreadable final pair.
+Primary controls use the shared action background/foreground/border together.
+Dialog `open=false` precedes the `close` event; check restored focus after that
+event, without an arbitrary sleep. The source recipe
+`tools/verification/recipes/trust-primary-ux.json` covers these controls on Trusted
+actions and PAEA, with read/preview doubles rather than native-service proof.
+See the [evidence and limits](plans/actions-confiance/paea/INCREMENT-13.md).
+
+Run `node tests/window_identity_ui.cjs BINARY EVIDENCE_DIRECTORY` and the existing
+design recipe for complete states, forms and interaction checks. The focused
+recipe checks FR/EN, both themes, desktop and mobile widths. It opens static
+dialogs for geometry without submitting their forms; separate interactions
+exercise the connection, version, help and method controls. No agent or paid
+provider is needed. The [increment report](../reports/window-identity-20261017.md)
+distinguishes local verification from a running installation and historical
+training recordings.
+
+Source integrity uses the current manifest chain. Run
+`python3 tools/refresh_ui_source_manifest.py`, then, if the engine manifest exists,
+`python3 tools/verification/refresh_engine_source_manifest.py`. The Go qualification
+test selects the engine snapshot when present, rather than the UI parent alone.
+Run `go test ./internal/engine -run TestGraphDeliveryD03QualificationManifest -count=1 -timeout=0`
+to check the selected snapshot. Regeneration records current inputs, including
+existing unrelated edits; it never renews historical acceptance.
+
+
+KPI values use compact colored badges rather than full colored cards: blue/cyan
+for information, green for validation, amber for decisions or review, and red
+for alerts. Untoned values stay neutral. Header metrics and mission KPIs reuse
+the existing semantic background/foreground pairs in both themes. Labels and
+exact values remain visible, including “—” for unavailable data; color grants
+no engine status or acceptance.
+
+Visual verification: open the cockpit, compare the four badges with their labels,
+switch both themes and FR/EN, and check contrast and overflow. Keep dashes without
+a selected mission and preserve producer values on an existing mission. No task
+launch is needed to verify this presentation.
+
+
+Native task-table, lane and inspector status badges share
+`SwarmWorkbench.statusBadge`: green accepted, blue running, red blocked/failed,
+amber submitted/stale/waived, gray todo or unknown. Color families remain the
+same in both themes, with contrast-adjusted semantic background/foreground pairs.
+Tone depends on the received code, never its display label. Unknown states remain
+visible and neutral; status text is never parsed as HTML. Verify the
+`task-status-badges.json` DOM-double regression and real FR/EN light/dark flows.
+
+
+Agent badges use the same color families with a separate state vocabulary: blue
+queued/starting/running, green completed, red failed, amber stopping/interrupted
+and explicitly unconfirmed observations; unknown codes stay neutral.
+SwarmWorkbench.agentStatusBadge never turns agent completion into task acceptance.
+Keep “Recorded state”, identifiers and existing autonomy observations. Reuse both
+theme palettes and FR/EN labels. Run agent-status-badges.json, then the dedicated
+browser fixture without launching agents; check the installed page separately.
+
+
+### Version lists and presentation preferences
+
+Dialog paragraphs, lists and descriptions use `overflow-wrap: anywhere`: full
+technical identifiers may wrap without forcing horizontal scrolling of the
+content. Do not clip/hide prose or widen the dialog to conceal the cause. The
+cockpit theme button updates only the URL `theme` parameter, consumed on reload
+and language navigation, preserving other query parameters and history position.
+No engine setting or Work storage is changed. Permanent regression:
+`version-dialog-preferences.json`, using `SWARM_STATUS_CONTRACT_BINARY` and a
+private Rust Root, FR/EN × both themes at624/390px, exact complete notes, title
+focus/Escape/reopening, language/reload and invalid-theme fallback. Source asset
+overlays are diagnostic evidence, not compiled or installed delivery evidence.
+
+If replaceState refuses the theme update, the cockpit keeps the previous DOM and
+URL, displays a safe diagnostic and propagates a typed error retaining its cause.
+A new action after recovery may save the preference; color alone never proves
+persistence.

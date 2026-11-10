@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "native-post-publication-worker",
+  "inputs": [
+    "tests/rust_agent_model_route.py",
+    "tests/rust_managed_auto_worker.py",
+    "tests/rust_managed_planning.py",
+    "tests/rust_managed_repository_bootstrap.py",
+    "tests/rust_managed_result_recovery.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_native_first_publication.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_native_http_mission.py",
+    "tests/rust_native_managed_candidate.py",
+    "tests/rust_native_managed_review_inputs.py",
+    "tests/rust_native_managed_reviewer.py",
+    "tests/rust_native_managed_validation.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_reviewer.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_post_publication_worker.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "docs/architecture/NATIVE-REVIEWER.md",
+    "docs/en/NATIVE-REVIEWER.md",
+    "rust/crates/swarm-engine/src/managed_repository.rs",
+    "rust/crates/swarm-engine/src/managed_repository_worker.rs",
+    "version_history.json",
+    "rust/crates/swarm-engine/src/task_lifecycle.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "dependent-copy-from-published-candidate",
+      "expected_exit": 0,
+      "required_stdout": [
+        "POST_PUBLICATION_WORKER_RECIPE_VERIFIED"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='native-post-publication-',dir='.cache')).resolve()/'flow'\ncommand=['python3','tests/rust_post_publication_worker.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(p)]\nif os.environ.get('SWARM_POST_PUBLICATION_NATIVE_FROM'):command.extend(['--native-from',os.environ['SWARM_POST_PUBLICATION_NATIVE_FROM']])\nif os.environ.get('SWARM_POST_PUBLICATION_PUBLISHED_FROM'):command.extend(['--published-from',os.environ['SWARM_POST_PUBLICATION_PUBLISHED_FROM']])\nsubprocess.run(command,check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS' and len(r['checks'])==4 and not r['paid_provider'] and not r['cumulative_publication'] and not r['mission_accepted']\nprint('POST_PUBLICATION_WORKER_RECIPE_VERIFIED '+str(p))"
+      ]
+    }
+  ]
+}

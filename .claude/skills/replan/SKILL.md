@@ -1,13 +1,13 @@
 ---
 name: replan
-description: "Revise an existing Swarm plan after a concrete failure, invalid assumption or changed requirement. Use to recover blocked coordination without resetting attempts, losing task history or repeating the same failing action."
+description: "Recover a Swarm plan after an anomaly, changed assumption or improvement; preserve history, authority and verified outcomes."
 ---
 
 # Replan without hiding the failure
 
-Read `tools/agent-workflows/CONTRACT.md`. Load the canonical plan, public runtime
-state, last attempt and relevant evidence. In preparation, propose a revision only;
-do not invoke recovery operations or claim live state not supplied in the context.
+Read `tools/agent-workflows/CONTRACT.md`; apply its required recursive diagnosis,
+continuity and closure rules. Load canonical plan, public state, last attempt and
+evidence. In preparation, only propose from supplied context; no recovery operations.
 
 1. State expected versus observed behavior and identify the first failed precondition.
    Classify the cause: code, environment, unavailable provider, quota, workspace,
@@ -22,8 +22,21 @@ do not invoke recovery operations or claim live state not supplied in the contex
 5. Make resumption conditional on a verifiable changed precondition. Never refund
    attempts, raise limits, clear quota delays early, rename a failed task or create
    a replacement mission to evade a ceiling. Use supported public operations only.
+   For `unknown` due to missing context, consult `review_evidence_inventory`.
+   Name the missing original, its delivery evidence path or supplemental manifest,
+   and the check that will make the criterion verifiable. Extra citations alone
+   do not supply the original; do not edit an unchanged source just to create a diff.
 6. Continue independent authorized work. If the blocked path requires a new decision
    or authorization, give one precise question and explain why it changes the outcome.
+7. Reassess the original requirement. Diagnose failed diagnosis/context/control/
+   recovery recursively, linked to its parent; consider your method and the engine.
+   Verify received context, recorded decision and public effect. An unchanged failure
+   needs a different discriminating check or escalation, not another retry.
+8. Correct the general faulty contract, never a mission-ID exception. Keep the
+   original failing case as a regression guard with relevant variants and invalid
+   inputs. Verify reception, decision, application and effect before claiming a
+   durable correction; carry the learning into shared future instructions. Label
+   temporary measures as temporary and keep the underlying incident open.
 
 Deliver cause/evidence, options/decision, old-to-new task mapping, affected acceptance
 checks, next allowed action and who owns it. Distinguish proposed revision from one

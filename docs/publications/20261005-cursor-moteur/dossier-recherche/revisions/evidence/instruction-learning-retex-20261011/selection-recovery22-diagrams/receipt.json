@@ -1,0 +1,46 @@
+{
+  "checks": [
+    {
+      "command": [
+        "/home/fpizzi/.npm-global/bin/mmdc",
+        "-i",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-diagrams/fr.mmd",
+        "-o",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-diagrams/fr.png",
+        "-p",
+        "/tmp/swarm-mermaid-puppeteer.json",
+        "-w",
+        "1500",
+        "-b",
+        "white"
+      ],
+      "start": "2026-10-11T19:40:14.197377+00:00",
+      "end": "2026-10-11T19:40:18.275262+00:00",
+      "exit": 0,
+      "image": "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-diagrams/fr.png",
+      "sha256": "113b16bfcd98472692b8c4df9103891a4bf73ef1cefc7e9c6b3d82ffb7ec142d"
+    },
+    {
+      "command": [
+        "/home/fpizzi/.npm-global/bin/mmdc",
+        "-i",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-diagrams/en.mmd",
+        "-o",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-diagrams/en.png",
+        "-p",
+        "/tmp/swarm-mermaid-puppeteer.json",
+        "-w",
+        "1500",
+        "-b",
+        "white"
+      ],
+      "start": "2026-10-11T19:40:18.276956+00:00",
+      "end": "2026-10-11T19:40:21.978650+00:00",
+      "exit": 0,
+      "image": "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-diagrams/en.png",
+      "sha256": "99bae5af56225131f1f4f3059ea6dcb9b172235449c808ad92da25568c0e3891"
+    }
+  ],
+  "scope": "Documentation diagram render; no runtime acceptance proof",
+  "visual_inspection": "PASS FR/EN complete sequence, legible labels, no clipping"
+}

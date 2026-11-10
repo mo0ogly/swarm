@@ -1,0 +1,1 @@
+Original input pack preserved byte for byte in ../original-pack-preserved.zip. This directory retains its original manifest and safe-renamed source copies; extract the archive outside the Go module to reproduce the original layout. The current input pack is ../pack-safe/.

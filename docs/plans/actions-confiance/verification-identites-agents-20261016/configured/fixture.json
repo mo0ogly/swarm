@@ -1,0 +1,9 @@
+{
+  "root": "/tmp/swarm-ia1-agents-t8b4bfu4",
+  "binary": "/tmp/swarm-ia1-build-_bj_x21c/swarm",
+  "binary_sha256": "026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2",
+  "script_sha256": "eef243ba156826acbb6fb19f4acce0ecef246e619cac9348569bbbc7d95ba76a",
+  "model_calls": 0,
+  "uid": 1001,
+  "started_unix": 1792183509.7264237
+}

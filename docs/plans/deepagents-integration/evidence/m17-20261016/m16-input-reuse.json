@@ -1,0 +1,7 @@
+{
+  "result": "PASS",
+  "source_manifest": "../m16-20261016/build-final-inputs.json",
+  "checked_inputs": 1020,
+  "changed_inputs": [],
+  "new_go_tests_or_build_claimed": false
+}

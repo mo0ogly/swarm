@@ -1,0 +1,76 @@
+flowchart TB
+    accTitle: Supervision Swarm : observation, décision, application et reprise
+    accDescr: Les observations sont remises au superviseur IA propriétaire. Le moteur contrôle puis applique la conduite ; l’acceptation du résultat conserve la validation humaine requise par la politique.
+    subgraph G0["OBSERVATION"]
+        S_WORKER["Tentative en cours<br/>Outils · sorties · erreurs · processus"]
+        S_OBSERVE["Observation déterministe<br/>Durée · attente outil · silence<br/>Infrastructure · erreurs et compteurs"]
+        S_EVENT["run_observation durable<br/>scope · task · agent · attempt"]
+    end
+    subgraph G1["DÉCISION IA"]
+        S_INBOX["Boîte du propriétaire<br/>Événements courants / historiques"]
+        S_SCOPE["Sous-superviseur propriétaire<br/>Diagnostic et décision du périmètre"]
+        S_ROOT["Superviseur racine<br/>Tâches propres · arbitrages transversaux"]
+        S_WAIT["Propriétaire indisponible<br/>Signal conservé · aucun budget inventé"]
+        S_DECIDE["planning decide<br/>continue-run / stop-run · motif<br/>input_events effectivement reçus"]
+    end
+    subgraph G2["APPLICATION"]
+        S_ENGINE["MOTEUR DÉTERMINISTE RUST<br/>Droits · propriété · révision<br/>Bail · génération · tentative · budgets"]
+        S_RECORD["Décision et motif persistés<br/>Rejeu idempotent · compteurs conservés"]
+        S_CONTINUE["continue-run<br/>Processus et compteurs conservés"]
+        S_STOP["stop-run<br/>Demande au processus possédé"]
+        S_END["Fin réelle confirmée<br/>Avant libération et règlement"]
+    end
+    subgraph G3["REPRISE"]
+        S_EFFECT["Effet et résultat à constater<br/>Incident / correction / remise"]
+        S_REVIEW["Contrôles et revue IA du candidat<br/>Preuves fraîches · politique requise"]
+        S_LEARN["Réviser les consignes futures<br/>Attribution · réception · RETEX"]
+        S_HUMAN["Validation humaine · mode human<br/>Un PASS ne libère pas l’aval"]
+        S_ACCEPT["Acceptation contrôlée du résultat<br/>Critères · fraîcheur · décisions requises"]
+    end
+    subgraph G4["POLITIQUES"]
+        S_POLICY["Politiques sauvegardées et Admin<br/>Seuils d’observation ≠ budgets"]
+        S_CALL["Attente d’inférence structurée<br/>Vitalité · bail renouvelé · limites propres"]
+        S_JUDGE["Juge du cycle racine<br/>continue → renew · fin distincte"]
+    end
+    S_WORKER --> S_OBSERVE
+    S_POLICY --> S_OBSERVE
+    S_OBSERVE --> S_EVENT
+    S_EVENT --> S_INBOX
+    S_INBOX -->|Périmètre enfant| S_SCOPE
+    S_INBOX -->|Périmètre racine| S_ROOT
+    S_SCOPE -->|Dépendance hors périmètre| S_ROOT
+    S_INBOX -->|Pas de décision disponible| S_WAIT
+    S_SCOPE --> S_DECIDE
+    S_ROOT --> S_DECIDE
+    S_DECIDE --> S_ENGINE
+    S_ENGINE --> S_RECORD
+    S_RECORD -->|Continuer| S_CONTINUE
+    S_CONTINUE --> S_WORKER
+    S_RECORD -->|Arrêter| S_STOP
+    S_STOP --> S_END
+    S_END --> S_EFFECT
+    S_EFFECT -->|Nouveaux faits| S_INBOX
+    S_EFFECT --> S_REVIEW
+    S_EFFECT --> S_LEARN
+    S_ROOT --> S_JUDGE
+    S_JUDGE -->|Opération globale séparée| S_ENGINE
+    S_CALL -->|Limites et réservation d’appel| S_ENGINE
+    S_REVIEW -->|Mode human| S_HUMAN
+    S_REVIEW -->|Mode automatic| S_ACCEPT
+    S_HUMAN -->|Décision humaine requise| S_ACCEPT
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+    classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+    classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+    class S_WORKER,S_WAIT,S_DECIDE,S_EFFECT,S_REVIEW,S_LEARN,S_HUMAN ordinary;
+    class S_ENGINE core;
+    class S_OBSERVE,S_CONTINUE,S_STOP,S_END,S_POLICY,S_CALL,S_ACCEPT control;
+    class S_SCOPE,S_ROOT,S_JUDGE supervisor;
+    class S_EVENT,S_INBOX,S_RECORD data;
+    style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G1 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G2 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G3 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G4 fill:#f5f3ec,stroke:#205e70,color:#062b49

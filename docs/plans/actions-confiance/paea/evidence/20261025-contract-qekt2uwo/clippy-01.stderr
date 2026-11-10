@@ -1,0 +1,17 @@
+    Checking typenum v1.20.1
+    Checking memchr v2.8.2
+    Checking cfg-if v1.0.4
+    Checking cpufeatures v0.2.17
+    Checking itoa v1.0.18
+    Checking swarm-identity-contract v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-identity-contract)
+    Checking serde_core v1.0.228
+    Checking zmij v1.0.21
+    Checking generic-array v0.14.7
+    Checking block-buffer v0.10.4
+    Checking crypto-common v0.1.7
+    Checking digest v0.10.7
+    Checking sha2 v0.10.9
+    Checking serde_json v1.0.150
+    Checking serde v1.0.228
+    Checking swarm-protection-contract v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-protection-contract)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.98s

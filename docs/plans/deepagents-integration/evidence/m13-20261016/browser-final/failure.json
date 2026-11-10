@@ -1,0 +1,21 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     error: 'net::ERR_ABORTED',\n+     url: 'http://127.0.0.1:46863/api/v1/snapshot?work=w-f8284b4b203ba836a68d6558'\n+   }\n+ ]\n- []\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/dialogue_recovery_ui.cjs:83:37",
+  "errors": [],
+  "failures": [
+    {
+      "url": "http://127.0.0.1:46863/api/v1/snapshot?work=w-f8284b4b203ba836a68d6558",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "focus": {
+    "active": {
+      "id": "",
+      "action": "recovery-preview-t1"
+    },
+    "returnTarget": {
+      "id": "",
+      "connected": false,
+      "action": "recovery-preview-t1"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "source_sha256": "449725c70b70af0abfc766e9142ef62660c71b2424143b458d15c4355f947a98",
+  "cutoff": 4,
+  "parent_sha256": null,
+  "status": "ok",
+  "entries": [
+    {
+      "id": "snapshot",
+      "message": "current-task-snapshot",
+      "kind": "evidence",
+      "state": "historical",
+      "source_sha256": "e23ff1f9dc474610003bfb8cbb7a546a9d23f13fd9b526e3c516f1d9a5f82853",
+      "text": "{\"project_sha256\":\"f9308036446982ec87999f8d035b8d9bdbf99c5a3004247fa9a9715a550ff1dd\",\"work_title\":\"Summary source fixture\",\"work_objective\":\"Keep attributed history\",\"work_scope\":\"Owned fixture\",\"work_criteria\":[\"Sources remain available\"],\"task\":{\"id\":\"t1\",\"title\":\"Future worker\",\"owner\":\"\",\"deliverable\":\"report.txt\",\"criteria\":[\"Recheck current evidence\"],\"depends\":null,\"status\":\"todo\",\"blocker\":\"\",\"next\":\"Inspect sources\",\"attempts\":[]}}"
+    },
+    {
+      "id": "future",
+      "message": "dialogue-4277908c0f2ee663ec1452cbab7a18b23094193eb33f4377397745ca6f8dd29e-question",
+      "kind": "intention",
+      "state": "future",
+      "source_sha256": "3caf8b2c1fb04bbaeab925d45b531237de8f7566072f6ee56ad57af73bf1d9e9",
+      "text": "Intention future : vérifier avant de déployer."
+    },
+    {
+      "id": "prior",
+      "message": "dialogue-4277908c0f2ee663ec1452cbab7a18b23094193eb33f4377397745ca6f8dd29e-answer",
+      "kind": "evidence",
+      "state": "historical",
+      "source_sha256": "6bf1b43838ba4f5cc502eb6246ee532c455070cdefb4beed789fad0949a69e43",
+      "text": "Réponse historique conservée <source> ; aucun succès courant déclaré."
+    },
+    {
+      "id": "incident",
+      "message": "dialogue-abb36841bf292b794a5e376d8dcbde4cd4ede2be81b9fb5185f5f9916d6882a8-question",
+      "kind": "incident",
+      "state": "open",
+      "source_sha256": "5634e48d7488a1359e8d397758f4e500a6426cdd5ddd609b1822d40e697c3d89",
+      "text": "Incident ouvert : effet incertain à examiner avant reprise."
+    }
+  ]
+}

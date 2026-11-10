@@ -1,0 +1,23 @@
+{
+  "status": "DELIVERED_LOCAL_EXISTING_UI_READ_SLICE",
+  "version": "v0.1.1-dev.26",
+  "browser_assertions": 185,
+  "graph_identifier_assertions": 13,
+  "cache_regression": "PASS",
+  "route_checks": 9,
+  "recipe_integrity": "VERIFIED",
+  "archive_sha256": "8e7935a8797e16c86ab96e1001ca8fa04a07c5ff1a87ff845b3b433bb767cf17",
+  "native_profile": "Default features, no fixture; actual binary/process hash equality in installed.json",
+  "GLM": "2complete contributions integrated with corrections;11203declared tokens; no automatic retry",
+  "surfaces": [
+    "budget reads",
+    "recorded agents and parent/previous links",
+    "recorded task dependency graph"
+  ],
+  "limits": [
+    "Read only, no operator writes or provider execution",
+    "Advanced graph and other journeys remain open",
+    "No independent/global acceptance"
+  ],
+  "prior_evidence": "../20261024-cockpit1466/result.json"
+}

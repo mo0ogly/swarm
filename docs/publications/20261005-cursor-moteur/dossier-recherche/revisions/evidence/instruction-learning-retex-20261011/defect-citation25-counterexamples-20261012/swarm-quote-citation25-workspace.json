@@ -1,0 +1,70 @@
+{
+  "at": "2026-10-12T06:11:49.725057+00:00",
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-preview-6ff2n61k",
+  "parent_workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/inspection-state24-preview-_ieu0dde",
+  "parent_digest": "780e0c1d47c2dd6fbeb77c39ac9f393400204cda11fb87abcf0c0c1ec2936aac",
+  "parent_frozen_paths": 2113,
+  "parent_files_verified": true,
+  "canonical_links": [
+    {
+      "path": ".agents/skills/apex",
+      "target": "../../.claude/skills/apex"
+    },
+    {
+      "path": ".agents/skills/audit-pdca",
+      "target": "../../.claude/skills/audit-pdca"
+    },
+    {
+      "path": ".agents/skills/code-reviewer",
+      "target": "../../.claude/skills/code-reviewer"
+    },
+    {
+      "path": ".agents/skills/debug",
+      "target": "../../.claude/skills/debug"
+    },
+    {
+      "path": ".agents/skills/product-delivery",
+      "target": "../../.claude/skills/product-delivery"
+    },
+    {
+      "path": ".agents/skills/product-planning",
+      "target": "../../.claude/skills/product-planning"
+    },
+    {
+      "path": ".agents/skills/product-review",
+      "target": "../../.claude/skills/product-review"
+    },
+    {
+      "path": ".agents/skills/replan",
+      "target": "../../.claude/skills/replan"
+    },
+    {
+      "path": ".agents/skills/retex-analyzer",
+      "target": "../../.claude/skills/retex-analyzer"
+    },
+    {
+      "path": ".agents/skills/spec-audit",
+      "target": "../../.claude/skills/spec-audit"
+    },
+    {
+      "path": ".agents/skills/spec-builder",
+      "target": "../../.claude/skills/spec-builder"
+    },
+    {
+      "path": ".agents/skills/swarm-model-design",
+      "target": "../../.claude/skills/swarm-model-design"
+    },
+    {
+      "path": ".agents/skills/verify-fix",
+      "target": "../../.claude/skills/verify-fix"
+    }
+  ],
+  "public_native_fixtures": {
+    "defect-citation-native-packet.json": "9e921087ac51bd2e3fc9fcff9cebb00a1c68dac45636133ca83f55c976e1a884",
+    "defect-citation-native-first-reply.json": "5478e52c634748ee1c86752640a820724ba751ab4e931c1ff3f465eaf4633bd2",
+    "defect-citation-native-second-reply.json": "88e1d68d1f794789abe58f7581416a72853eb66721b9754353c210f7860ba522"
+  },
+  "native_review": "review-44f2da6a502adf1b1853484b",
+  "copy_replan": "Verified alias directories replaced with canonical links after duplicate logical inputs created directories; complete2113logical inputs then verified",
+  "limits": "Isolated qualified24 copy, public immutable fixtures only; no native DB/log/credential copied."
+}

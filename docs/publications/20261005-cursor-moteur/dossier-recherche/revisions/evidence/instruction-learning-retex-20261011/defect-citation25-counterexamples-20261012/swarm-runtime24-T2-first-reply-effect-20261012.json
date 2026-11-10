@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-12T05:52:32.889847+00:00",
+  "review": "review-44f2da6a502adf1b1853484b",
+  "candidate": "4af006a35e56d799a26eae29dd197326bf6288f5",
+  "revision": 618,
+  "packet": 0,
+  "packet_sha256": "b12ca0786228f5ca1254b63a87e58faaa06a416dcda1da6903db1c8672ab7670",
+  "call_id": "fragment-call-3672a44d9c0f3c162bc43b28",
+  "reply_sha256": "210e7c5d0e3f8382a0246198541c19a58b1e5e4f5847c1a781e098cebde5da7e",
+  "engine_state": "unknown",
+  "findings": {
+    "0": {
+      "verdict": "unknown",
+      "fields": [
+        "e",
+        "n",
+        "r",
+        "v"
+      ],
+      "needs_count": 3
+    },
+    "1": {
+      "verdict": "unknown",
+      "fields": [
+        "e",
+        "n",
+        "r",
+        "v"
+      ],
+      "needs_count": 4
+    },
+    "2": {
+      "verdict": "unknown",
+      "fields": [
+        "e",
+        "n",
+        "r",
+        "v"
+      ],
+      "needs_count": 3
+    },
+    "3": {
+      "verdict": "unknown",
+      "fields": [
+        "e",
+        "n",
+        "r",
+        "v"
+      ],
+      "needs_count": 3
+    },
+    "4": {
+      "verdict": "inspected",
+      "fields": [
+        "e",
+        "r",
+        "v"
+      ],
+      "needs_count": 0
+    },
+    "5": {
+      "verdict": "inspected",
+      "fields": [
+        "e",
+        "r",
+        "v"
+      ],
+      "needs_count": 0
+    }
+  },
+  "provider_responded": true,
+  "inspected_with_needs_absent": true,
+  "limits": "Original native response retained and parsed by engine under finding contract1. Unknown is not favorable business verdict; remaining inspections, selection and final review required."
+}

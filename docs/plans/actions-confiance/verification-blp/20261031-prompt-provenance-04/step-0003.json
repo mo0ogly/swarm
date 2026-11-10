@@ -1,0 +1,21 @@
+{
+  "id": "historical-recovery-keeps-legacy-boundary",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--lib",
+    "root_store::preparation_call::legacy::tests",
+    "--",
+    "--nocapture"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 0.22953960500308312,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

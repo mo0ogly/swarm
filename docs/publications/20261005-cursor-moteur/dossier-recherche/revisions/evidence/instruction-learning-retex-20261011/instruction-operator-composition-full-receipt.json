@@ -1,0 +1,20 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T14:10:56.856594+00:00",
+  "end": "2026-10-11T14:18:59.558016+00:00",
+  "seconds": 482.7014384239992,
+  "exit": 0,
+  "output": "/tmp/swarm-instruction-operator-composition-full.out",
+  "output_sha256": "475b3fd86584c014ef10361b2ea5b2d4e2ba4b9420a33198d0b5f2cdcf542441",
+  "source_manifest_sha256": "4fc441b341d4f705f503b752658294793c18f2e209aa79320be42cfbaa477d21",
+  "candidate_digest": "88f9ab5b8113673818e6c97a6787823c1847a90c2a6c599d1f8f071af3b66583",
+  "paths": 1170,
+  "source_drift": [],
+  "manifest_changed": false
+}

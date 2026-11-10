@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:comparison:v1",
+  "title": "PAEA offline document comparison v1",
+  "description": "Offline Rust CLI and native HTTP output shape. Structural comparison establishes no approval, current authority or effect. Build and execution provenance must be established separately.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scope", "comparison"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "scope": {"const": "offline-data-only"},
+    "comparison": {"$ref": "#/$defs/comparison"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "minLength": 64, "maxLength": 64, "not": {"pattern": "[^a-f0-9]"}},
+    "identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["document_sha256", "action_digest", "intent_id"],
+      "properties": {
+        "document_sha256": {"$ref": "#/$defs/digest"},
+        "action_digest": {"$ref": "#/$defs/digest"},
+        "intent_id": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "comparison": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "authority", "effect", "approval_validity", "before", "after", "changed_paths", "canonical_content_changed", "intent_changed", "transport_request_changed"],
+      "properties": {
+        "schema_version": {"type": "integer", "const": 1},
+        "authority": {"const": "not-established"},
+        "effect": {"const": "not-established"},
+        "approval_validity": {"const": "not-established"},
+        "before": {"$ref": "#/$defs/identity"},
+        "after": {"$ref": "#/$defs/identity"},
+        "changed_paths": {
+          "type": "array", "uniqueItems": true,
+          "description": "Sorted fixed direct-field JSON Pointers; source arrays compare as a whole. Values never included. Empty paths imply no permission.",
+          "items": {"enum": ["/action/kind", "/action/invoice_id", "/action/invoice_version", "/action/amount_minor", "/action/currency", "/action/beneficiary_account_id", "/action/repository_id", "/action/target_ref", "/action/expected_old_oid", "/action/candidate_oid", "/context/project_id", "/context/principal_id", "/context/instance_id", "/context/mandate_id", "/context/mandate_revision", "/context/policy_revision", "/context/policy_digest", "/context/tool_manifest_digest", "/context/sources"]}
+        },
+        "canonical_content_changed": {"type": "boolean"},
+        "intent_changed": {"type": "boolean"},
+        "transport_request_changed": {"type": "boolean"}
+      }
+    }
+  }
+}

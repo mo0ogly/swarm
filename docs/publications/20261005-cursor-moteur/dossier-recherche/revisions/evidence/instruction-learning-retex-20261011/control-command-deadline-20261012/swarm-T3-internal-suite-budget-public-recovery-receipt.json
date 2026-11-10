@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-12T14:40:36.833841+00:00",
+  "revision": 796,
+  "outer_budget": {
+    "scope": "role",
+    "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+    "scope_key": "validation",
+    "values": {
+      "silence_seconds": 0,
+      "tool_seconds": 600,
+      "max_tool_calls": 0,
+      "max_repeated_calls": 0,
+      "max_consecutive_errors": 0
+    },
+    "revision": 2,
+    "actor": "fpizzi/uid:1001",
+    "reason": "Replan apr\u00e8s original public0a9f24be99a3e3b4e26cb34a15388b69807cccf4ca954bcc32df434b93f29683 : arguments Go120s et deux budgets r\u00e9ellement re\u00e7us, processus ext\u00e9rieur180040ms sans sortie (CPU94465ms). Poste observ\u00e9 satur\u00e9 : 12 CPU, charge48, RAM et swap presque enti\u00e8rement utilis\u00e9s. Augmentation autoris\u00e9e du seul budget ext\u00e9rieur180\u2192600s pour laisser compilation et test cibl\u00e9 terminer ; Go120s inchang\u00e9. Source, crit\u00e8res, commande m\u00e9tier, r\u00e9sultat, 4 tentatives, 82 revues et les deux refus conserv\u00e9s ; aucune acceptation ni arr\u00eat de processus tiers.",
+    "updated": "2026-10-12T14:29:29.037041782Z"
+  },
+  "inner_budget": {
+    "scope": "role",
+    "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+    "scope_key": "validation-go-test",
+    "values": {
+      "silence_seconds": 0,
+      "tool_seconds": 480,
+      "max_tool_calls": 0,
+      "max_repeated_calls": 0,
+      "max_consecutive_errors": 0
+    },
+    "revision": 2,
+    "actor": "fpizzi/uid:1001",
+    "reason": "Replan original public2acaa786be9f418dff5b7a7dd06b0e7123a5ad12bbf3a356a0e805c474a590cd : T1 franchi, contr\u00f4le T3 Go TestPlanning/Recovery expire sur d\u00e9lai agr\u00e9g\u00e9120s ; cas actif39s/sous-cas6s, sans assertion en \u00e9chec. Le r\u00e9glage global120 abaissait la commande T3 initialement150s : erreur de r\u00e9glage op\u00e9rateur reconnue. Budget Go explicite480s nouvelle r\u00e9vision2, inf\u00e9rieur au processus600s r\u00e9vision2 ; marge120s. M\u00eame source et crit\u00e8res approuv\u00e9s, pas de suppression de tests de validation, suite g\u00e9n\u00e9rale non rejou\u00e9e, m\u00eame r\u00e9sultat/4 tentatives/82 revues et refus conserv\u00e9s. Reprendre parcours public, observer contr\u00f4les puis coordination/revue ind\u00e9pendante.",
+    "updated": "2026-10-12T14:40:28.618509061Z"
+  },
+  "same_result_preserved": true,
+  "attempts": 4,
+  "review_calls": 82,
+  "acceptance_created": false,
+  "source_changed": false,
+  "retries": 4,
+  "processes_of_others_stopped": false
+}

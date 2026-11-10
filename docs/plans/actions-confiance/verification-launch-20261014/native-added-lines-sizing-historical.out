@@ -1,0 +1,181 @@
+=== RUN   TestNativeReferenceSelectionSizingProbe
+{
+  "actual_error": "capacité en tokens dépassée après réserves",
+  "actual_measure": {
+    "prompt_tokens": 169498,
+    "schema_tokens": 2221,
+    "utf8_bytes": 537524,
+    "remaining_text_tokens": -11623
+  },
+  "already_supplied": [
+    {
+      "packet": 1,
+      "artifact": 0,
+      "sha256": "d68056784895e7114c6d245a6868a606ab47e43fdbbc4ce2a392eac3e882ec4e"
+    }
+  ],
+  "alternative_error": "capacité en tokens dépassée après réserves",
+  "alternative_limit": "Diagnostic only: original final schema retained for a conservative comparison; no production protocol, provider call or verdict.",
+  "alternative_measure": {
+    "prompt_tokens": 163928,
+    "schema_tokens": 2221,
+    "utf8_bytes": 504316,
+    "remaining_text_tokens": -6053
+  },
+  "alternative_shared_bytes": 499763,
+  "call": "fragment-final-e3e1d429c041dd6b3ed1809f",
+  "candidate": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+  "declared_selected_tokens": 108187,
+  "declared_token_limit": 92641,
+  "originals": [
+    {
+      "artifact": 6,
+      "bytes": 1372,
+      "kind": "diff",
+      "name": "diff --git a/internal/engine/review_timeout_test.go b/internal/engine/review_timeout_test.go",
+      "packet": 0
+    },
+    {
+      "artifact": 10,
+      "bytes": 44702,
+      "kind": "diff",
+      "name": "diff --git a/internal/engine/trust_actions_operator_regression_test.go b/internal/engine/trust_actions_operator_regression_test.go",
+      "packet": 0
+    },
+    {
+      "artifact": 6,
+      "bytes": 1766,
+      "kind": "source",
+      "name": "internal/engine/web_session.go",
+      "packet": 1
+    },
+    {
+      "artifact": 12,
+      "bytes": 44992,
+      "kind": "source",
+      "name": "internal/engine/trust_actions.go",
+      "packet": 1
+    },
+    {
+      "artifact": 13,
+      "bytes": 1939,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_cli.go",
+      "packet": 1
+    },
+    {
+      "artifact": 14,
+      "bytes": 2689,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_http.go",
+      "packet": 1
+    },
+    {
+      "artifact": 0,
+      "bytes": 26709,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_test.go",
+      "packet": 2
+    },
+    {
+      "artifact": 1,
+      "bytes": 14368,
+      "kind": "source",
+      "name": "tests/actions_confiance_t2.py",
+      "packet": 2
+    },
+    {
+      "artifact": 2,
+      "bytes": 18254,
+      "kind": "source",
+      "name": "tests/actions_confiance_t2_ui.cjs",
+      "packet": 2
+    },
+    {
+      "artifact": 3,
+      "bytes": 6146,
+      "kind": "source",
+      "name": "web/trust-actions.html",
+      "packet": 2
+    },
+    {
+      "artifact": 4,
+      "bytes": 2955,
+      "kind": "source",
+      "name": "web/trust-actions.css",
+      "packet": 2
+    },
+    {
+      "artifact": 5,
+      "bytes": 7664,
+      "kind": "source",
+      "name": "web/trust-actions.js",
+      "packet": 2
+    },
+    {
+      "artifact": 12,
+      "bytes": 48127,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_operator_regression_test.go",
+      "packet": 2
+    },
+    {
+      "artifact": 13,
+      "bytes": 3573,
+      "kind": "source",
+      "name": "package.json",
+      "packet": 2
+    },
+    {
+      "artifact": 14,
+      "bytes": 21363,
+      "kind": "source",
+      "name": "internal/engine/main.go",
+      "packet": 2
+    },
+    {
+      "artifact": 15,
+      "bytes": 35854,
+      "kind": "source",
+      "name": "internal/engine/web_server.go",
+      "packet": 2
+    },
+    {
+      "artifact": 17,
+      "bytes": 1831,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_originals.go",
+      "packet": 2
+    },
+    {
+      "artifact": 18,
+      "bytes": 4409,
+      "kind": "source",
+      "name": "tests/i18n_test.cjs",
+      "packet": 2
+    },
+    {
+      "artifact": 23,
+      "bytes": 8116,
+      "kind": "source",
+      "name": "internal/engine/web_requests_config_test.go",
+      "packet": 2
+    },
+    {
+      "artifact": 24,
+      "bytes": 2995,
+      "kind": "source",
+      "name": "tools/actions-confiance/qualify.py",
+      "packet": 2
+    }
+  ],
+  "questions": 32,
+  "reply_sha256": "9d61f2b1aea1fb3b72aa382cd171171d8e9ccb36a20f583644b8742f6951fa45",
+  "review": "review-648b1d25ee01e0532390cff9",
+  "scope": "Read-only sizing and source attribution. No provider call, database or changed review is produced.",
+  "selected": 20,
+  "selected_without_cost_row": []
+}
+--- PASS: TestNativeReferenceSelectionSizingProbe (16.35s)
+PASS
+ok  	swarm.local/companion/internal/engine	16.379s

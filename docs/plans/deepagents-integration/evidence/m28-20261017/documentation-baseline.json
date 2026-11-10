@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-17T13:24:05.665786+00:00",
+  "reason": "Additional operational documentation identified before editing; initial baseline preserved",
+  "preimages": {
+    "REFERENCE.md": "6a58e6dccc7817be5fe8e53097be473565386bf957e735ea9e2af029f2ef6985",
+    "docs/en/REFERENCE.md": "eb9bdd1b809f1bd5a15c59c257261ae191cc7b6cff6e1156b9b47c4729c13cd7"
+  }
+}

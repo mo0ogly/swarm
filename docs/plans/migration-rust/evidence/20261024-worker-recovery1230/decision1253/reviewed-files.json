@@ -1,0 +1,15 @@
+{
+  "rust/crates/swarm-cli/src/mission_watch.rs": "9f624bcf78d2d2da02ab91805a46a9c3434e36494b8cc8d6c33c38e8835cb62b",
+  "rust/crates/swarm-engine/src/agent_completion_journal.rs": "8a639e21ba931f974d1d21ec85a4ceb4bdbdfb30abe1efbac13224a20d9c0763",
+  "rust/crates/swarm-engine/src/agent_execution_store.rs": "92eec97c96e3b16528cc4822217ec853a8dd97d9348d0e807693abb8bb1f65a7",
+  "rust/crates/swarm-engine/src/lib.rs": "f538245869124990cc25e9952a3a149cd17cfff7b424befcb648cc2c844b6ce8",
+  "rust/crates/swarm-engine/src/mission_supervision_store.rs": "35c6379d41a531a3f45c8728bf98ce6b6e54087c209290f58a9c415edea71667",
+  "rust/crates/swarm-engine/src/mission_worker_recovery.rs": "38e798796c8de40d75f18c1aa232d593c5de8129c0c47a70d27ed36480f0cf1a",
+  "rust/crates/swarm-engine/src/root_store.rs": "89397b066182d8549a380962f411e746075094eda7dbf7326f3199ab32608b52",
+  "version_history.json": "e79c5b324ebef191933c1fe308484f496bf1633702f06d7cd4638e6252c09a43",
+  "tests/rust_mission_worker_recovery.py": "dd088ec39c13423d6bce212193c69b71f8498e7552dfb117b9d6b513a12a9d8d",
+  "tools/verification/recipes/mission-worker-completion-recovery.json": "22684ea2b3d906a849b2e0269ef0985d9525549b86b4466704b9888b01ba2efb",
+  "docs/architecture/NATIVE-WORKER-RECOVERY.md": "fd048bceb645898ef490397b79694fef9b7aad25a9fb6fa82f06c5772bd2472e",
+  "docs/en/NATIVE-WORKER-RECOVERY.md": "498b4b8f4b8a0571e2f2993878c570f1e1281c5d23815a4992e11258e2b0fd11",
+  "docs/plans/migration-rust/REPLAYS.md": "2deb6a4195a58fba829d1537e889ccc94b292ce33c01e3992bfcb22d0e7d6d27"
+}

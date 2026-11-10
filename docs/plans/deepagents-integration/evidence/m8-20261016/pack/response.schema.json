@@ -1,0 +1,107 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "current_state",
+    "supported_version",
+    "source_sha256",
+    "upgrade_required",
+    "immediate_actions",
+    "conditional_paths",
+    "reason"
+  ],
+  "properties": {
+    "current_state": {
+      "type": "string",
+      "enum": [
+        "blocked",
+        "allowed"
+      ]
+    },
+    "supported_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "source_sha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "upgrade_required": {
+      "type": "string",
+      "enum": [
+        "unknown",
+        "yes",
+        "no",
+        "unsupported_cli"
+      ]
+    },
+    "immediate_actions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "accept_task",
+          "downgrade_storage",
+          "edit_database_directly",
+          "inspect_current_source",
+          "inspect_storage_readonly",
+          "launch_now",
+          "propose_supported_upgrade",
+          "request_compatible_cli",
+          "request_operator_decision",
+          "upgrade_now"
+        ]
+      }
+    },
+    "conditional_paths": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "when",
+          "then"
+        ],
+        "properties": {
+          "when": {
+            "type": "string",
+            "enum": [
+              "source_verified_and_storage_equal",
+              "source_verified_and_storage_newer",
+              "source_verified_and_storage_older",
+              "source_verified_upgrade_authorized_and_fresh_check_passed"
+            ]
+          },
+          "then": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "accept_task",
+                "downgrade_storage",
+                "edit_database_directly",
+                "inspect_current_source",
+                "inspect_storage_readonly",
+                "launch_now",
+                "propose_supported_upgrade",
+                "request_compatible_cli",
+                "request_operator_decision",
+                "upgrade_now"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

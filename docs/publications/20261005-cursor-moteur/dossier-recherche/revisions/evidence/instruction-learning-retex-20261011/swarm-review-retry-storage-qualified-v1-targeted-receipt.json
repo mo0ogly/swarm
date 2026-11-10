@@ -1,0 +1,22 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestReviewRetryStorage|TestReviewRetryConnected|TestPlanningReviewRetryDelivers|TestConcurrentWriters|TestMutation.*Busy|TestInspectionCLIRefuses|TestMigrationBackup|TestVersionTwoBackup|TestProviderCooldownStorageVersion|TestRunLimitsMigration|TestMigrationOnePreserves",
+    "-count=1",
+    "-v",
+    "-timeout=150s"
+  ],
+  "start": "2026-10-11T17:11:21.618545+00:00",
+  "end": "2026-10-11T17:11:42.755147+00:00",
+  "seconds": 21.136596377000387,
+  "exit": 0,
+  "output": "/tmp/swarm-review-retry-storage-qualified-v1-targeted.out",
+  "output_sha256": "0e53203e002e38b24824cf1cba7c881f6ad6e8743cf5a418196d65428427f250",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  }
+}

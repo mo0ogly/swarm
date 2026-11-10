@@ -1,0 +1,12 @@
+{
+  "error": "preparation-revision-conflict",
+  "failure": {
+    "causes": [
+      "preparation-revision-conflict"
+    ],
+    "code": "preparation-revision-conflict",
+    "message": "preparation-revision-conflict",
+    "retryable": false
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,20 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T14:37:17.821458+00:00",
+  "end": "2026-10-11T14:45:22.179226+00:00",
+  "seconds": 484.35775427800036,
+  "exit": 0,
+  "output": "/tmp/swarm-source-capacity-recovery-full.out",
+  "output_sha256": "809fc10f9268dcf7ff5455f87c8c46815fdddaeaa15692dc241390a9ae5da1a3",
+  "source_manifest_sha256": "3f04ea459630ace7c056e043162e42bf3aad9f5a4eaf16040c29d362d0b1a1b7",
+  "candidate_digest": "981af32b469a52a5efbe392a3bbb50dbd23b30519faf237857bb31774c16d6ac",
+  "paths": 1172,
+  "source_drift": [],
+  "manifest_changed": false
+}

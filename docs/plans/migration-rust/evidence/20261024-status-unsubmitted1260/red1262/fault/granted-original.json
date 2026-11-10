@@ -1,0 +1,19 @@
+{
+  "agent": "watch-93fc66cd4b016e163d5fdce0",
+  "supervisor": {
+    "pid": 3388915,
+    "stamp": "13621637",
+    "ppid": 3388769,
+    "pgid": 3388915,
+    "sid": 3388915,
+    "state": "S"
+  },
+  "provider": {
+    "pid": 3388916,
+    "stamp": "13621645",
+    "ppid": 3388915,
+    "pgid": 3388916,
+    "sid": 3388915,
+    "state": "S"
+  }
+}

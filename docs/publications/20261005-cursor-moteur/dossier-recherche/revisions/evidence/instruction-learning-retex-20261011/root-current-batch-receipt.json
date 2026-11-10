@@ -1,0 +1,23 @@
+{
+  "revision": 151,
+  "scope": "root",
+  "holder": "planner-04d0e8d38cec5e76bd6f47c6",
+  "generation": 24,
+  "activations": 11,
+  "delivery": {
+    "context_sha256": "dc0f9e08e5558cb5714af5d1cbb5e178126894ee40ec5effa07b58aa239fb58f",
+    "events": [
+      "plan-9922c4588b251328fbc8aaac59da2b4b375db64adb24b42c054574e69a85d3d2",
+      "plan-f8cb4e759c322f85985c5f1d1229cc3ee0dcc9e5c5588f15005298a5ac338653",
+      "review-4b2233e89effd7e81afc1b5e-result-e45b628c56d3b42c",
+      "plan-a820e1c201db07fbbdad4505be0af4dc4a938eebf22f338ac164182b93978ad3",
+      "review-6eadd171c67897f10f4ec754-result-099dedcebec00430",
+      "plan-e1751250729a762736ed19a570369ba3db6a0ebf3bb3386b5849d85c5216ee84",
+      "operator-project-through-retex-20261011"
+    ]
+  },
+  "excluded_stale_event": "plan-e79a07b241a67ff1216264edf22020294a22c6569ed7af7360e10f9cc04267b0",
+  "stale_excluded": true,
+  "latest_operator_resume_delivered": false,
+  "limit": "Received batch is exact and bounded; latest operator event remains pending for next batch. Actual operations and T8 creation not yet observed."
+}

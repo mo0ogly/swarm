@@ -1,0 +1,6 @@
+{
+  "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+  "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+  "internal/enrollmentproof/proof.go": "b221d1f935f9b991d19460c7914d5c9f03c39ff8579c22bf14e78e0a0c24fd08",
+  "internal/enrollmentproof/proof_test.go": "ffa0a142372fdf2409a203608d896febf82edb07ba09826cd2c84ed1ddab0377"
+}

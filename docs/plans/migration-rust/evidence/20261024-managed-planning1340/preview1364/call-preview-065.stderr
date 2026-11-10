@@ -1,0 +1,13 @@
+{
+  "error": "planning-call-workflow-changed",
+  "failure": {
+    "causes": [
+      "planning-call-workflow-changed",
+      "planning-call-workflow-changed"
+    ],
+    "code": "planning-call-workflow-changed",
+    "message": "planning-call-workflow-changed",
+    "retryable": false
+  },
+  "schema_version": 1
+}

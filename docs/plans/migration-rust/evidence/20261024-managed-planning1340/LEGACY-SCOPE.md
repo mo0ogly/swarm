@@ -1,0 +1,5 @@
+Discovery during1340 source inspection: managed_attempts already exists in initial_schema_37.sql (line163); searching Rust files alone had omitted the SQL include. No table/schema change is needed or claimed. Next worker port must consume actual DDL rather than inventing a missing table.
+
+Legacy qualification remains open (owner Root/R6): Go creates bare storage without Rust's explicit private0700 normalization and uses operation.lock; current Rust observer uses an existing private .engine-settings.lock. New Rust bootstrap is exercised, not adoption of every Go-prepared repository. Require a retained actual Go prepared fixture and an authorized supported migration/permission/lane path before claiming legacy compatibility. No silent permission repair or lock fallback was added.
+
+Diagnostic improvement (owner Root, pending): managed-operation-busy currently wraps any typed lock/open failure, not only contention. Causes retain operation and errno and are not retried as SQL BUSY, but a clearer public lock family would help diagnosis. Keep original codes/evidence; revisit with actual missing-lock/permission cases before changing the consumed error contract.

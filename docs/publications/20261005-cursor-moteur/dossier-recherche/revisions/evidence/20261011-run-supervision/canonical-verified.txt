@@ -1,0 +1,59 @@
+GO SUITE package=swarm.local/companion/internal/engine tests=1118 shards=19 coverage=disjoint-complete compile=once
+SHARD 0 exit_code=0 elapsed=0.7s covered=1/1 passed=1
+SHARD 1 exit_code=0 elapsed=0.6s covered=1/1 passed=1
+SHARD 2 exit_code=0 elapsed=0.6s covered=1/1 passed=1
+SHARD 3 RUN TestManagedFragmentHistoricalPublicRecovery/exit elapsed=30.0s
+SHARD 3 exit_code=0 elapsed=45.6s covered=1/1 passed=1
+SHARD 4 RUN TestManagedFragmentRuntimeProviderProtocol/questions-omitted elapsed=16.7s
+SHARD 4 exit_code=0 elapsed=19.2s covered=1/1 passed=1
+SHARD 5 RUN TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit elapsed=18.5s
+SHARD 5 RUN TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/questions-resolved elapsed=35.0s
+SHARD 5 exit_code=0 elapsed=40.8s covered=1/1 passed=1
+SHARD 6 exit_code=0 elapsed=12.3s covered=32/32 passed=32
+SHARD 8 RUN TestManagedIndependentReviewMissingOrBudgetExhaustedCannotPublish/budget elapsed=15.4s
+SHARD 7 RUN TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/coordinated elapsed=15.8s
+SHARD 9 RUN TestIndependentDeliveryDocumentsBoundedAndFresh elapsed=17.2s
+SHARD 10 RUN TestManagedBatchCitationRetryReceivesDiagnostic/tamper elapsed=16.6s
+SHARD 8 RUN TestRecoveryPreviewRefusalDoesNotUseVisitOrOtherTasks elapsed=31.1s
+SHARD 9 RUN TestManagedFragmentReplanPreservesHistory elapsed=33.1s
+SHARD 7 RUN TestRunSupervisionOwnerDecisionStopsActiveProcess/child elapsed=33.8s
+SHARD 8 exit_code=0 elapsed=34.2s covered=82/82 passed=81
+{"optional_skip": "TestCorrectiveRecoveryBrowserRecipe", "observed_output": ["=== RUN   TestMissionStatusAndCLIShareAttemptDiagnostic", "--- PASS: TestMissionStatusAndCLIShareAttemptDiagnostic (0.10s)", "=== RUN   TestCorrectiveRecoveryBrowserRecipe", "    corrective_recovery_test.go:234: set SWARM_CORRECTIVE_UI_BINARY and SWARM_CORRECTIVE_UI_OUT", "--- SKIP: TestCorrectiveRecoveryBrowserRecipe (0.00s)"]}
+SHARD 7 exit_code=0 elapsed=38.8s covered=64/64 passed=64
+SHARD 10 RUN TestFragmentReviewerReplacementPublicRecovery/active elapsed=32.1s
+SHARD 9 exit_code=0 elapsed=48.0s covered=86/86 passed=85
+{"optional_skip": "TestManagedRecoveryBrowserRecipe", "observed_output": ["=== RUN   TestManagedPreparedLaunchConcurrentResume", "--- PASS: TestManagedPreparedLaunchConcurrentResume (0.27s)", "=== RUN   TestManagedRecoveryBrowserRecipe", "    managed_recovery_ui_test.go:15: set SWARM_RECOVERY_UI_BINARY and SWARM_RECOVERY_UI_OUT", "--- SKIP: TestManagedRecoveryBrowserRecipe (0.00s)"]}
+SHARD 11 RUN TestFragmentV2ActionableRefusal elapsed=15.5s
+SHARD 12 RUN TestFragmentSchemaTextFitsSerializedBudget elapsed=15.2s
+SHARD 10 RUN TestTaskActionsDisponibiliteParEtat elapsed=48.5s
+SHARD 13 RUN TestIntegrationRetryRejectsChangedInputs/candidate elapsed=15.3s
+SHARD 10 exit_code=0 elapsed=51.3s covered=86/86 passed=86
+SHARD 11 RUN TestPlanningReviewBudgetRejectsUnusedOrInvalidLimit elapsed=30.5s
+SHARD 12 RUN TestObservedClaudeTerminalUsagePreservesCacheFields elapsed=30.2s
+SHARD 12 exit_code=0 elapsed=31.4s covered=90/90 passed=90
+SHARD 11 exit_code=0 elapsed=37.2s covered=88/88 passed=86
+{"optional_skip": "TestMissingReportRecoveryBrowserRecipe", "observed_output": ["=== RUN   TestReviewTokenCacheConcurrentCounts", "--- PASS: TestReviewTokenCacheConcurrentCounts (0.01s)", "=== RUN   TestMissingReportRecoveryBrowserRecipe", "    missing_report_recovery_test.go:73: browser recipe opt-in", "--- SKIP: TestMissingReportRecoveryBrowserRecipe (0.00s)"]}
+{"optional_skip": "TestRecoveryHealthBrowserRecipe", "observed_output": ["=== RUN   TestRuntimeHealthEndpointSurvivesDatabaseFailure", "--- PASS: TestRuntimeHealthEndpointSurvivesDatabaseFailure (0.05s)", "=== RUN   TestRecoveryHealthBrowserRecipe", "    runtime_health_ui_test.go:14: set SWARM_HEALTH_UI_BINARY and SWARM_HEALTH_UI_OUT", "--- SKIP: TestRecoveryHealthBrowserRecipe (0.00s)"]}
+SHARD 13 RUN TestCoordinatedFragmentsCoverageAndBudget/omission elapsed=30.5s
+SHARD 14 RUN TestManagedBatchRuntimeExplicitRetryReusesPaidPass elapsed=15.4s
+SHARD 15 RUN TestManagedRecoveryHandoffRejectsAlteredRepair/receipt elapsed=15.2s
+SHARD 16 RUN TestReviewDossierPublicExportNoBudgetOrMutation elapsed=16.5s
+SHARD 13 exit_code=0 elapsed=42.3s covered=91/91 passed=91
+SHARD 14 RUN TestReviewTokenCacheExactCountsAndEviction elapsed=30.8s
+SHARD 14 exit_code=0 elapsed=37.7s covered=94/94 passed=92
+{"optional_skip": "TestOperatorPreview", "observed_output": ["=== RUN   TestA9EnvironmentBlockExplainsRequiredNewCondition", "--- PASS: TestA9EnvironmentBlockExplainsRequiredNewCondition (0.00s)", "=== RUN   TestOperatorPreview", "    activity_description_test.go:70: optional visual artifact", "--- SKIP: TestOperatorPreview (0.00s)"]}
+{"optional_skip": "TestHistoricalRequalificationBrowser", "observed_output": ["=== RUN   TestGraphDraftB02BilingualHelp", "--- PASS: TestGraphDraftB02BilingualHelp (2.04s)", "=== RUN   TestHistoricalRequalificationBrowser", "    historical_requalification_ui_test.go:13: explicit browser recipe", "--- SKIP: TestHistoricalRequalificationBrowser (0.00s)"]}
+SHARD 16 RUN TestResultPresentationCoversMissingStaleAndFreshGate elapsed=31.6s
+SHARD 16 exit_code=0 elapsed=34.1s covered=95/95 passed=95
+SHARD 17 RUN TestReviewCoordinationThroughVersionedPlannerDecision elapsed=15.4s
+SHARD 15 RUN TestManagedFragmentResumeRejectsInvalidDeadline elapsed=35.6s
+SHARD 18 RUN TestGraphDraftB02CLIHTTPParity elapsed=15.1s
+SHARD 15 exit_code=0 elapsed=48.3s covered=94/94 passed=94
+SHARD 17 RUN TestRecoveryBudgetAndBoundPersistAcrossStoreRestart elapsed=30.9s
+SHARD 17 exit_code=0 elapsed=31.7s covered=96/96 passed=95
+{"optional_skip": "TestEngineContractTruthBrowser", "observed_output": ["--- PASS: TestEngineContractOwnershipParentCannotCloseIncompleteDescendants/cli/child-a (0.06s)", "--- PASS: TestEngineContractOwnershipParentCannotCloseIncompleteDescendants (0.23s)", "=== RUN   TestEngineContractTruthBrowser", "    engine_contract_truth_test.go:116: mandatory via engine_acceptance.cjs --case truth", "--- SKIP: TestEngineContractTruthBrowser (0.00s)"]}
+SHARD 18 RUN TestReportDiffReferenceRequiresExactCompleteNewFile elapsed=30.5s
+SHARD 18 exit_code=0 elapsed=38.9s covered=114/114 passed=113
+{"optional_skip": "TestLiveProviderStreamReplay", "observed_output": ["=== RUN   TestSelectedTaskShowsStopCauseWithoutAgentSelection", "--- PASS: TestSelectedTaskShowsStopCauseWithoutAgentSelection (0.05s)", "=== RUN   TestLiveProviderStreamReplay", "    stream_regression_test.go:152: optional local provider stream", "--- SKIP: TestLiveProviderStreamReplay (0.00s)"]}
+PASS full discovered Go suite: 1118 tests; all shards exited 0.
+Optional Go skips are listed explicitly above, never counted as passed; live-provider probes and opt-in browser recipes are not implied.

@@ -1,0 +1,37 @@
+{
+  "message": "The expression evaluated to a falsy value:\n\n  assert((await page.$eval('#trust-config-error',e=>e.textContent)).includes(lang==='fr'?'puissance de deux':'power of two'))\n",
+  "stack": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert((await page.$eval('#trust-config-error',e=>e.textContent)).includes(lang==='fr'?'puissance de deux':'power of two'))\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_kernel_ui.cjs:25:412",
+  "checks": [
+    "inactive diagnostic is explained and cannot launch",
+    "fr: preview read-only and Admin persists non-default policy",
+    "fr: saved values reopen and keyboard focus restores",
+    "fr: actual API unavailability is translated without synthetic events or mutation",
+    "fr: mobile target, visible status and progressive report render",
+    "fr: invalid ring is refused before mutation with translated reason",
+    "en: preview read-only and Admin persists non-default policy",
+    "en: saved values reopen and keyboard focus restores",
+    "en: actual API unavailability is translated without synthetic events or mutation",
+    "en: mobile target, visible status and progressive report render"
+  ],
+  "errors": [],
+  "root": "/tmp/swarm-kernel-ui-YoChY2",
+  "kernelDiagnostic": {
+    "request": {
+      "authorization_matches": true,
+      "header_names": [
+        "x-swarm-csrf",
+        "authorization",
+        "sec-ch-ua-platform",
+        "referer",
+        "sec-ch-ua",
+        "sec-ch-ua-mobile",
+        "user-agent",
+        "content-type"
+      ],
+      "authorization_length": 41,
+      "body": "{}"
+    },
+    "status": 200,
+    "body": "{\"effective_policy\":{\"enabled\":true,\"timeout_seconds\":19,\"ring_bytes\":262144},\"schema_version\":1,\"available\":false,\"source\":\"ebpf\",\"scope\":\"owned_fixture_only\",\"reason\":\"permission_denied\",\"diagnostic\":\"kernel backend ring: creating map: map create: operation not permitted (MEMLOCK may be too low, consider rlimit.RemoveMemlock)\",\"events\":[],\"owned_pids\":[3505458],\"fixture_verified\":false,\"global_qualification\":false,\"lost\":0,\"cleanup_verified\":true,\"revision\":3}\n"
+  }
+}

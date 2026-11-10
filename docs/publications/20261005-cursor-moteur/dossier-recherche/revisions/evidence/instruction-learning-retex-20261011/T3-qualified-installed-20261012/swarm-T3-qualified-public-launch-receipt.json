@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-12T10:22:33.800664+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "revision": 708,
+  "bundle": {
+    "at": "2026-10-12T10:18:13.169330+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-inputs-T3-exploration-concurrent-20261012.bundle",
+    "sha256": "78782277ace515058eb2aea0a63826e8c477c34b1df63879c6f37f4c4fabe224",
+    "commit": "e62373d8d5d0f5ce3e4169400b45b13ce6057ba6",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 125,
+    "manifest_sha256": "a63343b99d4ae9c646ff3c7a95340cdb1d682a9785b165c1841b64dfc7c07026",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-exploration-concurrent-inputs-vcel_nto",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-exploration-concurrent-import-dfwzpowk",
+    "old122_originals_preserved": true,
+    "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+    "limits": "Qualified T3: read-only accepted Git exploration, attributed source discovery, owned future dependency adaptation, concurrent-scope reservations. Includes original developed T2 Judge and all122 earlier priority inputs preserved byte-for-byte. Deferred27 excluded. Native T3 worker must import exact preimages, qualify its own cumulative candidate, deliver architecture and original receipts, and obtain independent review. Local tests and deployment do not accept T2 or T3."
+  },
+  "T3_operator_base_sha256": "fc4dc53d520e6937a86a961192217496b91d19c52ea92a41cf05649c09544f84",
+  "T3_next_bytes": 7188,
+  "T2_unchanged_before_resume": true,
+  "criteria_requirements_attempts_learning_preserved": true,
+  "paused": false,
+  "planning_paused": false,
+  "limits": "Root instruction saved and pauses resumed; supervisor graph decision, native worker reception and acceptance require observation."
+}

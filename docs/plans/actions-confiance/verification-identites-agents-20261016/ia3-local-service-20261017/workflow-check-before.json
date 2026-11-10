@@ -1,0 +1,5 @@
+{
+  "path": "tools/agent-workflows/check.py",
+  "sha256": "5d6f70809aa557abbfd1ebebccc4174c278d27a2efa9d9cc151b77e028066dde",
+  "observation": "Unjustified inherited 30s global Go test watchdog; original workflow check succeeded."
+}

@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-11T19:41:50.911250+00:00",
+  "binary": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-selection-recovery22-candidate",
+  "sha256": "8b2bcc55dc94734ce3e0b4ad55db9a21d7475fd0e8d53842f1c40f6c60b01246",
+  "source_digest": "5238f34c3c8c61b983dc220f75352078ae5f728f721db24332042dba881332bd",
+  "command": [
+    "go",
+    "build",
+    "-o",
+    "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-selection-recovery22-candidate",
+    "./cmd/swarm"
+  ],
+  "exit": 0,
+  "full": "running; no install permitted before complete qualification"
+}

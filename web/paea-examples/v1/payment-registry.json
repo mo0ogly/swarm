@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "project_id": "project-alpha",
+  "revision": 1,
+  "debts": [
+    {
+      "debt_id": "debt-17",
+      "supplier_id": "supplier-1",
+      "invoice_references": [
+        "F-12",
+        "legacy-12"
+      ],
+      "invoice_version": "v7",
+      "amount_minor": "420000",
+      "currency": "EUR",
+      "beneficiary_account_id": "account-17"
+    },
+    {
+      "debt_id": "debt-18",
+      "supplier_id": "supplier-2",
+      "invoice_references": [
+        "F-12"
+      ],
+      "invoice_version": "v7",
+      "amount_minor": "420000",
+      "currency": "EUR",
+      "beneficiary_account_id": "account-18"
+    }
+  ]
+}

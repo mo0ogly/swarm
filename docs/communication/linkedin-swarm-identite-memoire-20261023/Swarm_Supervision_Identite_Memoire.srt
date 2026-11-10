@@ -1,0 +1,95 @@
+1
+00:00:00,000 --> 00:00:04,000
+Swarm construit une continuité entre la mission confiée à un agent et les preuves de son résultat.
+
+2
+00:00:04,000 --> 00:00:08,000
+La supervision, l’identité et la mémoire répondent à des questions différentes, mais liées.
+
+3
+00:00:08,000 --> 00:00:12,000
+Le moteur maintient les preuves et applique les décisions autorisées dans le périmètre de la tâche.
+
+4
+00:00:12,000 --> 00:00:17,333
+Le superviseur racine conserve l’objectif global. Un sous-superviseur conduit son propre périmètre.
+
+5
+00:00:17,333 --> 00:00:22,667
+Les exécutants produisent leur travail et ses preuves. Les observations remontent au responsable concerné.
+
+6
+00:00:22,667 --> 00:00:28,000
+Chaque événement conserve son périmètre, sa tentative et ses compteurs pour atteindre le bon responsable.
+
+7
+00:00:28,000 --> 00:00:33,333
+Le moteur remonte les observations : durée, attente d’un outil et compteurs de la tentative.
+
+8
+00:00:33,333 --> 00:00:38,667
+Le responsable motive la poursuite ou l’arrêt. Le moteur vérifie les droits et les préconditions.
+
+9
+00:00:38,667 --> 00:00:44,000
+Une demande d’arrêt et une fin effective sont distinctes. Les preuves et l’historique restent conservés.
+
+10
+00:00:44,000 --> 00:00:50,000
+Rust dispose déjà de parcours publics ciblés pour lancer et suivre un worker.
+
+11
+00:00:50,000 --> 00:00:56,000
+D’autres recettes couvrent la reprise d’un worker en attente et l’enchaînement planification–exécution.
+
+12
+00:00:56,000 --> 00:01:02,000
+Ces résultats utilisent des fournisseurs de test. Les autres rôles et la supervision web restent à qualifier.
+
+13
+00:01:02,000 --> 00:01:06,667
+Le contrat distingue l’initiateur, l’agent logique et son instance d’exécution.
+
+14
+00:01:06,667 --> 00:01:11,333
+L’autorité porte sur une mission, une tâche, une opération, une ressource et un contenu précis.
+
+15
+00:01:11,333 --> 00:01:16,000
+La délégation reste bornée par le parent. Le raccordement public complet demeure à qualifier.
+
+16
+00:01:16,000 --> 00:01:22,000
+Le socle mémoire documenté en Go part d’un retour d’expérience vérifié et admet une version de la leçon.
+
+17
+00:01:22,000 --> 00:01:28,000
+L’opérateur choisit les versions utiles à une tâche. La tentative conserve le contexte et ses empreintes.
+
+18
+00:01:28,000 --> 00:01:34,000
+Lire, résumer et transmettre sont des usages distincts. Retirer une leçon ne purge pas le contexte déjà reçu.
+
+19
+00:01:34,000 --> 00:01:38,667
+AC-02 prépare une couche complémentaire de confinement, de contrôle réseau et d’usage des secrets.
+
+20
+00:01:38,667 --> 00:01:43,333
+Le choix est un moteur Swarm propre et un sous-ensemble compatible OpenShell à définir et vérifier.
+
+21
+00:01:43,333 --> 00:01:48,000
+Le futur parcours reliera refus, règle, révision appliquée et effet observé.
+
+22
+00:01:48,000 --> 00:01:52,000
+Les sources publiques éclairent les concepts. Elles ne certifient pas la conformité de Swarm.
+
+23
+00:01:52,000 --> 00:01:56,000
+La supervision fournit déjà des parcours Rust vérifiés sur fixtures ; l’intégration globale reste ouverte.
+
+24
+00:01:56,000 --> 00:02:00,000
+Présentation explicative et sous-titrée. Les liens des références accompagnent la vidéo.

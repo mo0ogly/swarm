@@ -1,0 +1,356 @@
+{
+  "at_utc": "2026-10-16T12:03:21.683061+00:00",
+  "git_head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "scope": "M11 durable dialogue boundary state, not provider restart",
+  "source_sha256": {
+    "internal/engine/model.go": "48f4d847be25de24ea8e6b0f9f99b753cc209c87789a9cec78f322b40d818eb1",
+    "internal/engine/store.go": "900dc14657b98175f4b10228bcd220289b6a13f3acc00e017bba751de57de09f",
+    "internal/engine/agent_dialogue.go": "92c75420174c1ce67e19dc91715ea937f06f36a1ed361b85814ae22840adec65",
+    "internal/engine/agent_dialogue_test.go": "588b3afe8d9313f57444fc9a8a502ff06baa48cf89ec69eb119a9ef0521baac5",
+    "internal/engine/console_cli.go": "bb73c277877bc3f62720b140586b890a6e4b091e0bf20c9be97196f37e04397c",
+    "internal/engine/web_server.go": "58bc3deb09379b3cf13ef05c7412579af405f8753ad08cd18871eecaa9247b81",
+    "internal/engine/loop_guard.go": "7c83e7b04f02da26128054703222ef8eb5a9bba418308738b18f185192203616",
+    "internal/engine/dialogue_supervisor_receipt_test.go": "21a08c3762ac8165179ecfc31e25899515ebb002da01aab845dfc162197d3ac0",
+    "internal/engine/dialogue_checkpoint.go": "ef4946276faa0fc60d3e5612a5c2a51557ecefac8ca739aea8f8646e3bd51f3b",
+    "internal/engine/dialogue_checkpoint_store.go": "cb8241a597a1b33cf59449234353207290e99ff42c3e0a42e2c345c2a23da35d",
+    "internal/engine/dialogue_checkpoint_test.go": "91697807b2291afdf5e08eea75136d08eb3169dde1d81a4ea502ff16fa5dc542",
+    "docs/PROJECT-MEMORY.md": "de7e0edc7e0cc31f984f182a62564f3d77f1db050a6b0b8c898b73952159652a",
+    "docs/en/PROJECT-MEMORY.md": "62faff3276f1365638278d50674a69be9bdf3a42952fc098d210e6fdba83f5b8",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-07.md": "789161166c406bade4b0c43547ae718c3dd7356bda17eba5ca8d54fa24fd9c87",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-07.md": "c8c08d9b7a0459853a5e4295c33959e0bfbfd8e245275b7b13da2028340f12bf",
+    "docs/plans/deepagents-integration/PLAN.md": "b1821172918dd5f370613e075fd30d0a2a0520b8d28ff1740bb3aa6aad7ac6bf",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "3e8044d653f10217a2542c1d3e9e15b14f5cd265b597a3f00c2a117f02b5627d"
+  },
+  "bound_input_count": 1007,
+  "changed_compilation_inputs": [],
+  "checks": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "gofmt",
+        "-l",
+        "internal/engine/model.go",
+        "internal/engine/store.go",
+        "internal/engine/agent_dialogue.go",
+        "internal/engine/agent_dialogue_test.go",
+        "internal/engine/console_cli.go",
+        "internal/engine/web_server.go",
+        "internal/engine/loop_guard.go",
+        "internal/engine/dialogue_supervisor_receipt_test.go",
+        "internal/engine/dialogue_checkpoint.go",
+        "internal/engine/dialogue_checkpoint_store.go",
+        "internal/engine/dialogue_checkpoint_test.go"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_supervisor_receipt_test.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_checkpoint.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_checkpoint_store.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "internal/engine/dialogue_checkpoint_test.go"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/PROJECT-MEMORY.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/en/PROJECT-MEMORY.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-07.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-07.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/PLAN.md"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "docs/plans/deepagents-integration/cas-evaluation.json"
+      ],
+      "exit_code": 1,
+      "output": "",
+      "pass": true
+    }
+  ],
+  "local_links_checked": 5,
+  "missing_links": [],
+  "receipts": {
+    "checkpoint-final": {
+      "receipt_sha256": "cf8d73e438fd7601b54ae56216d0fc384b19eab8fef72be4ba0ac2e71a6fb5b1",
+      "log_sha256": "9a576f06216710db2b17b71c6bf62358790012d0012279578d0e1a406679e744",
+      "named_tests": [
+        "TestDialogueCumulativeToolsAndIdle",
+        "TestDialogueResumeIdentityAndPermissions",
+        "TestDialogueUsageSnapshotDoesNotMutate",
+        "TestDialogueBoundaryHasDurableStateBeforeHeartbeat",
+        "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+        "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+        "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+        "TestDialogueCheckpointRejectsInvalidOrForeignState",
+        "TestDialogueCheckpointMigrationPreservesLegacyAndBackup",
+        "TestDialogueCheckpointSurvivesLifecycleDeleteRestore",
+        "TestDialoguePendingBoundaryHasDurableUsage",
+        "TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed",
+        "TestDialogueStartCheckpointDoesNotDescribeLaterEffects",
+        "TestDialogueCheckpointProgressUsesStoredBoundaryTime",
+        "TestDialogueIncompleteTurnCannotBeAnswered",
+        "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+        "TestDialogueCompletionRejectsContradictoryAndPrivateFailures",
+        "TestDialogueConfirmationStorageFailureBlocksContinuation",
+        "TestDialogueProtocolRejectsReplayAndUnconfirmedEOF",
+        "TestDialogueActualSupervisorConfirmsTurnReceipts",
+        "TestLifecycleArchiveRestoreAndRevisionConfirmation",
+        "TestLifecyclePurgeRetentionPreservesReceiptsAndProjectFiles",
+        "TestLoopGuardEvents",
+        "TestLoopGuardCaptureOffAndDefaults",
+        "TestSupervisorGuardStopsAndBlocksTask",
+        "TestSupervisorRetainsLastAuthorizedResult",
+        "TestMemoryContextReceiptReadThroughCLIAndAPI",
+        "TestProjectMemoryKnowledgeContexts",
+        "TestProjectMemoryStoragePlanContexts",
+        "TestInspectionCLIRefusesImplicitStorageUpgrade",
+        "TestInspectionDoesNotCreateMissingStore",
+        "TestStructuredProviderFailurePreservesSafeCause"
+      ],
+      "subtest_runs": 47
+    },
+    "checkpoint-final-race": {
+      "receipt_sha256": "c3036793997ea76be4d3b9e148ea4dd9340730c762415ea9742a94c349bfd437",
+      "log_sha256": "e7c7ffd58380ea7e6449eccb3c196bb0b4ed5db787dc2ade96b2ad81ffeeca47",
+      "named_tests": [
+        "TestDialogueUsageSnapshotDoesNotMutate",
+        "TestDialogueBoundaryHasDurableStateBeforeHeartbeat",
+        "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+        "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+        "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+        "TestDialogueCheckpointRejectsInvalidOrForeignState",
+        "TestDialogueCheckpointMigrationPreservesLegacyAndBackup",
+        "TestDialogueCheckpointSurvivesLifecycleDeleteRestore",
+        "TestDialoguePendingBoundaryHasDurableUsage",
+        "TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed",
+        "TestDialogueStartCheckpointDoesNotDescribeLaterEffects",
+        "TestDialogueCheckpointProgressUsesStoredBoundaryTime",
+        "TestDialogueIncompleteTurnCannotBeAnswered",
+        "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+        "TestDialogueConfirmationStorageFailureBlocksContinuation",
+        "TestDialogueProtocolRejectsReplayAndUnconfirmedEOF"
+      ],
+      "subtest_runs": 21
+    },
+    "engine-final-vet": {
+      "receipt_sha256": "860d8fa378cd58397bdc3de72b3d9c87abfeee857b8997ea25e9cfeb806f43ce",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "named_tests": [],
+      "subtest_runs": 0
+    }
+  },
+  "distinct_named_tests": [
+    "TestDialogueActualSupervisorConfirmsTurnReceipts",
+    "TestDialogueBoundaryHasDurableStateBeforeHeartbeat",
+    "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+    "TestDialogueCheckpointMigrationPreservesLegacyAndBackup",
+    "TestDialogueCheckpointProgressUsesStoredBoundaryTime",
+    "TestDialogueCheckpointRejectsInvalidOrForeignState",
+    "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+    "TestDialogueCheckpointSurvivesLifecycleDeleteRestore",
+    "TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed",
+    "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+    "TestDialogueCompletionRejectsContradictoryAndPrivateFailures",
+    "TestDialogueConfirmationStorageFailureBlocksContinuation",
+    "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+    "TestDialogueCumulativeToolsAndIdle",
+    "TestDialogueIncompleteTurnCannotBeAnswered",
+    "TestDialoguePendingBoundaryHasDurableUsage",
+    "TestDialogueProtocolRejectsReplayAndUnconfirmedEOF",
+    "TestDialogueResumeIdentityAndPermissions",
+    "TestDialogueStartCheckpointDoesNotDescribeLaterEffects",
+    "TestDialogueUsageSnapshotDoesNotMutate",
+    "TestInspectionCLIRefusesImplicitStorageUpgrade",
+    "TestInspectionDoesNotCreateMissingStore",
+    "TestLifecycleArchiveRestoreAndRevisionConfirmation",
+    "TestLifecyclePurgeRetentionPreservesReceiptsAndProjectFiles",
+    "TestLoopGuardCaptureOffAndDefaults",
+    "TestLoopGuardEvents",
+    "TestMemoryContextReceiptReadThroughCLIAndAPI",
+    "TestProjectMemoryKnowledgeContexts",
+    "TestProjectMemoryStoragePlanContexts",
+    "TestStructuredProviderFailurePreservesSafeCause",
+    "TestSupervisorGuardStopsAndBlocksTask",
+    "TestSupervisorRetainsLastAuthorizedResult"
+  ],
+  "red_sources_bound": true,
+  "evidence_sha256": {
+    "actual-supervisor/provider_failure.json": "8c318f319270ab477aa977a296dbb6874f97381e42b3964f0d8fcc3aac788ee2",
+    "actual-supervisor/tool_result_missing.json": "38b6d0f4e05c696c448e527fa89ab63fd4a06be9bf0edcb978ac9795eb1e4730",
+    "actual-supervisor/two_confirmed_turns.json": "9c7c3479b85a3e88b5bfc0a04cba747f7c34712cd365626433b172b4108a9546",
+    "actual-supervisor-final/provider_failure.json": "d06b86c6af958663ceae968709fa26d312511951e2ac395fba22d40c2543d4ae",
+    "actual-supervisor-final/tool_result_missing.json": "e01e304adf465f278441d97457e151fc213908cc3116f58b47ac849ddcc21981",
+    "actual-supervisor-final/two_confirmed_turns.json": "6bf01e488a9519576b6cfbe87d355efc7cec2bcb9b1008e73e5f966e08e57419",
+    "baseline.json": "ce755ed97e34b80619187fe5d6e305309d210863b03b296497c45896762c282d",
+    "boundary-time-red.json": "11295f2d6770fc5ba55a2de20395835f9594c79b16adee0cb484cc9f6643ca35",
+    "boundary-time-red.log": "34c65857da5d6fa5f4afe8b7d61ba3dc08fea953710b200c2097e1e5b760a655",
+    "boundary-time-source.json": "ccd13ca5170a2fc3f194d53649f839fe87dc985bbcdbaa676d02c9d73eb0e27c",
+    "candidate-inputs-before-final.json": "f5d312f3b7dab6ada3de6bcb2a5c0b529f6b3082012e603726ba85762c08df3a",
+    "candidate-inputs-before-green.json": "0a44188714436a11ecea237adc9821fcf8fe789cb86718c2d2980897c3d30e27",
+    "candidate-inputs-before-time-fix.json": "1da2f61a326026acbb23097b104858188cbed508e4d4fd3c6507977c8e822f9f",
+    "checkpoint-final-race.json": "c3036793997ea76be4d3b9e148ea4dd9340730c762415ea9742a94c349bfd437",
+    "checkpoint-final-race.log": "e7c7ffd58380ea7e6449eccb3c196bb0b4ed5db787dc2ade96b2ad81ffeeca47",
+    "checkpoint-final.json": "cf8d73e438fd7601b54ae56216d0fc384b19eab8fef72be4ba0ac2e71a6fb5b1",
+    "checkpoint-final.log": "9a576f06216710db2b17b71c6bf62358790012d0012279578d0e1a406679e744",
+    "checkpoint-green.json": "63cb249f377d3d5dac00c378ffe730df8e8a5c64ac28962c1b753d468467c84b",
+    "checkpoint-green.log": "98125aef68269878bbc1822509fd0f692670cbdf9047fa9b4bbfc3b76e00a469",
+    "checkpoint-initial-green.json": "aad7a2256ef9b8ba5c2af71f5185fb2d86bfffbe8f51131e181e9af14dab48fb",
+    "checkpoint-initial-green.log": "05ed58b8ab63e5a76c3c2e3868a4ff45c5bcd05e8af8a4a70f2993847873e27c",
+    "checkpoint-race.json": "f33b4c674e16779ec1776ee07fa31df602036ad70a6cb32013b051e51df673d6",
+    "checkpoint-race.log": "fb3e392876af21cc73b297483d40e0ce628aeeb0fe7a58f9118c78f3eaca49bf",
+    "checkpoint-red.json": "820e202f4cddb156a5a0007cc0fb6e1998afc41d43e4deddc084af0e5b70251b",
+    "checkpoint-red.log": "9d12c61cb2ce72757660ead2a4b38ed102b18a42b5b3b498228f0f52fa081a6f",
+    "engine-final-vet.json": "860d8fa378cd58397bdc3de72b3d9c87abfeee857b8997ea25e9cfeb806f43ce",
+    "engine-final-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "engine-vet.json": "4be28cc0c244c519b46e2fc6b709f53c92607b371624715ef32234688a9a7421",
+    "engine-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m11-changes.patch": "92251a220d3be144d95d8fd52c1c6d3aae1a42c409c041e8b1c3492ee3318742",
+    "method-observations.json": "72d352ccfdc134c3889180e859c2e930adb6c7b15a1119d6ca707826d238c6b6",
+    "preimages/dialogue_boundary_time_red_test.go.txt": "9b6bfb700992232fee2be4e43af36db85b05e2b4eb65741b0ce8f149ba84cb71",
+    "preimages/dialogue_checkpoint_first_green_test.go.txt": "2a14b09ec90347bc2b7ef0f3507d8592fc0c1c037f67bd6d92042d601783580c",
+    "preimages/dialogue_checkpoint_first_race_test.go.txt": "7f95eb1a25b10cfc682605f0a69a4e1d094d7b740f346863439d0477a6365d6e",
+    "preimages/dialogue_checkpoint_red_test.go.txt": "037174b4fb6c3debd459879b954783acf68a3f5765297963f5b98066bda3c9cf",
+    "preimages/dialogue_checkpoint_store_before_time_fix.go.txt": "08230d3769f25dfaaf2972e9ea7fdff48b11ae583c0acb8075121539ced0bafd",
+    "preimages/docs__PROJECT-MEMORY.md.txt": "60a0ca32cf41626c6ed25c53f778a497a889d43524a01324eb6a205f0b64feda",
+    "preimages/docs__en__PROJECT-MEMORY.md.txt": "66ed08d06ebd972fa801410d102810270654ecd383a83c761e21dfcee614b222",
+    "preimages/docs__plans__deepagents-integration__PLAN.md.txt": "e8c87ecbd27ee8a9f4c9a91825fef542f098e2dc39f65dba18abd8711ee9495f",
+    "preimages/docs__plans__deepagents-integration__cas-evaluation.json.txt": "c4cf42dfd7c8ae36279cf5ebbaf6f03f2ace8848afa14c3a2a2c9094567e08c5",
+    "preimages/internal__engine__agent_dialogue.go.txt": "307a68e2c145fdda8f3f6fe6d4dabc31422a13172df513c8b6014b9b074e8f23",
+    "preimages/internal__engine__agent_dialogue_test.go.txt": "bea4c518cbc84f49b341c99ed2c7127bb51103a81ba0201af6f3c059fbcff0b1",
+    "preimages/internal__engine__console_cli.go.txt": "014a25e57ca2af8f022dbdd7e4caeca432777ee82dcaa7ac63f19ed9ef7a7103",
+    "preimages/internal__engine__dialogue_supervisor_receipt_test.go.txt": "1b1904a50741d24868f7844eeb5f8de746d461731f483f0c40aad76106ca873a",
+    "preimages/internal__engine__loop_guard.go.txt": "86e719adcbeda313b2d1912370347d03574e4a70acd7cc6911bd67cf5c132ac6",
+    "preimages/internal__engine__model.go.txt": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+    "preimages/internal__engine__store.go.txt": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+    "preimages/internal__engine__web_server.go.txt": "dd6109ec1d3c444f86aba4ec2b127597bbd010b82f24bd66b88e98c2b51732c0",
+    "unchanged-live-runtime.json": "1ba6b66fcdb217e54e6deab4284f19d491ab28e0f9863ff20bbbdee13853305e"
+  },
+  "live_runtime": {
+    "running": true,
+    "pid": 1485609,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "deployed": false,
+  "storage_migration": "33 to 34 tested only in isolated fixtures",
+  "provider_restart": "NOT SUPPORTED / NOT TESTED",
+  "real_model_calls": 0,
+  "review": "Local implementation-context review; not independent acceptance"
+}

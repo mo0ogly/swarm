@@ -1,0 +1,7 @@
+=== RUN   TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen
+    planning_unresolved_review_recovery_test.go:14: sizes 164551 168167 21899 parts 1
+    planning_unresolved_review_recovery_test.go:58: acknowledgement hid unresolved current incident from fresh supervisor activation true map[] 0
+--- FAIL: TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen (1.25s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.329s
+FAIL

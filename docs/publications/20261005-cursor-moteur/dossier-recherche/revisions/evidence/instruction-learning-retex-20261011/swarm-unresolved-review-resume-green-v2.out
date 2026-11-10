@@ -1,0 +1,5 @@
+=== RUN   TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen
+    planning_unresolved_review_recovery_test.go:14: sizes 164551 168163 21899 parts 1
+--- PASS: TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen (3.81s)
+PASS
+ok  	swarm.local/companion/internal/engine	3.848s

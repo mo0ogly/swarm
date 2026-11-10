@@ -1,0 +1,46 @@
+=== RUN   TestIncrementalHistoricalPrefixRemainsStable
+--- PASS: TestIncrementalHistoricalPrefixRemainsStable (0.00s)
+=== RUN   TestManagedFragmentEveryInspectionReceivesCurrentCriteria
+--- PASS: TestManagedFragmentEveryInspectionReceivesCurrentCriteria (1.77s)
+=== RUN   TestManagedFragmentRejectsUnknownScopeVersion
+--- PASS: TestManagedFragmentRejectsUnknownScopeVersion (0.25s)
+=== RUN   TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection
+=== RUN   TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection/repack
+=== RUN   TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection/fresh
+--- PASS: TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection (41.70s)
+    --- PASS: TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection/repack (24.21s)
+    --- PASS: TestManagedFragmentScopeAcrossTokenPackingAndFinalSelection/fresh (15.59s)
+=== RUN   TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection
+=== RUN   TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection/submit
+=== RUN   TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection/revise
+--- PASS: TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection (3.00s)
+    --- PASS: TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection/submit (1.22s)
+    --- PASS: TestRecoveredResultEvidencePreflightPreservesStateAndAllowsCorrection/revise (1.78s)
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/valid
+    recovered_result_evidence_test.go:81: sizes 164551 168196 21899 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/confirmation
+    recovered_result_evidence_test.go:81: sizes 164551 168196 21899 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/unchanged
+    recovered_result_evidence_test.go:81: sizes 164551 168196 21899 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/stale
+    recovered_result_evidence_test.go:81: sizes 164551 168194 21899 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/active
+    recovered_result_evidence_test.go:81: sizes 164551 168196 21899 parts 1
+=== RUN   TestRecoveredResultExplicitCorrectionAfterUnknown/tampered
+    recovered_result_evidence_test.go:81: sizes 164551 168196 21899 parts 1
+--- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown (25.02s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/valid (5.96s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/confirmation (3.48s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/unchanged (4.39s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/stale (4.27s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/active (3.52s)
+    --- PASS: TestRecoveredResultExplicitCorrectionAfterUnknown/tampered (3.41s)
+=== RUN   TestRecoveredResultNewAttemptPreservesPreviousRepair
+--- PASS: TestRecoveredResultNewAttemptPreservesPreviousRepair (2.09s)
+=== RUN   TestRecoveredResultCorrectionAfterPublicPolicyChange
+--- PASS: TestRecoveredResultCorrectionAfterPublicPolicyChange (1.71s)
+=== RUN   TestRecoveredResultRevisionPreservesRefusalAndChecksNewCandidate
+--- PASS: TestRecoveredResultRevisionPreservesRefusalAndChecksNewCandidate (1.70s)
+PASS
+ok  	swarm.local/companion/internal/engine	78.408s

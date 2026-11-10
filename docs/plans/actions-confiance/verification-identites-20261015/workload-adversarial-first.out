@@ -1,0 +1,66 @@
+=== RUN   TestActionsConfianceT3WorkloadConfigurationRejectsUnsafeInputs
+--- PASS: TestActionsConfianceT3WorkloadConfigurationRejectsUnsafeInputs (0.06s)
+=== RUN   TestActionsConfianceT3WorkloadAuthenticatesEffectAndPersists
+--- PASS: TestActionsConfianceT3WorkloadAuthenticatesEffectAndPersists (0.11s)
+=== RUN   TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys
+=== RUN   TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys/nil-ec
+=== RUN   TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys/empty-ec
+=== RUN   TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys/empty
+=== RUN   TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys/nil-rsa
+--- PASS: TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys (0.00s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys/nil-ec (0.00s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys/empty-ec (0.00s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys/empty (0.00s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsMalformedPublicKeys/nil-rsa (0.00s)
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/issuer
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/subject
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/missing-jti
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/missing-iat
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/future-iat
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/signature
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/unknown-key
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/audience
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/expired
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/excessive-lifetime
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/future-nbf
+--- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation (0.75s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/issuer (0.05s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/subject (0.06s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/missing-jti (0.06s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/missing-iat (0.06s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/future-iat (0.06s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/signature (0.06s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/unknown-key (0.08s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/audience (0.08s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/expired (0.09s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/excessive-lifetime (0.07s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAssertionsWithoutMutation/future-nbf (0.07s)
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/missing-iat
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/expired
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/future-iat
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/human-id-token
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/signature
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/issuer
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/missing-jti
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/future-nbf
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/missing-key-id
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/subject
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/audience
+=== RUN   TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/client
+--- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens (1.03s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/missing-iat (0.08s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/expired (0.10s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/future-iat (0.09s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/human-id-token (0.09s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/signature (0.08s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/issuer (0.07s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/missing-jti (0.09s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/future-nbf (0.08s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/missing-key-id (0.08s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/subject (0.08s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/audience (0.08s)
+    --- PASS: TestActionsConfianceT3WorkloadRejectsInvalidAccessTokens/client (0.11s)
+PASS
+ok  	swarm.local/companion/internal/engine	2.010s

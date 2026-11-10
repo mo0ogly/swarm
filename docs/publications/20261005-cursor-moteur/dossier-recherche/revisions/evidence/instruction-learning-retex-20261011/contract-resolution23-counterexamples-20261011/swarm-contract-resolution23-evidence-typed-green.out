@@ -1,0 +1,109 @@
+=== RUN   TestIndependentReviewStepGatesDossierBeforeProviderCall
+    independent_review_dossier_gate_test.go:178: missing required receipt: reason=preuve documentaire inaccessible : docs/plan-3bc5013147-T1-controls.json, action=Renouveler les preuves et rejouer les contrôles préautorisés avant de demander la revue.; CLI and HTTP identical; history unchanged
+    independent_review_dossier_gate_test.go:178: missing required receipt: provider_started=false, review_calls_before=0, review_calls_after=0
+    independent_review_dossier_gate_test.go:182: required receipt is unreadable directory: reason=preuve documentaire inaccessible : docs/plan-3bc5013147-T1-controls.json, action=Renouveler les preuves et rejouer les contrôles préautorisés avant de demander la revue.; CLI and HTTP identical; history unchanged
+    independent_review_dossier_gate_test.go:182: required receipt is unreadable directory: provider_started=false, review_calls_before=0, review_calls_after=0
+    independent_review_dossier_gate_test.go:193: report hash drift: reason=vérification IA périmée : livrable modifié : docs/plan-3bc5013147-T1.md, action=Renouveler les preuves et rejouer les contrôles préautorisés avant de demander la revue.; CLI and HTTP identical; history unchanged
+    independent_review_dossier_gate_test.go:193: report hash drift: provider_started=false, review_calls_before=0, review_calls_after=0
+    independent_review_dossier_gate_test.go:222: admissible restored dossier: provider_started=true, review_calls_before=0, review_calls_after=1, task_status=submitted
+--- PASS: TestIndependentReviewStepGatesDossierBeforeProviderCall (0.26s)
+=== RUN   TestIndependentReviewImagesOnlyDeclaredFreshScreenshots
+--- PASS: TestIndependentReviewImagesOnlyDeclaredFreshScreenshots (0.02s)
+=== RUN   TestIndependentReviewVerdictsRequireEveryCriterionAndRealQuotation
+--- PASS: TestIndependentReviewVerdictsRequireEveryCriterionAndRealQuotation (0.00s)
+=== RUN   TestIndependentReviewProcessPersistsAndBlocksStaleEvidence
+--- PASS: TestIndependentReviewProcessPersistsAndBlocksStaleEvidence (0.07s)
+=== RUN   TestIndependentReviewRetryIsExplicitBoundedAndCannotReplaceApproval
+--- PASS: TestIndependentReviewRetryIsExplicitBoundedAndCannotReplaceApproval (0.03s)
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract/Matrice_JAN-1..JAN-7_et_FEB-1..FEB-4_avec_faits,_hypothèses_et_preuves_distincts.
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract/Evidence_must_cover_a_fresh_candidate_and_its_current_scope.
+=== RUN   TestManagedFragmentResolutionAcceptsVisibleTaskContract/Préserver_les_"droits"_<actuels>_&_les_preuves_avec_leur_attribution.
+--- PASS: TestManagedFragmentResolutionAcceptsVisibleTaskContract (0.00s)
+    --- PASS: TestManagedFragmentResolutionAcceptsVisibleTaskContract/Matrice_JAN-1..JAN-7_et_FEB-1..FEB-4_avec_faits,_hypothèses_et_preuves_distincts. (0.00s)
+    --- PASS: TestManagedFragmentResolutionAcceptsVisibleTaskContract/Evidence_must_cover_a_fresh_candidate_and_its_current_scope. (0.00s)
+    --- PASS: TestManagedFragmentResolutionAcceptsVisibleTaskContract/Préserver_les_"droits"_<actuels>_&_les_preuves_avec_leur_attribution. (0.00s)
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Producer_opinion_must_not_resolve_a_question
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Prior_review_opinion_must_not_resolve_a_question
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/"criteria":["An_obsolete_criterion_from_another_candidate."]
+=== RUN   TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Invented_evidence_absent_from_every_original
+--- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Producer_opinion_must_not_resolve_a_question (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Prior_review_opinion_must_not_resolve_a_question (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/"criteria":["An_obsolete_criterion_from_another_candidate."] (0.00s)
+    --- PASS: TestManagedFragmentContractResolutionDoesNotAdmitOpinionsOrOldContracts/Invented_evidence_absent_from_every_original (0.00s)
+=== RUN   TestManagedFragmentTaskContractCannotProveImplementationPass
+--- PASS: TestManagedFragmentTaskContractCannotProveImplementationPass (0.00s)
+=== RUN   TestManagedFragmentSelectedSourceKeepsOriginalTextBytes
+=== RUN   TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/unselected
+=== RUN   TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/selected
+--- PASS: TestManagedFragmentSelectedSourceKeepsOriginalTextBytes (0.00s)
+    --- PASS: TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/unselected (0.00s)
+    --- PASS: TestManagedFragmentSelectedSourceKeepsOriginalTextBytes/selected (0.00s)
+=== RUN   TestManagedFragmentFinalBundlePreservesOriginalEvidence
+--- PASS: TestManagedFragmentFinalBundlePreservesOriginalEvidence (0.23s)
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown/missing
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown/unknown
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown/tampered
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown/other-candidate
+--- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown (0.90s)
+    --- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown/missing (0.23s)
+    --- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown/unknown (0.26s)
+    --- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown/tampered (0.14s)
+    --- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown/other-candidate (0.27s)
+=== RUN   TestManagedFragmentQuestionsCannotDisappear
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/resolved
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/missing
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/duplicate
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/invented
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/unknown
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/bare
+--- PASS: TestManagedFragmentQuestionsCannotDisappear (0.40s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/resolved (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/missing (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/duplicate (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/invented (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/unknown (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/bare (0.03s)
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly/ticks
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly/wrap
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly/negation
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly/invented
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly/mixed
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly/hunks
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly/paragraphs
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly/fenced
+=== RUN   TestFragmentMarkdownQuoteFormattingOnly/source
+--- PASS: TestFragmentMarkdownQuoteFormattingOnly (0.00s)
+    --- PASS: TestFragmentMarkdownQuoteFormattingOnly/ticks (0.00s)
+    --- PASS: TestFragmentMarkdownQuoteFormattingOnly/wrap (0.00s)
+    --- PASS: TestFragmentMarkdownQuoteFormattingOnly/negation (0.00s)
+    --- PASS: TestFragmentMarkdownQuoteFormattingOnly/invented (0.00s)
+    --- PASS: TestFragmentMarkdownQuoteFormattingOnly/mixed (0.00s)
+    --- PASS: TestFragmentMarkdownQuoteFormattingOnly/hunks (0.00s)
+    --- PASS: TestFragmentMarkdownQuoteFormattingOnly/paragraphs (0.00s)
+    --- PASS: TestFragmentMarkdownQuoteFormattingOnly/fenced (0.00s)
+    --- PASS: TestFragmentMarkdownQuoteFormattingOnly/source (0.00s)
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/resolved
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/missing
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/unknown
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/old-excerpt
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/report
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/path-only
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/invented
+--- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact (0.56s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/resolved (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/missing (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/unknown (0.03s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/old-excerpt (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/report (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/path-only (0.03s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/invented (0.02s)
+=== RUN   TestIndependentReviewPreflightUsesLiteralObservationBeforeReservation
+--- PASS: TestIndependentReviewPreflightUsesLiteralObservationBeforeReservation (0.08s)
+PASS
+ok  	swarm.local/companion/internal/engine	2.587s

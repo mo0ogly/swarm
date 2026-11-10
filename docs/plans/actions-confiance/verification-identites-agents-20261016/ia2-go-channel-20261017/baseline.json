@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-17T06:22:40.594614+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "files": {
+    "internal/engine/agent_identity_authority.go": "cd335869ae1b6a80959e64432f0759fde44d94bc5846c48417d1ce8dcc32a150",
+    "internal/engine/agent_identity_authority_test.go": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808",
+    "internal/engine/agent_identity_contract_test.go": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9",
+    "internal/engine/agent_identity_contract.go": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+    "internal/engine/store.go": "85ddbecfcbfb4a9554eee520d6e78fdd65904b711525eb4b37879d9d3531940a",
+    "internal/engine/agents_process.go": "00d74a35555c8c4fb2f2ac56d5482bc3b8a8ca0bbb97755a14f5cb02dfec256f",
+    "docs/plans/actions-confiance/identites-agents-replan.md": "5224d5a5f644b5782ea5f3ea791a0cdbe04e8b503c249b0f45f7e0c7dbe9e709",
+    "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "a94a1439f0cd3060621b06afbac841ffe0d2c6322104dc308ab9e298582d02da",
+    "docs/en/AGENT-IDENTITY-CONTRACT.md": "0c11b1215eda7be31ed03d8af0a1f4ae982ed952e11d444a8f6926429d86ffca"
+  }
+}

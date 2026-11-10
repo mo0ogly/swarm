@@ -1,0 +1,32 @@
+{
+  "result": "PASS",
+  "languages": [
+    "fr",
+    "en"
+  ],
+  "themes": [
+    "etat",
+    "sombre"
+  ],
+  "widths": [
+    1440,
+    1024,
+    760,
+    390,
+    320
+  ],
+  "checks": [
+    "intent",
+    "theme-button",
+    "empty-state",
+    "keyboard",
+    "filter",
+    "preserved-user-title",
+    "preparation-prefill",
+    "template-dialog",
+    "error-retry",
+    "cockpit-link",
+    "no-mutations"
+  ],
+  "root": "/tmp/swarm-projects-home-69JioH"
+}

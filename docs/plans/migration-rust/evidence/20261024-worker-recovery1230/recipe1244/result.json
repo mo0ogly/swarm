@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "recipe": "mission-worker-completion-recovery",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "real-native-worker-completion-recovery",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='worker-recovery-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_worker_recovery.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "exit": 1,
+      "seconds": 16.13513942301506,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "22684ea2b3d906a849b2e0269ef0985d9525549b86b4466704b9888b01ba2efb",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "79e6339d3ef86acaca43faf2efe502808febc61949c97dd7fd884f92789d02ae",
+    "declared-inputs.tar.gz": "be6aff60118d8b1471a0d95bc704dd2f2894e97138f012755708f95ef1f91e09",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "be37267badbe906fd990ce3d3ac0d106f2608a07ed532bf98362c42e2adba2bb",
+    "step-0001.stderr": "c60dfc5adf96cb3ce53aa8063bbd0a2876b9f10cc5209cd508a993285b474ac3",
+    "step-0001.json": "8ddca6d141fe741f124e486c78da1d3b103ca6d380980636ca218a5f2aba4297",
+    "inputs.after.json": "79e6339d3ef86acaca43faf2efe502808febc61949c97dd7fd884f92789d02ae"
+  }
+}

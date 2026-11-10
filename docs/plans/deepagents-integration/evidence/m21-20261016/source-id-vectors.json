@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "go",
+    "run",
+    "/tmp/swarm-source-id-json-7nd_jp3b/main.go"
+  ],
+  "started_at": "2026-10-16T21:02:24.856135+00:00",
+  "finished_at": "2026-10-16T21:02:25.317070+00:00",
+  "exit_code": 0,
+  "scope": "standard-library serialization vectors only, not engine admission or identity authentication"
+}

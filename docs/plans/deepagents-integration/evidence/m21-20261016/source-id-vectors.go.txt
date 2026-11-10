@@ -1,0 +1,4 @@
+package main
+import ("crypto/sha256"; "encoding/hex"; "encoding/json"; "fmt"; "os")
+type DialogueRef struct { Task string `json:"task"`; Attempt string `json:"attempt"`; SHA256 string `json:"sha256"` }
+func main(){var refs []DialogueRef; if err:=json.NewDecoder(os.Stdin).Decode(&refs);err!=nil {panic(err)}; out:=[]map[string]any{};for _,ref:=range refs {raw,err:=json.Marshal(ref);if err!=nil{panic(err)};sum:=sha256.Sum256(raw);out=append(out,map[string]any{"ref":ref,"go_json":string(raw),"source_id":"dialogue-"+hex.EncodeToString(sum[:])})}; raw,err:=json.MarshalIndent(out,"","  ");if err!=nil{panic(err)};fmt.Println(string(raw))}

@@ -85,7 +85,8 @@ Chaque exécution reçoit un statut avant l'examen de ses mesures : **OK** (faut
 prévue), **INVALIDE** (faute non injectée), **DÉLAI**, ou **ERREUR** (défaillance de l'infrastructure
 du banc ou du moteur). Seules les exécutions OK entrent dans les taux ; les autres sont publiées
 case par case. Une case où plus de 10 % des exécutions sont exclues est signalée et discutée, jamais
-retirée.
+retirée. Les erreurs et délais restent des résultats de disponibilité et de reprise, même
+lorsqu’ils sont exclus des taux conditionnels de paiements inexacts.
 
 ## 5.7 Volume et statistiques
 
@@ -93,7 +94,10 @@ La campagne scriptée compte 100 exécutions par case (graines 1000 à 1099, ide
 condition à l'autre), soit 3 conditions × 3 clés × 10 cas × 100 = 9 000 exécutions, plus une
 répétition générale de 2 exécutions par case. Les taux sont rapportés avec un intervalle de Wilson
 à 95 %, case par case, sans test global : les hypothèses prédisent des taux nuls ou non nuls et se
-jugent sur les comptes. Le lot à agents réels est exploratoire : cinq essais par scénario, résultats
+jugent sur les comptes. Dans la campagne scriptée, ces intervalles décrivent les comptes
+observés sous les hypothèses du calcul ; les cas déterministes, hétérogènes et contrôlés ne
+constituent pas un échantillon aléatoire indépendant d’incidents opérationnels. Leur borne
+haute n’est donc pas une borne de risque financier en production. Le lot à agents réels est exploratoire : cinq essais par scénario, résultats
 publiés exécution par exécution, régularité rapportée par pass^k. Les durées sont rapportées par
 médiane et intervalle interquartile.
 
@@ -122,3 +126,12 @@ Formulées avant la campagne scriptée :
 Pour le lot à agents réels, trois questions exploratoires sans seuil : Q7 (paiements sur l'IBAN
 du libellé F9), Q8 (doublons sous F1 et F3 avec consigne de clé métier, attribués après examen des
 demandes de paiement consignées) et Q9 (différence entre W-réel et S-réel).
+
+
+## 5.10 Réplication complète préparée le 10 octobre 2026
+
+L'utilisateur autorise une nouvelle vérification de 1 700 cases et un rejeu de la campagne principale de 9 000 cases, avec les mêmes graines et critères historiques. Ces jeux seront publiés séparément, sans réécrire les observations antérieures. Le candidat est la base main 3faa8a9 plus une instrumentation publique d'identité du conducteur ; le banc F7 observe cette identité par CLI au lieu de lire la base Swarm. Les empreintes du snapshot figé et son état Git sale sont explicitement enregistrés : ce n'est pas un nouveau commit propre ni un résultat du serveur partagé.
+
+Les nouvelles cases sont exécutées en série. Le parallélisme B0/B1 historique était de quatre ; les comparaisons de temps brutes ne peuvent donc pas être interprétées comme un gain du moteur. Les mesures de paiement, exclusions, progression et attribution restent distinctes. Tout échec inattendu arrête le lot pour diagnostic ; une hypothèse infirmée sur une exécution mesurable est conservée. Les erreurs attendues du contrôle positif noguard ne sont pas des exclusions accidentelles.
+
+**À ce stade, aucun résultat complet des 10 700 nouvelles cases n'est acquis.** La répétition avec agents scriptés ne remplace pas le pilote S-collectif avec trois rôles LLM réels.

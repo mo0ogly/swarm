@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-12T15:41:06.998556+00:00",
+  "initial_need": "Swarm Cursor engine evolution through RETEX; user requires elastic to work.",
+  "latest_requirement": "elastic doit fonctionner",
+  "observations": [
+    "Elasticsearch localhost9200 active, cluster green and no indexes; no connection found in scoped Swarm source.",
+    "Swarm current admin run limits frozen at launch; retry preserves previous stricter spending ceilings. No supervised adaptive budget operation implemented.",
+    "T3 corrected candidate48db9ca5550eab184f01843877e2e3b3f657dd4b has all deterministic controls passing, review blocked on272 files and historical packet capacity refusal."
+  ],
+  "clarification": "Text question pending: Elasticsearch logs or Swarm elasticity. No answer inferred.",
+  "authorized_independent_work": "Repair existing T3 transport preflight without changing source result, criteria, counters or native acceptance.",
+  "method_error": "First red test sources mutated during compilation: build failure not accepted as reproduction. Separate frozen copy reproduces actual indivisible refusal.",
+  "proof": "/tmp/swarm-review-capacity-first-frozen-red-receipt.json",
+  "implementation": "isolated, not installed; targeted normal/refusal/coordination tests passed so far, full public dossier calculation pending."
+}

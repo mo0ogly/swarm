@@ -1,0 +1,8 @@
+{
+  "root": "/tmp/swarm-biba-parent-env-zrer3djz",
+  "parent_pid": 789365,
+  "parent_environment_scope": "Only synthetic marker, PATH and LANG supplied by launcher",
+  "exit": 0,
+  "stdout": "{\"owned_parent_marker_read\": false}\n",
+  "stderr": ""
+}

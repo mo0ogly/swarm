@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-16T02:45:05.023453+00:00",
+  "selected": "github.com/cilium/ebpf v0.19.0",
+  "go_requirement": "1.23.0",
+  "dependency_toolchain_directive": "go1.24.1",
+  "project_go": "1.24.0",
+  "installed_go": "1.24.3",
+  "x_sys": "v0.31.0",
+  "local_module_sha256": "f2bdf45235f3381d977187e38a186019d6d1b52e1a0a04ee9a1334837369cba6",
+  "sources": [
+    "https://raw.githubusercontent.com/cilium/ebpf/v0.19.0/go.mod",
+    "https://raw.githubusercontent.com/cilium/ebpf/v0.19.0/asm/load_store.go",
+    "https://raw.githubusercontent.com/cilium/ebpf/v0.19.0/link/perf_event.go",
+    "https://docs.kernel.org/bpf/ringbuf.html"
+  ],
+  "alternative": "bpftrace 0.23.5 text adapter",
+  "choice_reason": "fixed instructions and explicit loss/resource handling without compiler or tool-output parsing",
+  "maintenance_or_security_certification_claimed": false,
+  "linux_privilege_change": false
+}

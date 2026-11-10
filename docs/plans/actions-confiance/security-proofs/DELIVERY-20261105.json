@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "scope": "First readonly Security and evidence increment; program remains open",
+  "version": "v0.1.1-dev.336",
+  "binary_sha256": "23e4a1d64d958cbaed472e5a44f6b103f9b2e1f2997bba25488976e02b3f5214",
+  "compiled_commit": "d91d2391a4c5e0bf767c9cd1f09e1a2e34986965",
+  "modified": true,
+  "local_evidence": ".cache/security-proofs-20261105-01",
+  "profile": ".cache/local-delivery/rust-xzx_n63t/build/profile/result.json",
+  "checks": {
+    "engine_named_tests": 1,
+    "cli_http_assertions": 22,
+    "security_browser_assertions": 77,
+    "existing_version_fixture_assertions": 56,
+    "inventory_references": 69,
+    "inventory_flows_open": 25,
+    "inventory_checker_tests": 5
+  },
+  "installed_image_verified": true,
+  "real_authority_ui_verified": false,
+  "independent_review": false,
+  "global_blp_runtime_enforced": false,
+  "archive_status": "COPIED_SYNCED_READBACK_VERIFIED",
+  "remaining": [
+    "SP-L03 real Authority session and remaining interactions",
+    "SP-L04 structured policy administration",
+    "SP-L05 registered execution and durable evidence lifecycle",
+    "SP-L06 protected candidate-bound qualification",
+    "SP-L07 global review/acceptance/RETEX",
+    "Biba/composition integration"
+  ],
+  "resumption": "Existing human login for real UI check; use canonical SECURITY-PROOFS-APEX.md for next implementation packages. Never use a technical owner key as human authority.",
+  "usb_archive": "/media/fpizzi/Lexar/swarm-security-proofs-20261105-01/complete-evidence.tar.gz",
+  "usb_archive_sha256": "3d4a6d64c7c8146bacd3a3f034a44fc6eb1b8fb1ca025f4c0e002df188108ee4",
+  "usb_archive_bytes": 56218896,
+  "archive_members": 402,
+  "source_review_sha256": "3904d5779d7d15df8e487cb54b1a1a9a4383da585b0e840734fa5825cb43cd17",
+  "documentation_review_sha256": "cdecc73777009e4046e77c64cea0b3ed79ad9b09e2a705b32bcf01b249b602c6",
+  "private_browser_profiles_excluded": true,
+  "original_failures_preserved": true,
+  "restore_commands": [
+    [
+      "mkdir",
+      "-m",
+      "700",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/security-proofs-restore-20261105-01"
+    ],
+    [
+      "tar",
+      "--keep-old-files",
+      "-xzf",
+      "/media/fpizzi/Lexar/swarm-security-proofs-20261105-01/complete-evidence.tar.gz",
+      "-C",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/security-proofs-restore-20261105-01"
+    ]
+  ]
+}

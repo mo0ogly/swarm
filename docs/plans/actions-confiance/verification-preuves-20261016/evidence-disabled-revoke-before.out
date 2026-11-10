@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence.py", line 65, in <module>
+    current=remote('show');remote('policy-apply',command('disable-signing',expected_revision=current['configuration_revision'],policy={'enabled':False,'key_ttl_seconds':3600},reason='disable signing before emergency withdrawal'));current=remote('show');key=current['keys'][fourth['key']['key_id']];remote('key-revoke',command('disabled-policy-revoke',expected_registry_revision=current['registry_revision'],key_id=key['key_id'],key_digest=key['key_digest'],reason='emergency withdrawal while signing disabled'));assert remote('show')['keys'][key['key_id']]['state']=='revoked';checks.append('emergency key withdrawal remains available while public signing policy is disabled')
+                                                                                                                                                                                                                                                                                                          ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence.py", line 37, in remote
+    def remote(op,body=None,who='admin',expected=0):return call(absent,'evidence',op,body,who,expected,origin,session)
+                                                           ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence.py", line 14, in call
+    raise AssertionError('public evidence command failed; private diagnostics retained')
+AssertionError: public evidence command failed; private diagnostics retained

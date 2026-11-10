@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "exchange-status-compat-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/mission_status_read.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-wire-json/src/lib.rs",
+    "rust/crates/swarm-web/src/service/mission.rs",
+    "tests/rust_exchange_status_compat.py",
+    "tests/rust_agent_exchanges.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "docs/architecture/NATIVE-AGENT-EXCHANGES.md",
+    "docs/en/NATIVE-AGENT-EXCHANGES.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "previous-status-reader",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='exchange-status-compat-',dir='.cache')).resolve()/'status'\nprint('RETAINED_FLOW',p,flush=True)\nsubprocess.run(['python3','tests/rust_exchange_status_compat.py','--before-binary',os.environ['SWARM_EXCHANGE_BEFORE_BINARY'],'--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "EXCHANGE_STATUS_COMPAT_VERIFIED 4"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

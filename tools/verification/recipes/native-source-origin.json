@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "id": "native-source-origin",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/*.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/validation_policy.rs",
+    "tests/rust_native_validation_origin.py",
+    "tests/rust_native_task_validation*.py",
+    "tests/rust_mission_controls.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/NATIVE-REVIEWER.md",
+    "docs/en/NATIVE-REVIEWER.md",
+    "rust/crates/swarm-engine/src/managed_repository*.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "source-origin-and-existing-native-data-contracts",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::task_validation::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "native_source_origin_legacy_absence_preserves_base_without_writes ... ok",
+        "native_source_origin_receipt_must_match_registered_job_domain ... ok",
+        "native_validation_receipt_version_requires_explicit_origin_and_preserves_legacy ... ok",
+        "test result: ok. 26 passed; 0 failed;",
+        "native_validation_receipt_refuses_ordinary_opaque_candidate_binding ... ok",
+        "native_validation_receipt_refuses_matching_empty_or_invalid_argv ... ok",
+        "native_validation_receipt_cumulative_target_projection_and_prior_failure ... ok",
+        "native_validation_receipt_cumulative_refuses_mixed_and_resealed_corruption ... ok",
+        "native_validation_receipt_cumulative_sql_origin_refuses_partial_rebinding ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "candidate-custody-and-binding-dependency",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "managed_repository::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "managed_candidate_binding_covers_full_physical_and_control_preimage ... ok",
+        "managed_candidate_witness_helper_keeps_self_descriptors_through_exec ... ok",
+        "test result: ok. 27 passed; 0 failed;"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-origin-legacy-recovery-and-automatic-review",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='native-source-origin-',dir='.cache')).resolve();binary=os.environ['SWARM_STATUS_CONTRACT_BINARY'];profile=os.environ['SWARM_STATUS_CONTRACT_PROFILE'];legacy=os.environ['SWARM_ORIGIN_LEGACY_EVIDENCE'];prior=os.environ['SWARM_ORIGIN_PRIOR_V2_EVIDENCE']\ncommands=[('origin',['python3','tests/rust_native_validation_origin.py','--binary',binary,'--output',str(p/'origin'),'--legacy-evidence',legacy,'--prior-v2-evidence',prior]),('recovery',['python3','tests/rust_native_task_validation_failures.py','--binary',binary,'--output',str(p/'recovery')]),('automatic-review',['python3','tests/rust_mission_controls.py','--binary',binary,'--profile',profile,'--output',str(p/'automatic-review'),'--reviewer'])]\nfor label,cmd in commands:\n subprocess.run(cmd,check=True);result=json.loads((p/label/'result.json').read_text());assert result['status']=='PASS'\n if label=='origin':assert result['legacy']['actual_version1_original'] and result['missing_origin_refused'] and result['prior_v2']['actual_version2_original'] and result['prior_v2']['original_and_rows_unchanged']\nprint('NATIVE_SOURCE_ORIGIN_PUBLIC_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_SOURCE_ORIGIN_PUBLIC_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

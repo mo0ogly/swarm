@@ -1,0 +1,116 @@
+{
+  "at": "2026-10-12T11:30:16.738760+00:00",
+  "agent": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+  "public_messages": {
+    "entries": [
+      {
+        "seq": 154388,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:23:02.446488301Z",
+        "kind": "message",
+        "message": "J’applique `replan` à cette reprise : je conserve les preuves historiques, mais je repars du candidat courant et des quatre critères non démontrés. Première action bornée : importer et authentifier le seul bundle autorisé dans un dépôt temporaire, sans écrire dans `.git` de la copie."
+      },
+      {
+        "seq": 154391,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:23:11.072689004Z",
+        "kind": "message",
+        "message": "Le bundle129, sa ref, son commit et le manifeste correspondent exactement aux identités fournies; le HEAD de la copie est bien la base acceptée `e32388f…`. Je crée maintenant le checkpoint obligatoire, puis j’inspecte le manifeste importé pour valider chaque entrée et localiser le patch direct/harness sans lire d’autre copie."
+      },
+      {
+        "seq": 154402,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:23:40.260170471Z",
+        "kind": "message",
+        "message": "Les 129 entrées du manifeste sont validées octet par octet. Le transfert direct déclare 331 chemins, base `e32388f…`, arbre résultat `cf8b556…` et 1 221 sources qualifiées historiques; je vérifie maintenant les 331 préimages contre cette copie, puis le contrôle négatif attendu et `git apply --check`."
+      },
+      {
+        "seq": 154407,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:23:54.390531901Z",
+        "kind": "message",
+        "message": "Le patch direct s’applique proprement en arbre de travail : 331/331 préimages correspondaient, puis 331/331 postimages correspondent. Le contrôle négatif rejette bien une préimage altérée tout en terminant son orchestration normalement; je passe maintenant de l’intégrité du transfert à la qualification fonctionnelle de req‑9 à req‑12."
+      },
+      {
+        "seq": 154418,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:24:16.78504892Z",
+        "kind": "message",
+        "message": "Les tests fournis couvrent bien les frontières utiles : lecture de l’arbre Git accepté (pas le checkout sale), attribution/réouverture, adaptations et refus adverses, deux processus fournisseur simultanés, budget partagé, pause/reprise et rejeu. Je lance le contrôle comportemental configuré avant de toucher au code; tout échec déclenchera un diagnostic ciblé, pas une relance identique."
+      },
+      {
+        "seq": 154420,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:24:50.727484922Z",
+        "kind": "message",
+        "message": "Le contrôle Go est toujours actif après 30 secondes, sans diagnostic ni sortie partielle. Je le laisse aller jusqu’à sa borne configurée de 150 secondes et exploiterai son code final."
+      },
+      {
+        "seq": 154421,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:25:54.750562854Z",
+        "kind": "message",
+        "message": "Toujours aucune sortie à ~90 secondes; ce silence reste compatible avec le paquet Go non verbeux. Le processus est encore vivant et sa limite interne est inchangée; je continue jusqu’au résultat terminal."
+      },
+      {
+        "seq": 154428,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:27:12.388769185Z",
+        "kind": "message",
+        "message": "La recette T3 détaillée passe toutes ses variantes, y compris entrées invalides, adaptation sûre/unsafe, exploration remplacée, concurrence et pause. Le contrôle `-race` du scénario concurrent compile/exécute encore; il est la preuve complémentaire requise pour l’état partagé."
+      },
+      {
+        "seq": 154436,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:28:32.901111657Z",
+        "kind": "message",
+        "message": "Le premier écart frais est documentaire : le contrat anglais contient l’architecture T3 et ses limites, mais le contrat français s’arrête avant cette section. Je corrige cette asymétrie au niveau du contrat général, avec le même schéma et les mêmes limites (doubles déterministes, T2 non accepté, runtime non installé)."
+      },
+      {
+        "seq": 154443,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:28:52.817738962Z",
+        "kind": "message",
+        "message": "Le snapshot frais contient 1 157 chemins réellement énumérés par le harness actuel, avec digest candidat `935c3fcc…`; ses quatre parties et chaque fichier correspondent. Le « 1 221 » du paquet est une qualification historique d’un autre ensemble figé : je le conserve comme filiation, sans prétendre égalité avec ce snapshot ni avec le commit Git de base."
+      },
+      {
+        "seq": 154458,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:29:31.336864995Z",
+        "kind": "message",
+        "message": "La recette configurée inclut explicitement `TestPlanningLeaseFencesOldOwnerAndPause`, donc le cas de bail périmé est bien exécuté avec les autres tests `TestPlanning*`. Je formalise maintenant la remise et son inventaire de sources; elle déclarera le candidat sale par digest, sans inventer de commit, et conservera comme limites les fournisseurs doubles, le runtime non installé et la revue indépendante à venir."
+      },
+      {
+        "seq": 154467,
+        "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+        "at": "2026-10-12T11:30:14.777320989Z",
+        "kind": "message",
+        "message": "Le bilan JSON est valide, mais le contrôle documentaire a révélé un lien local cassé dans l’architecture : `../publications/.../20261010-parallelisme-plan.md` n’existe pas dans le candidat. Je traite ce contrôle comme un défaut lié : identifier si la cible a été renommée ou omise, corriger le lien seulement si une cible canonique existe, puis rejouer le même contrôle après précondition modifiée."
+      }
+    ],
+    "next_cursor": 154467,
+    "retained_from": 154384,
+    "retention_gap": false,
+    "more": false
+  },
+  "progress": {
+    "elapsed_seconds": 440,
+    "action": "Exécution d’une commande",
+    "detail": "/bin/bash -lc 'python3 docs/plans/engine-cursor-contract/check-evolution-docs.py T3'",
+    "tool_calls": 34,
+    "tool_results": 34,
+    "pending_tools": 0,
+    "last_tool": "command_execution",
+    "last_result_at": "2026-10-12T11:30:11.337661846Z",
+    "last_output_at": "2026-10-12T11:30:14.77725235Z",
+    "output_state": "recent",
+    "tool_state": "idle",
+    "provider_vitality": "unknown",
+    "metrics_version": 1,
+    "tool_writes": 6,
+    "tool_unclassified": 28,
+    "tool_errors_total": 1,
+    "tool_repeats_total": 2
+  },
+  "status": "running"
+}

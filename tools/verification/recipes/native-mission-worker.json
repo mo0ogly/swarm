@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "native-mission-worker",
+  "inputs": [
+    "rust/crates/swarm-engine/src/**/*.rs",
+    "rust/crates/swarm-cli/examples/mission_worker_admission.rs",
+    "tests/rust_*.py",
+    "tools/verification/verify_sdk_example.py",
+    "tools/verification/recipe.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "tests/test_sdk_example_invocation.py",
+    "rust/crates/swarm-engine/tests/mission_cycle.rs",
+    "docs/architecture/NATIVE-MISSION-CYCLE.md",
+    "docs/en/NATIVE-MISSION-CYCLE.md",
+    "rust/crates/swarm-cli/src/costs.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "docs/architecture/REPORTED-COSTS.md",
+    "docs/en/REPORTED-COSTS.md",
+    "rust/crates/swarm-engine/src/mission_cost_guard.rs",
+    "rust/crates/swarm-engine/src/root_store/reported_costs.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "sdk-invocation-refusal-and-recovery",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_sdk_example_invocation.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_invocation_refusal_and_same_input_recovery",
+        "Ran 1 test",
+        "OK"
+      ]
+    },
+    {
+      "id": "real-worker-provenance-refusal-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,sys,subprocess,tempfile; from pathlib import Path\nkeys={'binary':'SWARM_WORKER_NORMAL_BINARY','profile':'SWARM_WORKER_NORMAL_PROFILE','sdk-binary':'SWARM_WORKER_SDK_BINARY','sdk-profile':'SWARM_WORKER_SDK_PROFILE'}\nargs=[sys.executable,'tests/rust_native_mission_worker.py']\nfor option,key in keys.items():\n value=Path(os.environ[key]).resolve(); assert value.is_file(),key; args += ['--'+option,str(value)]\nbase=Path(tempfile.mkdtemp(prefix='native-mission-worker-',dir='.cache')).resolve()\nsubprocess.run(args+['--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS automatic worker provenance, revocation, cancellation and actual handoff",
+        "REPLAY_EVIDENCE",
+        "PASS reported worker costs, partial declarations and normal CLI",
+        "PASS reported-cost automatic refusal, equality, saved policy changes and recovery"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

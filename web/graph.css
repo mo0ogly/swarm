@@ -79,3 +79,150 @@
 .graph-draft-fields select{min-height:40px;background:var(--wattson-champ);color:var(--wattson-texte);border:1px solid var(--wattson-ligne)}
 .graph-draft-controls{margin-top:12px}.graph-draft-status{font-weight:600}.graph-draft-error{display:flex;gap:12px;align-items:center}.graph-draft-error[hidden]{display:none}
 .graph-draft-panel ol{margin-bottom:0}.graph-draft-panel button:focus-visible,.graph-draft-panel select:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:2px}
+
+/* Recorded native projection carries no command or inspector action. */
+.graph-noeud[role=img]{cursor:default}
+
+/* Native graph uses a modal top layer so fullscreen retains keyboard isolation. */
+dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-width:100vw; height:100dvh; max-height:100dvh; border:0; background:var(--wattson-carte); color:var(--wattson-texte); }
+.native-graph-dialog .native-graph-studio.is-fullscreen { position:relative; width:100%; }
+.native-graph-studio .native-graph-canvas { touch-action:none; cursor:grab; }
+.native-graph-studio .graph-noeud { cursor:default; }
+.native-graph-studio output { align-self:center; min-width:4em; text-align:center; }
+.native-graph-studio .pilot-actions { flex-wrap:wrap; }
+.native-graph-search { display:flex; flex-wrap:wrap; align-items:center; gap:8px; flex-basis:100%; min-width:0; }
+.native-graph-search label,.native-graph-search output { flex-basis:100%; min-width:0; overflow-wrap:anywhere; }
+.native-graph-search input { flex:1 1 160px; width:100%; min-width:0; }
+.native-graph-studio .graph-search-match .graph-cadre { stroke:var(--wattson-lien); stroke-width:3; stroke-dasharray:6 3; }
+
+.native-graph-editor,.native-graph-help { width:min(640px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:0; background:var(--wattson-carte); color:var(--wattson-texte); border:1px solid var(--wattson-ligne); }
+.native-graph-editor form { display:flex; flex-direction:column; max-height:calc(100dvh - 26px); }
+.native-graph-editor header,.native-graph-editor footer,.native-graph-help>header,.native-graph-help>footer { padding:14px; flex-shrink:0; display:flex; gap:12px; align-items:center; justify-content:space-between; }
+.native-graph-editor .modal-body,.native-graph-help>.modal-body { padding:14px; overflow:auto; display:grid; gap:12px; }
+.native-graph-editor label { display:grid; gap:6px; min-width:0; }
+.native-graph-editor input,.native-graph-editor textarea,.native-graph-editor select { width:100%; min-width:0; box-sizing:border-box; }
+.native-graph-editor select[multiple],.native-graph-editor textarea { min-height:100px; }
+.native-graph-editor #native-graph-progress { margin:0; min-height:1.5em; }
+
+.native-graph-studio .graph-task-open { cursor:pointer; }
+.native-graph-studio .graph-task-open:focus { outline:none; }
+.native-graph-studio .graph-task-open:focus .graph-cadre { stroke:var(--wattson-lien); stroke-width:4; }
+.graph-studio.native-graph-studio .graph-minimap { pointer-events:auto; cursor:crosshair; touch-action:none; }
+.native-graph-studio .graph-minimap:focus-visible { outline:2px solid var(--wattson-lien); outline-offset:3px; }
+.graph-minimap-viewport { fill:none; stroke:var(--wattson-lien); stroke-width:2; stroke-dasharray:4 2; vector-effect:non-scaling-stroke; pointer-events:none; }
+.graph-copy { cursor:pointer; }
+.graph-copy rect { fill:var(--wattson-carte-appuyee); stroke:var(--wattson-ligne); }
+.graph-copy text { fill:var(--wattson-texte); font-size:12px; pointer-events:none; }
+.graph-copy:focus rect,.graph-copy:hover rect { stroke:var(--wattson-lien); stroke-width:4; }
+.native-graph-copy-fallback { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.native-graph-copy-fallback[hidden] { display:none; }
+.native-graph-copy-fallback input { min-width:0; max-width:100%; }
+.native-graph-help { padding:8px; border:1px solid var(--wattson-ligne); background:var(--wattson-carte); color:var(--wattson-texte); }
+.native-graph-help summary { cursor:pointer; }
+.native-graph-help li { margin-block:6px; }
+
+.native-graph-neighbors { display:grid; flex:1 1 220px; min-width:0; max-width:100%; gap:4px; }
+.native-graph-neighbors select { min-width:0; width:100%; max-width:100%; }
+#pilot-neighbor-status { display:block; overflow-wrap:anywhere; }
+.native-graph-studio .graph-neighbor-focus .graph-cadre { stroke:var(--wattson-lien); stroke-width:5; }
+.native-graph-studio .graph-neighbor-in .graph-cadre { stroke:var(--wattson-lien); stroke-width:3; stroke-dasharray:8 4; }
+.native-graph-studio .graph-neighbor-out .graph-cadre { stroke:var(--wattson-lien); stroke-width:3; stroke-dasharray:2 3; }
+.native-graph-studio .graph-neighbor-link { stroke:var(--wattson-lien); stroke-width:4; }
+#native-graph-dependency-selection { overflow-wrap:anywhere; }
+
+.native-graph-tools { border:1px solid var(--wattson-ligne); background:var(--wattson-carte); color:var(--wattson-texte); padding:8px; }
+.native-graph-tools summary { cursor:pointer; min-height:28px; padding:6px; }
+.native-graph-tools .pilot-actions { margin-top:8px; }
+.native-graph-tools:not([open])>.pilot-actions { display:none; }
+.native-graph-preference-status { overflow-wrap:anywhere; }
+.native-graph-preference-status:empty { display:none; }
+.native-graph-analysis { border:1px solid var(--wattson-ligne); background:var(--wattson-carte); color:var(--wattson-texte); padding:8px; }
+.native-graph-analysis summary { cursor:pointer; min-height:28px; padding:6px; }
+.native-graph-analysis>.pilot-actions { margin-top:8px; }
+.native-graph-analysis:not([open])>.pilot-actions { display:none; }
+.native-graph-analysis p { flex-basis:100%; margin:4px 0; }
+.native-graph-analysis-section { flex-basis:100%; min-width:0; border-bottom:1px solid var(--wattson-ligne); }
+.native-graph-analysis-section>.pilot-actions { margin:8px 0; }
+.native-graph-analysis-section:not([open])>.pilot-actions { display:none; }
+.native-graph-analysis button[aria-pressed=true] { background:var(--wattson-info-fond); color:var(--wattson-info-encre); border:2px solid var(--wattson-info-encre); }
+.native-graph-studio .graph-analysis-hidden { display:none; }
+.native-graph-studio .graph-multi-selected .graph-cadre { stroke:var(--wattson-lien); stroke-width:5; stroke-dasharray:10 3 2 3; }
+.native-graph-studio .graph-multi-selected .graph-task-open:focus .graph-cadre { stroke-width:6; stroke-dasharray:2 2; }
+#pilot-analysis-status,#pilot-selection-status { overflow-wrap:anywhere; }
+#pilot-analysis-status:empty,#pilot-selection-status:empty { display:none; }
+.native-graph-batch { width:min(960px,calc(100vw - 24px)); }
+.native-graph-batch[open] { display:flex; flex-direction:column; }
+.native-graph-batch>header>button { flex-shrink:0; white-space:nowrap; }
+.native-graph-batch>header>h2 { min-width:0; overflow-wrap:anywhere; }
+.native-graph-batch>.modal-body { min-height:0; }
+.native-graph-batch .pilot-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.native-graph-batch li { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-block:8px; }
+.native-graph-batch .notice,.native-graph-batch p,.native-graph-batch summary,.native-graph-batch li { overflow-wrap:anywhere; }
+.native-graph-batch details { padding:8px; border:1px solid var(--wattson-ligne); }
+.native-graph-batch details:not([open])>.pilot-actions,.native-graph-batch details:not([open])>p { display:none; }
+.native-graph-batch-comparison { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr)); gap:12px; }
+.native-graph-batch-comparison section { min-width:0; padding:12px; background:var(--wattson-carte-creuse); border:1px solid var(--wattson-ligne); }
+.native-graph-batch-comparison dl { margin:0; }
+.native-graph-batch-comparison dt { font-weight:600; }
+.native-graph-batch-comparison dd { margin:0 0 10px; white-space:pre-line; overflow-wrap:anywhere; }
+
+/* Native graph affordances: semantic pairs retain their theme contrast; icons
+   are decorative and each action keeps its visible/accessible text label. */
+.native-graph-tool-icon { width:18px; height:18px; flex-shrink:0; vertical-align:middle; margin-inline-end:6px; }
+.native-graph-studio .pilot-actions>button:not(.primary):not(:disabled),
+.native-graph-studio .native-graph-tools>summary,
+.native-graph-studio .native-graph-analysis>summary { background:var(--wattson-info-fond); color:var(--wattson-info-encre); border-color:var(--wattson-info-encre); }
+.native-graph-studio .pilot-actions>button:not(.primary):hover:not(:disabled) { box-shadow:inset 0 -2px var(--wattson-info-encre); }
+.native-graph-studio #pilot-zoom-out,.native-graph-studio #pilot-zoom-in { font-weight:700; }
+.native-graph-studio .graph-task-open { cursor:grab; touch-action:none; user-select:none; }
+.native-graph-studio .graph-task-open:active { cursor:grabbing; }
+.native-graph-studio .graph-noeud[data-etat=attente] .graph-cadre { fill:color-mix(in srgb,var(--wattson-info-fond) 45%,var(--wattson-carte)); stroke:var(--wattson-info-encre); stroke-width:2; }
+.native-graph-studio .graph-drag rect { fill:var(--wattson-info-fond); stroke:var(--wattson-info-encre); }
+.native-graph-studio .graph-drag text { fill:var(--wattson-info-encre); }
+.native-graph-studio .graph-port[data-side=in] { fill:var(--wattson-attention-fond); stroke:var(--wattson-attention-encre); }
+.native-graph-studio .graph-port[data-side=out] { fill:var(--wattson-info-fond); stroke:var(--wattson-info-encre); }
+.native-graph-studio .graph-arete { stroke:var(--wattson-info-encre); stroke-width:2.5; cursor:pointer; pointer-events:stroke; }
+.native-graph-studio .graph-arete:hover,.native-graph-studio .graph-arete:focus-visible { stroke:var(--wattson-lien); stroke-width:5; }
+.native-graph-studio .graph-fleche { fill:var(--wattson-info-encre); }
+.native-graph-color-key { display:flex; flex-wrap:wrap; gap:8px 16px; color:var(--wattson-texte); font-size:13px; margin-block:8px; }
+.native-graph-color-key .graph-teinte[data-etat=attente]::before { background:color-mix(in srgb,var(--wattson-info-fond) 45%,var(--wattson-carte)); border-color:var(--wattson-info-encre); }
+.native-graph-gesture-hint { margin-block:8px; color:var(--wattson-texte); }
+.native-graph-help[open] { display:flex; flex-direction:column; padding:0; }
+.native-graph-help>.modal-body { min-height:0; overflow:auto; }
+.native-graph-help li { margin-block:8px; }
+.native-graph-link-editor footer { flex-wrap:wrap; }
+
+@media(max-width:760px) {
+  .native-graph-studio #pilot-zoom-in,.native-graph-studio #pilot-zoom-out,
+  .native-graph-studio #pilot-fullscreen,.native-graph-studio #pilot-search-previous,
+  .native-graph-studio #pilot-search-next,.native-graph-studio #pilot-search-clear { width:44px; min-width:44px; min-height:44px; padding:8px; position:relative; }
+  .native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-action-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-tool-icon { margin:0; }
+  .native-graph-search input { flex-basis:100px; }
+  .native-graph-gesture-hint { font-size:13px; line-height:1.4; }
+}
+
+/* Scoped ID beats the shared neutral fit override without changing its token. */
+.native-graph-studio #pilot-fit { background:var(--wattson-info-fond); color:var(--wattson-info-encre); border-color:var(--wattson-info-encre); }
+.native-graph-studio .graph-studio-hint:empty { display:none; }
+@media(max-width:760px) {
+  .native-graph-studio .native-graph-tools,.native-graph-studio .native-graph-analysis { padding:0; }
+  .native-graph-studio .native-graph-tools>summary,.native-graph-studio .native-graph-analysis>summary { min-height:44px; box-sizing:border-box; padding:10px; }
+}
+
+/* Conduite alignment (docs/design/swarm/Main.dc.html): one compact bar.
+ * Search leads the bar; zoom, full screen and match navigation become icon
+ * buttons on every width (their text stays as accessible name and title).
+ * A search dims non-matching cards without hiding or disabling them. */
+.native-graph-studio .pilot-actions { align-items:center; gap:6px; }
+.native-graph-studio .native-graph-search { order:-1; flex:1 1 100%; }
+.native-graph-studio .native-graph-search label { position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.native-graph-studio .native-graph-search output:empty { display:none; }
+.native-graph-studio #pilot-zoom-in,.native-graph-studio #pilot-zoom-out,
+.native-graph-studio #pilot-fullscreen,.native-graph-studio #pilot-search-previous,
+.native-graph-studio #pilot-search-next,.native-graph-studio #pilot-search-clear { width:36px; min-width:36px; min-height:36px; padding:6px; position:relative; justify-content:center; }
+.native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-action-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-tool-icon { margin:0; }
+.native-graph-studio .graph-search-dim { opacity:.32; transition:opacity .15s; }
+@media(prefers-reduced-motion:reduce) { .native-graph-studio .graph-search-dim { transition:none; } }
+@media(max-width:760px) { .native-graph-studio #pilot-zoom-in,.native-graph-studio #pilot-zoom-out,.native-graph-studio #pilot-fullscreen,.native-graph-studio #pilot-search-previous,.native-graph-studio #pilot-search-next,.native-graph-studio #pilot-search-clear { width:44px; min-width:44px; min-height:44px; } }

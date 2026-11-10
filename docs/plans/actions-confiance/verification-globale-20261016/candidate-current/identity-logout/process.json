@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "node",
+    "tests/actions_confiance_oidc_logout_ui.cjs",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+    "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/identity-logout"
+  ],
+  "pid": 4094643,
+  "start_ticks": "6297065",
+  "started_unix": 1792128546.5109086,
+  "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "status": "passed",
+  "exit_code": 0,
+  "ended_unix": 1792128562.2383652,
+  "checks": 18,
+  "report_sha256": "7b9b8c41a55c8ae60c736e296e6774070db91bd1dd8d93ac2300508f14985770"
+}

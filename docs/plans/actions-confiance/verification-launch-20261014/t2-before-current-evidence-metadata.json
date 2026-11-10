@@ -1,0 +1,359 @@
+{
+  "schema_version": 1,
+  "executor": "operator/Codex",
+  "work": "w-68b50cc82ec3fe55624f9549",
+  "task": "plan-68b50cc82e-T2",
+  "attempt": "a-b4669e24bbfb91f7a9686499",
+  "producer_process": "completed, unchanged",
+  "source_base": "a2d6410389c03e16270fa43d3f50b5deeb04f313",
+  "operator_binary_sha256": "3a3b943c58b620785f9ed30527a02828149216e8d3728f8948321ceaff9629e5",
+  "local_go_main_tests": 24,
+  "local_go_subcases": 34,
+  "browser_checks": [
+    "actual loading state observed while the initial API response is held",
+    "loading-empty-success states and real GET API",
+    "first keyboard skip link moves focus to main",
+    "touch targets >=44px and input fonts >=16px",
+    "real public request renders a localized French action state",
+    "exact amount above 2^53 renders without numeric rounding",
+    "labelled Admin dialog and initial keyboard focus",
+    "Admin identity template contains no usable preset credentials",
+    "Admin refuses blank credentials before preview without mutation",
+    "Escape closes and restores focus",
+    "in-flight previews preserve newer input and ignore reordered or closed responses",
+    "Admin preview is non-mutating",
+    "Admin apply persists, reopens and exposes actual technical bounds without arbitrary ceilings",
+    "État and sombre themes rendered with measured button contrast >= 4.5",
+    "FR/EN layouts at 1440,1024,760,390,320px in both themes with long data, touch sizes and no overflow",
+    "English locale includes the Admin fields and labels",
+    "checkbox label target is measured and actually clickable in French and English at mobile widths",
+    "visible network error state"
+  ],
+  "contrast": [
+    {
+      "theme": "etat",
+      "controls": [
+        {
+          "id": "trust-theme",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 181.90625
+        },
+        {
+          "id": "Retour au cockpit",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "ratio": 9.78560397602312,
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "ratio": 14.487732305657662,
+          "height": 44,
+          "width": 185.171875
+        }
+      ]
+    },
+    {
+      "theme": "sombre",
+      "controls": [
+        {
+          "id": "trust-theme",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 159.515625
+        },
+        {
+          "id": "Retour au cockpit",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 159.046875
+        },
+        {
+          "id": "trust-refresh",
+          "ratio": 11.142092464746288,
+          "height": 44,
+          "width": 90.875
+        },
+        {
+          "id": "trust-config-open",
+          "ratio": 9.096062373277045,
+          "height": 44,
+          "width": 185.171875
+        }
+      ]
+    }
+  ],
+  "expected_network_error_count": 1,
+  "unexpected_errors": [],
+  "receipt_sha256": {
+    "t2-operator-c1-after.out": "3e296de7d8b9b02ae13471c2bed612f355c13ad99960abae396bb6eacb71b7e2",
+    "t2-operator-c2-after.out": "8c78f287dbd048f7d3989caba3475d0c228a00c9c67dab1222a4726d442dd794",
+    "t2-operator-c3-after.out": "0d28a4c2a666a51f25deb3d58f5e9d86c3612e541b36c47aa09f0f41b06eade5",
+    "t2-operator-c4-interaction.out": "98c934405722564a78faaf7be75150ef1027becc59b3398c4f4a12bfadf38b7f",
+    "t2-operator-race.out": "60b17a2c5153a94d221330d5e7eee2e907c4f923578eee1bdf1ab008b4744e85",
+    "t2-operator-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-review-defects-before.out": "d9f8960ed3cfffd570cea33ce8c82ca867f60a7fe3716acfaad96eab47d7a318",
+    "t2-json-trailing-before.out": "b54139ac27dcfde11664dfece857efab155c33d584732ce46440071427f2c1ac",
+    "t2-review-defects-after.out": "862947babfaee456b7f0ebd405feb6c3532a924d3211c4a4aa27f2b7796d8c40",
+    "t2-review-validation-final.out": "2b801acf6c9c618a95b5a5553ac67f8d17d73bd2c103d7c118f2b64bcd67811c",
+    "t2-review-delivery-configured.out": "25d6887597ebb8f8db9c28c9f365ebdba7da0d970554a480c41799cd5dc41043",
+    "t2-review-vet-final.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-approval-before.out": "6ae8e47f9671a0c5bf28805f8e0dd82de2e928b130a8f046e5373e52cae1b026",
+    "t2-approval-after.out": "114822fbcaa4794ccb743e45109a4ba38238bb4913e104e5e476d01b8a1c375a",
+    "t2-third-validation.out": "018a5c32d3a6ea8650e085fb9e90d703988758eac6726144c9e033e54317ed93",
+    "t2-third-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-dynamic-locale-before.out": "3b17aa621923680868f46d93059d175b5b01fc32145ddc9bc8bba6c10f866742",
+    "t2-dynamic-locale-after.out": "8fe231f0927aa0ce0640813eb1b3a58a3b67f31aff57d6047ab5830b5da966aa",
+    "t2-state-labels-observed.out": "400c6fa2c7a78823134fc44253eae41e521f0e7a0690e47d589e4617819d378e",
+    "t2-mobile-data-before.out": "b3e69b44d1500584fe04e91015201b721d03d94e532e5525fa51c3fcc8f8f575",
+    "t2-mobile-data-after.out": "3c21c0aa83182ae1341c106f614ce782b30e374e8240bfcdab238c043b4a2089",
+    "t2-fourth-delivery.out": "464c1afa218fcf804410b47fef2fc9d54884f9d77456a933bad6347be910e730",
+    "t2-fourth-browser-retained.out": "6a9e03ebed647ccf189581f0336f146c128e213e42d896fd6657e75b50f9f2c0",
+    "t2-replay-auth-before.out": "45449f376c3a00fff430b2d875ff239e24182abb485f705d8459233b8f4cbb19",
+    "t2-replay-auth-after.out": "f149843c76bc7f14f6bad6da17a464074fafa98bd834af13178e3449292af455",
+    "t2-replay-auth-corrected.out": "af493557e21a59201b68144f4f833ae60e43f5aea1ae8f2a0d4d0e8365dfd2b7",
+    "t2-replay-integer-legacy.out": "31938a02a0c966fb784fa53ea1ce8b95089fa859f7bacb1790978255f1af57d1",
+    "t2-fifth-race.out": "b7511c266b6776fe7a5d2ae492261daec116138b60068deab7970ba8afca18d8",
+    "t2-fifth-validation.out": "84ce5de97525d2ab5725a862b0c647da3811f57abfbe222336c95cc051f7d5a4",
+    "t2-fifth-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-a11y-before.out": "e06ab119c1883f5ada17dcdfa51b3a58180de4c7bd7eac1b452e0b707f003f81",
+    "t2-a11y-after.out": "fef5d878ea4efc2429cecd9bec628eabf9043e9bc8351c874e42f760ea4f4777",
+    "t2-a11y-all-viewports.out": "f45568a8277cde0f479f36809ecb529edd82180bb00fc9c5b20ead6cd8429fa2",
+    "t2-sixth-delivery.out": "bbc5f4e285f173e11e607141f531175ee6709ed86fd4192e99a082d1fd24774b",
+    "t2-a11y-i18n-build.out": "6c89e249f49299babcb6cffd276efb5fc28e6fecbb340470debfe8a85eb2de8b",
+    "t2-a11y-i18n-test.out": "94c4242e4cb9df422cf05c573c69050b25542e37bc027d0739c019c65d35380f",
+    "t2-sixth-browser-retained.out": "8dc4122deb61d36ea0a647780109ccb5b28494834b8cde8461486e27eaa7a2b1",
+    "t2-originals-before.out": "e478c98b28297de6b8128dfcbbd47afed4467406dfd641b283eb09bbd5a62e2f",
+    "t2-originals-after.out": "13af87495f27bf90770b7b6119635fa0c124d0b35580719c98a7ae6d6e3a4cd9",
+    "t2-originals-corrected.out": "7d0fae29a4f978ee9b1c281ba7d81f271e52f167a1669363ce8b0d2b6bb05331",
+    "t2-originals-full-race.out": "193315f0f861a709431cd63efefa9a0e188cccbfa1da62aa87ba189619f1b114",
+    "t2-originals-validation.out": "339883123e6626ad139888920dd44eeb4f2b2738023a46ec25391abc525f9c04",
+    "t2-originals-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-loading-observed.out": "903d80977d190587b14f54f7854856e881663d69cc638f132ab616c1657d0532",
+    "t2-originals-i18n-test.out": "94c4242e4cb9df422cf05c573c69050b25542e37bc027d0739c019c65d35380f",
+    "t2-originals-delivery.out": "3cf2859b7a83bb5f32f3d51eb20dc358fb71f959699d25d763b5438862694355",
+    "t2-replan-validation.out": "4e9e60654bfed52bdbd74a03262aea719602095dbf6a20849ee174f085aead16",
+    "t2-replan-race.out": "b071b3f6450f848a0b8a18cdbe22938f28f226416febbb7ad41bf931f23021d2",
+    "t2-replan-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-replan-build.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-replan-browser.out": "8b214570ced4c7deec699e8a30cce3062b3d3218b57d7d919904f8acb1cd37aa",
+    "t2-replan-delivery.out": "e1f85d14d0c3450c33ed96799abba5e0a9cfce3eedaf265c701ea1f3c75efe45",
+    "t2-i18n-check-before.out": "a23e254dcd1077ac332240609747017117f0d6af0a7efa68de1f8899b4f9b3b4",
+    "t2-i18n-check-corrected.out": "23d0852b273fc311a94c30acddc4f7e897ac4e8f2782cabdb417754737419987",
+    "t2-i18n-check-parity-corrected.out": "fc2c4f9c05b8cf1fa42a6b6b62f87112f494255704068964567a9e3a65fdced8",
+    "t2-wide-ui-before.out": "9d91cfb60cfc6253f94057aa26eeaa786d9275f6d825777a6e1bd116fbf18f77",
+    "t2-final-contracts-race.out": "1801582c859173605f636e6c22de6dbc3e7cffc8b5ac00b11a30da948717cb6f",
+    "t2-business-replay-before.out": "6ed5faa639de90e1d7a3d68460b8710e28e2d37bf6494b3e2388a21013b9d595",
+    "t2-further-contracts-before.out": "1d0a741daf2417bd2123cbcbdcefad39f9a9f0a3dcc3a62ef985eacb9a7997ad",
+    "t2-legacy-credential-before.out": "30a7d2ee5078c286f36bcf690f6a60e7feab1c69a3ef97ca2975af6d34643004",
+    "t2-authority-key-before.out": "0474d4761854e9b5e5b84a7732e5b9da05ca60c44390c9df715b678198ebc32d",
+    "t2-authority-key-after.out": "042d90781da22f9d1e9b1743f74ee30df546e745ba206663547b9a062def1b9e",
+    "t2-unattributed-key-before.out": "c06cb0c99bd5fd11f41c3230e4c90c112cb569a7d5bb88fdf6da6bd94148b487",
+    "t2-authority-key-public-validation.out": "eefd4b4fe78c38b3f2f8344a774b7c7267488c82513d28c0bd1e111916f11820",
+    "t2-final-authority-key-race.out": "4b779b1e7b3931403d71e1794fd04443c00e9ec05732860a3cd01fcf7aff7e76",
+    "t2-final-authority-key-validation.out": "a8a0be5516f49a2e911615f63d9475931f046c377b7f98e0656b7d1df268b33e",
+    "t2-final-authority-key-delivery.out": "53e641b9747cc2f8d2fd8ddd80250e45d1acce39a246d33c85f47ab08cc72a79",
+    "t2-final-authority-key-build.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-final-authority-key-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-final-authority-key-browser.out": "8b214570ced4c7deec699e8a30cce3062b3d3218b57d7d919904f8acb1cd37aa",
+    "authenticated-refusal-go-before.out": "dcfe2c939a779cb9e247ca4c366b51fac56ac6279f0a53b8a00aff79640efc2d",
+    "authenticated-refusal-after.json": "91e7520a571cffff6b924a6412804bb9e6197615c0d9bed03d8cf050cdd86d5d",
+    "ui-preview-race-before.out": "2074235cf107c91de8d7a3e4ab481b5fedd0ad33ca8edc0b1dc75b9aa5931440",
+    "t2-audit-preview-full-race.out": "d88db9f2f5055fc1b9deee654a085b9567b4bad8e677aee521d6b97058e0b58b",
+    "t2-audit-preview-validation.out": "3a9558184e6de0c34cf613f44472acee2283d2946d30221263f8a7fbdeb461c2",
+    "t2-audit-preview-delivery.out": "23ac342063c81ad2a9dbed8793377efb3f464356b2482301db0c6d4cc4121d91",
+    "t2-audit-preview-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "t2-audit-preview-browser-v2.out": "99f48d9b4e9544cdbd5649842a0bd60f1e4bd99219a57161f85e64cbb4b36d8c",
+    "t2-386-before.out": "31d6627b192e0d8efa49358da6360e38fd431adc8ecaf66304074fe0f9031870",
+    "t2-386-after.out": "ebd8ee13e86d210041655af6fc21e431120fa86e37a308c80e1db75b1231c7b4",
+    "t2-portable-boundary-amd64.out": "33248eb6ed3e8f428089d809b42b81f32768d3fda0cd6b89626e20fa4e3d3c0f"
+  },
+  "limits": [
+    "local simulated effect only",
+    "operator environment is distinct from producer sandbox",
+    "engine checks and independent review still required"
+  ],
+  "independent_review_retained": {
+    "id": "review-97ee81b76a1096d0e7b7525e",
+    "state": "unknown",
+    "cause": "Selection capacity and original evidence missing; local defects separately reproduced and corrected."
+  },
+  "new_regressions": [
+    "Configured positive reconcile delay blocks early recovery without another ledger effect and admits the exact due boundary",
+    "HTTP and CLI share verifyTrustCommand and preserve proof integrity checks",
+    "Trailing JSON is rejected before state mutation",
+    "English Admin labels are observed in the actual browser",
+    "Distinct exited CLI processes are recorded around unknown/reconcile",
+    "Approval rejects a supplied resource contradicting action_id without action mutation",
+    "Reapproval cannot regress committed, unknown or reconciled states or duplicate ledger effects",
+    "Real nonempty request renders localized state, next action and minor-unit amount labels",
+    "Long public beneficiary wraps at 390 and 320 px without page overflow",
+    "Configuration replay preserves the original response after later changes and restart, including integer precision above 2^53",
+    "Unavailable historical response is refused without current-state substitution or mutation",
+    "Business replays require authentication and HTTP enforces Bearer syntax, including malformed and valid variants",
+    "First keyboard skip link transfers focus to main",
+    "Twenty viewport/language/theme cases measure touch targets at least 44px, input fonts at least 16px and no global overflow",
+    "Exact HTTP/CLI original bytes survive restart and version-2 proof export; each decision has its own referenced original",
+    "Altered, missing or unbound original bytes are refused; historical gaps remain visible and block new business effects",
+    "Initial loading state is observed while the actual API response is held, then released",
+    "Business replay and public browser projection preserve integer amounts above 2^53 exactly",
+    "Revocation recomputes the mandate content digest covering version and revoked_at",
+    "Final persisted bytes, including newline, respect the readable state bound at -1/0/+1",
+    "Configuration and authentication reject known example credentials; Admin starts with empty token inputs",
+    "Associated checkbox label is measured and actually toggled in FR/EN at 800,390,320 px",
+    "Read-only generator check rejects stale artifacts without changing tested files; npm i18n execution receipts include full stdout and input hashes",
+    "Replay binds subject, roles and integrity; foreign and stale authority are refused without mutation; credential rotation for the same authority preserves the original JSON reply",
+    "Public CLI observes authorization_required as exit 4 for a valid but different principal, including unchanged storage and same-authority replay",
+    "Proof key refuses symlink, nonregular object, public permissions, malformed length/hex and missing historical material; initial configuration refuses unattributed regular files and hardlinks",
+    "Public CLI rejects a symlink-backed anchor without changing state or target",
+    "All viewport dimensions are losslessly reconstructed from the compact labelled receipt; npm inputs share one hashed manifest",
+    "Four authenticated mandate validation/refusal variants preserve original bytes, error codes, authority binding and idempotent restart without business mutation.",
+    "Held HTTP preview responses are invalidated by input and close; older responses cannot replace newer previews.",
+    "GOARCH=386 executes the targeted policy, review-timeout and web-request configuration checks; oversized JSON integers are rejected at decoding or shared validation without native-int constant overflow."
+  ],
+  "independent_protocol_error_retained": {
+    "id": "review-18d40d0f807c447c34a3ff50",
+    "state": "error",
+    "reason": "defect without unique failed artifact",
+    "note": "Raw reply is retained and unvalidated; its two product hypotheses were separately reproduced."
+  },
+  "independent_unknown_retained": {
+    "id": "review-0004c2c85aa9458a3a30711c",
+    "state": "unknown",
+    "reason": "Supplied metadata was requested again and full unchanged dispatch/theme originals were absent; new evidence supplied without prescribing a verdict."
+  },
+  "at_utc": "2026-10-15T02:30:27.855636+00:00",
+  "independent_selection_error_retained": {
+    "id": "review-0172834249b5ae9e231edb5f",
+    "state": "error",
+    "reason": "Mistyped evidence digest; no final verdict. Product hypotheses separately reproduced and corrected."
+  },
+  "viewport_summary": {
+    "cases": 20,
+    "widths": [
+      320,
+      390,
+      760,
+      1024,
+      1440
+    ],
+    "languages": [
+      "en",
+      "fr"
+    ],
+    "themes": [
+      "etat",
+      "sombre"
+    ],
+    "minimum_control_height": 44,
+    "minimum_input_font_size": 16,
+    "overflow_cases": 0
+  },
+  "independent_citation_error_retained": {
+    "id": "review-fdadd3c686a8d0d0f77c40fa",
+    "state": "error",
+    "reason": "Invalid quote retained; native owner applied an attributed protocol retry on the same candidate. Accessibility hypotheses separately measured and corrected."
+  },
+  "independent_business_refusal_retained": {
+    "id": "review-fdadd3c686a8d0d0f77c40fa",
+    "state": "changes_requested",
+    "passed_criteria": [
+      1,
+      2
+    ],
+    "failed_criteria": [
+      3,
+      4
+    ],
+    "new_correction": "Complete originals retained and verified; tactile link measured at 44px; fresh independent qualification still required."
+  },
+  "checkbox_targets": [
+    {
+      "lang": "fr",
+      "width": 800,
+      "target_width": 356,
+      "target_height": 71.59375,
+      "actual_label_click": true
+    },
+    {
+      "lang": "en",
+      "width": 390,
+      "target_width": 326,
+      "target_height": 46.59375,
+      "actual_label_click": true
+    },
+    {
+      "lang": "en",
+      "width": 320,
+      "target_width": 256,
+      "target_height": 46.59375,
+      "actual_label_click": true
+    }
+  ],
+  "independent_sixth_protocol_error_retained": {
+    "id": "review-9c4de7e7cb4683ec6efd2bb1",
+    "state": "error",
+    "failure_code": "review_fragment_protocol",
+    "cause": "Literal CLI/HTTP sources were omitted as new-file diff duplicates; no final verdict. Full originals and actual npm receipts now supplied, without editing the historical reply."
+  },
+  "public_named_go_cases": 58,
+  "independent_seventh_recovery_retained": {
+    "id": "review-481aead2af7d5e3314889c6e",
+    "state": "error",
+    "failure_code": "review_fragment_interrupted",
+    "native_owner_decision": "planning-claim-92726aace3ac6d4e73d710ee-decision",
+    "reason": "Initial malformed association was retried by its actual owner; valid inspections and ready selection retained. Publication was paused after separate reproduction of two business defects. Abandoned final reservation was reconciled without another paid review; changed candidate still requires fresh independent qualification."
+  },
+  "independent_eighth_unknown_retained": {
+    "id": "review-2d04785fe3141f8224439317",
+    "state": "changes_requested",
+    "reason": "Final questions remained unknown: some shared originals were absent and main.go was selected only as its diff despite the complete file already in the inventory. No product acceptance or invented source supplied.",
+    "unchanged_production_and_test_sources": true,
+    "new_declared_originals": [
+      "internal/engine/model.go",
+      "internal/engine/store.go"
+    ],
+    "explicit_shared_dependencies": [
+      "readInput",
+      "strict",
+      "printJSON",
+      "atomicWrite",
+      "openStoreWithMigration"
+    ]
+  },
+  "independent_tenth_business_refusal_retained": {
+    "id": "review-4ce246e4f3db9ce3d191d8fe",
+    "state": "changes_requested",
+    "passed_criteria": [
+      1,
+      2
+    ],
+    "failed_criteria": [
+      3,
+      4
+    ],
+    "diagnosis": "Authenticated business validation refusals lacked attributed originals; late UI previews could replace visible inputs. Both reproduced before correction. Core receipt-resolution fix verified natively before this candidate repair."
+  },
+  "current_verification_receipts": [
+    "authenticated-refusal-go-before.out",
+    "authenticated-refusal-after.json",
+    "ui-preview-race-before.out",
+    "t2-audit-preview-full-race.out",
+    "t2-audit-preview-validation.out",
+    "t2-audit-preview-delivery.out",
+    "t2-audit-preview-vet.out",
+    "t2-audit-preview-browser-v2.out"
+  ],
+  "portability_receipt": "docs/plan-68b50cc82e-T2.portability.json",
+  "independent_eleventh_protocol_error_retained": {
+    "id": "review-575ed494ca01d902e18fe319",
+    "state": "error",
+    "cause": "Two quote-attribution errors, no final opinion; exact quote field existed. The 32-bit hypothesis was separately reproduced, including two inherited fixture constants, then corrected and verified."
+  }
+}

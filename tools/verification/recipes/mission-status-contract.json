@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "id": "mission-status-contract",
+  "inputs": [
+    "tests/rust_mission_status_contract.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-cli/examples/mission_status_observation.rs",
+    "rust/crates/swarm-cli/src/mission_status.rs",
+    "rust/crates/swarm-cli/src/mission.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_read.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_evidence.rs",
+    "rust/crates/swarm-engine/src/root_store/material_path.rs",
+    "rust/crates/swarm-engine/src/mission_status_tasks.rs",
+    "rust/crates/swarm-engine/src/mission_status_tasks/tests.rs",
+    "rust/crates/swarm-engine/src/mission_status_contract.rs",
+    "rust/crates/swarm-engine/src/mission_status_contract/tests.rs",
+    "rust/crates/swarm-engine/src/mission_status_spending.rs",
+    "rust/crates/swarm-engine/src/mission_status_spending/tests.rs",
+    "rust/crates/swarm-engine/src/mission_status_insights.rs",
+    "rust/crates/swarm-engine/src/mission_status_insights/tests.rs",
+    "rust/crates/swarm-engine/src/recorded_work.rs",
+    "rust/crates/swarm-engine/src/recorded_event.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/initial_schema_37.sql",
+    "rust/crates/swarm-wire-json/src/go_rfc3339.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "tools/verification/verify_sdk_example.py",
+    "tools/verification/verify_native_profile.py",
+    "rust/crates/swarm-engine/src/root_store/mission_status_results.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-engine/src/mission_status_runtime.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "version_history.json",
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/gate_evaluation.rs",
+    "rust/crates/swarm-engine/src/local_path.rs",
+    "rust/crates/swarm-engine/src/mission_supervision.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_read.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_cycles.rs",
+    "rust/crates/swarm-engine/src/terminal_clip/UNISEG-LICENSE.txt",
+    "rust/crates/swarm-engine/src/terminal_clip/cluster.rs",
+    "rust/crates/swarm-engine/src/terminal_clip/grapheme.rs",
+    "rust/crates/swarm-engine/src/terminal_clip/mod.rs",
+    "rust/crates/swarm-engine/src/terminal_clip/properties.rs",
+    "rust/crates/swarm-engine/src/terminal_clip/tests.rs",
+    "tests/fixtures/terminal_clip_go047.json",
+    "tools/rust-migration/generate_terminal_clip.py",
+    "tests/generate_terminal_clip_oracle.py",
+    "tests/test_terminal_clip_tools.py",
+    "rust/crates/swarm-engine/tests/engine_settings.rs",
+    "tests/rust_status_submitted_window.py",
+    "rust/crates/swarm-engine/src/agent_supervision.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/agent_storage_retry.rs",
+    "tests/rust_status_abandoned.py",
+    "rust/crates/swarm-engine/src/task_lifecycle.rs",
+    "tools/verification/recipes/mission-status-abandoned.json",
+    "tests/rust_status_active.py",
+    "tools/verification/recipes/mission-status-active.json",
+    "rust/crates/swarm-engine/src/root_store/mission_status_activity.rs",
+    "rust/crates/swarm-engine/src/agent_heartbeat.rs",
+    "rust/crates/swarm-engine/src/supervisor_identity.rs",
+    "tests/rust_status_accepted.py",
+    "tools/verification/recipes/mission-status-accepted.json",
+    "rust/crates/swarm-engine/src/mission_cost_guard.rs",
+    "rust/crates/swarm-engine/src/mission_controls.rs",
+    "rust/crates/swarm-engine/src/mission_organization.rs",
+    "rust/crates/swarm-engine/src/planning_control.rs",
+    "rust/crates/swarm-engine/src/agent_models.rs",
+    "rust/crates/swarm-engine/src/planning_activation.rs",
+    "rust/crates/swarm-engine/src/planning_decision.rs",
+    "rust/crates/swarm-engine/src/planning_state.rs",
+    "rust/crates/swarm-engine/src/planning_budget.rs",
+    "rust/crates/swarm-engine/src/review_evidence.rs",
+    "rust/crates/swarm-engine/src/work_engine.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_readiness.rs",
+    "rust/crates/swarm-engine/src/financial_budget.rs",
+    "tests/rust_manual_mission.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "owned-inactive-public-inputs-freshness-coverage-spending-and-refusal-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nkeys=['SWARM_STATUS_CONTRACT_BINARY','SWARM_STATUS_CONTRACT_PROFILE','SWARM_STATUS_CONTRACT_SDK_BINARY','SWARM_STATUS_CONTRACT_SDK_PROFILE']\npaths={key:os.environ[key] for key in keys}\nbase=Path(tempfile.mkdtemp(prefix='mission-status-contract-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_status_contract.py','--binary',paths[keys[0]],'--profile',paths[keys[1]],'--sdk-binary',paths[keys[2]],'--sdk-profile',paths[keys[3]],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS status default-core profile control refusal recovery",
+        "PASS status partial API reads empty Work and zero recorded calls without DB mutation",
+        "PASS status partial API reads real task without profile and preserves absent spending",
+        "PASS status unknown Work and marker operator refusals preserve DB and recover",
+        "PASS status actual stale gate observation retains failed_or_stale and safe Gate cause",
+        "PASS status stale gate output ENOSPC retains original Gate and IO causes without private data",
+        "PASS status original gate bytes restore positive observation without DB mutation",
+        "REPLAY_EVIDENCE",
+        "PASS historical public JSON reads actual empty Work without mutation",
+        "PASS historical public JSON task unknown-work output refusal and recovery preserve DB",
+        "PASS persisted public storage thresholds preview reopen block and recovery",
+        "PASS public terminal identity unknown usage report contained-link compatibility outside-link refusal and byte recovery",
+        "PASS public completed local worker submitted report pending review missing gate and output recovery",
+        "PASS public selected cooldown active expired cleared corruption and byte recovery"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-lease-public-root-status-clock-and-cycle-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "mission_status_native_lease_active_stale_future_and_recovery",
+        "--",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 1 test",
+        "test root_store::mission_status_historical::tests::mission_status_native_lease_active_stale_future_and_recovery ... ok",
+        "1 passed; 0 failed; 0 ignored"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "unicode15-go047-grapheme-and-scalar-differential",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "terminal_clip::",
+        "--",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 8 tests",
+        "test terminal_clip::tests::go_reference_graphemes_widths_and_clips ... ok",
+        "test terminal_clip::tests::go_reference_widths_for_all_unicode_scalars ... ok",
+        "8 passed; 0 failed; 0 ignored"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "retained-completed-history-latest-attempt-projection",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "mission_status_reports_completed_submitted_uses_retained_report_without_scan",
+        "--",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 1 test",
+        "test root_store::mission_status_reports::tests::mission_status_reports_completed_submitted_uses_retained_report_without_scan ... ok",
+        "1 passed; 0 failed; 0 ignored"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "status-configured-recent-window-full-ledger",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "mission_status_changes_recent_window_preserves_complete_inputs",
+        "--",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 1 test",
+        "test root_store::mission_status_historical::tests::mission_status_changes_recent_window_preserves_complete_inputs ... ok",
+        "1 passed; 0 failed; 0 ignored"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "status-window-settings-adoption",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "engine_settings",
+        "status_view_windows_",
+        "--",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 2 tests",
+        "test status_view_windows_upgrade_save_reopen_and_stale_refusal ... ok",
+        "test status_view_windows_validate_absence_null_zero_and_recovery ... ok",
+        "2 passed; 0 failed; 0 ignored"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "pending-helper-read-only-stop-and-heartbeat-resume",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "pending_gate_observes_stop_without_heartbeat_writes",
+        "--",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 1 test",
+        "test agent_supervision::tests::pending_gate_observes_stop_without_heartbeat_writes ... ok",
+        "1 passed; 0 failed; 0 ignored"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "submitted-window-public-costs-and-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='submitted-window-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_submitted_window.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public completed local worker submitted report pending review missing gate and output recovery",
+        "PASS actual submitted result outside Agent window, full costs and restoration",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-abandon-and-reopen",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='status-abandoned-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_abandoned.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public abandonment nonvalidated, unchanged reads and reopen recovery",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-active-observation",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='status-active-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_active.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public queued and running observation, early report, cancellation and submission recovery",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-accepted-freshness",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='status-accepted-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_accepted.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS accepted freshness, saved profile manual/pause, dependencies and initial planning",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

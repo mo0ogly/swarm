@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-11T17:22:36.789653+00:00",
+  "path": "internal/engine/graph_delivery_migration_test.go",
+  "preimage_sha256": "bc4a4014ea59b17bff3b850e31a08977db31065eedbb4d2c86687edd8b3efa04",
+  "preimage_file": "/tmp/swarm-review-retry-storage-frozen-16/graph_delivery_migration_test.go",
+  "postimage_sha256": "754ddee09f7ac4efb7beb7f188df42b3e377cb04b34d4bff648b52f44b4ea623",
+  "cause": "Historical fixture hardcodes28 as future; new supported version is28. Product correctly accepts it. Fixture must test schemaVersion+1, retaining rollback/config/history assertions.",
+  "parent_full_failure": "/tmp/swarm-review-retry-storage-qualified-v1-full-receipt.json",
+  "code_changed": false,
+  "tests_weakened": false
+}

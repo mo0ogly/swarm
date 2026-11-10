@@ -1,0 +1,11 @@
+{
+  "observed": "uncatalogued resource refused by public CLI without mutation",
+  "expected_observed": true,
+  "exit_code": 4,
+  "state_sha256_unchanged": "6345c030d360175515fee4b8a404f51fa44427b18fdb79102b7f7bffa60fe2c4",
+  "actions": 0,
+  "effects": 0,
+  "fixture_root": "/tmp/swarm-resource-policy-before-ra1quy01",
+  "binary_sha256": "1a7a69aed6f2aa153413b628c525895a77b8e2fe0aea0a84cf621aabad110d31",
+  "at": "2026-10-15T20:19:28.510314+00:00"
+}

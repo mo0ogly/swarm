@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/public-test/prompt.txt",
+      "sha256": "1e085aa1cdb31d7f10b328cc5627f49967409076cd80721ee9745b340895d994"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-bootstrap1310/public-test/context.txt",
+      "sha256": "ff8ac522306e15556b517d719ba016852c4a03e3c14e60c717c12e1b39b66d1f"
+    }
+  ],
+  "endpoint": "https://chat.skynet.cossi.internet/openai/chat/completions",
+  "timeout_seconds": null,
+  "script_sha256": "50d1428af3380d292c7b9fa7646f430115a95e8f34f46fccf10eef97f06764a0"
+}

@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-c12004bf64f1ac5371d78ebeb4ab2d852da9b0e83d3e4a692b8fb28268dbc69b",
+    "web",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-model83-_di1pokq",
+    "--json",
+    "--lang",
+    "en"
+  ],
+  "pid": 2835452,
+  "start": 1793558315.6165895,
+  "global_watchdog": null,
+  "owned": true
+}

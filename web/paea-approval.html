@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Swarm — PAEA</title>
+  <link rel="icon" href="/swarm-logo.png">
+  <link rel="stylesheet" href="/wattson_themes.css">
+  <link rel="stylesheet" href="/swarm-design.css">
+  <link rel="stylesheet" href="/paea.css">
+  <script src="/i18n-en.js" defer></script>
+  <script src="/i18n.js" defer></script>
+  <script src="/paea.js" defer></script>
+</head>
+<body data-paea-operation="check-approval">
+  <a class="paea-skip" href="#paea-main" data-i18n>Aller aux vérifications</a>
+  <header>
+    <a href="/">Swarm</a>
+    <h1 data-i18n>Correspondance d’un accord</h1>
+    <nav aria-label="Navigation PAEA">
+      <a href="/" data-i18n>Cockpit</a>
+      <a href="/paea.html" data-paea-link data-i18n>Vérifications PAEA</a>
+      <button id="paea-theme" type="button" data-i18n>Changer de thème</button>
+    </nav>
+  </header>
+  <main id="paea-main" tabindex="-1">
+    <p data-i18n>Rapprocher les empreintes d’un accord fourni avec l’action exacte et sa politique déclarée.</p>
+    <p id="paea-limits" class="paea-notice" data-i18n>Les deux fichiers et l’approbateur déclaré ne sont pas authentifiés. Une correspondance ne valide aucun accord, droit courant, attention humaine ou effet.</p>
+    <details id="paea-format-help">
+      <summary data-i18n>Préparer les fichiers</summary>
+      <p data-i18n>Choisir un document {proposal,context} et un accord contenant schema_version, action_digest, policy_digest et approver_id. Le contrôle recalcule le contenu canonique et compare les deux empreintes de liaison.</p>
+      <p data-i18n>Une différence produit un rapport négatif explicite. Un fichier invalide refuse le contrôle. L’identité, la signature, la révocation, l’expiration et les droits de l’approbateur restent à vérifier auprès du contrôle protégé.</p>
+    </details>
+    <details id="paea-example-help">
+      <summary data-i18n>Exemples fictifs à télécharger</summary>
+      <p data-i18n>Télécharger les deux fichiers du même domaine, puis les sélectionner et lancer la vérification. Aucun fichier n’est chargé automatiquement.</p>
+      <p data-i18n>Les exemples correspondent aux empreintes des actions, mais restent des déclarations non authentifiées. Changer le contenu ou la politique rend la liaison différente ; changer seulement la clé de tentative ne change pas le contenu canonique.</p>
+      <ul>
+        <li><a href="/paea-examples/v1/payment-document.json" download="payment-document.json" data-i18n>Document d’action — règlement fictif</a></li>
+        <li><a href="/paea-examples/v1/payment-approval.json" download="payment-approval.json" data-i18n>Accord fictif — règlement fictif</a></li>
+        <li><a href="/paea-examples/v1/git-document.json" download="git-document.json" data-i18n>Document d’action — promotion Git</a></li>
+        <li><a href="/paea-examples/v1/git-approval.json" download="git-approval.json" data-i18n>Accord fictif — promotion Git</a></li>
+      </ul>
+      <p data-i18n>Ces fichiers publics de démonstration ne contiennent aucune donnée de votre projet. Ils ne constituent ni accord authentifié ni preuve d’un effet réel.</p>
+    </details>
+    <form id="paea-form" aria-describedby="paea-limits">
+      <fieldset id="paea-inputs">
+        <legend data-i18n>Action et accord fournis</legend>
+        <label for="paea-document" data-i18n>Document de l’action — JSON UTF-8</label>
+        <input id="paea-document" type="file" accept=".json,application/json" required>
+        <label for="paea-approval" data-i18n>Accord fourni — JSON UTF-8</label>
+        <input id="paea-approval" type="file" accept=".json,application/json" required>
+      </fieldset>
+      <button id="paea-check" class="paea-primary" type="submit" disabled data-i18n>Rapprocher l’accord et l’action</button>
+    </form>
+    <p id="paea-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement de la session…</p>
+    <section aria-labelledby="paea-result-title">
+      <h2 id="paea-result-title" data-i18n>Résultat du rapprochement</h2>
+      <p id="paea-summary"></p>
+      <dl id="paea-identities"></dl>
+      <button id="paea-download" type="button" disabled data-i18n>Télécharger le rapport</button>
+      <details><summary data-i18n>Rapport technique</summary><pre id="paea-report"></pre></details>
+    </section>
+  </main>
+</body>
+</html>

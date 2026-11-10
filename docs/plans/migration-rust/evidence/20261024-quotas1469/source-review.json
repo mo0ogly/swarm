@@ -1,0 +1,59 @@
+{
+  "status": "LOCAL_SEMANTIC_REVIEW_RECORDED",
+  "reviewer": "Codex principal, not independent",
+  "source_sha256": {
+    "web/native-quotas.js": "2bb7eeeb243f5338d02c575a73c803bbff2d35d4613abea46e21a6537098043a",
+    "web/cockpit-native-quotas.js": "67482f3e6e85b6370629653374eeb7917d5b10f5fcad6d1aeb3f53a2e28a4f9f",
+    "web/cockpit-native.js": "e3cb2cb1f27f2b61f3012a43ef1a2bf94796c898de2b0637b4210ab20c89e300",
+    "rust/crates/swarm-web/src/service/native_admin.rs": "72d1ebeab0499302ab893f63ee684da933e0f45d2837b4f7b951e7ec0386de8b",
+    "tests/rust_native_cockpit_browser.py": "290c113d7fe9c5dcf03ac4870490f8e5c50778f136caff3536df461dcb1d39bf",
+    "tests/rust_existing_cockpit_ui.cjs": "6ec7a22b82af644071baba190866fb8984dbd76a4c7119217b93677238538f70",
+    "tools/verification/recipes/existing-cockpit-rust.json": "7b95d1c3a76208ecc3f619743e172a141d20745c7609dd5aa4ad15eecf6cc3fa",
+    "tools/verification/recipes/native-cockpit-ux.json": "e722ec6510786c1611faa2bee3cfa5ee448bf1bfdb64033ff50ae3b1ea412ccb",
+    "frontend/engine-settings/admin.css": "aed2833e25b9b29f8810239060c5d881ed1a4f108bae3fec2cd770f625582d45",
+    "locales/en.json": "60a4605e4bda84cefec51990f66417448bdd4628cadcecf30ef6150a87264a32",
+    "web/i18n-en.js": "8ca0b53c546643e6e3cbcabc53e63006b015f276efe9c301788e3c5673e56302",
+    "version_history.json": "1565b8aa61177be9613dc8b58a664dda1efd80bc1d98248312040e7c0616455e",
+    "docs/BUDGETS.md": "e903c8476232dfc42c332de106ef7d09c8140f7b3374be01ca94a8ce0086ccb4",
+    "docs/en/BUDGETS.md": "66c9e32c913f26c47516c559b0c760400888251e6ab6b354ecb0a4c66732662b",
+    "docs/architecture/RUST-MIGRATION.md": "9dbabd49e52a9c61076697e31045df1129dba81b7f4a5297ea0c5d0a0d717fbf",
+    "docs/en/RUST-MIGRATION.md": "8281023269486157ba1244121b28818f3b558285f2b39cce33b80b155bd97f76",
+    "docs/plans/migration-rust/PLAN.md": "cbdbda65933d8df380fe0e3fbe82f0d7a668b80233cd8dc329e9f77427fa47c3",
+    "docs/plans/migration-rust/REPLAYS.md": "0333b2a415662abb9a75beede31060a7b326b3b40bbd739bb2006aeb21245b22"
+  },
+  "policies": "No new engine route, setting, cap, retry, deadline, provider execution or permission. Existing persisted quota policies/reason validation/CAS/consumption/hierarchy checks remain authoritative. Fixed paths are protocol, completion barrier is serialization without cap or retry. Safe integer checks are technical browser representation, never server quota ceilings. Empty selectedWork means explicit selection, not default Work/planning creation. All fixture limits/provider/check declarations are private test data. Default native Admin mount preserved. Existing scope zero/inheritance semantics not changed.",
+  "functions": {
+    "shared_component": "Reviewed optional opener/selectedWork mount, one opener listener, loadWorks and semantic header. Unlike GLM patch, builds full list then calls getter once, no double-click listeners or repeated getter per row. Only actually listed planning Work can be preselected, never implicitly enable planning. Current/proposal cleared before open, API failures leave edit/preview unavailable. Default no-options mount retains button/explicit selection, verified on actual native-runtime.html.",
+    "bridge": "Reviewed view,mount,send,exchange,request: fixed same-origin paths, cookie/CSRF retained closure only, completion barrier always releases, strict Work list and actual QuotaView field validation before render. Mandatory counters distinguish malformed empty objects from successful absence; nullable optional fields preserved. Preview before/after revision and shape checked, no new token invented. Apply/read-back/error behavior remains shared component behavior.",
+    "bootstrap_assets": "Existing quotas-open reenabled via mount and budget notice accurately describes connected controls. Native component and shared Admin CSS reused from existing protected resources; only one new adapter resource added. Canonical index/Live/Claude unchanged. Header uses shared logo/typography hook.",
+    "tests": "Public CLI configures owned inert provider and a third isolated Work with planning, reviewer and a declared allowed-program control; none execute. Actual quota preview-no-write, apply/readback/restoration, consumed tasks preserved, no implicit selection, selected Work reuse, help/keyboard/focus, malformed client DTO/recovery. Actual default Admin caller tested with separate page and console/resource collection.273named browser assertions plus13graph identifiers/cache,13budget API and9read API checks. Existing case APIs unchanged; no full acceptance inferred."
+  },
+  "errors": "Invalid session/list/view/preview fail visibly, no fake empty success or automatic retry. Safe code/structured response/HTTP status/original cause retained; shared component preserves recorded_work on known apply/failed read-back. Initial HTTP500 organizational refusal preserved with public CLI diagnostic; fixture missing required declaration corrected. Second setup refusal was validation allowed-program boundary, fixed using already permitted python3 and inert helper argument, without relaxing policy. No production organization/status guard modified or failures filtered. All original attempts retained.",
+  "documentation": "FR/EN quota guides and migration architecture, PLAN/REPLAYS and current compiled notes/catalogue updated; shared/new nontrivial functions documented. i18n tests PASS; captured initial untranslated Apply corrected, final screenshot inspected. New dialogues verified FR/EN both themes1440/390, whole cockpit5widths. No full accessibility audit, native Admin full regression or independent approval claimed.",
+  "limits": [
+    "Other cockpit journeys/global migration acceptance remain open.",
+    "Source bridge validates canonical DTOs; default Admin malformed-view behavior outside this new bridge is not independently hardened by this increment.",
+    "Incomplete organization status still refuses, as retained original; fixture repair does not establish a new product degraded-status contract.",
+    "No new active-provider/nonzero-consumption quota fixture; existing engine unchanged, actual recorded scope/depth usage and task consumption preserved.",
+    "Native Version dialog remains unconnected; protected compiled identity/notes checked separately."
+  ],
+  "follow_up": [
+    {
+      "origin": "1469 new planning Work diagnosis",
+      "value": "Clearer incomplete-organization UX",
+      "owner": "Codex",
+      "state": "observed existing refusal retained",
+      "scope": "mission status projection and typed HTTP classification",
+      "criterion": "Public incomplete Work witness, preserve refusal/controls and show actionable configuration issue without fabricated readiness",
+      "resume": "When connecting planning preparation/status UX; do not relax organization checks"
+    },
+    {
+      "origin": "1469 shared component review",
+      "value": "Uniform malformed-view guard across all callers",
+      "owner": "Codex",
+      "state": "hypothesis for default Admin, canonical bridge guarded and tested",
+      "criterion": "Reproduce malformed default Admin reply and ensure no editable/empty-success state",
+      "resume": "Shared Admin hardening, with valid default caller witness"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "pid": 2504626,
+  "proc_start_ticks": "4360207",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-checkpoint-final.py",
+    "run"
+  ],
+  "at": "2026-10-16T00:06:17.929581+00:00"
+}

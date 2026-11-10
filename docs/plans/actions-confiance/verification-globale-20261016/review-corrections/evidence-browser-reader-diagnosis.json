@@ -1,0 +1,10 @@
+{
+  "product_archive_exact": true,
+  "fixture_archive_exact_occurrences": 2,
+  "failing_expression": "page.$eval('#pe-archive-output', e => JSON.parse(e.textContent))",
+  "cause": "recipe JSON.parse/CDP roundtrip loses unsafe integer; exact parser already used elsewhere",
+  "pending_fix": "transfer rendered raw text then exactParse in Node",
+  "owner": "Codex root",
+  "original_report": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-evidence-browser/evidence-ui-failure.json",
+  "product_change_required": false
+}

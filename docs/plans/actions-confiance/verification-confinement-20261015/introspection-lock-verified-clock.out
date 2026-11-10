@@ -1,0 +1,8 @@
+=== RUN   TestActionsConfianceT3IdentityContextClockAfterLock
+=== RUN   TestActionsConfianceT3IdentityContextClockAfterLock/identity-context
+=== RUN   TestActionsConfianceT3IdentityContextClockAfterLock/request
+--- PASS: TestActionsConfianceT3IdentityContextClockAfterLock (3.34s)
+    --- PASS: TestActionsConfianceT3IdentityContextClockAfterLock/identity-context (1.66s)
+    --- PASS: TestActionsConfianceT3IdentityContextClockAfterLock/request (1.68s)
+PASS
+ok  	swarm.local/companion/internal/engine	5.016s

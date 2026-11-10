@@ -1,0 +1,75 @@
+{
+  "captured_at_utc": "2026-10-15T19:52:17.732521+00:00",
+  "user_attachment": {
+    "path": "/home/fpizzi/.codex/attachments/376539dc-4e58-4bc1-9108-c0e404ccd0a5/Pasted text.txt",
+    "snapshot": "user-provided-memory-guide.md",
+    "title": "Memory",
+    "lines": 1757,
+    "sha256": "f3034c16f9a427628aaa581bacb09590ca4d7a8d9e78a794c544de5bac1fbd15"
+  },
+  "identified_source": {
+    "url": "https://docs.langchain.com/oss/python/langgraph/add-memory",
+    "live_markdown_url": "https://docs.langchain.com/oss/python/langgraph/add-memory.md",
+    "snapshot": "official-memory-guide.md",
+    "sha256": "f3034c16f9a427628aaa581bacb09590ca4d7a8d9e78a794c544de5bac1fbd15",
+    "identical_to_paste": true
+  },
+  "scope": "Guide section inventory, selected source paths and two offline LangGraph boundary probes; no external database, provider call or Swarm implementation",
+  "swarm_head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "swarm_dirty": true,
+  "langmem_commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+  "installed_versions": {
+    "langgraph": "1.2.15",
+    "langgraph-checkpoint": "4.3.0",
+    "langchain-core": "1.6.11"
+  },
+  "files": [
+    {
+      "path": "/tmp/swarm-deepagents-memory-env-944lMS/lib/python3.13/site-packages/langgraph/graph/message.py",
+      "sha256": "1f918f3555cfbdd92aaf888da7395778526de0a15a47b65608549ec10ed43565"
+    },
+    {
+      "path": "/tmp/swarm-deepagents-memory-env-944lMS/lib/python3.13/site-packages/langgraph/checkpoint/memory/__init__.py",
+      "sha256": "9e81ce01b41fc1bf591e930e350629282fb4ac86d667e211899bae9b5b573a84"
+    },
+    {
+      "path": "/tmp/swarm-deepagents-memory-env-944lMS/lib/python3.13/site-packages/langgraph/pregel/main.py",
+      "sha256": "c96d4424e7a75388aef09afeaa8fcfe17c026e60dafca1331003775ca1bf0ffc"
+    },
+    {
+      "path": "/tmp/swarm-deepagents-memory-env-944lMS/lib/python3.13/site-packages/langchain_core/messages/utils.py",
+      "sha256": "f3f1e35ca275cc5337b7853747f8c9b922ac943aae929616273b76766341c1c1"
+    },
+    {
+      "path": "/tmp/swarm-langmem-audit-md_bk6dp/src/langmem/short_term/summarization.py",
+      "sha256": "53b6cabcf3a64fc9445cb5a2252e8e8ab67de9a726ab04bca5aa1cd35bdd0909"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/store.go",
+      "sha256": "31fea4b7f69f932b28354a9605cfe05e11b4335e918e504f4dad361435317502"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_dialogue.go",
+      "sha256": "9560564e0c409e446e33f4f14055251e42d6beac1b804fb859b631f1b600b25c"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/worker_recovery_context.go",
+      "sha256": "b9993b698462b8138c7b5349ea809cf2fdead033341c0e5c53b4e33200e15459"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/dialogue_context.go",
+      "sha256": "b8885e9d6e6f7681307cf42b10dc76cca7774df43319974a8fbb521a2970e2ab"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/archive.go",
+      "sha256": "23a38bedd8a2990daeb2af27172973302ccbadd3ddb0af5660687cb9e941dc9f"
+    }
+  ],
+  "method_recovery": {
+    "observed": "Repeated user report of a different document was treated as a duplicate based on the received URL and concept-page hash.",
+    "cause": "URL identity was checked repeatedly without receiving the displayed document; that did not establish which content the user intended.",
+    "owner": "Codex",
+    "changed_precondition": "User supplied full text headed Memory, with LangGraph add-memory source link.",
+    "prevention": "On content disagreement, identify title and headings from user-provided content; do not repeat a URL-only conclusion as proof of intended-document identity."
+  }
+}

@@ -1,0 +1,339 @@
+# Mémoire du projet
+
+La mémoire de projet conserve une expérience ou une procédure issue d’un RETEX
+vérifié, puis permet à l’opérateur local de sélectionner sa version pour une
+tâche exécutante future. Elle ne modifie ni les méthodes du moteur, ni les
+permissions, budgets, critères ou preuves d’acceptation.
+
+L’accès se trouve dans la vue RETEX, lien **Mémoire du projet**. La page
+`/project-memory.html` propose le même contrat que la CLI et l’API. Un RETEX
+`verifie`, de nature `fait`, doit conserver son échange ou sa recette source et
+une tâche acceptée avec des preuves fraîches. Le moteur recontrôle ces sources
+à l’admission, à la sélection et avant le premier appel fournisseur de la tentative.
+
+```mermaid
+flowchart LR
+  R[RETEX vérifié et sources] --> P[Aperçu opérateur]
+  P --> V[Version admise et événement]
+  V --> S[Sélection explicite pour une tâche future]
+  S --> C[Texte, conditions et références dans le contexte]
+  C --> A[Exécutant dans ses droits existants]
+  V --> N[Remplacement ou retrait attribué]
+  N --> H[Versions et contextes historiques conservés]
+```
+
+## Utilisation
+
+1. Choisir la mission source, son RETEX vérifié et le type `experience` ou
+   `procedure`. Rédiger la leçon, ses conditions de réemploi et le motif.
+2. Examiner l’aperçu puis appliquer. L’aperçu ne change ni révision ni stockage.
+3. Choisir la mission destinataire, une tâche `todo` exécutante et les versions
+   actives utiles. Motiver la sélection, examiner le contenu puis l’enregistrer.
+4. Lancer la tâche par le parcours habituel. Son contexte contient le texte exact,
+   les conditions, le travail source, le RETEX, la version et leurs empreintes.
+5. Pour corriger une leçon, choisir **Remplacer cette version** ou **Retirer cette
+   leçon**. Les anciens textes restent historiques. Une sélection devenue périmée
+   doit être refaite ou vidée avant le prochain départ.
+
+La recherche initiale est textuelle et littérale, dans le contenu et les
+conditions. Le choix explicite de l’opérateur établit la pertinence pour la tâche ;
+aucune extraction automatique, recherche vectorielle ou amélioration LLM n’est
+présumée. Une procédure mémorisée reste une connaissance conditionnelle ; elle
+ne réécrit pas librement les consignes communes ou les poids du modèle.
+
+## CLI et API
+
+`swarm memory list --json` retourne les versions, leur provenance et leur état.
+Les autres opérations prennent `--input demande.json` :
+`admit-preview`, `admit`, `replace-preview`, `replace`, `withdraw-preview`,
+`withdraw`, `select-preview`, `select`.
+
+L’API locale authentifiée expose `GET /api/v1/project-memory?q=texte` et
+`POST /api/v1/project-memory?action=OPERATION`. Les écritures HTTP suivent la
+session et le contrôle d’origine/CSRF existants. Les opérations de mémoire
+partagent la validation Go avec la CLI ; elles ne créent pas de nouveau rôle.
+
+Exemple d’admission, avec les identifiants et révision réellement lus dans le
+projet :
+
+```json
+{
+  "schema_version": 1,
+  "event_id": "memory-admission-1",
+  "expected_revision": 12,
+  "work": "w-source",
+  "id": "verification-parcours",
+  "source_retex": "r-source",
+  "kind": "procedure",
+  "body": "Vérifier le résultat observable après une correction.",
+  "conditions": "Parcours concerné, sources et preuves courantes à contrôler.",
+  "reason": "Réutiliser le retour vérifié."
+}
+```
+
+Appeler `admit-preview`, puis ajouter son `preview_token` à la même demande
+avant `admit`. Le token couvre décision, révision et sources ; un aperçu périmé
+est refusé. Un même `event_id` et contenu rejoue sans écrire deux fois ; le même
+identifiant avec un autre contenu est refusé.
+
+Pour remplacer, fournir aussi `expected_sha256`, l’empreinte de la dernière
+version, et tous les champs de contenu/source. Le retrait demande uniquement
+schéma, événement, travail, identifiant, révision, empreinte attendue et motif.
+Il reste possible quand les preuves de la source sont devenues indisponibles.
+
+La sélection demande travail destinataire, révision, tâche, motif et `selections` :
+
+```json
+{
+  "schema_version": 1,
+  "event_id": "memory-selection-1",
+  "expected_revision": 8,
+  "work": "w-destination",
+  "task": "verification",
+  "reason": "Même type de correction.",
+  "selections": [
+    {"work": "w-source", "id": "verification-parcours", "version": 1, "sha256": "empreinte-lue-dans-la-reponse"}
+  ]
+}
+```
+
+Examiner avec `select-preview`, appliquer avec `select` et son token. Un tableau
+vide enlève la sélection pour les départs suivants. Une tâche déjà active, une
+version retirée/remplacée, une source modifiée ou une preuve périmée provoque un
+refus sans modification partielle. Une erreur de stockage n’est pas un catalogue
+vide réussi. Le contenu utilisateur est affiché comme texte, sans HTML exécuté.
+
+## Stockage, reprise et limites
+
+Les versions sont ajoutées au travail source dans SQLite et conservées avec ses
+événements. La mémoire versionnée a introduit le stockage 33 ; les états de
+frontière du dialogue portent désormais le stockage courant à 34, avec sauvegarde
+avant migration d’un espace existant. Arrêter les anciens programmes avant cette mise à niveau ;
+les commandes de consultation ne migrent pas silencieusement un ancien espace.
+Une compilation seule ne met pas à jour un serveur déjà en cours.
+
+Les archives conservent les versions et les contextes reçus. Une importation
+marque les leçons comme importées ; elle n’importe pas leur admission locale.
+Une nouvelle admission distincte et une source fraîche sont nécessaires. Le
+contexte d’une tentative historique n’est jamais corrigé rétroactivement.
+La liaison au projet utilise sa racine canonique : un déplacement exige aussi
+une nouvelle admission locale des connaissances concernées.
+
+Le catalogue indique les tentatives actives qui ont reçu chaque version ; les
+aperçus de remplacement/retrait les signalent également. Une conversation déjà
+démarrée conserve son contexte : le retrait ne l’arrête pas et ne revalide pas
+chaque tour. Son responsable décide de sa poursuite ou de sa reprise par les
+opérations publiques existantes.
+
+Une leçon du Guide désormais gérée par cette mémoire n’est plus annoncée par
+l’index implicite. Sa présence directe dans un profil ou les pièces de reprise
+est refusée : retirer cette référence héritée par les opérations de configuration
+existantes et sélectionner la version. Les copies libres de texte ne constituent
+pas un mécanisme d’effacement global.
+
+Les chemins des pièces de reprise et les liens locaux de l’index sont normalisés
+avant ce contrôle, y compris les fragments et encodages des liens. Lorsqu’une
+leçon est gérée, une pièce de reprise visant l’index complet est aussi refusée ;
+l’index implicite filtré reste disponible. Un retrait ne supprime pas les sources.
+
+Les requêtes mémoire ont une capacité de transport JSON de 1 Mio, commune au
+moteur et aux adaptateurs. Le contexte complet reste soumis à la capacité du
+parcours de lancement ; il n’est pas tronqué silencieusement pour ajouter une
+leçon. Ces bornes ne fixent ni rétention ni budget d’apprentissage. Une politique
+supplémentaire doit être persistée et éditable dans Admin, API, CLI et Go.
+
+## Contexte préparé et contexte de départ
+
+Pour une tentative exécutante, le manifeste `context` décrit le texte complet
+dans `prompt`, y compris les consignes de livraison gérée. Au départ d’un
+exécutant non interactif, le moteur peut ajouter une projection attribuée de la
+tentative précédente de la même tâche. Il conserve alors le manifeste initial
+dans `prepared_context`, contrôle le contexte complet et enregistre le nouveau
+`context` avant de démarrer le fournisseur. Les références mémoire, leur sélection
+et leurs conditions restent conservées.
+
+```mermaid
+flowchart LR
+  P[Contexte complet préparé] --> H[Projection historique de la même tâche]
+  H --> V[Capacité et empreinte finales]
+  V --> S[Reçu enregistré]
+  S --> F[Départ fournisseur]
+  V -->|Refus| E[Tentative en échec sans départ]
+  S -->|Échec d’écriture| E
+```
+
+Le SHA-256 et la taille en octets de `context` portent sur le `prompt` complet.
+`prepared_context` distingue l’aperçu préparé de l’ajout effectué au départ ; son
+absence sur un ancien enregistrement n’est pas une preuve de contexte vide. Une
+projection de reprise ne restaure pas la conversation du fournisseur. Ses
+opérations restent historiques, à vérifier avant réexécution.
+
+La capacité de lancement existante est de 128 000 octets, appliquée aussi après
+ajout de la reprise. Un dépassement ou un échec d’enregistrement empêche le départ,
+sans troncature silencieuse. Un reçu enregistré décrit le texte destiné au
+fournisseur ; il ne prouve pas, à lui seul, que le processus l’a reçu ou a réussi.
+
+La CLI `swarm --json agent show IDENTIFIANT` et l’API locale authentifiée
+`GET /api/v1/agent-detail?work=TRAVAIL&agent=IDENTIFIANT` exposent ces champs dans
+`agent`. Les tentatives et consommations antérieures ne sont pas réinitialisées,
+les contextes terminés ne sont pas réécrits et aucune acceptation n’est créée.
+La reprise implicite d’un wrapper de dialogue déjà commencé reste refusée.
+
+Le lot ne restaure pas une conversation fournisseur après arrêt du wrapper, ne
+résume pas automatiquement l’historique et ne prouve pas qu’un LLM applique
+correctement la procédure. La recette et ses limites sont conservées dans
+`docs/plans/deepagents-integration/`.
+
+## Fin confirmée d’un tour de dialogue
+
+En mode `dialogue`, le wrapper demande au moniteur l’autorisation de commencer
+chaque échange, puis sa confirmation de fin. Un code de sortie fournisseur nul
+ne suffit pas pour inscrire `answered` dans `agent_dialogue_turns`. Le moniteur
+exige un événement terminal positif unique : `turn.completed` pour Codex,
+`result` de sous-type `success` pour Claude, sans indicateur d’erreur. L’identité
+de conversation doit être présente et rester la même entre les tours.
+
+```mermaid
+sequenceDiagram
+  participant W as Wrapper
+  participant M as Moniteur
+  participant F as Fournisseur
+  participant S as Stockage
+  W->>M: Début du tour
+  M->>S: État de début enregistré
+  M-->>W: Autorisation de commencer
+  W->>F: Question et session courante
+  F-->>W: Événements puis sortie du processus
+  W->>M: Événements et demande de confirmation de fin
+  M->>M: Fin positive, session, gardes et résultats d’outils
+  M->>S: Journaux et état de fin enregistrés
+  M-->>W: Confirmation ou refus
+  W->>S: answered seulement après confirmation
+```
+
+Un refus fournisseur, un événement après la fin positive, une activité non prise
+en charge, un résultat d’outil manquant ou une limite déjà déclenchée interdit la
+confirmation. Une panne d’écriture des journaux ou du statut empêche aussi
+l’échange suivant. Le superviseur finalise les tours encore `running` en
+`interrupted` ; les appels d’outils et usages observés restent comptabilisés.
+L’absence d’usage rapporté reste inconnue, sans valeur inventée.
+
+Les échanges confirmés réutilisent la session et les permissions configurées.
+Les compteurs sont cumulés sur toute la tentative ; les identifiants d’outils
+sont distingués par tour, même si le fournisseur réutilise un identifiant.
+`answered` qualifie cette frontière technique. Il n’établit ni la justesse de la
+réponse, ni l’acceptation de la tâche, ni un point de restauration complet. Un
+wrapper déjà commencé ne peut toujours pas être relancé implicitement : restaurer
+les gardes cumulées et vérifier les effets incertains reste nécessaire.
+
+La recette locale utilise des processus fournisseurs de fixture, sans modèle :
+
+```sh
+go test ./internal/engine -run '^(TestDialogueIncompleteTurnCannotBeAnswered|TestDialogueActualSupervisorConfirmsTurnReceipts)$' -count=1 -v
+```
+
+Elle contrôle les statuts des tours, le nombre d’invocations et les compteurs,
+puis relit l’agent par la CLI construite. Les preuves, variantes de panne et
+limites sont dans `docs/plans/deepagents-integration/RESULTATS-MEMOIRE-06.md`.
+
+## État durable aux frontières du dialogue
+
+Le moniteur enregistre un état de version 1 dans la colonne `checkpoint` du tour,
+avant l’autorisation de commencer et avant la confirmation de fin. L’état conserve
+les gardes cumulées : limites, signatures et répétitions, erreurs, appels/résultats,
+outils en attente et observations connues, avec l’usage rapporté. Son empreinte
+lie les valeurs au projet, à la tentative, au tour et au lancement enregistré.
+Elle détecte une incohérence ; elle n’est ni une signature d’autorité ni une preuve
+de l’état actuel des permissions ou de la conversation chez le fournisseur.
+
+La CLI `swarm --json agent show IDENTIFIANT` et l’API authentifiée
+`GET /api/v1/agent-detail?work=TRAVAIL&agent=IDENTIFIANT` ajoutent un objet
+`dialogue` pour ce mode. Il contient `available`, `phase`, `status`,
+`boundary_confirmed`, `restart_supported`, l’identité de session, l’empreinte,
+la date, `progress`, `usage` et la portée de ces observations. Les signatures et
+détails internes des gardes restent dans le stockage privé. L’API contrôle le
+travail propriétaire avant de lire cet état.
+
+| État conservé | Interprétation |
+| --- | --- |
+| `running` | État au début du tour ; effets et usages ultérieurs inconnus. |
+| `confirmed` et statut `answered` | Frontière de fin confirmée, avec usage cumulé connu à cette frontière. |
+| `confirmed` sans statut `answered` | Confirmation du statut non établie, par exemple après interruption du wrapper. |
+| `interrupted` | Dernière frontière d’interruption observée ; effets à examiner avant toute reprise. |
+| `available: false` | Aucun état ou ancien tour sans checkpoint ; aucun zéro ni succès de restauration inventé. |
+
+Une écriture d’état refusée au début empêche l’appel fournisseur ; en fin, elle
+empêche `answered` et l’échange suivant. Une fermeture observée du canal conserve
+l’état interrompu si le stockage est disponible. Un arrêt brutal des deux
+processus peut laisser seulement l’état de début : ses effets ultérieurs restent
+inconnus. L’état de fin et le statut du tour sont deux écritures successives ;
+`boundary_confirmed` exige les deux. L’objet `agent` garde ses compteurs de
+supervision périodiques ; `dialogue.usage` donne l’usage durable de cette frontière
+sans attendre le battement. Un usage non rapporté reste absent.
+Les durées et états d’attente de cette projection sont calculés à la date `at`
+de la frontière ; consulter un état interrompu plus tard ne les fait pas croître.
+
+Les tours restent conservés lors de la purge des journaux. Leur état est inclus
+dans la suppression récupérable et sa restauration locale ; un export historique
+standard ne devient pas pour autant un checkpoint exécutable. Un ancien tour
+n’est pas reconstruit à partir des journaux tronqués. Un état non vide altéré,
+incompatible ou visant un autre lancement est refusé explicitement.
+
+`restart_supported` reste `false` : ni l’inspection ni la reconstitution technique
+des gardes n’autorise de redémarrage fournisseur. La prochaine étape doit définir
+la décision de reprise et le traitement des effets incertains. Avant toute mise
+à niveau réelle vers le stockage 34, arrêter les anciens processus selon le
+parcours d’installation ; une commande de consultation ne migre pas la base.
+
+Recette locale sans modèle :
+
+```sh
+go test ./internal/engine -run '^(TestDialogueBoundaryHasDurableStateBeforeHeartbeat|TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing|TestDialogueCheckpointWriteFailureStopsBeforeNextProvider)$' -count=1 -v
+```
+
+## Diagnostic avant une reprise de conversation
+
+`swarm --json mission recovery TRAVAIL TACHE [AGENT]`, sa sortie texte et
+`GET /api/v1/recovery-preview?work=TRAVAIL&task=TACHE&agent=AGENT` consultent
+désormais la frontière du dialogue. Le panneau **Avant une relance** présente
+le même diagnostic, sous **Reprise de conversation**, en lecture seule. La
+sélection explicite vise l’identité exacte conservée ; sans identifiant, le
+moteur lit la dernière tentative de la tâche, même si elle n’est plus parmi les
+200 agents récents affichés. Une tentative ancienne sélectionnée est signalée.
+
+L’objet `dialogue` de cet aperçu contient `boundary`, `checks`,
+`recommended_path`, `recommendation`, `observed_at`, `facts_sha256`,
+`decision_owner`, `decision_recorded` et `resume_supported`. Chaque contrôle a
+un code, un statut `pass`, `fail` ou `unknown`, et une explication. Le responsable
+ou l’opérateur local reçoit ce diagnostic ; il n’enregistre aucune décision.
+
+| Parcours recommandé | Signification |
+| --- | --- |
+| `select_latest_attempt` | La sélection ne correspond pas à la dernière tentative courante. |
+| `wait_for_stop` | La fin du processus fournisseur n’est pas confirmée. |
+| `inspect_history` | Aucun checkpoint exploitable ; gardes et effets historiques restent à qualifier. |
+| `reconcile_effects` | Le dernier tour n’a pas une frontière de fin confirmée ; vérifier les effets avant tout rejeu. |
+| `review_current_contract` | Une garde, la configuration, les plafonds, la mémoire ou l’attente fournisseur demandent un nouvel examen. |
+| `review_boundary` | Frontière confirmée à examiner ; précontrôle et décision restent inconnus. |
+
+Les contrôles relisent la configuration du programme, du modèle et des noms
+d’environnement autorisés, la compatibilité des plafonds historiques avec les
+réglages actuels, les sources mémoire sélectionnées et l’attente fournisseur
+enregistrée. Ils ne lancent ni fournisseur ni précontrôle. La présence d’un
+exécutable et une configuration identique ne prouvent ni l’authentification, ni
+les permissions effectives, ni la disponibilité de la session. Accès, réservations,
+contrat complet de départ et décision fraîche restent à vérifier au lancement.
+
+`facts_sha256` attribue les faits exposés, sans inclure l’heure de consultation ;
+ce n’est pas un jeton d’approbation et aucune mutation ne l’accepte comme tel.
+Une erreur de lecture du checkpoint non vide est refusée, sans résultat vide
+réussi. Une configuration non consultable reste inconnue. L’absence de session
+web est refusée selon le contrat existant, et une tentative d’un autre travail
+ou d’une autre tâche n’est pas exposée.
+
+`decision_recorded` et `resume_supported` restent `false`, y compris pour
+`review_boundary`. Les opérations existantes de nouvelle tentative et de reprise
+corrective gardent leurs propres règles ; elles ne restaurent pas implicitement
+la conversation. L’aperçu ne crée aucun agent, réservation, remise à zéro ou
+acceptation. Les contrôles de démarrage devront être refaits sur des preuves
+fraîches par une future opération explicite de restauration.

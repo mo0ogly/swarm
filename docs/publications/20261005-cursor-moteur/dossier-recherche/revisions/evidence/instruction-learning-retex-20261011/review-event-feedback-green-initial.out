@@ -1,0 +1,6 @@
+--- FAIL: TestPlanningReviewRetryRestrictionTracksWholeReducedBatch (0.56s)
+    planning_historical_delivery_test.go:260: sizes 164551 168167 20336 parts 1
+    planning_historical_delivery_test.go:288: projection repaired review or erased consumption
+FAIL
+FAIL	swarm.local/companion/internal/engine	6.068s
+FAIL

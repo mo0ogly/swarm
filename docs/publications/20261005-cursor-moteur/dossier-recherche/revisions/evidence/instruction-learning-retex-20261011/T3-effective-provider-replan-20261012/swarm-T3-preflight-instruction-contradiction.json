@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-12T11:00:58.256070+00:00",
+  "owner": "root supervisor; operator supplies correction before next worker reservation",
+  "observed_contract": "scope-preview uses unpaid preflight of an immutable current result; active production cannot supply that inventory",
+  "predicates": [
+    "task.status == blocked",
+    "no current independent review or batch resume",
+    "last production ended",
+    "attributed immutable managed result and checkpoint exist"
+  ],
+  "source_inputs": [
+    {
+      "path": "internal/engine/managed_scope.go",
+      "sha256": "a610a939cb03d4cea51f4ff7eb593a2e18dd0313c780f7f1a8a40c97e178017d"
+    },
+    {
+      "path": "internal/engine/managed_review_preflight_retry.go",
+      "sha256": "4a1ccc613bc2e211b1c9ab91c9748c04880cf9c341df4a245e2e8a01f37b8f07"
+    }
+  ],
+  "correction": "Estimate local diff during production; preserve complete code/report and original evidence. After immutable size refusal, owner requests scope-preview and chooses a covering review-plan before paid review. Do not wait for unavailable preflight inventory as a condition to produce the result.",
+  "limits": "Source contract observation; no native result or acceptance fabricated. Corrective instruction prepared, worker reception/effect pending."
+}

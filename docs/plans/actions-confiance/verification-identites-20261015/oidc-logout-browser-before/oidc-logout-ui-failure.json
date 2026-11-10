@@ -1,0 +1,10 @@
+{
+  "message": "Missing expected rejection: an earlier login must not recreate a revoked session",
+  "stack": "AssertionError [ERR_ASSERTION]: Missing expected rejection: an earlier login must not recreate a revoked session\n    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_oidc_logout_ui.cjs:27:343",
+  "checks": [
+    "fr: provider logout policy previews without network or mutation and persists exact values",
+    "fr: saved freshness and unlimited retention reopen with callback address, focus and no mobile overflow"
+  ],
+  "errors": [],
+  "root": "/tmp/swarm-oidc-logout-ui-nkcQqx"
+}

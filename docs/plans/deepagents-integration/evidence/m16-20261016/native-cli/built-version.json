@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "binary": {
+    "version": "devel",
+    "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+    "modified": true,
+    "build_date": null,
+    "provenance": "go_build_info"
+  },
+  "diagnostic": {
+    "installed_cli": {
+      "available": true,
+      "version": "devel",
+      "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+      "modified": true,
+      "provenance": "go_build_info"
+    },
+    "active_server": {
+      "available": false,
+      "version": null,
+      "commit": null,
+      "modified": null,
+      "provenance": "runtime_health",
+      "hint": "Fournissez l’URL de session du serveur actif avec --server."
+    },
+    "candidate": {
+      "available": false,
+      "version": null,
+      "commit": null,
+      "modified": null,
+      "provenance": "git",
+      "hint": "Vérifiez --root et que le candidat est une copie Git lisible."
+    },
+    "state": "unknown",
+    "differences": [],
+    "next_step": "Rendez accessibles les identités manquantes (active_server, candidate) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+  }
+}

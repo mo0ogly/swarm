@@ -1,0 +1,16 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityRegistryAtomicWriteRequiresSyncableDirectory$",
+    "-count=1",
+    "-timeout",
+    "30s"
+  ],
+  "start": "2026-10-17T07:05:11.463066+00:00",
+  "end": "2026-10-17T07:05:42.689330+00:00",
+  "exit_code": 0
+}

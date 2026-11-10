@@ -5,6 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from controlled_autonomy_campaign import assess, cli, prepare, run, LIMITS
 from controlled_business_fault import CHECK
@@ -68,9 +69,9 @@ class OracleTests(unittest.TestCase):
 class PublicCampaignTests(unittest.TestCase):
     def test_public_campaign_with_deterministic_provider(self):
         # Runs actual Swarm processes with a deterministic provider, never a model.
-        with tempfile.TemporaryDirectory(prefix='swarm-campaign-test-') as tmp:
+        with tempfile.TemporaryDirectory(prefix='swarm-campaign-test-', dir=fixture_area()) as tmp:
             base=Path(tmp);provider=base/'claude';review=base/'review.py'
-            source=Path(__file__).resolve().parent.parent/'managed_review_test.go'
+            source=Path(__file__).resolve().parent.parent/'internal/engine/managed_review_test.go'
             fixture=source.read_text().split('const managedReviewerFixture = `',1)[1].split('\n`',1)[0]
             review.write_text(fixture)
             provider.write_text('#!'+sys.executable+'\n'+r'''

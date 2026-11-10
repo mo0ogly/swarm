@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-12T07:02:55.015828+00:00",
+  "candidate_digest": "6fb31492cf25976e3f4ab9ed187b7903defd1d95ee7224813cc28f3f36c11c0a",
+  "paths_transferred": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_review_fragment_defect.go",
+    "internal/engine/managed_review_fragment_defect_citation.go",
+    "internal/engine/managed_review_fragment_defect_citation_test.go",
+    "internal/engine/managed_review_fragment_plan.go",
+    "internal/engine/managed_review_fragment_prompt.go",
+    "internal/engine/managed_review_fragment_reply.go",
+    "internal/engine/managed_review_fragment_reuse.go",
+    "internal/engine/managed_review_fragment_runtime_test.go",
+    "internal/engine/managed_review_fragment_tokens.go",
+    "internal/engine/managed_review_method_restart.go",
+    "internal/engine/testdata/defect-citation-native-first-reply.json",
+    "internal/engine/testdata/defect-citation-native-packet.json",
+    "internal/engine/testdata/defect-citation-native-second-reply.json"
+  ],
+  "source_inputs_verified": 1213,
+  "preimages_verified": true,
+  "backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-primary-preimages",
+  "operator_patch": "defect-citation-contract-recovery-20261012.patch",
+  "patch_sha256": "fe449d881d943b5bc059761a6a7282814db5334e4b0a8d6ba2423f28a45ba481",
+  "runtime": "24 unchanged; installation pending"
+}

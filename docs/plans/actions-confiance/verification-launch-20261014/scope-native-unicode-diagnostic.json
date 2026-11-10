@@ -1,0 +1,36 @@
+{
+  "revision": 333,
+  "review": "review-b03fcdf22b23d6817513711b",
+  "packet": 1,
+  "original_sha256": "7d71c40d5302d596bba8d1a735c94f9716262d200c35d2fcf5eb79f8efd30f41",
+  "lengths": [
+    {
+      "artifact": "0",
+      "need_index": 0,
+      "codepoints": 223,
+      "utf8_bytes": 231,
+      "duplicate": false
+    },
+    {
+      "artifact": "12",
+      "need_index": 0,
+      "codepoints": 240,
+      "utf8_bytes": 243,
+      "duplicate": false
+    },
+    {
+      "artifact": "13",
+      "need_index": 0,
+      "codepoints": 190,
+      "utf8_bytes": 194,
+      "duplicate": false
+    },
+    {
+      "artifact": "14",
+      "need_index": 0,
+      "codepoints": 210,
+      "utf8_bytes": 216,
+      "duplicate": false
+    }
+  ]
+}

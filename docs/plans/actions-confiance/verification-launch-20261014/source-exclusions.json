@@ -1,0 +1,14 @@
+{
+  "internal/engine/planning.go": {
+    "head_sha256": "540ba68838db0666d9c2897924265bea4c9fed556ad5e5bea03c46652cffe86b",
+    "working_sha256": "820c802cb94aefd460cae03de307bc3e3af9e2bcb97ccac4cbd90ff95cd6aea9"
+  },
+  "internal/engine/recovered_result.go": {
+    "head_sha256": "a3935f8f83445aff256aba58899baf478ee284ff8e5fcc1423ea15f3792cd436",
+    "working_sha256": "979825c4fb555065cbbdd0e85398a94a21adb0e0ce87683e62b19dc916abe573"
+  },
+  "internal/engine/recovered_result_evidence_test.go": {
+    "head_sha256": "ca6c03b7d3b46e29f1b9bdcabf9ead5770ae69d62ec13db2ea3341a1c3453954",
+    "working_sha256": "59edc706e4b666b12758302a67c2d3b438eec81f960face35f933b5cd2aec34d"
+  }
+}

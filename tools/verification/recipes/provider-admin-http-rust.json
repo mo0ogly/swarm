@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "provider-admin-http-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/provider_administration.rs",
+    "rust/crates/swarm-engine/src/provider_model_route.rs",
+    "rust/crates/swarm-engine/src/provider_policy_import.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/assistant_provider.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/provider_admin.rs",
+    "rust/crates/swarm-web/src/service/observation.rs",
+    "tests/rust_provider_admin_http.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_provider_policy_http.py",
+    "docs/architecture/NATIVE-PROVIDER-ADMIN.md",
+    "docs/en/NATIVE-PROVIDER-ADMIN.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "protected-cli-provider-inventory-and-original-observation-causes",
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROVIDER_ADMIN_HTTP_VERIFIED"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\nout=Path(tempfile.mkdtemp(prefix='provider-admin-http-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_provider_admin_http.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(out)],check=True)\nr=json.loads((out/'result.json').read_bytes());assert r['status']=='PASS' and len(r['checks'])==5 and r['observation_causes_retained'] and not r['provider_started'] and not r['mission_accepted']\nprint('PROVIDER_ADMIN_HTTP_VERIFIED '+str(out))"
+      ]
+    }
+  ]
+}

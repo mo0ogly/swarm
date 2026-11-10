@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "paea-linux-identity-channel",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-linux-identity-channel/**/*",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-linux-identity-channel.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "kernel-message-witnesses-refusals-and-handle-custody",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--test",
+        "channel",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "same_process_packet_has_kernel_credentials_and_explicit_close ... ok",
+        "wrong_socket_and_non_socket_refuse_then_valid_recovers ... ok",
+        "empty_buffer_refuses_without_consuming_queued_packet ... ok",
+        "truncated_payload_and_empty_packet_close_handles_before_recovery ... ok",
+        "unexpected_rights_and_control_truncation_do_not_leak_fds ... ok",
+        "option_alias_change_refuses_without_dequeue_then_reconfigures ... ok",
+        "forged_unprivileged_credentials_refuse_before_legitimate_recovery ... ok",
+        "child_sender_differs_from_connection_creator_and_exit_refuses_namespace ... ok",
+        "test result: ok. 9 passed",
+        "nonblocking_empty_and_peer_shutdown_keep_causes_and_descriptor_owner ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "linux-ffi-private-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    }
+  ]
+}

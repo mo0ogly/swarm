@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "mission-insights-rust",
+  "inputs": [
+    "rust/crates/swarm-cli/src/mission.rs",
+    "rust/crates/swarm-cli/src/mission_status.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "tests/rust_mission_insights.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/RUST-MIGRATION.md",
+    "docs/en/RUST-MIGRATION.md",
+    "version_history.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-insights",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='mission-insights-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_mission_insights.py','--binary',os.environ['SWARM_INSIGHTS_BINARY'],'--output',str(p)],check=True)\nprint('INSIGHTS_REPLAY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS insights-empty-fr-changes-exact",
+        "PASS insights-task-en-spending-exact",
+        "PASS insights-changes-recovery",
+        "PASS insights-spending-recovery",
+        "INSIGHTS_REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

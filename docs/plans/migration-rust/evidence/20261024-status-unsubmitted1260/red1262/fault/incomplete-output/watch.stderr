@@ -1,0 +1,12 @@
+{
+  "error": "agent-completion-wait-not-confirmed",
+  "failure": {
+    "causes": [
+      "agent-completion-wait-not-confirmed"
+    ],
+    "code": "agent-completion-wait-not-confirmed",
+    "message": "agent-completion-wait-not-confirmed",
+    "retryable": false
+  },
+  "schema_version": 1
+}

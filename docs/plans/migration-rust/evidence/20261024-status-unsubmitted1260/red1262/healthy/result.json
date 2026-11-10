@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "mode": "sigint",
+  "root": "/tmp/swarm-model83-_ddjlp3y",
+  "work": "w-fb9104b0010fb99e75753229",
+  "agent": "watch-2258fa20309920265b0b4ef4",
+  "public_cli": true,
+  "independent_worker_survived": true,
+  "actual_provider_entry": true,
+  "supervisor_waitpid_exit": 0,
+  "completion_receipt": {
+    "file": "native-completion-5567eb153c602366f0a91afeeb58d1799023713e727fa18560afc4fae824acf4.json",
+    "sha256": "e75f68c86284778e2a3c275152d1b85d1ec32a396ca451726438eeca5dfbd064",
+    "agent_id": "watch-2258fa20309920265b0b4ef4",
+    "work_id": "w-fb9104b0010fb99e75753229",
+    "reservation": [
+      "w-fb9104b0010fb99e75753229",
+      1.0,
+      "estimated"
+    ],
+    "public_details_equal": true,
+    "required_native_facts_verified": true
+  },
+  "watch_events": [
+    {
+      "event": "mission-watch-started",
+      "generation": 1,
+      "mission_complete": false,
+      "observation_is_permission": false,
+      "poll_interval_ms": "2000",
+      "schema_version": 1,
+      "settings_revision": "1",
+      "work": "w-fb9104b0010fb99e75753229"
+    },
+    {
+      "agent_id": "watch-2258fa20309920265b0b4ef4",
+      "event": "mission-worker-started",
+      "mission_complete": false,
+      "observation_is_permission": false,
+      "provider_start_verified": false,
+      "schema_version": 1,
+      "session_state": "pending",
+      "supervisor_pid": 3388480,
+      "work": "w-fb9104b0010fb99e75753229"
+    },
+    {
+      "children_still_running": 1,
+      "event": "mission-watch-stopped",
+      "lease_released": true,
+      "mission_complete": false,
+      "reason": "sigint",
+      "root_closed": true,
+      "schema_version": 1,
+      "work": "w-fb9104b0010fb99e75753229"
+    }
+  ],
+  "task_accepted": false,
+  "paid_provider": false,
+  "installed": false,
+  "global_watchdog": null,
+  "queued_preexisting_public_restart": "NOT TESTED; prior engine continuation evidence remains separate",
+  "status_legacy_json_parity": false,
+  "native_status_extension": true,
+  "original_lease": {
+    "conductor": "mission-fa06668c46933408304cf946",
+    "stopped_at": ""
+  }
+}

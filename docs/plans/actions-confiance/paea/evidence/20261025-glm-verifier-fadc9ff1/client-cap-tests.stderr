@@ -1,0 +1,23 @@
+test_atomic_write_failure_preserves_original_and_recovery (test_call.DirectCall.test_atomic_write_failure_preserves_original_and_recovery)
+Injected ENOSPC preserves a valid original and permits later replacement. ... ok
+test_complete_response_context_hashes_and_private_evidence (test_call.DirectCall.test_complete_response_context_hashes_and_private_evidence)
+Check real request/context, usage and private artifact modes on success. ... ok
+test_empty_truncated_and_malformed_refuse_then_recover (test_call.DirectCall.test_empty_truncated_and_malformed_refuse_then_recover)
+Keep invalid responses incomplete, then verify a fresh successful call. ... ok
+test_existing_evidence_and_secret_prompt_refuse_before_send (test_call.DirectCall.test_existing_evidence_and_secret_prompt_refuse_before_send)
+Preserve prior evidence and prevent known prompt-secret transmission. ... ok
+test_explicit_reasoning_effort_forwarded_without_default (test_call.DirectCall.test_explicit_reasoning_effort_forwarded_without_default)
+Keep provider defaults untouched unless effort is explicitly selected. ... ok
+test_http_refusal_retains_redacted_cause_and_does_not_retry (test_call.DirectCall.test_http_refusal_retains_redacted_cause_and_does_not_retry)
+Observe one request per refusal, a safe cause and explicit recovery. ... ok
+test_no_client_output_cap_by_default_and_explicit_cap_remains_optional (test_call.DirectCall.test_no_client_output_cap_by_default_and_explicit_cap_remains_optional)
+Omitted allocation sends no max_tokens; explicit bounds validate before HTTP. ... ok
+test_redirect_does_not_forward_credentials (test_call.DirectCall.test_redirect_does_not_forward_credentials)
+Refuse redirect after a valid control without contacting its target. ... ok
+test_response_credentials_redacted (test_call.DirectCall.test_response_credentials_redacted)
+Mask a known credential returned in model text and retained metadata. ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 6.427s
+
+OK

@@ -1,0 +1,4 @@
+=== RUN   TestFragmentRetryFeedbackDiagnosesDuplicateDefects
+--- PASS: TestFragmentRetryFeedbackDiagnosesDuplicateDefects (0.03s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.070s

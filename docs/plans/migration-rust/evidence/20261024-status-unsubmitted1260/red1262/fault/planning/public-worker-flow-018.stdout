@@ -1,0 +1,19 @@
+{
+  "work": "w-bafc8cc3dc9f29c239b9f66a",
+  "revision": 11,
+  "turns": [
+    {
+      "seq": "1",
+      "work": "w-bafc8cc3dc9f29c239b9f66a",
+      "task": "task",
+      "workspace": "/tmp/swarm-model83-7zznxmxs/watch-worker",
+      "state": "released",
+      "agent": "watch-93fc66cd4b016e163d5fdce0",
+      "requested_at": "2026-10-24T10:08:03.095062684Z",
+      "acquired_at": "2026-10-24T10:08:03.22391052Z",
+      "released_at": "2026-10-24T10:08:05.686304922Z"
+    }
+  ],
+  "blockers": [],
+  "scope": "recorded-workspace-queue-observation-only-no-acquisition-or-launch"
+}

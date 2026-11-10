@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestMemorySummarySourceInspectionNever",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T19:54:22.469049+00:00",
+  "duration_seconds": 17.08,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "TestMemorySummarySourceInspectionNeverMigratesOldStore"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "241da08df3949ef902a59ee90bc861da46d57bb329f78fa901eaa726589154a5",
+  "real_model_calls": 0
+}

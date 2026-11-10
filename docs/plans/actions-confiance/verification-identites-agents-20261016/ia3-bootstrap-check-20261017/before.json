@@ -1,0 +1,13 @@
+{
+  "internal/engine/main.go": "648dff6e6e19516dd1b03b35ab817015b825bf40d056c05dcdbdedd84bf95151",
+  "internal/enrollmentconfig/store_linux.go": "35042fb579104287fd7a7c2cbbc452aa41c80969caf0bafa132100cd6d664bc0",
+  "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+  "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+  "INSTALL.md": "52cc4cc1d075193cb2dfb74e77fbb002e2d9131040331e24fe081b3e369606fb",
+  "docs/en/INSTALL.md": "10761b40f5ab24a0f267c34db299b1e9d167b16667277725b25a1c9309f39569",
+  "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "2926baded54ca6093ba6a7e55a9bc76098e101fce15ff15427e59bc63977c65f",
+  "docs/en/AGENT-IDENTITY-CONTRACT.md": "1b59af269914943e049d33ccce246d8152ce48a8c70600159008821704297527",
+  "docs/plans/actions-confiance/identites-agents-replan.md": "f531a37659a7a3cd209b8e667bfd6542b155c4b39dbb399df8a889b4aa017435",
+  "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md": "2beaa0e3f84f67fff824bb8c6c5deed1ace7fe09f240a69a71479e1087586644",
+  "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md": "8f81063720a255bc96f50901558dffcc05afa2645ae36925fb1d2dc5475c5c74"
+}

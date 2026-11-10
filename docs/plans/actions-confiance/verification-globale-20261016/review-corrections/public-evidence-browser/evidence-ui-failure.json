@@ -1,0 +1,13 @@
+{
+  "message": "Expected values to be strictly deep-equal:\n+ actual - expected\n... Skipped lines\n\n  {\n    evidence: [\n      {\n        actor: 'admin',\n        at: '2026-10-16T07:15:36.877684309Z',\n...\n            canonical_parameters: {\n+             amount_minor: 9007199254740992,\n-             amount_minor: [Object: null prototype] {\n-               rawJSON: '9007199254740993'\n-             },\n              beneficiary: 'ACME',\n              currency: 'EUR'\n            },\n            connector_id: 'local-ledger-simulation',\n            connector_version: 1,\n...\n            action_id: 'act-896f8e8e4563df42c877',\n+           amount_minor: 9007199254740992,\n-           amount_minor: [Object: null prototype] {\n-             rawJSON: '9007199254740993'\n-           },\n            beneficiary: 'ACME',\n            committed_at: '2026-10-16T07:15:37.299075157Z',\n            content_digest: '896f8e8e4563df42c877900e67a3dfad3004f9831dc46d14a00f49cb8648984c',\n            currency: 'EUR',\n            idempotency_key: 'large-proof',\n",
+  "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n... Skipped lines\n\n  {\n    evidence: [\n      {\n        actor: 'admin',\n        at: '2026-10-16T07:15:36.877684309Z',\n...\n            canonical_parameters: {\n+             amount_minor: 9007199254740992,\n-             amount_minor: [Object: null prototype] {\n-               rawJSON: '9007199254740993'\n-             },\n              beneficiary: 'ACME',\n              currency: 'EUR'\n            },\n            connector_id: 'local-ledger-simulation',\n            connector_version: 1,\n...\n            action_id: 'act-896f8e8e4563df42c877',\n+           amount_minor: 9007199254740992,\n-           amount_minor: [Object: null prototype] {\n-             rawJSON: '9007199254740993'\n-           },\n            beneficiary: 'ACME',\n            committed_at: '2026-10-16T07:15:37.299075157Z',\n            content_digest: '896f8e8e4563df42c877900e67a3dfad3004f9831dc46d14a00f49cb8648984c',\n            currency: 'EUR',\n            idempotency_key: 'large-proof',\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence_ui.cjs:15:984",
+  "checks": [
+    "fr: Admin preview leaves state unchanged; policy persists and reopens with keyboard focus",
+    "fr: proposer cannot activate exact key; translated refusal leaves state unchanged",
+    "fr: independent I3 activation produces public anchor bound to exact export and key"
+  ],
+  "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+  ],
+  "root": "/tmp/swarm-evidence-ui-3ICels"
+}

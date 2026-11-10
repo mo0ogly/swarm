@@ -1,0 +1,5 @@
+{"type":"thread.started","thread_id":"01a14378-fee1-78b2-bda0-73bd3123c17e"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"{\"decision\":\"rebuild_evidence\",\"actions\":[\"block_admission\",\"request_fresh_evidence\"],\"admission\":\"blocked\",\"acceptance\":\"unchanged\",\"reason\":\"L’archive et son empreinte sont indisponibles, donc l’original ne peut être vérifié ni restauré. La cible actuelle a une empreinte différente de celle requise ; l’acceptation historique ne vaut pas pour cet état. L’admission reste bloquée jusqu’à l’obtention d’une preuve fraîche portant sur la cible actuelle.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":16895,"cached_input_tokens":5888,"cache_write_input_tokens":0,"output_tokens":196,"reasoning_output_tokens":78}}

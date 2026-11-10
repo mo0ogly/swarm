@@ -1,0 +1,6 @@
+{
+  "binary": "/tmp/swarm-m14-release-bin-uqzy339n/swarm",
+  "binary_sha256": "bfcfb2fc0323bf2f59ae4ef2d153964c831986dc11e40cf64049adb73761a34e",
+  "built_source_manifest": "build-release-inputs.json",
+  "script_sha256": "5e6c2c5c8cfaaf7fbea8de26e6dd4b0abe3c34acc74fb3696798da3934a46be4"
+}

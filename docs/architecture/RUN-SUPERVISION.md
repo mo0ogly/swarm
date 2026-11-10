@@ -1,0 +1,320 @@
+# Conduite des agents : décision IA et observation déterministe
+
+Décision utilisateur du 11 octobre 2026, après l’interruption de T2 Cursor.
+Le superviseur propriétaire juge l’avancement utile et décide de la conduite.
+Le moteur mesure, transmet, vérifie les droits et applique une décision attribuée.
+Une durée écoulée ne prouve ni achèvement, ni absence de progrès, ni acceptation.
+
+## Communication pendant la reprise
+
+L’utilisateur interdit explicitement les attentes silencieuses prolongées, les
+heures de blocage sans prise en charge et les annonces « corrigé » sans résultat
+vérifié. Pendant le travail interactif actif, Codex donne au moins toutes les
+60 secondes un point utile : état observé, cause ou incertitude, action et preuve
+encore attendue. Les temps de réponse longs sont aussi interdits : réponse brève
+dès réception, étapes bornées et sorties d’outils concises, sans attendre la fin
+d’une analyse ou d’un contrôle. Une reconnexion affichée ne démontre pas sa cause.
+Une lenteur anormale déclenche `replan` sans relance humaine.
+Une reformulation ou un budget augmenté ne suffit pas à répéter un échec.
+
+Cette obligation figure dans les consignes personnelles, `AGENTS.md` et le
+contrat commun embarqué. Un rôle natif sans outils conserve son JSON imposé et
+remet l’incident à son superviseur ; il ne doit pas ajouter une conversation à
+son protocole. L’assemblage des contextes doit être vérifié, puis le binaire qui
+les remet identifié. La règle, sa présence dans un contexte et un réveil programmé
+ne prouvent ni réparation ni supervision effective. Distinguer les tests locaux,
+l’effet observé du parcours et l’acceptation globale ; les critères encore en
+échec ou non vérifiés restent ouverts.
+
+## Incident et choix
+
+La tentative `a-a349f9134d355713576b7166`, agent
+`auto-f2abbcfe6bed66fd1a5e`, a été interrompue le 11 octobre à
+08:36:27 UTC, avec code 143 et `stop_kind: delai`. Elle exécutait encore un test ;
+78 appels et 78 résultats étaient observés pour un plafond de 80 appels.
+Le délai total de 1 800 secondes a provoqué l’arrêt déterministe. Le travail
+conservé dans un stash n’est ni perdu ni accepté ; son existence ne prouve pas
+que les critères sont satisfaits. Les originaux restent conservés.
+
+Relever ce délai repousserait le même défaut. Désactiver indistinctement les
+limites retirerait aussi des contraintes de dépense. La correction retenue
+sépare les durées observées et les autorisations : les durées alimentent la
+décision du responsable ; les budgets autorisés restent opposables.
+
+Les deux parcours de production, automatisé et terminal/dialogue, perdent leur
+arrêt automatique par durée. L’attente d’un outil structuré devient également
+une observation. Les délais propres aux commandes de contrôle, aux appels
+structurés de préparation/revue et aux baux restent des mécanismes distincts ;
+ils ne sont pas une décision sur l’achèvement de la tâche.
+
+## Répartition des responsabilités
+
+| Responsable | Fait | Ne peut pas déduire du seul chronomètre |
+| --- | --- | --- |
+| Producteur | Exécute son périmètre, conserve ses preuves et remet son résultat | Qu’un critère est vérifié ou qu’une autre tâche lui appartient |
+| Sous-superviseur | Analyse les observations de ses propres tâches ; décide continuer ou arrêter ; transmet les dépendances hors périmètre | Une acceptation globale ou un budget supplémentaire |
+| Superviseur racine | Conduit l’objectif global et les arbitrages de ses tâches ; exploite les remises des enfants | Que chaque producteur a fini parce qu’un délai est dépassé |
+| Moteur Go | Mesure, attribue les événements, contrôle la décision et confirme la fin réelle du processus | Progrès utile, blocage sémantique ou tâche terminée |
+| Vérificateur indépendant | Examine le candidat et ses preuves dans un contexte distinct | La validité du candidat à partir d’un processus terminé |
+
+L’IA peut conclure que le travail est fini et proposer la clôture. Le moteur
+revérifie alors les preuves et transitions applicables. Ce contrôle d’intégrité
+n’est pas un jugement autonome du moteur sur le travail restant.
+
+```mermaid
+flowchart TD
+    W[Producteur actif et preuves observables] --> O[Moteur : durée, outil et compteurs]
+    O --> E[Événement run_observation de la tentative]
+    E --> S[Superviseur propriétaire : diagnostic]
+    S --> C[Proposition continue-run]
+    S --> A[Proposition stop-run avec motif]
+    C --> G{Droits, bail, entrée et tentative valides ?}
+    A --> G
+    G -->|non| R[Refus conservé ; aucun arrêt attribué]
+    G -->|oui : continuer| W
+    G -->|oui : arrêter| P[Demande d’arrêt du processus possédé]
+    P --> F[Fin réelle confirmée et compteurs conservés]
+    F --> D[Correction ou remise dans le parcours existant]
+    D --> V[Contrôles et revue du même candidat]
+    V --> K[Acceptation si preuves fraîches et critères satisfaits]
+```
+
+## Contrat réellement implémenté
+
+Les seuils existants restent configurables et figés par lancement :
+`timeout_seconds` dans le profil de lancement, `tool_seconds` et
+`silence_seconds` dans Admin, avec leur héritage existant. Le nom JSON historique
+`timeout_seconds` est conservé ; il désigne désormais un seuil d’observation
+pour ces processus de production. Aucun délai de remplacement n’est ajouté.
+L’UX FR/EN précise cette sémantique.
+
+`agent.progress` expose `elapsed_seconds`, `time_threshold_exceeded`,
+`tool_wait_seconds` et `tool_time_threshold_exceeded`, avec les compteurs existants.
+Le silence observé conserve une vitalité fournisseur `unknown` ; aucune proportion
+d’avancement n’est inventée. Le terminal natif expose la durée, sans inventer les
+appels d’outils qu’il ne voit pas.
+
+Pour une tâche de plan actif, `run_observation` est enregistré dans la transaction
+travail/événement et adressé à son `scope_id`. Il contient agent, tentative,
+déclencheur (`elapsed_time`, `tool_wait`, `output_silence`, `infrastructure` ou
+`tool_failure`), seuil et photographie des compteurs. Un seuil temporel est
+enregistré une seule fois par tentative. Les erreurs d'environnement et les
+autres erreurs d'outils sont remises une fois par nouveau compteur de leur
+catégorie ; une lecture répétée du même état ne crée aucun nouvel événement.
+Les compteurs continuent après le seuil. Le contexte réellement remis au
+planificateur et le schéma strict contiennent ces observations et opérations.
+Une production active ne bloque plus l’activation du responsable ; l’attente du
+verdict du contrôleur après la fin de production reste protégée.
+
+Les propositions `continue-run` et `stop-run` passent par `planning decide`,
+identiquement en CLI et API. Elles utilisent `id` de tâche et `next` motivé ;
+les autres champs de l’opération sont vides ou zéro. Elles exigent :
+
+- propriétaire exact, révision, bail et génération actuels ;
+- événement courant explicitement traité et effectivement remis au responsable ;
+- tâche en cours, même agent/tentative et processus encore actif ;
+- budgets de décisions et d’activations existants, mission disponible.
+
+Le motif et la décision sont persistés avec l’événement. `continue-run` conserve
+le processus et les compteurs ; il ne renouvelle aucun budget. `stop-run` est lu
+par le superviseur technique du processus, avec `stop_kind: planning`, puis la
+fin réelle est confirmée avant libération. La course arrêt/résultat tient compte
+d’une décision déjà persistée. Une décision périmée ne contrôle pas une tentative
+suivante ; une répétition identique de la requête ne dépense pas une autre décision.
+
+Les contraintes d’appels d’outils, répétitions et erreurs, quotas fournisseur,
+intégrité du stockage, arrêts humains, permissions et tentatives restent en place.
+Cette correction porte sur les coupures de durée ; elle ne prétend pas confier
+tous ces garde-fous à une IA. Une correction du code utilise la reprise existante
+après arrêt confirmé ; `next` n’est pas un canal de commande arbitraire au worker.
+
+## Plusieurs agents, propriétaires et indisponibilité
+
+```mermaid
+sequenceDiagram
+    participant A as Producteur A
+    participant B as Producteur B
+    participant M as Moteur et boîte de réception
+    participant S as Sous-superviseur de A
+    participant R as Racine propriétaire de B
+    A->>M: Observation de durée, tentative A
+    B->>M: Observation d’outil, tentative B
+    M->>S: Événement du périmètre A avec compteurs
+    M->>R: Événement du périmètre B avec compteurs
+    par Décision sur A
+        S->>M: continue-run, événement A et bail courant
+        M-->>A: Processus conservé sans budget ajouté
+    and Décision sur B
+        R->>M: stop-run, événement B et bail courant
+        M->>B: Arrêt demandé
+        B-->>M: Fin effective du processus
+    end
+    M-->>R: Résultat de B à diagnostiquer ou examiner
+```
+
+Ce diagramme décrit les frontières du contrat, pas une preuve de deux appels IA
+simultanés dans la mission Cursor. Son plan observé ne possède encore qu’un
+périmètre racine ; l’exercice de la hiérarchie est confié à T3.
+
+Si le responsable est en panne, sans budget, en pause ou sans fournisseur, aucune
+nouvelle décision IA n’est inventée et aucun nouveau budget n’est accordé. Le
+signal demeure visible et en attente ; le temps seul ne tue pas le producteur.
+L’arrêt opérateur reste disponible. Pour une exécution sans plan, les observations
+figurent dans l’état public de l’agent ; aucun superviseur IA fictif n’est créé.
+Un seuil inchangé ne provoque pas une série d’appels payants. Une autre observation
+courante ou un retour alimente le tour suivant ; une conduite continue avec suivi
+périodique renouvelé serait une politique explicite supplémentaire.
+
+## Vérification et portée
+
+Les tests isolés couvrent : processus et terminal actifs après le seuil, outil
+encore en cours, remise au propriétaire racine/enfant, décision CLI, arrêt
+confirmé, continuation, doublon, réouverture, contrôle d’identité et refus hors
+périmètre/inactif/non remis. La reproduction sur les trois sources originales
+échoue sur les anciennes coupures. Les tests utilisent un fournisseur double ;
+ils ne constituent ni une décision autonome avec IA réelle ni l’acceptation de T2.
+
+Les reçus exacts et l’état d’installation sont tenus dans la
+[note de recherche datée](../publications/20261005-cursor-moteur/dossier-recherche/revisions/20261011-run-supervision.md).
+Cette documentation oriente les lots suivants ; elle ne remplace pas leurs preuves.
+Le contrat complète [le protocole IA/moteur](AGENT-ENGINE-PROTOCOL.md),
+[la reprise autorécursive](AUTORECURSIVE-RECOVERY.md) et
+[le parallélisme](AGENT-PARALLELISM.md).
+
+## Valeurs Admin effectivement reçues au lancement
+
+Les seuils `tool_seconds` et `silence_seconds` explicitement enregistrés dans
+Admin remplacent les valeurs d’observation par défaut du fournisseur et celles
+de la tentative précédente pour un nouveau départ. Un délai explicite plus court
+dans la requête de lancement reste conservé. Le moteur relit ces réglages dans
+la transaction de réservation : un changement pendant le préflight ne fige pas
+un ancien seuil. Les valeurs et les directives de commande sont alors gelées
+dans l’agent réellement créé ; modifier Admin ensuite ne réécrit pas sa session.
+
+Les plafonds d’appels, d’erreurs, de répétitions, de plan et de reprise restent
+restrictifs. Une augmentation de seuil temporel ne leur accorde aucun budget et
+ne modifie aucune limite de compte du fournisseur. L’absence de valeur Admin
+explicite conserve l’héritage et les plafonds historiques. Ce choix corrige le
+cas mesuré où Admin indiquait900s mais le nouveau prompt restait limité à300s.
+
+## Incident d’infrastructure pendant une production
+
+Les erreurs ordinaires d'outil, de configuration ou de contrôle sont elles aussi
+remises au propriétaire exact par `tool_failure` pendant la production. Elles
+conservent les plafonds existants. Le responsable reçoit le diagnostic attribué
+et doit diagnostiquer, corriger ou transmettre, puis vérifier l'effet avant reprise.
+La classification technique n'est pas une décision métier ni une acceptation.
+
+La classification examine la sortie originale avant sa réduction. Les traces
+bornées conservent le début et la fin, afin qu'une longue pile d'appels ne masque
+pas sa cause finale. Chaque catégorie garde au plus trois traces, dont la première
+et la plus récente ; les journaux originaux restent distincts. Les données
+potentiellement sensibles sont masquées dans cette projection. Le diagnostic
+reste une observation fondée sur les événements visibles du fournisseur.
+
+Les échecs d’environnement reconnus par le diagnostic structuré sont conservés
+avec leurs compteurs et traces. Ils ne sont plus imputés au compteur d’erreurs
+consécutives du worker ni au plafond d’échecs identiques : un outil empêché de
+démarrer ne prouve pas une faute du code produit. Tant que cet échec persiste,
+la répétition d’une même commande est un incident à conduire ; elle ne remplace
+pas une décision de fin. Une commande réussie ou un échec ordinaire rétablit le
+comportement habituel des répétitions. Le plafond d’appels autorisés, les attentes
+fournisseur, l’intégrité du stockage et les arrêts humains restent opposables.
+
+Pour une tâche planifiée, le moteur remet un `run_observation` de déclencheur
+`infrastructure` au propriétaire du périmètre pendant que le processus est actif.
+L’observation capture le diagnostic attribué, l’agent, la tentative et les
+compteurs. Chaque nouveau constat environnemental est remis une seule fois ;
+un échec d’outil indépendant ne remet pas un ancien incident. Le responsable
+utilise `continue-run` ou `stop-run`, avec la raison et les preuves effectivement
+reçues. Le moteur vérifie les droits et la fraîcheur, puis confirme la fin réelle
+s’il applique un arrêt. Les tâches indépendantes peuvent continuer. Pour un
+processus sans planificateur, le diagnostic reste disponible et les budgets
+s’appliquent ; cette correction ne crée pas de superviseur implicite.
+
+L’UX affiche l’incident d’environnement et la décision attendue avec un vocabulaire
+fonctionnel ; les traces techniques se déplient dans le diagnostic et restent
+accessibles dans la console. Ne pas afficher « reprise terminée » avant contrôle
+observé, ni transformer un problème persistant en succès par une nouvelle étiquette.
+
+```mermaid
+sequenceDiagram
+    participant W as Worker actif
+    participant M as Moteur
+    participant S as Sous superviseur ou racine proprietaire
+    participant C as Console technique
+    W->>M: Echec observable avant execution de la commande
+    M->>M: Classer environnement, conserver compteurs et traces
+    M->>S: Incident attribue pendant la production
+    M->>C: Details techniques consultables
+    S->>M: Continuer ou arreter avec diagnostic et condition de reprise
+    M->>M: Verifier droits, reservation et tentative courante
+    M-->>W: Appliquer seulement la decision autorisee
+    M-->>S: Etat reel et resultat conserve
+```
+
+Le contrat de stockage passe à la version 30 pour préserver ces observations et
+les empreintes de budget des reprises de contrôles face aux anciens décodeurs.
+La migration publique sauvegarde le stockage privé sans réécrire les travaux,
+leurs événements ou leurs consommations. Arrêter les anciens processus avant
+cette migration ; ne jamais utiliser une mission active comme fixture de test.
+Les régressions isolées utilisent un fournisseur simulé et un vrai sous-processus,
+avec décision publique du responsable : elles ne prouvent pas une décision autonome
+par un modèle réel ni la remise en état des partages CIFS du poste.
+
+## Rust : résultat original et enveloppe des appels futurs
+
+Le parcours public `planning run` / `planning reconcile` distingue le démarrage
+d’un nouvel appel de la remise d’un original déjà attendu. Le démarrage et
+l’observation du processus appliquent toujours le tarif de réserve et le plafond
+courants. Un original réussi connu conserve sa réserve historique SQL, finie,
+non négative, estimated et sans usage réglé ; un changement de tarif ne la
+réécrit pas et n’exige pas un nouveau départ pour enregistrer son résultat.
+L’absence, le mauvais propriétaire/scope, le type invalide ou l’état incompatible
+de cette ligne restent des refus, pas un coût nul déduit par défaut.
+
+```mermaid
+flowchart LR
+  A[Original réellement attendu] --> B[Reçu, registre et propriétaire OS vérifiés]
+  B --> C[Réserve historique valide et conservée]
+  C --> D[Lease, sources et actions encore valides]
+  D --> E[Décision enregistrée une fois]
+  P[Budget courant] --> N[Nouveau départ : tarif et plafond courants]
+```
+
+`RunFence` choisit `verified_result` seulement pour un reçu original vérifié.
+Le vérificateur partage toutes les autres vérifications avec l’aperçu vivant :
+mission active, holder/génération/révision, échéance, contexte complet, workflow,
+rapports et contrat du scope. Pause, source périmée ou action interdite ne sont
+pas autorisées par la présence d’une réserve. Le résultat n’accorde aucun exec,
+remboursement ni acceptation de tâche. La ligne SQL autoritaire ne prouve pas
+un prix historique signé indépendant ni une facture fournisseur ; déclarations
+d’usage, identité d’agent authentifiée et confinement OS restent des preuves
+distinctes. Les lignes financières déjà réglées restent non portées par ce garde.
+
+Qualification161 : binaire normal04 e7c023,255sources effectives sans features
+fixture, non installé. Recette renforcée06 PASS : témoin, changement de budget et refus après pause ;
+les trois vrais cadres privés et les observations sont conservés avant PASS.
+Aperçus07, recette native08, cinq gardes financiers10 et Clippy/Rustdoc09 PASS.
+Le corps commun hors prédicat financier est identique (11). Voir le plan Rust et la recette
+`planning-result-budget` pour les preuves finales et limites, sans les assimiler
+à une acceptation globale ou à une identité humaine vérifiée.
+
+### Causes sûres des transactions enregistrées
+
+Le diagnostic natif commun expose les codes statiques de `RecordedChangeError`,
+`RecordedCommandError`, `RecordedWorkError`, `RecordedEventError` et `WorkError`.
+Une collision d’événement reste refusée ; le CLI conserve son code de frontière
+et ajoute `event_conflict` à ses causes. Les branches indépendantes `primary` et
+`cleanup` des finalisations/reprises sont parcourues, même si leurs codes SQL
+sont identiques ; une branche absente n’est pas inventée. Les codes numériques
+SQLite/OS sont conservés, sans sérialiser Display, SQL, chemin ou payload privé.
+
+Cette projection ne donne aucun droit de relance et ne prouve ni rollback ni
+réparation. La transaction et le compteur restent autoritaires. Les types inconnus
+continuent par `source()` ; la liste des types connus ne prouve pas la couverture
+universelle. Les neuf tests `native_diagnostics::tests::` couvrent les conflits,
+les doubles erreurs, les données privées et les erreurs de contexte déjà prises
+en charge ; la recette `native-recorded-diagnostics.json` vérifie aussi le refus
+réel sans mutation suivi du parcours reviewer normal. Qualification du graphe
+figé et installation utilisateur restent distinctes.

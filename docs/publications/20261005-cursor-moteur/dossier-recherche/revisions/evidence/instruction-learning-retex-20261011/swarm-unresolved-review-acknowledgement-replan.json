@@ -1,0 +1,39 @@
+{
+  "observed_at": "2026-10-11T17:50:57.093460+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "revision": 446,
+  "source_snapshot": "/tmp/swarm-native-current-replan-public.json",
+  "source_sha256": "df6462e6ce582138b4544d445d8527c4c6b4dad55d634bdacd9cbd3833c06e27",
+  "first_failed_boundary": "Protocol error remains current, but original independent_review event was acknowledged by decision27. Fresh operator_resume activation38 receives no review_failure_routing; engine marks review_retry_unavailable. Root decision28 acknowledges without recovery.",
+  "cause": "Pending event receipt was incorrectly used as the availability/lifetime of an unresolved current incident. Acknowledgement does not establish correction.",
+  "owner": "Engine context and review-retry protocol; root supervisor owns correction decision.",
+  "actual_decision": {
+    "schema_version": 1,
+    "event_id": "planning-claim-1dec4cfd285d940463918f8f-decision",
+    "expected_revision": 445,
+    "scope": "root",
+    "scope_revision": 32,
+    "holder": "planner-3bdda9fd33f7a3b2d5764378",
+    "generation": 93,
+    "input_events": [
+      "root-runtime16-installed-protocol-repair-directive-replan-20261011"
+    ],
+    "reason": "L'événement confirme l'installation des correctifs15/16 et la migration, mais ne change rien à l'état contrôlé de T2 : attempts_used=3/attempts_max=3 (tentatives épuisées), production_retry_unavailable=true et review_retry_unavailable=true dans ce scope, et review_failure_routing={} (aucune donnée de routage de revue réellement fournie pour cette activation, malgré la mention narrative « review-retry peut maintenant capturer… » dans le message opérateur). Le message d'un événement n'est pas une autorité : les champs structurés du moteur (retry unavailable, tentatives épuisées) priment. Je ne peux donc proposer ni retry de production (refusé explicitement) ni review-retry (indisponible et aucune review_failure_routing active à traiter). T3 dépend de T2 et reste bloqué en cascade ; T4..T8 ont déjà leur correctif « REPLAN » du paquet opérateur62fichiers dans leur champ next, donc rien de nouveau à y ajouter depuis cet événement. Comme ce périmètre est déjà root (aucun niveau supérieur), le seul déblocage possible est une décision/autorisation utilisateur explicite (lever le plafond de tentatives de T2 ou réactiver review-retry) ; en l'absence de cette autorisation, aucune opération n'est justifiée sur ce retour. Pas de clôture proposée : T2 reste bloqué, 6 tâches todo en aval."
+  },
+  "options": [
+    {
+      "option": "Reopen or rewrite old result acknowledgement",
+      "rejected": "Would lose original decision/history and manufacture a fresh receipt."
+    },
+    {
+      "option": "Restart producer or raise attempts",
+      "rejected": "Producer result exists intact; failure is independent reviewer protocol, not production."
+    },
+    {
+      "option": "Supply unresolved current incident separately with exact persisted delivery binding on a fresh public activation",
+      "selected": true,
+      "requirements": "Preserve original event/decision, scope/attempt/candidate/current state; pending inputs only acknowledged once; new instruction, budget and actual prompt/effect checked; no automatic unchanged retry."
+    }
+  ],
+  "next_evidence": "Isolated public ACK→fresh resume→reopen→claim/decision→real subprocess input→durable effect regression, RED then qualified fix. Native current incident must be delivered to supervisor after install."
+}

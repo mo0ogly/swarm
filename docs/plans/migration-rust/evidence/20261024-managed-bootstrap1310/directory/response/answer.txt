@@ -1,0 +1,101 @@
+## Proposal: three private helpers on `LocalDirectory`
+
+Missing evidence noted: no supplied caller, tests, or crate-internal `AgentLaunchError` type was shown; I use the existing `LocalStorageError` and assume `pub(crate)` visibility fits the file's conventions. All checks reuse `owned`/`owned_mode`, `Self::name`, and the `close_after` pattern already in `local_storage.rs`. No tests were run (no repository access).
+
+```rust
+impl LocalDirectory {
+    /// Open a child owned by this checked directory. NOFOLLOW only; no "..",
+    /// absolute or separator components are accepted beyond one simple name.
+    /// The descriptor, not any pathname, is the subsequent capability.
+    pub(crate) fn child(&self, name: &str, create: bool) -> Result<Self, LocalStorageError> {
+        Self::name(name)?;
+        if create {
+            fs::mkdirat(&self.file, name, Mode::RUSR | Mode::WUSR | Mode::XUSR)
+                .map_err(|e| LocalStorageError::new(LocalStorageOperation::CreateDirectory, e))?;
+            // mkdir is not durable until the parent directory entry is synced.
+            self.file.sync_all()
+                .map_err(|e| LocalStorageError::new(LocalStorageOperation::SyncDirectory, e))?;
+        }
+        let file: File = fs::openat(
+            &self.file,
+            name,
+            OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+            Mode::empty(),
+        )
+        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenDirectory, e))?
+        .into();
+        if let Err(error) = owned(&file, true) {
+            return close_after(Err(error), file);
+        }
+        Ok(Self { file })
+    }
+
+    /// Absolute path of a subprocess-opened directory via /proc/PID/fd/FD.
+    /// Trust boundary: the PID owner must equal ours and the link target must
+    /// re-resolve to the retained descriptor's dev/ino, else the peer closed or
+    /// swapped it. Refuses O_PATH and non-directory descriptors explicitly.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn process_path(
+        pid: nix::unistd::Pid,
+        fd: std::os::fd::RawFd,
+    ) -> Result<std::path::PathBuf, LocalStorageError> {
+        if pid.as_raw() != nix::unistd::getpid().as_raw()
+            && !nix::sys::stat::fstatat(
+                nix::fcntl::AtFlags::empty(),
+                format!("/proc/{}/fd/{}", pid.as_raw(), fd).as_str(),
+            )
+            .map(|st| st.st_uid() == nix::unistd::geteuid().as_raw())
+            .unwrap_or(false)
+        {
+            return Err(LocalStorageError::new(
+                LocalStorageOperation::OpenDirectory,
+                io::Error::new(io::ErrorKind::PermissionDenied, "subprocess owner mismatch"),
+            ));
+        }
+        let link = format!("/proc/{}/fd/{}", pid.as_raw(), fd);
+        let target = std::fs::read_link(&link)
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenDirectory, e))?;
+        // Verify the read target still denotes an owned directory; procfs magic
+        // links are only valid while the peer holds the descriptor open.
+        let check: File = fs::open(
+            &target,
+            OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+            Mode::empty(),
+        )
+        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenDirectory, e))?
+        .into();
+        close_after(owned(&check, true), check)?;
+        Ok(target)
+    }
+
+    /// Publish `from` as `to` atomically, refusing any existing target
+    /// (including symlinks) via NOREPLACE. Both names are simple children of
+    /// this directory; no cross-directory traversal is possible. A visible
+    /// rename with failed directory sync reports RenamedDurabilityUnknown and
+    /// never rolls back or removes `from`.
+    pub(crate) fn rename_child_no_replace(
+        &self,
+        from: &str,
+        to: &str,
+    ) -> Result<(), LocalStorageError> {
+        Self::name(from)?;
+        Self::name(to)?;
+        let renamed = fs::renameat_with(
+            &self.file, from, &self.file, to, fs::RenameFlags::NOREPLACE,
+        )
+        .map_err(|e| LocalStorageError::new(LocalStorageOperation::Rename, e));
+        renamed?;
+        self.file.sync_all().map_err(|e| {
+            let mut error = LocalStorageError::new(LocalStorageOperation::SyncDirectory, e);
+            error.publication = PublicationState::RenamedDurabilityUnknown;
+            error
+        })
+    }
+}
+```
+
+Notes / missing evidence:
+
+- `RenameFlags::NOREPLACE` is Linux-only (matches the existing `#[cfg(target_os = "linux")] CreateNew` path); a portable variant would need the same gate. Not verified against the pinned rustix version here.
+- `process_path` cannot authenticate the peer process, only ownership plus dev/ino-style validation via `owned`; the file's header already disclaims same-UID attackers, and that applies here too. The `fstatat` on the procfs link is a lightweight owner probe; if the crate prefers, drop it and rely solely on the reopen check.
+- No new `LocalStorageOperation` variants were introduced; if the codebase wants distinct operations (e.g., `ProcessPath`), that is an unsupplied decision left to reviewers.

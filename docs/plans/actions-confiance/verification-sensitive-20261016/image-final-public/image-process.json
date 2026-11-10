@@ -1,0 +1,7 @@
+{
+  "pid": 3925395,
+  "start": "6100809",
+  "root": "/tmp/swarm-trust-remote-recipe-_du6a3po/server",
+  "server_image": "/tmp/swarm-trust-remote-recipe-_du6a3po/server/server-image",
+  "source_binary_sha256": "8ee6463f481cd1264fd008c137e985a336b014db54572022d9bfffeb3dbb992f"
+}

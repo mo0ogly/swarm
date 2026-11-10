@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "assertions": [
+    "managed-native-planner-delegates-without-worker",
+    "managed-missing-copy-refuses-without-spend-or-provider",
+    "managed-restored-copy-resumes-child-and-creates-two-todo-tasks",
+    "managed-planners-write-only-attributed-i0-leaves",
+    "managed-candidate-capabilities-delivered-without-source-paths",
+    "managed-worker-launch-still-refuses-without-mutation",
+    "managed-status-two-unstarted-tasks-without-copy-spend-or-worker",
+    "managed-prepermission-reobserves-copy-without-mutation-or-inference",
+    "managed-unported-decision-refuses-and-acknowledgement-recovers"
+  ],
+  "binary_sha256": "bf0e6dc0ffc32ecceccfed7970de33cbf8c7a18efbbac040188e8af21e5d655f",
+  "actual_inert_planners": 2,
+  "protected_planner_claims": [
+    "planning-claim-003bc2096bb31200b3d1be67",
+    "planning-claim-bf3bef93767a57f3059e22fc"
+  ],
+  "manual_claims_without_inference": 1,
+  "planned_work": "w-85afc1bc04cf32629e12165b",
+  "worker_started": false,
+  "accepted": false,
+  "installed": false,
+  "global_watchdog": null
+}

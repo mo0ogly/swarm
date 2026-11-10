@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "preview-finite-policy",
+  "expected_revision": 4,
+  "budget": {
+    "limit_usd": 2,
+    "reserve_per_launch_usd": 1,
+    "estimate_source": "Owned planning financial fixture",
+    "reference_date": "2026-10-20"
+  }
+}

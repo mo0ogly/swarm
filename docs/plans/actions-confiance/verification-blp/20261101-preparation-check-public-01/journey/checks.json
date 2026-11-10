@@ -1,0 +1,106 @@
+[
+  {
+    "name": "actual-public-send-with-inert-provider",
+    "passed": true
+  },
+  {
+    "name": "actual-producer-provenance",
+    "passed": true
+  },
+  {
+    "name": "complete-byte-coverage",
+    "passed": true
+  },
+  {
+    "name": "unattributed-source-refuses",
+    "passed": true
+  },
+  {
+    "name": "missing-attribution-does-not-mutate",
+    "passed": true
+  },
+  {
+    "name": "source-derived-join",
+    "passed": true
+  },
+  {
+    "name": "diagnostic-is-not-dispatch-authority",
+    "passed": true
+  },
+  {
+    "name": "source-count-and-prompt-binding",
+    "passed": true
+  },
+  {
+    "name": "session-alone",
+    "passed": true
+  },
+  {
+    "name": "clearance-compartment",
+    "passed": true
+  },
+  {
+    "name": "no-grant-before-row-lookup",
+    "passed": true
+  },
+  {
+    "name": "stale-policy",
+    "passed": true
+  },
+  {
+    "name": "forged-label",
+    "passed": true
+  },
+  {
+    "name": "wrong-parent",
+    "passed": true
+  },
+  {
+    "name": "cli-refusals-do-not-mutate",
+    "passed": true
+  },
+  {
+    "name": "exact-read-replay",
+    "passed": true
+  },
+  {
+    "name": "http-join",
+    "passed": true
+  },
+  {
+    "name": "http-refusal-session",
+    "passed": true
+  },
+  {
+    "name": "http-refusal-compartment",
+    "passed": true
+  },
+  {
+    "name": "http-invalid-schema",
+    "passed": true
+  },
+  {
+    "name": "http-stale-policy",
+    "passed": true
+  },
+  {
+    "name": "http-missing-turn",
+    "passed": true
+  },
+  {
+    "name": "http-wrong-parent",
+    "passed": true
+  },
+  {
+    "name": "http-forged-label",
+    "passed": true
+  },
+  {
+    "name": "http-read-does-not-mutate",
+    "passed": true
+  },
+  {
+    "name": "qualified-image-unchanged",
+    "passed": true
+  }
+]

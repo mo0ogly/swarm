@@ -1,0 +1,1076 @@
+{
+  "version": 1,
+  "status": "target-architecture",
+  "candidate_baseline": "55ae082911c4c436e9011699969f4eff4d8321d7",
+  "requirements": [
+    {
+      "id": "R01",
+      "owner": "T3 / identity boundary",
+      "observable": "The authenticated principal and assurance context, never a caller-supplied actor field, identify every request.",
+      "verification": "OIDC user and workload-token positive cases; forged actor, wrong issuer, audience and expired token are rejected without a request record promoted to protected state.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/web_session.go",
+        "internal/engine/tracking.go"
+      ]
+    },
+    {
+      "id": "R02",
+      "owner": "T2 / mandate service",
+      "observable": "A versioned mandate binds subject, delegation chain, actions, resources, constraints and expiry; incompatible changes make approvals stale.",
+      "verification": "Public API/CLI readback plus subject, version, delegation, constraint and expiry negative cases; no aggregate score substitutes for a rule decision.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/model.go"
+      ]
+    },
+    {
+      "id": "R03",
+      "owner": "T2 / business effect service",
+      "observable": "The exact authorization and parameters are rechecked in the transaction that commits a simulated ledger effect.",
+      "verification": "Ledger before/after assertions for allowed action and no mutation for missing, expired, revoked, wrong-subject or out-of-scope mandates.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/managed_settlement_authorization.go"
+      ]
+    },
+    {
+      "id": "R04",
+      "owner": "T2 / mandate and effect services",
+      "observable": "Revocation and commitment use a defined serialization point; after accepted revocation no new commit succeeds, while earlier commits remain visible.",
+      "verification": "Concurrent revoke/commit test records transaction order, restarts the store and proves the resulting ledger and evidence state.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/store.go"
+      ]
+    },
+    {
+      "id": "R05",
+      "owner": "T2 / approval service",
+      "observable": "Approval binds the canonical action digest and enforces requester/approver separation.",
+      "verification": "Changed amount, currency, beneficiary or resource invalidates approval; self-approval and reused approval are denied without ledger mutation.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/independent_review.go"
+      ]
+    },
+    {
+      "id": "R06",
+      "owner": "T2 / connector runtime",
+      "observable": "Idempotency binds key to canonical content; lost response becomes unknown and is reconciled before any retry.",
+      "verification": "Same key/same content returns prior state, same key/different content conflicts, crash-after-commit reconciles exactly one ledger entry after restart.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/trust_connector.go",
+        "tests/actions_confiance_connectors.py",
+        "tests/actions_confiance_connectors_ui.cjs"
+      ]
+    },
+    {
+      "id": "R07",
+      "owner": "T6 / evidence service",
+      "observable": "Intent, identity, mandate, policy, decision, commit and observed result form a hash-linked, attributable evidence chain retaining denials and unknown states.",
+      "verification": "Export verification with separately acquired key and anchor detects altered content, reorder and omission under the anchor and contains no secret.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/automatic_validation.go",
+        "internal/engine/managed_review_fragment_begin.go"
+      ]
+    },
+    {
+      "id": "R08",
+      "owner": "T2-T7 / configuration owners",
+      "observable": "Every policy has one persisted versioned source, shared Go/API/CLI validation, non-mutating preview, stale-write rejection and Admin editing.",
+      "verification": "Preview leaves revision unchanged; apply/read/reopen use the same effective values; stale revision and invalid units are rejected; zero and inheritance semantics are asserted.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/validation_policy_config.go",
+        "internal/engine/web_requests_config.go",
+        "web/admin.js"
+      ]
+    },
+    {
+      "id": "R09",
+      "owner": "T2 / integrity admission service",
+      "observable": "Strict Biba rules protect official objects; only named trusted admission procedures can endorse lower-integrity input into protected state.",
+      "verification": "API, CLI and storage tests deny read-down/write-up/invoke-up paths, forged levels and direct writes; authorized endorsement persists provenance and survives restart.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/store.go"
+      ]
+    },
+    {
+      "id": "R10",
+      "owner": "T2 and T5 / separate frontends",
+      "observable": "Project and Business Process applications remain separately buildable while exposing textual action states and blocking reasons in FR/EN and both themes.",
+      "verification": "Browser journeys cover keyboard, Escape/focus restoration, 320/390/mobile widths, loading/empty/error/success and failed requests in etat/sombre and FR/EN.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "docs/PRODUCT-ARCHITECTURE.md",
+        "docs/UI-DESIGN.md",
+        "web/swarm-design.css",
+        "web/swarm-shell.js"
+      ]
+    },
+    {
+      "id": "R11",
+      "owner": "T8 / qualification owner",
+      "observable": "Public operations demonstrate actual ledger mutation, denial without mutation, restart persistence and concurrency on one exact candidate.",
+      "verification": "Named Python recipes and Go tests record assertions and observed state; controls and independent review bind the same candidate SHA.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "tools/actions-confiance/verify.py"
+      ]
+    },
+    {
+      "id": "R12",
+      "owner": "T8 / delivery and RETEX owner",
+      "observable": "Current FR/EN documentation, reproducible recipe, R01-R20 matrix and final RETEX distinguish local controls, engine receipts, review and acceptance.",
+      "verification": "Artifact inventory and candidate hashes are complete; unresolved or untested criteria remain open; RETEX follows complete-system qualification.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "tools/agent-workflows/CONTRACT.md"
+      ]
+    },
+    {
+      "id": "R13",
+      "owner": "T3 / application identity and agent admission",
+      "observable": "OIDC Authorization Code with PKCE authenticates people and private_key_jwt client credentials authenticate services; security attributes, delegation and revocation are enforced. Agent instances must be bound to authenticated principals; creation and delegation require current adopted-plan authority. An admissible out-of-plan creation remains blocked with an explanation until an authenticated authorized human distinct from the requester approves the exact content. Services cannot supply human approval.",
+      "verification": "Isolated issuer fixtures cover lifecycle, group/role mapping, key rotation, revocation, step-up and separation of duties; no third-party account is created. Extension IDA-01–18 is planned, not qualified by existing identity receipts: spoofing, unauthorized child creation, prompt injection, exact-content human approval, replay/concurrency, revocation before startup, recovery, framing usage rights, imported grants, and direct control-plane access across all public/internal launch paths.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/web_session.go",
+        "internal/engine/tracking.go",
+        "docs/plans/actions-confiance/identites-agents-replan.md",
+        "internal/engine/trust_identity_context.go",
+        "internal/engine/agents_store.go",
+        "internal/engine/agents_process.go"
+      ]
+    },
+    {
+      "id": "R14",
+      "owner": "T4 / data policy and execution boundary",
+      "observable": "Classification, destination, provider/tool allowlists and per-action secret grants apply on every actually controlled path; an unproven path fails closed.",
+      "verification": "Isolated exfiltration, symlink/path escape, direct binary, network destination and secret-scope attacks are denied with no sensitive output persisted.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/store.go",
+        "internal/engine/trust_secret_data_test.go",
+        "tests/actions_confiance_secret_data.py",
+        "tests/actions_confiance_secret_data_ui.cjs"
+      ]
+    },
+    {
+      "id": "R15",
+      "owner": "T5 / process definition and case services",
+      "observable": "Versioned process definitions drive cases, validations and exceptions with history through public operations and a separately deliverable Business Process UX.",
+      "verification": "Definition version pinning, case transition, invalid transition, exception authorization, restart and separate frontend build recipes pass.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "docs/PRODUCT-ARCHITECTURE.md",
+        "internal/engine/model.go"
+      ]
+    },
+    {
+      "id": "R16",
+      "owner": "T6 / durable evidence and key service",
+      "observable": "Signing-key rotation/revocation, independent anchors, retention and exports preserve attribution and detect alteration or omission below a known anchor.",
+      "verification": "Old/new/revoked key cases, independent anchor acquisition, retention boundary and tamper/reorder/omission tests pass without exporting secrets.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/managed_review_fragment_final_store.go",
+        "internal/engine/lifecycle.go"
+      ]
+    },
+    {
+      "id": "R17",
+      "owner": "T6 / simulation laboratory",
+      "observable": "Versioned adversarial scenarios replay in isolated roots with no production effect and persist policy, inputs, outcomes and limitations.",
+      "verification": "Escape attempts, fixture contamination and production connector selection fail; deterministic replay produces attributable results after reopen.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "tools/actions-confiance/README.md"
+      ]
+    },
+    {
+      "id": "R18",
+      "owner": "T6 / connector catalog",
+      "observable": "A versioned connector SPI supports simulated billing and a second sensitive simulated connector with service invariants, authorization, isolation, idempotency and reconciliation.",
+      "verification": "Contract suite runs against both connectors, rejects capability overstatement and direct bypass, and reconciles unknown results without duplicate effect.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "internal/engine/pilotage_receipts.go"
+      ]
+    },
+    {
+      "id": "R19",
+      "owner": "T6 / control mapping owner",
+      "observable": "Target-context applicability maps controls, evidence and gaps without claiming certification or global compliance from local tests.",
+      "verification": "Each mapping names scope, rationale, evidence owner, status and missing external assessment; unsupported claims are rejected in review.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "web/trust-controls.json",
+        "docs/architecture/actions-confiance-controls-reference.json",
+        "tools/actions-confiance/controls.py",
+        "tests/actions_confiance_controls.py",
+        "tests/actions_confiance_controls_ui.cjs"
+      ]
+    },
+    {
+      "id": "R20",
+      "owner": "T7 / Linux observation collector",
+      "observable": "An optional separate eBPF collector attributes project process, file and network observations to mission/task/attempt while reporting permission, loss, cleanup and measured overhead.",
+      "verification": "Real-kernel recipe proves owned PIDs/events and overhead with/without collection; foreign PID exclusion, lost-event visibility, cleanup, restart and unavailable-capability cases are explicit.",
+      "evidence_paths": [
+        "docs/architecture/ACTIONS-CONFIANCE.md",
+        "docs/en/ACTIONS-CONFIANCE.md",
+        "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+        "tools/actions-confiance/verify.py",
+        "docs/actions-confiance-T7.md",
+        "docs/en/actions-confiance-T7.md",
+        "internal/engine/kernel_observation_linux.go",
+        "internal/engine/kernel_observation_transport_linux.go",
+        "internal/engine/kernel_observation_linux_test.go",
+        "internal/engine/kernel_backend_linux_amd64.go",
+        "internal/engine/kernel_backend_native_linux_amd64.go",
+        "internal/engine/kernel_backend_resources_linux.go",
+        "internal/engine/kernel_backend_linux_amd64_test.go",
+        "internal/engine/trust_kernel_check.go",
+        "internal/engine/trust_kernel_check_process.go",
+        "internal/engine/trust_kernel_check_child.go",
+        "internal/engine/trust_kernel_check_native_linux_amd64.go",
+        "internal/engine/trust_kernel_check_native_other.go",
+        "internal/engine/trust_kernel_check_test.go",
+        "tests/actions_confiance_kernel.py",
+        "tests/actions_confiance_kernel_ui.cjs",
+        "internal/engine/kernel_attempt_source_linux.go",
+        "internal/engine/kernel_attempt_source_linux_test.go",
+        "internal/engine/trust_kernel_observe.go",
+        "internal/engine/kernel_observe_process_linux.go",
+        "internal/engine/kernel_observe_protocol_linux.go",
+        "internal/engine/kernel_observe_child_linux.go",
+        "internal/engine/kernel_observe_native_linux_amd64.go",
+        "internal/engine/kernel_observe_native_other.go",
+        "internal/engine/kernel_fixed_helper_linux.go",
+        "internal/engine/trust_kernel_observe_test.go",
+        "internal/engine/kernel_observe_process_linux_test.go",
+        "internal/engine/kernel_observe_native_linux_amd64_test.go",
+        "internal/engine/kernel_observe_cleanup_test.go",
+        "internal/engine/kernel_observe_public_linux_test.go",
+        "web/trust-observe.js",
+        "tests/actions_confiance_observe_ui.cjs",
+        "tests/actions_confiance_observe_client_test.cjs"
+      ]
+    }
+  ],
+  "story_ids": [
+    "s01-mandat",
+    "s02-reglement",
+    "s03-reprise",
+    "s04-preuve",
+    "s05-pilotage",
+    "s06-recette",
+    "s07-identites",
+    "s08-donnees",
+    "s09-processus",
+    "s10-conservation",
+    "s11-simulation",
+    "s12-connecteurs",
+    "s13-referentiels",
+    "s14-ebpf"
+  ],
+  "boundaries": [
+    {
+      "id": "session-auth",
+      "state": "existing",
+      "owner": "Swarm web server",
+      "resource": "project-scoped bearer session",
+      "control": "same-origin session cookie, CSRF and private 0600 token; it authenticates a project session, not an enterprise person"
+    },
+    {
+      "id": "enterprise-identity",
+      "state": "target",
+      "owner": "T3 identity service",
+      "resource": "OIDC principals, workloads and delegation",
+      "control": "issuer/audience/signature/nonce/PKCE or private_key_jwt validation, lifecycle and revocation"
+    },
+    {
+      "id": "optimistic-command",
+      "state": "existing",
+      "owner": "Swarm engine",
+      "resource": "work mutation and selected command receipts",
+      "control": "expected revision, event identity, transaction and digest-bound replay"
+    },
+    {
+      "id": "trust-admission",
+      "state": "target",
+      "owner": "T2 integrity admission service",
+      "resource": "official mandate, policy, approval and evidence objects",
+      "control": "strict Biba plus narrow attributed endorsement procedures"
+    },
+    {
+      "id": "business-effect",
+      "state": "target",
+      "owner": "T2 business effect service",
+      "resource": "simulated ledger",
+      "control": "authorization recheck and ledger mutation in one serializable transaction"
+    },
+    {
+      "id": "connector-egress",
+      "state": "target",
+      "owner": "T2/T6 connector runtime",
+      "resource": "simulated external effects",
+      "control": "capability manifest, mandatory mediation, content-bound idempotency and reconciliation"
+    },
+    {
+      "id": "review-receipts",
+      "state": "existing",
+      "owner": "Swarm validation and review engine",
+      "resource": "control receipts and independent-review originals",
+      "control": "candidate/input hashes, preserved originals, anchor digests and freshness guards"
+    },
+    {
+      "id": "ordinary-logs",
+      "state": "existing",
+      "owner": "Swarm activity/log query",
+      "resource": "agent and activity logs",
+      "control": "work/agent attribution, pagination and retention-gap visibility; not immutable business proof"
+    },
+    {
+      "id": "durable-evidence",
+      "state": "target",
+      "owner": "T6 evidence service",
+      "resource": "signed action evidence export",
+      "control": "hash chain, signing key lifecycle, separately acquired anchor, omission/reorder detection"
+    },
+    {
+      "id": "policy-config",
+      "state": "target",
+      "owner": "T2-T7 policy owners",
+      "resource": "action/identity/data/process/evidence/connector/eBPF policy",
+      "control": "versioned persisted source, preview/apply, optimistic revision, history and Admin/CLI/API parity"
+    },
+    {
+      "id": "project-frontend",
+      "state": "existing",
+      "owner": "Projects UX",
+      "resource": "project orchestration screens",
+      "control": "public API only and independent build boundary to preserve"
+    },
+    {
+      "id": "business-process-frontend",
+      "state": "target",
+      "owner": "T5 Business Process UX",
+      "resource": "definitions and cases",
+      "control": "separate entry/build/tests using common public API and shared design tokens"
+    },
+    {
+      "id": "ebpf-collector",
+      "state": "unverified",
+      "owner": "T7 collector operator",
+      "resource": "Linux project processes and descendants",
+      "control": "feature/capability probe, PID-start-time/cgroup allowlist, local authenticated transport, loss and cleanup reporting"
+    },
+    {
+      "id": "nonmediated-paths",
+      "state": "unverified",
+      "owner": "T2/T4 security boundary owners",
+      "resource": "direct binaries, filesystem and network paths",
+      "control": "inventory and deny configuration unless containment is demonstrated; eBPF observation alone is not enforcement"
+    }
+  ],
+  "interfaces": [
+    {
+      "id": "identity-context-v1",
+      "producer": "T3",
+      "consumers": [
+        "T2",
+        "T4",
+        "T5",
+        "T6"
+      ],
+      "fields": [
+        "principal_id",
+        "principal_kind",
+        "issuer",
+        "subject",
+        "assurance",
+        "attributes",
+        "delegation_id",
+        "authenticated_at",
+        "expires_at",
+        "token_digest"
+      ],
+      "rule": "caller actor fields are ignored; raw tokens and secrets are never persisted in action evidence"
+    },
+    {
+      "id": "data-policy-v1",
+      "producer": "T4",
+      "consumers": [
+        "T2 admission and effect",
+        "T5 process service",
+        "T6 connectors"
+      ],
+      "fields": [
+        "enabled",
+        "classifications",
+        "destinations",
+        "providers",
+        "tools",
+        "resources"
+      ],
+      "rule": "Exact operator-managed resource classification is required; caller metadata cannot downgrade it. Local public/internal paths are local-ledger/swarm/simulated-settlement and local-process-state/swarm/process-workflow, with exact tuple checks. Admission rechecks stored digest-bound context before mutation and replay disclosure. Sensitive providers and external effects remain unqualified."
+    },
+    {
+      "id": "secret-grant-v1",
+      "producer": "T4",
+      "consumers": [
+        "T6 connectors"
+      ],
+      "fields": [
+        "grant_id",
+        "policy_revision",
+        "action_digest",
+        "principal_id",
+        "connector_id",
+        "secret_ref",
+        "destination",
+        "issued_at",
+        "expires_at",
+        "consumed_at",
+        "data_context"
+      ],
+      "rule": "Implemented only for sealed-attestation/local-attestation: persistent server holds ephemeral material in memory, issues a revision/session/action-bound single-attempt grant, persists metadata without raw material, and transfers through a pipe only after the fixed helper proves containment. Restart loses material and denies old grants; provider connectors and sensitive business effects remain unsupported targets. Clients require positive protected readiness before raw transfer. No raw material in business API replies, evidence or agent copies. With data_policy active, restricted/local-attestation/swarm/sealed-attestation must be explicitly allowlisted at preparation, before raw HTTP read, memory load, grant and consumption. The action resource retains separate admission. Computed optional data_context is bound by swarm-secret-delivery-v1; absent policy preserves the exact legacy attestation input. Running helper image is pinned by descriptor; arbitrary providers remain unsupported."
+    },
+    {
+      "id": "process-definition-v1",
+      "producer": "T5",
+      "consumers": [
+        "T5 case service",
+        "Business Process UX"
+      ],
+      "fields": [
+        "schema_version",
+        "id",
+        "version",
+        "content_digest",
+        "document",
+        "published_by",
+        "published_at"
+      ],
+      "rule": "Published immutable FR/EN graph, I3 publisher, expected prior version; normal graph acyclic and ending, explicit admin exception edges. No executable commands or automatic payment approval."
+    },
+    {
+      "id": "case-v1",
+      "producer": "T5",
+      "consumers": [
+        "Business Process UX",
+        "T6 evidence export"
+      ],
+      "fields": [
+        "schema_version",
+        "id",
+        "definition_id",
+        "definition_version",
+        "definition_digest",
+        "revision",
+        "input_digest",
+        "owner",
+        "participants",
+        "resource",
+        "data_context",
+        "title",
+        "reference",
+        "node_id",
+        "history",
+        "created_at",
+        "updated_at"
+      ],
+      "rule": "Latest exact version at creation; fixed thereafter. Current authenticated membership, roles, integrity and data policy before transitions and replay disclosure; revision/digests bind decisions. Shared atomic state and identity-linked evidence; no T2 effect linkage in this slice."
+    },
+    {
+      "id": "public-anchor-v1",
+      "producer": "T6 first R16 slice",
+      "consumers": [
+        "public verifier"
+      ],
+      "fields": [
+        "schema_version",
+        "domain",
+        "key_id",
+        "registry_revision",
+        "policy_revision",
+        "sequence",
+        "hash",
+        "export_digest",
+        "signed_at",
+        "signature"
+      ],
+      "rule": "Schema3 domain-separated Ed25519 signature binds canonical export v2; trusted public key and lifecycle metadata acquired separately, never self-selected by export. Retired historical keys remain verifiable within period, revoked pins deny acceptance. Old offline pins do not learn later revocations automatically. Optional caller-supplied trusted_checkpoint carries an independently acquired anchor and pin; verifier rejects rollback or divergent prefix, checking canonical original bytes. Absence is explicit checkpoint_verified:false; operator storage is not physically immutable."
+    },
+    {
+      "id": "evidence-key-registry-v1",
+      "producer": "T6 first R16 slice",
+      "consumers": [
+        "Admin",
+        "API",
+        "CLI",
+        "public verifier"
+      ],
+      "fields": [
+        "registry_revision",
+        "active_key_id",
+        "pending_key_id",
+        "keys",
+        "material_available"
+      ],
+      "rule": "Persist only public key identity/digest/proposer/period/configuration and lifecycle. Different I3 activates exact candidate; I3 emergency revocation is immediate. Private key remains protected runtime-only; restart/configuration/expiry fails closed, new rotation required. This does not deliver retention or outside production attestation."
+    },
+    {
+      "id": "evidence-archive-v1",
+      "producer": "T6 local R16 slice",
+      "consumers": [
+        "Admin",
+        "API",
+        "CLI"
+      ],
+      "fields": [
+        "archive_id",
+        "sequence",
+        "hash",
+        "key_id",
+        "created_at",
+        "created_by",
+        "retention_days",
+        "policy_revision",
+        "released_at",
+        "released_by"
+      ],
+      "rule": "Copy exact signed prefix and originals without replacing files; content-addressed regular private payload plus attributed registry receipt. Existing evidence_retention_days is a minimum hold captured at copy creation and never shortened by later policy reduction. Explicit current I3 release only after elapsed whole days, with no copy/original deletion. Preview is pure; identical orphan publication recoverable, missing/corrupt/link payload fails even on replay. Local operator-controlled storage is not immutable against the same UID; archived pins do not learn later revocations."
+    },
+    {
+      "id": "laboratory-scenario-v1",
+      "producer": "T6 R17 fixed corpus",
+      "consumers": [
+        "laboratory helper",
+        "Admin",
+        "API",
+        "CLI"
+      ],
+      "fields": [
+        "corpus_version",
+        "corpus_digest",
+        "seed",
+        "scenario_ids",
+        "connector_id"
+      ],
+      "rule": "Closed content-addressed versioned corpus, canonical uint64 seed string, known unique scenarios and fixed local-ledger-simulation-v1 connector. Caller paths/commands/URLs/production selectors are rejected. The parent creates an empty owned fixture and launches only its fixed Landlock/seccomp helper; fourteen OS boundary assertions precede Trust scenarios. Fixture policy/time are corpus inputs rather than production configuration."
+    },
+    {
+      "id": "laboratory-result-v1",
+      "producer": "T6 R17 laboratory",
+      "consumers": [
+        "operator UX",
+        "T8 qualification"
+      ],
+      "fields": [
+        "run_id",
+        "replay_of",
+        "input",
+        "corpus",
+        "policy",
+        "configuration_revision",
+        "principal_id",
+        "status",
+        "started_at",
+        "finished_at",
+        "result",
+        "diagnostic_code"
+      ],
+      "rule": "Reserve each attributed attempt before execution, run outside business lock, then revalidate current authority/revision/policy before positive publication. Preserve inputs/corpus/policy/outcomes; exact request replay creates nothing, explicit replay creates a linked new attempt and compares deterministic digest. Owner loss stays visible and never refunds attempts. Parent cancellation/death stops fixed child; a hard server crash can leave owned fixture files until explicit cleanup. Simulated results are not provider or eBPF evidence."
+    },
+    {
+      "id": "mandate-v1",
+      "producer": "T2",
+      "consumers": [
+        "T2 effect service",
+        "T5 process service",
+        "T6 connectors"
+      ],
+      "fields": [
+        "id",
+        "version",
+        "subject",
+        "delegator",
+        "actions",
+        "resource_selectors",
+        "constraints",
+        "not_before",
+        "expires_at",
+        "revoked_at",
+        "policy_revision",
+        "integrity_level",
+        "digest"
+      ],
+      "rule": "canonical digest changes on every covered field and invalidates incompatible approvals"
+    },
+    {
+      "id": "action-request-v1",
+      "producer": "public API/CLI",
+      "consumers": [
+        "T2 admission and approval"
+      ],
+      "fields": [
+        "request_id",
+        "event_id",
+        "expected_revision",
+        "identity_context",
+        "mandate_ref",
+        "action",
+        "resource",
+        "parameters",
+        "idempotency_key",
+        "submitted_at"
+      ],
+      "rule": "canonical parameter schema is connector-owned; unknown fields are rejected"
+    },
+    {
+      "id": "approval-v1",
+      "producer": "T2 approval service",
+      "consumers": [
+        "T2 effect service"
+      ],
+      "fields": [
+        "approval_id",
+        "action_digest",
+        "approver_principal",
+        "role",
+        "decision",
+        "reason",
+        "policy_revision",
+        "created_at",
+        "expires_at"
+      ],
+      "rule": "requester and approver separation is enforced from authenticated identities"
+    },
+    {
+      "id": "effect-intent-v1",
+      "producer": "T2 effect service",
+      "consumers": [
+        "T2/T6 connector runtime"
+      ],
+      "fields": [
+        "intent_id",
+        "action_digest",
+        "mandate_digest",
+        "approval_digests",
+        "connector_id",
+        "connector_version",
+        "resource",
+        "canonical_parameters",
+        "idempotency_key",
+        "deadline"
+      ],
+      "rule": "only an admitted protected intent crosses the connector boundary"
+    },
+    {
+      "id": "effect-result-v1",
+      "producer": "connector runtime",
+      "consumers": [
+        "T2 ledger",
+        "T6 evidence",
+        "operator UX"
+      ],
+      "fields": [
+        "intent_id",
+        "connector_receipt",
+        "state",
+        "committed_at",
+        "observed_at",
+        "result_digest",
+        "reconciliation_required",
+        "diagnostic_code"
+      ],
+      "rule": "states are denied, committed, unknown or reconciled; unknown is never retried before connector readback"
+    },
+    {
+      "id": "evidence-envelope-v1",
+      "producer": "T6",
+      "consumers": [
+        "operator export",
+        "T8 qualification"
+      ],
+      "fields": [
+        "sequence",
+        "previous_digest",
+        "event_type",
+        "object_ref",
+        "actor_ref",
+        "payload_digest",
+        "occurred_at",
+        "recorded_at",
+        "signing_key_id",
+        "signature"
+      ],
+      "rule": "payload references exclude secrets; export includes anchor metadata and verification recipe"
+    },
+    {
+      "id": "connector-spi-v1",
+      "producer": "T6 catalog",
+      "consumers": [
+        "T2 effect service"
+      ],
+      "fields": [
+        "manifest",
+        "validate",
+        "prepare",
+        "commit",
+        "status",
+        "reconcile"
+      ],
+      "rule": "manifest declares action/resource schema, isolation and capabilities; direct plugin network/filesystem access outside granted boundary is denied"
+    },
+    {
+      "id": "kernel-observation-v1",
+      "producer": "T7 collector",
+      "consumers": [
+        "Swarm observation ingest",
+        "Admin/diagnostics"
+      ],
+      "fields": [
+        "collector_boot_id",
+        "sequence",
+        "ktime_ns",
+        "event_type",
+        "pid",
+        "pid_start_time",
+        "parent_pid",
+        "cgroup_id",
+        "mission_id",
+        "task_id",
+        "attempt_id",
+        "resource_digest",
+        "lost_before",
+        "probe_set"
+      ],
+      "rule": "Unix transport authenticates peer credentials; business decisions and payload secrets never originate here"
+    }
+  ],
+  "alternatives": [
+    {
+      "id": "A-start-only",
+      "decision": "rejected as sole control",
+      "description": "Reuse launch-time agent authorization and post-hoc validation only.",
+      "advantages": [
+        "small implementation change",
+        "reuses existing orchestration gates"
+      ],
+      "limits": [
+        "authority can expire or be revoked before effect",
+        "parameters can drift",
+        "direct connector paths remain unmediated",
+        "post-hoc evidence cannot prevent an effect"
+      ]
+    },
+    {
+      "id": "B-per-action-reference-monitor",
+      "decision": "selected",
+      "description": "Add canonical per-action admission, exact approval digest, transactional authorization at effect time and mandatory connector mediation.",
+      "advantages": [
+        "revocation and concurrency have a serialization point",
+        "least authority per effect",
+        "content-bound replay and reconciliation",
+        "negative paths can assert no business mutation"
+      ],
+      "limits": [
+        "requires new domain store/API/CLI/Admin and connector containment",
+        "cannot claim protection for uninventoried direct paths"
+      ]
+    },
+    {
+      "id": "C-ebpf-enforcement",
+      "decision": "rejected for T7",
+      "description": "Use eBPF/LSM as the primary authorization or effect blocker.",
+      "advantages": [
+        "kernel-level visibility and possible enforcement on selected hooks"
+      ],
+      "limits": [
+        "privileged, kernel-dependent and hard to map to business semantics",
+        "observation probes do not establish authorization",
+        "cannot replace service invariants or transaction-level idempotency"
+      ]
+    }
+  ],
+  "recovery": [
+    {
+      "trigger": "lost response or crash after connector commit",
+      "state": "unknown",
+      "owner": "connector runtime",
+      "action": "freeze retry, query status by content-bound idempotency key, reconcile ledger and append evidence",
+      "forbidden": "blind retry or treating timeout as denial"
+    },
+    {
+      "trigger": "revocation races with commit",
+      "state": "ordered by business transaction serialization",
+      "owner": "mandate/effect services",
+      "action": "retain the winner order and evidence; prohibit commits whose authorization check occurs after accepted revocation",
+      "forbidden": "rewriting an already committed effect"
+    },
+    {
+      "trigger": "stale policy, mandate, approval or Admin preview",
+      "state": "conflict without mutation",
+      "owner": "authoritative service",
+      "action": "reload current revision, obtain a new decision/preview and retry with a new event when content changes",
+      "forbidden": "reusing approval or preview across changed content"
+    },
+    {
+      "trigger": "evidence signing key unavailable or revoked",
+      "state": "effect policy decides fail-closed before commit; post-commit evidence gap stays visible",
+      "owner": "T6 key/evidence operator",
+      "action": "rotate under dual control, anchor new key, resume only after verifier acquisition",
+      "forbidden": "unsigned evidence presented as signed"
+    },
+    {
+      "trigger": "collector unavailable, loses events or disconnects",
+      "state": "engine remains usable and observation status is degraded",
+      "owner": "T7 collector operator",
+      "action": "record permission/features/loss counters, detach probes, reconnect and measure anew",
+      "forbidden": "claiming enforcement or complete observation"
+    },
+    {
+      "trigger": "direct path or isolation not demonstrated",
+      "state": "sensitive action disabled",
+      "owner": "T4 execution boundary owner",
+      "action": "inventory path, add containment/control and negative bypass recipe before enabling",
+      "forbidden": "allowing effect because monitoring exists"
+    }
+  ],
+  "configuration": [
+    {
+      "domain": "actions",
+      "owner": "T2",
+      "values": "approval rules, mandate defaults, effect deadlines, reconciliation intervals",
+      "units_zero": "seconds/milliseconds stated per field; zero only where explicitly unlimited/disabled",
+      "scope": "project then process/connector override"
+    },
+    {
+      "domain": "identity",
+      "owner": "T3",
+      "values": "issuer metadata pins, audiences, assurance and role mappings, clock skew, session/token lifetimes",
+      "units_zero": "seconds; zero is rejected for security lifetimes",
+      "scope": "project/tenant"
+    },
+    {
+      "domain": "data",
+      "owner": "T4",
+      "values": "classifications, destination/provider/tool rules and secret grants",
+      "units_zero": "no numeric sentinel; deny when rule is absent",
+      "scope": "project/process/action"
+    },
+    {
+      "domain": "process",
+      "owner": "T5",
+      "values": "definition versions, validation and exception rules",
+      "units_zero": "not applicable; explicit version required",
+      "scope": "process definition"
+    },
+    {
+      "domain": "evidence",
+      "owner": "T6",
+      "values": "signing key references, anchor schedule and retention",
+      "units_zero": "days/seconds stated; zero meaning must be explicit and never silently erase protected evidence",
+      "scope": "project/evidence class"
+    },
+    {
+      "domain": "connectors",
+      "owner": "T6",
+      "values": "enabled manifests, endpoints for fixtures, deadlines and reconciliation",
+      "units_zero": "milliseconds; zero disable/unlimited semantics explicit per field",
+      "scope": "connector/action"
+    },
+    {
+      "domain": "ebpf",
+      "owner": "T7",
+      "values": "enabled, probe set, sample rate, ring size and retention",
+      "units_zero": "sample ratio/count and seconds/bytes stated; disabled is an explicit boolean",
+      "scope": "host/project"
+    },
+    {
+      "contract": "all domains",
+      "persistence": "versioned local configuration with immutable history and atomic writes or transactional rows",
+      "preview_apply": "preview validates normalized exact values without mutation; apply binds preview token/event identity and expected revision",
+      "surfaces": "same validation/effective values in Go, API, CLI and Admin FR/EN",
+      "consumption": "show configured policy separately from current usage, health, loss and transport/kernel limits"
+    }
+  ],
+  "ui_states": [
+    {
+      "surface": "Projects UX",
+      "delivery": "independent",
+      "states": [
+        "request draft",
+        "awaiting approval",
+        "denied",
+        "expired",
+        "revoked",
+        "committed",
+        "unknown",
+        "reconciled"
+      ],
+      "rule": "project vocabulary and existing navigation; no Business Process screen dependency"
+    },
+    {
+      "surface": "Business Process UX",
+      "delivery": "independent",
+      "states": [
+        "case inbox",
+        "in control",
+        "awaiting validation",
+        "blocked",
+        "completed",
+        "exception"
+      ],
+      "rule": "case-oriented vocabulary; graph is explanatory, not required to perform routine work"
+    },
+    {
+      "surface": "Admin",
+      "delivery": "shared shell module with domain panels",
+      "states": [
+        "loading",
+        "empty",
+        "preview",
+        "stale conflict",
+        "apply success",
+        "network error",
+        "degraded collector"
+      ],
+      "rule": "visible title/labels/close, keyboard and Escape, focus restoration, effective value/history/consumption separated"
+    },
+    {
+      "surface": "all",
+      "delivery": "shared design system only",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "success"
+      ],
+      "rule": "FR/EN, etat/sombre, textual status plus color, visible blockers/next action, 1440/1024/760/390/320 widths and failed-request diagnostics"
+    }
+  ],
+  "lot_interfaces": [
+    {
+      "lot": "T2",
+      "depends_on": [
+        "T1"
+      ],
+      "provides": [
+        "mandate-v1",
+        "action-request-v1",
+        "approval-v1",
+        "effect-intent-v1",
+        "effect-result-v1"
+      ],
+      "negative_recipe": "forged actor/level, expired or revoked mandate, self-approval, parameter drift, replay conflict, crash/reconcile and direct-bypass denial"
+    },
+    {
+      "lot": "T3",
+      "depends_on": [
+        "T1",
+        "T2 identity-context seam"
+      ],
+      "provides": [
+        "identity-context-v1"
+      ],
+      "negative_recipe": "wrong issuer/audience/nonce, expired/revoked identity, workload impersonation, stale delegation and separation-of-duty denial"
+    },
+    {
+      "lot": "T4",
+      "depends_on": [
+        "T2",
+        "T3"
+      ],
+      "provides": [
+        "data-policy-v1",
+        "secret-grant-v1"
+      ],
+      "negative_recipe": "exfiltration, path/symlink escape, forbidden destination/provider/tool, secret reuse and unproven containment denial"
+    },
+    {
+      "lot": "T5",
+      "depends_on": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "provides": [
+        "process-definition-v1",
+        "case-v1",
+        "Business Process UX"
+      ],
+      "negative_recipe": "invalid transition/version, unauthorized exception, cross-case access, stale definition and separate-build checks"
+    },
+    {
+      "lot": "T6",
+      "depends_on": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "provides": [
+        "evidence-envelope-v1",
+        "connector-spi-v1",
+        "simulation-scenario-v1",
+        "control-map-v1"
+      ],
+      "negative_recipe": "tamper/reorder/omission, revoked key, lab escape, connector over-capability, duplicate effect and unsupported compliance claim"
+    },
+    {
+      "lot": "T7",
+      "depends_on": [
+        "T2 process attribution",
+        "T4 privacy policy"
+      ],
+      "provides": [
+        "kernel-observation-v1"
+      ],
+      "negative_recipe": "missing capability/BTF, foreign PID, PID reuse, ring loss, disconnect, cleanup and overhead regression"
+    },
+    {
+      "lot": "T8",
+      "depends_on": [
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7"
+      ],
+      "provides": [
+        "exact-candidate qualification",
+        "R01-R20 matrix",
+        "RETEX"
+      ],
+      "negative_recipe": "candidate drift, missing original, zero tests, failed mandatory check, simulation/real conflation and self-acceptance denial"
+    }
+  ]
+}

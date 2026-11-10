@@ -1,0 +1,131 @@
+{
+  "planning": {
+    "reviewer_required": true,
+    "reviewer": {
+      "max_context_files": 24,
+      "max_source_bytes": 98304,
+      "max_context_bytes": 131072,
+      "max_files": 100,
+      "provider": "fixture",
+      "provider_digest": "9eda80cd76e73385aca7199c01ba9cfc5906e7884d72e324eac44a8f837382ef",
+      "model_route": {
+        "level": "standard",
+        "model": "fixture-standard",
+        "effort": "fixture-medium",
+        "billing": "external",
+        "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+        "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+      },
+      "max_calls": 2,
+      "calls": 0,
+      "authorized": "2026-10-24T11:43:19.162751671Z"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "fixture-standard",
+      "effort": "fixture-medium",
+      "billing": "external",
+      "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+      "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+    },
+    "provider": "fixture",
+    "provider_digest": "9eda80cd76e73385aca7199c01ba9cfc5906e7884d72e324eac44a8f837382ef",
+    "activations": 1,
+    "max_activations": 3,
+    "version": 1,
+    "paused": false,
+    "max_tasks": 10,
+    "max_decisions": 10,
+    "decisions": 0,
+    "scopes": [
+      {
+        "last_model": {
+          "provider": "fixture",
+          "provider_digest": "9eda80cd76e73385aca7199c01ba9cfc5906e7884d72e324eac44a8f837382ef",
+          "route": {
+            "level": "standard",
+            "model": "fixture-standard",
+            "effort": "fixture-medium",
+            "billing": "external",
+            "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+            "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+          },
+          "actor": "",
+          "at": "2026-10-24T11:43:19.224893971Z"
+        },
+        "delivery": {
+          "judge_available": true,
+          "judge_cycle": 1,
+          "task_budget": 10,
+          "activation_budget": 3,
+          "closure_unavailable": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "c990ece88f5ac6fc6b74f8da96430b5cf861354ed662bc2b4b8ccf4eae133c66",
+          "events": [
+            "preview-enable"
+          ]
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "97edc37b630828c58fd907ec7cf8597fdef78f5344bcf6cabcafc82eae80dccb"
+        },
+        "activations": 1,
+        "id": "root",
+        "objective": "Scoped fixture planning",
+        "requirements": [
+          "req-1"
+        ],
+        "revision": 1,
+        "generation": 1,
+        "holder": "fixture-planner",
+        "lease_until": "2026-10-24T11:44:19.224893971Z",
+        "state": "ready"
+      }
+    ],
+    "inbox": [
+      {
+        "id": "preview-enable",
+        "scope": "root",
+        "kind": "brief",
+        "message": "Scoped fixture planning",
+        "at": "2026-10-24T11:43:19.162751671Z"
+      }
+    ],
+    "judge": {
+      "cycle": 1,
+      "max_cycles": 0,
+      "closed": false
+    }
+  },
+  "schema_version": 1,
+  "id": "w-04f6ee87aef1e2b8ace9ee46",
+  "revision": 3,
+  "title": "Public planning bootstrap",
+  "objective": "Scoped fixture planning",
+  "scope": "Owned local bootstrap",
+  "criteria": [
+    "Configuration is persisted without model execution"
+  ],
+  "next": "",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-24T11:43:19.066307935Z",
+  "updated": "2026-10-24T11:43:19.233664158Z",
+  "git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "tasks": []
+}

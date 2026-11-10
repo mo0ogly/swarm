@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T11:31:53.120124+00:00",
+  "review": "review-f5cb258178e80a4bdc4778d3",
+  "candidate": "1ce2af045bef41baf4af808c610a921c7fe71224",
+  "first_fragment_state": "unknown",
+  "first_fragment_needs": "Code and report absent from this fragment, supplied in other frozen packets; final collation must reconcile these needs, no operator verdict.",
+  "source_presence": {
+    "internal/engine/planning_judge.go": [
+      {
+        "packet": 3,
+        "kind": "diff",
+        "name": "diff --git a/internal/engine/planning_judge.go b/internal/engine/planning_judge.go",
+        "sha256": "6ad28918cff78834706f29c5cdd6bc15de177a3f1e109c8586f70300d395c003"
+      }
+    ],
+    "internal/engine/planning_judge_test.go": [
+      {
+        "packet": 3,
+        "kind": "diff",
+        "name": "diff --git a/internal/engine/planning_judge_test.go b/internal/engine/planning_judge_test.go",
+        "sha256": "ad8e54f51083f67ce6b4f8b6b24a782ef0b5356b869b542c1196d5de7d7f599f"
+      }
+    ],
+    "internal/engine/planning.go": [
+      {
+        "packet": 3,
+        "kind": "diff",
+        "name": "diff --git a/internal/engine/planning.go b/internal/engine/planning.go",
+        "sha256": "3f8d14afc5ce7e7e8ba614cb6dc9244635c4570a546ebe649e1e79c507b788fe"
+      },
+      {
+        "packet": 4,
+        "kind": "source",
+        "name": "internal/engine/planning.go",
+        "sha256": "bdf56336463d036a09479edb7c9ba52e5cd18139d31981121ec954853815fc35"
+      }
+    ],
+    "internal/engine/planning_api.go": [
+      {
+        "packet": 3,
+        "kind": "diff",
+        "name": "diff --git a/internal/engine/planning_api.go b/internal/engine/planning_api.go",
+        "sha256": "56c6654811fe65cda5b91ac6875401e90cb83e1ab8b97957e59b25ab120c0813"
+      },
+      {
+        "packet": 4,
+        "kind": "source",
+        "name": "internal/engine/planning_api.go",
+        "sha256": "38eabe54acc66d8ea8d4311d74818d2e68507095ef8ff53cf6d9483ca05fd319"
+      }
+    ],
+    "docs/plan-ca937edf4e-T2.md": [
+      {
+        "packet": 1,
+        "kind": "diff",
+        "name": "diff --git a/docs/plan-ca937edf4e-T2.md b/docs/plan-ca937edf4e-T2.md",
+        "sha256": "e29f5d5f48312c4b8e17dea6ad2e211d0c626140203feaefd92a1dfeb0f94719"
+      }
+    ]
+  },
+  "plan_sha256": "f3cad1de92aff60555a643f02ddac300b9c38202c3a68a94e13611782eb4b5c0",
+  "journal_sha256": "8b2e6314361ff6475ab4e1d03f6740ea605bfbb4bafd7d371ed265a91b24812a"
+}

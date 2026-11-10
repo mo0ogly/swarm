@@ -1,0 +1,3 @@
+package probe
+import("testing";"os")
+func TestActualTempDirMode(t *testing.T){p:=t.TempDir();s,err:=os.Stat(p);if err!=nil{t.Fatal(err)};t.Logf("TempDir final mode=%04o; store requires 0700",s.Mode().Perm());if s.Mode().Perm()==0700{t.Log("already private on this environment")}}

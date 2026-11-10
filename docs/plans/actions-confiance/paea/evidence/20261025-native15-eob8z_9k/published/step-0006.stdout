@@ -1,0 +1,9 @@
+
+running 4 tests
+test protection_receipt_write_and_flush_failures_keep_cause_and_recover ... ok
+test protection_receipt_runtime_options_and_framing_refuse_before_reads ... ok
+test protection_receipt_both_domains_and_reconciliation_are_offline ... ok
+test protection_receipt_invalid_inputs_and_bindings_refuse_then_recover ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.82s
+

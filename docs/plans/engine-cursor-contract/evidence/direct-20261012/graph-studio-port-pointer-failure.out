@@ -1,0 +1,7 @@
+TimeoutError: Waiting failed: 30000ms exceeded
+    at new WaitTask (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/common/WaitTask.js:49:34)
+    at IsolatedWorld.waitForFunction (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Realm.js:25:26)
+    at CdpFrame.waitForFunction (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:583:43)
+    at CdpFrame.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/util/decorators.js:109:27)
+    at CdpPage.waitForFunction (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:1445:37)
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/graph_studio_ui.cjs:23:547

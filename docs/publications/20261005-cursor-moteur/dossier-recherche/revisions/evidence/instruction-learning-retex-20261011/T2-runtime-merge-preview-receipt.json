@@ -1,0 +1,34 @@
+{
+  "preview_only": true,
+  "candidate_accepted": false,
+  "source_tree": "1ded4021e9c822ccb8b2ce3e427f075bfdc9d7ff",
+  "isolated_root": "/tmp/swarm-T2-runtime-integration-check-20261011-vmgw26pa",
+  "copied_files": 2394,
+  "copied_bytes": 145986528,
+  "manual_conflicts": [
+    "API usage retains reject-instructions and adds judge/renew",
+    "Context keeps current protocol fields and adds root global_cycle"
+  ],
+  "files": [
+    {
+      "path": "internal/engine/planning.go",
+      "preview_sha256": "e49cd0beb660de79582864af976db53fce230b91011b07c20b11f25caa0c0b7b"
+    },
+    {
+      "path": "internal/engine/planning_api.go",
+      "preview_sha256": "6680491c81a1b0d6b73f84d33128281a1352217ddf687fc49e435c80846e1027"
+    },
+    {
+      "path": "internal/engine/planning_context.go",
+      "preview_sha256": "15d4d456d16930bed34019e7c513d0e611cfc9c84300d7ab1064625cdea703fa"
+    },
+    {
+      "path": "internal/engine/planning_judge.go",
+      "preview_sha256": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b"
+    },
+    {
+      "path": "internal/engine/planning_judge_test.go",
+      "preview_sha256": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd"
+    }
+  ]
+}

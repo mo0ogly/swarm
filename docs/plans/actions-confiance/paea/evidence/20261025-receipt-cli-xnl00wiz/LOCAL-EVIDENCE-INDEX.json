@@ -1,0 +1,137 @@
+{
+  "scope": "original full directory retained locally; binaries, caches and raw private fixtures are not published",
+  "files": {
+    "git-diff-check.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "own-and-observed-changes.patch": {
+      "sha256": "7ccafa8ec5b4fceb77653e0290c4a42a0c0ea414c10a635796ce8c5854ce36ce",
+      "bytes": 57136
+    },
+    "rustfmt-check.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "rustfmt-version.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "static-checks.json": {
+      "sha256": "a5dc93642a2b6a81b5bfb50141a4fbda79ff5f031ef750e196b38dea8472ee62",
+      "bytes": 21521
+    },
+    "plan.json": {
+      "sha256": "70bc4d067056f0b9eb3f82e1fc581f60a120114b47c9d0175fea40919d10ff3f",
+      "bytes": 2581
+    },
+    "rustfmt-version.stdout": {
+      "sha256": "58e77f09cbe97eb2d0ab9174e5523494d03814f2879c8e187ed66370320abc7c",
+      "bytes": 45
+    },
+    "integrity-check.json": {
+      "sha256": "b7ca7ae7674283ba9fc38f61befa356a0a09c9c9bba46936d3118748b4b4ee21",
+      "bytes": 333
+    },
+    "rustfmt-check.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifact-hashes.json": {
+      "sha256": "4801c2b77782df5ad1e979e0a36738382e0eebd338f555471c07b4a0efc3c3b9",
+      "bytes": 590
+    },
+    "cli-root-syntax.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "git-diff-check.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "source-review.json": {
+      "sha256": "c5d5f6d513c3c48fd7e4d8e0107532b0d091ce93287279db250ec5303e80decf",
+      "bytes": 29734
+    },
+    "static-01/git-diff-check.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "static-01/own-and-observed-changes.patch": {
+      "sha256": "578ebc76620aa3c2881a2c64e1d27dd69821ab2bae179bf8ba593c9df3b5543c",
+      "bytes": 55587
+    },
+    "static-01/rustfmt-check.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "static-01/rustfmt-version.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "static-01/static-checks.json": {
+      "sha256": "44a9c8ec826feecbf24f88933dc56775c6e3e0be0b2ca764ea969254362a55e8",
+      "bytes": 24427
+    },
+    "static-01/rustfmt-version.stdout": {
+      "sha256": "58e77f09cbe97eb2d0ab9174e5523494d03814f2879c8e187ed66370320abc7c",
+      "bytes": 45
+    },
+    "static-01/rustfmt-check.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "static-01/cli-root-syntax.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "static-01/git-diff-check.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "before/version_history.json": {
+      "sha256": "575692a4e8f7f6615c866904ed2d3427dcbede6428fbbf08d136dfb6ceb200c6",
+      "bytes": 97111
+    },
+    "before/tools/verification/recipes/paea-contract.json": {
+      "sha256": "d1b752382476a8e263060862361ad7bcadfafda467bdb99377bfeea90062d95c",
+      "bytes": 4024
+    },
+    "before/docs/architecture/PAEA-CONTRACT.md": {
+      "sha256": "ee89c9c119445b5cc1041249a5a1c72c67c570fc9b5c1c9af6785466b64ec302",
+      "bytes": 11962
+    },
+    "before/docs/en/PAEA-CONTRACT.md": {
+      "sha256": "887f4325d0b7504070e7fe44d54c9069333f0a56705c612f376243b07fd21b75",
+      "bytes": 9780
+    },
+    "before/docs/en/APEX-QUEUE.md": {
+      "sha256": "8bd0cd3f7cf0df0178dcb113cfb4b1eaa13715cc3a83e3375396269f4e322152",
+      "bytes": 18630
+    },
+    "before/docs/plans/FILE-APEX.md": {
+      "sha256": "a6b8cc7164b5ad5378f38782847c4fca582f336eb05c1bc09c7e29dc50a2d3d6",
+      "bytes": 20156
+    },
+    "before/docs/plans/actions-confiance/PAEA-APEX.md": {
+      "sha256": "93941d2986684a341e4c61010b00b8f1c0c0886c5e970828e67dcafc811fbb58",
+      "bytes": 20433
+    },
+    "before/docs/en/plans/actions-confiance/PAEA-APEX.md": {
+      "sha256": "aa298325139234f35f523ec5c3b56a88d6b369669fc6594e1522acad614d08a1",
+      "bytes": 16748
+    },
+    "before/rust/crates/swarm-cli/src/protection.rs": {
+      "sha256": "00aa619e2209c73c8171a00f5f5992532930f8b762d3753ae3b09a02cefb56e0",
+      "bytes": 3115
+    },
+    "before/rust/crates/swarm-cli/src/lib.rs": {
+      "sha256": "182b48cf5f40b0071d8b5d2ac131ac2043ab6b18363e71b5f71933aff39f5e0c",
+      "bytes": 96167
+    },
+    "before/rust/crates/swarm-cli/tests/protection.rs": {
+      "sha256": "21c4372a6b09a62b5b8829d14429b9f0902c38266830312c03b04ed7d7290060",
+      "bytes": 10679
+    }
+  }
+}

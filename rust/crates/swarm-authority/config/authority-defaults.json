@@ -1,0 +1,13 @@
+{
+ "schema_version": 1,
+ "session_absolute_seconds": 43200,
+ "session_idle_seconds": 3600,
+ "argon2": {
+  "memory_kib": 65536,
+  "passes": 3,
+  "parallelism": 1
+ },
+ "relay_body_max_bytes": 16777216,
+ "audit_retention_days": 365,
+ "log_level": "info"
+}

@@ -1,0 +1,42 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T17:11:59.541590+00:00",
+  "end": "2026-10-11T17:20:11.934981+00:00",
+  "seconds": 492.3955303210023,
+  "exit": 0,
+  "output": "/tmp/swarm-T2-raw-canonical-suite-replan-full.out",
+  "output_sha256": "819e9d284cee57905f99251f21941928211c0a887a00409ab3a9bb3beb1d4bdf",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "781aae84758188233594a94a0082166084e4d6c6700eeb9857dad154d8763ebe",
+  "candidate_digest": "d62229308d111bd7233db5a401d1f130e48238a313d1f32872242cfe7c7fbea9",
+  "paths": 1049,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T17:11:59.541590+00:00",
+    "driver_pid": 1823560,
+    "pgid": 1823560,
+    "sid": 1823560,
+    "command": [
+      "go",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "manifest_sha256": "781aae84758188233594a94a0082166084e4d6c6700eeb9857dad154d8763ebe",
+    "source_digest": "d62229308d111bd7233db5a401d1f130e48238a313d1f32872242cfe7c7fbea9",
+    "paths": 1049,
+    "precondition": "Independent owned T2 code-identical copy, frozen manifest verified, new raw standard full Go command. Historical shard opinions/originals preserved; matching shard counts neither prove forgery nor authenticity. Fresh canonical unsplit run supplies discriminating original evidence.",
+    "go_pid": 1823585
+  }
+}

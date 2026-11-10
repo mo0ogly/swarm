@@ -1,0 +1,27 @@
+%% Flux mémoire documenté dans le socle Go ; droits d’usage et Rust à qualifier.
+%%{init: {"theme":"base","fontFamily":"Arial, sans-serif","themeVariables":{"fontFamily":"Arial, sans-serif","fontSize":"20px","primaryTextColor":"#243d4a","lineColor":"#526976","background":"#f5f3ec","edgeLabelBackground":"#f5f3ec"},"flowchart":{"htmlLabels":true,"wrappingWidth":400,"curve":"basis","nodeSpacing":30,"rankSpacing":30}}}%%
+flowchart TB
+  T["SWARM · MÉMOIRE DE PROJET<br/>Socle Go documenté ; parcours Rust à qualifier"]
+  R["Retour d’expérience vérifié<br/>Sources et conditions conservées"]
+  V["Admission d’une version<br/>Aperçu puis enregistrement"]
+  S["Sélection explicite<br/>Pour une tâche future"]
+  C["Contexte effectivement reçu<br/>Texte · version · empreintes"]
+  U["CONTRAT D’USAGE À INTÉGRER<br/>Lire ≠ résumer ≠ transmettre"]
+  H["Remplacement ou retrait<br/>Historique conservé"]
+  N["Limite explicite<br/>Retirer ne purge pas le contexte déjà reçu"]
+  T ~~~ R
+  R --> V --> S --> C
+  U -. "Contrôler chaque source et destinataire" .-> S
+  V --> H
+  H --> N
+  H -. "Revalider la sélection et la reprise" .-> S
+  classDef titre fill:#102b3b,color:#fffefa,stroke:#102b3b,stroke-width:2px;
+  classDef memoire fill:#ede9fe,color:#4c1d95,stroke:#7c3aed,stroke-width:2px;
+  classDef controle fill:#dbeafe,color:#173d66,stroke:#1b5f7a,stroke-width:2px;
+  classDef futur fill:#fff7ed,color:#9a3412,stroke:#c2410c,stroke-width:3px,stroke-dasharray:7 5;
+  classDef limite fill:#fffefa,color:#243d4a,stroke:#526976,stroke-width:2px;
+  class T titre;
+  class R,V,C,H memoire;
+  class S controle;
+  class U futur;
+  class N limite;

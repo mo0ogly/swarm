@@ -1,12 +1,15 @@
 {
   "version": 1,
-  "groups": 16,
-  "parallelism": 16,
+  "groups": 13,
+  "parallelism": 4,
   "test_timeout_seconds": 240,
   "isolated": [
     "TestEngineContractRevisionKillsInferenceOnContractMutation",
     "TestEngineContractRevisionRejectsReceiptChangedDuringInference",
-    "TestManagedReviewDoesNotBlockConductorOrOtherMissions"
+    "TestManagedReviewDoesNotBlockConductorOrOtherMissions",
+    "TestManagedFragmentHistoricalPublicRecovery",
+    "TestManagedFragmentRuntimeProviderProtocol",
+    "TestManagedFragmentIntegrationPublishesOnlyFinalVerdict"
   ],
   "observed_seconds": {
     "TestActionSkillsRefuseUnsafeSourcesAndDuplicateAliases": 0.26,

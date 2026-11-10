@@ -1,0 +1,42 @@
+# Bounded advice: readable mission status for completed worker on blocked nonmanaged planned task
+
+## 1) Missing contracts and narrow eligible shape
+
+**Diagnosis of `mission-status-planning-unported`.** For a blocked task with a completed Agent and no current review, `planned_pair` (`mission_status_reports.rs`) admits `blocked` only for `failed|interrupted` Agents or `completed` **with `matching_review`**. A completed Agent with no review therefore fails `planned_pair`, and `supported()` refuses `mission-status-planning-unported` (planning branch) / `mission-status-terminal-task-branch-unported` (terminal loop). Go's `resultPresentation` does display this shape: review branches fall through (`currentReviewPresentation` false), `t.Status=="submitted"` false, and the final `completed` branch runs `provenReport(t.ID, a.Started)` → `result_to_review`/`attributable_unsubmitted` or `completed_unproven`.
+
+**Missing contracts (must be added before wiring):**
+- A read-only **root-scoped** attribution observation equivalent to Go `Store.provenReport` (lines 155–189 of `conductor.go`): newest-first docs listing, per-candidate regular/contained check, nonempty size, `mtime >= started − skew`, single-fresh → attributed; otherwise one of three exact French reasons (missing / stale-count / ambiguous-with-list).
+- Plumbing of the clock margin into `result_inputs_with_review`, which currently has no settings access.
+- Permission in `result_inputs_with_review` for completed+blocked without a current review (Go falls through to the completed branch; today Rust refuses `mission-status-completed-unsubmitted-unported`).
+- Admission change so `supported()` stops refusing completed+blocked-without-review (display only; no acceptance, no relay).
+
+**Narrow eligible shape (all must hold):**
+- `work.planning` present, no `repository` (managed review/provenance stays refused), scopes `ready|waiting` (already allowed).
+- Task `blocked`, single latest Agent `completed`, full row history retained; `review_shape` still passes (non-passed review still requires matching producer; absent review is fine).
+- Attribution observed only when actually consumed: `agent.status=="completed" && task.status=="blocked"` and the review branch did not return (`ReviewObservation::NotApplicable`).
+- `IncompleteReport`: Go `incompleteDeliveryReport` requires `Planning.Repository != nil`; without a repository it returns `""`. For the nonmanaged shape, supply `IncompleteReport::Observed(None)` when the blocker prefix matches — this reproduces Go's empty report without fabricating one.
+- **Excluded:** the incomplete-delivery proof path (`Planning.Repository.Storage/proofs/...`) — evidence not supplied; keep refusal if ever reached with a repository present.
+- **Not reused:** `relay_mission_report` / `report()` in `mission_report_relay.rs` (agent-cwd workspace resolution, consent/lease/producer/fence requirements, submission hashing). Status attribution is root-scoped, read-only, and does not hash report bytes (Go `provenReport` only stats).
+
+**Attribution reason parity note.** Reusing relay's `select` is insufficient: Go `provenReport` returns (a) `"plusieurs rapports candidats pour cette tentative (" + join(fresh, ", ") + ")"`, (b) `"aucun rapport produit par cette tentative ; N rapport(s) antérieur(s) ignoré(s)"`, (c) `"aucun rapport lisible et non vide sous docs/ pour cette tâche"`, and (d) `"date de départ de la tentative illisible"` for unparseable `started` — the latter is an `Unavailable` reason, **not** a typed refusal. `select` returns static codes without candidate names or stale counts, and its parse failure is an error. Replicate the loop locally (≈15 lines) instead of adapting `select`.
+
+## 2) Helper and call-site patch proposal
+
+**A. New helper in `mission_status_reports.rs`** (root-scoped, no cwd, no hashing):
+
+```rust
+/// Go Store.provenReport over the mission root, display only. Lists the actual
+/// docs reports, keeps nonempty regular candidates modified at/after the
+/// attempt start minus the supplied skew, and refuses nothing for absent
+/// evidence: missing/stale/ambiguous/unparseable-start return Go's exact
+/// reason strings as ReportAttribution::Unavailable. Per-candidate metadata or
+/// containment failures are skipped (Go `continue`), never converted to absence
+/// of the whole scan; walk IO from task_reports retains its typed causes.
+/// No report content, digest, cwd, relay, consent or acceptance is involved.
+pub(super) fn proven_report(
+    root: &Path,
+    agent: &Agent,
+    skew: i64,
+) -> Result<Result<String, String>, E> {
+    if skew < 0 { return Err(E::Refused("mission-report-clock-skew-invalid")); }
+    let started = match swarm_wire_json::go_rfc3339::parse(&agent.started)

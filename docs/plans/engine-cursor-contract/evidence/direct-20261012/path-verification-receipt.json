@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-12T20:55:06.371024+00:00",
+  "status": "TARGETED_SOURCE_PATH_CONTRACT_PASS_NOT_NATIVE_INSTALL",
+  "base_head": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "command": "go test ./internal/engine -run '^(TestProjectRootAlias.*|TestWebAttributedReportRead|TestWebReportCannotEscapeDocumentation|TestPreparationSourcesRejectSecretsSymlinksAndBinary|TestPlanningReportRelay.*|TestAttemptReportRefuses.*|TestExchange.*)$' -count=1 -timeout=90s -json",
+  "passed_tests_and_subcases": [
+    "TestExchangeHostConsumedRejectsWrongIdentity",
+    "TestExchangeHostExpiredHelpCannotBeAcknowledged",
+    "TestExchangeHostDeleteRestorePreservesExchange",
+    "TestExchangeHostConcurrentSendHasOneEffect",
+    "TestExchangeHostAckReplayBoundToContentAfterRestart",
+    "TestExchangeHandoffConsumedOnceAndRejectsStaleAttempt",
+    "TestExchangeChangedArtifactBecomesStale",
+    "TestExchangeHelpAnswerAndEscalationAreBounded",
+    "TestExchangeIsObservableThroughCLIAndWeb",
+    "TestExchangeInstructionsExposeBoundIdentityToAgent",
+    "TestPlanningReportRelayIsAtomicScopedAndIdempotent",
+    "TestAttemptReportRefusesStaleAmbiguousOutsideAndInterrupted",
+    "TestPreparationSourcesRejectSecretsSymlinksAndBinary",
+    "TestProjectRootAliasPreservesOwnedBoundaries/file",
+    "TestProjectRootAliasPreservesOwnedBoundaries/artifact",
+    "TestProjectRootAliasPreservesOwnedBoundaries/workspace",
+    "TestProjectRootAliasPreservesOwnedBoundaries",
+    "TestProjectRootAliasPublicReportAndEscapeRefusal",
+    "TestWebAttributedReportRead/incomplete",
+    "TestWebAttributedReportRead/review_rejected",
+    "TestWebAttributedReportRead",
+    "TestWebReportCannotEscapeDocumentation"
+  ],
+  "source_sha256": {
+    "internal/engine/model.go": "4d56779a9b958c0845b9463d4fa44262e1d2f4c9d54b28c2d37392432fbb116a",
+    "internal/engine/store.go": "a1d74fe951a943b14622bea3438ba85923aebc897486a32c941df59c69abdaa7",
+    "internal/engine/agents_store.go": "25c59bf5860cc78d3f0c932c9976e959cdfc7dcbdb3976c083463ecf65b769d7",
+    "internal/engine/agent_exchange.go": "50ee5b5462d32d386b78e5f1c98ebfbd3c146114eaa59ae944b245f89edfc8f2",
+    "internal/engine/review_dialog.go": "586a8f4ca882cfe9088a9e2250e87ff1bb86cdc06b9fd44ca40adb0fbaf5efe2",
+    "internal/engine/project_root_alias_test.go": "c12edd0dea5159c43b047065e06519ccd0781d8a13df7b5e7cb4a33381c0015d"
+  },
+  "proof_sha256": {
+    "direct-root-alias-red.jsonl": "f477455786313c341e364482cbe8f20bba35408a06d6a8ffec5f769bfe9b0b17",
+    "direct-root-alias-contracts.jsonl": "ab3f30911afb4dff307f2ce0d9797849522fd1ccaf107e8d1c42e322d0a8c36e",
+    "direct-root-alias-contracts-repaired.jsonl": "2f74ac47c9c88b3fd45f6b81fdd5aec161854a024a10456c49c5bc0ea620b867"
+  },
+  "limits": [
+    "Isolated fixture roots; no native database mutation or real provider call",
+    "Native running binary is unchanged; observed report access remains refused there",
+    "Managed repository/copy/handoff migration is outside these 22 passing cases",
+    "Earlier verification-receipt.json retains its original source identity and is not current for changed files",
+    "Paths are not all editable in Admin; remaining Chrome/CIFS literals are recorded in repertoires-20261012.md"
+  ]
+}

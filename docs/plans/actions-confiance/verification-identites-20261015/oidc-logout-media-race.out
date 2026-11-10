@@ -1,0 +1,20 @@
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/host
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/get
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/bad-token
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/duplicate-token
+=== RUN   TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/operator-api-still-private
+--- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI (1.50s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/host (0.02s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/get (0.02s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/bad-token (0.04s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/duplicate-token (0.01s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutAnonymousHTTPAndCLI/operator-api-still-private (0.01s)
+=== RUN   TestActionsConfianceT3OIDCLogoutFormContentTypeCase
+=== RUN   TestActionsConfianceT3OIDCLogoutFormContentTypeCase/Application/X-WWW-Form-Urlencoded;_charset=UTF-8
+=== RUN   TestActionsConfianceT3OIDCLogoutFormContentTypeCase/application/x-www-form-urlencoded_;_charset=utf-8
+--- PASS: TestActionsConfianceT3OIDCLogoutFormContentTypeCase (3.03s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutFormContentTypeCase/Application/X-WWW-Form-Urlencoded;_charset=UTF-8 (1.54s)
+    --- PASS: TestActionsConfianceT3OIDCLogoutFormContentTypeCase/application/x-www-form-urlencoded_;_charset=utf-8 (1.49s)
+PASS
+ok  	swarm.local/companion/internal/engine	6.171s

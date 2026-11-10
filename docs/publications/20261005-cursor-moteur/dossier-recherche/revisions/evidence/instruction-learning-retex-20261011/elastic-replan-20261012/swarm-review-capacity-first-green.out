@@ -1,0 +1,79 @@
+=== RUN   TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal
+    managed_review_capacity_first_test.go:15: sizes 164551 168169 21899 parts 1
+--- PASS: TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal (7.53s)
+=== RUN   TestFreshCapacityFragmentsRetainRefusals
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/calls
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/bytes
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/tokens
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/invalid-capacity
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/missing
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/duplicate
+=== RUN   TestFreshCapacityFragmentsRetainRefusals/binary
+--- PASS: TestFreshCapacityFragmentsRetainRefusals (57.98s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/calls (0.00s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/bytes (0.08s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/tokens (0.14s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/invalid-capacity (0.00s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/missing (18.52s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/duplicate (19.87s)
+    --- PASS: TestFreshCapacityFragmentsRetainRefusals/binary (19.26s)
+=== RUN   TestFreshCapacityFragmentsPreserveCoordination
+--- PASS: TestFreshCapacityFragmentsPreserveCoordination (13.00s)
+=== RUN   TestFreshCapacityCurrentPublicDossier
+panic: test timed out after 3m0s
+	running tests:
+		TestFreshCapacityCurrentPublicDossier (1m41s)
+
+goroutine 266 [running]:
+testing.(*M).startAlarm.func1()
+	/usr/local/go/src/testing/testing.go:2484 +0x394
+created by time.goFunc
+	/usr/local/go/src/time/sleep.go:215 +0x2d
+
+goroutine 1 [chan receive, 1 minutes]:
+testing.(*T).Run(0xc000003880, {0x1420053?, 0xc0005c9b30?}, 0x4073d48)
+	/usr/local/go/src/testing/testing.go:1859 +0x431
+testing.runTests.func1(0xc000003880)
+	/usr/local/go/src/testing/testing.go:2279 +0x37
+testing.tRunner(0xc000003880, 0xc0005c9c70)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+testing.runTests(0xc000010048, {0x4e8ba40, 0x4d1, 0x4d1}, {0x4e96fe0?, 0x7?, 0x4e95320?})
+	/usr/local/go/src/testing/testing.go:2277 +0x4b4
+testing.(*M).Run(0xc000258aa0)
+	/usr/local/go/src/testing/testing.go:2142 +0x64a
+main.main()
+	_testmain.go:2513 +0x9b
+
+goroutine 265 [runnable]:
+github.com/dlclark/regexp2.(*runner).checkTimeout(0xc00141a1c0)
+	/home/fpizzi/go/pkg/mod/github.com/dlclark/regexp2@v1.11.5/runner.go:1560 +0xcb
+github.com/dlclark/regexp2.(*runner).execute(0xc00141a1c0)
+	/home/fpizzi/go/pkg/mod/github.com/dlclark/regexp2@v1.11.5/runner.go:184 +0x54
+github.com/dlclark/regexp2.(*runner).scan(0xc00141a1c0, {0xc001980000?, 0xceca8fc6a278e2fd?, 0xc0018f8f98?}, 0x46105e?, 0x0, 0x0?)
+	/home/fpizzi/go/pkg/mod/github.com/dlclark/regexp2@v1.11.5/runner.go:143 +0x2b5
+github.com/dlclark/regexp2.(*Regexp).run(0xc00052c380, 0x0, 0x1579c, {0xc001980000, 0x1be6e, 0x1c000})
+	/home/fpizzi/go/pkg/mod/github.com/dlclark/regexp2@v1.11.5/runner.go:90 +0xea
+github.com/dlclark/regexp2.(*Regexp).FindNextMatch(0x11db6e0?, 0xc00061c030?)
+	/home/fpizzi/go/pkg/mod/github.com/dlclark/regexp2@v1.11.5/regexp.go:230 +0x5f
+github.com/tiktoken-go/tokenizer/codec.(*Codec).tokenize(0xc001415350, {0xc0014ee000?, 0x13ca394?}, 0xc0018f90e8)
+	/home/fpizzi/go/pkg/mod/github.com/tiktoken-go/tokenizer@v0.6.2/codec/codec.go:64 +0x1a8
+github.com/tiktoken-go/tokenizer/codec.(*Codec).Count(0xc0018f9198?, {0xc0014ee000?, 0x0?})
+	/home/fpizzi/go/pkg/mod/github.com/tiktoken-go/tokenizer@v0.6.2/codec/codec.go:26 +0x3c
+swarm.local/companion/internal/engine.(*reviewTokenCountCache).count(0x4ec4ac0, {0xc0014ee000, 0x1bfa8})
+	/home/fpizzi/.cache/swarm-operator-replan-20261011/review-capacity-first-h2gbhzsc/internal/engine/managed_review_token_count_cache.go:42 +0x27a
+swarm.local/companion/internal/engine.managedReviewInputBudget.measure({{0x0, 0x0}, {0x0, 0x0}, {0x0, 0x0}, {0x0, 0x0}, 0x1, {0x138dba2, ...}, ...}, ...)
+	/home/fpizzi/.cache/swarm-operator-replan-20261011/review-capacity-first-h2gbhzsc/internal/engine/managed_review_input_budget.go:98 +0x205
+swarm.local/companion/internal/engine.fragmentInputFits(0x1?, {0xc0014ee000?, 0x0?}, {0xc00139f000?, 0x0?})
+	/home/fpizzi/.cache/swarm-operator-replan-20261011/review-capacity-first-h2gbhzsc/internal/engine/managed_review_fragment_tokens.go:35 +0xc5
+swarm.local/companion/internal/engine.managedFragmentInspectionPrompt({0x0, 0x0}, {0x1, 0x1, 0x0, 0x0, {0x0, 0x0}, 0xc000574090, 0x4, ...})
+	/home/fpizzi/.cache/swarm-operator-replan-20261011/review-capacity-first-h2gbhzsc/internal/engine/managed_review_fragment_prompt.go:51 +0x51f
+swarm.local/companion/internal/engine.planFreshTokenFragments({0x0, 0xc000ec4bd0, {0xc000568f08, 0x8, 0x8}, {0xc00039fb30, 0x28}, {0xc00039fb60, 0x28}, {0xc001e08000, ...}, ...}, ...)
+	/home/fpizzi/.cache/swarm-operator-replan-20261011/review-capacity-first-h2gbhzsc/internal/engine/managed_review_capacity_first.go:49 +0xdc8
+swarm.local/companion/internal/engine.TestFreshCapacityCurrentPublicDossier(0xc00180a8c0)
+	/home/fpizzi/.cache/swarm-operator-replan-20261011/review-capacity-first-h2gbhzsc/internal/engine/managed_review_capacity_first_test.go:149 +0x345
+testing.tRunner(0xc00180a8c0, 0x4073d48)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go/src/testing/testing.go:1851 +0x413
+FAIL	swarm.local/companion/internal/engine	180.163s
+FAIL

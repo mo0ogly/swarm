@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "id": "project-profile-configuration-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/src/project_context.rs",
+    "rust/crates/swarm-engine/src/context_policy.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/project_profile_read.rs",
+    "rust/crates/swarm-engine/src/root_store/project_profile_write.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "rust/crates/swarm-engine/src/local_path.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-cli/src/project_profile.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/project_profile.rs",
+    "web/project-profile.js",
+    "web/preparation-native.js",
+    "web/prepare.html",
+    "web/prephase.css",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "tests/rust_project_profile_configuration.py",
+    "tests/rust_project_profile_configuration_ui.cjs",
+    "tests/rust_project_profile_read.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "rust/crates/swarm-engine/tests/project_profile_configuration.rs",
+    "docs/plans/migration-rust/PROJECT-PROFILE-SELECT-20261027.md",
+    "REFERENCE.md",
+    "docs/en/REFERENCE.md",
+    "tests/rust_project_memory_source.py",
+    "rust/crates/swarm-engine/examples/memory_source_fixture.rs"
+  ],
+  "environment": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_TARGET_DIR": ".cache/rust-native-version846-target"
+  },
+  "steps": [
+    {
+      "id": "profile-configuration-public",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='profile-configuration-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_project_profile_configuration.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)]+['--browser'],check=True)\nprint('PROFILE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROJECT_PROFILE_CONFIGURATION_PASS 24",
+        "PROJECT_PROFILE_CONFIGURATION_BROWSER_PASS 62",
+        "PASS profile-output-failure-preserves-recorded-state",
+        "PASS profile-invalid-active-public-repair",
+        "PASS profile-refresh-does-not-rebase-draft"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "source-disclosure-regressions",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='profile-disclosure-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_project_profile_read.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)]+[],check=True)\nprint('PROFILE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROJECT_PROFILE_READ_PASS 52",
+        "PASS profile-metadata-name-secret-refuses",
+        "PASS profile-metadata-path-secret-refuses",
+        "PASS profile-metadata-native-alias-secret-refuses",
+        "PASS profile-metadata-private-alias-secret-refuses",
+        "PASS profile-metadata-private-hardlink-secret-refuses"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "held-root",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "project_profile_configuration",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 1 test",
+        "test held_root_profile_refuses_replacement_and_recovers ... ok",
+        "test result: ok. 1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "supplied-document-helper",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "project_context::supplied_document_tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 1 test",
+        "test project_context::supplied_document_tests::supplied_document_matches_reader_without_profile_writes ... ok",
+        "test result: ok. 1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

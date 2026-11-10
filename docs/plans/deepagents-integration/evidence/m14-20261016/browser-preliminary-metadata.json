@@ -1,0 +1,7 @@
+{
+  "binary": "/tmp/swarm-m14-bin-ipol3toj/swarm",
+  "binary_sha256": "24ba2b8d7b293047795993dd10740553dc2ab9b0eee54743e485b04789d460fc",
+  "built_source_manifest": "build-inputs.json",
+  "script_sha256": "e7e0041bc042d2892dabfee2b77ab77d66551bb71e1d9baa743d5fadbcd6a050",
+  "qualification": "Preliminary earlier binary; final candidate requires its own run"
+}

@@ -1,0 +1,19 @@
+{
+  "allowed_read": true,
+  "allowed_write": true,
+  "outside_denied": true,
+  "traversal_denied": true,
+  "symlink_denied": true,
+  "direct_binary_denied": true,
+  "tcp_denied": true,
+  "abi": 7,
+  "fixture_root": "/tmp/swarm-landlock-fixture-5ppw8svg",
+  "kernel": "6.17.0-41-generic",
+  "at": "2026-10-15T20:32:23.732407+00:00",
+  "scope": "isolated OS feasibility probe, not Swarm integration",
+  "limits": [
+    "TCP only; UDP and inherited descriptors are not claimed controlled",
+    "No secret broker or provider launch integration implemented"
+  ],
+  "source_sha256": "66dee697fea2d65564e53d456485713a1d9045c3279b630bb65bdff95a8ad1eb"
+}

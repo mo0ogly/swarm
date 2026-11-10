@@ -1,0 +1,28 @@
+{
+  "status": "DELIVERED_LOCAL_TYPED_TRANSCRIPT",
+  "version": "v0.1.1-dev.43",
+  "binary_sha256": "88d4380204362cc6511415114e6bdaedcc7e020eda334a4997afa403c3865c8c",
+  "browser_assertions": 499,
+  "transcript_browser_assertions": 35,
+  "transcript_HTTP_assertions": 14,
+  "unit_tests": 3,
+  "installed_logs_transcript_assertions": 40,
+  "installed_version_assertions": 14,
+  "served_assets": 46,
+  "recipe_integrity": "VERIFIED",
+  "archive_sha256": "3549b3b2057dd877194d83cd6e723352d0ec1552355e70eb3900c673f1686c8a",
+  "GLM_calls": 1,
+  "GLM_declared_tokens": 3662,
+  "automatic_retry": false,
+  "business_provider_execution": false,
+  "live_business_mutations": false,
+  "installed_transcript_state": "receipt-absent on two sampled historical agents; available validated on owned native fixture",
+  "limits": [
+    "1472-BATCH and1472-STATUS remain open",
+    "Terminal-task mission status branch remains unported",
+    "No native receipt on sampled legacy agents; no historical stream/provenance fabricated",
+    "No raw content/interactive terminal or transcript export in this slice",
+    "Malformed stored receipt verified by pure decoder/status test, not live SQL corruption",
+    "No full independent/global migration acceptance"
+  ]
+}

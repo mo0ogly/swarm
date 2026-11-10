@@ -1,0 +1,7 @@
+{
+  "pid": 4056835,
+  "start": "6258762",
+  "root": "/tmp/swarm-trust-remote-recipe-xilirrpq/server",
+  "server_image": "/tmp/swarm-trust-remote-recipe-xilirrpq/server/server-image",
+  "source_binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79"
+}

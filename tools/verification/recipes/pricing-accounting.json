@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "pricing-admin-and-retained-accounting",
+  "inputs": [
+    "*.go",
+    "go.mod",
+    "go.sum",
+    "internal/**/*.go",
+    "web/*",
+    "locales/*.json",
+    "version_history.json",
+    "config/*.json",
+    "contracts/*.json",
+    ".claude/skills/*/SKILL.md",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/**/*.md",
+    ".claude/commands/ks-*.md",
+    "tests/pricing_ui.cjs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "pricing-accounting-regressions",
+      "command": [
+        "go",
+        "test",
+        "./internal/engine",
+        "-run",
+        "^(TestCostSummary.*|TestCostText.*|TestBudget.*|TestPricing.*|TestCommandErrorPreservesPrivateCause)$",
+        "-v",
+        "-count=1",
+        "-timeout=0"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "--- PASS: TestCostSummaryIncludesAllRetainedAttempts",
+        "--- PASS: TestBudgetDoesNotHideReportedCostReadFailure",
+        "--- PASS: TestCommandErrorPreservesPrivateCause",
+        "--- PASS: TestPricingRepresentationBounds",
+        "--- PASS: TestPricingHistoryHasNoVersionCountPolicy",
+        "--- PASS: TestPricingStoredInvalidRateRefusesWithoutMutation",
+        "--- PASS: TestPricingInvalidAndConcurrentWrites",
+        "PASS\nok",
+        "--- PASS: TestPricingPreservesExistingFiniteQuoteArithmetic"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

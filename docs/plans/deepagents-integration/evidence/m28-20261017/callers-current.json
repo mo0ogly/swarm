@@ -1,0 +1,1367 @@
+[
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_exchange.go",
+    "line": 252,
+    "function": "sendExchangeOnce",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_exchange.go",
+    "line": 335,
+    "function": "sendExchangeOnce",
+    "kind": "literal_sql",
+    "value": "SELECT revision FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_exchange.go",
+    "line": 387,
+    "function": "agentExchanges",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_exchange.go",
+    "line": 423,
+    "function": "consumeExchangeOnce",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_plan_linux.go",
+    "line": 164,
+    "function": "readAgentIdentityRecordedPlan",
+    "kind": "literal_sql",
+    "value": "SELECT w.revision,w.body,p.generation,p.digest,p.projection_version FROM works w LEFT JOIN agent_identity_plan_heads p ON p.work_id=w.id WHERE w.id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_registry_publish.go",
+    "line": 88,
+    "function": "changeAgentIdentityRegistry",
+    "kind": "literal_sql",
+    "value": "SELECT count(*) FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agents_store.go",
+    "line": 397,
+    "function": "pause",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agents_store.go",
+    "line": 492,
+    "function": "prepareLaunch",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agents_store.go",
+    "line": 682,
+    "function": "prepareLaunch",
+    "kind": "literal_sql",
+    "value": "SELECT revision,body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agents_store.go",
+    "line": 1204,
+    "function": "settleAgentTask",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/archive.go",
+    "line": 44,
+    "function": "export",
+    "kind": "literal_sql",
+    "value": "SELECT body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/archive.go",
+    "line": 352,
+    "function": "importBundle",
+    "kind": "literal_sql",
+    "value": "SELECT count(*) FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/assist_action.go",
+    "line": 54,
+    "function": "assistActionPlan",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/assist_context.go",
+    "line": 74,
+    "function": "pageContext",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/assist_store.go",
+    "line": 124,
+    "function": "assistPreview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/assist_store.go",
+    "line": 421,
+    "function": "assistCurrentTurns",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automatic_validation.go",
+    "line": 311,
+    "function": "runAutomaticValidation",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automatic_validation.go",
+    "line": 471,
+    "function": "runAutomaticValidation",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automatic_validation.go",
+    "line": 526,
+    "function": "resumeAutomaticValidations",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automation_cli.go",
+    "line": 93,
+    "function": "target",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automation_requests.go",
+    "line": 154,
+    "function": "automationPolicyTx",
+    "kind": "literal_sql",
+    "value": "SELECT body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automation_requests.go",
+    "line": 250,
+    "function": "automationWorkspaceBusyTx",
+    "kind": "literal_sql",
+    "value": "SELECT body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automation_schedule.go",
+    "line": 335,
+    "function": "createAutomationSchedule",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automation_schedule.go",
+    "line": 662,
+    "function": "recoverAutomationRequestCausally",
+    "kind": "literal_sql",
+    "value": "SELECT body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/autonomy.go",
+    "line": 55,
+    "function": "setAutonomy",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/budget_commands.go",
+    "line": 43,
+    "function": "previewBudget",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/budget_commands.go",
+    "line": 77,
+    "function": "budgetCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/conductor.go",
+    "line": 29,
+    "function": "conduct",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/conductor.go",
+    "line": 100,
+    "function": "reconcileOrphanedManagedReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/conductor.go",
+    "line": 121,
+    "function": "relayHandoff",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console.go",
+    "line": 23,
+    "function": "cockpitSnapshot",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console.go",
+    "line": 78,
+    "function": "operatorTask",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console.go",
+    "line": 97,
+    "function": "priority",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console.go",
+    "line": 264,
+    "function": "consoleCommand",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console.go",
+    "line": 360,
+    "function": "renderConsole",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console.go",
+    "line": 448,
+    "function": "console",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console.go",
+    "line": 494,
+    "function": "console",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_cli.go",
+    "line": 123,
+    "function": "agentCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_cli.go",
+    "line": 146,
+    "function": "agentCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_cli.go",
+    "line": 304,
+    "function": "agentCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_conduite.go",
+    "line": 14,
+    "function": "renderConduite",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_dialog.go",
+    "line": 91,
+    "function": "openTaskDialog",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_dialog.go",
+    "line": 270,
+    "function": "dialogKey",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_dialog.go",
+    "line": 588,
+    "function": "dialogKey",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_dialog.go",
+    "line": 743,
+    "function": "launchDialog",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_panels.go",
+    "line": 48,
+    "function": "openPanel",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_panels.go",
+    "line": 100,
+    "function": "panelKey",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_panels.go",
+    "line": 160,
+    "function": "panelKey",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_start.go",
+    "line": 17,
+    "function": "chooseConsoleWork",
+    "kind": "selector",
+    "value": "list"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/console_start.go",
+    "line": 88,
+    "function": "plainConsole",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/corrective_recovery.go",
+    "line": 79,
+    "function": "authorizeCorrectiveRecovery",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/dashboard.go",
+    "line": 25,
+    "function": "dashboardTasks",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/dashboard.go",
+    "line": 71,
+    "function": "renderDashboard",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/dialogue_restore.go",
+    "line": 242,
+    "function": "dialogueRestoreStartGuard",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/dispatcher.go",
+    "line": 322,
+    "function": "dispatch",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/dispatcher.go",
+    "line": 392,
+    "function": "dispatch",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/dispatcher.go",
+    "line": 534,
+    "function": "setProfile",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/durable_coordinator.go",
+    "line": 58,
+    "function": "reconcileMissionAttempts",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/durable_coordinator.go",
+    "line": 119,
+    "function": "reconcileKnownMissionResult",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/gate_dialog.go",
+    "line": 61,
+    "function": "previewGate",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/graph_draft.go",
+    "line": 214,
+    "function": "saveGraphDraft",
+    "kind": "literal_sql",
+    "value": "SELECT revision FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/graph_draft.go",
+    "line": 455,
+    "function": "previewGraphDraft",
+    "kind": "literal_sql",
+    "value": "SELECT revision,body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/graph_draft.go",
+    "line": 541,
+    "function": "applyGraphDraft",
+    "kind": "literal_sql",
+    "value": "SELECT revision,body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/graph_draft_cli.go",
+    "line": 97,
+    "function": "compareGraphDraft",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/graph_draft_cli.go",
+    "line": 189,
+    "function": "graphDraftCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/historical_requalification.go",
+    "line": 54,
+    "function": "requalifyHistorical",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/historical_requalification.go",
+    "line": 178,
+    "function": "historicalRequalificationRequest",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/independent_review.go",
+    "line": 319,
+    "function": "retryIndependentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/independent_review_runtime.go",
+    "line": 80,
+    "function": "independentReviewStep",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/independent_review_runtime.go",
+    "line": 240,
+    "function": "independentReviewStep",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/independent_review_runtime.go",
+    "line": 266,
+    "function": "saveIndependentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/independent_review_runtime.go",
+    "line": 311,
+    "function": "reviewFailure",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/lifecycle.go",
+    "line": 113,
+    "function": "lifecycleMissions",
+    "kind": "literal_sql",
+    "value": "SELECT w.id,w.body,w.revision,l.archived_at\n\t\tFROM works w LEFT JOIN mission_lifecycle l ON l.work_id=w.id\n\t\tORDER BY w.rowid DESC"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/lifecycle.go",
+    "line": 202,
+    "function": "lifecyclePreview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/lifecycle.go",
+    "line": 421,
+    "function": "checkLifecycleCurrent",
+    "kind": "literal_sql",
+    "value": "SELECT revision FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/lifecycle.go",
+    "line": 766,
+    "function": "applyRestore",
+    "kind": "literal_sql",
+    "value": "SELECT count(*) FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/lifecycle.go",
+    "line": 778,
+    "function": "applyRestore",
+    "kind": "literal_sql",
+    "value": "SELECT revision FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/main.go",
+    "line": 546,
+    "function": "run",
+    "kind": "selector",
+    "value": "list"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/main.go",
+    "line": 585,
+    "function": "run",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_cleanup.go",
+    "line": 32,
+    "function": "managedCleanupPreview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_control_diagnostic_api.go",
+    "line": 22,
+    "function": "managedControlDiagnostic",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_control_diagnostic_api.go",
+    "line": 79,
+    "function": "managedControlDiagnostic",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_delivery.go",
+    "line": 60,
+    "function": "managedBundle",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_git.go",
+    "line": 476,
+    "function": "managedFailure",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_integration.go",
+    "line": 96,
+    "function": "integrateManagedAttempt",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_integration_retry.go",
+    "line": 123,
+    "function": "retryManagedIntegration",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_preparation.go",
+    "line": 165,
+    "function": "resumeAutomaticPreparedLaunch",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_preparation.go",
+    "line": 188,
+    "function": "resumePreparedLaunchAs",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_preparation.go",
+    "line": 218,
+    "function": "resumePreparedLaunchAs",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_result_staging.go",
+    "line": 57,
+    "function": "managedIntegrationInput",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review.go",
+    "line": 329,
+    "function": "reviewManagedCandidate",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review.go",
+    "line": 520,
+    "function": "reviewManagedCandidate",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review.go",
+    "line": 582,
+    "function": "saveManagedReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_batch_runtime.go",
+    "line": 179,
+    "function": "reviewManagedBatches",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_batch_runtime.go",
+    "line": 215,
+    "function": "reviewManagedBatches",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_batch_runtime.go",
+    "line": 239,
+    "function": "reviewManagedBatches",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_diagnostic.go",
+    "line": 57,
+    "function": "diagnoseManagedFragmentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_diagnostic.go",
+    "line": 175,
+    "function": "diagnoseManagedFragmentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_diagnostic.go",
+    "line": 178,
+    "function": "diagnoseManagedFragmentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_diagnostic.go",
+    "line": 203,
+    "function": "diagnoseManagedFragmentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_dossier.go",
+    "line": 23,
+    "function": "managedReviewDossier",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_final_store.go",
+    "line": 86,
+    "function": "commitManagedFragmentFinal",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_finish.go",
+    "line": 53,
+    "function": "finishManagedFragmentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_finish.go",
+    "line": 116,
+    "function": "finishManagedFragmentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_resume.go",
+    "line": 93,
+    "function": "activateManagedFragmentResume",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_resume.go",
+    "line": 253,
+    "function": "settleOrphanManagedReviewReservation",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_runtime.go",
+    "line": 39,
+    "function": "runManagedFragmentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_runtime.go",
+    "line": 70,
+    "function": "runManagedFragmentReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_store.go",
+    "line": 214,
+    "function": "commitFragmentJournal",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_preflight_retry.go",
+    "line": 42,
+    "function": "readManagedPreflight",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_preflight_retry.go",
+    "line": 183,
+    "function": "previewManagedFragments",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_recovery.go",
+    "line": 40,
+    "function": "reviewRecoveryPreview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_scope.go",
+    "line": 131,
+    "function": "managedScopePreview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_settlement_authorization.go",
+    "line": 65,
+    "function": "managedSettlementLiveAuthority",
+    "kind": "literal_sql",
+    "value": "SELECT body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/memory_summary_source.go",
+    "line": 53,
+    "function": "memorySummarySource",
+    "kind": "literal_sql",
+    "value": "SELECT revision,body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission.go",
+    "line": 33,
+    "function": "setMission",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission.go",
+    "line": 151,
+    "function": "missionOwnedCycle",
+    "kind": "selector",
+    "value": "list"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission.go",
+    "line": 188,
+    "function": "missionOwnedCycle",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission.go",
+    "line": 206,
+    "function": "missionCycleObserved",
+    "kind": "selector",
+    "value": "list"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission.go",
+    "line": 273,
+    "function": "missionCycleWork",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission.go",
+    "line": 351,
+    "function": "stopMission",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission_cli.go",
+    "line": 20,
+    "function": "missionCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission_cli.go",
+    "line": 85,
+    "function": "missionCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission_cli.go",
+    "line": 94,
+    "function": "missionCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission_cli.go",
+    "line": 157,
+    "function": "missionCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission_cli.go",
+    "line": 195,
+    "function": "missionCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission_cli.go",
+    "line": 203,
+    "function": "missionCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission_insights.go",
+    "line": 234,
+    "function": "recoveryPreview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission_status.go",
+    "line": 169,
+    "function": "missionLaunchPreview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/mission_status.go",
+    "line": 332,
+    "function": "missionStatus",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/organization.go",
+    "line": 124,
+    "function": "organizationGuardTx",
+    "kind": "literal_sql",
+    "value": "SELECT body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/pilotage.go",
+    "line": 155,
+    "function": "launchEligibility",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/pilotage_receipts.go",
+    "line": 55,
+    "function": "agentCommandReceipt",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/plan_store.go",
+    "line": 26,
+    "function": "readPlan",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning.go",
+    "line": 172,
+    "function": "planningChange",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning.go",
+    "line": 186,
+    "function": "planningChange",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning.go",
+    "line": 205,
+    "function": "planningChange",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning.go",
+    "line": 238,
+    "function": "planningChange",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning.go",
+    "line": 288,
+    "function": "planningChange",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning.go",
+    "line": 1003,
+    "function": "revokePlanningTx",
+    "kind": "literal_sql",
+    "value": "SELECT body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning_api.go",
+    "line": 32,
+    "function": "planningCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning_api.go",
+    "line": 39,
+    "function": "planningCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning_api.go",
+    "line": 204,
+    "function": "registerPlanning",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning_rejection.go",
+    "line": 26,
+    "function": "planningRejected",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning_runner.go",
+    "line": 32,
+    "function": "planningStep",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning_runner.go",
+    "line": 157,
+    "function": "planningStep",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning_runner.go",
+    "line": 187,
+    "function": "planningStep",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning_runner.go",
+    "line": 240,
+    "function": "planningFailure",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/post_delivery.go",
+    "line": 73,
+    "function": "retexEvolution",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/preflight.go",
+    "line": 356,
+    "function": "preflightLaunch",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/prephase_conversion.go",
+    "line": 76,
+    "function": "preparationConversionReview",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/prephase_conversion.go",
+    "line": 143,
+    "function": "convertPreparation",
+    "kind": "literal_sql",
+    "value": "SELECT body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/prephase_store.go",
+    "line": 182,
+    "function": "preparationCommand",
+    "kind": "literal_sql",
+    "value": "SELECT id FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/project_memory.go",
+    "line": 441,
+    "function": "memoryLegacyPaths",
+    "kind": "literal_sql",
+    "value": "SELECT id,revision,body FROM works"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/provider_relay.go",
+    "line": 78,
+    "function": "providerRelayView",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/quotas.go",
+    "line": 262,
+    "function": "registerQuotas",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/quotas.go",
+    "line": 276,
+    "function": "previewQuotas",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/quotas.go",
+    "line": 317,
+    "function": "quotasCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/recovered_result.go",
+    "line": 100,
+    "function": "recoverResult",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/recovered_result.go",
+    "line": 120,
+    "function": "recoverResult",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/recovered_result.go",
+    "line": 301,
+    "function": "recoverResult",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/retex.go",
+    "line": 58,
+    "function": "retexAction",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/review_dialog.go",
+    "line": 82,
+    "function": "attributedTaskReports",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/review_dialog.go",
+    "line": 166,
+    "function": "reviewText",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/review_dialog.go",
+    "line": 208,
+    "function": "acceptReviewedTask",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/review_dialog.go",
+    "line": 266,
+    "function": "submitReportVerified",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/review_dialog.go",
+    "line": 421,
+    "function": "overrideReviewedTaskAt",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/role_model.go",
+    "line": 112,
+    "function": "previewRoleModel",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/run_supervision.go",
+    "line": 28,
+    "function": "observeRun",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/run_supervision.go",
+    "line": 142,
+    "function": "runStopRequest",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/task_model.go",
+    "line": 69,
+    "function": "previewTaskModel",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/task_model.go",
+    "line": 101,
+    "function": "taskModelCLI",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/terminal_help.go",
+    "line": 66,
+    "function": "openTerminalHelp",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/tracking.go",
+    "line": 39,
+    "function": "decisions",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/tracking.go",
+    "line": 161,
+    "function": "resolveDecision",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/tracking_views.go",
+    "line": 12,
+    "function": "hierarchyText",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/tracking_views.go",
+    "line": 33,
+    "function": "resumeSinceText",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/tracking_views.go",
+    "line": 101,
+    "function": "gateSummary",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/validation_policy_config.go",
+    "line": 99,
+    "function": "previewValidationPolicy",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 143,
+    "function": "webAction",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 170,
+    "function": "webAction",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 236,
+    "function": "webAction",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 281,
+    "function": "webAction",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 425,
+    "function": "newWebHandler",
+    "kind": "selector",
+    "value": "list"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 580,
+    "function": "newWebHandler",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 701,
+    "function": "newWebHandler",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 766,
+    "function": "newWebHandler",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 833,
+    "function": "newWebHandler",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 850,
+    "function": "newWebHandler",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/web_server.go",
+    "line": 863,
+    "function": "newWebHandler",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/work_row.go",
+    "line": 45,
+    "function": "readWorkRow",
+    "kind": "literal_sql",
+    "value": "SELECT id,revision,body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/work_row.go",
+    "line": 53,
+    "function": "listWorkRows",
+    "kind": "literal_sql",
+    "value": "SELECT id,revision,body FROM works ORDER BY rowid DESC"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/worker_recovery_focus.go",
+    "line": 33,
+    "function": "recoveryTaskFocus",
+    "kind": "literal_sql",
+    "value": "SELECT body FROM works WHERE id=?"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+    "line": 348,
+    "function": "integrateWorkspace",
+    "kind": "selector",
+    "value": "get"
+  },
+  {
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+    "line": 422,
+    "function": "integrateWorkspace",
+    "kind": "literal_sql",
+    "value": "SELECT revision FROM works WHERE id=?"
+  }
+]

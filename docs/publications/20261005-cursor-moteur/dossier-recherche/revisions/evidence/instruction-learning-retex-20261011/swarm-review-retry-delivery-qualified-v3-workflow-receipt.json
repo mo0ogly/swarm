@@ -1,0 +1,16 @@
+{
+  "command": [
+    "python3",
+    "tools/agent-workflows/check.py"
+  ],
+  "start": "2026-10-11T16:57:22.529284+00:00",
+  "end": "2026-10-11T16:57:25.847728+00:00",
+  "seconds": 3.318460062997474,
+  "exit": 0,
+  "output": "/tmp/swarm-review-retry-delivery-qualified-v3-workflow.out",
+  "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  }
+}

@@ -1,0 +1,52 @@
+**Missing evidence (stated up front):** the contents of `tests/rust_native_two_task.py` were not supplied. Only `tests/rust_native_web_conductor.py`, `tests/rust_planning_worker_public_flow.py`, `tests/rust_workspace_fifo_completion.py`, and selected helper functions were provided. Therefore the named assertions below are derived **exclusively** from `run()`/`held_planner()`/`main()` in `tests/rust_native_web_conductor.py` (the only supplied public two-role web journey with `passed()` named checks). If `rust_native_two_task.py` has a different check set, this recipe must be revised against its actual source; nothing here is executed or accepted.
+
+```json
+{
+  "schema_version": 1,
+  "id": "public-web-conductor-two-role-journey",
+  "derivation": "Named assertions copied verbatim from passed() calls in tests/rust_native_web_conductor.py run() and held_planner(), plus terminal markers from run() and main(). No watchdog; exit codes and stdout matching only.",
+  "environment": {
+    "SWARM_STATUS_CONTRACT_BINARY": "qualified normal production binary, empty engine features",
+    "SWARM_STATUS_CONTRACT_PROFILE": "profile JSON with no_fixture_feature true and sha256 matching the binary"
+  },
+  "steps": [
+    {
+      "id": "web-conductor-worker-journey",
+      "command": [
+        "python3",
+        "tests/rust_native_two_task.py",
+        "--binary", "${SWARM_STATUS_CONTRACT_BINARY}",
+        "--profile", "${SWARM_STATUS_CONTRACT_PROFILE}",
+        "--output", "${RECIPE_OUTPUT_DIR}/web-conductor"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS protected-mission-reads-before-start",
+        "PASS http-start-alone-launches-real-inert-worker",
+        "PASS http-status-responds-during-active-session",
+        "PASS competing-cli-watch-refused-without-duplicate-agent",
+        "PASS second-web-server-remains-usable-without-owning-or-releasing-first-lease",
+        "PASS invalid-and-unauthorized-controls-refuse-without-work-mutation-and-read-recovers",
+        "PASS all-six-http-writers-remain-responsive-and-stop-revokes-consent",
+        "PASS server-shutdown-releases-lease-and-granted-worker-survives",
+        "PASS reopen-preserves-revocation-and-no-duplicate-agent",
+        "PASS independent-worker-completes-after-server-without-fake-acceptance",
+        "PASS foreign-datastore-stops-coordinator-and-preserves-original",
+        "PASS restored-original-reopens-with-retained-completion-and-revocation",
+        "WEB_WORKER_JOURNEY_PASS",
+        "PASS web-owned-held-planner-shutdown-retains-actual-TERM-failed-receipt",
+        "NATIVE_WEB_CONDUCTOR_PASS"
+      ],
+      "required_stderr": []
+    }
+  ],
+  "not_claims": [
+    "No execution, acceptance, tool use, or repository access occurred.",
+    "rust_native_two_task.py source was not supplied; its assertions could not be read directly.",
+    "task_accepted remains false throughout; recipe grants no model, launch or settlement authority.",
+    "Same binary/profile env (SWARM_STATUS_CONTRACT_BINARY/SWARM_STATUS_CONTRACT_PROFILE) as the supplied RECIPE is reused; global_watchdog is absent by design."
+  ]
+}
+```
+
+**Integration notes (bounded):** the recipe reuses the conductor's own argument contract (`--binary --profile --output`, all required `Path`s) and asserts only strings the supplied source provably prints via `passed()`/final markers (`WEB_WORKER_JOURNEY_PASS`, `NATIVE_WEB_CONDUCTOR_PASS`, and the held-planner `PASS` line). `expected_exit: 0` matches `main()`'s normal return path; any failure raises a `BaseExceptionGroup` with retained cleanup errors, which the non-zero exit captures without masking. Root-cause staging markers (`STAGE awaiting-server-owned-provider`, `REPLAY_EVIDENCE`) are intentionally not asserted since the supplied `rust_native_web_conductor.py` `main()` does not print them.

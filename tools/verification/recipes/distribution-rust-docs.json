@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "distribution-rust-docs",
+  "inputs": [
+    "install.sh",
+    "build.sh",
+    "swarm",
+    "swarm.sh",
+    "Dockerfile",
+    ".dockerignore",
+    "deploy/entrypoint.sh",
+    "compose.yaml",
+    "Makefile",
+    ".github/workflows/ci.yml",
+    "tools/check_distribution.py",
+    "tools/swarm_local.py",
+    "tools/swarm_version.py",
+    "tools/rust-migration/build_native.py",
+    "tools/verification/verify_native_profile.py",
+    "tests/test_rust_distribution.py",
+    "tests/rust_native_install.py",
+    "tests/rust_docker_install.py",
+    "README.md",
+    "README.en.md",
+    "INSTALL.md",
+    "docs/en/INSTALL.md",
+    "CONTRIBUTING.md",
+    "docs/FRESH-INSTALL.md",
+    "docs/en/FRESH-INSTALL.md",
+    "docs/REPOSITORY-STRUCTURE.md",
+    "docs/en/REPOSITORY-STRUCTURE.md",
+    "docs/architecture/NATIVE-LOCAL-LAUNCHER.md",
+    "docs/en/NATIVE-LOCAL-LAUNCHER.md",
+    "rust/README.md",
+    "frontend/README.md",
+    "frontend/engine-settings/README.md",
+    "REFERENCE.md",
+    "docs/en/REFERENCE.md",
+    "version_history.json",
+    "rust/crates/swarm-cli/src/version.rs",
+    "rust/crates/swarm-cli/tests/version_no_repository.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "installer-regression-guards",
+      "command": [
+        "python3",
+        "tests/test_rust_distribution.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 4 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "entry-links-and-no-Go-distribution",
+      "command": [
+        "python3",
+        "tools/check_distribution.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS: entry docs links"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

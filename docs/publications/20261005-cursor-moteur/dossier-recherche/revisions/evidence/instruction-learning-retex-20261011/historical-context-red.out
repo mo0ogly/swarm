@@ -1,0 +1,7 @@
+--- FAIL: TestPlanningContextPrioritizesCurrentAttemptWithoutConsumingHistory (0.00s)
+    planning_context_priority_test.go:31: [current] 4
+--- FAIL: TestPlanningHistoricalInputsCannotPoisonCurrentDecision (0.03s)
+    planning_historical_delivery_test.go:41: current decision poisoned by old return: [current-return operator-retex old-return]
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.058s
+FAIL

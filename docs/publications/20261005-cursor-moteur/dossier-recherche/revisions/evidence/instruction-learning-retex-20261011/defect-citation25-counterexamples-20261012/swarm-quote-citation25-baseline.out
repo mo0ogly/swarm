@@ -1,0 +1,10 @@
+=== RUN   TestDefectCitationNativeLegacyOriginalsRemainRejected
+=== RUN   TestDefectCitationNativeLegacyOriginalsRemainRejected/first
+    managed_review_fragment_defect_citation_test.go:45: invented trailing newline was present
+=== RUN   TestDefectCitationNativeLegacyOriginalsRemainRejected/second
+--- FAIL: TestDefectCitationNativeLegacyOriginalsRemainRejected (0.01s)
+    --- FAIL: TestDefectCitationNativeLegacyOriginalsRemainRejected/first (0.00s)
+    --- PASS: TestDefectCitationNativeLegacyOriginalsRemainRejected/second (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.025s
+FAIL

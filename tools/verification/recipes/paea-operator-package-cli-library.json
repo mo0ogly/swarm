@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "id": "paea-operator-package-cli-library",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/**/*",
+    "web/*",
+    "web/lib/**/*",
+    "web/paea-examples/v1/*.json",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "version_history.json",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-cli/tests/identity_control.rs",
+    "tools/verification/recipes/paea-identity-options.json",
+    "tests/fixtures/paea_personal_tty.py",
+    "tests/fixtures/paea_personal_report_schema.py",
+    "schemas/paea/personal-lifecycle-cli-v1.schema.json",
+    "tools/verification/recipes/paea-personal-cli.json",
+    "tests/paea_personal_native_driver.py",
+    "tools/verification/recipes/paea-personal-cli-native.json",
+    "rust/crates/swarm-cli/tests/identity_provisioning.rs",
+    "schemas/paea/operator-package-cli-v1.schema.json",
+    "tests/paea_operator_package_schema_test.py",
+    "tools/verification/recipes/paea-operator-package-cli-library.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "public-operator-package-export-refusal-and-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "identity_operator",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "operator_check_pinned_private_package_fr_en_without_export_or_journal",
+        "operator_service_export_exact_no_replace_and_explicit_reconcile",
+        "operator_export_output_failure_keeps_publication_and_reconcile_recovers",
+        "operator_closed_flags_refuse_before_source_io_then_recover"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-source-target-cleanup-and-nonce",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--lib",
+        "provisioning::operator_handoff::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "operator_input_late_release_close_keep_decode_and_withhold_keys_then_recover",
+        "operator_wrong_role_and_close_keep_primary_refusal_without_handoff",
+        "operator_export_visible_then_cleanup_failure_reconciles_exact_bytes",
+        "operator_reconcile_read_ack_failure_keeps_pin_and_all_cleanup",
+        "operator_temporary_nonce_failure_refuses_then_retries_same_material"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-source-target-cleanup-and-custom-io-branches",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--features",
+        "test-fixtures",
+        "--lib",
+        "identity_operator::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "operator_custom_io_output_wrapper_retains_package_and_target_branches"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "closed-operator-report-phase-and-authority-schema",
+      "command": [
+        "python3",
+        "tests/paea_operator_package_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "private-operator-cli-and-request-borrow-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "-p",
+        "swarm-enrollment-authority",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Documenting swarm-cli",
+        "Documenting swarm-enrollment-authority",
+        "Finished"
+      ]
+    }
+  ]
+}

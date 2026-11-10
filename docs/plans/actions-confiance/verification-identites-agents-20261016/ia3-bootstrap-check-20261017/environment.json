@@ -1,0 +1,12 @@
+{
+  "CGO_ENABLED": "1",
+  "GOARCH": "amd64",
+  "GOFLAGS": "",
+  "GOMOD": "/home/fpizzi/Documents/ChatGPT/swarm/go.mod",
+  "GOOS": "linux",
+  "GOROOT": "/usr/local/go",
+  "GOVERSION": "go1.24.3",
+  "GOWORK": "",
+  "kernel": "6.17.0-41-generic",
+  "bubblewrap": "bubblewrap 0.11.0"
+}

@@ -1,0 +1,12 @@
+{
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-inputs-planning-capacity-20261012.bundle",
+  "sha256": "866d680986e614f15aea34b6974e61be5a7599d12f967d3aff62abd6629e536b",
+  "commit": "e19d7b85bd8eafb22b9a1f46a93afe271d651be4",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 146,
+  "manifest_sha256": "ef21ab2f6446c295d62a733910d9c6a37e125cd3a31e3bbc1fb713520eca0cb6",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/planning-input146-he5h3o6o",
+  "old144_preserved": true,
+  "check": "PASS isolated import and every original byte",
+  "instructions": "Preserve all144 originals. Latest cumulative planning-input-capacity patch replaces, rather than follows, review-capacity-first. Apply after binary-preflight-inspection with exact preimages and qualify cumulative task source. Actual reviewer cost9/18ready and native root now receives complete inputs; no semantic acceptance inferred. Deferred27 remains excluded."
+}

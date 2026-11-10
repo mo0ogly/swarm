@@ -1,0 +1,46 @@
+{
+  "at": "2026-10-11T09:48:44.491868+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "operations": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "event": "unpaid-preflight-judge-continuity-T3-20261011",
+      "from_revision": 119,
+      "to_revision": 120,
+      "next_sha256": "06dd33623ab8d2a76374e909458b6f02f419b2749d6bd02ce68ac6fbd974b0a7",
+      "next_prefix": "REPLAN T3 : intégrer réellement le juge global et le renouvellement aux décisions IA natives strictes ; T2 fournit planning judge/renew et global_cycle, pas encore les opérations du schéma fournisseur. Préserver acceptedFresh, droits/lease/périmètre, replay et compteurs ; le moteur applique un verdict attribué, ne décide pas de la fin. Prouver deux sous-superviseurs distincts simultanés ; résoudre la réorganisation des tâches déjà affectées via un parcours public sans perdre IDs/preuves. Architecture FR/EN et preuves de réception/effet ; T7 vérifiera avec fournisseur réel.",
+      "prior_instruction_preserved": true,
+      "criteria_dependencies_budgets_unchanged": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "event": "unpaid-preflight-judge-continuity-T4-20261011",
+      "from_revision": 120,
+      "to_revision": 121,
+      "next_sha256": "e7522d468eef091a62c820c6626c0ab51a0476d8ab68fdfefe432b43eefc0ca1",
+      "next_prefix": "REPLAN T4 : après run-supervision-20261011.patch, intégrer unpaid-preflight-revision-20261011.patch puis unpaid-preflight-documentation-20261011.patch (empreinte et parent dans son JSON). Il corrige la révision explicite d’un résultat interrompu après précontrôle sans appel, en vérifiant checkpoint/reçus/fin du processus ; tests/race/suite1120 PASS. Préserver les modifications T2/T3 et leurs preuves ; T2 fournit déjà le découpage complet du manifeste source. Regénérer le snapshot après fusion, sans changer le manifeste historique ni relever les budgets. Source : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/.",
+      "prior_instruction_preserved": true,
+      "criteria_dependencies_budgets_unchanged": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "event": "unpaid-preflight-judge-continuity-T5-20261011",
+      "from_revision": 121,
+      "to_revision": 122,
+      "next_sha256": "5fddafc6b425d3e88bb8168d652eb4eeb52e425c19baf194d21d232c95bd1672",
+      "next_prefix": "REPLAN T5 : compléter T2/T3/T4 : politiques du juge exposées/persistées via Admin FR/EN et API/CLI ; initialiser les missions historiques sans réactiver enable ni effacer plan, compteurs ou preuves. Aucun réglage de politique caché. Conserver schéma IA strict et décisions du responsable. Intégrer unpaid-preflight-revision-20261011.patch puis unpaid-preflight-documentation-20261011.patch puis review-time-policy-documentation-20261011.patch après run-supervision (JSON/parents dans recovery/ du dépôt source). UX de précontrôle impayé : diagnostic vérifié, résultat arrêté attribuable, correction explicite, nouvelle revue ; jamais forcer un booléen. Tester refus et parcours FR/EN réel.",
+      "prior_instruction_preserved": true,
+      "criteria_dependencies_budgets_unchanged": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "event": "unpaid-preflight-judge-continuity-T7-20261011",
+      "from_revision": 122,
+      "to_revision": 123,
+      "next_sha256": "f89ac3b2f55a4b90aabbe9d1271fa7485b4d2802cbe1937ed97b1ae80362ace7",
+      "next_prefix": "REPLAN T7 : recette indépendante sur le candidat exact : superviseur racine et deux sous-superviseurs IA réels, simultanéité/attribution, réception des observations, continue-run/stop-run motivés, juge/renouvellement réellement utilisés. Préserver toutes les consommations et les reçus ; distinguer intervention opérateur T2, fournisseurs doubles et autonomie réelle. Une primitive CLI ou un nom de rôle ne démontre pas le comportement global. Documenter architecture et limites du même candidat.",
+      "prior_instruction_preserved": true,
+      "criteria_dependencies_budgets_unchanged": true
+    }
+  ]
+}

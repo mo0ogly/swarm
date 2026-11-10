@@ -1,0 +1,18 @@
+flowchart TD
+    P[Production du candidat] --> C[Controles sur les entrees exactes]
+    C -->|Controles passes| R[Revue independante du candidat et des preuves]
+    C -->|Echec| I[Incident conserve et remis]
+    R -->|Defaut ou preuve manquante| I
+    I --> S[Superviseur du perimetre diagnostique et decide]
+    S -->|Probleme transversal| G[Superviseur racine arbitre]
+    G --> D[Decision autorisee]
+    S --> D
+    D --> M[Moteur verifie et applique]
+    M --> V[Correction et effet observes]
+    V -->|Echec de correction| I
+    V --> C
+    R -->|Avis favorable et preuves fraiches| A[Decision de poursuite ou de fin par le superviseur]
+    A --> F[Moteur controle et enregistre la decision admissible]
+    V --> L[Apprentissage pour les taches suivantes]
+    L --> U[Ajout visible et rejet utilisateur possible]
+    F --> T[Recette puis RETEX du besoin convenu]

@@ -1,0 +1,8 @@
+{"Time":"2026-10-12T22:17:35.092399787+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-12T22:17:35.155542088+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestManagedPublicationMeasuredConcurrency"}
+{"Time":"2026-10-12T22:17:35.155639053+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedPublicationMeasuredConcurrency","Output":"=== RUN   TestManagedPublicationMeasuredConcurrency\n"}
+{"Time":"2026-10-12T22:17:42.376934031+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedPublicationMeasuredConcurrency","Output":"--- PASS: TestManagedPublicationMeasuredConcurrency (7.22s)\n"}
+{"Time":"2026-10-12T22:17:42.376991154+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestManagedPublicationMeasuredConcurrency","Elapsed":7.22}
+{"Time":"2026-10-12T22:17:42.377110921+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-12T22:17:42.384380229+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t7.292s\n"}
+{"Time":"2026-10-12T22:17:42.384432874+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":7.292}

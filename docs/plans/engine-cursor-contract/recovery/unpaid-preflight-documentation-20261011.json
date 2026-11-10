@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "patch": "docs/plans/engine-cursor-contract/recovery/unpaid-preflight-documentation-20261011.patch",
+  "sha256": "e8e4ba88adcb4eec068b717cb2c9a6dec512a5d33e4dcc1b2c50c271c5275801",
+  "bytes": 6950,
+  "parent_patch": "unpaid-preflight-revision-20261011.patch",
+  "files": [
+    "docs/ATTEMPT-RECOVERY.md",
+    "docs/en/ATTEMPT-RECOVERY.md"
+  ],
+  "effect": "FR/EN explicit stopped-result no-call preflight correction, original receipts/history retained, fresh controls/review, current duration observations; no reset or limit change",
+  "checks": {
+    "reverse_application": "PASS",
+    "engine_suite": "1120 canonical targets PASS; go test ./... PASS; race/vet PASS"
+  },
+  "source_partition": "T2 supplies partitioned snapshot; regenerate after own changes."
+}

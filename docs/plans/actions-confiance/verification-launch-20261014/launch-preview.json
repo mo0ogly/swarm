@@ -1,0 +1,100 @@
+{
+  "identity": {
+    "objective": "Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.",
+    "role": "worker",
+    "provider": "codex",
+    "requested_level": "standard",
+    "resolved_model": "gpt-5.6-sol",
+    "actual_model": "",
+    "project_profile": "",
+    "skills": []
+  },
+  "organization": {
+    "ready": true,
+    "label": "Organisation autonome configurée",
+    "issues": [],
+    "next": "Consulter les responsables et les contrôles autorisés.",
+    "verification": "Vérificateur IA indépendant : codex · 0/40 appels. Avis requis avant acceptation. Contrôles configurés ; aucune revue IA indépendante implicite."
+  },
+  "verdict_token": "bed80e4393a922ee5496906bbd112a2b292e6e9bdc23e392515b3f3066749dcf",
+  "revision": 8,
+  "requested_slots": 2,
+  "immediate": 1,
+  "effective_concurrency": 1,
+  "shared_workspace": false,
+  "concurrency_mode": "bounded",
+  "concurrency_detail": "La concurrence annoncée est la première vague calculée maintenant ; créneaux, dépendances, budget et espaces disponibles peuvent la borner.",
+  "departures": [
+    {
+      "id": "plan-68b50cc82e-T1",
+      "title": "Définir l’architecture complète",
+      "workspace": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T1-1",
+      "identity": {
+        "objective": "Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.",
+        "role": "worker",
+        "provider": "codex",
+        "requested_level": "standard",
+        "resolved_model": "gpt-5.6-sol",
+        "actual_model": "",
+        "project_profile": "",
+        "skills": []
+      }
+    }
+  ],
+  "waiting": [
+    {
+      "id": "plan-68b50cc82e-T2",
+      "title": "Livrer le pilote avec Biba",
+      "reason": "Dépendance non validée ou périmée",
+      "normal": true
+    },
+    {
+      "id": "plan-68b50cc82e-T3",
+      "title": "Intégrer les identités d’entreprise",
+      "reason": "Dépendance non validée ou périmée",
+      "normal": true
+    },
+    {
+      "id": "plan-68b50cc82e-T4",
+      "title": "Maîtriser les données et secrets",
+      "reason": "Dépendance non validée ou périmée",
+      "normal": true
+    },
+    {
+      "id": "plan-68b50cc82e-T5",
+      "title": "Livrer les processus et dossiers métier",
+      "reason": "Dépendance non validée ou périmée",
+      "normal": true
+    },
+    {
+      "id": "plan-68b50cc82e-T6",
+      "title": "Renforcer les preuves et éprouver les contrôles",
+      "reason": "Dépendance non validée ou périmée",
+      "normal": true
+    },
+    {
+      "id": "plan-68b50cc82e-T7",
+      "title": "Intégrer le collecteur eBPF",
+      "reason": "Dépendance non validée ou périmée",
+      "normal": true
+    },
+    {
+      "id": "plan-68b50cc82e-T8",
+      "title": "Qualifier l’ensemble et livrer le RETEX",
+      "reason": "Dépendance non validée ou périmée",
+      "normal": true
+    }
+  ],
+  "limits": [
+    "Au plus 2 départ(s) simultané(s), selon les espaces réellement disponibles.",
+    "Un même espace de travail est utilisé par un seul agent à la fois.",
+    "Après 2 tentatives automatiques infructueuses, une décision humaine est requise.",
+    "Les dépendances, budgets, arrêts demandés et validations restent bloquants."
+  ],
+  "contract": {
+    "scope": "# Actions de confiance dans Swarm\n\n## Objectif\n\nUn opérateur définit un mandat, examine une demande, autorise ou refuse l’action et retrouve son résultat. Un agent ne peut pas étendre ses droits ni présenter son propre texte comme une autorisation officielle.\n\n## Socle existant\n\nLa console des journaux est en lecture seule. Les réponses originales de revue sont conservées sans écrasement et liées à une empreinte. Les journaux de revue sont vérifiés contre une empreinte ancrée dans l’état durable. Les journaux d’activité ordinaires sont distincts et soumis à rétention. Le programme réutilise ces mécanismes après vérification de leurs producteurs, lecteurs, droits et limites ; une lecture seule dans l’interface ne démontre pas une interdiction d’écriture au niveau du stockage.\n\n## Pilote initial\n\nPilote de facturation simulée avec grand livre déterministe et service factice en racine isolée. Aucun accès bancaire ou paiement réel. Le connecteur pilote constitue le périmètre de protection à démontrer ; les exécutables et chemins d’accès non médiés sont inventoriés et leurs limites explicites.\n\n## Exigences\n\nR01 Identité — Le point d’entrée authentifie le demandeur. Un champ actor fourni par le demandeur ne constitue pas une identité authentifiée.\n\nR02 Mandat — Sujet, délégation, actions, ressources, contraintes, version et expiration sont vérifiés. Modifier un élément couvert invalide les approbations incompatibles. Les droits proviennent des règles et autorisations, sans compensation par un score agrégé.\n\nR03 Effet — Le service vérifie l’autorisation et les paramètres exacts au moment d’engager l’effet. Mandat absent, expiré, révoqué, mauvais sujet ou ressource hors périmètre : refus sans mutation métier.\n\nR04 Révocation — L’ordre entre révocation et engagement concurrent est défini et testé. Après prise en compte de la révocation, aucun nouvel engagement n’est autorisé. Les effets déjà engagés restent conservés et observables.\n\nR05 Approbation — L’accord porte sur l’empreinte exacte de l’action : montant, devise, bénéficiaire et ressource. Le moteur applique la séparation des responsabilités ; le demandeur ne fabrique pas sa propre approbation.\n\nR06 Reprise — Une clé d’idempotence est liée au contenu. Même clé et contenu différent : conflit sans mutation. Même clé et contenu identique : retour de l’état connu. Réponse perdue ou arrêt après engagement : état inconnu puis réconciliation avec le service avant toute nouvelle tentative.\n\nR07 Preuves — Relier intention, identité, mandat, politique, décision, engagement et résultat observé en réutilisant les reçus, originaux et vérifications existants. Les refus et états inconnus restent conservés. Ajouter seulement les garanties manquantes pour l’export signé du pilote. La vérification utilise une clé et une ancre acquises séparément ; elle détecte altérations, réordonnancement et omissions par rapport à l’ancre. Aucun secret dans l’export.\n\nR08 Configuration — Toute nouvelle règle, durée, reprise ou rétention possède une source de vérité persistée, un aperçu sans mutation, une application protégée des révisions anciennes et une édition Admin. API, CLI et Go partagent validation et valeurs effectives. Unités, héritage, défauts et sens de zéro sont définis avant implémentation. Aucune seconde limite cachée.\n\nR09 Intégrité Biba — Définir la variante du modèle Biba retenue, les niveaux d’intégrité des sujets et objets et les règles de lecture, écriture et invocation. Les entrées externes et sorties d’agents conservent leur provenance et leur niveau ; un agent ne peut pas s’attribuer un niveau supérieur ou réécrire politiques, clés et preuves officielles. Toute admission dans un état protégé passe par une procédure de validation explicitement autorisée et attribuée. Vérifier les flux interdits, les admissions permises, les contournements et la persistance via API, CLI et stockage. La seule lecture du journal dans l’interface ne démontre pas ces garanties.\n\nR10 Interface — Présenter demandes, approbations, refus, expiration, révocation, engagements, états inconnus et réconciliations. Motifs bloquants et prochaine action visibles ; statuts exprimés par du texte. Vérifier FR/EN, État/sombre, clavier, Escape/focus, mobile, chargement/vide/erreur/succès et erreurs réseau. L’architecture conserve la livraison séparée des UX Projet et Processus métier.\n\nR11 Recette — Les opérations publiques vérifient les changements réels du grand livre, les refus sans mutation, la persistance après redémarrage et la concurrence. Les contrôles et la revue indépendante portent sur le même candidat. Séparer simulation, fournisseur réel, intervention opérateur et acceptation ; aucune autoacceptation.\n\nR12 Livraison — Fournir documentation courante FR/EN, recette reproductible, matrice des exigences et preuves puis RETEX final. Distinguer contrôles locaux, reçus moteur et revue. Les travaux non vérifiés restent ouverts.\n\n## Parcours\n\nDéfinir les règles et le mandat → présenter une demande → vérifier l’autorité → obtenir l’approbation requise → engager l’action autorisée → observer ou réconcilier le résultat → consulter et exporter les preuves.\n\n## Architecture et responsabilités\n\nLe moteur contrôle droits, versions et transitions. Le service métier applique ses invariants dans la transaction qui engage l’effet. Le connecteur porte l’idempotence et la réconciliation. Les agents demandent une action dans leur périmètre ; l’opérateur autorise les règles et la revue indépendante évalue le candidat.\n\nLe cadrage compare les contrôles de départ seuls et un passage contrôlé par action. Il définit le passage obligatoire du connecteur pilote, la protection des secrets hors des copies d’agents et les restrictions des accès directs. Une configuration dont l’isolation n’est pas démontrée est refusée. Les contrôles de conformité du résultat et les contrôles préalables à l’effet restent complémentaires.\n\n## Observation système avec eBPF\n\nReprendre l’étude existante dans docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md, section « Extension demandée : observabilité eBPF ». Elle définit une option étudiée, sans collecteur intégré ni activation privilégiée réalisée.\n\nIntégrer un collecteur Linux optionnel, séparé du moteur, pour les événements de processus, accès disque et réseau. Relier PID, descendants et cgroups disponibles aux identités mission/tâche/tentative. Les décisions métier, tokens et verdicts restent attribués aux événements du moteur.\n\nL’incrément d’observation précisera les sondes, capacités nécessaires, disponibilité du noyau, événements perdus, confidentialité, nettoyage et surcoût mesuré. Activation, sélection des sondes, échantillonnage et rétention seront persistés et administrables. Le moteur reste utilisable sans collecteur ; son absence et ses pertes de mesures restent visibles.\n\nL’observation complète les traces du moteur. Le blocage d’une écriture ou d’une action sensible exige un mécanisme de contrôle explicitement configuré et vérifié ; la collecte ne constitue ni une autorisation ni une garantie d’inaltérabilité des journaux.\n\n## Exigences des extensions\n\nR13 Identités d’entreprise — Authentifier personnes et services via le protocole choisi, contrôler les attributs de sécurité et gérer délégation, cycle de vie, révocation et séparation des responsabilités.\n\nR14 Données — Appliquer classification, destinations et secrets par action aux flux effectivement contrôlés. Refuser une action sensible lorsque la protection de son chemin n’est pas démontrée. Vérifier exfiltration et contournement en simulation isolée.\n\nR15 Processus — Définitions versionnées, dossiers, validations et exceptions avec historique ; UX métier livrable séparément. Les modèles respectent les opérations publiques réellement supportées.\n\nR16 Preuves durables — Rotation et révocation des clés, ancrage indépendant, rétention et export ; détecter les altérations et omissions sous ancre. Conserver l’attribution des originaux et protéger les secrets.\n\nR17 Simulation — Rejeu et scénarios adversariaux isolés sans effet de production ; politiques, résultats et limites visibles et persistés.\n\nR18 Connecteurs — Catalogue extensible et second connecteur sensible simulé avec invariants du service, autorisation, isolation, idempotence et réconciliation vérifiés.\n\nR19 Référentiels — Établir l’applicabilité, les contrôles, preuves et écarts pour le contexte cible ; aucune certification ou conformité globale déduite d’un test local.\n\nR20 eBPF — Intégrer le collecteur Linux optionnel, corréler les événements au périmètre du projet, gérer permissions, pertes et nettoyage, rendre les paramètres persistés et administrables, et mesurer collecte réelle et surcoût. Une autorité système manquante reste une preuve bloquée avec condition de reprise ; les autres travaux continuent.\n\n## Départ et acceptation\n\nLe lancement couvre les quatorze stories, organisées en huit lots dépendants. Configurer l’équipe Codex, l’isolation Git et les contrôles exécutables via les opérations publiques. Les agents peuvent décomposer les lots dans les droits et budgets attribués, sans créer une acceptation implicite. La recette et le RETEX couvrent l’ensemble ; aucun paiement réel, publication ou déploiement externe n’est autorisé.\n\n## Périmètre détaillé des lots\n\nT1 Définir l’architecture complète — Inspecter producteurs, API/CLI, stockage et UX ; reprendre l’étude eBPF et le système visuel. Livrer docs/architecture/ACTIONS-CONFIANCE.md et docs/en/ACTIONS-CONFIANCE.md, avec architecture et interfaces précises de tous les lots.\n\nT2 Livrer le pilote avec Biba — Moteur et connecteur de facturation factice, mandat/approbation, idempotence et réconciliation ; Admin et parcours opérateur FR/EN. Réutiliser les journaux, reçus et ancrages existants.\n\nT3 Intégrer les identités d’entreprise — Un protocole OIDC explicitement choisi, personnes et services, droits délégués et cycle de vie ; API/CLI/Admin et parcours de connexion. Issuer factice isolé pour les tests ; aucun compte tiers créé.\n\nT4 Maîtriser les données et secrets — Classification et politiques de destinations, fournisseurs et outils ; secrets par action et frontières d’exécution, avec refus des configurations dont les garanties ne sont pas démontrées.\n\nT5 Livrer les processus et dossiers métier — Définitions versionnées, dossiers, validations et exceptions ; UX Processus métier livrable séparément avec moteur commun. Utiliser .claude/skills/swarm-model-design/SKILL.md pour les modèles de processus.\n\nT6 Renforcer les preuves et éprouver les contrôles — Clés et ancrage externe, rétention, exports ; laboratoire de simulation/adversarial isolé ; un second connecteur sensible simulé et matrice des référentiels applicables.\n\nT7 Intégrer le collecteur eBPF — Collecteur Linux optionnel séparé du moteur, transport local, attribution des événements et Admin. Sondes limitées aux processus du projet et à leurs descendants ; aucune observation étrangère au périmètre.\n\nT8 Qualifier l’ensemble et livrer le RETEX — Recette indépendante du candidat complet, contrôles cumulés, documentation FR/EN, matrice R01–R20 et RETEX. Aucun changement du candidat pendant la revue. · 8 tâche(s) · dossier /home/fpizzi/Documents/ChatGPT/swarm",
+    "budget": "Aucun plafond financier configuré ; les limites d’outils et de tentatives de chaque tâche restent appliquées.",
+    "recovery": "Au plus 2 tentatives automatiques par chaîne de reprise, premier départ compris ; un environnement inchangé attend une nouvelle vérification et les plafonds propres aux tâches restent prioritaires.",
+    "validation": "0 tâche(s) en revue humaine · 8 tâche(s) avec 56 contrôle(s) automatique(s) préautorisés."
+  }
+}

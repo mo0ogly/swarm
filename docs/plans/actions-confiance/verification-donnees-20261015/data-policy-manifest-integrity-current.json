@@ -1,0 +1,7 @@
+{
+  "paths": 1390,
+  "mismatches": [],
+  "manifest_sha256": "a51e671c6e551157dd95912f10b7dcf9fcb24d56e57cb008b2e5cbe497ec2a00",
+  "at": "2026-10-15T20:25:44.378762+00:00",
+  "schema_handling": "input_parts read according to refresh producer; earlier ad-hoc inputs assumption rejected"
+}

@@ -1,0 +1,9 @@
+%%{init:{"theme":"base","fontFamily":"Arial, sans-serif","themeVariables":{"fontFamily":"Arial, sans-serif","fontSize":"27px","lineColor":"#526976","edgeLabelBackground":"#f5f3ec"},"flowchart":{"htmlLabels":true,"wrappingWidth":260,"nodeSpacing":32,"rankSpacing":55}}}%%
+flowchart LR
+  R["RETEX<br/>Vérifié"] --> V["Version<br/>Admise"]
+  V --> S["Sélection<br/>Explicite"]
+  S --> C["Contexte reçu<br/>Conservé"]
+  classDef memoire fill:#ede9fe,color:#4c1d95,stroke:#7c3aed,stroke-width:3px;
+  classDef choix fill:#dbeafe,color:#173d66,stroke:#1b5f7a,stroke-width:3px;
+  class R,V,C memoire;
+  class S choix;

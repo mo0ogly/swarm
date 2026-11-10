@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-12T13:08:51.354199+00:00",
+  "public_error": "validation automatique suspendue ou autonomie d\u00e9sactiv\u00e9e",
+  "cause": "Existing authorization guard refuses reservation while global cockpit pause is set. Planning pause is retained to prevent production during corrected reservation.",
+  "worker_attempts": 4,
+  "review_calls": 82,
+  "result": "61693d4413607770cfff22508236f3986c20bd33",
+  "state_unchanged": true
+}

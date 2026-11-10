@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "failure": "AssertionError: expected 16 source archives",
+  "observed_archives": 17,
+  "cause": "The verifier hard-coded an incorrect inventory count; actual archived bytes matched current sources before this assertion.",
+  "correction": "Compare exact archive path set against the actual 14 agent_identity files plus model/store/trust_actions, not a manually entered count.",
+  "effect_on_go_checks": "None; no Go source changed or check rerun."
+}

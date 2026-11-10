@@ -1,0 +1,26 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityRuntime",
+    "-count=1",
+    "-timeout",
+    "40s"
+  ],
+  "start": "2026-10-17T06:27:37.064287+00:00",
+  "end": "2026-10-17T06:28:06.657314+00:00",
+  "exit_code": 0,
+  "identity_sources": {
+    "internal/engine/agent_identity_authority.go": "cd335869ae1b6a80959e64432f0759fde44d94bc5846c48417d1ce8dcc32a150",
+    "internal/engine/agent_identity_authority_test.go": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808",
+    "internal/engine/agent_identity_channel_linux.go": "4c8912a102a687b73c673d97eb39a98c95c226af855549d96892a562e775529a",
+    "internal/engine/agent_identity_channel_linux_test.go": "27e6e63ebb2224bf51035c6b3b060f27a92971d25a6b8c763efb1ee3b52b8088",
+    "internal/engine/agent_identity_contract.go": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+    "internal/engine/agent_identity_contract_test.go": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9",
+    "internal/engine/agent_identity_runtime_linux.go": "7cf817aade7ec77d2e7377cf347a6e9ec2f7ee14830f22c1c2b746303bcb3658",
+    "internal/engine/agent_identity_runtime_linux_test.go": "12d995bf1d732e9a3193516369ff0a29a0b3877a37155bfc44ba9a6da457fb6c"
+  }
+}

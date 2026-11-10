@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "native-reviewer-private-journal",
+  "inputs": [
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_reviewer_claim_candidate.py",
+    "tools/agent-workflows/check.py",
+    "tools/agent-workflows/test_check.py",
+    "tests/rust_native_reviewer.py",
+    "tools/verification/verify_native_profile.py",
+    "tools/verification/recipe.py",
+    "tools/verification/native_no_go.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r97",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "qualified-oracle-and-six-private-journal-scenarios",
+      "command": [
+        "python3",
+        "-c",
+        "import json,tempfile,subprocess,sys; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-review-journal-',dir='.cache')).resolve(); subprocess.run([sys.executable,'tools/verification/verify_native_profile.py','--output',str(base/'profile')],check=True); profile=json.loads((base/'profile/result.json').read_bytes()); cases=['complete','duration','source','output-error','domain-invalid','changes-requested']; exec(\"for case in cases:\\n    output=base/case\\n    subprocess.run([sys.executable,'tests/rust_reviewer_claim_candidate.py','--binary',profile['binary'],'--output',str(output),'--execute-reviewer','--final-reserved-call','--controller-case',case,'--require-private-receipt'],check=True)\\n    result=json.loads((output/'result.json').read_bytes())\\n    assert result['status']=='PASS' and result['private_receipt_written'] is True and result['business_result_published'] is False\\nprint('PRIVATE_REVIEW_JOURNAL_CASES='+str(len(cases)))\\nprint('REPLAY_EVIDENCE '+str(base))\")"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PRIVATE_REVIEW_JOURNAL_CASES=6",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-admission-public",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "fixed-domain-actual-cli-http",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-preparation-proof-')/'journey'; subprocess.run(['python3','tests/blp_admission_public.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_PREPARATION_CLI_HTTP_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "exit": 1,
+      "seconds": 7.260142084007384,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "c9f36b2192a7b0faa227273bb3ecdafe885c0f9de1163e4fda5f2851ce6ec243",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "3b081af533f208b3c6674552436097114ab57984209182a4f7c8f75800704eff",
+    "declared-inputs.tar.gz": "9dc715794f187e6664c62723e312cc8b99ece5a16eb99dda89a4950f67f5addf",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "d49f295b9c7b7a011bbdc58877ce76030bbd989cf6e4dddf35860cf31fb7ca06",
+    "step-0001.stderr": "c174f0c714a46efe910dd8302d7843bacdf0275f350f84011f52d4f8cc0357d4",
+    "step-0001.json": "f76cb56915bb75fd9c8064983107de7890eefb72752c391b8f0b0ac68dfba77d",
+    "inputs.after.json": "3b081af533f208b3c6674552436097114ab57984209182a4f7c8f75800704eff"
+  }
+}

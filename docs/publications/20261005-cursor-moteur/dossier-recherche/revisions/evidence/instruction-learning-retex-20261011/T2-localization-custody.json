@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T11:20:50.491068+00:00",
+  "producer": "auto-f2abbcfe6bed66fd1a5e",
+  "status": "interrupted",
+  "accepted_head_preserved": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "before_tree": "941725657c5a85bb7699ade3974b3de485e29780",
+  "after_tree": "1ded4021e9c822ccb8b2ce3e427f075bfdc9d7ff",
+  "patch_sha256": "ae993886671be3369cdbc1c81497deef688010096f33cea923335eaf23215917",
+  "owned_recovery": "/tmp/swarm-T2-operator-recovery-20261011-i8yzie71",
+  "native_copy": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-2",
+  "review_id": "review-dec9eececb2d49ee384f93de",
+  "limits": "Only stopped producer copy updated with checked correction; no active process, database edit, refund or acceptance."
+}

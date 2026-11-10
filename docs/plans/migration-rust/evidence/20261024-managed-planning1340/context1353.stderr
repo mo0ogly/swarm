@@ -1,0 +1,3 @@
+   Compiling swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+    Finished `test` profile [unoptimized] target(s) in 34.75s
+     Running unittests src/lib.rs (.cache/rust-native-version846-target/debug/deps/swarm_engine-b6aa09cf62374457)

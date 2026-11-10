@@ -1,0 +1,140 @@
+{
+  "format": "1920x1080, H.264, 30 fps, silent French captioned explainer",
+  "editorial_date": "2026-10-23",
+  "scenes": [
+    {
+      "id": "01-introduction",
+      "duration": 12,
+      "eyebrow": "IDENTITÉ · MÉMOIRE · SUPERVISION",
+      "title": "Swarm, des agents dans un cadre explicite",
+      "subtitle": "Relier une mission, son autorité et ses résultats.",
+      "badge": "PRÉSENTATION DU PROJET",
+      "mode": "intro",
+      "cards": [
+        {"title": "Superviser", "body": "Conduire le travail et traiter les incidents", "tone": "blue"},
+        {"title": "Attribuer", "body": "Distinguer acteur, instance et autorité", "tone": "teal"},
+        {"title": "Mémoriser", "body": "Conserver des leçons et leur provenance", "tone": "purple"}
+      ],
+      "captions": [
+        "Swarm construit une continuité entre la mission confiée à un agent et les preuves de son résultat.",
+        "La supervision, l’identité et la mémoire répondent à des questions différentes, mais liées.",
+        "Le moteur maintient les preuves et applique les décisions autorisées dans le périmètre de la tâche."
+      ]
+    },
+    {
+      "id": "02-supervision",
+      "duration": 16,
+      "eyebrow": "SUPERVISION",
+      "title": "Un responsable pour chaque périmètre",
+      "subtitle": "Le contrat de conduite distingue les rôles et leurs responsabilités.",
+      "badge": "CONTRAT DU SOCLE GO",
+      "diagram": "supervision.mmd",
+      "captions": [
+        "Le superviseur racine conserve l’objectif global. Un sous-superviseur conduit son propre périmètre.",
+        "Les exécutants produisent leur travail et ses preuves. Les observations remontent au responsable concerné.",
+        "Chaque événement conserve son périmètre, sa tentative et ses compteurs pour atteindre le bon responsable."
+      ]
+    },
+    {
+      "id": "03-conduite",
+      "duration": 16,
+      "eyebrow": "OBSERVATION ET DÉCISION",
+      "title": "Observer, décider, puis appliquer",
+      "subtitle": "Une durée écoulée ne démontre ni achèvement ni acceptation.",
+      "badge": "MÉCANISME DOCUMENTÉ EN GO",
+      "diagram": "conduite.mmd",
+      "captions": [
+        "Le moteur remonte les observations : durée, attente d’un outil et compteurs de la tentative.",
+        "Le responsable motive la poursuite ou l’arrêt. Le moteur vérifie les droits et les préconditions.",
+        "Une demande d’arrêt et une fin effective sont distinctes. Les preuves et l’historique restent conservés."
+      ]
+    },
+    {
+      "id": "04-rust",
+      "duration": 18,
+      "eyebrow": "SUPERVISION DÉJÀ VÉRIFIÉE",
+      "title": "Des parcours CLI Rust concrets",
+      "subtitle": "Résultats de recettes locales conservés · fournisseurs de fixture.",
+      "badge": "PARCOURS CIBLÉS · PAS DE CAPTURE LIVE",
+      "mode": "cards",
+      "cards": [
+        {"title": "Lancer et suivre", "body": "Worker et observation du conducteur", "tag": "Recette 213 · PASS", "tone": "blue"},
+        {"title": "Reprendre", "body": "Worker queued et nouvelle génération", "tag": "Recette 224 · PASS", "tone": "teal"},
+        {"title": "Planifier puis exécuter", "body": "Planification jusqu’à la fin d’un worker de test", "tag": "Recette 244 · PASS", "tone": "purple"}
+      ],
+      "captions": [
+        "Rust dispose déjà de parcours publics ciblés pour lancer et suivre un worker.",
+        "D’autres recettes couvrent la reprise d’un worker en attente et l’enchaînement planification–exécution.",
+        "Ces résultats utilisent des fournisseurs de test. Les autres rôles et la supervision web restent à qualifier."
+      ]
+    },
+    {
+      "id": "05-identite",
+      "duration": 14,
+      "eyebrow": "IDENTITÉ ET AUTORITÉ",
+      "title": "Rattacher l’action à un contexte précis",
+      "subtitle": "Un nom d’agent ou un identifiant de processus ne suffit pas.",
+      "badge": "CONTRATS ET COMPOSANTS INTERNES",
+      "diagram": "identite.mmd",
+      "captions": [
+        "Le contrat distingue l’initiateur, l’agent logique et son instance d’exécution.",
+        "L’autorité porte sur une mission, une tâche, une opération, une ressource et un contenu précis.",
+        "La délégation reste bornée par le parent. Le raccordement public complet demeure à qualifier."
+      ]
+    },
+    {
+      "id": "06-memoire",
+      "duration": 18,
+      "eyebrow": "MÉMOIRE DE PROJET",
+      "title": "Des leçons versionnées, choisies pour une tâche",
+      "subtitle": "Provenance, conditions d’usage et contexte effectivement reçu.",
+      "badge": "SOCLE GO · PARCOURS RUST À QUALIFIER",
+      "diagram": "memoire.mmd",
+      "captions": [
+        "Le socle mémoire documenté en Go part d’un retour d’expérience vérifié et admet une version de la leçon.",
+        "L’opérateur choisit les versions utiles à une tâche. La tentative conserve le contexte et ses empreintes.",
+        "Lire, résumer et transmettre sont des usages distincts. Retirer une leçon ne purge pas le contexte déjà reçu."
+      ]
+    },
+    {
+      "id": "07-securite",
+      "duration": 14,
+      "eyebrow": "ÉVOLUTION PRÉVUE · AC-02",
+      "title": "Relier les protections à leurs preuves",
+      "subtitle": "Références : NVIDIA OpenShell, Bromure et Agent Baseline.",
+      "badge": "PLAN FUTUR · NON DÉMARRÉ",
+      "mode": "cards",
+      "cards": [
+        {"title": "Confinement", "body": "Fichiers, processus et descendants", "tone": "orange"},
+        {"title": "Réseau et secrets", "body": "Destination et opération autorisées", "tone": "orange"},
+        {"title": "Traçabilité", "body": "Tâche, outil, flux et décision reliés", "tone": "orange"}
+      ],
+      "captions": [
+        "AC-02 prépare une couche complémentaire de confinement, de contrôle réseau et d’usage des secrets.",
+        "Le choix est un moteur Swarm propre et un sous-ensemble compatible OpenShell à définir et vérifier.",
+        "Le futur parcours reliera refus, règle, révision appliquée et effet observé."
+      ]
+    },
+    {
+      "id": "08-references",
+      "duration": 12,
+      "eyebrow": "POUR ALLER PLUS LOIN",
+      "title": "Architecture expliquée, maturité affichée",
+      "subtitle": "État documentaire au 23 octobre 2026 · migration Rust en cours.",
+      "badge": "RÉFÉRENCES ET PÉRIMÈTRE",
+      "mode": "references",
+      "cards": [
+        {"title": "Cursor", "body": "Scaling long-running autonomous coding · 14 janvier 2026"},
+        {"title": "NVIDIA OpenShell", "body": "Policy Schema Reference · version 0.1.5"},
+        {"title": "Bromure", "body": "OpenShell policies and network lineage · 21 octobre 2026"},
+        {"title": "Agent Baseline", "body": "Secure Software Factory · version 1 · catalogue 1.0-draft"},
+        {"title": "LangChain", "body": "Memory overview"}
+      ],
+      "captions": [
+        "Les sources publiques éclairent les concepts. Elles ne certifient pas la conformité de Swarm.",
+        "La supervision fournit déjà des parcours Rust vérifiés sur fixtures ; l’intégration globale reste ouverte.",
+        "Présentation explicative et sous-titrée. Les liens des références accompagnent la vidéo."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "label": "race",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "./internal/engine",
+      "-run",
+      "TestPlanningTaskPreview|TestPlanningRejected|TestPlanningCompleteEnvelope|TestManagedReviewProducerStatusContract|TestManagedReviewFragmentInspectionPrompt",
+      "-count=1",
+      "-timeout=120s"
+    ],
+    "start": "2026-10-11T13:25:43.102547+00:00",
+    "seconds": 30.874410854001326,
+    "exit": 0,
+    "output": "/tmp/swarm-review-contract-owner-context-race.out"
+  },
+  {
+    "label": "vet",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "start": "2026-10-11T13:26:14.006742+00:00",
+    "seconds": 2.2756031050012098,
+    "exit": 0,
+    "output": "/tmp/swarm-review-contract-owner-context-vet.out"
+  },
+  {
+    "label": "workflows",
+    "command": [
+      "python3",
+      "tools/agent-workflows/check.py"
+    ],
+    "start": "2026-10-11T13:26:16.283320+00:00",
+    "seconds": 12.109150361000502,
+    "exit": 0,
+    "output": "/tmp/swarm-review-contract-owner-context-workflows.out"
+  }
+]

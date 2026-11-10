@@ -1,0 +1,36 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^(TestMemoryRuntimeRecoveryContextMatchesProviderAndPersists|TestMemoryRuntimeContextCapacityStopsBeforeProvider|TestMemoryRuntimeContextWriteFailureStopsBeforeProvider|TestMemoryContextBindingPreservesMetadataAndRefusesOverflow|TestMemoryContextReceiptReadThroughCLIAndAPI|TestKernelAttemptSourceActualSupervisor)$",
+    "-count=1",
+    "-v",
+    "-timeout=120s"
+  ],
+  "started_at_utc": "2026-10-16T09:20:15.487971+00:00",
+  "ended_at_utc": "2026-10-16T09:20:59.837826+00:00",
+  "elapsed_seconds": 44.349842240000726,
+  "exit_code": 0,
+  "changed_inputs": [],
+  "named_tests_expected": [
+    "TestMemoryRuntimeRecoveryContextMatchesProviderAndPersists",
+    "TestMemoryRuntimeContextCapacityStopsBeforeProvider",
+    "TestMemoryRuntimeContextWriteFailureStopsBeforeProvider",
+    "TestMemoryContextBindingPreservesMetadataAndRefusesOverflow",
+    "TestMemoryContextReceiptReadThroughCLIAndAPI",
+    "TestKernelAttemptSourceActualSupervisor"
+  ],
+  "named_tests_ran": [
+    "TestKernelAttemptSourceActualSupervisor",
+    "TestMemoryRuntimeRecoveryContextMatchesProviderAndPersists",
+    "TestMemoryRuntimeContextCapacityStopsBeforeProvider",
+    "TestMemoryRuntimeContextWriteFailureStopsBeforeProvider",
+    "TestMemoryContextBindingPreservesMetadataAndRefusesOverflow",
+    "TestMemoryContextReceiptReadThroughCLIAndAPI"
+  ],
+  "log_sha256": "54a0030e84db057511c63be372a2d54ae4c1960e5d7ac70a66139b61d3f0b7ad",
+  "real_model_calls": 0
+}

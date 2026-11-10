@@ -1,0 +1,6 @@
+{
+  "Replace": {
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/work_row.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/work_row.go.overlay.txt",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/work_row_test.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/work_row_test.go.overlay.txt"
+  }
+}

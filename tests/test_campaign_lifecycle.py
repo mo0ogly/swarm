@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import signal
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from unittest.mock import patch, Mock
 import controlled_autonomy_campaign as campaign
@@ -11,7 +12,7 @@ import controlled_autonomy_campaign as campaign
 class LifecycleTests(unittest.TestCase):
     def test_interruption_stops_agents_and_server_and_cannot_restart(self):
         for interruption in ('signal', 'sigint', 'keyboard', 'observation'):
-            with self.subTest(interruption=interruption), tempfile.TemporaryDirectory() as directory:
+            with self.subTest(interruption=interruption), tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
                 root=Path(directory)
                 (root/'campaign.json').write_text(json.dumps({'engine':'unused','store':'unused','work':'w','profile':{}}))
                 commands=[]
@@ -44,7 +45,7 @@ class LifecycleTests(unittest.TestCase):
                 self.assertEqual(signal.getsignal(signal.SIGTERM),old)
 
     def test_unconfirmed_cleanup_overrides_success_and_preserves_server(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             root=Path(directory)
             (root/'campaign.json').write_text(json.dumps({'engine':'unused','store':'unused','work':'w','profile':{}}))
             def cli(m,args,data=None):
@@ -58,7 +59,7 @@ class LifecycleTests(unittest.TestCase):
             self.assertEqual(json.loads((root/'result.json').read_text()),result)
 
     def test_failed_atomic_publication_preserves_prior_result(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory(dir=fixture_area()) as directory:
             path=Path(directory)/'result.json'
             campaign.write(path,{'status':'RUNNING'})
             with patch.object(campaign.os,'replace',side_effect=OSError('disk failure')):

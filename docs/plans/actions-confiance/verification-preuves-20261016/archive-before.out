@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence.py", line 63, in <module>
+    before=(root/'.swarm/trust-actions.json').read_bytes();preview=remote('archive-preview',body);assert before==(root/'.swarm/trust-actions.json').read_bytes();assert not (root/'.swarm/trust-archives').exists();receipt=remote('archive-create',body);assert receipt['archive_id']==preview['archive_id'];assert remote('archive-create',body)==receipt
+                                                                   ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence.py", line 37, in remote
+    def remote(op,body=None,who='admin',expected=0):return call(absent,'evidence',op,body,who,expected,origin,session)
+                                                           ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence.py", line 14, in call
+    raise AssertionError('public evidence command failed; private diagnostics retained')
+AssertionError: public evidence command failed; private diagnostics retained

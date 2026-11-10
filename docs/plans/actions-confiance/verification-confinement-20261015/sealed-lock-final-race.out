@@ -1,0 +1,94 @@
+=== RUN   TestActionsConfianceT2InitialKeyPublicationFailure
+--- PASS: TestActionsConfianceT2InitialKeyPublicationFailure (2.53s)
+=== RUN   TestActionsConfianceT4DataPolicyPublicContract
+--- PASS: TestActionsConfianceT4DataPolicyPublicContract (1.18s)
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/provider
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/confidential
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/restricted
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/absent
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/url
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/path
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/symlink
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/binary
+--- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture (9.40s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/provider (1.73s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/confidential (1.28s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/restricted (1.07s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/absent (1.08s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/url (1.10s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/path (0.98s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/symlink (1.06s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/binary (1.10s)
+=== RUN   TestActionsConfianceT4DataPolicyExactActionAndRecovery
+--- PASS: TestActionsConfianceT4DataPolicyExactActionAndRecovery (1.52s)
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/enabled-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/enabled-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/classifications-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/classifications-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/destinations-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/destinations-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/providers-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/providers-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/tools-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/tools-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/resources-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/resources-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-classification
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-destination
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-provider
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-tool
+--- PASS: TestActionsConfianceT4DataPolicyStrictValidation (5.69s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/enabled-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/enabled-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/classifications-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/classifications-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/destinations-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/destinations-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/providers-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/providers-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/tools-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/tools-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/resources-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/resources-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-classification (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-destination (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-provider (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-tool (0.00s)
+=== RUN   TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect
+=== RUN   TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/approve
+=== RUN   TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/commit
+--- PASS: TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect (1.93s)
+    --- PASS: TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/approve (0.94s)
+    --- PASS: TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/commit (0.99s)
+=== RUN   TestActionsConfianceT4DataPolicyPersistenceAndDisabled
+--- PASS: TestActionsConfianceT4DataPolicyPersistenceAndDisabled (1.14s)
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification/uncatalogued
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification/downgraded
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification/empty-rules
+--- PASS: TestActionsConfianceT4DataPolicyResourceClassification (7.79s)
+    --- PASS: TestActionsConfianceT4DataPolicyResourceClassification/uncatalogued (1.04s)
+    --- PASS: TestActionsConfianceT4DataPolicyResourceClassification/downgraded (0.98s)
+    --- PASS: TestActionsConfianceT4DataPolicyResourceClassification/empty-rules (1.03s)
+=== RUN   TestActionsConfianceT4SealedPublicPolicy
+--- PASS: TestActionsConfianceT4SealedPublicPolicy (1.06s)
+=== RUN   TestActionsConfianceT4SealedHelper
+--- PASS: TestActionsConfianceT4SealedHelper (0.00s)
+=== RUN   TestActionsConfianceT4SealedBoundary
+--- PASS: TestActionsConfianceT4SealedBoundary (1.62s)
+=== RUN   TestActionsConfianceT4SealedValidationAndPersistence
+--- PASS: TestActionsConfianceT4SealedValidationAndPersistence (1.45s)
+=== RUN   TestActionsConfianceT4SealedDisabledAndInvalidRequest
+--- PASS: TestActionsConfianceT4SealedDisabledAndInvalidRequest (0.95s)
+=== RUN   TestActionsConfianceT4SealedCancellation
+--- PASS: TestActionsConfianceT4SealedCancellation (0.00s)
+=== RUN   TestActionsConfianceT4SealedTimeoutClosesDescendants
+--- PASS: TestActionsConfianceT4SealedTimeoutClosesDescendants (2.03s)
+=== RUN   TestActionsConfianceT4SealedStaleConfiguration
+--- PASS: TestActionsConfianceT4SealedStaleConfiguration (0.97s)
+=== RUN   TestActionsConfianceT4SealedBusyStateRefusesPromptly
+--- PASS: TestActionsConfianceT4SealedBusyStateRefusesPromptly (1.19s)
+PASS
+ok  	swarm.local/companion/internal/engine	43.096s

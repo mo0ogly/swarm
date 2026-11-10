@@ -1,0 +1,442 @@
+[
+  {
+    "source": "AGENTS.md",
+    "link": ".claude/skills/swarm-model-design/SKILL.md"
+  },
+  {
+    "source": "docs/AGENT-METHODS.md",
+    "link": "en/AGENT-METHODS.md"
+  },
+  {
+    "source": "docs/AGENT-METHODS.md",
+    "link": "../GUIDE-UTILISATEUR.md"
+  },
+  {
+    "source": "docs/AGENT-METHODS.md",
+    "link": "../README.md"
+  },
+  {
+    "source": "docs/AGENT-METHODS.md",
+    "link": "PRODUCT-WORKFLOW.md"
+  },
+  {
+    "source": "docs/AGENT-METHODS.md",
+    "link": "AGENT-COMMUNICATION.md"
+  },
+  {
+    "source": "docs/AGENT-METHODS.md",
+    "link": "../tools/agent-workflows/CONTRACT.md"
+  },
+  {
+    "source": "docs/AGENT-METHODS.md",
+    "link": "ENGINE-ACCEPTANCE.md"
+  },
+  {
+    "source": "docs/AGENT-METHODS.md",
+    "link": "plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md"
+  },
+  {
+    "source": "docs/AGENT-METHODS.md",
+    "link": "plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md"
+  },
+  {
+    "source": "docs/en/AGENT-METHODS.md",
+    "link": "../AGENT-METHODS.md"
+  },
+  {
+    "source": "docs/en/AGENT-METHODS.md",
+    "link": "USER-GUIDE.md"
+  },
+  {
+    "source": "docs/en/AGENT-METHODS.md",
+    "link": "../../README.en.md"
+  },
+  {
+    "source": "docs/en/AGENT-METHODS.md",
+    "link": "PRODUCT-WORKFLOW.md"
+  },
+  {
+    "source": "docs/en/AGENT-METHODS.md",
+    "link": "AGENT-COMMUNICATION.md"
+  },
+  {
+    "source": "docs/en/AGENT-METHODS.md",
+    "link": "../../tools/agent-workflows/CONTRACT.md"
+  },
+  {
+    "source": "docs/en/AGENT-METHODS.md",
+    "link": "ENGINE-ACCEPTANCE.md"
+  },
+  {
+    "source": "docs/en/AGENT-METHODS.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md"
+  },
+  {
+    "source": "docs/en/AGENT-METHODS.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md"
+  },
+  {
+    "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../en/AGENT-IDENTITY-CONTRACT.md"
+  },
+  {
+    "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md"
+  },
+  {
+    "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/identites-agents-contrat-IA2.md"
+  },
+  {
+    "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md"
+  },
+  {
+    "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md"
+  },
+  {
+    "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md"
+  },
+  {
+    "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md"
+  },
+  {
+    "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md"
+  },
+  {
+    "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md"
+  },
+  {
+    "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../architecture/AGENT-IDENTITY-CONTRACT.md"
+  },
+  {
+    "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md"
+  },
+  {
+    "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/identites-agents-contrat-IA2.md"
+  },
+  {
+    "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md"
+  },
+  {
+    "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md"
+  },
+  {
+    "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md"
+  },
+  {
+    "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md"
+  },
+  {
+    "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md"
+  },
+  {
+    "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "link": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "identites-agents-replan.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "verification-identites-agents-20261016/RAPPORT-IA1.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "verification-identites-agents-20261016/COUVERTURE-RISQUES.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "../../architecture/AGENT-IDENTITY-CONTRACT.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+    "link": "verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "verification-identites-agents-20261016/RAPPORT-IA1.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "../../architecture/AGENT-IDENTITY-CONTRACT.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "../deepagents-integration/INCREMENT-MEMOIRE-16.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "verification-identites-agents-20261016/COUVERTURE-RISQUES.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "identites-agents-contrat-IA2.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "../../architecture/AGENT-IDENTITY-CONTRACT.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "../../publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "verification-identites-agents-20261016/ia2-runtime-binding-20261017/checks-documentation-final.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+    "link": "verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "fiches-lecture.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "figures/identites-mediation.mmd"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/identites-agents-contrat-IA2.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "figures/identites-mediation.svg"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "figures/identites-filiation.svg"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "figures/identites-amelioration.svg"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/COUVERTURE-RISQUES.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/identites-agents-contrat-IA2.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../architecture/AGENT-IDENTITY-CONTRACT.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-isolation-initial/results.json"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/identites-agents-replan.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../dossier-recherche/revisions/evidence/20261016-identites-cycle-vie/verification.json"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/checks-documentation-final.json"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+    "link": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "link": "article-scientifique/fiches-lecture.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "link": "dossier-recherche/02-etat-art.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "link": "dossier-recherche/07-moniteur.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "link": "dossier-recherche/revisions/20261010-vivacite-supervision.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "link": "dossier-recherche/revisions/20261010-refus-contexte-revue.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "link": "article-scientifique/identites-autorite-cycle-vie.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "link": "../../plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "link": "../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md"
+  },
+  {
+    "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+    "link": "../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "source-final.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "receipt-before-02-run.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "receipt-before-02.jsonl"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "normal-contracts-02-run.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "race-contracts-02-run.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "vet-01-run.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "app-build-01-run.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "app-binary.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "finalize.py"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "frozen-neighbors.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "receipt-fr.svg"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "receipt-en.svg"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "diagrams.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "run_checks.py"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "race-registry-01-run.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "go-test-timeout-help.txt"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "compile-observation.json"
+  },
+  {
+    "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md",
+    "link": "instructions-persistence.json"
+  }
+]

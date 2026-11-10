@@ -1,0 +1,70 @@
+{
+  "at": "2026-10-11T18:49:46.236846+00:00",
+  "old_pid": 2669097,
+  "installed_pid": 2891692,
+  "old_sha256": "e23d4ff43d8cb6f64b00bee8b4e531dcb3da2a71f390d8be5c130f3f79445ece",
+  "installed_sha256": "371239add2a2ba968c3b1807d5bfd896eb6662c31d59d0644792753321f471ff",
+  "executed_sha256": "371239add2a2ba968c3b1807d5bfd896eb6662c31d59d0644792753321f471ff",
+  "source_digest": "4398355922eb04e5eccd38b1ed3f8329c7af3af817c9fc97a9c754031546a696",
+  "full_seconds": 497.549835343998,
+  "source_paths": 1187,
+  "before": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 473,
+      "paused": false,
+      "holders": [],
+      "active_reviews": [],
+      "detached_agents": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "holders": [],
+      "active_reviews": [],
+      "detached_agents": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "holders": [],
+      "active_reviews": [],
+      "detached_agents": []
+    }
+  ],
+  "paused": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 474,
+      "paused": true,
+      "holders": [],
+      "active_reviews": [],
+      "detached_agents": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "holders": [],
+      "active_reviews": [],
+      "detached_agents": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "holders": [],
+      "active_reviews": [],
+      "detached_agents": []
+    }
+  ],
+  "public_post_pause_work_body_preserved": true,
+  "schema": "29 unchanged; no migration or native DB copy/edit",
+  "compatible19_reader_exit": 0,
+  "authenticated_health_state": "ready",
+  "launch_allowed": true,
+  "authenticated_console_frame_and_parent_served": true,
+  "scope": "Console20 qualified and installed; native T2 unknown after selection needs remains unresolved, original project T3..RETEX pending. Mission held paused briefly for fresh89input routing before server unpause."
+}

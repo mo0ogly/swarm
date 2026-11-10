@@ -1,0 +1,114 @@
+{
+  "status": "PASS",
+  "time": "2026-10-17T16:55:46.100866+00:00",
+  "binary": "/tmp/swarm-dense-reading-20261017-release",
+  "binary_sha256": "4d8089164e720a55f9e649c99677a59e1da9186d2909643abb45e747a6a67ea6",
+  "root": "/tmp/swarm-ui-integrity-yts11a7c",
+  "inputs": [
+    {
+      "path": "web/index.html",
+      "source_sha256": "bedd416520212a0dd543ca3550739c77213de989ed6454a4cbb5acc104a42562",
+      "served_sha256": "bedd416520212a0dd543ca3550739c77213de989ed6454a4cbb5acc104a42562",
+      "expected_sha256": "bedd416520212a0dd543ca3550739c77213de989ed6454a4cbb5acc104a42562",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/text-reader.js",
+      "source_sha256": "daa5da1156a45ea1aaa41e2e4d1e868e74e5006ca1fa882d6ee793ca5478c6a7",
+      "served_sha256": "daa5da1156a45ea1aaa41e2e4d1e868e74e5006ca1fa882d6ee793ca5478c6a7",
+      "expected_sha256": "daa5da1156a45ea1aaa41e2e4d1e868e74e5006ca1fa882d6ee793ca5478c6a7",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/cockpit.js",
+      "source_sha256": "1150c46e22ad124dbebba0f8a03a358960bdd371a7238c5b6e9628f07d9298bc",
+      "served_sha256": "1150c46e22ad124dbebba0f8a03a358960bdd371a7238c5b6e9628f07d9298bc",
+      "expected_sha256": "1150c46e22ad124dbebba0f8a03a358960bdd371a7238c5b6e9628f07d9298bc",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/pilot-inspector.js",
+      "source_sha256": "f80868784977dcda43cabd615eeab59633e3d1fab5fb9be719f3c6674ceb3394",
+      "served_sha256": "f80868784977dcda43cabd615eeab59633e3d1fab5fb9be719f3c6674ceb3394",
+      "expected_sha256": "f80868784977dcda43cabd615eeab59633e3d1fab5fb9be719f3c6674ceb3394",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/instruction-revisions.js",
+      "source_sha256": "1c77e19b9d566e7214ec7b4efd911cdc2e15a69d3fc13149eee7cb738302ff13",
+      "served_sha256": "1c77e19b9d566e7214ec7b4efd911cdc2e15a69d3fc13149eee7cb738302ff13",
+      "expected_sha256": "1c77e19b9d566e7214ec7b4efd911cdc2e15a69d3fc13149eee7cb738302ff13",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/mission.js",
+      "source_sha256": "5513609e1b732d2084a34f21d4867108b9b099f79877821edda900477b3542d1",
+      "served_sha256": "5513609e1b732d2084a34f21d4867108b9b099f79877821edda900477b3542d1",
+      "expected_sha256": "5513609e1b732d2084a34f21d4867108b9b099f79877821edda900477b3542d1",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/pilot-actions.js",
+      "source_sha256": "8fda8f46aa384c99228e5ce0b1ea9de07ee908030b4573ae0d8b4587eed1f15d",
+      "served_sha256": "8fda8f46aa384c99228e5ce0b1ea9de07ee908030b4573ae0d8b4587eed1f15d",
+      "expected_sha256": "8fda8f46aa384c99228e5ce0b1ea9de07ee908030b4573ae0d8b4587eed1f15d",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/swarm-design.css",
+      "source_sha256": "368af3f66815af113ae4115f40d8996cdcde174f49f6c1ebfbd58047c7f1e760",
+      "served_sha256": "368af3f66815af113ae4115f40d8996cdcde174f49f6c1ebfbd58047c7f1e760",
+      "expected_sha256": "368af3f66815af113ae4115f40d8996cdcde174f49f6c1ebfbd58047c7f1e760",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/log-console.html",
+      "source_sha256": "5943c5988bda37d95aaf5f3cb36ce57988f8d19edb3af42577038c8ebbbc977e",
+      "served_sha256": "378c4784bc2d96553bd61ea411955d8dd34a0fe211079145aadf3110e90730a2",
+      "expected_sha256": "378c4784bc2d96553bd61ea411955d8dd34a0fe211079145aadf3110e90730a2",
+      "transformation": "documented CSP style nonce substitution only",
+      "matches": true
+    },
+    {
+      "path": "web/log-console.js",
+      "source_sha256": "68485ea5e0705d88c7c1956f17091dd609cf4083d01b206b0cfc9b22e0e95e83",
+      "served_sha256": "68485ea5e0705d88c7c1956f17091dd609cf4083d01b206b0cfc9b22e0e95e83",
+      "expected_sha256": "68485ea5e0705d88c7c1956f17091dd609cf4083d01b206b0cfc9b22e0e95e83",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/log-console.css",
+      "source_sha256": "88d7bbcd3f46f54e8d9ca61857898026a465ba5d9e09bfe841fdd081e8f8eb09",
+      "served_sha256": "88d7bbcd3f46f54e8d9ca61857898026a465ba5d9e09bfe841fdd081e8f8eb09",
+      "expected_sha256": "88d7bbcd3f46f54e8d9ca61857898026a465ba5d9e09bfe841fdd081e8f8eb09",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/journal-console.js",
+      "source_sha256": "fa81f8eac2140b9888ed7b2db1dfab7e0e80253a95753fafc63e9cf3fc133d83",
+      "served_sha256": "fa81f8eac2140b9888ed7b2db1dfab7e0e80253a95753fafc63e9cf3fc133d83",
+      "expected_sha256": "fa81f8eac2140b9888ed7b2db1dfab7e0e80253a95753fafc63e9cf3fc133d83",
+      "transformation": "none",
+      "matches": true
+    },
+    {
+      "path": "web/i18n-en.js",
+      "source_sha256": "1e1651a9bd995a68f892ea4001f44497de5bc40ae6f55b22c85add95ea59c310",
+      "served_sha256": "1e1651a9bd995a68f892ea4001f44497de5bc40ae6f55b22c85add95ea59c310",
+      "expected_sha256": "1e1651a9bd995a68f892ea4001f44497de5bc40ae6f55b22c85add95ea59c310",
+      "transformation": "none",
+      "matches": true
+    }
+  ],
+  "limits": "Local immutable UI candidate; no live server/provider or backend acceptance. Source resources.go embeds canonical web files. CSP nonce validated but never stored."
+}

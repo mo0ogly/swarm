@@ -1,0 +1,210 @@
+--- originals/rust/crates/swarm-engine/src/root_store/mission_status_reports.rs
++++ rust/crates/swarm-engine/src/root_store/mission_status_reports.rs
+@@ -185,6 +185,52 @@
+     })();
+     close(result, file)
+ }
++/// Observe Go provenReport over Root docs, not the worker's workspace. The
++/// supplied nonnegative margin comes from persisted settings; it is not a local
++/// fallback. Nonempty regular candidates at/after start-minus-margin are fresh;
++/// exactly one is attributable, many/old/empty candidates retain Go's reasons.
++/// Invalid start retains its typed cause beside the explicit unavailable result.
++/// Metadata/containment/scan/close errors propagate, never become empty success.
++/// No content, authorship, quality, mutation or permission is established; these
++/// sequential filesystem observations are not an atomic snapshot or an ABA fence.
++fn proven_report(root: &Path, agent: &Agent, skew: i64, causes: &mut Vec<E>)
++    -> Result<crate::mission_status_tasks::ReportAttribution, E> {
++    use crate::mission_status_tasks::ReportAttribution::{Attributed, Unavailable};
++    if skew < 0 { return Err(E::Refused("mission-status-report-clock-skew-invalid")); }
++    let started = match swarm_wire_json::go_rfc3339::parse(&agent.started) {
++        Ok(value) => value.unix_timestamp_nanos(),
++        Err(error) => {
++            causes.push(cause("mission-status-report-start-invalid", error));
++            return Ok(Unavailable { reason: "date de départ de la tentative illisible".into() });
++        }
++    };
++    // i64 seconds and the parsed timestamp fit i128 nanoseconds; this is a unit
++    // conversion, never a business cutoff or configurable second policy ceiling.
++    let since = started - i128::from(skew) * 1_000_000_000;
++    let mut fresh = Vec::new();
++    let mut stale = 0usize;
++    for name in task_reports(root, &agent.task_id)? {
++        let (_, metadata) = crate::gate_evaluation::artifact_metadata(root, &name)
++            .map_err(|e| E::Gate(crate::GateContractError::Evaluation(e)))?;
++        if metadata.len() == 0 { continue; }
++        let modified = i128::from(metadata.mtime()) * 1_000_000_000 + i128::from(metadata.mtime_nsec());
++        if modified < since { stale += 1; } else { fresh.push(name); }
++    }
++    match fresh.as_slice() {
++        [name] => Ok(Attributed(name.clone())),
++        [] => Ok(Unavailable { reason: if stale > 0 {
++            format!("aucun rapport produit par cette tentative ; {stale} rapport(s) antérieur(s) ignoré(s)")
++        } else { "aucun rapport lisible et non vide sous docs/ pour cette tâche".into() } }),
++        _ => Ok(Unavailable { reason: format!("plusieurs rapports candidats pour cette tentative ({})", fresh.join(", ")) }),
++    }
++}
++/// Narrow ordinary completion shape whose attribution producer is wired here.
++/// Incomplete-delivery and current-review branches keep their separate evidence
++/// requirements. This read-only shape is not validation of the original process.
++fn unsubmitted_pair(task: &crate::Task, agent: &Agent) -> bool {
++    task.id == agent.task_id && task.status == "blocked" && agent.status == "completed"
++        && !task.blocker.starts_with("Livraison incomplète :")
++}
+ /// Go operationText masking and terminal-cell clipping for fallback traces.
+ /// Sanitization and sensitivity masking precede the Go-compatible 600-cell
+ /// representation bound. Whole clusters are preserved; checked width overflow
+@@ -409,7 +455,7 @@
+ fn planned_pair(task: &crate::Task, agent: &Agent) -> bool {
+     task.id == agent.task_id && match task.status.as_str() {
+         "running" => agent.is_active(),
+-        "blocked" => matches!(agent.status.as_str(),"failed" | "interrupted") || (agent.status=="completed" && matching_review(task,agent)),
++        "blocked" => matches!(agent.status.as_str(),"failed" | "interrupted") || (agent.status=="completed" && (matching_review(task,agent) || unsubmitted_pair(task,agent))),
+         "submitted" | "accepted" => agent.status == "completed",
+         _ => false,
+     }
+@@ -467,8 +513,9 @@
+ /// Running tasks may retain queued/starting/running/stopping Agents; blocked
+ /// tasks may retain failed/interrupted Agents. Actual process observation stays
+ /// mandatory before a live classification, never inferred from these rows.
+-/// Completed but unsubmitted without a current review, recovery/managed execution
+-/// and closed scopes still refuse at this port boundary, not a quota. Full Agent history is required;
++/// Completed blocked nonmanaged planned tasks may display actual Root-scoped
++/// attribution without a current review. Incomplete delivery, other unsubmitted
++/// shapes, recovery/managed execution and closed scopes still refuse here. Full Agent history is required;
+ /// callers must validate before applying display windows. Root, parent,
+ /// ownership and depth invariants come from structural validation, not scope count.
+ /// Original validation causes survive; configuration establishes no executed review.
+@@ -545,7 +592,7 @@
+         if agent.is_some() || matches!(task.status.as_str(), "submitted" | "abandoned" | "accepted") {
+             let supported_state = match agent.map(|a| a.status.as_str()) {
+                 Some("queued" | "starting" | "running" | "stopping") => task.status == "running",
+-                Some("completed") => matches!(task.status.as_str(), "submitted" | "accepted") || (task.status=="blocked" && agent.is_some_and(|a|matching_review(task,a))),
++                Some("completed") => matches!(task.status.as_str(), "submitted" | "accepted") || (task.status=="blocked" && agent.is_some_and(|a|matching_review(task,a) || (work.planning.is_some() && unsubmitted_pair(task,a)))),
+                 Some("failed" | "interrupted") => task.status == "blocked",
+                 None => matches!(task.status.as_str(), "submitted" | "abandoned" | "accepted"),
+                 _ => false,
+@@ -626,7 +673,9 @@
+ /// Observe the real current review before building result facts. Complete Work,
+ /// settings and full-history/view eligibility must already be checked by Root.
+ /// Semantic causes stay in the supplied sidecar; facts causes are also retained.
+-/// No new authority, defaults, launch or mutation follows. Unknown read/close
++/// Completed/blocked fallthrough obtains attribution from Root docs and the
++/// saved clock margin only after an observed NotApplicable review. Other branches
++/// do not scan for attribution. No new authority, defaults, launch or mutation follows. Unknown read/close
+ /// errors refuse, and caller still verifies its enclosing material snapshot.
+ pub(super) fn observed_result_inputs(root:&Path,work:&crate::Work,task:&crate::Task,agent:Option<&Agent>,settings:&crate::EngineSettingsDocument,causes:&mut Vec<E>,mut facts:super::TaskFreshnessEvidence)->Result<crate::mission_status_tasks::ResultObservation,E> {
+     causes.append(&mut facts.causes);
+@@ -635,14 +684,22 @@
+         Some(_)=>Some(crate::mission_status_tasks::ReviewObservation::NotApplicable),
+         None=>None,
+     };
+-    result_inputs_with_review(root,task,agent,facts.freshness,facts.gate,review)
++    let attribution = match agent {
++        Some(agent) if unsubmitted_pair(task, agent)
++            && matches!(&review, Some(crate::mission_status_tasks::ReviewObservation::NotApplicable)) => {
++                Some(proven_report(root, agent, settings.values.report_clock_skew_seconds()
++                    .map_err(E::Settings)?, causes)?)
++            }
++        _ => None,
++    };
++    result_inputs_with_review(root,task,agent,facts.freshness,facts.gate,review,attribution)
+ }
+ 
+ /// Test-only constructor adapter: unsupported non-passed opinions still refuse
+ /// without a real producer. Supplied facts establish no actual Root evidence.
+ #[cfg(test)]
+ pub(super) fn result_inputs(root:&Path,task:&crate::Task,agent:Option<&Agent>,freshness:crate::mission_status_tasks::FreshnessObservation,gate:crate::mission_status_tasks::GateObservation)->Result<crate::mission_status_tasks::ResultObservation,E> {
+-    result_inputs_with_review(root,task,agent,freshness,gate,None)
++    result_inputs_with_review(root,task,agent,freshness,gate,None,None)
+ }
+ 
+ /// Observe only facts consumed by the applicable ordinary terminal result branch.
+@@ -654,7 +711,8 @@
+ /// fresh report; reports/attribution/incomplete remain explicitly NotObserved.
+ /// Callers must run supported() on full history: ordinary Work or the bounded
+ /// nonmanaged planned active, failed/interrupted or submitted branches admitted
+-/// there. Display-window absence of an Agent cannot establish eligibility;
++/// there, including completed/blocked without incomplete delivery when actual
++/// Root-scoped attribution was supplied. Display-window absence of an Agent cannot establish eligibility;
+ /// supported_view() must also establish the selected branch's required facts.
+ /// Current review is absent or passed before NotApplicable is supplied, matching
+ /// Go’s passed-opinion fallthrough. Previous opinions still refuse; non-passed
+@@ -668,6 +726,7 @@
+     freshness: crate::mission_status_tasks::FreshnessObservation,
+     gate: crate::mission_status_tasks::GateObservation,
+     observed_review: Option<crate::mission_status_tasks::ReviewObservation>,
++    attribution: Option<crate::mission_status_tasks::ReportAttribution>,
+ ) -> Result<crate::mission_status_tasks::ResultObservation, E> {
+     use crate::mission_status_tasks::*;
+     if let Some(agent) = agent {
+@@ -680,7 +739,8 @@
+             return Err(E::Refused("mission-status-terminal-review-unported"));
+         }
+         if agent.status == "completed" && !matches!(task.status.as_str(), "submitted" | "accepted")
+-            && !(task.status=="blocked" && matches!(&observed_review,Some(ReviewObservation::Presented(_)))) {
++            && !(task.status=="blocked" && matches!(&observed_review,Some(ReviewObservation::Presented(_))))
++            && !(unsubmitted_pair(task, agent) && attribution.is_some()) {
+             return Err(E::Refused("mission-status-completed-unsubmitted-unported"));
+         }
+     }
+@@ -694,7 +754,7 @@
+         } else {
+             ReportListing::NotObserved
+         },
+-        attribution: ReportAttribution::NotObserved,
++        attribution: attribution.unwrap_or(ReportAttribution::NotObserved),
+         incomplete_report: IncompleteReport::NotObserved,
+         review: observed_review.unwrap_or_else(|| if agent.is_some() {
+             ReviewObservation::NotApplicable
+@@ -1337,4 +1397,50 @@
+         agents[1].status = "failed".into();
+         supported(&work, &agents).unwrap();
+     }
+-}
++    /// Real filesystem control precedes stale/empty/ambiguous/invalid variants.
++    /// Boundary equality uses an explicit test margin, never a product default.
++    #[test]
++    fn mission_status_unsubmitted_report_selection_and_recovery() {
++        use crate::mission_status_tasks::ReportAttribution::{Attributed, Unavailable};
++        let fixture = Fixture::new();
++        let mut agent = Agent { task_id: "task".into(), started: "1970-01-01T00:01:40Z".into(), ..Default::default() };
++        let mut causes = Vec::new();
++        assert!(matches!(proven_report(&fixture.0,&agent,2,&mut causes).unwrap(),Unavailable { .. }));
++        disk::create_dir(fixture.0.join("docs")).unwrap();
++        let path=fixture.0.join("docs/task.md");disk::write(&path,"actual report").unwrap();
++        let set_time=|seconds| { disk::File::options().write(true).open(&path).unwrap().set_times(
++            disk::FileTimes::new().set_modified(std::time::UNIX_EPOCH + std::time::Duration::from_secs(seconds))).unwrap(); };
++        set_time(98);
++        assert!(matches!(proven_report(&fixture.0,&agent,2,&mut causes).unwrap(),Attributed(name) if name=="docs/task.md"));
++        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason.contains("1 rapport(s) antérieur(s)")));
++        set_time(100);
++        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));
++        let second=fixture.0.join("docs/task-other-handoff.md");disk::write(&second,"second").unwrap();
++        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason.contains("plusieurs rapports") && reason.contains("docs/task.md") && reason.contains("docs/task-other-handoff.md")));
++        disk::remove_file(second).unwrap();disk::write(&path,"").unwrap();
++        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason=="aucun rapport lisible et non vide sous docs/ pour cette tâche"));
++        disk::write(&path,"restored").unwrap();
++        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));
++        assert!(causes.is_empty());
++        assert!(proven_report(&fixture.0,&agent,-1,&mut causes).is_err());
++        agent.started="not-a-date".into();
++        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Unavailable{reason} if reason=="date de départ de la tentative illisible"));
++        assert_eq!(causes.len(),1);assert!(std::error::Error::source(&causes[0]).is_some());
++    }
++    /// A contained genuine candidate precedes an outside-root link refusal;
++    /// restoring its exact owned path reestablishes the read-only attribution.
++    #[test]
++    fn mission_status_unsubmitted_report_path_error_is_not_absence() {
++        use crate::mission_status_tasks::ReportAttribution::Attributed;
++        let fixture=Fixture::new();let foreign=Fixture::new();
++        disk::create_dir(fixture.0.join("docs")).unwrap();
++        let path=fixture.0.join("docs/task.md");disk::write(&path,"owned").unwrap();
++        let agent=Agent { task_id:"task".into(), started:"1970-01-01T00:00:00Z".into(), ..Default::default() };
++        let mut causes=Vec::new();assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));
++        let original=disk::read(&path).unwrap();disk::write(foreign.0.join("report"),"foreign").unwrap();
++        disk::remove_file(&path).unwrap();std::os::unix::fs::symlink(foreign.0.join("report"),&path).unwrap();
++        assert!(proven_report(&fixture.0,&agent,0,&mut causes).is_err());
++        disk::remove_file(&path).unwrap();disk::write(&path,original).unwrap();
++        assert!(matches!(proven_report(&fixture.0,&agent,0,&mut causes).unwrap(),Attributed(_)));
++    }
++}

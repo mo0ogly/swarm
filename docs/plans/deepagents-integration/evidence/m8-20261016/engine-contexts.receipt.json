@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestProjectMemory(StoragePlanContexts|KnowledgeContexts)$",
+    "-count=1",
+    "-v",
+    "-timeout=90s"
+  ],
+  "started_at_utc": "2026-10-16T08:10:57.736025+00:00",
+  "ended_at_utc": "2026-10-16T08:12:18.251749+00:00",
+  "elapsed_seconds": 80.5158233569964,
+  "exit_code": 0,
+  "changed_inputs": [],
+  "log_sha256": "06ee9724ee482302aa0ff73fa275764efe247bb1346db39653902c04af933485",
+  "export": "pack",
+  "model_calls": 0
+}

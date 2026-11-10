@@ -1,0 +1,71 @@
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   "TypeError: Cannot read properties of undefined (reading 'top')\n" +
++     '    at gR (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n' +
++     '    at SZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n' +
++     '    at CZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n' +
++     '    at Object.finalize (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n' +
++     '    at f0._constructLines (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n' +
++     '    at f0.onModelFlushed (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:48593)\n' +
++     '    at b0.onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:71232)\n' +
++     '    at xL._onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:234:3448)\n' +
++     '    at xL._emitContentChangedEvent (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:610)\n' +
++     '    at xL._setValueFromTextBuffer (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:1516)',
++   "TypeError: Cannot read properties of undefined (reading 'top')\n" +
++     '    at gR (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n' +
++     '    at SZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n' +
++     '    at CZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n' +
++     '    at Object.finalize (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n' +
++     '    at f0._constructLines (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n' +
++     '    at f0.onModelFlushed (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:48593)\n' +
++     '    at b0.onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:71232)\n' +
++     '    at xL._onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:234:3448)\n' +
++     '    at xL._emitContentChangedEvent (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:610)\n' +
++     '    at xL._setValueFromTextBuffer (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:1516)',
++   "TypeError: Cannot read properties of undefined (reading 'top')\n" +
++     '    at gR (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n' +
++     '    at SZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n' +
++     '    at CZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n' +
++     '    at Object.finalize (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n' +
++     '    at f0._constructLines (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n' +
++     '    at f0.onModelFlushed (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:48593)\n' +
++     '    at b0.onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:71232)\n' +
++     '    at xL._onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:234:3448)\n' +
++     '    at xL._emitContentChangedEvent (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:610)\n' +
++     '    at xL._setValueFromTextBuffer (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:1516)',
++   "TypeError: Cannot read properties of undefined (reading 'top')\n" +
++     '    at gR (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n' +
++     '    at SZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n' +
++     '    at CZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n' +
++     '    at Object.finalize (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n' +
++     '    at f0._constructLines (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n' +
++     '    at f0.onModelFlushed (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:48593)\n' +
++     '    at b0.onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:71232)\n' +
++     '    at xL._onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:234:3448)\n' +
++     '    at xL._emitContentChangedEvent (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:610)\n' +
++     '    at xL._setValueFromTextBuffer (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:1516)',
++   "TypeError: Cannot read properties of undefined (reading 'top')\n" +
++     '    at gR (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n' +
++     '    at SZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n' +
++     '    at CZ (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n' +
++     '    at Object.finalize (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n' +
++     '    at f0._constructLines (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n' +
++     '    at f0.onModelFlushed (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:48593)\n' +
++     '    at b0.onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:235:71232)\n' +
++     '    at xL._onDidChangeContentOrInjectedText (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:234:3448)\n' +
++     '    at xL._emitContentChangedEvent (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:610)\n' +
++     '    at xL._setValueFromTextBuffer (http://127.0.0.1:41803/lib/monaco/chunk-6NYP3BCE.js:225:1516)'
++ ]
+- []
+
+    at loadMeasurement (/home/fpizzi/Documents/ChatGPT/swarm/tests/graph_draft_ui.cjs:120:10)
+    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/graph_draft_ui.cjs:127:141 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

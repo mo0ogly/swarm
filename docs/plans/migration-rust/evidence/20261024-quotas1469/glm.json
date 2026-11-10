@@ -1,0 +1,24 @@
+{
+  "calls": 1,
+  "result": {
+    "usable_response": true,
+    "requested_model": "glm-5.2",
+    "started_at_unix": 1792864055.5917113,
+    "automatic_retries": 0,
+    "reported_model": "glm-5.2",
+    "usage": {
+      "completion_tokens": 1647,
+      "prompt_tokens": 3496,
+      "total_tokens": 5143,
+      "completion_tokens_details": {
+        "reasoning_tokens": 584,
+        "text_tokens": 1063
+      }
+    },
+    "finish_reason": "stop",
+    "elapsed_seconds": 9.854
+  },
+  "integrated": "Optional existing opener and selected Work on shared native quotas component; principal corrected duplicate listeners and list/getter order and implemented protected bridge.",
+  "automatic_retries": 0,
+  "backend": "User identifies GLM5.3, API requested/reported glm-5.2; backend version not verified."
+}

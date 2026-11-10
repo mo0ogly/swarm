@@ -1,0 +1,12 @@
+{
+  "first_call": "unusable length; usage retained, no verdict",
+  "focused_call": "usable targeted IO review",
+  "adopted": [
+    "Fixed standard stdout FD avoids Python closed/None stream wrapper classification; partial-write/zero/failure/recovery regression incorporated."
+  ],
+  "not_adopted": [
+    "Unbuffered path still allegedly corrupts stderr at teardown: no demonstrated reproducer for standalone tool with no buffered output. Do not redirect/detach global streams on this hypothesis. Real /dev/full test verifies actual exit and JSON stderr."
+  ],
+  "limits": "not independent E3; direct loop tests use OS writer doubles; public CLI test uses real /dev/full",
+  "budget": "second task reduced complete IO boundary from4185 to799 input tokens and output allocation4096 to2048; no unchanged retry or raised budget"
+}

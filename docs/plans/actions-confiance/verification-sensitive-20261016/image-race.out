@@ -1,0 +1,185 @@
+=== RUN   TestTrustFixedHelperPinnedImage
+=== RUN   TestTrustFixedHelperPinnedImage/false
+=== RUN   TestTrustFixedHelperPinnedImage/true
+--- PASS: TestTrustFixedHelperPinnedImage (0.00s)
+    --- PASS: TestTrustFixedHelperPinnedImage/false (0.00s)
+    --- PASS: TestTrustFixedHelperPinnedImage/true (0.00s)
+=== RUN   TestKernelCheckHelper
+    trust_kernel_check_test.go:62: owned helper fixture only
+--- SKIP: TestKernelCheckHelper (0.00s)
+=== RUN   TestKernelCheckProcessCancellation
+--- PASS: TestKernelCheckProcessCancellation (0.20s)
+=== RUN   TestKernelCheckParentDeathStopsHelper
+--- PASS: TestKernelCheckParentDeathStopsHelper (0.48s)
+=== RUN   TestKernelCheckRealProcessProtocol
+--- PASS: TestKernelCheckRealProcessProtocol (1.17s)
+=== RUN   TestKernelCheckPolicyInvalid
+--- PASS: TestKernelCheckPolicyInvalid (0.00s)
+=== RUN   TestKernelCheckFreshAuthorityAndRevision
+--- PASS: TestKernelCheckFreshAuthorityAndRevision (0.39s)
+=== RUN   TestKernelCheckCLIRejectsEmptyVerdict
+--- PASS: TestKernelCheckCLIRejectsEmptyVerdict (0.00s)
+=== RUN   TestKernelCheckProtocolInvalid
+--- PASS: TestKernelCheckProtocolInvalid (0.00s)
+=== RUN   TestKernelCheckUnavailableCLI
+--- PASS: TestKernelCheckUnavailableCLI (0.00s)
+=== RUN   TestKernelCheckPolicy
+--- PASS: TestKernelCheckPolicy (0.32s)
+=== RUN   TestKernelCheckInactiveRefusesBeforeRunner
+--- PASS: TestKernelCheckInactiveRefusesBeforeRunner (0.24s)
+=== RUN   TestActionsConfianceT6LaboratoryHelper
+--- PASS: TestActionsConfianceT6LaboratoryHelper (0.00s)
+=== RUN   TestActionsConfianceT6LaboratorySealedCorpus
+--- PASS: TestActionsConfianceT6LaboratorySealedCorpus (3.04s)
+=== RUN   TestActionsConfianceT6LaboratoryPersistence
+--- PASS: TestActionsConfianceT6LaboratoryPersistence (3.41s)
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":null,"timeout_seconds":30,"max_concurrent_runs":1}
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":false,"timeout_seconds":0,"max_concurrent_runs":1}
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":false,"timeout_seconds":30,"max_concurrent_runs":0}
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":false,"timeout_seconds":1.5,"max_concurrent_runs":1}
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":false,"timeout_seconds":30}
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/path
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/production
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/duplicate
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/wrong-digest
+=== RUN   TestActionsConfianceT6LaboratoryStrictInputs/numeric-seed
+--- PASS: TestActionsConfianceT6LaboratoryStrictInputs (0.24s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":null,"timeout_seconds":30,"max_concurrent_runs":1} (0.00s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":false,"timeout_seconds":0,"max_concurrent_runs":1} (0.00s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":false,"timeout_seconds":30,"max_concurrent_runs":0} (0.00s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":false,"timeout_seconds":1.5,"max_concurrent_runs":1} (0.00s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/{"enabled":false,"timeout_seconds":30} (0.00s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/path (0.00s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/production (0.00s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/duplicate (0.00s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/wrong-digest (0.00s)
+    --- PASS: TestActionsConfianceT6LaboratoryStrictInputs/numeric-seed (0.00s)
+=== RUN   TestActionsConfianceT6LaboratoryConcurrencyAndInvalidation
+--- PASS: TestActionsConfianceT6LaboratoryConcurrencyAndInvalidation (0.32s)
+=== RUN   TestActionsConfianceT6LaboratoryTimeoutAndContamination
+--- PASS: TestActionsConfianceT6LaboratoryTimeoutAndContamination (0.24s)
+=== RUN   TestActionsConfianceT6LaboratoryOldCorpusReadable
+--- PASS: TestActionsConfianceT6LaboratoryOldCorpusReadable (0.00s)
+=== RUN   TestActionsConfianceT6LaboratoryPolicyReplay
+--- PASS: TestActionsConfianceT6LaboratoryPolicyReplay (0.35s)
+=== RUN   TestActionsConfianceT6LaboratoryParentDeath
+--- PASS: TestActionsConfianceT6LaboratoryParentDeath (0.42s)
+=== RUN   TestActionsConfianceT4SealedPublicPolicy
+--- PASS: TestActionsConfianceT4SealedPublicPolicy (0.30s)
+=== RUN   TestActionsConfianceT4SealedHelper
+--- PASS: TestActionsConfianceT4SealedHelper (0.00s)
+=== RUN   TestActionsConfianceT4SealedBoundary
+--- PASS: TestActionsConfianceT4SealedBoundary (1.20s)
+=== RUN   TestActionsConfianceT4SealedValidationAndPersistence
+--- PASS: TestActionsConfianceT4SealedValidationAndPersistence (0.36s)
+=== RUN   TestActionsConfianceT4SealedDisabledAndInvalidRequest
+--- PASS: TestActionsConfianceT4SealedDisabledAndInvalidRequest (0.33s)
+=== RUN   TestActionsConfianceT4SealedCancellation
+--- PASS: TestActionsConfianceT4SealedCancellation (0.00s)
+=== RUN   TestActionsConfianceT4SealedTimeoutClosesDescendants
+--- PASS: TestActionsConfianceT4SealedTimeoutClosesDescendants (2.01s)
+=== RUN   TestActionsConfianceT4SealedStaleConfiguration
+--- PASS: TestActionsConfianceT4SealedStaleConfiguration (0.27s)
+=== RUN   TestActionsConfianceT4SealedBusyStateRefusesPromptly
+--- PASS: TestActionsConfianceT4SealedBusyStateRefusesPromptly (0.29s)
+=== RUN   TestActionsConfianceT4SecretBrokerPolicy
+--- PASS: TestActionsConfianceT4SecretBrokerPolicy (0.26s)
+=== RUN   TestActionsConfianceT4SecretBrokerScope
+--- PASS: TestActionsConfianceT4SecretBrokerScope (0.52s)
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-1.5
+--- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-1.5 (0.00s)
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/restart
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/revoke
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/expired
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/failed-consumer
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/configuration
+--- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery (2.04s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/restart (0.38s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/revoke (0.45s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/expired (0.39s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/failed-consumer (0.41s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/configuration (0.40s)
+=== RUN   TestActionsConfianceT4SecretBrokerConcurrency
+--- PASS: TestActionsConfianceT4SecretBrokerConcurrency (0.40s)
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/not-ready
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/wrong-role
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/oversized
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/cancelled
+--- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries (0.43s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/not-ready (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/wrong-role (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/oversized (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/cancelled (0.01s)
+=== RUN   TestActionsConfianceT4SecretBrokerStatusAfterRestart
+--- PASS: TestActionsConfianceT4SecretBrokerStatusAfterRestart (0.37s)
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/digest
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/destination
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/connector
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/action
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/ref
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/role
+--- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries (0.42s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/digest (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/destination (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/connector (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/action (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/ref (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/role (0.01s)
+=== RUN   TestActionsConfianceT4SecretBrokerPreparation
+--- PASS: TestActionsConfianceT4SecretBrokerPreparation (0.01s)
+PASS
+ok  	swarm.local/companion/internal/engine	21.298s

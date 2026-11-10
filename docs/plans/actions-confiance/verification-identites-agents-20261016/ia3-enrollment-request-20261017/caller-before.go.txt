@@ -1,0 +1,302 @@
+//go:build linux
+
+package engine
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"path/filepath"
+	"time"
+	"unicode/utf8"
+
+	"swarm.local/companion/internal/identitycontract"
+)
+
+// These private types describe the admission contract. They are not Launch
+// fields and are not accepted as authority by any CLI or HTTP handler. IA3 must
+// connect the verifier to protected storage, runtime attestation and launchers.
+type agentIdentityPrincipal identitycontract.Principal
+
+type agentIdentityActor struct {
+	Principal  agentIdentityPrincipal `json:"principal"`
+	InstanceID string                 `json:"instance_id,omitempty"`
+}
+
+type agentIdentityScope identitycontract.Scope
+
+// Resources are exact identifiers, never globs or a path-prefix policy.
+type agentIdentityPermission identitycontract.Permission
+
+type agentIdentityGrant struct {
+	ID            string                    `json:"id"`
+	ParentID      string                    `json:"parent_grant_id,omitempty"`
+	Issuer        agentIdentityActor        `json:"issuer"`
+	Holder        agentIdentityActor        `json:"holder"`
+	Scope         agentIdentityScope        `json:"scope"`
+	TrustRevision int                       `json:"trust_configuration_revision"`
+	Permissions   []agentIdentityPermission `json:"permissions"`
+	Delegable     []agentIdentityPermission `json:"delegable"`
+	NotBefore     time.Time                 `json:"not_before"`
+	ExpiresAt     time.Time                 `json:"expires_at"`
+	RevokedAt     *time.Time                `json:"revoked_at,omitempty"`
+}
+
+type agentIdentityInstance struct {
+	ID             string                 `json:"id"`
+	LogicalAgentID string                 `json:"logical_agent_id"`
+	Principal      agentIdentityPrincipal `json:"principal"`
+	Scope          agentIdentityScope     `json:"scope"`
+	GrantID        string                 `json:"grant_id"`
+	BindingID      string                 `json:"binding_id"`
+	RevokedAt      *time.Time             `json:"revoked_at,omitempty"`
+}
+
+// A snapshot is data, including after import or restart. Its digest alone
+// grants no authority: agentIdentityAuthority is a separate private input.
+type agentIdentitySnapshot struct {
+	Schema    int                              `json:"schema_version"`
+	Revision  int                              `json:"revision"`
+	Grants    map[string]agentIdentityGrant    `json:"grants"`
+	Instances map[string]agentIdentityInstance `json:"instances"`
+}
+
+type agentIdentityRequest struct {
+	Schema        int                `json:"schema_version"`
+	EventID       string             `json:"event_id"`
+	Scope         agentIdentityScope `json:"scope"`
+	GrantID       string             `json:"grant_id"`
+	Operation     string             `json:"operation"`
+	Resource      string             `json:"resource"`
+	ContentDigest string             `json:"content_digest"`
+}
+
+// A successful evaluation is not a reservation, a human approval, an attested
+// process or an observed effect. Persistence/consumption belongs to IA2.3/IA3.
+type agentIdentityDecision struct {
+	ProjectDigest    string             `json:"project_context_digest"`
+	EventID          string             `json:"event_id"`
+	Actor            agentIdentityActor `json:"actor"`
+	RequestDigest    string             `json:"request_digest"`
+	SnapshotDigest   string             `json:"snapshot_digest"`
+	SnapshotRevision int                `json:"snapshot_revision"`
+	TrustRevision    int                `json:"trust_revision"`
+	ExpiresAt        time.Time          `json:"expires_at"`
+}
+
+// No exported/JSON fields: a request cannot populate the trusted frame.
+// IA2.3 must supply it from an independently protected current authority,
+// including its root-grant allowlist and the actual adopted plan. It must not
+// compute this frame from the snapshot being authenticated.
+type agentIdentityAuthority struct {
+	projectRoot      string
+	snapshotDigest   string
+	snapshotRevision int
+	trustRevision    int
+	scope            agentIdentityScope
+	roots            map[string]bool
+}
+
+// Non-agent callers are resolved through Trust. Runtime callers additionally
+// need a verified binding supplied by the protected broker (not implemented).
+// Matching a binding ID is not itself host attestation.
+type agentIdentityCaller struct {
+	projectRoot   string
+	actor         agentIdentityActor
+	trustRevision int
+	expiresAt     *time.Time
+	bindingID     string
+	verifiedAt    time.Time
+}
+
+func agentIdentityError(code string) error {
+	return &CommandError{Code: code, Message: "identité ou autorité d'agent absente, incompatible ou périmée"}
+}
+
+func agentIdentityDigest(v any) (string, error) {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return hash(b), nil
+}
+
+func agentIdentityHashValid(v string) bool { return identitycontract.Digest(v) }
+
+func agentIdentityText(v string) bool { return identitycontract.Text(v) }
+
+func (p agentIdentityPrincipal) valid() bool { return identitycontract.Principal(p).Valid() }
+
+func (a agentIdentityActor) valid() bool {
+	return a.Principal.valid() && (a.InstanceID == "" || safeName(a.InstanceID))
+}
+
+func (s agentIdentityScope) valid() bool { return identitycontract.Scope(s).Valid() }
+
+func (p agentIdentityPermission) valid() bool { return identitycontract.Permission(p).Valid() }
+
+func (r agentIdentityRequest) valid() bool {
+	return r.Schema == 1 && safeName(r.EventID) && r.Scope.valid() && safeName(r.GrantID) &&
+		(agentIdentityPermission{r.Operation, r.Resource}).valid() && agentIdentityHashValid(r.ContentDigest)
+}
+
+// Reject duplicate keys before canonicalizing. encoding/json otherwise silently
+// takes the last key, including nested/escaped aliases of authority fields.
+func agentIdentityUniqueJSON(raw []byte) error {
+	d := json.NewDecoder(bytes.NewReader(raw))
+	var value func() error
+	value = func() error {
+		token, err := d.Token()
+		if err != nil {
+			return err
+		}
+		delim, ok := token.(json.Delim)
+		if !ok {
+			return nil
+		}
+		switch delim {
+		case '{':
+			seen := map[string]bool{}
+			for d.More() {
+				key, err := d.Token()
+				if err != nil {
+					return err
+				}
+				name, ok := key.(string)
+				if !ok || seen[name] {
+					return fmt.Errorf("clé JSON dupliquée ou invalide")
+				}
+				seen[name] = true
+				if err := value(); err != nil {
+					return err
+				}
+			}
+		case '[':
+			for d.More() {
+				if err := value(); err != nil {
+					return err
+				}
+			}
+		default:
+			return fmt.Errorf("structure JSON invalide")
+		}
+		_, err = d.Token()
+		return err
+	}
+	if err := value(); err != nil {
+		return err
+	}
+	if _, err := d.Token(); err != io.EOF {
+		return fmt.Errorf("un seul document JSON requis")
+	}
+	return nil
+}
+
+func decodeAgentIdentityRequest(raw []byte) (agentIdentityRequest, error) {
+	var r agentIdentityRequest
+	if err := agentIdentityUniqueJSON(raw); err != nil || !utf8.Valid(raw) {
+		return r, agentIdentityError("agent_identity_request_invalid")
+	}
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &fields); err != nil {
+		return r, agentIdentityError("agent_identity_request_invalid")
+	}
+	for name := range fields {
+		switch name {
+		case "schema_version", "event_id", "scope", "grant_id", "operation", "resource", "content_digest":
+		default:
+			return r, agentIdentityError("agent_identity_request_invalid")
+		}
+	}
+	var scopeFields map[string]json.RawMessage
+	if err := json.Unmarshal(fields["scope"], &scopeFields); err != nil {
+		return r, agentIdentityError("agent_identity_request_invalid")
+	}
+	for name := range scopeFields {
+		if name != "work_id" && name != "plan_version" && name != "plan_digest" {
+			return r, agentIdentityError("agent_identity_request_invalid")
+		}
+	}
+	if err := strict(raw, &r); err != nil || !r.valid() {
+		return agentIdentityRequest{}, agentIdentityError("agent_identity_request_invalid")
+	}
+	return r, nil
+}
+
+func decodeAgentIdentitySnapshot(raw []byte) (agentIdentitySnapshot, error) {
+	var snapshot agentIdentitySnapshot
+	if err := agentIdentityUniqueJSON(raw); err != nil || !utf8.Valid(raw) {
+		return snapshot, agentIdentityError("agent_identity_snapshot_invalid")
+	}
+	if err := strict(raw, &snapshot); err != nil || snapshot.Schema != 1 || snapshot.Revision <= 0 || snapshot.Grants == nil || snapshot.Instances == nil {
+		return agentIdentitySnapshot{}, agentIdentityError("agent_identity_snapshot_invalid")
+	}
+	return snapshot, nil
+}
+
+func resolveAgentIdentityCaller(root string, st *trustState, token string, at time.Time) (agentIdentityCaller, error) {
+	var caller agentIdentityCaller
+	if !filepath.IsAbs(root) || filepath.Clean(root) != root {
+		return caller, agentIdentityError("agent_identity_project_required")
+	}
+	if at.IsZero() {
+		return caller, agentIdentityError("agent_identity_clock_required")
+	}
+	id, err := findTrustIdentityAt(st, token, at)
+	if err != nil {
+		return caller, err
+	}
+	c := id.Context
+	if c == nil || c.Schema != 1 || c.Revision <= 0 || c.Revision != st.Revision || c.PrincipalID != id.Subject ||
+		c.Issuer == nil || c.Subject == nil || c.AuthenticatedAt == nil || c.AuthenticatedAt.After(at) {
+		return caller, agentIdentityError("agent_identity_context_incomplete")
+	}
+	if c.PrincipalKind != "local" && (c.ExpiresAt == nil || !at.Before(*c.ExpiresAt)) {
+		return caller, agentIdentityError("agent_identity_context_expired")
+	}
+	caller.actor.Principal = agentIdentityPrincipal{c.PrincipalID, c.PrincipalKind, *c.Issuer, *c.Subject}
+	if !caller.actor.Principal.valid() {
+		return agentIdentityCaller{}, agentIdentityError("agent_identity_context_incomplete")
+	}
+	caller.trustRevision = c.Revision
+	caller.projectRoot = root
+	caller.verifiedAt = at
+	if c.ExpiresAt != nil {
+		expires := *c.ExpiresAt
+		caller.expiresAt = &expires
+	}
+	return caller, nil
+}
+
+// This internal consumer keeps resolution and evaluation under the same Trust
+// read lock and reauthenticates even for a repeated result. It is not registered
+// as a public endpoint. Runtime instance callers need the future protected broker.
+// Production callers use a zero at value, sampled after lock acquisition; tests
+// may inject their fixture clock. No caller-supplied JSON clock is accepted.
+func (s *Store) evaluateAgentIdentityRequest(raw []byte, token string, snapshot agentIdentitySnapshot, authority agentIdentityAuthority, previous *agentIdentityDecision, at time.Time) (agentIdentityDecision, error) {
+	request, err := decodeAgentIdentityRequest(raw)
+	if err != nil {
+		return agentIdentityDecision{}, err
+	}
+	var decision agentIdentityDecision
+	_, err = s.withTrustLock(false, func(st *trustState) (any, error) {
+		if at.IsZero() {
+			at = time.Now().UTC()
+		}
+		caller, err := resolveAgentIdentityCaller(s.root, st, token, at)
+		if err != nil {
+			return nil, err
+		}
+		if previous != nil {
+			decision, err = reuseAgentIdentityDecision(*previous, snapshot, authority, caller, request, at)
+		} else {
+			decision, err = evaluateAgentIdentity(snapshot, authority, caller, request, at)
+		}
+		return nil, err
+	})
+	if err != nil {
+		return agentIdentityDecision{}, err
+	}
+	return decision, nil
+}

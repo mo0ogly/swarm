@@ -1,0 +1,8 @@
+{"Time":"2026-10-17T13:11:17.524544731+02:00","Action":"start","Package":"swarm.local/companion/internal/enrollmentstate"}
+{"Time":"2026-10-17T13:11:17.530444405+02:00","Action":"run","Package":"swarm.local/companion/internal/enrollmentstate","Test":"TestConcurrentIdenticalChangeHasOneEvent"}
+{"Time":"2026-10-17T13:11:17.530662585+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentstate","Test":"TestConcurrentIdenticalChangeHasOneEvent","Output":"=== RUN   TestConcurrentIdenticalChangeHasOneEvent\n"}
+{"Time":"2026-10-17T13:11:17.543138246+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentstate","Test":"TestConcurrentIdenticalChangeHasOneEvent","Output":"--- PASS: TestConcurrentIdenticalChangeHasOneEvent (0.01s)\n"}
+{"Time":"2026-10-17T13:11:17.543277688+02:00","Action":"pass","Package":"swarm.local/companion/internal/enrollmentstate","Test":"TestConcurrentIdenticalChangeHasOneEvent","Elapsed":0.01}
+{"Time":"2026-10-17T13:11:17.543306723+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentstate","Output":"PASS\n"}
+{"Time":"2026-10-17T13:11:17.544231814+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentstate","Output":"ok  \tswarm.local/companion/internal/enrollmentstate\t0.019s\n"}
+{"Time":"2026-10-17T13:11:17.544464021+02:00","Action":"pass","Package":"swarm.local/companion/internal/enrollmentstate","Elapsed":0.02}

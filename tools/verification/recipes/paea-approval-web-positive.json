@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "paea-approval-web-positive",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/Cargo.toml",
+    "rust/crates/**/src/**/*.rs",
+    "rust/crates/swarm-cli/tests/paea_approval_web.rs",
+    "rust/crates/swarm-cli/tests/common/*.rs",
+    "rust/crates/swarm-enrollment-authority/tests/common/*.rs",
+    "web/**/*",
+    "frontend/**/*",
+    ".cargo/config.toml",
+    "tests/fixture_area.py",
+    "tools/verification/recipes/paea-capture-reader.json",
+    "tools/verification/recipes/paea-approval-web-positive.json",
+    "tools/verification/README.md",
+    ".cache/rust-migration-binaries/swarm-rust-23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c",
+    ".cache/local-delivery/rust-it8w409o/build/profile/result.json",
+    "docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-direct-held-lock-guard-review-repair-20261105T104154Z/supervisor-source-normal334-20261105T105919Z/result.json",
+    "docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-direct-held-lock-guard-review-repair-20261105T104154Z/supervisor-source-normal334-20261105T105919Z/inputs.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_NET_OFFLINE": "true",
+    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/docs/plans/actions-confiance/paea/evidence/20261028-acquisition81-mvfdts57/glm-direct-held-lock-guard-review-repair-20261105T104154Z/supervisor-source-normal334-20261105T105919Z",
+    "SWARM_PAEA_APPROVAL_WEB_CLI": "{root}/.cache/rust-migration-binaries/swarm-rust-23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c",
+    "SWARM_PAEA_APPROVAL_WEB_CLI_SHA256": "23651e383c4b7eb6ba1b25bf66d0c63d3e58dd8adf6ab18435fe3cfb7390514c"
+  },
+  "steps": [
+    {
+      "id": "approval-web-positive-witness-owned-capture-and-signal-stop",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_approval_web",
+        "approval_web_cli_binds_and_consumes_exact_preparation_once",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test approval_web_cli_binds_and_consumes_exact_preparation_once ... ok",
+        "1 passed; 0 failed; 0 ignored;"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

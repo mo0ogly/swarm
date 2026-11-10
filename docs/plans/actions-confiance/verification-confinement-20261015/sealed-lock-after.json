@@ -1,0 +1,10 @@
+{
+  "mode": "after",
+  "observed": "busy state refused promptly without starting a helper",
+  "exit_code": 5,
+  "state_unchanged": true,
+  "elapsed_seconds": 0.08410850599830155,
+  "fixture_root": "/tmp/swarm-sealed-lock-57_3dblv",
+  "binary_sha256": "77e92112aca0dec7e031388ad804d21bdfdaeb5ae5a5c9b323f507c609e403c8",
+  "at": "2026-10-15T20:52:03.457130+00:00"
+}

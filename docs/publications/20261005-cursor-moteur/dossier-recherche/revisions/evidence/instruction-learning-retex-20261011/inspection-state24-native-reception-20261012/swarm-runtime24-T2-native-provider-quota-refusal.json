@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-11T22:34:51.184705+00:00",
+  "revision": 604,
+  "review": "review-44f2da6a502adf1b1853484b",
+  "candidate": "4af006a35e56d799a26eae29dd197326bf6288f5",
+  "state": "error",
+  "cause": "Fournisseur claude : quota refusé (429). Nouveaux appels suspendus jusqu’au 2026-10-12 01:00:00 UTC. Les tentatives et budgets déjà consommés restent conservés.",
+  "owner": "Claude provider account quota",
+  "condition": "Provider reset announced2026-10-12 01:00UTC (03:00Paris) or actual account restoration; then fresh authorized public recovery and genuine call must verify availability. No unchanged replay or bypass.",
+  "native_result_event": "review-44f2da6a502adf1b1853484b-result-e426a01e9971add3",
+  "incident_saved_for_root": true,
+  "packet_contract_versions": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "journal_states": [
+    "interrupted"
+  ],
+  "reviewer_calls": 70,
+  "reviewer_limit": 100,
+  "planning_activations": 53,
+  "planning_limit": 60,
+  "native_receipt_sha256": "f5a442fc4455a4581a079aa23f011354c9c06d715ac9cbcf9f6f85c9c1fdc265",
+  "controls": [
+    {
+      "id": "plan-entry",
+      "exit": 0,
+      "wall_duration_ms": 34,
+      "stdout_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    },
+    {
+      "id": "plan-validation",
+      "exit": 0,
+      "wall_duration_ms": 9349,
+      "stdout_sha256": "0dbcaf77cf5eda3eac15c82310488526c24311ba7b3685401c749dba94e33398"
+    },
+    {
+      "id": "plan-delivery",
+      "exit": 0,
+      "wall_duration_ms": 27,
+      "stdout_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    },
+    {
+      "id": "plan-criterion-1",
+      "exit": 0,
+      "wall_duration_ms": 28,
+      "stdout_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    },
+    {
+      "id": "plan-criterion-2",
+      "exit": 0,
+      "wall_duration_ms": 29,
+      "stdout_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    },
+    {
+      "id": "plan-criterion-3",
+      "exit": 0,
+      "wall_duration_ms": 27,
+      "stdout_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    },
+    {
+      "id": "plan-criterion-4",
+      "exit": 0,
+      "wall_duration_ms": 25,
+      "stdout_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    }
+  ],
+  "old_history_retained": true,
+  "limits": "New contract received but first provider call refused429. No inspection reply, final selection, favorable verdict, acceptance or autonomous chain completion observed. Local Swarm budget remaining30review calls and7planning activations does not release provider quota."
+}

@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "closed versioned catalog exposes actual local capabilities without provider claims",
+    "shared Admin data policy persists both exact simulated paths",
+    "ledger: direct effect without approval refused",
+    "ledger: admitted intent, exact approval and unknown state preserve one native effect",
+    "ledger: readback after independent Store reopen confirms result without duplication",
+    "access refuses settlement destination before storing original or action",
+    "access: direct effect without approval refused",
+    "access: admitted intent, exact approval and unknown state preserve one native effect",
+    "access: readback after independent Store reopen confirms result without duplication",
+    "null, unknown implementation, unsupported version and capability overstatement refused without mutation",
+    "distinct simulated registries persist without changing real identities or creating client root"
+  ],
+  "binary_sha256": "c0030271a0c2108a6d872b954b0be7556f69642463e28e3070f6bde1edfd8ec8",
+  "at": 1792134941.9974165,
+  "simulation": true
+}

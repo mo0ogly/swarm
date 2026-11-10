@@ -1,0 +1,79 @@
+{
+  "at": "2026-10-16T17:52:40.241426+00:00",
+  "cases": [
+    {
+      "argv": [
+        "/tmp/swarm-m14-bin-ipol3toj/swarm",
+        "--root",
+        "/tmp/swarm-m14-storage-preview-4sf_25fm",
+        "--json",
+        "agent",
+        "resume-dialogue-preview",
+        "absent"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "{\n  \"error\": \"open : no such file or directory\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"open : no such file or directory\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+      "version_before": 34,
+      "version_after": 35,
+      "backup_count": 1,
+      "result": "FAIL"
+    },
+    {
+      "argv": [
+        "/tmp/swarm-m14-bin-ipol3toj/swarm",
+        "--root",
+        "/tmp/swarm-m14-storage-preview-w477g2lm",
+        "--json",
+        "mission",
+        "recovery",
+        "w-6b82a95d0ad46b6d02684273",
+        "absent"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "{\n  \"error\": \"tâche inconnue : absent\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"tâche inconnue : absent\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+      "version_before": 34,
+      "version_after": 35,
+      "backup_count": 1,
+      "result": "FAIL"
+    },
+    {
+      "argv": [
+        "/tmp/swarm-m14-bin-ipol3toj/swarm",
+        "--root",
+        "/tmp/swarm-m14-storage-preview-4e0d101u",
+        "--json",
+        "mission",
+        "changes",
+        "w-86c08d2aeeef27d2d4b73597"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"from_revision\": 0,\n  \"to_revision\": 1,\n  \"first_visit\": true,\n  \"more\": false,\n  \"items\": []\n}\n",
+      "stderr": "",
+      "version_before": 34,
+      "version_after": 35,
+      "backup_count": 1,
+      "result": "FAIL"
+    },
+    {
+      "argv": [
+        "/tmp/swarm-m14-bin-ipol3toj/swarm",
+        "--root",
+        "/tmp/swarm-m14-storage-preview-4aty5xwv",
+        "--json",
+        "mission",
+        "spending",
+        "w-c22ef0f11a6605ebc1d6c594"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"calls\": [],\n  \"observed_at\": \"2026-10-16T17:52:40.196585422Z\",\n  \"measurement_source\": \"agent.lifecycle + agent.progress + provider.result + task.review-history + planning_calls + events\",\n  \"rows\": [],\n  \"recorded_control_executions\": 0,\n  \"worker_retries\": 0,\n  \"note\": \"Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.\",\n  \"attempts\": []\n}\n",
+      "stderr": "",
+      "version_before": 34,
+      "version_after": 35,
+      "backup_count": 1,
+      "result": "FAIL"
+    }
+  ],
+  "model_calls": 0
+}

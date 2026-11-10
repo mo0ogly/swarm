@@ -1,0 +1,140 @@
+{
+ "schema_version": 1,
+ "id": "paea-git-call-agreement-terms-rust",
+ "inputs": [
+  "rust/Cargo.toml",
+  "rust/Cargo.lock",
+  ".cargo/config.toml",
+  "rust/crates/*/Cargo.toml",
+  "rust/crates/swarm-engine/src/**/*",
+  "rust/crates/swarm-web/src/**/*",
+  "rust/crates/swarm-web/tests/paea_git_call.rs",
+  "rust/crates/swarm-enrollment-*/src/**/*",
+  "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+  "rust/crates/swarm-identity-contract/src/**/*",
+  "rust/crates/swarm-protection-contract/src/**/*",
+  "tools/verification/recipe.py",
+  "tools/verification/recipes/paea-git-call-agreement-terms-rust.json",
+  ".swarm-fixtures/source-fixture-terms-api-regen-20261031/result.json"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+  "CARGO_PROFILE_DEV_DEBUG": "0",
+  "CARGO_PROFILE_TEST_DEBUG": "0",
+  "CARGO_INCREMENTAL": "0",
+  "SWARM_PAEA_SOURCE_FIXTURE": "{root}/.swarm-fixtures/source-fixture-terms-api-regen-20261031"
+ },
+ "steps": [
+  {
+   "id": "engine-agreement-and-terms-observation",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--lib",
+    "--",
+    "root_store::paea_git_agreement",
+    "--test-threads=1"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "7 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "preview-explicit-absence-without-source",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "preview_route_reports_explicit_absence_without_source",
+    "--",
+    "--exact",
+    "--nocapture"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "preview_route_reports_explicit_absence_without_source ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "web-preview-exposes-engine-terms",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "--",
+    "--ignored",
+    "--exact",
+    "preview_route_presents_exact_bound_action_with_current_state"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "preview_route_presents_exact_bound_action_with_current_state ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "web-terms-then-trust-capture-guard-match",
+   "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-web",
+    "--test",
+    "paea_git_call",
+    "--",
+    "--ignored",
+    "--exact",
+    "approver_ux_preview_terms_then_existing_trust_channel_captures_agreement"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "approver_ux_preview_terms_then_existing_trust_channel_captures_agreement ... ok",
+    "1 passed; 0 failed"
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "i18n-catalog-check",
+   "command": [
+    "node",
+    "scripts/i18n/build.cjs",
+    "--check"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "\"mode\":\"check\"",
+    "\"status\":\"pass\""
+   ],
+   "required_stderr": []
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+=== RUN   TestManagedFragmentHistoricalPublicRecovery
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/fail
+--- PASS: TestManagedFragmentHistoricalPublicRecovery (20.77s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/fail (20.77s)
+PASS
+ok  	swarm.local/companion/internal/engine	20.791s

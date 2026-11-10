@@ -1,0 +1,44 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T17:11:21.501910+00:00",
+  "end": "2026-10-11T17:20:45.704619+00:00",
+  "seconds": 564.2031929880031,
+  "exit": 1,
+  "output": "/tmp/swarm-review-retry-storage-qualified-v1-full.out",
+  "output_sha256": "2356f1c06901ad562a93e5acaff0b3d3ef7f0642f9332448dde245a66588e973",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "2217207848fd1732269e21631b5de2d81cba0ab19bdc0cfa24bf14f1cb0bf84d",
+  "candidate_digest": "e77e9a9354363634c0306a83031ecea9f952a90b60341ec09fd71c683182c64f",
+  "paths": 1175,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T17:11:21.501910+00:00",
+    "driver_pid": 1817739,
+    "pgid": 1817739,
+    "sid": 1817739,
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "manifest_sha256": "2217207848fd1732269e21631b5de2d81cba0ab19bdc0cfa24bf14f1cb0bf84d",
+    "source_digest": "e77e9a9354363634c0306a83031ecea9f952a90b60341ec09fd71c683182c64f",
+    "paths": 1175,
+    "precondition": "Scoped16 storage version28 and per-mutation guard combined with fully qualified15; isolated RED\u2192GREEN, fresh1175-source snapshot. Detached owning session verified survives coupled wrapper termination.",
+    "go_pid": 1817749
+  }
+}

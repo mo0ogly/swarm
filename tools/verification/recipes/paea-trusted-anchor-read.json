@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "id": "paea56-trusted-anchor-read",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "tests/fixtures/paea_provisioning_request.json",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "rust/crates/swarm-linux-identity-channel/**/*",
+    "rust/crates/swarm-enrollment-config/tests/private_trusted_read_durable.rs",
+    "tools/verification/recipes/paea-trusted-anchor-read.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "explicit-trusted-locator-durability-refusal-and-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-config",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "private_trusted_read_durable",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "trusted_private_read_exact_ack_and_reopen",
+        "trusted_private_read_faults_keep_ack_without_pin_and_recover",
+        "trusted_private_read_preserves_independent_pin_refusal",
+        "trusted_private_read_unsafe_files_and_names_refuse_then_restore",
+        "trusted_private_read_cancelled_then_fresh_context_recovers"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "existing-independent-pin-durability-regressions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-config",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "private_read_durable",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "durable_private_read_wrong_pin_precedes_sync_and_plain_read_is_unchanged"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "shared-fd-read-identity-substitution-regressions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-config",
+        "--features",
+        "test-fixtures",
+        "--lib",
+        "store::guarded_read::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-trusted-anchor-read-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-config",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Documenting swarm-enrollment-config",
+        "Finished"
+      ]
+    }
+  ]
+}

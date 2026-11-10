@@ -1,0 +1,8 @@
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+2026/10/11 12:27:34 http: TLS handshake error from 127.0.0.1:41396: remote error: tls: bad certificate
+--- FAIL: TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentReturn (0.05s)
+    planning_test.go:580: stale attempt return was not acknowledged by a no-operation decision événement non fourni dans cette activation : plan-643c58146e7eb5074a90f7c3b62b0ea19433eec0cfad2897f0e35884c84ec73d
+FAIL
+FAIL	swarm.local/companion/internal/engine	445.483s
+FAIL

@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-11T14:13:35.041577+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-composition-20261011.bundle",
+  "sha256": "b9fab10f7f6ff2853e1c8218de25324b5df873accfa6b19ddd169e65a604f717",
+  "bytes": 318113,
+  "ref": "refs/heads/operator-inputs",
+  "commit": "9b65f18d442cbbaff6186639356c053ba2488bce",
+  "manifest_sha256": "a00574406a355b612c61b589dac78d254e4a5bd9b1dc4265d5fea1db95574aa9",
+  "input_files": 47,
+  "source": "/tmp/swarm-operator-composition-inputs-20261011-jqrj3nke",
+  "isolated_import_check": "/tmp/swarm-operator-composition-input-check-rozh76r7",
+  "verification": "PASS isolated fetch, exact commit, manifest and all declared full input bytes/hash recovered",
+  "limits": "Immutable operator input only, no task acceptance. Native receipt/use still requires observation."
+}

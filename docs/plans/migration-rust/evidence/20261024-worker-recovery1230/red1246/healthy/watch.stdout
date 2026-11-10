@@ -1,0 +1,3 @@
+{"event":"mission-watch-started","generation":1,"mission_complete":false,"observation_is_permission":false,"poll_interval_ms":"2000","schema_version":1,"settings_revision":"1","work":"w-d723dd1c3d0738a9a18edc70"}
+{"agent_id":"watch-17babd6283a9c054854b2272","event":"mission-worker-started","mission_complete":false,"observation_is_permission":false,"provider_start_verified":false,"schema_version":1,"session_state":"pending","supervisor_pid":3332085,"work":"w-d723dd1c3d0738a9a18edc70"}
+{"children_still_running":1,"event":"mission-watch-stopped","lease_released":true,"mission_complete":false,"reason":"sigint","root_closed":true,"schema_version":1,"work":"w-d723dd1c3d0738a9a18edc70"}

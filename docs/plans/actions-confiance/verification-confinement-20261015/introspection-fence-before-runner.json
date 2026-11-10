@@ -1,0 +1,10 @@
+{
+  "pid": 1921151,
+  "proc_start_ticks": "3658212",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-introspection-fence-before.py",
+    "run"
+  ],
+  "at": "2026-10-15T22:09:17.979366+00:00"
+}

@@ -1,0 +1,10 @@
+PASS managed-native-planner-delegates-without-worker
+PASS managed-missing-copy-refuses-without-spend-or-provider
+PASS managed-restored-copy-resumes-child-and-creates-two-todo-tasks
+PASS managed-candidate-capabilities-delivered-without-source-paths
+PASS managed-worker-launch-still-refuses-without-mutation
+PASS managed-status-two-unstarted-tasks-without-copy-spend-or-worker
+PASS managed-prepermission-reobserves-copy-without-mutation-or-inference
+PASS managed-unported-decision-refuses-and-acknowledgement-recovers
+MANAGED_PLANNING_PASS
+REPLAY_EVIDENCE /home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-planning-cb672w31

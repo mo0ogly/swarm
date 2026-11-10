@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-review-budget-through-retex-20261011",
+  "expected_revision": 183,
+  "limits": {
+    "planning_activations": 30,
+    "planning_decisions": 30,
+    "review_calls": 70
+  },
+  "reason": "Autorisation explicite utilisateur : si droits/budget insuffisants, augmenter pour ce projet jusqu’au RETEX. Diagnostic :18 appels consommés, reprise T2 demande6 puis6 tâches T3..T8 demandent au moins3 appels gérés chacune, totalminimal42>plafond30. Estimation au format actuel T2(5 inspections+2finaux) :66appels, allocation70 avec4appels de correction. Augmenter seulement review_calls de30 à70 ; plafonds planification/décisions inchangés, consommation et avis historiques conservés, pas de plafond financier modifié ni limite de compte fournisseur contournée. Étape de budget, aucune acceptation ni reprise automatique."
+}

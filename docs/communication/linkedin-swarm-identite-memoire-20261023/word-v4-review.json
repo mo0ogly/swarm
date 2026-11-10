@@ -1,0 +1,169 @@
+{
+  "date": "2026-10-23",
+  "scope": "French editorial Word v4 and existing documentation entry points",
+  "input_request_sha256": "7354a7c1c0f6476714ed32ceefbce405a297173a5e63c48a472aa63c7ab649a3",
+  "source_v3_sha256": "ddc184e453e7223df60f928eaa782f1f6abe9a5165018926af1ba39b16a29fe4",
+  "source_v2_sha256": "3f98e64d3afbe9b6dddd32783a29a07318a57776446bc1581f43915f01104230",
+  "output_sha256": "42e6a0a983ca1ec60a6b3ba6f097f45ef22203bf5da2c3a9d9dfab8e3d6d4883",
+  "outputs": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v4.docx",
+    "/home/fpizzi/Downloads/swarm/Swarm_Article2_Identite_Memoire_v4.docx"
+  ],
+  "bytes": 3235303,
+  "pages": 13,
+  "figures": [
+    {
+      "key": "architecture-overview",
+      "png_sha256": "a4ca7f9cc7677f5b668ccf33762d667e34bd689a1ffc560568519bf41441ca72",
+      "svg_sha256": "16c1a4112f5a9441b02922ac4414836edc37b980e1b1e8e67da83ec8cb26f3fb",
+      "mermaid_sha256": "1221c5e3651f826ffd88c41ac200f83eae426ae7273aa8a6734859c753be3142",
+      "pixels": [
+        4788,
+        4508
+      ],
+      "display_width_mm": 376.01,
+      "embedded_part": "/word/media/image3.png"
+    },
+    {
+      "key": "identity-authority",
+      "png_sha256": "a18d95ec26f382560cd9af39ca97791885bf24922c7cb96b43a068093fdc80ed",
+      "svg_sha256": "5c7923fd955531525f4cf5ef182aba98b1fda5433b5ac7fdf8271c958eb6a3eb",
+      "mermaid_sha256": "e923542db6af0337c3e36db7b24c0c7c0d066728d990d5dfca33bf49184b18ac",
+      "pixels": [
+        4402,
+        4550
+      ],
+      "display_width_mm": 376.01,
+      "embedded_part": "/word/media/image4.png"
+    },
+    {
+      "key": "memory-context",
+      "png_sha256": "b6cba92e1cfff402913821768567f5086ef7ab305c6f9e3e02a59586213a3706",
+      "svg_sha256": "774f92a29a5c07ca2c3aedea60632dafd424ced864050f3052a157bdad6063f5",
+      "mermaid_sha256": "d7aa102af692a8d937f35ced3676f72ab546838dfdef0cc5a112dc3200d7ae06",
+      "pixels": [
+        5164,
+        3820
+      ],
+      "display_width_mm": 424.47,
+      "embedded_part": "/word/media/image5.png"
+    },
+    {
+      "key": "run-supervision",
+      "png_sha256": "ead3b172e32230af1729cd86c32a9c5411a4669b391a4f4f2d7fc41243eb9108",
+      "svg_sha256": "99a12a8a5355fd0489490e549b471b75b40abc6ac68bd16454807f0f3cf8e86a",
+      "mermaid_sha256": "d20f0d8a70ed29295be7a2b63523c3d37a9a571e281f36eada1bc7528a5f9228",
+      "pixels": [
+        4252,
+        4598
+      ],
+      "display_width_mm": 376.01,
+      "embedded_part": "/word/media/image6.png"
+    },
+    {
+      "key": "logs-observability",
+      "png_sha256": "b01bd2bc7e9d9b9899d8225b368a200198e4c6b18bad103be361bb0d0e683044",
+      "svg_sha256": "4f015bc06e98ce912de799f7e0ccb419903d609d44cb39aac023a604572dc890",
+      "mermaid_sha256": "fa9fa996c65fae22c04f1839c38641b9149174f30f1b8a47fd7fb03fb2923855",
+      "pixels": [
+        4944,
+        2044
+      ],
+      "display_width_mm": 550.02,
+      "embedded_part": "/word/media/image7.png"
+    }
+  ],
+  "references": 18,
+  "editorial_comments": 6,
+  "source_decisions": "sources-v4-review.json",
+  "source_contracts": {
+    "docs/ENGINE-ACCEPTANCE.md": "a43377f1f1ffe9f146467f4e63390a1c3cd587629a95256264f74357a7c653cd",
+    "docs/architecture/INSTRUCTION-LEARNING.md": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038",
+    "rust/crates/swarm-engine/src/root_store/task_validation/gate.rs": "dae6dc543cd5bf835dbc1e954172b90255f210e5605b79d0b05c9877b171de9e",
+    "docs/diagrams/architecture-contracts.json": "b78be7893ae86d2cff6cd6abbc985e50027253c89589ab7427525e3fe3b6a247",
+    "docs/diagrams/CONTRACT-MAP.md": "76bdd87f655b1686e5978cc489fb61a4bf8541d74f57b6c28e2a318d567fe8fe"
+  },
+  "verification": {
+    "render": "Packaged documents renderer, bundled LibreOffice, 110 dpi",
+    "render_directory": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v4/render-02",
+    "pdf_sha256": "597244063e32847663b7a8048d97cb51695331986145f6c2a3d0190efadc59f5",
+    "all_pages_visually_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "result": "Clean text, five complete diagrams, no isolated announcement page, no clipping or missing arrowheads observed",
+    "checks": {
+      "original_v2_unchanged": true,
+      "frozen_v3_unchanged": true,
+      "main_article_body_preserved": true,
+      "five_current_svg_sources_unchanged": true,
+      "five_embedded_pngs_match": true,
+      "opaque_parts_unchanged": 17,
+      "references_numbered_1_to_18": true,
+      "sections": 6
+    },
+    "limits": [
+      "LibreOffice PDF rendering checked; native Microsoft Word field refresh not exercised",
+      "Document-only change; no global security, identity or Rust runtime qualification",
+      "Editorial self-review, no independent external reviewer invoked"
+    ],
+    "final_local_file_links": {
+      "count": 279,
+      "failed": 0,
+      "fragment_scope": "Existing heading fragments unchanged; new links target files only."
+    },
+    "git_diff_check": "passed",
+    "input_stability": "Task-owned files, retained originals and five figure sources match their retained hashes after inspection.",
+    "rendered_page_sha256": {
+      "page-1.png": "3ee2936024e5a1b5be0ae3dad5de2d6252ee110317f1d5fcc1fcdf2e4201ea4a",
+      "page-2.png": "d3e1fc6aaef1e960278c18d562abd5ac57aeb058ba2cb85235cdbf535e694290",
+      "page-3.png": "4b39e02a6ef65cf2d1a26b6f257e4538135c5ed116dc59116f56a8705961d113",
+      "page-4.png": "01d7e8a7bc7270a9da903578410d9bb68c07768bd4358c470a3c1bbeafa7b50a",
+      "page-5.png": "4220592a014f804e9ac8343486ec15d9bd33e0d4769f71813543b342902d2240",
+      "page-6.png": "a49c83117e28d7604113c65c53a2ac608e94c46e147c7d38a4b4618d32f79409",
+      "page-7.png": "99981e43b69ad227a76f8a81bceb7dab642df878daf2547ffed199ace72c1b25",
+      "page-8.png": "e76f9751cd06608f7928f055ec5929a9e9594475c121d48c4646a86298580704",
+      "page-9.png": "ee7adf99590436c6ce1866a4aba574e6bb4c2634819bf31581715ac1ae2d4cda",
+      "page-10.png": "6a885ceaf0e3d05a7a5e18f0b2478f5eca7faf278171c28245376c2346a069df",
+      "page-11.png": "cd4babfb91ebdf9630456e51205c238b07925d8d28aefb9da4e62ec99be7bd19",
+      "page-12.png": "e96df4695e25a5bf8313141f17cce8b652577056c32cd2a7caa967d4e446a3ed",
+      "page-13.png": "df052323306acafe20ea6265bcd6b9ca270636caba318610998a044696885923"
+    }
+  },
+  "increment_review": {
+    "policies": "No executable/operator policy created or changed. human/automatic and AC02 statements retain their contracts; research metrics do not become Swarm thresholds.",
+    "functions": "No shipped public/nontrivial software function modified. Temporary document helpers have purpose/input/error limits documented; only documentation files are delivered.",
+    "errors": "No runtime error path changed. Unknown sources qualified; download failures preserved in source audit. First layout orphan page retained in render-01 and corrected in render-02.",
+    "build_inputs": "No software build/deployment/restart. version_history local delivery rule not applicable to standalone editorial output; v4 and SHA256 identify this artifact.",
+    "languages": "French article requested. FR and EN entry points updated together, explicitly identifying a French document. Five existing bilingual source diagram families remain unchanged."
+  },
+  "retained_learning": "First publication, revision, disclosure and press coverage are distinct dates. Cite primary passages and preserve experimental limits, fixes and draft status. Signatures establish neither truth nor semantic safety.",
+  "future_ideas": "ED4-13 in sources-v4-review.json retains memory controls with owner, criterion and resumption condition. AC02 not started.",
+  "task_owned_files": {
+    "README.md": "7deef0c139775f089c45ba33020bdf16bff78b5c8d74b214aef5917bf6284595",
+    "README.en.md": "7fd7ee240f2a203f7a1c865e26256e45d1f687065f99d053255c698501acf2a2",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md": "55b9c5e91901b86e92ce50980fc5d35a60b5e6cc6d049575ef61d63c8622c065",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/article-v4-fr.md": "207c53635a27d9c7a9076cad583549c1bd6d7e9d788b7ef7abfea61c1d5e1aae",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/sources-v4-review.json": "f5dc19e5d2e4eadcf45f49eb1d7dcc897e4a88347a9ceb96cc68f05d5342205d",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v4.docx": "42e6a0a983ca1ec60a6b3ba6f097f45ef22203bf5da2c3a9d9dfab8e3d6d4883",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/word-v4-entry-points.patch": "a0d1fa32e3b4bf665da8db8d35a88fed61c312b203c9eb65c289dd662d3819f2"
+  },
+  "status": "Editorial output verified and saved locally; not published; no runtime delivery claimed",
+  "entry_points_before_sha256": {
+    "README.md": "3c879466481653fe39ad55397cae82636bb3566656e92874fd2940b5f59d4bd0",
+    "README.en.md": "69bb2056a818524d62b025394b409d205d6d7f3975e139c961aa7fcb29bf75e6",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md": "4a8c41c3e906d32f791952f1c0a5fd5ff02c5f9013a4da8906bf007635de9f27"
+  },
+  "patch": "word-v4-entry-points.patch"
+}

@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "tests/test_memory_summary_admission.py"
+  ],
+  "started_at_utc": "2026-10-16T20:10:49.666012+00:00",
+  "duration_seconds": 0.391,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "test_cli_invalid_json_is_an_explicit_error_without_output",
+    "test_cli_preserves_inputs_private_output_and_refuses_replacement",
+    "test_prepares_declarative_selection_without_operator_text_or_authority",
+    "test_rejects_changed_unrelated_or_fallback_receipt",
+    "test_requires_reason_and_a_protected_dialogue_in_prefix"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "5d90c04aea2e8262452ac8b12780c8d189840802a0caa730981c17356521190e",
+  "real_model_calls": 0
+}

@@ -1,0 +1,23 @@
+{
+  "executor": "Codex direct audit",
+  "argv": [
+    "go",
+    "test",
+    "-overlay",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m1-20261015/swarm-overlay-ready.json",
+    "./internal/engine",
+    "-run",
+    "^TestMemoryAudit",
+    "-count=1",
+    "-v"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "environment_keys": [
+    "HOME",
+    "PATH"
+  ],
+  "started_at_utc": "2026-10-15T19:10:02.998489+00:00",
+  "ended_at_utc": "2026-10-15T19:10:53.766978+00:00",
+  "exit_code": 0,
+  "log_sha256": "059c43bb065d6b844cb6b27840fd9759b7d4bc3861b1cc5164ee8256c0bc872c"
+}

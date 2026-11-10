@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-11T14:21:24.636882+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-duration-20261011.bundle",
+  "sha256": "aa1ba110b8ac17b9358eac7f06de7968aaefa25bca2ff29873aa4652a86fa68c",
+  "bytes": 322555,
+  "ref": "refs/heads/operator-inputs",
+  "commit": "fccdd21602bfc2761dd2713ce9567c85011981f1",
+  "manifest_sha256": "0b8e3e91a32a35b9b73375b65b714d34fd39d391f4547affde29bb2c167e9706",
+  "input_files": 49,
+  "source": "/tmp/swarm-operator-duration-inputs-20261011-jewrr81v",
+  "isolated_import_check": "/tmp/swarm-operator-duration-input-check-eneo2t8z",
+  "verification": "PASS isolated fetch, exact commit, manifest and all49 declared full input bytes/hash recovered",
+  "limits": "Immutable operator input only, no task acceptance. Native receipt/use still requires observation."
+}

@@ -1,0 +1,19 @@
+{"Time":"2026-10-17T09:36:35.098459404+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-17T09:36:35.135157148+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesArbitraryScope"}
+{"Time":"2026-10-17T09:36:35.13520069+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesArbitraryScope","Output":"=== RUN   TestAgentIdentityPlanRefusesArbitraryScope\n"}
+{"Time":"2026-10-17T09:36:35.293353528+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesArbitraryScope","Output":"    agent_identity_plan_linux_test.go:25: arbitrary plan digest did not produce the expected refusal:  \u003cnil\u003e\n"}
+{"Time":"2026-10-17T09:36:35.30147511+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesArbitraryScope","Output":"--- FAIL: TestAgentIdentityPlanRefusesArbitraryScope (0.17s)\n"}
+{"Time":"2026-10-17T09:36:35.301577293+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesArbitraryScope","Elapsed":0.17}
+{"Time":"2026-10-17T09:36:35.301594144+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesCurrentContractDrift"}
+{"Time":"2026-10-17T09:36:35.301913575+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesCurrentContractDrift","Output":"=== RUN   TestAgentIdentityPlanRefusesCurrentContractDrift\n"}
+{"Time":"2026-10-17T09:36:35.427338849+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesCurrentContractDrift","Output":"    agent_identity_plan_linux_test.go:47: changed recorded contract remained usable:  \u003cnil\u003e\n"}
+{"Time":"2026-10-17T09:36:35.434419533+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesCurrentContractDrift","Output":"--- FAIL: TestAgentIdentityPlanRefusesCurrentContractDrift (0.13s)\n"}
+{"Time":"2026-10-17T09:36:35.434453748+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesCurrentContractDrift","Elapsed":0.13}
+{"Time":"2026-10-17T09:36:35.434464267+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesMissingRecordedPlan"}
+{"Time":"2026-10-17T09:36:35.434469748+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesMissingRecordedPlan","Output":"=== RUN   TestAgentIdentityPlanRefusesMissingRecordedPlan\n"}
+{"Time":"2026-10-17T09:36:35.527581327+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesMissingRecordedPlan","Output":"    agent_identity_plan_linux_test.go:69: missing recorded plan did not produce the expected refusal:  \u003cnil\u003e\n"}
+{"Time":"2026-10-17T09:36:35.530221775+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesMissingRecordedPlan","Output":"--- FAIL: TestAgentIdentityPlanRefusesMissingRecordedPlan (0.10s)\n"}
+{"Time":"2026-10-17T09:36:35.53026675+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanRefusesMissingRecordedPlan","Elapsed":0.1}
+{"Time":"2026-10-17T09:36:35.531617031+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-17T09:36:35.537118463+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.438s\n"}
+{"Time":"2026-10-17T09:36:35.537156915+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.439}

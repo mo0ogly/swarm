@@ -1,0 +1,45 @@
+{
+  "at": "2026-10-17T08:01:20.668450+00:00",
+  "provenance": "Observed after all final checks; not a pre-run environment attestation",
+  "commands": [
+    {
+      "command": [
+        "go",
+        "version"
+      ],
+      "exit_code": 0,
+      "stdout": "go version go1.24.3 linux/amd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "env",
+        "GOOS",
+        "GOARCH",
+        "CGO_ENABLED"
+      ],
+      "exit_code": 0,
+      "stdout": "linux\namd64\n1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uname",
+        "-srmo"
+      ],
+      "exit_code": 0,
+      "stdout": "Linux 6.17.0-41-generic x86_64 GNU/Linux\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "bwrap",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "bubblewrap 0.11.0\n",
+      "stderr": ""
+    }
+  ]
+}

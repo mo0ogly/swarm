@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "operation": "Fresh CLI work list during live verification",
+  "cause_observed": "database is locked (5) (SQLITE_BUSY)",
+  "exit": 2,
+  "new_precondition": "Use the already-open authenticated server store through its public HTTP API after closing the verification browser; do not retry the same CLI operation or change storage policy."
+}

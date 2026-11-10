@@ -1,0 +1,9 @@
+
+running 4 tests
+test unknown_and_terminal_states_cannot_be_relabelled_or_replayed ... ok
+test invalid_representation_or_expected_sink_never_yields_a_state ... ok
+test altered_action_intent_or_sink_refuses_with_control_and_recovery ... ok
+test exact_receipt_correspondence_in_both_domains_establishes_no_authenticity ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

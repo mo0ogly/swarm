@@ -3,10 +3,11 @@ import json
 import subprocess
 import sys
 import tempfile
+from fixture_area import fixture_area
 import uuid
 from pathlib import Path
 
-root = Path(tempfile.mkdtemp(prefix='swarm-assist-recipe-'))
+root = Path(tempfile.mkdtemp(prefix='swarm-assist-recipe-', dir=fixture_area()))
 binary = sys.argv[1]
 provider_src = Path(sys.argv[2]).resolve()
 

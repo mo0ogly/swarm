@@ -1,0 +1,44 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T19:11:04.291340+00:00",
+  "end": "2026-10-11T19:20:03.953966+00:00",
+  "seconds": 539.6626341810043,
+  "exit": 0,
+  "output": "/tmp/swarm-review-inventory21-qualified-v1-full.out",
+  "output_sha256": "9b2d28a6ab66607a4455629f94e8fedf974440d292c3bd3244bb08a3fae016ec",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "3937cf4f3b77daf0903009d2866f720196c16bed6aea2cc64e36e96693ccf6bf",
+  "candidate_digest": "06064eea1d5decca52c2e964268886053637bb3a786346351d53b819939348ad",
+  "paths": 1187,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T19:11:04.291340+00:00",
+    "driver_pid": 3022137,
+    "pgid": 3022137,
+    "sid": 3022137,
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "manifest_sha256": "3937cf4f3b77daf0903009d2866f720196c16bed6aea2cc64e36e96693ccf6bf",
+    "source_digest": "06064eea1d5decca52c2e964268886053637bb3a786346351d53b819939348ad",
+    "paths": 1187,
+    "precondition": "Qualified20 plus generic admitted whole-context inventory and acknowledged current review knowledge for root/child; no extra retry authority. Final selection uses received immutable partial replies, speculative admission preserved; version1 exact historical prompt replay, new final journal2. RED counterexamples, targeted versioned38.805s and copied native originals PASS: 11sources, both complete Judge files23334bytes fit79564bytes rather than14618. No native mission DB fixture or provider invoked. Full required before install; all original negative/unknown outcomes retained.",
+    "go_pid": 3022138
+  }
+}

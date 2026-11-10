@@ -1,0 +1,18 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/agent-workflows",
+    "-p",
+    "test_check.py",
+    "-k",
+    "test_rejects_empty_success",
+    "-v"
+  ],
+  "exit": 1,
+  "at": "2026-10-17T13:24:13.546894+00:00",
+  "expected_failure": true
+}

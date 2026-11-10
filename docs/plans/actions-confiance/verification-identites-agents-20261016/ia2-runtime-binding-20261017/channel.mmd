@@ -1,0 +1,15 @@
+sequenceDiagram
+  participant C as Contrôle de fixture
+  participant W as Bubblewrap
+  participant A as Instance A
+  participant B as Instance B
+  participant R as Récepteur
+  C->>W: Lancer avec info et porte bloquée
+  W-->>C: PID hôte et namespaces
+  C->>C: Ouvrir et conserver PID/montage
+  C->>W: Libérer le programme
+  B->>R: Connexion de B
+  C->>A: Copier le vrai endpoint client de B (attaque de fixture)
+  A->>R: Message avec identité B déclarée
+  R->>R: Connexion = B, émetteur du message = A
+  R-->>A: Refus

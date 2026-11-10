@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "id": "w-a93ab84c0f8a42cb6074ad5a",
+  "revision": 8,
+  "title": "IA1 agent authority fixture",
+  "objective": "Reproduce missing identity boundaries",
+  "scope": "Isolated local fixture only",
+  "criteria": [
+    "No model calls or real mission mutation"
+  ],
+  "next": "Audit",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-16T20:45:09.892148378Z",
+  "updated": "2026-10-16T20:45:10.740185121Z",
+  "git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "tasks": [
+    {
+      "id": "anonymous",
+      "title": "anonymous",
+      "owner": "",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "Audit",
+      "attempts": []
+    },
+    {
+      "id": "invalid",
+      "title": "invalid",
+      "owner": "",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "Audit",
+      "attempts": []
+    },
+    {
+      "id": "revoked",
+      "title": "revoked",
+      "owner": "",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "Audit",
+      "attempts": []
+    },
+    {
+      "id": "api",
+      "title": "api",
+      "owner": "",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "Audit",
+      "attempts": []
+    },
+    {
+      "id": "api-revoked",
+      "title": "api-revoked",
+      "owner": "",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "Audit",
+      "attempts": []
+    },
+    {
+      "id": "spoof",
+      "title": "spoof",
+      "owner": "",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "Audit",
+      "attempts": []
+    },
+    {
+      "id": "pivot",
+      "title": "pivot",
+      "owner": "",
+      "deliverable": "audit evidence",
+      "criteria": [
+        "Scripted fixture only"
+      ],
+      "depends": null,
+      "status": "todo",
+      "blocker": "",
+      "next": "Audit",
+      "attempts": []
+    }
+  ]
+}

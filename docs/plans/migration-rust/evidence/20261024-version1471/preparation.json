@@ -1,0 +1,21 @@
+{
+  "provenance": "Reconstructed summary of original tool outputs retained in chat, not a fabricated original stderr file",
+  "events": [
+    {
+      "observed": "Nonexistent version.rs path; call script refused missing context before request",
+      "changed_precondition": "Read actual version_identity.rs via rg --files; full existing producer supplied",
+      "provider_request": false
+    },
+    {
+      "observed": "Helper prefix split at first s=Path cut the edit function, IndentationError before product edits; subsequent node syntax check also refused nonexistent test file",
+      "changed_precondition": "Explicit complete helper definitions; product/test edits and later syntax checks succeeded",
+      "lesson": "Do not use brittle source splitting to import helpers; keep dependent checks behind successful prerequisites."
+    }
+  ],
+  "GLM_context_improvement": {
+    "state": "Retained improvement, saving unmeasured",
+    "owner": "Codex",
+    "origin": "24977 declared tokens; complete historical catalogue unnecessary for schema",
+    "next": "Use complete consumed DTO/producer plus representative actual notes instead of full version history. Verify context completeness and measure usage before claiming improvement."
+  }
+}

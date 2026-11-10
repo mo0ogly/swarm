@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/run-public.py", line 33, in <module>
+    receipt.update(status='watchdog_failed',exit_code=child.returncode,ended_unix=time.time());dest.write_text(json.dumps(receipt,indent=2)+'\n');raise
+                                                                                                                                                  ^^^^^
+RuntimeError: No active exception to reraise

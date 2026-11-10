@@ -1,0 +1,37 @@
+=== RUN   TestStructuredCitationContractRequiresOriginalReferences
+--- PASS: TestStructuredCitationContractRequiresOriginalReferences (2.92s)
+=== RUN   TestReferencedCitationBatchSchemaMatchesAssignment
+--- PASS: TestReferencedCitationBatchSchemaMatchesAssignment (0.08s)
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/pass
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-resolved
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-open
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-invalid
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-stale
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+--- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard (102.87s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/pass (23.19s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-resolved (25.21s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-open (19.36s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-invalid (17.44s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-stale (17.66s)
+=== RUN   TestReferencedCitationOrdinaryRetryRequiresChangedPrecondition
+--- PASS: TestReferencedCitationOrdinaryRetryRequiresChangedPrecondition (0.86s)
+=== RUN   TestReferencedCitationInstructionsAloneCannotRestart
+--- PASS: TestReferencedCitationInstructionsAloneCannotRestart (0.75s)
+=== RUN   TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation
+=== RUN   TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/binary
+=== RUN   TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/oversize
+--- PASS: TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation (4.49s)
+    --- PASS: TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/binary (0.72s)
+    --- PASS: TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/oversize (3.77s)
+=== RUN   TestManagedIndependentReviewPreservesRepetitiveOriginalWithoutTruncation
+    managed_review_test.go:472: large repetitive original was truncated or substituted
+--- FAIL: TestManagedIndependentReviewPreservesRepetitiveOriginalWithoutTruncation (1.96s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	114.132s
+FAIL

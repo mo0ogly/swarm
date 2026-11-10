@@ -1,0 +1,8 @@
+fr: Admin preview performs no network request; apply persists exact values
+fr: saved configuration reopens
+fr: cross-site OIDC callback validates PKCE and creates a business request with local privileges
+fr: explicit logout clears and revokes the business session
+en: Admin preview performs no network request; apply persists exact values
+en: saved configuration reopens
+en: cross-site OIDC callback validates PKCE and creates a business request with local privileges
+en: explicit logout clears and revokes the business session

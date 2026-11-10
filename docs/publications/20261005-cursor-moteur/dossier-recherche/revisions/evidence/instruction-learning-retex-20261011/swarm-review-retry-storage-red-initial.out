@@ -1,0 +1,4 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/managed_review_retry_storage_test.go:43:45: undefined: itoa
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

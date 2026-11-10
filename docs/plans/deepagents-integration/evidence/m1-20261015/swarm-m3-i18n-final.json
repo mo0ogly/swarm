@@ -1,0 +1,16 @@
+{
+  "executor": "Codex direct audit",
+  "argv": [
+    "node",
+    "tests/i18n_test.cjs"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "environment_keys": [
+    "HOME",
+    "PATH"
+  ],
+  "started_at_utc": "2026-10-15T20:38:29.031676+00:00",
+  "ended_at_utc": "2026-10-15T20:38:29.854671+00:00",
+  "exit_code": 0,
+  "log_sha256": "5aeab2056c4d2858a6a353dcce0133bc848da0ce4a9f786105240e755a3f9af7"
+}

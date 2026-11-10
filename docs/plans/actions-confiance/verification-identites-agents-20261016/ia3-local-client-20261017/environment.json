@@ -1,0 +1,8 @@
+{
+  "go": "go1.24.3 linux/amd64",
+  "kernel": "6.17.0-41-generic",
+  "at": "2026-10-17T13:59:20.517512+00:00",
+  "public_runtime_activation": false,
+  "independent_review": false,
+  "real_human_authentication": false
+}

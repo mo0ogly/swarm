@@ -1,0 +1,32 @@
+{
+  "status": "PASS within manual preparation scope",
+  "version": "v0.1.1-dev.108",
+  "binary_sha256": "5ef899642fae0a8a7fb2048dfa458a17a0cb5f06496255ffd22cdcb7231384ac",
+  "effective_input_count": 472,
+  "browser_assertions": 105,
+  "browser_recipe": "private/campaign/recipe-final108",
+  "browser_integrity": "VERIFIED",
+  "backend_answers_assertions": 35,
+  "backend_binary_version": "v0.1.1-dev.105; unchanged affected producers only",
+  "installed_http_checks": 16,
+  "installed_version_checks": 14,
+  "installed_readonly_page_checks": 6,
+  "settings_preserved_schema": 41,
+  "paused_missions_revisions": [
+    50,
+    469
+  ],
+  "glm_completed_static_reviews": 3,
+  "glm_declared_tokens": 111577,
+  "glm_requested_reported_model": "glm-5.2; backend version not established",
+  "independent_final_acceptance": false,
+  "global_migration_acceptance": false,
+  "unported": [
+    "AI dialogue",
+    "templates/enriched editor",
+    "conversion and launch from preparation"
+  ],
+  "live_prerequisite": "Explicit Admin adoption/activation of required write settings",
+  "commit_push_performed": false,
+  "global_diff_check": "two existing out-of-scope blank EOF findings retained"
+}

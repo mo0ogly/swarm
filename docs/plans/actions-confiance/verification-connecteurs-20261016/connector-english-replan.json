@@ -1,0 +1,8 @@
+{
+  "observed": "English page renders French requester/approver denial",
+  "original": "connector-browser-exact/connector-ui-failure.json",
+  "owner": "Codex",
+  "decision": "add exact server-error translations and retain visible-language assertion",
+  "scope": "local catalog only, no Go change",
+  "resumption_condition": "same browser scenario passes both language assertions"
+}

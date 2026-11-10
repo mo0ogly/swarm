@@ -1,0 +1,756 @@
+{
+  "records": [
+    {
+      "schema_version": 1,
+      "event": "web-bound",
+      "address": "127.0.0.1:41899",
+      "settings_revision": "1",
+      "runtime_ready": false
+    },
+    {
+      "schema_version": 1,
+      "event": "web-outcome",
+      "outcome": {
+        "schema_version": 1,
+        "status": 200,
+        "error": null,
+        "recorded_work": null,
+        "configuration_may_be_recorded": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "event": "web-outcome",
+      "outcome": {
+        "schema_version": 1,
+        "status": 200,
+        "error": null,
+        "recorded_work": {
+          "work": "w-32ec0b728851684bad4cbf71",
+          "revision": 9
+        },
+        "configuration_may_be_recorded": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "event": "web-outcome",
+      "outcome": {
+        "schema_version": 1,
+        "status": 200,
+        "error": null,
+        "recorded_work": {
+          "work": "w-32ec0b728851684bad4cbf71",
+          "revision": 11
+        },
+        "configuration_may_be_recorded": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "event": "web-outcome",
+      "outcome": {
+        "schema_version": 1,
+        "status": 200,
+        "error": null,
+        "recorded_work": null,
+        "configuration_may_be_recorded": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "event": "web-stopped",
+      "accepted_connections": 4,
+      "completed_jobs": 4,
+      "rejected_requests": 0,
+      "rejected_connections": 0,
+      "rejected_queued_jobs": 0,
+      "connection_failures": 0,
+      "disconnected_replies": 0,
+      "observed_outcomes": 4,
+      "configuration_outcomes": 0,
+      "work_outcomes": 2,
+      "first_request_failure": null,
+      "first_service_failure": null,
+      "first_connection_failure": null,
+      "last_recorded_work": [
+        "w-32ec0b728851684bad4cbf71",
+        11
+      ],
+      "last_recorded_configuration": null
+    }
+  ],
+  "requests": [
+    {
+      "path": "/api/v1/native-session",
+      "method": "GET",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "response": {
+        "csrf_format": "hmac-sha256-v1",
+        "csrf_token": "<redacted>",
+        "host": "127.0.0.1:41899",
+        "legacy_csrf_header": true,
+        "schema_version": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mission?work=w-32ec0b728851684bad4cbf71&action=start",
+      "status": 200,
+      "response": {
+        "planning": {
+          "reviewer_required": true,
+          "reviewer": {
+            "max_context_files": 24,
+            "max_source_bytes": 98304,
+            "max_context_bytes": 131072,
+            "max_files": 100,
+            "provider": "fixture",
+            "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+            "model_route": {
+              "level": "standard",
+              "model": "fixture-standard",
+              "effort": "fixture-medium",
+              "billing": "external",
+              "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+              "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+            },
+            "max_calls": 2,
+            "calls": 0,
+            "authorized": "2026-10-24T11:06:56.118144887Z"
+          },
+          "model_route": {
+            "level": "standard",
+            "model": "fixture-standard",
+            "effort": "fixture-medium",
+            "billing": "external",
+            "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+            "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+          },
+          "checks": {
+            "req-1": [
+              {
+                "inputs": [
+                  "handoff.md"
+                ],
+                "id": "actual-handoff",
+                "command": [
+                  "python3",
+                  "-c",
+                  "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+                ],
+                "criteria": [
+                  1
+                ],
+                "justification": "Check actual owned fixture handoff input digest",
+                "timeout_seconds": 60
+              }
+            ]
+          },
+          "provider": "fixture",
+          "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+          "activations": 2,
+          "max_activations": 6,
+          "version": 1,
+          "paused": true,
+          "max_tasks": 10,
+          "max_decisions": 10,
+          "decisions": 2,
+          "scopes": [
+            {
+              "last_model": {
+                "provider": "fixture",
+                "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+                "route": {
+                  "level": "standard",
+                  "model": "fixture-standard",
+                  "effort": "fixture-medium",
+                  "billing": "external",
+                  "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+                  "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+                },
+                "actor": "",
+                "at": "2026-10-24T11:06:56.199701498Z"
+              },
+              "delivery": {
+                "judge_available": true,
+                "judge_cycle": 1,
+                "task_budget": 10,
+                "activation_budget": 6,
+                "closure_unavailable": true,
+                "review_retry_unavailable": true,
+                "production_retry_unavailable": true,
+                "context_sha256": "6ac6f6e58acddca7a8f5e8ba9752205d2372fd4375e5608260e52e7fedb56147",
+                "events": [
+                  "public-flow-enable"
+                ],
+                "decision": "planning-decision-12488bce1181045e47da7a59"
+              },
+              "workflow": {
+                "version": 1,
+                "role": "planner",
+                "methods": [
+                  "apex",
+                  "audit-pdca",
+                  "spec-builder",
+                  "spec-audit",
+                  "replan",
+                  "debug",
+                  "product-planning"
+                ],
+                "sha256": "97edc37b630828c58fd907ec7cf8597fdef78f5344bcf6cabcafc82eae80dccb"
+              },
+              "activations": 2,
+              "id": "root",
+              "objective": "ROOT-PRIVATE-OBJECTIVE",
+              "requirements": [],
+              "revision": 2,
+              "generation": 3,
+              "state": "waiting"
+            },
+            {
+              "last_model": {
+                "provider": "fixture",
+                "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+                "route": {
+                  "level": "standard",
+                  "model": "fixture-standard",
+                  "effort": "fixture-medium",
+                  "billing": "external",
+                  "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+                  "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+                },
+                "actor": "",
+                "at": "2026-10-24T11:06:56.513405667Z"
+              },
+              "delivery": {
+                "task_budget": 10,
+                "activation_budget": 6,
+                "closure_unavailable": true,
+                "review_retry_unavailable": true,
+                "production_retry_unavailable": true,
+                "context_sha256": "e8d090c01ac2b7437d1daaa49175fe4abd53692dc8a0639a8315449528fade2c",
+                "events": [
+                  "plan-1a1296a153f70ada9d6a8ab2d72396a0e39b2833c558b5a0ec61807d4df47c95"
+                ],
+                "decision": "planning-decision-e63d57c533c6e749d7b6261b"
+              },
+              "workflow": {
+                "version": 1,
+                "role": "subplanner",
+                "methods": [
+                  "apex",
+                  "audit-pdca",
+                  "spec-builder",
+                  "spec-audit",
+                  "replan",
+                  "debug",
+                  "product-planning"
+                ],
+                "sha256": "1b0360fa92e0d1f1a0903650bd2fb1cd47915945b3f195eb09cd9ccbe073a39c"
+              },
+              "max_tasks": 2,
+              "max_activations": 3,
+              "activations": 1,
+              "id": "child",
+              "parent": "root",
+              "objective": "OWN-SCOPE\nProduce only the owned requirement",
+              "requirements": [
+                "req-1"
+              ],
+              "revision": 2,
+              "generation": 3,
+              "state": "waiting"
+            }
+          ],
+          "inbox": [
+            {
+              "id": "public-flow-enable",
+              "scope": "root",
+              "kind": "brief",
+              "message": "ROOT-PRIVATE-OBJECTIVE",
+              "decision": "planning-decision-12488bce1181045e47da7a59",
+              "at": "2026-10-24T11:06:56.118144887Z"
+            },
+            {
+              "id": "plan-1a1296a153f70ada9d6a8ab2d72396a0e39b2833c558b5a0ec61807d4df47c95",
+              "scope": "child",
+              "kind": "delegation",
+              "message": "OWN-SCOPE",
+              "decision": "planning-decision-e63d57c533c6e749d7b6261b",
+              "at": "2026-10-24T11:06:56.421506213Z"
+            }
+          ],
+          "judge": {
+            "cycle": 1,
+            "max_cycles": 0,
+            "closed": false
+          }
+        },
+        "launch_profile": {
+          "provider": "fixture",
+          "role": "worker",
+          "workspace": "/tmp/swarm-model83-yi65jsud/watch-worker",
+          "level": "standard",
+          "capture_output": true,
+          "updated": "2026-10-24T11:06:57.446947731Z",
+          "actor": "fpizzi/uid:1001"
+        },
+        "schema_version": 1,
+        "id": "w-32ec0b728851684bad4cbf71",
+        "revision": 9,
+        "title": "ROOT-PRIVATE-TITLE",
+        "objective": "ROOT-PRIVATE-OBJECTIVE",
+        "scope": "ROOT-PRIVATE-BRIEF",
+        "criteria": [
+          "OWN-REQUIREMENT"
+        ],
+        "next": "",
+        "summary": "",
+        "memory": null,
+        "created": "2026-10-24T11:06:55.993670174Z",
+        "updated": "2026-10-24T11:06:57.451899874Z",
+        "git": {
+          "head": "",
+          "branch": "",
+          "changes": ""
+        },
+        "tasks": [
+          {
+            "scope_id": "child",
+            "requirements": [
+              "req-1"
+            ],
+            "validation_policy": {
+              "mode": "automatic",
+              "controls": [
+                {
+                  "inputs": [
+                    "handoff.md"
+                  ],
+                  "id": "check-ccc6d5834ae3a4e245f553b7",
+                  "command": [
+                    "python3",
+                    "-c",
+                    "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+                  ],
+                  "criteria": [
+                    1
+                  ],
+                  "justification": "Check actual owned fixture handoff input digest",
+                  "timeout_seconds": 60
+                }
+              ],
+              "authorized_at": "2026-10-24T11:06:56.741732777Z",
+              "actor": "autorisation initiale de la mission"
+            },
+            "plan_checks": {
+              "check-ccc6d5834ae3a4e245f553b7": "delivery"
+            },
+            "plan_role": "worker",
+            "plan_max_attempts": 2,
+            "id": "task",
+            "title": "OWN-TASK",
+            "owner": "child",
+            "deliverable": "handoff.md",
+            "criteria": [
+              "OWN-REQUIREMENT"
+            ],
+            "depends": null,
+            "status": "todo",
+            "blocker": "",
+            "next": "Produce the actual local handoff\nPrécisions de réalisation proposées : OWN-CRITERION",
+            "attempts": []
+          },
+          {
+            "scope_id": "child",
+            "requirements": [
+              "req-1"
+            ],
+            "validation_policy": {
+              "mode": "automatic",
+              "controls": [
+                {
+                  "inputs": [
+                    "handoff.md"
+                  ],
+                  "id": "check-ccc6d5834ae3a4e245f553b7",
+                  "command": [
+                    "python3",
+                    "-c",
+                    "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+                  ],
+                  "criteria": [
+                    1
+                  ],
+                  "justification": "Check actual owned fixture handoff input digest",
+                  "timeout_seconds": 60
+                }
+              ],
+              "authorized_at": "2026-10-24T11:06:56.741732777Z",
+              "actor": "autorisation initiale de la mission"
+            },
+            "plan_checks": {
+              "check-ccc6d5834ae3a4e245f553b7": "delivery"
+            },
+            "plan_role": "worker",
+            "plan_max_attempts": 2,
+            "id": "task-2",
+            "title": "SECOND-OWN-TASK",
+            "owner": "child",
+            "deliverable": "second/handoff.md",
+            "criteria": [
+              "OWN-REQUIREMENT"
+            ],
+            "depends": null,
+            "status": "todo",
+            "blocker": "",
+            "next": "Produce the second owned handoff\nPrécisions de réalisation proposées : OWN-CRITERION",
+            "attempts": []
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mission?work=w-32ec0b728851684bad4cbf71&action=pause",
+      "status": 200,
+      "response": {
+        "planning": {
+          "reviewer_required": true,
+          "reviewer": {
+            "max_context_files": 24,
+            "max_source_bytes": 98304,
+            "max_context_bytes": 131072,
+            "max_files": 100,
+            "provider": "fixture",
+            "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+            "model_route": {
+              "level": "standard",
+              "model": "fixture-standard",
+              "effort": "fixture-medium",
+              "billing": "external",
+              "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+              "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+            },
+            "max_calls": 2,
+            "calls": 0,
+            "authorized": "2026-10-24T11:06:56.118144887Z"
+          },
+          "model_route": {
+            "level": "standard",
+            "model": "fixture-standard",
+            "effort": "fixture-medium",
+            "billing": "external",
+            "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+            "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+          },
+          "checks": {
+            "req-1": [
+              {
+                "inputs": [
+                  "handoff.md"
+                ],
+                "id": "actual-handoff",
+                "command": [
+                  "python3",
+                  "-c",
+                  "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+                ],
+                "criteria": [
+                  1
+                ],
+                "justification": "Check actual owned fixture handoff input digest",
+                "timeout_seconds": 60
+              }
+            ]
+          },
+          "provider": "fixture",
+          "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+          "activations": 2,
+          "max_activations": 6,
+          "version": 1,
+          "paused": true,
+          "max_tasks": 10,
+          "max_decisions": 10,
+          "decisions": 2,
+          "scopes": [
+            {
+              "last_model": {
+                "provider": "fixture",
+                "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+                "route": {
+                  "level": "standard",
+                  "model": "fixture-standard",
+                  "effort": "fixture-medium",
+                  "billing": "external",
+                  "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+                  "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+                },
+                "actor": "",
+                "at": "2026-10-24T11:06:56.199701498Z"
+              },
+              "delivery": {
+                "judge_available": true,
+                "judge_cycle": 1,
+                "task_budget": 10,
+                "activation_budget": 6,
+                "closure_unavailable": true,
+                "review_retry_unavailable": true,
+                "production_retry_unavailable": true,
+                "context_sha256": "6ac6f6e58acddca7a8f5e8ba9752205d2372fd4375e5608260e52e7fedb56147",
+                "events": [
+                  "public-flow-enable"
+                ],
+                "decision": "planning-decision-12488bce1181045e47da7a59"
+              },
+              "workflow": {
+                "version": 1,
+                "role": "planner",
+                "methods": [
+                  "apex",
+                  "audit-pdca",
+                  "spec-builder",
+                  "spec-audit",
+                  "replan",
+                  "debug",
+                  "product-planning"
+                ],
+                "sha256": "97edc37b630828c58fd907ec7cf8597fdef78f5344bcf6cabcafc82eae80dccb"
+              },
+              "activations": 2,
+              "id": "root",
+              "objective": "ROOT-PRIVATE-OBJECTIVE",
+              "requirements": [],
+              "revision": 2,
+              "generation": 4,
+              "state": "waiting"
+            },
+            {
+              "last_model": {
+                "provider": "fixture",
+                "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+                "route": {
+                  "level": "standard",
+                  "model": "fixture-standard",
+                  "effort": "fixture-medium",
+                  "billing": "external",
+                  "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+                  "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+                },
+                "actor": "",
+                "at": "2026-10-24T11:06:56.513405667Z"
+              },
+              "delivery": {
+                "task_budget": 10,
+                "activation_budget": 6,
+                "closure_unavailable": true,
+                "review_retry_unavailable": true,
+                "production_retry_unavailable": true,
+                "context_sha256": "e8d090c01ac2b7437d1daaa49175fe4abd53692dc8a0639a8315449528fade2c",
+                "events": [
+                  "plan-1a1296a153f70ada9d6a8ab2d72396a0e39b2833c558b5a0ec61807d4df47c95"
+                ],
+                "decision": "planning-decision-e63d57c533c6e749d7b6261b"
+              },
+              "workflow": {
+                "version": 1,
+                "role": "subplanner",
+                "methods": [
+                  "apex",
+                  "audit-pdca",
+                  "spec-builder",
+                  "spec-audit",
+                  "replan",
+                  "debug",
+                  "product-planning"
+                ],
+                "sha256": "1b0360fa92e0d1f1a0903650bd2fb1cd47915945b3f195eb09cd9ccbe073a39c"
+              },
+              "max_tasks": 2,
+              "max_activations": 3,
+              "activations": 1,
+              "id": "child",
+              "parent": "root",
+              "objective": "OWN-SCOPE\nProduce only the owned requirement",
+              "requirements": [
+                "req-1"
+              ],
+              "revision": 2,
+              "generation": 4,
+              "state": "waiting"
+            }
+          ],
+          "inbox": [
+            {
+              "id": "public-flow-enable",
+              "scope": "root",
+              "kind": "brief",
+              "message": "ROOT-PRIVATE-OBJECTIVE",
+              "decision": "planning-decision-12488bce1181045e47da7a59",
+              "at": "2026-10-24T11:06:56.118144887Z"
+            },
+            {
+              "id": "plan-1a1296a153f70ada9d6a8ab2d72396a0e39b2833c558b5a0ec61807d4df47c95",
+              "scope": "child",
+              "kind": "delegation",
+              "message": "OWN-SCOPE",
+              "decision": "planning-decision-e63d57c533c6e749d7b6261b",
+              "at": "2026-10-24T11:06:56.421506213Z"
+            }
+          ],
+          "judge": {
+            "cycle": 1,
+            "max_cycles": 0,
+            "closed": false
+          }
+        },
+        "launch_profile": {
+          "provider": "fixture",
+          "role": "worker",
+          "workspace": "/tmp/swarm-model83-yi65jsud/watch-worker",
+          "level": "standard",
+          "capture_output": true,
+          "updated": "2026-10-24T11:06:57.446947731Z",
+          "actor": "fpizzi/uid:1001"
+        },
+        "schema_version": 1,
+        "id": "w-32ec0b728851684bad4cbf71",
+        "revision": 11,
+        "title": "ROOT-PRIVATE-TITLE",
+        "objective": "ROOT-PRIVATE-OBJECTIVE",
+        "scope": "ROOT-PRIVATE-BRIEF",
+        "criteria": [
+          "OWN-REQUIREMENT"
+        ],
+        "next": "",
+        "summary": "",
+        "memory": null,
+        "created": "2026-10-24T11:06:55.993670174Z",
+        "updated": "2026-10-24T11:07:01.294652462Z",
+        "git": {
+          "head": "",
+          "branch": "",
+          "changes": ""
+        },
+        "tasks": [
+          {
+            "scope_id": "child",
+            "requirements": [
+              "req-1"
+            ],
+            "validation_policy": {
+              "mode": "automatic",
+              "controls": [
+                {
+                  "inputs": [
+                    "handoff.md"
+                  ],
+                  "id": "check-ccc6d5834ae3a4e245f553b7",
+                  "command": [
+                    "python3",
+                    "-c",
+                    "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+                  ],
+                  "criteria": [
+                    1
+                  ],
+                  "justification": "Check actual owned fixture handoff input digest",
+                  "timeout_seconds": 60
+                }
+              ],
+              "authorized_at": "2026-10-24T11:06:56.741732777Z",
+              "actor": "autorisation initiale de la mission"
+            },
+            "plan_checks": {
+              "check-ccc6d5834ae3a4e245f553b7": "delivery"
+            },
+            "plan_role": "worker",
+            "plan_max_attempts": 2,
+            "id": "task",
+            "title": "OWN-TASK",
+            "owner": "fixture",
+            "deliverable": "handoff.md",
+            "criteria": [
+              "OWN-REQUIREMENT"
+            ],
+            "depends": null,
+            "status": "running",
+            "blocker": "",
+            "next": "Examiner le handoff et les preuves après exécution",
+            "attempts": [
+              {
+                "id": "a-ac5fb830e83f38ab967e6681",
+                "status": "recorded",
+                "started": "2026-10-24T11:06:59.603195377Z"
+              }
+            ]
+          },
+          {
+            "scope_id": "child",
+            "requirements": [
+              "req-1"
+            ],
+            "validation_policy": {
+              "mode": "automatic",
+              "controls": [
+                {
+                  "inputs": [
+                    "handoff.md"
+                  ],
+                  "id": "check-ccc6d5834ae3a4e245f553b7",
+                  "command": [
+                    "python3",
+                    "-c",
+                    "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+                  ],
+                  "criteria": [
+                    1
+                  ],
+                  "justification": "Check actual owned fixture handoff input digest",
+                  "timeout_seconds": 60
+                }
+              ],
+              "authorized_at": "2026-10-24T11:06:56.741732777Z",
+              "actor": "autorisation initiale de la mission"
+            },
+            "plan_checks": {
+              "check-ccc6d5834ae3a4e245f553b7": "delivery"
+            },
+            "plan_role": "worker",
+            "plan_max_attempts": 2,
+            "id": "task-2",
+            "title": "SECOND-OWN-TASK",
+            "owner": "child",
+            "deliverable": "second/handoff.md",
+            "criteria": [
+              "OWN-REQUIREMENT"
+            ],
+            "depends": null,
+            "status": "todo",
+            "blocker": "",
+            "next": "Produce the second owned handoff\nPrécisions de réalisation proposées : OWN-CRITERION",
+            "attempts": []
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/mission?work=w-32ec0b728851684bad4cbf71&action=show",
+      "status": 200,
+      "response": {
+        "revision": 11,
+        "paused": true,
+        "autonomy": "autonome",
+        "slots": 1,
+        "consent_enabled": true,
+        "archived": false
+      }
+    }
+  ],
+  "exit": 0,
+  "start": 1792840017.0901434,
+  "end": 1792840021.3743503
+}

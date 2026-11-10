@@ -1,0 +1,1619 @@
+[
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "init",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842198.6411977,
+    "end": 1792842198.6946228,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "create",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-002.input.json"
+    ],
+    "start": 1792842198.7004068,
+    "end": 1792842198.7872732,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "task",
+      "add",
+      "w-dca975b4d0a818a527bbec45",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-003.input.json"
+    ],
+    "start": 1792842198.792712,
+    "end": 1792842198.8608463,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "budget",
+      "apply",
+      "w-dca975b4d0a818a527bbec45",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-004.input.json"
+    ],
+    "start": 1792842198.8660643,
+    "end": 1792842198.916411,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "create",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-005.input.json"
+    ],
+    "start": 1792842199.032,
+    "end": 1792842199.1186304,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "enable",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-006.input.json"
+    ],
+    "start": 1792842199.1238437,
+    "end": 1792842199.1776311,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "claim",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-007.input.json"
+    ],
+    "start": 1792842199.1838915,
+    "end": 1792842199.2520165,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842199.25499,
+    "end": 1792842199.3202686,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-009.input.json"
+    ],
+    "start": 1792842199.334316,
+    "end": 1792842199.3842895,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842199.387908,
+    "end": 1792842199.4505162,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842199.4601324,
+    "end": 1792842199.5200524,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-012.input.json"
+    ],
+    "start": 1792842199.5306747,
+    "end": 1792842199.5806055,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842199.5837553,
+    "end": 1792842199.6477983,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842199.6555269,
+    "end": 1792842199.7190073,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-015.input.json"
+    ],
+    "start": 1792842199.7287884,
+    "end": 1792842199.7646232,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842199.767064,
+    "end": 1792842199.8322666,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842199.840059,
+    "end": 1792842199.9067745,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-018.input.json"
+    ],
+    "start": 1792842199.9165344,
+    "end": 1792842199.9681878,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842199.9707322,
+    "end": 1792842200.0280185,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.035614,
+    "end": 1792842200.0942807,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-021.input.json"
+    ],
+    "start": 1792842200.1033766,
+    "end": 1792842200.1527505,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.156137,
+    "end": 1792842200.2230496,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.2322142,
+    "end": 1792842200.2939525,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-024.input.json"
+    ],
+    "start": 1792842200.3033502,
+    "end": 1792842200.3534114,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.3559306,
+    "end": 1792842200.4190185,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.4267612,
+    "end": 1792842200.4865472,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-027.input.json"
+    ],
+    "start": 1792842200.4962897,
+    "end": 1792842200.5372608,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.5407414,
+    "end": 1792842200.6082249,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.6161275,
+    "end": 1792842200.6774726,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-030.input.json"
+    ],
+    "start": 1792842200.6875632,
+    "end": 1792842200.7364008,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.7394419,
+    "end": 1792842200.7996979,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.80683,
+    "end": 1792842200.8687537,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-033.input.json"
+    ],
+    "start": 1792842200.8802323,
+    "end": 1792842200.9215913,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.9251397,
+    "end": 1792842200.9888895,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842200.9964797,
+    "end": 1792842201.0568652,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-036.input.json"
+    ],
+    "start": 1792842201.0671425,
+    "end": 1792842201.116339,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842201.119272,
+    "end": 1792842201.1805332,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842201.1880486,
+    "end": 1792842201.2478938,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-039.input.json"
+    ],
+    "start": 1792842201.2576122,
+    "end": 1792842201.3020923,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842201.3047376,
+    "end": 1792842201.3637235,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842201.3757653,
+    "end": 1792842201.441063,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-042.input.json"
+    ],
+    "start": 1792842201.451015,
+    "end": 1792842201.4995468,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842201.5028667,
+    "end": 1792842201.5819554,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842201.5913846,
+    "end": 1792842201.6538312,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-045.input.json"
+    ],
+    "start": 1792842201.6693358,
+    "end": 1792842201.7114222,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842201.714756,
+    "end": 1792842201.778163,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "lease-renew",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-047.input.json"
+    ],
+    "start": 1792842201.7925224,
+    "end": 1792842201.8495207,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842201.8530767,
+    "end": 1792842201.9208202,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-049.input.json"
+    ],
+    "start": 1792842201.9326456,
+    "end": 1792842201.982656,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842201.9863286,
+    "end": 1792842202.048292,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.0594103,
+    "end": 1792842202.126824,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-052.input.json"
+    ],
+    "start": 1792842202.13695,
+    "end": 1792842202.1897354,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.1931915,
+    "end": 1792842202.2582455,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.2668967,
+    "end": 1792842202.3300264,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-055.input.json"
+    ],
+    "start": 1792842202.3433094,
+    "end": 1792842202.3956795,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.3995948,
+    "end": 1792842202.4662485,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.4762576,
+    "end": 1792842202.5406733,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-058.input.json"
+    ],
+    "start": 1792842202.554581,
+    "end": 1792842202.604162,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.6071486,
+    "end": 1792842202.675641,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.6833782,
+    "end": 1792842202.7467337,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-061.input.json"
+    ],
+    "start": 1792842202.7596166,
+    "end": 1792842202.8122807,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.8151467,
+    "end": 1792842202.8742576,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "agent-workflow",
+      "planner",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.8845863,
+    "end": 1792842202.9345295,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842202.9375982,
+    "end": 1792842202.9975095,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-065.input.json"
+    ],
+    "start": 1792842203.0073242,
+    "end": 1792842203.0563285,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.0592535,
+    "end": 1792842203.1271155,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.1398878,
+    "end": 1792842203.1996746,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-068.input.json"
+    ],
+    "start": 1792842203.210285,
+    "end": 1792842203.2603528,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.2635853,
+    "end": 1792842203.3286128,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.3366704,
+    "end": 1792842203.3991628,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-071.input.json"
+    ],
+    "start": 1792842203.4103734,
+    "end": 1792842203.460279,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.4637818,
+    "end": 1792842203.524792,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.5355504,
+    "end": 1792842203.578522,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.5833051,
+    "end": 1792842203.6345015,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "preview",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-075.input.json"
+    ],
+    "start": 1792842203.6426783,
+    "end": 1792842203.697202,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "apply",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-076.input.json"
+    ],
+    "start": 1792842203.7037213,
+    "end": 1792842203.7789352,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.7825892,
+    "end": 1792842203.8315625,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.8347979,
+    "end": 1792842203.9146388,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-079.input.json"
+    ],
+    "start": 1792842203.9249096,
+    "end": 1792842203.9810312,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842203.984986,
+    "end": 1792842204.0704193,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842204.079626,
+    "end": 1792842204.1264524,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "preview",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-082.input.json"
+    ],
+    "start": 1792842204.132498,
+    "end": 1792842204.198956,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "apply",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-083.input.json"
+    ],
+    "start": 1792842204.2053432,
+    "end": 1792842204.2949407,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842204.2992263,
+    "end": 1792842204.352509,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842204.3569098,
+    "end": 1792842204.435481,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-086.input.json"
+    ],
+    "start": 1792842204.447089,
+    "end": 1792842204.5057633,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842204.5096672,
+    "end": 1792842204.59826,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842204.606151,
+    "end": 1792842204.6849587,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-089.input.json"
+    ],
+    "start": 1792842204.6966803,
+    "end": 1792842204.7553968,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842204.7585347,
+    "end": 1792842204.8388038,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842204.8467393,
+    "end": 1792842204.900792,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842204.905208,
+    "end": 1792842204.9635234,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "preview",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-093.input.json"
+    ],
+    "start": 1792842204.971446,
+    "end": 1792842205.034012,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "apply",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-094.input.json"
+    ],
+    "start": 1792842205.0423856,
+    "end": 1792842205.1467235,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842205.150806,
+    "end": 1792842205.206894,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842205.211866,
+    "end": 1792842205.296508,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-097.input.json"
+    ],
+    "start": 1792842205.312237,
+    "end": 1792842205.374783,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842205.378959,
+    "end": 1792842205.4586053,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842205.4657044,
+    "end": 1792842205.517156,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "preview",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-100.input.json"
+    ],
+    "start": 1792842205.5276866,
+    "end": 1792842205.5836887,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "apply",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-101.input.json"
+    ],
+    "start": 1792842205.591527,
+    "end": 1792842205.68837,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "engine-settings",
+      "show",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842205.6933546,
+    "end": 1792842205.7423184,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842205.747508,
+    "end": 1792842205.819606,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-104.input.json"
+    ],
+    "start": 1792842205.8284075,
+    "end": 1792842205.8789163,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842205.8830924,
+    "end": 1792842205.9632807,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842205.9786282,
+    "end": 1792842206.0144036,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "budget",
+      "apply",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-107.input.json"
+    ],
+    "start": 1792842206.019222,
+    "end": 1792842206.0783608,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842206.0813272,
+    "end": 1792842206.1148014,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842206.1183598,
+    "end": 1792842206.1822746,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "planning",
+      "call-preview",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-managed-planning1340/preview1364/call-preview-110.input.json"
+    ],
+    "start": 1792842206.1905138,
+    "end": 1792842206.2363179,
+    "exit": 2
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+      "work",
+      "show",
+      "w-04f6ee87aef1e2b8ace9ee46",
+      "--root",
+      "/tmp/swarm-model83-mg0klzim",
+      "--json"
+    ],
+    "start": 1792842206.240728,
+    "end": 1792842206.308624,
+    "exit": 0
+  }
+]

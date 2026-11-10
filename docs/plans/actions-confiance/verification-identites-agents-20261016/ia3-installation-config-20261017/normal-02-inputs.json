@@ -1,0 +1,10 @@
+{
+  "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+  "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+  "internal/enrollmentconfig/config.go": "927b71d896eadff1423b30745b41afd84a3ff098711ffb93e5ec33bfa65a908e",
+  "internal/enrollmentconfig/config_test.go": "12cb1327d906572a5972f19e32818dbeea1a0ac454f717759d8b01ec0f0c5f06",
+  "internal/enrollmentconfig/store_linux.go": "77e5df9e3346fffa5a30f539892953bca4c5e6e490f01fcf6230f843b1b65ec4",
+  "internal/enrollmentconfig/store_linux_test.go": "bbe5a56e76e39e3c5b6ee9f9e113b8832261b6f150907e881b6f244ce6549e98",
+  "internal/identitycontract/contract.go": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+  "internal/identitycontract/contract_test.go": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7"
+}

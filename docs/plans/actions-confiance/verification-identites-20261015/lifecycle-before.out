@@ -1,0 +1,20 @@
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/alice
+    trust_identity_lifecycle_test.go:36: json: unknown field "disabled"
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/bob
+    trust_identity_lifecycle_test.go:36: json: unknown field "disabled"
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service
+    trust_identity_lifecycle_test.go:36: json: unknown field "disabled"
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin
+    trust_identity_lifecycle_test.go:36: json: unknown field "disabled"
+--- FAIL: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation (0.10s)
+    --- FAIL: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/alice (0.03s)
+    --- FAIL: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/bob (0.02s)
+    --- FAIL: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service (0.02s)
+    --- FAIL: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin (0.03s)
+=== RUN   TestActionsConfianceT3IdentitySuspensionPreviewDoesNotApply
+    trust_identity_lifecycle_test.go:77: json: unknown field "disabled"
+--- FAIL: TestActionsConfianceT3IdentitySuspensionPreviewDoesNotApply (0.03s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.165s
+FAIL

@@ -1,0 +1,81 @@
+{
+  "at_utc": "2026-10-14T23:19:18.173382+00:00",
+  "work": "w-68b50cc82ec3fe55624f9549",
+  "revision": 92,
+  "task": "plan-68b50cc82e-T2",
+  "attempts": [
+    {
+      "id": "a-769ed89815896246f9ba4af5",
+      "status": "interrupted",
+      "started": "2026-10-14T20:13:19.079638262Z",
+      "ended": "2026-10-14T20:36:16.279269672Z"
+    },
+    {
+      "id": "a-b4669e24bbfb91f7a9686499",
+      "status": "completed",
+      "started": "2026-10-14T20:36:34.956689338Z",
+      "ended": "2026-10-14T21:05:55.9317104Z"
+    }
+  ],
+  "review_id": "review-fdadd3c686a8d0d0f77c40fa",
+  "review_state": "running",
+  "review_calls": 15,
+  "events_with_owner_decision": [
+    {
+      "id": "plan-430ea492573456aab078f590c95962f0b75b8ff45255da86be4c3cb659b2a9c9",
+      "scope": "root",
+      "kind": "integration_failed",
+      "task": "plan-68b50cc82e-T2",
+      "attempt": "a-b4669e24bbfb91f7a9686499",
+      "message": "revue de fragments non favorable : inspection de fragment : defect without unique failed artifact",
+      "decision": "planning-claim-0de826cfc004a8948e463e3f-decision",
+      "at": "2026-10-14T22:27:17.305576549Z"
+    },
+    {
+      "id": "review-0004c2c85aa9458a3a30711c-result-14ded6b8c25737e0",
+      "scope": "root",
+      "kind": "independent_review",
+      "task": "plan-68b50cc82e-T2",
+      "attempt": "a-b4669e24bbfb91f7a9686499",
+      "message": "unknown : Preuves supplémentaires nécessaires ; la sélection ne permet pas de rendre un verdict final.",
+      "decision": "planning-claim-0de826cfc004a8948e463e3f-decision",
+      "at": "2026-10-14T22:37:19.044891219Z"
+    },
+    {
+      "id": "review-0172834249b5ae9e231edb5f-result-a37cf5aebe6b215c",
+      "scope": "root",
+      "kind": "independent_review",
+      "task": "plan-68b50cc82e-T2",
+      "attempt": "a-b4669e24bbfb91f7a9686499",
+      "message": "error : empreinte de preuve périmée\nConstat PARTIEL conservé ; aucun verdict final : Correction demandée : diff --git a/internal/engine/trust_actions.go b/internal/engine/trust_actions.go, ligne de la pièce 453 : Le chemin de rejeu ne conserve pas la réponse originale de configuration. Il renvoie l’état public courant : après l’application de E1 puis E2, rejouer E1 restitue la révision de E2 au lieu de l’état connu produit par E1. Cela contredit l’idempotence annoncée et peut faire prendre un état ultérieur pour le résultat de l’événement rejoué. Reproduction : Appliquer E1 à la révision 0, appliquer E2 à la révision 1, puis rejouer exactement E1. Observer que la réponse indique la révision 2 plutôt que la réponse originale de révision 1. Attendu : Le rejeu exact d’un config-apply doit restituer la réponse liée à cet événement, même si des configurations ultérieures ont été appliquées.\ndiff --git a/internal/engine/trust_actions_http.go b/internal/engine/trust_actions_http.go, ligne de la pièce 86 : TrimPrefix laisse inchangée une valeur dépourvue du préfixe «Bearer ». Un jeton valide envoyé directement dans Authorization est donc accepté, alors que le contrat public impose explicitement le schéma Bearer. Les tests fournis ne couvrent pas cette variante mal formée. Reproduction : Envoyer un POST métier avec Authorization contenant uniquement un jeton valide, sans «Bearer ». findTrustIdentity reçoit néanmoins ce jeton et authentifie la requête. Attendu : Une action métier HTTP doit refuser tout en-tête Authorization qui ne respecte pas exactement le schéma «Bearer <jeton>».",
+      "decision": "planning-claim-0de826cfc004a8948e463e3f-decision",
+      "at": "2026-10-14T23:06:51.803774475Z"
+    },
+    {
+      "id": "review-fdadd3c686a8d0d0f77c40fa-result-3f57125146669031",
+      "scope": "root",
+      "kind": "independent_review",
+      "task": "plan-68b50cc82e-T2",
+      "attempt": "a-b4669e24bbfb91f7a9686499",
+      "message": "error : inspection de fragment : citation de la pièce 18 : quote absent",
+      "decision": "planning-claim-0de826cfc004a8948e463e3f-decision",
+      "at": "2026-10-14T23:16:22.544113212Z"
+    }
+  ],
+  "retry_directive": {
+    "decision": "planning-claim-0de826cfc004a8948e463e3f-decision",
+    "scope": "root",
+    "result_event": "review-fdadd3c686a8d0d0f77c40fa-result-3f57125146669031",
+    "review": "review-fdadd3c686a8d0d0f77c40fa",
+    "candidate_commit": "84c13f5954ebfcc95b5757c2fb545ddaab91dd45",
+    "attempt": "a-b4669e24bbfb91f7a9686499",
+    "failure_code": "review_fragment_protocol",
+    "cause": "inspection de fragment : citation de la pièce 18 : quote absent",
+    "instruction": "Reprendre la revue indépendante du même candidat et des mêmes preuves, sans renouveler les tentatives ni les dépenses. Corriger le protocole d’inspection de fragments à sa première frontière défaillante : toute citation de pièce, notamment la pièce 18, doit contenir une quote originale non vide, rattachée sans ambiguïté à l’unique artefact et à son empreinte ; si ce rattachement est impossible, produire un incident structuré nommant la pièce et l’original manquant au lieu d’une citation invalide. Vérifier cette correction sur le cas initial « citation de la pièce 18 : quote absent » ainsi que sur les variantes quote vide, artefact absent et artefacts multiples. Conserver les avis unknown, les défauts précédemment signalés et l’empreinte périmée comme historique : la nouvelle sélection et la nouvelle décision doivent réexaminer les originaux complets du candidat, sans présumer ni succès du produit ni résolution des constats sémantiques antérieurs."
+  },
+  "resume_calls": [
+    "fragment-call-45029f7d72eca331e45a5ac9"
+  ],
+  "next": "Reprendre la revue indépendante du même candidat et des mêmes preuves, sans renouveler les tentatives ni les dépenses. Corriger le protocole d’inspection de fragments à sa première frontière défaillante : toute citation de pièce, notamment la pièce 18, doit contenir une quote originale non vide, rattachée sans ambiguïté à l’unique artefact et à son empreinte ; si ce rattachement est impossible, produire un incident structuré nommant la pièce et l’original manquant au lieu d’une citation invalide. Vérifier cette correction sur le cas initial « citation de la pièce 18 : quote absent » ainsi que sur les variantes quote vide, artefact absent et artefacts multiples. Conserver les avis unknown, les défauts précédemment signalés et l’empreinte périmée comme historique : la nouvelle sélection et la nouvelle décision doivent réexaminer les originaux complets du candidat, sans présumer ni succès du produit ni résolution des constats sémantiques antérieurs.",
+  "limits": "Decision and application observed; provider verdict and final effect still pending"
+}

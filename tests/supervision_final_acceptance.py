@@ -3,6 +3,7 @@ import json
 import pathlib
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 import time
 from collections import deque
 
@@ -42,7 +43,7 @@ execute(['python3', 'tests/supervision_go_suite.py'])
 execute(['go', 'vet', './...'])
 execute(['python3', 'tools/agent-workflows/check.py'])
 execute(['git', 'diff', '--check'])
-with tempfile.TemporaryDirectory(prefix='swarm-final-controls-') as root:
+with tempfile.TemporaryDirectory(prefix='swarm-final-controls-', dir=fixture_area()) as root:
     binary = str(pathlib.Path(root) / 'swarm')
     execute(['sh', 'build.sh', binary])
     destination = str(pathlib.Path(root) / 'version-browser')

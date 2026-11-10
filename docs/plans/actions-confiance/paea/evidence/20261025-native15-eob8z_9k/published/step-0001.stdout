@@ -1,0 +1,15 @@
+test_approval_and_receipt_definitions_keep_observations_distinct (__main__.ContractSchema.test_approval_and_receipt_definitions_keep_observations_distinct)
+AUTHORIZED cannot masquerade as an effect-service outcome. ... ok
+test_label_duplicates_and_identifier_controls_refuse (__main__.ContractSchema.test_label_duplicates_and_identifier_controls_refuse)
+Existing identifier grammar and set labels are explicit representations. ... ok
+test_retained_canonical_bytes_and_digest_are_reproducible (__main__.ContractSchema.test_retained_canonical_bytes_and_digest_are_reproducible)
+Recompute Python spec encoding independently of Rust outputs. ... ok
+test_schema_and_fourteen_both_domain_vectors (__main__.ContractSchema.test_schema_and_fourteen_both_domain_vectors)
+Every frozen document must satisfy the declared shape. ... ok
+test_unknown_authority_claims_and_malformed_shapes_refuse (__main__.ContractSchema.test_unknown_authority_claims_and_malformed_shapes_refuse)
+Schema itself never admits a supplied actor or approval flag. ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.034s
+
+OK

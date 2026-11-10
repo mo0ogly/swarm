@@ -1,0 +1,32 @@
+{
+  "provider": {
+    "pid": 3332100,
+    "ppid": 3332085,
+    "sid": 3332085,
+    "pgid": 3332100,
+    "nonce": "5ade3894e3f2f1504430145ece37f70d29a8ac6f6a1836a3dc6500f5d3f797cf"
+  },
+  "supervisor": {
+    "pid": 3332085,
+    "stamp": "13520617",
+    "ppid": 3331742,
+    "pgid": 3332085,
+    "sid": 3332085,
+    "state": "S"
+  },
+  "turn": {
+    "seq": "1",
+    "work": "w-d723dd1c3d0738a9a18edc70",
+    "task": "task",
+    "workspace": "/tmp/swarm-model83-sdxi6pyl/watch-worker",
+    "state": "acquired",
+    "agent": "watch-17babd6283a9c054854b2272",
+    "requested_at": "2026-10-24T09:51:12.666429731Z",
+    "acquired_at": "2026-10-24T09:51:12.96075248Z",
+    "released_at": ""
+  },
+  "reservation": [
+    "reserved",
+    1.0
+  ]
+}

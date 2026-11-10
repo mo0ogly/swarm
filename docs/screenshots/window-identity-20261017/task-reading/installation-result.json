@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "version": "v0.1.1-dev.5",
+  "binary_sha256": "d6cd99bfb87b154b5d59459f3b26e64659ef84e5105c6d6d740afe818ddd70b2",
+  "works_retained": 5,
+  "tasks_retained": 35,
+  "agents_retained": 30,
+  "active_agents": 0,
+  "mission_policies_preserved": true,
+  "unrelated_observed_processes_alive": 2,
+  "boundary": "Authenticated existing-server public API; no new CLI Store opener or live database fixture"
+}

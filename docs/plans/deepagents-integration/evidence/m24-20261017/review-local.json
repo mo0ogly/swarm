@@ -1,0 +1,49 @@
+{
+  "scope": "same-author local review, not independent",
+  "owned_files": {
+    "docs/PROJECT-MEMORY.md": "2e717ee0df5e2443b3da120705e40ca84b5d328863ce9b0fab646a9c4e6fcdf4",
+    "docs/en/PROJECT-MEMORY.md": "1e4c4e7f9027318bdbdb2ba5da16f4e964431a0445ef5423c79adc9fe89a631d",
+    "docs/plans/deepagents-integration/PLAN.md": "72d85765c7c0f4831934e512c491ab0666651403576953c6b9c3071c204a5a95",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-16.md": "027b3693c686ef6caba42c37478148a6168c20c1abc0de033add14fea2caf437",
+    "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md": "a91468eb8100363594c53a5ea2adafd540db1b9d064fad2b8353d3991f01f687",
+    "internal/engine/memory_usage_binding.go": "dbfbd664bcdf3c7df39bec54fe7ccb98233205db126fcf89e48ebd1443d75501",
+    "internal/engine/memory_usage_binding_test.go": "3c844ea4e2a199ae38a34998e21e02e1606aa78661488065cf85af435be2a0b8",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-20.md": "759738c2edb739e1615d0219b6bb1727c37d2469d52954774fe241fac5978b6d",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-20.md": "7b4a5e64991d5b425e35c9d8fc94cb9394c32752e111c80d0ffc71ad36c9045c"
+  },
+  "read_only_unchanged": {
+    "internal/engine/agent_identity_contract.go": true,
+    "internal/engine/agent_identity_authority.go": true,
+    "internal/engine/agent_identity_registry_types.go": false,
+    "internal/engine/agent_identity_issuer_linux.go": false,
+    "internal/engine/agent_identity_plan_linux.go": true,
+    "internal/engine/memory_summary_source.go": true,
+    "internal/engine/memory_summary_selection.go": true,
+    "internal/engine/dialogue_context.go": true,
+    "internal/engine/agents_store.go": true
+  },
+  "relative_links_checked": 23,
+  "diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "gofmt": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "reviewed_contracts": [
+    "actual M19 producer and resolver",
+    "no public JSON admission or text output",
+    "source metadata and exact recipient in content digest",
+    "separate kernel permissions",
+    "no SQL/reentrancy, persistence, authority or effect introduced"
+  ],
+  "limitations": [
+    "same-context self-review",
+    "protected current recipient resolution not wired",
+    "public authority/enrollment and preplan authority remain open",
+    "no public memory enforcement enabled"
+  ]
+}

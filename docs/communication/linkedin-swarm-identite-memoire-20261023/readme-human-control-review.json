@@ -1,0 +1,657 @@
+{
+  "status": "verified_documentation",
+  "date": "2026-10-23",
+  "git_head": "553593a2ffa3823d16784a6fedc291eebf390837",
+  "scope": "README FR/EN, technical overviews, five detailed architecture families, human-validation and instruction-revision explanation; no runtime change.",
+  "replan": {
+    "objective": "Bring README FR/EN and their detailed views up to date with the human-validation contract restored in Word v3.",
+    "observed": "README and diagram pipeline made AI supervision visible but left human validation implicit in generic acceptance labels. Instruction revision had been wrongly used to infer absence of human validation.",
+    "options": [
+      "Add prose only, leaving the diagram omission",
+      "Add matching FR/EN prose, explicit human/automatic diagram branches, source map and bounded maturity statements"
+    ],
+    "decision": "Second option; documentation only, with no node or relation removed.",
+    "owner": "Codex documentation integration",
+    "scope_limits": [
+      "No runtime change or build, provider calls, deployment, AC02 execution or claim of independent acceptance",
+      "Word v3 remains a frozen editorial artifact with its own verified source hashes"
+    ]
+  },
+  "claim_sources": {
+    "human_result_validation": "docs/ENGINE-ACCEPTANCE.md#contrôles-comme-preuves-dune-revue-humaine",
+    "native_validation": "docs/architecture/RUST-MIGRATION.md#tâches-ordinaires-et-validation-humaine--raccord139-en-qualification",
+    "native_gate": {
+      "path": "rust/crates/swarm-engine/src/root_store/task_validation/gate.rs",
+      "sha256": "dae6dc543cd5bf835dbc1e954172b90255f210e5605b79d0b05c9877b171de9e"
+    },
+    "instruction_revision": "docs/architecture/INSTRUCTION-LEARNING.md"
+  },
+  "review_axes": {
+    "policies": "No new runtime policy, deadline, budget or default. The documented human/automatic choice is existing policy; graph dimensions are presentation inputs.",
+    "functions": "No engine/API/public function created or modified; Rustdoc unchanged.",
+    "errors": "No runtime error path changed. Documentation distinguishes pending human, review and acceptance; source/hash mismatch refuses finalization. The first catalogue assertion omitted digits in its identifier regex and falsely missed A_AC02; the parser was corrected to include digits, with no diagram requirement removed.",
+    "build_and_delivery": "No build, restart, version_history change, provider call or deployment: documentation-only increment. Local Markdown rendering does not prove GitHub hosting or served application resources."
+  },
+  "source_inventory": [
+    {
+      "key": "engine",
+      "path": "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+      "section": "Protocole entre les IA et le moteur déterministe",
+      "line": 1,
+      "anchor": "protocole-entre-les-ia-et-le-moteur-déterministe",
+      "sha256": "3d47b29e40df99d5a9c775e50e67e2c450b3d145fee7c9e3ab05b4d057fd66b3"
+    },
+    {
+      "key": "trace",
+      "path": "docs/architecture/TRACEABILITY.md",
+      "section": "La chaîne de preuve",
+      "line": 28,
+      "anchor": "la-chaîne-de-preuve",
+      "sha256": "b8849982a56455d1289dc8f6558b63e0c6b522e81381c8cea62008a91a5cea3e"
+    },
+    {
+      "key": "review",
+      "path": "docs/architecture/REVIEW-EVIDENCE.md",
+      "section": "Comportement global du moteur",
+      "line": 48,
+      "anchor": "comportement-global-du-moteur",
+      "sha256": "e6f7cc6b0fb87bbdc5f7664642bdfe871d3e6c69882d97afee5d978bec9194f7"
+    },
+    {
+      "key": "scope",
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "section": "Répartition des responsabilités",
+      "line": 50,
+      "anchor": "répartition-des-responsabilités",
+      "sha256": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e"
+    },
+    {
+      "key": "run",
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "section": "Contrat réellement implémenté",
+      "line": 82,
+      "anchor": "contrat-réellement-implémenté",
+      "sha256": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e"
+    },
+    {
+      "key": "wait",
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "section": "Plusieurs agents, propriétaires et indisponibilité",
+      "line": 131,
+      "anchor": "plusieurs-agents-propriétaires-et-indisponibilité",
+      "sha256": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e"
+    },
+    {
+      "key": "identity",
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Données et sources d'autorité",
+      "line": 35,
+      "anchor": "données-et-sources-dautorité",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    {
+      "key": "registry",
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Source durable et publication récupérable — IA2.3b",
+      "line": 207,
+      "anchor": "source-durable-et-publication-récupérable--ia23b",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    {
+      "key": "journal",
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Journal durable de l’enrôlement — IA3c.2b",
+      "line": 533,
+      "anchor": "journal-durable-de-lenrôlement--ia3c2b",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    {
+      "key": "attribution",
+      "path": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+      "section": "Attribution, propriété et permission",
+      "line": 27,
+      "anchor": "attribution-propriété-et-permission",
+      "sha256": "5103687bb52f19ab08eaabde219965651ca65fc88dc0c23961648a5be324cda2"
+    },
+    {
+      "key": "planid",
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Liaison au contrat courant du plan — IA3a",
+      "line": 279,
+      "anchor": "liaison-au-contrat-courant-du-plan--ia3a",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    {
+      "key": "human",
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Authentification locale par défaut et réglage UX",
+      "line": 884,
+      "anchor": "authentification-locale-par-défaut-et-réglage-ux",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    {
+      "key": "enroll",
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Authentifier une réponse du futur service d’enrôlement — IA3c.2a",
+      "line": 478,
+      "anchor": "authentifier-une-réponse-du-futur-service-denrôlement--ia3c2a",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    {
+      "key": "configid",
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Témoin local et reprise coordonnée — IA3c.2f-02b",
+      "line": 1057,
+      "anchor": "témoin-local-et-reprise-coordonnée--ia3c2f-02b",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    {
+      "key": "channel",
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Remise privée IA3c.2f-03c — preuve avant demande métier",
+      "line": 1354,
+      "anchor": "remise-privée-ia3c2f-03c--preuve-avant-demande-métier",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    {
+      "key": "authority",
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "section": "Émettre un permis depuis une autorité humaine explicite — IA3b",
+      "line": 354,
+      "anchor": "émettre-un-permis-depuis-une-autorité-humaine-explicite--ia3b",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
+    },
+    {
+      "key": "mem",
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Utilisation",
+      "line": 81,
+      "anchor": "utilisation",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    {
+      "key": "memstore",
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Stockage, reprise et limites",
+      "line": 162,
+      "anchor": "stockage-reprise-et-limites",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    {
+      "key": "memcontext",
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Contexte préparé et contexte de départ",
+      "line": 235,
+      "anchor": "contexte-préparé-et-contexte-de-départ",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    {
+      "key": "memextract",
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Sélection extractive pour un lancement explicite",
+      "line": 419,
+      "anchor": "sélection-extractive-pour-un-lancement-explicite",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    {
+      "key": "dialogue",
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Fin confirmée d’un tour de dialogue",
+      "line": 485,
+      "anchor": "fin-confirmée-dun-tour-de-dialogue",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    {
+      "key": "boundary",
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "État durable aux frontières du dialogue",
+      "line": 537,
+      "anchor": "état-durable-aux-frontières-du-dialogue",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    {
+      "key": "resumemem",
+      "path": "docs/PROJECT-MEMORY.md",
+      "section": "Reprise explicite d'une conversation arrêtée",
+      "line": 672,
+      "anchor": "reprise-explicite-dune-conversation-arrêtée",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13"
+    },
+    {
+      "key": "usage",
+      "path": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+      "section": "Contrat du consommateur à réaliser",
+      "line": 44,
+      "anchor": "contrat-du-consommateur-à-réaliser",
+      "sha256": "5103687bb52f19ab08eaabde219965651ca65fc88dc0c23961648a5be324cda2"
+    },
+    {
+      "key": "preplan",
+      "path": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+      "section": "Le cadrage précède l'adoption du plan",
+      "line": 84,
+      "anchor": "le-cadrage-précède-ladoption-du-plan",
+      "sha256": "5103687bb52f19ab08eaabde219965651ca65fc88dc0c23961648a5be324cda2"
+    },
+    {
+      "key": "learn",
+      "path": "docs/architecture/INSTRUCTION-LEARNING.md",
+      "section": "Historique et transmission",
+      "line": 33,
+      "anchor": "historique-et-transmission",
+      "sha256": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038"
+    },
+    {
+      "key": "logs",
+      "path": "docs/architecture/LOG-CONSOLE.md",
+      "section": "Console des journaux",
+      "line": 1,
+      "anchor": "console-des-journaux",
+      "sha256": "3f786b9e3f9b5f01fe279df22944f3972d6ab006d2a67bf12818cf23d5a96477"
+    },
+    {
+      "key": "calls",
+      "path": "docs/architecture/CALL-ACCOUNTING.md",
+      "section": "Contrat et provenance",
+      "line": 19,
+      "anchor": "contrat-et-provenance",
+      "sha256": "e5dcd236a63900fdc375923428b515dcd676381bbcf96ffd4155de4a9611ba08"
+    },
+    {
+      "key": "live",
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "section": "Observation en direct des agents — LIVE-UX-01 (lecture seule)",
+      "line": 181,
+      "anchor": "observation-en-direct-des-agents--live-ux-01-lecture-seule",
+      "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+    },
+    {
+      "key": "otel",
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "section": "Télémétrie fournisseur — LIVE-UX-03, incrément E2E-1 (local, vérifié)",
+      "line": 248,
+      "anchor": "télémétrie-fournisseur--live-ux-03-incrément-e2e-1-local-vérifié",
+      "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+    },
+    {
+      "key": "liveness",
+      "path": "docs/architecture/PROVIDER-LIVENESS.md",
+      "section": "Configuration persistée et opérations publiques",
+      "line": 45,
+      "anchor": "configuration-persistée-et-opérations-publiques",
+      "sha256": "364f81dabf8ac064ebead09dd4700432898674147bbdbbc862e7f82f2c52c48c"
+    },
+    {
+      "key": "judgment",
+      "path": "docs/architecture/JUDGMENT-CYCLES.md",
+      "section": "Fin et refus",
+      "line": 71,
+      "anchor": "fin-et-refus",
+      "sha256": "1c5e855fd68a66e4451bf3d408b3ef17224087c356d9aaa85a58c4c97eba800d"
+    },
+    {
+      "key": "nativejudge",
+      "path": "docs/architecture/NATIVE-GLOBAL-JUDGE.md",
+      "section": "Juge global natif : cycles, quotas et histoire",
+      "line": 1,
+      "anchor": "juge-global-natif--cycles-quotas-et-histoire",
+      "sha256": "6a90926bdc8f3531ebbb9daa8cab4e691e5c0f7c6f390bc7bcd3a8a3141980ff"
+    },
+    {
+      "key": "ac02",
+      "path": "docs/plans/actions-confiance/securite-execution-apex.md",
+      "section": "AC-02 — Plan APEX consolidé avec spécification des menus de sécurité",
+      "line": 1,
+      "anchor": "ac-02--plan-apex-consolidé-avec-spécification-des-menus-de-sécurité",
+      "sha256": "07a3b77b0fb8b72a0e51e0074fdb82121491707fc0b4efd5dcd7d7041e6bfafb"
+    },
+    {
+      "key": "rust",
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "section": "Pilotage par parcours",
+      "line": 39,
+      "anchor": "pilotage-par-parcours",
+      "sha256": "9df7f33d40ff725aaf8e0de85e1b8b8657a5f683793bcdbb152fff9e55f5224c"
+    },
+    {
+      "key": "humanvalidation",
+      "path": "docs/ENGINE-ACCEPTANCE.md",
+      "section": "Contrôles comme preuves d’une revue humaine",
+      "line": 41,
+      "anchor": "contrôles-comme-preuves-dune-revue-humaine",
+      "sha256": "a43377f1f1ffe9f146467f4e63390a1c3cd587629a95256264f74357a7c653cd"
+    },
+    {
+      "key": "nativevalidation",
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "section": "Tâches ordinaires et validation humaine — raccord139 en qualification",
+      "line": 7515,
+      "anchor": "tâches-ordinaires-et-validation-humaine--raccord139-en-qualification",
+      "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+    },
+    {
+      "key": "learnrules",
+      "path": "docs/architecture/INSTRUCTION-LEARNING.md",
+      "section": "Amélioration récursive des consignes",
+      "line": 1,
+      "anchor": "amélioration-récursive-des-consignes",
+      "sha256": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038"
+    }
+  ],
+  "refreshed_provenance": [
+    {
+      "key": "live",
+      "before": {
+        "path": "docs/architecture/RUST-MIGRATION.md",
+        "section": "Observation en direct des agents — LIVE-UX-01 (lecture seule)",
+        "line": 181,
+        "anchor": "observation-en-direct-des-agents--live-ux-01-lecture-seule",
+        "sha256": "70a815cb93fc4c2f274a957bee4ac591d5be8ecb45cab2ec14538109bb8a8bfd"
+      },
+      "after": {
+        "path": "docs/architecture/RUST-MIGRATION.md",
+        "section": "Observation en direct des agents — LIVE-UX-01 (lecture seule)",
+        "line": 181,
+        "anchor": "observation-en-direct-des-agents--live-ux-01-lecture-seule",
+        "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+      },
+      "reason": "Relevant section reread; unrelated concurrent source changes do not change the diagram claim."
+    },
+    {
+      "key": "otel",
+      "before": {
+        "path": "docs/architecture/RUST-MIGRATION.md",
+        "section": "Télémétrie fournisseur — LIVE-UX-03, incrément E2E-1 (local, vérifié)",
+        "line": 248,
+        "anchor": "télémétrie-fournisseur--live-ux-03-incrément-e2e-1-local-vérifié",
+        "sha256": "70a815cb93fc4c2f274a957bee4ac591d5be8ecb45cab2ec14538109bb8a8bfd"
+      },
+      "after": {
+        "path": "docs/architecture/RUST-MIGRATION.md",
+        "section": "Télémétrie fournisseur — LIVE-UX-03, incrément E2E-1 (local, vérifié)",
+        "line": 248,
+        "anchor": "télémétrie-fournisseur--live-ux-03-incrément-e2e-1-local-vérifié",
+        "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+      },
+      "reason": "Relevant section reread; unrelated concurrent source changes do not change the diagram claim."
+    },
+    {
+      "key": "rust",
+      "before": {
+        "path": "docs/plans/migration-rust/PLAN.md",
+        "section": "Pilotage par parcours",
+        "line": 39,
+        "anchor": "pilotage-par-parcours",
+        "sha256": "a93344ff8b75a4e34dd00559b8b368d1acf9ec3e520cd76fc820860f5a8899a9"
+      },
+      "after": {
+        "path": "docs/plans/migration-rust/PLAN.md",
+        "section": "Pilotage par parcours",
+        "line": 39,
+        "anchor": "pilotage-par-parcours",
+        "sha256": "a51e4783bae528e7eb5208ffc8454b50095b285b18c033078c8666a9fb673446"
+      },
+      "reason": "Relevant section reread; unrelated concurrent source changes do not change the diagram claim."
+    }
+  ],
+  "concurrent_plan_refresh": {
+    "before": {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "section": "Pilotage par parcours",
+      "line": 39,
+      "anchor": "pilotage-par-parcours",
+      "sha256": "a51e4783bae528e7eb5208ffc8454b50095b285b18c033078c8666a9fb673446"
+    },
+    "section_read": "## Pilotage par parcours\n\n[Classement des surfaces et inventaire](CHEMIN-CRITIQUE-SPEC.md#décision-applicable--22-octobre-2026).\nContrats : données, JSON CLI consommé, refus sécurité/identité/budget/droits,\nlancement et supervision. Autres surfaces : réécriture acceptée par parcours.\nLes compteurs ci-dessous portent les groupes, pas des pourcentages de charge.\nPremier corpus exécuté :2/2 scénarios de lecture Work identiques, sur binaires\nidentifiés ; source Go précompilée non qualifiée, aucune acceptation globale.\n\n| Groupe | Prochaine unité de livraison | État de vérification/acceptation |\n|---|---|---|\n| G1 Cockpit | suivre la mission, avec G3 | texte/native213 ; JSON ordinaire309 et annulationAgent325 vérifiés, revues favorables ; completed332 vérifié ; soumis hors fenêtre376/recette378, abandon sans Agent388, actifs ordinaires400, acceptation/fraîcheur411, todo profilé manuel/pause418, planning initial sans activité424 et startup heartbeat375 vérifiés ; revue G1 complète, planning actif/revues/cockpit et autres états ouverts |\n| G2 Terminal | session et contrôle autorisé | ouvert |\n| G3 Supervision | raccord planner→worker puis rôles/web | worker213, reprise224, planner→worker244 et startup worker375/376 vérifiés ; registered/reviewer/validation/web ouverts |\n| G4 Planification | préparer le plan de mission | ouvert ; composants natifs, parcours global à qualifier |\n| G5 Préparations | préparation jusqu'au démarrage | ouvert ; dépend G4 |\n| G6 Fournisseurs | configurer/résoudre/tester connexion | ouvert ; contrats secrets et budgets requis |\n| G7 Confiance | autoriser, vérifier et révoquer | ouvert ; aucune protection globale supposée |\n| G8 Projet/mémoire | éditer et partager avec provenance | ouvert |\n| G9 Coûts/limites | configurer et observer consommation | ouvert ; réservations/refus contractuels |\n| G10 Automatisation | déclencher et suivre un parcours | ouvert ; dépend G1/G3 |\n| G11 Pages | compléter les parcours des groupes servis | ouvert ; FR/EN, thèmes, clavier et ressources réelles |\n| G12 Divers CLI | recheck, aide et complétude | ouvert ; sous-commandes à inventorier |\n\nOrdre : G3/G1 → G4/G5 → G6/G9 → G8/G7 → G2/G10 → complétude G11/G12.\nR6/R7 préparés en parallèle. Une recette complète en fin de lot vertical ;\nentre modifications, tests ciblés. Risque A : instantané et revue indépendante ;\nB : tests moteur ciblés puis recette finale ; C : parcours et inspection visuelle.\nReplan immédiat aux anomalies ; trois échecs sur le même point imposent réduction.\n",
+    "limit": "Refresh of generic journey status only; no new qualification inferred from concurrent plan edits.",
+    "after": {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "section": "Pilotage par parcours",
+      "line": 39,
+      "anchor": "pilotage-par-parcours",
+      "sha256": "9df7f33d40ff725aaf8e0de85e1b8b8657a5f683793bcdbb152fff9e55f5224c"
+    }
+  },
+  "graph_counts": {
+    "families": 5,
+    "languages": 2,
+    "nodes_per_language": 96,
+    "edges_per_language": 111,
+    "previous_nodes_per_language": 93,
+    "previous_edges_per_language": 106,
+    "none_removed": true
+  },
+  "checks": [
+    "architecture-overview_all_prior_nodes_and_relations_retained_and_bilingual_labels_match",
+    "identity-authority_all_prior_nodes_and_relations_retained_and_bilingual_labels_match",
+    "memory-context_all_prior_nodes_and_relations_retained_and_bilingual_labels_match",
+    "run-supervision_all_prior_nodes_and_relations_retained_and_bilingual_labels_match",
+    "logs-observability_all_prior_nodes_and_relations_retained_and_bilingual_labels_match",
+    "README.md_human_policy_five_views_and_current_Word",
+    "README.en.md_human_policy_five_views_and_current_Word",
+    "current_contract_sources_hash_match",
+    "manual_human_gate_source_observed",
+    "8_exports_regenerated_10_diagrams_geometry_checked",
+    "16_theme_language_width_previews_and_8_human_section_previews",
+    "8_changed_diagrams_visually_inspected",
+    "Word_v3_and_historical_reviews_preserved",
+    "owned_text_whitespace_clean",
+    "final_551_local_links_and_fragments_across_7_documents",
+    "git_diff_check_passed"
+  ],
+  "preview_summary": {
+    "documents": 6,
+    "local_links": 509,
+    "theme_language_width_combinations": 16,
+    "human_focus_combinations": 8,
+    "broken_links_at_preview": 0,
+    "geometry_diagrams": 10,
+    "clipped_labels": 0,
+    "cluster_node_overlaps": 0
+  },
+  "evidence_directory": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/readme-human-control",
+  "owned_files": [
+    {
+      "path": "README.en.md",
+      "before_sha256": "7b1f96526acf5a59ce855dc961dc56467188f3a73b17808cc61b022bcde405ec",
+      "after_sha256": "69bb2056a818524d62b025394b409d205d6d7f3975e139c961aa7fcb29bf75e6"
+    },
+    {
+      "path": "README.md",
+      "before_sha256": "127edfc7674050d24da763aa15185ee0eed878417356109c971fc09f6010b900",
+      "after_sha256": "3c879466481653fe39ad55397cae82636bb3566656e92874fd2940b5f59d4bd0"
+    },
+    {
+      "path": "docs/architecture/OVERVIEW.md",
+      "before_sha256": "256c585daf0a795cd9f27fa1e15a758b6b81f88cb788aada2394b59e7fe9f5b0",
+      "after_sha256": "dc32a0b7320381388e83e52a2eb0c8a2e7d571bffa9517a4f0aa95e6007e590d"
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md",
+      "before_sha256": "7fa921882a12237ea6dae81a4c813046abfa61689ee2e67d0052200ec840d9d6",
+      "after_sha256": "4a8c41c3e906d32f791952f1c0a5fd5ff02c5f9013a4da8906bf007635de9f27"
+    },
+    {
+      "path": "docs/diagrams/CONTRACT-MAP.md",
+      "before_sha256": "d4c51c9ce066b33fb55ebcaff835fc4534e2f8005f734ee45cafc5c833551f7d",
+      "after_sha256": "76bdd87f655b1686e5978cc489fb61a4bf8541d74f57b6c28e2a318d567fe8fe"
+    },
+    {
+      "path": "docs/diagrams/README.md",
+      "before_sha256": "e03df3dddefc8b6f27ce9805685497c0f57186b7faccf917d81a79315fdfec52",
+      "after_sha256": "77cc9a924d5f919c6e84218e8fe000f6fe427957229a60445b96ddd26debcab6"
+    },
+    {
+      "path": "docs/diagrams/architecture-contracts.json",
+      "before_sha256": "c6c3a7eb1872a105d1fca578a36796a7356d1c276647a0d22007fc7bbf177264",
+      "after_sha256": "b78be7893ae86d2cff6cd6abbc985e50027253c89589ab7427525e3fe3b6a247"
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.mmd",
+      "before_sha256": "5b579f44051a6a8b46714b21eb4a0978309fcc1522576ed6888811ffe7072027",
+      "after_sha256": "accafc1cce6763fd5c3e420ab597561724d792cdb0e82d5196a095324e32e431"
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.png",
+      "before_sha256": "36cc2c88e537ed48162d7c3a86b6afcb1c5aa5cbe9d18193b7e3bec989e12237",
+      "after_sha256": "c455111630918fb1eab38c20eeeccfd59b8b7316596089ab896bef0ecccab063"
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.svg",
+      "before_sha256": "a1324258606b528a5d3d14255cc254d31e10f9cb74bb1e41429222e56e94a5b7",
+      "after_sha256": "1847cdb9092ae5065e69474b494c3e219677ad2ea017225c145c32542a2fb66e"
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.mmd",
+      "before_sha256": "a13856ec0a8f49df8ccf0b660e07f4f20901eccc262aee9682101df6d659d5e7",
+      "after_sha256": "1221c5e3651f826ffd88c41ac200f83eae426ae7273aa8a6734859c753be3142"
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.png",
+      "before_sha256": "9607c0615ff0a86eb5f06176bb450cdd2c925e85591815512b1ec42b499ecc6a",
+      "after_sha256": "756686c8c6a4439af05806276eb666d56b81dda049e76c5cd5f9b9665d4cb31c"
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.svg",
+      "before_sha256": "2ac72e787d4399e6285cdd8abb1bdc3201facb394c7b9106bbd105f989d0750e",
+      "after_sha256": "16c1a4112f5a9441b02922ac4414836edc37b980e1b1e8e67da83ec8cb26f3fb"
+    },
+    {
+      "path": "docs/diagrams/logs-observability-en.mmd",
+      "before_sha256": "45927b4a1f8565e7632a9cd268969fdfac0dacd24f2f13276b237d8fb9ac30da",
+      "after_sha256": "992ae74d49bb8b9b071c9727d5fa6fbf8164e7bfc22846c16820bc9f5c0301d9"
+    },
+    {
+      "path": "docs/diagrams/logs-observability-en.png",
+      "before_sha256": "2e3a51eed52755dc322ef2c5968cd875592bb5d2f0bc781a2116eca798bd512a",
+      "after_sha256": "a0addb40c1a29c0a88232c96d23f0e6803b8be2af16f51387e99568cab03f3f0"
+    },
+    {
+      "path": "docs/diagrams/logs-observability-en.svg",
+      "before_sha256": "15915ce5a6ddf1d771cb4ae3f144ac5dca2e6d4714ddaa9b4dc2bd5a1bb80882",
+      "after_sha256": "5b983e6ee239f7a11c09c9ca1e87af73dba68bba4bce6cb7360311571737a981"
+    },
+    {
+      "path": "docs/diagrams/logs-observability-fr.mmd",
+      "before_sha256": "19daecc4e273fb1260dad001a5a9e9fdb03157e1e113af8e67788a42969191e0",
+      "after_sha256": "fa9fa996c65fae22c04f1839c38641b9149174f30f1b8a47fd7fb03fb2923855"
+    },
+    {
+      "path": "docs/diagrams/logs-observability-fr.png",
+      "before_sha256": "d04b8ebc5fc2bb7bbf70d9f64a069126da2175ca1ace2ee4ae09b8e84b621777",
+      "after_sha256": "53e73f720d8f708500e036ab1cf89e09df750880e0ce27357f4b750ed8394742"
+    },
+    {
+      "path": "docs/diagrams/logs-observability-fr.svg",
+      "before_sha256": "90ecd31bed691d9a22b38058ca3f41ef046d83055b257dacf1b140cddd3739b4",
+      "after_sha256": "4f015bc06e98ce912de799f7e0ccb419903d609d44cb39aac023a604572dc890"
+    },
+    {
+      "path": "docs/diagrams/memory-context-en.mmd",
+      "before_sha256": "16ab652938aab45409556fb1136d1a0ddb408a67a429f5995e83a424f8861831",
+      "after_sha256": "3c2c227e67f2e18b3320aef0891b3ef886731e49f2b452a238e7687c5cda5909"
+    },
+    {
+      "path": "docs/diagrams/memory-context-en.png",
+      "before_sha256": "3da15a4b518aea7f9354d4b950427f62898929919556a6f2a2e54fcd78891935",
+      "after_sha256": "7dd905768aec86cff3e1b41a52f54d9ff2a12a09cdda418d95ecf9a4f78c61bb"
+    },
+    {
+      "path": "docs/diagrams/memory-context-en.svg",
+      "before_sha256": "01ca763bc3da71d3f86553588c68c163a0a71af3463a64c689acfa958f380b24",
+      "after_sha256": "fc6ebbf8815b63b8d992e2452106786aa9770192495239b74afe97ef8e81cc17"
+    },
+    {
+      "path": "docs/diagrams/memory-context-fr.mmd",
+      "before_sha256": "209b01e2a735542f6c17443d548dffcdbc8ff435908102f1bfbd47903fed55e5",
+      "after_sha256": "d7aa102af692a8d937f35ced3676f72ab546838dfdef0cc5a112dc3200d7ae06"
+    },
+    {
+      "path": "docs/diagrams/memory-context-fr.png",
+      "before_sha256": "83497533dd85f9b3f3d25bdc025d2710d518b4d1cd932140668d3bb21541fb0f",
+      "after_sha256": "8852666454bef30aabc99593015fd50b5d8599b8e35191fe60fb3a29afe185aa"
+    },
+    {
+      "path": "docs/diagrams/memory-context-fr.svg",
+      "before_sha256": "f901eed6b10c92cda2c896926799557d14f6fcdb0fec975844a86b9ab306b73b",
+      "after_sha256": "774f92a29a5c07ca2c3aedea60632dafd424ced864050f3052a157bdad6063f5"
+    },
+    {
+      "path": "docs/diagrams/run-supervision-en.mmd",
+      "before_sha256": "561901aecae169667c9a7ace476223e42d6c1bab5686a0c3089d7f1ffebac411",
+      "after_sha256": "729db559c52c6e00a5ef12d2ace03e6e5345483460aac1c4bf9c52cd6667ddb9"
+    },
+    {
+      "path": "docs/diagrams/run-supervision-en.png",
+      "before_sha256": "0209cd9362a4f23967a42a802409a29ce3909b465536cc5afd1106b708e0d982",
+      "after_sha256": "afd3298b2e766f2566a1b9a2920df3ce2c7c01f940a51ec229906d15ced7e90f"
+    },
+    {
+      "path": "docs/diagrams/run-supervision-en.svg",
+      "before_sha256": "51c172dd53b64992f0da88fc19d41e7523dbd717ebacf58e4a8a9920664ebc33",
+      "after_sha256": "67711c3fc0dca9f6151b75825b93fffb4134cf59356e7c437791c00c52d55f3d"
+    },
+    {
+      "path": "docs/diagrams/run-supervision-fr.mmd",
+      "before_sha256": "af8f1aaad766c16483259922a5125bbd377ff600f7eb23e22e0e2fac2c154fea",
+      "after_sha256": "d20f0d8a70ed29295be7a2b63523c3d37a9a571e281f36eada1bc7528a5f9228"
+    },
+    {
+      "path": "docs/diagrams/run-supervision-fr.png",
+      "before_sha256": "917dfb6488ed1ea32b5f88efdc745a36a0a7bbcc9bd88d32e694345449e3bb1b",
+      "after_sha256": "dd0ea72f056775ba4f503e0c6984c033295596a5f0d5926dfe48f957ec7291db"
+    },
+    {
+      "path": "docs/diagrams/run-supervision-fr.svg",
+      "before_sha256": "f39a06116f182ab74653044bb6d6c8eda7070fef9a82c23b3e12baec95be3084",
+      "after_sha256": "99a12a8a5355fd0489490e549b471b75b40abc6ac68bd16454807f0f3cf8e86a"
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "before_sha256": "61b1120239ba0ea2f6c24e57d75a561b94f71f59ba3095876907831ae284f2a2",
+      "after_sha256": "94b66de5c4765dec5050793677b85f68b7cb4838ccc486cc7111428b0e70bc0b"
+    }
+  ],
+  "retained_learning": "Human result validation cannot be inferred from AI process supervision or default-approved instruction additions. Read ENGINE-ACCEPTANCE and the current native validation gate. Acceptance, human authentication, instruction revision and process control remain separate contracts.",
+  "context_transmission": "Current README FR/EN and source map carry the distinction to future readers. Word v3 remains frozen; embedded native agent contexts and already-running processes are not modified.",
+  "limits": [
+    "Documentation and local browser checks only; no new runtime qualification or independent review",
+    "Current branches show contract requirements; protected human identity/global service integration remains open",
+    "No code or AC02 implementation started; no push or publication performed"
+  ],
+  "final_link_check": {
+    "documents": 7,
+    "links": 551,
+    "broken": 0,
+    "result": [
+      {
+        "file": "README.md",
+        "localLinks": 130
+      },
+      {
+        "file": "README.en.md",
+        "localLinks": 130
+      },
+      {
+        "file": "docs/architecture/OVERVIEW.md",
+        "localLinks": 66
+      },
+      {
+        "file": "docs/en/ARCHITECTURE.md",
+        "localLinks": 66
+      },
+      {
+        "file": "docs/diagrams/README.md",
+        "localLinks": 39
+      },
+      {
+        "file": "docs/diagrams/CONTRACT-MAP.md",
+        "localLinks": 79
+      },
+      {
+        "file": "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md",
+        "localLinks": 41
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+flowchart TD
+  R[Recipe: required checks and decision] --> F{Fresh evidence and supervisor closure?}
+  F -->|No| C[Correct and resume recipe]
+  F -->|Yes| T[Optional retrospective and quick wins]
+  T --> P[Fact or hypothesis, value, effort, risk, criterion]
+  P --> U{User choice}
+  U -->|Keep or dismiss| H[Preserved history]
+  U -->|Evolve| B[Prepare next increment]
+  B --> A[Adopt plan and authorize launch]
+  A --> E[Implement, verify and accept]
+  E --> T

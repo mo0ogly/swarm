@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-t7-read-scope-release",
+    "--root",
+    "/tmp/swarm-t7-codex-2pbm7fl4",
+    "--json",
+    "work",
+    "show",
+    "w-6a2c13c498cba8780192b44d"
+  ],
+  "exit": 0,
+  "at": "2026-10-13T08:33:22.209353+00:00",
+  "stdout_sha256": "440367a576f89c7991442a5db63c4b42e922ae6dfaee0f646d0b71a16d92f09f",
+  "revision": 127,
+  "validated": 2,
+  "stale": 0,
+  "engine_commit": "3f121f759200b5f8d0a0d9c5d0170208b29b07ba"
+}

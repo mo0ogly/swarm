@@ -1,0 +1,149 @@
+[
+  {
+    "argv": [
+      "version"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "init"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "work",
+      "create"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": "f431323db596e17fe2e705afb5829987035d2ea57cf3fdc3ca3899168bb858e9"
+  },
+  {
+    "argv": [
+      "task",
+      "add",
+      "w-2a47c70cd5443fbc13326cdf"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": "9891d185378c2068732ecd940ca13149a40df05b8e57727cfaf539f59e35a306"
+  },
+  {
+    "argv": [
+      "agent",
+      "start",
+      "w-2a47c70cd5443fbc13326cdf"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": "be6717716f2fc8791d59ee79b8f15ed96d5210639e7fe43eb1890b5c423d0d2d"
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "f8858962-0bb0-484a-8d83-5f58f64dcc22"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "f8858962-0bb0-484a-8d83-5f58f64dcc22"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-2a47c70cd5443fbc13326cdf"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "agent",
+      "logs",
+      "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+      "-1"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "agent",
+      "start",
+      "w-2a47c70cd5443fbc13326cdf"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": "cd87642b9eb4024f8656a950b76a60b8b07d3d5b42f353d3f00a5bcb689be85e"
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "3bba78a7-284d-467b-9a1d-a9689045c78f"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "3bba78a7-284d-467b-9a1d-a9689045c78f"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "f8858962-0bb0-484a-8d83-5f58f64dcc22"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "agent",
+      "logs",
+      "f8858962-0bb0-484a-8d83-5f58f64dcc22",
+      "-1"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-2a47c70cd5443fbc13326cdf"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "input_sha256": null
+  }
+]

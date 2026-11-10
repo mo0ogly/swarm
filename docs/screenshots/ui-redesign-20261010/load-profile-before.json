@@ -1,0 +1,552 @@
+{
+  "diagnostic_only": true,
+  "instrumented": true,
+  "elapsed": 969,
+  "details": {
+    "spans": [
+      {
+        "name": "mission.render",
+        "start": 616.0999999940395,
+        "ms": 50.70000000298023
+      },
+      {
+        "name": "product.render",
+        "start": 666.9000000059605,
+        "ms": 0.699999988079071
+      },
+      {
+        "name": "dagre.layout",
+        "start": 687.9000000059605,
+        "ms": 130.79999999701977
+      },
+      {
+        "name": "draft.minimap",
+        "start": 856.0999999940395,
+        "ms": 4.300000011920929
+      },
+      {
+        "name": "graph.draw",
+        "start": 667.7000000029802,
+        "ms": 276.79999999701977
+      },
+      {
+        "name": "draft.render",
+        "start": 944.5,
+        "ms": 3.5999999940395355
+      },
+      {
+        "name": "pilot.render",
+        "start": 613.2999999970198,
+        "ms": 335.1000000089407
+      },
+      {
+        "name": "cockpit.render",
+        "start": 610.2999999970198,
+        "ms": 340.6000000089407
+      }
+    ],
+    "resources": [
+      {
+        "path": "/i18n-en.js",
+        "start": 42.29999999701977,
+        "total": 30.400000005960464,
+        "ttfb": 7.600000008940697,
+        "bytes": 300
+      },
+      {
+        "path": "/i18n.js",
+        "start": 42.599999994039536,
+        "total": 39.80000001192093,
+        "ttfb": 0.5,
+        "bytes": 300
+      },
+      {
+        "path": "/status-contract.js",
+        "start": 42.70000000298023,
+        "total": 153.8999999910593,
+        "ttfb": 16.099999994039536,
+        "bytes": 300
+      },
+      {
+        "path": "/wattson_themes.css",
+        "start": 42.79999999701977,
+        "total": 45.20000000298023,
+        "ttfb": 0.5,
+        "bytes": 8360
+      },
+      {
+        "path": "/cockpit.css",
+        "start": 42.79999999701977,
+        "total": 78.5,
+        "ttfb": 1.2999999970197678,
+        "bytes": 300
+      },
+      {
+        "path": "/cockpit-ux.css",
+        "start": 43,
+        "total": 79.40000000596046,
+        "ttfb": 1.2000000029802322,
+        "bytes": 300
+      },
+      {
+        "path": "/agent-terminal.css",
+        "start": 43,
+        "total": 79.59999999403954,
+        "ttfb": 4.399999991059303,
+        "bytes": 300
+      },
+      {
+        "path": "/agent-terminal.js",
+        "start": 43.099999994039536,
+        "total": 147.80000001192093,
+        "ttfb": 7.200000002980232,
+        "bytes": 300
+      },
+      {
+        "path": "/lib/preparation-security.js",
+        "start": 43.099999994039536,
+        "total": 150.5,
+        "ttfb": 12.5,
+        "bytes": 300
+      },
+      {
+        "path": "/lifecycle-manager.js",
+        "start": 43.20000000298023,
+        "total": 142.8999999910593,
+        "ttfb": 4.200000002980232,
+        "bytes": 300
+      },
+      {
+        "path": "/cockpit.js",
+        "start": 43.29999999701977,
+        "total": 214.79999999701977,
+        "ttfb": 214.79999999701977,
+        "bytes": 46113
+      },
+      {
+        "path": "/pricing.js",
+        "start": 43.400000005960464,
+        "total": 180.79999999701977,
+        "ttfb": 0.4000000059604645,
+        "bytes": 300
+      },
+      {
+        "path": "/quotas.js",
+        "start": 43.400000005960464,
+        "total": 196.29999999701977,
+        "ttfb": 3.2000000029802322,
+        "bytes": 300
+      },
+      {
+        "path": "/task-models.js",
+        "start": 43.5,
+        "total": 222,
+        "ttfb": 0.7000000029802322,
+        "bytes": 300
+      },
+      {
+        "path": "/role-models.js",
+        "start": 43.599999994039536,
+        "total": 229.40000000596046,
+        "ttfb": 0.4000000059604645,
+        "bytes": 300
+      },
+      {
+        "path": "/runtime-health.js",
+        "start": 43.70000000298023,
+        "total": 232.79999999701977,
+        "ttfb": 3.5,
+        "bytes": 300
+      },
+      {
+        "path": "/pilot-graph.js",
+        "start": 43.79999999701977,
+        "total": 237.79999999701977,
+        "ttfb": 1.6000000089406967,
+        "bytes": 300
+      },
+      {
+        "path": "/product-graph.js",
+        "start": 43.79999999701977,
+        "total": 241.40000000596046,
+        "ttfb": 5.100000008940697,
+        "bytes": 300
+      },
+      {
+        "path": "/lib/dagre.min.js",
+        "start": 43.79999999701977,
+        "total": 244.20000000298023,
+        "ttfb": 12.200000002980232,
+        "bytes": 300
+      },
+      {
+        "path": "/product-views.css",
+        "start": 44,
+        "total": 81.79999999701977,
+        "ttfb": 1,
+        "bytes": 300
+      },
+      {
+        "path": "/product-views.js",
+        "start": 44,
+        "total": 236.29999999701977,
+        "ttfb": 236.20000000298023,
+        "bytes": 12811
+      },
+      {
+        "path": "/pilot-actions.js",
+        "start": 44.099999994039536,
+        "total": 260.40000000596046,
+        "ttfb": 1.0999999940395355,
+        "bytes": 300
+      },
+      {
+        "path": "/mission.css",
+        "start": 44.20000000298023,
+        "total": 83.5,
+        "ttfb": 0.800000011920929,
+        "bytes": 300
+      },
+      {
+        "path": "/mission-help.js",
+        "start": 44.20000000298023,
+        "total": 278.29999999701977,
+        "ttfb": 20.600000008940697,
+        "bytes": 300
+      },
+      {
+        "path": "/evidence-contract.js",
+        "start": 44.29999999701977,
+        "total": 275.40000000596046,
+        "ttfb": 17.899999991059303,
+        "bytes": 300
+      },
+      {
+        "path": "/planning.js",
+        "start": 44.400000005960464,
+        "total": 266.79999999701977,
+        "ttfb": 9.299999997019768,
+        "bytes": 300
+      },
+      {
+        "path": "/mission.js",
+        "start": 44.5,
+        "total": 264.09999999403954,
+        "ttfb": 264.09999999403954,
+        "bytes": 52210
+      },
+      {
+        "path": "/mission-insights.js",
+        "start": 44.5,
+        "total": 271.20000000298023,
+        "ttfb": 11.700000002980232,
+        "bytes": 300
+      },
+      {
+        "path": "/pilot-batch.js",
+        "start": 44.599999994039536,
+        "total": 263.80000001192093,
+        "ttfb": 5.700000002980232,
+        "bytes": 300
+      },
+      {
+        "path": "/pilotage.js",
+        "start": 44.70000000298023,
+        "total": 272.5,
+        "ttfb": 272.3999999910593,
+        "bytes": 25972
+      },
+      {
+        "path": "/pilot-inspector.js",
+        "start": 44.70000000298023,
+        "total": 288.8999999910593,
+        "ttfb": 0.7000000029802322,
+        "bytes": 300
+      },
+      {
+        "path": "/report-summary.js",
+        "start": 44.79999999701977,
+        "total": 291.90000000596046,
+        "ttfb": 3.7000000029802322,
+        "bytes": 300
+      },
+      {
+        "path": "/graph-draft.js",
+        "start": 44.900000005960464,
+        "total": 281.5,
+        "ttfb": 281.5,
+        "bytes": 12296
+      },
+      {
+        "path": "/pilotage.css",
+        "start": 45,
+        "total": 115.70000000298023,
+        "ttfb": 0.5999999940395355,
+        "bytes": 300
+      },
+      {
+        "path": "/graph.js",
+        "start": 45,
+        "total": 291.5,
+        "ttfb": 291.40000000596046,
+        "bytes": 19876
+      },
+      {
+        "path": "/activity.js",
+        "start": 45.099999994039536,
+        "total": 307,
+        "ttfb": 1.300000011920929,
+        "bytes": 300
+      },
+      {
+        "path": "/conduite.js",
+        "start": 45.20000000298023,
+        "total": 310.09999999403954,
+        "ttfb": 8.299999997019768,
+        "bytes": 300
+      },
+      {
+        "path": "/conduite.css",
+        "start": 45.400000005960464,
+        "total": 121.09999999403954,
+        "ttfb": 1,
+        "bytes": 300
+      },
+      {
+        "path": "/graph.css",
+        "start": 45.400000005960464,
+        "total": 122.3999999910593,
+        "ttfb": 0.9000000059604645,
+        "bytes": 300
+      },
+      {
+        "path": "/brainstorm.js",
+        "start": 45.400000005960464,
+        "total": 326.19999998807907,
+        "ttfb": 12.200000002980232,
+        "bytes": 300
+      },
+      {
+        "path": "/cockpit-help.js",
+        "start": 45.599999994039536,
+        "total": 315.1000000089407,
+        "ttfb": 1.2000000029802322,
+        "bytes": 300
+      },
+      {
+        "path": "/retex.js",
+        "start": 45.599999994039536,
+        "total": 318.40000000596046,
+        "ttfb": 4.5,
+        "bytes": 300
+      },
+      {
+        "path": "/plan.css",
+        "start": 45.79999999701977,
+        "total": 122.40000000596046,
+        "ttfb": 0.5,
+        "bytes": 300
+      },
+      {
+        "path": "/plan.js",
+        "start": 45.79999999701977,
+        "total": 321.20000000298023,
+        "ttfb": 7.200000002980232,
+        "bytes": 300
+      },
+      {
+        "path": "/assistant.js",
+        "start": 45.79999999701977,
+        "total": 328.29999999701977,
+        "ttfb": 14.200000002980232,
+        "bytes": 300
+      },
+      {
+        "path": "/assistant.css",
+        "start": 46,
+        "total": 122.59999999403954,
+        "ttfb": 0.7000000029802322,
+        "bytes": 300
+      },
+      {
+        "path": "/ai-connections.js",
+        "start": 46,
+        "total": 338.70000000298023,
+        "ttfb": 3.8999999910593033,
+        "bytes": 300
+      },
+      {
+        "path": "/project-profile-settings.js",
+        "start": 46.099999994039536,
+        "total": 350.5,
+        "ttfb": 13.899999991059303,
+        "bytes": 300
+      },
+      {
+        "path": "/project-profile-settings.css",
+        "start": 46.20000000298023,
+        "total": 122.8999999910593,
+        "ttfb": 2.2999999970197678,
+        "bytes": 300
+      },
+      {
+        "path": "/action-skills.js",
+        "start": 46.20000000298023,
+        "total": 346.09999999403954,
+        "ttfb": 9.199999988079071,
+        "bytes": 300
+      },
+      {
+        "path": "/providers.css",
+        "start": 46.400000005960464,
+        "total": 122.8999999910593,
+        "ttfb": 1.199999988079071,
+        "bytes": 300
+      },
+      {
+        "path": "/providers.js",
+        "start": 46.400000005960464,
+        "total": 341.5,
+        "ttfb": 6,
+        "bytes": 300
+      },
+      {
+        "path": "/admin.js",
+        "start": 46.599999994039536,
+        "total": 360.5,
+        "ttfb": 3.3999999910593033,
+        "bytes": 300
+      },
+      {
+        "path": "/context-help.css",
+        "start": 46.70000000298023,
+        "total": 122.70000000298023,
+        "ttfb": 3.2999999970197678,
+        "bytes": 300
+      },
+      {
+        "path": "/automation.js",
+        "start": 46.70000000298023,
+        "total": 367.20000000298023,
+        "ttfb": 0.5999999940395355,
+        "bytes": 300
+      },
+      {
+        "path": "/context-help.js",
+        "start": 46.900000005960464,
+        "total": 372,
+        "ttfb": 4.0999999940395355,
+        "bytes": 300
+      },
+      {
+        "path": "/swarm-design.css",
+        "start": 47,
+        "total": 81.79999999701977,
+        "ttfb": 0.9000000059604645,
+        "bytes": 22964
+      },
+      {
+        "path": "/swarm-shell.js",
+        "start": 47,
+        "total": 375.90000000596046,
+        "ttfb": 6,
+        "bytes": 300
+      },
+      {
+        "path": "/swarm-logo.png",
+        "start": 47.099999994039536,
+        "total": 386.70000000298023,
+        "ttfb": 0.7999999970197678,
+        "bytes": 564347
+      },
+      {
+        "path": "/api/v1/session",
+        "start": 267,
+        "total": 142,
+        "ttfb": 0.5,
+        "bytes": 344
+      },
+      {
+        "path": "/api/v1/assist/meta",
+        "start": 384.90000000596046,
+        "total": 48.29999999701977,
+        "ttfb": 2.7999999970197678,
+        "bytes": 2154
+      },
+      {
+        "path": "/api/v1/graph-performance",
+        "start": 410.5,
+        "total": 32.900000005960464,
+        "ttfb": 3,
+        "bytes": 682
+      },
+      {
+        "path": "/api/v1/works",
+        "start": 413.20000000298023,
+        "total": 30.899999991059303,
+        "ttfb": 6.200000002980232,
+        "bytes": 39436
+      },
+      {
+        "path": "/api/v1/runtime-health",
+        "start": 438,
+        "total": 46.5,
+        "ttfb": 33.19999998807907,
+        "bytes": 2651
+      },
+      {
+        "path": "/api/v1/assist/turns",
+        "start": 466.79999999701977,
+        "total": 24.700000002980232,
+        "ttfb": 15.399999991059303,
+        "bytes": 328
+      },
+      {
+        "path": "/api/v1/snapshot",
+        "start": 468.59999999403954,
+        "total": 110.80000001192093,
+        "ttfb": 96.29999999701977,
+        "bytes": 1755418
+      },
+      {
+        "path": "/favicon.svg",
+        "start": 469.70000000298023,
+        "total": 21,
+        "ttfb": 1.1000000089406967,
+        "bytes": 1061
+      },
+      {
+        "path": "/swarm-logo.png",
+        "start": 498.59999999403954,
+        "total": 9.700000002980232,
+        "ttfb": 2.2000000029802322,
+        "bytes": 564347
+      },
+      {
+        "path": "/api/v1/activity",
+        "start": 948.9000000059605,
+        "total": 27.5,
+        "ttfb": 4.299999997019768,
+        "bytes": 8554
+      },
+      {
+        "path": "/api/v1/assist/turns",
+        "start": 949,
+        "total": 26.599999994039536,
+        "ttfb": 7.300000011920929,
+        "bytes": 328
+      }
+    ],
+    "navigation": [
+      {
+        "responseEnd": 21.599999994039536,
+        "domInteractive": 65.20000000298023,
+        "domContentLoaded": 438.40000000596046
+      }
+    ]
+  },
+  "diagnostics": [],
+  "binary_sha256": "a0a6fda97a64ccfa0c4e2c5020671dd7ca2d2e0f87e91e8c9a72398c8d2a5ff1",
+  "ui_source_digest": "e62a0cc4460b44bfcd1937484d30ee35f67d74ea5b225c7bbf930b55992bc83a",
+  "limit": "Instrumented diagnosis with request interception and CPU profiling, not the acceptance measurement. The after run overlapped a design UI recipe; elapsed timings are not a controlled before/after comparison."
+}

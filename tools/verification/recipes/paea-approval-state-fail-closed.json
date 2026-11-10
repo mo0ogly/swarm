@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "paea-approval-state-fail-closed",
+  "inputs": [
+    "tests/paea-approval-state-fail-closed.cjs",
+    "web/**/*",
+    "locales/en.json",
+    "package.json",
+    "package-lock.json",
+    "tools/verification/README.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "paea-approval-state-fail-closed-fresh-tmpdir-node",
+      "command": [
+        "sh",
+        "-c",
+        "dir=$(mktemp -d \"${TMPDIR:-/tmp}/paea-approval-state-fail-closed.XXXXXXXX\") && echo \"$dir\" && exec node tests/paea-approval-state-fail-closed.cjs \"$dir\""
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"checks\":36",
+        "\"unexpected_diagnostics\":0"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

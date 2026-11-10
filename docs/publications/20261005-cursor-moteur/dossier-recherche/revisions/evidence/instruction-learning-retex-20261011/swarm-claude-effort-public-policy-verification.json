@@ -1,0 +1,51 @@
+{
+  "at": "2026-10-11T16:12:19.917647+00:00",
+  "server_pid": 1229997,
+  "installed_sha256": "1250e99e8f4c3f65a25a26186f46bc688dfab5e9c3b8bf48c1543ca3f33576cd",
+  "runtime_state": "ready",
+  "runtime_launch_allowed": true,
+  "before_digest": "d6ad84beae4b54a2f8168eb40feadd8c7161e9f912e21fef3caaf6a146725e5f",
+  "after_digest": "e017a0fb2c2f8d9a18798fb79efffd4913d3b35e8ef2409886785a81e9ce0878",
+  "policy_before": {
+    "version": 1,
+    "billing": "external",
+    "work_level": "standard",
+    "page_level": "simple",
+    "levels": {
+      "exigeant": {
+        "model": "opus",
+        "effort": ""
+      },
+      "simple": {
+        "model": "haiku",
+        "effort": ""
+      },
+      "standard": {
+        "model": "sonnet",
+        "effort": ""
+      }
+    }
+  },
+  "policy_after": {
+    "version": 1,
+    "billing": "external",
+    "work_level": "standard",
+    "page_level": "simple",
+    "levels": {
+      "exigeant": {
+        "model": "opus",
+        "effort": ""
+      },
+      "simple": {
+        "model": "haiku",
+        "effort": ""
+      },
+      "standard": {
+        "model": "sonnet",
+        "effort": "medium"
+      }
+    }
+  },
+  "effect": "Only Claude standard effort now explicitly medium, via authenticated Admin preview/CAS/apply. Others preserved, empty choices retained. No role updated or agent launched by saving.",
+  "limit": "Requested effort; real applied model/caps and performance still unmeasured. Full frozen-source rerun still running."
+}

@@ -1,0 +1,21 @@
+/* Presentation only: local mockups, no product execution policy. */
+:root{color-scheme:dark;--ux-bg:#081b29;--ux-surface:#102b3b;--ux-text:#e5edf0;--ux-muted:#a9bcc4;--ux-line:#2a5163;--ux-focus:#f8c650}
+:root[data-theme=clair]{color-scheme:light;--ux-bg:#f5f3ec;--ux-surface:#fffefa;--ux-text:#243d4a;--ux-muted:#52656f;--ux-line:#cfcabb;--ux-focus:#926300}
+*{box-sizing:border-box}body{background:var(--ux-bg);font-family:'Segoe UI',system-ui,sans-serif}x-dc{display:block}helmet{display:contents}
+.preview-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 20px;padding:10px 24px;background:var(--ux-surface);color:var(--ux-text);border-bottom:1px solid var(--ux-line);font-size:13px}
+.preview-bar strong{font-family:Georgia,serif;font-size:20px;margin-right:auto}.preview-bar strong span{font-family:system-ui,sans-serif;font-size:12px;font-weight:400;color:var(--ux-muted)}
+.preview-bar a{color:var(--ux-text);padding:10px 0;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}.preview-bar a[aria-current]{border-bottom:2px solid var(--ux-focus)}
+.preview-bar button{font:inherit;min-height:44px;padding:8px 14px;border:1px solid var(--ux-line);border-radius:5px;background:var(--ux-bg);color:var(--ux-text)}
+.preview-notice{position:fixed;bottom:12px;left:16px;right:16px;max-width:720px;z-index:10;margin:0;padding:14px 18px;background:var(--ux-surface);color:var(--ux-text);border:1px solid var(--ux-focus);border-radius:8px;box-shadow:0 8px 32px #0004}
+button:disabled{cursor:not-allowed}button,a,input,textarea,summary,select{scroll-margin:20px}button:hover:not(:disabled){filter:brightness(1.07)}
+:focus-visible{outline:3px solid var(--ux-focus)!important;outline-offset:3px!important}
+main>header{padding-bottom:22px;border-bottom:1px solid var(--ux-line)}
+.task-map{background-image:radial-gradient(var(--ux-line) 1px,transparent 1px);background-size:20px 20px}
+.task-inspector,.brief-panel{border-top:3px solid var(--ux-focus)!important}
+aside h2{letter-spacing:-.3px}details summary{cursor:pointer}input,textarea{max-width:100%}
+@media(min-width:1200px){.brief-panel,.task-inspector{position:sticky;top:20px}}
+@media(max-width:760px){.preview-bar{padding:8px 16px;gap:2px 14px}.preview-bar strong{flex-basis:100%}x-dc>div>nav{max-width:none!important;min-width:0!important;flex-basis:100%!important}main{padding:22px 16px!important}main>header{gap:12px!important}.brief-panel,.task-inspector{flex-basis:100%!important}fieldset{margin-left:0!important}section[role=dialog]>header{flex-wrap:wrap;padding:18px!important}section[role=dialog]>header>div{flex-basis:65%!important}section[role=dialog]>div>div,section[role=dialog] aside{padding:18px!important}section[role=dialog] footer{padding:16px!important}section[role=dialog] footer>div{width:100%}section[role=dialog] footer button{flex:1 1 100%}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+/* Anchor clipped labels at the origin: an absolute auto position inside a
+ * horizontally scrolled table must not increase the document scroll width. */
+x-dc [style*="clip: rect"]{left:0;top:0;clip-path:inset(50%);white-space:nowrap}

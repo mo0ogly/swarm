@@ -1,0 +1,106 @@
+{
+  "at": "2026-10-11T17:39:52.865543+00:00",
+  "before_pid": 1229997,
+  "after_pid": 2182028,
+  "installed_sha256": "20d067a54279fe4271614d55395cd3682f1a3ec8c8edfb8ca159a377d748c37e",
+  "executed_sha256": "20d067a54279fe4271614d55395cd3682f1a3ec8c8edfb8ca159a377d748c37e",
+  "source_digest": "aa71b5c2b7bb950ec73e89d79c0ad0beb36532df204b372ecfe84e1c8d5df53f",
+  "full": {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T17:22:38.016915+00:00",
+    "end": "2026-10-11T17:31:30.181061+00:00",
+    "seconds": 532.1660955530024,
+    "exit": 0,
+    "output": "/tmp/swarm-review-retry-storage-qualified-v2-full.out",
+    "output_sha256": "94d9dd5ec284b5ff376e5415a0590563c670c44e2f81ed694cdb0093f5a5ce9b",
+    "qualification_environment": {
+      "TMPDIR": "/tmp",
+      "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+    },
+    "source_manifest_sha256": "818d49be64e86baa9eefa219e8acf8de1200ec455138b6d70a02bd764f0aabc8",
+    "candidate_digest": "aa71b5c2b7bb950ec73e89d79c0ad0beb36532df204b372ecfe84e1c8d5df53f",
+    "paths": 1175,
+    "source_drift": [],
+    "manifest_changed": false,
+    "driver": {
+      "start": "2026-10-11T17:22:38.016915+00:00",
+      "driver_pid": 2003267,
+      "pgid": 2003267,
+      "sid": 2003267,
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./...",
+        "-count=1",
+        "-timeout=12m"
+      ],
+      "manifest_sha256": "818d49be64e86baa9eefa219e8acf8de1200ec455138b6d70a02bd764f0aabc8",
+      "source_digest": "aa71b5c2b7bb950ec73e89d79c0ad0beb36532df204b372ecfe84e1c8d5df53f",
+      "paths": 1175,
+      "precondition": "Replan16: original full fails only obsolete historical future-version fixture hardcoded28. Fixture now tests schemaVersion+1; production code unchanged, all other full cases previously passed. New frozen1175 snapshot, full required again; originals retained.",
+      "go_pid": 2003289
+    }
+  },
+  "idle_before": {
+    "at": "2026-10-11T17:36:20.735451+00:00",
+    "rows": [
+      {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "revision": 436,
+        "paused": false,
+        "enabled": true,
+        "active_agents": [],
+        "reviews": [],
+        "holders": []
+      },
+      {
+        "work": "w-fff7368010d114f6e2578985",
+        "revision": 31,
+        "paused": true,
+        "enabled": false,
+        "active_agents": [],
+        "reviews": [],
+        "holders": []
+      },
+      {
+        "work": "w-5757437164b50815bee50a0c",
+        "revision": 55,
+        "paused": true,
+        "enabled": false,
+        "active_agents": [],
+        "reviews": [],
+        "holders": []
+      }
+    ]
+  },
+  "private_v28_backup": {
+    "path": "/home/fpizzi/workspace/swarm/.swarm/state-pre-v28-8e5397bcc754d83faeef5999.db",
+    "mode": "0600"
+  },
+  "storage_rows_preserved_by_original_hashes": true,
+  "public_pause_expected_effect": "revision436→437 and root generation invalidated before migration; verification boundary corrected using backup/current read-only row hashes. Original failed comparison retained.",
+  "legacy_reader_exit": 2,
+  "legacy_reader_error": "version de stockage non supportée : 28",
+  "authenticated_runtime_health_HTTP": 200,
+  "health_fields": [
+    "state",
+    "launch_allowed",
+    "observed_at",
+    "message",
+    "next_step",
+    "volumes",
+    "version",
+    "version_diagnostic"
+  ],
+  "health_receipt": "/tmp/swarm-runtime16-qualified-health.json",
+  "resume": "Original mission publicly resumed; two disabled/paused missions untouched",
+  "scope": "Qualified15+16+fixture installed.17partial/global review fix and whole incident function still incomplete. No operator acceptance."
+}

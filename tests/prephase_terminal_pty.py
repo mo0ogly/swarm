@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Real 80x24 PTY, native typing/paste, fixture provider; never a real model."""
 import os,pty,select,signal,struct,fcntl,termios,time,json,tempfile,subprocess,sys,pathlib,hashlib,datetime
-binary=os.path.abspath(sys.argv[1]);out=pathlib.Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True);root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-prepare-pty-'))
+from fixture_area import fixture_area
+binary=os.path.abspath(sys.argv[1]);out=pathlib.Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True);root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-prepare-pty-', dir=fixture_area()))
 def cli(args,data=None):
  return json.loads(subprocess.check_output([binary,'--root',str(root),*args,*(['--input','-'] if data else [])],input=json.dumps(data).encode() if data else None))
 cli(['init'])

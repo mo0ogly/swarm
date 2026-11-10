@@ -1,0 +1,59 @@
+{
+  "at": "2026-10-11T21:35:24.529803+00:00",
+  "bundle": {
+    "at": "2026-10-11T21:35:16.110189+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-typed-original-evidence-20261011.bundle",
+    "sha256": "52da3100e77eb2cd50c810202a3b5224c33699d458346d2a736fa37df8b15a89",
+    "commit": "60426c9d20952a748ad52700a96e3dbfa6f65b85",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 110,
+    "manifest_sha256": "e79171a282e0983bcac9ba8620d493c8f03b021c1a084a25b43ffed9072e9b4c",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-inputs-z3b_8prt",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-import-1g_uaaqw",
+    "old101_originals_preserved": true,
+    "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+    "limits": "Cumulative101 inputs preserved byte-for-byte, including six-example controls/feedback documentation, plus qualified23 typed original-evidence recovery and versioned exact preimages. Apply current preimages only when justified by recorded prior hash; never overwrite a divergence. T3 integrates all corrections and native Judge then qualifies its own complete candidate. T4 checks invalid original citations, task metadata cannot prove business completion, selected/unselected sources and per-file typed boundaries. T7 proves actual reception/decision/application/effect; T8 RETEX after recipe. Complete2108-path local qualification recorded; native acceptance remains independent. Reviewer/planner methods, schema29, histories, provider consumption and original refusals preserved."
+  },
+  "updates": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "revision": 555,
+      "operator_base_sha256": "2686509bcaf30044b23e0a033fcd7d935cc831a402e8360d79a447f5c9771cf0",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision": 556,
+      "operator_base_sha256": "3b06b23df5fb10a4d3755878150e7814186050fa0dc34755c206fd75097ea73b",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision": 557,
+      "operator_base_sha256": "a137c905945b828e04f9ca72b40824d440690447ee585573a4bc8d3f85955d51",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "revision": 558,
+      "operator_base_sha256": "ccf1d1f8f378a06ec4077e18dc1dc7e5240b6af2cd2f956ff3bf481e516ae638",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision": 559,
+      "operator_base_sha256": "b5726042258224f2d02d0824903dbcd35a8b94f98bf0ba068455d193fe1b53a2",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "revision": 560,
+      "operator_base_sha256": "7353149ea74141bf6151afe6637afcbd106c171831f9d36e5fc0d6b3ea223833",
+      "criteria_dependencies_attempts_learning_preserved": true
+    }
+  ],
+  "native_revision": 560,
+  "paused": false,
+  "t2_original_preserved": true,
+  "limits": "Inputs saved by public operations; future worker reception and native acceptance remain required."
+}

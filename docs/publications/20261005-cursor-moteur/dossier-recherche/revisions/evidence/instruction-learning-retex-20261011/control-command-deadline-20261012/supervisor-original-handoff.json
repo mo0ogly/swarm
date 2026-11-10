@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-12T13:59:43.065164+00:00",
+  "after_revision": 773,
+  "event": "T3-control-original-supervisor-e651e02235dd429ba135963f35a638be",
+  "evidence_sha256": "db370b566914f4070be5bf4b9b58c6331a40e419c90c35a08be36d3c93240d6b",
+  "original_public_endpoint": true,
+  "original_output_transmitted": "bounded original quote plus exact hashes, complete capture size and attribution",
+  "acceptance_created": false,
+  "producer_restart": false,
+  "status": "public handoff delivered; supervisor decision/effect still required"
+}

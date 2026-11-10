@@ -1,0 +1,10 @@
+{
+  "pid": 2226158,
+  "proc_start_ticks": "4017836",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-process-manifest-delivery.py",
+    "run"
+  ],
+  "at": "2026-10-15T23:09:14.218215+00:00"
+}

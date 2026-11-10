@@ -1,0 +1,10 @@
+--- FAIL: TestSelectionCapacityRecoverySupervisorReceivesDecidesAndHasActualEffect (1.41s)
+    --- FAIL: TestSelectionCapacityRecoverySupervisorReceivesDecidesAndHasActualEffect/root (0.75s)
+        managed_review_selection_capacity_recovery_test.go:91: sizes 164551 168167 21899 parts 1
+        managed_review_selection_capacity_recovery_test.go:125: supervisor did not receive verified changed selection precondition {map[] map[] map[]}
+    --- FAIL: TestSelectionCapacityRecoverySupervisorReceivesDecidesAndHasActualEffect/child (0.67s)
+        managed_review_selection_capacity_recovery_test.go:91: sizes 164551 168167 21899 parts 1
+        managed_review_selection_capacity_recovery_test.go:91: tâche hors propriété
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.438s
+FAIL

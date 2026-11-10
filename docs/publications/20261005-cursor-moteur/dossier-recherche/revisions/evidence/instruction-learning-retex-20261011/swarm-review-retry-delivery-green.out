@@ -1,0 +1,5 @@
+=== RUN   TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen
+    managed_review_retry_delivery_test.go:16: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen (2.29s)
+PASS
+ok  	swarm.local/companion/internal/engine	2.313s

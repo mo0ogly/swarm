@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-concise-current-report-unpaid-capacity-replan-20261011",
+  "expected_revision": 425,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "confirm_recovery": true,
+  "result_tree": "3f4ddf6990e07c3895f88b223c8269fe5d7eec9d",
+  "reason": "Précontrôle425 a refusé avant toute revue/appel: décision finale trop grande, puis contexte racine trop volumineux. Cause confirmée: rapportT2 accumulait22489octets d historique; dossier courant source18/126587 respecte ses propres bornes. Nouvelle précondition: rapport courant complet4573octets, tous4critères/sources/limites conservés; ancien rapport intact au commit96c0ea89 SHA51e84624 et copie opérateur. Aucun original, Go, compteur, avis ou tentative supprimé/modifié. Suite Go brute entière T2 PASS492.395s codeinchangé et sources18/126587inchangées. Arbre3f4ddf69 vérifié sur copie producteur terminé; aucune revueactive et consommation38inchangée depuisrejet. Demander nouveaux contrôles/revue indépendante fraîche du candidatdoccorrigé, sans fauxPASS ni annulationancienneopinion."
+}

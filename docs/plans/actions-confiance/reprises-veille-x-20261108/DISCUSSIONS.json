@@ -1,0 +1,152 @@
+{
+  "recorded_at": "2026-11-08T21:03:22.241Z",
+  "scope": "50 chats récents et tous épinglés inspectés ; quatre chats de recherche existants relus, pas inventaire exhaustif des projets",
+  "skill": "/home/fpizzi/.codex/skills/swarm-research/SKILL.md",
+  "threads": [
+    {
+      "thread_id": "01a1bbb6-ef86-7471-9025-fba8d1edd81d",
+      "host_id": "local",
+      "previous_title": "Diagnostiquer la piste Peter Wilcheck",
+      "new_title": "Swarm 10 — Peter · Mandats et faux accords",
+      "role": "existing-peter",
+      "context": "01-mandats-effets/CONTEXTE.md",
+      "observed_activity": "notLoaded",
+      "observed_checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "work_status": "Rapport R1/R2 disponible, pas reprise automatique",
+      "strategy_ack": "received",
+      "title_history": [
+        {
+          "previous": "Swarm Recherche — Peter · Faux accords et preuves",
+          "at": "2026-11-08T22:39:52.219239+00:00"
+        }
+      ]
+    },
+    {
+      "thread_id": "01a1bbe3-cea2-7413-998e-6a27656acd69",
+      "host_id": "local",
+      "previous_title": "Cadrer la revue Gi.eth du lot 14",
+      "new_title": "Swarm 01 — Gi.eth · Qualification historique",
+      "role": "existing-gieth",
+      "context": "02-revues-candidats/CONTEXTE.md",
+      "observed_activity": "active",
+      "observed_checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "work_status": "Correctif de lecture historique en cours, dernière livraison UI déclarée séparée",
+      "strategy_ack": "delivered_to_active_thread_no_ack_yet",
+      "title_history": [
+        {
+          "previous": "Swarm Recherche — Gi.eth · Revues et livraison",
+          "at": "2026-11-08T22:39:52.219239+00:00"
+        }
+      ]
+    },
+    {
+      "thread_id": "01a1bbe6-9e55-7150-a909-5734cdca43d4",
+      "host_id": "local",
+      "previous_title": "MIKhAIL X-IDEE-07 et POC-03",
+      "new_title": "Swarm 11 — Mikhail · Effets et réconciliation",
+      "role": "existing-mikhail",
+      "context": "03-resultats-inconnus/CONTEXTE.md",
+      "observed_activity": "idle",
+      "observed_checkout": "/home/fpizzi/.codex/worktrees/pr20-ci-rotation/swarm",
+      "work_status": "BF-L0-A A-4 clôturé dans portée six déclarations/miniatures ; global ouvert",
+      "strategy_ack": "received",
+      "title_history": [
+        {
+          "previous": "Swarm Recherche — Mikhail · Effets et réconciliation",
+          "at": "2026-11-08T22:39:52.219239+00:00"
+        }
+      ]
+    },
+    {
+      "thread_id": "01a1bbe9-3264-7d81-a648-c1b0e14d42da",
+      "host_id": "local",
+      "previous_title": "Analyser l’article pour Swarm",
+      "new_title": "Swarm 12 — Qualification avec un vrai modèle",
+      "role": "existing-model",
+      "context": "01-mandats-effets/CONTEXTE.md",
+      "observed_activity": "idle",
+      "observed_checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "work_status": "Qualification vrai modèle non aboutie, témoin Bubblewrap en échec",
+      "strategy_ack": "received",
+      "title_history": [
+        {
+          "previous": "Swarm Recherche — Actions · Qualification vrai modèle",
+          "at": "2026-11-08T22:39:52.219239+00:00"
+        }
+      ]
+    },
+    {
+      "thread_id": "01a1bcf7-294d-7212-aa7e-d00dc65623d9",
+      "host_id": "local",
+      "previous_title": "Swarm 1 — Mandats et effets",
+      "new_title": "Swarm Réserve A1 — Mandats et effets",
+      "role": "reserve-a1",
+      "context": "01-mandats-effets/CONTEXTE.md",
+      "observed_activity": "idle",
+      "observed_checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "work_status": "Réserve, propriétaire existant à consulter avant reprise",
+      "strategy_ack": "received",
+      "title_history": [
+        {
+          "previous": "Swarm Recherche — Réserve A1 · Mandats et effets",
+          "at": "2026-11-08T22:39:52.219239+00:00"
+        }
+      ]
+    },
+    {
+      "thread_id": "01a1bcf7-35c7-7943-8079-52ef453912ff",
+      "host_id": "local",
+      "previous_title": "Swarm 2 — Revues et candidat livré",
+      "new_title": "Swarm Réserve A2 — Revues et candidat",
+      "role": "reserve-a2",
+      "context": "02-revues-candidats/CONTEXTE.md",
+      "observed_activity": "idle",
+      "observed_checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "work_status": "Réserve, propriétaire existant à consulter avant reprise",
+      "strategy_ack": "received",
+      "title_history": [
+        {
+          "previous": "Swarm Recherche — Réserve A2 · Revues et candidat",
+          "at": "2026-11-08T22:39:52.219239+00:00"
+        }
+      ]
+    },
+    {
+      "thread_id": "01a1bcf7-471c-7a51-82bc-f98a1dd52648",
+      "host_id": "local",
+      "previous_title": "Swarm 3 — Timeouts et réconciliation",
+      "new_title": "Swarm Réserve A3 — Timeouts",
+      "role": "reserve-a3",
+      "context": "03-resultats-inconnus/CONTEXTE.md",
+      "observed_activity": "idle",
+      "observed_checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "work_status": "Réserve, propriétaire existant à consulter avant reprise",
+      "strategy_ack": "received",
+      "title_history": [
+        {
+          "previous": "Swarm Recherche — Réserve A3 · Timeouts",
+          "at": "2026-11-08T22:39:52.219239+00:00"
+        }
+      ]
+    },
+    {
+      "thread_id": "01a1bcf7-55ee-7c02-90fb-b12f77a4da99",
+      "host_id": "local",
+      "previous_title": "Swarm 4 — Consignes et supervision",
+      "new_title": "Swarm Réserve A4 — Consignes et supervision",
+      "role": "reserve-a4",
+      "context": "04-transmission-supervision/CONTEXTE.md",
+      "observed_activity": "idle",
+      "observed_checkout": "/home/fpizzi/Documents/ChatGPT/swarm",
+      "work_status": "Réserve : axe transmission à cadrer",
+      "strategy_ack": "received",
+      "title_history": [
+        {
+          "previous": "Swarm Recherche — Réserve A4 · Consignes et supervision",
+          "at": "2026-11-08T22:39:52.219239+00:00"
+        }
+      ]
+    }
+  ],
+  "strategy_transmitted_at": "2026-11-08T21:06:16.245221+00:00"
+}

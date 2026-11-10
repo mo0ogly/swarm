@@ -4,6 +4,8 @@ Date de la tentative : 19 septembre 2026
 Périmètre : architecture de responsabilités et flux de retour uniquement.  
 Source comparée : [Cursor, « Towards self-driving codebases », section « The final system design »](https://cursor.com/blog/self-driving-codebases#the-final-system-design), consultée le 19 septembre 2026.
 
+> Clarification du 10 octobre 2026 : l’utilisateur retient janvier et février. Ce rapport conserve sa portée historique contre février ; il ne démontre pas toutes les exigences des deux références. La [matrice actuelle](architecture/CURSOR-ENGINE-CONTRACT.md) distingue JAN-1 à JAN-7 et FEB-1 à FEB-4. Le juge et les cycles frais restent à vérifier pour Swarm, sans les attribuer au système final de février.
+
 ## Verdict borné
 
 Le contrat de responsabilités P0 est implémenté et couvert sur le chemin de planification hiérarchique : le responsable est sans outils d’écriture, les sous-périmètres délèguent récursivement dans des limites explicites, les tâches exécutables sont exclusivement des `worker`, les échanges latéraux sont refusés, une remise structurée remonte au propriétaire du périmètre, puis ce propriétaire peut adapter une reprise bornée.

@@ -1,0 +1,195 @@
+{
+  "result": "PASS_INTERNAL_GO_CHANNEL_ONLY",
+  "at": "2026-10-17T06:38:51.680301+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "tests": {
+    "named_runs": 133,
+    "named_pass": 133,
+    "top_level": 26,
+    "new_channel_runtime": 19,
+    "existing": 114,
+    "skipped": 0
+  },
+  "race": {
+    "exit_code": 0,
+    "runs": 19,
+    "passes": 19,
+    "failures": [],
+    "skips": [],
+    "changed_inputs": []
+  },
+  "inputs": {
+    "files": 1046,
+    "changed": [],
+    "manifest": "inputs-final.json",
+    "frozen_sources_match": true,
+    "preexisting_go_changed": []
+  },
+  "clock_before_fix_reproduced": true,
+  "statics_build_pass": true,
+  "local_links_checked": 76,
+  "missing_links": [],
+  "whitespace_findings": [],
+  "gofmt": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "git_diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "diagrams": {
+    "fr_en_rendered": true,
+    "png_visually_inspected": 2
+  },
+  "model_calls": 0,
+  "deployed": false,
+  "public_launchers_integrated": false,
+  "durable_authority_producer": false,
+  "independent_review": false,
+  "open": [
+    "IA2.3b protected durable authority and bootstrap",
+    "Trust/SQLite commitment and recovery",
+    "IA3 all public executors and exact human approval",
+    "IA4 memory rights",
+    "IA5 IDA qualification and RETEX",
+    "F01-F07"
+  ],
+  "files": [
+    {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "1d115da506438a02fb118bc64214e893166f4767f99db717759f972629bce93d"
+    },
+    {
+      "path": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "12e96475b0d0580d68a12b504459cf47aab56e504991040f7600191c464a5297"
+    },
+    {
+      "path": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "sha256": "68f151ae42897ba2f8a39c12bddef5beb31cdcf9215c8083ca0b4ae0cca24c3f"
+    },
+    {
+      "path": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "sha256": "bd48eda08aa0c54efa8b00a2e3eadf88c58a81b2612e91b1a436f4cd3256ba54"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "sha256": "541628e47acb47e5158af53dacfa4755fac3637415556e84d4b5282813300c8e"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "sha256": "cb6d33e8e9a71584599beb3a2a3e92e669719fb8e22bb500a3449648d6206de9"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md",
+      "sha256": "75ce19ed3e07b3e74fc6533b19c25d85c2cc0e0f0b9e477b5097384ed48276aa"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/review-local-initial.md",
+      "sha256": "5e8dbe0db6d3472cac8fdb16964019b5c2f42a037e24ddf6376535d7e3978e26"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/review-local-final.md",
+      "sha256": "7e292e31abc43f619488506cc2ee20438cfe172bf013ae9126f8470e5aa16988"
+    },
+    {
+      "path": "internal/engine/agent_identity_authority.go",
+      "sha256": "cd335869ae1b6a80959e64432f0759fde44d94bc5846c48417d1ce8dcc32a150"
+    },
+    {
+      "path": "internal/engine/agent_identity_authority_test.go",
+      "sha256": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808"
+    },
+    {
+      "path": "internal/engine/agent_identity_channel_linux.go",
+      "sha256": "3528f0eed5ce77171d4e5506c387f50936314b8f24296c566e16c7045f2a91e3"
+    },
+    {
+      "path": "internal/engine/agent_identity_channel_linux_test.go",
+      "sha256": "d4a0eb6debdb63ae5f795a8e58015d66926b09519a23644fdc58d6b998c3dab8"
+    },
+    {
+      "path": "internal/engine/agent_identity_contract.go",
+      "sha256": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55"
+    },
+    {
+      "path": "internal/engine/agent_identity_contract_test.go",
+      "sha256": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9"
+    },
+    {
+      "path": "internal/engine/agent_identity_runtime_linux.go",
+      "sha256": "74ccc6b2c91aecf0c9fe87c818eca43c23e79c14c133dae07574f0232241c2e7"
+    },
+    {
+      "path": "internal/engine/agent_identity_runtime_linux_test.go",
+      "sha256": "8ff373547cd9ce2be571b258c44df6cd0ee3d41e499c85500cff609ba5a8bcf0"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/inputs-final.json",
+      "sha256": "bb5a6f2972a58adf71b7c43e3450aea2d892da0a18f8096b2b6ad22c803844ab"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/tests-final-run.json",
+      "sha256": "562390e20558486b3b377572649c750bc459d4c2f5925ad9a78a7c6e1649929d"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/race-final-run.json",
+      "sha256": "fd0a1c8641ec58e3a3f80aa88ba04b615449fa3736b17bab2a1e67a28d55e7a0"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/static-build-final.json",
+      "sha256": "bc06ade88729e7d4ef0ec03e309455ca02ae7f7ab126d3a5e4b9bfd49e98f2ef"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/binary-final.json",
+      "sha256": "6b3c72aa49ba726bab27e0c17ad74f0cde245d1af8f0d9f0cc9fb880cc71cc01"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/runtime-initial-run.json",
+      "sha256": "7bc7565da71c1c241eaf9c8a787966a00bfd4f9d76ed27189e6a48db7d3efa83"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/clock-before-run.json",
+      "sha256": "dbe673de9fc25499f2222b0b5e2a5715329a6ba88bd99521a3441f5c2c33c452"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/diagrams.json",
+      "sha256": "38ea4191466f184d45cd99833171c8936184fc622d2e42993dd23e92aa07c9b9"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/channel-fr.mmd",
+      "sha256": "40d3a4a768078022d8c0af56d528829f8cfa1f09450bedce425c301896d503fe"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/channel-fr.svg",
+      "sha256": "587a0fb2067d7d3540b8701c2e0526a2b52c3cbe0d0916548699e629c4ed46d3"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/channel-fr.png",
+      "sha256": "24f1d846a1f75b14226ea1b7e25c2b7e135059634ac7e64e27d8c365a51c50c0"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/channel-en.mmd",
+      "sha256": "dc66be6aea517ccaed66c7e933a7c560d25c05bdc89897f55652275d0d8306af"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/channel-en.svg",
+      "sha256": "a3744bf961cb082e2e7f347f97e4d947d427d16c6d7d9d301fa4829a6828b8f3"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/channel-en.png",
+      "sha256": "5b381c7529a6bfe76babb721e302f9ec47f80380ace9fe11ae07a487493ea2c4"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/research-note-before.txt",
+      "sha256": "7295bd3da42848924b3f87b6c7e0195bf821155666e53ad9e4f20316442672b7"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/research-programme-before.txt",
+      "sha256": "945859853318397e7d9a430939941cb2af2b9866084030617117b53dc17af5f4"
+    }
+  ],
+  "final_documentation_note": "Clarified immutable snapshot ownership for the future authority producer; no tested input changed"
+}

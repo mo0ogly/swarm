@@ -1,0 +1,46 @@
+{
+  "served_assets": [
+    {
+      "path": "graph-studio.js",
+      "bytes": 12918,
+      "sha256": "3a1b28646df002e443b5e9c1e081772e2eb684638c76b1704ca54981d2ac843f"
+    },
+    {
+      "path": "admin.js",
+      "bytes": 21191,
+      "sha256": "c148b619d43d42176af0c6dc10c4723cbd88bb27dac103490664fafd32570dab"
+    },
+    {
+      "path": "web-requests-admin.js",
+      "bytes": 5142,
+      "sha256": "fba07b14e52e21cb5b011bc80708310571aaec257a527a422a13f023e37459e1"
+    },
+    {
+      "path": "log-console.js",
+      "bytes": 4864,
+      "sha256": "bbc2db46ce9d4735658c724e058a10774a509309461f8471cf49e17c80212c3f"
+    },
+    {
+      "path": "log-console.css",
+      "bytes": 1979,
+      "sha256": "0508c806f17af18bb7526ad438911b244c6b42585b3c7c4c3a8c072116f93ffe"
+    }
+  ],
+  "settings_revision": 0,
+  "settings_fields": [
+    "general_ms",
+    "snapshot_ms",
+    "connection_test_ms"
+  ],
+  "pid": 2599704,
+  "binary_sha256": "35526c31c35712fa0b52ee45aa7fac9230c0e0ef7f9bcfde85a7033627654fc9",
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "ready": true,
+  "build": {
+    "version": "devel",
+    "commit": "3f121f759200b5f8d0a0d9c5d0170208b29b07ba",
+    "modified": false,
+    "build_date": "2026-10-13T08:30:53Z",
+    "provenance": "injected"
+  }
+}

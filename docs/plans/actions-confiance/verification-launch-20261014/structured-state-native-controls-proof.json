@@ -1,0 +1,68 @@
+{
+  "candidate": "1ccf61a749cb7143455ce0287daa8d600abd67ae",
+  "review_id": "review-f5b1b04170c262cb710b41e6",
+  "context": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-90c6bc785136a183/review-f5b1b04170c262cb710b41e6-context.json",
+  "context_sha256": "58c23dc0f25b921b53d8067d613386607d29e05e0d809547e152484e3f7cc67d",
+  "exact_declared_sources_received": 31,
+  "baseline_version": 2,
+  "controls": [
+    {
+      "id": "plan-entry",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 107,
+      "output_sha256": "68dc84a8f9e026926eaeeec4dc4abb5111f8cd19cbe2e3669abce7bb4d744912"
+    },
+    {
+      "id": "plan-validation",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 64977,
+      "output_sha256": "2c36c24994f508358126bd6479a31356e0bcb4ab8a07824ab535922d5a3120d5",
+      "passed_named_go_tests": 58
+    },
+    {
+      "id": "plan-delivery",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 8147,
+      "output_sha256": "26619ddfea695277f1f09a1c567cc85053753cd47cd06c64664d0c18a6eec6c7"
+    },
+    {
+      "id": "plan-criterion-1",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 541,
+      "output_sha256": "9b605d7ba8c4b71ae79eced1f0367c0ed6c447e3cb2a7a7e3661e59ac465f551"
+    },
+    {
+      "id": "plan-criterion-2",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 595,
+      "output_sha256": "ba9d3eaf1b6f0240602458bf28ae0d11b7f1171e2cdc5680f0703f87fce11d12"
+    },
+    {
+      "id": "plan-criterion-3",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 517,
+      "output_sha256": "90b301f6acc6976080182910a007dda9292199befe41e0a55649c1b15be5ebb2"
+    },
+    {
+      "id": "plan-criterion-4",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 6815,
+      "output_sha256": "23a69a5ace5c78681382c8fa25118b128e3758874b63ee7387c0dbe8a662f292"
+    }
+  ],
+  "independent_verdict": "pending"
+}

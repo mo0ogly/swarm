@@ -1,0 +1,8 @@
+=== RUN   TestManagedFragmentNativeDecisionDiagnostic
+    managed_review_native_diagnostic_test.go:56: render decision 391.824162ms
+    managed_review_native_diagnostic_test.go:66: parse decision 35.441155ms state  tasks 0
+    managed_review_native_diagnostic_test.go:68: résolution sans preuve originale visible
+--- FAIL: TestManagedFragmentNativeDecisionDiagnostic (0.45s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.632s
+FAIL

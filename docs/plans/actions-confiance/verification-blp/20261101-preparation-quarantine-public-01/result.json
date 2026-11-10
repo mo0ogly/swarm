@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-quarantine-public",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "actual-inert-api-cli-and-admin-ui",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess; subprocess.run(['python3','tests/blp_quarantine_public.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--helper',os.environ['SWARM_BLP_HELPER'],'--output',os.environ['SWARM_BLP_PROOF_OUTPUT']],check=True)"
+      ],
+      "expected_exit": 0,
+      "exit": 1,
+      "seconds": 16.649122315997374,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "8338e27b8e3bf1788917fedcabfd0a14ee60de0216b9ac463c95c159c4deda55",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "ac090bdde6aa9f0e78040be8cf7836ed3ca82e69c200dd902c27c9d20ec2092b",
+    "declared-inputs.tar.gz": "d1e8a760fc73aac9015bcfc7be3f125b6515232b88d0f32db4acb67586399958",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "7726413f470d06f3c40095b31106ae44bc298fbc982f42f9b541d1bd6ccaa210",
+    "step-0001.stderr": "d95fba409a66e5d6993c677b12a0c3ec2aa0d98c1f9607e387c378a825889d17",
+    "step-0001.json": "7bd1bbb02859e8959f8b66eac38544c7fd3c935f9857cdd73e86f1abe8120065",
+    "inputs.after.json": "ac090bdde6aa9f0e78040be8cf7836ed3ca82e69c200dd902c27c9d20ec2092b"
+  }
+}

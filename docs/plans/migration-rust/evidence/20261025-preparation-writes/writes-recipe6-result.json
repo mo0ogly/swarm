@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "recipe": "preparation-writes-rust",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "public-preparation-writes",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-writes-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_writes.py','--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_WRITES_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 33.6208179530222,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "historical-preparation-key-contract",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-keys-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_keys.py','--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_KEYS_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.960892130038701,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "atomic-retained-root-refusal-recovery",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "preparation_writes"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.47354633902432397,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "3faca5a939b35ebde92d658e7c23ac379cf4b9fa662cd269ca17df1c4183336d",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "d2031a5cb81ccdf8644dadda5768a0636c1f439d4206c22303a32bb2148d7f2a",
+    "declared-inputs.tar.gz": "faa60fbf3d2bc8a75e53dd1da6c936956ea00d99133b4a2047b1cfb5f59925c7",
+    "environment.json": "054a5a8b3b24ba1ad36c2ba79be8c1d430e2ce9652c55631ee8fc9a22fd6b2c0",
+    "step-0001.stdout": "de02e1707d230a4b12593a5c900bd7749b4d30ab45b997958e435ddb52fcc2f1",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "431c76c4671a87cde10679bbfc1129ebee97c1f941c56edd83592fa1461d8a14",
+    "step-0002.stdout": "d8b26401b1a17de3c1c1961977b9bee780e20d626c671a3233026483efd47ca7",
+    "step-0002.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0002.json": "ba19c43668d760e1ebf1d89c862ae2ee1c10f3841163256d01fc027ba7c18c50",
+    "step-0003.stdout": "c65a75b732e8b5a7dc893877874f5ea2316afb655d1c08df4e5a6e31b41aefab",
+    "step-0003.stderr": "542c33ecff21497f85c7b7b9a6b688553754cc68a9b54a8f79c2c7848304ccd2",
+    "step-0003.json": "5a9051c802928f9506803b5680ba2255642f6fc190ed9d7a415cf3e91aef6eec",
+    "inputs.after.json": "d2031a5cb81ccdf8644dadda5768a0636c1f439d4206c22303a32bb2148d7f2a"
+  }
+}

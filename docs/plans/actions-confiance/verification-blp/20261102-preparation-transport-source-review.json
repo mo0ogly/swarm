@@ -1,0 +1,88 @@
+{
+ "schema_version": 1,
+ "review_kind": "same-context code-reviewer; not independent acceptance",
+ "scope": "BLP-05 explicit destination binding and last-use transport decision; legacy send path untouched, no result/reader inheritance, no OS confinement",
+ "files": {
+  "rust/crates/swarm-engine/src/root_store/preparation_transport.rs": "453333cc50804f4db214e5822003c66e61a0e4ef5928d31886f9bb038003ae2a",
+  "rust/crates/swarm-engine/src/root_store/preparation_admission.rs": "d9b2282cd6306b338da40806af9d658e3346590b0a4c8e5169cb1968c0e69455",
+  "rust/crates/swarm-engine/src/root_store/preparation_call_budget.rs": "61103ae205a7c8209bc9590db113ac6928f3373d3b868b71fd93943fd22f4c07",
+  "rust/crates/swarm-engine/src/root_store/trust_store.rs": "806840779f20d2a8bf756a7d9961627c9aef050883e00b716a2c7db793a35ed6",
+  "rust/crates/swarm-cli/src/trust.rs": "0895181f6c51ebd14006f042804d2bc1c89fc4adca5baef3b1b8abb36ca8f291",
+  "rust/crates/swarm-web/src/service/trust.rs": "9af0abddb7b56a48082e61f1018b03dbbe7c7683a18de4e8b2419b4b98d85bdc",
+  "rust/crates/swarm-web/src/service.rs": "95ec4570c4c5e009f565385026654845db5fd6bf2a3986ae5445711a3d17268c",
+  "rust/crates/swarm-engine/tests/preparation_transport.rs": "8fdafd7827601ae7e6f4970c83370fe6490e51f3187aa805a2b77ce41ee9947c",
+  "rust/crates/swarm-engine/tests/preparation_calls.rs": "a7bd90c9b1db409ae8b44acc569d8eda9ac06d1078e2e8acaf34814b282f3486",
+  "tests/blp_transport_public.py": "c94f24aa53f14470bca40362e6505a3a5c38b58d17514e17df80de7599e06b7a",
+  "tests/blp_attribution_history_cli.py": "8652793f2e492f750a342c4cde862acc205cde7552ab2d350bb20a8c19b53a03",
+  "docs/architecture/BELL-LAPADULA.md": "0e4232d38a406a5acbddde7eee5c9c667e3cf397e6545bf594cc664c5581e0f7",
+  "docs/en/BELL-LAPADULA.md": "0bdbd37cd37f0eac85c12d46a2b9aaf6c617866d32d574bcaa6ffb71754e99ec",
+  "docs/architecture/BIBA-RUST.md": "63b90864392407afa875877a7554b64a6d7c1227f25a0a29133e56af364450fb",
+  "docs/en/BIBA-RUST.md": "9ecc4176f5afea6a1ad86b1ec458c6fda9d70d7b5fdcf231e0c4525010234a7d",
+  "docs/architecture/BLP-FLOWS.md": "f21eb22ea69c3694ab2b4d7d1c452aa11d63b744bccbac0d076470ebdbb028b4",
+  "docs/en/BLP-FLOWS.md": "70bed2c268b9712007fcb685abe49d02478cb638ff66fad97856797c316c78a7",
+  "docs/plans/actions-confiance/BLP-APEX.md": "dd45295b8f0ab67e25cbeff4fb8290ede68c110f01469a352dc8fc3611a128df",
+  "docs/en/plans/actions-confiance/BLP-APEX.md": "29c2661c8a3a24fcb6969cbb4b5b8300902343f077c95d22bc4b67511a98e57a",
+  "docs/architecture/blp-flow-inventory.json": "def2cf4a1ccc85e1c551c479b37a8bb7410682a612f371b728efe7801c898c81",
+  "tools/verification/README.md": "4dad8d11e2ac595d7609b019f579b681dcf860c9c5a0436bb78a24b6fbb501a5",
+  "tools/verification/recipes/blp-preparation-transport-public.json": "c4d2e4ad0183543aaa74e4e81f7866de4ef780d833c97ad33df7b93bcf272062",
+  "tools/verification/recipes/blp-flow-inventory.json": "9290a1ecb2b1e5fa90b970cf33a37e17fbbfa988559367ab6bf299c9bf514775",
+  "docs/plans/actions-confiance/verification-blp/20261102-preparation-transport-source-review.json": "(this file)",
+  "docs/plans/actions-confiance/paea/RETEX-BLP-05-20261102.md": "7e5912aa6af6c03bd8f03d68505820a8fc845530db9dc6459d2ebdb909a63a60",
+  "docs/plans/actions-confiance/paea/RETEX-BLP-05-20261102.en.md": "6617f6b5aa2862117d9ba9d218720688bfad70a8369b4c57d26ead5e76931b50"
+ },
+ "policies": {
+  "protocol": "schema 1, `api-` connection grammar, fixed non-emissive reply fields and typed refusal families are protocol invariants; `runtime_authorized:false`/`runtime_enforced:false` are scope truth, not operator switches",
+  "operator": "no new execution policy, default classification, timeout, retry or cap; the transport decision adds no budget consumption and no saved-setting write",
+  "fixtures": "two fixture connections with synthetic keys (`PRIVATE_FIXTURE_KEY`, `PRIVATE_OTHER_KEY`) are test inputs; the three policy revisions in the journey are explicit renewals, not watchdogs",
+  "resources": "no global watchdog; `timeout 900` on the interactive journey command is an operator session bound, not product policy; recipe step runs without one"
+ },
+ "functions": [
+  "destination_digest: domain-separated canonical digest of (kind, root, connection, base_url, model, provider_source); stored key never an input — covered transitively by catalogue digests",
+  "resolve_destination: live catalogue read via preparation_api_provider; caller echo of base_url/model is the TOCTOU pin; malformed echo and unknown connection refusals distinct",
+  "destination_attribute: admin-only, current-entry policy read check, `blp-object-attribute` producer delegation (exact-once uniqueness, anti-declassification inherited), request digests only in reason, key never in reply",
+  "execute: egress lock ordering (egress→trust→settings), full capsule re-verify via preparation_admission::verify before destination checks, connection/provider_source/settings freshness trio, current-entry attribution_for on the recomputed digest, last-use no-write-down check_output, rollback-only observe_budget, publication None",
+  "observe_budget: with_material_read + unchecked_transaction + Ignore drop behavior + explicit rollback; refusal on unavailable preparation, never a default authorization",
+  "current_settings_digest: reads CURRENT saved settings history; truncated/missing history refuses instead of fabricating",
+  "HTTP mapping (service.rs:389-392) and named diagnostic regression (1668-1674): exact typed mapping 400/404/409 for the seven new codes; no prefix fallback",
+  "preparation_calls.rs Fixture::new: TMPDIR required, canonicalized, /tmp refused; birth record retained; close removes the root, Drop retains it on panic only"
+ ],
+ "errors": {
+  "authentication": "authenticated principal and clearance before any capsule read (execute) and administrator role before attribution; possession of an admission id is not a read permission",
+  "data": "malformed schema/connection/echo refusals typed separately (blp-transport-invalid / blp-destination-invalid / blp-destination-echo-mismatch); admission receipt grammar distinct from transport request grammar",
+  "storage": "trust reservation inside egress lock; finished() folds lock-close failures preserving the primary refusal; read_bounded for state; native receipt absent() maps to blp-admission-not-found not storage",
+  "effects": "no journal write, no publication, no turn/reservation/SQL mutation on the decision path; budget observation is rollback-only; freshness trio refuses with typed 409 codes",
+  "cleanup": "egress wrapper cleanup folding; observe_budget explicit rollback with Ignore drop behavior; no /tmp allocation anywhere in the producer or journey",
+  "http": "seven new codes each mapped and regression-covered; ownership 404 (not 403) so a non-owner learns nothing about the capsule"
+ },
+ "inventory_semantic_review": {
+  "changed_prior_sources": [
+   "preparation_admission.rs: current()/filename()/verify() reused unchanged; transport is a new consumer",
+   "trust_store.rs: readonly dispatch arm added under existing egress wrapper; existing mutating dispatch untouched",
+   "swarm-cli/src/trust.rs + service/trust.rs: whitelist/route additions only; existing operations untouched"
+  ],
+  "journey_revision_semantics": "verified empirically on the qualified binary: config-apply bumps trust revision and orphans old policy entries for current() until an explicit blp-policy-apply creates an entry with the new trust_revision; reply current_revision reports the PRE-apply revision",
+  "publication_semantics": "binding goes through blp-object-attribute (recorded/replayed, blp-attribution journal); transport has publication None — doc draft initially wrong, corrected in BIBA-RUST FR/EN before delivery",
+  "anti_declassification": "the guard scans all history, so no-write-down testing requires a FRESH digest (second connection), not a public rebinding of the secret-bound digest (which refuses forever)"
+ },
+ "evidence": {
+  "integration_test": "preparation_transport.rs 1/1 PASS (2.0s), self-cleaned fixture",
+  "journey": "tests/blp_transport_public.py 65/65 PASS on qualified binary sha256 41f00bf9… (profile rust-zrtk4hyt, installed v0.1.1-dev.312), BLP_TRANSPORT_JOURNEY_SHA256 0690d1e0…",
+  "recipe": "recipe.py run PASS then recipe.py verify VERIFIED/PASS; evidence .swarm-fixtures/blp-transport-recipe-20261102/, journey .swarm-fixtures/blp-transport-proof-20261102/",
+  "tmp_interdiction": "no journey/recipe residue under /tmp; producer-side leak found and fixed (preparation_calls.rs temp_dir → pinned TMPDIR), suite 7/7 PASS with /tmp before=after proof",
+  "inventory": "tools/paea/check_blp_inventory.py 65 refs / 25 flows, 0 failures"
+ },
+ "limits": [
+  "The decision authorizes nothing at OS/runtime level: BF-07 real transport emission (worker hook) is the NEXT increment; legacy send path untouched",
+  "Result/reader inheritance, descendant confinement, upstream transformations, migration, human declassification, capsule withdrawal: out of scope, unchanged",
+  "runtime_enforced:false stays justified until a runtime enforcement increment exists",
+  "Local verification and same-context review are not independent review, native acceptance or real-data acceptance",
+  "27 /tmp swarm-* leftovers from 31 October belong to other sessions; attribution recorded, not deleted from here"
+ ],
+ "delivery": {
+  "version": "v0.1.1-dev.312",
+  "sha256": "41f00bf96e568caaa0ef40cc26b758139acbb2133cddb4829dd0965dfa2ad061",
+  "note": "binary installed locally via restart --prepared-build; preparation_calls.rs fixture-area fix is a test-source change, pending next qualified build"
+ },
+ "retrospective": "Probe refusals empirically before asserting revision semantics; make overridable helper fields explicit named parameters to avoid duplicate-keyword TypeErrors; snapshot trust state immediately before the call under test; when a guard scans all history, design the test fixture for fresh digests from the start; scan the whole crate tree (not just the increment) for /tmp producers once a journey claims cleanliness",
+ "same_context_review_verdict": "BLP-05 binding + last-use decision implemented, locally verified on the installed qualified binary, recipe-pinned; no independent/global BLP acceptance; worker emission hook remains open (BF-07)"
+}

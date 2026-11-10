@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-17T11:41:23.232157+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "existing_files": {
+    "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "internal/engine/agent_identity_contract.go": "009643397dfb11afda7edb764d780758c207ce6047b917ad401efa7fc045840c",
+    "internal/engine/model.go": "9b8f2f15d6af6c046cc3b7c909a4a8bf3155b9dd1e6c4ce04612758a763c9086",
+    "internal/enrollmentauthority/authority.go": "4e8db4b72bd2c333c5b54cd71e6bc987158ae320b635946719556351e5d3c019",
+    "internal/enrollmentauthority/authority_test.go": "a84c64b128b230eb4b31bee02cab765b27fccddd8b4a527efc2d3b9a4230bf93",
+    "internal/enrollmentproof/proof.go": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+    "internal/enrollmentproof/proof_test.go": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "internal/enrollmentstate/journal.go": "13b4b7b94e5d1ee2df2a47a9810756eeffba724c07a37f1ba4ab425c5f6aca87",
+    "internal/enrollmentstate/journal_test.go": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+    "internal/enrollmentstate/recovery_test.go": "648eaa86435154bd94b04740dad651433f5c84970417d1386a2850c12e88a51d",
+    "internal/identitycontract/contract.go": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+    "internal/identitycontract/contract_test.go": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7",
+    "internal/engine/agent_identity_issuer_linux.go": "7ee38e272c7ca66fae7d9962d159acac314ba1c868cea3e603973081e21a5a1d",
+    "internal/engine/agent_identity_registry_types.go": "1f3a02411c92b57a1cce4b2f6c2a72e85a2e89e7ab4f2a7567844a102848ccd7",
+    "internal/engine/agent_identity_authority.go": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+    "internal/engine/agent_identity_issuer_linux_test.go": "3e42434cd7afa5ad27815e42954d14cdf58ac1efcc8795c3a1c8ab8cfe7df7f5"
+  },
+  "global_test_watchdog": 0,
+  "operator_decisions": "boundary and initial principal unanswered; no activation"
+}

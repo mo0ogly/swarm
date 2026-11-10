@@ -1,0 +1,48 @@
+{
+  "status": "PASS",
+  "version": "v0.1.1-dev.304",
+  "binary_sha256": "341e71bb2e67d47d0c468c04f8c7ecd38f313fb0686b60af88ba675d50cbade6",
+  "runtime_sources_match": [
+    "rust/crates/swarm-engine/src/root_store/preparation_confidentiality.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_enrollment.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
+    "rust/crates/swarm-cli/src/preparation_worker.rs",
+    "web/trust-confidentiality.js",
+    "web/trust-native.html",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+    "rust/crates/swarm-engine/src/trust/authentication.rs",
+    "rust/crates/swarm-engine/src/trust/confidentiality.rs",
+    "rust/crates/swarm-engine/src/trust/state.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-engine/src/root_store/reader_guard.rs",
+    "rust/crates/swarm-engine/src/trust/error.rs",
+    "rust/crates/swarm-confidentiality/src/lib.rs",
+    "rust/crates/swarm-web/src/service/trust.rs",
+    "rust/crates/swarm-cli/src/trust.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_attribution.rs"
+  ],
+  "profile": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-sbsvgwmm/build/profile",
+  "service_restarted_by_readonly_probe": false,
+  "global_watchdog": null,
+  "scope": "installed quarantine/captured-source candidate, protected asset bytes and read-only PAEA/version browser; no live classification, quarantine activation or global BLP conformance",
+  "increment_restarted_managed_service": true,
+  "installation_command": [
+    "./swarm.sh",
+    "restart",
+    "--prepared-build",
+    "341e71bb2e67d47d0c468c04f8c7ecd38f313fb0686b60af88ba675d50cbade6",
+    "--no-open"
+  ],
+  "browser_assertions": 56,
+  "public_assertions": 103,
+  "notes_languages": [
+    "fr",
+    "en"
+  ],
+  "live_classification_or_policy_changed": false,
+  "independent_acceptance": false
+}

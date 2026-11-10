@@ -1,0 +1,684 @@
+{
+  "schema_version": 1,
+  "matrix_id": "swarm-actions-local",
+  "matrix_version": 5,
+  "assessed_at": "2026-10-16",
+  "context": {
+    "id": "local-simulation-v1",
+    "scope": {
+      "fr": "Pilote local public/internal, identités de fixture et effets simulés ; sous-ensemble illustratif, aucune baseline sélectionnée.",
+      "en": "Local public/internal pilot, fixture identities and simulated effects; illustrative subset with no selected baseline."
+    },
+    "classifications": [
+      "public",
+      "internal"
+    ],
+    "effects": "simulated",
+    "baseline_selected": false,
+    "areas": [
+      "access",
+      "identity",
+      "audit",
+      "cryptography",
+      "lifecycle",
+      "providers",
+      "incidents"
+    ],
+    "runtime_assessment": false
+  },
+  "claims": {
+    "certification": false,
+    "global_compliance": false,
+    "independent_assessment": false
+  },
+  "framework": {
+    "id": "NIST-SP-800-53",
+    "revision": "5",
+    "catalog_version": "5.2.0",
+    "source_url": "https://raw.githubusercontent.com/usnistgov/oscal-content/78650f02ad9321bb7b817846f8fbd4f2bcd620de/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json",
+    "source_sha256": "01f37cf90ea99d92242c936cbfbdebcc338eef1f71454e2acac36cc56e9bc062",
+    "reference_path": "docs/architecture/actions-confiance-controls-reference.json",
+    "reference_sha256": "4be9c47151f14d782e5bef98566593bc94fc0c99d3e54a818d5b9ea478cf464e"
+  },
+  "evidence": [
+    {
+      "id": "effects",
+      "kind": "historical_local_verification",
+      "receipt": {
+        "path": "docs/plans/actions-confiance/verification-sensitive-20261016/secret-data-effects-controls-receipt.json",
+        "sha256": "ee942842259256f7a3a8fdf1d764f72a50fd234609c156757eba9e59ff2e18eb"
+      },
+      "source_bindings": [
+        {
+          "path": "internal/engine/trust_actions.go",
+          "sha256": "5e8f2e99cb7d2d0dedea7696ce287b5901ba199a09cb68a63edd43f8d9feb9f4"
+        },
+        {
+          "path": "internal/engine/trust_delegation.go",
+          "sha256": "e2aa74b2806b3999fb2d5b57607bff2e6961402ffe00f9a06c939d518c04039b"
+        },
+        {
+          "path": "internal/engine/trust_connector.go",
+          "sha256": "61ad5f667968cbada2a924614eb9cbd417a8a4754cbe4931c0723ede6b9d2751"
+        },
+        {
+          "path": "internal/engine/trust_data_policy.go",
+          "sha256": "04003cb0f60db4b9330356ee4c5bf830f15ffc28a5962030547c62f37921a7b6"
+        },
+        {
+          "path": "internal/engine/trust_connector_test.go",
+          "sha256": "18838137de2a953b5b8008ed0a2a4062f0199da5e7052394bdb903b765a7db08"
+        }
+      ],
+      "limitations": {
+        "fr": "Recette locale historique ; seules les entrées pertinentes nommées sont comparées, aucun contrôle externe ni réexécution actuelle.",
+        "en": "Historical local recipe; only named relevant inputs are compared, with no external assessment or current rerun."
+      }
+    },
+    {
+      "id": "identities",
+      "kind": "historical_local_verification",
+      "receipt": {
+        "path": "docs/plans/actions-confiance/verification-confinement-20261015/introspection-verification.json",
+        "sha256": "a7713f1dec6045d7b6d235a5f561a362a19b13bb8fe1064778bd15a5eb474223"
+      },
+      "source_bindings": [
+        {
+          "path": "internal/engine/trust_identity_context.go",
+          "sha256": "f30a9231523fad8cedc4d1248f3691520835fbdc3205e3308bdca0bac85ba231"
+        },
+        {
+          "path": "internal/engine/trust_introspection.go",
+          "sha256": "00508fb775054dd22c6882a33bc728b45da6f0c122f35a9e63b1308b88c43de1"
+        },
+        {
+          "path": "internal/engine/trust_introspection_runtime.go",
+          "sha256": "968917cbcb5174b26262c3d5cfd338b08e95c3f45afdf310558614f9997fbe9d"
+        },
+        {
+          "path": "internal/engine/trust_introspection_test.go",
+          "sha256": "90339f185277a10085728c3ae24c6be122fe8e93dfd9ac281c6d608779e2b0b1"
+        },
+        {
+          "path": "internal/engine/trust_introspection_transport.go",
+          "sha256": "e08fbe69633de5d19603a98cfcada4a1eea419dea7011ae5aaaa15ed10101460"
+        },
+        {
+          "path": "internal/engine/trust_oidc.go",
+          "sha256": "97fc62056c6a6f0945d6a5f2926e2aa0b4c16f599370c780ab9ed8c6451e35a1"
+        },
+        {
+          "path": "internal/engine/trust_workload.go",
+          "sha256": "047dee5453d165b576aeaf2a4972982c5182dfe8c48c671ef2a39da5e0e027a4"
+        }
+      ],
+      "limitations": {
+        "fr": "Recette locale historique ; seules les entrées pertinentes nommées sont comparées, aucun contrôle externe ni réexécution actuelle.",
+        "en": "Historical local recipe; only named relevant inputs are compared, with no external assessment or current rerun."
+      }
+    },
+    {
+      "id": "secrets",
+      "kind": "historical_local_verification",
+      "receipt": {
+        "path": "docs/plans/actions-confiance/verification-sensitive-20261016/secret-data-secrets-controls-receipt.json",
+        "sha256": "72d1068fdab9ace3e3a659d7bcf3b93d41da38d1ca777ce1410cbbe61084eee8"
+      },
+      "source_bindings": [
+        {
+          "path": "internal/engine/trust_sealed.go",
+          "sha256": "fb585298a37f44ea73a56790c629ce235bc508430a3a8c23251e4ff513a010de"
+        },
+        {
+          "path": "internal/engine/trust_sealed_linux_amd64.go",
+          "sha256": "94df1144ea34782bcd00705807ec92837ec39ae12b8cfdff2747572e995a0e0d"
+        },
+        {
+          "path": "internal/engine/trust_sealed_other.go",
+          "sha256": "bf84484f9403de56e6a1f65681ace2c89109725bf24a2ae84175e0ca5e7ca4f4"
+        },
+        {
+          "path": "internal/engine/trust_sealed_test.go",
+          "sha256": "974b23f11dca8c2a7a7f07d676140b27959506c7b1ce6e7c3b536ee7c5adce4f"
+        },
+        {
+          "path": "internal/engine/trust_secret.go",
+          "sha256": "c56cb7d993d78a188ca996220ead135eaaaf5494d5716f605be594f24ce5aa5d"
+        },
+        {
+          "path": "internal/engine/trust_secret_broker.go",
+          "sha256": "fc03d70ced666137d64aa3b88023ef1888cf2be7f5da37c5e6d9777907a9a215"
+        },
+        {
+          "path": "internal/engine/trust_secret_consumer.go",
+          "sha256": "2fc9ebbc16a2263662d54f1cdbc6196e11f935f0c0edc5f331f48e0c1fa9b662"
+        },
+        {
+          "path": "internal/engine/trust_secret_http.go",
+          "sha256": "027cb523e64033ba2ecc0c5fd349feaa3c57297ea4dccb437114ff9a95c0c0ff"
+        },
+        {
+          "path": "internal/engine/trust_secret_test.go",
+          "sha256": "ae3589d07f3a6f90bca3e959e01629cef6b67093aa5e06672cd420256050e04e"
+        },
+        {
+          "path": "internal/engine/trust_fixed_image_linux.go",
+          "sha256": "56b4c4a7a974f6d7e319e17ddbb64d973afd5cd3bf479b3ff9ca3c8392471911"
+        },
+        {
+          "path": "internal/engine/trust_fixed_image_linux_test.go",
+          "sha256": "769da608f1abecfbc3ff849079a43c489a502ce00bad407f255526f56860d4c1"
+        },
+        {
+          "path": "internal/engine/trust_secret_data_test.go",
+          "sha256": "859fa35d03e1fedbf9eddc2fd061ac8117e49a51acb5ad7e7c41f58b811f7bce"
+        },
+        {
+          "path": "internal/engine/trust_data_policy.go",
+          "sha256": "04003cb0f60db4b9330356ee4c5bf830f15ffc28a5962030547c62f37921a7b6"
+        }
+      ],
+      "limitations": {
+        "fr": "Recette locale historique ; seules les entrées pertinentes nommées sont comparées, aucun contrôle externe ni réexécution actuelle.",
+        "en": "Historical local recipe; only named relevant inputs are compared, with no external assessment or current rerun."
+      }
+    },
+    {
+      "id": "archives",
+      "kind": "historical_local_verification",
+      "receipt": {
+        "path": "docs/plans/actions-confiance/verification-preuves-20261016/archive-verification.json",
+        "sha256": "77b7537694d76eeb3702caedc8d354f212c913c8bb8e0b7c6de58981a5bc521f"
+      },
+      "source_bindings": [
+        {
+          "path": "internal/engine/trust_evidence.go",
+          "sha256": "bf25417313cdd3e9a0989cfc3e74ebd5709b28c3154c737ef1a1cb18ba9d9853"
+        },
+        {
+          "path": "internal/engine/trust_evidence_archive.go",
+          "sha256": "5c75d330a378d2db8eed450cbd0cfeffe1b16fb7231111d93c1701ec53970c03"
+        },
+        {
+          "path": "internal/engine/trust_evidence_archive_test.go",
+          "sha256": "5af4254f272f2f44dce3c7c87ef3c1ce391aeec0dc1504a6c7da1bb238cf595f"
+        },
+        {
+          "path": "internal/engine/trust_evidence_checkpoint_test.go",
+          "sha256": "7b40a9c2e6b7143b15b92c594ae83ad0a345e26620facdf7b24496106abd0fce"
+        },
+        {
+          "path": "internal/engine/trust_evidence_http.go",
+          "sha256": "1d3b0ae96798b064c107c5d95661d6163d2079c6f55128a4ebde570346bbae38"
+        },
+        {
+          "path": "internal/engine/trust_evidence_runtime_types.go",
+          "sha256": "b4eb8f37ba795cd6f1f97b2c973e374415c7fe4d4a2c73561977564560ad1a10"
+        },
+        {
+          "path": "internal/engine/trust_evidence_service.go",
+          "sha256": "9c701743a050897a7f0f3f5554fefbf000b187b1f9fabf5be6aed753dc76e57c"
+        },
+        {
+          "path": "internal/engine/trust_evidence_test.go",
+          "sha256": "e15f44e0578cdb2146763848acfca45a03eac747947b755887c9013c0553f8b5"
+        },
+        {
+          "path": "internal/engine/trust_evidence_validation.go",
+          "sha256": "9f011cbba602a317edd2b23f0cd88a46a3df179928333fa0b1ce62ef8d108a1f"
+        }
+      ],
+      "limitations": {
+        "fr": "Recette locale historique ; seules les entrées pertinentes nommées sont comparées, aucun contrôle externe ni réexécution actuelle.",
+        "en": "Historical local recipe; only named relevant inputs are compared, with no external assessment or current rerun."
+      }
+    },
+    {
+      "id": "processes",
+      "kind": "historical_local_verification",
+      "receipt": {
+        "path": "docs/plans/actions-confiance/verification-processus-20261015/process-verification.json",
+        "sha256": "24d6fb907b86b979af3f7cf3abd88170d8c17163ad72075f8e7dad6426d687f3"
+      },
+      "source_bindings": [
+        {
+          "path": "internal/engine/trust_process.go",
+          "sha256": "f4b260fdd357e245849c465df1404dc49e161d0d672e30476459b4224ae80d27"
+        },
+        {
+          "path": "internal/engine/trust_process_cli.go",
+          "sha256": "0ed8c76db9b2174ebf3b66e7a8666d63192da30893545c18f6571ee866eba529"
+        },
+        {
+          "path": "internal/engine/trust_process_http.go",
+          "sha256": "a119caa3c912530c2eb2e8f9c7ae9b46def170c1b636911fd2d6fd0cbc8031ff"
+        },
+        {
+          "path": "internal/engine/trust_process_service.go",
+          "sha256": "73034afdc810c9b7cf0d59a006a6310958f1ae748a5a1a003c40ba8d94e97b31"
+        },
+        {
+          "path": "internal/engine/trust_process_test.go",
+          "sha256": "5e0195143fb1777369f55276aa1cdd2e15ea9f2c1a79d099eadf6d4a4889eaff"
+        },
+        {
+          "path": "internal/engine/trust_process_validation.go",
+          "sha256": "f04ab3ec1e3c5de28736dfb95c8fc3d8ab4e90be2d0dee7fbad12a7759b529ac"
+        }
+      ],
+      "limitations": {
+        "fr": "Recette locale historique ; seules les entrées pertinentes nommées sont comparées, aucun contrôle externe ni réexécution actuelle.",
+        "en": "Historical local recipe; only named relevant inputs are compared, with no external assessment or current rerun."
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "control_id": "AC-3",
+      "title": {
+        "fr": "Application des autorisations",
+        "en": "Authorization enforcement"
+      },
+      "area": "access",
+      "scope": {
+        "fr": "Mandats et effets simulés locaux.",
+        "en": "Local mandates and simulated effects."
+      },
+      "rationale": {
+        "fr": "Le service relit identité, mandat et contenu approuvé.",
+        "en": "The service rechecks identity, mandate and approved content."
+      },
+      "owner": "Codex",
+      "status": "partial",
+      "evidence_ids": [
+        "effects"
+      ],
+      "gaps": [
+        {
+          "fr": "Aucune autorisation réelle de fournisseur qualifiée.",
+          "en": "No real provider authorization is qualified."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "AC-5",
+      "title": {
+        "fr": "Séparation des responsabilités",
+        "en": "Separation of duties"
+      },
+      "area": "access",
+      "scope": {
+        "fr": "Demande, accord et activation de clé.",
+        "en": "Request, approval and key activation."
+      },
+      "rationale": {
+        "fr": "Les rôles locaux et le second administrateur sont contrôlés.",
+        "en": "Local roles and second-administrator activation are checked."
+      },
+      "owner": "Codex",
+      "status": "partial",
+      "evidence_ids": [
+        "effects",
+        "archives"
+      ],
+      "gaps": [
+        {
+          "fr": "Organisation des rôles et comptes réels non évaluée.",
+          "en": "Real account and organizational role assignment is not assessed."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "IA-4",
+      "title": {
+        "fr": "Gestion des identifiants",
+        "en": "Identifier lifecycle"
+      },
+      "area": "identity",
+      "scope": {
+        "fr": "Mapping explicite des identités et suspension.",
+        "en": "Explicit identity mapping and suspension."
+      },
+      "rationale": {
+        "fr": "Le sujet externe ne crée pas de droits locaux.",
+        "en": "External subjects do not create local permissions."
+      },
+      "owner": "Codex",
+      "status": "partial",
+      "evidence_ids": [
+        "identities"
+      ],
+      "gaps": [
+        {
+          "fr": "Cycle RH et annuaire réel non évalués.",
+          "en": "Real workforce and directory lifecycle is not assessed."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "IA-5",
+      "title": {
+        "fr": "Gestion des authentifiants",
+        "en": "Authenticator management"
+      },
+      "area": "identity",
+      "scope": {
+        "fr": "OIDC et sessions de service isolées.",
+        "en": "Isolated OIDC and service sessions."
+      },
+      "rationale": {
+        "fr": "Validation signée et introspection sont exercées en fixture.",
+        "en": "Signed validation and introspection are exercised in fixtures."
+      },
+      "owner": "Codex",
+      "status": "partial",
+      "evidence_ids": [
+        "identities",
+        "secrets"
+      ],
+      "gaps": [
+        {
+          "fr": "Fournisseur réel, sauvegarde et assurance opérateur non évalués.",
+          "en": "Real identity provider, backup and operator assurance are not assessed."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "AU-9",
+      "title": {
+        "fr": "Protection des preuves d'audit",
+        "en": "Audit evidence protection"
+      },
+      "area": "audit",
+      "scope": {
+        "fr": "Chaîne, signatures, témoin et archives locales.",
+        "en": "Local chain, signatures, checkpoint and archives."
+      },
+      "rationale": {
+        "fr": "Altération, rollback et divergence sont détectés dans le périmètre signé.",
+        "en": "Alteration, rollback and divergence are detected within the signed scope."
+      },
+      "owner": "Codex",
+      "status": "partial",
+      "evidence_ids": [
+        "archives"
+      ],
+      "gaps": [
+        {
+          "fr": "Pas de temps tiers ni stockage immuable contre le même UID.",
+          "en": "No third-party time or immutable storage against the same UID."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "AU-6",
+      "title": {
+        "fr": "Revue des journaux",
+        "en": "Audit review"
+      },
+      "area": "audit",
+      "scope": {
+        "fr": "Analyse organisationnelle des événements.",
+        "en": "Organizational review of events."
+      },
+      "rationale": {
+        "fr": "La présence de preuves ne démontre pas une revue humaine régulière.",
+        "en": "Evidence availability does not demonstrate regular human review."
+      },
+      "owner": "Codex",
+      "status": "not_assessed",
+      "evidence_ids": [],
+      "gaps": [
+        {
+          "fr": "Fréquence, responsables et efficacité de revue non évalués.",
+          "en": "Review frequency, owners and effectiveness are not assessed."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "SC-12",
+      "title": {
+        "fr": "Cycle des clés cryptographiques",
+        "en": "Cryptographic key lifecycle"
+      },
+      "area": "cryptography",
+      "scope": {
+        "fr": "Clés publiques métier et courtier éphémère.",
+        "en": "Business signing keys and ephemeral broker."
+      },
+      "rationale": {
+        "fr": "Préparation, double activation, rotation et révocation sont exercées.",
+        "en": "Preparation, dual activation, rotation and revocation are exercised."
+      },
+      "owner": "Codex",
+      "status": "partial",
+      "evidence_ids": [
+        "archives",
+        "secrets"
+      ],
+      "gaps": [
+        {
+          "fr": "Aucun HSM ni protection contre swap ou traçage privilégié qualifié.",
+          "en": "No HSM, swap or privileged-tracing protection is qualified."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "CM-3",
+      "title": {
+        "fr": "Contrôle des changements",
+        "en": "Change control"
+      },
+      "area": "lifecycle",
+      "scope": {
+        "fr": "Révisions de configuration et processus versionnés.",
+        "en": "Configuration revisions and versioned processes."
+      },
+      "rationale": {
+        "fr": "CAS, aperçu et versions fixées conservent les historiques.",
+        "en": "Revision checks, preview and pinned versions preserve history."
+      },
+      "owner": "Codex",
+      "status": "partial",
+      "evidence_ids": [
+        "effects",
+        "processes"
+      ],
+      "gaps": [
+        {
+          "fr": "Approbation organisationnelle des changements non évaluée.",
+          "en": "Organizational change approval is not assessed."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "CP-9",
+      "title": {
+        "fr": "Copies et conservation",
+        "en": "Copies and retention"
+      },
+      "area": "lifecycle",
+      "scope": {
+        "fr": "Archives signées locales non destructives.",
+        "en": "Local non-destructive signed archives."
+      },
+      "rationale": {
+        "fr": "La durée minimale est figée et les originaux sont conservés.",
+        "en": "The minimum hold is pinned and originals are preserved."
+      },
+      "owner": "Codex",
+      "status": "partial",
+      "evidence_ids": [
+        "archives"
+      ],
+      "gaps": [
+        {
+          "fr": "Sauvegarde hors site, restauration et RPO/RTO non démontrés.",
+          "en": "Off-site backup, restoration and RPO/RTO are not demonstrated."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "SA-9",
+      "title": {
+        "fr": "Services externes",
+        "en": "External services"
+      },
+      "area": "providers",
+      "scope": {
+        "fr": "Fournisseurs réels hors périmètre simulé.",
+        "en": "Real providers outside the simulated scope."
+      },
+      "rationale": {
+        "fr": "Les capacités sensibles réelles ne sont pas activées par ces recettes.",
+        "en": "These recipes do not activate real sensitive capabilities."
+      },
+      "owner": "Codex",
+      "status": "out_of_scope",
+      "evidence_ids": [],
+      "gaps": [
+        {
+          "fr": "Contrats, exigences et contrôle des prestataires non évalués.",
+          "en": "Provider contracts, requirements and oversight are not assessed."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "SC-7",
+      "title": {
+        "fr": "Frontières techniques",
+        "en": "Technical boundaries"
+      },
+      "area": "providers",
+      "scope": {
+        "fr": "Helper fixe scellé et chemins locaux admis.",
+        "en": "Fixed sealed helper and admitted local paths."
+      },
+      "rationale": {
+        "fr": "Les gardes OS et les destinations exactes sont exercées.",
+        "en": "OS guards and exact destinations are exercised."
+      },
+      "owner": "Codex",
+      "status": "partial",
+      "evidence_ids": [
+        "secrets",
+        "effects"
+      ],
+      "gaps": [
+        {
+          "fr": "Pas de confinement général des providers ou de réseau de production.",
+          "en": "No general provider containment or production network qualification."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    },
+    {
+      "control_id": "IR-4",
+      "title": {
+        "fr": "Traitement des incidents",
+        "en": "Incident handling"
+      },
+      "area": "incidents",
+      "scope": {
+        "fr": "Réponse organisationnelle en exploitation réelle.",
+        "en": "Organizational response during real operation."
+      },
+      "rationale": {
+        "fr": "Une reprise déterministe locale ne prouve pas un processus de crise.",
+        "en": "A local deterministic recovery does not demonstrate a crisis process."
+      },
+      "owner": "Codex",
+      "status": "not_assessed",
+      "evidence_ids": [],
+      "gaps": [
+        {
+          "fr": "Équipe, escalade, exercice et délais de réponse réels non évalués.",
+          "en": "Real response team, escalation, exercise and response times are not assessed."
+        }
+      ],
+      "external_assessment": {
+        "status": "not_performed",
+        "required_for_target_use": {
+          "fr": "Évaluer le déploiement, les acteurs et les procédures réels avec un responsable mandaté.",
+          "en": "Assess the real deployment, actors and procedures with an appointed owner."
+        }
+      }
+    }
+  ]
+}

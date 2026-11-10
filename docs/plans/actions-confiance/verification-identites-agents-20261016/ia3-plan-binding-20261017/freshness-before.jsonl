@@ -1,0 +1,11 @@
+{"Time":"2026-10-17T09:53:51.483500595+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-17T09:53:51.526950597+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanChangeDuringRuntimeWait"}
+{"Time":"2026-10-17T09:53:51.527017873+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanChangeDuringRuntimeWait","Output":"=== RUN   TestAgentIdentityPlanChangeDuringRuntimeWait\n"}
+{"Time":"2026-10-17T09:53:51.73029234+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanChangeDuringRuntimeWait","Output":"    agent_identity_plan_freshness_linux_test.go:40: instance=instance-child bootstrap_pid=3869266 pinned_pid=4026533856 pinned_mnt=4026533853\n"}
+{"Time":"2026-10-17T09:53:51.743227411+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanChangeDuringRuntimeWait","Output":"    agent_identity_plan_freshness_linux_test.go:105: plan_committed_before_runtime_unlock=true decision_code=\n"}
+{"Time":"2026-10-17T09:53:51.74328514+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanChangeDuringRuntimeWait","Output":"    agent_identity_plan_freshness_linux_test.go:107: decision used the old plan after its source changed during runtime wait:  \u003cnil\u003e\n"}
+{"Time":"2026-10-17T09:53:51.763516653+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanChangeDuringRuntimeWait","Output":"--- FAIL: TestAgentIdentityPlanChangeDuringRuntimeWait (0.24s)\n"}
+{"Time":"2026-10-17T09:53:51.763552521+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityPlanChangeDuringRuntimeWait","Elapsed":0.24}
+{"Time":"2026-10-17T09:53:51.764090173+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-17T09:53:51.768939947+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.285s\n"}
+{"Time":"2026-10-17T09:53:51.768998427+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.286}

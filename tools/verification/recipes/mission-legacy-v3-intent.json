@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "mission-legacy-v3-intent",
+  "inputs": [
+    "tools/verification/recipe.py",
+    "tests/rust_*.py",
+    "tests/test_rust_mission_legacy_v3_intent_guards.py",
+    "rust/crates/swarm-cli/examples/mission_watch_worker.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-engine/src/agent_store.rs",
+    "rust/crates/swarm-engine/src/agent_completion_journal.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/mission_supervision.rs",
+    "rust/crates/swarm-engine/src/workspace_turn.rs",
+    "rust/crates/swarm-engine/src/workspace_turn_write.rs",
+    "rust/crates/swarm-engine/src/mission_worker_dispatch.rs",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/legacy-v3-next106.md",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/legacy-v3-contract106.md",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/legacy-v3-fixture-inputs106/**/*",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/sdk-late-probe-plan62.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "genuine-v3-fifo-eof-owned-cleanup-guards",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_mission_legacy_v3_intent_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_binding3_requires_historical_absence_and_canonical_positive_sequence",
+        "test_acquired_generation_and_owner_match_actual_journal",
+        "test_release_preserves_exact_old_history_and_reservation_amount_type",
+        "test_eof_accepts_only_exact_typed_action_failure_and_nonzero_real_exit",
+        "test_optimized_setup_refuses_before_request_or_archived_import",
+        "test_bundle_requires_exact_qualified_old_binary_and_confined_source_bytes",
+        "test_loaded_historical_imports_reject_current_fallback_and_missing_module",
+        "test_normal_eof_closes_only_stdin_and_actually_reaps_without_signal",
+        "test_pipe_close_failure_signals_only_fresh_owned_pidfd_then_reaps_but_stays_failed",
+        "test_changed_sdk_identity_refuses_signal_and_records_unresolved_without_fake_reap",
+        "test_signal_and_diagnostic_publication_failures_preserve_all_causes",
+        "test_wait_and_exit_publication_failures_never_qualify_expected_eof",
+        "Ran 12 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "fresh-v4-control-genuine-v3-refusal-fifo-cancellation-eof-reopen",
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import os,subprocess,tempfile,sys\nfrom pathlib import Path\nif sys.flags.optimize != 0:raise ValueError('historical verification requires Python assertions enabled')\nbase=Path(tempfile.mkdtemp(prefix='mission-legacy-v3-',dir='.cache')).resolve()\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\nargs=[sys.executable,'-B','tests/rust_mission_legacy_v3_intent.py']\nfor key,var in [('binary', 'SWARM_LEGACY_V3_NEW_BINARY'), ('profile', 'SWARM_LEGACY_V3_NEW_PROFILE'), ('old-binary', 'SWARM_LEGACY_V3_OLD_BINARY'), ('old-profile', 'SWARM_LEGACY_V3_OLD_PROFILE'), ('legacy-sdk', 'SWARM_LEGACY_V3_SDK'), ('legacy-profile', 'SWARM_LEGACY_V3_SDK_PROFILE'), ('current-sdk', 'SWARM_LEGACY_V3_CURRENT_SDK'), ('current-sdk-profile', 'SWARM_LEGACY_V3_CURRENT_SDK_PROFILE'), ('old-helpers-manifest', 'SWARM_LEGACY_V3_HELPERS_MANIFEST'), ('old-helpers-root', 'SWARM_LEGACY_V3_HELPERS_ROOT')]:\n value=Path(os.environ[var]).resolve()\n if not value.exists():raise ValueError('legacy-v3-input-missing:'+var)\n args+=['--'+key,str(value)]\nsubprocess.run(args+['--output',str(base/'run')],check=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "REPLAY_EVIDENCE",
+        "PASS current v4 worker witness before historical v3 intention",
+        "PASS genuine historical v3 grant refused; exact FIFO cancellation and replay preserved",
+        "PASS old v3 SDK EOF typed action refusal and actual reap preserve cancelled provenance"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

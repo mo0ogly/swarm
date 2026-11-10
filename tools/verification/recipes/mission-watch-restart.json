@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "mission-watch-restart",
+  "inputs": [
+    "rust/crates/swarm-cli/src/mission_watch.rs",
+    "rust/crates/swarm-cli/src/mission_worker_entry.rs",
+    "rust/crates/swarm-cli/src/mission_status.rs",
+    "rust/crates/swarm-cli/examples/mission_watch_restart_seed.rs",
+    "rust/crates/swarm-engine/src/mission_worker_adoption.rs",
+    "rust/crates/swarm-engine/src/mission_worker_continuation.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_receipts.rs",
+    "tests/rust_*.py",
+    "tests/test_rust_mission_watch_restart_guards.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/mission.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "tools/verification/verify_native_profile.py",
+    "tools/verification/verify_sdk_example.py",
+    "tests/test_rust_mission_watch_public_guards.py",
+    "rust/crates/swarm-cli/examples/mission_worker_adoption_refusals.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "queued-restart-ledger-event-and-seed-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_mission_watch_restart_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_same_admission_witness_and_changed_rows_refused",
+        "test_one_terminal_settlement_without_refund_or_second_admission",
+        "test_actual_adoption_event_matches_one_append_only_chain_before_spawn",
+        "test_seed_declares_stopped_owner_not_provider_or_ledger_authority",
+        "test_real_api_checker_requires_all_refusals_and_exact_replay_recovery",
+        "test_fresh_witness_refuses_revision_changed_by_control_mutations",
+        "Ran 8 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "public-watch-new-generation-continues-real-old-queued-worker",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-watch-restart-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_watch_restart.py','--binary',os.environ['SWARM_WATCH_RESTART_BINARY'],'--profile',os.environ['SWARM_WATCH_RESTART_PROFILE'],'--sdk-binary',os.environ['SWARM_WATCH_RESTART_SDK_BINARY'],'--sdk-profile',os.environ['SWARM_WATCH_RESTART_SDK_PROFILE'],'--refusal-sdk-binary',os.environ['SWARM_WATCH_RESTART_REFUSAL_SDK_BINARY'],'--refusal-sdk-profile',os.environ['SWARM_WATCH_RESTART_REFUSAL_SDK_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public mission watch continues same queued Agent attempt FIFO reservation without second admission",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "existing-first-admission-watch-regression-three-inert-roots",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-watch-public-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_watch_public.py','--binary',os.environ['SWARM_WATCH_RESTART_BINARY'],'--profile',os.environ['SWARM_WATCH_RESTART_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public mission watch pause preserves independently granted worker completion",
+        "PASS public mission watch sigint preserves independently granted worker completion",
+        "PASS public mission watch sigterm preserves independently granted worker completion",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

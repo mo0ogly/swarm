@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-11T07:57:11.496122+00:00",
+  "patch": "docs/plans/engine-cursor-contract/recovery/recovery-repaired-handoff-20261011.patch",
+  "sha256": "a1a1e4d83fefdd8ccbb82d75f2d535a3b296741dcd961b72d0c8ed870a0a0317",
+  "bytes": 10300,
+  "parent_patch": "agent-engine-protocol-20261011.patch",
+  "parent_sha256": "a9eb1ca8961e446e4d777c3202759c51e02c1c555e8929303853bb1f51f4cb84",
+  "scope": "Incremental repair-ref handoff correction and attributable external repair provenance. Preserve native T1..T4 changes.",
+  "source_snapshot": "Regenerate with tools/verification/refresh_engine_source_manifest.py inside the integrated candidate.",
+  "verification_state": "targeted, race and complete default suite running; no independent native acceptance claimed"
+}

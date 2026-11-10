@@ -1,0 +1,6 @@
+{
+  "source": "docs/plans/migration-rust/evidence/20261022-157/departed05/complete/owned-review-public-certificate.json",
+  "sha256": "d6d7f72a62e294be19acb6503c976ab2c3e45ffa357381fa19d248291368771b",
+  "source_profile": "docs/plans/migration-rust/evidence/20261022-157/departed05/complete/recovery/sdk.profile.json",
+  "scope": "Actual retained certificate from owned inert native fixture, wire compatibility only; no Root permission or positive receipt seeded"
+}

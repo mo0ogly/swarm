@@ -1,0 +1,15 @@
+flowchart TD
+    W[Producteur actif et preuves observables] --> O[Moteur : durée, outil et compteurs]
+    O --> E[Événement run_observation de la tentative]
+    E --> S[Superviseur propriétaire : diagnostic]
+    S --> C[Proposition continue-run]
+    S --> A[Proposition stop-run avec motif]
+    C --> G{Droits, bail, entrée et tentative valides ?}
+    A --> G
+    G -->|non| R[Refus conservé ; aucun arrêt attribué]
+    G -->|oui : continuer| W
+    G -->|oui : arrêter| P[Demande d’arrêt du processus possédé]
+    P --> F[Fin réelle confirmée et compteurs conservés]
+    F --> D[Correction ou remise dans le parcours existant]
+    D --> V[Contrôles et revue du même candidat]
+    V --> K[Acceptation si preuves fraîches et critères satisfaits]

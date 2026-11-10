@@ -1,0 +1,17 @@
+--- FAIL: TestManagedFragmentRefusalRequiresOriginalProof (0.88s)
+    managed_review_fragment_finish_test.go:73: sizes 164551 168163 21899 parts 1
+    managed_review_fragment_finish_test.go:88: missing final independent refusal error inspection de fragment : réponse structurée invalide
+--- FAIL: TestManagedFragmentHistoricalPublicRecovery (36.49s)
+    --- FAIL: TestManagedFragmentHistoricalPublicRecovery/fail (6.88s)
+        managed_review_fragment_reuse_test.go:274: new defect bypassed blocked revue de fragments non favorable : inspection de fragment : réponse structurée invalide
+--- FAIL: TestManagedFragmentRuntimeProviderProtocol (20.04s)
+    --- FAIL: TestManagedFragmentRuntimeProviderProtocol/fail (0.89s)
+        managed_review_fragment_runtime_test.go:63: sizes 164551 168167 21899 parts 1
+        managed_review_fragment_runtime_test.go:99: error inspection de fragment : réponse structurée invalide
+--- FAIL: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift (8.75s)
+    --- FAIL: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fail (1.59s)
+        managed_review_fragment_tokens_store_test.go:23: sizes 164551 168167 21899 parts 1
+        managed_review_fragment_tokens_store_test.go:125: final independent refusal missing error inspection de fragment : réponse structurée invalide
+FAIL
+FAIL	swarm.local/companion/internal/engine	170.403s
+FAIL

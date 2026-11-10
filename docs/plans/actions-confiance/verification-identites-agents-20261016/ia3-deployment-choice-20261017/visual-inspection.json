@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-17T12:13:11.140371+00:00",
+  "method": "Viewed every listed PNG with view_image during this increment",
+  "files": {
+    "deployment-fr.png": "92f4285ec7344f341d542f230468be8d4458029702eb9426e87a12c2ac92c77c",
+    "deployment-en.png": "f98fcf578d130505955471051b4ab2b47ad99cd364d7a2d8980630c68f24c24d",
+    "bootstrap-proof-fr.png": "6239106722bb51f9feb169dac2754674f2bdec2215baa63f9cd212b91c9941ed",
+    "bootstrap-proof-en.png": "0bbfeb177046f4dc1a6538f2034a5a75db7d96b7875c1bafb0071f3a2dd0c464",
+    "bootstrap-state-fr.png": "c5847d72bf4dc0488e87cf13ae52e58ad44273fac9baa6beb515de1a68059a5b",
+    "bootstrap-state-en.png": "38aafbd91b1ea16644e8966e3113c73bfe0dc9f0c1830b7ac30459d0d8228aa1"
+  },
+  "result": "Six diagrams readable, complete, no observed clipping or label overlap; target/unimplemented state explicit",
+  "scope": "Static documentation; no UI behavior or runtime protection established"
+}

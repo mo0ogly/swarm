@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant C as Contrôleur appelant
+  participant K as Canal Linux configuré
+  participant S as Adaptateur privé
+  participant A as Autorité indépendante (raccord restant)
+  participant W as Coordinateur et témoin
+  C->>K: Paquet canonique et demande exacte
+  K->>S: Émetteur noyau et pidfd du message
+  S->>A: Authentifier et autoriser cette opération
+  Note over A,W: Protection de l’autorité maintenue pendant l’opération
+  A->>W: Exécuter une seule fois sous le principal épinglé
+  W-->>S: View confirmée ou Projection, sinon erreur
+  S-->>C: Résultat explicite ou code limité
+  Note over C,W: Réponse perdue après effet : retry exact réautorisé, sans doublon

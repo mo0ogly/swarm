@@ -1,0 +1,22 @@
+{
+  "id": "shared-producer-legacy-regressions-and-fixed-domain",
+  "command": [
+    "/home/fpizzi/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "--locked",
+    "-p",
+    "swarm-engine",
+    "--test",
+    "preparation_calls",
+    "--",
+    "--nocapture"
+  ],
+  "expected_exit": 0,
+  "exit": 101,
+  "seconds": 609.1740979549941,
+  "executable": "/home/fpizzi/.cargo/bin/rustup",
+  "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

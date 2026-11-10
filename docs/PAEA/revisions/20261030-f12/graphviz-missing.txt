@@ -1,0 +1,1 @@
+Initial generator baseline refused before output: FileNotFoundError: dot. Original traceback retained in chat. Recovery: optional --reuse-diagrams-from reads the original eleven embedded images, rejects incomplete references and preserves bytes. No package installation or diagram redesign.

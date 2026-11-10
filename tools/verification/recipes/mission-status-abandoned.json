@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "mission-status-abandoned",
+  "inputs": [
+    "tests/rust_status_abandoned.py",
+    "tests/rust_mission_status_contract.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-engine/src/mission_status_tasks.rs",
+    "rust/crates/swarm-engine/src/task_lifecycle.rs",
+    "version_history.json",
+    "tools/verification/recipes/mission-status-abandoned.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-abandon-and-reopen",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='status-abandoned-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_abandoned.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public abandonment nonvalidated, unchanged reads and reopen recovery",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

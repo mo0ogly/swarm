@@ -1,0 +1,26 @@
+{
+  "at_utc": "2026-10-16T20:06:10.758458+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "runtime": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "files": {
+    "internal/engine/agents_store.go": "6eb422e8204713ddf9457e8c3bb343be475a6e3c67bf21b8916a968785e57d1f",
+    "internal/engine/dialogue_context.go": "e4d5da03d1cfbb3b6dd58daecf18f55ab8415c6f83f21a7675d6c1abbdbd84d6",
+    "internal/engine/memory_summary_source.go": "750458d73f45f5be529dd483486bd92f19289913f8db74eb9dc425fc54d580e8",
+    "internal/engine/console_cli.go": "017b032688c1846b62979da0a5e36428f94d0449e2475468e98f5b66e7af4b32",
+    "internal/engine/web_server.go": "93776f4e6608192fa8b91c87a131812e4f98cb989b89cf1256631ebe8e49f25f",
+    "internal/engine/storage_inspection.go": "2e384ffb72104ed32ab0bb1afbbde92fbe3162eebfe137cd3696a8332d0a6ff1",
+    "internal/engine/main.go": "7a5728ba475d321d8fad4b60810c9c75052e6ca913c33a14a7e703164a4b2fa5",
+    "docs/PROJECT-MEMORY.md": "ad62a660d97458d9f438a630ec6566093977e65c011c51085b0a778f34653b5d",
+    "docs/en/PROJECT-MEMORY.md": "38d5dd9b3bc70c200b782bdabf9f2f2d0822306b99b9bdc43ae2045f06b9aba7",
+    "tools/memory-evaluation/README.md": "4326f3af253b092d7bc974186252ad062f3f0439b587b29373a2482f3f567ce1",
+    "docs/plans/deepagents-integration/PLAN.md": "313f8f408c1723a7b0d5cc3fade2ee2e773e5afa238a0a49a65d5da67571b107",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "b5be61e62dfe7fee013b13cd48617457167d3681ac3dc064e8a589891204126a"
+  }
+}

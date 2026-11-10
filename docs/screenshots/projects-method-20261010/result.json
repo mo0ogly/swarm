@@ -1,0 +1,33 @@
+{
+  "result": "PASS",
+  "languages": [
+    "fr",
+    "en"
+  ],
+  "themes": [
+    "etat",
+    "sombre"
+  ],
+  "widths": [
+    1440,
+    1024,
+    760,
+    390,
+    320
+  ],
+  "checks": [
+    "five-shared-six-repeated",
+    "six-distinct-stage-outcomes",
+    "translation",
+    "keyboard-selection",
+    "escape-focus-return",
+    "close-focus-return",
+    "tab-shift-tab-focus-wrap",
+    "reopen-reset",
+    "catalog-failure-independent",
+    "no-mutations-no-missions"
+  ],
+  "errors": [],
+  "mutations": [],
+  "root": "/tmp/swarm-projects-method-IS51Cv"
+}

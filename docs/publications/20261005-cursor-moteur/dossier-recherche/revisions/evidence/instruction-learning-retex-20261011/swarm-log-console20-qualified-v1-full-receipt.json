@@ -1,0 +1,44 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T18:36:18.566476+00:00",
+  "end": "2026-10-11T18:44:36.116329+00:00",
+  "seconds": 497.549835343998,
+  "exit": 0,
+  "output": "/tmp/swarm-log-console20-qualified-v1-full.out",
+  "output_sha256": "a3c0e3d0f2637c03bb2c0fb9c660f56b3e94c8d6d3b0fda94ec1c558523a4107",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "0fd97a542bf200235e136dd35251aed1c383e8671899ad4da46fabf7f009267b",
+  "candidate_digest": "4398355922eb04e5eccd38b1ed3f8329c7af3af817c9fc97a9c754031546a696",
+  "paths": 1187,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T18:36:18.566476+00:00",
+    "driver_pid": 2746739,
+    "pgid": 2746739,
+    "sid": 2746739,
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "manifest_sha256": "0fd97a542bf200235e136dd35251aed1c383e8671899ad4da46fabf7f009267b",
+    "source_digest": "4398355922eb04e5eccd38b1ed3f8329c7af3af817c9fc97a9c754031546a696",
+    "paths": 1187,
+    "precondition": "Qualified19 sources plus log console20: read-only authenticated frame, exact public logs and engine/supervisor source, request generation rejects stale mission replies, colours/themes/FR-EN/search/live/export/mobile/fallback verified by isolated browser recipev5. New CSP test passes without widening cockpit script/style policy. Current source1187 immutable snapshot; no native mission DB used. Full required before runtime install; originals UIv1..v4 failures retained and diagnostic conditions corrected.",
+    "go_pid": 2746749
+  }
+}

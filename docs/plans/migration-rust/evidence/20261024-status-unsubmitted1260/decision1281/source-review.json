@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "reviewer": "Root source self-review, not independent acceptance",
+  "baseline_sha256": "afd20c617d2a4472ee232eebb055cbbdf3132a969667d682fd44aeaa1d387ff1",
+  "current_sha256": "aaea1341339a1cf3671a6fefc5494592953bc34c770547f5536c1821f711f5ba",
+  "files": {
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs": {
+      "sha256": "61527754ded1c7b450b7d3f0e1124d5b7d1607ec8ca969da4967460cf40aa8c8",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs": {
+      "sha256": "96eb83e2ced515829c9d87938052fefe5ed845da772cb8b37bf4fa887b4f4663",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        }
+      }
+    },
+    "version_history.json": {
+      "sha256": "81458ba4ca19409b8df87bdf3cd75d9596d7453d81573716d7a6f8e31bcc2655",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "Changed bytes and actual consumed contracts examined in retained file-specific review; tested scope and unverified criteria explicit.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md",
+              "sha256": "e693b88a67cfd6701fb372c1fa41a834b7be9c8c954f9024486753639e52e90b"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

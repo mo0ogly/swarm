@@ -1,0 +1,13 @@
+{
+  "exit": 1,
+  "result": "FAIL timeout 180s",
+  "passing_subsets": [
+    "actual provider metadata adapter fallback",
+    "capacity and evidence refusals",
+    "coordination coverage"
+  ],
+  "failed_check": "full current public dossier, active101s at global180s deadline",
+  "cause_observed": "stack shows exact tokenizer of cumulative packet prefix inside planFreshTokenFragments",
+  "output_sha256": "a65d6963a82ba501c00d1b7fd8a41b7df894f26f226a168ab6374a9c36cb27e7",
+  "decision": "binary-search complete prefix packing, early coverage validation; retain exact final preflight; timeout not increased; prior results preserved"
+}

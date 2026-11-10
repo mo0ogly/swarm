@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-11T12:45:45.881406+00:00",
+  "operator_instruction_not_AI_learning": true,
+  "transmissions": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "revision_before": 231,
+      "observed_revision_after": 232,
+      "next_exactly_verified": true,
+      "status": "todo",
+      "request": "/tmp/swarm-same-attempt-candidate-history-T3-1.request.json",
+      "response": "/tmp/swarm-same-attempt-candidate-history-T3-1.response.json",
+      "verification": "/tmp/swarm-same-attempt-candidate-history-T3-verified-work.json",
+      "limit": "CLI response was plain text; success verified by fresh public state, mutation not replayed"
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision_before": 232,
+      "revision_after": 233,
+      "contracts_attempts_limits_unchanged": true,
+      "request": "/tmp/swarm-same-attempt-candidate-history-T7-1.request.json",
+      "response": "/tmp/swarm-same-attempt-candidate-history-T7-1.response.json"
+    }
+  ]
+}

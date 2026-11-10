@@ -1,0 +1,15 @@
+{
+  "name": "vet",
+  "argv": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "started": "2026-10-12T15:04:37.873250+00:00",
+  "finished": "2026-10-12T15:05:16.908223+00:00",
+  "exit": 0,
+  "wall_seconds": 39.03495485399617,
+  "output": "/tmp/swarm-binary-preflight-inspection-vet.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "drift": []
+}

@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-11T07:47:00.325129+00:00",
+  "source_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "working_tree_modified": true,
+  "patch": {
+    "schema_version": 1,
+    "observed_at": "2026-10-11T07:38:33.634100+00:00",
+    "patch": "docs/plans/engine-cursor-contract/recovery/agent-engine-protocol-20261011.patch",
+    "sha256": "a9eb1ca8961e446e4d777c3202759c51e02c1c555e8929303853bb1f51f4cb84",
+    "bytes": 241951,
+    "base_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+    "scope": "Consolidated current engine corrections, shared methods and architecture; preserve native T1..T4 changes when merging.",
+    "supersedes_root_patch_contents": [
+      "review-evidence-20261010.patch",
+      "plan-phases-20261010.patch",
+      "recovery-source-preflight-20261010.patch"
+    ],
+    "separate_required_patch": "provider-wait-20261010.patch",
+    "candidate_integration_required": "After merge, run python3 tools/verification/refresh_engine_source_manifest.py in the owned candidate. Do not import the root generated snapshot or rewrite historical acceptance manifests.",
+    "checks": {
+      "partitioned_complete_go_suite": "1110 discovered default tests/examples/fuzz targets; four disjoint groups all exit 0",
+      "go_vet": "PASS",
+      "race": "PASS; deterministic fixtures",
+      "agent_workflows": "PASS; actual engine-built contexts",
+      "mermaid": "FR/EN render PASS"
+    },
+    "limits": "Local implementation and fixture verification; independent native candidate review and integration remain required."
+  },
+  "checks": [
+    {
+      "artifact": "swarm-quote-before.jsonl",
+      "purpose": "red regression with exact HEAD implementation via Go overlay",
+      "observed_exit_code": 1,
+      "started_at": "2026-10-11T09:32:29.36506557+02:00",
+      "last_event_at": "2026-10-11T09:32:29.399249359+02:00",
+      "go_event_counts": {
+        "start": 1,
+        "run": 9,
+        "output": 22,
+        "fail": 4,
+        "pass": 6
+      },
+      "failures": [
+        "TestFragmentDefectQuoteStartsWithinDeclaredLine/inline_Unicode_on_long_JSON_line",
+        "TestFragmentDefectQuoteStartsWithinDeclaredLine/exact_multiline",
+        "TestFragmentDefectQuoteStartsWithinDeclaredLine",
+        "swarm.local/companion/internal/engine"
+      ],
+      "command_limit": "Full command retained for serial full suite; exact targeted selectors not retained. Raw JSONL preserves discovered/executed tests."
+    },
+    {
+      "artifact": "swarm-protocol-targeted.jsonl",
+      "purpose": "initial incorrect test fixture; corrected later to use actual engine result event",
+      "observed_exit_code": 1,
+      "started_at": "2026-10-11T09:15:43.153659984+02:00",
+      "last_event_at": "2026-10-11T09:16:19.446359903+02:00",
+      "go_event_counts": {
+        "start": 1,
+        "run": 63,
+        "output": 167,
+        "pass": 61,
+        "fail": 3
+      },
+      "failures": [
+        "TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/wrong_scope",
+        "TestPlanningReviewRetryRejectsInvalidRecoveryAtomically",
+        "swarm.local/companion/internal/engine"
+      ],
+      "command_limit": "Full command retained for serial full suite; exact targeted selectors not retained. Raw JSONL preserves discovered/executed tests."
+    },
+    {
+      "artifact": "swarm-protocol-core.jsonl",
+      "purpose": "protocol routing and quote regressions",
+      "observed_exit_code": 0,
+      "started_at": "2026-10-11T09:20:10.240623781+02:00",
+      "last_event_at": "2026-10-11T09:20:16.291988843+02:00",
+      "go_event_counts": {
+        "start": 1,
+        "run": 34,
+        "output": 81,
+        "pass": 35
+      },
+      "failures": [],
+      "command_limit": "Full command retained for serial full suite; exact targeted selectors not retained. Raw JSONL preserves discovered/executed tests."
+    },
+    {
+      "artifact": "swarm-method-restart-final.jsonl",
+      "purpose": "full method restart and historical integrity regressions",
+      "observed_exit_code": 0,
+      "started_at": "2026-10-11T09:28:10.500896792+02:00",
+      "last_event_at": "2026-10-11T09:29:06.870234102+02:00",
+      "go_event_counts": {
+        "start": 1,
+        "run": 22,
+        "output": 63,
+        "pass": 23
+      },
+      "failures": [],
+      "command_limit": "Full command retained for serial full suite; exact targeted selectors not retained. Raw JSONL preserves discovered/executed tests."
+    },
+    {
+      "artifact": "swarm-protocol-final-full.jsonl",
+      "purpose": "go test ./... -json -count=1 -timeout 15m; before last timeout-preview field adjustment",
+      "observed_exit_code": 0,
+      "started_at": "2026-10-11T09:28:26.180022825+02:00",
+      "last_event_at": "2026-10-11T09:36:28.474691662+02:00",
+      "go_event_counts": {
+        "start": 3,
+        "output": 3975,
+        "skip": 10,
+        "run": 1864,
+        "pass": 1857
+      },
+      "failures": [],
+      "command_limit": "Full command retained for serial full suite; exact targeted selectors not retained. Raw JSONL preserves discovered/executed tests."
+    },
+    {
+      "artifact": "swarm-protocol-final-race.jsonl",
+      "purpose": "targeted race checks for changed review shared state and reservation",
+      "observed_exit_code": 0,
+      "started_at": "2026-10-11T09:28:52.284393746+02:00",
+      "last_event_at": "2026-10-11T09:29:29.415409497+02:00",
+      "go_event_counts": {
+        "start": 1,
+        "run": 24,
+        "output": 69,
+        "pass": 25
+      },
+      "failures": [],
+      "command_limit": "Full command retained for serial full suite; exact targeted selectors not retained. Raw JSONL preserves discovered/executed tests."
+    },
+    {
+      "artifact": "swarm-protocol-last-regressions.jsonl",
+      "purpose": "latest timeout-preview metadata and source qualification checks",
+      "observed_exit_code": 0,
+      "started_at": "2026-10-11T09:30:33.566941271+02:00",
+      "last_event_at": "2026-10-11T09:30:48.992036492+02:00",
+      "go_event_counts": {
+        "start": 1,
+        "run": 19,
+        "output": 56,
+        "pass": 20
+      },
+      "failures": [],
+      "command_limit": "Full command retained for serial full suite; exact targeted selectors not retained. Raw JSONL preserves discovered/executed tests."
+    }
+  ],
+  "latest_complete_suite": {
+    "command": [
+      "python3",
+      "tools/verification/go_suite.py"
+    ],
+    "coverage": "1110 default named tests/examples/fuzz targets in four disjoint discovered groups, all exit 0",
+    "stdout": "swarm-protocol-partitioned-suite.stdout",
+    "stderr": "swarm-protocol-partitioned-suite.stderr"
+  },
+  "additional_checks": [
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "exit_code": 0,
+      "scope": "12 shared skills and actual engine-built role contexts"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "scope": "checked before and after documentation append; all local Markdown links in new FR/EN contract and research revision resolve"
+    },
+    {
+      "scope": "Mermaid FR/EN rendered with mmdc 11.12.0 and installed system Chrome; SVG originals included",
+      "exit_code": 0
+    }
+  ],
+  "limits": [
+    "local temporary repositories/provider doubles are not native independent acceptance",
+    "partitioned full suite includes latest engine changes; serial full suite preceded one timeout-preview metadata adjustment covered by final regressions",
+    "generated engine source snapshot proves current source integrity only; historical pending acceptance rows remain pending",
+    "paid native review continues under existing budgets; T2 semantic issues require new independent judgment",
+    "The historical Go source is saved with .go.txt extension to avoid compiling an evidence directory as a new package. Bytes and SHA remain unchanged."
+  ],
+  "artifacts": [
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-quote-before.jsonl",
+      "bytes": 9711,
+      "sha256": "b5f17cae2350d21d8da6f9076814a1ba473d09a7eeec92fbc24141251c1badda"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-quote-baseline.go.txt",
+      "bytes": 3422,
+      "sha256": "00b3f75e4244eb37dad8d39750a50d61df9bb2c233120ecc86332298c3ec7995"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-quote-baseline-overlay.json",
+      "bytes": 127,
+      "sha256": "b485ac7f92c593bb48bfee6760278e010f9bf3b88f19b4d76996cb4b9563f7a2"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-core.jsonl",
+      "bytes": 34270,
+      "sha256": "d1b884f282170adc0c82a1f0cffb3673942bbf0333d83d8def284966a2f8822d"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-targeted.jsonl",
+      "bytes": 68169,
+      "sha256": "08cc2d29963f6a1ea08995f560eb4e51112110108998c7992de098c7b107f000"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-method-restart-final.jsonl",
+      "bytes": 26310,
+      "sha256": "14a7324544c4094b35c1092bf09a57b9852ad1c0a991594861086539222b6a1b"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-final-full.jsonl",
+      "bytes": 1703462,
+      "sha256": "5713a3492113fc1813dbef76340c94dca2a9887cf837842d806b4feb88beb60a"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-final-full.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-partitioned-suite.stdout",
+      "bytes": 759,
+      "sha256": "b60f4d4a5a3a4062f2328607d8000ee0f9b8efac4859965054a04969781fccfa"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-partitioned-suite.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-final-race.jsonl",
+      "bytes": 28608,
+      "sha256": "55b792fdc2d840adb2f376f169b1b62fc3f393b500e1a2198e19a73698cd56cc"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-final-race.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-last-regressions.jsonl",
+      "bytes": 23381,
+      "sha256": "759e522b2cd4611fb95951d98d92a42e79cf2a52e857ac6efd186e67692e5230"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-last-vet.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-last-vet.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-last-workflow.stdout",
+      "bytes": 97,
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-last-workflow.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-manifest-final.stdout",
+      "bytes": 50,
+      "sha256": "cf32215677b5b40161b6e38af7fa9d3fea63c878118c643922ac7df22f0ab993"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-manifest-final.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-manifest-before.stdout",
+      "bytes": 197,
+      "sha256": "a0047c06c15a5ba449ca6ba66e1b09408c719720b6ebaec9be4106a4b1e552ae"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-mermaid-fr.stdout",
+      "bytes": 32,
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-mermaid-fr.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-mermaid-en.stdout",
+      "bytes": 32,
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-mermaid-en.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-fr-0.svg",
+      "bytes": 21630,
+      "sha256": "9e141c7aa6fa321be5561fd1b712b3f4fdcd20afeb818b2ef062837f49d125f4"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-en-0.svg",
+      "bytes": 21573,
+      "sha256": "a87d1d7ede8b1087e0cc3de2b28c39d9d9f960b474952843dac19a58680743ce"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-protocol-resume-request.json",
+      "bytes": 675,
+      "sha256": "e6997aed51b2b4779b00edbc73ce4ae5283b914f3044eca2a32c69e3a0cb9a10"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/swarm-old-protocol-proofs.json",
+      "bytes": 1157,
+      "sha256": "a192a5f7d0d55a257bbbab32ce72e5e0a75948a6930c74656de710cf0f3cf4f2"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-agent-engine-protocol/public-observation.json",
+      "bytes": 3759,
+      "sha256": "2c0b0b351e8fb1bd7e6adcd7cdf3303c9b95875afc9b18d6e5435710c5969306"
+    }
+  ]
+}

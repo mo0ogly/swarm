@@ -1,0 +1,21 @@
+{
+  "status": "DELIVERED_LOCAL_RESUME_WITH_EXPLICIT_RECORDED_MODE",
+  "version": "v0.1.1-dev.39",
+  "browser_assertions": 404,
+  "resume_browser_assertions": 38,
+  "resume_HTTP_assertions": 16,
+  "installed_resume_assertions": 21,
+  "installed_version_dialog_assertions": 14,
+  "served_assets_verified": 45,
+  "recipe_integrity": "VERIFIED",
+  "archive_sha256": "8604eaf1614cbf0ca52a50550bce5d29829d4ebf951d44c035f3beab060cabd3",
+  "GLM_calls": 1,
+  "declared_GLM_tokens": 2863,
+  "automatic_retry": false,
+  "live_mutation_or_provider_execution": false,
+  "limits": [
+    "Portal full managed batch projection remains open; recorded data is explicitly unvalidated",
+    "Historical agent provenance prevents mission status, retained open",
+    "No independent/global migration acceptance"
+  ]
+}

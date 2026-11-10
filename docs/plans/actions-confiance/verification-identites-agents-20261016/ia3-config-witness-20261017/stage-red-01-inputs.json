@@ -1,0 +1,14 @@
+{
+  "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+  "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+  "internal/enrollmentconfig/config.go": "32302422388538e4432afff63ef540e3a6225b5b2cf1a55d5330baeb39a531d1",
+  "internal/enrollmentconfig/config_test.go": "d6d6e1d0f8a600b7e6b97bfe2c785129c0c0c5b8b75114317f491c89f0ef4977",
+  "internal/enrollmentconfig/coordinator_linux.go": "f7d2e861aa347334ec705e93beb71b5938276ec06c99b30d809cf712fcc69f3a",
+  "internal/enrollmentconfig/coordinator_linux_test.go": "a3b0406a98105746a456f69e19aacf43ee3c3de280c1bf3080ab484ed9bf719c",
+  "internal/enrollmentconfig/store_linux.go": "35042fb579104287fd7a7c2cbbc452aa41c80969caf0bafa132100cd6d664bc0",
+  "internal/enrollmentconfig/store_linux_test.go": "975833b2ba07e1a54bf432867025e7a5db0e9f56c7860d3b720f25f056db6706",
+  "internal/enrollmentconfig/witness_linux.go": "a7cdb1a5f4f33ceba740522092a1a9aa630b0a0ab779958dad31f348090684bd",
+  "internal/enrollmentconfig/witness_linux_test.go": "7c00c7ed8e27e881d203a295ed87639b09f39d4aa69ab435d4365cd858c3cc5b",
+  "internal/identitycontract/contract.go": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+  "internal/identitycontract/contract_test.go": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7"
+}

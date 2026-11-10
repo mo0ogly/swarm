@@ -1,0 +1,9 @@
+{"Time":"2026-10-13T21:37:11.869468372+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-13T21:37:11.901000553+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCallLedgerAttributesMissingUsageAndCaches"}
+{"Time":"2026-10-13T21:37:11.901042692+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCallLedgerAttributesMissingUsageAndCaches","Output":"=== RUN   TestMissionSpendingCallLedgerAttributesMissingUsageAndCaches\n"}
+{"Time":"2026-10-13T21:37:11.959930239+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCallLedgerAttributesMissingUsageAndCaches","Output":"    spending_calls_test.go:95: JSON null became reported zeros \u0026{\u003cnil\u003e \u003cnil\u003e \u003cnil\u003e \u003cnil\u003e 0 0   }\n"}
+{"Time":"2026-10-13T21:37:11.961712719+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCallLedgerAttributesMissingUsageAndCaches","Output":"--- FAIL: TestMissionSpendingCallLedgerAttributesMissingUsageAndCaches (0.06s)\n"}
+{"Time":"2026-10-13T21:37:11.961784875+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCallLedgerAttributesMissingUsageAndCaches","Elapsed":0.06}
+{"Time":"2026-10-13T21:37:11.961802489+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-13T21:37:11.965682334+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.096s\n"}
+{"Time":"2026-10-13T21:37:11.965736346+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.096}

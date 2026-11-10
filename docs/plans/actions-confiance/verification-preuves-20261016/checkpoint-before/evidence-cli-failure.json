@@ -1,0 +1,1 @@
+{"family": "evidence", "op": "verify", "expected": 0, "exit": 2, "stdout": "", "stderr": "{\n  \"error\": \"preuve publique : commande, cl\u00e9 ou ancre invalide\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"preuve publique : commande, cl\u00e9 ou ancre invalide\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"}

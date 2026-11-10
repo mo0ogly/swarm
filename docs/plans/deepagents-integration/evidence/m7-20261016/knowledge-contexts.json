@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestProjectMemoryKnowledgeContexts$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "started_at_utc": "2026-10-16T07:42:40.691103+00:00",
+  "ended_at_utc": "2026-10-16T07:43:33.399109+00:00",
+  "exit_code": 0,
+  "changed_inputs": [],
+  "log_sha256": "b9cf20b568b7d678a1253a1503fabc6aa0caf2d05fdacb367a1970bcb234fef9"
+}

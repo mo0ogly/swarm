@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT2StateBoundIncludesFinalNewline
+    trust_actions_operator_regression_test.go:579: replacement after metadata validation followed another state inode: revision 2
+--- FAIL: TestActionsConfianceT2StateBoundIncludesFinalNewline (0.04s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.073s
+FAIL

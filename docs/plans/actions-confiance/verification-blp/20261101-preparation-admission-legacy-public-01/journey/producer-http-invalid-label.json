@@ -1,0 +1,10 @@
+{
+  "status": 400,
+  "body": {
+    "error": "blp-classification-invalid",
+    "failure": {
+      "code": "blp-classification-invalid"
+    },
+    "schema_version": 1
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "security-proofs-engine",
+  "inputs": [
+    "rust/Cargo.toml", "rust/Cargo.lock", "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/src/**/*", "rust/crates/swarm-engine/config/**/*",
+    "rust/crates/swarm-engine/tests/confidentiality.rs",
+    "rust/crates/swarm-confidentiality/src/**/*", "rust/crates/swarm-wire-json/src/**/*",
+    "docs/architecture/blp-flow-inventory.json", "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0", "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0", "CARGO_BUILD_JOBS": "1"
+  },
+  "steps": [{
+    "id": "admin-readonly-metadata-policy-freshness-and-no-invented-qualification",
+    "command": ["cargo", "test", "--manifest-path", "rust/Cargo.toml", "--offline", "--locked", "-p", "swarm-engine", "--test", "confidentiality", "security_status_is_admin_readonly_and_never_invents_qualification", "--", "--nocapture"],
+    "expected_exit": 0,
+    "required_stdout": ["security_status_is_admin_readonly_and_never_invents_qualification", "1 passed; 0 failed"],
+    "required_stderr": []
+  }]
+}

@@ -1,0 +1,68 @@
+{
+  "at": "2026-10-11T21:35:12.440994+00:00",
+  "old_pid": 3497645,
+  "new_pid": 2828,
+  "old_sha256": "8b2bcc55dc94734ce3e0b4ad55db9a21d7475fd0e8d53842f1c40f6c60b01246",
+  "installed_sha256": "f9f5d5152e6e791c55166ee218ec765e3133ae4fd8aef8fb9e8a3fceb95d7bb9",
+  "executed_sha256": "f9f5d5152e6e791c55166ee218ec765e3133ae4fd8aef8fb9e8a3fceb95d7bb9",
+  "source_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+  "schema": 29,
+  "idle_before": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 554,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "idle_after": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 554,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "public_work_post_pause_bodies_exact": true,
+  "storage_init_migration_or_copy": false,
+  "private_log_mode": "0600",
+  "health": "ready",
+  "launch_allowed": true,
+  "scope": "Qualified23 installed quiescent; mission paused for immutable future-input routing. No native acceptance inferred."
+}

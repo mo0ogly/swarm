@@ -1,0 +1,173 @@
+{
+  "date": "2026-10-23",
+  "request": "Move five complete diagrams from appended technical plates into the corresponding article sections.",
+  "owner": "Codex alone",
+  "scope": "Local Word layout and editorial entry points only",
+  "source_sha256": "7221c298384ffa611eade4877340856f3e44957e8af58bc2c740f8ca91b49135",
+  "output_sha256": "b3ad1823bdcdf405f0a4b316424433f5601dd26abb9142c6e177f72db1bee70b",
+  "output_bytes": 3502893,
+  "downloads_copy_identical": true,
+  "replan": {
+    "origin": "User asks whether diagrams were placed outside the article; v5 had five appended A2 plates after references and film page.",
+    "owner": "Codex root editorial delivery",
+    "requirement": "Five complete technical figures embedded at the corresponding article section; no simplification or implementation change.",
+    "options": [
+      "Interleave existing A2 figures with A4 prose at section boundaries.",
+      "Shrink all complete figures onto A4 pages, risking illegible labels."
+    ],
+    "decision": "Interleave original complete figure blocks and retain their original size. The short logs introduction shares the landscape figure page; other prose resumes on A4.",
+    "observable_checks": [
+      "Each view between its relevant section and the next section, before references.",
+      "All article prose except metadata and placement sentence preserved.",
+      "Five technical images and video poster unchanged byte for byte.",
+      "All comments, references and opaque package parts unchanged.",
+      "Render and inspect all pages; check absence of clipping or empty pages."
+    ],
+    "status": "verified local editorial correction, not published",
+    "previous_source_sha256": "7221c298384ffa611eade4877340856f3e44957e8af58bc2c740f8ca91b49135",
+    "effect": "All five complete figures precede references within their corresponding article sections; 15 final pages visually inspected."
+  },
+  "package_checks": {
+    "only_changed_part": "word/document.xml",
+    "all_other_parts_byte_identical": true,
+    "technical_views": 5,
+    "poster": 1,
+    "comments": 6,
+    "references": 18,
+    "declared_text_replacements": {
+      "ARTICLE LINKEDIN | Swarm deuxième partie | 23 octobre 2026 | version 5": "ARTICLE LINKEDIN | Swarm deuxième partie | 23 octobre 2026 | version 6",
+      "Les cinq vues techniques qui suivent conservent tous leurs composants. Les schémas d’identité et de mémoire rappellent désormais qu’une signature ne prouve pas la vérité du contenu et qu’un souvenir ne crée aucun droit. Les 18 références de l’article restent conservées. AC02 n’est pas démarré.": "Les cinq vues techniques sont intégrées aux sections correspondantes de l’article et conservent tous leurs composants. Les schémas d’identité et de mémoire rappellent désormais qu’une signature ne prouve pas la vérité du contenu et qu’un souvenir ne crée aucun droit. Les 18 références de l’article restent conservées. AC02 n’est pas démarré."
+    }
+  },
+  "placement": {
+    "rust": 4,
+    "identity": 6,
+    "memory_and_instructions": 8,
+    "supervision_and_human_validation": 10,
+    "logs": 11,
+    "references_start": 13,
+    "film_page": 15
+  },
+  "visual_review": {
+    "renderer": "Bundled documents/render_docx.py with isolated LibreOffice",
+    "render_directory": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v6/render-02",
+    "pages": 15,
+    "all_pages_opened_at_original_resolution": true,
+    "no_empty_pages_clipped_figures_or_overlaps_observed": true,
+    "figure_sizes_preserved": true,
+    "pdf_sha256": "9ac5d3a5b229530f00a4009883c94ff2dfacf6a1e848723ab6b7d85012b849f5",
+    "page_png_sha256": {
+      "page-1.png": "080c5750846f3a07e7b6a15ab3247f2d2c5a5eafbf6da4c851b6f57628b0a60d",
+      "page-10.png": "4c4cf9e25e82cd3aba2fed7c7af3ac3fb1e9daf6544c832336724d6375f88479",
+      "page-11.png": "fa4fc74e06e597ec4d25039848f797261edae3d6d68b9be43c744d186ee9420b",
+      "page-12.png": "f8e5c1971c61236b5a2fdd22b73fc7595e4dea96b9bda78fcf6ce16b53c03c0e",
+      "page-13.png": "05718c539f29581395892be712bf0df585a8f4fce40655e0c2b96f50ae58b295",
+      "page-14.png": "05378b4f31051dfc7c8c4a38379882ad9fb3934fada41c2a3d1f4fa5025452f2",
+      "page-15.png": "07ea0b9b0f1e89da5bda63cb50d305717a447d8c893dba7363c5e13e107370df",
+      "page-2.png": "d3e1fc6aaef1e960278c18d562abd5ac57aeb058ba2cb85235cdbf535e694290",
+      "page-3.png": "7395a4dae6564ec2daf114138d8b53df27a1354e6cd110c0b73b67031d3042fa",
+      "page-4.png": "963387215bd43500362d7aad84ab873b99fb9e1a8cf28933cd66102413307660",
+      "page-5.png": "9d4d1865d19ab841f0214711faaeb24dc3026327eb1652b8088501e842d2b604",
+      "page-6.png": "fb23da5b9e21b6c70ad6cf269d6f3494a635b7900218054e685105f157abccfa",
+      "page-7.png": "0774917a35361e3925299a311758c56e78168082d6ce76c002cd8bf2940c507d",
+      "page-8.png": "b0bbef3241591263b62b4c103eb4c78461ea00f67a4ea21184f5e3e1466fd83f",
+      "page-9.png": "7ac720fe34051b9c9ef90bd2a45b0cbe3929268ee65873bff5ad4db9c07a8008"
+    },
+    "native_microsoft_word_not_exercised": true
+  },
+  "first_render_issue": {
+    "cause": "Short logs prose isolated on an A4 page by interleaving figure sections.",
+    "proof": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v6/render-01/page-11.png",
+    "action": "Place the logs heading and paragraph on the same A2 landscape page as the complete logs figure.",
+    "observed_effect": "Final logs prose and complete figure share page 11; final document is 15 pages instead of 16."
+  },
+  "export_helper_recovery": {
+    "observed": "Generic lxml elements do not inherit python-docx XPath namespace shortcuts.",
+    "failure": "XPathEvalError Undefined namespace prefix; no Word or Markdown output was written by this failed finalize attempt.",
+    "correction": "Use namespace-qualified element iteration for all text extraction.",
+    "effect": "Final package, placement, original-entry hashes and Markdown images checked before completion."
+  },
+  "increment_review": {
+    "policies": "No runtime configuration, hidden policy, threshold, retry, or default changed; paper sizes are inherited editorial layout.",
+    "functions": "No maintained application function modified. Temporary OOXML authoring helpers document preservation contracts and assert package/text/placement invariants.",
+    "errors": "Candidate writes use flushed same-directory temporary files and atomic replacement. First layout candidate and original render retained. Verification guards do not convert failed preservation or rendering into success.",
+    "build_inputs": "No build or runtime delivery change; version_history and running server unchanged. Media and current diagram sources reused without modification.",
+    "languages": "FR and EN README links and layout descriptions updated together. French article request does not require a new English article."
+  },
+  "learning": {
+    "origin": "User correction of diagram placement after the article.",
+    "lesson": "Technical diagram completeness and article integration are separate checks. Verify every figure sits between its relevant section and the next section before references.",
+    "owner": "Codex editorial delivery",
+    "retained_in": "This review, current editorial index, illustrated article and FR/EN entry points.",
+    "limit": "No engine rule or already-started native context changed."
+  },
+  "unchanged_media": {
+    "film_sha256": "bb5f6a0f6355991618e380f4a231b657d74c180862e462cf2d48b8f2513eebf9",
+    "diagram_sources_unchanged": true
+  },
+  "task_owned_files": {
+    "README.md": "431512018af4851f5c157554f60e4ba3e1c9b201733525963331f4ed179ab81a",
+    "README.en.md": "65addd1d20f03c6ca88f2f2a333d8e4cbc587f1b1f5cc565056e14cdd7b262b2",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md": "34d75bf84e56f628d990b17d19e5a0458e99747ee19814b832810408ac4c7e67",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md": "1594d4e444724262e41b0e518f3d3873f607c5d64de58eb24ca53f16efdb6712",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v6.docx": "b3ad1823bdcdf405f0a4b316424433f5601dd26abb9142c6e177f72db1bee70b",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/article-v6-fr.md": "ef3a0ac8cdfd00c0f9890f75baaa6e9a8f29e4be91564853e3337eb998569f21",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/word-v6-placement.patch": "f348842ab24f6cec5f073a603af1d38068eade335082f48f3caf55a8cd0efa25"
+  },
+  "baseline_entry_hashes": {
+    "README.md": "7de7131d056977ba201f02dc8e35204447b870621f0f0508bc141a433bf69da1",
+    "README.en.md": "d90ab4b1c27a2baebc9d43d0ec2663be285fef65872a83b8ae18fb43574017e2",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md": "cf7e21230ff530a7aabed05e7978bdf186ae1ee8b5e126283999a388b9efcc10",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md": "a6561979e98d9f19e7e89f917af796c64d59ecfc9908807732a61c064e36aa3b"
+  },
+  "links": {
+    "documents": 9,
+    "links": 584,
+    "broken": 0,
+    "result": [
+      {
+        "file": "README.md",
+        "localLinks": 131
+      },
+      {
+        "file": "README.en.md",
+        "localLinks": 131
+      },
+      {
+        "file": "docs/architecture/OVERVIEW.md",
+        "localLinks": 66
+      },
+      {
+        "file": "docs/en/ARCHITECTURE.md",
+        "localLinks": 66
+      },
+      {
+        "file": "docs/diagrams/README.md",
+        "localLinks": 40
+      },
+      {
+        "file": "docs/diagrams/CONTRACT-MAP.md",
+        "localLinks": 81
+      },
+      {
+        "file": "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md",
+        "localLinks": 48
+      },
+      {
+        "file": "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md",
+        "localLinks": 14
+      },
+      {
+        "file": "docs/communication/linkedin-swarm-identite-memoire-20261023/article-v6-fr.md",
+        "localLinks": 7
+      }
+    ]
+  },
+  "git_diff_check": "PASS, exit 0",
+  "limits": [
+    "No publication, commit, runtime restart, AC02 execution or new global Rust qualification.",
+    "Review performed by the author; not an independent candidate review."
+  ],
+  "status": "Verified local editorial correction, not published",
+  "frozen_v5_and_diagram_inputs_checked": true
+}

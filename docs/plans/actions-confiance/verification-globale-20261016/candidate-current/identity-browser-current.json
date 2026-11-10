@@ -1,0 +1,112 @@
+{
+  "stages": [
+    {
+      "argv": [
+        "node",
+        "tests/actions_confiance_oidc_ui.cjs",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/identity-human",
+        "--group-mapping"
+      ],
+      "pid": 4086133,
+      "start_ticks": "6289877",
+      "started_unix": 1792128474.6263187,
+      "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+      "status": "passed",
+      "exit_code": 0,
+      "ended_unix": 1792128489.2766926,
+      "checks": 26,
+      "report_sha256": "b0433369b2dda13d0f301205b438691130d308a57ad2a0212c935ffb51c4281a"
+    },
+    {
+      "argv": [
+        "node",
+        "tests/actions_confiance_workload_ui.cjs",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/identity-service",
+        "--group-mapping"
+      ],
+      "pid": 4087842,
+      "start_ticks": "6291371",
+      "started_unix": 1792128489.5714517,
+      "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+      "status": "passed",
+      "exit_code": 0,
+      "ended_unix": 1792128501.2492483,
+      "checks": 14,
+      "report_sha256": "70cd62aef62b2b771d8c3186b1753fa15e51fb976eba36626993f1e6ce6d11bb"
+    },
+    {
+      "argv": [
+        "node",
+        "tests/actions_confiance_workload_ui.cjs",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/identity-introspection",
+        "--introspection"
+      ],
+      "pid": 4089326,
+      "start_ticks": "6292561",
+      "started_unix": 1792128501.4684083,
+      "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+      "status": "passed",
+      "exit_code": 0,
+      "ended_unix": 1792128516.1021557,
+      "checks": 16,
+      "report_sha256": "aaee0d3810cbbb35786dcc8a29a1f39561c9f57ca81c6078c3bd9d739786af49"
+    },
+    {
+      "argv": [
+        "node",
+        "tests/actions_confiance_delegation_ui.cjs",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/identity-delegation"
+      ],
+      "pid": 4091134,
+      "start_ticks": "6294046",
+      "started_unix": 1792128516.3209684,
+      "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+      "status": "passed",
+      "exit_code": 0,
+      "ended_unix": 1792128529.3099005,
+      "checks": 10,
+      "report_sha256": "a6a7ad2a3218e69ddbe3b04ddfba3afa423962b52bde02af5a52815ebb1b2fa9"
+    },
+    {
+      "argv": [
+        "node",
+        "tests/actions_confiance_step_up_ui.cjs",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/identity-step-up"
+      ],
+      "pid": 4092691,
+      "start_ticks": "6295371",
+      "started_unix": 1792128529.5661488,
+      "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+      "status": "passed",
+      "exit_code": 0,
+      "ended_unix": 1792128546.2878342,
+      "checks": 20,
+      "report_sha256": "d44e0474c2f70938b6c3421fbf6a1242acc73e89a5a89885b160ba9c6f4ff100"
+    },
+    {
+      "argv": [
+        "node",
+        "tests/actions_confiance_oidc_logout_ui.cjs",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/identity-logout"
+      ],
+      "pid": 4094643,
+      "start_ticks": "6297065",
+      "started_unix": 1792128546.5109086,
+      "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+      "status": "passed",
+      "exit_code": 0,
+      "ended_unix": 1792128562.2383652,
+      "checks": 18,
+      "report_sha256": "7b9b8c41a55c8ae60c736e296e6774070db91bd1dd8d93ac2300508f14985770"
+    }
+  ],
+  "inputs_unchanged": true,
+  "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "independent_review": false
+}

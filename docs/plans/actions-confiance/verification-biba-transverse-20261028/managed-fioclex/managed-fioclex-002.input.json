@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "biba-fioclex-budget",
+  "expected_revision": 12,
+  "budget": {
+    "limit_usd": 10,
+    "reserve_per_launch_usd": 1,
+    "estimate_source": "Owned inert Biba fixture",
+    "reference_date": "2026-10-28"
+  }
+}

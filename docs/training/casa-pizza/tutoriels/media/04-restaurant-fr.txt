@@ -1,0 +1,20 @@
+00s — Ouvrir Espace restaurant
+Une connexion est nécessaire pour consulter et faire avancer les commandes.
+
+06s — Essayer un mot de passe incorrect
+L’accès est refusé ; le catalogue public reste distinct de l’espace restaurant.
+
+12s — Se connecter avec atelier dans cette démo
+La même commande et le même total sont affichés côté restaurant.
+
+18s — Passer à En préparation
+Le restaurant avance manuellement le statut ; aucune autonomie IA n’est démontrée.
+
+24s — Actualiser le suivi côté client
+Le statut En préparation correspond à l’action du restaurant.
+
+30s — Passer à En livraison
+Les étapes sont parcourues dans l’ordre.
+
+36s — Passer à Livrée puis actualiser le client
+Le suivi confirme la livraison fictive du même numéro de commande.

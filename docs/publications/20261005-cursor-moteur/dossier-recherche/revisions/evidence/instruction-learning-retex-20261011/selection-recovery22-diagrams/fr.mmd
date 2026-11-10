@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant S as Superviseur du perimetre
+    participant M as Moteur deterministe
+    participant R as Revue independante
+    M->>S: Entree fraiche, original exact, capacite avant/apres
+    S->>M: Decision review-retry avec correction motivee
+    M->>M: Preuves, droits, budget, producteur termine dans la transaction
+    M->>M: Historique preserve et nouveau journal version 2
+    M->>R: Selection avec decision recue et inspections originales
+    R->>M: Pieces necessaires ou unknown
+    M->>R: Message final complet controle avant reservation
+    R->>M: Avis final independant, y compris refus
+    M->>S: Nouvel avis attribue et effet public

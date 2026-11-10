@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "preparation_id": "prep-688350fb6dec4e0d4b1bb93f",
+  "event_id": "explicit-standard",
+  "expected_revision": 2,
+  "provider": "fixture",
+  "capability_hash": "801023d08742f53d1ae233a4cd63cb4920d43f4bdbe25a793547b7944b2bcb10",
+  "model_policy_hash": "1fe3eaf59e14447dba38882e33056f1c767a93127d00d1b29de54d54c9ea3439",
+  "level": "standard",
+  "message": "Propose brief",
+  "context_mode": "full"
+}

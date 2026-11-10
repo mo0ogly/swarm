@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "id": "paea-controller-packet",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tests/fixtures/paea_provisioning_request.json",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-personal-service-core.json",
+    "schemas/paea/personal-service-response-v1.schema.json",
+    "tests/paea_service_response_schema_test.py",
+    "rust/crates/swarm-linux-identity-channel/**/*",
+    "tools/verification/recipes/paea-controller-packet.json",
+    "tests/paea_controller_rustdoc_test.py",
+    "tests/paea_initial_rustdoc_test.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "kernel-retained-domain-public",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--test",
+        "namespace_domain",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "namespace_domain_same_objects_repeated_observation_and_explicit_closes ... ok",
+        "namespace_domain_actual_private_namespace_refuses_then_original_recovers ... ok",
+        "2 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "kernel-wrong-object-private",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--lib",
+        "namespace_domain_tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "namespace_domain_wrong_mount_or_pid_refuses_then_original_recovers ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "packet-binding-private-order-outcomes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "personal_service::controller_packet::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "controller_packet_uid_before_decode_and_no_dispatch_then_valid_recovers ... ok",
+        "controller_packet_exact_domain_decode_refusal_and_callback_once ... ok",
+        "controller_packet_dispatch_refusal_and_known_business_outcome_survive ... ok",
+        "controller_packet_late_cleanup_keeps_reply_business_error_and_original_cause ... ok",
+        "controller_packet_after_use_and_custom_io_preserve_all_known_error_branches ... ok",
+        "controller_packet_actual_other_domain_before_decode_and_no_dispatch ... ok",
+        "10 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-service-public-wrong-uid",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "personal_service",
+        "personal_service_packet_dispatch_wrong_uid_preserves_real_state",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "personal_service_packet_dispatch_wrong_uid_preserves_real_state ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "strict-doc-swarm-linux-identity-channel",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "strict-doc-swarm-enrollment-authority",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "exact-doc-sources-and-contracts",
+      "command": [
+        "python3",
+        "tests/paea_controller_rustdoc_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "CONTROLLER_SOURCE_BOUND_RUSTDOC_PASS sources=3 pages=4"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

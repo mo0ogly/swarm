@@ -1,0 +1,170 @@
+{
+  "at": "2026-10-11T15:36:00.573025+00:00",
+  "baseline": "/tmp/swarm-future-planning-control-baseline-receipt.json",
+  "records": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "before": 333,
+      "after": 334,
+      "worker_revision": 335,
+      "commands": [
+        [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestPreparedOrganizationManagedRepository|TestPlanning|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestCursorEngineT3",
+          "-count=1",
+          "-timeout=150s"
+        ]
+      ],
+      "timeouts": [
+        20,
+        180,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "criteria_and_control_ids_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "before": 335,
+      "after": 336,
+      "worker_revision": 337,
+      "commands": [
+        [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestPreparedOrganizationManagedRepository|TestPlanning|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestCursorEngineT4",
+          "-count=1",
+          "-timeout=150s"
+        ]
+      ],
+      "timeouts": [
+        20,
+        180,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "criteria_and_control_ids_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "before": 338,
+      "after": 339,
+      "worker_revision": 340,
+      "commands": [
+        [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestPreparedOrganizationManagedRepository|TestPlanning|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestCursorEngineT5",
+          "-count=1",
+          "-timeout=150s"
+        ]
+      ],
+      "timeouts": [
+        17,
+        180,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17
+      ],
+      "criteria_and_control_ids_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "before": 340,
+      "after": 341,
+      "worker_revision": 342,
+      "commands": [
+        [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestPreparedOrganizationManagedRepository|TestPlanning|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestCursorEngineT6",
+          "-count=1",
+          "-timeout=150s"
+        ]
+      ],
+      "timeouts": [
+        20,
+        180,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "criteria_and_control_ids_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "before": 342,
+      "after": 343,
+      "worker_revision": 344,
+      "commands": [
+        [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestPreparedOrganizationManagedRepository|TestPlanning|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestCursorEngineT7",
+          "-count=1",
+          "-timeout=150s"
+        ]
+      ],
+      "timeouts": [
+        20,
+        180,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "criteria_and_control_ids_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "before": 344,
+      "after": 345,
+      "worker_revision": 350,
+      "commands": [
+        [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff",
+          "-count=1",
+          "-timeout",
+          "25s"
+        ]
+      ],
+      "timeouts": [
+        40,
+        40,
+        40,
+        40
+      ],
+      "criteria_and_control_ids_preserved": true
+    }
+  ],
+  "T2_review_not_modified_by_policy_changes": true,
+  "linked_diagnosis": "Initial verification assumed seven controls and wrong command index; corrected receipt verification against actual policies, no repeat mutations. T8 has four document-only controls and no Go change scope, retained.",
+  "limit": "Configured future controls and received instructions; no future tests executed or tasks accepted"
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T18:38:15.214094+00:00",
+  "parent": "review-local-negative-recovery-20261011.patch",
+  "parent_tree": "1ed4f832c7f00f5adb72ea1690dac7085c048447",
+  "preimage_tree": "8ab23d9b37687dd55618727d664b2b9a53878c3b",
+  "preimage_extensions": [
+    {
+      "path": "docs/UI-DESIGN.md",
+      "sha256": "a2f01ba8f9ffa95a3ec03088dfa753879bdcf3c4e486f60f6d2e374a9ed8ebd1",
+      "blob": "500190f7e2f35ccfab0ba1135ac3cbccc3f7a22f"
+    },
+    {
+      "path": "internal/engine/web_terminal.go",
+      "sha256": "144668c768bb2e63f73c1a576cce6d2d01800f5eee368976d0f6cf0939dcaf4f",
+      "blob": "73df6845afbee175a70115a90f86a3956e75e195"
+    },
+    {
+      "path": "web/cockpit.js",
+      "sha256": "d4c1e52ec6bfef285040c4d5e5dcc335c5d242fed4a9380bae631f7526ca3a09",
+      "blob": "80fec5e9d6b8be62ec817007fdd582a96402e0f6"
+    }
+  ],
+  "preimages": {
+    "docs/UI-DESIGN.md": "a2f01ba8f9ffa95a3ec03088dfa753879bdcf3c4e486f60f6d2e374a9ed8ebd1",
+    "docs/architecture/LOG-CONSOLE.md": null,
+    "docs/en/LOG-CONSOLE.md": null,
+    "internal/engine/web_terminal.go": "144668c768bb2e63f73c1a576cce6d2d01800f5eee368976d0f6cf0939dcaf4f",
+    "internal/engine/web_log_console_test.go": null,
+    "locales/en.json": "552e0a6ad265c40f50175bb47a1d0ff984baae44207e279004d1139ab91aae15",
+    "web/i18n-en.js": "affc1303b622aa2af7a0e298d70ff71d04823affd34a29cafd1e707185e225f6",
+    "web/cockpit.js": "d4c1e52ec6bfef285040c4d5e5dcc335c5d242fed4a9380bae631f7526ca3a09",
+    "web/index.html": "97e56a669cdd758d8a1f34e3a1246d144ad531d6f07976f99a3047cadb725866",
+    "web/journal-console.js": null,
+    "web/log-console.html": null,
+    "web/log-console.js": null,
+    "web/log-console.css": null,
+    "tools/verification/refresh_engine_source_manifest.py": "0d55e36e5bc4bc4611e9b18f44609c175ec41b5bc1ce1b6c74c3897f26b685f6",
+    "tests/log_console_ui.cjs": null
+  },
+  "postimages": {
+    "docs/UI-DESIGN.md": "f3d1cd28781054fa862d30d1a8144938ef5dd2c587aa19cbc9b9cc964ea03ba3",
+    "docs/architecture/LOG-CONSOLE.md": "319d6f17ce5459682f8fb6a53b1e27a72d358ceaf092b884127f6d1ac05d9d0f",
+    "docs/en/LOG-CONSOLE.md": "b566cb3af501b18a98e4372e6d67ac83d3d113295aa3db2d87140369e4025c0f",
+    "internal/engine/web_terminal.go": "c19382900ff33635b05bcc54ecffe7222718c4551b3908796494d0b8ccf3a22f",
+    "internal/engine/web_log_console_test.go": "369e465d64b3a6a1c97f9bc92fb6c7576c4790f76e086ee04bde355938ca41c7",
+    "locales/en.json": "1a2e23f9b892e2ed134af741e364a6d0e576e6a1bf242b482367438ad1e5584a",
+    "web/i18n-en.js": "2cb90ebf28c8f4bbcf2877ede4aa8d07deddf86a6df41b9341a25755eb61d750",
+    "web/cockpit.js": "5515efba36b294869e0e91c2e22a9bbbe1f8a8080a17a59f60d026530dd78a16",
+    "web/index.html": "aa0a2a28ebc632906230abf1731c32c6d9467b4427cbfa464cb7fc25a4c73f2e",
+    "web/journal-console.js": "aa532ecbfcf0c911767775e09851814e7a322657a5b3a8ff449d66204e2ba4e8",
+    "web/log-console.html": "0cada7289993d060a4cf17cc16074350f5737417f7291a4749e32b6904841cf6",
+    "web/log-console.js": "4ceba9b502a574f176db378e0b4f57af8aa4675bd98cc5cc5fca10d3cfc9b3d4",
+    "web/log-console.css": "0508c806f17af18bb7526ad438911b244c6b42585b3c7c4c3a8c072116f93ffe",
+    "tools/verification/refresh_engine_source_manifest.py": "cd225cf0ece0a9f024b1d4e1923ac84b787d28172238860336a97b1828a07d4d",
+    "tests/log_console_ui.cjs": "f78cd602d53af85e5bcff6340bc895da8add7cdecda2c7511bcfa5b90d3bd0b0"
+  },
+  "result_tree": "e2ec243ccd1da1b9d818a86e0d5a27c304d2d6f7",
+  "patch": "log-console-20261011.patch",
+  "patch_sha256": "2d3d8f20355a4f22a8ae047f7fa17d7e1f592942f2d1a1c6e1b263602699fa61",
+  "paths": [
+    "docs/UI-DESIGN.md",
+    "docs/architecture/LOG-CONSOLE.md",
+    "docs/en/LOG-CONSOLE.md",
+    "internal/engine/web_terminal.go",
+    "internal/engine/web_log_console_test.go",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "web/cockpit.js",
+    "web/index.html",
+    "web/journal-console.js",
+    "web/log-console.html",
+    "web/log-console.js",
+    "web/log-console.css",
+    "tools/verification/refresh_engine_source_manifest.py",
+    "tests/log_console_ui.cjs"
+  ],
+  "check": "PASS exact15path diff, refreshed-index apply and result tree/allpostimages",
+  "qualification": {
+    "browser": "log-console-ui-v5 PASS6 grouped behavioral checks, no model called",
+    "CSP_Go": "PASS0.929s actual authenticated route/scope/frame policy plus prior authentication/preparation/manifest checks",
+    "npm": "PASS",
+    "vet": "PASS",
+    "methods": "PASS after preserving exact canonical skill links",
+    "full20": "running, no installation or final qualification implied",
+    "full_exit": 0,
+    "full_seconds": 497.549835343998,
+    "full_source_digest": "4398355922eb04e5eccd38b1ed3f8329c7af3af817c9fc97a9c754031546a696",
+    "full_paths": 1187,
+    "source_drift": [],
+    "full_receipt": "/tmp/swarm-log-console20-qualified-v1-full-receipt.json",
+    "keyboard": "/tmp/swarm-log-console20-keyboard-receipt.json",
+    "compatible_detached_agent_restart": "/tmp/swarm-log-console20-detached-agent-restart-receipt.json"
+  },
+  "purpose": "Read-only local Monaco console in Logs, attempt/engine/supervisor sources, four labelled semantic colours FR/EN themes, original API export, search/live/pagination, stale request rejection, network and Monaco fallback. Fixture UI data are not native supervisor decisions or acceptance."
+}

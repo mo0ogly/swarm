@@ -1,0 +1,29 @@
+{
+  "scope": "Local M13; no delegation, real model or runtime deployment",
+  "incidents": [
+    {
+      "cause": "Reader omitted row-session agreement and semantic session/usage checks; end confirmation overwrote a changed session",
+      "original": "boundary-red.json/.log",
+      "owner": "Codex engine change",
+      "effect": "Shared reader refuses; compare-and-set blocks next exchange; negative and transition cases retained"
+    },
+    {
+      "cause": "Browser recipe assumed a storage key and retained English URL",
+      "original": "browser.json/.log; browser/failure.json",
+      "changed_precondition": "Use actual lang query parameter and setTheme function",
+      "owner": "Codex recipe"
+    },
+    {
+      "cause": "Snapshot polling canceled by navigation counted as unexpected failure",
+      "original": "browser-final.json/.log",
+      "changed_precondition": "Classify only same-fixture snapshot ERR_ABORTED during observed navigation; retain separately; all other failures block",
+      "owner": "Codex recipe",
+      "final_navigation_aborts": []
+    },
+    {
+      "cause": "File searches assumed absent paths; documentation patch introduced stray plus; audit rejected legitimate existing text",
+      "changed_precondition": "Read actual producers; reread corrected paragraph; narrow audit to current result status",
+      "owner": "Codex method"
+    }
+  ]
+}

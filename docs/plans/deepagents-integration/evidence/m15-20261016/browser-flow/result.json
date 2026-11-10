@@ -1,0 +1,45 @@
+{
+  "status": "PASS",
+  "root": "/tmp/swarm-dr-ui-PvBbNM",
+  "checks": [
+    "Imported isolated RETEX recipe rechecked through the public evaluator, then version admitted and selected through the public CLI",
+    "Actual provider boundary and stopped process inspected through recovery-preview; no provider restart",
+    "FR/EN, both themes, 1440/760/390/320 widths, Escape and semantic action focus restoration",
+    "Two unknown checks remain visible, verified checks expand on demand and confirmation is hidden",
+    "Rendered diagnostic text contrast is at least 4.5:1",
+    "Untrusted diagnostic text is rendered as text without executable nodes",
+    "Deselection blocks actual recovery diagnosis in FR/EN and both themes at desktop/mobile widths, without a restore form or mutation; Escape returns focus",
+    "Explicitly reselecting the still-valid version allows an actual UI restoration to the same session, with separate execution usage",
+    "Public withdrawal blocks subsequent restoration and retains both original versions, prompts and checkpoints without another provider invocation"
+  ],
+  "errors": [],
+  "failures": [],
+  "expectedFailures": [
+    {
+      "url": "http://127.0.0.1:33541/api/v1/dialogue-resume?work=w-b78fa7732963618dc9bfc0d5&agent=91587971-9fb5-4bf3-8a51-fa6e88f028f1",
+      "status": 409
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 409 (Conflict)"
+    },
+    {
+      "url": "http://127.0.0.1:33541/api/v1/dialogue-resume?work=w-b78fa7732963618dc9bfc0d5&agent=95aed6be-79cc-43bf-b44e-c4d896eb5a07",
+      "status": 409
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 409 (Conflict)"
+    }
+  ],
+  "navigationAborts": [
+    {
+      "url": "http://127.0.0.1:33541/api/v1/assist/turns?work=w-b78fa7732963618dc9bfc0d5",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:33541/api/v1/snapshot?work=w-b78fa7732963618dc9bfc0d5",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "provider_invocations": 2,
+  "model_calls": 0
+}

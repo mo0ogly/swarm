@@ -1,0 +1,14 @@
+00s — Ouvrir le catalogue local
+Six recettes disponibles ; atelier fictif, sans paiement réel.
+
+06s — Cocher Végétariennes uniquement
+Trois recettes restent visibles.
+
+12s — Commander une Margherita avec des coordonnées fictives
+9,50 euros hors livraison : le serveur refuse le minimum inférieur à 10 euros.
+
+18s — Passer la quantité à deux avec Flèche haut
+19,00 euros de pizzas + 2,90 euros de livraison = 21,90 euros.
+
+24s — Confirmer puis ouvrir Mon suivi
+Un numéro de commande apparaît. Le statut initial est Reçue.

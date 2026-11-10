@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "work": "w-6ec6f9ecb0fb24c96fd9924b",
+  "started": "2026-10-13T20:01:45.991510+00:00",
+  "operator_interventions_after_start": 0,
+  "candidate": "12c9dc28d4e87124da051405beabfaa7d51f2393",
+  "root_judge": {
+    "verdict": "end",
+    "reason": "Le résultat de module_4 a été intégré puis accepté sur le candidat 12c9dc28d4e87124da051405beabfaa7d51f2393 après une revue indépendante passée. L’état contrôlé indique désormais les quatre tâches module_1 à module_4 acceptées et fraîches sur ce même candidat, couvrant req-1 à req-4, sans incident de revue ni travail restant. Le cycle global peut donc se terminer sur ce candidat ; cette décision s’appuie sur l’acceptation moteur et la revue reçues, et non sur les seuls contrôles locaux du producteur.",
+    "evidence_ref": "12c9dc28d4e87124da051405beabfaa7d51f2393",
+    "at": "2026-10-13T20:07:38.913965621Z",
+    "cycle": 1,
+    "max_cycles": 0,
+    "closed": true,
+    "history": [
+      {
+        "verdict": "end",
+        "reason": "Le résultat de module_4 a été intégré puis accepté sur le candidat 12c9dc28d4e87124da051405beabfaa7d51f2393 après une revue indépendante passée. L’état contrôlé indique désormais les quatre tâches module_1 à module_4 acceptées et fraîches sur ce même candidat, couvrant req-1 à req-4, sans incident de revue ni travail restant. Le cycle global peut donc se terminer sur ce candidat ; cette décision s’appuie sur l’acceptation moteur et la revue reçues, et non sur les seuls contrôles locaux du producteur.",
+        "evidence_ref": "12c9dc28d4e87124da051405beabfaa7d51f2393",
+        "at": "2026-10-13T20:07:38.913965621Z",
+        "cycle": 1
+      }
+    ]
+  },
+  "max_simultaneous_workers": 1,
+  "review_refusals": [],
+  "tasks": 4,
+  "planning_calls": 5,
+  "review_calls": 4,
+  "bundle_sha256": "871792002d12c2b53b5f369b169ff3a7bc0c0a11d1f914f746d8dde970efb85c",
+  "functional_check": {
+    "command": [
+      "/usr/bin/python3",
+      "-B",
+      "-c",
+      "import module_1;assert module_1.answer()==1;import module_2;assert module_2.answer()==2;import module_3;assert module_3.answer()==3;import module_4;assert module_4.answer()==4"
+    ],
+    "exit": 0
+  },
+  "scope": "Real Codex campaign at explicit concurrency",
+  "finished": "2026-10-13T20:07:42.602457+00:00",
+  "elapsed_seconds": 356.61139211400223
+}

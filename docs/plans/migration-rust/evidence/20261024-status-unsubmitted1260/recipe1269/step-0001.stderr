@@ -1,0 +1,40 @@
+  + Exception Group Traceback (most recent call last):
+  |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 276, in <module>
+  |     if __name__=='__main__':main()
+  |                             ~~~~^^
+  |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 273, in main
+  |     worker.subreaper_scope(cases,lambda e:fixture.publish(out/'failure.json',dict(status='FAIL',cause=''.join(traceback.format_exception(e)))),parent_death.subreaper)
+  |     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_watch_worker.py", line 90, in subreaper_scope
+  |     raise BaseExceptionGroup('watch observation/publication/subreaper restoration', errors)
+  | ExceptionGroup: watch observation/publication/subreaper restoration (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_watch_worker.py", line 80, in subreaper_scope
+    |     result = operation()
+    |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 270, in cases
+    |     fault(binary,out/'fault',args.baseline_probe)
+    |     ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 256, in fault
+    |     if primary is not None or errors:raise BaseExceptionGroup('worker recovery and cleanup',([primary] if primary else [])+errors)
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | ExceptionGroup: worker recovery and cleanup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Traceback (most recent call last):
+      |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 219, in fault
+      |     stale=status_read('saved-zero-rejects-old-report','completed_unproven','absent_or_unattributed')
+      |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py", line 194, in status_read
+      |     shown=f.ok(['mission','status',f.work])
+      |   File "/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_agent_model_route.py", line 143, in ok
+      |     assert code == 0, (self.label,args,code,value)
+      |            ^^^^^^^^^
+      | AssertionError: ('public-worker-flow', ['mission', 'status', 'w-3f0ee1c8c11a743be130be10'], 2, {'error': 'root-cleanup', 'failure': {'causes': ['root-cleanup', 'root-cleanup', 'root-cleanup', 'root-cleanup', 'root-cleanup', 'root-cleanup', 'root-cleanup', 'root-cleanup', 'mission-status-supervision-changed', 'git-report', 'git-report', 'git-report', 'review-evidence-invalid', 'review-evidence-invalid', 'review-required'], 'code': 'root-cleanup', 'message': 'root-cleanup', 'retryable': False}, 'schema_version': 1})
+      +------------------------------------
+Traceback (most recent call last):
+  File "<string>", line 4, in <module>
+    subprocess.run(['python3','tests/rust_mission_worker_recovery.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python3', 'tests/rust_mission_worker_recovery.py', '--binary', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-a190e3550e464c1fdcdb28c1d2fbd886cd2dfdc70b7904f90e6169c557a8d484', '--profile', '/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/migration-rust/evidence/20261024-status-unsubmitted1260/normal1265/result.json', '--output', '/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-svrmyxh7/run']' returned non-zero exit status 1.

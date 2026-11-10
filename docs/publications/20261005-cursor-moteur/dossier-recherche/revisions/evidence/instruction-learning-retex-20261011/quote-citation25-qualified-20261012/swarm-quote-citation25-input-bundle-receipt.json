@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-12T07:03:38.023356+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-defect-citation-contract-20261012.bundle",
+  "sha256": "d8ad78949ac673fc820254f75ff9f6792c3bd8002643c319f3b33f9fbb1bb8ac",
+  "commit": "f3d451f28912221bf3788594ab5e89aeeb9ed33a",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 116,
+  "manifest_sha256": "cac911b762022c8f6a2395b9ded4192b6b85a9a18e3512908b8de37c1cd1f9c4",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-inputs-a3rfgaj_",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-import-nzu87fyy",
+  "old114_originals_preserved": true,
+  "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+  "limits": "Cumulative114 original inputs unchanged, including six-example documentation; plus qualified25 quote-only defect citation contract and explicit complete protocol restart. T3 integrates all operator fixes then qualifies its own candidate. T4 guards exact, short, multiline, Unicode, absent and ambiguous quotations, historical schema, full protocol restart and preserved original opinions/calls. T5 handles observed clock/provider-recovery projection omission; current runtime25 fixes citations only. T7 proves actual reception/decision/application/effect; T8 RETEX after recipe. No native acceptance inferred; methods, schema29, actor authority, counters and original proofs preserved."
+}

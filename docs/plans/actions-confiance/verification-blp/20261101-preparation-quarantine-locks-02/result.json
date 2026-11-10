@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-preparation-quarantine-locks",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": false,
+  "steps": [
+    {
+      "id": "release-preserves-observed-effect",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::preparation_confidentiality::tests",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 71.18782597100653,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "policy-public-storage-and-actual-lock-order",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "confidentiality",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 50.60833770300087,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-declared-inputs-changed",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "7a32ebc2df9bb694ce9fdea52b952e400d44677ba787512b906d15ef2fca155b",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "79a2b797ecc04801933ce91fc58b9640aae91b26598515e45ddb5bcaf9f80a20",
+    "declared-inputs.tar.gz": "2893e8814f2b31e81b8e8d32f6c42b196f474cc654430d8058313485605ee639",
+    "environment.json": "5bb3210e002c55a567147892b20d4eb8449de3a250e9a119554abecea3f95608",
+    "step-0001.stdout": "730d0f23103e937986b541faa7fd076056de6526ce429aedb0e12f537456597f",
+    "step-0001.stderr": "7ed93f971a3a5bee6067c3950b55d7a1438fa8aa376a600af5af5486dd98d558",
+    "step-0001.json": "25cc31129c3c5e627b1904d0995783bd61be5835b3e6ad17ad3c990dd6b3a56c",
+    "step-0002.stdout": "e9dec4d2a8f86ae18da955fec3cf25282a94788b34d6b3df4c06484efad1f0ca",
+    "step-0002.stderr": "362ae1ad9895b2b86443cfa898a261fe33de3cd5c08d8de13a7bcdfe1246c473",
+    "step-0002.json": "547e81f0b30fdb24cdba8ab9b0746f698d862a70d17908c48896d5d79e28622a",
+    "inputs.after.json": "538ed6436e6b2e33e65414e8174f7dd9f72dc37480b5f427a5ab4ef56b0c1f75"
+  }
+}

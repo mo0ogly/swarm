@@ -1,0 +1,11 @@
+{
+  "cause": "Editorial rewrite substituted a 1355-word derivative for the supplied article; checking only against the derivative source did not establish fidelity to the attachment.",
+  "original_sha256": "36e2101c7d07244bd045494e7ad76bf5b6921c17939212ff1d89469b0c2fcda2",
+  "original_words": 4081,
+  "article_words": 3278,
+  "article_exact_slice": true,
+  "decision": "Restore original article without rewriting; preserve surrounding supplied commentary as an appendix and byte-exact full original as Markdown. Keep positioning documentation separate.",
+  "previous_wrong_deliverable_retained": true,
+  "status": "CORRECTED_AND_VERIFIED",
+  "verification": "verification.json"
+}

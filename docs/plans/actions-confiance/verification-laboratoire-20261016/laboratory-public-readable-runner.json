@@ -1,0 +1,10 @@
+{
+  "pid": 2794722,
+  "proc_start_ticks": "4711887",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-laboratory-public-readable.py",
+    "run"
+  ],
+  "at": "2026-10-16T01:04:54.724879+00:00"
+}

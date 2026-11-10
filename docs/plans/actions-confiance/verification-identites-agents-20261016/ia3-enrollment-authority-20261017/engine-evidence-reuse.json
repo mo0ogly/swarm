@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-17T11:35:57.492617+00:00",
+  "bound_attempt": "03",
+  "input_count": 1069,
+  "changed_since_run": [],
+  "own_authority_test_change_not_in_engine_graph": true,
+  "limit": "test and build prove their recorded source graph; later shared edits require their own checks"
+}

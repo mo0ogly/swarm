@@ -1,0 +1,10 @@
+flowchart LR
+  A[API publique : journaux, activité, décisions] --> B[Page attribuée à la mission et à la source]
+  B --> C[Export des données originales]
+  B --> D[Console Monaco en lecture seule]
+  D --> E[Recherche et couleurs avec libellés]
+  D --> F[Repli texte si Monaco indisponible]
+  G[Incident observé] --> H[Sous-superviseur ou superviseur racine]
+  H --> I[Décision autorisée appliquée par le moteur]
+  I --> J[Effet à vérifier séparément]
+  J --> A

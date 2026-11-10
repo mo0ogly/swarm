@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "agent-exchanges-read-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/exchange_read.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_read.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-cli/src/exchange.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-web/src/service/exchanges.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "web/native-cockpit.js",
+    "web/native-runtime.js",
+    "web/native-runtime.css",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "tests/rust_agent_exchanges.py",
+    "tests/rust_agent_exchanges_browser.py",
+    "tests/rust_agent_exchanges_ui.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tests/helpers/verification_cleanup.cjs",
+    "docs/architecture/NATIVE-AGENT-EXCHANGES.md",
+    "docs/en/NATIVE-AGENT-EXCHANGES.md",
+    "tests/test_http_head_wire.py",
+    "rust/crates/swarm-wire-json/src/lib.rs",
+    "tests/rust_http_head_regressions.py",
+    "tests/rust_installed_agent_exchanges.py",
+    "tests/rust_installed_version_read.cjs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-go",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='agent-exchanges-final-',dir='.cache')).resolve()/'public-go'\nprint('RETAINED_FLOW',p,flush=True)\na=['python3','tests/rust_agent_exchanges.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\na+=['--go-binary',os.environ['SWARM_GO_REFERENCE_BINARY']]\nsubprocess.run(a,check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "AGENT_EXCHANGES_PUBLIC_GO_VERIFIED 7"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "browser",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='agent-exchanges-final-',dir='.cache')).resolve()/'browser'\nprint('RETAINED_FLOW',p,flush=True)\na=['python3','tests/rust_agent_exchanges_browser.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nsubprocess.run(a,check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "AGENT_EXCHANGES_BROWSER_VERIFIED 4"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+--- FAIL: TestPlanningRejectedProposalReturnsToOwnerWithIntactEvidence (0.06s)
+    planning_rejection_test.go:59: rejection globally stopped plan or mutated contract &{<nil> false <nil> <nil>  map[] <nil> test aee6ba02ccb2700cb3fa3d71fc6f742b5fe75f0194fa83a52bdb37608994961b 2 15 Proposition non appliquée : opération 1 task[existing] : tâche déjà présente 1 false 10 10 1 [{<nil> <nil> 0xc000023e50 0xc000111260 0xc0001112c0 0 0 2 root  Préserver le travail [req-1 req-2] 2 4   waiting}] [{<nil>   <nil> test-plan-63383303249b6cf22ad9a9fa root brief   Préserver le travail [] test-plan-18d6f07f83408cb4d425ccd1 2026-10-11T12:15:15.509488656Z} {<nil>   <nil> next-input root operator_resume   Create a new task without recreating existing tasks. []  }]}
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.078s
+FAIL

@@ -1,0 +1,23 @@
+{
+  "recorded_at": "2026-10-16T07:02:07.312141+00:00",
+  "old_candidate_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "review_verdict": "request_changes",
+  "new_code_status": "native final groups compiling",
+  "known_corrections": [
+    "chain validation before protected publication and direct connector effect",
+    "authenticated read-only fallback for exact historical replies",
+    "immutable versioned policy/intent/result/native contexts in event hashes",
+    "canonical JSON native-result digest after persistence",
+    "exact large-integer evidence UI"
+  ],
+  "pending": [
+    "propagate unsupported exact-decoder error in evidence API after source freeze",
+    "current binary/public and browser checks",
+    "R19 refreshed bound receipts",
+    "new independent review",
+    "retrospective completion"
+  ],
+  "r20": "DEFERRED_BY_USER",
+  "native_kernel_qualified": false,
+  "global_acceptance": false
+}

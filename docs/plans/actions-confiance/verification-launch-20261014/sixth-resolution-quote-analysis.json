@@ -1,0 +1,62 @@
+[
+  {
+    "packet": 0,
+    "artifact": 5,
+    "matches": [
+      "diff --git a/docs/plan-68b50cc82e-T2.review-context.json b/docs/plan-68b50cc82e-T2.review-context.json"
+    ],
+    "quote": null
+  },
+  {
+    "packet": 0,
+    "artifact": 9,
+    "matches": [
+      "internal/engine/web_server.go"
+    ],
+    "quote": null
+  },
+  {
+    "packet": 0,
+    "artifact": 13,
+    "matches": [
+      "internal/engine/web_server.go"
+    ],
+    "quote": null
+  },
+  {
+    "packet": 1,
+    "artifact": 3,
+    "matches": [
+      "diff --git a/web/trust-actions.html b/web/trust-actions.html"
+    ],
+    "quote": null
+  },
+  {
+    "packet": 1,
+    "artifact": 4,
+    "matches": [
+      "diff --git a/tests/actions_confiance_t2_ui.cjs b/tests/actions_confiance_t2_ui.cjs"
+    ],
+    "quote": null
+  },
+  {
+    "packet": 1,
+    "artifact": 5,
+    "matches": [
+      "plan-68b50cc82e-T2/plan-validation"
+    ],
+    "quote": null
+  },
+  {
+    "packet": 1,
+    "artifact": 6,
+    "matches": [],
+    "quote": "func (s *Store) trustActionsCLI(pos []string, input string, out io.Writer) error {\n\tif len(pos) != 2 {\n\t\treturn fmt.Errorf(\"swarm trust show|config-preview|config-apply|mandate-create|mandate-revoke|request|approve|commit|reconcile|direct-write|elevate-integrity|export|anchor|verify\")\n\t}"
+  },
+  {
+    "packet": 1,
+    "artifact": 7,
+    "matches": [],
+    "quote": "\t\tif !strings.HasPrefix(authorization, \"Bearer \") || strings.TrimSpace(authorization[7:]) == \"\" || strings.ContainsAny(authorization[7:], \" \\t\\r\\n\") {\n\t\t\tfail(w, &CommandError{Code: \"authorization_required\", Message: \"Authorization: Bearer <jeton> requis\"})\n\t\t\treturn\n\t\t}"
+  }
+]

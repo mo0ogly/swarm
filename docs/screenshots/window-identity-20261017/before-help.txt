@@ -1,0 +1,5 @@
+AssertionError [ERR_ASSERTION]: long help starts at its title
+
+'' !== 'help-title'
+
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/window_identity_ui.cjs:84:12

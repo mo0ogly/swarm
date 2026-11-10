@@ -1,0 +1,12 @@
+{
+  "binary_sha256": "3a3b943c58b620785f9ed30527a02828149216e8d3728f8948321ceaff9629e5",
+  "fixture_root": "/tmp/swarm-authenticated-refusal-7o3u08y5",
+  "before_count": 0,
+  "after_count": 1,
+  "first_exit": 2,
+  "replay_exit": 2,
+  "foreign_exit": 4,
+  "replay_preserved": true,
+  "original_bytes_preserved": true,
+  "business_unchanged": true
+}

@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-16T19:27:37.124143+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "runtime": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "files": {
+    "docs/plans/deepagents-integration/PLAN.md": "c46d69dfb2a9357a91cb109206156f1a927697445e238c58861add148a9c3313",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "ebdd6d9fc594b5837a3dc8e1cbf4e1fca4da13cc6221f1e87c0594947bbde4be",
+    "docs/PROJECT-MEMORY.md": "663b50d0e3475f59df5107a6ea65030ed12976b272e4e6cc8abb56a459319f97",
+    "docs/en/PROJECT-MEMORY.md": "460b52c14e9add355463f91acaf66756642fd5c55b10d41c0e15b09ba90f9180",
+    "tools/memory-evaluation/README.md": "07b88efe7c402805eadf20b14b3698db07dfac35c9fa35e00ce39fd34bffa9f7"
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "cases": [
+    {
+      "context": {
+        "sha256": "58a20854d48dabd310f455d5172800be021d857fb3ecbe98897ac3219b441a47",
+        "bytes": 40241,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 32
+      },
+      "id": "contract-current-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "contract-current-without.txt",
+      "prompt_sha256": "3dd093e69ab083f6affb9b98c85ebe19ac496bebe57c5247a0b4bb5edf4a305b",
+      "raw_prompt": "contract-current-without.engine.txt",
+      "scenario": "contract-current",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-11d7ed0bfefcec401f509206",
+            "id": "storage-source-contract",
+            "version": 1,
+            "sha256": "f96c3a96d43c6a77932b4127ac537ee16a3c23d5ce88883a49bdf0ae41c1a7a2"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-6d9e23e344485852f569604b",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Vérifier l'applicabilité du contrat sourcé à la cible",
+          "at": "2026-10-16T07:43:32.678626879Z"
+        },
+        "sha256": "0cfc7b195db452b3f5b30ac48945ab89eb33b95a3589a2d07847899a73bd6f18",
+        "bytes": 41810,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 32
+      },
+      "id": "contract-current-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "contract-current-with.txt",
+      "prompt_sha256": "70c6342a8b9c860bf26d20c7a8681a17a807fdbe86fe6cb4a6271276a8b113aa",
+      "raw_prompt": "contract-current-with.engine.txt",
+      "scenario": "contract-current",
+      "source_revision": 3,
+      "treatment": "with"
+    },
+    {
+      "context": {
+        "sha256": "7b8c3cda7d7d513457904291e6f6769d88dde4f1791bd5a2961ed7a0d9738cd6",
+        "bytes": 40241,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "0056182d7acaeaba1fa64aa2844c1f94172320610b8ce275bccb19593901b492",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 32
+      },
+      "id": "contract-changed-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "contract-changed-without.txt",
+      "prompt_sha256": "610cb7dab5e06b703a8683e81bd389599f8fded392796a555c5be0bbeb986790",
+      "raw_prompt": "contract-changed-without.engine.txt",
+      "scenario": "contract-changed",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-11d7ed0bfefcec401f509206",
+            "id": "storage-source-contract",
+            "version": 1,
+            "sha256": "f96c3a96d43c6a77932b4127ac537ee16a3c23d5ce88883a49bdf0ae41c1a7a2"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-f25b10d1d23bd1f06bc1bd61",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Vérifier l'applicabilité du contrat sourcé à la cible",
+          "at": "2026-10-16T07:43:32.814258129Z"
+        },
+        "sha256": "663cfb8faa53a5b05a9150220ab2ab988e07ac45e6d4cf45356c00dc5fc908a2",
+        "bytes": 41810,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "0056182d7acaeaba1fa64aa2844c1f94172320610b8ce275bccb19593901b492",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 32
+      },
+      "id": "contract-changed-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "contract-changed-with.txt",
+      "prompt_sha256": "7d7ebcf60d97b3d6235ad73f3d8c88b0358f2e9dd41efac669620302b5bf98b6",
+      "raw_prompt": "contract-changed-with.engine.txt",
+      "scenario": "contract-changed",
+      "source_revision": 3,
+      "treatment": "with"
+    }
+  ],
+  "inspection_control": {
+    "after_storage_version": 32,
+    "before_storage_version": 32,
+    "error_code": "storage_upgrade_required",
+    "work_preserved": true
+  },
+  "knowledge": {
+    "source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+    "source_snapshot": "contract-model.go",
+    "store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+    "store_snapshot": "contract-store.go",
+    "supported_version": 33
+  },
+  "lesson": {
+    "version": 1,
+    "action": "admit",
+    "kind": "procedure",
+    "body": "Source observée : internal/engine/model.go, schemaVersion = 33, SHA-256 ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa. internal/engine/store.go (openStoreWithMigration), SHA-256 fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1, refuse une consultation sans migration d'un stockage positif plus ancien que cette version (storage_upgrade_required). Si ces deux sources correspondent à la cible et que son stockage est plus ancien, préparer une migration prise en charge avec décision opérateur, puis un nouveau contrôle de compatibilité. Cela n'autorise pas une migration, un lancement ou une acceptation immédiate. Si une empreinte diffère, cette connaissance ne certifie plus la cible : réclamer sa source courante.",
+    "conditions": "Comparer les deux empreintes de source à celles observées sur la cible avant réemploi. Ne pas deviner le numéro d'une autre révision.",
+    "source_retex": "memory-source",
+    "source_sha256": "7e0ab2ad236d78009da6751b2a2f4924805aea5ddd285bd0a538b7f0c054da17",
+    "project_sha256": "a1e60bc49e4d53ea812e9ae6e2dcd0359b6a3cdd792e0f36cacde10025f6bc70",
+    "actor": "fpizzi/uid:1001",
+    "reason": "Conserver un contrat extrait et vérifié, distinct de l'état courant",
+    "at": "2026-10-16T07:43:32.588275648Z",
+    "sha256": "f96c3a96d43c6a77932b4127ac537ee16a3c23d5ce88883a49bdf0ae41c1a7a2"
+  },
+  "protocol": "storage-knowledge-v2",
+  "provenance": "audited source snapshots and engine previews; no provider invocation",
+  "schema_version": 1
+}

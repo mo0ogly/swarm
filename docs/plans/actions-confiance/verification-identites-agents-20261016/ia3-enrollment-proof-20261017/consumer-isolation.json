@@ -1,0 +1,15 @@
+{
+  "previous_issuer_receipt_sources_unchanged": true,
+  "previous_owned_go_files": [
+    "internal/engine/agent_identity_issuer_linux.go",
+    "internal/engine/agent_identity_registry_types.go",
+    "internal/engine/agent_identity_registry_publish.go",
+    "internal/engine/agent_identity_registry_store.go",
+    "internal/engine/agent_identity_receipt_linux.go",
+    "internal/engine/agent_identity_receipt_linux_test.go"
+  ],
+  "engine_or_cli_importers": [],
+  "rg_exit_no_matches": 1,
+  "no_current_enrollment_service": true,
+  "operator_choice_pending": true
+}

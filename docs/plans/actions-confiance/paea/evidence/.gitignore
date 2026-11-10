@@ -1,0 +1,4 @@
+# Raw qualification directories may contain private fixture sessions and binaries.
+# Publish only explicitly reviewed, selected proof files; keep all originals local.
+*
+!.gitignore

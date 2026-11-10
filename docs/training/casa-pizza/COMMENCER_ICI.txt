@@ -1,7 +1,7 @@
 FORMATION SWARM CASA PIZZA
 
 Ouvrir le guide Word Formation_Swarm_Casa_Pizza.docx.
-36 chapitres illustrés pour débutants.
+38 chapitres illustrés pour débutants.
 
 ESSAYER LA RÉFÉRENCE
 Dans un terminal, depuis le dossier extrait :
@@ -44,3 +44,14 @@ Les statuts avancent manuellement dans l'espace restaurant. Après confirmation,
 le panier est vidé et le suivi reste dans l'onglet. L'écoute 127.0.0.1 garde
 cette démo sur le poste qui exécute le serveur. Ce n'est pas un déploiement.
 Le kit exclut credentials, sessions privées, bases SQLite et historique Git.
+
+TUTORIELS ANIMÉS — ÉDITION DU 9 OCTOBRE 2026
+Les guides comptent maintenant 38 chapitres : les 36 précédents sont conservés.
+Après extraction complète, ouvrir tutoriels/index.html. Choisir un module,
+avancer pas à pas ou lire la vidéo courte, puis répondre à l’exercice corrigé.
+Dans le cockpit mis à jour : Aide du cockpit → Formation Casa Pizza.
+Vidéos FR/EN sans audio, GIF d’aperçu, transcriptions et images complètes.
+Les vidéos montent des captures réelles ; elles ne sont pas des films continus.
+Aucune des six tâches pédagogiques n’a été exécutée dans cette capture.
+
+PDF : Formation_Swarm_Casa_Pizza.pdf (FR), Swarm_Casa_Pizza_Training_EN.pdf (EN). Guides de 38 pages accessibles depuis le lecteur et inclus dans les kits ; Word conservés comme sources éditables.

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "tests/test_memory_codex_events.py"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "started_at_utc": "2026-10-16T06:50:28.894187+00:00",
+  "ended_at_utc": "2026-10-16T06:50:29.176844+00:00",
+  "exit_code": 0,
+  "sources_sha256": {
+    "tools/memory-evaluation/run_codex.py": "1be2e3cc0086e7612c75580867d402a7f9775592de72a6888278ef46a647bc38",
+    "tools/memory-evaluation/compare.py": "2d0277366d5f6772aecdf6a344d769a0c21131c65d8eb5ac0b0261dd50e9f041",
+    "tests/test_memory_comparison.py": "b5805aeb7784e21764ead0983532653c0b02174cbe5d31698a6355f6a660fb7c",
+    "tests/test_memory_codex_events.py": "03a6b08acb294dcab3abc80cea0b4ea0bce9db34f7ab362b3ac0841e00f170e5"
+  },
+  "log_sha256": "18d3e62f8329c1b1f7568d8739002c8f051587faf647c45d558b3462d252fae3"
+}

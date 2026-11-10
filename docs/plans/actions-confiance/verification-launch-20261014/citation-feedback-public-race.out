@@ -1,0 +1,18 @@
+=== RUN   TestCitationDiagnosticPreservesLiteralBoundaries
+=== RUN   TestCitationDiagnosticPreservesLiteralBoundaries/indentation
+=== RUN   TestCitationDiagnosticPreservesLiteralBoundaries/encoded_output
+--- PASS: TestCitationDiagnosticPreservesLiteralBoundaries (0.05s)
+    --- PASS: TestCitationDiagnosticPreservesLiteralBoundaries/indentation (0.02s)
+    --- PASS: TestCitationDiagnosticPreservesLiteralBoundaries/encoded_output (0.03s)
+=== RUN   TestCitationDiagnosticRejectsInvalidWireAndKeepsHistoricalPrefix
+--- PASS: TestCitationDiagnosticRejectsInvalidWireAndKeepsHistoricalPrefix (0.00s)
+=== RUN   TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen
+=== RUN   TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/operator
+    managed_review_citation_feedback_test.go:182: sizes 164551 168196 21899 parts 1
+=== RUN   TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/supervisor
+    managed_review_citation_feedback_test.go:182: sizes 164551 168196 21899 parts 1
+--- PASS: TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen (50.37s)
+    --- PASS: TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/operator (25.54s)
+    --- PASS: TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/supervisor (24.83s)
+PASS
+ok  	swarm.local/companion/internal/engine	51.556s

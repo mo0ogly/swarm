@@ -1,0 +1,23 @@
+{
+  "packages": {},
+  "command": [
+    "go",
+    "build",
+    "./internal/enrollmentconfig"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T13:00:18.426988+00:00",
+  "end": "2026-10-17T13:00:18.520611+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 12
+}

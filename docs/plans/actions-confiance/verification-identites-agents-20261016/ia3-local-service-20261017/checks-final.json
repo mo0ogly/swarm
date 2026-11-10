@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-17T13:26:45.780191+00:00",
+  "local_links_checked": 193,
+  "missing_links": [],
+  "owned_whitespace": [],
+  "gofmt_exit": 0,
+  "gofmt_output": "",
+  "diff_check_exit": 0,
+  "diff_check_output": "",
+  "effective_sources_changed": [],
+  "effective_source_count": 830,
+  "overlay_matches_checkout": {
+    "internal/engine/work_row.go": true,
+    "internal/engine/work_row_test.go": true
+  },
+  "diagrams": {
+    "fr": {
+      "exit": 0,
+      "inspected": true
+    },
+    "en": {
+      "exit": 0,
+      "inspected": true
+    }
+  },
+  "independent_review": false,
+  "deployment": false,
+  "public_service_activation": false,
+  "global_identity_complete": false
+}

@@ -1,0 +1,50 @@
+{
+  "owner": "Codex Biba APEX",
+  "review": "glm-profile-review/answer.txt",
+  "verdict": "REQUEST_CHANGES_NOT_ACCEPTANCE",
+  "adjudication": {
+    "F1": {
+      "status": "reproduced_then_native_fixed",
+      "before": "workspace-swap-before.json",
+      "after": "workspace-swap-fd-after/result.json",
+      "limit": "Engine candidate and final Root/worksheet authority integration not yet qualified"
+    },
+    "F2": {
+      "status": "partially_rejected_as_stated",
+      "reason": "read_leaves recurses only when private.starts_with(entry), not into /root, /proc/<pid> or other unrelated subtrees. O_PATH does not require directory readability. Unreadable ancestors or vanished siblings can still refuse explicitly; availability under churn remains unqualified."
+    },
+    "F3": {
+      "status": "scope_clarified",
+      "reason": "Read access outside private Root is intentional in current integrity-only profile; not a general confidentiality/provider-secret claim. Documentation says ancestor-chain traversal with read leaves, not recursive scanning."
+    },
+    "F4": {
+      "status": "partial_fix_limits_open",
+      "reason": "Private Root descriptor pinned and symlink/non-directory refused. Privileged bind-mount aliases/unconfined same-UID replacement are not qualified."
+    },
+    "F5": {
+      "status": "real_source_before_after_pass",
+      "evidence": "stdio-real-source-adapted/result.json",
+      "limit": "Sparse real-source fixture; no normal engine profile or public preparation execution claim"
+    },
+    "F6": {
+      "status": "fixed_denials_not_real_keyring_observation",
+      "reason": "add_key/request_key/keyctl denied. No existing keyring read or altered; runtime positive material isolation not claimed."
+    },
+    "F7": {
+      "status": "recheck_added_limit_explicit",
+      "reason": "Tree inspected through pinned FD and rechecked before restriction. Outside unconfined same-UID writer cannot be atomically excluded by this profile; remaining launchers BT03 must be mediated."
+    },
+    "F8": {
+      "status": "fixed",
+      "reason": "Removed pathname chdir in transport; library uses fchdir on retained workspace FD."
+    }
+  },
+  "sources": {
+    "rust/crates/swarm-biba-linux/src/lib.rs": "61181745800afb407868464f83d2aeb9830457008bdcde5e8813fcc267d3ae2e",
+    "rust/crates/swarm-biba-linux/src/kernel.rs": "5df147144108f5402a2e689593f8e3678f3911bb3c7586efc2a0391caa58be77",
+    "rust/crates/swarm-engine/src/native_provider_exec.rs": "8cae41ccce6148760b061cf343310ea26bb692567b30a7169c3718d15a340214",
+    "rust/crates/swarm-engine/src/native_provider_biba.rs": "c32a400a11251d9b09c943c45649bf7e33ba05a05b2bb002c812353c6a5ce54d"
+  },
+  "qualified": false,
+  "installed": false
+}

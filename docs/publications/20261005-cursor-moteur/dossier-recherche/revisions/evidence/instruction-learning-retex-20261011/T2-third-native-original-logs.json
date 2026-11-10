@@ -1,0 +1,660 @@
+[
+  {
+    "seq": 121943,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:02.476437567Z",
+    "kind": "command",
+    "message": "Lancement demandé par opérateur local"
+  },
+  {
+    "seq": 121944,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:02.559506216Z",
+    "kind": "lifecycle",
+    "message": "Départ automatique par le conducteur ; profil : claude · rôle worker · espace /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3"
+  },
+  {
+    "seq": 121946,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:02.666551617Z",
+    "kind": "environment",
+    "message": "Cache de compilation Go prêt : /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/.swarm/cache/go-build ; cache global conservé."
+  },
+  {
+    "seq": 121947,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:02.73773062Z",
+    "kind": "lifecycle",
+    "message": "Processus fournisseur démarré"
+  },
+  {
+    "seq": 121948,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:02.748823968Z",
+    "kind": "limits",
+    "message": "Limites : durée 1800s ; silence 180s ; outil observable 300s ; appels 80 ; répétitions 4 ; erreurs consécutives 3"
+  },
+  {
+    "seq": 121953,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:10.748570394Z",
+    "kind": "message",
+    "message": "Checking workspace state first per task rules — pwd, git root, existing report status."
+  },
+  {
+    "seq": 121955,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:11.862924424Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Check working dir, git root, status, recent commits · pwd && echo \"---\" && git rev-parse --show-toplevel && echo \"---\" && git status --short && echo \"---branch---\" && git log --oneline -3"
+  },
+  {
+    "seq": 121958,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:14.355751064Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Check if report already exists in this copy · \\ if test -f docs/plan-ca937edf4e-T2.md; then echo \"=== REPORT EXISTS ===\"; cat docs/plan-ca937edf4e-T2.md; else printf 'Rapport non encore créé\\n'; fi"
+  },
+  {
+    "seq": 121959,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:14.657671144Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 1 reçus · 1 en attente"
+  },
+  {
+    "seq": 121960,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:16.682635969Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 2 reçus · 0 en attente"
+  },
+  {
+    "seq": 121965,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:22.776113344Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Read swarm recovery dossier and verify checksum · \\ if test -f .git/swarm-recovery.json; then sha256sum .git/swarm-recovery.json; echo \"---content---\"; cat .git/swarm-recovery.json; else echo \"NO RECOVERY FILE\"; fi"
+  },
+  {
+    "seq": 121967,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:25.065861528Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 3 reçus · 0 en attente"
+  },
+  {
+    "seq": 121972,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:32.656337257Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Verify HEAD matches base_commit and inspect the repaired result commit · \\ git rev-parse HEAD && echo \"---ref previous---\" && \\ git rev-parse refs/swarm/recovery/previous 2>&1 && echo \"---show result commit tree---\" && \\ git cat-file -t 736460f60459595c61df1d953dec77ac132db9e5 2>&1 && \\ git log --oneline -1 736460f60459595c61df1d953dec77ac132db9e5 2>&1"
+  },
+  {
+    "seq": 121974,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:34.586348513Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Diff stat between base commit and repaired result commit · \\ git diff --stat e32388fda21e7c225c3b2416d230d6f5450230cd 736460f60459595c61df1d953dec77ac132db9e5"
+  },
+  {
+    "seq": 121975,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:34.896628818Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 4 reçus · 1 en attente"
+  },
+  {
+    "seq": 121977,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:37.095047999Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 5 reçus · 0 en attente"
+  },
+  {
+    "seq": 121982,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:43.806466816Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Check parent chain of result commit · \\ git log --oneline 736460f60459595c61df1d953dec77ac132db9e5 -3 && echo \"---parent check---\" && \\ git rev-parse 736460f60459595c61df1d953dec77ac132db9e5^1"
+  },
+  {
+    "seq": 121984,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:12:45.816733292Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 6 reçus · 0 en attente"
+  },
+  {
+    "seq": 121991,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:13:00.732751065Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Fast-forward merge the repaired result commit (direct child of HEAD) into this copy · \\ git merge --ff-only 736460f60459595c61df1d953dec77ac132db9e5 && git log --oneline -3 && git status --short"
+  },
+  {
+    "seq": 121998,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:13:11.258947668Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 7 reçus · 0 en attente"
+  },
+  {
+    "seq": 122002,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:13:16.860996308Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : List test function names in planning_judge_test.go · \\ rg -n '^func Test' internal/engine/planning_judge_test.go"
+  },
+  {
+    "seq": 122004,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:13:19.265529216Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 8 reçus · 0 en attente"
+  },
+  {
+    "seq": 122010,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:13:29.583410262Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Run plan-validation control with -v to see each matched test name · \\ mkdir -p docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ EV=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ GOCACHE=/tmp/gocache-T2-3 GOTMPDIR=/tmp TMPDIR=/tmp timeout 60 go test ./internal/engine -run 'TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestPlanningJudge' -count=1 -timeout 25s -v > \"$EV/go-test-plan-validation.out\" 2>&1; echo \"EXIT:$?\" | tee \"$EV/go-test-plan-validation.exit\""
+  },
+  {
+    "seq": 122037,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:21.068541688Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 9 reçus · 0 en attente"
+  },
+  {
+    "seq": 122040,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:25.901105486Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Show RUN/PASS/FAIL lines from plan-validation output · \\ EV=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ grep -E '^(=== RUN|--- PASS|--- FAIL|PASS|FAIL|ok )' \"$EV/go-test-plan-validation.out\""
+  },
+  {
+    "seq": 122043,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:27.978306019Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 10 reçus · 0 en attente"
+  },
+  {
+    "seq": 122047,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:34.898411678Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Count PASS/FAIL and list top-level test names run · \\ EV=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ grep -c '^--- PASS' \"$EV/go-test-plan-validation.out\" && \\ grep -c '^--- FAIL' \"$EV/go-test-plan-validation.out\" && \\ echo \"---tail (ok line)---\" && tail -5 \"$EV/go-test-plan-validation.out\" && \\ echo \"---all top-level RUN names---\" && \\ grep '^=== RUN   Test' \"$EV/go-test-plan-validation.out\" | grep -v '/' "
+  },
+  {
+    "seq": 122049,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:37.026596727Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 11 reçus · 0 en attente"
+  },
+  {
+    "seq": 122052,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:41.541331104Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-execution-3/go-test-plan-validation.out"
+  },
+  {
+    "seq": 122053,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:41.579017963Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 12 reçus · 0 en attente"
+  },
+  {
+    "seq": 122059,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:51.590554692Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Run mechanical doc check for T2 · \\ EV=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ timeout 30 python3 docs/plans/engine-cursor-contract/check-evolution-docs.py T2 > \"$EV/check-evolution-docs.out\" 2>&1; echo \"EXIT:$?\" | tee \"$EV/check-evolution-docs.exit\""
+  },
+  {
+    "seq": 122061,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:53.594255407Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 13 reçus · 0 en attente"
+  },
+  {
+    "seq": 122064,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:56.81258637Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-execution-3/check-evolution-docs.out"
+  },
+  {
+    "seq": 122065,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:56.845495922Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 14 reçus · 0 en attente"
+  },
+  {
+    "seq": 122067,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:14:58.923169122Z",
+    "kind": "message",
+    "message": "Doc check pass. Now go build/vet to confirm no regression from the merged judge code."
+  },
+  {
+    "seq": 122069,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:15:01.648090913Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Run go build and go vet across the module, capture exit codes · \\ EV=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ GOCACHE=/tmp/gocache-T2-3 GOTMPDIR=/tmp TMPDIR=/tmp timeout 90 go build ./... > \"$EV/go-build.out\" 2>&1; echo $? | tee \"$EV/go-build.exit\" && \\ GOCACHE=/tmp/gocache-T2-3 GOTMPDIR=/tmp TMPDIR=/tmp timeout 90 go vet ./... > \"$EV/go-vet.out\" 2>&1; echo $? | tee \"$EV/go-vet.exit\""
+  },
+  {
+    "seq": 122079,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:15:19.691080087Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 15 reçus · 0 en attente"
+  },
+  {
+    "seq": 122085,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:15:29.237692136Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Search prior full-suite evidence for panic/FAIL mentions · \\ rg -n \"panic|FAIL|TestManagedFragmentHistoricalPublicRecovery\" docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-full-engine.out docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-final.out docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/suite-before-checkpoint.out 2>&1 | head -60"
+  },
+  {
+    "seq": 122087,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:15:31.334465056Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 16 reçus · 0 en attente"
+  },
+  {
+    "seq": 122092,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:15:38.023821132Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-full-engine.out"
+  },
+  {
+    "seq": 122093,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:15:38.051057954Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 17 reçus · 0 en attente"
+  },
+  {
+    "seq": 122099,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:15:50.374361317Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Rerun the newly added graph delivery qualification test in isolation · \\ EV=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ GOCACHE=/tmp/gocache-T2-3 GOTMPDIR=/tmp TMPDIR=/tmp timeout 30 go test ./internal/engine -run 'TestGraphDeliveryD03QualificationManifest' -count=1 -timeout 20s -v > \"$EV/go-test-graph-qual.out\" 2>&1; echo $? | tee \"$EV/go-test-graph-qual.exit\""
+  },
+  {
+    "seq": 122102,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:15:54.744013982Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 18 reçus · 0 en attente"
+  },
+  {
+    "seq": 122106,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:00.220987535Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-execution-3/go-test-graph-qual.out"
+  },
+  {
+    "seq": 122107,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:00.243924458Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 19 reçus · 0 en attente"
+  },
+  {
+    "seq": 122113,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:09.055346982Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Search merged report/handoff for notes on the pre-existing flaky test · \\ grep -n \"TestManagedFragmentHistoricalPublicRecovery\\|pre-existing\\|préexist\\|baseline\" docs/plan-ca937edf4e-T2.md docs/plans/engine-cursor-contract/evidence/T2-handoff.md 2>&1 | head -40"
+  },
+  {
+    "seq": 122115,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:11.140387827Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 20 reçus · 0 en attente"
+  },
+  {
+    "seq": 122118,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:15.316847418Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-final.out"
+  },
+  {
+    "seq": 122119,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:15.347567193Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 21 reçus · 0 en attente"
+  },
+  {
+    "seq": 122126,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:28.566579095Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-handoff.md"
+  },
+  {
+    "seq": 122127,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:28.578478272Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 22 reçus · 0 en attente"
+  },
+  {
+    "seq": 122134,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:38.999282963Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plan-ca937edf4e-T2.delivery.json"
+  },
+  {
+    "seq": 122135,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:39.011247253Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 23 reçus · 0 en attente"
+  },
+  {
+    "seq": 122140,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:46.893040295Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out"
+  },
+  {
+    "seq": 122141,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:16:46.907052828Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 24 reçus · 0 en attente"
+  },
+  {
+    "seq": 122154,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:17:10.308546771Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json"
+  },
+  {
+    "seq": 122155,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:17:10.65531287Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 25 reçus · 0 en attente"
+  },
+  {
+    "seq": 122164,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:17:28.702706699Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Inspect existing canonical exit codes and check output · \\ echo \"=build.exit=\"; cat docs/plans/engine-cursor-contract/evidence/T2-execution/go-build.exit; \\ echo \"=vet.exit=\"; cat docs/plans/engine-cursor-contract/evidence/T2-execution/go-vet.exit; \\ echo \"=check.out=\"; cat docs/plans/engine-cursor-contract/evidence/T2-execution/check-evolution-docs.out; \\ echo \"=plan-validation.exit=\"; cat docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.exit"
+  },
+  {
+    "seq": 122167,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:17:30.937999148Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 26 reçus · 0 en attente"
+  },
+  {
+    "seq": 122172,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:17:37.970509515Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-execution-3/go-test-plan-validation.out"
+  },
+  {
+    "seq": 122173,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:17:37.985214792Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 27 reçus · 0 en attente"
+  },
+  {
+    "seq": 122181,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:17:52.155999868Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Archive new judge-coverage evidence set and keep the old stale receipt for comparison · \\ DEST=docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011 && \\ mkdir -p \"$DEST\" && \\ SRC=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ cp \"$SRC/go-test-plan-validation.out\" \"$DEST/go-test-plan-validation.out\" && \\ cp \"$SRC/go-test-plan-validation.exit\" \"$DEST/go-test-plan-validation.exit\" && \\ cp \"$SRC/check-evolution-docs.out\" \"$DEST/check-evolution-docs.out\" && \\ cp \"$SRC/check-evolution-docs.exit\" \"$DEST/check-evolution-docs.exit\" && \\ cp \"$SRC/go-build.out\" \"$DEST/go-build.out\" && \\ cp \"$SRC/go-build.exit\" \"$DEST/go-build.exit\" && \\ cp \"$S…"
+  },
+  {
+    "seq": 122183,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:17:54.758140972Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 28 reçus · 0 en attente"
+  },
+  {
+    "seq": 122187,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:18:02.016008171Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Confirm archive dir content and overwrite canonical receipt with fresh judge-covering output · \\ DEST=docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011 && \\ ls \"$DEST\" && echo \"---canonical still stale, now overwrite from SRC---\" && \\ SRC=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ cp \"$SRC/go-test-plan-validation.out\" docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out && \\ cp \"$SRC/go-test-plan-validation.exit\" docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.exit && \\ grep -c \"TestPlanningJudge\" docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-valid…"
+  },
+  {
+    "seq": 122189,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:18:04.189110757Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 29 reçus · 0 en attente"
+  },
+  {
+    "seq": 122194,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:18:11.224680832Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Remove redundant temp evidence dir and check git status · \\ rm -rf docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ git status --short | head -30"
+  },
+  {
+    "seq": 122196,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:18:13.357123984Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 30 reçus · 0 en attente"
+  },
+  {
+    "seq": 122200,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:18:20.174029725Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Compute sha256 digests for the new/updated evidence files · \\ sha256sum docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.out \\   docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-plan-validation.exit \\   docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/*.out \\   docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/*.exit"
+  },
+  {
+    "seq": 122202,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:18:22.28069996Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 31 reçus · 0 en attente"
+  },
+  {
+    "seq": 122204,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:18:24.666629504Z",
+    "kind": "message",
+    "message": "Now write the metadata receipt and update delivery.json + reports with current attempt identity."
+  },
+  {
+    "seq": 122224,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:00.003850201Z",
+    "kind": "activity",
+    "message": "Write · Écriture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json"
+  },
+  {
+    "seq": 122225,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:00.052501448Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 32 reçus · 0 en attente"
+  },
+  {
+    "seq": 122226,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:02.432921205Z",
+    "kind": "message",
+    "message": "Now update delivery.json to the current attempt identity, with evidence pointing to the fresh plan-validation receipt."
+  },
+  {
+    "seq": 122237,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:22.13924436Z",
+    "kind": "activity",
+    "message": "Write · Écriture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plan-ca937edf4e-T2.delivery.json"
+  },
+  {
+    "seq": 122238,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:22.188393414Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 33 reçus · 0 en attente"
+  },
+  {
+    "seq": 122241,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:25.375842294Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plan-ca937edf4e-T2.md"
+  },
+  {
+    "seq": 122242,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:25.390857956Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 34 reçus · 0 en attente"
+  },
+  {
+    "seq": 122255,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:49.659743352Z",
+    "kind": "activity",
+    "message": "Edit · Modification d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plan-ca937edf4e-T2.md"
+  },
+  {
+    "seq": 122256,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:49.695900292Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 35 reçus · 0 en attente"
+  },
+  {
+    "seq": 122258,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:19:51.52361779Z",
+    "kind": "message",
+    "message": "Now append the new \"Correction f613\" section at the end, with the fresh receipt details."
+  },
+  {
+    "seq": 122277,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:20:28.06781774Z",
+    "kind": "activity",
+    "message": "Edit · Modification d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plan-ca937edf4e-T2.md"
+  },
+  {
+    "seq": 122278,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:20:28.10828437Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 36 reçus · 0 en attente"
+  },
+  {
+    "seq": 122287,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:20:42.014195687Z",
+    "kind": "activity",
+    "message": "Edit · Modification d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plans/engine-cursor-contract/evidence/T2-handoff.md"
+  },
+  {
+    "seq": 122288,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:20:42.044602429Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 37 reçus · 0 en attente"
+  },
+  {
+    "seq": 122291,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:20:46.920558704Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Validate delivery.json JSON and rerun mechanical doc check after report edits · \\ python3 -c \"import json; json.load(open('docs/plan-ca937edf4e-T2.delivery.json')); print('delivery.json valid')\" && \\ python3 docs/plans/engine-cursor-contract/check-evolution-docs.py T2"
+  },
+  {
+    "seq": 122293,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:20:49.047966772Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 38 reçus · 0 en attente"
+  },
+  {
+    "seq": 122296,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:20:53.750364474Z",
+    "kind": "activity",
+    "message": "Read · Lecture d’un fichier · /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3/docs/plan-ca937edf4e-T2.review-context.json"
+  },
+  {
+    "seq": 122297,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:20:53.762980121Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 39 reçus · 0 en attente"
+  },
+  {
+    "seq": 122310,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:21:17.08177749Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Final check of dirty diff and HEAD commit for this attempt · \\ git status --short && echo \"---HEAD---\" && git rev-parse HEAD"
+  },
+  {
+    "seq": 122312,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:21:19.203514149Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 40 reçus · 0 en attente"
+  },
+  {
+    "seq": 122322,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:21:38.249882531Z",
+    "kind": "activity",
+    "message": "Bash · Annonce de l’agent : Verify every evidence path cited in delivery.json exists on disk · \\ python3 - <<'EOF' import json d = json.load(open(\"docs/plan-ca937edf4e-T2.delivery.json\")) import os missing = [] for c in d[\"criteria\"]:     for ev in c[\"evidence\"]:         if not os.path.isfile(ev):             missing.append((c[\"index\"], ev)) print(\"missing:\", missing if missing else \"none\") EOF"
+  },
+  {
+    "seq": 122325,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:21:40.328309611Z",
+    "kind": "activity",
+    "message": "Résultat d'outil reçu · 41 reçus · 0 en attente"
+  },
+  {
+    "seq": 122333,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:21:53.941623938Z",
+    "kind": "message",
+    "message": "All evidence paths resolve. Work for this attempt is done — summarizing.  **Status: delivered (producer-local), outcome=complete in delivery.json, pending engine acceptance + independent review.**  What this attempt did (3rd/3 authorized attempt, agent `auto-a23c60f03a732c02841f`, attempt `a-2f9e1debb1548be96273f0d3`):  1. Fast-forward merged the attributed repaired result (`736460f`, direct child of base `e32388f`) into this copy — no new tree, no conflicts. Brought in the judge implementation (`planning_judge.go`, 5 Go files total) and prior docs/evidence. 2. Reran the **exact** `plan-validation` control with its corrected `-run` pattern (now including `TestPlanningJudge`) with `-v`: exit 0, 16 top-level tests, 0 FAIL, and all 7 `TestPlanningJudge*` functions visible by name. This closes the gap the paid refusal f613 flagged — the old receipt cited as proof never ran a single `TestPlanningJudge*` function. 3. Reran `go build ./...`, `go vet ./...`, `check-evolution-docs.py T2`: all PASS. 4. Rechecked `TestGraphDeliveryD03QualificationManifest` (seen FAIL in a stale inherited full-suite capture, \"stale input: AGENTS.md\") — passes now, manifest already refreshed in the merged commit. 5. Reviewed prior sharded full-suite evidence (1095 tests, 19 shards, all exit 0, including the test that panics under a serial single-process timeout) — judged pre-existing serial-timeout artifact, out of T2 scope; didn't rerun the full multi-minute suite myself, noted as explicit limit. 6. Overwrote the stale canonical `go-test-plan-validation.out/.exit`, kept the old one archived as `*.PREVIOUS-STALE.*` for comparison, added a dated metadata receipt, and rewrote `delivery.json` + `docs/plan-ca937edf4e-T2.md` + `T2-handoff.md` attributing to this attempt and citing the fresh receipt per criterion instead of the mismatched one.  Limits: no Go code changed (reused the attributed repair as instructed); no new attempt/budget created; provider doubles only, no real autonomous judge call observed; full sharded suite not re-run  [tronqué]"
+  },
+  {
+    "seq": 122335,
+    "agent_id": "auto-a23c60f03a732c02841f",
+    "at": "2026-10-11T14:21:56.936807649Z",
+    "kind": "lifecycle",
+    "message": "Processus terminé ; résultat à examiner, tâche non acceptée"
+  }
+]

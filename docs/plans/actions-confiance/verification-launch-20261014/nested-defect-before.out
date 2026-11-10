@@ -1,0 +1,43 @@
+=== RUN   TestFragmentNestedDefectBinding
+    managed_review_fragment_nested_defect_test.go:30: nested independent claim not bound to its failed finding:  {Candidate: ContextDigest: PacketDigest: Findings:[] Defects:[]} inspection de fragment : contrat de constat non pris en charge
+--- FAIL: TestFragmentNestedDefectBinding (0.00s)
+=== RUN   TestFragmentNestedDefectInvalidBoundaries
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/inspected_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/unknown_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/fail_without_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/fail_with_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/inspected_with_empty_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/unknown_without_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/global_defects
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/global_null
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/foreign_artifact
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/line_supplied
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/string_anchor
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/missing_anchor
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/altered_quote
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/duplicate_claim
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/too_many_claims
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/array_findings
+--- PASS: TestFragmentNestedDefectInvalidBoundaries (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/inspected_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/unknown_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/fail_without_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/fail_with_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/inspected_with_empty_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/unknown_without_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/global_defects (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/global_null (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/foreign_artifact (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/line_supplied (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/string_anchor (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/missing_anchor (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/altered_quote (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/duplicate_claim (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/too_many_claims (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/array_findings (0.00s)
+=== RUN   TestFragmentNestedDefectSchemaOracle
+    managed_review_fragment_nested_defect_test.go:97: global defects still representable
+--- FAIL: TestFragmentNestedDefectSchemaOracle (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.020s
+FAIL

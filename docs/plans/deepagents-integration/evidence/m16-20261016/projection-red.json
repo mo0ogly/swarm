@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestRecoveryProjection",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T19:17:24.293723+00:00",
+  "duration_seconds": 17.276,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "TestRecoveryProjectionSignalsTruncatedOperation",
+    "TestRecoveryProjectionSignalsEveryTruncatedFocusField",
+    "TestRecoveryProjectionRetainsDistinctLongOperations",
+    "TestRecoveryProjectionPropagatesCriterionOmission",
+    "TestRecoveryProjectionRejectsMissingTask"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "3f8587bba8b27c809df082802a7f3bf1840748567a2f652ec5f19fb99928cd6a",
+  "real_model_calls": 0
+}

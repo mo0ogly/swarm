@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "event_id": "session",
+  "expected_revision": 4,
+  "task_id": "task",
+  "provider": "fixture",
+  "capture_output": true
+}

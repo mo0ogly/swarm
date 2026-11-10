@@ -1,0 +1,78 @@
+{
+  "result": "PASS_LOCAL_KERNEL_AND_ISOLATED_CHANNEL_ONLY",
+  "at": "2026-10-17T06:09:55.317634+00:00",
+  "go_named_checks": 114,
+  "go_kernel_named_checks": 100,
+  "go_existing_named_checks": 14,
+  "channel_checks": 13,
+  "namespace_join_attempts_denied": 3,
+  "model_calls": 0,
+  "deployed": false,
+  "launchers_integrated": false,
+  "protected_authority_producer": false,
+  "go_inputs_unchanged_since_test": true,
+  "missing_links": [],
+  "whitespace_findings": [],
+  "git_diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "channel_source_sha256": "9253af47218b7fe8edddd4ca954b49f4856904c7a054a222e6193efc16c1f065",
+  "frozen_channel_recipe": "with-setns/recipe.py",
+  "runtime_control_kind": "Standalone Python fixture, no Swarm business effects",
+  "environment_provenance": "environment.json observed after run; kernel/OS administrator compromise not covered",
+  "kernel_evidence": "../ia2-contract-kernel-20261017/tests-final-run.json",
+  "open": [
+    "Protected Go broker and authority source",
+    "Persistent registry and commitment across Trust/SQLite",
+    "All launchers, human approval and memory consumers",
+    "Qualification and RETEX"
+  ],
+  "files": [
+    {
+      "path": "internal/engine/agent_identity_authority.go",
+      "sha256": "cd335869ae1b6a80959e64432f0759fde44d94bc5846c48417d1ce8dcc32a150"
+    },
+    {
+      "path": "internal/engine/agent_identity_authority_test.go",
+      "sha256": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808"
+    },
+    {
+      "path": "internal/engine/agent_identity_contract.go",
+      "sha256": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55"
+    },
+    {
+      "path": "internal/engine/agent_identity_contract_test.go",
+      "sha256": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9"
+    },
+    {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "90c3132dc2359d38759530d32ef4fcbfbff5c5aff2b385bca512a72c58a59bb8"
+    },
+    {
+      "path": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "2c73f9b27a501287c0c913e47fc205ff7d90e28cee75731fdcb95cdc64e6414f"
+    },
+    {
+      "path": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "sha256": "0e42a2b2c59673fde9bc2054d88f86f2a21b64a0def05811c81ce6506227ad37"
+    },
+    {
+      "path": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "sha256": "4ebc90aa1850b4f93dba8c002e1f555726bb38f1fcd39c5ce78903a16a19252d"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md",
+      "sha256": "ba8a59982c72e1ff752c5a0f9b45348521b71601e03c5c0b1b94fde89238fe72"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md",
+      "sha256": "936475e6b9657f6a33ef7e1bd2aa7ac30731e2ce1d543bb47582c02bee4283ca"
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2_runtime_binding.py",
+      "sha256": "9253af47218b7fe8edddd4ca954b49f4856904c7a054a222e6193efc16c1f065"
+    }
+  ]
+}

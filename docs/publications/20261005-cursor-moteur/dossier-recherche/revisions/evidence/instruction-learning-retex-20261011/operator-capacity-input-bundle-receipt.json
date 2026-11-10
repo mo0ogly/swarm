@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-11T14:38:49.269438+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-capacity-20261011.bundle",
+  "sha256": "ad021a0d34ee90e34b8d826747019d876411ead734c1e2be389273b54ea3016c",
+  "bytes": 329838,
+  "ref": "refs/heads/operator-inputs",
+  "commit": "702a96e9bb82051388365910849b49e5b589673e",
+  "manifest_sha256": "6c331b815e3c7fe37460e174662364980523b4e48b671c8376d2a3fd1d523c6a",
+  "input_files": 51,
+  "source": "/tmp/swarm-operator-capacity-inputs-20261011-jk6xmje4",
+  "isolated_import_check": "/tmp/swarm-operator-capacity-input-check-o3414ras",
+  "verification": "PASS isolated fetch, exact commit, manifest and all51 declared full input bytes/hash recovered",
+  "limits": "Immutable operator input only. Full source qualification and native input use/acceptance are separate."
+}

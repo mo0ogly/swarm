@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-10T17:53:34.874726+00:00",
+  "kind": "Observation exploratoire après incident, hors campagne de facturation et hors protocole pré-enregistré",
+  "source": "CLI publique work show et fichiers de preuve immuables référencés par les événements publics, lus sans modification",
+  "work_id": "w-ca937edf4e0abd85f8d3d67b",
+  "task_id": "plan-ca937edf4e-T1",
+  "checkout_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "runtime_provenance": "Binaire construit sur d4539e0041000a38acb162a17f053e318fb3db5d avec modifications ; voir observation de vivacité, pas reconstruit depuis 1169df7",
+  "before": {
+    "revision": 28,
+    "task_status": "blocked",
+    "attempts": [
+      {
+        "id": "a-d01bafdfcfe21d50ef1d7d8c",
+        "status": "completed",
+        "started": "2026-10-10T17:01:27.733756516Z",
+        "ended": "2026-10-10T17:15:33.722874868Z"
+      },
+      {
+        "id": "a-29a7a2f21ea5f1f764409e08",
+        "status": "completed",
+        "started": "2026-10-10T17:34:48.88659613Z",
+        "ended": "2026-10-10T17:45:01.638089713Z"
+      }
+    ],
+    "max_attempts": 2,
+    "max_tool_calls": 80,
+    "review_calls": 3,
+    "max_review_calls": 30,
+    "planning_activations": 3,
+    "planning_decisions": 2
+  },
+  "reviews": [
+    {
+      "id": "review-849606d4679df263de116295",
+      "attempt": "a-d01bafdfcfe21d50ef1d7d8c",
+      "producer": "auto-12f5d63624b255c3e70a",
+      "reviewer": "reviewer://claude",
+      "candidate_commit": "38345bb1805ef56137087b3326d19f2c4d8cf204",
+      "state": "changes_requested",
+      "started": "2026-10-10T17:29:47.604934808Z",
+      "finished": "2026-10-10T17:32:34.00073999Z",
+      "criteria": [
+        {
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "en séparant explicitement ce qui a été observé ce lot (fait), ce qui reste supposé (hypothèse) et la preuve exacte."
+        },
+        {
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Couverture du juge global (JAN-4) | Natif : un juge dédié ferme chaque cycle sur l'objectif et les résultats."
+        },
+        {
+          "index": 3,
+          "verdict": "unknown",
+          "evidence": "Le fichier docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md, cité dans le JSON de livraison comme preuve de l'examen des sources complémentaires (Google/OpenAI/Anthropic), n'est ni modifié par ce diff ni fourni comme source complémentaire dans ce contexte de revue ; son contenu réel ne peut être vérifié, donc l'examen de ces sources avant décision reste indémontré alors que la partie reprise/débit/qualité/effort/compatibilité et juillet Cursor (SRC-CUR-03) est bien présente dans le §3 fourni."
+        },
+        {
+          "index": 4,
+          "verdict": "pass",
+          "evidence": "Elle n'a pas été lue (base `.swarm` privée hors périmètre), pas modifiée, pas remise à zéro par ce lot."
+        }
+      ],
+      "context": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-12f5d63624b255c3e70a/review-context.json",
+      "context_sha256": "27d36974a003f39f0f6a633cf04847626ca72f4a50a6d8383d1f25a5e7f942b6",
+      "receipt_sha256": "7ebe488004ec358e4ed190221c5fc5817370fb846d06d99e6a110b0dca829cab",
+      "reply_sha256": "e283d8c9656bc670e8167c5ab217e512742010b76c680d4e25553240e3848480",
+      "source_files_in_context": [],
+      "context_digest_matches": true
+    },
+    {
+      "id": "review-c96e0e832eb54fc6b28db2bc",
+      "attempt": "a-29a7a2f21ea5f1f764409e08",
+      "producer": "auto-ed3d6ce2b54e02740a68",
+      "reviewer": "reviewer://claude",
+      "candidate_commit": "6392cd32a2ce77a86b6b91c36098f635d4ffecf1",
+      "state": "changes_requested",
+      "started": "2026-10-10T17:45:20.996785809Z",
+      "finished": "2026-10-10T17:47:31.90913127Z",
+      "criteria": [
+        {
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "| ID | Comportement attendu (source) | Fait observé ce lot | Hypothèse restante | Preuve | Statut |"
+        },
+        {
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Couverture du juge global (JAN-4) | Natif : un juge dédié ferme chaque cycle sur l'objectif et les résultats. | Absent du modèle de février (retiré dans son évolution intermédiaire selon `docs/architecture/CURSOR-ENGINE-CONTRACT.md`) ; à ajouter comme vérification périodique Swarm, distincte de la revue de candidat V1–V5 qui est scopée au candidat, pas à l'objectif. |"
+        },
+        {
+          "index": 3,
+          "verdict": "unknown",
+          "evidence": "docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md is the sole source for the SRC-CUR-03..SRC-ANT-02 quotes and line numbers added in T1-handoff.md paragraph 3, but that file is unchanged by this diff and was not supplied as a source in this review context, so the quoted excerpts and line references cannot be verified against the actual file content."
+        },
+        {
+          "index": 4,
+          "verdict": "pass",
+          "evidence": "Elle n'a pas été lue (base `.swarm` privée hors périmètre), pas modifiée, pas remise à zéro par ce lot."
+        }
+      ],
+      "context": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-ed3d6ce2b54e02740a68/review-context.json",
+      "context_sha256": "4c3fb96416363afb0f280069364f0f59db36ed871c59ef0a05cc4c325568b6a1",
+      "receipt_sha256": "bd8cc9e65d73586b23b20bca5985225e86ff1a16de999ab51f7fdb9d4c19a01c",
+      "reply_sha256": "4f5cb83ba38db09283a07b8d72f7dfa050bff368fb8f47a9bd0f78aebfc41241",
+      "source_files_in_context": [],
+      "context_digest_matches": true
+    }
+  ],
+  "supervisor_decisions": [
+    {
+      "id": "planning-claim-d61f03603da48d818b2ba11e-decision",
+      "at": "2026-10-10T17:34:44.831099302Z",
+      "operations": [
+        {
+          "kind": "retry",
+          "id": "plan-ca937edf4e-T1",
+          "title": "Confirmer les écarts et décider l'architecture de l'évolution",
+          "requirements": [
+            "req-1",
+            "req-2",
+            "req-3",
+            "req-4"
+          ],
+          "deliverable": "Document d'architecture confirmant les écarts (req-1, req-2) et décision motivée d'architecture (req-4), avec le critère 3 (req-3) rendu vérifiable par des preuves directement incluses dans le diff candidat.",
+          "criteria": [
+            "Critères 1, 2 et 4 (matrices JAN/FEB à colonnes fait/hypothèse/preuve, tableau comparatif couvrant JAN-4 et JAN-5, séparation documentée avec la mission historique) restent valides sans régression par rapport au candidat 38345bb1805ef56137087b3326d19f2c4d8cf204.",
+            "Critère 3 (req-3) corrigé : l'examen des 'sources complémentaires' s'appuie sur un contenu vérifiable inclus dans ce diff (citations exactes de fiches-lecture.md ou mise à jour de ce fichier dans le même commit), en plus de l'examen déjà accepté de la source Cursor de juillet (SRC-CUR-03) ; la preuve doit démontrer un examen sémantique réel, pas seulement l'exécution du script structurel ('semantic review still required').",
+            "Bilan local du producteur par critère (pass/unknown/fail) avec commande exécutée, fichier/extrait de preuve et justification ; aucune revendication d'acceptation du moteur ni de revue indépendante déjà rendue."
+          ],
+          "next": "Reprendre la révision candidate 38345bb1805ef56137087b3326d19f2c4d8cf204 (tentative 2/2 pour T1, dernière avant blocage définitif). La revue indépendante (review-849606d4679df263de116295) confirme les critères 1, 2 et 4 : ne pas les modifier. Seul le critère 3 (req-3) est en défaut : l'examen des 'sources complémentaires' repose sur fiches-lecture.md, fichier inchangé par ce diff et non fourni dans ce contexte, donc invérifiable (statut correct : unknown, pas pass). Corriger précisément ce point, au choix : (a) inclure dans ce diff les extraits exacts et citations de fiches-lecture.md réellement examinés, avec contenu vérifiable ; (b) mettre à jour fiches-lecture.md dans ce même commit pour le rendre lisible par une revue indépendante ; (c) documenter directement dans le livrable du critère 3 le contenu des sources complémentaires avec une preuve vérifiable équivalente à celle déjà acceptée pour SRC-CUR-03. Ne pas se contenter de relancer le script structurel : les reçus actuels ne prouvent que son exécution ('semantic review still required'), pas la suffisance sémantique attendue par req-3. Consigner un bilan local traçable (commande, fichier, résultat observé) par critère sans prétendre à une acceptation du moteur ni à une revue indépendante déjà rendue sur cette nouvelle preuve."
+        }
+      ],
+      "reason": "T1 reste bloquée. La première revue (review-321669c31cbace95ee1e9a4e / plan-786926de8c15f03a23739cb3e6b78deb21294b043fa8e35f8b01100827c8094f) avait échoué par expiration du délai planificateur, un défaut d'environnement depuis corrigé par l'opérateur (live-planner-ebe670c5e4a14f10b59a6f5d0b6d2ef7), budgets inchangés. La revue réelle qui a suivi (review-849606d4679df263de116295 / plan-3fa5268d1997bbf60cd77318c4a59702295262eb7520c1a5e97e19872d6a4fe0) valide les critères 1, 2 et 4 sur le candidat 38345bb1805ef56137087b3326d19f2c4d8cf204, mais marque le critère 3 (req-3, examen des sources complémentaires) comme 'unknown' : il s'appuie sur fiches-lecture.md, un fichier inchangé par ce diff et non fourni, donc invérifiable ; les reçus ne prouvent que l'exécution du script structurel, pas la suffisance sémantique. C'est un défaut concret et localisé, pas une répétition d'échec inchangé : il reste 1 tentative sur 2 pour T1, je propose donc un retry avec une correction précise et nouvelle ciblant uniquement ce point, sans toucher aux parties déjà validées. T2 à T7 dépendent de T1 et restent non actionnables ce tour ; aucune clôture n'est proposée tant que T1 n'est pas acceptée par le moteur."
+    },
+    {
+      "id": "planning-claim-454640e8f1889e759e8c90fc-decision",
+      "at": "2026-10-10T17:48:36.818298678Z",
+      "operations": [],
+      "reason": "Les trois événements fournis concernent tous la même tâche plan-ca937edf4e-T1 (attempt a-29a7a2f21ea5f1f764409e08) sur le candidat 6392cd32a2ce77a86b6b91c36098f635d4ffecf1 : fin de processus, puis revue indépendante « changes_requested », puis échec d'intégration avec le même message. La tâche affiche attempts_used=2/attempts_max=2 : la limite de tentatives est épuisée. Le seul critère non satisfait (Crit.3) reste « unknown » : les citations verbatim avec numéros de ligne de fiches-lecture.md ne peuvent être vérifiées car ce fichier n'est ni modifié par le diff ni fourni en contexte de revue — écart déjà relevé lors d'une revue précédente et seulement déplacé dans le livrable, donc pas une preuve nouvelle justifiant une nouvelle tentative. Les instructions imposent explicitement : si la limite de tentatives ne le permet pas, expliquer le blocage plutôt que relancer. Créer une nouvelle tâche sous un autre identifiant pour reprendre le même travail constituerait une mission de remplacement pour échapper au plafond, ce qui est proscrit par le contrat partagé. Les tâches T2 à T7 dépendent toutes, directement ou en chaîne, de T1 et restent donc inactionnables dans ce périmètre tant que ce blocage n'est pas levé. Aucune clôture n'est proposée : l'objectif du périmètre est loin d'être atteint (6 tâches encore todo) et T1 n'est pas résolu. La décision qui lèverait ce blocage — fournir fiches-lecture.md comme preuve/contexte pour une revue sur un diff distinct couvrant ce point précis, accepter explicitement le risque résiduel Crit.3, ou ajuster le budget de tentatives — dépasse l'autorité du planificateur et doit venir du responsable humain ou du moteur. Aucune opération utile n'est donc proposée dans cette activation."
+    }
+  ],
+  "repair": {
+    "proof_key": "auto-ed3d6ce2b54e02740a68-repair-493138f7620f40fe",
+    "replaces_result": "04d12be204b4a0c1842c30f7e5b8d7f4955659a3",
+    "prior_review_id": "review-c96e0e832eb54fc6b28db2bc",
+    "event_id": "cursor-T1-source-context-repair-bcf118309f5a47f4b89acdde3a23bec1",
+    "request_sha256": "493138f7620f40fed0c75c9d1f58549310ade7a278f8ebfa04ba24c14ab55b05",
+    "agent_id": "auto-ed3d6ce2b54e02740a68",
+    "attempt_id": "a-29a7a2f21ea5f1f764409e08",
+    "result_commit": "20c2961aecf9bd9332a01e3abdd52c38a1244bec",
+    "tree": "ef07c4377ee57ea8604b59d06670a3a2e3c9977a",
+    "actor": "fpizzi/uid:1001",
+    "at": "2026-10-10T17:51:53.558380294Z",
+    "reason": "Réparation externe explicite du dossier après deux verdicts unknown du critère 3 : déclarer la source inchangée complète via review-context.json, vérifier ses octets et SHA256 dans le candidat, corriger le fait eBPF 1/2. Nouvelle précondition de preuve ; aucune hausse ou remise de budget ni nouvelle tentative ; contrôles et revue indépendante frais requis.",
+    "original_process_status": "completed"
+  },
+  "corrected_candidate": "6da19fd7700cfc540fc0e078b94f9c56453ca3f5",
+  "source_in_corrected_context": {
+    "path": "docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md",
+    "git_blob": "fe87c05dbbd02b528b30412bb6277468b0fcfe44",
+    "sha256": "1c7e84b87fc2e7baa53383be0c494658f6d0c1615962daf40511d99c7301934a",
+    "bytes": 23612
+  },
+  "corrected_context_sha256": "83f323b39b5964f1300b640ea21e081c6890b4c286a5931fff0e13a5fd21f5d9",
+  "source_matches_unchanged_blob": true,
+  "source_verification": "Octets comparés au blob du candidat refusé avant soumission ; SHA256 identique au contenu de sources[] du nouveau contexte",
+  "fresh_controls": [
+    {
+      "id": "plan-entry",
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-validation",
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "493a1796342d2d2b3742b6f1beec2f3883f877bc2897449109ee1f0df02aee3f"
+    },
+    {
+      "id": "plan-delivery",
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-criterion-1",
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-criterion-2",
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-criterion-3",
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-criterion-4",
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    }
+  ],
+  "after": {
+    "observed_at": "2026-10-10T17:55:52.500248+00:00",
+    "revision": 36,
+    "task_status": "accepted",
+    "attempts_used": 2,
+    "max_attempts": 2,
+    "max_tool_calls": 80,
+    "review_calls": 4,
+    "max_review_calls": 30,
+    "review": {
+      "id": "review-bc4a136c4713357aed3c56b9",
+      "candidate_commit": "6da19fd7700cfc540fc0e078b94f9c56453ca3f5",
+      "state": "passed",
+      "started": "2026-10-10T17:52:16.200443736Z",
+      "finished": "2026-10-10T17:55:05.414020512Z",
+      "criteria": [
+        {
+          "index": 1,
+          "verdict": "pass",
+          "evidence": "| ID | Comportement attendu (source) | Fait observé ce lot | Hypothèse restante | Preuve | Statut |"
+        },
+        {
+          "index": 2,
+          "verdict": "pass",
+          "evidence": "Couverture du juge global (JAN-4) | Natif : un juge dédié ferme chaque cycle sur l'objectif et les résultats."
+        },
+        {
+          "index": 3,
+          "verdict": "pass",
+          "evidence": "aucune des huit sources complémentaires (Cursor avril/septembre, Google/Gemini, OpenAI, Anthropic) ne décrit ni ne recommande un juge de fin de cycle global comparable à JAN-4"
+        },
+        {
+          "index": 4,
+          "verdict": "pass",
+          "evidence": "## 6. Architecture cible, migrations, reprise, risques"
+        }
+      ],
+      "reason": "Les 4 critères sont vérifiables directement dans le diff (pas seulement via l'auto-déclaration du producteur). Les matrices JAN/FEB distinguent fait/hypothèse/preuve ; le tableau Option A/B traite explicitement JAN-4 et JAN-5 pour les deux modèles ; la sous-section corrigée du §3 cite mot pour mot (vérifié contre la source fiches-lecture.md fournie, sha256 identique à celle déclarée dans le rapport) les huit sources complémentaires et juillet avant la décision motivée (reprise/débit/qualité/effort/compatibilité) ; §5-6 documentent séparation de mission, architecture cible, migrations, reprise, risques. Les contrôles automatiques eux-mêmes précisent ne couvrir que la structure, pas la sémantique ('semantic review still required') : le verdict ci-dessous repose sur une lecture directe du contenu, pas sur ces contrôles ni sur les verdicts passés revendiqués par le producteur.",
+      "context_sha256": "83f323b39b5964f1300b640ea21e081c6890b4c286a5931fff0e13a5fd21f5d9",
+      "reply_sha256": "cf7124f47add0f5e4ce0219cf5d4716e30cc534f05bcc45914f30803a4298e63"
+    },
+    "planning_scopes": [
+      {
+        "id": "root",
+        "state": "ready"
+      }
+    ],
+    "status": "T1 accepté après réparation externe, contrôles et revue fraîche ; T2 encore todo à cette observation"
+  },
+  "limitations": [
+    "Une seule tâche ; réparation manuelle externe, pas reprise autonome réussie démontrée",
+    "Les coûts bruts de fournisseur ne constituent pas un coût total calculé",
+    "Aucune donnée ni verdict historique de facturation modifié"
+  ],
+  "guidance_recorded": [
+    {
+      "task_id": "plan-ca937edf4e-T2",
+      "event_id": "cursor-review-evidence-guidance-T2-9765b9e64b9843a5a48802ccded65ecc"
+    },
+    {
+      "task_id": "plan-ca937edf4e-T5",
+      "event_id": "cursor-review-evidence-guidance-T5-c78661d5b5254dff9b5113791f5db06f"
+    }
+  ]
+}

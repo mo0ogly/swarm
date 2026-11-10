@@ -1,0 +1,29 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.000
+Open the restaurant area
+Signing in is required to view and advance orders.
+
+00:00:06.000 --> 00:00:12.000
+Try an incorrect password
+Access is rejected; the public catalogue remains separate from the restaurant area.
+
+00:00:12.000 --> 00:00:18.000
+Sign in with atelier in this demo
+The restaurant shows the same order and total.
+
+00:00:18.000 --> 00:00:24.000
+Move to Preparing
+The restaurant advances the status manually; no AI autonomy is demonstrated.
+
+00:00:24.000 --> 00:00:30.000
+Refresh tracking on the customer side
+Preparing matches the restaurant action.
+
+00:00:30.000 --> 00:00:36.000
+Move to Out for delivery
+The steps are traversed in order.
+
+00:00:36.000 --> 00:00:42.000
+Move to Delivered then refresh the customer
+Tracking confirms fictitious delivery of the same order number.

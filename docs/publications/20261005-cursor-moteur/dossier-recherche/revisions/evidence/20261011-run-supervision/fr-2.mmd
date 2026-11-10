@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant A as Producteur A
+    participant B as Producteur B
+    participant M as Moteur et boîte de réception
+    participant S as Sous-superviseur de A
+    participant R as Racine propriétaire de B
+    A->>M: Observation de durée, tentative A
+    B->>M: Observation d’outil, tentative B
+    M->>S: Événement du périmètre A avec compteurs
+    M->>R: Événement du périmètre B avec compteurs
+    par Décision sur A
+        S->>M: continue-run, événement A et bail courant
+        M-->>A: Processus conservé sans budget ajouté
+    and Décision sur B
+        R->>M: stop-run, événement B et bail courant
+        M->>B: Arrêt demandé
+        B-->>M: Fin effective du processus
+    end
+    M-->>R: Résultat de B à diagnostiquer ou examiner

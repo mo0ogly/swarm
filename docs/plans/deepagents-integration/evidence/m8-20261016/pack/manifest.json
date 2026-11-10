@@ -1,0 +1,411 @@
+{
+  "cases": [
+    {
+      "context": {
+        "sha256": "6e539691bc403aea77894ef462df42da948c1b9eca29b4cd9f1f32d179bb0393",
+        "bytes": 40368,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 32
+      },
+      "id": "storage-32-current-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-32-current-without.txt",
+      "prompt_sha256": "97ef84314333c8e6c7c50b7ce0fc58920cd6c0ac3828853aaf65dae0b354ac23",
+      "raw_prompt": "storage-32-current-without.engine.txt",
+      "scenario": "storage-32-current",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-25edf7683244ad499eae358a",
+            "id": "storage-source-plan",
+            "version": 1,
+            "sha256": "0fc9004543af2e1c14710eef4bbfca757f74e790fb6789d08da92ec325800918"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-1b3cab925a9e09214aec4911",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Comparer trois versions et la source applicable",
+          "at": "2026-10-16T08:12:16.24405822Z"
+        },
+        "sha256": "80e58cd5b031a6447bcc3b26869e9a90809277c9dee7184c577fe92049002a43",
+        "bytes": 42137,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 32
+      },
+      "id": "storage-32-current-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-32-current-with.txt",
+      "prompt_sha256": "701d04e95cb456145f6a322946cc7ac9ef40e7c678acb4de0654e9727447de8f",
+      "raw_prompt": "storage-32-current-with.engine.txt",
+      "scenario": "storage-32-current",
+      "source_revision": 3,
+      "treatment": "with"
+    },
+    {
+      "context": {
+        "sha256": "339995e0fe2cc515ecf64206a72826c5d1e3626d1ac703448be340566f981b99",
+        "bytes": 40368,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "8c5f9432ed4ac2b9b7a1d435cb1656971be86ba9c1ba6d9934e4dcf82257863e",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 32
+      },
+      "id": "storage-32-changed-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-32-changed-without.txt",
+      "prompt_sha256": "00b2fce0cbf8cf6899d86ba219817fe94f602b475e27a648923c521d103326df",
+      "raw_prompt": "storage-32-changed-without.engine.txt",
+      "scenario": "storage-32-changed",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-25edf7683244ad499eae358a",
+            "id": "storage-source-plan",
+            "version": 1,
+            "sha256": "0fc9004543af2e1c14710eef4bbfca757f74e790fb6789d08da92ec325800918"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-3ea8a9025ad6d8b0f10ea266",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Comparer trois versions et la source applicable",
+          "at": "2026-10-16T08:12:16.38626451Z"
+        },
+        "sha256": "276a4496ce785bc9d87a13dde5f1856d078bd0de0e42f6e88bffe3c1bbcbfc2e",
+        "bytes": 42137,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "8c5f9432ed4ac2b9b7a1d435cb1656971be86ba9c1ba6d9934e4dcf82257863e",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 32
+      },
+      "id": "storage-32-changed-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-32-changed-with.txt",
+      "prompt_sha256": "6bf8ab31d6a6a8a0c81780e8374beeccb14be049695061e2f3295613730825e0",
+      "raw_prompt": "storage-32-changed-with.engine.txt",
+      "scenario": "storage-32-changed",
+      "source_revision": 3,
+      "treatment": "with"
+    },
+    {
+      "context": {
+        "sha256": "642bba3d65406cbec05ce3373131a82324124b0b91ed1bacde80fa0707d56856",
+        "bytes": 40368,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 33
+      },
+      "id": "storage-33-current-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-33-current-without.txt",
+      "prompt_sha256": "743f20b65dd1de2292e8aaa20fce55695d26db11f62a28193f6599dc3fbf6704",
+      "raw_prompt": "storage-33-current-without.engine.txt",
+      "scenario": "storage-33-current",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-25edf7683244ad499eae358a",
+            "id": "storage-source-plan",
+            "version": 1,
+            "sha256": "0fc9004543af2e1c14710eef4bbfca757f74e790fb6789d08da92ec325800918"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-8507b8cbeb22cf1bd98808d0",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Comparer trois versions et la source applicable",
+          "at": "2026-10-16T08:12:16.600867426Z"
+        },
+        "sha256": "40a112b0b8040912030c16cc5a7a67d72497ea81b555643718ce5c153ca32182",
+        "bytes": 42137,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 33
+      },
+      "id": "storage-33-current-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-33-current-with.txt",
+      "prompt_sha256": "0015157a12765b6e39dbca4ebb26d0bf21f48235c876d36aba5b29758d237c31",
+      "raw_prompt": "storage-33-current-with.engine.txt",
+      "scenario": "storage-33-current",
+      "source_revision": 3,
+      "treatment": "with"
+    },
+    {
+      "context": {
+        "sha256": "212e54f24f2e922d4d7111f66ebbea6281fec5342ea74cfe2eb4f1a97e465b7f",
+        "bytes": 40368,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "8c5f9432ed4ac2b9b7a1d435cb1656971be86ba9c1ba6d9934e4dcf82257863e",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 33
+      },
+      "id": "storage-33-changed-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-33-changed-without.txt",
+      "prompt_sha256": "afd53c76229597bd44332622a064fe7058a8caf270a13515d6b1879ad3dfd85c",
+      "raw_prompt": "storage-33-changed-without.engine.txt",
+      "scenario": "storage-33-changed",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-25edf7683244ad499eae358a",
+            "id": "storage-source-plan",
+            "version": 1,
+            "sha256": "0fc9004543af2e1c14710eef4bbfca757f74e790fb6789d08da92ec325800918"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-ba93529d81e31ecd6bc05d5d",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Comparer trois versions et la source applicable",
+          "at": "2026-10-16T08:12:16.789881371Z"
+        },
+        "sha256": "aaaa32c1d1863e9f633ed9b450b641fcd82d824dce729a6d3e495c7fc680d435",
+        "bytes": 42137,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "8c5f9432ed4ac2b9b7a1d435cb1656971be86ba9c1ba6d9934e4dcf82257863e",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 33
+      },
+      "id": "storage-33-changed-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-33-changed-with.txt",
+      "prompt_sha256": "3878232fa8fc99db0ee47d8f20d2b543b7f949f07bba9f9f8631bc67f210e3a8",
+      "raw_prompt": "storage-33-changed-with.engine.txt",
+      "scenario": "storage-33-changed",
+      "source_revision": 3,
+      "treatment": "with"
+    },
+    {
+      "context": {
+        "sha256": "ab7133b29baa59eff17bd23c7c7fba18d11f05ee0c3b1ce3e97c2d09c9436a26",
+        "bytes": 40368,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 34
+      },
+      "id": "storage-34-current-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-34-current-without.txt",
+      "prompt_sha256": "09c1b1d8ff9609e9ee27e87fab4802df3b26ae2ea4d75903fdf63e7679589b24",
+      "raw_prompt": "storage-34-current-without.engine.txt",
+      "scenario": "storage-34-current",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-25edf7683244ad499eae358a",
+            "id": "storage-source-plan",
+            "version": 1,
+            "sha256": "0fc9004543af2e1c14710eef4bbfca757f74e790fb6789d08da92ec325800918"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-f685307e9a7fbffb13aa2b4a",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Comparer trois versions et la source applicable",
+          "at": "2026-10-16T08:12:16.97151156Z"
+        },
+        "sha256": "566ef0e0a8a5db7385be025b51266c262498367442c9a01ab7eb3c1d5b5dfdbc",
+        "bytes": 42137,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 34
+      },
+      "id": "storage-34-current-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-34-current-with.txt",
+      "prompt_sha256": "3fe9be604b25f849afff6e6d67a773919ec867247b676cb6e5917c07597fc36d",
+      "raw_prompt": "storage-34-current-with.engine.txt",
+      "scenario": "storage-34-current",
+      "source_revision": 3,
+      "treatment": "with"
+    },
+    {
+      "context": {
+        "sha256": "2f89eae2ad1b4fd453dd8d10ae7990c00c7e9ca8d07252ee0a4252239fcdbda2",
+        "bytes": 40368,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "8c5f9432ed4ac2b9b7a1d435cb1656971be86ba9c1ba6d9934e4dcf82257863e",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 34
+      },
+      "id": "storage-34-changed-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-34-changed-without.txt",
+      "prompt_sha256": "e73cb53f0f2fa43bb80f9273e48991f057caa2e60fc477c04b0ba150e8efdb59",
+      "raw_prompt": "storage-34-changed-without.engine.txt",
+      "scenario": "storage-34-changed",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-25edf7683244ad499eae358a",
+            "id": "storage-source-plan",
+            "version": 1,
+            "sha256": "0fc9004543af2e1c14710eef4bbfca757f74e790fb6789d08da92ec325800918"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-40e7339fd80b797a62f8f992",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Comparer trois versions et la source applicable",
+          "at": "2026-10-16T08:12:17.127143498Z"
+        },
+        "sha256": "ed9dc9d0e091766d3f45c638ebfbf910ffb0920c2afafb437b74cb10d131822b",
+        "bytes": 42137,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "observed_source_sha256": "8c5f9432ed4ac2b9b7a1d435cb1656971be86ba9c1ba6d9934e4dcf82257863e",
+        "observed_store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+        "workspace_storage_version": 34
+      },
+      "id": "storage-34-changed-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "storage-34-changed-with.txt",
+      "prompt_sha256": "76596cb672f84ae071202b9e29d81c5e1268497fa756d30427ff461974c17c9d",
+      "raw_prompt": "storage-34-changed-with.engine.txt",
+      "scenario": "storage-34-changed",
+      "source_revision": 3,
+      "treatment": "with"
+    }
+  ],
+  "inspection_controls": [
+    {
+      "exit_code": 2,
+      "migration_backup_created": false,
+      "storage_version": 32,
+      "storage_version_preserved": true,
+      "work_and_events_preserved": true
+    },
+    {
+      "exit_code": 0,
+      "migration_backup_created": false,
+      "storage_version": 33,
+      "storage_version_preserved": true,
+      "work_and_events_preserved": true
+    },
+    {
+      "exit_code": 2,
+      "migration_backup_created": false,
+      "storage_version": 34,
+      "storage_version_preserved": true,
+      "work_and_events_preserved": true
+    }
+  ],
+  "knowledge": {
+    "source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+    "source_snapshot": "contract-model.go.txt",
+    "store_sha256": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+    "store_snapshot": "contract-store.go.txt",
+    "supported_version": 33
+  },
+  "lesson": {
+    "version": 1,
+    "action": "admit",
+    "kind": "procedure",
+    "body": "Contrat source vérifié : internal/engine/model.go, schemaVersion = 33, SHA-256 ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa ; internal/engine/store.go (openStoreWithMigration), SHA-256 fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1. Pour une version de stockage positive : si elle est inférieure à la version du CLI, la consultation refuse storage_upgrade_required ; proposer une mise à niveau prise en charge à l'opérateur, sans l'exécuter. Si elle est égale, une consultation est possible sans migration. Si elle est supérieure, ce CLI refuse la version non supportée : demander un CLI compatible, jamais rétrograder. Ces conclusions sont conditionnelles aux deux empreintes courantes identiques. Si elles diffèrent, demander la source courante et ne pas certifier de version. Une branche explicitement conditionnelle ne prouve pas que sa condition est satisfaite. Une compatibilité de stockage ne donne aucune autorisation de lancement métier.",
+    "conditions": "Comparer les deux empreintes avant réemploi ; distinguer l'action justifiée maintenant et les branches futures.",
+    "source_retex": "memory-source",
+    "source_sha256": "59a7ddc976ec49d37e55e6e026159eeb3a11d1989b78863eeaf1b18e58533561",
+    "project_sha256": "da7e874c31c998bb4e0ee3a6105cdb133041456fe2fbc877ffc0f28adbde4b93",
+    "actor": "fpizzi/uid:1001",
+    "reason": "Contrat de code vérifié et trois variantes CLI isolées",
+    "at": "2026-10-16T08:12:16.170146233Z",
+    "sha256": "0fc9004543af2e1c14710eef4bbfca757f74e790fb6789d08da92ec325800918"
+  },
+  "protocol": "storage-plan-v3",
+  "provenance": "audited source snapshots, isolated CLI controls and engine previews; no provider invocation",
+  "schema_version": 1
+}

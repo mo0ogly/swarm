@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T19:39:42.539151+00:00",
+  "parent": "review-evidence-capacity-20261011.patch",
+  "parent_tree": "e432f5f3ec6419831f88dc61b941eaa2618cbbbe",
+  "preimage_tree": "9d71caddf6f3697b37ae1c0f54d4adc01dec8259",
+  "preimage_extensions": [
+    {
+      "path": "internal/engine/agent_workflow.go",
+      "sha256": "de0c395edca36e9caa90da86a5365facc36bbb5f2585cfb5ed2b77850c7cb4fa",
+      "blob": "bfd0fc470115ef1bec8b18c08fc26d7e043e498e"
+    }
+  ],
+  "preimages": {
+    ".claude/skills/replan/SKILL.md": "81e3fc1776ff8e2ab046cf9b538f002afbe24cf776fe127597b3ec7ca18303c8",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "961565fcab28152c2e4514325af94062ec6dbda70158f7cb8cb4434618b54194",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "e575b00f3e661729800223373e5f195ab3652986a493aaef9bb3e9b939f850c8",
+    "internal/engine/agent_workflow.go": "de0c395edca36e9caa90da86a5365facc36bbb5f2585cfb5ed2b77850c7cb4fa",
+    "internal/engine/independent_review.go": "779294363af78355369ccc7faf58c410c0a923a5746fe0257720b1f62cf5e10b",
+    "internal/engine/managed_review_recovery.go": "8535c66b0227e28dab29c656bd197d8019a7181f65316b3137050c3b98bf0aa9",
+    "internal/engine/managed_review_retry_delivery.go": "3244a2deaaeb3781b6f1c82030cac885ea51a8a7103b7e8309449bb5ff2f2914",
+    "internal/engine/managed_review_selection_capacity_recovery.go": null,
+    "internal/engine/managed_review_selection_capacity_recovery_test.go": null,
+    "internal/engine/planning.go": "ce00037e318e032f9584ad3c7ba55e0422954284069703581129e18ce2533198",
+    "internal/engine/planning_delivery.go": "115cda74fcd215fa12f8ebe969eb6a5079a05b1d26e1f6f2a7412695efb1af0d",
+    "internal/engine/planning_prompt.go": "9e98a65b3848b1cff8b7da4738ad6aea2f0b11e76bb95242b4b0f05535d83da6",
+    "internal/engine/planning_review_retry.go": "fdcb3e25ed60f1cf49b8568025253440e53257512f2030ae06850584bbc330c9"
+  },
+  "postimages": {
+    ".claude/skills/replan/SKILL.md": "a496827ab164f790fb6961fc864a32e653cdef809e773eb6f4b035cf1f631a68",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "65ae311929dcd64c6ca036ce15506a856bccdba6124be6594d2d08308a7826ca",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "3067123caef597e5f503c542a02554b3e048371808649fcfee0dff58ef047d01",
+    "internal/engine/agent_workflow.go": "8631dcc9f931d234f5acc98f917f0437950df01802b701ab503a05c1f53bb990",
+    "internal/engine/independent_review.go": "2d550b9036f0b4d986cce57e6d13910063b04c176675d5d61d58f140dabd76fd",
+    "internal/engine/managed_review_recovery.go": "40b33af97bc3841d494da10da14b0de2cd32649f254324ef4d83290df381bf7f",
+    "internal/engine/managed_review_retry_delivery.go": "840d55483264ebf93ba55378fa2e3810d8a2073c1a4adcf0a81f9478bbd594a7",
+    "internal/engine/managed_review_selection_capacity_recovery.go": "dc8513bfb4ff70ae41a5917de85b8dded850e1b47eea45315744fcc551531d30",
+    "internal/engine/managed_review_selection_capacity_recovery_test.go": "9d2740d42a38f6131d0196bc634dc02fb2c3bd4c7d2ac5bc367b96ebaaff2938",
+    "internal/engine/planning.go": "a4dd2d877b5da60b602c45a558ade9ac9efce71819f0d6ad6ad593ebd356101b",
+    "internal/engine/planning_delivery.go": "fd19239ec37cd6f451bb8d99cce38aef74bb1d016ad8515b3c4fbe44932f040f",
+    "internal/engine/planning_prompt.go": "9f3ae975cac269d2c38ece3499bf0044f09b1c7d4338fd5eb208e8702dfba38b",
+    "internal/engine/planning_review_retry.go": "ae46f520be9781d32f3a3b0fd041e66fcb6688acb54910741a954977b5745beb"
+  },
+  "result_tree": "0c8d8da8b17846d37da8d2bbe27a803ccb345ac9",
+  "patch": "/tmp/swarm-selection-recovery22-prospective.patch",
+  "patch_sha256": "1ec487f0c5c72aa8b00748aaf0981ef9723178452b84db50b5ab878cca331d52",
+  "paths": [
+    ".claude/skills/replan/SKILL.md",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "internal/engine/agent_workflow.go",
+    "internal/engine/independent_review.go",
+    "internal/engine/managed_review_recovery.go",
+    "internal/engine/managed_review_retry_delivery.go",
+    "internal/engine/managed_review_selection_capacity_recovery.go",
+    "internal/engine/managed_review_selection_capacity_recovery_test.go",
+    "internal/engine/planning.go",
+    "internal/engine/planning_delivery.go",
+    "internal/engine/planning_prompt.go",
+    "internal/engine/planning_review_retry.go"
+  ],
+  "check": "PASS exact13path diff, refreshed-index apply, result tree and allpostimages",
+  "candidate_digest": "5238f34c3c8c61b983dc220f75352078ae5f728f721db24332042dba881332bd",
+  "qualification": {
+    "root_child_chain": "PASS6.249s actual simulated selection/final refusal, unchanged originals and consumption",
+    "guards": "PASS29.081s",
+    "native_readonly": "PASS1.157s exact workflow/originalv1/whole context/14618to79564; noDB/provider mutation",
+    "full22": "running; no installation permitted until complete qualification"
+  },
+  "purpose": "General guarded selection-stage capacity correction: exact historical version1 unknown without final task verdict, immutable complete inspections, genuine computed capacity increase; fresh persisted receipt and explicit owner decision. Producer termination verified through existing SQL commit connection. Original journal, ACK, unknown and spending unchanged; no new production, no override of valid semantic rejection/current version2 unknown. Planner/worker prevention rules and shared personal Codex/Claude directive; historical reviewer method unchanged."
+}

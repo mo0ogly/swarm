@@ -1,0 +1,133 @@
+package engine
+
+import (
+	"bytes"
+	"database/sql"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"reflect"
+	"testing"
+)
+
+func TestWorkRowStoreGetRejectsInvalidRows(t *testing.T) {
+	for _, scenario := range []string{"identity", "revision", "schema", "null", "invalid-utf8"} {
+		t.Run(scenario, func(t *testing.T) {
+			db, err := sql.Open("sqlite", ":memory:")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer db.Close()
+			db.SetMaxOpenConns(1)
+			if _, err := db.Exec("CREATE TABLE works(id TEXT PRIMARY KEY,revision INTEGER,body BLOB)"); err != nil {
+				t.Fatal(err)
+			}
+			w := Work{Schema: 1, ID: "source", Revision: 1, Title: "Stored source"}
+			columnRevision := w.Revision
+			switch scenario {
+			case "identity":
+				w.ID = "foreign"
+			case "revision":
+				columnRevision++
+			case "schema":
+				w.Schema = 2
+			}
+			raw, _ := json.Marshal(w)
+			if scenario == "null" {
+				raw = []byte("null")
+			}
+			if scenario == "invalid-utf8" {
+				raw = bytes.Replace(raw, []byte("Stored"), []byte{0xff}, 1)
+			}
+			if _, err := db.Exec("INSERT INTO works(id,revision,body) VALUES(?,?,?)", "source", columnRevision, raw); err != nil {
+				t.Fatal(err)
+			}
+			s := &Store{db: db}
+			if got, err := s.get("source"); err == nil || !reflect.DeepEqual(got, Work{}) {
+				t.Fatal("Store.get returned an inconsistent row", got.ID, got.Revision, err)
+			}
+		})
+	}
+}
+
+func TestWorkRowStoreListRejectsPartialResult(t *testing.T) {
+	s := storeTest(t)
+	older := createTest(t, s)
+	_ = createTest(t, s) // Valid row is visited first by newest-first list.
+	if _, err := s.db.Exec("UPDATE works SET revision=revision+1 WHERE id=?", older.ID); err != nil {
+		t.Fatal(err)
+	}
+	before := recoverySnapshotTest(t, s)
+	if got, err := s.list(); err == nil || got != nil {
+		t.Fatal("Store.list returned a partial or inconsistent collection", got, err)
+	}
+	if before != recoverySnapshotTest(t, s) {
+		t.Fatal("list refusal changed storage or leaked its cursor")
+	}
+}
+
+func TestWorkRowCommonMutationRejectsBeforeCallbacks(t *testing.T) {
+	for _, scenario := range []string{"fresh", "replay"} {
+		t.Run(scenario, func(t *testing.T) {
+			s := storeTest(t)
+			w := createTest(t, s)
+			events, err := s.events(w.ID)
+			if err != nil || len(events) != 1 {
+				t.Fatal("creation fixture", events, err)
+			}
+			id, kind, event, revision, request := w.ID, "fixture.check", newID("e-"), w.Revision, []byte(`{}`)
+			if scenario == "replay" {
+				id, revision, event = "", 0, events[0].ID
+				if err := s.db.QueryRow("SELECT kind,request FROM events WHERE id=?", event).Scan(&kind, &request); err != nil {
+					t.Fatal(err)
+				}
+			}
+			wrong := w
+			wrong.ID = "foreign-source"
+			raw, _ := json.Marshal(wrong)
+			if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); err != nil {
+				t.Fatal(err)
+			}
+			before := recoverySnapshotTest(t, s)
+			called, hooked := false, false
+			got, err := s.mutateWithHookOnce(id, kind, event, revision, request, func(*Work) error {
+				called = true
+				return nil
+			}, func(*sql.Tx, *Work) error {
+				hooked = true
+				return nil
+			})
+			if err == nil || called || hooked || !reflect.DeepEqual(got, Work{}) {
+				t.Fatal("inconsistent mutation/replay reached a callback or returned data", scenario, called, hooked, got.ID, err)
+			}
+			if before != recoverySnapshotTest(t, s) {
+				t.Fatal("mutation refusal changed state")
+			}
+		})
+	}
+}
+
+func TestWorkRowPublicReadersRefuseIncoherentWork(t *testing.T) {
+	s := storeTest(t)
+	w := createTest(t, s)
+	if _, err := s.db.Exec("UPDATE works SET revision=revision+1 WHERE id=?", w.ID); err != nil {
+		t.Fatal(err)
+	}
+	before := recoverySnapshotTest(t, s)
+	for _, args := range [][]string{{"work", "show", w.ID}, {"work", "list"}} {
+		var stdout, stderr bytes.Buffer
+		if code := run(append([]string{"--root", s.root, "--json"}, args...), &stdout, &stderr); code != 2 || stdout.Len() != 0 || stderr.Len() == 0 {
+			t.Fatal("inconsistent work published by CLI", args, code, stdout.String(), stderr.String())
+		}
+	}
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:18787/api/v1/works", nil)
+	request.AddCookie(&http.Cookie{Name: "swarm_session", Value: "fixture-token"})
+	response := httptest.NewRecorder()
+	newWebHandler(s, "localhost:18787", "fixture-token").ServeHTTP(response, request)
+	if response.Code != http.StatusBadRequest {
+		t.Fatal("inconsistent work published by HTTP", response.Code, response.Body.String())
+	}
+	if before != recoverySnapshotTest(t, s) {
+		t.Fatal("public inspection mutated state")
+	}
+}

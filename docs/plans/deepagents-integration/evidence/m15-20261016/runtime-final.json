@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-16T18:32:53.769368+00:00",
+  "runtime": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  }
+}

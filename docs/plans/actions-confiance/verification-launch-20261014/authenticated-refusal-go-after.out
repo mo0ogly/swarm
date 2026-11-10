@@ -1,0 +1,26 @@
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/requester-token-012345
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Basic_requester-token-012345
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer__requester-token-012345
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/#00
+=== RUN   TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_requester-token-012345
+--- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays (1.45s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/requester-token-012345 (0.22s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Basic_requester-token-012345 (0.22s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer__requester-token-012345 (0.25s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_ (0.27s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/#00 (0.25s)
+    --- PASS: TestActionsConfianceT2HTTPRequiresBearerAndAuthenticatesReplays/Bearer_requester-token-012345 (0.23s)
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify/altered
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify/missing
+=== RUN   TestActionsConfianceT2OriginalBytesPersistAndVerify/extra
+--- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify (1.16s)
+    --- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify/altered (0.00s)
+    --- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify/missing (0.00s)
+    --- PASS: TestActionsConfianceT2OriginalBytesPersistAndVerify/extra (0.00s)
+=== RUN   TestActionsConfianceT2BusinessReplayPreservesIntegerPrecision
+--- PASS: TestActionsConfianceT2BusinessReplayPreservesIntegerPrecision (0.23s)
+PASS
+ok  	swarm.local/companion/internal/engine	4.007s

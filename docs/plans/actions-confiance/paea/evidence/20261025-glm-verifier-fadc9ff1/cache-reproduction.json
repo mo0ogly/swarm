@@ -1,0 +1,9 @@
+{
+  "exit": 0,
+  "stdout_hex": "504145415f564543544f52535f435245415445442031340a",
+  "stderr_hex": "",
+  "extra_caches": [
+    "tools/verification/__pycache__/recipe.cpython-313.pyc"
+  ],
+  "generator_sha256": "83981277cee76d369cfe86d42a241369d1718f245555660250012d57cb11116f"
+}

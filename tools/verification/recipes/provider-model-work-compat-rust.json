@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "provider-model-work-compat-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/provider_model_route.rs",
+    "rust/crates/swarm-engine/src/model_routing_policy.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "tests/rust_provider_model_work_compat.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/NATIVE-PROVIDER-RESOLUTION.md",
+    "docs/en/NATIVE-PROVIDER-RESOLUTION.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "same-root-work-route-and-model-source-before-after",
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROVIDER_WORK_COMPAT_VERIFIED"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\nout=Path(tempfile.mkdtemp(prefix='provider-work-compat-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_provider_model_work_compat.py','--before-binary',os.environ['SWARM_PROVIDER_MODEL_BEFORE_BINARY'],'--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(out)],check=True)\nr=json.loads((out/'result.json').read_bytes());assert r['status']=='PASS' and len(r['checks'])==5 and not r['provider_started']\nprint('PROVIDER_WORK_COMPAT_VERIFIED '+str(out))"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "pid": 2019177,
+  "proc_start_ticks": "3768657",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-introspection-lock-t2t4.py",
+    "run"
+  ],
+  "at": "2026-10-15T22:27:42.431601+00:00"
+}

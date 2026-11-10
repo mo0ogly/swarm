@@ -1,0 +1,11 @@
+flowchart TD
+  B["Bootstrap et protection OS<br/>cible : principal initial et service à établir"] -.-> K["Clé publique et projet épinglés"]
+  K --> J["Journal SQLite dédié<br/>chaîne signée et tête vérifiées"]
+  H["Head retenu indépendamment<br/>protection durable : cible"] --> A["Apply : comparer puis ajouter<br/>ou reconnaître le retry exact courant"]
+  J --> A
+  A --> D["COMMIT événement et tête<br/>enroll unique ou revoke irréversible"]
+  D --> L["WithActive : BEGIN IMMEDIATE<br/>relire toute la chaîne et comparer Head"]
+  H --> L
+  L --> S["SignActive sous réservation locale<br/>réponse liée au challenge"]
+  S --> V["enrollmentproof.Verify<br/>authenticité des octets"]
+  V -.-> E["Schéma métier et fraîcheur à l’usage<br/>raccord moteur : non réalisé"]

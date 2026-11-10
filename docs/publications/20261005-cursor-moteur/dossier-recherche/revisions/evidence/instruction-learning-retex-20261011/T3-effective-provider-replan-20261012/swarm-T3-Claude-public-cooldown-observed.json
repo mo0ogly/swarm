@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-12T10:53:52.682294+00:00",
+  "argv": [
+    "/home/fpizzi/workspace/swarm/bin/swarm",
+    "--root",
+    "/home/fpizzi/workspace/swarm",
+    "--json",
+    "providers",
+    "cooldown",
+    "show",
+    "claude"
+  ],
+  "exit": 0,
+  "observed": {
+    "active": true,
+    "cooldown": {
+      "provider": "claude",
+      "observed_at": "2026-10-12T10:34:12.387835172Z",
+      "resets_at": 1791808800,
+      "source": "auto-9335267bdccccc3dbb52",
+      "signal": "result.api_error_status.429"
+    },
+    "digest": "4354e5ec516a70ae653e512f25d4b067f218cc7152e69a2b4e0a74edb208b78f",
+    "provider": "claude"
+  }
+}

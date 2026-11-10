@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "work_id": "w-10fb269432444817aedce668",
+  "work_revision": 24,
+  "task_id": "task",
+  "producer_agent_id": "watch-12e525926625c1504db9d47d",
+  "attempt_id": "a-99bd596dba1a2c98b0b1be52",
+  "candidate_commit": "b043f52a9d73f0a5b86ed50544aae0b41ab36e56",
+  "candidate_binding_sha256": "482d0c08c549a9dc8b8a5c8ea7a39207b28dfbbf3a7d8e55f2b9cdacc6fcc26f",
+  "cohort_task_count": 1,
+  "control_count": 1,
+  "job_created": false,
+  "controls_started": false,
+  "task_accepted": false
+}

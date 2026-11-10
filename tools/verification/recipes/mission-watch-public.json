@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "id": "mission-watch-public",
+  "inputs": [
+    "rust/crates/swarm-cli/src/mission_watch.rs",
+    "rust/crates/swarm-cli/src/mission_status.rs",
+    "rust/crates/swarm-cli/src/mission.rs",
+    "rust/crates/swarm-cli/src/mission_worker_entry.rs",
+    "rust/crates/swarm-engine/src/mission_worker_dispatch.rs",
+    "rust/crates/swarm-engine/src/mission_worker_continuation.rs",
+    "rust/crates/swarm-engine/src/agent_supervision.rs",
+    "rust/crates/swarm-engine/src/agent_completion_journal.rs",
+    "tests/rust_*.py",
+    "tests/test_rust_mission_watch_public_guards.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-engine/src/mission_cycle_runner.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_read.rs",
+    "tools/agent-workflows/check_workflow_size.py",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/*.md",
+    ".claude/skills/*/SKILL.md",
+    ".claude/skills/apex/references/rust-migration.md",
+    "rust/crates/swarm-engine/config/agent-workflow-descriptor.json",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "tests/test_workflow_size_preflight.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "shipped-workflow-instructions-fit-initial-policy",
+      "command": [
+        "python3",
+        "tools/agent-workflows/check_workflow_size.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"fits\": true"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "workflow-size-typed-schema-regression",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_workflow_size_preflight.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_schema_version_requires_integer_after_valid_control",
+        "Ran 1 test",
+        "OK"
+      ]
+    },
+    {
+      "id": "public-watch-projection-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_mission_watch_public_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_complete_native_event_control",
+        "test_empty_wrong_work_and_duplicate_start_refuse",
+        "test_exit_claim_before_release_refused",
+        "test_status_requires_unique_actual_target",
+        "Ran 12 tests",
+        "OK",
+        "test_optional_idle_planning_exact_record_refusal_and_recovery"
+      ]
+    },
+    {
+      "id": "public-watch-pause-SIGINT-SIGTERM-independent-worker-completion",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-watch-public-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_watch_public.py','--binary',os.environ['SWARM_PUBLIC_WATCH_BINARY'],'--profile',os.environ['SWARM_PUBLIC_WATCH_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public mission watch pause preserves independently granted worker completion",
+        "PASS public mission watch sigint preserves independently granted worker completion",
+        "PASS public mission watch sigterm preserves independently granted worker completion",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

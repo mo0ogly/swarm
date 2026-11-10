@@ -1,0 +1,66 @@
+{
+  "at_utc": "2026-10-15T07:32:33.519974+00:00",
+  "binary_sha256": "7b16c2c11f2627de933b407418ea450960301eb02d944cd3e12b9ebe76d424ab",
+  "race_main_pass": 10,
+  "race_subcases_pass": 6,
+  "race_exit_code": 0,
+  "vet_exit_code": 0,
+  "method_contexts": 12,
+  "work_revision": 378,
+  "review_calls": 78,
+  "accepted_lots": 1,
+  "total_lots": 8,
+  "cause": "Retry preflight incorrectly included completed inspections; exact remaining message then exposed a real token deficit from duplicate multi-issue diagnostics.",
+  "correction": "Validate immutable history, measure remaining stage, serialize attributed diagnostic once for first rejected citation. All final questions and original replies remain unchanged.",
+  "native_limit": "Decision call reserved with persisted diagnostic; model result and acceptance not established in this snapshot. Sizing probe only reads immutable files, opens no database, mutates no runtime state and invokes no provider. Public resume reason understated the main test count as nine; the original log proves ten and remains unchanged.",
+  "proofs": {
+    "citation-compact-before.out": {
+      "sha256": "9f835045f8bd78dee5d89b62a331d2d3c90b5c6ccf959cc5525e8b0a90224098",
+      "bytes": 1014
+    },
+    "citation-compact-after-race.out": {
+      "sha256": "1f9673c092928c0b6736fa0aa9a832da23572a4febfbdd03b12787a76234ae8e",
+      "bytes": 2693
+    },
+    "citation-compact-vet.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "citation-compact-methods.out": {
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "bytes": 97
+    },
+    "citation-compact-source-proof.json": {
+      "sha256": "2cd076f63d79cc8e76a854674d62fb610a888ccdaf9755ed19296b60356e8c1a",
+      "bytes": 103636
+    },
+    "citation-compact-retried.json": {
+      "sha256": "7479c3e5b4a39328ee303cb765eaabf49dd989127a87010e1bbfd7bfbcab78b1",
+      "bytes": 424154
+    },
+    "conductor-citation-compact-process.json": {
+      "sha256": "2744a62707fef47352342e416df0fe0e3061fd2744c7d2f61b96d48f0fd2c273",
+      "bytes": 579
+    },
+    "citation-compact-native-dispatch-proof.json": {
+      "sha256": "454d3aae2b5e431720a37be7e233b57ef2dadb2db778287d25e5526161cf7122",
+      "bytes": 3307
+    },
+    "native-citation-sizing-first.json": {
+      "sha256": "5eda5fe68f171d3d9de142c2d1d637c5fa7f995aede4d9ca1bd5badfaa6bc5a7",
+      "bytes": 2014
+    },
+    "native-citation-sizing-final.json": {
+      "sha256": "a994809b55ad7621da16bc8713fae02ef034807e319b75847521ff988667e0c3",
+      "bytes": 1912
+    },
+    "citation-capacity-before-verified.out": {
+      "sha256": "5602a4eef6d975e3e108217c5aab57b6c28667cbfd07ccf5f2b6589a3566c624",
+      "bytes": 447
+    },
+    "citation-capacity-final-race.out": {
+      "sha256": "a65cb5240460a54735d8f4596f00825c2d1a9e1232dcd9961be24b7af56a8baf",
+      "bytes": 263
+    }
+  }
+}

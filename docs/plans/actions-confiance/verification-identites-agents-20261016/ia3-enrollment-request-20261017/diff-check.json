@@ -1,0 +1,11 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "exit": 0,
+  "owned_files_checked": 15,
+  "owned_untracked_whitespace": [],
+  "review": "new sources and scoped caller diff inspected; not independent"
+}

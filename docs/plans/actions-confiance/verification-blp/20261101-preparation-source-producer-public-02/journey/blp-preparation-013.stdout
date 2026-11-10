@@ -1,0 +1,31 @@
+[
+  {
+    "model_route": {
+      "level": "standard",
+      "model": "fixture-standard",
+      "effort": "",
+      "billing": "external",
+      "policy_hash": "1fe3eaf59e14447dba38882e33056f1c767a93127d00d1b29de54d54c9ea3439",
+      "reason": "Politique fournisseur enregistrée · preparation · sans montée en gamme automatique ; annonce non authentifiée"
+    },
+    "context_mode": "full",
+    "used_in_plan": false,
+    "used_in_brief": false,
+    "id": "pt-5306ceae0f48faf9274e1a1492b9df4e",
+    "preparation_id": "prep-fa8847b0c33183273f594550",
+    "status": "running",
+    "created_at": "2026-11-01T16:42:22.640541241Z",
+    "source_revision": 2,
+    "method_hash": "bf2a935fa0b945bacea01e32c4871799fd6d097c70be1c7dd17f15a7942d485b",
+    "provider": "fixture",
+    "provider_digest": "b9b34907f097dc01660defe347b8b92d52655b1c837639423e895cecc2e07286",
+    "request_hash": "f0b9a74184856d817fdbd432e1b1ebc9296289cb2f97d080c0b1c1a69266b408",
+    "question": "PRIVATE_BLP_SOURCE",
+    "stale": false,
+    "timeout_seconds": 300,
+    "timeout_maximum_seconds": 600,
+    "supervisor_pid": 2443123,
+    "supervisor_stamp": "10925002",
+    "host": "fpizzi:93ca189a-b565-4bcd-8585-7b98e29f74b1:pid:[4026531836]"
+  }
+]

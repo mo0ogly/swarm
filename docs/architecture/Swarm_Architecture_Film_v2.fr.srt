@@ -1,0 +1,107 @@
+1
+00:00:00,000 --> 00:00:03,333
+Une mauvaise commande peut devenir un souvenir.
+
+2
+00:00:03,333 --> 00:00:06,667
+Puis revenir dans le contexte d’une autre instance.
+
+3
+00:00:06,667 --> 00:00:10,000
+Comment conserver la continuité sans hériter aveuglément de l’erreur ?
+
+4
+00:00:10,000 --> 00:00:14,000
+Un résumé peut transporter une instruction injectée ou une conclusion erronée.
+
+5
+00:00:14,000 --> 00:00:18,000
+Une nouvelle instance doit retrouver les sources, la version et les conditions d’usage.
+
+6
+00:00:18,000 --> 00:00:22,000
+Retirer une leçon ne réécrit pas les contextes déjà reçus.
+
+7
+00:00:22,000 --> 00:00:26,000
+L’humain ou le service mandant, l’agent logique et l’instance sont distincts.
+
+8
+00:00:26,000 --> 00:00:30,000
+Le droit porte sur une opération, une ressource et une portée précises.
+
+9
+00:00:30,000 --> 00:00:34,000
+Une signature atteste une origine sous ses conditions de confiance ; elle ne prouve pas la vérité.
+
+10
+00:00:34,000 --> 00:00:38,000
+Le moteur relie le plan, les droits, les réservations, les budgets et les preuves.
+
+11
+00:00:38,000 --> 00:00:42,000
+Il vérifie les préconditions avant d’appliquer la transition autorisée.
+
+12
+00:00:42,000 --> 00:00:46,000
+Ces contrôles déterministes ne rendent pas le raisonnement du modèle déterministe.
+
+13
+00:00:46,000 --> 00:00:50,000
+Les contrôles produisent des preuves ; la revue IA examine le candidat.
+
+14
+00:00:50,000 --> 00:00:54,000
+La validation humaine exigée par la politique conserve son propre rôle.
+
+15
+00:00:54,000 --> 00:00:58,000
+Un test vert ou un avis IA favorable ne libère pas les tâches suivantes.
+
+16
+00:00:58,000 --> 00:01:02,000
+Un incident reste lié à sa tâche, à son agent et à sa tentative.
+
+17
+00:01:02,000 --> 00:01:06,000
+Le superviseur de périmètre décide ; la racine arbitre les questions transversales.
+
+18
+00:01:06,000 --> 00:01:10,000
+La reprise demande un effet observé, pas seulement une annonce de correction.
+
+19
+00:01:10,000 --> 00:01:13,333
+Les sorties d’agents, événements et mesures conservent leurs sources.
+
+20
+00:01:13,333 --> 00:01:16,667
+Le candidat, les contrôles et la fraîcheur des preuves restent liés.
+
+21
+00:01:16,667 --> 00:01:20,000
+Afficher un événement ne vaut pas acceptation du résultat.
+
+22
+00:01:20,000 --> 00:01:23,333
+Le plan futur prévoit fichiers et processus Linux, réseau et usage encadré des secrets.
+
+23
+00:01:23,333 --> 00:01:26,667
+Quatre vues prévues : politique, refus, chaîne d’une connexion et timeline.
+
+24
+00:01:26,667 --> 00:01:30,000
+La reprise dépend de la qualification Rust puis d’une décision explicite.
+
+25
+00:01:30,000 --> 00:01:33,333
+L’architecture complète tient en cinq vues détaillées, conservées dans le Word et les README.
+
+26
+00:01:33,333 --> 00:01:36,667
+Les parcours Rust sont qualifiés progressivement ; les raccords ouverts restent indiqués.
+
+27
+00:01:36,667 --> 00:01:40,000
+Sources publiques, limites et références sont reliées au document.

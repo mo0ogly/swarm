@@ -1,0 +1,11 @@
+=== RUN   TestManagedFragmentHistoricalPublicRecovery
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/pass
+    managed_review_fragment_reuse_test.go:350: Actual subprocess calls: original=6 differential=4; reused=2; exact candidate, reopen, corruption and idempotence checked
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/fail
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/exit
+--- PASS: TestManagedFragmentHistoricalPublicRecovery (46.64s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/pass (13.41s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/fail (16.29s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/exit (16.95s)
+PASS
+ok  	swarm.local/companion/internal/engine	46.671s

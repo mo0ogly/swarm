@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-flow-inventory",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "reviewed-source-flow-contracts",
+      "command": [
+        "/usr/bin/python3",
+        "tools/paea/check_blp_inventory.py",
+        "--inventory",
+        "docs/architecture/blp-flow-inventory.json"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.1822586900088936,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "inventory-drift-refusal-and-recovery",
+      "command": [
+        "/usr/bin/python3",
+        "tests/blp_flow_inventory_test.py"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.2343682190112304,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "8136ebee469ebef539b223a68cc7dd930247f692cc8802581e8ce89fd0b8627d",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "185474c8ef4361805d97483716d0816396ed760a18f119e857941938ce7d401f",
+    "declared-inputs.tar.gz": "1a8c5bd173eb9c86336a9995415c9e1387f06826fc8d99bbcd6ae4a96f38d573",
+    "environment.json": "7941c5c31a9da0bb823b0eab00827361ddc2326ac370f2c45bc2772429ddb99f",
+    "step-0001.stdout": "13a34c45c4c72a732d2f51fa1229535282e5a86fda2647bf9aeced7571d7b20b",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "d182a03e644c2490886a2ee04eb4bab14beb2ec48d2f689a322c0dcef8cf9676",
+    "step-0002.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0002.stderr": "e8b6090c8f5b651854a0f7ca9ee728c4770625cbf62003523ea7425d3dc0ae58",
+    "step-0002.json": "d5615fb6b7233610f50bb211656705491c5566dfca39a91050236dab54687714",
+    "inputs.after.json": "185474c8ef4361805d97483716d0816396ed760a18f119e857941938ce7d401f"
+  }
+}

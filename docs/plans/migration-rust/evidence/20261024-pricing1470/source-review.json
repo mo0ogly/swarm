@@ -1,0 +1,66 @@
+{
+  "status": "LOCAL_SEMANTIC_REVIEW_RECORDED",
+  "reviewer": "Codex principal, not independent",
+  "source_sha256": {
+    "rust/crates/swarm-web/src/service.rs": "80f7dcaaad5c898dcdc6c16dfd754a709d75bb1356e38d714ae39cba4a56e12d",
+    "rust/crates/swarm-web/src/service/pricing.rs": "706ae4f92b9379abf9dff894001bad1d9340a4e0afba4df2dc0d940b2aa6e7d0",
+    "rust/crates/swarm-web/src/service/native_admin.rs": "fca900cf424ee86f4365af6999d757ad6b7ecfe7b48178be835c5df8a6b8ade3",
+    "web/pricing.js": "ef8d1c10df75a4cc4895159b8b6ca6f8fa42ce900749250f59f9f0eae7bb3887",
+    "web/cockpit-native-pricing.js": "4679b1149f5120ebe98866f05fd237ea294a287e6dbb407cd92742d3999cd071",
+    "web/cockpit-native.js": "c3fb356a1fd1eba38e45290043a6f6f5d5dde6860216ec3fa46f2b8cd68bd6c0",
+    "web/cockpit.css": "dd6e364e26a473c965831c7c0e280567f5e94c9da27a1b547dc8140ec1e83f02",
+    "web/cockpit-ux.css": "d7cf31b792e365c6e56b1f38ceafa782fdad5cb90b17e0df6d60938c8e5c382f",
+    "web/swarm-design.css": "0997b3414e479b94c24f5361a06fe1f0acb80362c9c01d9dc33c80294a0807c4",
+    "locales/en.json": "7f52622cd6ba68a2879cb32659402dbd3253be63116190f0216937df55e15e91",
+    "web/i18n-en.js": "25dbd867c63f665894dadbde82f24fbfeecef7715a7227ddd1a2851fa75bb6c3",
+    "version_history.json": "d97bc37be96d371dcb17e4dd63d39af071b2161e1c03404c29a38390a86c6a5c",
+    "tests/rust_existing_pricing_flow.cjs": "8d8b18d01c191095f348727ec0b65873ea87d959eee2c149bd1ea8ef519c9da3",
+    "tests/rust_pricing_http_contract.py": "56d820cecdc5a15b9abe7706bad9e27aad9ab13ad1aa10b886a5268dedf4e9a2",
+    "tests/rust_native_cockpit_browser.py": "a53b03fab5d189c7af7f854b7725d6a924ef3460345194b798978d59982e8fad",
+    "tests/rust_existing_cockpit_ui.cjs": "c3d7c67584721e0862e9fd52b295302e4988e87deb145007266472f985362172",
+    "tools/verification/recipes/existing-cockpit-rust.json": "c73201f50a6101cb4c562a99826bfb520372abec064240cef8136c632876f595",
+    "tools/verification/recipes/native-cockpit-ux.json": "5e5cfbf147f9be78f4d34a18128cd782b72b16aa8980948bdd29b36d8673cb44",
+    "docs/BUDGETS.md": "96d40a85c4f2b1f6427c6faa70fee0aecc216908460596cfc9ccda24684d1f94",
+    "docs/en/BUDGETS.md": "1117b50005dae62a404ee1b2e5d766ad129185acadd31aeb470e7b8564fa8a9a",
+    "docs/architecture/RUST-MIGRATION.md": "61c319402d1264adbca1b447562cf7c2691e4f6a8e5630ad6decbbb1951affb8",
+    "docs/en/RUST-MIGRATION.md": "3315a8abbaf6eda40733b39567666f6e192d39df6919a24c3f2446079eca44ec",
+    "docs/plans/migration-rust/PLAN.md": "8399f111f90f08d1ac2eee919a81ff556eef627b7ec0a4541e43dab584922058",
+    "docs/plans/migration-rust/REPLAYS.md": "9eb0b1ada66dddd497bba4235bf06119aae0f03668f89d906930fc039b028244"
+  },
+  "policies": "Fixed endpoints/schema/methods are protocol. Browser finite/nonnegative/safe-integer validation is technical representation and inherited domain rules, not price/volume/budget ceilings. No new retry/deadline/cap/operator default or price discovery. Explicit null vs zero rates retained. Original zero cache volumes remain visible editable simulation inputs, no spending. Source model-rates.json -> shared decode/validate/digest -> Root save -> CLI and new protected API -> shared UI/actual quote. CAS refusal and actual read-back/CLI persistence witnessed. Engine inherited catalogue format bound unchanged; no live provider or budget mutation.",
+  "functions": "Reviewed PricingOperation, pricing_route, pricing_input; factory createPricing and changed load/list/open/edit/submit hooks including retained original Go response producer; native rate/validate/send/api/node/button/field/openModal/controls/failed/dismiss/enable; route/asset/bootstrap additions; additive canonical CSS ID selectors; permanent public HTTP/browser helpers. Nontrivial contracts documented. Two legacy global $ listener references removed after original failure; explicit DOM binding preserves old caller. Synchronous dismiss plus delayed-close guard preserves focus/context. Shared renderer field/section/order unchanged. Nil rates display empty, never fabricated records. All rendering textContent.",
+  "errors": "Input decode/validation occurs before writable open; corrupt stored catalogue stays500, explicit typed caller validation400, unknown quote version404, stale digest409, CSRF403. Shared root descriptor/capacity/access retained. Save known/uncertain publication survives encoding/close/response wrappers via configuration state; no fake settings receipt. Browser preserves cause/status/response, rejects malformed success, locks after failed save and requires fresh read, never retries. Actual post-save lost response injected after real positive witness; preserved versions read exactly once. UI inherited context active means no unrelated modal submit/close listener collision; form data captured before disabling controls.",
+  "documentation": "FR/EN budget guide and Mermaid, migration architecture, PLAN/REPLAYS, compiled FR/EN release notes/catalogue updated. Runtime42assets match current source, compiled notes/current catalogue match. Original Version dialog remains unconnected; no claim its UI is verified. First failed replay and normal build sources/profile preserved.",
+  "proof": {
+    "recipe": ".cache/existing-cockpit1470-corrected",
+    "integrity": "VERIFIED",
+    "browser_assertions": 321,
+    "pricing_browser_assertions": 48,
+    "pricing_HTTP_assertions": 10,
+    "budget_API_checks": 13,
+    "read_API_checks": 9,
+    "graph_identifier_assertions": 13,
+    "graph_cache_regression": "PASS",
+    "i18n": "PASS",
+    "screenshots": "FR/EN both themes,1440/390 modal overflow assertions; final en-sombre390 and initial fr-etat390 visually inspected. Existing cockpit five widths still covered.",
+    "normal_profile": "all_core_features_empty/all_core_test_false/no_fixture_feature true, actual source archive verified",
+    "installed": "v0.1.1-dev.34, sha39deeeff08c5aa1a6f2b7e4648f9f797dfea1dc156cc34147b3c54afcbd130e4"
+  },
+  "limits": [
+    "No independent/global acceptance or complete migration",
+    "No live/nonzero-spending provider test; live catalogue read only",
+    "Other product commands, advanced graph/preparation and original Version dialog remain open",
+    "No real pricing discovery/provenance authentication or invoice precision inferred"
+  ],
+  "post_replay_docstrings": {
+    "scope": "Two inherited recipe docstrings only; no executable statements changed. Functional proof reused for unchanged logic; exact tested originals retained in proof archive, documentation delta retained alongside.",
+    "delta_sha256": "4cbc7e0f1a10bcb998aa0c57365ba5238d06b1aa3bb9a6d27adad9f103caeeff"
+  },
+  "commit_whitespace_review": {
+    "cause": "git diff --cached --check found one extra blank line at EOF in new pricing.rs; prior unstaged diff check did not include untracked files.",
+    "correction": "Removed trailing blank line only; Rust tokens unchanged. Original tested bytes retained in normal build/proof archive.",
+    "old_sha256": "8a13bf2778cf2b443e871738da6d6e8c99427f14f39dc487aa29f55f6746810b",
+    "new_sha256": "706ae4f92b9379abf9dff894001bad1d9340a4e0afba4df2dc0d940b2aa6e7d0",
+    "functional_evidence": "Reused for unchanged Rust tokens; installed dev34 remains the earlier tested binary. No rebuild or reinstallation claimed for whitespace-only correction."
+  }
+}

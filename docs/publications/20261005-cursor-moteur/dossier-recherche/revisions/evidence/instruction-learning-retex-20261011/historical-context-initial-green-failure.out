@@ -1,0 +1,5 @@
+--- FAIL: TestPlanningHistoricalInputsCannotPoisonCurrentDecision (0.03s)
+    planning_historical_delivery_test.go:44: decide exigence déjà confiée à la tâche bloquée producer ; utiliser retry
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.303s
+FAIL

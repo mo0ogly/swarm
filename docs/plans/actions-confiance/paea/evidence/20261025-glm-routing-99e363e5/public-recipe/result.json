@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "recipe": "paea-public-existing-binary",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "offline-public-corpus",
+      "command": [
+        "/usr/bin/python3",
+        "tests/paea_public_contract_test.py"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 2.149822324019624,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "9a0293c9520f84c8bc88e27a04a027c870dd322dae70c1873b717b53635f6e23",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "f8510ac1e0efcb5b8299539b811f3c96760110bcb5269777b63dbeb48f1023c1",
+    "declared-inputs.tar.gz": "fe0a95be6cbfde1bf595ef31dd2ebe0098e8a21a9b10c81e4090a466e2f42806",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "f9ff255e4e7bd978c1b107374f94db25fb9ee0df42de91c2bb28ed06fac78639",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "acc600224de32bfe8464bc37757989cbaad18dc2cc3190886b266a681887559d",
+    "inputs.after.json": "f8510ac1e0efcb5b8299539b811f3c96760110bcb5269777b63dbeb48f1023c1"
+  }
+}

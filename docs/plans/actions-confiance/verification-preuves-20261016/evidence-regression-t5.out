@@ -1,0 +1,48 @@
+=== RUN   TestActionsConfianceT5PublicNamespace
+--- PASS: TestActionsConfianceT5PublicNamespace (0.91s)
+=== RUN   TestActionsConfianceT5VersionPinningAndApproval
+--- PASS: TestActionsConfianceT5VersionPinningAndApproval (1.32s)
+=== RUN   TestActionsConfianceT5ReplayRechecksDataAdmission
+--- PASS: TestActionsConfianceT5ReplayRechecksDataAdmission (0.94s)
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/null-terminal
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/script
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/missing-node
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/no-start
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/weak-exception
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/cycle
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/no-terminal
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/empty-roles
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/weak-approval
+--- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation (8.34s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/null-terminal (0.85s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/script (0.84s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/missing-node (0.87s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/no-start (0.91s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/weak-exception (1.06s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/cycle (0.99s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/no-terminal (1.01s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/empty-roles (0.92s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/weak-approval (0.89s)
+=== RUN   TestActionsConfianceT5PolicyPublicPreviewPersistence
+--- PASS: TestActionsConfianceT5PolicyPublicPreviewPersistence (0.84s)
+=== RUN   TestActionsConfianceT5TransitionGuardsAndRestart
+=== RUN   TestActionsConfianceT5TransitionGuardsAndRestart/digest
+=== RUN   TestActionsConfianceT5TransitionGuardsAndRestart/revision
+=== RUN   TestActionsConfianceT5TransitionGuardsAndRestart/input
+=== RUN   TestActionsConfianceT5TransitionGuardsAndRestart/role
+=== RUN   TestActionsConfianceT5TransitionGuardsAndRestart/exception
+=== RUN   TestActionsConfianceT5TransitionGuardsAndRestart/actor
+--- PASS: TestActionsConfianceT5TransitionGuardsAndRestart (1.20s)
+    --- PASS: TestActionsConfianceT5TransitionGuardsAndRestart/digest (0.02s)
+    --- PASS: TestActionsConfianceT5TransitionGuardsAndRestart/revision (0.02s)
+    --- PASS: TestActionsConfianceT5TransitionGuardsAndRestart/input (0.02s)
+    --- PASS: TestActionsConfianceT5TransitionGuardsAndRestart/role (0.02s)
+    --- PASS: TestActionsConfianceT5TransitionGuardsAndRestart/exception (0.02s)
+    --- PASS: TestActionsConfianceT5TransitionGuardsAndRestart/actor (0.00s)
+=== RUN   TestActionsConfianceT5ConcurrencyAndPrivacy
+--- PASS: TestActionsConfianceT5ConcurrencyAndPrivacy (1.17s)
+=== RUN   TestActionsConfianceT5RemoteNamespace
+--- PASS: TestActionsConfianceT5RemoteNamespace (0.98s)
+PASS
+ok  	swarm.local/companion/internal/engine	17.185s

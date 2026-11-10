@@ -1,0 +1,13 @@
+sequenceDiagram
+  participant C as Contrôle autorisé
+  participant T as Trust / fichier durable
+  participant S as SQLite
+  C->>T: Prendre Trust exclusif sans attente cachée
+  C->>S: Réserver transaction et vérifier version / travail
+  C->>C: Vérifier permission exacte, appelant frais et ancienne tête
+  C->>T: Persister intention et instantané cible
+  Note over T,S: Toute lecture identité refuse<br/>une intention en attente
+  C->>S: Insérer instantané et reçu, puis COMMIT
+  C->>T: Finaliser la tête et retirer le marqueur en attente
+  T-->>C: Checkpoint cible après publication réussie
+  Note over C,S: Après interruption, reprise exacte du permis initial, sans lancer de processus

@@ -1,0 +1,6 @@
+=== RUN   TestRecoveryPrefixCarriesLiteralCitationConventions
+    managed_review_citation_feedback_test.go:36: literal original or exchange convention absent CONVENTIONS DE CITATION
+--- FAIL: TestRecoveryPrefixCarriesLiteralCitationConventions (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.020s
+FAIL

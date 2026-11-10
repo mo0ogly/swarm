@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "cargo",
+    "clippy",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--offline",
+    "-p",
+    "swarm-cli",
+    "-p",
+    "swarm-web",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit": 101,
+  "seconds": 24.64684534072876,
+  "global_watchdog": null
+}

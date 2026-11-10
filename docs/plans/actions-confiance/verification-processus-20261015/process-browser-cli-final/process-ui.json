@@ -1,0 +1,26 @@
+{
+  "checks": [
+    "independent web artifact contains only explicit process assets",
+    "fr: Admin preview preserves state; policy and admission persist and reopen",
+    "fr: immutable definition publication through public preview and confirmation",
+    "fr: requester creates a case bound to the published version and administered resource",
+    "fr: owner cannot self approve; refusal is translated and leaves no original or state mutation",
+    "fr: independent approver confirms exact revision; attributed history shows both transitions",
+    "fr: mobile theme, translation, focus and 44px target verified without overflow",
+    "en: Admin preview preserves state; policy and admission persist and reopen",
+    "en: immutable definition publication through public preview and confirmation",
+    "en: requester creates a case bound to the published version and administered resource",
+    "en: owner cannot self approve; refusal is translated and leaves no original or state mutation",
+    "en: independent approver confirms exact revision; attributed history shows both transitions",
+    "en: mobile theme, translation, focus and 44px target verified without overflow",
+    "version 2 leaves the original case pinned to version 1; no business effect is created",
+    "remote CLI performs an attributed admin exception through API without touching a local root",
+    "process activity is included in the shared verifiable evidence export",
+    "separate artifact served to browser; only two expected self approval HTTP refusals"
+  ],
+  "unexpected_diagnostics": [],
+  "expected_denials": 2,
+  "root": "/tmp/swarm-process-ui-TsWuO3",
+  "artifact": "/tmp/swarm-process-ui-TsWuO3/process-app",
+  "at": "2026-10-15T23:04:35.600Z"
+}

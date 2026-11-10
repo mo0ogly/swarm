@@ -1,0 +1,25 @@
+**Bounded integrable proposal — two sequential tasks: `run()` then `held_planner()` in `tests/rust_native_web_conductor.py`**
+
+Note: no repository or runtime access; this is static review of supplied sources only. No tests were executed.
+
+**Task 1 — `run()` (worker journey)**
+
+Precondition failures identified:
+
+1. `before['agents']==[]` at start requires the shared qualified profile's "empty features" state; the recipe's step runs `rust_mission_worker_recovery.py` (not in scope) — for this journey, ensure the profile passed via `--profile` matches the qualified `sha256`/`no_fixture_feature` contract asserted in `run()`. Missing evidence: actual profile contents.
+
+2. `planning.flow(..., before_worker=True, return_fixture=True)` returns `READY_FOR_NATIVE_WORKER`; `run()` immediately assumes `f.environment`, `f.ok`, `f.work` exist — corrections: none needed if `flow` contract holds (supplied source confirms these attributes are set in the authorized path). Minimum change: assert `ready['status']=='READY_FOR_NATIVE_WORKER'` after the call (currently asserted in `rust_workspace_fifo_completion.py` but not in `run()`).
+
+3. `attach_provider` expects supervisor argv `[binary, '_mission_worker_entry', <agent_id>, '--root', root, '--json']` (6 args). If the product binary's real entry argv differs, this fails. No invented API; correction is to verify the actual argv in the current binary before integration — evidence missing.
+
+4. `verify_current_root_binding(agent['native_mission'], root)` defaults to v4. Confirm the current binary emits Binding4 with `root_instance` pairs; if v3, pass `expected_version=3` explicitly. Evidence missing from supplied sources.
+
+**Task 2 — `held_planner()`**
+
+1. Depends on `planner.setup`, `planner_peer`, and receipt format `SR1` with `failure=='planning-execution-interrupted'` and `signal==15`. Not verifiable from supplied sources; correction: obtain/verify `rust_mission_watch_planning.py` and the relay's receipt writer before integration.
+
+2. `rows(f, ...)` uses `timeout=0` (nonblocking); under a live DB write, `sqlite3.OperationalError: database is locked` is possible. Minimum correction: none (refusal is intended design per its docstring) — but integration must expect this, not treat it as product failure.
+
+3. `server.stop()` must publish a TERM'd planner receipt before lease close. This is a product behavior precondition; no supplied engine source in this context confirms it. Missing evidence: `native_web/conductor.rs` contents.
+
+**Integration ordering**: run Task 1 to completion (including its release/reap cleanup) before Task 2, since both use `out/` subpaths and independent Roots; `main()` already sequences them. No product API changes proposed.

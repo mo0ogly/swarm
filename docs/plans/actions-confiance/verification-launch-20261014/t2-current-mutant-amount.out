@@ -1,0 +1,20 @@
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba
+--- FAIL: TestActionsConfianceT2IdentityMandateApprovalAndBiba (0.02s)
+panic: interface conversion: interface {} is engine.TrustAction, not map[string]interface {} [recovered]
+	panic: interface conversion: interface {} is engine.TrustAction, not map[string]interface {}
+
+goroutine 21 [running]:
+testing.tRunner.func1.2({0x1260400, 0xc000421290})
+	/usr/local/go/src/testing/testing.go:1734 +0x21c
+testing.tRunner.func1()
+	/usr/local/go/src/testing/testing.go:1737 +0x35e
+panic({0x1260400?, 0xc000421290?})
+	/usr/local/go/src/runtime/panic.go:792 +0x132
+swarm.local/companion/internal/engine.TestActionsConfianceT2IdentityMandateApprovalAndBiba(0xc000582c40)
+	/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-2/internal/engine/trust_actions_test.go:346 +0x1214
+testing.tRunner(0xc000582c40, 0x413aa58)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go/src/testing/testing.go:1851 +0x413
+FAIL	swarm.local/companion/internal/engine	0.045s
+FAIL

@@ -1,0 +1,14 @@
+flowchart TD
+  B["Independently supplied bootstrap<br/>pins and Authorizer ; fixtures only"] --> O["Open : UID, ancestors, directory 0700<br/>private lock ; no configuration defaults"]
+  O --> P["Preview : read and authorize<br/>distinct Projection ; no save"]
+  O --> A["Explicit Create or Apply<br/>strict codec, authorization and CAS"]
+  H["Independent supplied Head<br/>protected durable witness not implemented"] --> A
+  A --> W["Verified 0600 temporary file<br/>write and file fsync"]
+  W --> R["Atomic rename"]
+  R --> D["Directory fsync"]
+  D --> V["View : saved configuration<br/>no effective-service evidence"]
+  D -. "failure after rename" .-> E["ErrIndeterminate<br/>uncertain durable outcome"]
+  E --> C["Observe against checkpoint<br/>exact current retry with reauthorization"]
+  C --> D
+  A --> F["Remote unimplemented, conflict or denial<br/>no empty success or permissive fallback"]
+  V -. "integration still absent" .-> U["Isolated service, setup and Admin<br/>current authority and final use to verify"]

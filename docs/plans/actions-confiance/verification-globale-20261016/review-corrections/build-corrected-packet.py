@@ -1,0 +1,15 @@
+from pathlib import Path
+import json,hashlib,datetime,subprocess
+root=Path.cwd();out=Path(__file__).resolve().parent;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());prior=read(out.parent/'candidate-current/review-packet.json');build=read(out/'build-lexical-process.json');native=read(out/'native-verification.json');campaign=read(out/'public-campaign-lexical/public-campaign.json');effect=read(out/'public-effect-proof-lexical/effect-proof-public.json');browser=read(out/'public-evidence-browser-confirmed/evidence-ui.json')
+assert build['exit_code']==0 and build['inputs_unchanged'];assert all(s['exit_code']==0 for s in campaign['stages']);assert effect['legacy_receipt_sha256']==sha(out/'independent-receipt.json') and 'historical unchanged export and HMAC anchor verified by corrected binary' in effect['checks'];assert not browser['unexpected_diagnostics']
+inputs=read(out/'build-lexical-inputs.json');changed={k:dict(before=v,after=sha(root/k)) for k,v in inputs.items() if sha(root/k)!=v}
+allowed=set()
+assert set(changed)<=allowed,changed
+for k in inputs:inputs[k]=sha(root/k)
+inputs['tests/actions_confiance_effect_proof.py']=sha(root/'tests/actions_confiance_effect_proof.py')
+proofs={str(p.relative_to(root)):sha(p) for p in out.rglob('*') if p.is_file() and p.suffix in ['.json','.jsonl','.out','.stdout','.stderr','.png'] and p.name not in ['review-packet.json']}
+requirements=prior['requirements']
+for r in requirements:
+ r['status']='DEFERRED_BY_USER' if r['id']=='R20' else 'LOCAL_VERIFICATION_SUBMITTED_FOR_INDEPENDENT_REVIEW'
+d=dict(schema_version=1,prepared_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),status='CORRECTED_CANDIDATE_READY_FOR_INDEPENDENT_REVIEW_R20_DEFERRED',binary=build['binary'],binary_sha256=build['binary_sha256'],base_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),branch=subprocess.check_output(['git','branch','--show-current'],text=True).strip(),dirty_diff_sha256=hashlib.sha256(subprocess.check_output(['git','diff','--binary'])).hexdigest(),source_input_sha256=inputs,proof_sha256=proofs,post_build_harness_delta=changed,native=native['go_tests'],native_execution_limits=native['limitations'],public_stages=[dict(name=s['stage'],results=s['observed_results']) for s in campaign['stages']],effect_proof=effect,evidence_browser=dict(checks=len(browser['checks']),unexpected_diagnostics=browser['unexpected_diagnostics']),requirements=requirements,independent_review=False,global_acceptance=False,final_retex=False,limits=['R20 native positive deferred by user; no Linux privilege or BPF retry authorized','Second native group structured package PASS; exit code not recovered after wrapper143','Separate fixture roots and named counts; units not summed','Historical original packet and failed recipes preserved; no retroactive qualification'])
+f=out/'review-packet.json';assert not f.exists();f.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');print(json.dumps(dict(packet=str(f),sha256=sha(f),inputs=len(inputs),proofs=len(proofs),binary_sha256=build['binary_sha256'])))

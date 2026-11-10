@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "/tmp/swarm-deepagents-memory-env-944lMS/bin/python",
+    "-m",
+    "pytest",
+    "-p",
+    "pytest_asyncio.plugin",
+    "-p",
+    "pytest_socket",
+    "--disable-socket",
+    "--allow-unix-socket",
+    "-p",
+    "no:cacheprovider",
+    "-vv",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m2-howto-20261015/test_context_boundaries.py"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "started_at_utc": "2026-10-15T19:51:41.442178+00:00",
+  "ended_at_utc": "2026-10-15T19:51:45.802668+00:00",
+  "exit_code": 0,
+  "log_sha256": "dcbcec027f92e4c219942c3b0b5f90e0387f18e93bc46d24928d6238553f8677",
+  "test_source_sha256": "f952e016cdb1a23d1a0b605380de8cbb83dd69af7239d00a5f472127fc74d379",
+  "scope": "Actual installed LangGraph, local in-memory saver/store and deterministic consumer; no LLM, no database backend, no Swarm runtime acceptance"
+}

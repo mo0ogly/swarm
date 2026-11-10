@@ -1,0 +1,12 @@
+=== RUN   TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource
+    trust_actions_operator_regression_test.go:189: missing/foreign approval digest admitted (0): engine.TrustAction{ID:"act-293c55e3aa80378110eb", MandateID:"approval-digest", Requester:"alice", Approver:"bob", Resource:"invoice/acme", Amount:100, Currency:"EUR", Beneficiary:"ACME", IdempotencyKey:"digest-key", ContentHash:"293c55e3aa80378110ebdc3d722bc7a685a53d1cf8540de330da5a7815226f6d", OriginalHash:"b639373f54fb5e959a9e7cc9e80bd50a0191b14c36b035413fa0fcd626d97da5", State:"approved", Reason:"", NextAction:"engager le connecteur simulé", CreatedAt:"2026-10-14T12:00:00Z", UpdatedAt:"2026-10-14T12:00:00Z"}
+--- FAIL: TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource (0.02s)
+=== RUN   TestActionsConfianceT2ReplayBindsAuthenticatedAuthority
+    trust_actions_operator_regression_test.go:650: ignored claims changed event replay: <nil> event_id réutilisé avec un contenu différent
+--- FAIL: TestActionsConfianceT2ReplayBindsAuthenticatedAuthority (0.02s)
+=== RUN   TestActionsConfianceT2IdempotencyRestartAndReconciliation
+    trust_actions_test.go:326: request accepted different content with the same key <nil>
+--- FAIL: TestActionsConfianceT2IdempotencyRestartAndReconciliation (0.02s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.099s
+FAIL

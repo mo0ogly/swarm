@@ -1,0 +1,5258 @@
+{
+  "coverage_status": "PASS",
+  "contract_status": "DECLARED_REVIEW_COMPLETE",
+  "files": 7,
+  "open_findings": [],
+  "lexical_candidates": {
+    "rust/crates/swarm-cli/src/lib.rs": {
+      "policies": [
+        {
+          "line": 54,
+          "text": "    /// This metadata preserves readback context, never success or retry authority."
+        },
+        {
+          "line": 92,
+          "text": "    /// confirms only a descriptor, not complete bytes or rollback. No retry grant."
+        },
+        {
+          "line": 105,
+          "text": "    /// This observation never infers success or retries an operation."
+        },
+        {
+          "line": 170,
+          "text": "    /// A false observation is unknown/unrecorded, never proof of rollback."
+        },
+        {
+          "line": 180,
+          "text": "                return true;"
+        },
+        {
+          "line": 186,
+          "text": "            false"
+        },
+        {
+          "line": 191,
+          "text": "    /// grants no retry or permission and never includes arbitrary cause text."
+        },
+        {
+          "line": 195,
+          "text": "            Self::Output(e) if e.raw_os_error() == Some(28) => \"storage_unavailable\","
+        },
+        {
+          "line": 224,
+          "text": "    /// This observation neither retries work nor establishes task acceptance."
+        },
+        {
+          "line": 237,
+          "text": "                (true,true) => \"Output handle opened; publication or close failed. The file may be partial. Inspect it before retrying.\","
+        },
+        {
+          "line": 238,
+          "text": "                (false,true) => \"Output handle not obtained. File outcome is unconfirmed; inspect the destination before retrying.\","
+        },
+        {
+          "line": 239,
+          "text": "                (true,false) => \"Descripteur de sortie ouvert ; publication ou fermeture en échec. Le fichier peut être partiel. Vérifier avant reprise.\","
+        },
+        {
+          "line": 240,
+          "text": "                (false,false) => \"Descripteur de sortie non obtenu. État du fichier non confirmé ; vérifier la destination avant reprise.\","
+        },
+        {
+          "line": 243,
+          "text": "            Self::ArgumentEncoding => \"arguments must be valid UTF-8\".into(),"
+        },
+        {
+          "line": 274,
+          "text": "            Self::Output(e) if e.raw_os_error() == Some(28) => \"Écriture impossible : stockage plein. Libérez de l’espace puis vérifiez l’état de la mission avant de reprendre ; aucun résultat n’est validé par cette erreur.\".into(),"
+        },
+        {
+          "line": 397,
+          "text": "        server: false,"
+        },
+        {
+          "line": 398,
+          "text": "        json: false,"
+        },
+        {
+          "line": 399,
+          "text": "        help: false,"
+        },
+        {
+          "line": 405,
+          "text": "            \"--json\" => result.json = true,"
+        },
+        {
+          "line": 408,
+          "text": "                result.help = true;"
+        },
+        {
+          "line": 422,
+          "text": "                    \"--server\" => result.server = true,"
+        },
+        {
+          "line": 486,
+          "text": "        return Ok(0);"
+        },
+        {
+          "line": 488,
+          "text": "    if a.pos[0] == \"version\" { return version::execute(a,out); }"
+        },
+        {
+          "line": 490,
+          "text": "    if a.pos[0] == \"web\" {"
+        },
+        {
+          "line": 495,
+          "text": "        a.pos[0].as_str(),"
+        },
+        {
+          "line": 498,
+          "text": "        if a.pos.len() != 2"
+        },
+        {
+          "line": 507,
+          "text": "        let result = if a.pos[0] == \"_reviewer_gate\" {"
+        },
+        {
+          "line": 508,
+          "text": "            swarm_engine::execute_review_gate(std::path::Path::new(&a.root), &a.pos[1])"
+        },
+        {
+          "line": 509,
+          "text": "        } else if a.pos[0] == \"_validation_gate\" {"
+        },
+        {
+          "line": 510,
+          "text": "            swarm_engine::execute_validation_gate(std::path::Path::new(&a.root), &a.pos[1])"
+        },
+        {
+          "line": 511,
+          "text": "        } else if a.pos[0] == \"_planning_gate\" {"
+        },
+        {
+          "line": 512,
+          "text": "            swarm_engine::execute_planning_gate(std::path::Path::new(&a.root), &a.pos[1])"
+        },
+        {
+          "line": 514,
+          "text": "            swarm_engine::execute_agent_gate(std::path::Path::new(&a.root), &a.pos[1])"
+        },
+        {
+          "line": 522,
+          "text": "    if a.pos[0] == \"admin-budget\" {return admin_budget::execute(a,out);}"
+        },
+        {
+          "line": 523,
+          "text": "    if a.pos[0] == \"init\" || a.pos[0] == \"engine-settings\" {"
+        },
+        {
+          "line": 524,
+          "text": "        return execute_root(a, out).map(|()| 0);"
+        },
+        {
+          "line": 527,
+          "text": "    if a.pos[0] == \"quotas\" { return quotas::execute(a,out); }"
+        },
+        {
+          "line": 529,
+          "text": "    if a.pos[0] == \"mission\" { return mission::execute(a,out); }"
+        },
+        {
+          "line": 531,
+          "text": "    if a.pos[0] == \"costs\" { return costs::execute(a,out); }"
+        },
+        {
+          "line": 533,
+          "text": "    if a.pos[0] == \"task-model\" {"
+        },
+        {
+          "line": 537,
+          "text": "    if a.pos[0] == \"providers\" {"
+        },
+        {
+          "line": 538,
+          "text": "        return if a.pos.get(1).is_some_and(|s| s == \"policies\") {"
+        },
+        {
+          "line": 544,
+          "text": "    if a.pos[0] == \"pricing\" {"
+        },
+        {
+          "line": 547,
+          "text": "    if a.pos[0] == \"agent\" {"
+        },
+        {
+          "line": 550,
+          "text": "    if a.pos[0] == \"planning-output\" {"
+        },
+        {
+          "line": 553,
+          "text": "    if matches!(a.pos[0].as_str(), \"planning\" | \"budget\") {"
+        },
+        {
+          "line": 557,
+          "text": "    if a.pos[0]==\"task\" && a.pos.get(1).is_some_and(|v|matches!(v.as_str(),\"review\"|\"review-reconcile\"|\"review-retire-stale\")) {return task_review::execute(a,out);}"
+        },
+        {
+          "line": 558,
+          "text": "    if a.pos[0] == \"task\" && a.pos.get(1).is_some_and(|v| matches!(v.as_str(), \"review-preview\" | \"review-inputs\" | \"validation-preview\" | \"validate\" | \"validation-reconcile\" | \"validation-retire\")) {"
+        },
+        {
+          "line": 562,
+          "text": "        a.pos[0].as_str(),"
+        },
+        {
+          "line": 568,
+          "text": "        a.pos[0].as_str(),"
+        },
+        {
+          "line": 571,
+          "text": "        let report = a.pos[0] == \"planning-report\";"
+        },
+        {
+          "line": 572,
+          "text": "        if a.pos.len() != if report { 1 } else { 2 }"
+        },
+        {
+          "line": 594,
+          "text": "        let store = swarm_engine::RootStore::open(std::path::Path::new(&a.root), false)"
+        },
+        {
+          "line": 607,
+          "text": "        } else if a.pos[0] == \"agent-workflow\" {"
+        },
+        {
+          "line": 609,
+          "text": "                .agent_workflow(&a.pos[1])"
+        },
+        {
+          "line": 614,
+          "text": "                .project_context(&a.pos[1])"
+        },
+        {
+          "line": 631,
+          "text": "        return Ok(0);"
+        },
+        {
+          "line": 633,
+          "text": "    if a.pos[0] == \"evaluate\" {"
+        },
+        {
+          "line": 636,
+          "text": "    if a.pos[0] != \"identity\" {"
+        },
+        {
+          "line": 639,
+          "text": "    if a.pos.len() != 3"
+        },
+        {
+          "line": 640,
+          "text": "        || a.pos[1] != \"bootstrap-check\""
+        },
+        {
+          "line": 651,
+          "text": "    let document = bootstrap::load(&a.input, &a.pos[2]).map_err(CliError::Bootstrap)?;"
+        },
+        {
+          "line": 653,
+          "text": "        schema_version: 1,"
+        },
+        {
+          "line": 654,
+          "text": "        bootstrap_digest: a.pos[2].clone(),"
+        },
+        {
+          "line": 656,
+          "text": "        storage_verified: true,"
+        },
+        {
+          "line": 657,
+          "text": "        human_authentication_verified: false,"
+        },
+        {
+          "line": 658,
+          "text": "        confinement_verified: false,"
+        },
+        {
+          "line": 659,
+          "text": "        service_started: false,"
+        },
+        {
+          "line": 662,
+          "text": "    write_output(out, &bytes).map(|()| 0)"
+        },
+        {
+          "line": 670,
+          "text": "    if a.pos.len() != 2"
+        },
+        {
+          "line": 678,
+          "text": "    let operation = a.pos[1].as_str();"
+        },
+        {
+          "line": 723,
+          "text": "    let mut saved = false;"
+        },
+        {
+          "line": 735,
+          "text": "            saved = true;"
+        },
+        {
+          "line": 757,
+          "text": "    result.map(|()| 0).map_err(|primary| {"
+        },
+        {
+          "line": 769,
+          "text": "/// stdin framing uses the existing command transport limit; no provider starts."
+        },
+        {
+          "line": 789,
+          "text": "        swarm_engine::RootStore::open(std::path::Path::new(&a.root), false).map_err(root_error)?;"
+        },
+        {
+          "line": 795,
+          "text": "        (Ok(bytes), Ok(())) => write_output(out, &bytes).map(|()| 0),"
+        },
+        {
+          "line": 812,
+          "text": "    let action = a.pos[1].as_str();"
+        },
+        {
+          "line": 837,
+          "text": "                .preview_planning_call(&a.pos[2], &raw)"
+        },
+        {
+          "line": 842,
+          "text": "            let value = store.step_planning(&a.pos[2]).map_err(root_error)?;"
+        },
+        {
+          "line": 849,
+          "text": "            store.run_planning(&a.pos[2], &raw)"
+        },
+        {
+          "line": 851,
+          "text": "            store.reconcile_planning(&a.pos[2])"
+        },
+        {
+          "line": 866,
+          "text": "    result.map(|()| 0).map_err(|primary| {"
+        },
+        {
+          "line": 886,
+          "text": "/// remain unported; native verdict/retry/protocol decisions use Root proof. Bounded input goes to"
+        },
+        {
+          "line": 894,
+          "text": "    if a.pos.len() != 3"
+        },
+        {
+          "line": 902,
+          "text": "    let action = a.pos[1].as_str();"
+        },
+        {
+          "line": 903,
+          "text": "    if a.pos[0] == \"planning\" && matches!(action, \"call-preview\" | \"run\" | \"reconcile\" | \"step\") {"
+        },
+        {
+          "line": 906,
+          "text": "    let kind = if a.pos[0] == \"budget\" {"
+        },
+        {
+          "line": 951,
+          "text": "                .execute_external(&a.pos[2], kind, raw, &mut swarm_engine::SystemEnvironment)"
+        },
+        {
+          "line": 957,
+          "text": "            store.read_work(&a.pos[2]).map_err(root_error)?"
+        },
+        {
+          "line": 970,
+          "text": "    result.map(|()| 0).map_err(|primary| {"
+        },
+        {
+          "line": 995,
+          "text": "        || (!a.task.is_empty() && a.pos[0] != \"gate\")"
+        },
+        {
+          "line": 999,
+          "text": "    let (kind, id) = match a.pos[0].as_str() {"
+        },
+        {
+          "line": 1000,
+          "text": "        \"work\" if a.pos.len() == 2 && a.pos[1] == \"list\" => {"
+        },
+        {
+          "line": 1001,
+          "text": "            return execute_work_list(a, out).map(|()| 0)"
+        },
+        {
+          "line": 1003,
+          "text": "        \"work\" if a.pos.len() == 2 && a.pos[1] == \"create\" => (\"work.create\", \"\"),"
+        },
+        {
+          "line": 1004,
+          "text": "        \"work\" if a.pos.len() == 3 => ("
+        },
+        {
+          "line": 1005,
+          "text": "            match a.pos[1].as_str() {"
+        },
+        {
+          "line": 1010,
+          "text": "            a.pos[2].as_str(),"
+        },
+        {
+          "line": 1012,
+          "text": "        \"task\" if a.pos.len() == 3 => ("
+        },
+        {
+          "line": 1013,
+          "text": "            match a.pos[1].as_str() {"
+        },
+        {
+          "line": 1019,
+          "text": "            a.pos[2].as_str(),"
+        },
+        {
+          "line": 1021,
+          "text": "        \"resume\" if a.pos.len() == 1 => return execute_work_list(a, out).map(|()| 0),"
+        },
+        {
+          "line": 1022,
+          "text": "        \"resume\" | \"ooda\" | \"checkpoint\" | \"gate\" if a.pos.len() == 2 => {"
+        },
+        {
+          "line": 1023,
+          "text": "            (a.pos[0].as_str(), a.pos[1].as_str())"
+        },
+        {
+          "line": 1065,
+          "text": "    let mut exit_status = 0;"
+        },
+        {
+          "line": 1084,
+          "text": "                    exit_status = 1;"
+        },
+        {
+          "line": 1131,
+          "text": "    if !(a.pos.len() == 2 && a.pos[0] == \"work\" && a.pos[1] == \"list\""
+        },
+        {
+          "line": 1132,
+          "text": "        || a.pos.len() == 1 && a.pos[0] == \"resume\")"
+        },
+        {
+          "line": 1142,
+          "text": "        swarm_engine::RootStore::open(std::path::Path::new(&a.root), false).map_err(root_error)?;"
+        },
+        {
+          "line": 1176,
+          "text": "        .replace('\\u{2028}', \"\\\\u2028\")"
+        },
+        {
+          "line": 1177,
+          "text": "        .replace('\\u{2029}', \"\\\\u2029\")"
+        },
+        {
+          "line": 1183,
+          "text": "    if a.pos.len() != 1"
+        },
+        {
+          "line": 1200,
+          "text": "    let (allowed, bytes) = if method == \"3\" {"
+        },
+        {
+          "line": 1202,
+          "text": "            swarm_engine::RootStore::open(root, false).map_err(|e| CliError::Root(Box::new(e)))?;"
+        },
+        {
+          "line": 1231,
+          "text": "    Ok(if allowed { 0 } else { 1 })"
+        },
+        {
+          "line": 1239,
+          "text": "/// original typed marker. No retry, rollback, history reset or authority is added."
+        },
+        {
+          "line": 1246,
+          "text": "    let initialize = a.pos.len() == 1 && a.pos[0] == \"init\";"
+        },
+        {
+          "line": 1249,
+          "text": "    } else if a.pos.len() == 2 && a.pos[0] == \"engine-settings\" {"
+        },
+        {
+          "line": 1250,
+          "text": "        a.pos[1].as_str()"
+        },
+        {
+          "line": 1309,
+          "text": "            serde_json::json!({\"schema_version\":1,\"root\":std::fs::canonicalize(&a.root).map_err(CliError::Input)?,\"state\":\".swarm/state.db\"}),"
+        },
+        {
+          "line": 1337,
+          "text": "            configuration_recorded = true;"
+        },
+        {
+          "line": 1376,
+          "text": "        Err(_) => Ok(0),"
+        },
+        {
+          "line": 1378,
+          "text": "    let code = result.as_ref().copied().unwrap_or(0);"
+        },
+        {
+          "line": 1400,
+          "text": "/// data address. Diagnostic codes grant no retry, rollback or acceptance authority."
+        },
+        {
+          "line": 1493,
+          "text": "/// error, so a failed diagnostic cannot hide a recorded state or authorize retry."
+        },
+        {
+          "line": 1498,
+          "text": "/// the supplied error sink, performs no Root IO/retry and grants no acceptance."
+        },
+        {
+          "line": 1523,
+          "text": "        let mut document = serde_json::json!({\"schema_version\":1,\"error\":message,\"failure\":Failure{code:error.code(),message:&message,retryable:false,causes:safe_causes(&error)}});"
+        },
+        {
+          "line": 1546,
+          "text": "        code: 2,"
+        },
+        {
+          "line": 1585,
+          "text": "/// This development command accepts UTF-8 paths, as its bootstrap Text contract."
+        },
+        {
+          "line": 1598,
+          "text": "        None => report(CliError::ArgumentEncoding, false, false, err),"
+        },
+        {
+          "line": 1611,
+          "text": "        let mut raw=Vec::new();let result=report(private(),true,true,&mut raw);assert_ne!(result.code,0);"
+        },
+        {
+          "line": 1613,
+          "text": "        for index in 0..3 {"
+        },
+        {
+          "line": 1615,
+          "text": "                0=>CliError::PlanningStatePreserved{primary:Box::new(private()),work:\"known-work\".into(),revision:7,english:true},"
+        },
+        {
+          "line": 1616,
+          "text": "                1=>CliError::StatePreserved{primary:Box::new(private()),work:\"known-work\".into(),revision:7,english:true},"
+        },
+        {
+          "line": 1617,
+          "text": "                _=>CliError::TaskValidationStatePreserved{primary:Box::new(private()),work:\"known-work\".into(),revision:7,english:true},"
+        },
+        {
+          "line": 1619,
+          "text": "            assert_eq!(known.recorded_work(),Some((\"known-work\".into(),7)));"
+        },
+        {
+          "line": 1621,
+          "text": "            let mut raw=Vec::new();let result=report(nested,true,true,&mut raw);assert_ne!(result.code,0);let value:serde_json::Value=serde_json::from_slice(&raw).unwrap();"
+        },
+        {
+          "line": 1622,
+          "text": "            assert_eq!(value[\"recorded_work\"],serde_json::json!({\"id\":\"known-work\",\"revision\":7}));assert!(value[\"failure\"][\"causes\"].as_array().unwrap().iter().any(|v|v==\"io-kind:BrokenPipe\"));assert!(!String::from_utf8(raw).unwrap().contains(\"PRIVATE_IO_CONTENT\"));"
+        },
+        {
+          "line": 1634,
+          "text": "            assert_ne!(result.code,0);assert!(out.is_empty());"
+        },
+        {
+          "line": 1701,
+          "text": "                Some(&self.0)"
+        },
+        {
+          "line": 1705,
+          "text": "        assert!(safe_causes(&value.0).contains(&\"io-kind:Other\".into()));"
+        },
+        {
+          "line": 1728,
+          "text": "            english: true,"
+        },
+        {
+          "line": 1740,
+          "text": "        let r = report(compound, true, false, &mut out);"
+        },
+        {
+          "line": 1741,
+          "text": "        assert_eq!(r.code, 2);"
+        },
+        {
+          "line": 1759,
+          "text": "            revision: 3,"
+        },
+        {
+          "line": 1765,
+          "text": "        assert_eq!(error.recorded_work(), Some((\"w-fixture\".into(), 3)));"
+        },
+        {
+          "line": 1776,
+          "text": "            english: true,"
+        },
+        {
+          "line": 1779,
+          "text": "        assert!(error.to_string().contains('3'));"
+        },
+        {
+          "line": 1790,
+          "text": "        for json in [false, true] {"
+        },
+        {
+          "line": 1791,
+          "text": "            for english in [false, true] {"
+        },
+        {
+          "line": 1805,
+          "text": "                assert_eq!(outcome.code, 2);"
+        },
+        {
+          "line": 1836,
+          "text": "            revision: 7,"
+        },
+        {
+          "line": 1838,
+          "text": "        assert_eq!(direct.recorded_work(), Some((\"w-io\".into(), 7)));"
+        },
+        {
+          "line": 1843,
+          "text": "                revision: 7,"
+        },
+        {
+          "line": 1849,
+          "text": "            Some((\"w-io\".into(), 7)),"
+        },
+        {
+          "line": 1857,
+          "text": "        let outcome = report(error, true, true, &mut stderr);"
+        },
+        {
+          "line": 1858,
+          "text": "        assert_eq!(outcome.code, 2);"
+        },
+        {
+          "line": 1881,
+          "text": "            rollback_confirmed: false,"
+        },
+        {
+          "line": 1892,
+          "text": "        let outcome = report(error, true, true, &mut stderr);"
+        },
+        {
+          "line": 1893,
+          "text": "        assert_eq!(outcome.code, 2);"
+        }
+      ],
+      "functions": [
+        {
+          "line": 106,
+          "text": "    fn typed_causes(&self) -> Vec<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 150,
+          "text": "    fn recorded_work(&self) -> Option<(String, i64)> {"
+        },
+        {
+          "line": 171,
+          "text": "    fn configuration_may_be_recorded(&self) -> bool {"
+        },
+        {
+          "line": 192,
+          "text": "    pub fn code(&self) -> &'static str {"
+        },
+        {
+          "line": 225,
+          "text": "    fn message(&self) -> String {"
+        },
+        {
+          "line": 280,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 288,
+          "text": "    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 342,
+          "text": "fn write_output(out: &mut dyn Write, bytes: &[u8]) -> Result<(), CliError> {"
+        },
+        {
+          "line": 349,
+          "text": "fn json_bytes(value: &impl Serialize) -> io::Result<Vec<u8>> {"
+        },
+        {
+          "line": 365,
+          "text": "fn parse(args: &[String], environment_language: &str) -> Result<Arguments, CliError> {"
+        },
+        {
+          "line": 470,
+          "text": "fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 669,
+          "text": "fn execute_pricing(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 771,
+          "text": "fn execute_planning_output(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 811,
+          "text": "fn execute_planning_call_preview(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 881,
+          "text": "fn execute_planning_call_preview(_: &Arguments, _: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 893,
+          "text": "fn execute_control(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 991,
+          "text": "fn execute_work(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 1129,
+          "text": "fn execute_work_list(a: &Arguments, out: &mut dyn Write) -> Result<(), CliError> {"
+        },
+        {
+          "line": 1172,
+          "text": "fn evaluation_bytes(value: &impl Serialize) -> Result<Vec<u8>, CliError> {"
+        },
+        {
+          "line": 1182,
+          "text": "fn execute_evaluation(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 1240,
+          "text": "fn execute_root(a: &Arguments, out: &mut dyn Write) -> Result<(), CliError> {"
+        },
+        {
+          "line": 1365,
+          "text": "pub fn run_detailed("
+        },
+        {
+          "line": 1401,
+          "text": "fn safe_causes(error: &(dyn std::error::Error + 'static)) -> Vec<String> {"
+        },
+        {
+          "line": 1499,
+          "text": "fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) -> RunOutcome {"
+        },
+        {
+          "line": 1551,
+          "text": "pub fn run("
+        },
+        {
+          "line": 1561,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 1569,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 1586,
+          "text": "pub fn run_os_detailed("
+        },
+        {
+          "line": 1609,
+          "text": "    fn recorded_cli_control_metadata_reaches_json_without_a_web_error() {"
+        },
+        {
+          "line": 1629,
+          "text": "    fn unsupported_commands_keep_typed_code_and_both_languages() {"
+        },
+        {
+          "line": 1643,
+          "text": "    fn nested_guard_causes_are_classified_without_private_text() {"
+        },
+        {
+          "line": 1658,
+          "text": "    fn cli_compound_cleanup_retains_primary_and_secondary_causes() {"
+        },
+        {
+          "line": 1677,
+          "text": "    fn typed_same_address_source_is_not_mistaken_for_a_cycle() {"
+        },
+        {
+          "line": 1681,
+          "text": "            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 1686,
+          "text": "            fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 1695,
+          "text": "            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 1700,
+          "text": "            fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 1718,
+          "text": "    fn cli_configuration_marker_survives_own_io_and_cleanup_wrappers() {"
+        },
+        {
+          "line": 1755,
+          "text": "    fn cli_retains_root_recorded_work_through_compound_cleanup() {"
+        },
+        {
+          "line": 1789,
+          "text": "    fn cli_settings_publication_survives_late_close_in_json_and_text() {"
+        },
+        {
+          "line": 1832,
+          "text": "    fn cli_preserved_state_wrapped_in_io_keeps_work_and_config_markers() {"
+        },
+        {
+          "line": 1870,
+          "text": "    fn cli_native_commit_projection_retains_both_causes_without_private_text() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 42,
+          "text": "    /// proof that an Agent/provider started. The original runtime error remains"
+        },
+        {
+          "line": 104,
+          "text": "    /// error identity prevents source cycles without conflating transparent wrappers."
+        },
+        {
+          "line": 106,
+          "text": "    fn typed_causes(&self) -> Vec<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 107,
+          "text": "        use std::error::Error;"
+        },
+        {
+          "line": 111,
+          "text": "        while let Some(error) = pending.pop() {"
+        },
+        {
+          "line": 112,
+          "text": "            let pointer = error as *const dyn Error;"
+        },
+        {
+          "line": 117,
+          "text": "            causes.push(error);"
+        },
+        {
+          "line": 119,
+          "text": "            pending.extend(native_web::branches(error));"
+        },
+        {
+          "line": 124,
+          "text": "            pending.extend(swarm_engine::native_error_links(error).children.into_iter().map(|(_, cause)| cause));"
+        },
+        {
+          "line": 125,
+          "text": "            if let Some(Self::RootCleanup { cleanup, .. }) = error.downcast_ref::<Self>() {"
+        },
+        {
+          "line": 128,
+          "text": "            if let Some(Self::OutputFile { primary, close, .. }) = error.downcast_ref::<Self>() {"
+        },
+        {
+          "line": 132,
+          "text": "            // IO source() skips its custom error itself. Retain that typed node,"
+        },
+        {
+          "line": 134,
+          "text": "            if let Some(io) = error.downcast_ref::<io::Error>() {"
+        },
+        {
+          "line": 140,
+          "text": "            if let Some(source) = error.source() {"
+        },
+        {
+          "line": 148,
+          "text": "    /// parse human messages or infer revision from an output error. None means"
+        },
+        {
+          "line": 151,
+          "text": "        self.typed_causes().into_iter().find_map(|error| {"
+        },
+        {
+          "line": 152,
+          "text": "            if let Some(Self::TaskValidationStatePreserved { work, revision, .. } | Self::PlanningStatePreserved { work, revision, .. } | Self::StatePreserved { work, revision, .. }) = error.downcast_ref::<Self>() {"
+        },
+        {
+          "line": 155,
+          "text": "            if let Some(root) = error.downcast_ref::<swarm_engine::RootStoreError>() {"
+        },
+        {
+          "line": 161,
+          "text": "            if let Some(web) = error.downcast_ref::<swarm_web::NativeServerError>() {"
+        },
+        {
+          "line": 169,
+          "text": "    /// Inspect typed saved/visible configuration state, not an error string."
+        },
+        {
+          "line": 172,
+          "text": "        self.typed_causes().into_iter().any(|error| {"
+        },
+        {
+          "line": 174,
+          "text": "                error.downcast_ref::<Self>(),"
+        },
+        {
+          "line": 176,
+          "text": "            ) || error"
+        },
+        {
+          "line": 183,
+          "text": "            if let Some(web) = error.downcast_ref::<swarm_web::NativeServerError>() {"
+        },
+        {
+          "line": 218,
+          "text": "            _ => \"command_failed\","
+        },
+        {
+          "line": 223,
+          "text": "    /// original typed causes remain in the error chain, not interpolated payloads."
+        },
+        {
+          "line": 258,
+          "text": "                _ => e.to_string(),"
+        },
+        {
+          "line": 271,
+          "text": "            Self::Input(e) => format!(\"input failed ({:?}, errno {:?})\",e.kind(),e.raw_os_error()),"
+        },
+        {
+          "line": 275,
+          "text": "            Self::Output(e) => format!(\"output failed ({:?}, errno {:?})\", e.kind(), e.raw_os_error()),"
+        },
+        {
+          "line": 284,
+          "text": "impl std::error::Error for CliError {"
+        },
+        {
+          "line": 285,
+          "text": "    /// Retain the original primary error, including a private bootstrap's known"
+        },
+        {
+          "line": 288,
+          "text": "    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 311,
+          "text": "            Self::OutputFile { primary, close, .. } => primary.as_ref().or(close.as_ref()).map(|e| e.as_ref() as &(dyn std::error::Error + 'static)),"
+        },
+        {
+          "line": 313,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 320,
+          "text": "    pub error: Option<CliError>,"
+        },
+        {
+          "line": 350,
+          "text": "    let raw = swarm_engine::encode_public_model(value).map_err(io::Error::other)?;"
+        },
+        {
+          "line": 377,
+          "text": "                .ok_or_else(|| CliError::Language(\"--lang requires fr or en\".into()))?"
+        },
+        {
+          "line": 386,
+          "text": "        return Err(CliError::Language(format!("
+        },
+        {
+          "line": 387,
+          "text": "            \"unsupported language {language:?}; use fr or en\""
+        },
+        {
+          "line": 415,
+          "text": "                })?;"
+        },
+        {
+          "line": 423,
+          "text": "                    _ => unreachable!(),"
+        },
+        {
+          "line": 426,
+          "text": "            _ => result.pos.push(a),"
+        },
+        {
+          "line": 485,
+          "text": "        )?;"
+        },
+        {
+          "line": 505,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 518,
+          "text": "            Err(error) => Err(CliError::Root(Box::new(error))),"
+        },
+        {
+          "line": 580,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 589,
+          "text": "                .map_err(CliError::CommandInput)?,"
+        },
+        {
+          "line": 595,
+          "text": "            .map_err(|e| CliError::Root(Box::new(e)))?;"
+        },
+        {
+          "line": 621,
+          "text": "            (Err(e), Ok(())) => return Err(e),"
+        },
+        {
+          "line": 622,
+          "text": "            (Ok(_), Err(e)) => return Err(CliError::Root(Box::new(e))),"
+        },
+        {
+          "line": 623,
+          "text": "            (Err(primary), Err(cleanup)) => {"
+        },
+        {
+          "line": 624,
+          "text": "                return Err(CliError::RootCleanup {"
+        },
+        {
+          "line": 630,
+          "text": "        write_output(out, &observed)?;"
+        },
+        {
+          "line": 637,
+          "text": "        return Err(CliError::Unsupported);"
+        },
+        {
+          "line": 649,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 651,
+          "text": "    let document = bootstrap::load(&a.input, &a.pos[2]).map_err(CliError::Bootstrap)?;"
+        },
+        {
+          "line": 661,
+          "text": "    let bytes = json_bytes(&result).map_err(CliError::Output)?;"
+        },
+        {
+          "line": 676,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 680,
+          "text": "        return Err(CliError::Unsupported);"
+        },
+        {
+          "line": 684,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 689,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 697,
+          "text": "            .map_err(CliError::CommandInput)?,"
+        },
+        {
+          "line": 703,
+          "text": "            swarm_engine::decode_rate_change(raw.as_deref().ok_or(CliError::Usage)?)"
+        },
+        {
+          "line": 704,
+          "text": "                .map_err(pricing_error)?,"
+        },
+        {
+          "line": 711,
+          "text": "            swarm_engine::decode_rate_quote(raw.as_deref().ok_or(CliError::Usage)?)"
+        },
+        {
+          "line": 712,
+          "text": "                .map_err(pricing_error)?,"
+        },
+        {
+          "line": 718,
+          "text": "        swarm_engine::validate_rate_change(change).map_err(pricing_error)?;"
+        },
+        {
+          "line": 722,
+          "text": "        .map_err(root_error)?;"
+        },
+        {
+          "line": 726,
+          "text": "            json_bytes(&store.rate_catalogue().map_err(root_error)?).map_err(CliError::Output)"
+        },
+        {
+          "line": 731,
+          "text": "                    change.as_ref().ok_or(CliError::Usage)?,"
+        },
+        {
+          "line": 734,
+          "text": "                .map_err(root_error)?;"
+        },
+        {
+          "line": 741,
+          "text": "                .map_err(root_error)?"
+        },
+        {
+          "line": 742,
+          "text": "                .quote(quote.as_ref().ok_or(CliError::Usage)?)"
+        },
+        {
+          "line": 743,
+          "text": "                .map_err(pricing_error)?;"
+        },
+        {
+          "line": 746,
+          "text": "        _ => Err(CliError::Unsupported),"
+        },
+        {
+          "line": 750,
+          "text": "        (Err(primary), Ok(())) => Err(primary),"
+        },
+        {
+          "line": 751,
+          "text": "        (Ok(_), Err(e)) => Err(root_error(e)),"
+        },
+        {
+          "line": 752,
+          "text": "        (Err(primary), Err(cleanup)) => Err(CliError::RootCleanup {"
+        },
+        {
+          "line": 779,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 786,
+          "text": "    .map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 789,
+          "text": "        swarm_engine::RootStore::open(std::path::Path::new(&a.root), false).map_err(root_error)?;"
+        },
+        {
+          "line": 796,
+          "text": "        (Err(e), Ok(())) => Err(e),"
+        },
+        {
+          "line": 797,
+          "text": "        (Ok(_), Err(e)) => Err(root_error(e)),"
+        },
+        {
+          "line": 798,
+          "text": "        (Err(primary), Err(cleanup)) => Err(CliError::RootCleanup {"
+        },
+        {
+          "line": 815,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 820,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 827,
+          "text": "        .map_err(CliError::CommandInput)?"
+        },
+        {
+          "line": 832,
+          "text": "            .map_err(root_error)?;"
+        },
+        {
+          "line": 842,
+          "text": "            let value = store.step_planning(&a.pos[2]).map_err(root_error)?;"
+        },
+        {
+          "line": 853,
+          "text": "        .map_err(root_error)?;"
+        },
+        {
+          "line": 859,
+          "text": "        (Err(e), Ok(())) => Err(e),"
+        },
+        {
+          "line": 860,
+          "text": "        (Ok(_), Err(e)) => Err(root_error(e)),"
+        },
+        {
+          "line": 861,
+          "text": "        (Err(primary), Err(cleanup)) => Err(CliError::RootCleanup {"
+        },
+        {
+          "line": 882,
+          "text": "    Err(CliError::Unsupported)"
+        },
+        {
+          "line": 900,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 908,
+          "text": "            return Err(CliError::Unsupported);"
+        },
+        {
+          "line": 922,
+          "text": "            _ => {"
+        },
+        {
+          "line": 923,
+          "text": "                return Err(CliError::PlanningUnsupported {"
+        },
+        {
+          "line": 931,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 939,
+          "text": "            .map_err(CliError::CommandInput)?,"
+        },
+        {
+          "line": 946,
+          "text": "        .map_err(root_error)?;"
+        },
+        {
+          "line": 952,
+          "text": "                .map_err(root_error)?;"
+        },
+        {
+          "line": 957,
+          "text": "            store.read_work(&a.pos[2]).map_err(root_error)?"
+        },
+        {
+          "line": 963,
+          "text": "        (Err(primary), Ok(())) => Err(primary),"
+        },
+        {
+          "line": 964,
+          "text": "        (Ok(_), Err(cleanup)) => Err(root_error(cleanup)),"
+        },
+        {
+          "line": 965,
+          "text": "        (Err(primary), Err(cleanup)) => Err(CliError::RootCleanup {"
+        },
+        {
+          "line": 997,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 1008,
+          "text": "                _ => return Err(CliError::Usage),"
+        },
+        {
+          "line": 1017,
+          "text": "                _ => return Err(CliError::Usage),"
+        },
+        {
+          "line": 1025,
+          "text": "        _ => return Err(CliError::Usage),"
+        },
+        {
+          "line": 1029,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 1038,
+          "text": "            .map_err(CliError::CommandInput)?,"
+        },
+        {
+          "line": 1044,
+          "text": "        let raw = input.as_deref().ok_or(CliError::Usage)?;"
+        },
+        {
+          "line": 1045,
+          "text": "        let request = swarm_engine::decode_gate_request(raw).map_err(CliError::GateInput)?;"
+        },
+        {
+          "line": 1047,
+          "text": "            return Err(CliError::GateTaskMismatch {"
+        },
+        {
+          "line": 1063,
+          "text": "            .map_err(root_error)?;"
+        },
+        {
+          "line": 1070,
+          "text": "                .map_err(root_error)?;"
+        },
+        {
+          "line": 1082,
+          "text": "                    })?;"
+        },
+        {
+          "line": 1097,
+          "text": "        .map_err(root_error)?;"
+        },
+        {
+          "line": 1106,
+          "text": "        (Err(primary), Ok(())) => Err(primary),"
+        },
+        {
+          "line": 1107,
+          "text": "        (Ok(_), Err(e)) => Err(root_error(e)),"
+        },
+        {
+          "line": 1108,
+          "text": "        (Err(primary), Err(cleanup)) => Err(CliError::RootCleanup {"
+        },
+        {
+          "line": 1127,
+          "text": "/// any failure preserves its cause, and an output error remains a failed command."
+        },
+        {
+          "line": 1139,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 1142,
+          "text": "        swarm_engine::RootStore::open(std::path::Path::new(&a.root), false).map_err(root_error)?;"
+        },
+        {
+          "line": 1161,
+          "text": "        (Err(primary), Ok(())) => return Err(primary),"
+        },
+        {
+          "line": 1162,
+          "text": "        (Ok(_), Err(error)) => return Err(root_error(error)),"
+        },
+        {
+          "line": 1163,
+          "text": "        (Err(primary), Err(cleanup)) => {"
+        },
+        {
+          "line": 1164,
+          "text": "            return Err(CliError::RootCleanup {"
+        },
+        {
+          "line": 1174,
+          "text": "        serde_json::to_string_pretty(value).map_err(|e| CliError::Output(io::Error::other(e)))?;"
+        },
+        {
+          "line": 1189,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 1196,
+          "text": "    .map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 1198,
+          "text": "        swarm_engine::gate_document_method(&raw).map_err(|e| CliError::Evaluation(Box::new(e)))?;"
+        },
+        {
+          "line": 1202,
+          "text": "            swarm_engine::RootStore::open(root, false).map_err(|e| CliError::Root(Box::new(e)))?;"
+        },
+        {
+          "line": 1206,
+          "text": "                .map_err(|e| CliError::Root(Box::new(e)))?"
+        },
+        {
+          "line": 1213,
+          "text": "            (Err(primary), Ok(())) => return Err(primary),"
+        },
+        {
+          "line": 1214,
+          "text": "            (Ok(_), Err(e)) => return Err(CliError::Root(Box::new(e))),"
+        },
+        {
+          "line": 1215,
+          "text": "            (Err(primary), Err(cleanup)) => {"
+        },
+        {
+          "line": 1216,
+          "text": "                return Err(CliError::RootCleanup {"
+        },
+        {
+          "line": 1223,
+          "text": "            .map_err(|e| CliError::Evaluation(Box::new(e)))?;"
+        },
+        {
+          "line": 1224,
+          "text": "        (evaluated.evaluation.allowed, evaluation_bytes(&evaluated)?)"
+        },
+        {
+          "line": 1227,
+          "text": "            .map_err(|e| CliError::Evaluation(Box::new(e)))?;"
+        },
+        {
+          "line": 1228,
+          "text": "        (evaluated.allowed, evaluation_bytes(&evaluated)?)"
+        },
+        {
+          "line": 1230,
+          "text": "    write_output(out, &bytes)?;"
+        },
+        {
+          "line": 1244,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 1252,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 1258,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 1262,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 1265,
+          "text": "            .map_err(|e| root_error(swarm_engine::RootStoreError::Settings(e)))?;"
+        },
+        {
+          "line": 1266,
+          "text": "        return write_output(out, &json_bytes(&catalog).map_err(CliError::Output)?);"
+        },
+        {
+          "line": 1271,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 1278,
+          "text": "        .map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 1282,
+          "text": "                    .map_err(CliError::SettingsInput)?,"
+        },
+        {
+          "line": 1288,
+          "text": "                    .map_err(CliError::SettingsInput)?,"
+        },
+        {
+          "line": 1293,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 1303,
+          "text": "    .map_err(root_error)?;"
+        },
+        {
+          "line": 1309,
+          "text": "            serde_json::json!({\"schema_version\":1,\"root\":std::fs::canonicalize(&a.root).map_err(CliError::Input)?,\"state\":\".swarm/state.db\"}),"
+        },
+        {
+          "line": 1311,
+          "text": "        \"show\" => serde_json::to_value(store.settings().map_err(root_error)?)"
+        },
+        {
+          "line": 1315,
+          "text": "                .check_model_policy(model_check.as_ref().ok_or(CliError::Usage)?)"
+        },
+        {
+          "line": 1316,
+          "text": "                .map_err(root_error)?,"
+        },
+        {
+          "line": 1322,
+          "text": "                .map_err(root_error)?"
+        },
+        {
+          "line": 1324,
+          "text": "                .map_err(|e| root_error(swarm_engine::RootStoreError::Settings(e)))?,"
+        },
+        {
+          "line": 1329,
+          "text": "                .preview_settings(change.as_ref().ok_or(CliError::Usage)?)"
+        },
+        {
+          "line": 1330,
+          "text": "                .map_err(root_error)?,"
+        },
+        {
+          "line": 1335,
+          "text": "                .apply_settings(change.as_ref().ok_or(CliError::Usage)?, &mut environment)"
+        },
+        {
+          "line": 1336,
+          "text": "                .map_err(root_error)?;"
+        },
+        {
+          "line": 1340,
+          "text": "        _ => Err(CliError::Usage),"
+        },
+        {
+          "line": 1346,
+          "text": "        (Err(primary), Ok(())) => Err(primary),"
+        },
+        {
+          "line": 1347,
+          "text": "        (Ok(_), Err(error)) => Err(root_error(error)),"
+        },
+        {
+          "line": 1348,
+          "text": "        (Err(primary), Err(cleanup)) => Err(CliError::RootCleanup {"
+        },
+        {
+          "line": 1376,
+          "text": "        Err(_) => Ok(0),"
+        },
+        {
+          "line": 1379,
+          "text": "    let error = match (parsed.as_ref(), result) {"
+        },
+        {
+          "line": 1380,
+          "text": "        (Err(_), _) => parsed.err(),"
+        },
+        {
+          "line": 1381,
+          "text": "        (_, Err(e)) => Some(e),"
+        },
+        {
+          "line": 1382,
+          "text": "        _ => None,"
+        },
+        {
+          "line": 1384,
+          "text": "    let Some(error) = error else {"
+        },
+        {
+          "line": 1387,
+          "text": "            error: None,"
+        },
+        {
+          "line": 1391,
+          "text": "    report(error, json_mode, english, err)"
+        },
+        {
+          "line": 1394,
+          "text": "/// error Display/SQL/paths/context never enter this diagnostic. Compound cleanup"
+        },
+        {
+          "line": 1401,
+          "text": "fn safe_causes(error: &(dyn std::error::Error + 'static)) -> Vec<String> {"
+        },
+        {
+          "line": 1402,
+          "text": "    let mut pending = vec![error];"
+        },
+        {
+          "line": 1403,
+          "text": "    let mut seen: Vec<*const dyn std::error::Error> = Vec::new();"
+        },
+        {
+          "line": 1406,
+          "text": "        let pointer = e as *const dyn std::error::Error;"
+        },
+        {
+          "line": 1408,
+          "text": "        // Include trait metadata while detecting repeated error objects."
+        },
+        {
+          "line": 1439,
+          "text": "            pending.extend(links.children.into_iter().rev().map(|(_, error)| error));"
+        },
+        {
+          "line": 1465,
+          "text": "                out.push(format!(\"storage-operation:{:?}\", e.operation));"
+        },
+        {
+          "line": 1474,
+          "text": "                out.push(format!(\"io-kind:{:?}\", e.kind()));"
+        },
+        {
+          "line": 1492,
+          "text": "/// Returns failure exit2 with both the original error and any encode/write/flush"
+        },
+        {
+          "line": 1493,
+          "text": "/// error, so a failed diagnostic cannot hide a recorded state or authorize retry."
+        },
+        {
+          "line": 1497,
+          "text": "/// diagnostic and secondary writer error in RunOutcome. This writes/flushes only"
+        },
+        {
+          "line": 1498,
+          "text": "/// the supplied error sink, performs no Root IO/retry and grants no acceptance."
+        },
+        {
+          "line": 1499,
+          "text": "fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) -> RunOutcome {"
+        },
+        {
+          "line": 1500,
+          "text": "    // A Root apply may return Err after known publication, before the command's"
+        },
+        {
+          "line": 1502,
+          "text": "    let error = if !matches!(&error, CliError::ConfigurationStatePreserved { .. })"
+        },
+        {
+          "line": 1503,
+          "text": "        && error.configuration_may_be_recorded()"
+        },
+        {
+          "line": 1506,
+          "text": "            primary: Box::new(error),"
+        },
+        {
+          "line": 1510,
+          "text": "        error"
+        },
+        {
+          "line": 1515,
+          "text": "        error,"
+        },
+        {
+          "line": 1519,
+          "text": "    let message = if english && matches!(&error, CliError::Unsupported) {"
+        },
+        {
+          "line": 1521,
+          "text": "    } else { error.message() };"
+        },
+        {
+          "line": 1523,
+          "text": "        let mut document = serde_json::json!({\"schema_version\":1,\"error\":message,\"failure\":Failure{code:error.code(),message:&message,retryable:false,causes:safe_causes(&error)}});"
+        },
+        {
+          "line": 1524,
+          "text": "        if let Some((id, revision)) = error.recorded_work() {"
+        },
+        {
+          "line": 1528,
+          "text": "        native_web::details(&error, &mut document);"
+        },
+        {
+          "line": 1543,
+          "text": "        Err(e) => Some(e),"
+        },
+        {
+          "line": 1547,
+          "text": "        error: Some(error),"
+        },
+        {
+          "line": 1572,
+          "text": "            .field(\"error\", &self.error)"
+        },
+        {
+          "line": 1606,
+          "text": "    /// of a web error. A bare output failure supplies no revision; cleanup nesting"
+        },
+        {
+          "line": 1612,
+          "text": "        let unknown:serde_json::Value=serde_json::from_slice(&raw).unwrap();assert!(unknown.get(\"recorded_work\").is_none());"
+        },
+        {
+          "line": 1617,
+          "text": "                _=>CliError::TaskValidationStatePreserved{primary:Box::new(private()),work:\"known-work\".into(),revision:7,english:true},"
+        },
+        {
+          "line": 1621,
+          "text": "            let mut raw=Vec::new();let result=report(nested,true,true,&mut raw);assert_ne!(result.code,0);let value:serde_json::Value=serde_json::from_slice(&raw).unwrap();"
+        },
+        {
+          "line": 1622,
+          "text": "            assert_eq!(value[\"recorded_work\"],serde_json::json!({\"id\":\"known-work\",\"revision\":7}));assert!(value[\"failure\"][\"causes\"].as_array().unwrap().iter().any(|v|v==\"io-kind:BrokenPipe\"));assert!(!String::from_utf8(raw).unwrap().contains(\"PRIVATE_IO_CONTENT\"));"
+        },
+        {
+          "line": 1627,
+          "text": "    /// in either language, with no Root access or error-text classification."
+        },
+        {
+          "line": 1635,
+          "text": "            let value:serde_json::Value=serde_json::from_slice(&err).unwrap();assert_eq!(value[\"failure\"][\"code\"],\"command_not_ported\");"
+        },
+        {
+          "line": 1636,
+          "text": "            assert!(value[\"error\"].as_str().unwrap().contains(if language==\"en\" {\"not yet ported\"}else{\"non encore portée\"}));"
+        },
+        {
+          "line": 1648,
+          "text": "            .expect(\"invalid public trace must refuse\");"
+        },
+        {
+          "line": 1685,
+          "text": "        impl std::error::Error for Cycle {"
+        },
+        {
+          "line": 1686,
+          "text": "            fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 1699,
+          "text": "        impl std::error::Error for Wrapped {"
+        },
+        {
+          "line": 1700,
+          "text": "            fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {"
+        },
+        {
+          "line": 1742,
+          "text": "        let j: serde_json::Value = serde_json::from_slice(&out).unwrap();"
+        },
+        {
+          "line": 1745,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 1761,
+          "text": "        let error = CliError::RootCleanup {"
+        },
+        {
+          "line": 1765,
+          "text": "        assert_eq!(error.recorded_work(), Some((\"w-fixture\".into(), 3)));"
+        },
+        {
+          "line": 1766,
+          "text": "        let causes = safe_causes(&error);"
+        },
+        {
+          "line": 1771,
+          "text": "        let (work, revision) = committed.or_else(|| error.recorded_work()).unwrap();"
+        },
+        {
+          "line": 1772,
+          "text": "        let error = CliError::StatePreserved {"
+        },
+        {
+          "line": 1773,
+          "text": "            primary: Box::new(error),"
+        },
+        {
+          "line": 1778,
+          "text": "        assert!(error.to_string().contains(\"w-fixture\"));"
+        },
+        {
+          "line": 1779,
+          "text": "        assert!(error.to_string().contains('3'));"
+        },
+        {
+          "line": 1792,
+          "text": "                let error = CliError::RootCleanup {"
+        },
+        {
+          "line": 1802,
+          "text": "                assert!(error.configuration_may_be_recorded());"
+        },
+        {
+          "line": 1804,
+          "text": "                let outcome = report(error, json, english, &mut output);"
+        },
+        {
+          "line": 1807,
+          "text": "                let text = String::from_utf8(output).unwrap();"
+        },
+        {
+          "line": 1814,
+          "text": "                    let v: serde_json::Value = serde_json::from_str(&text).unwrap();"
+        },
+        {
+          "line": 1815,
+          "text": "                    let causes = v[\"failure\"][\"causes\"].as_array().unwrap();"
+        },
+        {
+          "line": 1828,
+          "text": "    /// Standard IO source() skips its custom error itself. Preserve typed Work/"
+        },
+        {
+          "line": 1830,
+          "text": "    /// These are error-aggregation fixtures, not actual OS failures/mutations."
+        },
+        {
+          "line": 1839,
+          "text": "        let error = CliError::Input(io::Error::other("
+        },
+        {
+          "line": 1846,
+          "text": "        assert!(safe_causes(&error).contains(&\"work-state-preserved\".into()));"
+        },
+        {
+          "line": 1848,
+          "text": "            error.recorded_work(),"
+        },
+        {
+          "line": 1852,
+          "text": "        let error = CliError::Input(io::Error::other(swarm_engine::RootStoreError::Published {"
+        },
+        {
+          "line": 1855,
+          "text": "        assert!(error.configuration_may_be_recorded());"
+        },
+        {
+          "line": 1857,
+          "text": "        let outcome = report(error, true, true, &mut stderr);"
+        },
+        {
+          "line": 1860,
+          "text": "        let v: serde_json::Value = serde_json::from_slice(&stderr).unwrap();"
+        },
+        {
+          "line": 1861,
+          "text": "        assert!(v[\"error\"]"
+        },
+        {
+          "line": 1863,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 1888,
+          "text": "        let error = CliError::Root(Box::new(swarm_engine::RootStoreError::Launch(Box::new("
+        },
+        {
+          "line": 1892,
+          "text": "        let outcome = report(error, true, true, &mut stderr);"
+        },
+        {
+          "line": 1895,
+          "text": "        let document: serde_json::Value = serde_json::from_slice(&stderr).unwrap();"
+        },
+        {
+          "line": 1896,
+          "text": "        let causes = document[\"failure\"][\"causes\"].as_array().unwrap();"
+        },
+        {
+          "line": 1908,
+          "text": "        assert!(!String::from_utf8(stderr).unwrap().contains(\"PRIVATE\"));"
+        }
+      ]
+    },
+    "rust/crates/swarm-cli/src/mission_watch.rs": {
+      "policies": [
+        {
+          "line": 52,
+          "text": "/// traversable through native error links; these observations authorize no retry."
+        },
+        {
+          "line": 72,
+          "text": "/// retry and makes no no-effect claim; engine-private launch constructors stay private."
+        },
+        {
+          "line": 237,
+          "text": "    /// joins and retains its original cause; no unbounded retry is performed."
+        },
+        {
+          "line": 351,
+          "text": "/// Use only the claim's validated persisted policy, with no new retry/default"
+        },
+        {
+          "line": 356,
+          "text": "        u64::try_from(policy.poll_interval_ms.0)"
+        },
+        {
+          "line": 369,
+          "text": "                current_lease_generation: false,"
+        },
+        {
+          "line": 434,
+          "text": "        &json!({\"schema_version\":1,\"event\":\"mission-worker-started\",\"work\":work,\"agent_id\":agent,"
+        },
+        {
+          "line": 435,
+          "text": "        \"supervisor_pid\":pid,\"session_state\":\"pending\",\"provider_start_verified\":false,\"mission_complete\":false,\"observation_is_permission\":false}),"
+        },
+        {
+          "line": 462,
+          "text": "    let mut index = 0;"
+        },
+        {
+          "line": 466,
+          "text": "                index += 1;"
+        },
+        {
+          "line": 472,
+          "text": "                index += 1;"
+        },
+        {
+          "line": 477,
+          "text": "        let record = json!({\"schema_version\":1,\"event\":\"mission-worker-exited\",\"work\":work,\"agent_id\":child.agent,"
+        },
+        {
+          "line": 478,
+          "text": "            \"supervisor_pid\":child.process.id(),\"exit_code\":status.code(),\"exit_signal\":status.signal(),\"mission_complete\":false});"
+        },
+        {
+          "line": 521,
+          "text": "    let mut active_context = false;"
+        },
+        {
+          "line": 562,
+          "text": "    } else if control.paused != Some(false) {"
+        },
+        {
+          "line": 564,
+          "text": "    } else if control.consent_enabled != Some(true) {"
+        },
+        {
+          "line": 587,
+          "text": "            false"
+        },
+        {
+          "line": 604,
+          "text": "        json!({\"schema_version\":1,\"event\":\"mission-planning-step\",\"work\":work,\"status\":step.status,"
+        },
+        {
+          "line": 607,
+          "text": "        \"mission_complete\":false,\"automatic_planner\":true,\"automatic_reviewer\":false,\"automatic_validation\":false,\"observation_is_permission\":false}),"
+        },
+        {
+          "line": 614,
+          "text": "/// visibly deferred until no active worker context remains. No cancellation/refund/retry is"
+        },
+        {
+          "line": 618,
+          "text": "/// main only uses pending=true for non-executing deferral observations. Existing"
+        },
+        {
+          "line": 646,
+          "text": "            &json!({\"schema_version\":1,\"event\":\"mission-watch-blocked\",\"work\":work,\"reason\":reason,"
+        },
+        {
+          "line": 647,
+          "text": "            \"automatic_planner\":true,\"automatic_reviewer\":false,\"automatic_validation\":false,\"mission_complete\":false,\"observation_is_permission\":false}),"
+        },
+        {
+          "line": 708,
+          "text": "    json!({\"schema_version\":1,\"event\":\"mission-watch-blocked\",\"work\":work,"
+        },
+        {
+          "line": 712,
+          "text": "        \"automatic_planner\":true,\"automatic_reviewer\":false,\"automatic_validation\":false,\"mission_complete\":false,\"observation_is_permission\":false})"
+        },
+        {
+          "line": 775,
+          "text": "                let record = json!({\"schema_version\":1,\"event\":event,\"phase\":role,\"work\":known,\"revision\":revision,\"reason\":stop.name(),\"failed_call_recorded\":true,\"decision_applied\":false,\"task_accepted\":false,\"mission_complete\":false});"
+        },
+        {
+          "line": 827,
+          "text": "                let record = json!({\"schema_version\":1,\"event\":\"mission-report-submitted\",\"work\":work,\"revision\":revision,\"agent_id\":agent_id,\"report\":report,\"task_accepted\":false,\"automatic_validation\":false,\"automatic_reviewer\":false,\"mission_complete\":false});"
+        },
+        {
+          "line": 840,
+          "text": "                        &json!({\"schema_version\":1,\"event\":\"mission-report-waiting\",\"work\":work,\"agent_id\":agent.id,\"reason\":reason,\"mission_complete\":false}),"
+        },
+        {
+          "line": 927,
+          "text": "            planning_once(store,work,true,out,planning_recorded)?;"
+        },
+        {
+          "line": 952,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 963,
+          "text": "            *admission_recorded = true;"
+        },
+        {
+          "line": 966,
+          "text": "                || adopted.agent.supervisor_pid != 0"
+        },
+        {
+          "line": 967,
+          "text": "                || adopted.agent.child_pid != 0"
+        },
+        {
+          "line": 976,
+          "text": "                &json!({\"schema_version\":1,\"event\":\"mission-worker-adopted\",\"work\":work,"
+        },
+        {
+          "line": 978,
+          "text": "                \"created\":adopted.created,\"provider_start_verified\":false,\"mission_complete\":false,"
+        },
+        {
+          "line": 979,
+          "text": "                \"observation_is_permission\":false}),"
+        },
+        {
+          "line": 994,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 1004,
+          "text": "                let observation=json!({\"schema_version\":1,\"event\":\"mission-watch-blocked\",\"work\":work,"
+        },
+        {
+          "line": 1006,
+          "text": "                    \"synchronization_committed\":false,\"preparation_attempted\":false,\"causes\":crate::safe_causes(&error),"
+        },
+        {
+          "line": 1007,
+          "text": "                    \"mission_complete\":false,\"observation_is_permission\":false});"
+        },
+        {
+          "line": 1010,
+          "text": "                // actual Work; this never retries a recorded/uncertain preparation."
+        },
+        {
+          "line": 1023,
+          "text": "            *admission_recorded = true;"
+        },
+        {
+          "line": 1074,
+          "text": "/// successful watch. This starts no retry and preserves original typed causes."
+        },
+        {
+          "line": 1120,
+          "text": "    if a.pos.len() != 3"
+        },
+        {
+          "line": 1121,
+          "text": "        || a.pos[0] != \"mission\""
+        },
+        {
+          "line": 1122,
+          "text": "        || a.pos[1] != \"watch\""
+        },
+        {
+          "line": 1137,
+          "text": "    let store = match RootStore::open(&root, true) {"
+        },
+        {
+          "line": 1146,
+          "text": "    session(&root, &executable, &a.pos[2], signals, store, None, out)"
+        },
+        {
+          "line": 1155,
+          "text": "/// Ok(false) means an active competing lease was observed and no session ran;"
+        },
+        {
+          "line": 1156,
+          "text": "/// Ok(true) means the owned session stopped or a pre-start local stop was observed."
+        },
+        {
+          "line": 1164,
+          "text": "        Ok(Some(_)) => return store.close().map(|_| true).map_err(|e|CliError::Root(Box::new(e))),"
+        },
+        {
+          "line": 1175,
+          "text": "        Ok(lease) => session(root, executable, work, Signals::local(source, received), store, Some(lease), out).map(|_| true),"
+        },
+        {
+          "line": 1181,
+          "text": "                Ok(()) if busy => return Ok(false),"
+        },
+        {
+          "line": 1196,
+          "text": "    let mut admission_recorded = false;"
+        },
+        {
+          "line": 1218,
+          "text": "            &json!({\"schema_version\":1,\"event\":\"mission-watch-started\",\"work\":work,\"generation\":owned.generation(),"
+        },
+        {
+          "line": 1220,
+          "text": "            \"mission_complete\":false,\"observation_is_permission\":false}),"
+        },
+        {
+          "line": 1259,
+          "text": "                if let Err(error) = store.update_mission_supervision(&owned, &now, true) {"
+        },
+        {
+          "line": 1289,
+          "text": "    emit(out, &json!({\"schema_version\":1,\"event\":\"mission-watch-stopped\",\"work\":work,\"reason\":stop.name(),"
+        },
+        {
+          "line": 1290,
+          "text": "        \"children_still_running\":children.len(),\"lease_released\":lease_acquired,\"root_closed\":true,\"mission_complete\":false}))"
+        },
+        {
+          "line": 1295,
+          "text": "    Ok(0)"
+        },
+        {
+          "line": 1372,
+          "text": "            revision: 3,"
+        },
+        {
+          "line": 1374,
+          "text": "        for flush in [false, true] {"
+        },
+        {
+          "line": 1399,
+          "text": "            assert_eq!(error.recorded_work(), Some((\"fixture-work\", 3)));"
+        },
+        {
+          "line": 1415,
+          "text": "        for previous in [1, 5, 1] {"
+        },
+        {
+          "line": 1422,
+          "text": "                revision: 3,"
+        },
+        {
+          "line": 1435,
+          "text": "            seen.push(known.unwrap().1);"
+        },
+        {
+          "line": 1438,
+          "text": "        assert_eq!(seen, vec![3, 5, 3]);"
+        },
+        {
+          "line": 1477,
+          "text": "            revision: 1,"
+        },
+        {
+          "line": 1478,
+          "text": "            paused: Some(false),"
+        },
+        {
+          "line": 1481,
+          "text": "            consent_enabled: Some(true),"
+        },
+        {
+          "line": 1482,
+          "text": "            archived: false,"
+        },
+        {
+          "line": 1484,
+          "text": "        assert_eq!(planning_entry(&control(), false), None);"
+        },
+        {
+          "line": 1486,
+          "text": "            |v: &mut swarm_engine::MissionControlView| v.paused = Some(true),"
+        },
+        {
+          "line": 1488,
+          "text": "            |v: &mut swarm_engine::MissionControlView| v.consent_enabled = Some(false),"
+        },
+        {
+          "line": 1492,
+          "text": "            |v: &mut swarm_engine::MissionControlView| v.archived = true,"
+        },
+        {
+          "line": 1494,
+          "text": "            assert_eq!(planning_entry(&control(), false), None);"
+        },
+        {
+          "line": 1497,
+          "text": "            assert!(planning_entry(&changed, false).is_some());"
+        },
+        {
+          "line": 1501,
+          "text": "                generation: 1,"
+        },
+        {
+          "line": 1502,
+          "text": "                current_lease_generation: false,"
+        },
+        {
+          "line": 1505,
+          "text": "                generation: 1,"
+        },
+        {
+          "line": 1506,
+          "text": "                current_lease_generation: true,"
+        },
+        {
+          "line": 1521,
+          "text": "            output_complete: true,"
+        },
+        {
+          "line": 1522,
+          "text": "            provider_may_have_started: true"
+        },
+        {
+          "line": 1531,
+          "text": "            schema_version: 1,"
+        },
+        {
+          "line": 1533,
+          "text": "            accepted: false,"
+        },
+        {
+          "line": 1536,
+          "text": "            settings_revision: swarm_engine::SettingCount(7),"
+        },
+        {
+          "line": 1541,
+          "text": "        let idle = planning_record(&step, \"fixture-work\", 5).unwrap();"
+        },
+        {
+          "line": 1543,
+          "text": "        assert_eq!(idle[\"decision_applied\"], false);"
+        },
+        {
+          "line": 1546,
+          "text": "        assert!(planning_record(&step, \"fixture-work\", 5).is_err());"
+        },
+        {
+          "line": 1548,
+          "text": "            schema_version: 1,"
+        },
+        {
+          "line": 1551,
+          "text": "            decision_applied: true,"
+        },
+        {
+          "line": 1552,
+          "text": "            accepted: false,"
+        },
+        {
+          "line": 1553,
+          "text": "            replayed: false,"
+        },
+        {
+          "line": 1556,
+          "text": "                revision: 5,"
+        },
+        {
+          "line": 1557,
+          "text": "                ..Default::default()"
+        },
+        {
+          "line": 1563,
+          "text": "        let applied = planning_record(&step, \"fixture-work\", 5).unwrap();"
+        },
+        {
+          "line": 1564,
+          "text": "        assert_eq!(applied[\"decision_applied\"], true);"
+        },
+        {
+          "line": 1565,
+          "text": "        assert_eq!(applied[\"settings_revision\"], \"7\");"
+        },
+        {
+          "line": 1569,
+          "text": "        assert!(planning_record(&step, \"fixture-work\", 5).is_err());"
+        },
+        {
+          "line": 1570,
+          "text": "        let known = (\"fixture-work\".to_owned(), 5);"
+        },
+        {
+          "line": 1580,
+          "text": "                    std::io::Error::from_raw_os_error(13),"
+        },
+        {
+          "line": 1584,
+          "text": "                    std::io::Error::from_raw_os_error(28),"
+        },
+        {
+          "line": 1589,
+          "text": "            matches!(&error, RootError::WorkRecorded { work, revision: 5, .. } if work == \"fixture-work\")"
+        },
+        {
+          "line": 1593,
+          "text": "            \"os-errno:13\","
+        },
+        {
+          "line": 1594,
+          "text": "            \"os-errno:28\","
+        },
+        {
+          "line": 1608,
+          "text": "            generation: 1,"
+        },
+        {
+          "line": 1609,
+          "text": "            current_lease_generation: true,"
+        },
+        {
+          "line": 1611,
+          "text": "        assert!(retained_allowed(true, &queued).is_ok());"
+        },
+        {
+          "line": 1613,
+          "text": "            retained_allowed(false, &queued),"
+        },
+        {
+          "line": 1616,
+          "text": "        assert!(retained_allowed(true, &State::RegisteredObserved).is_ok());"
+        },
+        {
+          "line": 1617,
+          "text": "        assert!(retained_allowed(false, &State::RegisteredObserved).is_ok());"
+        },
+        {
+          "line": 1618,
+          "text": "        assert!(!adoption_candidate(false, &State::RegisteredObserved));"
+        },
+        {
+          "line": 1620,
+          "text": "        assert!(retained_allowed(false, &State::OutsideAutomaticWorkerScope).is_ok());"
+        },
+        {
+          "line": 1622,
+          "text": "    /// Persisted cadence has no local default/clamp. Invalid policy refuses;"
+        },
+        {
+          "line": 1627,
+          "text": "            poll_interval_ms: swarm_engine::SettingCount(37),"
+        },
+        {
+          "line": 1628,
+          "text": "            stale_after_ms: swarm_engine::SettingCount(99),"
+        },
+        {
+          "line": 1629,
+          "text": "            future_tolerance_ms: swarm_engine::SettingCount(0),"
+        },
+        {
+          "line": 1631,
+          "text": "        assert_eq!(cadence(&policy).unwrap(), Duration::from_millis(37));"
+        },
+        {
+          "line": 1632,
+          "text": "        policy.poll_interval_ms = swarm_engine::SettingCount(0);"
+        },
+        {
+          "line": 1662,
+          "text": "            revision: 1,"
+        },
+        {
+          "line": 1692,
+          "text": "        assert_eq!(record[\"automatic_planner\"], true);"
+        },
+        {
+          "line": 1693,
+          "text": "        assert_eq!(record[\"mission_complete\"], false);"
+        },
+        {
+          "line": 1725,
+          "text": "                code: Some(23),"
+        },
+        {
+          "line": 1729,
+          "text": "        assert!(crate::safe_causes(&exit).contains(&\"mission-worker-exit-code:23\".into()));"
+        },
+        {
+          "line": 1733,
+          "text": "                std::io::Error::from_raw_os_error(13),"
+        },
+        {
+          "line": 1737,
+          "text": "                std::io::Error::from_raw_os_error(28),"
+        },
+        {
+          "line": 1740,
+          "text": "        let control = preserve_admission(false, fixture());"
+        },
+        {
+          "line": 1744,
+          "text": "            \"os-errno:13\","
+        },
+        {
+          "line": 1745,
+          "text": "            \"os-errno:28\","
+        },
+        {
+          "line": 1754,
+          "text": "        let retained = preserve_admission(true, fixture());"
+        },
+        {
+          "line": 1759,
+          "text": "            \"os-errno:13\","
+        },
+        {
+          "line": 1760,
+          "text": "            \"os-errno:28\","
+        },
+        {
+          "line": 1772,
+          "text": "            generation: 1,"
+        },
+        {
+          "line": 1773,
+          "text": "            current_lease_generation: false,"
+        },
+        {
+          "line": 1775,
+          "text": "        assert!(adoption_candidate(false, &old));"
+        },
+        {
+          "line": 1776,
+          "text": "        assert!(retained_allowed(false, &old).is_ok());"
+        },
+        {
+          "line": 1777,
+          "text": "        assert!(!adoption_candidate(true, &old));"
+        },
+        {
+          "line": 1779,
+          "text": "            generation: 2,"
+        },
+        {
+          "line": 1780,
+          "text": "            current_lease_generation: true,"
+        },
+        {
+          "line": 1782,
+          "text": "        assert!(adoption_candidate(false, &old));"
+        },
+        {
+          "line": 1783,
+          "text": "        assert!(!adoption_candidate(false, &current));"
+        },
+        {
+          "line": 1784,
+          "text": "        assert!(retained_allowed(false, &current).is_err());"
+        },
+        {
+          "line": 1786,
+          "text": "            generation: 1,"
+        },
+        {
+          "line": 1787,
+          "text": "            current_lease_generation: false,"
+        },
+        {
+          "line": 1789,
+          "text": "        assert!(adoption_candidate(false, &old));"
+        },
+        {
+          "line": 1790,
+          "text": "        assert!(!adoption_candidate(false, &stopping));"
+        },
+        {
+          "line": 1791,
+          "text": "        assert!(retained_allowed(false, &stopping).is_err());"
+        },
+        {
+          "line": 1792,
+          "text": "        assert!(adoption_candidate(false, &old));"
+        },
+        {
+          "line": 1793,
+          "text": "        assert!(!adoption_candidate(false, &State::RegisteredObserved));"
+        },
+        {
+          "line": 1794,
+          "text": "        assert!(retained_allowed(false, &State::RegisteredObserved).is_ok());"
+        }
+      ],
+      "functions": [
+        {
+          "line": 25,
+          "text": "pub(super) fn owned_panic(payload: Box<dyn std::any::Any + Send>) -> RootError {"
+        },
+        {
+          "line": 36,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 41,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 46,
+          "text": "    fn source(&self) -> Option<&(dyn Error + 'static)> {"
+        },
+        {
+          "line": 53,
+          "text": "pub(super) fn safe_labels(error: &(dyn Error + 'static)) -> Vec<String> {"
+        },
+        {
+          "line": 73,
+          "text": "fn phase(code: &'static str, cause: impl Error + Send + Sync + 'static) -> RootError {"
+        },
+        {
+          "line": 84,
+          "text": "fn join(primary: Option<RootError>, secondary: RootError) -> RootError {"
+        },
+        {
+          "line": 96,
+          "text": "fn preserve_admission(admission_recorded: bool, error: RootError) -> RootError {"
+        },
+        {
+          "line": 107,
+          "text": "fn emit(out: &mut dyn Write, record: &Value) -> Result<(), RootError> {"
+        },
+        {
+          "line": 126,
+          "text": "    fn name(self) -> &'static str {"
+        },
+        {
+          "line": 143,
+          "text": "    fn new(runtime: &tokio::runtime::Runtime) -> Result<Self, RootError> {"
+        },
+        {
+          "line": 153,
+          "text": "    fn poll(&mut self, cx: &mut std::task::Context<'_>) -> Poll<Result<Stop, RootError>> {"
+        },
+        {
+          "line": 176,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 181,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 189,
+          "text": "fn run_signal_listener("
+        },
+        {
+          "line": 225,
+          "text": "    fn joined(handle: std::thread::JoinHandle<Result<(), RootError>>) -> Result<(), RootError> {"
+        },
+        {
+          "line": 238,
+          "text": "    fn new() -> Result<Self, RootError> {"
+        },
+        {
+          "line": 300,
+          "text": "    fn local(source: swarm_engine::ExecutionInterrupt, received: std::sync::mpsc::Receiver<Stop>) -> Self {"
+        },
+        {
+          "line": 305,
+          "text": "    fn ready(&mut self) -> Result<Option<Stop>, RootError> {"
+        },
+        {
+          "line": 323,
+          "text": "    fn wait(&mut self, cadence: Duration) -> Result<Option<Stop>, RootError> {"
+        },
+        {
+          "line": 342,
+          "text": "    fn close(&mut self) -> Result<(), RootError> {"
+        },
+        {
+          "line": 353,
+          "text": "pub(super) fn cadence(policy: &swarm_engine::MissionSupervisionPolicy) -> Result<Duration, RootError> {"
+        },
+        {
+          "line": 364,
+          "text": "fn adoption_candidate(known_child: bool, state: &State) -> bool {"
+        },
+        {
+          "line": 379,
+          "text": "fn retained_allowed(known_child: bool, state: &State) -> Result<(), &'static str> {"
+        },
+        {
+          "line": 400,
+          "text": "fn worker_command(executable: &Path, root: &Path, agent: &str) -> Command {"
+        },
+        {
+          "line": 416,
+          "text": "fn start_worker("
+        },
+        {
+          "line": 446,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 454,
+          "text": "fn reap("
+        },
+        {
+          "line": 511,
+          "text": "fn continuation("
+        },
+        {
+          "line": 542,
+          "text": "fn planning_context_pending(state: &State) -> bool {"
+        },
+        {
+          "line": 554,
+          "text": "fn planning_entry("
+        },
+        {
+          "line": 576,
+          "text": "fn planning_record("
+        },
+        {
+          "line": 620,
+          "text": "fn planning_once("
+        },
+        {
+          "line": 662,
+          "text": "fn preserve_planning(recorded: Option<&(String, i64)>, result: RootError) -> RootError {"
+        },
+        {
+          "line": 675,
+          "text": "fn dispatch_record(outcome: &Dispatch, work: &str) -> Value {"
+        },
+        {
+          "line": 716,
+          "text": "fn dispatch_causes(outcome: Dispatch, publication: RootError) -> RootError {"
+        },
+        {
+          "line": 750,
+          "text": "fn interrupted_phase("
+        },
+        {
+          "line": 806,
+          "text": "fn relay_reports("
+        },
+        {
+          "line": 857,
+          "text": "fn stale_dispatch_observation(error: &swarm_engine::MissionWorkerDispatchFailure) -> bool {"
+        },
+        {
+          "line": 875,
+          "text": "fn drive("
+        },
+        {
+          "line": 1075,
+          "text": "fn cycle_failure(error: MissionCycleFailure<Stop>) -> RootError {"
+        },
+        {
+          "line": 1119,
+          "text": "pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 1157,
+          "text": "pub(super) fn owned_session("
+        },
+        {
+          "line": 1193,
+          "text": "fn session(root: &Path, executable: &Path, work: &str, mut signals: Signals,"
+        },
+        {
+          "line": 1303,
+          "text": "    fn stale_dispatch_reobservation_requires_exact_no_effect_proof() {"
+        },
+        {
+          "line": 1320,
+          "text": "    fn local_session_stop_and_owner_loss_are_distinct() {"
+        },
+        {
+          "line": 1345,
+          "text": "    fn watch_interrupted_output_keeps_original_and_known_work() {"
+        },
+        {
+          "line": 1350,
+          "text": "            fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {"
+        },
+        {
+          "line": 1360,
+          "text": "            fn flush(&mut self) -> std::io::Result<()> {"
+        },
+        {
+          "line": 1411,
+          "text": "    fn watch_interruption_keeps_newer_session_work() {"
+        },
+        {
+          "line": 1443,
+          "text": "    fn watch_listener_panic_must_wake_owned_role() {"
+        },
+        {
+          "line": 1463,
+          "text": "    fn watch_signal_listener_startup_wait_and_checked_shutdown() {"
+        },
+        {
+          "line": 1475,
+          "text": "    fn watch_planning_entry_requires_explicit_controls_and_defers_active_context() {"
+        },
+        {
+          "line": 1529,
+          "text": "    fn watch_planning_projection_keeps_idle_distinct_and_excludes_private_work() {"
+        },
+        {
+          "line": 1606,
+          "text": "    fn watch_retained_intentions_distinguish_owned_pending_children() {"
+        },
+        {
+          "line": 1625,
+          "text": "    fn watch_cadence_uses_validated_saved_milliseconds() {"
+        },
+        {
+          "line": 1638,
+          "text": "    fn watch_worker_argv_uses_existing_private_bootstrap() {"
+        },
+        {
+          "line": 1659,
+          "text": "    fn watch_blocked_dispatch_preserves_permission_cause_without_fake_completion() {"
+        },
+        {
+          "line": 1698,
+          "text": "    fn watch_cycle_after_action_keeps_supervision_and_journal_errors() {"
+        },
+        {
+          "line": 1721,
+          "text": "    fn watch_admission_preservation_keeps_primary_and_cleanup_causes() {"
+        },
+        {
+          "line": 1770,
+          "text": "    fn watch_adoption_candidates_are_only_unknown_old_nonstopped_queued() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 8,
+          "text": "    error::Error,"
+        },
+        {
+          "line": 24,
+          "text": "/// Retain an owned-thread panic without rendering its potentially private payload."
+        },
+        {
+          "line": 51,
+          "text": "/// No error message or private Agent content is rendered. The source remains"
+        },
+        {
+          "line": 52,
+          "text": "/// traversable through native error links; these observations authorize no retry."
+        },
+        {
+          "line": 53,
+          "text": "pub(super) fn safe_labels(error: &(dyn Error + 'static)) -> Vec<String> {"
+        },
+        {
+          "line": 54,
+          "text": "    if let Some(error) = error.downcast_ref::<PhaseError>() {"
+        },
+        {
+          "line": 55,
+          "text": "        return vec![error.code.into()];"
+        },
+        {
+          "line": 57,
+          "text": "    if let Some(error) = error.downcast_ref::<ChildExit>() {"
+        },
+        {
+          "line": 58,
+          "text": "        return error"
+        },
+        {
+          "line": 63,
+          "text": "                error"
+        },
+        {
+          "line": 96,
+          "text": "fn preserve_admission(admission_recorded: bool, error: RootError) -> RootError {"
+        },
+        {
+          "line": 99,
+          "text": "            primary: Box::new(error),"
+        },
+        {
+          "line": 102,
+          "text": "        error"
+        },
+        {
+          "line": 108,
+          "text": "    let bytes = serde_json::to_vec(record).map_err(|e| phase(\"mission-watch-json\", e))?;"
+        },
+        {
+          "line": 147,
+          "text": "                .map_err(|e| phase(\"mission-watch-sigint\", e))?,"
+        },
+        {
+          "line": 149,
+          "text": "                .map_err(|e| phase(\"mission-watch-sigterm\", e))?,"
+        },
+        {
+          "line": 152,
+          "text": "    /// Observe only actual delivered OS signals; a closed stream is an error."
+        },
+        {
+          "line": 161,
+          "text": "                    return Poll::Ready(Err(RootError::Refused("
+        },
+        {
+          "line": 171,
+          "text": "/// Retain an opaque original panic without rendering private payload contents."
+        },
+        {
+          "line": 186,
+          "text": "/// Execute the actual listener body and wake a scoped role on error or unwind."
+        },
+        {
+          "line": 187,
+          "text": "/// Retain opaque panic data; this does not replace the process panic hook or"
+        },
+        {
+          "line": 193,
+          "text": "    let result = match std::panic::catch_unwind(std::panic::AssertUnwindSafe(operation)) {"
+        },
+        {
+          "line": 195,
+          "text": "        Err(payload) => Err(phase("
+        },
+        {
+          "line": 204,
+          "text": "        Err(error) => match source.request(swarm_engine::ExecutionInterruptReason::ListenerFailure)"
+        },
+        {
+          "line": 206,
+          "text": "            Ok(()) => Err(error),"
+        },
+        {
+          "line": 207,
+          "text": "            Err(wake) => Err(join("
+        },
+        {
+          "line": 208,
+          "text": "                Some(error),"
+        },
+        {
+          "line": 224,
+          "text": "    /// Join actual listener result, preserving IO failures and opaque panic data."
+        },
+        {
+          "line": 228,
+          "text": "            Err(payload) => Err(phase("
+        },
+        {
+          "line": 240,
+          "text": "            .map_err(|e| phase(\"mission-watch-interruption-source\", e))?;"
+        },
+        {
+          "line": 252,
+          "text": "                        .map_err(|e| phase(\"mission-watch-runtime\", e))?;"
+        },
+        {
+          "line": 253,
+          "text": "                    let mut streams = SignalStreams::new(&runtime)?;"
+        },
+        {
+          "line": 256,
+          "text": "                        .map_err(|e| phase(\"mission-watch-signal-ready\", e))?;"
+        },
+        {
+          "line": 265,
+          "text": "                    }))?;"
+        },
+        {
+          "line": 268,
+          "text": "                            .map_err(|e| phase(\"mission-watch-signal-publish\", e))?;"
+        },
+        {
+          "line": 279,
+          "text": "                            .map_err(|e| phase(\"mission-watch-interruption-publish\", e))?;"
+        },
+        {
+          "line": 284,
+          "text": "            .map_err(|e| phase(\"mission-watch-signal-thread-spawn\", e))?;"
+        },
+        {
+          "line": 286,
+          "text": "            Self::joined(handle)?;"
+        },
+        {
+          "line": 287,
+          "text": "            return Err(RootError::Refused(\"mission-watch-signal-startup-missing\"));"
+        },
+        {
+          "line": 314,
+          "text": "            Err(std::sync::mpsc::TryRecvError::Empty) => Ok(None),"
+        },
+        {
+          "line": 315,
+          "text": "            Err(std::sync::mpsc::TryRecvError::Disconnected) => {"
+        },
+        {
+          "line": 316,
+          "text": "                self.close()?;"
+        },
+        {
+          "line": 317,
+          "text": "                Err(RootError::Refused(\"mission-watch-signal-stream-closed\"))"
+        },
+        {
+          "line": 324,
+          "text": "        if let Some(stop) = self.ready()? {"
+        },
+        {
+          "line": 332,
+          "text": "            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => Ok(None),"
+        },
+        {
+          "line": 333,
+          "text": "            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => {"
+        },
+        {
+          "line": 334,
+          "text": "                self.close()?;"
+        },
+        {
+          "line": 335,
+          "text": "                Err(RootError::Refused(\"mission-watch-signal-stream-closed\"))"
+        },
+        {
+          "line": 345,
+          "text": "                Ok(()) | Err(()) => {}"
+        },
+        {
+          "line": 354,
+          "text": "    policy.validate().map_err(RootError::Settings)?;"
+        },
+        {
+          "line": 357,
+          "text": "            .map_err(|e| phase(\"mission-watch-cadence-invalid\", e))?,"
+        },
+        {
+          "line": 385,
+          "text": "            Err(\"mission-watch-retained-queued-requires-recovery\")"
+        },
+        {
+          "line": 387,
+          "text": "        State::Refused { .. } => Err(\"mission-watch-continuation-refused\"),"
+        },
+        {
+          "line": 388,
+          "text": "        _ => Ok(()),"
+        },
+        {
+          "line": 426,
+          "text": "        .map_err(|error| phase(\"mission-watch-worker-spawn\", error))?;"
+        },
+        {
+          "line": 470,
+          "text": "            Err(error) => {"
+        },
+        {
+          "line": 471,
+          "text": "                failure = Some(join(failure, phase(\"mission-watch-child-try-wait\", error)));"
+        },
+        {
+          "line": 479,
+          "text": "        if let Err(error) = emit(out, &record) {"
+        },
+        {
+          "line": 480,
+          "text": "            failure = Some(join(failure, error));"
+        },
+        {
+          "line": 502,
+          "text": "            Err(error) => failure = Some(join(failure, error)),"
+        },
+        {
+          "line": 505,
+          "text": "    failure.map_or(Ok(()), Err)"
+        },
+        {
+          "line": 518,
+          "text": "        .map_err(|error| phase(\"mission-watch-continuation\", *error))?;"
+        },
+        {
+          "line": 528,
+          "text": "        if let Err(code) = retained_allowed(known, &entry.state) {"
+        },
+        {
+          "line": 529,
+          "text": "            let error = match entry.state {"
+        },
+        {
+          "line": 531,
+          "text": "                _ => RootError::Refused(code),"
+        },
+        {
+          "line": 533,
+          "text": "            failure = Some(join(failure, error));"
+        },
+        {
+          "line": 536,
+          "text": "    failure.map_or(Ok((candidates, active_context)), Err)"
+        },
+        {
+          "line": 574,
+          "text": "/// idle has no claim/run; refusal remains an error. This observation grants no"
+        },
+        {
+          "line": 597,
+          "text": "        _ => {"
+        },
+        {
+          "line": 598,
+          "text": "            return Err(RootError::Refused("
+        },
+        {
+          "line": 627,
+          "text": "    let observed = store.read_work(work)?;"
+        },
+        {
+          "line": 637,
+          "text": "        .map_err(|e| phase(\"mission-watch-planning-controls\", e))?;"
+        },
+        {
+          "line": 650,
+          "text": "    let step = store.step_planning(work)?;"
+        },
+        {
+          "line": 654,
+          "text": "    let current = store.read_work(work)?;"
+        },
+        {
+          "line": 655,
+          "text": "    let record = planning_record(&step, work, current.revision)?;"
+        },
+        {
+          "line": 687,
+          "text": "        .map(|error| crate::safe_causes(error));"
+        },
+        {
+          "line": 691,
+          "text": "        .map(|entry| json!({\"task_id\":entry.task,\"causes\":crate::safe_causes(&entry.error)}))"
+        },
+        {
+          "line": 728,
+          "text": "        if let Some(error) = queue.permission_refusal {"
+        },
+        {
+          "line": 729,
+          "text": "            result = join(Some(result), phase(\"mission-watch-permission\", error));"
+        },
+        {
+          "line": 732,
+          "text": "            result = join(Some(result), phase(\"mission-watch-candidate\", entry.error));"
+        },
+        {
+          "line": 749,
+          "text": "/// Work in its error chain. Stopping accepts no task and changes no consent."
+        },
+        {
+          "line": 751,
+          "text": "    error: RootError,"
+        },
+        {
+          "line": 757,
+          "text": "    if let Some((role, known, revision)) = error"
+        },
+        {
+          "line": 765,
+          "text": "            _ => return Err(error),"
+        },
+        {
+          "line": 776,
+          "text": "                if let Err(output_error) = emit(out, &record) {"
+        },
+        {
+          "line": 777,
+          "text": "                    return Err(join(Some(error), output_error));"
+        },
+        {
+          "line": 782,
+          "text": "            Err(signal_error) => return Err(join(Some(error), signal_error)),"
+        },
+        {
+          "line": 785,
+          "text": "    Err(error)"
+        },
+        {
+          "line": 814,
+          "text": "    for agent in store.list_agents(work)? {"
+        },
+        {
+          "line": 818,
+          "text": "        match store.relay_mission_report(lease, &agent.id)? {"
+        },
+        {
+          "line": 828,
+          "text": "                if let Err(primary) = emit(out, &record) {"
+        },
+        {
+          "line": 829,
+          "text": "                    return Err(RootError::WorkRecorded {"
+        },
+        {
+          "line": 841,
+          "text": "                    )?;"
+        },
+        {
+          "line": 856,
+          "text": "/// uses typed protocol variants, never formatted error text or a generic source walk."
+        },
+        {
+          "line": 857,
+          "text": "fn stale_dispatch_observation(error: &swarm_engine::MissionWorkerDispatchFailure) -> bool {"
+        },
+        {
+          "line": 858,
+          "text": "    error.phase == \"revision\""
+        },
+        {
+          "line": 859,
+          "text": "        && matches!(error.queue, swarm_engine::MissionDispatchQueueEffect::NotAttempted)"
+        },
+        {
+          "line": 860,
+          "text": "        && matches!(error.preparation, swarm_engine::MissionDispatchPreparationEffect::NotAttempted)"
+        },
+        {
+          "line": 861,
+          "text": "        && error.resources.is_empty()"
+        },
+        {
+          "line": 862,
+          "text": "        && matches!(&error.cause, swarm_engine::MissionDispatchCause::Mission(cause)"
+        },
+        {
+          "line": 891,
+          "text": "    let cadence = cadence(lease.policy())?;"
+        },
+        {
+          "line": 898,
+          "text": "        let main = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {"
+        },
+        {
+          "line": 901,
+          "text": "            return Err(RootError::Refused(\"mission-watch-heartbeat-not-running\"));"
+        },
+        {
+          "line": 903,
+          "text": "        if let Some(stop) = signals.ready()? {"
+        },
+        {
+          "line": 907,
+          "text": "            let report = role_job::joined(job.take().expect(\"checked owned role\"));"
+        },
+        {
+          "line": 909,
+          "text": "            if let Err(error) = role_job::publish(report,work,planning_recorded,out) {"
+        },
+        {
+          "line": 910,
+          "text": "                return interrupted_phase(error,work,signals,planning_recorded,out);"
+        },
+        {
+          "line": 914,
+          "text": "        reap(store, work, children, out)?;"
+        },
+        {
+          "line": 922,
+          "text": "        )?;"
+        },
+        {
+          "line": 923,
+          "text": "        let (candidates, active_context) = continuation(store, lease, children)?;"
+        },
+        {
+          "line": 927,
+          "text": "            planning_once(store,work,true,out,planning_recorded)?;"
+        },
+        {
+          "line": 935,
+          "text": "                job=Some(role_job::start(scope,role,root.to_owned(),work.to_owned(),lease,signals.source.clone())?);"
+        },
+        {
+          "line": 939,
+          "text": "            return Err(RootError::Refused(\"mission-watch-heartbeat-not-running\"));"
+        },
+        {
+          "line": 941,
+          "text": "        if let Some(stop) = signals.ready()? {"
+        },
+        {
+          "line": 946,
+          "text": "                return Err(RootError::Refused(\"mission-watch-heartbeat-not-running\"));"
+        },
+        {
+          "line": 948,
+          "text": "            if let Some(stop) = signals.ready()? {"
+        },
+        {
+          "line": 954,
+          "text": "                    .map_err(|error| phase(\"mission-watch-adoption-event-id\", error))?,"
+        },
+        {
+          "line": 955,
+          "text": "                expected_revision: store.read_work(work)?.revision,"
+        },
+        {
+          "line": 960,
+          "text": "                .map_err(|error| phase(\"mission-watch-adoption\", error))?;"
+        },
+        {
+          "line": 970,
+          "text": "                return Err(RootError::Refused("
+        },
+        {
+          "line": 980,
+          "text": "            )?;"
+        },
+        {
+          "line": 982,
+          "text": "                return Err(RootError::Refused(\"mission-watch-heartbeat-not-running\"));"
+        },
+        {
+          "line": 984,
+          "text": "            if let Some(stop) = signals.ready()? {"
+        },
+        {
+          "line": 987,
+          "text": "            start_worker(executable, root, &agent_id, work, children, out)?;"
+        },
+        {
+          "line": 990,
+          "text": "        let revision = store.read_work(work)?.revision;"
+        },
+        {
+          "line": 996,
+          "text": "                    .map_err(|e| phase(\"mission-watch-event-id\", e))?,"
+        },
+        {
+          "line": 1002,
+          "text": "            Err(error) if stale_dispatch_observation(&error) => {"
+        },
+        {
+          "line": 1003,
+          "text": "                let error = phase(\"mission-watch-dispatch\", *error);"
+        },
+        {
+          "line": 1006,
+          "text": "                    \"synchronization_committed\":false,\"preparation_attempted\":false,\"causes\":crate::safe_causes(&error),"
+        },
+        {
+          "line": 1008,
+          "text": "                if let Err(publication)=emit(out,&observation) { return Err(join(Some(error),publication)); }"
+        },
+        {
+          "line": 1012,
+          "text": "                if let Some(stop)=signals.wait(cadence)? { return Ok(stop); }"
+        },
+        {
+          "line": 1015,
+          "text": "            Err(error) => return Err(phase(\"mission-watch-dispatch\", *error)),"
+        },
+        {
+          "line": 1018,
+          "text": "        // or any other fallible consumer; a later error cannot erase this fact."
+        },
+        {
+          "line": 1029,
+          "text": "            if let Err(error) = emit(out, &diagnostic) {"
+        },
+        {
+          "line": 1030,
+          "text": "                return Err(dispatch_causes(outcome, error));"
+        },
+        {
+          "line": 1040,
+          "text": "                    return Err(RootError::Refused(\"mission-watch-dispatch-not-new-queued\"));"
+        },
+        {
+          "line": 1043,
+          "text": "                    return Err(RootError::Refused(\"mission-watch-heartbeat-not-running\"));"
+        },
+        {
+          "line": 1045,
+          "text": "                if let Some(stop) = signals.ready()? {"
+        },
+        {
+          "line": 1048,
+          "text": "                start_worker(executable, root, &intention.agent.id, work, children, out)?;"
+        },
+        {
+          "line": 1052,
+          "text": "                return Err(RootError::Refused("
+        },
+        {
+          "line": 1058,
+          "text": "        if let Some(stop) = signals.wait(cadence)? {"
+        },
+        {
+          "line": 1062,
+          "text": "    })).unwrap_or_else(|payload|Err(role_job::panicked(payload)));"
+        },
+        {
+          "line": 1075,
+          "text": "fn cycle_failure(error: MissionCycleFailure<Stop>) -> RootError {"
+        },
+        {
+          "line": 1076,
+          "text": "    let succeeded = error.action.as_ref().is_some_and(Result::is_ok);"
+        },
+        {
+          "line": 1077,
+          "text": "    let mut result = error.action.and_then(Result::err);"
+        },
+        {
+          "line": 1078,
+          "text": "    if let Some(error) = error.supervision {"
+        },
+        {
+          "line": 1079,
+          "text": "        result = Some(join(result, phase(\"mission-watch-supervision\", error)));"
+        },
+        {
+          "line": 1081,
+          "text": "    if let Some(error) = error.journal {"
+        },
+        {
+          "line": 1082,
+          "text": "        result = Some(join(result, phase(\"mission-watch-cycle-journal\", error)));"
+        },
+        {
+          "line": 1129,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 1133,
+          "text": "        .map_err(|e| CliError::Root(Box::new(phase(\"mission-watch-root-path\", e))))?;"
+        },
+        {
+          "line": 1135,
+          "text": "        .map_err(|e| CliError::Root(Box::new(phase(\"mission-watch-current-exe\", e))))?;"
+        },
+        {
+          "line": 1136,
+          "text": "    let mut signals = Signals::new().map_err(|e| CliError::Root(Box::new(e)))?;"
+        },
+        {
+          "line": 1139,
+          "text": "        Err(primary) => {"
+        },
+        {
+          "line": 1140,
+          "text": "            return Err(CliError::Root(Box::new(match signals.close() {"
+        },
+        {
+          "line": 1142,
+          "text": "                Err(secondary) => join(Some(primary), secondary),"
+        },
+        {
+          "line": 1165,
+          "text": "        Err(error) => {"
+        },
+        {
+          "line": 1166,
+          "text": "            let error=phase(\"web-conductor-stop-observation\",error);"
+        },
+        {
+          "line": 1167,
+          "text": "            return Err(CliError::Root(Box::new(match store.close(){Ok(())=>error,Err(close)=>join(Some(error),close)})));"
+        },
+        {
+          "line": 1176,
+          "text": "        Err(error) => {"
+        },
+        {
+          "line": 1177,
+          "text": "            let busy = matches!(error, RootError::Mutation(swarm_engine::WorkEngineError::Mission(ref cause))"
+        },
+        {
+          "line": 1182,
+          "text": "                Ok(()) => error,"
+        },
+        {
+          "line": 1183,
+          "text": "                Err(close) => join(Some(error), close),"
+        },
+        {
+          "line": 1185,
+          "text": "            Err(CliError::Root(Box::new(failure)))"
+        },
+        {
+          "line": 1199,
+          "text": "        if let Some(stop) = signals.ready()? { return Ok(stop); }"
+        },
+        {
+          "line": 1205,
+          "text": "                &swarm_engine::system_timestamp().map_err(|e| phase(\"mission-watch-clock\", e))?,"
+        },
+        {
+          "line": 1207,
+          "text": "            .map_err(|e| phase(\"mission-watch-claim\", e))?;"
+        },
+        {
+          "line": 1212,
+          "text": "            .ok_or(RootError::Refused(\"mission-watch-lease-missing\"))?;"
+        },
+        {
+          "line": 1215,
+          "text": "        continuation(&store, owned, &children)?;"
+        },
+        {
+          "line": 1221,
+          "text": "        )?;"
+        },
+        {
+          "line": 1243,
+          "text": "            .map_err(|error| cycle_failure(*error))"
+        },
+        {
+          "line": 1247,
+          "text": "        Err(error) => (None, Some(error)),"
+        },
+        {
+          "line": 1249,
+          "text": "    if let Err(error) = signals.close() {"
+        },
+        {
+          "line": 1250,
+          "text": "        failure = Some(join(failure, error));"
+        },
+        {
+          "line": 1252,
+          "text": "    if let Err(error) = reap(&store, work, &mut children, out) {"
+        },
+        {
+          "line": 1253,
+          "text": "        failure = Some(join(failure, error));"
+        },
+        {
+          "line": 1259,
+          "text": "                if let Err(error) = store.update_mission_supervision(&owned, &now, true) {"
+        },
+        {
+          "line": 1260,
+          "text": "                    failure = Some(join(failure, phase(\"mission-watch-release-lease\", error)));"
+        },
+        {
+          "line": 1263,
+          "text": "            Err(error) => {"
+        },
+        {
+          "line": 1264,
+          "text": "                failure = Some(join(failure, phase(\"mission-watch-cleanup-clock\", error)))"
+        },
+        {
+          "line": 1267,
+          "text": "        if let Err(error) = owned.close() {"
+        },
+        {
+          "line": 1268,
+          "text": "            failure = Some(join(failure, phase(\"mission-watch-close-lease\", error)));"
+        },
+        {
+          "line": 1271,
+          "text": "    if let Err(error) = store.close() {"
+        },
+        {
+          "line": 1272,
+          "text": "        failure = Some(join(failure, error));"
+        },
+        {
+          "line": 1274,
+          "text": "    if let Some(error) = failure {"
+        },
+        {
+          "line": 1275,
+          "text": "        return Err(CliError::Root(Box::new(preserve_admission("
+        },
+        {
+          "line": 1277,
+          "text": "            preserve_planning(planning_recorded.as_ref(), error),"
+        },
+        {
+          "line": 1288,
+          "text": "    })?;"
+        },
+        {
+          "line": 1291,
+          "text": "        .map_err(|error| CliError::Root(Box::new(preserve_admission(admission_recorded, preserve_planning(planning_recorded.as_ref(), error)))))?;"
+        },
+        {
+          "line": 1309,
+          "text": "        let mut error=clean();error.phase=\"queue-observation-revision\";assert!(!super::stale_dispatch_observation(&error));"
+        },
+        {
+          "line": 1310,
+          "text": "        let mut error=clean();error.queue=Q::OutcomeUnknown;assert!(!super::stale_dispatch_observation(&error));"
+        },
+        {
+          "line": 1311,
+          "text": "        let mut error=clean();error.preparation=P::ReplayAttempted{event_id:\"same-id\".into()};assert!(!super::stale_dispatch_observation(&error));"
+        },
+        {
+          "line": 1312,
+          "text": "        let mut error=clean();error.cause=C::Root(Box::new(swarm_engine::RootStoreError::Refused(\"revision_conflict\")));assert!(!super::stale_dispatch_observation(&error));"
+        },
+        {
+          "line": 1313,
+          "text": "        let mut error=clean();error.cause=C::Mission(Box::new(M::Refused(\"mission-lease-lost\")));assert!(!super::stale_dispatch_observation(&error));"
+        },
+        {
+          "line": 1314,
+          "text": "        let mut error=clean();error.resources.push(swarm_engine::MissionDispatchResourceRefusal::Occupied{task:\"task\".into(),cause:swarm_engine::RootStoreError::Refused(\"fixture-resource\")});assert!(!super::stale_dispatch_observation(&error));"
+        },
+        {
+          "line": 1321,
+          "text": "        let source=swarm_engine::ExecutionInterrupt::new().unwrap();"
+        },
+        {
+          "line": 1324,
+          "text": "        assert_eq!(signals.ready().unwrap(),None);"
+        },
+        {
+          "line": 1325,
+          "text": "        source.request(swarm_engine::ExecutionInterruptReason::ControllerShutdown).unwrap();"
+        },
+        {
+          "line": 1326,
+          "text": "        tx.send(super::Stop::ControllerShutdown).unwrap();"
+        },
+        {
+          "line": 1327,
+          "text": "        assert_eq!(signals.ready().unwrap(),Some(super::Stop::ControllerShutdown));"
+        },
+        {
+          "line": 1328,
+          "text": "        assert_eq!(signals.wait(std::time::Duration::ZERO).unwrap(),Some(super::Stop::ControllerShutdown));"
+        },
+        {
+          "line": 1329,
+          "text": "        signals.close().unwrap();"
+        },
+        {
+          "line": 1331,
+          "text": "        let source=swarm_engine::ExecutionInterrupt::new().unwrap();"
+        },
+        {
+          "line": 1333,
+          "text": "        assert_eq!(lost.ready().unwrap(),None);drop(tx);"
+        },
+        {
+          "line": 1334,
+          "text": "        assert!(matches!(lost.ready(),Err(swarm_engine::RootStoreError::Refused(\"mission-watch-signal-stream-closed\"))));"
+        },
+        {
+          "line": 1335,
+          "text": "        assert_eq!(source.reason().unwrap(),None);lost.close().unwrap();"
+        },
+        {
+          "line": 1338,
+          "text": "        tx.send(super::Stop::ControllerShutdown).unwrap();"
+        },
+        {
+          "line": 1339,
+          "text": "        assert_eq!(recovered.ready().unwrap(),Some(super::Stop::ControllerShutdown));"
+        },
+        {
+          "line": 1354,
+          "text": "                    Err(std::io::Error::new("
+        },
+        {
+          "line": 1361,
+          "text": "                Err(std::io::Error::new("
+        },
+        {
+          "line": 1375,
+          "text": "            let mut listener = super::Signals::new().unwrap();"
+        },
+        {
+          "line": 1387,
+          "text": "                .unwrap(),"
+        },
+        {
+          "line": 1390,
+          "text": "            let error = super::interrupted_phase("
+        },
+        {
+          "line": 1398,
+          "text": "            listener.close().unwrap();"
+        },
+        {
+          "line": 1399,
+          "text": "            assert_eq!(error.recorded_work(), Some((\"fixture-work\", 3)));"
+        },
+        {
+          "line": 1400,
+          "text": "            let labels = crate::safe_causes(&crate::CliError::Root(Box::new(error)));"
+        },
+        {
+          "line": 1412,
+          "text": "        let mut listener = super::Signals::new().unwrap();"
+        },
+        {
+          "line": 1417,
+          "text": "            let error = swarm_engine::RootStoreError::WorkRecorded {"
+        },
+        {
+          "line": 1426,
+          "text": "                    error,"
+        },
+        {
+          "line": 1432,
+          "text": "                .unwrap(),"
+        },
+        {
+          "line": 1435,
+          "text": "            seen.push(known.unwrap().1);"
+        },
+        {
+          "line": 1437,
+          "text": "        listener.close().unwrap();"
+        },
+        {
+          "line": 1441,
+          "text": "    /// stop, then a controlled panic must become a retained failure and wake."
+        },
+        {
+          "line": 1444,
+          "text": "        let source = swarm_engine::ExecutionInterrupt::new().unwrap();"
+        },
+        {
+          "line": 1445,
+          "text": "        super::run_signal_listener(&source, || Ok(())).unwrap();"
+        },
+        {
+          "line": 1446,
+          "text": "        assert_eq!(source.reason().unwrap(), None);"
+        },
+        {
+          "line": 1447,
+          "text": "        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {"
+        },
+        {
+          "line": 1448,
+          "text": "            super::run_signal_listener(&source, || std::panic::panic_any(123_u32))"
+        },
+        {
+          "line": 1452,
+          "text": "            \"listener panic must become a typed failure and wake source\""
+        },
+        {
+          "line": 1454,
+          "text": "        assert!(result.unwrap().is_err());"
+        },
+        {
+          "line": 1456,
+          "text": "            source.reason().unwrap(),"
+        },
+        {
+          "line": 1464,
+          "text": "        let mut listener = super::Signals::new().unwrap();"
+        },
+        {
+          "line": 1465,
+          "text": "        assert_eq!(listener.ready().unwrap(), None);"
+        },
+        {
+          "line": 1466,
+          "text": "        assert_eq!(listener.wait(std::time::Duration::ZERO).unwrap(), None);"
+        },
+        {
+          "line": 1467,
+          "text": "        listener.close().unwrap();"
+        },
+        {
+          "line": 1468,
+          "text": "        listener.close().unwrap();"
+        },
+        {
+          "line": 1469,
+          "text": "        assert_eq!(listener.source.reason().unwrap(), None);"
+        },
+        {
+          "line": 1541,
+          "text": "        let idle = planning_record(&step, \"fixture-work\", 5).unwrap();"
+        },
+        {
+          "line": 1563,
+          "text": "        let applied = planning_record(&step, \"fixture-work\", 5).unwrap();"
+        },
+        {
+          "line": 1575,
+          "text": "        let error = preserve_planning("
+        },
+        {
+          "line": 1589,
+          "text": "            matches!(&error, RootError::WorkRecorded { work, revision: 5, .. } if work == \"fixture-work\")"
+        },
+        {
+          "line": 1591,
+          "text": "        let labels = crate::safe_causes(&error);"
+        },
+        {
+          "line": 1614,
+          "text": "            Err(\"mission-watch-retained-queued-requires-recovery\")"
+        },
+        {
+          "line": 1631,
+          "text": "        assert_eq!(cadence(&policy).unwrap(), Duration::from_millis(37));"
+        },
+        {
+          "line": 1689,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 1696,
+          "text": "    /// Known native wrappers preserve all branches without private error text."
+        },
+        {
+          "line": 1699,
+          "text": "        let error = cycle_failure(MissionCycleFailure {"
+        },
+        {
+          "line": 1708,
+          "text": "        let labels = crate::safe_causes(&error);"
+        }
+      ]
+    },
+    "rust/crates/swarm-cli/src/mission_watch/role_job.rs": {
+      "policies": [
+        {
+          "line": 16,
+          "text": "            (Self::Controls, true) => Self::Controls,"
+        },
+        {
+          "line": 17,
+          "text": "            (Self::Controls, false) => Self::Reviewer,"
+        },
+        {
+          "line": 18,
+          "text": "            (Self::Reviewer, true) => Self::Reviewer,"
+        },
+        {
+          "line": 19,
+          "text": "            (Self::Reviewer, false) => Self::Planner,"
+        },
+        {
+          "line": 88,
+          "text": "                                        emit(&mut output, &json!({\"schema_version\":1,\"event\":\"mission-controls-recorded\",\"work\":validation.work.id,\"revision\":validation.work.revision,\"job_id\":validation.job_id,\"controls_passed\":validation.controls_passed,\"task_accepted\":false,\"automatic_reviewer\":false,\"mission_complete\":false}))?;"
+        },
+        {
+          "line": 95,
+          "text": "                                        emit(&mut output, &json!({\"schema_version\":1,\"event\":\"mission-review-recorded\",\"work\":review.work.id,\"revision\":review.work.revision,\"review_id\":review.review_id,\"review_recorded\":review.review_recorded,\"verdict_applicable\":review.verdict_applicable,\"replayed\":review.replayed,\"task_accepted\":review.task_accepted,\"mission_complete\":false}))?;"
+        },
+        {
+          "line": 207,
+          "text": "        assert_eq!(Controls.next(true), Controls);"
+        },
+        {
+          "line": 208,
+          "text": "        assert_eq!(Controls.next(false), Reviewer);"
+        },
+        {
+          "line": 209,
+          "text": "        assert_eq!(Reviewer.next(true), Reviewer);"
+        },
+        {
+          "line": 210,
+          "text": "        assert_eq!(Reviewer.next(false), Planner);"
+        },
+        {
+          "line": 211,
+          "text": "        assert_eq!(Planner.next(true), Controls);"
+        },
+        {
+          "line": 212,
+          "text": "        assert_eq!(Planner.next(false), Controls);"
+        },
+        {
+          "line": 220,
+          "text": "            (None, false),"
+        },
+        {
+          "line": 221,
+          "text": "            (Some(Stop::Interrupt), true),"
+        },
+        {
+          "line": 222,
+          "text": "            (Some(Stop::Terminate), false),"
+        },
+        {
+          "line": 228,
+          "text": "            let barrier = std::sync::Arc::new(std::sync::Barrier::new(2));"
+        },
+        {
+          "line": 230,
+          "text": "            let mut recorded = Some((\"work\".to_owned(), 1));"
+        },
+        {
+          "line": 246,
+          "text": "                            revision: 3,"
+        },
+        {
+          "line": 276,
+          "text": "                assert_eq!(error.recorded_work(), Some((\"work\", 3)));"
+        },
+        {
+          "line": 291,
+          "text": "                if self.0 {"
+        },
+        {
+          "line": 305,
+          "text": "                revision: 3,"
+        },
+        {
+          "line": 308,
+          "text": "            recorded: Some((\"work\".into(), 2)),"
+        },
+        {
+          "line": 315,
+          "text": "                recorded: Some((\"work\".into(), 1))"
+        },
+        {
+          "line": 322,
+          "text": "        for flush in [false, true] {"
+        },
+        {
+          "line": 324,
+          "text": "            assert_eq!(error.recorded_work(), Some((\"work\", 3)));"
+        }
+      ],
+      "functions": [
+        {
+          "line": 14,
+          "text": "    pub(super) fn next(self, recorded: bool) -> Self {"
+        },
+        {
+          "line": 24,
+          "text": "    fn thread_name(self) -> &'static str {"
+        },
+        {
+          "line": 41,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 46,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 52,
+          "text": "pub(super) fn panicked(payload: Box<dyn std::any::Any + Send>) -> RootError {"
+        },
+        {
+          "line": 66,
+          "text": "pub(super) fn start<'scope, 'env>("
+        },
+        {
+          "line": 121,
+          "text": "pub(super) fn joined(handle: ScopedJoinHandle<'_, Report>) -> Report {"
+        },
+        {
+          "line": 131,
+          "text": "pub(super) fn publish("
+        },
+        {
+          "line": 169,
+          "text": "pub(super) fn finish("
+        },
+        {
+          "line": 205,
+          "text": "    fn ordered_role_phases_do_not_promote_empty_results_or_skip_receipts() {"
+        },
+        {
+          "line": 218,
+          "text": "    fn planner_finish_distinguishes_main_shutdown_and_actual_stop_metadata() {"
+        },
+        {
+          "line": 287,
+          "text": "    fn planner_report_keeps_original_and_latest_work_on_output_failure() {"
+        },
+        {
+          "line": 290,
+          "text": "            fn write(&mut self, b: &[u8]) -> std::io::Result<usize> {"
+        },
+        {
+          "line": 297,
+          "text": "            fn flush(&mut self) -> std::io::Result<()> {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 36,
+          "text": "/// Opaque original panic payload; formatting never renders its private value."
+        },
+        {
+          "line": 79,
+          "text": "            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {"
+        },
+        {
+          "line": 83,
+          "text": "                        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {"
+        },
+        {
+          "line": 86,
+          "text": "                                    if let Some(validation) = store.run_next_mission_validation(lease)? {"
+        },
+        {
+          "line": 88,
+          "text": "                                        emit(&mut output, &json!({\"schema_version\":1,\"event\":\"mission-controls-recorded\",\"work\":validation.work.id,\"revision\":validation.work.revision,\"job_id\":validation.job_id,\"controls_passed\":validation.controls_passed,\"task_accepted\":false,\"automatic_reviewer\":false,\"mission_complete\":false}))?;"
+        },
+        {
+          "line": 93,
+          "text": "                                    if let Some(review) = store.run_next_mission_review(lease)? {"
+        },
+        {
+          "line": 95,
+          "text": "                                        emit(&mut output, &json!({\"schema_version\":1,\"event\":\"mission-review-recorded\",\"work\":review.work.id,\"revision\":review.work.revision,\"review_id\":review.review_id,\"review_recorded\":review.review_recorded,\"verdict_applicable\":review.verdict_applicable,\"replayed\":review.replayed,\"task_accepted\":review.task_accepted,\"mission_complete\":false}))?;"
+        },
+        {
+          "line": 101,
+          "text": "                                        .map_err(|e| phase(\"mission-watch-planner-context\", *e))?;"
+        },
+        {
+          "line": 107,
+          "text": "                        .unwrap_or_else(|payload| Err(panicked(payload)))"
+        },
+        {
+          "line": 111,
+          "text": "            .unwrap_or_else(|payload| Err(panicked(payload)));"
+        },
+        {
+          "line": 118,
+          "text": "        .map_err(|error| phase(\"mission-watch-role-thread\", error))"
+        },
+        {
+          "line": 120,
+          "text": "/// Join only our actual handle. An unexpected unwind is an error, never completion."
+        },
+        {
+          "line": 123,
+          "text": "        result: Err(panicked(payload)),"
+        },
+        {
+          "line": 130,
+          "text": "/// imply acceptance; an error can follow output already visible to its consumer."
+        },
+        {
+          "line": 157,
+          "text": "            Err(error) => Err(join("
+        },
+        {
+          "line": 159,
+          "text": "                phase(\"mission-watch-output\", error),"
+        },
+        {
+          "line": 163,
+          "text": "    result.map_err(|error| preserve_planning(recorded.as_ref(), error))"
+        },
+        {
+          "line": 166,
+          "text": "/// A real observed stop retains its actual reason; a main error requests only local"
+        },
+        {
+          "line": 181,
+          "text": "        Err(_) => swarm_engine::ExecutionInterruptReason::ControllerShutdown,"
+        },
+        {
+          "line": 183,
+          "text": "    if let Err(wake) = signals.source.request(reason) {"
+        },
+        {
+          "line": 184,
+          "text": "        main = Err(join("
+        },
+        {
+          "line": 192,
+          "text": "        (Ok(stop), Err(error)) => {"
+        },
+        {
+          "line": 193,
+          "text": "            interrupted_phase(error, work, signals, recorded, out).map(|_| stop)"
+        },
+        {
+          "line": 195,
+          "text": "        (Err(error), Ok(())) => Err(error),"
+        },
+        {
+          "line": 196,
+          "text": "        (Err(error), Err(peer)) => Err(join(Some(error), peer)),"
+        },
+        {
+          "line": 224,
+          "text": "            let mut signals = Signals::new().unwrap();"
+        },
+        {
+          "line": 234,
+          "text": "                    while source.reason().unwrap().is_none() {"
+        },
+        {
+          "line": 243,
+          "text": "                        result: Err(RootError::WorkRecorded {"
+        },
+        {
+          "line": 255,
+          "text": "                    stop.map_or_else(|| Err(RootError::Refused(\"fixture-main\")), Ok),"
+        },
+        {
+          "line": 262,
+          "text": "            signals.close().unwrap();"
+        },
+        {
+          "line": 264,
+          "text": "                observed.reason().unwrap(),"
+        },
+        {
+          "line": 273,
+          "text": "                assert_eq!(result.unwrap(), Stop::Interrupt);"
+        },
+        {
+          "line": 275,
+          "text": "                let error = result.unwrap_err();"
+        },
+        {
+          "line": 276,
+          "text": "                assert_eq!(error.recorded_work(), Some((\"work\", 3)));"
+        },
+        {
+          "line": 277,
+          "text": "                let causes = crate::safe_causes(&CliError::Root(Box::new(error)));"
+        },
+        {
+          "line": 294,
+          "text": "                    Err(std::io::ErrorKind::BrokenPipe.into())"
+        },
+        {
+          "line": 298,
+          "text": "                Err(std::io::ErrorKind::BrokenPipe.into())"
+        },
+        {
+          "line": 302,
+          "text": "            result: Err(RootError::WorkRecorded {"
+        },
+        {
+          "line": 323,
+          "text": "            let error = publish(report(), \"work\", &mut known, &mut Sink(flush)).unwrap_err();"
+        },
+        {
+          "line": 324,
+          "text": "            assert_eq!(error.recorded_work(), Some((\"work\", 3)));"
+        },
+        {
+          "line": 325,
+          "text": "            let causes = crate::safe_causes(&CliError::Root(Box::new(error)));"
+        }
+      ]
+    },
+    "rust/crates/swarm-cli/src/native_web.rs": {
+      "policies": [
+        {
+          "line": 19,
+          "text": "/// sinks are not made cancellable by this command. No output watchdog/retry is added."
+        },
+        {
+          "line": 27,
+          "text": "    if !(1..=2).contains(&a.pos.len())"
+        },
+        {
+          "line": 37,
+          "text": "    let server = NativeHttpServer::bind(Path::new(&a.root), a.pos.get(1).map(String::as_str))"
+        },
+        {
+          "line": 47,
+          "text": "                schema_version: 1,"
+        },
+        {
+          "line": 51,
+          "text": "                runtime_ready: false,"
+        },
+        {
+          "line": 80,
+          "text": "                    schema_version: 1,"
+        },
+        {
+          "line": 128,
+          "text": "    result.map(|_already_reported| 0).map_err(|cause| {"
+        },
+        {
+          "line": 180,
+          "text": "    timeout: bool,"
+        },
+        {
+          "line": 183,
+          "text": "/// Borrow final counters/known values and classify first causes; no IO or retry."
+        },
+        {
+          "line": 187,
+          "text": "        schema_version: 1,"
+        },
+        {
+          "line": 210,
+          "text": "                timeout: error.is_timeout(),"
+        },
+        {
+          "line": 227,
+          "text": "/// causes remain typed. No lossy conversion, hidden size cap or retry is performed."
+        },
+        {
+          "line": 265,
+          "text": "/// No IO, formatting of arbitrary data, authority or retry follows this traversal."
+        },
+        {
+          "line": 364,
+          "text": "            configuration_outcomes: 1,"
+        },
+        {
+          "line": 365,
+          "text": "            work_outcomes: 1,"
+        },
+        {
+          "line": 366,
+          "text": "            last_recorded_work: Some((\"owned-late-work\".into(), 3)),"
+        },
+        {
+          "line": 369,
+          "text": "                event_revision: swarm_engine::SettingCount(2),"
+        },
+        {
+          "line": 370,
+          "text": "                current_revision: swarm_engine::SettingCount(2),"
+        },
+        {
+          "line": 371,
+          "text": "                replayed: false,"
+        },
+        {
+          "line": 376,
+          "text": "            ..Default::default()"
+        },
+        {
+          "line": 391,
+          "text": "        let cli = native(cause, true);"
+        },
+        {
+          "line": 393,
+          "text": "        assert_eq!(cli.recorded_work(), Some((\"owned-late-work\".into(), 3)));"
+        },
+        {
+          "line": 395,
+          "text": "        let outcome = super::super::report(cli, true, true, &mut diagnostic);"
+        },
+        {
+          "line": 396,
+          "text": "        assert_eq!(outcome.code, 2);"
+        },
+        {
+          "line": 400,
+          "text": "        assert_eq!(json[\"configuration_may_be_recorded\"], true);"
+        },
+        {
+          "line": 425,
+          "text": "        let outcome=error.pending.remove(0);"
+        }
+      ],
+      "functions": [
+        {
+          "line": 26,
+          "text": "pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 185,
+          "text": "fn stop_record(report: &swarm_web::NativeServerReport) -> StopRecord<'_> {"
+        },
+        {
+          "line": 228,
+          "text": "fn line(out: &mut dyn Write, value: &impl serde::Serialize) -> io::Result<()> {"
+        },
+        {
+          "line": 235,
+          "text": "fn native(cause: NativeServerError, english: bool) -> CliError {"
+        },
+        {
+          "line": 244,
+          "text": "fn failed_conductor_start(server: NativeHttpServer, cause: swarm_engine::RootStoreError) -> NativeServerError {"
+        },
+        {
+          "line": 248,
+          "text": "fn failed_bound(server: NativeHttpServer, primary: NativeServerError, english: bool) -> CliError {"
+        },
+        {
+          "line": 266,
+          "text": "pub(super) fn branches<'a>(error: &'a (dyn Error + 'static)) -> Vec<&'a (dyn Error + 'static)> {"
+        },
+        {
+          "line": 310,
+          "text": "pub(super) fn family(error: &(dyn Error + 'static)) -> Option<&'static str> {"
+        },
+        {
+          "line": 329,
+          "text": "pub(super) fn details(error: &CliError, document: &mut serde_json::Value) {"
+        },
+        {
+          "line": 362,
+          "text": "    fn late_web_summary_failure_retains_report_effects_and_safe_causes() {"
+        },
+        {
+          "line": 418,
+          "text": "    fn ancillary_native_causes_reach_cli_after_observation_and_encoding_failure() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 6,
+          "text": "    error::Error,"
+        },
+        {
+          "line": 34,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 38,
+          "text": "        .map_err(|cause| native(cause, english))?;"
+        },
+        {
+          "line": 41,
+          "text": "        Err(error) => return Err(failed_bound(server, error, english)),"
+        },
+        {
+          "line": 64,
+          "text": "    if let Err(cause) = announcement {"
+        },
+        {
+          "line": 65,
+          "text": "        return Err(failed_bound("
+        },
+        {
+          "line": 89,
+          "text": "                if let Err(error) = tokio::signal::ctrl_c().await {"
+        },
+        {
+          "line": 90,
+          "text": "                    signal_error = Some(error);"
+        },
+        {
+          "line": 98,
+          "text": "        Some(cause) => Err(NativeServerError::SessionState {"
+        },
+        {
+          "line": 105,
+          "text": "                Err(primary) => NativeServerError::Cleanup {"
+        },
+        {
+          "line": 118,
+          "text": "            Err(cause) => Err(NativeServerError::SessionState {"
+        },
+        {
+          "line": 126,
+          "text": "        Err(error) => Err(error),"
+        },
+        {
+          "line": 132,
+          "text": "        let error = native(cause, english);"
+        },
+        {
+          "line": 135,
+          "text": "                primary: Box::new(error),"
+        },
+        {
+          "line": 140,
+          "text": "            None => error,"
+        },
+        {
+          "line": 207,
+          "text": "        first_connection_failure: report.first_connection_failure.as_ref().map(|error| {"
+        },
+        {
+          "line": 209,
+          "text": "                parse: error.is_parse(),"
+        },
+        {
+          "line": 210,
+          "text": "                timeout: error.is_timeout(),"
+        },
+        {
+          "line": 211,
+          "text": "                causes: super::safe_causes(error),"
+        },
+        {
+          "line": 229,
+          "text": "    let mut bytes = serde_json::to_vec(value).map_err(io::Error::other)?;"
+        },
+        {
+          "line": 231,
+          "text": "    out.write_all(&bytes)?;"
+        },
+        {
+          "line": 234,
+          "text": "/// Preserve native typed error and language; no raw cause/path/body is rendered."
+        },
+        {
+          "line": 246,
+          "text": "    match server.close() { Ok(()) => primary, Err(cleanup) => NativeServerError::Cleanup { primary: Box::new(primary), cleanup: Box::new(cleanup) } }"
+        },
+        {
+          "line": 249,
+          "text": "    let error = match server.close() {"
+        },
+        {
+          "line": 251,
+          "text": "        Err(cleanup) => NativeServerError::Cleanup {"
+        },
+        {
+          "line": 258,
+          "text": "            primary: Box::new(error),"
+        },
+        {
+          "line": 263,
+          "text": "/// Additional non-linear native error branches for the CLI's existing typed,"
+        },
+        {
+          "line": 266,
+          "text": "pub(super) fn branches<'a>(error: &'a (dyn Error + 'static)) -> Vec<&'a (dyn Error + 'static)> {"
+        },
+        {
+          "line": 268,
+          "text": "    if let Some(error) = error.downcast_ref::<NativeServerError>() {"
+        },
+        {
+          "line": 269,
+          "text": "        match error {"
+        },
+        {
+          "line": 272,
+          "text": "                if let Some(error) = report.first_request_failure.as_ref() {"
+        },
+        {
+          "line": 273,
+          "text": "                    out.push(error);"
+        },
+        {
+          "line": 275,
+          "text": "                if let Some(error) = report.first_service_failure.as_ref() {"
+        },
+        {
+          "line": 276,
+          "text": "                    out.push(error);"
+        },
+        {
+          "line": 278,
+          "text": "                if let Some(error) = report.first_connection_failure.as_ref() {"
+        },
+        {
+          "line": 279,
+          "text": "                    out.push(error);"
+        },
+        {
+          "line": 283,
+          "text": "                if let Some(error) = outcome.failure.as_ref() {"
+        },
+        {
+          "line": 284,
+          "text": "                    out.push(error);"
+        },
+        {
+          "line": 288,
+          "text": "            _ => (),"
+        },
+        {
+          "line": 291,
+          "text": "    if let Some(error) = error.downcast_ref::<swarm_web::NativeObservationFailure>() {"
+        },
+        {
+          "line": 292,
+          "text": "        for outcome in &error.pending {"
+        },
+        {
+          "line": 293,
+          "text": "            if let Some(error) = outcome.failure.as_ref() {"
+        },
+        {
+          "line": 294,
+          "text": "                out.push(error);"
+        },
+        {
+          "line": 299,
+          "text": "    if let Some(error) = error.downcast_ref::<swarm_web::HttpServiceError>() {"
+        },
+        {
+          "line": 300,
+          "text": "        match error {"
+        },
+        {
+          "line": 303,
+          "text": "            _ => (),"
+        },
+        {
+          "line": 309,
+          "text": "/// panic payloads, raw request/headers, paths and arbitrary cause messages stay out."
+        },
+        {
+          "line": 310,
+          "text": "pub(super) fn family(error: &(dyn Error + 'static)) -> Option<&'static str> {"
+        },
+        {
+          "line": 311,
+          "text": "    if let Some(error) = error.downcast_ref::<NativeServerError>() {"
+        },
+        {
+          "line": 312,
+          "text": "        Some(error.code())"
+        },
+        {
+          "line": 313,
+          "text": "    } else if let Some(error) = error.downcast_ref::<swarm_web::HttpServiceError>() {"
+        },
+        {
+          "line": 314,
+          "text": "        Some(error.code())"
+        },
+        {
+          "line": 315,
+          "text": "    } else if let Some(error) = error.downcast_ref::<swarm_web::NativeObservationFailure>() {"
+        },
+        {
+          "line": 316,
+          "text": "        Some(error.code())"
+        },
+        {
+          "line": 317,
+          "text": "    } else if let Some(error) = error.downcast_ref::<swarm_web::NativeObservationCause>() {"
+        },
+        {
+          "line": 318,
+          "text": "        Some(match error {"
+        },
+        {
+          "line": 320,
+          "text": "            swarm_web::NativeObservationCause::Panic(_) => \"web-observer-panic\","
+        },
+        {
+          "line": 327,
+          "text": "/// outcome projection. This neither invents precision for an unknown Root error"
+        },
+        {
+          "line": 329,
+          "text": "pub(super) fn details(error: &CliError, document: &mut serde_json::Value) {"
+        },
+        {
+          "line": 330,
+          "text": "    if let Some(native) = error"
+        },
+        {
+          "line": 333,
+          "text": "        .find_map(|error| error.downcast_ref::<NativeServerError>())"
+        },
+        {
+          "line": 379,
+          "text": "        line(&mut witness, &stop_record(&report)).unwrap();"
+        },
+        {
+          "line": 381,
+          "text": "            serde_json::from_slice::<serde_json::Value>(&witness).unwrap()[\"event\"],"
+        },
+        {
+          "line": 398,
+          "text": "        let json: serde_json::Value = serde_json::from_slice(&diagnostic).unwrap();"
+        },
+        {
+          "line": 407,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 422,
+          "text": "        let outcome = outcome.observe(&mut |_| Ok(())).unwrap();"
+        },
+        {
+          "line": 423,
+          "text": "        let mut error = outcome.observe(&mut |_| Err(io::Error::new(io::ErrorKind::BrokenPipe,\"fixture-observer\"))).unwrap_err();"
+        },
+        {
+          "line": 424,
+          "text": "        assert!(branches(&error).iter().any(|cause| matches!(cause.downcast_ref::<swarm_engine::RootStoreError>(),Some(swarm_engine::RootStoreError::Refused(\"fixture-ancillary\")))));"
+        },
+        {
+          "line": 425,
+          "text": "        let outcome=error.pending.remove(0);"
+        },
+        {
+          "line": 427,
+          "text": "        let error=NativeServerError::OutcomeEncoding { cause: encoding, outcome: Box::new(outcome) };"
+        },
+        {
+          "line": 428,
+          "text": "        assert!(branches(&error).iter().any(|cause| matches!(cause.downcast_ref::<swarm_engine::RootStoreError>(),Some(swarm_engine::RootStoreError::Refused(\"fixture-ancillary\")))));"
+        }
+      ]
+    },
+    "rust/crates/swarm-cli/src/native_web/conductor.rs": {
+      "policies": [
+        {
+          "line": 87,
+          "text": "/// Session failure stops admission and drains every owned session; no silent retry."
+        },
+        {
+          "line": 107,
+          "text": "                let observed = RootStore::open(root, false)?;"
+        },
+        {
+          "line": 109,
+          "text": "                    Ok(true) => Ok(()),"
+        },
+        {
+          "line": 110,
+          "text": "                    Ok(false) => Err(E::Refused(\"web-root-binding-changed\")),"
+        },
+        {
+          "line": 143,
+          "text": "                        || control.paused != Some(false)"
+        },
+        {
+          "line": 144,
+          "text": "                        || control.consent_enabled != Some(true)"
+        },
+        {
+          "line": 157,
+          "text": "                            let peer = RootStore::open(root, true)"
+        },
+        {
+          "line": 160,
+          "text": "                                Ok(true) => {}"
+        },
+        {
+          "line": 331,
+          "text": "        let report = swarm_web::NativeServerReport { completed_jobs: 3, ..Default::default() };"
+        },
+        {
+          "line": 335,
+          "text": "            revision: 4,"
+        },
+        {
+          "line": 339,
+          "text": "            NativeServerError::StoppedOutput { report, .. } => assert_eq!(report.completed_jobs, 3),"
+        },
+        {
+          "line": 342,
+          "text": "        let cli = super::super::native(native, true);"
+        },
+        {
+          "line": 343,
+          "text": "        assert_eq!(cli.recorded_work(), Some((\"late-work\".into(), 4)));"
+        },
+        {
+          "line": 356,
+          "text": "            revision: 9,"
+        },
+        {
+          "line": 362,
+          "text": "        let cli = super::super::native(wrapped, true);"
+        },
+        {
+          "line": 363,
+          "text": "        assert_eq!(cli.recorded_work(), Some((\"fixture-work\".into(), 9)));"
+        }
+      ],
+      "functions": [
+        {
+          "line": 11,
+          "text": "fn cause(code: &'static str, error: impl Error + Send + Sync + 'static) -> E {"
+        },
+        {
+          "line": 25,
+          "text": "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {"
+        },
+        {
+          "line": 30,
+          "text": "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {"
+        },
+        {
+          "line": 35,
+          "text": "    fn source(&self) -> Option<&(dyn Error + 'static)> {"
+        },
+        {
+          "line": 40,
+          "text": "fn join(primary: Option<E>, cleanup: E) -> E {"
+        },
+        {
+          "line": 50,
+          "text": "fn web(error: E) -> NativeServerError {"
+        },
+        {
+          "line": 66,
+          "text": "    fn stop(&self) -> Result<(), E> {"
+        },
+        {
+          "line": 76,
+          "text": "    fn finish(self) -> Result<bool, E> {"
+        },
+        {
+          "line": 91,
+          "text": "fn run("
+        },
+        {
+          "line": 219,
+          "text": "pub(super) fn serve<'a, F: Future<Output = ()>>("
+        },
+        {
+          "line": 306,
+          "text": "fn merge("
+        },
+        {
+          "line": 330,
+          "text": "    fn late_conductor_failure_keeps_http_report_and_typed_effects() {"
+        },
+        {
+          "line": 352,
+          "text": "    fn conductor_wrapped_known_work_and_cleanup_reach_cli() {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 11,
+          "text": "fn cause(code: &'static str, error: impl Error + Send + Sync + 'static) -> E {"
+        },
+        {
+          "line": 16,
+          "text": "            cause: Box::new(error),"
+        },
+        {
+          "line": 49,
+          "text": "/// Retain Root causes under the existing web error traversal contract."
+        },
+        {
+          "line": 50,
+          "text": "fn web(error: E) -> NativeServerError {"
+        },
+        {
+          "line": 53,
+          "text": "        cause: Box::new(error),"
+        },
+        {
+          "line": 75,
+          "text": "    /// Join the actual thread; retain opaque panic payload through existing helper."
+        },
+        {
+          "line": 79,
+          "text": "            Err(payload) => Err(crate::mission_watch::owned_panic(payload)),"
+        },
+        {
+          "line": 101,
+          "text": "        let main = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Result<(), E> {"
+        },
+        {
+          "line": 104,
+          "text": "                    Ok(()) | Err(mpsc::TryRecvError::Disconnected) => return Ok(()),"
+        },
+        {
+          "line": 105,
+          "text": "                    Err(mpsc::TryRecvError::Empty) => {}"
+        },
+        {
+          "line": 107,
+          "text": "                let observed = RootStore::open(root, false)?;"
+        },
+        {
+          "line": 110,
+          "text": "                    Ok(false) => Err(E::Refused(\"web-root-binding-changed\")),"
+        },
+        {
+          "line": 111,
+          "text": "                    Err(error) => Err(error),"
+        },
+        {
+          "line": 116,
+          "text": "                    (Err(error), Ok(())) | (Ok(()), Err(error)) => return Err(error),"
+        },
+        {
+          "line": 117,
+          "text": "                    (Err(error), Err(close)) => return Err(join(Some(error), close)),"
+        },
+        {
+          "line": 120,
+          "text": "                    .settings()?"
+        },
+        {
+          "line": 123,
+          "text": "                    .map_err(E::Settings)?;"
+        },
+        {
+          "line": 124,
+          "text": "                let cadence = mission_watch::cadence(&policy)?;"
+        },
+        {
+          "line": 132,
+          "text": "                        session.finish()?;"
+        },
+        {
+          "line": 135,
+          "text": "                for work in store.list_works()? {"
+        },
+        {
+          "line": 141,
+          "text": "                    })?;"
+        },
+        {
+          "line": 150,
+          "text": "                        ExecutionInterrupt::new().map_err(|e| cause(\"web-conductor-source\", e))?;"
+        },
+        {
+          "line": 158,
+          "text": "                                .map_err(|e| CliError::Root(Box::new(e)))?;"
+        },
+        {
+          "line": 162,
+          "text": "                                    let error = matched"
+        },
+        {
+          "line": 165,
+          "text": "                                    return Err(CliError::Root(Box::new(match peer.close() {"
+        },
+        {
+          "line": 166,
+          "text": "                                        Ok(()) => error,"
+        },
+        {
+          "line": 167,
+          "text": "                                        Err(close) => join(Some(error), close),"
+        },
+        {
+          "line": 181,
+          "text": "                        .map_err(|e| cause(\"web-conductor-thread\", e))?;"
+        },
+        {
+          "line": 192,
+          "text": "                    Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => return Ok(()),"
+        },
+        {
+          "line": 193,
+          "text": "                    Err(mpsc::RecvTimeoutError::Timeout) => {}"
+        },
+        {
+          "line": 197,
+          "text": "        .unwrap_or_else(|payload| Err(mission_watch::owned_panic(payload)));"
+        },
+        {
+          "line": 201,
+          "text": "            if let Err(error) = session.stop() {"
+        },
+        {
+          "line": 202,
+          "text": "                failure = Some(join(failure, error));"
+        },
+        {
+          "line": 206,
+          "text": "            if let Err(error) = session.finish() {"
+        },
+        {
+          "line": 207,
+          "text": "                failure = Some(join(failure, error));"
+        },
+        {
+          "line": 210,
+          "text": "        failure.map_or(Ok(()), Err)"
+        },
+        {
+          "line": 218,
+          "text": "/// workers, install the binary, accept a mission or recover managed processes."
+        },
+        {
+          "line": 227,
+          "text": "        Err(error) => {"
+        },
+        {
+          "line": 228,
+          "text": "            return Err(match server.close() {"
+        },
+        {
+          "line": 229,
+          "text": "                Ok(()) => error,"
+        },
+        {
+          "line": 230,
+          "text": "                Err(cleanup) => NativeServerError::Cleanup {"
+        },
+        {
+          "line": 231,
+          "text": "                    primary: Box::new(error),"
+        },
+        {
+          "line": 239,
+          "text": "        Err(error) => {"
+        },
+        {
+          "line": 240,
+          "text": "            let error = match store.close() {"
+        },
+        {
+          "line": 241,
+          "text": "                Ok(()) => error,"
+        },
+        {
+          "line": 242,
+          "text": "                Err(close) => join(Some(error), close),"
+        },
+        {
+          "line": 244,
+          "text": "            return Err(match server.close() {"
+        },
+        {
+          "line": 245,
+          "text": "                Ok(()) => web(error),"
+        },
+        {
+          "line": 246,
+          "text": "                Err(close) => NativeServerError::Cleanup {"
+        },
+        {
+          "line": 247,
+          "text": "                    primary: Box::new(web(error)),"
+        },
+        {
+          "line": 257,
+          "text": "            Err(error) => {"
+        },
+        {
+          "line": 258,
+          "text": "                return Err(super::failed_conductor_start("
+        },
+        {
+          "line": 260,
+          "text": "                    cause(\"web-conductor-executable\", error),"
+        },
+        {
+          "line": 282,
+          "text": "            Err(error) => {"
+        },
+        {
+          "line": 283,
+          "text": "                return Err(super::failed_conductor_start("
+        },
+        {
+          "line": 285,
+          "text": "                    cause(\"web-conductor-spawn\", error),"
+        },
+        {
+          "line": 291,
+          "text": "                tokio::select! {_=shutdown=>{},_=failure_rx=>{}}"
+        },
+        {
+          "line": 298,
+          "text": "            Err(payload) => Err(mission_watch::owned_panic(payload)),"
+        },
+        {
+          "line": 312,
+          "text": "        (Ok(report), Err(error)) => Err(NativeServerError::StoppedOutput {"
+        },
+        {
+          "line": 314,
+          "text": "            cause: io::Error::other(error),"
+        },
+        {
+          "line": 317,
+          "text": "        (Err(primary), Err(error)) => Err(NativeServerError::Cleanup {"
+        },
+        {
+          "line": 319,
+          "text": "            cleanup: Box::new(web(error)),"
+        },
+        {
+          "line": 327,
+          "text": "    /// A late coordinator error must preserve the already collected HTTP report,"
+        },
+        {
+          "line": 337,
+          "text": "        let native = match merge(Ok(report), Err(failure)) { Err(error)=>error, Ok(_)=>panic!(\"late error lost\") };"
+        },
+        {
+          "line": 340,
+          "text": "            _ => panic!(\"report lost\"),"
+        },
+        {
+          "line": 349,
+          "text": "    /// Actual error wrappers preserve highest known Work and both cleanup causes;"
+        }
+      ]
+    },
+    "rust/crates/swarm-web/src/service/listener.rs": {
+      "policies": [
+        {
+          "line": 14,
+          "text": "/// no retry, rollback or session deletion is implied by any error code."
+        },
+        {
+          "line": 68,
+          "text": "                report.configuration_outcomes > 0"
+        },
+        {
+          "line": 79,
+          "text": "            _ => false,"
+        },
+        {
+          "line": 131,
+          "text": "    /// no cause/effect is flattened into a successful empty response or retry."
+        },
+        {
+          "line": 159,
+          "text": "            Self::SessionState { .. } => true,"
+        },
+        {
+          "line": 163,
+          "text": "            _ => false,"
+        },
+        {
+          "line": 225,
+          "text": "        let store = RootStore::open(root_path, true)"
+        },
+        {
+          "line": 240,
+          "text": "            if policy.max_connections == Some(0) {"
+        },
+        {
+          "line": 303,
+          "text": "        let store = RootStore::open(&self.service.root, true)"
+        }
+      ],
+      "functions": [
+        {
+          "line": 46,
+          "text": "    pub fn code(&self) -> &'static str {"
+        },
+        {
+          "line": 63,
+          "text": "    pub fn configuration_may_be_recorded(&self) -> bool {"
+        },
+        {
+          "line": 84,
+          "text": "    pub fn recorded_configuration(&self) -> Option<&super::RecordedConfiguration> {"
+        },
+        {
+          "line": 99,
+          "text": "    pub fn recorded_work(&self) -> Option<(&str, i64)> {"
+        },
+        {
+          "line": 120,
+          "text": "    pub fn stopped_report(&self) -> Option<&super::NativeServerReport> {"
+        },
+        {
+          "line": 132,
+          "text": "    pub fn observation_failure(&self) -> Option<&NativeObservationFailure> {"
+        },
+        {
+          "line": 144,
+          "text": "    pub(super) fn observation_failure_mut(&mut self) -> Option<&mut NativeObservationFailure> {"
+        },
+        {
+          "line": 156,
+          "text": "    pub fn session_state_may_be_recorded(&self) -> bool {"
+        },
+        {
+          "line": 168,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 173,
+          "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+        },
+        {
+          "line": 178,
+          "text": "    fn source(&self) -> Option<&(dyn Error + 'static)> {"
+        },
+        {
+          "line": 195,
+          "text": "pub(super) fn finish<T>("
+        },
+        {
+          "line": 224,
+          "text": "    pub fn bind(root_path: &Path, address: Option<&str>) -> Result<Self, NativeServerError> {"
+        },
+        {
+          "line": 281,
+          "text": "    pub(super) fn known_session(primary: NativeServerError) -> NativeServerError {"
+        },
+        {
+          "line": 288,
+          "text": "    pub fn local_addr(&self) -> Result<SocketAddr, NativeServerError> {"
+        },
+        {
+          "line": 302,
+          "text": "    pub fn bound_mission_root(&self) -> Result<RootStore, NativeServerError> {"
+        },
+        {
+          "line": 316,
+          "text": "    pub fn settings_revision(&self) -> SettingCount {"
+        },
+        {
+          "line": 322,
+          "text": "    pub fn policy(&self) -> &WebTransportPolicy {"
+        },
+        {
+          "line": 327,
+          "text": "    pub fn close(self) -> Result<(), NativeServerError> {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 6,
+          "text": "    error::Error,"
+        },
+        {
+          "line": 14,
+          "text": "/// no retry, rollback or session deletion is implied by any error code."
+        },
+        {
+          "line": 62,
+          "text": "    /// to the caller's observer, not this pending-error summary."
+        },
+        {
+          "line": 79,
+          "text": "            _ => false,"
+        },
+        {
+          "line": 86,
+          "text": "            Self::Service(error) => error.recorded_configuration(),"
+        },
+        {
+          "line": 87,
+          "text": "            Self::Observation(error) => error.recorded_configuration(),"
+        },
+        {
+          "line": 94,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 115,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 127,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 139,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 151,
+          "text": "            _ => None,"
+        },
+        {
+          "line": 163,
+          "text": "            _ => false,"
+        },
+        {
+          "line": 201,
+          "text": "        (Err(e), Ok(())) | (Ok(_), Err(e)) => Err(e),"
+        },
+        {
+          "line": 202,
+          "text": "        (Err(primary), Err(cleanup)) => Err(NativeServerError::Cleanup {"
+        },
+        {
+          "line": 226,
+          "text": "            .map_err(|e| NativeServerError::Service(root(\"open\", e)))?;"
+        },
+        {
+          "line": 230,
+          "text": "                .map_err(|e| NativeServerError::Service(root(\"settings\", e)))?;"
+        },
+        {
+          "line": 239,
+          "text": "            })?;"
+        },
+        {
+          "line": 241,
+          "text": "                return Err(NativeServerError::Refused(\"web-network-disabled\"));"
+        },
+        {
+          "line": 247,
+          "text": "                })?;"
+        },
+        {
+          "line": 252,
+          "text": "            Err(primary) => {"
+        },
+        {
+          "line": 254,
+          "text": "                    Err(primary),"
+        },
+        {
+          "line": 273,
+          "text": "            Err(primary) => finish("
+        },
+        {
+          "line": 274,
+          "text": "                Err(NativeServerError::Service(primary)),"
+        },
+        {
+          "line": 304,
+          "text": "            .map_err(|cause| NativeServerError::Service(root(\"conductor-open\", cause)))?;"
+        },
+        {
+          "line": 307,
+          "text": "            Err(primary) => match store.close() {"
+        },
+        {
+          "line": 308,
+          "text": "                Ok(()) => Err(NativeServerError::Service(primary)),"
+        },
+        {
+          "line": 309,
+          "text": "                Err(cleanup) => Err(NativeServerError::Service(HttpServiceError::Close {"
+        }
+      ]
+    },
+    "version_history.json": {
+      "policies": [
+        {
+          "line": 2,
+          "text": "  \"schema_version\": 1,"
+        },
+        {
+          "line": 95,
+          "text": "        \"en\": \"Rust candidate: initial hierarchical missions show provider waits with UTC expiry or explicit intervention, without clearing quotas or implicit retries.\""
+        },
+        {
+          "line": 167,
+          "text": "        \"en\": \"Memory and mission state: an unreadable pause refuses affected launches and operations, retains a safe diagnostic and no longer becomes a false “launches allowed” state.\""
+        },
+        {
+          "line": 174,
+          "text": "        \"fr\": \"Migration Rust en qualification : lecture structurée des avis et trois limites UTF-8 persistantes réglables dans Admin, sans acceptation implicite ni remplacement du serveur.\","
+        },
+        {
+          "line": 175,
+          "text": "        \"en\": \"Rust migration under qualification: structured review reply parsing and three persisted UTF-8 limits editable in Admin, without implicit acceptance or server replacement.\""
+        },
+        {
+          "line": 211,
+          "text": "        \"en\": \"Go/Rust sources under qualification: required criterion bindings from task.add, blank criteria refused and Admin limit consumed by Rust creation; historical task adoption remains open.\""
+        },
+        {
+          "line": 219,
+          "text": "        \"en\": \"Rust migration: persisted configurable default check phases with FR/EN Admin choices; existing task requirements and criteria remain protected. Explicit legacy-setting adoption, safe errors and recovery verified by scope; verification evidence is scoped, while installation and cutover remain separate.\""
+        },
+        {
+          "line": 310,
+          "text": "        \"fr\": \"Recettes Admin : les états de refus visibles remontent hors du polling, avec régressions conservées et sans timeout global arbitraire ; les essais restent distincts du service installé.\","
+        },
+        {
+          "line": 311,
+          "text": "        \"en\": \"Admin recipes: visible refusal states propagate outside polling, with retained regression checks and no arbitrary global timeout; verification remains distinct from the installed service.\""
+        },
+        {
+          "line": 319,
+          "text": "        \"en\": \"Rust migration, verified component: per-attempt frozen Admin failure-window policy, diagnostic CLI replay and shared SQLite retries verified; actual supervision and cutover remain open, no process enabled.\""
+        },
+        {
+          "line": 350,
+          "text": "        \"fr\": \"Candidat Rust non installé : routage natif explicite vérifié sur huit parcours locaux, avec sources relues avant exécution, format modèle v1, limites Admin et reprises ; 566 tests workspace et quatre parcours Admin passent. Migration globale encore partielle.\","
+        },
+        {
+          "line": 351,
+          "text": "        \"en\": \"Uninstalled Rust candidate: explicit native routing verified in eight local journeys, with sources reread before execution, v1 model format, Admin limits and recovery; 566 workspace tests and four Admin journeys pass. Overall migration remains partial.\""
+        },
+        {
+          "line": 358,
+          "text": "        \"fr\": \"Candidat Rust non installé : création et lecture fournisseur par CLI vérifiées sans écrasement ; courses, erreurs de stockage/durabilité/sortie et reprises couvertes. 140 tests de recette, 593 tests workspace tous features et dix parcours natifs passent. Migration globale partielle.\","
+        },
+        {
+          "line": 359,
+          "text": "        \"en\": \"Uninstalled Rust candidate: provider-file CLI create/readback verified without overwrite; creation races, storage/durability/output errors and recovery covered. 140 recipe tests, 593 all-features workspace tests and ten native journeys pass. Overall migration stays partial.\""
+        },
+        {
+          "line": 362,
+          "text": "        \"fr\": \"Candidat Rust86 non installé : édition et restauration fournisseur vérifiées avec aperçu lié au Root, CAS, sauvegardes exactes et reprise. 151 tests Rust, 13 parcours natifs, Clippy et Rustdoc passent ; migration globale partielle.\","
+        },
+        {
+          "line": 363,
+          "text": "        \"en\": \"Uninstalled Rust86 candidate: provider update/restore verified with Root-bound preview, CAS, exact snapshots and recovery. 151 Rust tests, 13 native journeys, Clippy and Rustdoc pass; overall migration partial.\""
+        },
+        {
+          "line": 366,
+          "text": "        \"fr\": \"Candidat Rust87 non installé : choix de modèle par tâche conservé/rejoué et réellement appliqué au processus, avec refus des divergences et reprise. Compatibilité JSON Go et erreurs de transaction/sortie vérifiées. 155 tests de recette, 10 transactionnels et 14 parcours natifs passent ; migration partielle.\","
+        },
+        {
+          "line": 367,
+          "text": "        \"en\": \"Uninstalled Rust87 candidate: task model choice persists/replays and reaches actual process argv, with conflict refusals and recovery. Go JSON compatibility and transaction/output failures verified. 155 recipe tests, 10 transaction tests and 14 native journeys pass; overall migration partial.\""
+        },
+        {
+          "line": 370,
+          "text": "        \"fr\": \"Candidat Rust88 non installé : import/export de politiques explicites avec sauvegarde et refus/reprise ; confirmation UI liée au Root, choix par défaut conservé et règles Admin appliquées. 161 tests Rust et 15 parcours natifs, 4 parcours navigateur passent. Aucun modèle implicite ajouté ; migration globale partielle.\","
+        },
+        {
+          "line": 371,
+          "text": "        \"en\": \"Uninstalled Rust88 candidate: explicit policy import/export with snapshots/refusal/recovery; Root-bound UI confirmation, preserved default choice and saved Admin rules. 161 Rust tests, 15 native and 4 browser journeys pass. No implicit named model added; overall migration partial.\""
+        },
+        {
+          "line": 374,
+          "text": "        \"fr\": \"Candidat Rust89 non installé : mission manuelle worker/rapport/soumission/gate/validation opérateur vérifiée ; identités SQL/corps incohérentes refusées par les lecteurs. 169 tests Rust de recette, 15 parcours de routage et 4 missions passent. Migration globale partielle.\","
+        },
+        {
+          "line": 375,
+          "text": "        \"en\": \"Uninstalled Rust89 candidate: verified manual worker/report/submission/gate/operator acceptance; readers refuse inconsistent SQL/body identities. 169 Rust recipe tests, 15 routing and 4 mission journeys pass. Overall migration partial.\""
+        },
+        {
+          "line": 378,
+          "text": "        \"fr\": \"Candidat Rust90–91 non installé : garde HTTP local et routage typé partiel vers le vrai Root ; datastore lié par descripteur, refus des chemins remplacés, état conservé après échecs tardifs. Session locale persistante qualifiée :202tests Rust, Clippy/Rustdoc et parcours CLI vérifiés ; transport réseau et serveur Go inchangés.\","
+        },
+        {
+          "line": 379,
+          "text": "        \"en\": \"Uninstalled Rust90–91 candidate: local HTTP gate and limited typed routing into actual Root; descriptor-bound datastore, replacement-path refusal, retained state after late failures. Persistent local session qualified:202Rust tests, Clippy/Rustdoc and CLI journeys verified; network transport and Go server unchanged.\""
+        },
+        {
+          "line": 383,
+          "text": "        \"en\": \"Uninstalled Rust92 candidate: retained configuration after init/settings apply/replay output or close failure; refusals without false publication markers. Local qualification206Rust tests, Clippy/Rustdoc and CLI journeys verified.\""
+        },
+        {
+          "line": 422,
+          "text": "        \"fr\": \"Migration Rust102 : commandes Work sous bail vérifiées dans la transaction et avant commit, rollback budgétaire sur expiration et reprise de tests sans timeout arbitraire. Journal, conduite complète et bascule globale restent ouverts ; serveur Go conservé.\","
+        },
+        {
+          "line": 423,
+          "text": "        \"en\": \"Rust migration102: Work commands lease-checked inside the transaction and before commit, budget rollback on expiry and recovered verification without arbitrary timeout. Journal, complete conductor and global cutover remain open; serving Go preserved.\""
+        },
+        {
+          "line": 466,
+          "text": "        \"fr\": \"Candidat Rust113/114 vérifié localement : réservation et décisions task/delegate, refus atomiques et adoption explicite v24→v25 ; réglages Admin FR/EN réellement consommés. Conduite complète et bascule restent ouvertes ; application en service inchangée.\","
+        },
+        {
+          "line": 467,
+          "text": "        \"en\": \"Rust113/114 locally verified candidate: scope claims and task/delegate decisions, atomic refusal and explicit v24→v25 adoption; FR/EN Admin settings consumed by actual operations. Complete orchestration and cutover remain open; the running application is unchanged.\""
+        },
+        {
+          "line": 519,
+          "text": "        \"en\": \"Rust migration: structured-provider waiting and ownership renewal declared as persisted Admin settings; the lease does not become a model-duration limit, runner still in progress.\""
+        },
+        {
+          "line": 523,
+          "text": "        \"en\": \"Rust CLOCK_BOOTTIME clock and absolute timerfd wake primitive, without fallback or new product timeout; planner integration remains in progress.\""
+        },
+        {
+          "line": 526,
+          "text": "        \"fr\": \"Le contrôleur Rust peut réveiller le poll du processus possédé via un descripteur noyau ; vérification locale en cours, sans nouveau timeout global ni raccord planner implicite.\","
+        },
+        {
+          "line": 527,
+          "text": "        \"en\": \"The Rust controller can wake the owned-process poll via a kernel descriptor; local verification in progress, with no new global timeout or implicit planner integration.\""
+        },
+        {
+          "line": 642,
+          "text": "        \"fr\": \"Rust : raccord JSON historique de mission status pour les missions ordinaires sans profil, Agent ni planification ; santé stockage réelle et seuils persistés dans Admin (schéma réglages 38). Qualification du parcours en cours, aucune installation revendiquée.\","
+        },
+        {
+          "line": 643,
+          "text": "        \"en\": \"Rust: historical mission status JSON wired for ordinary missions without profiles, Agents or planning; actual storage health and persisted Admin thresholds (settings schema 38). Journey qualification in progress; no installation claimed.\""
+        },
+        {
+          "line": 657,
+          "text": "      \"version\": \"v0.1.0\","
+        },
+        {
+          "line": 658,
+          "text": "      \"date\": \"2026-10-06\","
+        },
+        {
+          "line": 673,
+          "text": "      \"release_url\": \"https://github.com/mo0ogly/swarm/releases/tag/v0.1.0\""
+        }
+      ],
+      "functions": [],
+      "errors": [
+        {
+          "line": 215,
+          "text": "        \"en\": \"Rust migration: continuous policy, function, error and documentation review, with hash/evidence checks in qualification. This method does not establish exhaustive semantic correctness or deployment.\""
+        },
+        {
+          "line": 235,
+          "text": "        \"en\": \"Rust candidate: ordinary hierarchical projection combines review, gate and dependencies; typed staleness and retained error causes, under verification without cutover.\""
+        },
+        {
+          "line": 259,
+          "text": "        \"en\": \"Worker framing: policy, function documentation and error-handling rules are delivered as a canonical embedded source. No extra rights or raised limits; verification in progress.\""
+        },
+        {
+          "line": 327,
+          "text": "        \"en\": \"Rust migration: manual agent run with private helper, execve without shell fallback, sealed prompt, stream guards and settlement without acceptance. Elapsed duration is observation only; native verification and replay recipe in progress. No service restarted.\""
+        },
+        {
+          "line": 431,
+          "text": "        \"en\": \"Rust migration104: cycle error/recovery journal, shared owner checks and rollback on journal failure.48targeted tests and2HTTP flows pass. Complete conductor and cutover remain open.\""
+        },
+        {
+          "line": 438,
+          "text": "        \"fr\": \"Migration Rust106 : consentement, révocation, pause et autonomie lus sans fallback ; corruption refusée sans mutation, reprise SQL vérifiée.33tests ciblés et2parcours HTTP passent. Configuration et départ automatique restent ouverts.\","
+        },
+        {
+          "line": 439,
+          "text": "        \"en\": \"Rust migration106:consent, revocation, pause and autonomy read without fallback; corruption refused without mutation and SQL recovery verified.33targeted tests and2HTTP flows pass. Configuration and automatic launch remain open.\""
+        },
+        {
+          "line": 523,
+          "text": "        \"en\": \"Rust CLOCK_BOOTTIME clock and absolute timerfd wake primitive, without fallback or new product timeout; planner integration remains in progress.\""
+        },
+        {
+          "line": 603,
+          "text": "        \"en\": \"Rust: read-only reviewer original inputs, saved limits and precise context error reasons; reviewer invocation remains unported.\""
+        }
+      ]
+    }
+  },
+  "independent_review": false,
+  "semantic_guarantee": false,
+  "runtime_acceptance": false
+}

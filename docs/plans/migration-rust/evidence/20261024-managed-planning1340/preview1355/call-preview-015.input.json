@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "expected_revision": 3,
+  "claim_id": "preview-claim",
+  "scope": "root",
+  "scope_revision": 1,
+  "holder": "fixture-planner",
+  "generation": 1,
+  "PRIVATE_UNTRUSTED": "PRIVATE value"
+}

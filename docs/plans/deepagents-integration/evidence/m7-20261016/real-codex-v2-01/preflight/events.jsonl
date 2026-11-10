@@ -1,0 +1,5 @@
+{"type":"thread.started","thread_id":"01a143b7-cd0e-7f23-b682-da71d1d1be25"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."}}
+{"type":"turn.started"}
+{"type":"error","message":"unexpected status 503 Service Unavailable: Intentional local preflight rejection, url: http://127.0.0.1:45601/v1/responses"}
+{"type":"turn.failed","error":{"message":"unexpected status 503 Service Unavailable: Intentional local preflight rejection, url: http://127.0.0.1:45601/v1/responses"}}

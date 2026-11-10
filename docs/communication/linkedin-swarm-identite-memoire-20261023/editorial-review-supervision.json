@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "editorial_date": "2026-10-23 Europe/Paris",
+  "request": "Include the implemented supervision in the video",
+  "predecessor": "editorial-review.json",
+  "state": "Editorial update verified; video not recorded",
+  "checks": {
+    "word_zip": "PASS",
+    "rendered_and_visually_inspected_pages": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "embedded_diagrams": 2,
+    "public_reference_targets": 6,
+    "local_links": 27,
+    "previous_word_recoverable": [
+      ".cache/editorial-swarm-20261023/candidates/previous-1792766171975966680.docx"
+    ],
+    "video_duration": "about 120 seconds, editorial only"
+  },
+  "review": {
+    "cause": "Prior response emphasized architecture too narrowly; implemented supervision contracts and scoped Rust recipes can be presented.",
+    "decision": "Add supervision to article/Word and make it a concrete video sequence after a fresh isolated rehearsal; do not wait for global Rust qualification for that scoped sequence.",
+    "policy": "No Swarm policy, default, rights or budget changed.",
+    "functions": "No product function modified. Only editorial prose/storyboard and the Word artifact changed.",
+    "errors": "Keep fixture versus real-provider and scoped verification versus acceptance distinct. Required rehearsal is still open.",
+    "documentation": "French editorial update; no shared product contract changed; runtime version/evolution notes not modified.",
+    "runtime": "No application test, build, provider call, live mission, restart, recording or publication performed.",
+    "independence": "Same-session editorial/visual QA, not independent system acceptance."
+  },
+  "retained_results": [
+    {
+      "path": "docs/plans/migration-rust/evidence/20261022-root-instance-201/watch-public213/result.json",
+      "sha256": "659466e79b2d38cc475fd7e387e390b31f4dbd86c891fb839f53b13f7c9e1f54",
+      "observed_status": "PASS",
+      "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+      "rerun": false
+    },
+    {
+      "path": "docs/plans/migration-rust/evidence/20261022-g3-watch-restart/public224/result.json",
+      "sha256": "8440c52cd0383b0c9165c72b6670a4b93bad5e01601ecf3b1768fc8485160457",
+      "observed_status": "PASS",
+      "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+      "rerun": false
+    },
+    {
+      "path": "docs/plans/migration-rust/evidence/20261022-g3-watch-planning/public244/result.json",
+      "sha256": "bef388f7eebbc2a5b16bfcc146b0b7315933a95eaaae266ea8c3aa67e9355336",
+      "observed_status": "PASS",
+      "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+      "rerun": false
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/article-fr.md",
+      "sha256": "ad7e34b7572a647f1a3279e604d25128e5976502eac5e32dd52a6b13f92e90e2",
+      "bytes": 6909
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/storyboard-video-fr.md",
+      "sha256": "eb622b02591866ce29a0cd7f4b2855463c640291d326a4558ac3ef914952431f",
+      "bytes": 5880
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md",
+      "sha256": "51400f8430c470e2375cc59fc9fe45abfab16bc9feca5bbb2c77e095e8560429",
+      "bytes": 4938
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Identite_Memoire_LinkedIn.docx",
+      "sha256": "b081b8ed24930af729c4813ce17a935b07e6e2ecb2c86ef0ef84e59e6d08d5ac",
+      "bytes": 449424
+    }
+  ],
+  "source_contracts": [
+    {
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "sha256_at_review": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e"
+    },
+    {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "sha256_at_review": "90c1e95f24e7ed75ce8e50268ad5f09fc55fcc3028ccd9fca0b519b1a4f8c0de"
+    }
+  ],
+  "next_condition": "Select and rehearse the exact public fixture flow on the identified binary before filming. Registered/reviewer/validation/web and AC-02 not implied."
+}

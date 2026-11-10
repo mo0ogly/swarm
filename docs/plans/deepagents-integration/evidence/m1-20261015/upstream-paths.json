@@ -1,0 +1,30 @@
+{
+  "executor": "Codex direct audit",
+  "argv": [
+    "/tmp/swarm-deepagents-memory-env-944lMS/bin/python",
+    "-m",
+    "pytest",
+    "-p",
+    "pytest_asyncio.plugin",
+    "-p",
+    "pytest_socket",
+    "--disable-socket",
+    "--allow-unix-socket",
+    "-vv",
+    "-s",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m1-20261015/test_memory_paths.py"
+  ],
+  "cwd": "/tmp/swarm-deepagents-audit-944lMS/libs/deepagents",
+  "environment_keys": [
+    "HOME",
+    "LANGCHAIN_TRACING_V2",
+    "LANGSMITH_TRACING",
+    "PATH",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD",
+    "PYTHONPATH"
+  ],
+  "started_at_utc": "2026-10-15T19:07:35.690163+00:00",
+  "ended_at_utc": "2026-10-15T19:07:59.969130+00:00",
+  "exit_code": 0,
+  "log_sha256": "02c0f7f9b821db833921988f3ba25f627238ae63fa832f8fb49b2fdcc5ad64ae"
+}

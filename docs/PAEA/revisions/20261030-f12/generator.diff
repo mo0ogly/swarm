@@ -1,0 +1,211 @@
+--- original-generator
++++ revised-generator
+@@ -4,9 +4,11 @@
+ Outputs FR+EN DOCX, editable Mermaid sources and rendered color diagrams.
+ Requires python-docx, Graphviz `dot`; Mermaid CLI `mmdc` optional.
+ Usage: python PAEA_F12_Guide_Finance_build.py --out ./output
++Alternatively use --reuse-diagrams-from ./docs/PAEA to preserve embedded pictures
++without Graphviz. The adjacent PAEA_F12_editorial.json supplies reviewed FR/EN prose.
+ No external banking or model API calls are made.
+ """
+-import argparse, json, subprocess, zipfile
++import argparse, json, subprocess, zipfile, os, tempfile
+ from pathlib import Path
+ from docx import Document
+ from docx.shared import Inches,Pt,RGBColor
+@@ -46,7 +48,22 @@
+  [('a',t('Processus et criticité','Process and criticality')),('b',t('Contrôles et propriétaires','Controls and owners')),('c',t('Tests et contre-exemples','Tests and counterexamples')),('d',t('Coût, blocages, résilience','Cost, false denials, resilience')),('e',t('GO limité / NO-GO / à corriger','Limited GO / NO-GO / remediate'))], [('a','b'),('b','c'),('c','d'),('d','e')],['a','b','c','d','e'])
+  ]
+ 
+-def draw(out,lang):
++def draw(out,lang,reuse_from=None):
++ """Write editable diagram sources and return their titles and PNG paths.
++
++ With reuse_from, copy the eleven embedded pictures from the matching original
++ guide in document order, preserving their bytes. Reject an incomplete reference.
++ Otherwise Graphviz must be installed; rendering errors propagate before delivery.
++ """
++ originals=[]
++ if reuse_from is not None:
++  name='PAEA_v0.3_F12_Guide_DAF_Audit_FR.docx' if lang=='fr' else 'PAEA_v0.3_F12_CFO_Audit_Guide_EN.docx'
++  reference=Document(reuse_from/name)
++  for shape in reference.inline_shapes:
++   rid=shape._inline.graphic.graphicData.pic.blipFill.blip.embed
++   originals.append(reference.part.related_parts[rid].blob)
++  if len(originals)!=len(diagram_data(lang)):
++   raise ValueError('Reference must contain exactly the eleven F-12 diagrams')
+  figdir=out/'diagrams'/lang;figdir.mkdir(parents=True,exist_ok=True);pics={}
+  for stem,title,nodes,edges,ordered in diagram_data(lang):
+   lines=['flowchart LR']
+@@ -65,34 +82,57 @@
+   for a,b in edges:dot.append(f'{a} -> {b};')
+   dot.append('}')
+   (figdir/(stem+'.dot')).write_text('\n'.join(dot),encoding='utf8')
+-  png=figdir/(stem+'.png');subprocess.run(['dot','-Tpng','-Gdpi=170',str(figdir/(stem+'.dot')),'-o',str(png)],check=True)
++  png=figdir/(stem+'.png')
++  if originals: png.write_bytes(originals[len(pics)])
++  else: subprocess.run(['dot','-Tpng','-Gdpi=170',str(figdir/(stem+'.dot')),'-o',str(png)],check=True)
+   pics[stem]=(title,png)
+  return pics
+ 
+ def shade(c,clr):
+  el=OxmlElement('w:shd');el.set(qn('w:fill'),clr);c._tc.get_or_add_tcPr().append(el)
+ def setup(d,L):
++ """Set bilingual guide typography and live PAGE / NUMPAGES footer fields.
++
++ Fields are evaluated by Word/LibreOffice during layout, not guessed at build time.
++ No business policy or qualification status is established by this formatting.
++ """
+  sec=d.sections[0];sec.top_margin=Inches(.76);sec.bottom_margin=Inches(.67);sec.left_margin=Inches(.9);sec.right_margin=Inches(.9)
+  normal=d.styles['Normal'];normal.font.name='Cambria';normal.font.size=Pt(10.5);normal.font.color.rgb=RGBColor.from_string(INK);normal.paragraph_format.space_after=Pt(7);normal.paragraph_format.line_spacing=1.18
++ normal.paragraph_format.alignment=WD_ALIGN_PARAGRAPH.LEFT
++ normal.paragraph_format.widow_control=True
+  for n,s,clr in [('Title',24,NAVY),('Heading 1',16,NAVY),('Heading 2',12,TEAL),('Heading 3',10.5,TEAL)]:
+   x=d.styles[n];x.font.name='Aptos Display';x.font.size=Pt(s);x.font.bold=True;x.font.color.rgb=RGBColor.from_string(clr);x.paragraph_format.space_before=Pt(12 if n!='Title' else 3);x.paragraph_format.space_after=Pt(7);x.paragraph_format.keep_with_next=True
+  h=sec.header.paragraphs[0];h.alignment=WD_ALIGN_PARAGRAPH.RIGHT;h.add_run('SWARM  /  PAEA v0.3  ·  '+('FINANCE & AUDIT' if L=='fr' else 'FINANCE & AUDIT')).font.size=Pt(8)
+  f=sec.footer.paragraphs[0];f.alignment=WD_ALIGN_PARAGRAPH.CENTER;f.add_run('PAEA  ·  F-12  |  '+('Scénario de recherche simulé' if L=='fr' else 'Simulated research scenario')).font.size=Pt(8)
++ f.add_run('  |  Page ').font.size=Pt(8)
++ for label,field in [('', 'PAGE'),(' sur ' if L=='fr' else ' of ', 'NUMPAGES')]:
++  f.add_run(label).font.size=Pt(8)
++  element=OxmlElement('w:fldSimple');element.set(qn('w:instr'),field)
++  f._p.append(element)
++ update=OxmlElement('w:updateFields');update.set(qn('w:val'),'true');d.settings.element.append(update)
++ sec.footer_distance=Inches(.3)
+ 
+ def text(d,x):d.add_paragraph(x)
+ def h(d,x,level=1):d.add_heading(x,level)
+ def note(d,title,body,kind='question'):
++ """Keep a short labelled finance callout together on one page.
++
++ kind selects an existing semantic palette; it grants no business authority.
++ """
+  palettes={'question':('E7F1F4',TEAL),'audit':('FCEEE8',RED),'decision':('EAF4EC',GREEN),'example':('FFF5E3',AMBER)};bg,clr=palettes[kind]
+  t=d.add_table(rows=1,cols=1);t.autofit=True;c=t.cell(0,0);shade(c,bg)
++ keep=OxmlElement('w:cantSplit');t.rows[0]._tr.get_or_add_trPr().append(keep)
+  p=c.paragraphs[0];p.paragraph_format.space_after=Pt(4);r=p.add_run(title);r.bold=True;r.font.name='Aptos';r.font.size=Pt(10);r.font.color.rgb=RGBColor.from_string(clr)
+  q=c.add_paragraph(body);q.paragraph_format.space_after=Pt(2);q.paragraph_format.line_spacing=1.15
+  d.add_paragraph().paragraph_format.space_after=Pt(0)
+ def tbl(d,headers,rows):
++ """Add a readable table with repeating headers and unsplit individual rows."""
+  t=d.add_table(rows=1,cols=len(headers));t.autofit=True;t.style='Table Grid';t.alignment=WD_TABLE_ALIGNMENT.CENTER
+  for i,z in enumerate(headers):
+   c=t.rows[0].cells[i];c.text=z;shade(c,NAVY)
+   for p in c.paragraphs:
+    for run in p.runs:run.font.bold=True;run.font.color.rgb=RGBColor(255,255,255);run.font.size=Pt(9)
++ repeat=OxmlElement('w:tblHeader');t.rows[0]._tr.get_or_add_trPr().append(repeat)
+  for j,row in enumerate(rows):
+   cells=t.add_row().cells
+   for i,z in enumerate(row):
+@@ -100,13 +140,22 @@
+    if j%2==1:shade(cells[i],'F2F5F6')
+    for p in cells[i].paragraphs:
+     for run in p.runs:run.font.size=Pt(9)
++ for row in t.rows:
++  keep=OxmlElement('w:cantSplit');row._tr.get_or_add_trPr().append(keep)
+  d.add_paragraph()
+ def code(d,s):
+- p=d.add_paragraph();p.paragraph_format.left_indent=Inches(.18)
++ """Render illustrative code left aligned, retaining explicit line boundaries.
++
++ This is explanatory text, never an executed or interoperable API contract.
++ """
++ p=d.add_paragraph();p.alignment=WD_ALIGN_PARAGRAPH.LEFT;p.paragraph_format.left_indent=Inches(.18)
++ p.paragraph_format.line_spacing=1.0;p.paragraph_format.keep_together=True
+  q=OxmlElement('w:shd');q.set(qn('w:fill'),'EEF3F4');p._p.get_or_add_pPr().append(q)
+  r=p.add_run(s);r.font.name='Consolas';r.font.size=Pt(8)
+ def figure(d,pics,key,caption):
+- _,p=pics[key];x=d.add_paragraph();x.alignment=WD_ALIGN_PARAGRAPH.CENTER;x.paragraph_format.keep_with_next=True;x.add_run().add_picture(str(p),width=Inches(6.62))
++ """Place the unchanged diagram within the actual printable page width."""
++ sec=d.sections[-1];width=sec.page_width-sec.left_margin-sec.right_margin
++ _,p=pics[key];x=d.add_paragraph();x.alignment=WD_ALIGN_PARAGRAPH.CENTER;x.paragraph_format.keep_with_next=True;x.add_run().add_picture(str(p),width=width)
+  c=d.add_paragraph(caption);c.alignment=WD_ALIGN_PARAGRAPH.CENTER;c.style='Caption';c.paragraph_format.space_after=Pt(10)
+ 
+ def chapter(d,L,title_fr,title_en,parts,faq=None,fig=None,pics=None):
+@@ -117,9 +166,21 @@
+   for frq,enq,fra,ena,kind in faq:note(d,tr(L,frq,enq),tr(L,fra,ena),kind)
+ 
+ def build(L,out,pics):
++ """Generate one language edition from synthetic finance content and diagrams.
++
++ Save through a synced adjacent temporary file and atomically replace the DOCX;
++ failures leave any prior document intact. This creates no bank or audit result.
++ """
++ editorial=json.loads(P.with_name('PAEA_F12_editorial.json').read_text(encoding='utf-8'))
++ for key in ('summary','protocol','review'):
++  if not isinstance(editorial.get(key+'_'+L),str) or not editorial[key+'_'+L].strip():
++   raise ValueError('Missing bilingual editorial content: '+key+'_'+L)
+  d=Document();setup(d,L);t=lambda f,e:tr(L,f,e)
+  d.add_heading(t('PAEA v0.3 — F-12 : maîtriser un paiement préparé par des agents','PAEA v0.3 — F-12: Controlling an AI-prepared Payment'),0)
+  text(d,t('Démonstrateur méthodologique destiné aux directions financières, responsables comptables, contrôle interne et audit.','A methodological demonstrator for CFOs, accounting leaders, internal controls and auditors.'))
++ text(d,t('Fabrice Pizzi | Swarm | Révision éditoriale du 30 octobre 2026','Fabrice Pizzi | Swarm | Editorial revision 30 October 2026'))
++ h(d,t('Ce que ce guide propose','What this guide proposes'))
++ text(d,editorial['summary_'+L])
+  note(d,t('Le problème en une phrase','The problem in one sentence'),t('Comment tirer parti d’agents pour préparer des règlements sans leur remettre un accès bancaire qu’ils pourraient détourner, et comment le prouver au DAF ?','How can AI agents help prepare payments without receiving bank authority they could misuse—and how can a CFO verify the result?'),'question')
+  text(d,t('Périmètre : fournisseur fictif S01 / FOURN-883, facture F-12 / FAC-2026-0147, montant TTC illustratif 4 200,00 € (420 000 centimes). Les politiques, seuils, documents, journaux et transactions sont synthétiques. Aucun paiement ni audit de production n’a eu lieu.','Scope: fictional supplier S01 / FOURN-883, invoice F-12 / FAC-2026-0147, illustrative gross amount EUR 4,200.00 (420,000 euro cents). Policies, thresholds, documents, logs and transactions are synthetic. No live payment or production audit has taken place.'))
+  h(d,t('Mode d’emploi pour le lecteur','How to use this guide'),1)
+@@ -218,7 +279,8 @@
+  (t('Reçu bancaire et registre d’effet','Bank receipt and effect ledger'),t('Service bancaire fictif','Simulated bank'),t('Engagement / absence constatée selon oracle','Observed effect or non-effect within oracle scope')),
+  (t('Écriture et rapprochement','Journal and reconciliation'),t('Comptabilité / trésorerie','Accounting / treasury'),t('Dette soldée selon pièces et politique','Liability cleared under supporting evidence'))])
+  note(d,t('Attention audit — Un SHA-256 n’est pas un certificat de vérité','Audit concern — SHA-256 is not a truth certificate'),t('Une empreinte lie des octets à une version. Si l’auteur peut réécrire à la fois le fichier et son empreinte, elle ne garantit pas l’intégrité du dossier. Il faut contrôler la chaîne de confiance, les accès, les signatures ou ancrages indépendants selon le modèle de menace.','A hash binds bytes to a version. If an actor can rewrite both the data and its digest, it cannot secure the audit trail. The trust chain, access controls, signatures or independent anchors must be evaluated against the threat model.'),'audit')
+- h(d,t('12. Comment tester : cinq recettes explicitées','12. How to test: five fully specified experiments'))
++ h(d,t('12. Comment tester : cinq scénarios à rendre reproductibles','12. How to test: five scenarios to make reproducible'))
++ text(d,t('Ces scénarios définissent des contrôles attendus. Ils ne constituent ni une recette exécutable complète ni des résultats obtenus. L’annexe D précise les pièces et le témoin légitime à préparer avant toute injection.','These scenarios define expected checks. They are neither a complete executable recipe nor obtained results. Appendix D specifies the records and legitimate control to prepare before any fault injection.'))
+  text(d,t('Le laboratoire utilise uniquement un service bancaire fictif et un grand livre synthétique, séparés du contrôleur. Une recette est réussie lorsque l’oracle du service constate le bon résultat, et non lorsque l’agent annonce « refusé ». Les attaques sont injectées sur une version, des données et une politique figées ; les preuves d’échec sont conservées.','The laboratory uses only a simulated bank and synthetic ledger, independent from the controller. A test passes when the effect oracle observes the intended state, not when the agent merely reports “denied”. Attacks are injected against pinned versions, data and policy; failures and counterexamples are retained.'))
+  experiments=[
+  ('R1 — PDF avec IBAN trompeur','R1 — PDF with malicious account details','Injecter un IBAN non référencé dans F-12 et une instruction de contournement dans le texte.','Inject a non-approved account and a bypass instruction into F-12.','Intention vers l’IBAN non approuvé rejetée ; aucun effet bancaire.','Non-approved payee request rejected; zero bank effects.'),
+@@ -261,7 +323,7 @@
+  (t('Processus et périmètre','Process and scope'),t('Fournisseurs / entités / banques / canaux autorisés','Suppliers / entities / banks / permitted channels')),
+  (t('Actifs et conséquences','Assets and consequences'),t('Montant maximal, cumul, confidentialité, délais, réversibilité','Maximum amount, cumulative effect, secrecy, timing, reversibility')),
+  (t('Responsabilités','Owners'),t('Propriétaire métier, approbateur, RSSI, audit, support','Business owner, approver, security, audit, support')),
+- (t('Contrôles réels','Actual controls'),t('Identités, politiques, isolations, connecteur, preuve bancaires','Identities, policies, sandbox, connector, bank evidence')),
++ (t('Contrôles réels','Actual controls'),t('Identités, politiques, isolations, connecteur, preuves bancaires','Identities, policies, sandbox, connector, bank evidence')),
+  (t('Exceptions ouvertes','Open exceptions'),t('Changement d’IBAN, frais, avoir, litige, urgence','Bank detail change, fees, credit note, dispute, urgency')),
+  (t('Tests et couverture','Tests and coverage'),t('R1 à R5, chemins additionnels, résultat service','R1–R5, additional paths, service-side results')),
+  (t('Performance et coût','Performance and cost'),t('Temps, incidents, faux refus, coût facture','Time, incidents, false denials, per-invoice cost')),
+@@ -317,19 +379,43 @@
+  (t('Pas de contournement','No bypass'),t('Inventaire réseau, fichiers et outils + tests','Inventory of network/files/tools + trials'),t('Scénario à tester','Scenario to test')),
+  (t('Aucun doublon','No duplicate'),t('Grand livre du sink, après panne et reprise','Sink ledger after fault and recovery'),t('Scénario à tester','Scenario to test')),
+  (t('Rapprochement','Reconciliation'),t('Reçu, écriture, résultat de rapprochement','Receipt, journal and reconciliation result'),t('Scénario à tester','Scenario to test'))])
++ h(d,t('Annexe D — Protocole de reproduction et revue experte','Appendix D — Reproduction protocol and expert review'))
++ text(d,editorial['protocol_'+L])
++ tbl(d,[t('Niveau de preuve','Evidence status'),t('Pièces nécessaires pour conclure','Records needed to support a conclusion')],[
++  (t('Méthode proposée','Proposed method'),t('Contrats, hypothèses, invariants et limites explicités','Explicit contracts, assumptions, invariants and limits')),
++  (t('Scénario F-12 illustratif','Illustrative F-12 scenario'),t('Données fictives de ce guide ; aucun résultat bancaire observé','Synthetic data in this guide; no observed banking result')),
++  (t('Vérification locale Swarm','Local Swarm verification'),t('Version, profil, recette, entrées et résultats exacts à joindre pour chaque propriété revendiquée','Attach exact version, profile, recipe, inputs and results for each claimed property')),
++  (t('Évaluation indépendante','Independent evaluation'),t('Évaluateur distinct, protocole, contre-exemples et verdict à fournir ; ce guide ne les établit pas','Provide separate evaluator, protocol, counterexamples and verdict; this guide does not establish them')),
++  (t('Usage en production','Production use'),t('Décision métier et qualification du connecteur et du service bancaire réels à fournir','Provide business decision and qualification of the actual connector and banking service'))])
++ h(d,t('Questions ouvertes aux experts','Questions for expert reviewers'),2)
++ text(d,editorial['review_'+L])
++ h(d,t('Sources pour situer la contribution','Sources for positioning the contribution'),2)
++ text(d,t('PAEA propose de relier les contrôles à la conséquence métier et à sa preuve. ACS décrit un protocole de contrôle et de traçabilité ; CaMeL étudie la séparation des flux de contrôle et des données non fiables. Une comparaison détaillée reste nécessaire pour établir la contribution propre de PAEA.','PAEA proposes linking controls to business consequences and evidence. ACS describes a control and traceability protocol; CaMeL studies separation of control flows from untrusted data. A detailed comparison is still required to establish PAEA’s specific contribution.'))
++ text(d,'Agent Control Standard (ACS): https://genai-security-project.github.io/agent-control-standard/docs/acs/')
++ text(d,'Debenedetti et al., Defeating Prompt Injections by Design (CaMeL): https://arxiv.org/abs/2503.18813')
+  h(d,t('Conclusion : ce qu’un DAF peut décider','Conclusion: what a CFO can decide'))
+  text(d,t('PAEA n’apporte pas une certification du paiement. Il propose une méthode vérifiable pour éviter que la liberté de raisonnement des agents devienne une liberté d’engagement. Dans le cas F-12, le décideur peut juger la justification de la dette, l’identité des approbateurs, la protection des secrets, la maîtrise du dernier commit, le rapprochement comptable et le coût réel du contrôle. Si l’un de ces points reste sans preuve, l’autonomie critique demeure hors périmètre.','PAEA does not certify payments. It proposes a verifiable method to ensure agent freedom to reason does not become unchecked authority to commit. In F-12, finance decision-makers can examine debt substantiation, approver identity, secret protection, last-commit gating, accounting reconciliation and actual cost. If a necessary property lacks evidence, critical autonomous execution remains out of scope.'))
+- dest=out/('PAEA_v0.3_F12_Guide_DAF_Audit_FR.docx' if L=='fr' else 'PAEA_v0.3_F12_CFO_Audit_Guide_EN.docx');d.save(dest);return dest
++ dest=out/('PAEA_v0.3_F12_Guide_DAF_Audit_FR.docx' if L=='fr' else 'PAEA_v0.3_F12_CFO_Audit_Guide_EN.docx')
++ fd,name=tempfile.mkstemp(dir=out,suffix='.docx')
++ try:
++  with os.fdopen(fd,'wb') as stream:
++   d.save(stream);stream.flush();os.fsync(stream.fileno())
++  os.replace(name,dest)
++ finally:
++  if os.path.exists(name):os.unlink(name)
++ return dest
+ 
+ def main():
+- parser=argparse.ArgumentParser();parser.add_argument('--out',default='output');args=parser.parse_args();out=Path(args.out).resolve();out.mkdir(exist_ok=True,parents=True)
++ """Build both editions and their kits; propagate invalid inputs or IO failures."""
++ parser=argparse.ArgumentParser();parser.add_argument('--out',default='output');parser.add_argument('--reuse-diagrams-from',type=Path,help='Directory holding original FR/EN DOCX; preserve all eleven embedded diagrams instead of requiring Graphviz');args=parser.parse_args();out=Path(args.out).resolve();out.mkdir(exist_ok=True,parents=True)
+  for lang in ['fr','en']:
+-  diagrams=draw(out,lang);build(lang,out,diagrams)
++  diagrams=draw(out,lang,args.reuse_diagrams_from);build(lang,out,diagrams)
+  with zipfile.ZipFile(out/'PAEA_v0.3_F12_Mermaid_FR_EN.zip','w',zipfile.ZIP_DEFLATED) as z:
+   for p in (out/'diagrams').rglob('*.mmd'):z.write(p,p.relative_to(out))
+  with zipfile.ZipFile(out/'PAEA_v0.3_F12_Full_Kit_FR_EN.zip','w',zipfile.ZIP_DEFLATED) as z:
+   for p in out.glob('*.docx'):z.write(p,p.name)
+   z.write(P,P.name)
++  z.write(P.with_name('PAEA_F12_editorial.json'),'PAEA_F12_editorial.json')
+   for p in (out/'diagrams').rglob('*.mmd'):z.write(p,p.relative_to(out))
+   for p in (out/'diagrams').rglob('*.png'):z.write(p,p.relative_to(out))
+  print('CREATED',*[str(p) for p in out.glob('*') if p.is_file()],sep='\n')

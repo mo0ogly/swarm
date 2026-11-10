@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "pause-diagnose-final-resolution-7c2937771c1240ca",
+  "expected_revision": 223,
+  "reason": "Diagnostic récursif : les constats version2 passent, mais une résolution finale cite une preuve refusée. Le contre-exemple exact doit être isolé avant une nouvelle dépense ; conserver toutes les réponses, réservations et consommations. Suspension temporaire des départs pendant correction, aucun verdict implicite."
+}

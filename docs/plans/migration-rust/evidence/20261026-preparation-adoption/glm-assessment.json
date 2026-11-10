@@ -1,0 +1,28 @@
+{
+  "model_requested": "glm-5.2",
+  "model_reported": "glm-5.2",
+  "usage": {
+    "completion_tokens": 51837,
+    "prompt_tokens": 14761,
+    "total_tokens": 66598,
+    "completion_tokens_details": {
+      "reasoning_tokens": 49605,
+      "text_tokens": 2232
+    }
+  },
+  "static_only": true,
+  "accepted": [
+    "D1 Box copy already reproduced/fixed by compiler before review arrival",
+    "SDK receipt rollback/recovery test integrated, augmented with valid actual adoption then new brief before trigger"
+  ],
+  "resolved": [
+    "44 public cases demonstrate CLI/HTTP mapping and protected reachability",
+    "Go re-adoption increments revision after CAS; receipt replay is separate",
+    "Go nonnil decisions empty array refused; dev82 guard retained",
+    "Write policy v42 validated by prior upgrade recipe; historical read-model fixture schema41 is not current default",
+    "Shared Go trim-space helper exercised with Unicode-space public refusal"
+  ],
+  "missing_evidence": [
+    "Independent runtime acceptance and global migration conformance remain unestablished"
+  ]
+}

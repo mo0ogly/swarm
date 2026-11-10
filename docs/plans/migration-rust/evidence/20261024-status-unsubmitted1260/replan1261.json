@@ -1,0 +1,9 @@
+{
+  "cause": "GLM4000 output exhausted:2923 reasoning +1077 text, length; full context38729 prompt tokens",
+  "original": "glm/result.json",
+  "decision": "No automatic retry or allocation increase; replace broad patch task with <=350-word selection/error audit and ~200-line context",
+  "model_user": "GLM5.3",
+  "api_model": "glm-5.2",
+  "owner": "Codex",
+  "remaining": "Root must implement and test real CLI/HTTP status; partial pseudo-patch skips errors and is rejected"
+}

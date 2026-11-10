@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "biba-controls-planning",
+  "expected_revision": 23,
+  "reason": "Authorize only manual control of retained fixture reports"
+}

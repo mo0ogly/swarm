@@ -1,0 +1,7 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: source text focus survives refresh\n\nfalse !== true\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/dense_text_ui.cjs:53:10",
+  "checks": [],
+  "errors": [],
+  "httpErrors": [],
+  "root": "/tmp/swarm-dense-reading-8z9YHE"
+}

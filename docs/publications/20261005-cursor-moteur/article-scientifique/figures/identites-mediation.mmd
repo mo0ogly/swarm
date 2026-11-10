@@ -1,0 +1,22 @@
+flowchart TB
+  subgraph autorite["Contrôle IA2 cible"]
+    H["Humain authentifié<br/>objectif, mandat, exception exacte"]
+    R["Identités et délégations<br/>politique, plan et révocations versionnés"]
+    M["Moniteur déterministe<br/>vérifier identité, instance, droits et fraîcheur<br/>réserver et appliquer la décision autorisée"]
+    J["Journal et reçus<br/>décision liée à la proposition<br/>effet observé ou incertain"]
+    H --> R
+    R --> M
+    M --> J
+  end
+  subgraph agents["Fournisseurs"]
+    P["Planificateur / superviseur<br/>décision dans son mandat"]
+    W["Instance agent confinée<br/>raisonnement et propositions"]
+    P -->|"proposition de création / reprise"| M
+    W -->|"enfant, outil, mémoire, effet"| M
+  end
+  M -->|"admission avant tout exécutable concerné"| W
+  M -->|"capacité limitée et liée à l'instance"| E["Point d'application protégé<br/>lancement / mémoire / outil / effet"]
+  E --> S["Ressources et systèmes métier"]
+  E -->|"résultat constaté"| J
+  J -->|"incident et preuves"| P
+  W -. "accès direct à retirer et tester" .-> S

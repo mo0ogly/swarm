@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "type": "KeyboardInterrupt",
+  "reason": "",
+  "scope": "Build unqualified; inspect original Cargo channels",
+  "global_watchdog": null
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueBoundaryHasDurableStateBeforeHeartbeat|TestDialoguePendingBoundaryHasDurableUsage)$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "started_at_utc": "2026-10-16T11:52:34.417285+00:00",
+  "elapsed_seconds": 25.95311322300404,
+  "exit_code": 1,
+  "log_sha256": "9d12c61cb2ce72757660ead2a4b38ed102b18a42b5b3b498228f0f52fa081a6f",
+  "test_source_sha256": "037174b4fb6c3debd459879b954783acf68a3f5765297963f5b98066bda3c9cf",
+  "real_model_calls": 0
+}

@@ -1,0 +1,6 @@
+{
+  "at": "2026-10-11T18:47:56.346470+00:00",
+  "observed": "Generated packaging helper globally renamed the old84source receipt reference to the not-yet-created89output receipt; failed before creating any bundle.",
+  "correction": "Bind the source explicitly to existing verified84receipt and output to fresh89receipt; all original-byte/hash checks remain mandatory.",
+  "scope": "Operator packaging only, no native mutation."
+}

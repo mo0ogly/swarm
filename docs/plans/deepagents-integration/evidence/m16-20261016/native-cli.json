@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "python3",
+    "tests/worker_recovery_projection.py",
+    "/tmp/swarm-m16-bin-xz0f58zo/swarm",
+    "docs/plans/deepagents-integration/evidence/m16-20261016/native-cli"
+  ],
+  "started_at_utc": "2026-10-16T19:21:49.495134+00:00",
+  "duration_seconds": 1.639,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "e968502b2b39d1c87762409b074b89eb0c2d8dbcc25b151ab72f44ee28c215d3",
+  "real_model_calls": 0
+}

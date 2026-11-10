@@ -1,0 +1,14 @@
+{
+  "command": [
+    "rg",
+    "-n",
+    "\"swarm.local/companion/internal/enrollmentconfig\"",
+    "--glob",
+    "*.go",
+    "cmd",
+    "internal"
+  ],
+  "exit": 1,
+  "imports": [],
+  "scope": "Repository cmd/internal Go sources"
+}

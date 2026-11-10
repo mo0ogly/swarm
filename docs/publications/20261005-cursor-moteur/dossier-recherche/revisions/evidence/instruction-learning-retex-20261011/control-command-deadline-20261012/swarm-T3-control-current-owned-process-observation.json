@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-12T14:35:15.964637+00:00",
+  "service": 3975914,
+  "descendants": [
+    {
+      "pid": 4055065,
+      "ppid": 3975914,
+      "name": "go",
+      "state": "S",
+      "rss_pages": 3339
+    },
+    {
+      "pid": 4056913,
+      "ppid": 4055065,
+      "name": "engine.test",
+      "state": "S",
+      "rss_pages": 9391
+    }
+  ],
+  "scope": "Process names/parents/states only; no private log, environment, command arguments or database."
+}

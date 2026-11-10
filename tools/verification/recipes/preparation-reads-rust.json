@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "preparation-reads-rust",
+  "inputs": [
+    ".claude/commands/ks-feature.md",
+    ".claude/commands/ks-plan.md",
+    ".claude/skills/apex/SKILL.md",
+    ".claude/skills/audit-pdca/SKILL.md",
+    ".claude/skills/debug/SKILL.md",
+    ".claude/skills/product-delivery/SKILL.md",
+    ".claude/skills/product-planning/SKILL.md",
+    ".claude/skills/product-review/SKILL.md",
+    "docs/RUNTIME-RECOVERY.md",
+    "docs/architecture/RUST-MIGRATION.md",
+    "docs/en/RUNTIME-RECOVERY.md",
+    "docs/en/RUST-MIGRATION.md",
+    "frontend/engine-settings/admin.js",
+    "locales/en.json",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-engine/config/engine-settings*.json",
+    "rust/crates/swarm-engine/src/agent_storage_retry.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/engine_settings_catalog.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/preparation_models.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_*.rs",
+    "rust/crates/swarm-engine/tests/engine_settings_catalog.rs",
+    "rust/crates/swarm-engine/tests/settings_evolution.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "tests/helpers/engine_settings_admin_state.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_preparation*.py",
+    "tests/rust_preparation_admin_ui.cjs",
+    "tools/agent-workflows/CONTRACT.md",
+    "version_history.json",
+    "web/i18n-en.js"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "preparation-public-read-and-admin",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-reads-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_reads.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_REPLAY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_READS_PASS",
+        "PREPARATION_REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

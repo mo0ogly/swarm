@@ -1,0 +1,57 @@
+Proposal (integrable snippet, not executed; based on supplied `rust_planning_worker_public_flow.flow` actual API — no other evidence of a `planning.pause`-named knob exists in the shown sources, so pause is asserted via the work DTO as in the web conductor context).
+
+```python
+#!/usr/bin/env python3
+"""Two planned tasks, child_task_budget=2, before_worker=True, shared workspace."""
+import argparse
+from pathlib import Path
+import rust_agent_model_route as fixture
+import rust_planning_worker_public_flow as planning
+
+
+def run(binary, profile, out):
+    """Setup only: READY state with two explicitly budgeted child tasks, no worker."""
+    qualified = json.loads(profile.read_bytes())
+    assert qualified['no_fixture_feature'] and fixture.digest(binary.read_bytes()) == qualified['sha256']
+    ready, owned = planning.flow(
+        binary, out / 'planning',
+        before_worker=True, return_fixture=True,
+        child_task_budget=2,            # explicit delegate-proposal fixture value
+        extra_worker=True,              # second task under the same explicit budget
+        fixture_files=(('shared-workspace.json', dict(workspace='watch-worker', shared=True)),),
+        control_inputs=['handoff.md'],
+    )
+    assert ready['status'] == 'READY_FOR_NATIVE_WORKER' and not ready['worker_started']
+    work = owned.ok(['work', 'show', owned.work])['work']
+    child = next(s for s in work['planning']['scopes'] if s['id'] == 'child')
+    assert child['parent'] == 'root'
+    ids = [t['id'] for t in work['tasks']]
+    assert ids == ['task', 'task-2'], ids
+    assert all(t['plan_role'] == 'worker' and t['scope_id'] == 'child' for t in work['tasks'])
+    assert not (owned.root / 'model-received.json').exists()   # no manual prepare/start
+    pause_event = next(e for e in work['planning']['inbox'] if e['kind'] == 'pause')
+    assert pause_event['scope'] == 'child' and pause_event['decision']
+    fixture.publish(out / 'result.json', dict(
+        status='READY_FOR_NATIVE_WORKER', root=str(owned.root), work_id=owned.work,
+        revision=work['revision'], tasks=ids, child_task_budget=2,
+        before_worker=True, shared_workspace=True, planning_pause_observed=True,
+        worker_started=False, accepted=False, paid_provider=False, installed=False,
+        global_watchdog=None))
+    print('TWO_TASK_SETUP_READY', flush=True)
+    return ready
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    for name in ['binary', 'profile', 'output']:
+        p.add_argument('--' + name, type=Path, required=True)
+    a = p.parse_args()
+    run(a.binary.resolve(), a.profile.resolve(), a.output.resolve())
+
+
+if __name__ == '__main__':
+    import json
+    main()
+```
+
+Missing evidence stated: no supplied source shows a `['planning','pause']` CLI verb; the pause event shape (`e['kind']=='pause'`) is inferred from `rust_native_http_cli`-adjacent usage and `flow`'s pending-event selection, and must be confirmed against the engine before integration. No tests were run; acceptance of this proposal is not claimed.

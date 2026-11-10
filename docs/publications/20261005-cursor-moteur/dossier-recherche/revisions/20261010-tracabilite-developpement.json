@@ -1,0 +1,584 @@
+{
+  "schema_version": 1,
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "observed_at": "2026-10-10T19:29:47.505660+00:00",
+  "decision": "Utiliser l’analyse de traçabilité pour préciser les critères et preuves des lots existants",
+  "sources": [
+    {
+      "path": "docs/architecture/TRACEABILITY.md",
+      "sha256": "a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c"
+    },
+    {
+      "path": "docs/en/TRACEABILITY.md",
+      "sha256": "7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a"
+    },
+    {
+      "path": "docs/architecture/AGENT-PARALLELISM.md",
+      "sha256": "c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d"
+    },
+    {
+      "path": "docs/en/AGENT-PARALLELISM.md",
+      "sha256": "83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40"
+    },
+    {
+      "path": "tools/agent-workflows/CONTRACT.md",
+      "sha256": "85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b"
+    },
+    {
+      "path": "tools/agent-workflows/templates/HANDOFF.md",
+      "sha256": "e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2"
+    }
+  ],
+  "events": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "event_id": "traceability-development-b00ac913c84448d79fb54e713e6816c1",
+      "operation": "task update",
+      "before_revision": 65,
+      "after_revision": 66,
+      "fields_changed": [
+        "next"
+      ],
+      "instructions": "Précision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-2/TR-3/TR-4 : fournir aux responsables un inventaire attribué des preuves reçues/manquantes ; relier découvertes et décisions au propriétaire, périmètre et révision. Vérifier deux périmètres concurrents, décisions atomiques, refus de révision périmée, persistance et réservations sans effets doubles. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.",
+      "observed_at": "2026-10-10T19:29:48.140084+00:00"
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "event_id": "traceability-development-01ffa8758ca64acda4593b0dde24b211",
+      "operation": "task update",
+      "before_revision": 66,
+      "after_revision": 67,
+      "fields_changed": [
+        "next"
+      ],
+      "instructions": "Précision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-1/TR-3/TR-4/TR-5 : relier les remises et exécutions à mission/tâche/tentative/agent/candidat, arguments, dates, codes et originaux. Deux remises concurrentes restent attribuées à leurs propriétaires. Même candidat pour contrôles/revue/publication ; reprise publique après correction identifiée, refus et consommations conservés. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.",
+      "observed_at": "2026-10-10T19:29:48.737649+00:00"
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "event_id": "traceability-development-352eb19ced204938985631a4f0026d57",
+      "operation": "task update",
+      "before_revision": 67,
+      "after_revision": 68,
+      "fields_changed": [
+        "next"
+      ],
+      "instructions": "Précision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-2/TR-5 : intégrer les consignes communes et le modèle de remise actualisés dans votre candidat, en fusionnant les évolutions précédentes. Distinguer traces locales, reçus contrôleur et verdict indépendant ; diagnostic du sous-superviseur dans son périmètre, arbitrage racine entre périmètres. API/CLI/Admin FR/EN, provenance et persistance pour toute nouvelle politique ; aucune constante de politique arbitraire. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.",
+      "observed_at": "2026-10-10T19:29:49.476533+00:00"
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "event_id": "traceability-development-aedebd9dce764a3e938f224dc3b610a1",
+      "operation": "task update",
+      "before_revision": 68,
+      "after_revision": 69,
+      "fields_changed": [
+        "next"
+      ],
+      "instructions": "Précision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-1/TR-6 : mesurer couverture des exécutions et sources, inconnus, attribution, reprises, attente centrale et coût connu/inconnu. Garder arguments exacts, candidat, exécutant, dates, stdout/stderr, codes et empreintes. Séparer tests avec doubles, fournisseur réel et intervention opérateur. Une commande annoncée sans original ne suffit pas. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.",
+      "observed_at": "2026-10-10T19:29:50.129036+00:00"
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "event_id": "traceability-development-1182c835c4a14610bf05ad2a88f8a4d4",
+      "operation": "task update",
+      "before_revision": 69,
+      "after_revision": 70,
+      "fields_changed": [
+        "next"
+      ],
+      "instructions": "Précision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-6 : vérifier indépendamment les preuves du candidat exact et l’usage réel des remises et diagnostics par les sous-superviseurs/racine. Distinguer mécanisme disponible et parcours observé, traces locales et reçus du moteur. Tester la concurrence réelle avec identités et événements ; ne pas déclarer une autonomie à partir de documentation ou de fixtures. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.",
+      "observed_at": "2026-10-10T19:29:50.734329+00:00"
+    }
+  ],
+  "contracts_changed": false,
+  "dependencies_changed": false,
+  "budgets_changed": false,
+  "autonomous_replanning_demonstrated": false,
+  "documentation_verification": {
+    "diagrams": 12,
+    "languages": [
+      "fr",
+      "en"
+    ],
+    "parser_and_svg_render": "pass",
+    "browser_errors": [],
+    "command": "node /tmp/swarm-traceability-check.cjs",
+    "artifact": "/tmp/swarm-traceability-mermaid-check.json",
+    "local_links": "pass",
+    "diff_check": "pass"
+  },
+  "local_execution_status": "targeted judge tests passed; complete suite interrupted without final result; host operator, not controller receipt",
+  "local_judge_execution": {
+    "schema_version": 1,
+    "executor": "host operator; isolated clone; NOT engine receipt",
+    "candidate": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
+    "command": [
+      "go",
+      "test",
+      "./internal/engine",
+      "-run",
+      "^Test(Judge|ConfigureJudge)",
+      "-json",
+      "-count=1",
+      "-timeout",
+      "60s"
+    ],
+    "started_at": "2026-10-10T19:28:49.550427+00:00",
+    "finished_at": "2026-10-10T19:29:06.521421+00:00",
+    "exit_code": 0,
+    "artifacts": [
+      {
+        "path": "/tmp/swarm-T2-traceability-c1hvvch0/judge-tests.jsonl",
+        "bytes": 13181,
+        "sha256": "1d7a3e77b4b20f1542224c50d4264a1daef0b970612815367d9cbd0020c0d362"
+      },
+      {
+        "path": "/tmp/swarm-T2-traceability-c1hvvch0/judge-tests.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "versioned_artifacts": [
+      {
+        "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-T2-traceability/judge-tests.jsonl",
+        "sha256": "1d7a3e77b4b20f1542224c50d4264a1daef0b970612815367d9cbd0020c0d362",
+        "bytes": 13181
+      },
+      {
+        "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-T2-traceability/judge-tests.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    ],
+    "counts": {
+      "top_level": {
+        "pass": 6
+      },
+      "including_subtests": {
+        "pass": 13
+      }
+    },
+    "environment_observed_after_execution": {
+      "go_version": "go version go1.24.3 linux/amd64",
+      "go_env": [
+        "linux",
+        "amd64",
+        "1"
+      ]
+    }
+  },
+  "producer_public_activity": {
+    "operation": "agent logs",
+    "agent": "auto-0f7f61a183068fd63528",
+    "full_export": {
+      "path": "/tmp/swarm-T2-producer-logs.jsonl",
+      "bytes": 44334,
+      "sha256": "f47a8a02fab527b9be206c5823c8a36700abdfb560d7ed7ee8a18b07b6b766d0"
+    },
+    "retained_excerpt": {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-T2-traceability/producer-activity-excerpt.jsonl",
+      "sequences": [
+        104945,
+        104952,
+        104954,
+        104968,
+        105111,
+        105295,
+        105301
+      ],
+      "bytes": 1962,
+      "sha256": "4532f2416cf8861d300b7a3cc4b33e2cd51f5da13feb928aa12d401f3a5d959f"
+    },
+    "limit": "Activity announcements and tool-result counters; no original stdout/stderr or Go process exit code in these events",
+    "original_execution_success_verified": false
+  },
+  "complete_suite_observation": {
+    "schema_version": 1,
+    "observation_kind": "host operator report of interrupted execution; not subprocess completion metadata",
+    "candidate": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
+    "command": [
+      "go",
+      "test",
+      "./...",
+      "-json",
+      "-count=1",
+      "-timeout",
+      "15m"
+    ],
+    "observed_at": "2026-10-10T19:33:28.786275+00:00",
+    "runner_exit_code": 143,
+    "go_exit_code": null,
+    "completion_metadata_present": false,
+    "complete": false,
+    "cause": "unknown; last started test is correlation, not attribution",
+    "first_output_event_at": "2026-10-10T21:24:15.984876808+02:00",
+    "last_output_event_at": "2026-10-10T21:32:16.190025194+02:00",
+    "last_started_test": "TestSupervisionR3TotalTimeoutStillBoundsSilence",
+    "partial_top_level_outcomes": {
+      "pass": 979,
+      "skip": 8,
+      "fail": 1
+    },
+    "partial_outcomes_including_subtests": {
+      "pass": 1667,
+      "skip": 8,
+      "fail": 1
+    },
+    "failed_tests": [
+      "TestGraphDeliveryD03QualificationManifest"
+    ],
+    "artifacts": [
+      {
+        "path": "/tmp/swarm-T2-traceability-c1hvvch0/go-suite-corrected.jsonl",
+        "bytes": 1533239,
+        "sha256": "ab5489dcc72feb6c707cf948c11fe35e9aba90c9ae8eff470d54020a35c43242",
+        "versioned": false
+      },
+      {
+        "path": "/tmp/swarm-T2-traceability-c1hvvch0/go-suite-corrected.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "versioned": false
+      }
+    ]
+  },
+  "interruption_diagnostic": {
+    "schema_version": 1,
+    "executor": "host operator; isolated clone; NOT engine receipt",
+    "candidate": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
+    "command": [
+      "go",
+      "test",
+      "./internal/engine",
+      "-run",
+      "^TestSupervisionR3TotalTimeoutStillBoundsSilence$",
+      "-json",
+      "-count=1",
+      "-timeout",
+      "20s"
+    ],
+    "started_at": "2026-10-10T19:33:11.394910+00:00",
+    "finished_at": "2026-10-10T19:33:14.826815+00:00",
+    "exit_code": 0,
+    "changed_precondition": "Restricted to last started test; child Go process in separate session; no full-suite retry",
+    "artifacts": [
+      {
+        "path": "/tmp/swarm-T2-traceability-c1hvvch0/interruption-diagnostic.jsonl",
+        "bytes": 1414,
+        "sha256": "241cdff3c43f5c580a2f7fb7083f0dd98a3ea901bd780137e824e57e58451876"
+      },
+      {
+        "path": "/tmp/swarm-T2-traceability-c1hvvch0/interruption-diagnostic.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "T2_evidence_handoff": {
+    "task": "plan-ca937edf4e-T2",
+    "event_id": "traceability-T2-evidence-f4dfbb8fc1864d2cb03f25ec936d7507",
+    "before_revision": 70,
+    "after_revision": 71,
+    "operation": "task update",
+    "fields_changed": [
+      "next"
+    ],
+    "sources": [
+      {
+        "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-T2-traceability/judge-execution.json",
+        "sha256": "5c4e34f1ad35cd1f86f307f317b098150af097f8e4f14eb6c5562fb54d682884"
+      },
+      {
+        "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-T2-traceability/judge-tests.jsonl",
+        "sha256": "1d7a3e77b4b20f1542224c50d4264a1daef0b970612815367d9cbd0020c0d362"
+      },
+      {
+        "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-T2-traceability/judge-tests.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "instructions": "Précision opérateur traçabilité du 10 octobre 2026 : reproduction locale ciblée terminée sur candidat a27e175eb4f3e38f9cede1c888956a5ca5a0310f : go test ./internal/engine -run ^Test(Judge|ConfigureJudge) -json -count=1 -timeout 60s, exit 0, six tests de premier niveau et 13 PASS avec sous-cas. Originaux conservés dans le dépôt source /home/fpizzi/workspace/swarm : docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-T2-traceability/judge-execution.json SHA256 5c4e34f1ad35cd1f86f307f317b098150af097f8e4f14eb6c5562fb54d682884, docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-T2-traceability/judge-tests.jsonl SHA256 1d7a3e77b4b20f1542224c50d4264a1daef0b970612815367d9cbd0020c0d362, docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-T2-traceability/judge-tests.stderr SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855. Origine opérateur en clone isolé, pas reçu moteur ni acceptation. La suite complète go test ./... -json -count=1 -timeout 15m a été interrompue avec code lanceur 143 et code Go inconnu ; ne pas déclarer un bilan complet. Le test dernier démarré passe seul en session de processus isolée, cause de l’interruption encore inconnue. Consulter la note et le relevé JSON revisions/20261010-tracabilite-developpement dans le dossier-recherche. Ne pas modifier le candidat ou les preuves pendant la revue active. Après le verdict final, si un manque demeure, choisir la reprise publique correspondant à la cause et joindre les originaux attribués, avec nouveaux contrôles/revue requis ; conserver tentative, consommations et refus. Ces preuves corrigent la précondition documentaire, sans modifier les plafonds.",
+    "observed_at": "2026-10-10T19:34:09.581352+00:00"
+  },
+  "latest_review_state_observed": "running",
+  "solution_updates": [
+    {
+      "observed_at": "2026-10-10T19:53:27.562612+00:00",
+      "diagnosis": [
+        "Prepared repair exceeded source union capacity",
+        "Expanded workflow contract exceeded actual planner/worker context capacity",
+        "Static workflow file checks missed the combined embedded contexts"
+      ],
+      "corrections": [
+        "Reuse engine immutable-source preflight before recovery mutation",
+        "Compact shared contract while retaining obligations",
+        "Run actual embedded role-context test from workflow checker",
+        "Public T2 repair with original attributed judge evidence and partial-suite limits"
+      ],
+      "verification": {
+        "top_level_pass": 22,
+        "including_subtests_pass": 46,
+        "exit_code": 0,
+        "role_context_bytes_including_metadata": {
+          "planner": 32172,
+          "subplanner": 32178,
+          "worker": 31493,
+          "reviewer": 17387
+        },
+        "workflow_contract_bytes": 7202,
+        "mermaid_diagrams_verified": 7,
+        "mermaid_errors": 0
+      },
+      "handoff": {
+        "operation": "task update (next only)",
+        "event_id": "recovery-preflight-development-8a68831bb4a84d1aae25d1594dc2789e",
+        "task": "plan-ca937edf4e-T5",
+        "before_revision": 81,
+        "after_revision": 82,
+        "previous_next_sha256": "1d64b8e4a558c88173ff458ee62ce15476df21aeddeb9645ce57104d5c7a6a86",
+        "new_next_sha256": "b6a91a1da5902ce109a464c236b810c7f3ad2dc2bb35239bbe46443258294072",
+        "prefix": "REPLAN T5 : fusionner recovery-source-preflight-20261010.patch avec les correctifs déjà transmis ; contrôler les sources avant mutation de reprise. Reprendre le CONTRACT.md compact actuel et les méthodes APEX/replan ; check.py vérifie les quatre contextes réels. Régressions : 22 tests / 46 PASS, exit 0, fournisseur simulé. Source : /home/fpizzi/workspace/swarm ; détail et statut dans REVIEW-EVIDENCE.md et la mise à jour de recherche 20261010-tracabilite-developpement.md. Préserver les corrections T1..T4, quotas et historique.\n\n",
+        "prefix_chars": 533,
+        "observed_at": "2026-10-10T19:52:43.096607+00:00",
+        "projection_verification": "prefix present within first 600 characters of public Next; not proof of future model understanding"
+      },
+      "public_recovery": {
+        "schema_version": 1,
+        "observed_at": "2026-10-10T19:53:27.562612+00:00",
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "revision": 82,
+        "operation": "planning revise-recovered-result",
+        "event_id": "T2-traceability-repair-20261010",
+        "original_review": "review-8a5b4d26457e4456353da385",
+        "original_review_outcome": "interrupted provider 429; no semantic final verdict",
+        "repair": {
+          "proof_key": "auto-0f7f61a183068fd63528-repair-7ee30d29ee8d98ec",
+          "replaces_result": "ce754b1814fb922a3baa572a7894ce02bd162f16",
+          "prior_review_id": "review-8a5b4d26457e4456353da385",
+          "event_id": "T2-traceability-repair-20261010",
+          "request_sha256": "7ee30d29ee8d98ec2cad0aaf4a2202a04bf6d50a659a285f027f13f1e1213f71",
+          "agent_id": "auto-0f7f61a183068fd63528",
+          "attempt_id": "a-5fff6319655d0b5b9b34413a",
+          "result_commit": "ccd2f3b902ad132ae34d69db9ecded810df46880",
+          "tree": "4ac77f1d127cf3b410c362201bd6ea2bc971aa44",
+          "actor": "fpizzi/uid:1001",
+          "at": "2026-10-10T19:51:37.140663795Z",
+          "reason": "Correction externe explicite après interruption fournisseur 429, sans prétendre à un refus sémantique : joindre les originaux attribués du rejeu juge (6 tests / 13 PASS, exit 0), les limites de la suite interrompue et une sélection de sources examinable. Code inchangé, tentative et budgets conservés. Les nouveaux contrôles doivent être reçus ; aucune acceptation ni nouvel appel pendant le délai fournisseur.",
+          "original_process_status": "completed"
+        },
+        "controller_candidate": "56ca8cab5bfde7dc9ddf7a7a5d2169231d87c9a9",
+        "controller_receipt": {
+          "path": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-0f7f61a183068fd63528-repair-7ee30d29ee8d98ec/receipt.json",
+          "sha256": "923ade83a2c9a327122b7e509cd7230782b64ca730c1e839fb54b75273cc1604",
+          "controls": [
+            {
+              "task": "plan-ca937edf4e-T1",
+              "total": 7,
+              "passed": 7,
+              "exit_codes": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "task": "plan-ca937edf4e-T2",
+              "total": 7,
+              "passed": 7,
+              "exit_codes": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "sources": [
+          {
+            "path": "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
+            "bytes": 15108,
+            "sha256": "951a18b22de8e1623dd85ff5205baf9acb0b59ee56885cf439bfcea0ba8902e9"
+          },
+          {
+            "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+            "bytes": 10147,
+            "sha256": "8bd4f53d332dbabbec8cdcabbf5fb7a04404cc9c46f47fedaf461ed632d6ca8e"
+          },
+          {
+            "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/index.json",
+            "bytes": 2722,
+            "sha256": "6487308e2087524051871a492d46a4bc82a50cdc76c87c6a59facce120438d22"
+          },
+          {
+            "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/interrupted-suite-observation.json",
+            "bytes": 1462,
+            "sha256": "25cf8923831e309688a9273aeb938b5de2a8bf958a41bb5f111a66a81273300e"
+          },
+          {
+            "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json",
+            "bytes": 840,
+            "sha256": "5c4e34f1ad35cd1f86f307f317b098150af097f8e4f14eb6c5562fb54d682884"
+          },
+          {
+            "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl",
+            "bytes": 13181,
+            "sha256": "1d7a3e77b4b20f1542224c50d4264a1daef0b970612815367d9cbd0020c0d362"
+          },
+          {
+            "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/suite-failure-events.jsonl",
+            "bytes": 1060,
+            "sha256": "cd49e8f8a91dd2dc7f7d5fe9e6205a2b4fbc11c816cc3ca3510accfd5b6cb02c"
+          },
+          {
+            "path": "docs/plans/engine-cursor-contract/evidence/T2-handoff.md",
+            "bytes": 11691,
+            "sha256": "b427660aee05f4509e32219fe9fb3bad9f34c59d5d54cd77e262430bce6deecf"
+          },
+          {
+            "path": "internal/engine/planning.go",
+            "bytes": 40065,
+            "sha256": "247c7456ef6073e26b66ae59fad01c240b3b9c631510ad22c170b544d33966cb"
+          },
+          {
+            "path": "internal/engine/planning_judge.go",
+            "bytes": 7665,
+            "sha256": "02bfd68ac3cb4e9b1845931bdc8e8696723f8ce1e04bda84e994112f43b67dcb"
+          },
+          {
+            "path": "internal/engine/planning_judge_test.go",
+            "bytes": 13972,
+            "sha256": "63c9f4e6ac8d493a634bc8f40785606412c4dd81bbed68632bbe94ff020699d0"
+          }
+        ],
+        "source_code_unchanged": true,
+        "current_review": null,
+        "reviewer_calls": 9,
+        "t2_attempts": 1,
+        "recovery_command_exit": 2,
+        "recovery_command_limit": "State change and candidate controls completed; provider_cooldown prevented the review call; no acceptance",
+        "provider_reset_utc": "2026-10-10T21:20:00Z",
+        "acceptance": "pending independent review",
+        "new_engine_guard_installation": "locally verified; active server still old binary"
+      },
+      "sources": [
+        {
+          "path": "internal/engine/recovered_result.go",
+          "sha256": "440cb0411af7425e74c1fabdaa9a0485c3c770d1ee9349f9df9d9d529d81c541"
+        },
+        {
+          "path": "internal/engine/recovered_result_evidence_test.go",
+          "sha256": "ca6c03b7d3b46e29f1b9bdcabf9ead5770ae69d62ec13db2ea3341a1c3453954"
+        },
+        {
+          "path": "tools/agent-workflows/check.py",
+          "sha256": "5d6f70809aa557abbfd1ebebccc4174c278d27a2efa9d9cc151b77e028066dde"
+        },
+        {
+          "path": "tools/agent-workflows/CONTRACT.md",
+          "sha256": "f12a2638ce18bb513a448f8180e58dfd37d92315078e253b0a4dd655594e7758"
+        },
+        {
+          "path": "docs/architecture/REVIEW-EVIDENCE.md",
+          "sha256": "963d5b259e8719154007d0932cca52780c30e3af818101de7cf5829ebc9b28a9"
+        },
+        {
+          "path": "docs/en/REVIEW-EVIDENCE.md",
+          "sha256": "912bae56a74b84f3909be94d9a69546a3c356702895c1e9fc4d0c4f1ea8391a8"
+        },
+        {
+          "path": "docs/plans/engine-cursor-contract/recovery/recovery-source-preflight-20261010.patch",
+          "sha256": "2e1b60067c37ce64e91a41b1dbe282eac17e0e86c8552e80199a83a13276a78c"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/first-compaction-execution.json",
+          "bytes": 903,
+          "sha256": "266084b5b5e578e8ea362925680dd0570345c1726b519e23778f0731b72f8691"
+        },
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/first-compaction-failed.jsonl",
+          "bytes": 53388,
+          "sha256": "4d0be640afe3a2d6adbe27817daa2aa35d424753fc0e3b83415a2299ed43eacb"
+        },
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/public-recovery-limit.json",
+          "bytes": 470,
+          "sha256": "42cea0531396854e0bd35384d06e3bed6943775d92b4530d1eb27286261d7ebd"
+        },
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/public-recovery-observation.json",
+          "bytes": 5080,
+          "sha256": "0bcdf15f74deb52f6b2f112af3e4b2e095b48ebb15ee76de292be1ae9a047dca"
+        },
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/public-recovery-request.json",
+          "bytes": 842,
+          "sha256": "918a6e99e06424adb59291da3cc1e35cdf59cdebf4d6324794c99b5d95809956"
+        },
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/regressions-after-execution.json",
+          "bytes": 915,
+          "sha256": "1d42edd0271f593ed717b49d4e694c568e25394f308fd76e506de06f398050ac"
+        },
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/regressions-after.jsonl",
+          "bytes": 44068,
+          "sha256": "330da43a5ce1ee9787f0c0ea6e64c506e38c790c6188fa96fa2b247a2ceabdbe"
+        },
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/regressions-after.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/workflow-before.jsonl",
+          "bytes": 5625,
+          "sha256": "c3b451113dd48a0950029c053dd7c2b1d04714e6bb4d1f39a35834e0078de55d"
+        },
+        {
+          "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261010-recovery-capacity/workflow-check.txt",
+          "bytes": 97,
+          "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+        }
+      ]
+    },
+    {
+      "revision": "20261011-agent-engine-protocol",
+      "document": "20261011-agent-engine-protocol.md",
+      "evidence": "evidence/20261011-agent-engine-protocol/verification-index.json",
+      "public_observation": "evidence/20261011-agent-engine-protocol/public-observation.json",
+      "installed": true,
+      "public_review_resumed": true,
+      "native_task_accepted": false,
+      "budgets_changed": false,
+      "original_proof_hashes_preserved": 5,
+      "ui_confirmation_assigned_to": "plan-ca937edf4e-T5"
+    },
+    {
+      "revision": "20261011-agent-engine-protocol-resumption",
+      "document": "20261011-agent-engine-protocol.md",
+      "evidence": "evidence/20261011-repaired-handoff/verification-index.json",
+      "native_worker_state_observed": "running",
+      "native_task_accepted": false,
+      "producer_attempts_used": 2,
+      "producer_attempts_allowed": 2,
+      "budgets_changed": false,
+      "original_prepared_manifest_unchanged": true
+    }
+  ]
+}

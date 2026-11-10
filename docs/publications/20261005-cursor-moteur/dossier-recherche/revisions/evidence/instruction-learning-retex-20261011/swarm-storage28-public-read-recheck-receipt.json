@@ -1,0 +1,41 @@
+{
+  "at": "2026-10-11T17:16:45.882862+00:00",
+  "steps": [
+    {
+      "label": "old_reader",
+      "command": [
+        "/home/fpizzi/workspace/swarm/bin/swarm",
+        "--root",
+        "/tmp/swarm-storage28-public-0uk761nu",
+        "work",
+        "list",
+        "--json"
+      ],
+      "start": "2026-10-11T17:16:45.813757+00:00",
+      "end": "2026-10-11T17:16:45.844617+00:00",
+      "exit": 2,
+      "error": "version de stockage non supportée : 28",
+      "output": "/tmp/swarm-storage28-public-read-recheck-old_reader.json",
+      "output_sha256": "f33f73864aa39237d9cdfff01c1760d95a317bf0337a2efa4766392df5b2b336"
+    },
+    {
+      "label": "new_reader",
+      "command": [
+        "/tmp/swarm-review-retry-storage-candidate",
+        "--root",
+        "/tmp/swarm-storage28-public-0uk761nu",
+        "work",
+        "list",
+        "--json"
+      ],
+      "start": "2026-10-11T17:16:45.844729+00:00",
+      "end": "2026-10-11T17:16:45.882780+00:00",
+      "exit": 0,
+      "error": null,
+      "output": "/tmp/swarm-storage28-public-read-recheck-new_reader.json",
+      "output_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    }
+  ],
+  "why_recheck": "Correct summary helper type handling and directly capture previously unavailable exit codes. Existing isolated28 store, read-only calls, no native state.",
+  "result": "PASS"
+}

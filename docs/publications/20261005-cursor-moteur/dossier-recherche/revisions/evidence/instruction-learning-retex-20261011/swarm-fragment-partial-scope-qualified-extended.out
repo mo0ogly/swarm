@@ -1,0 +1,474 @@
+=== RUN   TestFragmentDiagnosticNeverAcceptsOrRepeatsCall
+    managed_review_diagnostic_test.go:14: sizes 164551 168169 21899 parts 1
+--- PASS: TestFragmentDiagnosticNeverAcceptsOrRepeatsCall (6.00s)
+=== RUN   TestFragmentDiagnosticRejectsUnprovenDefect
+--- PASS: TestFragmentDiagnosticRejectsUnprovenDefect (0.00s)
+=== RUN   TestManagedFragmentBeginNoSpendAndReopen
+    managed_review_fragment_begin_test.go:31: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentBeginNoSpendAndReopen (2.02s)
+=== RUN   TestManagedFragmentBeginRefusalsPreserveWork
+=== RUN   TestManagedFragmentBeginRefusalsPreserveWork/pause
+    managed_review_fragment_begin_test.go:67: sizes 164551 168163 21899 parts 1
+=== RUN   TestManagedFragmentBeginRefusalsPreserveWork/budget
+    managed_review_fragment_begin_test.go:67: sizes 164551 168163 21899 parts 1
+=== RUN   TestManagedFragmentBeginRefusalsPreserveWork/receipt
+    managed_review_fragment_begin_test.go:67: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentBeginRefusalsPreserveWork/path
+    managed_review_fragment_begin_test.go:67: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentBeginRefusalsPreserveWork/attempt
+    managed_review_fragment_begin_test.go:67: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentBeginRefusalsPreserveWork/model
+    managed_review_fragment_begin_test.go:67: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentBeginRefusalsPreserveWork/context
+    managed_review_fragment_begin_test.go:67: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentBeginRefusalsPreserveWork (6.58s)
+    --- PASS: TestManagedFragmentBeginRefusalsPreserveWork/pause (1.40s)
+    --- PASS: TestManagedFragmentBeginRefusalsPreserveWork/budget (1.23s)
+    --- PASS: TestManagedFragmentBeginRefusalsPreserveWork/receipt (1.02s)
+    --- PASS: TestManagedFragmentBeginRefusalsPreserveWork/path (0.66s)
+    --- PASS: TestManagedFragmentBeginRefusalsPreserveWork/attempt (0.82s)
+    --- PASS: TestManagedFragmentBeginRefusalsPreserveWork/model (0.82s)
+    --- PASS: TestManagedFragmentBeginRefusalsPreserveWork/context (0.62s)
+=== RUN   TestManagedFragmentDecisionCapacityBoundsActual
+--- PASS: TestManagedFragmentDecisionCapacityBoundsActual (0.31s)
+=== RUN   TestManagedFragmentFindingSerializedBudget
+--- PASS: TestManagedFragmentFindingSerializedBudget (0.00s)
+=== RUN   TestManagedFragmentDecisionCapacityCoversSerializedLocalDefects
+--- PASS: TestManagedFragmentDecisionCapacityCoversSerializedLocalDefects (0.22s)
+=== RUN   TestManagedFragmentDecisionOnlyVisibleOriginals
+--- PASS: TestManagedFragmentDecisionOnlyVisibleOriginals (0.27s)
+=== RUN   TestManagedFragmentDecisionRefusesIncompleteOrOversized
+--- PASS: TestManagedFragmentDecisionRefusesIncompleteOrOversized (0.25s)
+=== RUN   TestManagedFragmentDecisionRejectsCitationNotPresented
+--- PASS: TestManagedFragmentDecisionRejectsCitationNotPresented (0.34s)
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs/valid
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs/inspection
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs/reply
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs/prompt
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs/call
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs/phase
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs/state
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs/budget
+=== RUN   TestManagedFragmentFinalJournalRechecksProofs/reserved
+--- PASS: TestManagedFragmentFinalJournalRechecksProofs (4.51s)
+    --- PASS: TestManagedFragmentFinalJournalRechecksProofs/valid (0.49s)
+    --- PASS: TestManagedFragmentFinalJournalRechecksProofs/inspection (0.36s)
+    --- PASS: TestManagedFragmentFinalJournalRechecksProofs/reply (0.51s)
+    --- PASS: TestManagedFragmentFinalJournalRechecksProofs/prompt (0.59s)
+    --- PASS: TestManagedFragmentFinalJournalRechecksProofs/call (0.58s)
+    --- PASS: TestManagedFragmentFinalJournalRechecksProofs/phase (0.34s)
+    --- PASS: TestManagedFragmentFinalJournalRechecksProofs/state (0.88s)
+    --- PASS: TestManagedFragmentFinalJournalRechecksProofs/budget (0.36s)
+    --- PASS: TestManagedFragmentFinalJournalRechecksProofs/reserved (0.42s)
+=== RUN   TestManagedFragmentFinalStoreReservationAndReply
+    managed_review_fragment_final_store_test.go:62: sizes 164551 168163 21899 parts 1
+--- PASS: TestManagedFragmentFinalStoreReservationAndReply (1.89s)
+=== RUN   TestManagedFragmentFinalStorePauseRollsBack
+    managed_review_fragment_final_store_test.go:149: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentFinalStorePauseRollsBack (1.01s)
+=== RUN   TestManagedFragmentFinalStoreConcurrentReservationOnce
+    managed_review_fragment_final_store_test.go:165: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentFinalStoreConcurrentReservationOnce (0.88s)
+=== RUN   TestManagedFragmentFinalStoreBudgetAndModelGuards
+=== RUN   TestManagedFragmentFinalStoreBudgetAndModelGuards/budget
+    managed_review_fragment_final_store_test.go:201: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentFinalStoreBudgetAndModelGuards/model
+    managed_review_fragment_final_store_test.go:201: sizes 164551 168165 21899 parts 1
+--- PASS: TestManagedFragmentFinalStoreBudgetAndModelGuards (1.74s)
+    --- PASS: TestManagedFragmentFinalStoreBudgetAndModelGuards/budget (0.92s)
+    --- PASS: TestManagedFragmentFinalStoreBudgetAndModelGuards/model (0.82s)
+=== RUN   TestManagedFragmentFinalBundlePreservesOriginalEvidence
+--- PASS: TestManagedFragmentFinalBundlePreservesOriginalEvidence (0.21s)
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown/missing
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown/unknown
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown/tampered
+=== RUN   TestManagedFragmentFinalBundleRefusesPartialOrUnknown/other-candidate
+--- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown (0.89s)
+    --- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown/missing (0.22s)
+    --- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown/unknown (0.21s)
+    --- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown/tampered (0.22s)
+    --- PASS: TestManagedFragmentFinalBundleRefusesPartialOrUnknown/other-candidate (0.24s)
+=== RUN   TestManagedFragmentFinishRequiresDurableDecision
+    managed_review_fragment_finish_test.go:13: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentFinishRequiresDurableDecision (0.73s)
+=== RUN   TestManagedFragmentFinishPersistsProtocolFailureCode
+    managed_review_fragment_finish_test.go:30: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentFinishPersistsProtocolFailureCode (0.70s)
+=== RUN   TestManagedFragmentSaveRejectsStaleJournalAnchor
+    managed_review_fragment_finish_test.go:53: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentSaveRejectsStaleJournalAnchor (0.71s)
+=== RUN   TestManagedFragmentRefusalRequiresOriginalProof
+    managed_review_fragment_finish_test.go:73: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentRefusalRequiresOriginalProof (2.22s)
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/pass
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/decision-fail
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/retry
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit-second
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit-selection
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit-decision
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/questions-resolved
+=== RUN   TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/questions-open
+--- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict (39.03s)
+    --- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/pass (12.02s)
+    --- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/decision-fail (2.27s)
+    --- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/retry (3.21s)
+    --- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit (3.56s)
+    --- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit-second (3.60s)
+    --- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit-selection (4.30s)
+    --- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/exit-decision (4.50s)
+    --- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/questions-resolved (3.16s)
+    --- PASS: TestManagedFragmentIntegrationPublishesOnlyFinalVerdict/questions-open (2.39s)
+=== RUN   TestManagedFragmentJournalReadAfterRestart
+--- PASS: TestManagedFragmentJournalReadAfterRestart (0.00s)
+=== RUN   TestManagedFragmentJournalRefusesDuplicateAndStale
+=== RUN   TestManagedFragmentJournalRefusesDuplicateAndStale/call
+=== RUN   TestManagedFragmentJournalRefusesDuplicateAndStale/packet
+=== RUN   TestManagedFragmentJournalRefusesDuplicateAndStale/reply
+=== RUN   TestManagedFragmentJournalRefusesDuplicateAndStale/state
+=== RUN   TestManagedFragmentJournalRefusesDuplicateAndStale/attempt
+=== RUN   TestManagedFragmentJournalRefusesDuplicateAndStale/provider
+=== RUN   TestManagedFragmentJournalRefusesDuplicateAndStale/plan
+--- PASS: TestManagedFragmentJournalRefusesDuplicateAndStale (0.00s)
+    --- PASS: TestManagedFragmentJournalRefusesDuplicateAndStale/call (0.00s)
+    --- PASS: TestManagedFragmentJournalRefusesDuplicateAndStale/packet (0.00s)
+    --- PASS: TestManagedFragmentJournalRefusesDuplicateAndStale/reply (0.00s)
+    --- PASS: TestManagedFragmentJournalRefusesDuplicateAndStale/state (0.00s)
+    --- PASS: TestManagedFragmentJournalRefusesDuplicateAndStale/attempt (0.00s)
+    --- PASS: TestManagedFragmentJournalRefusesDuplicateAndStale/provider (0.00s)
+    --- PASS: TestManagedFragmentJournalRefusesDuplicateAndStale/plan (0.00s)
+=== RUN   TestManagedFragmentJournalInterruptedCallNotRefunded
+--- PASS: TestManagedFragmentJournalInterruptedCallNotRefunded (0.00s)
+=== RUN   TestFragmentPartialNegativeRequiresWholeCandidateDecision
+    managed_review_fragment_partial_scope_test.go:15: sizes 164551 168167 21899 parts 1
+--- PASS: TestFragmentPartialNegativeRequiresWholeCandidateDecision (2.77s)
+=== RUN   TestFragmentLocalNegativeCannotReplaceLaterTransportError
+    managed_review_fragment_partial_scope_test.go:71: sizes 164551 168167 21899 parts 1
+--- PASS: TestFragmentLocalNegativeCannotReplaceLaterTransportError (1.58s)
+=== RUN   TestFragmentFinalReviewerCanRefuteLocalFindingWithOriginalEvidence
+    managed_review_fragment_partial_scope_test.go:109: sizes 164551 168167 21899 parts 1
+--- PASS: TestFragmentFinalReviewerCanRefuteLocalFindingWithOriginalEvidence (3.73s)
+=== RUN   TestManagedFragmentCompleteEvidence
+--- PASS: TestManagedFragmentCompleteEvidence (0.48s)
+=== RUN   TestManagedFragmentRejectsTampering
+=== RUN   TestManagedFragmentRejectsTampering/missing
+=== RUN   TestManagedFragmentRejectsTampering/duplicate
+=== RUN   TestManagedFragmentRejectsTampering/content
+=== RUN   TestManagedFragmentRejectsTampering/candidate
+=== RUN   TestManagedFragmentRejectsTampering/report
+=== RUN   TestManagedFragmentRejectsTampering/source
+=== RUN   TestManagedFragmentRejectsTampering/receipt
+=== RUN   TestManagedFragmentRejectsTampering/order
+=== RUN   TestManagedFragmentRejectsTampering/executable
+=== RUN   TestManagedFragmentRejectsTampering/budget
+--- PASS: TestManagedFragmentRejectsTampering (2.69s)
+    --- PASS: TestManagedFragmentRejectsTampering/missing (0.32s)
+    --- PASS: TestManagedFragmentRejectsTampering/duplicate (0.30s)
+    --- PASS: TestManagedFragmentRejectsTampering/content (0.22s)
+    --- PASS: TestManagedFragmentRejectsTampering/candidate (0.22s)
+    --- PASS: TestManagedFragmentRejectsTampering/report (0.22s)
+    --- PASS: TestManagedFragmentRejectsTampering/source (0.23s)
+    --- PASS: TestManagedFragmentRejectsTampering/receipt (0.22s)
+    --- PASS: TestManagedFragmentRejectsTampering/order (0.21s)
+    --- PASS: TestManagedFragmentRejectsTampering/executable (0.35s)
+    --- PASS: TestManagedFragmentRejectsTampering/budget (0.40s)
+=== RUN   TestManagedFragmentRejectsUnboundedEvidence
+--- PASS: TestManagedFragmentRejectsUnboundedEvidence (0.50s)
+=== RUN   TestManagedFragmentPreviewReadOnly
+    managed_review_fragment_plan_test.go:114: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentPreviewReadOnly (1.45s)
+=== RUN   TestManagedFragmentManySmallFilesReplyCapacity
+--- PASS: TestManagedFragmentManySmallFilesReplyCapacity (0.12s)
+=== RUN   TestManagedFragmentPromptBoundAndIdentity
+--- PASS: TestManagedFragmentPromptBoundAndIdentity (0.00s)
+=== RUN   TestManagedFragmentCumulativeReportProvenance
+--- PASS: TestManagedFragmentCumulativeReportProvenance (2.13s)
+=== RUN   TestManagedFragmentQuestionsCannotDisappear
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/resolved
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/missing
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/duplicate
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/invented
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/unknown
+=== RUN   TestManagedFragmentQuestionsCannotDisappear/bare
+--- PASS: TestManagedFragmentQuestionsCannotDisappear (0.61s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/resolved (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/missing (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/duplicate (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/invented (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/unknown (0.03s)
+    --- PASS: TestManagedFragmentQuestionsCannotDisappear/bare (0.05s)
+=== RUN   TestManagedFragmentUnknownJournalReusableWithoutRefund
+--- PASS: TestManagedFragmentUnknownJournalReusableWithoutRefund (0.00s)
+=== RUN   TestManagedFragmentResumePreservesUnknownQuestions
+    managed_review_fragment_questions_test.go:99: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentResumePreservesUnknownQuestions (0.99s)
+=== RUN   TestManagedFragmentReplanPreservesHistory
+    managed_review_fragment_replan_test.go:14: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentReplanPreservesHistory (0.69s)
+=== RUN   TestManagedFragmentReplanRejectsUnsafeRestart
+=== RUN   TestManagedFragmentReplanRejectsUnsafeRestart/budget
+    managed_review_fragment_replan_test.go:52: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentReplanRejectsUnsafeRestart/active
+    managed_review_fragment_replan_test.go:52: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentReplanRejectsUnsafeRestart/inspected
+    managed_review_fragment_replan_test.go:52: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentReplanRejectsUnsafeRestart/unknown
+    managed_review_fragment_replan_test.go:52: sizes 164551 168169 21899 parts 1
+=== RUN   TestManagedFragmentReplanRejectsUnsafeRestart/final
+    managed_review_fragment_replan_test.go:52: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentReplanRejectsUnsafeRestart/running
+    managed_review_fragment_replan_test.go:52: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentReplanRejectsUnsafeRestart (5.01s)
+    --- PASS: TestManagedFragmentReplanRejectsUnsafeRestart/budget (0.69s)
+    --- PASS: TestManagedFragmentReplanRejectsUnsafeRestart/active (0.98s)
+    --- PASS: TestManagedFragmentReplanRejectsUnsafeRestart/inspected (0.90s)
+    --- PASS: TestManagedFragmentReplanRejectsUnsafeRestart/unknown (1.12s)
+    --- PASS: TestManagedFragmentReplanRejectsUnsafeRestart/final (0.63s)
+    --- PASS: TestManagedFragmentReplanRejectsUnsafeRestart/running (0.68s)
+=== RUN   TestManagedFragmentInspectionNeverAcceptsTask
+--- PASS: TestManagedFragmentInspectionNeverAcceptsTask (0.00s)
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/candidate
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/context
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/packet
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/missing
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/duplicate
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/digest
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/invented
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/needs
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/accepted
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/oversized
+=== RUN   TestManagedFragmentInspectionRejectsFalseProof/unknown-field
+--- PASS: TestManagedFragmentInspectionRejectsFalseProof (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/candidate (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/context (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/packet (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/missing (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/duplicate (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/digest (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/invented (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/needs (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/accepted (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/oversized (0.00s)
+    --- PASS: TestManagedFragmentInspectionRejectsFalseProof/unknown-field (0.00s)
+=== RUN   TestManagedFragmentAllCallsPreflight
+--- PASS: TestManagedFragmentAllCallsPreflight (0.46s)
+=== RUN   TestManagedFragmentSelectionCostsCoverActualEncoding
+--- PASS: TestManagedFragmentSelectionCostsCoverActualEncoding (0.26s)
+=== RUN   TestManagedFragmentFinalRequestBindings
+=== RUN   TestManagedFragmentFinalRequestBindings/valid
+=== RUN   TestManagedFragmentFinalRequestBindings/candidate
+=== RUN   TestManagedFragmentFinalRequestBindings/context
+=== RUN   TestManagedFragmentFinalRequestBindings/plan
+=== RUN   TestManagedFragmentFinalRequestBindings/duplicate
+=== RUN   TestManagedFragmentFinalRequestBindings/digest
+=== RUN   TestManagedFragmentFinalRequestBindings/state
+=== RUN   TestManagedFragmentFinalRequestBindings/large
+=== RUN   TestManagedFragmentFinalRequestBindings/unknown
+--- PASS: TestManagedFragmentFinalRequestBindings (0.58s)
+    --- PASS: TestManagedFragmentFinalRequestBindings/valid (0.06s)
+    --- PASS: TestManagedFragmentFinalRequestBindings/candidate (0.02s)
+    --- PASS: TestManagedFragmentFinalRequestBindings/context (0.02s)
+    --- PASS: TestManagedFragmentFinalRequestBindings/plan (0.02s)
+    --- PASS: TestManagedFragmentFinalRequestBindings/duplicate (0.05s)
+    --- PASS: TestManagedFragmentFinalRequestBindings/digest (0.06s)
+    --- PASS: TestManagedFragmentFinalRequestBindings/state (0.03s)
+    --- PASS: TestManagedFragmentFinalRequestBindings/large (0.08s)
+    --- PASS: TestManagedFragmentFinalRequestBindings/unknown (0.02s)
+=== RUN   TestManagedFragmentFinalOrphanReservationResume
+=== RUN   TestManagedFragmentFinalOrphanReservationResume/available
+    managed_review_fragment_resume_test.go:19: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentFinalOrphanReservationResume/exhausted
+    managed_review_fragment_resume_test.go:19: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentFinalOrphanReservationResume (2.11s)
+    --- PASS: TestManagedFragmentFinalOrphanReservationResume/available (1.08s)
+    --- PASS: TestManagedFragmentFinalOrphanReservationResume/exhausted (1.03s)
+=== RUN   TestManagedFragmentDurableVerdictResumesWithoutBudget
+    managed_review_fragment_resume_test.go:67: sizes 164551 168165 21899 parts 1
+--- PASS: TestManagedFragmentDurableVerdictResumesWithoutBudget (5.08s)
+=== RUN   TestManagedFragmentInspectionOrphanResume
+    managed_review_fragment_resume_test.go:108: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentInspectionOrphanResume (0.66s)
+=== RUN   TestManagedFragmentResumeRejectsInvalidDeadline
+    managed_review_fragment_resume_test.go:141: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentResumeRejectsInvalidDeadline (0.70s)
+=== RUN   TestManagedFragmentHistoricalSavingsAndIdentity
+    managed_review_fragment_reuse_test.go:70: full=8 calls, differential=4 calls, historical groups=4
+--- PASS: TestManagedFragmentHistoricalSavingsAndIdentity (0.66s)
+=== RUN   TestManagedFragmentHistoricalInvalidation
+=== RUN   TestManagedFragmentHistoricalInvalidation/dependency
+=== RUN   TestManagedFragmentHistoricalInvalidation/contract
+=== RUN   TestManagedFragmentHistoricalInvalidation/changed-all
+=== RUN   TestManagedFragmentHistoricalInvalidation/no-delta
+=== RUN   TestManagedFragmentHistoricalInvalidation/nested
+--- PASS: TestManagedFragmentHistoricalInvalidation (2.16s)
+    --- PASS: TestManagedFragmentHistoricalInvalidation/dependency (0.34s)
+    --- PASS: TestManagedFragmentHistoricalInvalidation/contract (0.49s)
+    --- PASS: TestManagedFragmentHistoricalInvalidation/changed-all (0.42s)
+    --- PASS: TestManagedFragmentHistoricalInvalidation/no-delta (0.45s)
+    --- PASS: TestManagedFragmentHistoricalInvalidation/nested (0.47s)
+=== RUN   TestManagedFragmentHistoricalTampering
+=== RUN   TestManagedFragmentHistoricalTampering/duplicate
+=== RUN   TestManagedFragmentHistoricalTampering/omitted
+=== RUN   TestManagedFragmentHistoricalTampering/reply
+=== RUN   TestManagedFragmentHistoricalTampering/origin
+=== RUN   TestManagedFragmentHistoricalTampering/delta
+=== RUN   TestManagedFragmentHistoricalTampering/charged
+--- PASS: TestManagedFragmentHistoricalTampering (2.04s)
+    --- PASS: TestManagedFragmentHistoricalTampering/duplicate (0.31s)
+    --- PASS: TestManagedFragmentHistoricalTampering/omitted (0.35s)
+    --- PASS: TestManagedFragmentHistoricalTampering/reply (0.34s)
+    --- PASS: TestManagedFragmentHistoricalTampering/origin (0.41s)
+    --- PASS: TestManagedFragmentHistoricalTampering/delta (0.31s)
+    --- PASS: TestManagedFragmentHistoricalTampering/charged (0.32s)
+=== RUN   TestManagedFragmentHistoricalUnknownRemainsOpen
+--- PASS: TestManagedFragmentHistoricalUnknownRemainsOpen (0.40s)
+=== RUN   TestManagedFragmentHistoricalPublicRecovery
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/pass
+    managed_review_fragment_reuse_test.go:358: Actual subprocess calls: original=6 differential=4; reused=2; exact candidate, reopen, corruption and idempotence checked
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/fail
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/exit
+--- PASS: TestManagedFragmentHistoricalPublicRecovery (57.40s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/pass (13.95s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/fail (25.85s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/exit (17.59s)
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/resolved
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/missing
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/unknown
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/old-excerpt
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/report
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/path-only
+=== RUN   TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/invented
+--- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact (0.56s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/resolved (0.03s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/missing (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/unknown (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/old-excerpt (0.03s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/report (0.02s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/path-only (0.03s)
+    --- PASS: TestManagedFragmentHistoricalDecisionRequiresCurrentImpact/invented (0.02s)
+=== RUN   TestManagedFragmentHistoricalTinyAndRenameEvidence
+--- PASS: TestManagedFragmentHistoricalTinyAndRenameEvidence (0.00s)
+=== RUN   TestManagedFragmentHistoricalCapacityPreservesKnownInputs
+--- PASS: TestManagedFragmentHistoricalCapacityPreservesKnownInputs (0.50s)
+=== RUN   TestManagedFragmentRuntimeProviderProtocol
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/pass
+    managed_review_fragment_runtime_test.go:63: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/fail
+    managed_review_fragment_runtime_test.go:63: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/unknown
+    managed_review_fragment_runtime_test.go:63: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/exit
+    managed_review_fragment_runtime_test.go:63: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/selection-unknown
+    managed_review_fragment_runtime_test.go:63: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/decision-fail
+    managed_review_fragment_runtime_test.go:63: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-resolved
+    managed_review_fragment_runtime_test.go:63: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-open
+    managed_review_fragment_runtime_test.go:63: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-omitted
+    managed_review_fragment_runtime_test.go:63: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentRuntimeProviderProtocol (28.81s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/pass (4.00s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/fail (3.48s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/unknown (1.63s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/exit (1.12s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/selection-unknown (2.54s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/decision-fail (3.22s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/questions-resolved (5.02s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/questions-open (4.11s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/questions-omitted (3.71s)
+=== RUN   TestManagedFragmentPacketSchemaBoundToInventory
+--- PASS: TestManagedFragmentPacketSchemaBoundToInventory (0.00s)
+=== RUN   TestManagedFragmentPromptCountsBoundSchema
+--- PASS: TestManagedFragmentPromptCountsBoundSchema (0.00s)
+=== RUN   TestManagedFragmentSelectionOriginalAndBounded
+--- PASS: TestManagedFragmentSelectionOriginalAndBounded (0.41s)
+=== RUN   TestManagedFragmentSelectionRefusesInvalidRequests
+--- PASS: TestManagedFragmentSelectionRefusesInvalidRequests (0.62s)
+=== RUN   TestManagedFragmentStoreAtomicReservation
+    managed_review_fragment_store_test.go:73: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentStoreAtomicReservation (1.28s)
+=== RUN   TestManagedFragmentStoreBudgetRefusalPreservesAnchor
+    managed_review_fragment_store_test.go:103: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentStoreBudgetRefusalPreservesAnchor (1.07s)
+=== RUN   TestManagedFragmentStorePauseRollsBackReservation
+    managed_review_fragment_store_test.go:118: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentStorePauseRollsBackReservation (1.26s)
+=== RUN   TestManagedFragmentStoreConcurrentReservationOnce
+    managed_review_fragment_store_test.go:133: sizes 164551 168165 21899 parts 1
+--- PASS: TestManagedFragmentStoreConcurrentReservationOnce (1.26s)
+=== RUN   TestManagedFragmentStoreReplySurvivesReopen
+    managed_review_fragment_store_test.go:187: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentStoreReplySurvivesReopen (1.07s)
+=== RUN   TestManagedFragmentStoreModelChangeRejectsReturn
+    managed_review_fragment_store_test.go:215: sizes 164551 168165 21899 parts 1
+--- PASS: TestManagedFragmentStoreModelChangeRejectsReturn (0.99s)
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/pass
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fail
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/capacity-drift
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/coordinated
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift (13.22s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/pass (4.43s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fail (3.54s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/capacity-drift (1.55s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/coordinated (3.69s)
+=== RUN   TestManagedFragmentTokenPlanPreservesLegacyAndEvidence
+--- PASS: TestManagedFragmentTokenPlanPreservesLegacyAndEvidence (3.22s)
+=== RUN   TestManagedFragmentTokenPlanKeepsHistoricalObligations
+--- PASS: TestManagedFragmentTokenPlanKeepsHistoricalObligations (1.32s)
+=== RUN   TestManagedFragmentTokenBudgetReportsShortfall
+--- PASS: TestManagedFragmentTokenBudgetReportsShortfall (1.47s)
+=== RUN   TestManagedFragmentFinalTransportLossless
+--- PASS: TestManagedFragmentFinalTransportLossless (0.19s)
+=== RUN   TestPlanningReviewRetryCanRestartChangedMethod
+    managed_review_method_restart_test.go:66: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryCanRestartChangedMethod (0.78s)
+=== RUN   TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen
+    managed_review_retry_delivery_test.go:16: sizes 164551 168165 21899 parts 1
+--- PASS: TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen (2.20s)
+=== RUN   TestPlanningReviewRetryRestrictionTracksWholeReducedBatch
+    planning_historical_delivery_test.go:260: sizes 164551 168165 21899 parts 1
+--- PASS: TestPlanningReviewRetryRestrictionTracksWholeReducedBatch (0.63s)
+=== RUN   TestPlanningReviewRetryQueuesSameCandidateWithoutProductionOrSpend
+    review_failure_routing_test.go:113: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryQueuesSameCandidateWithoutProductionOrSpend (0.70s)
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/wrong_scope
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/semantic_refusal
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_candidate
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_contract
+    review_failure_routing_test.go:146: sizes 164551 168165 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/no_budget
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/implicit_edit
+    review_failure_routing_test.go:146: sizes 164551 168165 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/unchanged_correction
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/active_producer
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically (5.46s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/wrong_scope (0.69s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/semantic_refusal (0.88s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_candidate (0.65s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_contract (0.58s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/no_budget (0.64s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/implicit_edit (0.67s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/unchanged_correction (0.63s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/active_producer (0.73s)
+PASS
+ok  	swarm.local/companion/internal/engine	232.825s

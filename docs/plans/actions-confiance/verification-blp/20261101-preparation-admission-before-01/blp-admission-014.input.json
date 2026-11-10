@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "event_id": "admission",
+  "expected_revision": 1,
+  "expected_trust_revision": 1,
+  "intent": {
+    "version": 1,
+    "event_id": "unsent-intent",
+    "preparation_id": "prep-fa8847b0c33183273f594550",
+    "expected_revision": 2,
+    "provider": "fixture",
+    "capability_hash": "f124bdd4a08853113f001bea372f0ec2903ca2df456321f62765b7348459c31b",
+    "message": "PRIVATE_ADMISSION_INPUT",
+    "context_mode": "full"
+  }
+}

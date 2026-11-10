@@ -1,0 +1,6 @@
+=== RUN   TestManagedReviewCompactionPreservesDeclaredOriginals
+    managed_review_dedup_test.go:59: declared original lost or altered during compaction
+--- FAIL: TestManagedReviewCompactionPreservesDeclaredOriginals (0.08s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.098s
+FAIL

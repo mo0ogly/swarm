@@ -1,0 +1,85 @@
+{
+  "command": [
+    "bwrap",
+    "--unshare-user",
+    "--unshare-pid",
+    "--unshare-net",
+    "--unshare-ipc",
+    "--unshare-uts",
+    "--die-with-parent",
+    "--new-session",
+    "--cap-drop",
+    "ALL",
+    "--ro-bind",
+    "/usr",
+    "/usr",
+    "--symlink",
+    "usr/bin",
+    "/bin",
+    "--symlink",
+    "usr/sbin",
+    "/sbin",
+    "--symlink",
+    "usr/lib",
+    "/lib",
+    "--symlink",
+    "usr/lib64",
+    "/lib64",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--ro-bind",
+    "/tmp/swarm-ia2-binding-7osj48cb/worker.py",
+    "/worker.py",
+    "--clearenv",
+    "--setenv",
+    "PATH",
+    "/usr/bin",
+    "--info-fd",
+    "4",
+    "--block-fd",
+    "5",
+    "--",
+    "/usr/bin/python3",
+    "/worker.py"
+  ],
+  "root": "/tmp/swarm-ia2-binding-7osj48cb",
+  "bootstrap_info_before_release": true,
+  "namespace_fds": {
+    "pid": {
+      "inode": 4026532986,
+      "readlink": "pid:[4026532986]"
+    },
+    "mnt": {
+      "inode": 4026532857,
+      "readlink": "mnt:[4026532857]"
+    },
+    "user": {
+      "inode": 4026532856,
+      "readlink": "user:[4026532856]"
+    }
+  },
+  "info_raw": "{\n    \"child-pid\": 2812465,\n    \"ipc-namespace\": 4026532984,\n    \"mnt-namespace\": 4026532857,\n    \"net-namespace\": 4026532988,\n    \"pid-namespace\": 4026532986,\n    \"uts-namespace\": 4026532863\n}\n",
+  "info": {
+    "child-pid": 2812465,
+    "ipc-namespace": 4026532984,
+    "mnt-namespace": 4026532857,
+    "net-namespace": 4026532988,
+    "pid-namespace": 4026532986,
+    "uts-namespace": 4026532863
+  },
+  "worker": {
+    "pid": 2,
+    "namespaces": {
+      "pid": "pid:[4026532986]",
+      "mnt": "mnt:[4026532857]",
+      "user": "user:[4026533606]"
+    }
+  },
+  "exit_code": 0,
+  "remaining_stdout": "",
+  "stderr": ""
+}

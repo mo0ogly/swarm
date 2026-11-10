@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "boundary": "Read-only DOM and accessibility inspection of the actual managed server in Codex browser",
+  "version": "v0.1.1-dev.5",
+  "panel_open": true,
+  "action_areas": 1,
+  "original_messages": 1,
+  "raw_git_visible_in_panel": false,
+  "readable_git_explanation": true,
+  "label_weights": [
+    "750",
+    "750",
+    "750",
+    "750",
+    "750",
+    "750",
+    "750",
+    "750",
+    "750",
+    "750",
+    "750",
+    "750",
+    "750"
+  ],
+  "browser_errors": 0,
+  "limit": "No Git repository repair or task relaunch was performed."
+}

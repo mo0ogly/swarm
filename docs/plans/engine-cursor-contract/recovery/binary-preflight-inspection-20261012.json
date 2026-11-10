@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-12T15:06:44.129292+00:00",
+  "parent": "control-command-deadline-20261012.patch",
+  "parent_tree": "7227cb704ad7423cc60143e6f31866c98a9cac7d",
+  "preimage_tree": "1cb9994f96706d9888c29279a2dcb0c286c0ac96",
+  "preimage_extensions": [
+    {
+      "path": "internal/engine/managed_scope.go",
+      "sha256": "a610a939cb03d4cea51f4ff7eb593a2e18dd0313c780f7f1a8a40c97e178017d",
+      "blob": "721917d3452264c26a498a4db47bdf1a905e011f",
+      "parent_sha256": null,
+      "reason": "Current primary preimage, including existing user instruction templates; historical parent unchanged"
+    }
+  ],
+  "preimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "72d5dd8e40f54c16b33a76cd9231174187bd3f2123a5a0e0ebf51ee13edb6037",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "5588f117f597ca674ba9592a0ff520a12267257ab7d2bb813bd7a934fa1caac3",
+    "docs/engine-cursor-source-inputs-001.json": "fd672e4db0311fb91bf3eaae29796fb3ee4c2393038e0d24c8aabde5c10bfebe",
+    "docs/engine-cursor-source-inputs-003.json": "e3f9e58560610da271b6024d633922ee40006eba18398fd69bb6a16f780405ed",
+    "docs/engine-cursor-source-inputs-004.json": "55e64ba7568f874a4f9656cc2786adb91ca0192a2c881e6c15d219cdb5ea86c9",
+    "docs/engine-cursor-source-inputs-005.json": "dd8b44f3fd2c7f1ff9921b59af23e8913d9e8e846aa35dbfc7c71c03d9b2aeaa",
+    "docs/engine-cursor-source-manifest.json": "fe906cfa962781ae62bd9137a2f5e98ff6b416058ee232dd7a0392ee5077f26a",
+    "internal/engine/managed_binary_preflight_inspection_test.go": null,
+    "internal/engine/managed_review.go": "c595e413e2e27b8eea848df7c7decdbf1689b3e2a6e5d328ac9cf385936628e5",
+    "internal/engine/managed_review_preflight_retry.go": "4a1ccc613bc2e211b1c9ab91c9748c04880cf9c341df4a245e2e8a01f37b8f07",
+    "internal/engine/managed_scope.go": "a610a939cb03d4cea51f4ff7eb593a2e18dd0313c780f7f1a8a40c97e178017d"
+  },
+  "postimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "c1d8861be09ce4e9d7c2f73454188fe2b48d4fc5f9f6cd236ec1bb3f1cc4f3f4",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "3dbd0e9b5bf1d6443b872b95930187d8bcb24bdff2a37f0fb7d49f17a06a8d79",
+    "docs/engine-cursor-source-inputs-001.json": "b905c2efec1dae486b69efebcb6e9b94fd051d480a5afd243191636a6ded43e3",
+    "docs/engine-cursor-source-inputs-003.json": "8eb929b44b3827024720faed37185c0860167c081a1e11bdfd19392444960de9",
+    "docs/engine-cursor-source-inputs-004.json": "51afd4d2eb649ed705261292b80cb63caf203d9f36e18888cc82f3244f388c2c",
+    "docs/engine-cursor-source-inputs-005.json": "5ad939baea6c37166d03262a4f933342e926047f8f00bba070510f8b3c7e7e8b",
+    "docs/engine-cursor-source-manifest.json": "14aa235076c5e116ef4d231050159ae499d36e29c84402ca83803369b6636280",
+    "internal/engine/managed_binary_preflight_inspection_test.go": "af3359990793dd9e2d929d0ebfaafd6bba10b194d2e51baebd75733060bec5d5",
+    "internal/engine/managed_review.go": "9fe00c135d1dbff86cf1a829e4c0e0863c53d6181411ce67ba813e5fa5e7044f",
+    "internal/engine/managed_review_preflight_retry.go": "d42fd3644bc2659252b1f0ba387326d4db9c092c2c80aef87e98751896f08b4d",
+    "internal/engine/managed_scope.go": "502d3eaea01ba0e087aa53b798490a09a46bac53d3abe5438dab8ccf9a1823d2"
+  },
+  "result_tree": "458425633550f9197fafae3e03eb24a6353f9dd5",
+  "patch": "binary-preflight-inspection-20261012.patch",
+  "patch_sha256": "cd2464d3e83c4ed21fb8aa16af37abbe64ff64ed68126c7f91e1386b25ebb804",
+  "paths": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_binary_preflight_inspection_test.go",
+    "internal/engine/managed_review.go",
+    "internal/engine/managed_review_preflight_retry.go",
+    "internal/engine/managed_scope.go"
+  ],
+  "candidate_digest": "55ca089bb9b8d6986593cd401c898d8194ad3a493eb2407dbe544230bc748300",
+  "check": "PASS exact path diff, isolated refreshed-index apply, result tree and all postimages",
+  "qualification": {
+    "at": "2026-10-12T15:05:45.502129+00:00",
+    "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/binary-preflight-inspection-ypkxu18q",
+    "candidate_digest": "55ca089bb9b8d6986593cd401c898d8194ad3a493eb2407dbe544230bc748300",
+    "checks": [
+      {
+        "name": "targeted",
+        "exit": 0,
+        "drift": [],
+        "output": "/tmp/swarm-binary-preflight-inspection-targeted.out",
+        "output_sha256": "4c169696e823b76c6b6193937ed3bf5cfcb46d7793922f453ba8ac1cab1a5799",
+        "reused_passing_result": true,
+        "source_hashes_verified": {
+          "internal/engine/managed_review.go": "9fe00c135d1dbff86cf1a829e4c0e0863c53d6181411ce67ba813e5fa5e7044f",
+          "internal/engine/managed_review_preflight_retry.go": "d42fd3644bc2659252b1f0ba387326d4db9c092c2c80aef87e98751896f08b4d",
+          "internal/engine/managed_scope.go": "502d3eaea01ba0e087aa53b798490a09a46bac53d3abe5438dab8ccf9a1823d2",
+          "internal/engine/managed_binary_preflight_inspection_test.go": "af3359990793dd9e2d929d0ebfaafd6bba10b194d2e51baebd75733060bec5d5"
+        },
+        "selection": "Read-only binary scope inventory and interrupted-result correction; unchanged refusal/spending, altered receipt/candidate/attempt rejection, and directly affected scope/text-review guards. No source or runtime execution input relevant to these isolated fixtures changed since passing runs."
+      },
+      {
+        "name": "vet",
+        "argv": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "started": "2026-10-12T15:04:37.873250+00:00",
+        "finished": "2026-10-12T15:05:16.908223+00:00",
+        "exit": 0,
+        "wall_seconds": 39.03495485399617,
+        "output": "/tmp/swarm-binary-preflight-inspection-vet.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": []
+      },
+      {
+        "name": "methods",
+        "argv": [
+          "python3",
+          "tools/agent-workflows/check.py"
+        ],
+        "started": "2026-10-12T15:05:18.935033+00:00",
+        "finished": "2026-10-12T15:05:31.545491+00:00",
+        "exit": 0,
+        "wall_seconds": 12.610459767005523,
+        "output": "/tmp/swarm-binary-preflight-inspection-methods.out",
+        "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+        "drift": []
+      },
+      {
+        "name": "build",
+        "argv": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/swarm-qualified-binary-preflight-inspection-build",
+          "./cmd/swarm"
+        ],
+        "started": "2026-10-12T15:05:34.072300+00:00",
+        "finished": "2026-10-12T15:05:43.525165+00:00",
+        "exit": 0,
+        "wall_seconds": 9.452879225995275,
+        "output": "/tmp/swarm-binary-preflight-inspection-build.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": [],
+        "binary_sha256": "476e602235d5f631eba521f6ab12e3f3dcd574b7d583a391018985c2d7c55b94"
+      }
+    ],
+    "result": "PASS proportionate targeted qualification",
+    "limits": "Full suite not rerun by explicit user instruction. No persisted Work authority or synchronization change; storage31 unchanged. Attributed read-only inventory does not authorize binary text review. Native installation/configuration/retry/acceptance remain unproved."
+  },
+  "purpose": "Attributed read-only inventory/corrective preflight with binary metadata and complete successful original controls. Ordinary text/paid review still refuses binary changes, malformed/stale bindings rejected and spending/state preserved. Schema31 unchanged; no acceptance or visual review.",
+  "preimage_scope": "Exact current primary preimages checked; any divergence from historical24 external packaging tree explicitly extended without rewriting its old objects."
+}

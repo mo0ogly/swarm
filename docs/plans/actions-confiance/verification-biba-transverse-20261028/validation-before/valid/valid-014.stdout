@@ -1,0 +1,338 @@
+{
+  "work": {
+    "launch_profile": {
+      "provider": "fixture",
+      "role": "worker",
+      "workspace": "/tmp/swarm-model83-xcm8zswe",
+      "capture_output": true,
+      "updated": "2026-10-28T17:35:05.098165025Z",
+      "actor": "operateur"
+    },
+    "schema_version": 1,
+    "id": "w-6f8a90ab5cc11d94d6eb2d0e",
+    "revision": 7,
+    "title": "Requested model fixture",
+    "objective": "Observe route",
+    "scope": "Owned local program",
+    "criteria": [
+      "Observed, not accepted"
+    ],
+    "next": "",
+    "summary": "",
+    "memory": null,
+    "created": "2026-10-28T17:35:04.414142654Z",
+    "updated": "2026-10-28T17:35:06.0116631Z",
+    "git": {
+      "head": "",
+      "branch": "",
+      "changes": ""
+    },
+    "tasks": [
+      {
+        "validation_policy": {
+          "mode": "human",
+          "controls": [
+            {
+              "review_output": true,
+              "inputs": [
+                "handoff.md"
+              ],
+              "id": "owned-report-test",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path\ntext=Path('handoff.md').read_text()\ncode=text.split('\\nFIXTURE_CODE\\n',1)[1].split('\\nEND_FIXTURE_CODE\\n',1)[0]\nexec(compile(code,'<owned_i0_report>','exec'),{})\nfrom pathlib import Path\nimport os,json,re,hashlib\nraw=Path('handoff.md').read_bytes()\nassert re.search(rb'Input SHA256: [0-9a-f]{64}',raw)\nwith Path('validation-executed.json').open('x') as f:\n json.dump(dict(pid=os.getpid(),ppid=os.getppid(),cwd=os.getcwd(),report_sha256=hashlib.sha256(raw).hexdigest()),f)\n f.flush();os.fsync(f.fileno())\nprint('CONTROL-PROBE-SUCCESS',flush=True)\n"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Run owned report test code, never accept the task",
+              "timeout_seconds": 60
+            }
+          ],
+          "authorized_at": "2026-10-28T17:35:04.962387462Z",
+          "actor": "fpizzi/uid:1001"
+        },
+        "launch_profile": {
+          "provider": "fixture",
+          "role": "worker",
+          "workspace": "/tmp/swarm-model83-xcm8zswe",
+          "timeout_seconds": 1800,
+          "capture_output": true,
+          "updated": "2026-10-28T17:35:05.098165025Z",
+          "actor": "operateur"
+        },
+        "plan_checks": {
+          "plan-criterion-1": "validation",
+          "plan-delivery": "delivery",
+          "plan-entry": "entry",
+          "plan-validation": "validation"
+        },
+        "id": "task",
+        "title": "Run",
+        "owner": "fixture",
+        "deliverable": "Evidence",
+        "criteria": [
+          "Observed, not accepted"
+        ],
+        "depends": null,
+        "status": "submitted",
+        "blocker": "",
+        "next": "Évaluer les preuves et la gate delivery ; handoff : handoff.md",
+        "attempts": [
+          {
+            "id": "a-b671c03d9b42001160a4a9a3",
+            "status": "completed",
+            "started": "2026-10-28T17:35:05.098117225Z",
+            "ended": "2026-10-28T17:35:05.500802047Z"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": {
+    "state": "open",
+    "label": "OUVERT",
+    "validated": 0,
+    "historical": 0,
+    "stale": 0,
+    "tasks": {
+      "task": {
+        "state": "submitted",
+        "fresh": false,
+        "blockers": [],
+        "owner": "fixture",
+        "next": "",
+        "evidence": {
+          "attempt_id": "a-b671c03d9b42001160a4a9a3",
+          "revision": 7,
+          "freshness": "unknown",
+          "observed_at": "unknown",
+          "report_review": {
+            "state": "not_configured",
+            "attempt_id": "a-b671c03d9b42001160a4a9a3",
+            "reviewer": "unknown",
+            "at": "unknown",
+            "limits": [
+              "Aucune revue indépendante du rapport n’est configurée."
+            ]
+          },
+          "controls": {
+            "state": "unknown",
+            "items": [
+              {
+                "id": "unknown",
+                "attempt_id": "unknown",
+                "execution": "unknown",
+                "revision": "unknown",
+                "candidate_sha": "unknown",
+                "command": [],
+                "exit_code": null,
+                "started_at": "unknown",
+                "finished_at": "unknown",
+                "wall_duration_ms": null,
+                "cpu_duration_ms": null,
+                "cost": "unknown",
+                "tokens": "unknown",
+                "freshness": "unknown",
+                "result": "unknown",
+                "limits": [
+                  "Aucun reçu d’exécution moteur : une citation du rapport ou un statut de gate ne démontre ni la commande ni son code de sortie."
+                ]
+              }
+            ],
+            "history": [],
+            "longest_measured": []
+          },
+          "acceptance": {
+            "state": "not_accepted",
+            "revision": "unknown",
+            "at": "unknown"
+          },
+          "limits": [
+            "Les valeurs unknown ne constituent pas un succès."
+          ]
+        }
+      }
+    }
+  },
+  "events": [
+    {
+      "id": "create",
+      "work_id": "w-6f8a90ab5cc11d94d6eb2d0e",
+      "revision": 1,
+      "kind": "work.create",
+      "at": "2026-10-28T17:35:04.435576247Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "create",
+        "expected_revision": 0,
+        "title": "Requested model fixture",
+        "objective": "Observe route",
+        "scope": "Owned local program",
+        "criteria": [
+          "Observed, not accepted"
+        ]
+      }
+    },
+    {
+      "id": "add",
+      "work_id": "w-6f8a90ab5cc11d94d6eb2d0e",
+      "revision": 2,
+      "kind": "task.add",
+      "at": "2026-10-28T17:35:04.533988451Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "add",
+        "expected_revision": 1,
+        "id": "task",
+        "title": "Run",
+        "criteria": [
+          "Observed, not accepted"
+        ],
+        "deliverable": "Evidence"
+      }
+    },
+    {
+      "id": "budget",
+      "work_id": "w-6f8a90ab5cc11d94d6eb2d0e",
+      "revision": 3,
+      "kind": "budget.configure",
+      "at": "2026-10-28T17:35:04.638531544Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "budget",
+        "expected_revision": 2,
+        "budget": {
+          "limit_usd": 10,
+          "reserve_per_launch_usd": 1,
+          "estimate_source": "Local model fixture",
+          "reference_date": "2026-10-19",
+          "updated": "",
+          "actor": ""
+        }
+      }
+    },
+    {
+      "id": "authorize",
+      "work_id": "w-6f8a90ab5cc11d94d6eb2d0e",
+      "revision": 4,
+      "kind": "task.update",
+      "at": "2026-10-28T17:35:04.962645518Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "authorize",
+        "expected_revision": 3,
+        "id": "task",
+        "validation_policy": {
+          "mode": "human",
+          "controls": [
+            {
+              "review_output": true,
+              "inputs": [
+                "handoff.md"
+              ],
+              "id": "owned-report-test",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path\ntext=Path('handoff.md').read_text()\ncode=text.split('\\nFIXTURE_CODE\\n',1)[1].split('\\nEND_FIXTURE_CODE\\n',1)[0]\nexec(compile(code,'\u003cowned_i0_report\u003e','exec'),{})\nfrom pathlib import Path\nimport os,json,re,hashlib\nraw=Path('handoff.md').read_bytes()\nassert re.search(rb'Input SHA256: [0-9a-f]{64}',raw)\nwith Path('validation-executed.json').open('x') as f:\n json.dump(dict(pid=os.getpid(),ppid=os.getppid(),cwd=os.getcwd(),report_sha256=hashlib.sha256(raw).hexdigest()),f)\n f.flush();os.fsync(f.fileno())\nprint('CONTROL-PROBE-SUCCESS',flush=True)\n"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Run owned report test code, never accept the task"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "launch-00b2d8963836c62d8c3222fa",
+      "work_id": "w-6f8a90ab5cc11d94d6eb2d0e",
+      "revision": 5,
+      "kind": "agent.start",
+      "at": "2026-10-28T17:35:05.098165025Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "session",
+        "expected_revision": 4,
+        "task_id": "task",
+        "provider": "fixture",
+        "workspace": "",
+        "instruction": "",
+        "role": "",
+        "timeout_seconds": 0,
+        "capture_output": true
+      }
+    },
+    {
+      "id": "finish-eb7f8fe22ca86ed2f38450a1",
+      "work_id": "w-6f8a90ab5cc11d94d6eb2d0e",
+      "revision": 6,
+      "kind": "task.update",
+      "at": "2026-10-28T17:35:05.500710975Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "finish-eb7f8fe22ca86ed2f38450a1",
+        "expected_revision": 5,
+        "id": "task",
+        "status": "blocked",
+        "blocker": "Processus terminé ; handoff, preuves et validation requis",
+        "next": "Examiner les preuves puis reprendre explicitement",
+        "outcome": "completed",
+        "origin": "operateur"
+      }
+    },
+    {
+      "id": "submit",
+      "work_id": "w-6f8a90ab5cc11d94d6eb2d0e",
+      "revision": 7,
+      "kind": "task.submit",
+      "at": "2026-10-28T17:35:06.0116631Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "submit",
+        "expected_revision": 6,
+        "id": "task",
+        "agent_id": "session",
+        "report_path": "handoff.md",
+        "report_sha256": "c6d7358be683a94aea72e402a652a3da7d4d3b905baecd6e4d94f56a9a740efd",
+        "status": "submitted"
+      }
+    }
+  ],
+  "current_gates": {},
+  "current_git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "resume_markdown": "# Requested model fixture\n\nTravail : w-6f8a90ab5cc11d94d6eb2d0e | révision 7 | OUVERT\nDernière activité : 2026-10-28T17:35:06.0116631Z\n\n## Objectif et résultat attendu\nObserve route\nPérimètre : Owned local program\n- Observed, not accepted\n\n## Situation actuelle\nnon renseigné\nHEAD enregistré : non renseigné\nBranche enregistrée : non renseigné\nHEAD courant : non renseigné\nBranche courante : non renseigné\nMétadonnée Git indisponible (HEAD) : git-command-failed.\nMétadonnée Git indisponible (branch) : git-command-failed.\nMétadonnée Git indisponible (changes) : git-command-failed.\n\n## Tâches actives et résultats attendus\n- task : Run — SOUMISE — À VALIDER\n  Responsable : fixture\n  Livrable : Evidence\n  Prochaine action : Évaluer les preuves et la gate delivery ; handoff :\nhandoff.md\n\n## Travail validé\nTâches acceptées (preuves ou dérogation) : 0/1.\nCe ratio est distinct de la progression des critères d’une gate.\n\n## Travail restant et blocages\n- task : Run — SOUMISE — À VALIDER\n  Livrable : Evidence\n  Dépendances : non renseigné\n  Blocage : non renseigné\n  Critère : Observed, not accepted\n  Tentative a-b671c03d9b42001160a4a9a3 : completed\n\n## Gates, qualité et progression vérifiée\n- task · preuve structurée : tentative=a-b671c03d9b42001160a4a9a3 ; révision=7 ;\nfraîcheur=unknown\n  Revue du rapport=not_configured ; contrôles exécutés=unknown ;\nacceptation=not_accepted\n  Contrôle unknown : tentative=unknown ; exécution=unknown ; révision=unknown ;\nsha_candidat=unknown ; commande=unknown ; code=unknown ; début=unknown ;\nfin=unknown ; fraîcheur=unknown\n- task : gate non renseignée.\n\n## Prochaine action du travail\nà définir\n\n## Décisions OODA et mémoire utile\nMémoire spécifique : non renseignée.\n\nLes tentatives enregistrées ne prouvent pas qu’un processus tourne encore.\nUne gate ne remplace pas une autorisation de publication.\n",
+  "git_diagnostics": [
+    {
+      "field": "head",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "branch",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "changes",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    }
+  ]
+}

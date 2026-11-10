@@ -1,0 +1,13 @@
+{
+  "command": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "start": "2026-10-11T14:37:17.822236+00:00",
+  "end": "2026-10-11T14:37:29.051137+00:00",
+  "seconds": 11.228920215999096,
+  "exit": 0,
+  "output": "/tmp/swarm-source-capacity-recovery-vet.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,5 +1,18 @@
 # APEX — revue fiable et proportionnée
 
+## Repère de lecture — 24 octobre 2026
+
+Les étapes et états ci-dessous sont historiques. La
+[fin du journal](EVIDENCE.md#29-septembre--reprise-dun-avis-périmé-et-arrêt-demandé)
+indique ensuite la mise à la corbeille de la mission et de ses huit tâches sur
+demande utilisateur : « suivre la revue en cours » n’est donc plus une instruction
+active. Le [PASS E6 isolé](E6-PASS-20260928.md) reste distinct de l’acceptation
+de cette mission. La [file APEX FR](../FILE-APEX.md#vague-2--rapprochement-des-suivis-antérieurs-24-octobre-2026)
+et [EN](../../en/APEX-QUEUE.md#wave-2--reconciling-earlier-tracking-october-24-2026)
+conserve les correctifs et limites sans relance. Codex racine possède ce
+rapprochement ; toute reprise exige l’état public courant et une demande
+applicable, sans recréer la mission pour contourner son état ou ses consommations.
+
 ## Contrat
 Objectif : supprimer les refus incompréhensibles et les réexamens sans information nouvelle, sans affaiblir l'acceptation. Mission E6 existante conservée, aucun budget augmenté ni appel réel pour développer. Base 2b14d90 ; diagnostic externe publications/debug-review-loop/DEBUG.md.
 

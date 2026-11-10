@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "connector_catalog_present": false,
+  "expected": "two versioned simulated connectors",
+  "mutation": false
+}

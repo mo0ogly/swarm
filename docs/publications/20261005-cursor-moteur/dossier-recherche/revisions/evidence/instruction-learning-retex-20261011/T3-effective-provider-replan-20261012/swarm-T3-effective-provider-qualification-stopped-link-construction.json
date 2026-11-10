@@ -1,0 +1,8 @@
+{
+  "reason": "Copy construction expanded 13 canonical skill symlinks; required methods check would fail. Stop owned test runs before restoring links and freezing final inputs. No native process or state changed.",
+  "go_processes": [
+    3368076
+  ],
+  "descendants_stopped": 9,
+  "qualified": false
+}

@@ -1,0 +1,1 @@
+{"observed":"test_reference_bool_schema accepts true as version 1","cause":"Python bool compares equal to int; reference version lacked exact type check","owner":"Codex","original":"mapping-guards-first.out","correction":"same exact integer contract as matrix version","resumption_condition":"named regression and all mapping tests pass"}

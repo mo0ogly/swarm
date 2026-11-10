@@ -1,0 +1,13 @@
+sequenceDiagram
+  participant C as Authorized controller
+  participant T as Trust / durable file
+  participant S as SQLite
+  C->>T: Acquire exclusive Trust without a hidden wait policy
+  C->>S: Reserve transaction and check version / work
+  C->>C: Verify exact permit, fresh caller and prior head
+  C->>T: Persist intent and target snapshot
+  Note over T,S: Identity readers reject<br/>a pending intent
+  C->>S: Insert snapshot and receipt, then COMMIT
+  C->>T: Finalize head and remove pending marker
+  T-->>C: Target checkpoint after successful publication
+  Note over C,S: Interrupted publication requires the exact original permit, with no process start

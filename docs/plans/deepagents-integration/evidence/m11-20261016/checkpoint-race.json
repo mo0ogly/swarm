@@ -1,0 +1,37 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueBoundaryHasDurableStateBeforeHeartbeat|TestDialoguePendingBoundaryHasDurableUsage|TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing|TestDialogueCheckpointWriteFailureStopsBeforeNextProvider|TestDialogueCheckpointAPIReadAndForeignWorkRefusal|TestDialogueCheckpointRejectsInvalidOrForeignState|TestDialogueCheckpointMigrationPreservesLegacyAndBackup|TestDialogueCheckpointSurvivesLifecycleDeleteRestore|TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed|TestDialogueStartCheckpointDoesNotDescribeLaterEffects|TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions|TestDialogueIncompleteTurnCannotBeAnswered|TestDialogueConfirmationStorageFailureBlocksContinuation|TestDialogueProtocolRejectsReplayAndUnconfirmedEOF|TestDialogueUsageSnapshotDoesNotMutate)$",
+    "-count=1",
+    "-v",
+    "-timeout=180s"
+  ],
+  "started_at_utc": "2026-10-16T11:58:16.340131+00:00",
+  "ended_at_utc": "2026-10-16T11:59:15.476907+00:00",
+  "elapsed_seconds": 59.136785936003434,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueUsageSnapshotDoesNotMutate",
+    "TestDialogueBoundaryHasDurableStateBeforeHeartbeat",
+    "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+    "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+    "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+    "TestDialogueCheckpointRejectsInvalidOrForeignState",
+    "TestDialogueCheckpointMigrationPreservesLegacyAndBackup",
+    "TestDialogueCheckpointSurvivesLifecycleDeleteRestore",
+    "TestDialoguePendingBoundaryHasDurableUsage",
+    "TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed",
+    "TestDialogueStartCheckpointDoesNotDescribeLaterEffects",
+    "TestDialogueIncompleteTurnCannotBeAnswered",
+    "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+    "TestDialogueConfirmationStorageFailureBlocksContinuation",
+    "TestDialogueProtocolRejectsReplayAndUnconfirmedEOF"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "fb3e392876af21cc73b297483d40e0ce628aeeb0fe7a58f9118c78f3eaca49bf",
+  "real_model_calls": 0
+}

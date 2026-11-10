@@ -1,0 +1,47 @@
+{
+  "at_utc": "2026-10-17T08:22:03.094911+00:00",
+  "status": "M22 PRESENTATION COMPONENT PASS; LIVE INTEGRATION AND M20 RIGHTS OPEN",
+  "requirements": {
+    "M22.1": "PASS in isolated presentation scope",
+    "M22.2": "PASS in isolated presentation scope",
+    "M22.3": "PASS in isolated presentation scope",
+    "M22.4": "PASS in isolated presentation scope"
+  },
+  "definitions": 29,
+  "languages": [
+    "fr",
+    "en"
+  ],
+  "themes": [
+    "etat",
+    "sombre"
+  ],
+  "responsive_configurations": 20,
+  "browser_check_groups": 5,
+  "contrast_min": {
+    "etat": 5.750614836508003,
+    "sombre": 8.019744080685664
+  },
+  "console_errors": [],
+  "failed_requests": [],
+  "invalid_input_cases": 10,
+  "browser_receipt": "browser-verified/result.json",
+  "code_inputs_unchanged": true,
+  "read_only_web_assets_unchanged": true,
+  "owned_files": 15,
+  "local_links_resolved": 30,
+  "visual_inspection": [
+    "seal-default.png",
+    "legend-protection.png",
+    "fr-sombre-mobile.png",
+    "browser-verified/seal-paper.png"
+  ],
+  "public_api_calls": 0,
+  "model_calls": 0,
+  "go_builds": 0,
+  "live_server_replaced": false,
+  "inter_chat_message": false,
+  "shared_component": "frontend/signals/signals.js + signals.css",
+  "reuse_guide": "docs/SEMANTIC-SIGNALS.md; docs/en/SEMANTIC-SIGNALS.md",
+  "pending": "adopt assets through coordinated frontend delivery, rebuild affected app, verify actual engine-bound states; M20 ownership/author/usage enforcement remains open"
+}

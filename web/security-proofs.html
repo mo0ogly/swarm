@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sécurité et preuves — Swarm</title><link rel="icon" href="/swarm-logo.png">
+<link rel="stylesheet" href="/wattson_themes.css"><link rel="stylesheet" href="/swarm-design.css">
+<link rel="stylesheet" href="/trust-native.css"><link rel="stylesheet" href="/security-proofs.css">
+<script src="/i18n-en.js" defer></script><script src="/i18n.js" defer></script>
+<script src="/security-proofs.js" defer></script></head>
+<body><a class="security-skip" href="#security-main">Aller au contenu</a>
+<header><a href="/">Swarm</a><h1>Sécurité et preuves</h1><nav aria-label="Sécurité">
+<a href="/trust-actions.html">Administration Biba et Bell–LaPadula</a>
+<button id="security-theme" type="button">Changer de thème</button></nav></header>
+<main id="security-main"><p>Configuration, couverture déclarée, vérifications et qualification sont présentées séparément.</p>
+<form id="security-access"><label for="security-token">Jeton administrateur I3</label>
+<input id="security-token" type="password" autocomplete="off" spellcheck="false" required>
+<p>Le jeton reste en mémoire de cette page.</p><button class="trust-primary" id="security-refresh" type="submit">Consulter l’état de sécurité</button>
+<button id="security-clear" type="button">Effacer le jeton et les résultats</button></form>
+<p id="security-message" role="status" aria-live="polite">Aucun état de sécurité chargé.</p>
+<div id="security-report" hidden>
+<section aria-labelledby="security-summary-title"><h2 id="security-summary-title">Bell–LaPadula — confidentialité</h2>
+<p id="security-runtime"></p><p id="security-config"></p><p id="security-currency"></p><p id="security-version"></p>
+<p>Une politique enregistrée ne prouve pas la confidentialité de bout en bout.</p></section>
+<section aria-labelledby="security-coverage-title"><h2 id="security-coverage-title">Couverture déclarée</h2>
+<p id="security-count"></p><p>Les frontières recensées ne constituent pas des vérifications réussies.</p>
+<p>Cette vue ne vérifie pas la fraîcheur des ancrages de l’inventaire.</p>
+<details id="security-flows-disclosure"><summary>Consulter les frontières recensées</summary><div id="security-flows"></div></details></section>
+<section aria-labelledby="security-checks-title"><h2 id="security-checks-title">Vérifications de sécurité</h2>
+<p id="security-check-state"></p><p>Les recettes permanentes sont consultables ci-dessous. Leur lancement depuis cette interface reste à raccorder.</p>
+<details><summary>Consulter les recettes disponibles</summary><ul id="security-recipes"></ul></details></section>
+<section aria-labelledby="security-evidence-title"><h2 id="security-evidence-title">Preuves et fraîcheur</h2>
+<p>Cette observation ne charge aucune preuve de recette et ne valide aucun résultat historique.</p>
+<dl id="security-binding"></dl><details><summary>Observation technique sans jeton ni contenu projet</summary><pre id="security-json"></pre></details></section>
+<section aria-labelledby="security-qualification-title"><h2 id="security-qualification-title">Qualification interne</h2>
+<p id="security-qualification"></p><p>La revue indépendante et la décision d’acceptation ne sont pas établies par cette observation.</p>
+<p>Le raccord Biba et les contrôles de composition restent à réaliser.</p></section>
+</div></main></body></html>

@@ -1,0 +1,9 @@
+flowchart TD
+  E["Current protected enrollment<br/>prerequisite: still a fixture"] --> A["Explicit private authority<br/>principal, scope, rights and dates"]
+  H["OIDC session resolved by Trust"] --> V["Shared Trust then SQLite writer<br/>current plan and fresh time"]
+  A --> V
+  S["Full candidate and previous checkpoint"] --> V
+  V --> P["Exact private permit<br/>digest, roots, session and deadline"]
+  P --> C["Publisher: revalidate session and authority<br/>after waiting and before intent"]
+  C --> D["Trust intent then SQLite COMMIT<br/>then Trust head"]
+  D -.-> X["Public launchers and exact creation approval<br/>integration remains open"]

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "executor": "host operator; isolated clone; NOT engine receipt",
+  "candidate": "a27e175eb4f3e38f9cede1c888956a5ca5a0310f",
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^Test(Judge|ConfigureJudge)",
+    "-json",
+    "-count=1",
+    "-timeout",
+    "60s"
+  ],
+  "started_at": "2026-10-10T19:28:49.550427+00:00",
+  "finished_at": "2026-10-10T19:29:06.521421+00:00",
+  "exit_code": 0,
+  "artifacts": [
+    {
+      "path": "/tmp/swarm-T2-traceability-c1hvvch0/judge-tests.jsonl",
+      "bytes": 13181,
+      "sha256": "1d7a3e77b4b20f1542224c50d4264a1daef0b970612815367d9cbd0020c0d362"
+    },
+    {
+      "path": "/tmp/swarm-T2-traceability-c1hvvch0/judge-tests.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

@@ -1,0 +1,315 @@
+{
+  "public_snapshot": "receipt-native-progress-2.json",
+  "public_snapshot_sha256": "aff06014fcd246e2b1b57ad9dc226d62f6d0e8d75cea7487bdd15e0a2fa3d93d",
+  "events": [
+    {
+      "id": "resume-exact-receipt-resolution-e5292f31cadb443e",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 225,
+      "kind": "planning.resume",
+      "at": "2026-10-15T02:19:05.3817646Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "resume-exact-receipt-resolution-e5292f31cadb443e",
+        "expected_revision": 224,
+        "reason": "Replan sur contre-exemple exact vérifié : la citation refusée du premier avis final est packet=2 artifact=12 need_index=1 : \"candidate_commit\":\"671336f40f5e33279a61898131abab2809990c77\". Elle figure bien dans le reçu moteur transmis ; le parseur des résolutions omettait cet original de contexte. Ce défaut du lecteur est corrigé au niveau commun, avec refus inchangé du reçu comme preuve d’implémentation, des reçus absents et des identités altérées. 6 tests principaux et 9 sous-cas avec race passent ; la même réponse originale relue sans modification ni appel fournisseur devient changes_requested sur deux tâches. Ce n’est pas un fichier web absent ni une précondition métier corrigée. Le superviseur peut reprendre seulement la décision finale indépendante du même candidat, en conservant les trois inspections valides, les réponses refusées, les 43 appels et les deux tentatives. L’avis métier doit rester libre, y compris ses refus audit/UI reproduits séparément. Ne pas relancer la production pour corriger ce transport."
+      }
+    },
+    {
+      "id": "planning-claim-47061020fed8cd9fd55e347a",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 226,
+      "kind": "planning.claim",
+      "at": "2026-10-15T02:19:06.051411934Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "planning-claim-47061020fed8cd9fd55e347a",
+        "expected_revision": 225,
+        "scope": "root",
+        "scope_revision": 18,
+        "holder": "planner-e6b6dd882ceadf561dacde2d",
+        "lease_seconds": 120
+      }
+    },
+    {
+      "id": "planning-claim-47061020fed8cd9fd55e347a-decision",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 227,
+      "kind": "planning.decide",
+      "at": "2026-10-15T02:19:28.69076732Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "planning-claim-47061020fed8cd9fd55e347a-decision",
+        "expected_revision": 226,
+        "scope": "root",
+        "scope_revision": 18,
+        "holder": "planner-e6b6dd882ceadf561dacde2d",
+        "generation": 62,
+        "input_events": [
+          "resume-exact-receipt-resolution-e5292f31cadb443e",
+          "review-4ce246e4f3db9ce3d191d8fe-result-ec22fa215c85a444"
+        ],
+        "operations": [
+          {
+            "kind": "review-retry",
+            "id": "plan-68b50cc82e-T2",
+            "title": "",
+            "requirements": null,
+            "next": "Reprendre uniquement la décision finale indépendante sur le candidat inchangé 671336f40f5e33279a61898131abab2809990c77 après correction commune du lecteur de résolutions : relire l’original exact déjà reçu, packet=2 artifact=12 need_index=1, contenant « candidate_commit\":\"671336f40f5e33279a61898131abab2809990c77 ». Vérifier que cet original est désormais effectivement visible au vérificateur, sans accepter le reçu comme preuve d’implémentation et en maintenant les refus des reçus absents ou aux identités altérées. Conserver les trois inspections valides, les réponses refusées, les 43 appels et les deux tentatives. Rendre librement le verdict métier final, notamment sur le risque de réponse d’aperçu tardive dans web/trust-actions.js et les refus audit/UI reproduits séparément, sans présumer succès ni relancer la production pour cet incident de transport."
+          }
+        ],
+        "reason": "Le premier échec se situe dans le protocole de résolution de revue : l’original exact du candidat était présent dans le reçu moteur, mais le lecteur l’omettait. La reprise apporte une précondition modifiée et falsifiable : correction générale du parseur, avec contre-exemple exact et régressions annoncées, tout en conservant l’historique et les dépenses. Cela justifie une nouvelle décision indépendante sur le même candidat ; le constat métier relatif à l’aperçu périmé reste à arbitrer par cette revue et ne prouve pas à lui seul un défaut de production validé."
+      }
+    },
+    {
+      "id": "review-4ce246e4f3db9ce3d191d8fe-resume-227",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 228,
+      "kind": "review.fragment.resume",
+      "at": "2026-10-15T02:19:29.882634891Z",
+      "payload": {
+        "review": "review-4ce246e4f3db9ce3d191d8fe"
+      }
+    },
+    {
+      "id": "review-4ce246e4f3db9ce3d191d8fe-result-b58552ba90bbb7ef",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 231,
+      "kind": "review.managed.result",
+      "at": "2026-10-15T02:20:45.258178136Z",
+      "payload": {
+        "result_event": "review-4ce246e4f3db9ce3d191d8fe-result-b58552ba90bbb7ef",
+        "fragment_journal": {
+          "retry_directive": {
+            "decision": "planning-claim-47061020fed8cd9fd55e347a-decision",
+            "scope": "root",
+            "result_event": "review-4ce246e4f3db9ce3d191d8fe-result-ec22fa215c85a444",
+            "review": "review-4ce246e4f3db9ce3d191d8fe",
+            "candidate_commit": "671336f40f5e33279a61898131abab2809990c77",
+            "attempt": "a-b4669e24bbfb91f7a9686499",
+            "failure_code": "review_fragment_protocol",
+            "cause": "résolution sans preuve originale visible\nConstat PARTIEL conservé ; aucun verdict final : Correction demandée : web/trust-actions.js, ligne de la pièce 9 : Pendant l’attente réseau, le gestionnaire input laisse trustPending à null. La réponse tardive affecte ensuite sans contrôle l’ancienne requête à trustPending. L’utilisateur peut donc modifier les champs puis appliquer une configuration différente des valeurs visibles, à partir d’un aperçu périmé. Reproduction : Soumettre la prévisualisation avec une réponse retardée, modifier un champ avant son retour, laisser l’ancien aperçu s’afficher puis confirmer. L’ancienne requête est envoyée à config-apply. Attendu : Une modification du formulaire pendant la requête d’aperçu doit invalider cette réponse; seul un nouvel aperçu des valeurs courantes peut devenir applicable.",
+            "instruction": "Reprendre uniquement la décision finale indépendante sur le candidat inchangé 671336f40f5e33279a61898131abab2809990c77 après correction commune du lecteur de résolutions : relire l’original exact déjà reçu, packet=2 artifact=12 need_index=1, contenant « candidate_commit\":\"671336f40f5e33279a61898131abab2809990c77 ». Vérifier que cet original est désormais effectivement visible au vérificateur, sans accepter le reçu comme preuve d’implémentation et en maintenant les refus des reçus absents ou aux identités altérées. Conserver les trois inspections valides, les réponses refusées, les 43 appels et les deux tentatives. Rendre librement le verdict métier final, notamment sur le risque de réponse d’aperçu tardive dans web/trust-actions.js et les refus audit/UI reproduits séparément, sans présumer succès ni relancer la production pour cet incident de transport."
+          },
+          "inspection_task": "plan-68b50cc82e-T2",
+          "inspection_attempt": "a-b4669e24bbfb91f7a9686499",
+          "inspection_producer": "auto-c8053557575a81bb6164",
+          "final_journal": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-581cec8704c8ecf3/fragment-final-deecb27e35a98cce8664c4c190f6dd5174f560ad9f587d53935cfafb58e40760.json",
+          "final_journal_sha256": "deecb27e35a98cce8664c4c190f6dd5174f560ad9f587d53935cfafb58e40760",
+          "workflow_sha256": "0b5d056832b3443734c933d91b6681c63439e70d3e6f886e4215fe47988ca809",
+          "model_config_sha256": "06b02d0ff26321d3e2f91b77d312b010f53b8b3a18176ab9506f370fb1689e39",
+          "plan": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-581cec8704c8ecf3/review-4ce246e4f3db9ce3d191d8fe-plan.json",
+          "plan_sha256": "ab5841468253ffb5fe8117a4ac6a4410a7126fe53a5524ee9be7580f8fcdcf69",
+          "journal": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-581cec8704c8ecf3/fragment-journal-cdc184b95c77928177032a7861f8d74d025ad91a4ac9c3bbf9c982e3efd52fe0.json",
+          "journal_sha256": "cdc184b95c77928177032a7861f8d74d025ad91a4ac9c3bbf9c982e3efd52fe0"
+        },
+        "model_route": {
+          "level": "standard",
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "billing": "external",
+          "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+          "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+        },
+        "batch_provider_sha256": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+        "workflow": {
+          "version": 1,
+          "role": "reviewer",
+          "methods": [
+            "audit-pdca",
+            "code-reviewer",
+            "product-review"
+          ],
+          "sha256": "28b293cca11cf97690380d482960742c94ed7df9cb0ce899b70fc82201bdcb50"
+        },
+        "git_report": "docs/plan-68b50cc82e-T2.md",
+        "candidate_commit": "671336f40f5e33279a61898131abab2809990c77",
+        "previous_candidate": "a2d6410389c03e16270fa43d3f50b5deeb04f313",
+        "receipt": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-581cec8704c8ecf3/receipt.json",
+        "receipt_sha256": "06de45baab39ca7ae18e9e8d10d4b17596858222672f4a278ce780ec99164175",
+        "context": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-581cec8704c8ecf3/review-4ce246e4f3db9ce3d191d8fe-context.json",
+        "context_sha256": "c1873dd65756f24b4d580b72ac0565956c8767269cae1c5fa21fe567a5a0e36c",
+        "managed_tasks": [
+          {
+            "task": "plan-68b50cc82e-T1",
+            "attempt": "a-a1e83462f4bae22c52ecb05e",
+            "producer": "auto-0a2f3785ced73543e990",
+            "contract": "bd9160361d2609639e1a2bbc7af9d10974faff3063ef7607e7e0f34123e61511",
+            "policy": "48773b3bac01ae543a210b396135c9adab8e5d29034304b381e17aa73b7f6a5c",
+            "report": "docs/plan-68b50cc82e-T1.md",
+            "report_sha256": "b77ae71bb1b992395210034cd37ef0c2cba1f489ab70991916791c7564a17aca",
+            "reason": "La base T1 était acceptée, le delta courant ne modifie pas ses livrables, et les quatre contrôles frais exécutés sur le commit candidat confirment toujours 20 exigences et 14 stories. Aucun élément fourni ne démontre de régression T1. L’acceptation globale du lot reste néanmoins bloquée par les défauts et réserves T2.",
+            "criteria": [
+              {
+                "index": 1,
+                "verdict": "pass",
+                "evidence": "{\"task\": \"T1\", \"mode\": \"c1\", \"requirements\": 20, \"stories\": 14, \"contract_sha256\": \"f22c60c9bcb335b173d710313149ce0e62ee031020b4104e15dc6b88366035ff\", \"status\": \"pass\"}\n"
+              },
+              {
+                "index": 2,
+                "verdict": "pass",
+                "evidence": "{\"task\": \"T1\", \"mode\": \"c2\", \"requirements\": 20, \"stories\": 14, \"contract_sha256\": \"f22c60c9bcb335b173d710313149ce0e62ee031020b4104e15dc6b88366035ff\", \"status\": \"pass\"}\n"
+              },
+              {
+                "index": 3,
+                "verdict": "pass",
+                "evidence": "{\"task\": \"T1\", \"mode\": \"c3\", \"requirements\": 20, \"stories\": 14, \"contract_sha256\": \"f22c60c9bcb335b173d710313149ce0e62ee031020b4104e15dc6b88366035ff\", \"status\": \"pass\"}\n"
+              },
+              {
+                "index": 4,
+                "verdict": "pass",
+                "evidence": "{\"task\": \"T1\", \"mode\": \"c4\", \"requirements\": 20, \"stories\": 14, \"contract_sha256\": \"f22c60c9bcb335b173d710313149ce0e62ee031020b4104e15dc6b88366035ff\", \"status\": \"pass\"}\n"
+              }
+            ]
+          },
+          {
+            "task": "plan-68b50cc82e-T2",
+            "attempt": "a-b4669e24bbfb91f7a9686499",
+            "producer": "auto-c8053557575a81bb6164",
+            "contract": "18fabe7925aca0d09963975e361a5e8aa000c24890812fb0dd360cae7358111b",
+            "policy": "2e25d46a9431e3d11acbb47721503dde6781e6fb4b355158be0312080b469d91",
+            "report": "docs/plan-68b50cc82e-T2.md",
+            "report_sha256": "cfb41660b18660e3c3e66c9692ccff6da9a5d35e90bb27f555f071ce7b60fbe5",
+            "reason": "Les contrôles frais couvrent l’identité/Biba et la reprise, mais deux défauts sont démontrés dans les originaux. Certains refus métier authentifiés quittent mandate-create avant appendTrustEvidence, contredisant la preuve attribuée du critère 3. Surtout, l’UI accepte une réponse config-preview tardive après modification du formulaire et peut appliquer l’ancienne requête alors que les valeurs visibles ont changé; les recettes jointes ne testent pas cette course. Le responsable ACT doit invalider les réponses en vol à chaque saisie et ajouter les deux gardes de régression.",
+            "criteria": [
+              {
+                "index": 1,
+                "verdict": "pass",
+                "evidence": "{\"task\": \"T2\", \"mode\": \"c1\", \"cases\": 2, \"status\": \"pass\"}\n"
+              },
+              {
+                "index": 2,
+                "verdict": "pass",
+                "evidence": "{\"task\": \"T2\", \"mode\": \"c2\", \"cases\": 2, \"status\": \"pass\"}\n"
+              },
+              {
+                "index": 3,
+                "verdict": "fail",
+                "evidence": "Dans mandate-create, les entrées invalides retournent directement « mandat invalide » avant appendTrustEvidence; le refus authentifié n’est donc ni attribué ni lié à son original."
+              },
+              {
+                "index": 4,
+                "verdict": "fail",
+                "evidence": "Après l’attente de config-preview, le code exécute trustPending=request sans vérifier qu’aucune saisie n’a eu lieu; une réponse tardive réactive ainsi un aperçu périmé et permet d’appliquer des valeurs différentes de celles affichées."
+              }
+            ]
+          }
+        ],
+        "id": "review-4ce246e4f3db9ce3d191d8fe",
+        "attempt": "a-b4669e24bbfb91f7a9686499",
+        "producer": "auto-c8053557575a81bb6164",
+        "reviewer": "reviewer://codex",
+        "report": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-581cec8704c8ecf3/review-4ce246e4f3db9ce3d191d8fe-report-6919ec49479743c2f62ec53f8057624da55881aa5c2e872f49a941481c8f0532.md",
+        "sha256": "cfb41660b18660e3c3e66c9692ccff6da9a5d35e90bb27f555f071ce7b60fbe5",
+        "contract": "18fabe7925aca0d09963975e361a5e8aa000c24890812fb0dd360cae7358111b",
+        "state": "changes_requested",
+        "reason": "Les contrôles frais couvrent l’identité/Biba et la reprise, mais deux défauts sont démontrés dans les originaux. Certains refus métier authentifiés quittent mandate-create avant appendTrustEvidence, contredisant la preuve attribuée du critère 3. Surtout, l’UI accepte une réponse config-preview tardive après modification du formulaire et peut appliquer l’ancienne requête alors que les valeurs visibles ont changé; les recettes jointes ne testent pas cette course. Le responsable ACT doit invalider les réponses en vol à chaque saisie et ajouter les deux gardes de régression.",
+        "criteria": [
+          {
+            "index": 1,
+            "verdict": "pass",
+            "evidence": "{\"task\": \"T2\", \"mode\": \"c1\", \"cases\": 2, \"status\": \"pass\"}\n"
+          },
+          {
+            "index": 2,
+            "verdict": "pass",
+            "evidence": "{\"task\": \"T2\", \"mode\": \"c2\", \"cases\": 2, \"status\": \"pass\"}\n"
+          },
+          {
+            "index": 3,
+            "verdict": "fail",
+            "evidence": "Dans mandate-create, les entrées invalides retournent directement « mandat invalide » avant appendTrustEvidence; le refus authentifié n’est donc ni attribué ni lié à son original."
+          },
+          {
+            "index": 4,
+            "verdict": "fail",
+            "evidence": "Après l’attente de config-preview, le code exécute trustPending=request sans vérifier qu’aucune saisie n’a eu lieu; une réponse tardive réactive ainsi un aperçu périmé et permet d’appliquer des valeurs différentes de celles affichées."
+          }
+        ],
+        "started": "2026-10-15T01:52:08.162280671Z",
+        "finished": "2026-10-15T02:20:42.485779045Z"
+      }
+    },
+    {
+      "id": "planning-claim-f00f66a889d691a1770c2760",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 233,
+      "kind": "planning.claim",
+      "at": "2026-10-15T02:20:45.952894921Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "planning-claim-f00f66a889d691a1770c2760",
+        "expected_revision": 232,
+        "scope": "root",
+        "scope_revision": 19,
+        "holder": "planner-f18ad53309c56db47114f337",
+        "lease_seconds": 120
+      }
+    },
+    {
+      "id": "planning-claim-f00f66a889d691a1770c2760-decision",
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "revision": 234,
+      "kind": "planning.decide",
+      "at": "2026-10-15T02:21:29.737897217Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "planning-claim-f00f66a889d691a1770c2760-decision",
+        "expected_revision": 233,
+        "scope": "root",
+        "scope_revision": 19,
+        "holder": "planner-f18ad53309c56db47114f337",
+        "generation": 64,
+        "input_events": [
+          "review-4ce246e4f3db9ce3d191d8fe-result-b58552ba90bbb7ef",
+          "plan-36b2ed50a8308f387485002de0e22866d97a5eaa51bc35bddd2ea27885b42590"
+        ],
+        "operations": [
+          {
+            "kind": "revise-instructions",
+            "id": "plan-68b50cc82e-T3",
+            "title": "",
+            "requirements": null,
+            "next": "Ajout préventif issu de la revue T2 : pour tout flux authentifié produisant une décision métier, vérifier que chaque sortie, y compris les refus précoces, passe par le mécanisme commun de preuve attribuée avant retour, sans mutation métier non autorisée ; conserver comme gardes de régression au moins un refus précoce authentifié et un refus tardif. Pour toute interface lançant un aperçu ou une validation asynchrone à partir d’un formulaire mutable, invalider la requête en vol dès chaque modification pertinente, empêcher l’application d’une réponse associée à un état antérieur et tester explicitement la course « requête lancée → saisie modifiée → ancienne réponse reçue », ainsi que la réponse courante acceptée. Consigner les originaux et distinguer vérification locale, revue indépendante et acceptation moteur."
+          }
+        ],
+        "reason": "Les deux événements décrivent le même échec d’intégration fondé sur une revue indépendante du candidat 671336f40f5e33279a61898131abab2809990c77. La première frontière défaillante est double : des refus métier authentifiés sortent avant appendTrustEvidence, et l’UI peut appliquer une réponse config-preview devenue obsolète après modification du formulaire. Ces défauts contredisent la preuve du critère 3 et ne disposent pas de gardes de régression. T2 a consommé ses 2 tentatives et production_retry_unavailable=true : aucune reprise de production, tâche de remplacement, remboursement de tentative ou clôture n’est autorisé. La correction de T2 reste donc bloquée sous responsabilité du superviseur/moteur jusqu’à disponibilité d’un parcours public autorisé permettant une nouvelle correction sur la tâche historique, avec précondition modifiée, puis contrôles frais et revue indépendante du même candidat. L’unique action utile actuellement autorisée est de transmettre l’apprentissage général à la future T3 ; cette révision préventive ne résout ni n’accepte T2 et ses dépendances restent bloquées."
+      }
+    }
+  ],
+  "task_states": [
+    [
+      "plan-68b50cc82e-T1",
+      "accepted"
+    ],
+    [
+      "plan-68b50cc82e-T2",
+      "blocked"
+    ],
+    [
+      "plan-68b50cc82e-T3",
+      "todo"
+    ],
+    [
+      "plan-68b50cc82e-T4",
+      "todo"
+    ],
+    [
+      "plan-68b50cc82e-T5",
+      "todo"
+    ],
+    [
+      "plan-68b50cc82e-T6",
+      "todo"
+    ],
+    [
+      "plan-68b50cc82e-T7",
+      "todo"
+    ],
+    [
+      "plan-68b50cc82e-T8",
+      "todo"
+    ]
+  ],
+  "review_calls": 44
+}

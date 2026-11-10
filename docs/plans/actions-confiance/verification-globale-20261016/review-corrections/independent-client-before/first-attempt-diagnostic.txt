@@ -1,0 +1,1 @@
+Reviewer harness initially compared Python ensure_ascii bytes against JavaScript JSON.stringify bytes, so equivalent Unicode strings differed lexically. No product conclusion from that assertion. Corrected comparison to parsed object equality; original attempt source retained.

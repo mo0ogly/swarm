@@ -1,0 +1,11 @@
+
+running 1 test
+test policy_revision_cannot_lower_or_remove_object_classification ... FAILED
+
+failures:
+
+failures:
+    policy_revision_cannot_lower_or_remove_object_classification
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.38s
+

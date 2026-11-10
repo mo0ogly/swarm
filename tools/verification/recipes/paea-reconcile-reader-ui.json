@@ -1,0 +1,74 @@
+{
+    "schema_version": 1,
+    "id": "paea-reconcile-reader-ui",
+    "inputs": [
+        "web/paea-effects.html",
+        "web/paea-effects.js",
+        "web/paea-approval-form.js",
+        "web/paea.html",
+        "web/paea.css",
+        "web/i18n.js",
+        "web/i18n-en.js",
+        "web/wattson_themes.css",
+        "web/swarm-design.css",
+        "web/swarm-logo.png",
+        "locales/en.json",
+        "scripts/i18n/build.cjs",
+        "tests/paea_reconcile_reader_ui.cjs",
+        "tests/fixture_area.cjs",
+        "package.json",
+        "package-lock.json",
+        "tools/verification/recipe.py",
+        "tools/verification/recipes/paea-reconcile-reader-ui.json",
+        "docs/architecture/PAEA-GIT-TRANSACTION.md",
+        "docs/en/PAEA-GIT-TRANSACTION.md"
+    ],
+    "environment": {},
+    "steps": [
+        {
+            "id": "i18n-generated",
+            "command": [
+                "node",
+                "scripts/i18n/build.cjs",
+                "--check"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "\"mode\":\"check\"",
+                "\"status\":\"pass\""
+            ],
+            "required_stderr": []
+        },
+        {
+            "id": "reconcile-reader-double-close-guard",
+            "command": [
+                "env",
+                "PAEA_RECONCILE_DOUBLE_GUARD=1",
+                "node",
+                "tests/paea_reconcile_reader_ui.cjs"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "DOUBLE_CLOSE_GUARD_VERIFIED"
+            ],
+            "required_stderr": []
+        },
+        {
+            "id": "reconcile-reader-component-test",
+            "command": [
+                "env",
+                "-u",
+                "PAEA_RECONCILE_DOUBLE_GUARD",
+                "node",
+                "tests/paea_reconcile_reader_ui.cjs",
+                "{root}/.cache/paea-reconcile-reader-ui"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "PAEA_RECONCILE_READER_UI_VERIFIED",
+                "PAEA_RECONCILE_READER_UI_RUN_DIR"
+            ],
+            "required_stderr": []
+        }
+    ]
+}

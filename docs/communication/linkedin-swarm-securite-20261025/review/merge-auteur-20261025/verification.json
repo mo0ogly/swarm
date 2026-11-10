@@ -1,0 +1,49 @@
+{
+  "status": "PASS_MERGE_AND_VISUAL_REVIEW",
+  "author_source_sha256": "bbce05793f46df3cbbcfc362b2ea972a16360f0c5b9c010624ab5b26935822ba",
+  "author_words": 2493,
+  "merged_words": 3859,
+  "author_blocks_preserved_verbatim_and_in_order": 160,
+  "all_word_text_blocks_equal_merged_source": 212,
+  "hyperlinks": 14,
+  "original_references_retained": 11,
+  "supplementary_reference_ids": [
+    12,
+    13,
+    14
+  ],
+  "old_appendix_included": false,
+  "files_sha256": {
+    "article-fr.md": "88b782d392c8b567180646015a5f90b2f12c7ec3cec1bc7a7ab3f3583b88104c",
+    "source-auteur-fr.md": "bbce05793f46df3cbbcfc362b2ea972a16360f0c5b9c010624ab5b26935822ba",
+    "README.md": "b84e5146380c5adbf04f45dadc5c8ccd383bb899ce2a5bd2a2c96bb9cf95fe98",
+    "build_word.py": "04765599812f6c08030172df417f8690b20efe2a10b70a21481bb1796804620c",
+    "Swarm_Securite_LinkedIn.docx": "11f11fc8836d681fc0933ff78af4cd3e01f1c694b0ec8bfadf2a391681748788",
+    "docs/SECURITY-POSITIONING.md": "8b696e058bdf12950249f64633883c504cb15aef22feb4c69db9e6aff7e43fc8",
+    "docs/en/SECURITY-POSITIONING.md": "9f7ec3a8cdadf73a4b4266753696e2c926b94e350ad563d594e37556fea88128"
+  },
+  "visual_review": "PASS",
+  "runtime_changed": false,
+  "published": false,
+  "pages_rendered_and_visually_inspected": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "review": {
+    "policies": "Only editorial content and presentation changed; PAEA remains a proposal. No active execution policies, certification levels or budgets introduced.",
+    "functions": "Updated add_article and build contracts match bibliography page break, source title metadata and removal of old appendix. No network access by builder.",
+    "errors": "Input/parse errors propagate before atomic publication; original source retention is checked separately from generated content parity. Existing output remains intact until replace.",
+    "documentation": "PAEA name, consequence-based scope and cumulative effects documented in FR/EN; all original author blocks retained in the merged article.",
+    "references": "Primary metadata checked for CaMeL, AgentSpec, ACRFence, the Das individual draft and ANSSI. Existing author bibliography retained; this is not a claim of exhaustive normative assessment.",
+    "runtime": "No runtime, product version, active security profile or deployed service changed."
+  },
+  "new_documentation_links_checked": 37
+}

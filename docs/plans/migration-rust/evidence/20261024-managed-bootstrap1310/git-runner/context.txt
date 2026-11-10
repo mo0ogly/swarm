@@ -1,0 +1,657 @@
+IMPLEMENTATION contract: public planning.enable repository bootstrap ONLY for committed_only=true with empty include_dirty. Existing pure apply refuses repository. Root work_engine strips repository from a local clone solely for prevalidation/provider observation, then calls crate::managed_repository::prepare(root, workid, original_repository_request, settings)->Result<ManagedRepository,AgentLaunchError>; sets resulting planning.repository, validates actual candidate, existing mutation intent/replay retains ORIGINAL request. Root's existing public replay precedes IO. No managed claim/decide/launch/settlement guards removed. No source/index/HEAD mutation, no real model. Saved git_command_timeout_seconds, no 90sec literal. Local private directories and operation lock retained, manifest JSON digest exact Go encode, candidate/base actual immutable commit. Pending manifest before bare no-replace publication, final manifest after; replay verifies commit objects and exact request/paths. Unknown/orphan/changed manifest refuses without overwrite. New helper functions private, use AgentLaunchError typed cause+finish for independent close errors. Deliver code/proposal only, not execution.
+
+FILE rust/crates/swarm-engine/src/git_metadata.rs
+//! Checked Git display observations. No snapshot, actor authentication or authority.
+#![cfg(target_os = "linux")]
+use crate::{EngineSettingsDocument, GitCommandOutput, GitReportError, GitState, SettingCount};
+use serde::Serialize;
+use sha2::{Digest, Sha256};
+use std::{
+    collections::BTreeSet,
+    error::Error,
+    ffi::OsString,
+    fmt,
+    io::{self, Write},
+    os::unix::ffi::OsStringExt,
+    path::Path,
+    process::Command,
+    time::{Duration, Instant},
+};
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum GitMetadataField {
+    Head,
+    Branch,
+    Changes,
+}
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct GitMetadataDiagnostic {
+    pub field: GitMetadataField,
+    pub reason: &'static str,
+    pub exit_code: Option<i32>,
+    pub timed_out: bool,
+    pub stdout_sha256: String,
+    pub stderr_sha256: String,
+}
+/// Exact output stays only in the typed cause, never ordinary public formatting.
+pub struct GitMetadataIssue {
+    pub field: GitMetadataField,
+    pub cause: GitReportError,
+}
+impl fmt::Debug for GitMetadataIssue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("GitMetadataIssue")
+            .field("field", &self.field)
+            .field("reason", &self.cause.reason())
+            .finish()
+    }
+}
+/// Per-command observations, not a consistent repository snapshot or cleanliness proof.
+pub struct GitMetadataObservation {
+    pub state: GitState,
+    pub diagnostics: Vec<GitMetadataDiagnostic>,
+    pub issues: Vec<GitMetadataIssue>,
+    pub settings_revision: SettingCount,
+    pub external_filters_disabled: bool,
+}
+impl fmt::Debug for GitMetadataObservation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("GitMetadataObservation")
+            .field("issue_count", &self.issues.len())
+            .finish_non_exhaustive()
+    }
+}
+pub enum GitMetadataError {
+    Report(Box<GitReportError>),
+    Text(crate::RuntimeError),
+}
+impl GitMetadataError {
+    /// Safe family; the original typed cause retains any private output.
+    pub fn code(&self) -> &'static str {
+        "git-metadata"
+    }
+    /// Stable safe discriminant, excluding configuration values and filenames.
+    pub fn reason(&self) -> &'static str {
+        match self {
+            Self::Report(e) => e.reason(),
+            Self::Text(_) => "git-output-encoding",
+        }
+    }
+}
+impl fmt::Debug for GitMetadataError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self, f)
+    }
+}
+impl fmt::Display for GitMetadataError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}: {}", self.code(), self.reason())
+    }
+}
+impl Error for GitMetadataError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Report(e) => Some(e.as_ref()),
+            Self::Text(e) => Some(e),
+        }
+    }
+}
+#[derive(Default)]
+struct Bytes(Vec<u8>);
+impl Write for Bytes {
+    fn write(&mut self, b: &[u8]) -> io::Result<usize> {
+        self.0.try_reserve(b.len()).map_err(io::Error::other)?;
+        self.0.extend_from_slice(b);
+        Ok(b.len())
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+struct Output {
+    run: crate::validation_run::OwnedProcessRun,
+    stdout: Vec<u8>,
+    stderr: Vec<u8>,
+}
+impl Output {
+    /// Move original failed output into its checked cause, without allocating a copy.
+    fn failure(self) -> GitReportError {
+        GitReportError::Command {
+            exit_code: self.run.usage.status.code(),
+            timed_out: self.run.timed_out,
+            stdout_sha256: format!("{:x}", Sha256::digest(&self.stdout)),
+            stderr_sha256: format!("{:x}", Sha256::digest(&self.stderr)),
+            output: Box::new(GitCommandOutput::from_parts(self.stdout, self.stderr)),
+        }
+    }
+}
+fn wrap(error: GitReportError) -> GitMetadataError {
+    GitMetadataError::Report(Box::new(error))
+}
+/// Own/drain/reap a fixed metadata command under one explicit monotonic deadline.
+/// Arguments are not interpreted by a shell; inherited Git overrides/traces and
+/// optional index writes, prompts, hooks and fsmonitor execution are disabled.
+fn run(
+    root: &Path,
+    args: &[&str],
+    overrides: &[OsString],
+    timeout: Option<Duration>,
+) -> Result<Output, GitMetadataError> {
+    let deadline = timeout
+        .map(|d| {
+            Instant::now()
+                .checked_add(d)
+                .ok_or_else(|| wrap(GitReportError::Refused("git-deadline-representation")))
+        })
+        .transpose()?;
+    let mut command = Command::new("git");
+    command.args([
+        "--no-pager",
+        "--no-optional-locks",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "-c",
+        "core.fsmonitor=false",
+    ]);
+    for value in overrides {
+        command.arg("-c").arg(value);
+    }
+    command.args(args).current_dir(root);
+    for (key, _) in std::env::vars_os() {
+        if key.as_encoded_bytes().starts_with(b"GIT_") {
+            command.env_remove(key);
+        }
+    }
+    command
+        .env("GIT_TERMINAL_PROMPT", "0")
+        .env("GIT_OPTIONAL_LOCKS", "0");
+    let (mut stdout, mut stderr) = (Bytes::default(), Bytes::default());
+    let process =
+        crate::validation_run::run_owned_command(command, deadline, &mut stdout, Some(&mut stderr));
+    let process = match process {
+        Ok(p) => p,
+        Err(cause) => {
+            return Err(wrap(GitReportError::Process {
+                cause: Box::new(cause),
+                output: Box::new(GitCommandOutput::from_parts(stdout.0, stderr.0)),
+            }))
+        }
+    };
+    Ok(Output {
+        run: process,
+        stdout: stdout.0,
+        stderr: stderr.0,
+    })
+}
+/// Read names only (never command values), then neutralize every configured
+/// filter family. Raw OS bytes preserve subsection names containing whitespace or
+/// non-UTF-8. Missing/invalid protection data refuses before invoking status.
+fn filter_overrides(
+    root: &Path,
+    timeout: Option<Duration>,
+) -> Result<Vec<OsString>, GitMetadataError> {
+    let listed = run(
+        root,
+        &[
+            "config",
+            "--name-only",
+            "--null",
+            "--get-regexp",
+            r"^filter\.",
+        ],
+        &[],
+        timeout,
+    )?;
+    if listed.run.timed_out {
+        return Err(wrap(listed.failure()));
+    }
+    if listed.run.usage.status.code() == Some(1) && listed.stdout.is_empty() {
+        return Ok(vec![]);
+    }
+    if !listed.run.usage.status.success() {
+        return Err(wrap(listed.failure()));
+    }
+    if !listed.stdout.is_empty() && !listed.stdout.ends_with(&[0]) {
+        return Err(wrap(GitReportError::Refused("git-filter-config-framing")));
+    }
+    let mut names = BTreeSet::new();
+    for key in listed.stdout.split(|&b| b == 0).filter(|k| !k.is_empty()) {
+        let lower = key.to_ascii_lowercase();
+        if !lower.starts_with(b"filter.") {
+            return Err(wrap(GitReportError::Refused("git-filter-config-key")));
+        }
+        let dot = key
+            .iter()
+            .rposition(|&b| b == b'.')
+            .ok_or_else(|| wrap(GitReportError::Refused("git-filter-config-key")))?;
+        if dot > b"filter.".len() {
+            names.insert(key[..dot].to_vec());
+        }
+    }
+    let mut overrides = Vec::new();
+    for base in names {
+        for suffix in [
+            b".clean=".as_slice(),
+            b".process=",
+            b".smudge=",
+            b".required=false",
+        ] {
+            let mut key = base.clone();
+            key.extend_from_slice(suffix);
+            overrides.push(OsString::from_vec(key));
+        }
+    }
+    Ok(overrides)
+}
+/// Read the three fixed fields under actual saved per-command policy. Null is
+/// explicitly unlimited. No shell or repository-defined filter is executed.
+/// Nonzero exit/timeout leaves that field unavailable with diagnostics/original
+/// output; infrastructure, protection-query and policy failures return their cause.
+/// Separate observations never attest a Git snapshot, cleanliness or actor rights.
+pub fn observe_git_metadata(
+    root: &Path,
+    settings: &EngineSettingsDocument,
+) -> Result<GitMetadataObservation, GitMetadataError> {
+    settings
+        .validate()
+        .map_err(|e| wrap(GitReportError::Settings(e)))?;
+    let timeout = settings
+        .values
+        .git_command_timeout()
+        .map_err(|e| wrap(GitReportError::Settings(e)))?;
+    observe_git_commands(root, timeout, settings.revision)
+}
+/// Shared lower-level reader. None is only an explicit caller input, never a
+/// Root settings fallback; the legacy environment API declares its unbounded scope.
+pub(crate) fn observe_git_commands(
+    root: &Path,
+    timeout: Option<Duration>,
+    settings_revision: SettingCount,
+) -> Result<GitMetadataObservation, GitMetadataError> {
+    let overrides = filter_overrides(root, timeout)?;
+    let mut observed = GitMetadataObservation {
+        state: GitState::default(),
+        diagnostics: vec![],
+        issues: vec![],
+        settings_revision,
+        external_filters_disabled: !overrides.is_empty(),
+    };
+    for (field, args) in [
+        (GitMetadataField::Head, vec!["rev-parse", "HEAD"]),
+        (GitMetadataField::Branch, vec!["branch", "--show-current"]),
+        (
+            GitMetadataField::Changes,
+            vec!["status", "--porcelain", "--untracked-files=normal"],
+        ),
+    ] {
+        let output = run(root, &args, &overrides, timeout)?;
+        if output.run.timed_out || !output.run.usage.status.success() {
+            let diagnostic = GitMetadataDiagnostic {
+                field,
+                reason: if output.run.timed_out {
+                    "git-command-timeout"
+                } else {
+                    "git-command-failed"
+                },
+                exit_code: output.run.usage.status.code(),
+                timed_out: output.run.timed_out,
+                stdout_sha256: format!("{:x}", Sha256::digest(&output.stdout)),
+                stderr_sha256: format!("{:x}", Sha256::digest(&output.stderr)),
+            };
+            observed.diagnostics.push(diagnostic);
+            observed.issues.push(GitMetadataIssue {
+                field,
+                cause: output.failure(),
+            });
+            continue;
+        }
+        let value =
+            crate::environment::go_command_text(&output.stdout).map_err(GitMetadataError::Text)?;
+        match field {
+            GitMetadataField::Head => observed.state.head = value,
+            GitMetadataField::Branch => observed.state.branch = value,
+            GitMetadataField::Changes => observed.state.changes = value,
+        }
+    }
+    Ok(observed)
+}
+/// Retain issues in the legacy environment contract; no empty field implies success.
+pub(crate) fn into_environment(observed: GitMetadataObservation) -> crate::GitObservation {
+    crate::GitObservation {
+        state: observed.state,
+        issues: observed
+            .issues
+            .into_iter()
+            .map(|i| crate::GitIssue {
+                field: match i.field {
+                    GitMetadataField::Head => crate::GitField::Head,
+                    GitMetadataField::Branch => crate::GitField::Branch,
+                    GitMetadataField::Changes => crate::GitField::Changes,
+                },
+                cause: crate::GitIssueCause::CheckedMetadata(Box::new(i.cause)),
+            })
+            .collect(),
+    }
+}
+
+FILE rust/crates/swarm-engine/src/agent_launch_error.rs
+//! Safe preparation failures retaining original and cleanup causes.
+use std::{error::Error, fmt};
+/// No failure variant grants a process, reservation, identity or acceptance.
+/// Commit uncertainty requires rereading the event/agent before replay.
+pub enum AgentLaunchError {
+    Refused(&'static str),
+    /// Saved SQLite retry policy exhausted. Count includes the first SQL attempt;
+    /// revision identifies the policy refusing another attempt, not agent rights.
+    Busy {
+        cause: Box<Self>,
+        attempts: u64,
+        settings_revision: crate::SettingCount,
+    },
+    Cause {
+        code: &'static str,
+        cause: Box<dyn Error + Send + Sync>,
+    },
+    Cleanup {
+        primary: Box<Self>,
+        cleanup: Box<Self>,
+    },
+    Commit {
+        cause: Box<Self>,
+        rollback_confirmed: bool,
+        cleanup: Option<Box<Self>>,
+    },
+}
+impl AgentLaunchError {
+    /// Keep the original typed cause while rendering only a static public code.
+    pub(crate) fn caused(code: &'static str, cause: impl Error + Send + Sync + 'static) -> Self {
+        Self::Cause {
+            code,
+            cause: Box::new(cause),
+        }
+    }
+    /// Identify only direct SQLite BUSY storage failures. Compound cleanup,
+    /// nested business/read layers and all commit outcomes stay non-retryable.
+    /// Caller must also verify autocommit after checked rollback and release its
+    /// settings reservation before retrying; this classifier alone proves neither.
+    pub(crate) fn retryable_busy(&self) -> bool {
+        match self {
+            Self::Cause {
+                code: "agent-launch-storage",
+                cause,
+            } => cause
+                .downcast_ref::<rusqlite::Error>()
+                .and_then(rusqlite::Error::sqlite_error)
+                .is_some_and(|e| e.code == rusqlite::ErrorCode::DatabaseBusy),
+            _ => false,
+        }
+    }
+    /// Stable diagnostic contains no paths, prompt, credentials or raw SQL.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::Refused(code) | Self::Cause { code, .. } => code,
+            Self::Busy { .. } => "agent-launch-storage-busy",
+            Self::Cleanup { .. } => "agent-launch-cleanup",
+            Self::Commit {
+                rollback_confirmed: true,
+                ..
+            } => "agent-launch-commit-refused",
+            Self::Commit { .. } => "agent-launch-commit-uncertain",
+        }
+    }
+}
+impl fmt::Display for AgentLaunchError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Self::Busy {
+            attempts,
+            settings_revision,
+            ..
+        } = self
+        {
+            write!(
+                f,
+                "{} (storage_attempts={attempts}; settings_revision={})",
+                self.code(),
+                settings_revision.0
+            )
+        } else {
+            f.write_str(self.code())
+        }
+    }
+}
+impl fmt::Debug for AgentLaunchError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self, f)
+    }
+}
+impl Error for AgentLaunchError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Refused(_) => None,
+            Self::Cause { cause, .. } => Some(cause.as_ref()),
+            Self::Cleanup { primary, .. } => Some(primary.as_ref()),
+            Self::Commit { cause, .. } | Self::Busy { cause, .. } => Some(cause.as_ref()),
+        }
+    }
+}
+/// Join an operation and mandatory cleanup without discarding either failure.
+/// A successful operation becomes refusal if its cleanup fails; no retry occurs.
+pub(crate) fn finish<T>(
+    result: Result<T, AgentLaunchError>,
+    cleanup: Result<(), AgentLaunchError>,
+) -> Result<T, AgentLaunchError> {
+    match (result, cleanup) {
+        (Ok(v), Ok(())) => Ok(v),
+        (Err(e), Ok(())) | (Ok(_), Err(e)) => Err(e),
+        (Err(primary), Err(cleanup)) => Err(AgentLaunchError::Cleanup {
+            primary: Box::new(primary),
+            cleanup: Box::new(cleanup),
+        }),
+    }
+}
+
+GO REFERENCE committed preparation
+func (s *Store) configureManagedRepositoryLocked(work string, r ManagedRepositoryRequest) (*ManagedRepository, error) {
+	source, err := resolveWorkspace(s.root, r.Path)
+	if err != nil {
+		return nil, err
+	}
+	top, err := managedGit(source, "rev-parse", "--show-toplevel")
+	if err != nil {
+		return nil, err
+	}
+	subdir, err := filepath.Rel(top, source)
+	if err != nil || strings.HasPrefix(subdir, "..") {
+		return nil, fmt.Errorf("projet hors dépôt Git")
+	}
+	if subdir == "." {
+		subdir = ""
+	}
+	encoded, _ := json.Marshal(r)
+	digest := hash(encoded)
+	storage := filepath.Join(s.root, ".swarm", "managed", work)
+	manifest := filepath.Join(storage, "repository.json")
+	var retained *ManagedRepository
+	var retainedRaw, canonical []byte
+	finalPresent := false
+	for i, path := range []string{manifest, manifest + ".pending"} {
+		raw, err := os.ReadFile(path)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		var prior ManagedRepository
+		if err = json.Unmarshal(raw, &prior); err != nil {
+			return nil, fmt.Errorf("manifeste préparé invalide, conservé pour diagnostic : %w", err)
+		}
+		if err = validatePreparedRepository(prior, storage, source, subdir, digest, r.Include); err != nil {
+			return nil, fmt.Errorf("preuve du dépôt préparé conservée sans réécriture : %w", err)
+		}
+		encoded, err := json.Marshal(prior)
+		if err != nil {
+			return nil, err
+		}
+		if retained != nil && string(canonical) != string(encoded) {
+			return nil, fmt.Errorf("manifestes final et préparé divergents ; conserver les originaux et réconcilier avant reprise")
+		}
+		if retained == nil {
+			retained, retainedRaw, canonical = &prior, raw, encoded
+		}
+		finalPresent = finalPresent || i == 0
+	}
+	if retained != nil {
+		if !finalPresent {
+			if err = atomicWrite(manifest, retainedRaw); err != nil {
+				return nil, err
+			}
+		}
+		return retained, nil
+	}
+	base, err := managedGit(source, "rev-parse", "HEAD")
+	if err != nil {
+		return nil, err
+	}
+	dirty, err := managedGit(source, "status", "--porcelain", "--untracked-files=normal")
+	if err != nil {
+		return nil, err
+	}
+	if dirty != "" && !r.CommittedOnly && len(r.Include) == 0 {
+		return nil, fmt.Errorf("dépôt modifié : choisir le commit enregistré ou nommer les fichiers de l’instantané")
+	}
+	if r.CommittedOnly && len(r.Include) > 0 {
+		return nil, fmt.Errorf("choisir le commit seul ou une liste de fichiers, pas les deux")
+	}
+	staging, err := os.MkdirTemp(storage, "repository-build-")
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(staging)
+	bare := filepath.Join(staging, "repository.git")
+	if _, err = managedGit(storage, "clone", "--bare", "--no-local", "--no-hardlinks", top, bare); err != nil {
+		return nil, err
+	}
+	included := map[string]string{}
+	if len(r.Include) > 0 {
+		copyDir := filepath.Join(staging, "snapshot")
+		if _, err = managedGit(storage, "clone", "--no-local", bare, copyDir); err != nil {
+			return nil, err
+		}
+		if _, err = managedGit(copyDir, "checkout", "--detach", base); err != nil {
+			return nil, err
+		}
+		total := int64(0)
+		for _, name := range r.Include {
+			if name == "" || filepath.IsAbs(name) || filepath.Clean(name) != name || name == ".." || strings.HasPrefix(name, "../") || strings.HasPrefix(name, ".git/") || strings.HasPrefix(name, ".swarm/") || name == ".git" || name == ".swarm" {
+				return nil, fmt.Errorf("chemin d’instantané interdit : %s", name)
+			}
+			if _, err = managedGit(source, "check-ignore", "--", name); err == nil {
+				return nil, fmt.Errorf("fichier ignoré exclu de l’instantané : %s", name)
+			}
+			src := filepath.Join(source, name)
+			dest := filepath.Join(copyDir, subdir, name)
+			for parent := dest; parent != copyDir; parent = filepath.Dir(parent) {
+				if st, e := os.Lstat(parent); e == nil && st.Mode()&os.ModeSymlink != 0 {
+					return nil, fmt.Errorf("lien interdit dans la destination : %s", name)
+				}
+			}
+			stat, statErr := os.Lstat(src)
+			if os.IsNotExist(statErr) {
+				if _, err = managedGit(source, "ls-files", "--error-unmatch", "--", name); err != nil {
+					return nil, err
+				}
+				if err = os.Remove(dest); err != nil && !os.IsNotExist(err) {
+					return nil, err
+				}
+				included[name] = "deleted"
+				continue
+			}
+			if statErr != nil || !stat.Mode().IsRegular() {
+				return nil, fmt.Errorf("fichier régulier requis : %s", name)
+			}
+			if _, err = localFile(source, name); err != nil {
+				return nil, err
+			}
+			total += stat.Size()
+			if total > 64<<20 {
+				return nil, fmt.Errorf("instantané supérieur à 64 Mio")
+			}
+			data, err := os.ReadFile(src)
+			if err != nil {
+				return nil, err
+			}
+			if err = os.MkdirAll(filepath.Dir(dest), 0700); err != nil {
+				return nil, err
+			}
+			if err = os.WriteFile(dest, data, stat.Mode().Perm()); err != nil {
+				return nil, err
+			}
+			included[name] = hash(data)
+		}
+		gitPaths := []string{}
+		for _, name := range r.Include {
+			gitPaths = append(gitPaths, filepath.Join(subdir, name))
+		}
+		if _, err = managedGit(copyDir, append([]string{"add", "-A", "--"}, gitPaths...)...); err != nil {
+			return nil, err
+		}
+		tree, err := managedGit(copyDir, "write-tree")
+		if err != nil {
+			return nil, err
+		}
+		base, err = managedGit(copyDir, "commit-tree", tree, "-p", base, "-m", "Instantané autorisé pour Swarm")
+		if err != nil {
+			return nil, err
+		}
+		if _, err = managedGit(bare, "fetch", "--no-tags", copyDir, base); err != nil {
+			return nil, err
+		}
+	}
+	if _, err = managedGit(bare, "update-ref", "refs/heads/swarm-result", base); err != nil {
+		return nil, err
+	}
+	if _, err = managedGit(bare, "symbolic-ref", "HEAD", "refs/heads/swarm-result"); err != nil {
+		return nil, err
+	}
+	final := filepath.Join(storage, "repository.git")
+	if _, err = os.Lstat(final); err == nil {
+		return nil, fmt.Errorf("dépôt préparé sans manifeste : examiner avant reprise")
+	}
+	snap, _ := json.Marshal(map[string]any{"base": base, "files": included})
+	repo := &ManagedRepository{Subdir: subdir, Source: source, Storage: storage, Base: base, Candidate: base, Snapshot: hash(snap), Included: r.Include, RequestDigest: digest}
+	raw, _ := json.Marshal(repo)
+	if err = atomicWrite(manifest+".pending", raw); err != nil {
+		return nil, err
+	}
+	if err = os.Rename(bare, final); err != nil {
+		return nil, err
+	}
+	if err = atomicWrite(manifest, raw); err != nil {
+		return nil, err
+	}
+	return repo, nil
+}
+func validatePreparedRepository(prior ManagedRepository, storage, source, subdir, digest string, include []string) error {
+	if prior.RequestDigest != digest || prior.Storage != storage || prior.Source != source || prior.Subdir != subdir || !slices.Equal(prior.Included, include) {
+		return fmt.Errorf("manifeste du dépôt incompatible avec la sélection et ses chemins canoniques ; réconcilier avant reprise")
+	}
+	snapshot, err := hex.DecodeString(prior.Snapshot)
+	if err != nil || len(snapshot) != 32 {
+		return fmt.Errorf("empreinte SHA-256 du dépôt préparé absente ou invalide")
+	}
+	for _, oid := range []string{prior.Base, prior.Candidate} {
+		if oid == "" {
+			return fmt.Errorf("identité Git du dépôt préparé absente")
+		}
+		resolved, err := managedGit(filepath.Join(storage, "repository.git"), "rev-parse", "--verify", oid+"^{commit}")
+		if err != nil {
+			return fmt.Errorf("objet Git préparé absent : %w", err)
+		}
+		if resolved != oid {
+			return fmt.Errorf("identité Git préparée non canonique")
+		}
+	}
+	return nil
+}
+

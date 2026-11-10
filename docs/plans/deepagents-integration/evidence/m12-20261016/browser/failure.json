@@ -1,0 +1,5 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: Escape restores focus\n\nfalse !== true\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/dialogue_recovery_ui.cjs:46:118",
+  "errors": [],
+  "failures": []
+}

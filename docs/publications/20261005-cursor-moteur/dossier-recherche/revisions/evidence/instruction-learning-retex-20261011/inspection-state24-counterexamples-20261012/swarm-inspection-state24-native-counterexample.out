@@ -1,0 +1,6 @@
+=== RUN   TestFragmentFindingContractNativeInspectedNeeds
+--- PASS: TestFragmentFindingContractNativeInspectedNeeds (0.01s)
+=== RUN   TestFragmentFindingContractSchemaOracle
+--- PASS: TestFragmentFindingContractSchemaOracle (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.030s

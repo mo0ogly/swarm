@@ -1,0 +1,52 @@
+{"Time":"2026-10-12T23:59:48.211462533+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-12T23:59:48.232991952+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01HTTPPreviewApply"}
+{"Time":"2026-10-12T23:59:48.233059659+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01HTTPPreviewApply","Output":"=== RUN   TestGraphDraftB01HTTPPreviewApply\n"}
+{"Time":"2026-10-12T23:59:48.272479244+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01HTTPPreviewApply","Output":"--- PASS: TestGraphDraftB01HTTPPreviewApply (0.04s)\n"}
+{"Time":"2026-10-12T23:59:48.272538685+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01HTTPPreviewApply","Elapsed":0.04}
+{"Time":"2026-10-12T23:59:48.272562319+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01HTTPGuardsAndStatus"}
+{"Time":"2026-10-12T23:59:48.27256808+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01HTTPGuardsAndStatus","Output":"=== RUN   TestGraphDraftB01HTTPGuardsAndStatus\n"}
+{"Time":"2026-10-12T23:59:48.308189916+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01HTTPGuardsAndStatus","Output":"--- PASS: TestGraphDraftB01HTTPGuardsAndStatus (0.04s)\n"}
+{"Time":"2026-10-12T23:59:48.308236483+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01HTTPGuardsAndStatus","Elapsed":0.04}
+{"Time":"2026-10-12T23:59:48.308248395+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01Persistence"}
+{"Time":"2026-10-12T23:59:48.308252663+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01Persistence","Output":"=== RUN   TestGraphDraftB01Persistence\n"}
+{"Time":"2026-10-12T23:59:48.353759298+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01Persistence/migration-from-v23"}
+{"Time":"2026-10-12T23:59:48.35381947+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01Persistence/migration-from-v23","Output":"=== RUN   TestGraphDraftB01Persistence/migration-from-v23\n"}
+{"Time":"2026-10-12T23:59:48.515074538+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01Persistence/migration-from-v23","Output":"--- PASS: TestGraphDraftB01Persistence/migration-from-v23 (0.16s)\n"}
+{"Time":"2026-10-12T23:59:48.515217956+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01Persistence/migration-from-v23","Elapsed":0.16}
+{"Time":"2026-10-12T23:59:48.517098652+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01Persistence","Output":"--- PASS: TestGraphDraftB01Persistence (0.21s)\n"}
+{"Time":"2026-10-12T23:59:48.517147093+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01Persistence","Elapsed":0.21}
+{"Time":"2026-10-12T23:59:48.517163394+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies"}
+{"Time":"2026-10-12T23:59:48.51717247+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies","Output":"=== RUN   TestGraphDraftB01InvalidDependencies\n"}
+{"Time":"2026-10-12T23:59:48.556150951+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/unknown"}
+{"Time":"2026-10-12T23:59:48.55620946+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/unknown","Output":"=== RUN   TestGraphDraftB01InvalidDependencies/unknown\n"}
+{"Time":"2026-10-12T23:59:48.557565496+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/unknown","Output":"--- PASS: TestGraphDraftB01InvalidDependencies/unknown (0.00s)\n"}
+{"Time":"2026-10-12T23:59:48.557640857+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/unknown","Elapsed":0}
+{"Time":"2026-10-12T23:59:48.557657568+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/duplicate"}
+{"Time":"2026-10-12T23:59:48.557668949+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/duplicate","Output":"=== RUN   TestGraphDraftB01InvalidDependencies/duplicate\n"}
+{"Time":"2026-10-12T23:59:48.559149697+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/duplicate","Output":"--- PASS: TestGraphDraftB01InvalidDependencies/duplicate (0.00s)\n"}
+{"Time":"2026-10-12T23:59:48.559199681+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/duplicate","Elapsed":0}
+{"Time":"2026-10-12T23:59:48.559212625+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/cycle"}
+{"Time":"2026-10-12T23:59:48.559221552+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/cycle","Output":"=== RUN   TestGraphDraftB01InvalidDependencies/cycle\n"}
+{"Time":"2026-10-12T23:59:48.560617531+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/cycle","Output":"--- PASS: TestGraphDraftB01InvalidDependencies/cycle (0.00s)\n"}
+{"Time":"2026-10-12T23:59:48.560658508+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies/cycle","Elapsed":0}
+{"Time":"2026-10-12T23:59:48.562204739+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies","Output":"--- PASS: TestGraphDraftB01InvalidDependencies (0.05s)\n"}
+{"Time":"2026-10-12T23:59:48.562244673+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01InvalidDependencies","Elapsed":0.05}
+{"Time":"2026-10-12T23:59:48.562258259+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ConcurrentApply"}
+{"Time":"2026-10-12T23:59:48.562266705+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ConcurrentApply","Output":"=== RUN   TestGraphDraftB01ConcurrentApply\n"}
+{"Time":"2026-10-12T23:59:48.619308024+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ConcurrentApply","Output":"--- PASS: TestGraphDraftB01ConcurrentApply (0.06s)\n"}
+{"Time":"2026-10-12T23:59:48.619372825+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ConcurrentApply","Elapsed":0.06}
+{"Time":"2026-10-12T23:59:48.619387753+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope"}
+{"Time":"2026-10-12T23:59:48.619392562+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope","Output":"=== RUN   TestGraphDraftB01ActiveScope\n"}
+{"Time":"2026-10-12T23:59:48.619399355+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope/active-before-preview"}
+{"Time":"2026-10-12T23:59:48.619403863+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope/active-before-preview","Output":"=== RUN   TestGraphDraftB01ActiveScope/active-before-preview\n"}
+{"Time":"2026-10-12T23:59:48.673719867+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope/active-before-preview","Output":"--- PASS: TestGraphDraftB01ActiveScope/active-before-preview (0.05s)\n"}
+{"Time":"2026-10-12T23:59:48.67384454+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope/active-before-preview","Elapsed":0.05}
+{"Time":"2026-10-12T23:59:48.673861081+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope/active-after-preview"}
+{"Time":"2026-10-12T23:59:48.673870178+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope/active-after-preview","Output":"=== RUN   TestGraphDraftB01ActiveScope/active-after-preview\n"}
+{"Time":"2026-10-12T23:59:48.74466507+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope/active-after-preview","Output":"--- PASS: TestGraphDraftB01ActiveScope/active-after-preview (0.07s)\n"}
+{"Time":"2026-10-12T23:59:48.745277715+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope/active-after-preview","Elapsed":0.07}
+{"Time":"2026-10-12T23:59:48.74531234+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope","Output":"--- PASS: TestGraphDraftB01ActiveScope (0.13s)\n"}
+{"Time":"2026-10-12T23:59:48.745322058+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDraftB01ActiveScope","Elapsed":0.13}
+{"Time":"2026-10-12T23:59:48.745329482+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-12T23:59:48.749686227+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t0.538s\n"}
+{"Time":"2026-10-12T23:59:48.749742683+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":0.538}

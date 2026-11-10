@@ -1,0 +1,1150 @@
+{
+  "schema_version": 1,
+  "source": "docs/benchmarks/billing/resultats/campagne-20261005.jsonl",
+  "source_sha256": "273eb32334444b6fc25a59c7c205749af2ada9909e8aa99679cb03b4f3151c88",
+  "historical_commit": "de5cc67f48dc4845b32f43a92a92be5007a5e15e",
+  "binary_sha256": "ee014204158e5a1dff2a64093ad9e45ff0e02fe1ac45f1bffc7bd8a3a636640b",
+  "method": "CLI publique du binaire historique dont SHA256 concorde, sur 32 copies isolées ; aucune migration de ces copies ni écriture des originaux. work show et planning show.",
+  "cases": [
+    {
+      "key_mode": "none",
+      "fault": "F4e",
+      "seed": 1000,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 15,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 14,
+          "at": "2026-10-06T00:14:59.100781071Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T00:14:59.048023292Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "bb16bd29a0a8052a5ab436ff97479a02ad0acbae0d319d1f544c25f749a1aa90"
+    },
+    {
+      "key_mode": "none",
+      "fault": "F4e",
+      "seed": 1012,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T00:19:17.133042454Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T00:19:15.088104096Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "9af49588ce104abd9220258cb8b75e1276dc01e2c200176dece4c58242841080"
+    },
+    {
+      "key_mode": "none",
+      "fault": "F4e",
+      "seed": 1016,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 15,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 14,
+          "at": "2026-10-06T00:20:27.284198297Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T00:20:27.239151472Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "2242be0cac93c6654e63c3438ced1ea32e2fdb89dc1a9149a9c82a6de4f8ba00"
+    },
+    {
+      "key_mode": "none",
+      "fault": "F4e",
+      "seed": 1036,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T00:27:44.898655185Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T00:27:42.858918493Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "3b3c8beddc002d5fec8ccd08982a6d91b62c21f8f15aafe34448781d34407ffd"
+    },
+    {
+      "key_mode": "none",
+      "fault": "F4e",
+      "seed": 1038,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 19,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 18,
+          "at": "2026-10-06T00:28:16.753605911Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T00:28:12.706206354Z",
+          "lease_seconds": 120
+        },
+        {
+          "revision": 17,
+          "at": "2026-10-06T00:28:16.706299615Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "d8207db057286fb17e040ca7d0a8025a871e28c6b9c0926b8f20aa401d7184e8"
+    },
+    {
+      "key_mode": "none",
+      "fault": "F4e",
+      "seed": 1040,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 19,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 18,
+          "at": "2026-10-06T00:28:46.245094656Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T00:28:42.206512621Z",
+          "lease_seconds": 120
+        },
+        {
+          "revision": 17,
+          "at": "2026-10-06T00:28:46.205869057Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "a94253ed5caafb847d8e28bda66a508e73820e2add256ae41065739b131e90c0"
+    },
+    {
+      "key_mode": "none",
+      "fault": "F4e",
+      "seed": 1045,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T00:30:24.208556351Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T00:30:22.168478628Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "7d18692b43b6fffe81fceb7e36e7a81d644d3c05a1f1d723d5e6a83221590971"
+    },
+    {
+      "key_mode": "none",
+      "fault": "F4e",
+      "seed": 1047,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 15,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 14,
+          "at": "2026-10-06T00:30:51.664672727Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T00:30:51.633776161Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "312da7e2703c959accbf24295b52b740e9f669864dd54652a5b9cff616dfe62d"
+    },
+    {
+      "key_mode": "none",
+      "fault": "F4e",
+      "seed": 1087,
+      "status": "DÉLAI",
+      "error": null,
+      "attribution": "planning_progress_unresolved",
+      "public_event_count": 21,
+      "sqlite_busy_events": [],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T00:45:53.556360763Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "accepted",
+        "settle": "todo",
+        "verrou": "accepted"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "11f74c47349eca5f510f2c0b9a5135bfaa5bd43ba3235064d24c5c60381bac32",
+      "duration_s": 120.482,
+      "metrics": {
+        "invoices": 12,
+        "payments": 0,
+        "doubles": 0,
+        "wrong": 0,
+        "unpaid": 12,
+        "violations": []
+      },
+      "settle_launched": false,
+      "false_success": false,
+      "order_proof": {
+        "proven": true,
+        "prepare_accepted_at": 1791247557.640419,
+        "tampered_at": 1791247557.9855459,
+        "settle_started_at": null
+      },
+      "prepare_validation_state": "stale",
+      "holder_retained": true,
+      "lease_until": "2026-10-06T00:47:53.556328683Z"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F4e",
+      "seed": 1002,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 15,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 14,
+          "at": "2026-10-06T06:35:57.893875432Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T06:35:57.856023779Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "ef05c98549f864595a9190f9d6077eaf56829341438bd398e0e7eca3b2e7e9e3"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F4e",
+      "seed": 1004,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T06:36:23.609336146Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T06:36:21.571866723Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "eab9d9a626475b6d179d1fbde7bba72e7cf310b9eb7d38e19c0a5ec239211db5"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F4e",
+      "seed": 1006,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 15,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 14,
+          "at": "2026-10-06T06:36:49.583434253Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T06:36:49.542116518Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "d0bcb2615d8da1a8b5830d69ed305c76e0fea4c1745135e270ae272618c18b75"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F4e",
+      "seed": 1029,
+      "status": "DÉLAI",
+      "error": null,
+      "attribution": "planning_progress_unresolved",
+      "public_event_count": 21,
+      "sqlite_busy_events": [],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T06:45:12.653145646Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "accepted",
+        "settle": "todo",
+        "verrou": "accepted"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "9d2407b4c75579e09d103961ffd433330f0529d895d3db07e08e62270bca4b5d",
+      "duration_s": 120.64,
+      "metrics": {
+        "invoices": 12,
+        "payments": 0,
+        "doubles": 0,
+        "wrong": 0,
+        "unpaid": 12,
+        "violations": []
+      },
+      "settle_launched": false,
+      "false_success": false,
+      "order_proof": {
+        "proven": true,
+        "prepare_accepted_at": 1791269116.73108,
+        "tampered_at": 1791269116.7856598,
+        "settle_started_at": null
+      },
+      "prepare_validation_state": "stale",
+      "holder_retained": true,
+      "lease_until": "2026-10-06T06:47:12.653130227Z"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F4e",
+      "seed": 1030,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T06:47:15.380773876Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T06:47:13.344797199Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "77526358ac7a5b4b37c10c981b44a1ec19005613ed29abcd01f9618b189fe4ae"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F4e",
+      "seed": 1032,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 16,
+          "at": "2026-10-06T06:47:40.849330818Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 15,
+          "at": "2026-10-06T06:47:40.809209028Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "53f1e4ac659eefd5a6224fd452971f653d64ab831d6b7f8bf0722e7ac55d9e0f"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F4e",
+      "seed": 1037,
+      "status": "DÉLAI",
+      "error": null,
+      "attribution": "planning_progress_unresolved",
+      "public_event_count": 21,
+      "sqlite_busy_events": [],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T06:49:15.443469863Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "accepted",
+        "settle": "todo",
+        "verrou": "accepted"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "73bb4aa3ee7e79e198a3e1fbdc68b3c26fe8db9b91b0c12e531831386110c3f9",
+      "duration_s": 120.644,
+      "metrics": {
+        "invoices": 12,
+        "payments": 0,
+        "doubles": 0,
+        "wrong": 0,
+        "unpaid": 12,
+        "violations": []
+      },
+      "settle_launched": false,
+      "false_success": false,
+      "order_proof": {
+        "proven": true,
+        "prepare_accepted_at": 1791269359.525773,
+        "tampered_at": 1791269359.9018204,
+        "settle_started_at": null
+      },
+      "prepare_validation_state": "stale",
+      "holder_retained": true,
+      "lease_until": "2026-10-06T06:51:15.443449124Z"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F4e",
+      "seed": 1078,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T07:06:30.039103382Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T07:06:28.001889581Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "7ac2308dd97ba992ed0d50ff6386f5f5dc573a113d8bf8ff50c024362d613952"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F4e",
+      "seed": 1080,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T07:06:58.028811368Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T07:06:55.995556066Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "a63341a6b9b8687e2f3ecd28db2558af020dd111463defce87994818acef2665"
+    },
+    {
+      "key_mode": "attempt",
+      "fault": "F7",
+      "seed": 1010,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 12,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 12,
+          "at": "2026-10-06T08:15:08.414111715Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 11,
+          "at": "2026-10-06T08:15:08.348503826Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "8abd2a4a695c3acb5d1c38e791f36240a91c5276f782f0531d593e43d65584c7"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1008,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 19,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 18,
+          "at": "2026-10-06T12:56:35.657413676Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T12:56:31.621657056Z",
+          "lease_seconds": 120
+        },
+        {
+          "revision": 17,
+          "at": "2026-10-06T12:56:35.61770687Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "e18cd602c9d88e6047b7e0edcc871e12215e75bd8077ca3e2377ac2086c4ec4b"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1009,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T12:56:41.165356402Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T12:56:39.126169732Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "b58884d4d443552f519e9d3383bdd16858c2dadedc5e92b1d4a8fca1fba3f9af"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1017,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T12:59:29.945361634Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T12:59:27.9044622Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "a7ae8f58435a9e1142fe9b90a1ff951751a94a6e5fa02a354d30c80bfa15f04c"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1018,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 15,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 14,
+          "at": "2026-10-06T12:59:33.616342122Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T12:59:33.574241641Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "068e797345558bea0bb7da197376367c5cb80374bb43450544568dc2f594505c"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1021,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T13:00:28.150269087Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T13:00:26.114612864Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "f4e43d11bc6191d30b6790c5302e1a87138739a18870770419423cf487fa503b"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1027,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T13:02:30.978118656Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T13:02:28.943254123Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "0c15dea2a5a823476c3e6e4bd944e0885c548a198859bf970df0c7cc9a425f91"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1041,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 15,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 14,
+          "at": "2026-10-06T13:07:33.457543772Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T13:07:33.411307276Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "69068134b3047410a896f773cd9d658c4629c3d19796c3014b1e6a5a05d95024"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1056,
+      "status": "DÉLAI",
+      "error": null,
+      "attribution": "planning_progress_unresolved",
+      "public_event_count": 21,
+      "sqlite_busy_events": [],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T13:12:57.137244168Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "accepted",
+        "settle": "todo",
+        "verrou": "accepted"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "4fce183211fadf54419274c50e42f0098cc076889ac377dc57b452cf1d030b70",
+      "duration_s": 120.893,
+      "metrics": {
+        "invoices": 12,
+        "payments": 0,
+        "doubles": 0,
+        "wrong": 0,
+        "unpaid": 12,
+        "violations": []
+      },
+      "settle_launched": false,
+      "false_success": false,
+      "order_proof": {
+        "proven": true,
+        "prepare_accepted_at": 1791292381.223056,
+        "tampered_at": 1791292381.5507417,
+        "settle_started_at": null
+      },
+      "prepare_validation_state": "stale",
+      "holder_retained": true,
+      "lease_until": "2026-10-06T13:14:57.137225052Z"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1064,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 19,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 18,
+          "at": "2026-10-06T13:17:43.9667841Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 13,
+          "at": "2026-10-06T13:17:41.921131419Z",
+          "lease_seconds": 120
+        },
+        {
+          "revision": 17,
+          "at": "2026-10-06T13:17:43.917066922Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "e5de8f171e0df96b93e94de9715c0ae5750eb379ba672c01ddcc6ff6f03ff129"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1073,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T13:20:52.804272238Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T13:20:50.767346704Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "fc1cfba53aad4e0de872a62dcdbb13786c8353433a07e89817ed83ad802b0163"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1075,
+      "status": "ERREUR",
+      "error": "BenchError: planification suspendue : Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 15,
+      "sqlite_busy_events": [
+        {
+          "kind": "planning.failure",
+          "revision": 14,
+          "at": "2026-10-06T13:21:18.729113512Z",
+          "reason": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)"
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T13:21:18.692314959Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": "Proposition non appliquée : database is locked (5) (SQLITE_BUSY)",
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "58da39d8256177b172eec27cff4159c7043265641137765d4d2e4af28143abd7"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1078,
+      "status": "ERREUR",
+      "error": "BenchError: vérificateur indépendant en échec : database is locked (5) (SQLITE_BUSY)",
+      "attribution": "storage_busy",
+      "public_event_count": 17,
+      "sqlite_busy_events": [
+        {
+          "kind": "review.failure",
+          "revision": 16,
+          "at": "2026-10-06T13:22:12.694460637Z",
+          "reason": null
+        }
+      ],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T13:22:10.65915361Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": "database is locked (5) (SQLITE_BUSY)",
+      "tasks": {
+        "prepare": "submitted",
+        "settle": "todo",
+        "verrou": "blocked"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "86021b1654c4bb17f070eda7a3632e3a864eb3bb26337f0a7e2a100dc0f07cf4"
+    },
+    {
+      "key_mode": "business",
+      "fault": "F4e",
+      "seed": 1087,
+      "status": "DÉLAI",
+      "error": null,
+      "attribution": "planning_progress_unresolved",
+      "public_event_count": 21,
+      "sqlite_busy_events": [],
+      "planning_claims": [
+        {
+          "revision": 12,
+          "at": "2026-10-06T13:25:20.376874569Z",
+          "lease_seconds": 120
+        }
+      ],
+      "planning_failure": null,
+      "reviewer_failure": null,
+      "tasks": {
+        "prepare": "accepted",
+        "settle": "todo",
+        "verrou": "accepted"
+      },
+      "dependency_stale_event": false,
+      "events_sha256": "3401a25bbf8988eaa6bbc82ae9f50fa976a978e1cd40e7ea52c902477dcd61d2",
+      "duration_s": 120.769,
+      "metrics": {
+        "invoices": 12,
+        "payments": 0,
+        "doubles": 0,
+        "wrong": 0,
+        "unpaid": 12,
+        "violations": []
+      },
+      "settle_launched": false,
+      "false_success": false,
+      "order_proof": {
+        "proven": true,
+        "prepare_accepted_at": 1791293124.472712,
+        "tampered_at": 1791293124.5569932,
+        "settle_started_at": null
+      },
+      "prepare_validation_state": "stale",
+      "holder_retained": true,
+      "lease_until": "2026-10-06T13:27:20.376853218Z"
+    }
+  ]
+}

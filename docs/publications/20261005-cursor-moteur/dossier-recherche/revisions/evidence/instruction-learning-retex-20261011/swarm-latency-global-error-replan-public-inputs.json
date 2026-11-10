@@ -1,0 +1,86 @@
+{
+  "at": "2026-10-11T16:14:53.906232+00:00",
+  "bundle": {
+    "at": "2026-10-11T16:13:11.104390+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-effort-20261011.bundle",
+    "sha256": "317d19f615ca09627319c107edf35daa1c1ea1013824c050814c5c5b8b73bd11",
+    "bytes": 341981,
+    "ref": "refs/heads/operator-inputs",
+    "commit": "b78a7ec9776ee8c2eeb35a495e98aeff4020060d",
+    "manifest_sha256": "18b1324a239300204e58c7856fdecf2687cc5b1d819273f7754a5c282294af83",
+    "input_files": 55,
+    "source": "/tmp/swarm-operator-effort-inputs-20261011-os_o6uw6",
+    "isolated_import_check": "/tmp/swarm-operator-effort-input-check-0g6ko8r9",
+    "verification": "PASS isolated fetch, commit/manifest/all55 full hashes",
+    "limits": "Operator inputs only. No native integration, future code behavior or acceptance asserted."
+  },
+  "receipts": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "before_revision": 367,
+      "after_revision": 368,
+      "before_bytes": 30615,
+      "after_bytes": 15712,
+      "initial_bytes_preserved": 8442,
+      "learning_history_preserved": true,
+      "consumed_calls": 29,
+      "new_instruction_sha256": "6e2feaf37a0eaf0156730bab0bfcf7ffe41041dadf0b682730c4f0c8132eab8b"
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "before_revision": 368,
+      "after_revision": 369,
+      "before_bytes": 25250,
+      "after_bytes": 11708,
+      "initial_bytes_preserved": 6022,
+      "learning_history_preserved": true,
+      "consumed_calls": 29,
+      "new_instruction_sha256": "4d7af98626affa3382b175aae489ef2c350fc623a619c475f2c47cbde6d7e5dd"
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "before_revision": 369,
+      "after_revision": 370,
+      "before_bytes": 30956,
+      "after_bytes": 17328,
+      "initial_bytes_preserved": 11695,
+      "learning_history_preserved": true,
+      "consumed_calls": 29,
+      "new_instruction_sha256": "4b719698e6e9298393b8cadca25f37cfc7d7458f824ab82874ca56bd9b4ec075"
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "before_revision": 370,
+      "after_revision": 371,
+      "before_bytes": 18995,
+      "after_bytes": 13237,
+      "initial_bytes_preserved": 7218,
+      "learning_history_preserved": true,
+      "consumed_calls": 29,
+      "new_instruction_sha256": "fb29ab409dbd1336924f65032779bcc8ffebe0fe325569bd26d63e39207c901a"
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "before_revision": 371,
+      "after_revision": 372,
+      "before_bytes": 23893,
+      "after_bytes": 13073,
+      "initial_bytes_preserved": 6913,
+      "learning_history_preserved": true,
+      "consumed_calls": 29,
+      "new_instruction_sha256": "7fb5cf94bad72e2f561447a0e59e841f521815b91f19a99a0f2dc92b2a1d0ced"
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "before_revision": 372,
+      "after_revision": 373,
+      "before_bytes": 8813,
+      "after_bytes": 7319,
+      "initial_bytes_preserved": 1523,
+      "learning_history_preserved": true,
+      "consumed_calls": 29,
+      "new_instruction_sha256": "7d7f9ffe90760452434084c474c7710c1caaa150de4d08c4cdac4947ad77a71b"
+    }
+  ],
+  "limit": "Public task inputs received; native producer launches/contexts and global error behavior not yet proven. Superseded operator prefixes archived, initial content and attributed learning retained."
+}

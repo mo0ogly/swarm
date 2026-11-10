@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-quarantine-public",
+  "inputs": [
+    "tests/blp_quarantine_public.py",
+    "tests/blp_quarantine_ui.cjs",
+    "tests/blp_attribution_history_cli.py",
+    "tests/fixture_area.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tools/verification/recipe.py",
+    "package.json",
+    "package-lock.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-inert-api-cli-and-admin-ui",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess; subprocess.run(['python3','tests/blp_quarantine_public.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--helper',os.environ['SWARM_BLP_HELPER'],'--output',os.environ['SWARM_BLP_PROOF_OUTPUT']],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "QUARANTINE_PUBLIC_PASS 28",
+        "PASS refused-cli-api-send-no-socket-or-byte",
+        "PASS pending-production-worker-refuses-at-claim",
+        "PASS actual-cli-operation-holds-egress-reservation",
+        "QUARANTINE_JOURNEY_SHA256"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

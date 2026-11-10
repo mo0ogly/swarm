@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "id": "mission-reviewer-revocation",
+  "inputs": [
+    "rust/crates/swarm-cli/src/mission_watch.rs",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/financial_budget.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/native_diagnostics.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/agent_execution_origin.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_producer.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_report_relay.rs",
+    "rust/crates/swarm-engine/src/root_store/review_preview.rs",
+    "rust/crates/swarm-engine/src/root_store/review_preview/*.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/*.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/gate.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/journal.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/mission_authority.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/process.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/publication.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/retirement.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/review_evidence.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/runtime.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/source_authority.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/source_policy.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/store.rs",
+    "rust/crates/swarm-engine/src/task_report.rs",
+    "rust/crates/swarm-engine/src/work_engine.rs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_controls.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_review_refusal.py",
+    "tests/rust_mission_review_revocation.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "tests/test_rust_mission_control_helpers.py",
+    "tests/test_rust_report_relay_guards.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "running-barrier-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_report_relay_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_starting_is_not_success_and_actual_running_is_required",
+        "test_observation_and_cleanup_causes_both_survive",
+        "Ran 2 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "metadata-read-close-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_mission_control_helpers.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_positive_read_before_primary_and_close_fault",
+        "test_close_failure_never_turns_valid_read_into_success",
+        "Ran 2 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "actual-reviewer-consent-revocation",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='mission-reviewer-revocation-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_review_revocation.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS actual permitted reviewer terminates after public consent revocation without favorable verdict",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

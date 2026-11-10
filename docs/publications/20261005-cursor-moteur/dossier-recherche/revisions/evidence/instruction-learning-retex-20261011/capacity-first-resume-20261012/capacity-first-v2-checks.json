@@ -1,0 +1,59 @@
+[
+  {
+    "name": "anchors",
+    "argv": [
+      "go",
+      "test",
+      "./internal/engine",
+      "-run",
+      "^(TestFreshReserveRejectsUnbudgetedHistoricalArray|TestManagedFragmentSelection|TestManagedFragmentRejectsTampering|TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal)$",
+      "-count=1",
+      "-timeout=90s"
+    ],
+    "started": "2026-10-12T18:53:36.643854+00:00",
+    "exit": 0,
+    "seconds": 29.51421604999996,
+    "output_sha256": "87fda9192e05414844bce5daf188cfa3aad65027d33ed7ee0a0e79c7c2ede3e1",
+    "drift": []
+  },
+  {
+    "name": "vet",
+    "argv": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "started": "2026-10-12T18:54:06.158660+00:00",
+    "exit": 0,
+    "seconds": 14.76800583899967,
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "drift": []
+  },
+  {
+    "name": "methods",
+    "argv": [
+      "python3",
+      "tools/agent-workflows/check.py"
+    ],
+    "started": "2026-10-12T18:54:20.927435+00:00",
+    "exit": 0,
+    "seconds": 4.10274344499976,
+    "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+    "drift": []
+  },
+  {
+    "name": "build",
+    "argv": [
+      "go",
+      "build",
+      "-o",
+      "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-qualified-capacity-first-v2",
+      "./cmd/swarm"
+    ],
+    "started": "2026-10-12T18:54:25.030717+00:00",
+    "exit": 0,
+    "seconds": 2.640119304000109,
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "drift": []
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "citation-capacity-pause-b6195a2bf389",
+  "expected_revision": 371,
+  "reason": "Retry preflight refused before mutation or spending: recovery prefix was measured against completed inspections. Diagnose and reproduce the remaining-message boundary while preserving original journals and all budgets."
+}

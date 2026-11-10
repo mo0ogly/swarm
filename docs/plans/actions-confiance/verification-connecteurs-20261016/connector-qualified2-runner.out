@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/tmp/swarm-connector-qualified2.py", line 14, in <module>
+    for f in files:names.update(re.findall(r'^func (TestActionsConfianceT3\w+)\(',f.read_text(),re.M))
+                                                                                  ~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/pathlib/_local.py", line 548, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/pathlib/_abc.py", line 633, in read_text
+    return f.read()
+           ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x80 in position 7: invalid start byte

@@ -1,0 +1,96 @@
+ M docs/architecture/BIBA-RUST.md
+ M docs/architecture/NATIVE-MISSION-WORKER.md
+ M docs/architecture/PAEA-GIT-TRANSACTION.md
+ M docs/en/BIBA-RUST.md
+ M docs/en/NATIVE-MISSION-WORKER.md
+ M docs/en/PAEA-GIT-TRANSACTION.md
+ M docs/en/plans/actions-confiance/PAEA-APEX.md
+ M docs/plans/actions-confiance/PAEA-APEX.md
+ M rust/Cargo.lock
+ M rust/crates/swarm-biba-linux/src/kernel.rs
+ M rust/crates/swarm-biba-linux/src/lib.rs
+ M rust/crates/swarm-cli/src/mission_watch.rs
+ M rust/crates/swarm-cli/src/mission_watch/role_job.rs
+ M rust/crates/swarm-engine/Cargo.toml
+ M rust/crates/swarm-engine/src/agent_execution_gate.rs
+ M rust/crates/swarm-engine/src/git_pack.rs
+ M rust/crates/swarm-engine/src/lib.rs
+ M rust/crates/swarm-engine/src/local_storage.rs
+ M rust/crates/swarm-engine/src/native_provider_exec.rs
+ M rust/crates/swarm-engine/src/planning_run_material.rs
+ M rust/crates/swarm-engine/src/root_store.rs
+ M rust/crates/swarm-engine/src/root_store/paea_git_repository.rs
+ M rust/crates/swarm-engine/src/root_store/paea_git_repository/barrier_tests.rs
+ M rust/crates/swarm-engine/src/root_store/planning_native.rs
+ M rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs
+ M rust/crates/swarm-engine/src/root_store/reported_costs.rs
+ M rust/crates/swarm-engine/src/root_store/reviewer_native/gate.rs
+ M rust/crates/swarm-engine/src/root_store/reviewer_native/material.rs
+ M rust/crates/swarm-engine/src/validation_run.rs
+ M rust/crates/swarm-engine/tests/paea_git_repository.rs
+ M tests/rust_managed_planning.py
+ M tests/rust_mission_manual_review.py
+ M tools/verification/README.md
+ M tools/verification/recipes/mission-manual-automatic-controls.json
+ M tools/verification/recipes/paea-current-managed-git-publication.json
+ M tools/verification/recipes/paea-git-writer-format.json
+ M tools/verification/recipes/paea-historical-publication-cli.json
+ M tools/verification/recipes/paea-native-git-intent.json
+ M tools/verification/recipes/paea-native-git-pack.json
+ M tools/verification/recipes/paea-native-git-reference-transaction.json
+ M tools/verification/recipes/paea-private-git-repository.json
+ M tools/verification/recipes/paea-separated-settlement.json
+ M version_history.json
+?? docs/architecture/CLI-COMPATIBILITY-INVENTORY.md
+?? docs/architecture/GO-RUST-CUTOVER.md
+?? docs/en/CLI-COMPATIBILITY-INVENTORY.md
+?? docs/en/GO-RUST-CUTOVER.md
+?? docs/plans/actions-confiance/BIBA-TRANSVERSE-APEX.md
+?? docs/plans/actions-confiance/paea/BILAN-20261028.md
+?? docs/plans/actions-confiance/paea/CONTINUITE-77.md
+?? docs/plans/actions-confiance/paea/CONTINUITE-78.md
+?? docs/plans/actions-confiance/paea/CONTINUITE-79.md
+?? docs/plans/actions-confiance/paea/CONTINUITE-80.md
+?? docs/plans/actions-confiance/paea/CONTINUITE-81.md
+?? docs/plans/actions-confiance/paea/INCREMENT-77.md
+?? docs/plans/actions-confiance/paea/INCREMENT-78.md
+?? docs/plans/actions-confiance/paea/INCREMENT-79.md
+?? docs/plans/actions-confiance/paea/INCREMENT-80.md
+?? docs/plans/actions-confiance/paea/INCREMENT-81.md
+?? docs/plans/actions-confiance/verification-biba-transverse-20261028/
+?? docs/plans/migration-rust/COMPLETION-HORS-PAEA-20261028.md
+?? docs/plans/migration-rust/CURRENT-CLI-ROWS-20261028.json
+?? rust/crates/swarm-engine/src/local_pack_files.rs
+?? rust/crates/swarm-engine/src/native_provider_biba.rs
+?? rust/crates/swarm-engine/src/native_provider_workspace.rs
+?? rust/crates/swarm-engine/src/root_store/cockpit_actions.rs
+?? rust/crates/swarm-engine/src/root_store/cockpit_health.rs
+?? rust/crates/swarm-engine/src/root_store/cockpit_post_delivery.rs
+?? rust/crates/swarm-engine/src/root_store/paea_git_repository/source.rs
+?? rust/crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs
+?? rust/crates/swarm-engine/src/root_store/planning_stale_gate.rs
+?? rust/crates/swarm-engine/src/validation_run_recovery.rs
+?? tests/fixtures/biba_workspace_swap.c
+?? tests/paea_source_acquisition_inventory.py
+?? tests/rust_biba_boundary_driver.rs
+?? tests/rust_biba_linux_boundary.py
+?? tests/rust_biba_linux_boundary_build.py
+?? tests/rust_biba_private_root_probe.py
+?? tests/rust_biba_stdin_transport.py
+?? tests/rust_biba_workspace_swap.py
+?? tests/rust_cutover_go_root.py
+?? tests/test_rust_manual_provider_roles.py
+?? tools/rust-migration/cockpit_post_delivery_oracle.py
+?? tools/rust-migration/current_cli_inventory.py
+?? tools/rust-migration/fixtures/
+?? tools/rust-migration/run_cockpit_oracle.py
+?? tools/rust-migration/test_cockpit_oracle_retention.py
+?? tools/rust-migration/test_current_cli_inventory.py
+?? tools/verification/recipes/biba-linux-boundary.json
+?? tools/verification/recipes/cli-static-inventory.json
+?? tools/verification/recipes/go-rust-closed-cutover.json
+?? tools/verification/recipes/paea-native-git-source-context.json
+?? tools/verification/recipes/paea-native-git-source.json
+?? tools/verification/recipes/paea-owned-git-transfer.json
+?? tools/verification/recipes/paea-owned-source-acquisition.json
+?? tools/verification/recipes/paea-private-pack-files.json

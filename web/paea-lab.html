@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Swarm — PAEA</title>
+  <link rel="icon" href="/swarm-logo.png">
+  <link rel="stylesheet" href="/wattson_themes.css">
+  <link rel="stylesheet" href="/swarm-design.css">
+  <link rel="stylesheet" href="/paea.css">
+  <script src="/i18n-en.js" defer></script>
+  <script src="/i18n.js" defer></script>
+  <script src="/paea-lab.js" defer></script>
+</head>
+<body>
+<a class="paea-skip" href="#paea-main" data-i18n>Aller aux vérifications</a>
+<header><a href="/">Swarm</a><h1 data-i18n>Campagnes de laboratoire PAEA</h1><nav aria-label="Navigation PAEA"><a href="/paea.html" data-paea-link data-i18n>Vérifications PAEA</a><button id="paea-theme" type="button" data-i18n>Changer de thème</button></nav></header>
+<main id="paea-main" tabindex="-1">
+<p id="lab-limits" class="paea-notice" data-i18n>Effets SQLite/Git isolés, autorité simulée, même utilisateur système. Aucun accord humain, paiement réel, protection native ou évaluation indépendante.</p>
+<section aria-labelledby="lab-run-title"><h2 id="lab-run-title" data-i18n>Exécuter dans un laboratoire local</h2>
+<p data-i18n>Depuis le dépôt Swarm, utiliser un binaire déjà construit et son empreinte exacte. Choisir un dossier neuf dont le parent existe. Python et Git sont requis. Cette page ne lance aucune commande.</p>
+<pre id="lab-command" tabindex="0">python3 tools/paea/run_pilot.py --binary /CHEMIN/BINAIRE --sha256 SHA256 --output /DOSSIER/NEUF</pre>
+<p data-i18n>La commande conserve les sorties et les oracles, vérifie la recette, puis crée paea-lab-report.json seulement après huit tests réussis. Un échec conserve les preuves ; corriger sa cause et reprendre dans un nouveau dossier.</p>
+<details id="lab-scenarios"><summary data-i18n>Scénarios et limites</summary>
+<ul><li data-i18n>T04 : contenu substitué refusé, JSON équivalent accepté.</li><li data-i18n>T06/T21 : crash après effet, UNKNOWN, rapprochement et absence de duplication.</li><li data-i18n>T05/T17 : première utilisation après révocation refusée ; ordre inverse conservé. Ordres déterministes, pas une course distribuée.</li><li data-i18n>Oracle indisponible, référence Git périmée ou symbolique, échec de sortie : refus et reprise observés.</li><li data-i18n>Deux aliases bruts produisent deux effets : cela réfute l’unicité par identifiant brut. Deux aliases résolus convergent vers un seul effet dans la fixture coopérante.</li></ul>
+</details></section>
+<form id="lab-form"><fieldset id="lab-inputs"><legend data-i18n>Lire un résultat de campagne</legend><label for="lab-file" data-i18n>Rapport de laboratoire — JSON UTF-8</label><input id="lab-file" type="file" accept=".json,application/json"></fieldset><button id="lab-read" class="paea-primary" type="submit" disabled data-i18n>Lire le rapport</button></form>
+<p id="lab-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement…</p>
+<p data-i18n>Le fichier reste dans ce navigateur. Sa structure est contrôlée ; ses empreintes et ses déclarations ne sont pas authentifiées. Vérifier les originaux avec recipe.py verify avant toute interprétation.</p>
+<section id="lab-results" hidden aria-labelledby="lab-result-title"><h2 id="lab-result-title" data-i18n>Résultats déclarés du laboratoire</h2><p id="lab-counterexample" class="paea-notice" data-i18n>Le test des aliases bruts réussit en observant un défaut d’unicité. Ce résultat est un contre-exemple, aucune garantie de sécurité.</p><ul id="lab-tests"></ul><details><summary data-i18n>Empreintes déclarées des preuves</summary><dl id="lab-identities"></dl></details></section>
+<button id="lab-download" type="button" disabled data-i18n>Télécharger le rapport</button>
+</main></body></html>

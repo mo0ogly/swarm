@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT3IntrospectionActiveRevokedAndRestart
+    trust_introspection_test.go:136: positive in-flight proof survived observed issuer revocation
+--- FAIL: TestActionsConfianceT3IntrospectionActiveRevokedAndRestart (1.59s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	2.219s
+FAIL

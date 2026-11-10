@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT3IntrospectionPolicyContract
+    trust_introspection_test.go:19: introspection policy contract absent: json: unknown field "workload_introspection"
+--- FAIL: TestActionsConfianceT3IntrospectionPolicyContract (0.91s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.442s
+FAIL

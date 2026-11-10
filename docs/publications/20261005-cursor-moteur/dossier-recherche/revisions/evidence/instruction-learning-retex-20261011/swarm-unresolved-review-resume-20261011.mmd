@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant M as Moteur
+    participant S as Superviseur
+    participant R as Verificateur
+    M->>S: Incident original de protocole
+    S->>M: Acquittement sans correction
+    M->>M: Ancienne decision conservee, erreur toujours actuelle
+    Note over M,S: Entree actuelle nouvelle, aucune relance identique automatique
+    M->>S: Incident non resolu et reception liee aux identites
+    S->>M: Nouvelle correction review-retry
+    M->>M: Fraicheur, reception, droits et budget
+    M->>R: Directive originale capturee et preuves
+    R->>M: Avis independant
+    M->>M: Effet durable puis controles et publication

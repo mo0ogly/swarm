@@ -1,0 +1,10 @@
+{
+  "status": "GREEN_SAME_ORIGINAL_ROOT_EVENT_AND_MANIFEST",
+  "root": "/tmp/swarm-model83-ve37jk33",
+  "work": "w-3faae251c4cb1dfd9dd1e78f",
+  "binary_sha256": "47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+  "original_manifest_sha256": "e8d9126ec90869fe6d9126a74fcd3fa88c430508f7631ae0bbd2fba454068e4c",
+  "new_work_created": false,
+  "new_event_created": false,
+  "original_bytes_preserved": true
+}

@@ -1,0 +1,11 @@
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   'http://127.0.0.1:46313/log-console.html?lang=fr: net::ERR_ABORTED',
++   'http://127.0.0.1:46313/api/v1/runtime-health: net::ERR_ABORTED',
++   'http://127.0.0.1:46313/api/v1/snapshot?work=w-9e8621a313ea558a3e9016c9: net::ERR_ABORTED'
++ ]
+- []
+
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/project_memory_ui.cjs:69:37

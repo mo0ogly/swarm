@@ -1,0 +1,9 @@
+{
+  "path": "internal/engine/trust_evidence_service.go",
+  "before_sha256": "7b5db9f20f46176d6d26e5ac456489b07afa539d13ef59cc5505cadba17a9dce",
+  "after_sha256": "3636e767fa097a01aa71f68bff87c1336101d9e1fa73a24901cfecb07806f322",
+  "only_replacement": {
+    "before": "if op != \"policy-preview\" && op != \"policy-apply\" && !bool(p.Enabled) {",
+    "after": "if op != \"policy-preview\" && op != \"policy-apply\" && op != \"key-revoke\" && !bool(p.Enabled) {"
+  }
+}

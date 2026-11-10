@@ -1,0 +1,11 @@
+{
+  "verified_at_utc": "2026-10-16T07:27:54.629107+00:00",
+  "packet_sha256": "2855f3bde6af869d97ca8293d15659e01fb47cdf71f7ed347e3b4e6c17aa97b3",
+  "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6",
+  "dirty_diff_sha256": "f751c243ad1ab97125a2e8d4ebe67407c8124698960cf02e9b1447a3c5457ef1",
+  "source_entries": 1073,
+  "proof_entries": 204,
+  "mismatches": [],
+  "native_go_input_entries": 747,
+  "native_go_input_changes": []
+}

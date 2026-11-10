@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "foundation": "F1",
+  "title": "Definir les besoins du portail client Swarm",
+  "stories": [
+    "decouverte",
+    "catalogue",
+    "sessions",
+    "ressources",
+    "demarrage",
+    "administration",
+    "revocation"
+  ],
+  "users": [
+    {
+      "id": "prospect",
+      "label": "Prospect anonyme",
+      "stories": ["decouverte", "catalogue"],
+      "goal": "Comprendre Swarm (moteur deterministe separe des agents IA, coordination des responsabilites, preuves, reprise), voir le graphe et les preuves, comprendre les cinq fondations et les six etapes par fonctionnalite, choisir un modele.",
+      "constraints": "Pas de compte ; acces lecture seule aux pages publiques ; aucune ressource privee visible."
+    },
+    {
+      "id": "client",
+      "label": "Client connecte",
+      "stories": ["sessions", "ressources", "demarrage"],
+      "goal": "Se connecter, acceder a son espace personnel, consulter uniquement ses ressources autorisees, suivre le guide d'installation/fournisseurs/projet, preparer son lancement dans Swarm local ou les decisions et autorisations sont appliquees par le moteur.",
+      "constraints": "Isolation stricte de compte : aucun acces direct par URL ou identifiant devine aux ressources d'un autre compte ; session expirable et revocable a tout moment."
+    },
+    {
+      "id": "administrateur",
+      "label": "Administrateur plateforme",
+      "stories": ["administration", "revocation"],
+      "goal": "Selectionner un compte, attribuer ou retirer des droits, verifier que le refus serveur est reellement applique apres une revocation, consulter le journal des actions.",
+      "constraints": "Action d'administration tracee et horodatee ; effet verifiable immediatement cote serveur, pas seulement cote interface."
+    }
+  ],
+  "needs": [
+    {
+      "id": "N1",
+      "story": "decouverte",
+      "statement": "Presenter publiquement Swarm (moteur, methode, graphe, preuves) de maniere comprehensible sans jargon interne, en FR/EN, mobile et bureau.",
+      "priority": "must"
+    },
+    {
+      "id": "N2",
+      "story": "catalogue",
+      "statement": "Lister les modeles disponibles avec leurs cinq fondations et six etapes, permettre de comparer puis choisir un modele.",
+      "priority": "must"
+    },
+    {
+      "id": "N3",
+      "story": "sessions",
+      "statement": "Authentifier un client, maintenir une session avec expiration, permettre une deconnexion et une revocation immediate sans reliquat d'acces.",
+      "priority": "must"
+    },
+    {
+      "id": "N4",
+      "story": "ressources",
+      "statement": "Donner acces en lecture uniquement aux fichiers/ressources que le compte connecte est autorise a voir ; refuser toute ressource d'un autre compte meme via URL directe ou identifiant devine.",
+      "priority": "must"
+    },
+    {
+      "id": "N5",
+      "story": "demarrage",
+      "statement": "Guider pas a pas l'installation, le choix de fournisseur IA et la configuration projet jusqu'a la preparation effective dans Swarm local.",
+      "priority": "must"
+    },
+    {
+      "id": "N6",
+      "story": "administration",
+      "statement": "Permettre a un administrateur de rechercher un compte, consulter ses droits actuels, les modifier et voir un journal horodate des changements.",
+      "priority": "must"
+    },
+    {
+      "id": "N7",
+      "story": "revocation",
+      "statement": "Garantir qu'une revocation (session ou droit) produit un refus serveur effectif immediat, verifiable independamment de l'etat affiche par l'interface.",
+      "priority": "must"
+    },
+    {
+      "id": "N8",
+      "story": "transversal",
+      "statement": "Couvrir FR/EN, mobile/bureau, navigation clavier et les quatre etats (chargement/vide/erreur/succes) sur chaque ecran du parcours.",
+      "priority": "must"
+    }
+  ],
+  "scope": {
+    "included": [
+      "Pages publiques : presentation Swarm, graphe/preuves, catalogue de modeles, cinq fondations et six etapes explicatives.",
+      "Compte client : connexion, espace personnel, liste de ressources autorisees, guide de demarrage (installation, fournisseurs, projet), preparation locale.",
+      "Administration : selection de compte, attribution/retrait de droits, journal d'audit, revocation de session ou d'acces.",
+      "Contrats API portant l'isolation de compte, le controle d'acces aux fichiers, l'expiration de session et la revocation effective.",
+      "Design system FR/EN mobile/bureau avec etats chargement/vide/erreur/succes pour chaque ecran liste ci-dessus."
+    ],
+    "excluded_pointer": "voir champ exclusions"
+  },
+  "exclusions": [
+    "Aucune implementation du moteur Swarm, de ses missions existantes, bases privees, budgets ou preuves historiques : le portail reste un client de ces contrats, pas une reimplementation.",
+    "Aucun push, publication externe, paiement reel ou connexion a un service distant depuis cette tache.",
+    "Aucun code moteur ni modification de .swarm/state.db.",
+    "La pile technique definitive, l'hebergement et l'offre commerciale ne sont pas tranches ici : ce sont des decisions explicites a argumenter en F4 (architecture) avant toute realisation.",
+    "Les six etapes de realisation par story (recherche, conception, planification, realisation, validation, livraison) restent non planifiees jusqu'a leur examen ulterieur ; F1 ne produit pas ce plan de realisation.",
+    "Aucune authentification tierce reelle (OAuth externe, SSO) n'est specifiee ici au-dela d'une decision ouverte ; voir open_decisions."
+  ],
+  "success": [
+    {
+      "id": "S1",
+      "statement": "Un prospect anonyme comprend en moins de deux ecrans ce qu'est Swarm (moteur vs agents) et peut voir un exemple de graphe/preuves.",
+      "measure": "Test utilisateur ou revue : enonce correct du role moteur/agent et acces visible au graphe sans compte."
+    },
+    {
+      "id": "S2",
+      "statement": "Un client ne peut jamais lire une ressource d'un autre compte, y compris par URL directe ou identifiant devine.",
+      "measure": "Cas obligatoires testes : deux comptes distincts, URL directe vers ressource d'autrui, identifiant devine, compte anonyme, session revoquee -> refus serveur effectif dans tous les cas."
+    },
+    {
+      "id": "S3",
+      "statement": "Une revocation (session ou droit) par un administrateur produit un refus serveur verifiable immediatement, pas seulement une mise a jour d'affichage.",
+      "measure": "Controle : revoquer puis rejouer l'appel API precedemment valide -> reponse de refus explicite."
+    },
+    {
+      "id": "S4",
+      "statement": "Le parcours client (connexion -> espace -> ressources -> guide -> preparation locale) est complet en FR et EN, mobile et bureau, clavier inclus.",
+      "measure": "Parcours rejoue dans les deux langues, les deux formats d'ecran et au clavier seul, sans etape bloquante."
+    },
+    {
+      "id": "S5",
+      "statement": "Chaque ecran du parcours couvre les quatre etats chargement/vide/erreur/succes.",
+      "measure": "Inventaire des ecrans avec les quatre etats presents dans les maquettes F5 et verifies en revue."
+    }
+  ],
+  "open_decisions": [
+    {
+      "id": "D1",
+      "question": "Authentification du compte client : mot de passe local avec reinitialisation, ou delegation a un fournisseur d'identite externe (OAuth) ?",
+      "status": "ouverte",
+      "rationale": "Impacte directement l'architecture backend (F4) et le cout d'implementation des sessions ; aucun choix de fournisseur externe n'est autorise sans decision explicite de l'utilisateur, et le perimetre actuel exclut toute connexion reelle a un service distant."
+    },
+    {
+      "id": "D2",
+      "question": "Granularite des droits administrateur : role binaire (actif/revoque) ou droits fins par ressource/modele ?",
+      "status": "ouverte",
+      "rationale": "Un role binaire suffit au parcours administrateur minimal des sept stories mais ne couvre pas un futur partage selectif de ressources ; a trancher avant la conception API de F3/F4."
+    },
+    {
+      "id": "D3",
+      "question": "Frontiere exacte portail commercial / moteur Swarm local : quelles donnees le portail stocke-t-il lui-meme versus relaie-t-il depuis une installation locale ?",
+      "status": "ouverte",
+      "rationale": "Determine si le portail est purement vitrine+comptes ou s'il reflete un etat moteur distant ; a comparer dans F4 avec au moins deux options argumentees avant toute decision d'architecture backend."
+    },
+    {
+      "id": "D4",
+      "question": "Duree d'expiration de session et politique de renouvellement (fixe, glissante, ou revocation manuelle uniquement) ?",
+      "status": "ouverte",
+      "rationale": "Affecte directement le critere de succes S2/S3 sur la revocation effective ; doit etre fixee avant la conception des contrats API en F3."
+    },
+    {
+      "id": "D5",
+      "question": "Le journal d'audit administrateur est-il visible au client concerne (transparence) ou reserve a l'administrateur seul ?",
+      "status": "ouverte",
+      "rationale": "Question de confidentialite vs transparence du parcours administrateur ; a trancher avant la conception d'ecran (F5)."
+    }
+  ],
+  "decisions_recorded": [
+    "Perimetre agents limite aux copies Git gerees, fichiers docs/portal-client-swarm et rapports moteur sous docs ; aucun effet externe.",
+    "Deux tentatives et trente appels outils par tache ; cinq taches au total pour les cinq fondations.",
+    "Controles structurels Python pre-autorises puis revue independante Claude sur le meme candidat ; aucune publication externe sans demande utilisateur."
+  ],
+  "limits": [
+    "Aucune fondation anterieure acceptee n'existe a ce jour pour le portail client Swarm (dossier docs/portal-client-swarm absent avant cette tache) ; F1 est le premier livrable de la sequence des cinq fondations.",
+    "Les besoins ci-dessus restent a confirmer par revue independante ; ce document ne constitue pas une acceptation moteur.",
+    "La pertinence semantique des champs est hors de portee des controles structurels automatises ; seule la revue independante en juge."
+  ]
+}

@@ -1,0 +1,4 @@
+    Checking swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+    Checking swarm-web v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-web)
+    Checking swarm-cli v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-cli)
+    Finished `dev` profile [unoptimized] target(s) in 23.64s

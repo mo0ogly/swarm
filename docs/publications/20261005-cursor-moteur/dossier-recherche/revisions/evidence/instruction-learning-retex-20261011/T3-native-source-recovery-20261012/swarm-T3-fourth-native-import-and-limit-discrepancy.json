@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-12T11:26:34.536987+00:00",
+  "work_revision": 753,
+  "agent": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+  "attempt": "a-cd4afa7836a7687fe0e466c5",
+  "configured_task_limits_revision": 2,
+  "configured_max_consecutive_errors": 6,
+  "frozen_actual_max_consecutive_errors": 3,
+  "native_import129_and_apply331_publicly_reported": true,
+  "owner": "root; engine run-limit/recovery contract",
+  "limits": "Current worker active and untouched. Saved Admin policy is not proof of applied request. Reported transfer is not native acceptance."
+}

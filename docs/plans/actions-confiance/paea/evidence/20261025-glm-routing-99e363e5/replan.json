@@ -1,0 +1,6 @@
+{
+  "cause": "GLM proposal internally inconsistent: one new method but gate 6, unsupported accepted(root), undefined input_override, empty named file breaks no-files assertion, active operations omitted. No proposal executed.",
+  "decision": "Reuse valid-control/server/phase/missing-input cases; principal implements compatible generic invocation arguments and two complete tests, exact producer error codes, no empty extra fixture files.",
+  "owner": "Codex root",
+  "scope": "test harness only; no Rust or compilation"
+}

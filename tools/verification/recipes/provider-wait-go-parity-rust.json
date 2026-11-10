@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "provider-wait-go-parity-rust",
+  "inputs": [
+    "internal/engine/provider_wait_config.go",
+    "internal/engine/model.go",
+    "config/provider-wait.json",
+    "resources.go",
+    "rust/crates/swarm-engine/src/provider_wait.rs",
+    "rust/crates/swarm-engine/src/provider_wait_store.rs",
+    "rust/crates/swarm-cli/src/provider_wait.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "tests/rust_provider_wait_go_parity.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/NATIVE-PROVIDER-WAIT.md",
+    "docs/en/NATIVE-PROVIDER-WAIT.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-go-native-private-root-data-refusal-and-first-replay",
+      "expected_exit": 0,
+      "required_stdout": [
+        "PROVIDER_WAIT_GO_PARITY_VERIFIED 13"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='wait-go-parity-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_provider_wait_go_parity.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--go-reference',os.environ['SWARM_MIGRATION_GO_REFERENCE'],'--output',str(p)],check=True)"
+      ]
+    }
+  ]
+}

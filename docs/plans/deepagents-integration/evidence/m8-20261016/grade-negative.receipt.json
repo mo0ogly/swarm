@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "tools/memory-evaluation/storage_plan.py",
+    "--pack",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m8-20261016/pack",
+    "--answers",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m8-20261016/fixture-answers-negative.json",
+    "--output",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m8-20261016/fixture-results-negative.json"
+  ],
+  "started_at_utc": "2026-10-16T08:13:00.218641+00:00",
+  "ended_at_utc": "2026-10-16T08:13:00.506179+00:00",
+  "exit_code": 1,
+  "expected_exit_code": 1,
+  "log_sha256": "c0669633992d2b49ab24344789b2e7b646ec5ff03e3a3753331ae9e129bd3567"
+}

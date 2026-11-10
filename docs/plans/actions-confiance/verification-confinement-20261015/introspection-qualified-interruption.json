@@ -1,0 +1,11 @@
+{
+  "pid": 1936331,
+  "start_ticks": "3678488",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-introspection-qualified.py",
+    "run"
+  ],
+  "reason": "Owned test group interrupted after timeout fixture left httptest.Server.Close waiting; no final PASS receipt",
+  "at": "2026-10-15T22:15:06.843686+00:00"
+}

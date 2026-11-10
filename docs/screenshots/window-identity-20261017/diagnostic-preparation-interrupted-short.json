@@ -1,0 +1,9 @@
+{
+  "error": "Error: Waiting for selector `#documents:not([hidden]) #monaco:not([hidden]) .view-line` failed\n    at CSSQueryHandler.waitFor (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/common/QueryHandler.js:214:46)\n    at async CdpFrame.waitForSelector (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:544:21)\n    at async CdpPage.waitForSelector (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:1385:20)\n    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/preparation_editor_visibility_ui.cjs:36:2",
+  "errors": [],
+  "checks": [
+    "create after hidden initialization: document text and no console errors",
+    "hidden editor resize/theme changes; plain-to-rich text and actual rich editing persist"
+  ],
+  "root": "/tmp/swarm-editor-visibility-Z2gXwd"
+}

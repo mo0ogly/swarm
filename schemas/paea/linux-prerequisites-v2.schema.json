@@ -1,0 +1,763 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://swarm.local/schemas/paea/linux-prerequisites-v2.schema.json",
+  "title": "Read-only current-process Linux prerequisite observation; no launch approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "scope",
+    "identity",
+    "local_username",
+    "maps",
+    "assigned_ranges",
+    "mapping_helpers",
+    "missing_prerequisites",
+    "read_only",
+    "launch_verified",
+    "separate_host_uid_verified",
+    "confinement_verified",
+    "human_verified"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "kind": {
+      "const": "paea-linux-prerequisite-observation"
+    },
+    "scope": {
+      "const": "current-process-namespace"
+    },
+    "identity": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "value"
+          ],
+          "properties": {
+            "status": {
+              "const": "observed"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "euid",
+                "egid",
+                "groups"
+              ],
+              "properties": {
+                "euid": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967294
+                },
+                "egid": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967294
+                },
+                "groups": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967294
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "failure"
+          ],
+          "properties": {
+            "status": {
+              "const": "unavailable"
+            },
+            "failure": {
+              "$ref": "#/$defs/failure"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "code"
+          ],
+          "properties": {
+            "status": {
+              "const": "invalid"
+            },
+            "code": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+$"
+            }
+          }
+        }
+      ]
+    },
+    "local_username": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "value"
+          ],
+          "properties": {
+            "status": {
+              "const": "observed"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "failure"
+          ],
+          "properties": {
+            "status": {
+              "const": "unavailable"
+            },
+            "failure": {
+              "$ref": "#/$defs/failure"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "code"
+          ],
+          "properties": {
+            "status": {
+              "const": "invalid"
+            },
+            "code": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+$"
+            }
+          }
+        }
+      ]
+    },
+    "maps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uid_map",
+        "gid_map"
+      ],
+      "properties": {
+        "uid_map": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value"
+              ],
+              "properties": {
+                "status": {
+                  "const": "observed"
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "inside",
+                      "outside",
+                      "count"
+                    ],
+                    "properties": {
+                      "inside": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967294
+                      },
+                      "outside": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967294
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4294967295
+                      }
+                    }
+                  },
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "failure"
+              ],
+              "properties": {
+                "status": {
+                  "const": "unavailable"
+                },
+                "failure": {
+                  "$ref": "#/$defs/failure"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "code"
+              ],
+              "properties": {
+                "status": {
+                  "const": "invalid"
+                },
+                "code": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                }
+              }
+            }
+          ]
+        },
+        "gid_map": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value"
+              ],
+              "properties": {
+                "status": {
+                  "const": "observed"
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "inside",
+                      "outside",
+                      "count"
+                    ],
+                    "properties": {
+                      "inside": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967294
+                      },
+                      "outside": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967294
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4294967295
+                      }
+                    }
+                  },
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "failure"
+              ],
+              "properties": {
+                "status": {
+                  "const": "unavailable"
+                },
+                "failure": {
+                  "$ref": "#/$defs/failure"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "code"
+              ],
+              "properties": {
+                "status": {
+                  "const": "invalid"
+                },
+                "code": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "assigned_ranges": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subuid",
+        "subgid"
+      ],
+      "properties": {
+        "subuid": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value"
+              ],
+              "properties": {
+                "status": {
+                  "const": "observed"
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "start",
+                      "count"
+                    ],
+                    "properties": {
+                      "start": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4294967294
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4294967295
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "failure"
+              ],
+              "properties": {
+                "status": {
+                  "const": "unavailable"
+                },
+                "failure": {
+                  "$ref": "#/$defs/failure"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "code"
+              ],
+              "properties": {
+                "status": {
+                  "const": "invalid"
+                },
+                "code": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                }
+              }
+            }
+          ]
+        },
+        "subgid": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value"
+              ],
+              "properties": {
+                "status": {
+                  "const": "observed"
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "start",
+                      "count"
+                    ],
+                    "properties": {
+                      "start": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4294967294
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4294967295
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "failure"
+              ],
+              "properties": {
+                "status": {
+                  "const": "unavailable"
+                },
+                "failure": {
+                  "$ref": "#/$defs/failure"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "code"
+              ],
+              "properties": {
+                "status": {
+                  "const": "invalid"
+                },
+                "code": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "mapping_helpers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "newuidmap",
+        "newgidmap"
+      ],
+      "properties": {
+        "newuidmap": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value"
+              ],
+              "properties": {
+                "status": {
+                  "const": "observed"
+                },
+                "value": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "path",
+                    "owner",
+                    "mode",
+                    "metadata_safe"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "pattern": "^/"
+                    },
+                    "owner": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967294
+                    },
+                    "mode": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4095
+                    },
+                    "metadata_safe": {
+                      "type": "boolean"
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "metadata_safe": {
+                            "const": true
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "owner": {
+                            "const": 0
+                          },
+                          "mode": {
+                            "minimum": 2048
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "failure"
+              ],
+              "properties": {
+                "status": {
+                  "const": "unavailable"
+                },
+                "failure": {
+                  "$ref": "#/$defs/failure"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "code"
+              ],
+              "properties": {
+                "status": {
+                  "const": "invalid"
+                },
+                "code": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                }
+              }
+            }
+          ]
+        },
+        "newgidmap": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "value"
+              ],
+              "properties": {
+                "status": {
+                  "const": "observed"
+                },
+                "value": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "path",
+                    "owner",
+                    "mode",
+                    "metadata_safe"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "pattern": "^/"
+                    },
+                    "owner": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967294
+                    },
+                    "mode": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4095
+                    },
+                    "metadata_safe": {
+                      "type": "boolean"
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "metadata_safe": {
+                            "const": true
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "owner": {
+                            "const": 0
+                          },
+                          "mode": {
+                            "minimum": 2048
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "failure"
+              ],
+              "properties": {
+                "status": {
+                  "const": "unavailable"
+                },
+                "failure": {
+                  "$ref": "#/$defs/failure"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "code"
+              ],
+              "properties": {
+                "status": {
+                  "const": "invalid"
+                },
+                "code": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "missing_prerequisites": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "identity:groups",
+          "identity:local-passwd",
+          "helper:newuidmap",
+          "helper:newgidmap",
+          "range:subuid",
+          "range:subgid",
+          "map:uid_map",
+          "map:gid_map"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "read_only": {
+      "const": true
+    },
+    "launch_verified": {
+      "const": false
+    },
+    "separate_host_uid_verified": {
+      "const": false
+    },
+    "confinement_verified": {
+      "const": false
+    },
+    "human_verified": {
+      "const": false
+    }
+  },
+  "$defs": {
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "errno"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "errno": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$comment": "Shape and necessary owner/mode conditions only; numeric extents, missing markers and mode bits have semantic checks. No filesystem custody or launch proof."
+}

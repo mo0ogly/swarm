@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "paea-fixture-role-bindings",
+  "inputs": [
+    "tests/paea_fixture_binding_check.py",
+    "tests/paea_fixture_binding_guard_test.py",
+    "rust/crates/swarm-enrollment-authority/examples/service_installation_fixture.rs",
+    "rust/crates/swarm-enrollment-authority/examples/provisioning_request_fixture.rs",
+    "tools/verification/recipes/paea-fixture-role-bindings.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "valid-bound-fixtures-before-swapped-role-refusal-and-recovery",
+      "command": [
+        "python3",
+        "tests/paea_fixture_binding_guard_test.py",
+        "service",
+        "provisioning"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS swapped-fixture-role-service",
+        "PASS swapped-fixture-role-provisioning",
+        "FIXTURE_ROLE_GUARD_PASS cases=2"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

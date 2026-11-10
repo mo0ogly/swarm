@@ -1,0 +1,14 @@
+{
+  "command": [
+    "rg",
+    "-n",
+    "prepareAgentIdentityEnrollmentRequest\\(",
+    "--glob",
+    "*.go",
+    "."
+  ],
+  "exit": 0,
+  "matches": "./internal/engine/agent_identity_enrollment_request_linux.go:18:func prepareAgentIdentityEnrollmentRequest(root string, caller agentIdentityCaller, enrollment agentIdentityIssuerAuthority,\n./internal/engine/agent_identity_enrollment_request_linux_test.go:41:\tprepared, err := prepareAgentIdentityEnrollmentRequest(f.store.root, caller, f.authority, ref, f.permit.base, f.permit.scope, raw, f.permit.eventID, f.permit.roots, at)\n./internal/engine/agent_identity_enrollment_request_linux_test.go:107:\t\t\tif prepared, err := prepareAgentIdentityEnrollmentRequest(f.store.root, caller, f.authority, ref, base, scope, raw, f.permit.eventID, f.permit.roots, at); err == nil || len(prepared.Bytes()) != 0 {\n",
+  "stderr": "",
+  "interpretation": "definition and tests only; no production caller"
+}

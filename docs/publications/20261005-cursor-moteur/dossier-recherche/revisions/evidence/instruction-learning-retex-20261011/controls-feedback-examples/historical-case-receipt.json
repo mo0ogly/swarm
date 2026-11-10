@@ -1,0 +1,20 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestManagedFragmentHistoricalPublicRecovery$",
+    "-count=1",
+    "-timeout=4m30s",
+    "-v"
+  ],
+  "start": "2026-10-11T20:15:17.386023+00:00",
+  "end": "2026-10-11T20:16:05.973637+00:00",
+  "wall_seconds": 48.58760584400443,
+  "exit": 0,
+  "output_sha256": "658eb8e97669b4b787ece0400b2c78e895938dcbe56ca835ec59e4b168035626",
+  "source_drift": [],
+  "source_files": 519,
+  "scope": "Named original failing case isolated, all pass/fail/exit variants; original whole-package timeout and subsequent full-suite PASS retained, not reclassified as autonomy or acceptance."
+}

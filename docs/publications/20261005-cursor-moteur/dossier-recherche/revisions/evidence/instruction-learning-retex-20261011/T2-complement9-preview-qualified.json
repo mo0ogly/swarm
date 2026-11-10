@@ -1,0 +1,126 @@
+{
+  "at": "2026-10-11T13:42:09.379609+00:00",
+  "preview_only": true,
+  "T2_accepted": false,
+  "installed": false,
+  "source": {
+    "at": "2026-10-11T13:31:54.832848+00:00",
+    "preview_only": true,
+    "T2_accepted": false,
+    "installed": false,
+    "path": "/tmp/swarm-T2-complement9-runtime-preview-20261011-graijm4m",
+    "primary_source_digest": "8072b8e8c225768d145f4e363236ca039b53a9d34dfea9d06df2e1b3eb2ed752",
+    "preview_source_digest": "bb2981544005554f59b06b602f62407e6b739d110b41a46cc5e1d1cdc721debd",
+    "T2_go_source": "Same five Go files as reviewed1ce2 and doc-only revisedb5b49c7 before merge; merge preserves current operator1..9",
+    "merge_preimages": [
+      {
+        "path": "internal/engine/planning.go",
+        "primary_preimage_sha256": "ce00037e318e032f9584ad3c7ba55e0422954284069703581129e18ce2533198",
+        "merged_qualified_source_sha256": "e49cd0beb660de79582864af976db53fce230b91011b07c20b11f25caa0c0b7b",
+        "old_raw_merge_sha256": "e49cd0beb660de79582864af976db53fce230b91011b07c20b11f25caa0c0b7b",
+        "old_raw_merge_same": true
+      },
+      {
+        "path": "internal/engine/planning_api.go",
+        "primary_preimage_sha256": "b6fe380444f8d456a0084076a1f8658c9a2bec5eb51b371f1cd7cf0dad0d7a4c",
+        "merged_qualified_source_sha256": "6680491c81a1b0d6b73f84d33128281a1352217ddf687fc49e435c80846e1027",
+        "old_raw_merge_sha256": "db88eaa3caa44ab26bd90a83f0d9d2bdb123340183563e57baf62c538305b2ab",
+        "old_raw_merge_same": false
+      },
+      {
+        "path": "internal/engine/planning_context.go",
+        "primary_preimage_sha256": "99a6589a309d7fb7eb5670ca2f112f9e85ef9d3bbba3ca9b2d10239c36c9c411",
+        "merged_qualified_source_sha256": "15d4d456d16930bed34019e7c513d0e611cfc9c84300d7ab1064625cdea703fa",
+        "old_raw_merge_sha256": "028bb97f136175a6ba8cffa76b295f6efdbedf73bba2fc34086d5caefa38f3d8",
+        "old_raw_merge_same": false
+      },
+      {
+        "path": "internal/engine/planning_judge.go",
+        "primary_preimage_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "merged_qualified_source_sha256": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b",
+        "old_raw_merge_sha256": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b",
+        "old_raw_merge_same": true
+      },
+      {
+        "path": "internal/engine/planning_judge_test.go",
+        "primary_preimage_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "merged_qualified_source_sha256": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd",
+        "old_raw_merge_sha256": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd",
+        "old_raw_merge_same": true
+      }
+    ],
+    "method_correction": "First preview preparation refused stale initial raw merge fingerprints for two conflict-resolved files. No primary/runtime/candidate mutation occurred. Corrected using immutable qualified copy source-manifest hashes; initial merge receipt retained as history, not silently rewritten."
+  },
+  "checks": [
+    {
+      "label": "full",
+      "command": [
+        "go",
+        "test",
+        "./...",
+        "-count=1",
+        "-timeout=12m"
+      ],
+      "exit": 0,
+      "start": "2026-10-11T13:31:54.926103+00:00",
+      "end": "2026-10-11T13:39:54.148069+00:00",
+      "seconds": 479.22299184700023,
+      "output": "/tmp/swarm-T2-complement9-runtime-preview-full.out",
+      "sha256": "c48bc367999ee86a32be42bbc49e4bb31576918a7505284eafa524d7a36653a0"
+    },
+    {
+      "label": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "./internal/engine",
+        "-run",
+        "TestPlanningJudge|TestPlanningTaskPreview|TestPlanningRejected|TestInstructionRevision|TestManagedReviewProducerStatusContract",
+        "-count=1",
+        "-timeout=120s"
+      ],
+      "exit": 0,
+      "start": "2026-10-11T13:39:54.171312+00:00",
+      "end": "2026-10-11T13:40:25.799930+00:00",
+      "seconds": 31.628526683001837,
+      "output": "/tmp/swarm-T2-complement9-runtime-preview-race.out",
+      "sha256": "643728c7b76bc1dc3d6e53bd3e8e2ab71e6a1abc11956b498d48b1d3fc0e07b0"
+    },
+    {
+      "label": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit": 0,
+      "start": "2026-10-11T13:40:25.806848+00:00",
+      "end": "2026-10-11T13:40:27.682747+00:00",
+      "seconds": 1.8759128999990935,
+      "output": "/tmp/swarm-T2-complement9-runtime-preview-vet.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "build": {
+    "command": [
+      "go",
+      "build",
+      "-ldflags",
+      "-X swarm.local/companion/internal/engine.buildVersion=devel -X swarm.local/companion/internal/engine.buildCommit=1169df70bec73d50fd23f640245b8ffd1317b9de -X swarm.local/companion/internal/engine.buildModified=true -X swarm.local/companion/internal/engine.buildDate=2026-10-11T13:32:56Z -X swarm.local/companion/internal/engine.buildProvenance=injected",
+      "-o",
+      "/tmp/swarm-T2-complement9-runtime-preview-candidate",
+      "./cmd/swarm"
+    ],
+    "exit": 0,
+    "binary": "/tmp/swarm-T2-complement9-runtime-preview-candidate",
+    "sha256": "4bbaff4388c5dc5c9d0a82cef4e2f2472156b08c6caa402d72a69c5999dc13c0",
+    "build_date": "2026-10-11T13:32:56Z",
+    "head": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+    "source_digest": "bb2981544005554f59b06b602f62407e6b739d110b41a46cc5e1d1cdc721debd",
+    "preview_only": true,
+    "T2_accepted": false,
+    "installed": false,
+    "qualified": "Full preview Go check still in progress; no primary integration"
+  }
+}

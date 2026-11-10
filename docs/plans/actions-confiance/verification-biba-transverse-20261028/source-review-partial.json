@@ -1,0 +1,57 @@
+{
+  "status": "PARTIAL_SELF_REVIEW_NOT_ACCEPTANCE",
+  "owner": "Codex Biba APEX",
+  "inputs": {
+    "rust/crates/swarm-engine/src/native_provider_biba.rs": "6a18800816ff49db882ef472eb548fcbfb7be3946c22b8ddec0f29601a1dae4c",
+    "rust/crates/swarm-engine/src/native_provider_exec.rs": "e7ed94b8f4b1cfcc5676f6acf7b7cf2f88dfe5d1e0ca3b56fbf602932ae16078",
+    "rust/crates/swarm-engine/src/agent_execution_gate.rs": "cebf7adbfdf2d10e8ac15f01fad00bfd150ebf08f4eb2f32ad9aa7c83fa368bd",
+    "rust/crates/swarm-engine/src/root_store/planning_native.rs": "7bf9abf6e55c99f4f51487e11913d982157b8e070ea25b9274dcee3e5de1ae29",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/gate.rs": "5fe06a4dc7690cf0a7b912bd83365259ced1014af8962dc173f7c9973a0bfee3",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs": "92e270b5162d7fa11da45b6756d344783766f17401573b4b05858d97ab688938",
+    "rust/crates/swarm-engine/Cargo.toml": "f7fa78f14b493accc5d66814157d2b4203d88c373d9c9401a4ac29e977cd11f0",
+    "rust/Cargo.lock": "b6b62cceb791ded1310d66f73181c2b99ee886f352083ccd0ad5c5cc9a5afa37",
+    "rust/crates/swarm-biba-linux/src/kernel.rs": "6949a9592675cea6feecbce9f87daee4d32ea0cbd5e15fc371b0bb8b20340514",
+    "tests/rust_biba_linux_boundary_build.py": "37e1a36444cb6e32a48f4f295e23e32b1073a274607f458c45ab5852f9a347b6",
+    "tests/rust_biba_linux_boundary.py": "a4c4dffb6cf05918f81464cb62b412b25a118a36e16570a8e79d492cb345d9c6",
+    "tests/rust_biba_boundary_driver.rs": "5586ee284fef44808f10c8beffa83c940be11c4f8de388dec94fc9eba6aca802",
+    "docs/architecture/BIBA-RUST.md": "39330c7d97721cb91d0a138724c911df8b4a5e0236e11a420621512c36516ca0",
+    "docs/en/BIBA-RUST.md": "bc7da91a972c18169211c00ddfa5a9dd0c9a69e2bb6a9a5c9a64d529c95dfa12"
+  },
+  "policies": {
+    "result": "examined changed contract",
+    "classification": [
+      "Mandatory I0 boundary is an invariant, not an operator off switch",
+      "FIOCLEX is a fixed syscall protocol allowance setting CLOEXEC only",
+      "Existing ABI6 and technical mask remain; no operator timeout/retry/budget or external dependency version changed"
+    ]
+  },
+  "functions": {
+    "result": "Rustdoc and caller comments examined",
+    "scope": [
+      "convert preserves IO and independent close causes",
+      "prepare grants no identity and requires caller provenance",
+      "execute refuses unavailable/overlap and never raw-exec fallback",
+      "enforce returning failure requires helper exit"
+    ]
+  },
+  "errors": {
+    "result": "PARTIAL",
+    "examined": [
+      "prepare failure plus stdin close",
+      "attach failure plus profile close",
+      "enforce close cause conversion",
+      "public CPython EPERM retained through process result"
+    ],
+    "open": [
+      "Directory identity from HostPreparation is not passed into Sandbox; inode binding/replacement still to verify",
+      "Full public positive candidate not yet exercised",
+      "Tool-free Root cwd lanes refuse; compatibility migration required"
+    ]
+  },
+  "docs": {
+    "result": "FR/EN candidate and limits updated",
+    "permanent_recipe": "tools/verification/recipes/biba-linux-boundary.json"
+  },
+  "qualification": false,
+  "installed": false
+}

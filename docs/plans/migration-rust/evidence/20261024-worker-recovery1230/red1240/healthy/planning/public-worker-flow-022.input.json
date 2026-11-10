@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "public-watch-final-stop",
+  "expected_revision": 10,
+  "reason": "Owned public watch fixture"
+}

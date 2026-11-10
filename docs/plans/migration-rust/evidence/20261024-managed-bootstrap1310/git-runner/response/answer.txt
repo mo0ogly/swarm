@@ -1,0 +1,160 @@
+```rust
+//! Private fixed-argument git runner for managed repository preparation.
+use crate::{AgentLaunchError, EngineSettingsDocument, GitCommandOutput, GitReportError};
+use std::{
+    collections::BTreeSet,
+    ffi::OsString,
+    os::unix::ffi::OsStringExt,
+    path::Path,
+    process::Command,
+    time::{Duration, Instant},
+};
+
+/// Saved per-command deadline; no literal timeout. None is explicit unlimited.
+fn deadline(settings: &EngineSettingsDocument) -> Result<Option<Instant>, AgentLaunchError> {
+    settings
+        .validate()
+        .map_err(|e| AgentLaunchError::caused("agent-launch-settings", e))?;
+    let policy = settings
+        .values
+        .git_command_timeout()
+        .map_err(|e| AgentLaunchError::caused("agent-launch-settings", e))?;
+    policy
+        .map(|d: Duration| {
+            Instant::now()
+                .checked_add(d)
+                .ok_or(AgentLaunchError::Refused("git-deadline-representation"))
+        })
+        .transpose()
+}
+
+/// Strip every inherited GIT_* override so no actor or trace configuration leaks
+/// into the fixed command; prompts stay disabled independently.
+fn scrub_environment(command: &mut Command) {
+    for (key, _) in std::env::vars_os() {
+        if key.as_encoded_bytes().starts_with(b"GIT_") {
+            command.env_remove(key);
+        }
+    }
+    command
+        .env("GIT_TERMINAL_PROMPT", "0")
+        .env("GIT_OPTIONAL_LOCKS", "0");
+}
+
+/// Read configured filter family names only (never values), then neutralize each
+/// with explicit `-c` overrides so no repository-defined filter is ever executed.
+fn filter_overrides(
+    root: &Path,
+    settings: &EngineSettingsDocument,
+) -> Result<Vec<OsString>, AgentLaunchError> {
+    let listed = run(root, &["config", "--name-only", "--null", "--get-regexp", r"^filter\."], settings)?;
+    if !listed.run.usage.status.success() {
+        return Err(output_failure(listed));
+    }
+    if !listed.stdout.is_empty() && !listed.stdout.ends_with(&[0]) {
+        return Err(AgentLaunchError::Refused("git-filter-config-framing"));
+    }
+    let mut names = BTreeSet::new();
+    for key in listed.stdout.split(|&b| b == 0).filter(|k| !k.is_empty()) {
+        if !key.to_ascii_lowercase().starts_with(b"filter.") {
+            return Err(AgentLaunchError::Refused("git-filter-config-key"));
+        }
+        let dot = key
+            .iter()
+            .rposition(|&b| b == b'.')
+            .ok_or_else(|| AgentLaunchError::Refused("git-filter-config-key"))?;
+        if dot > b"filter.".len() {
+            names.insert(key[..dot].to_vec());
+        }
+    }
+    Ok(names
+        .into_iter()
+        .flat_map(|base| {
+            [
+                b".clean=".as_slice(),
+                b".process=",
+                b".smudge=",
+                b".required=false",
+            ]
+            .into_iter()
+            .map(move |suffix| OsString::from_vec([base, suffix].concat()))
+        })
+        .collect())
+}
+
+/// Move original failed output into its typed cause; never copied into messages.
+fn output_failure(output: RunOutput) -> AgentLaunchError {
+    AgentLaunchError::caused(
+        "agent-launch-git-command",
+        GitReportError::Command {
+            exit_code: output.run.usage.status.code(),
+            timed_out: output.run.timed_out,
+            stdout_sha256: sha256_hex(&output.stdout),
+            stderr_sha256: sha256_hex(&output.stderr),
+            output: Box::new(GitCommandOutput::from_parts(output.stdout, output.stderr)),
+        },
+    )
+}
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    use sha2::{Digest, Sha256};
+    format!("{:x}", Sha256::digest(bytes))
+}
+
+struct RunOutput {
+    run: crate::validation_run::OwnedProcessRun,
+    stdout: Vec<u8>,
+    stderr: Vec<u8>,
+}
+
+/// Run one fixed git argv under the saved deadline with hooks and fsmonitor
+/// disabled. Arguments are never interpreted by a shell.
+fn run(
+    root: &Path,
+    args: &[&str],
+    settings: &EngineSettingsDocument,
+) -> Result<RunOutput, AgentLaunchError> {
+    let end = deadline(settings)?;
+    let mut command = Command::new("git");
+    command.args([
+        "--no-pager",
+        "--no-optional-locks",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "-c",
+        "core.fsmonitor=false",
+    ]);
+    for value in filter_overrides(root, settings)? {
+        command.arg("-c").arg(value);
+    }
+    command.args(args).current_dir(root);
+    scrub_environment(&mut command);
+    let (mut stdout, mut stderr) = (Vec::new(), Vec::new());
+    match crate::validation_run::run_owned_command(command, end, &mut stdout, Some(&mut stderr)) {
+        Ok(process) => Ok(RunOutput { run: process, stdout, stderr }),
+        Err(cause) => Err(AgentLaunchError::caused(
+            "agent-launch-git-process",
+            GitReportError::Process {
+                cause: Box::new(cause),
+                output: Box::new(GitCommandOutput::from_parts(stdout, stderr)),
+            },
+        )),
+    }
+}
+
+/// Execute a fixed command and return checked stdout bytes on success only.
+/// Nonzero exit or timeout refuses with the original typed output retained.
+fn run_checked(
+    root: &Path,
+    args: &[&str],
+    settings: &EngineSettingsDocument,
+) -> Result<Vec<u8>, AgentLaunchError> {
+    let output = run(root, args, settings)?;
+    if output.run.timed_out || !output.run.usage.status.success() {
+        return Err(output_failure(output));
+    }
+    Ok(output.stdout)
+}
+```
+
+Notes on missing evidence: `EngineSettingsDocument::values.git_command_timeout()` error type, `GitCommandOutput::from_parts`, `GitReportError::{Command, Process}` shapes, and `validation_run::run_owned_command` signature are assumed from the supplied `git_metadata.rs`; verification against `crate::validation_run` is required. No tests were executed; this is a proposal only.

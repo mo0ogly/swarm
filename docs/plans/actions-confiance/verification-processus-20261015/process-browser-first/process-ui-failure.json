@@ -1,0 +1,12 @@
+{
+  "message": "Node is detached from document",
+  "stack": "Error: Node is detached from document\n    at CdpElementHandle.assertConnectedElement (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:1304:23)\n    at async CdpElementHandle.isIntersectingViewport (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:1329:17)\n    at async CdpElementHandle.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:122:20)\n    at async CdpElementHandle.scrollIntoViewIfNeeded (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:1311:17)\n    at async CdpElementHandle.click (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:725:13)\n    at async CdpElementHandle.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:133:24)\n    at async CdpFrame.click (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:752:17)\n    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_process_ui.cjs:25:164",
+  "checks": [
+    "independent web artifact contains only explicit process assets",
+    "fr: Admin preview preserves state; policy and admission persist and reopen",
+    "fr: immutable definition publication through public preview and confirmation",
+    "fr: requester creates a case bound to the published version and administered resource"
+  ],
+  "errors": [],
+  "root": "/tmp/swarm-process-ui-2TqLo6"
+}

@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "preview_pure": true,
+  "fences_refused": true,
+  "current_saved_context_caps_refused_and_recovered": true,
+  "legacy_missing_binding_refused_without_schema_creation": false,
+  "source_drift_refused_and_recovered": true,
+  "renewal_preserves_original_binding": true,
+  "current_budget_change_refused": true,
+  "provider_started": false,
+  "scope": "Input readiness only; no executable process or authenticated agent permission"
+}

@@ -1,0 +1,3 @@
+{"stage": "process-regression-t2", "exit_code": 0, "passed_cases": 126}
+{"stage": "process-regression-admission-remote", "exit_code": 0, "passed_cases": 68}
+{"stage": "process-regression-identity", "exit_code": 0, "passed_cases": 60}

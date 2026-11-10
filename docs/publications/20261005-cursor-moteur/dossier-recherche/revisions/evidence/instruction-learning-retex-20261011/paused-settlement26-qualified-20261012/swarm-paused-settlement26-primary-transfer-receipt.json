@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-12T07:57:27.612036+00:00",
+  "candidate_digest": "2232f9c7573b2e404cc383ba0b64fdd7c53e5e6ae0a77d9ec7c72e3c960e6150",
+  "paths_transferred": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_integration.go",
+    "internal/engine/managed_settlement_pause_test.go"
+  ],
+  "source_inputs_verified": 1214,
+  "preimages_verified": true,
+  "backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-primary-preimages",
+  "operator_patch": "paused-settlement-recovery-20261012.patch",
+  "patch_sha256": "d66e2b326508bd56d366b2bfcec5c778391c4b5d596f4f8c6163f0e53a9dd084",
+  "runtime": "25 unchanged; qualification of runtime26 does not install it"
+}

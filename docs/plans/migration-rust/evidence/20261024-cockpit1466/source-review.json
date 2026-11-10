@@ -1,0 +1,32 @@
+{
+  "status": "LOCAL_SEMANTIC_REVIEW_RECORDED",
+  "reviewer": "Codex principal, not independent",
+  "source_sha256": {
+    "rust/crates/swarm-web/src/service.rs": "6836e296c6606dd9d42f146f00fb92802dc2ce4b1dbdc4ddedaffb046ac2a48e",
+    "rust/crates/swarm-web/src/service/cockpit_read.rs": "a5cf7c79eb17bc1e9e750d96148f4efedbe8f10816dc60084ec365e840c562d2",
+    "rust/crates/swarm-web/src/service/native_admin.rs": "6c603c93773ce8dfc44bb88b0287cc1d5a4400506114f0ab9b9c3d5755cc6d01",
+    "web/cockpit-native.js": "4e58d5a91fbd90e080fd78c5a8cf0777c0cb4c8396adbd317949b2fec099506e",
+    "web/cockpit-native-panels.js": "aec6b037572b3b9aee6204e479b5ccb46efeb3c2fb5f878b126e9599fae07e45",
+    "tests/rust_native_cockpit_browser.py": "1b5d508125fd492d8fc3361a1eed22e87dfc1bcd85c48f2e261f7a6c5e2287aa",
+    "tests/rust_existing_cockpit_ui.cjs": "443ee18bb97920881e434dc548761c019ad48380c8233728f489865c4f4cf8c9",
+    "tools/verification/recipes/existing-cockpit-rust.json": "02af8794a2661fa24bf0c29b5f0cb3590e5d87635ded13e0e9647b437e827cee",
+    "locales/en.json": "d6b419ac2e408e2b04cbfcdd3ba86098a3cf1114df7ee0655abadd34075c5e0d",
+    "web/i18n-en.js": "0cb1b22a7d6c788b5e0e3fb242689e3482611eb1abdc1c1b27617324e755497f",
+    "version_history.json": "8df0db249933a8d34de74e67173aaa23ee66f184d6c27e1e63bd346120393143"
+  },
+  "policies": "schema_version=1, exact query keys and GET/HEAD are protocol. USD and zero=unlimited are actual WorkBudgetState producer contract, not new defaults. Number.isSafeInteger is browser numeric representation. No operator setting, launch, cap, retry, deadline, cost arithmetic or polling added. Existing admission, Root lane and binding remain authoritative. Explicit narrow projection excludes prompts, env, commands and private contexts. Complete list has no added hidden truncation. Themes/widths/amount37.25 are fixture/presentation values.",
+  "functions": {
+    "cockpit_read": "Documented method, explicit Work validation/existence, owned binding, projection, null, typed encode/close errors and non-atomic cross-read limitation. No writer reachable. Exact route/mod and static script/asset additions reviewed. Existing shared static Host/cookie protection preserved.",
+    "panels": "Reviewed all validate/render/clear helpers; principal removed nonexistent placeholder container and imaginary translation keys from GLM proposal. Schema, Work linkage, finite nonnegative figures, missing null policy and each agent string checked before DOM rendering. Literal user strings inserted textContent; engine states alone localized. No identity or liveness proof. null policy keeps unavailable costs unknown.",
+    "bootstrap": "select clears previous panels immediately and applies generation guard before render/catch, checks requested Work matches response, exposes safe failure codes; no empty success or automatic retry. No selection remains explicit. Setup labels these two existing views as reads, all unconnected writes still disabled.",
+    "verification": "Public CLI creates Work/task/budget; real protected HTTP observation, refusals, unchanged recovery. Agent nonempty renderer and malformed DTO cases explicitly client fixtures, not registration or authentic agents. No provider or global watchdog. Tests inventory final164 browser assertions plus9 route checks, FR/EN two themes five widths."
+  },
+  "errors": "Wrong/duplicate/unknown/missing query refuse before Root open. Existing unknown Work/read error retained. Store close combines primary/secondary cause via shared close. JSON encoding error typed. Client validates before rendering, catch clears old panels and displays safe code; malformed observation recovery exercised. Unsupported writes visibly disabled; no requests or optimistic mutation. Data read failure fails observation, no silent empty agents.",
+  "documentation": "French/English Rust architecture and PLAN updated together; source JSDoc/Rustdoc describe purpose, input, side effects, errors and limits. i18n build/test pass. Existing replay recipe updated with source inventory. No full Rustdoc claimed.",
+  "limits": [
+    "No independent review or global acceptance.",
+    "Nonempty agent presentation tested with explicit client fixture; real route fixture list is empty. Installed historical agents checked separately if present.",
+    "Budget editing, rate catalogue, graph, decisions, logs, preparation, providers and other commands not connected by this increment.",
+    "Existing load/select aria-busy overlap hypothesis retained from1465; no data-corruption claim or new reproduction."
+  ]
+}

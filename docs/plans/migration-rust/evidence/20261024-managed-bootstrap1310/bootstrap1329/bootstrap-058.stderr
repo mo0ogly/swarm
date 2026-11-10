@@ -1,0 +1,14 @@
+{
+  "error": "agent-model-policy-hash-changed",
+  "failure": {
+    "causes": [
+      "agent-model-policy-hash-changed",
+      "agent-model-policy-hash-changed",
+      "agent-model-policy-hash-changed"
+    ],
+    "code": "agent-model-policy-hash-changed",
+    "message": "agent-model-policy-hash-changed",
+    "retryable": false
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT5PublicNamespace
+    trust_process_test.go:17: process namespace unavailable: code 2
+--- FAIL: TestActionsConfianceT5PublicNamespace (1.33s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.791s
+FAIL

@@ -1,0 +1,173 @@
+{
+  "scope": "original full directory retained locally; binaries, caches and raw private fixtures are not published",
+  "files": {
+    "prechange-public-boundary.json": {
+      "sha256": "681a69561f4e36cc7dd91406d321b0938271e84b97fffc96de8cb15448ff9ac5",
+      "bytes": 6794
+    },
+    "integrity-refusal-01.json": {
+      "sha256": "73eaaebdb884961fda3521397fb6230a89aeaad02a7fd6fb27d3fbe1eda608ce",
+      "bytes": 652
+    },
+    "shared-drift-inventory.json": {
+      "sha256": "797186116883e1a6c05707953b80e4b9152eb8b28e62aa9b82e6ee1f1ff36296",
+      "bytes": 533
+    },
+    "diff-recheck.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "shared-version-drift.diff": {
+      "sha256": "dd3698a513ec4ba2e2c45498167b5eb5f0036c4e49e7e5e74e8171dcc9084aac",
+      "bytes": 1335
+    },
+    "own-and-observed-changes.patch": {
+      "sha256": "acc14e2aded68bc3461f121e378885f0a1aa12964f05e3feb630c26b6198769a",
+      "bytes": 76895
+    },
+    "prechange-public-boundary-02.json": {
+      "sha256": "8d129faafecae5a072fde8679b452f17bfcd755228f533d9d00afb984a32cb24",
+      "bytes": 13907
+    },
+    "format-command.json": {
+      "sha256": "df4c2b611964b91086384d2149ff1de7b5d69c70a70a182cb88c0c9c7210733f",
+      "bytes": 464
+    },
+    "rustfmt-check.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "diff-check.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "diff-check.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "rustfmt-version.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "static-checks.json": {
+      "sha256": "dcc70f97d8aa9e8816948f8a731684ce3cb690daaf01b46cede5a74b92123473",
+      "bytes": 25815
+    },
+    "plan.json": {
+      "sha256": "7ce8b1aab9673348c1d591df1efee4dc6345d9175e688913ee60c5a767a12800",
+      "bytes": 2681
+    },
+    "shared-cli-drift.diff": {
+      "sha256": "be93cbe70eddc49b5eac05370ddda57fd52c05dc6709c689e7e771ff94e8cacb",
+      "bytes": 10128
+    },
+    "rustfmt-version.stdout": {
+      "sha256": "58e77f09cbe97eb2d0ab9174e5523494d03814f2879c8e187ed66370320abc7c",
+      "bytes": 45
+    },
+    "integrity-check.json": {
+      "sha256": "0f0b537e631c2ca5434191b8137bdb02fa75f013bcbdf5e982031418b4622086",
+      "bytes": 312
+    },
+    "rustfmt-check.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "format.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "root-cli-syntax.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "diff-recheck.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "format.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "root-cli-syntax-recheck.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifact-hashes.json": {
+      "sha256": "f9f2fb0920220bceec3a9b2963eddc4302092115792ac1be3682e2cc8d2b1c35",
+      "bytes": 4156
+    },
+    "static-recheck.json": {
+      "sha256": "9096b16c3d58b0e2ff5a78b0a2ce0a91bd6c4ca77a2584621777a2bab169a831",
+      "bytes": 3138
+    },
+    "source-review.json": {
+      "sha256": "6f08eff6b715f12fdd472b70ea9fca77c0b4228012a50297a2ba0556bfd42c36",
+      "bytes": 12693
+    },
+    "before/version_history.json": {
+      "sha256": "adf6199cb0e87155690ee5349263af08c51897593d8541133331087bfe35be66",
+      "bytes": 98340
+    },
+    "static-bound/version_history.json": {
+      "sha256": "f957fd8b271c5a9227c2c9d48289495fd09000c4c3969257c6aa3ab676483460",
+      "bytes": 98893
+    },
+    "concurrent-after-static/version_history.json": {
+      "sha256": "f367b2c21907a006318e815fbbf77b5090aaffdfbfd3a67ae49ab6fb2321a8fc",
+      "bytes": 99454
+    },
+    "concurrent-after-static/rust/crates/swarm-cli/src/lib.rs": {
+      "sha256": "f3632bafd6a7bf2f44b74b7ff766a25cc11ece39eee187c70993f2aded01cec3",
+      "bytes": 97068
+    },
+    "static-bound/rust/crates/swarm-cli/src/lib.rs": {
+      "sha256": "a75c77b9e95caca736b16949b1721e57df159102aec49c49ac336928639c19cc",
+      "bytes": 97047
+    },
+    "before/tools/verification/recipes/paea-contract.json": {
+      "sha256": "7af3d87e1d2e85f048e112849a370eca55f54254104c252cd775707bf515cd9b",
+      "bytes": 4810
+    },
+    "before/docs/architecture/PAEA-CONTRACT.md": {
+      "sha256": "ec22effc8c6b70b840973797cf6f3f1f616b071a8de364a70431ad94d973c0af",
+      "bytes": 15545
+    },
+    "before/docs/en/PAEA-CONTRACT.md": {
+      "sha256": "fb8d86eb122f8c023686cb1344c1e40e6744b96d127a3948da79794c433c759e",
+      "bytes": 12851
+    },
+    "before/docs/en/APEX-QUEUE.md": {
+      "sha256": "812a762ccbfd38f15761297bae6dc4623f9c0734463fc05f9c1de7e8e4f8ff4a",
+      "bytes": 18547
+    },
+    "before/docs/plans/FILE-APEX.md": {
+      "sha256": "b2728ccf4674f12ca1b2e19dbb2af6dfda55a9cffa77ff3e31090f452e4285e7",
+      "bytes": 20075
+    },
+    "before/docs/plans/actions-confiance/PAEA-APEX.md": {
+      "sha256": "b2336c5e8581656eac06a9c19d9fd1a29a0bcbfc935abe7d7674adc2a88d60e5",
+      "bytes": 22339
+    },
+    "before/docs/en/plans/actions-confiance/PAEA-APEX.md": {
+      "sha256": "85114a385c30738976679fbac9851422cf05b8cbea7d40344708da7c9cc97d99",
+      "bytes": 18483
+    },
+    "before/rust/crates/swarm-cli/src/protection.rs": {
+      "sha256": "1cf422d57f08f1e58c8b44c3f503e1dc9373d04dd8c8e0adf07934b5b520aa8c",
+      "bytes": 5805
+    },
+    "before/rust/crates/swarm-cli/src/lib.rs": {
+      "sha256": "71925fe50bdcaf070a85131c0e2807d7bdeffaca5c08b3309e5a8a0748403146",
+      "bytes": 96432
+    },
+    "before/rust/crates/swarm-protection-contract/src/receipt.rs": {
+      "sha256": "863100afee29a52a95e922c92cf2226b0e44a1515d8739f296a3190453d87383",
+      "bytes": 2411
+    },
+    "before/rust/crates/swarm-protection-contract/src/lib.rs": {
+      "sha256": "d2ec9462574d1f3c324498dd26c989bd2db9aba5ad7426d0f48f8cbef3f6f3bc",
+      "bytes": 7787
+    }
+  }
+}

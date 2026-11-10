@@ -1,0 +1,57 @@
+PASS send-recorded-pending
+STATE pt-04a69badbba2cc649aa8162ea95c4bc7 running
+STATE pt-04a69badbba2cc649aa8162ea95c4bc7 answered
+PASS json-answer-recorded
+PASS usage-declared-preserved
+PASS no-tools-or-max-tokens-in-request
+PASS no-private-provider-state-published
+PASS documents-not-automatically-adopted
+PASS api-explicit-level-refuses-without-contact
+PASS exact-replay-no-second-contact
+PASS estimated-reservation-retained
+PASS proposal-explicit-cas-save
+PASS proposal-replay-no-history-rewrite
+STATE pt-942c437b14431235b8e56ff91b4f00c2 running
+STATE pt-942c437b14431235b8e56ff91b4f00c2 failed
+PASS tool-declaration-refuses-answer
+PASS failed-attempt-not-refunded
+{"state": "RUN", "case": "calls-http", "phase": "waiting-bound"}
+PASS http-capabilities-equal-cli
+PASS http-csrf-refuses-before-contact
+STATE pt-3f59869802f86c464545d533fb60be60 pending
+STATE pt-3f59869802f86c464545d533fb60be60 answered
+PASS sse-answer-and-no-reasoning
+PASS stop-request-recorded
+STATE pt-0af0e0d7753ee01bbec4d428f8ad4d8c stopping
+STATE pt-0af0e0d7753ee01bbec4d428f8ad4d8c interrupted
+PASS stop-settled-without-answer
+PASS stop-attempt-not-refunded
+PASS budget-refuses-before-provider
+STATE pt-94161fa604c74c4078498a5b47259187 running
+STATE pt-94161fa604c74c4078498a5b47259187 answered
+PASS linked-work-answer
+PASS linked-work-and-prep-estimates
+PASS work-envelope-refuses-before-contact
+PASS work-refusal-no-turn-or-prep-debit
+PASS work-envelope-change-keeps-consumption
+STATE pt-193784ea42099763321f2f87b49ee8f1 running
+STATE pt-193784ea42099763321f2f87b49ee8f1 answered
+PASS work-envelope-public-recovery
+STATE pt-895005d3b51fdbb9b30e9793bdca8785 running
+STATE pt-895005d3b51fdbb9b30e9793bdca8785 interrupted
+PASS owned-worker-crash-settled
+PASS crash-does-not-refund-attempt
+STATE pt-d78ee2eec209310bfbd6b562555d9279 running
+STATE pt-d78ee2eec209310bfbd6b562555d9279 answered
+PASS plan-proposal-counts-and-no-model-decision
+PASS plan-keeps-only-known-operator-answer
+PASS plan-proposal-no-mission-launch
+STATE pt-6792e69ae5cf1d2970c373dba26939ea running
+STATE pt-6792e69ae5cf1d2970c373dba26939ea answered
+PASS project-context-positive-control
+PASS memory-guard-safe-no-contact
+STATE pt-096e8dbc3b77e519d51e5334841452d6 running
+STATE pt-096e8dbc3b77e519d51e5334841452d6 answered
+PASS project-context-public-recovery
+PREPARATION_CALLS_PASS 34
+BLP_PROVENANCE_PUBLIC_EVIDENCE /home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/blp-provenance-http-z7webnus/journey

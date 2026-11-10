@@ -1,0 +1,24 @@
+{
+  "requested_model": "glm-5.2",
+  "reported_models": [
+    "glm-5.2",
+    "glm-5.2"
+  ],
+  "total_reported_tokens": 86894,
+  "automatic_retries": 0,
+  "contribution": "Validator module integrated; iterative graphs, injected policies, owner adaptation for shared identity and static typed errors.",
+  "review_accepted": "Wrong recorded hash vs validated text reproduced on89, then legacy matrix12; fixed across consumed documents and readiness, repair paths proven29.",
+  "resolved": [
+    "Absent need allowed by Go, not proof of complete specification",
+    "apply_freshness source compares exact plan/brief/method hashes; new read wrapper additionally checks text digests",
+    "Current write switch and raw input caps apply to replay by existing contract",
+    "No extra story/journey cap: canonical-byte and transport policies are explicit; no hidden fallback",
+    "Public routes/auth/status and fixture event namespace exercised by final recipe"
+  ],
+  "open": [
+    "Independent runtime acceptance and global migration qualification",
+    "Potential repeated observation causes across BUSY retries remains prior unproven hypothesis",
+    "Future conversion must revalidate current policies; not implemented here"
+  ],
+  "savings_not_measured": true
+}

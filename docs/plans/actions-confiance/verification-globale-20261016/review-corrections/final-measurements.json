@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "measured_at": "2026-10-16T07:25:31.402120+00:00",
+  "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6",
+  "public_campaign_stage_seconds": {
+    "connectors": 4.719525337219238,
+    "evidence": 8.42063021659851,
+    "laboratory": 3.3404653072357178,
+    "secrets": 4.365713357925415,
+    "secret-data": 5.344151258468628,
+    "helper-image": 3.022735118865967,
+    "pilot": 36.35539507865906,
+    "processes": 36.70266151428223,
+    "controls": 6.448209047317505
+  },
+  "public_campaign_span_seconds": 114.44315814971924,
+  "native_meaningful": 722,
+  "native_effects_process_seconds": 538.2210352420807,
+  "native_identity_until_structured_package_pass_seconds": 757.6869599819183,
+  "native_identity_exit_code_observed": false,
+  "evidence_browser_seconds": 40.01062893867493,
+  "units_not_summed": true,
+  "provider_calls": 0,
+  "real_payments": 0,
+  "native_missions_launched": 0,
+  "kernel_overhead_measured": false,
+  "codex_cost": null,
+  "limits": [
+    "Overlapping groups; durations are not total delivery time.",
+    "No kernel runtime performance claim."
+  ]
+}

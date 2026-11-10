@@ -1,0 +1,19 @@
+{
+  "id": "observer-partial-resource-refusal",
+  "command": [
+    "/usr/bin/python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_rust_registered_observer_resources.py",
+    "-v"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 0.3529091009986587,
+  "executable": "/usr/bin/python3.13",
+  "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+}

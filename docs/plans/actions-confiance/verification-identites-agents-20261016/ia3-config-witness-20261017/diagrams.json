@@ -1,0 +1,90 @@
+[
+  {
+    "language": "fr",
+    "format": "svg",
+    "command": [
+      "mmdc",
+      "-i",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/witness-fr.mmd",
+      "-o",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/witness-fr.svg",
+      "-c",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1900",
+      "-H",
+      "2100"
+    ],
+    "start": "2026-10-17T13:03:16.012590+00:00",
+    "end": "2026-10-17T13:03:27.315314+00:00",
+    "exit": 0
+  },
+  {
+    "language": "fr",
+    "format": "png",
+    "command": [
+      "mmdc",
+      "-i",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/witness-fr.mmd",
+      "-o",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/witness-fr.png",
+      "-c",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1900",
+      "-H",
+      "2100"
+    ],
+    "start": "2026-10-17T13:03:16.013124+00:00",
+    "end": "2026-10-17T13:03:27.642375+00:00",
+    "exit": 0
+  },
+  {
+    "language": "en",
+    "format": "svg",
+    "command": [
+      "mmdc",
+      "-i",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/witness-en.mmd",
+      "-o",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/witness-en.svg",
+      "-c",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1900",
+      "-H",
+      "2100"
+    ],
+    "start": "2026-10-17T13:03:16.013876+00:00",
+    "end": "2026-10-17T13:03:27.384331+00:00",
+    "exit": 0
+  },
+  {
+    "language": "en",
+    "format": "png",
+    "command": [
+      "mmdc",
+      "-i",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/witness-en.mmd",
+      "-o",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/witness-en.png",
+      "-c",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1900",
+      "-H",
+      "2100"
+    ],
+    "start": "2026-10-17T13:03:16.014429+00:00",
+    "end": "2026-10-17T13:03:27.552198+00:00",
+    "exit": 0
+  }
+]

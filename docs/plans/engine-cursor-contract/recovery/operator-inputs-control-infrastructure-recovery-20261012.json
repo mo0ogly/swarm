@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-12T13:06:17.068449+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-inputs-control-infrastructure-recovery-20261012.bundle",
+  "sha256": "26f2f26cfcf106e024ffa487f6dd4b342679e10f5338f276785d938a04ab95cf",
+  "commit": "96365fb04b47ca81762da693db9dc648c918ac79",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 134,
+  "manifest_sha256": "c82430224ba56e13045aea4d0df80c3455cf1b3cbebe8b9b335a064dd857c799",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-infrastructure-recovery-inputs-le16_iso",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-infrastructure-recovery-import-urvn9_go",
+  "old129_originals_preserved": true,
+  "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+  "limits": "Qualified control/runtime and infrastructure-supervision correction extends all129 prior originals unchanged. Source contract30, persisted validation duration, same-result guarded retry and live environmental incidents. Preserve every prior input and history; deferred27 excluded. Native future tasks must verify matching preimages, preserve their own manifest and qualify the cumulative candidate; operator deployment is not native acceptance or real-model autonomy."
+}

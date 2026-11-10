@@ -1,0 +1,15 @@
+# Contrôles des huit lots
+
+Le validateur opérateur est appelé depuis le candidat isolé. Sa copie dans le candidat doit rester identique à la version autorisée dans le dépôt source. Les chemins de preuves sont relatifs, réguliers, contenus dans le candidat et sans lien symbolique. Un contrôle structurel ne démontre pas à lui seul la conformité métier : les assertions observées, les originaux et la revue indépendante restent nécessaires.
+
+Commande : `python3 /chemin/source/tools/actions-confiance/verify.py T1 validation --timeout-seconds 150`. Les modes sont `entry`, `validation`, `delivery`, `c1` à `c4`. Les délais sont fournis par la politique de contrôles autorisée, sans plafond métier ajouté par le script.
+
+Pour T1, produire `docs/architecture/actions-confiance-contract.json`, version 1, avec exactement R01 à R20 dans `requirements`. Chaque exigence comporte `id`, `owner`, `observable`, `verification`, `evidence_paths`. Les quatorze `story_ids` sont ceux du plan adopté. Décrire `boundaries`, `interfaces`, `alternatives` (au moins deux), `recovery`, `configuration`, `ui_states`. Chaque frontière comporte `state` (`existing`, `target`, `unverified`), `owner`, `resource`, `control`. Les documents FR/EN `docs/architecture/ACTIONS-CONFIANCE.md` et `docs/en/ACTIONS-CONFIANCE.md` couvrent tous les identifiants et un flux Mermaid. Distinguer les composants inspectés de ceux restant à implémenter.
+
+Pour T2 à T8, produire `tests/actions_confiance_tN.py`. La recette reçoit `--criterion N` (0 pour validation/delivery), `--root CHEMIN` et `--timeout-seconds SECONDES`. Elle utilise les opérations publiques, des fixtures isolées et des assertions sur les effets réels. Elle écrit un seul objet JSON sur stdout, les diagnostics sur stderr, et retourne un code non nul en cas d'échec. Le résultat contient `version: 1`, `task: "TN"`, `criterion`, `cases`. Chaque cas a un `id` unique, `status: "pass"`, un nombre entier positif `assertions` et un objet non vide `observed` décrivant l'état constaté. Un résultat vide ou attribué à un autre lot est refusé.
+
+Le mode validation exécute aussi les tests Go nommés `TestActionsConfianceTN` dans `./internal/...` et refuse zéro test ou une exécution incomplète. Les modes `cN` vérifient le critère correspondant ; ils ne doivent pas fabriquer des succès sur des comportements absents. Le contrôle delivery reprend la recette complète du lot.
+
+T7 fournit en plus `kernel_observation` pour validation/delivery/c4 : `available`, `source: "ebpf"`, `events`, `owned_pids`. Une collecte réellement indisponible retourne 3 et reste un échec d'environnement visible. Les doublures ne démontrent pas la collecte Linux. Mesurer les événements et le surcoût uniquement sur les processus de la fixture et leurs descendants.
+
+Les workers déclarent dans leur rapport les sources complètes nécessaires à la revue, y compris les producteurs et interfaces inchangés. `docs/TASK-ID.review-context.json` complète les pièces selon le contrat partagé. Les vérifications du validateur opérateur ne remplacent pas la recette finale et le RETEX de T8.

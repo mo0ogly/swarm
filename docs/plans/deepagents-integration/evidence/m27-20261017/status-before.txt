@@ -1,0 +1,457 @@
+ M .claude/skills/replan/SKILL.md
+ M AGENTS.md
+ M INSTALL.md
+ M docs/AGENT-METHODS.md
+ M docs/ATTEMPT-RECOVERY.md
+ M docs/PREPARATION-TEMPLATES.md
+ M docs/UI-DESIGN.md
+ M docs/architecture/AUTORECURSIVE-RECOVERY.md
+ M docs/architecture/REVIEW-EVIDENCE.md
+ M docs/architecture/RUN-SUPERVISION.md
+ M docs/en/AGENT-METHODS.md
+ M docs/en/ATTEMPT-RECOVERY.md
+ M docs/en/AUTORECURSIVE-RECOVERY.md
+ M docs/en/INSTALL.md
+ M docs/en/PREPARATION-TEMPLATES.md
+ M docs/en/REVIEW-EVIDENCE.md
+ M docs/en/RUN-SUPERVISION.md
+ M docs/engine-cursor-source-inputs-001.json
+ M docs/engine-cursor-source-inputs-002.json
+ M docs/engine-cursor-source-inputs-003.json
+ M docs/engine-cursor-source-inputs-004.json
+ M docs/engine-cursor-source-inputs-005.json
+ M docs/engine-cursor-source-manifest.json
+ M docs/plans/fresh-install-methods-20261008.md
+ M docs/publications/20261005-cursor-moteur/article-scientifique/PLAN.md
+ M docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md
+ M docs/publications/20261005-cursor-moteur/dossier-recherche/02-etat-art.md
+ M docs/publications/20261005-cursor-moteur/dossier-recherche/90-bibliographie.md
+ M docs/publications/20261005-cursor-moteur/programme-recherche.md
+ M docs/ui-redesign-source-manifest.json
+ M go.mod
+ M go.sum
+ M internal/engine/agent_dialogue.go
+ M internal/engine/agent_dialogue_test.go
+ M internal/engine/agent_terminal_process.go
+ M internal/engine/agent_workflow.go
+ M internal/engine/agents_process.go
+ M internal/engine/agents_store.go
+ M internal/engine/archive.go
+ M internal/engine/assist_run.go
+ M internal/engine/attempt_diagnostic.go
+ M internal/engine/automatic_validation.go
+ M internal/engine/brainstorm.go
+ M internal/engine/console_cli.go
+ M internal/engine/corrective_recovery.go
+ M internal/engine/dialogue_context.go
+ M internal/engine/engine_contract_revision_test.go
+ M internal/engine/independent_review.go
+ M internal/engine/independent_review_runtime.go
+ M internal/engine/infrastructure_supervision_test.go
+ M internal/engine/interruption_record_test.go
+ M internal/engine/loop_guard.go
+ M internal/engine/loop_guard_test.go
+ M internal/engine/main.go
+ M internal/engine/managed_delivery_contract.go
+ M internal/engine/managed_delivery_test.go
+ M internal/engine/managed_git.go
+ M internal/engine/managed_git_test.go
+ M internal/engine/managed_recovery_handoff.go
+ M internal/engine/managed_review.go
+ M internal/engine/managed_review_batch_runtime.go
+ M internal/engine/managed_review_batch_runtime_test.go
+ M internal/engine/managed_review_batches.go
+ M internal/engine/managed_review_batches_test.go
+ M internal/engine/managed_review_capacity_first.go
+ M internal/engine/managed_review_capacity_first_test.go
+ M internal/engine/managed_review_cost.go
+ M internal/engine/managed_review_dedup_test.go
+ M internal/engine/managed_review_fragment_begin.go
+ M internal/engine/managed_review_fragment_begin_test.go
+ M internal/engine/managed_review_fragment_capacity.go
+ M internal/engine/managed_review_fragment_contract_evidence_test.go
+ M internal/engine/managed_review_fragment_decision.go
+ M internal/engine/managed_review_fragment_defect_citation.go
+ M internal/engine/managed_review_fragment_defect_citation_test.go
+ M internal/engine/managed_review_fragment_feedback.go
+ M internal/engine/managed_review_fragment_final_journal.go
+ M internal/engine/managed_review_fragment_final_journal_test.go
+ M internal/engine/managed_review_fragment_final_store.go
+ M internal/engine/managed_review_fragment_final_store_test.go
+ M internal/engine/managed_review_fragment_final_test.go
+ M internal/engine/managed_review_fragment_finding_contract.go
+ M internal/engine/managed_review_fragment_finding_contract_test.go
+ M internal/engine/managed_review_fragment_plan.go
+ M internal/engine/managed_review_fragment_prompt.go
+ M internal/engine/managed_review_fragment_questions.go
+ M internal/engine/managed_review_fragment_questions_test.go
+ M internal/engine/managed_review_fragment_reply.go
+ M internal/engine/managed_review_fragment_request.go
+ M internal/engine/managed_review_fragment_request_prompt.go
+ M internal/engine/managed_review_fragment_resume.go
+ M internal/engine/managed_review_fragment_reuse.go
+ M internal/engine/managed_review_fragment_reuse_test.go
+ M internal/engine/managed_review_fragment_runtime.go
+ M internal/engine/managed_review_fragment_runtime_test.go
+ M internal/engine/managed_review_fragment_store.go
+ M internal/engine/managed_review_fragment_store_test.go
+ M internal/engine/managed_review_fragment_tokens.go
+ M internal/engine/managed_review_fragment_tokens_store_test.go
+ M internal/engine/managed_review_incremental.go
+ M internal/engine/managed_review_incremental_test.go
+ M internal/engine/managed_review_input_budget.go
+ M internal/engine/managed_review_input_provider.go
+ M internal/engine/managed_review_method_restart.go
+ M internal/engine/managed_review_method_restart_test.go
+ M internal/engine/managed_review_preflight_retry.go
+ M internal/engine/managed_review_preflight_retry_test.go
+ M internal/engine/managed_review_recovery.go
+ M internal/engine/managed_review_retry_delivery.go
+ M internal/engine/managed_review_test.go
+ M internal/engine/managed_settlement_authorization.go
+ M internal/engine/managed_settlement_authorization_test.go
+ M internal/engine/mission_insights.go
+ M internal/engine/model.go
+ M internal/engine/planning.go
+ M internal/engine/planning_context.go
+ M internal/engine/planning_historical_delivery_test.go
+ M internal/engine/planning_review_retry.go
+ M internal/engine/planning_runner.go
+ M internal/engine/preflight.go
+ M internal/engine/prephase_contract.go
+ M internal/engine/prephase_conversion.go
+ M internal/engine/prephase_conversion_test.go
+ M internal/engine/prephase_organization.go
+ M internal/engine/prephase_organization_test.go
+ M internal/engine/prephase_store.go
+ M internal/engine/project_profile.go
+ M internal/engine/quotas.go
+ M internal/engine/recovered_result.go
+ M internal/engine/recovered_result_evidence_test.go
+ M internal/engine/review_failure_routing.go
+ M internal/engine/review_timeout_test.go
+ M internal/engine/run_limits.go
+ M internal/engine/run_supervision.go
+ M internal/engine/storage_inspection.go
+ M internal/engine/storage_inspection_test.go
+ M internal/engine/store.go
+ M internal/engine/web_requests_config_test.go
+ M internal/engine/web_server.go
+ M internal/engine/worker_recovery_context.go
+ M internal/engine/worker_recovery_focus.go
+ M locales/en.json
+ M package.json
+ M scripts/i18n/build.cjs
+ M tests/i18n_test.cjs
+ M tests/recovery_evidence_test.cjs
+ M tests/review_file_policy_ui.cjs
+ M tools/agent-workflows/CONTRACT.md
+ M tools/verification/refresh_engine_source_manifest.py
+ M web/i18n-en.js
+ M web/mission-insights.js
+ M web/quotas.js
+ M web/retex.js
+?? docs/PROJECT-MEMORY.md
+?? docs/SEMANTIC-SIGNALS.md
+?? docs/actions-confiance-T2.md
+?? docs/actions-confiance-T4.md
+?? docs/actions-confiance-T5.md
+?? docs/actions-confiance-T6.md
+?? docs/actions-confiance-T7.md
+?? docs/actions-confiance-laboratoire.md
+?? docs/actions-confiance-qualification.md
+?? docs/actions-confiance-referentiels.md
+?? docs/architecture/ACTIONS-CONFIANCE.md
+?? docs/architecture/AGENT-IDENTITY-CONTRACT.md
+?? docs/architecture/actions-confiance-contract.json
+?? docs/architecture/actions-confiance-controls-reference.json
+?? docs/en/ACTIONS-CONFIANCE.md
+?? docs/en/AGENT-IDENTITY-CONTRACT.md
+?? docs/en/PROJECT-MEMORY.md
+?? docs/en/SEMANTIC-SIGNALS.md
+?? docs/en/actions-confiance-T2.md
+?? docs/en/actions-confiance-T4.md
+?? docs/en/actions-confiance-T5.md
+?? docs/en/actions-confiance-T6.md
+?? docs/en/actions-confiance-T7.md
+?? docs/en/actions-confiance-laboratoire.md
+?? docs/en/actions-confiance-qualification.md
+?? docs/en/actions-confiance-referentiels.md
+?? docs/engine-cursor-source-inputs-006.json
+?? docs/plans/actions-confiance/
+?? docs/plans/deepagents-integration/
+?? docs/publications/20261005-cursor-moteur/article-scientifique/figures/
+?? docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
+?? docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261016-identites-cycle-vie/
+?? docs/publications/CLAUDE-OPEN-SOURCE-APPLICATION.md
+?? frontend/build-signals.mjs
+?? frontend/embed-signals.mjs
+?? frontend/signals/
+?? internal/engine/agent_context.go
+?? internal/engine/agent_identity_authority.go
+?? internal/engine/agent_identity_authority_test.go
+?? internal/engine/agent_identity_channel_linux.go
+?? internal/engine/agent_identity_channel_linux_test.go
+?? internal/engine/agent_identity_contract.go
+?? internal/engine/agent_identity_contract_test.go
+?? internal/engine/agent_identity_enrollment_request_linux.go
+?? internal/engine/agent_identity_enrollment_request_linux_test.go
+?? internal/engine/agent_identity_issuer_linux.go
+?? internal/engine/agent_identity_issuer_linux_test.go
+?? internal/engine/agent_identity_plan_freshness_linux_test.go
+?? internal/engine/agent_identity_plan_linux.go
+?? internal/engine/agent_identity_plan_linux_test.go
+?? internal/engine/agent_identity_plan_schema_linux.go
+?? internal/engine/agent_identity_receipt_linux.go
+?? internal/engine/agent_identity_receipt_linux_test.go
+?? internal/engine/agent_identity_registry_atomic_test.go
+?? internal/engine/agent_identity_registry_publish.go
+?? internal/engine/agent_identity_registry_schema.go
+?? internal/engine/agent_identity_registry_store.go
+?? internal/engine/agent_identity_registry_test.go
+?? internal/engine/agent_identity_registry_types.go
+?? internal/engine/agent_identity_runtime_linux.go
+?? internal/engine/agent_identity_runtime_linux_test.go
+?? internal/engine/dialogue_boundary_integrity_test.go
+?? internal/engine/dialogue_checkpoint.go
+?? internal/engine/dialogue_checkpoint_store.go
+?? internal/engine/dialogue_checkpoint_test.go
+?? internal/engine/dialogue_receipt_test.go
+?? internal/engine/dialogue_recovery.go
+?? internal/engine/dialogue_recovery_test.go
+?? internal/engine/dialogue_restore.go
+?? internal/engine/dialogue_restore_test.go
+?? internal/engine/dialogue_restore_usage.go
+?? internal/engine/dialogue_supervisor_receipt_test.go
+?? internal/engine/dialogue_turn_outcome.go
+?? internal/engine/execution_replan_test.go
+?? internal/engine/kernel_attempt_source_linux.go
+?? internal/engine/kernel_attempt_source_linux_test.go
+?? internal/engine/kernel_backend_linux_amd64.go
+?? internal/engine/kernel_backend_linux_amd64_test.go
+?? internal/engine/kernel_backend_native_linux_amd64.go
+?? internal/engine/kernel_backend_resources_linux.go
+?? internal/engine/kernel_fixed_helper_linux.go
+?? internal/engine/kernel_observation_linux.go
+?? internal/engine/kernel_observation_linux_test.go
+?? internal/engine/kernel_observation_transport_linux.go
+?? internal/engine/kernel_observe_child_linux.go
+?? internal/engine/kernel_observe_cleanup_test.go
+?? internal/engine/kernel_observe_native_linux_amd64.go
+?? internal/engine/kernel_observe_native_linux_amd64_test.go
+?? internal/engine/kernel_observe_native_other.go
+?? internal/engine/kernel_observe_process_linux.go
+?? internal/engine/kernel_observe_process_linux_test.go
+?? internal/engine/kernel_observe_protocol_linux.go
+?? internal/engine/kernel_observe_public_linux_test.go
+?? internal/engine/managed_delivery_ready_test.go
+?? internal/engine/managed_interrupted_recovery.go
+?? internal/engine/managed_interrupted_recovery_test.go
+?? internal/engine/managed_review_baseline_transport_test.go
+?? internal/engine/managed_review_citation_catalog.go
+?? internal/engine/managed_review_citation_catalog_test.go
+?? internal/engine/managed_review_citation_feedback.go
+?? internal/engine/managed_review_citation_feedback_test.go
+?? internal/engine/managed_review_citation_integration_test.go
+?? internal/engine/managed_review_citation_json.go
+?? internal/engine/managed_review_citation_prompt.go
+?? internal/engine/managed_review_citation_runtime_test.go
+?? internal/engine/managed_review_citation_wire.go
+?? internal/engine/managed_review_citation_wire_test.go
+?? internal/engine/managed_review_context_policy.go
+?? internal/engine/managed_review_context_policy_test.go
+?? internal/engine/managed_review_control_original_test.go
+?? internal/engine/managed_review_final_restart_archive.go
+?? internal/engine/managed_review_fragment_nested_defect_test.go
+?? internal/engine/managed_review_fragment_unicode.go
+?? internal/engine/managed_review_fragment_unicode_test.go
+?? internal/engine/managed_review_frozen_prompt.go
+?? internal/engine/managed_review_git_bytes_test.go
+?? internal/engine/managed_review_native_diagnostic_test.go
+?? internal/engine/managed_review_orphan_reservation_test.go
+?? internal/engine/managed_review_protocol_precondition.go
+?? internal/engine/managed_review_resolution_originals.go
+?? internal/engine/managed_review_scope.go
+?? internal/engine/managed_review_scope_test.go
+?? internal/engine/managed_review_supplied_context_test.go
+?? internal/engine/memory_context_receipt_test.go
+?? internal/engine/memory_summary_receipt.go
+?? internal/engine/memory_summary_receipt_test.go
+?? internal/engine/memory_summary_selection.go
+?? internal/engine/memory_summary_selection_test.go
+?? internal/engine/memory_summary_source.go
+?? internal/engine/memory_summary_source_test.go
+?? internal/engine/memory_usage_binding.go
+?? internal/engine/memory_usage_binding_test.go
+?? internal/engine/memory_usage_decision.go
+?? internal/engine/memory_usage_decision_test.go
+?? internal/engine/prephase_repository.go
+?? internal/engine/project_memory.go
+?? internal/engine/project_memory_comparison_test.go
+?? internal/engine/project_memory_dialogue.go
+?? internal/engine/project_memory_dialogue_test.go
+?? internal/engine/project_memory_knowledge_test.go
+?? internal/engine/project_memory_public.go
+?? internal/engine/project_memory_storage_plan_test.go
+?? internal/engine/project_memory_test.go
+?? internal/engine/recovered_result_policy_test.go
+?? internal/engine/structured_provider_original_test.go
+?? internal/engine/trust_actions.go
+?? internal/engine/trust_actions_cli.go
+?? internal/engine/trust_actions_http.go
+?? internal/engine/trust_actions_init.go
+?? internal/engine/trust_actions_operator_regression_test.go
+?? internal/engine/trust_actions_originals.go
+?? internal/engine/trust_actions_test.go
+?? internal/engine/trust_connector.go
+?? internal/engine/trust_connector_test.go
+?? internal/engine/trust_data_policy.go
+?? internal/engine/trust_data_policy_test.go
+?? internal/engine/trust_delegation.go
+?? internal/engine/trust_delegation_test.go
+?? internal/engine/trust_effect_proof.go
+?? internal/engine/trust_effect_proof_test.go
+?? internal/engine/trust_evidence.go
+?? internal/engine/trust_evidence_archive.go
+?? internal/engine/trust_evidence_archive_test.go
+?? internal/engine/trust_evidence_checkpoint_test.go
+?? internal/engine/trust_evidence_http.go
+?? internal/engine/trust_evidence_runtime_types.go
+?? internal/engine/trust_evidence_service.go
+?? internal/engine/trust_evidence_test.go
+?? internal/engine/trust_evidence_validation.go
+?? internal/engine/trust_fixed_image_linux.go
+?? internal/engine/trust_fixed_image_linux_test.go
+?? internal/engine/trust_group_mapping.go
+?? internal/engine/trust_group_mapping_test.go
+?? internal/engine/trust_identity.go
+?? internal/engine/trust_identity_context.go
+?? internal/engine/trust_identity_context_test.go
+?? internal/engine/trust_identity_lifecycle_test.go
+?? internal/engine/trust_introspection.go
+?? internal/engine/trust_introspection_runtime.go
+?? internal/engine/trust_introspection_test.go
+?? internal/engine/trust_introspection_transport.go
+?? internal/engine/trust_kernel_check.go
+?? internal/engine/trust_kernel_check_child.go
+?? internal/engine/trust_kernel_check_native_linux_amd64.go
+?? internal/engine/trust_kernel_check_native_other.go
+?? internal/engine/trust_kernel_check_process.go
+?? internal/engine/trust_kernel_check_test.go
+?? internal/engine/trust_kernel_observe.go
+?? internal/engine/trust_kernel_observe_test.go
+?? internal/engine/trust_laboratory.go
+?? internal/engine/trust_laboratory_child.go
+?? internal/engine/trust_laboratory_corpus.go
+?? internal/engine/trust_laboratory_http.go
+?? internal/engine/trust_laboratory_service.go
+?? internal/engine/trust_laboratory_test.go
+?? internal/engine/trust_oidc.go
+?? internal/engine/trust_oidc_logout.go
+?? internal/engine/trust_oidc_logout_test.go
+?? internal/engine/trust_oidc_test.go
+?? internal/engine/trust_process.go
+?? internal/engine/trust_process_cli.go
+?? internal/engine/trust_process_http.go
+?? internal/engine/trust_process_service.go
+?? internal/engine/trust_process_test.go
+?? internal/engine/trust_process_validation.go
+?? internal/engine/trust_remote.go
+?? internal/engine/trust_remote_test.go
+?? internal/engine/trust_sealed.go
+?? internal/engine/trust_sealed_linux_amd64.go
+?? internal/engine/trust_sealed_other.go
+?? internal/engine/trust_sealed_test.go
+?? internal/engine/trust_secret.go
+?? internal/engine/trust_secret_broker.go
+?? internal/engine/trust_secret_consumer.go
+?? internal/engine/trust_secret_data_test.go
+?? internal/engine/trust_secret_http.go
+?? internal/engine/trust_secret_test.go
+?? internal/engine/trust_service_runtime.go
+?? internal/engine/trust_step_up.go
+?? internal/engine/trust_step_up_test.go
+?? internal/engine/trust_workload.go
+?? internal/engine/trust_workload_test.go
+?? internal/engine/worker_recovery_projection.go
+?? internal/engine/worker_recovery_projection_test.go
+?? internal/enrollmentauthority/
+?? internal/enrollmentconfig/
+?? internal/enrollmentproof/
+?? internal/enrollmentrequest/
+?? internal/enrollmentstate/
+?? internal/identitycontract/
+?? locales/trust-actions-en.json
+?? scripts/processes/
+?? tests/actions_confiance_campaign.py
+?? tests/actions_confiance_connectors.py
+?? tests/actions_confiance_connectors_ui.cjs
+?? tests/actions_confiance_controls.py
+?? tests/actions_confiance_controls_ui.cjs
+?? tests/actions_confiance_data_policy_ui.cjs
+?? tests/actions_confiance_delegation_ui.cjs
+?? tests/actions_confiance_effect_proof.py
+?? tests/actions_confiance_evidence.py
+?? tests/actions_confiance_evidence_exact_test.cjs
+?? tests/actions_confiance_evidence_ui.cjs
+?? tests/actions_confiance_kernel.py
+?? tests/actions_confiance_kernel_ui.cjs
+?? tests/actions_confiance_laboratory.py
+?? tests/actions_confiance_laboratory_ui.cjs
+?? tests/actions_confiance_observe_client_test.cjs
+?? tests/actions_confiance_observe_ui.cjs
+?? tests/actions_confiance_oidc_logout_ui.cjs
+?? tests/actions_confiance_oidc_ui.cjs
+?? tests/actions_confiance_process_ui.cjs
+?? tests/actions_confiance_recipe_timeout_test.py
+?? tests/actions_confiance_remote.py
+?? tests/actions_confiance_sealed_ui.cjs
+?? tests/actions_confiance_secret_data.py
+?? tests/actions_confiance_secret_data_reopen.cjs
+?? tests/actions_confiance_secret_data_ui.cjs
+?? tests/actions_confiance_secret_image.py
+?? tests/actions_confiance_secret_readiness.py
+?? tests/actions_confiance_secret_ui.cjs
+?? tests/actions_confiance_step_up_ui.cjs
+?? tests/actions_confiance_t2.py
+?? tests/actions_confiance_t2_ui.cjs
+?? tests/actions_confiance_t5.py
+?? tests/actions_confiance_workload_ui.cjs
+?? tests/dialogue_recovery_ui.cjs
+?? tests/memory_summary_admission.py
+?? tests/memory_summary_source.py
+?? tests/memory_summary_source_id_vectors.json
+?? tests/project_memory_ui.cjs
+?? tests/semantic_signals_ui.cjs
+?? tests/test_memory_codex_events.py
+?? tests/test_memory_comparison.py
+?? tests/test_memory_knowledge.py
+?? tests/test_memory_storage_plan.py
+?? tests/test_memory_summarization.py
+?? tests/test_memory_summary_admission.py
+?? tests/test_memory_swarm_source.py
+?? tests/worker_recovery_projection.py
+?? tools/actions-confiance/
+?? tools/memory-evaluation/
+?? web/processes.css
+?? web/processes.html
+?? web/processes.js
+?? web/project-memory.css
+?? web/project-memory.html
+?? web/project-memory.js
+?? web/signals.css
+?? web/signals.js
+?? web/trust-actions-en.js
+?? web/trust-actions.css
+?? web/trust-actions.html
+?? web/trust-actions.js
+?? web/trust-connectors.js
+?? web/trust-controls.js
+?? web/trust-controls.json
+?? web/trust-evidence.js
+?? web/trust-kernel.js
+?? web/trust-laboratory.js
+?? web/trust-observe.js
+?? web/trust-oidc-callback.html
+?? web/trust-oidc-callback.js
+?? web/trust-secrets.js

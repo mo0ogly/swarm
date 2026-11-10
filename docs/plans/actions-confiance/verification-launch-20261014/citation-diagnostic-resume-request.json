@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "citation-diagnostic-resume-2cdc7cf11444",
+  "expected_revision": 370,
+  "reason": "General literal-citation recovery corrected and qualified: upfront conventions, attributed exact-original diagnostics, strict unchanged proof checks, operator and supervisor transport verified after Store reopen. Resume the existing candidate, two attempts and 77 consumed calls without resets."
+}

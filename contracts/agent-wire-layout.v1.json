@@ -1,0 +1,1933 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "kind": "frozen-legacy-wire-inventory",
+    "evidence": "docs/plans/migration-rust/evidence/20261021-141/legacy-schema08",
+    "scope": "Historical compatibility, not current source authority or identity"
+  },
+  "layout": {
+    "custom_methods": {},
+    "external": [],
+    "roots": [
+      "Agent",
+      "Launch",
+      "Providers"
+    ],
+    "types": {
+      "ActionSkill": {
+        "source": "internal/engine/action_skills.go",
+        "source_sha256": "55a787ab8b74049c648c32c414914bcf1dbc2bd2737e1e35629854d51127bb6f",
+        "fields": [
+          {
+            "go_name": "Path",
+            "go_type": "string",
+            "json_tag": "path",
+            "line": 18
+          },
+          {
+            "go_name": "SHA256",
+            "go_type": "string",
+            "json_tag": "sha256,omitempty",
+            "line": 19
+          },
+          {
+            "go_name": "Name",
+            "go_type": "string",
+            "json_tag": "name",
+            "line": 20
+          },
+          {
+            "go_name": "Description",
+            "go_type": "string",
+            "json_tag": "description",
+            "line": 21
+          },
+          {
+            "go_name": "Bytes",
+            "go_type": "int",
+            "json_tag": "bytes",
+            "line": 22
+          },
+          {
+            "go_name": "Available",
+            "go_type": "bool",
+            "json_tag": "available",
+            "line": 23
+          },
+          {
+            "go_name": "Reason",
+            "go_type": "string",
+            "json_tag": "reason,omitempty",
+            "line": 24
+          }
+        ]
+      },
+      "ActionSkillSelection": {
+        "source": "internal/engine/action_skills.go",
+        "source_sha256": "55a787ab8b74049c648c32c414914bcf1dbc2bd2737e1e35629854d51127bb6f",
+        "fields": [
+          {
+            "go_name": "Path",
+            "go_type": "string",
+            "json_tag": "path",
+            "line": 14
+          },
+          {
+            "go_name": "SHA256",
+            "go_type": "string",
+            "json_tag": "sha256",
+            "line": 15
+          }
+        ]
+      },
+      "Agent": {
+        "source": "internal/engine/agents_store.go",
+        "source_sha256": "29a04b2234fa0190a7c12ba318c26612e8cbcabc2025010ab03745e19e02039d",
+        "fields": [
+          {
+            "go_name": "DialogueRestore",
+            "go_type": "*DialogueRestoreReceipt",
+            "json_tag": "dialogue_restore,omitempty",
+            "line": 128
+          },
+          {
+            "go_name": "DeliveryVersion",
+            "go_type": "int",
+            "json_tag": "delivery_version,omitempty",
+            "line": 129
+          },
+          {
+            "go_name": "Workflow",
+            "go_type": "*AgentWorkflow",
+            "json_tag": "workflow,omitempty",
+            "line": 130
+          },
+          {
+            "go_name": "ProviderCooldown",
+            "go_type": "*ProviderCooldown",
+            "json_tag": "provider_cooldown,omitempty",
+            "line": 131
+          },
+          {
+            "go_name": "Preflight",
+            "go_type": "*PreflightResult",
+            "json_tag": "preflight,omitempty",
+            "line": 132
+          },
+          {
+            "go_name": "PreconditionEvidence",
+            "go_type": "string",
+            "json_tag": "precondition_evidence,omitempty",
+            "line": 133
+          },
+          {
+            "go_name": "Mode",
+            "go_type": "string",
+            "json_tag": "mode,omitempty",
+            "line": 134
+          },
+          {
+            "go_name": "ModelRoute",
+            "go_type": "*ModelRoute",
+            "json_tag": "model_route,omitempty",
+            "line": 136
+          },
+          {
+            "go_name": "ReportedModel",
+            "go_type": "*ReportedModel",
+            "json_tag": "reported_model,omitempty",
+            "line": 137
+          },
+          {
+            "go_name": "Context",
+            "go_type": "*ContextManifest",
+            "json_tag": "context,omitempty",
+            "line": 138
+          },
+          {
+            "go_name": "PreparedContext",
+            "go_type": "*ContextManifest",
+            "json_tag": "prepared_context,omitempty",
+            "line": 139
+          },
+          {
+            "go_name": "Brainstorm",
+            "go_type": "bool",
+            "json_tag": "brainstorm,omitempty",
+            "line": 140
+          },
+          {
+            "go_name": "Reply",
+            "go_type": "string",
+            "json_tag": "reply,omitempty",
+            "line": 141
+          },
+          {
+            "go_name": "Usage",
+            "go_type": "*Usage",
+            "json_tag": "usage,omitempty",
+            "line": 142
+          },
+          {
+            "go_name": "Progress",
+            "go_type": "AgentProgress",
+            "json_tag": "progress",
+            "line": 143
+          },
+          {
+            "go_name": "Diagnostic",
+            "go_type": "AttemptDiagnostic",
+            "json_tag": "diagnostic,omitempty",
+            "line": 144
+          },
+          {
+            "go_name": "Recovery",
+            "go_type": "RecoveryState",
+            "json_tag": "recovery",
+            "line": 145
+          },
+          {
+            "go_name": "Limits",
+            "go_type": "RunLimits",
+            "json_tag": "limits",
+            "line": 146
+          },
+          {
+            "go_name": "ID",
+            "go_type": "string",
+            "json_tag": "id",
+            "line": 147
+          },
+          {
+            "go_name": "WorkID",
+            "go_type": "string",
+            "json_tag": "work_id",
+            "line": 148
+          },
+          {
+            "go_name": "TaskID",
+            "go_type": "string",
+            "json_tag": "task_id",
+            "line": 149
+          },
+          {
+            "go_name": "Attempt",
+            "go_type": "string",
+            "json_tag": "attempt_id",
+            "line": 150
+          },
+          {
+            "go_name": "Origin",
+            "go_type": "string",
+            "json_tag": "origin,omitempty",
+            "line": 151
+          },
+          {
+            "go_name": "Relay",
+            "go_type": "string",
+            "json_tag": "relay,omitempty",
+            "line": 152
+          },
+          {
+            "go_name": "StopKind",
+            "go_type": "string",
+            "json_tag": "stop_kind,omitempty",
+            "line": 153
+          },
+          {
+            "go_name": "Provider",
+            "go_type": "string",
+            "json_tag": "provider",
+            "line": 154
+          },
+          {
+            "go_name": "Role",
+            "go_type": "string",
+            "json_tag": "role",
+            "line": 155
+          },
+          {
+            "go_name": "Parent",
+            "go_type": "string",
+            "json_tag": "parent,omitempty",
+            "line": 156
+          },
+          {
+            "go_name": "Previous",
+            "go_type": "string",
+            "json_tag": "previous,omitempty",
+            "line": 157
+          },
+          {
+            "go_name": "CWD",
+            "go_type": "string",
+            "json_tag": "workspace",
+            "line": 158
+          },
+          {
+            "go_name": "Status",
+            "go_type": "string",
+            "json_tag": "status",
+            "line": 159
+          },
+          {
+            "go_name": "Desired",
+            "go_type": "string",
+            "json_tag": "desired,omitempty",
+            "line": 160
+          },
+          {
+            "go_name": "Activity",
+            "go_type": "string",
+            "json_tag": "activity",
+            "line": 161
+          },
+          {
+            "go_name": "Started",
+            "go_type": "string",
+            "json_tag": "started",
+            "line": 162
+          },
+          {
+            "go_name": "Heartbeat",
+            "go_type": "string",
+            "json_tag": "heartbeat,omitempty",
+            "line": 163
+          },
+          {
+            "go_name": "Ended",
+            "go_type": "string",
+            "json_tag": "ended,omitempty",
+            "line": 164
+          },
+          {
+            "go_name": "ExitCode",
+            "go_type": "*int",
+            "json_tag": "exit_code,omitempty",
+            "line": 165
+          },
+          {
+            "go_name": "Supervisor",
+            "go_type": "int",
+            "json_tag": "supervisor_pid,omitempty",
+            "line": 166
+          },
+          {
+            "go_name": "SupervisorStamp",
+            "go_type": "string",
+            "json_tag": "supervisor_identity,omitempty",
+            "line": 167
+          },
+          {
+            "go_name": "Child",
+            "go_type": "int",
+            "json_tag": "child_pid,omitempty",
+            "line": 168
+          },
+          {
+            "go_name": "ChildStamp",
+            "go_type": "string",
+            "json_tag": "child_identity,omitempty",
+            "line": 169
+          },
+          {
+            "go_name": "Host",
+            "go_type": "string",
+            "json_tag": "host",
+            "line": 170
+          },
+          {
+            "go_name": "Timeout",
+            "go_type": "int",
+            "json_tag": "timeout_seconds",
+            "line": 171
+          },
+          {
+            "go_name": "Capture",
+            "go_type": "bool",
+            "json_tag": "capture_output",
+            "line": 172
+          },
+          {
+            "go_name": "Prompt",
+            "go_type": "string",
+            "json_tag": "prompt",
+            "line": 173
+          },
+          {
+            "go_name": "Command",
+            "go_type": "string",
+            "json_tag": "command",
+            "line": 174
+          },
+          {
+            "go_name": "Args",
+            "go_type": "[]string",
+            "json_tag": "args",
+            "line": 175
+          },
+          {
+            "go_name": "Env",
+            "go_type": "[]string",
+            "json_tag": "env_allow",
+            "line": 176
+          }
+        ]
+      },
+      "AgentProgress": {
+        "source": "internal/engine/agents_store.go",
+        "source_sha256": "29a04b2234fa0190a7c12ba318c26612e8cbcabc2025010ab03745e19e02039d",
+        "fields": [
+          {
+            "go_name": "ElapsedSeconds",
+            "go_type": "int",
+            "json_tag": "elapsed_seconds,omitempty",
+            "line": 80
+          },
+          {
+            "go_name": "TimeThresholdExceeded",
+            "go_type": "bool",
+            "json_tag": "time_threshold_exceeded,omitempty",
+            "line": 81
+          },
+          {
+            "go_name": "ToolWaitSeconds",
+            "go_type": "int",
+            "json_tag": "tool_wait_seconds,omitempty",
+            "line": 82
+          },
+          {
+            "go_name": "ToolTimeThresholdExceeded",
+            "go_type": "bool",
+            "json_tag": "tool_time_threshold_exceeded,omitempty",
+            "line": 83
+          },
+          {
+            "go_name": "Action",
+            "go_type": "string",
+            "json_tag": "action,omitempty",
+            "line": 84
+          },
+          {
+            "go_name": "Detail",
+            "go_type": "string",
+            "json_tag": "detail,omitempty",
+            "line": 85
+          },
+          {
+            "go_name": "ToolCalls",
+            "go_type": "int",
+            "json_tag": "tool_calls",
+            "line": 86
+          },
+          {
+            "go_name": "ToolResults",
+            "go_type": "int",
+            "json_tag": "tool_results",
+            "line": 87
+          },
+          {
+            "go_name": "PendingTools",
+            "go_type": "int",
+            "json_tag": "pending_tools",
+            "line": 88
+          },
+          {
+            "go_name": "LastTool",
+            "go_type": "string",
+            "json_tag": "last_tool,omitempty",
+            "line": 89
+          },
+          {
+            "go_name": "LastResult",
+            "go_type": "string",
+            "json_tag": "last_result_at,omitempty",
+            "line": 90
+          },
+          {
+            "go_name": "LastOutput",
+            "go_type": "string",
+            "json_tag": "last_output_at,omitempty",
+            "line": 91
+          },
+          {
+            "go_name": "OutputState",
+            "go_type": "string",
+            "json_tag": "output_state,omitempty",
+            "line": 92
+          },
+          {
+            "go_name": "ToolState",
+            "go_type": "string",
+            "json_tag": "tool_state,omitempty",
+            "line": 93
+          },
+          {
+            "go_name": "Vitality",
+            "go_type": "string",
+            "json_tag": "provider_vitality,omitempty",
+            "line": 94
+          },
+          {
+            "go_name": "Degraded",
+            "go_type": "string",
+            "json_tag": "degraded,omitempty",
+            "line": 95
+          },
+          {
+            "go_name": "MetricsVersion",
+            "go_type": "int",
+            "json_tag": "metrics_version,omitempty",
+            "line": 98
+          },
+          {
+            "go_name": "Reads",
+            "go_type": "int",
+            "json_tag": "tool_reads,omitempty",
+            "line": 99
+          },
+          {
+            "go_name": "Writes",
+            "go_type": "int",
+            "json_tag": "tool_writes,omitempty",
+            "line": 100
+          },
+          {
+            "go_name": "Unclassified",
+            "go_type": "int",
+            "json_tag": "tool_unclassified,omitempty",
+            "line": 101
+          },
+          {
+            "go_name": "Errors",
+            "go_type": "int",
+            "json_tag": "tool_errors_total,omitempty",
+            "line": 102
+          },
+          {
+            "go_name": "Repeats",
+            "go_type": "int",
+            "json_tag": "tool_repeats_total,omitempty",
+            "line": 103
+          }
+        ]
+      },
+      "AgentWorkflow": {
+        "source": "internal/engine/agent_workflow.go",
+        "source_sha256": "70fc614c1c07aa5e117f55945c3b9fa674519ff3c662ad21bcc029224c85be76",
+        "fields": [
+          {
+            "go_name": "Skills",
+            "go_type": "[]ActionSkill",
+            "json_tag": "skills,omitempty",
+            "line": 15
+          },
+          {
+            "go_name": "Project",
+            "go_type": "*ProjectContext",
+            "json_tag": "project,omitempty",
+            "line": 16
+          },
+          {
+            "go_name": "Version",
+            "go_type": "int",
+            "json_tag": "version",
+            "line": 17
+          },
+          {
+            "go_name": "Role",
+            "go_type": "string",
+            "json_tag": "role",
+            "line": 18
+          },
+          {
+            "go_name": "Methods",
+            "go_type": "[]string",
+            "json_tag": "methods",
+            "line": 19
+          },
+          {
+            "go_name": "SHA256",
+            "go_type": "string",
+            "json_tag": "sha256",
+            "line": 20
+          }
+        ]
+      },
+      "AttemptDiagnostic": {
+        "source": "internal/engine/agents_store.go",
+        "source_sha256": "29a04b2234fa0190a7c12ba318c26612e8cbcabc2025010ab03745e19e02039d",
+        "fields": [
+          {
+            "go_name": "AgentID",
+            "go_type": "string",
+            "json_tag": "agent_id",
+            "line": 106
+          },
+          {
+            "go_name": "AttemptID",
+            "go_type": "string",
+            "json_tag": "attempt_id",
+            "line": 107
+          },
+          {
+            "go_name": "ObservedErrors",
+            "go_type": "int",
+            "json_tag": "observed_errors",
+            "line": 108
+          },
+          {
+            "go_name": "ConsecutiveErrorLimit",
+            "go_type": "int",
+            "json_tag": "consecutive_error_limit",
+            "line": 109
+          },
+          {
+            "go_name": "LimitReached",
+            "go_type": "bool",
+            "json_tag": "limit_reached",
+            "line": 110
+          },
+          {
+            "go_name": "ConsecutiveLimitReached",
+            "go_type": "bool",
+            "json_tag": "consecutive_error_limit_reached",
+            "line": 111
+          },
+          {
+            "go_name": "LimitReason",
+            "go_type": "string",
+            "json_tag": "limit_reason,omitempty",
+            "line": 112
+          },
+          {
+            "go_name": "Summary",
+            "go_type": "string",
+            "json_tag": "summary",
+            "line": 113
+          },
+          {
+            "go_name": "Items",
+            "go_type": "[]DiagnosticItem",
+            "json_tag": "items",
+            "line": 114
+          }
+        ]
+      },
+      "ContextManifest": {
+        "source": "internal/engine/dialogue_context.go",
+        "source_sha256": "510d596e9f20ee3e27c3791b3ebf1ef2c96cf2d3eb348907b5e76725f99bf079",
+        "fields": [
+          {
+            "go_name": "Summary",
+            "go_type": "*MemorySummaryReceipt",
+            "json_tag": "summary,omitempty",
+            "line": 27
+          },
+          {
+            "go_name": "Memory",
+            "go_type": "[]MemoryReference",
+            "json_tag": "memory,omitempty",
+            "line": 28
+          },
+          {
+            "go_name": "MemoryDecision",
+            "go_type": "*MemorySelectionDecision",
+            "json_tag": "memory_decision,omitempty",
+            "line": 29
+          },
+          {
+            "go_name": "SHA256",
+            "go_type": "string",
+            "json_tag": "sha256",
+            "line": 30
+          },
+          {
+            "go_name": "Bytes",
+            "go_type": "int",
+            "json_tag": "bytes",
+            "line": 31
+          },
+          {
+            "go_name": "Included",
+            "go_type": "[]string",
+            "json_tag": "included",
+            "line": 32
+          },
+          {
+            "go_name": "Excluded",
+            "go_type": "[]string",
+            "json_tag": "excluded",
+            "line": 33
+          },
+          {
+            "go_name": "References",
+            "go_type": "[]DialogueRef",
+            "json_tag": "references",
+            "line": 34
+          },
+          {
+            "go_name": "Paths",
+            "go_type": "[]string",
+            "json_tag": "paths",
+            "line": 35
+          }
+        ]
+      },
+      "DiagnosticItem": {
+        "source": "internal/engine/agents_store.go",
+        "source_sha256": "29a04b2234fa0190a7c12ba318c26612e8cbcabc2025010ab03745e19e02039d",
+        "fields": [
+          {
+            "go_name": "Category",
+            "go_type": "string",
+            "json_tag": "category",
+            "line": 117
+          },
+          {
+            "go_name": "Label",
+            "go_type": "string",
+            "json_tag": "label",
+            "line": 118
+          },
+          {
+            "go_name": "Count",
+            "go_type": "int",
+            "json_tag": "count",
+            "line": 119
+          },
+          {
+            "go_name": "Cause",
+            "go_type": "string",
+            "json_tag": "cause",
+            "line": 120
+          },
+          {
+            "go_name": "Consequence",
+            "go_type": "string",
+            "json_tag": "consequence",
+            "line": 121
+          },
+          {
+            "go_name": "Action",
+            "go_type": "string",
+            "json_tag": "action",
+            "line": 122
+          },
+          {
+            "go_name": "ActionKind",
+            "go_type": "string",
+            "json_tag": "action_kind",
+            "line": 123
+          },
+          {
+            "go_name": "Unknown",
+            "go_type": "bool",
+            "json_tag": "unknown,omitempty",
+            "line": 124
+          },
+          {
+            "go_name": "Traces",
+            "go_type": "[]string",
+            "json_tag": "traces",
+            "line": 125
+          }
+        ]
+      },
+      "DialogueRef": {
+        "source": "internal/engine/dialogue_context.go",
+        "source_sha256": "510d596e9f20ee3e27c3791b3ebf1ef2c96cf2d3eb348907b5e76725f99bf079",
+        "fields": [
+          {
+            "go_name": "Task",
+            "go_type": "string",
+            "json_tag": "task",
+            "line": 9
+          },
+          {
+            "go_name": "Attempt",
+            "go_type": "string",
+            "json_tag": "attempt",
+            "line": 10
+          },
+          {
+            "go_name": "SHA256",
+            "go_type": "string",
+            "json_tag": "sha256",
+            "line": 11
+          }
+        ]
+      },
+      "DialogueRestoreChoice": {
+        "source": "internal/engine/dialogue_restore.go",
+        "source_sha256": "5bf4294aa733eabd0df9e26e958acbadc200729375ca01a368c21c4f8b2f829e",
+        "fields": [
+          {
+            "go_name": "Checkpoint",
+            "go_type": "string",
+            "json_tag": "checkpoint_sha256",
+            "line": 14
+          },
+          {
+            "go_name": "Facts",
+            "go_type": "string",
+            "json_tag": "facts_sha256",
+            "line": 15
+          },
+          {
+            "go_name": "Confirm",
+            "go_type": "bool",
+            "json_tag": "confirm",
+            "line": 16
+          },
+          {
+            "go_name": "Reason",
+            "go_type": "string",
+            "json_tag": "reason",
+            "line": 17
+          }
+        ]
+      },
+      "DialogueRestoreReceipt": {
+        "source": "internal/engine/dialogue_restore.go",
+        "source_sha256": "5bf4294aa733eabd0df9e26e958acbadc200729375ca01a368c21c4f8b2f829e",
+        "fields": [
+          {
+            "go_name": "SourceAgent",
+            "go_type": "string",
+            "json_tag": "source_agent",
+            "line": 34
+          },
+          {
+            "go_name": "SourceAttempt",
+            "go_type": "string",
+            "json_tag": "source_attempt",
+            "line": 35
+          },
+          {
+            "go_name": "SourceState",
+            "go_type": "string",
+            "json_tag": "source_state_sha256",
+            "line": 36
+          },
+          {
+            "go_name": "Checkpoint",
+            "go_type": "string",
+            "json_tag": "checkpoint_sha256",
+            "line": 37
+          },
+          {
+            "go_name": "Facts",
+            "go_type": "string",
+            "json_tag": "facts_sha256",
+            "line": 38
+          },
+          {
+            "go_name": "RootAgent",
+            "go_type": "string",
+            "json_tag": "root_agent",
+            "line": 39
+          },
+          {
+            "go_name": "PriorTurns",
+            "go_type": "int",
+            "json_tag": "prior_turns",
+            "line": 40
+          },
+          {
+            "go_name": "Reason",
+            "go_type": "string",
+            "json_tag": "reason",
+            "line": 41
+          },
+          {
+            "go_name": "Actor",
+            "go_type": "string",
+            "json_tag": "actor,omitempty",
+            "line": 42
+          },
+          {
+            "go_name": "At",
+            "go_type": "string",
+            "json_tag": "at,omitempty",
+            "line": 43
+          },
+          {
+            "go_name": "DecisionRecorded",
+            "go_type": "bool",
+            "json_tag": "decision_recorded",
+            "line": 44
+          }
+        ]
+      },
+      "Launch": {
+        "source": "internal/engine/agents_store.go",
+        "source_sha256": "29a04b2234fa0190a7c12ba318c26612e8cbcabc2025010ab03745e19e02039d",
+        "fields": [
+          {
+            "go_name": "Summary",
+            "go_type": "*MemorySummarySelection",
+            "json_tag": "summary_selection,omitempty",
+            "line": 29
+          },
+          {
+            "go_name": "DialogueRestore",
+            "go_type": "*DialogueRestoreChoice",
+            "json_tag": "dialogue_restore,omitempty",
+            "line": 30
+          },
+          {
+            "go_name": "SkillRefresh",
+            "go_type": "*PreparedSkillRefreshReceipt",
+            "json_tag": "prepared_skill_refresh,omitempty",
+            "line": 31
+          },
+          {
+            "go_name": "Skills",
+            "go_type": "[]ActionSkillSelection",
+            "json_tag": "skills,omitempty",
+            "line": 32
+          },
+          {
+            "go_name": "PreconditionEvidence",
+            "go_type": "string",
+            "json_tag": "precondition_evidence,omitempty",
+            "line": 33
+          },
+          {
+            "go_name": "ConductorID",
+            "go_type": "string",
+            "json_tag": "conductor_id,omitempty",
+            "line": 34
+          },
+          {
+            "go_name": "ProviderDigest",
+            "go_type": "string",
+            "json_tag": "provider_digest,omitempty",
+            "line": 35
+          },
+          {
+            "go_name": "Mode",
+            "go_type": "string",
+            "json_tag": "mode,omitempty",
+            "line": 36
+          },
+          {
+            "go_name": "Limits",
+            "go_type": "*RunLimits",
+            "json_tag": "limits,omitempty",
+            "line": 37
+          },
+          {
+            "go_name": "Level",
+            "go_type": "string",
+            "json_tag": "level,omitempty",
+            "line": 38
+          },
+          {
+            "go_name": "ModelPolicyHash",
+            "go_type": "string",
+            "json_tag": "model_policy_hash,omitempty",
+            "line": 39
+          },
+          {
+            "go_name": "PlanBriefHash",
+            "go_type": "string",
+            "json_tag": "plan_brief_hash,omitempty",
+            "line": 40
+          },
+          {
+            "go_name": "References",
+            "go_type": "[]DialogueRef",
+            "json_tag": "references,omitempty",
+            "line": 41
+          },
+          {
+            "go_name": "ContextHash",
+            "go_type": "string",
+            "json_tag": "context_hash,omitempty",
+            "line": 42
+          },
+          {
+            "go_name": "Brainstorm",
+            "go_type": "bool",
+            "json_tag": "brainstorm,omitempty",
+            "line": 43
+          },
+          {
+            "go_name": "Schema",
+            "go_type": "int",
+            "json_tag": "schema_version",
+            "line": 44
+          },
+          {
+            "go_name": "EventID",
+            "go_type": "string",
+            "json_tag": "event_id",
+            "line": 45
+          },
+          {
+            "go_name": "Revision",
+            "go_type": "int",
+            "json_tag": "expected_revision",
+            "line": 46
+          },
+          {
+            "go_name": "TaskID",
+            "go_type": "string",
+            "json_tag": "task_id",
+            "line": 47
+          },
+          {
+            "go_name": "Origin",
+            "go_type": "string",
+            "json_tag": "origin,omitempty",
+            "line": 48
+          },
+          {
+            "go_name": "Provider",
+            "go_type": "string",
+            "json_tag": "provider",
+            "line": 49
+          },
+          {
+            "go_name": "Workspace",
+            "go_type": "string",
+            "json_tag": "workspace",
+            "line": 50
+          },
+          {
+            "go_name": "Instruction",
+            "go_type": "string",
+            "json_tag": "instruction",
+            "line": 51
+          },
+          {
+            "go_name": "Role",
+            "go_type": "string",
+            "json_tag": "role",
+            "line": 52
+          },
+          {
+            "go_name": "Parent",
+            "go_type": "string",
+            "json_tag": "parent,omitempty",
+            "line": 53
+          },
+          {
+            "go_name": "Previous",
+            "go_type": "string",
+            "json_tag": "previous,omitempty",
+            "line": 54
+          },
+          {
+            "go_name": "Timeout",
+            "go_type": "int",
+            "json_tag": "timeout_seconds",
+            "line": 55
+          },
+          {
+            "go_name": "Capture",
+            "go_type": "bool",
+            "json_tag": "capture_output",
+            "line": 56
+          }
+        ]
+      },
+      "MemoryReference": {
+        "source": "internal/engine/project_memory.go",
+        "source_sha256": "16aa64873f1a26f102a9c1e26d4021425bf063ea7ff1b58c7634a423ec77070d",
+        "fields": [
+          {
+            "go_name": "Work",
+            "go_type": "string",
+            "json_tag": "work",
+            "line": 20
+          },
+          {
+            "go_name": "ID",
+            "go_type": "string",
+            "json_tag": "id",
+            "line": 21
+          },
+          {
+            "go_name": "Version",
+            "go_type": "int",
+            "json_tag": "version",
+            "line": 22
+          },
+          {
+            "go_name": "SHA256",
+            "go_type": "string",
+            "json_tag": "sha256",
+            "line": 23
+          }
+        ]
+      },
+      "MemorySelectionDecision": {
+        "source": "internal/engine/project_memory.go",
+        "source_sha256": "16aa64873f1a26f102a9c1e26d4021425bf063ea7ff1b58c7634a423ec77070d",
+        "fields": [
+          {
+            "go_name": "EventID",
+            "go_type": "string",
+            "json_tag": "event_id",
+            "line": 27
+          },
+          {
+            "go_name": "Actor",
+            "go_type": "string",
+            "json_tag": "actor",
+            "line": 28
+          },
+          {
+            "go_name": "Reason",
+            "go_type": "string",
+            "json_tag": "reason",
+            "line": 29
+          },
+          {
+            "go_name": "At",
+            "go_type": "string",
+            "json_tag": "at",
+            "line": 30
+          }
+        ]
+      },
+      "MemorySummaryProtection": {
+        "source": "internal/engine/memory_summary_selection.go",
+        "source_sha256": "09151f72964711349efd2038f9aef0ea137851c967638ceadc38e9fea5f12c52",
+        "fields": [
+          {
+            "go_name": "ID",
+            "go_type": "string",
+            "json_tag": "id",
+            "line": 22
+          },
+          {
+            "go_name": "Message",
+            "go_type": "string",
+            "json_tag": "message",
+            "line": 23
+          },
+          {
+            "go_name": "Kind",
+            "go_type": "string",
+            "json_tag": "kind",
+            "line": 24
+          },
+          {
+            "go_name": "State",
+            "go_type": "string",
+            "json_tag": "state",
+            "line": 25
+          }
+        ]
+      },
+      "MemorySummaryReceipt": {
+        "source": "internal/engine/memory_summary_selection.go",
+        "source_sha256": "09151f72964711349efd2038f9aef0ea137851c967638ceadc38e9fea5f12c52",
+        "fields": [
+          {
+            "go_name": "Schema",
+            "go_type": "int",
+            "json_tag": "schema_version",
+            "line": 29
+          },
+          {
+            "go_name": "Selection",
+            "go_type": "MemorySummarySelection",
+            "json_tag": "selection",
+            "line": 30
+          },
+          {
+            "go_name": "SelectionSHA",
+            "go_type": "string",
+            "json_tag": "selection_sha256",
+            "line": 31
+          },
+          {
+            "go_name": "Work",
+            "go_type": "string",
+            "json_tag": "work",
+            "line": 32
+          },
+          {
+            "go_name": "Task",
+            "go_type": "string",
+            "json_tag": "task",
+            "line": 33
+          },
+          {
+            "go_name": "PreparedRevision",
+            "go_type": "int",
+            "json_tag": "prepared_revision",
+            "line": 34
+          },
+          {
+            "go_name": "SourceCount",
+            "go_type": "int",
+            "json_tag": "source_message_count",
+            "line": 35
+          },
+          {
+            "go_name": "Received",
+            "go_type": "[]string",
+            "json_tag": "received_message_ids",
+            "line": 36
+          },
+          {
+            "go_name": "Omitted",
+            "go_type": "[]string",
+            "json_tag": "omitted_message_ids",
+            "line": 37
+          },
+          {
+            "go_name": "SnapshotInjected",
+            "go_type": "bool",
+            "json_tag": "operator_snapshot_injected",
+            "line": 38
+          },
+          {
+            "go_name": "AttachmentSHA",
+            "go_type": "string",
+            "json_tag": "attachment_sha256",
+            "line": 39
+          },
+          {
+            "go_name": "AttachmentBytes",
+            "go_type": "int",
+            "json_tag": "attachment_bytes",
+            "line": 40
+          },
+          {
+            "go_name": "QueuedRevision",
+            "go_type": "int",
+            "json_tag": "queued_revision,omitempty",
+            "line": 41
+          },
+          {
+            "go_name": "QueuedSourceSHA",
+            "go_type": "string",
+            "json_tag": "queued_source_sha256,omitempty",
+            "line": 42
+          },
+          {
+            "go_name": "CheckedBeforeStart",
+            "go_type": "string",
+            "json_tag": "checked_before_start_at,omitempty",
+            "line": 43
+          },
+          {
+            "go_name": "CheckedSourceSHA",
+            "go_type": "string",
+            "json_tag": "checked_source_sha256,omitempty",
+            "line": 44
+          }
+        ]
+      },
+      "MemorySummarySelection": {
+        "source": "internal/engine/memory_summary_selection.go",
+        "source_sha256": "09151f72964711349efd2038f9aef0ea137851c967638ceadc38e9fea5f12c52",
+        "fields": [
+          {
+            "go_name": "Schema",
+            "go_type": "int",
+            "json_tag": "schema_version",
+            "line": 13
+          },
+          {
+            "go_name": "SourceSHA",
+            "go_type": "string",
+            "json_tag": "source_sha256",
+            "line": 14
+          },
+          {
+            "go_name": "Dialogues",
+            "go_type": "[]DialogueRef",
+            "json_tag": "dialogues",
+            "line": 15
+          },
+          {
+            "go_name": "Cutoff",
+            "go_type": "int",
+            "json_tag": "cutoff",
+            "line": 16
+          },
+          {
+            "go_name": "Protected",
+            "go_type": "[]MemorySummaryProtection",
+            "json_tag": "protected",
+            "line": 17
+          },
+          {
+            "go_name": "Reason",
+            "go_type": "string",
+            "json_tag": "reason",
+            "line": 18
+          }
+        ]
+      },
+      "ModelChoice": {
+        "source": "internal/engine/provider_models.go",
+        "source_sha256": "d1c32751ad1420662b630defb18a04e5bdca71e38a0c5e8fe5dc1aa96e6b3a4b",
+        "fields": [
+          {
+            "go_name": "Model",
+            "go_type": "string",
+            "json_tag": "model",
+            "line": 15
+          },
+          {
+            "go_name": "Effort",
+            "go_type": "string",
+            "json_tag": "effort",
+            "line": 16
+          }
+        ]
+      },
+      "ModelPolicy": {
+        "source": "internal/engine/provider_models.go",
+        "source_sha256": "d1c32751ad1420662b630defb18a04e5bdca71e38a0c5e8fe5dc1aa96e6b3a4b",
+        "fields": [
+          {
+            "go_name": "Version",
+            "go_type": "int",
+            "json_tag": "version",
+            "line": 19
+          },
+          {
+            "go_name": "Billing",
+            "go_type": "string",
+            "json_tag": "billing",
+            "line": 20
+          },
+          {
+            "go_name": "WorkLevel",
+            "go_type": "string",
+            "json_tag": "work_level",
+            "line": 21
+          },
+          {
+            "go_name": "PageLevel",
+            "go_type": "string",
+            "json_tag": "page_level",
+            "line": 22
+          },
+          {
+            "go_name": "Levels",
+            "go_type": "map[string]ModelChoice",
+            "json_tag": "levels",
+            "line": 23
+          }
+        ]
+      },
+      "ModelRoute": {
+        "source": "internal/engine/provider_models.go",
+        "source_sha256": "d1c32751ad1420662b630defb18a04e5bdca71e38a0c5e8fe5dc1aa96e6b3a4b",
+        "fields": [
+          {
+            "go_name": "Level",
+            "go_type": "string",
+            "json_tag": "level",
+            "line": 26
+          },
+          {
+            "go_name": "Model",
+            "go_type": "string",
+            "json_tag": "model",
+            "line": 27
+          },
+          {
+            "go_name": "Effort",
+            "go_type": "string",
+            "json_tag": "effort",
+            "line": 28
+          },
+          {
+            "go_name": "Billing",
+            "go_type": "string",
+            "json_tag": "billing",
+            "line": 29
+          },
+          {
+            "go_name": "PolicyHash",
+            "go_type": "string",
+            "json_tag": "policy_hash",
+            "line": 30
+          },
+          {
+            "go_name": "Reason",
+            "go_type": "string",
+            "json_tag": "reason",
+            "line": 31
+          }
+        ]
+      },
+      "PreflightCheck": {
+        "source": "internal/engine/preflight.go",
+        "source_sha256": "f514435ab9c8227834ac4ac038d3adc9927af02111c2e517f5dfa0cba3ba0cba",
+        "fields": [
+          {
+            "go_name": "Name",
+            "go_type": "string",
+            "json_tag": "name",
+            "line": 29
+          },
+          {
+            "go_name": "Status",
+            "go_type": "string",
+            "json_tag": "status",
+            "line": 30
+          },
+          {
+            "go_name": "Detail",
+            "go_type": "string",
+            "json_tag": "detail",
+            "line": 31
+          }
+        ]
+      },
+      "PreflightResult": {
+        "source": "internal/engine/preflight.go",
+        "source_sha256": "f514435ab9c8227834ac4ac038d3adc9927af02111c2e517f5dfa0cba3ba0cba",
+        "fields": [
+          {
+            "go_name": "Schema",
+            "go_type": "int",
+            "json_tag": "schema_version",
+            "line": 37
+          },
+          {
+            "go_name": "Verdict",
+            "go_type": "string",
+            "json_tag": "verdict",
+            "line": 38
+          },
+          {
+            "go_name": "CheckedAt",
+            "go_type": "string",
+            "json_tag": "checked_at",
+            "line": 39
+          },
+          {
+            "go_name": "ValidUntil",
+            "go_type": "string",
+            "json_tag": "valid_until",
+            "line": 40
+          },
+          {
+            "go_name": "Scope",
+            "go_type": "string",
+            "json_tag": "scope",
+            "line": 41
+          },
+          {
+            "go_name": "Provider",
+            "go_type": "string",
+            "json_tag": "provider",
+            "line": 42
+          },
+          {
+            "go_name": "Workspace",
+            "go_type": "string",
+            "json_tag": "workspace",
+            "line": 43
+          },
+          {
+            "go_name": "DurationMS",
+            "go_type": "int64",
+            "json_tag": "duration_ms",
+            "line": 44
+          },
+          {
+            "go_name": "Verification",
+            "go_type": "string",
+            "json_tag": "verification",
+            "line": 45
+          },
+          {
+            "go_name": "Capabilities",
+            "go_type": "map[string]string",
+            "json_tag": "capabilities",
+            "line": 46
+          },
+          {
+            "go_name": "Checks",
+            "go_type": "[]PreflightCheck",
+            "json_tag": "checks",
+            "line": 47
+          }
+        ]
+      },
+      "PreparedSkillRefreshReceipt": {
+        "source": "internal/engine/prepared_skill_refresh.go",
+        "source_sha256": "e3caa2c9b0f92514cf821848df144a69452fee5466401e5207f19c1ae9f95590",
+        "fields": [
+          {
+            "go_name": "Prepared",
+            "go_type": "string",
+            "json_tag": "prepared_id",
+            "line": 18
+          },
+          {
+            "go_name": "Original",
+            "go_type": "string",
+            "json_tag": "original_request_sha256",
+            "line": 19
+          },
+          {
+            "go_name": "Previous",
+            "go_type": "[]ActionSkillSelection",
+            "json_tag": "previous_skills",
+            "line": 20
+          },
+          {
+            "go_name": "Reason",
+            "go_type": "string",
+            "json_tag": "reason",
+            "line": 21
+          },
+          {
+            "go_name": "Actor",
+            "go_type": "string",
+            "json_tag": "actor",
+            "line": 22
+          }
+        ]
+      },
+      "ProjectContext": {
+        "source": "internal/engine/project_profile.go",
+        "source_sha256": "f266bba43f3570daa22981d830544c62c937730ee3cf150c07ac74d5e92f90d8",
+        "fields": [
+          {
+            "go_name": "Name",
+            "go_type": "string",
+            "json_tag": "name",
+            "line": 34
+          },
+          {
+            "go_name": "Role",
+            "go_type": "string",
+            "json_tag": "role",
+            "line": 35
+          },
+          {
+            "go_name": "ProfileSHA256",
+            "go_type": "string",
+            "json_tag": "profile_sha256",
+            "line": 36
+          },
+          {
+            "go_name": "Source",
+            "go_type": "string",
+            "json_tag": "source,omitempty",
+            "line": 37
+          },
+          {
+            "go_name": "Sources",
+            "go_type": "[]ProjectSource",
+            "json_tag": "sources",
+            "line": 38
+          },
+          {
+            "go_name": "SHA256",
+            "go_type": "string",
+            "json_tag": "sha256",
+            "line": 39
+          }
+        ]
+      },
+      "ProjectSource": {
+        "source": "internal/engine/project_profile.go",
+        "source_sha256": "f266bba43f3570daa22981d830544c62c937730ee3cf150c07ac74d5e92f90d8",
+        "fields": [
+          {
+            "go_name": "Path",
+            "go_type": "string",
+            "json_tag": "path",
+            "line": 29
+          },
+          {
+            "go_name": "SHA256",
+            "go_type": "string",
+            "json_tag": "sha256",
+            "line": 30
+          },
+          {
+            "go_name": "Bytes",
+            "go_type": "int",
+            "json_tag": "bytes",
+            "line": 31
+          }
+        ]
+      },
+      "Provider": {
+        "source": "internal/engine/agents_store.go",
+        "source_sha256": "29a04b2234fa0190a7c12ba318c26612e8cbcabc2025010ab03745e19e02039d",
+        "fields": [
+          {
+            "go_name": "APIConnectionID",
+            "go_type": "string",
+            "json_tag": "api_connection_id,omitempty",
+            "line": 187
+          },
+          {
+            "go_name": "InteractiveArgs",
+            "go_type": "[]string",
+            "json_tag": "interactive_args,omitempty",
+            "line": 188
+          },
+          {
+            "go_name": "PreflightRequired",
+            "go_type": "bool",
+            "json_tag": "preflight_required,omitempty",
+            "line": 189
+          },
+          {
+            "go_name": "PreflightArgs",
+            "go_type": "[]string",
+            "json_tag": "preflight_args,omitempty",
+            "line": 190
+          },
+          {
+            "go_name": "PreflightKind",
+            "go_type": "string",
+            "json_tag": "preflight_kind,omitempty",
+            "line": 191
+          },
+          {
+            "go_name": "PreflightCaps",
+            "go_type": "[]string",
+            "json_tag": "preflight_capabilities,omitempty",
+            "line": 192
+          },
+          {
+            "go_name": "PreflightTimeout",
+            "go_type": "int",
+            "json_tag": "preflight_timeout_seconds,omitempty",
+            "line": 193
+          },
+          {
+            "go_name": "PreflightTTL",
+            "go_type": "int",
+            "json_tag": "preflight_ttl_seconds,omitempty",
+            "line": 194
+          },
+          {
+            "go_name": "ModelPolicy",
+            "go_type": "*ModelPolicy",
+            "json_tag": "model_policy,omitempty",
+            "line": 195
+          },
+          {
+            "go_name": "AssistantTimeout",
+            "go_type": "int",
+            "json_tag": "assistant_timeout_seconds,omitempty",
+            "line": 196
+          },
+          {
+            "go_name": "Limits",
+            "go_type": "RunLimits",
+            "json_tag": "limits,omitempty",
+            "line": 197
+          },
+          {
+            "go_name": "Command",
+            "go_type": "string",
+            "json_tag": "command",
+            "line": 198
+          },
+          {
+            "go_name": "Args",
+            "go_type": "[]string",
+            "json_tag": "args",
+            "line": 199
+          },
+          {
+            "go_name": "Env",
+            "go_type": "[]string",
+            "json_tag": "env_allow",
+            "line": 200
+          }
+        ]
+      },
+      "ProviderCooldown": {
+        "source": "internal/engine/provider_cooldown.go",
+        "source_sha256": "934d6066800bcd6b4a1f351a63de5fd683faf171c2f7222e4a219cc67c572b7f",
+        "fields": [
+          {
+            "go_name": "Provider",
+            "go_type": "string",
+            "json_tag": "provider",
+            "line": 19
+          },
+          {
+            "go_name": "ObservedAt",
+            "go_type": "string",
+            "json_tag": "observed_at",
+            "line": 20
+          },
+          {
+            "go_name": "ResetAt",
+            "go_type": "int64",
+            "json_tag": "resets_at,omitempty",
+            "line": 21
+          },
+          {
+            "go_name": "Source",
+            "go_type": "string",
+            "json_tag": "source",
+            "line": 22
+          },
+          {
+            "go_name": "Signal",
+            "go_type": "string",
+            "json_tag": "signal",
+            "line": 23
+          },
+          {
+            "go_name": "ClearedAt",
+            "go_type": "string",
+            "json_tag": "cleared_at,omitempty",
+            "line": 24
+          },
+          {
+            "go_name": "ClearEvent",
+            "go_type": "string",
+            "json_tag": "clear_event,omitempty",
+            "line": 25
+          },
+          {
+            "go_name": "ClearReason",
+            "go_type": "string",
+            "json_tag": "clear_reason,omitempty",
+            "line": 26
+          },
+          {
+            "go_name": "ClearActor",
+            "go_type": "string",
+            "json_tag": "clear_actor,omitempty",
+            "line": 27
+          },
+          {
+            "go_name": "ClearAccountChange",
+            "go_type": "bool",
+            "json_tag": "clear_account_change,omitempty",
+            "line": 28
+          }
+        ]
+      },
+      "Providers": {
+        "source": "internal/engine/agents_store.go",
+        "source_sha256": "29a04b2234fa0190a7c12ba318c26612e8cbcabc2025010ab03745e19e02039d",
+        "fields": [
+          {
+            "go_name": "Schema",
+            "go_type": "int",
+            "json_tag": "schema_version",
+            "line": 203
+          },
+          {
+            "go_name": "Providers",
+            "go_type": "map[string]Provider",
+            "json_tag": "providers",
+            "line": 204
+          }
+        ]
+      },
+      "RecoveryState": {
+        "source": "internal/engine/agents_store.go",
+        "source_sha256": "29a04b2234fa0190a7c12ba318c26612e8cbcabc2025010ab03745e19e02039d",
+        "fields": [
+          {
+            "go_name": "Category",
+            "go_type": "string",
+            "json_tag": "category,omitempty",
+            "line": 68
+          },
+          {
+            "go_name": "CauseFingerprint",
+            "go_type": "string",
+            "json_tag": "cause_fingerprint,omitempty",
+            "line": 69
+          },
+          {
+            "go_name": "ObservedCategory",
+            "go_type": "string",
+            "json_tag": "observed_category,omitempty",
+            "line": 70
+          },
+          {
+            "go_name": "ObservedCauseFingerprint",
+            "go_type": "string",
+            "json_tag": "observed_cause_fingerprint,omitempty",
+            "line": 71
+          },
+          {
+            "go_name": "OperationID",
+            "go_type": "string",
+            "json_tag": "operation_id,omitempty",
+            "line": 72
+          },
+          {
+            "go_name": "AutomaticUsed",
+            "go_type": "int",
+            "json_tag": "automatic_attempts_used",
+            "line": 73
+          },
+          {
+            "go_name": "AutomaticMax",
+            "go_type": "int",
+            "json_tag": "automatic_attempts_max",
+            "line": 74
+          },
+          {
+            "go_name": "BudgetRemaining",
+            "go_type": "int",
+            "json_tag": "budget_remaining",
+            "line": 75
+          },
+          {
+            "go_name": "NextEligibleAt",
+            "go_type": "string",
+            "json_tag": "next_eligible_at,omitempty",
+            "line": 76
+          },
+          {
+            "go_name": "Disposition",
+            "go_type": "string",
+            "json_tag": "disposition,omitempty",
+            "line": 77
+          }
+        ]
+      },
+      "ReportedModel": {
+        "source": "internal/engine/agent_reported_model.go",
+        "source_sha256": "4650883eb58441260a7e6fb172635276c04772471ef13b5beef4d1d594b5d43e",
+        "fields": [
+          {
+            "go_name": "Model",
+            "go_type": "string",
+            "json_tag": "model",
+            "line": 11
+          },
+          {
+            "go_name": "Source",
+            "go_type": "string",
+            "json_tag": "source",
+            "line": 12
+          },
+          {
+            "go_name": "At",
+            "go_type": "string",
+            "json_tag": "at",
+            "line": 13
+          }
+        ]
+      },
+      "RunLimits": {
+        "source": "internal/engine/run_limits.go",
+        "source_sha256": "6bb48452ed56abe5984c4759ca2105aaf2b15098eaa2511a5de8c8a88daf9157",
+        "fields": [
+          {
+            "go_name": "ObservationMode",
+            "go_type": "int",
+            "json_tag": "observation_mode,omitempty",
+            "line": 10
+          },
+          {
+            "go_name": "SilenceSeconds",
+            "go_type": "int",
+            "json_tag": "silence_seconds",
+            "line": 11
+          },
+          {
+            "go_name": "ToolSeconds",
+            "go_type": "int",
+            "json_tag": "tool_seconds",
+            "line": 12
+          },
+          {
+            "go_name": "MaxToolCalls",
+            "go_type": "int",
+            "json_tag": "max_tool_calls",
+            "line": 13
+          },
+          {
+            "go_name": "MaxRepeatedCalls",
+            "go_type": "int",
+            "json_tag": "max_repeated_calls",
+            "line": 14
+          },
+          {
+            "go_name": "MaxConsecutiveErrors",
+            "go_type": "int",
+            "json_tag": "max_consecutive_errors",
+            "line": 15
+          }
+        ]
+      },
+      "Usage": {
+        "source": "internal/engine/budgets.go",
+        "source_sha256": "289375d15abafefb5c781a8baad124f0580b9d357c61b12ce22c4c098e1a1814",
+        "fields": [
+          {
+            "go_name": "CacheRead",
+            "go_type": "*int64",
+            "json_tag": "cache_read_input_tokens,omitempty",
+            "line": 185
+          },
+          {
+            "go_name": "CacheCreation",
+            "go_type": "*int64",
+            "json_tag": "cache_creation_input_tokens,omitempty",
+            "line": 186
+          },
+          {
+            "go_name": "CachedInput",
+            "go_type": "*int64",
+            "json_tag": "cached_input_tokens,omitempty",
+            "line": 187
+          },
+          {
+            "go_name": "ReportedCost",
+            "go_type": "*float64",
+            "json_tag": "provider_reported_cost_usd,omitempty",
+            "line": 188
+          },
+          {
+            "go_name": "Input",
+            "go_type": "int64",
+            "json_tag": "input_tokens",
+            "line": 189
+          },
+          {
+            "go_name": "Output",
+            "go_type": "int64",
+            "json_tag": "output_tokens",
+            "line": 190
+          },
+          {
+            "go_name": "Source",
+            "go_type": "string",
+            "json_tag": "source",
+            "line": 191
+          },
+          {
+            "go_name": "Scope",
+            "go_type": "string",
+            "json_tag": "scope",
+            "line": 192
+          },
+          {
+            "go_name": "At",
+            "go_type": "string",
+            "json_tag": "at",
+            "line": 193
+          }
+        ]
+      }
+    }
+  }
+}

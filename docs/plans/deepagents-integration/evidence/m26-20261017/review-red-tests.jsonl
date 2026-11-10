@@ -1,0 +1,9 @@
+{"Time":"2026-10-17T14:47:25.667370475+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-17T14:47:25.688103393+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestMemorySummarySelectionPreparedReceiptCannotClaimStartCheck"}
+{"Time":"2026-10-17T14:47:25.688220092+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMemorySummarySelectionPreparedReceiptCannotClaimStartCheck","Output":"=== RUN   TestMemorySummarySelectionPreparedReceiptCannotClaimStartCheck\n"}
+{"Time":"2026-10-17T14:47:25.768588311+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMemorySummarySelectionPreparedReceiptCannotClaimStartCheck","Output":"    memory_summary_receipt_test.go:284: prepared receipt falsely claims a before-start check\n"}
+{"Time":"2026-10-17T14:47:25.769807405+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMemorySummarySelectionPreparedReceiptCannotClaimStartCheck","Output":"--- FAIL: TestMemorySummarySelectionPreparedReceiptCannotClaimStartCheck (0.08s)\n"}
+{"Time":"2026-10-17T14:47:25.769864452+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestMemorySummarySelectionPreparedReceiptCannotClaimStartCheck","Elapsed":0.08}
+{"Time":"2026-10-17T14:47:25.769912463+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-17T14:47:25.773061477+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.105s\n"}
+{"Time":"2026-10-17T14:47:25.773125558+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.106}

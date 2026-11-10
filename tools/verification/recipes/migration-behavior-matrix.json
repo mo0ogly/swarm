@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "migration-behavior-matrix",
+  "inputs": [
+    "tools/rust-migration/build_behavior_matrix.py",
+    "tests/test_migration_behavior_matrix.py",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/mission.rs",
+    "rust/crates/swarm-web/src/service.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "stale-duplicate-and-empty-inventory-refusals",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_migration_behavior_matrix.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_stale_dispatch_source_refuses_before_classification",
+        "test_duplicate_public_entry_refuses_instead_of_counting_twice",
+        "OK",
+        "test_empty_surface_refuses_instead_of_reporting_zero_success",
+        "Ran 3 tests"
+      ]
+    },
+    {
+      "id": "current-entry-and-reviewed-operation-matrix",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile,json\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='migration-matrix-',dir='.cache')).resolve()\nsubprocess.run(['python3','tools/rust-migration/build_behavior_matrix.py','--inventory',os.environ['SWARM_MATRIX_INVENTORY'],'--normal-profile-directory',os.environ['SWARM_MATRIX_NORMAL_DIRECTORY'],'--output',str(base/'matrix')],check=True)\nv=json.loads((base/'matrix/matrix.json').read_bytes())\nassert len(v['entry_rows'])==137 and len(v['mission_rows'])==11 and len(v['planning_rows'])==34\nassert not v['exhaustive'] and v['globally_accepted_rows']==0\nprint('PASS 137 entries plus 45 reviewed operation rows, no global parity claim')\nprint('REPLAY_EVIDENCE '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS 137 entries plus 45 reviewed operation rows, no global parity claim",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "root": "/tmp/swarm-summary-source-x6l9iuu8",
+  "agent": "dcc9caee-4bdd-4ae8-858b-03059ab32fc7",
+  "cause": "Fixture waited for BrainstormAnswer.attempt == Agent.attempt_id; actual producer stores Agent.id. Completed source and answer are retained; one script invocation, no model call.",
+  "producer": "internal/engine/agents_store.go:1255"
+}

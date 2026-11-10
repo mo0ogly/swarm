@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "native-partial-validation",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/task_validation/*.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/managed_repository*.rs",
+    "docs/architecture/NATIVE-REVIEWER.md",
+    "docs/en/NATIVE-REVIEWER.md",
+    "tests/rust_native_partial_validation.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_managed_validation.py",
+    "tests/rust_native_managed_candidate.py",
+    "tests/rust_managed_auto_worker.py",
+    "tests/rust_managed_result_recovery.py",
+    "tests/rust_managed_repository_bootstrap.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_native_http_mission.py",
+    "tests/rust_managed_planning.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-validation-data-contracts",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::task_validation::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test result: ok. 26 passed; 0 failed;"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-managed-complete-slot-reconstruction",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='partial-managed-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_native_partial_validation.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(p)],check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS' and not r['task_accepted'] and not r['reexecuted'] and r['ordinary']==False and len(r['checks'])==9\nprint('PARTIAL_MANAGED_RECIPE_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PARTIAL_MANAGED_RECIPE_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-ordinary-complete-slot-reconstruction",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='partial-ordinary-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_native_partial_validation.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(p)]+['--ordinary'],check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS' and not r['task_accepted'] and not r['reexecuted'] and r['ordinary']==True and len(r['checks'])==8\nprint('PARTIAL_ORDINARY_RECIPE_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PARTIAL_ORDINARY_RECIPE_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

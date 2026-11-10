@@ -1,0 +1,39 @@
+{
+  "pid": 2,
+  "direct_key": {
+    "accessible": false,
+    "errno": 2
+  },
+  "write_open_key": {
+    "accessible": false,
+    "errno": 2
+  },
+  "direct_registry": {
+    "accessible": false,
+    "errno": 2
+  },
+  "symlink_key": {
+    "accessible": false,
+    "errno": 2
+  },
+  "workspace_control": {
+    "accessible": false,
+    "errno": 2
+  },
+  "ancestor_root": {
+    "accessible": false,
+    "errno": 2
+  },
+  "ancestor_visible": false,
+  "inherited_private_env": false,
+  "child_key": {
+    "accessible": false
+  },
+  "workspace_write": true,
+  "control_cli": {
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "{\n  \"error\": \"lstat /tmp/swarm-ia2-isolation-3rhzi5mk: no such file or directory\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"lstat /tmp/swarm-ia2-isolation-3rhzi5mk: no such file or directory\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+  },
+  "host_loopback": false
+}

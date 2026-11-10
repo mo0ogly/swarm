@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T09:38:38.681903+00:00",
+  "old_tree": "17b843f85b3d0fc491ee6e063e145479426249bc",
+  "new_tree": "6add0b67cfcc588f64bd92d1c2100cc29940b533",
+  "patch": "/tmp/swarm-T2-unpaid-source-parts-revision.patch",
+  "sha256": "583f1fe6d2c604bc3222ce4b2fd6ac264e831a42a2e9d74e58090d8b508e5b66",
+  "bytes": 406174,
+  "native": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-2",
+  "original_head": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "preserved_stash": "a73f26244e8e0e59877fb30e8c88a8628b7ad33d",
+  "operator_action": "Correction of confirmed stopped externally repaired copy; public revision still required",
+  "changed_files_from_accepted_base": 56
+}

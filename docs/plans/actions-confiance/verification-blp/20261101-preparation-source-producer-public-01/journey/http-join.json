@@ -1,0 +1,19 @@
+{
+  "status": 200,
+  "body": {
+    "actor": "admin",
+    "diagnostic_only": true,
+    "output_classification": {
+      "compartments": [
+        "a",
+        "b"
+      ],
+      "level": "secret"
+    },
+    "policy_revision": "1",
+    "prompt_sha256": "80bab8212d4722ef2468dd87106d5d47a851f50a332e94d1985622a634bb75e6",
+    "runtime_authorized": false,
+    "schema_version": 1,
+    "source_count": 21
+  }
+}

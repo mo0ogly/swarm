@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "go",
+    "vet",
+    "./internal/engine"
+  ],
+  "started_at_utc": "2026-10-16T09:20:54.609314+00:00",
+  "ended_at_utc": "2026-10-16T09:20:58.736618+00:00",
+  "elapsed_seconds": 4.127280934000737,
+  "exit_code": 0,
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,27 @@
+Un agent peut préparer une action pertinente sans avoir l’autorité de l’exécuter.
+
+Cette distinction est au cœur de mon travail sur Swarm, un moteur d’orchestration multi-agents à contrôle déterministe.
+
+L’objectif est de relier chaque action à une identité, un mandat, un contenu approuvé et un résultat vérifiable. Les agents raisonnent et proposent ; les opérations contrôlées par le moteur restent soumises aux règles et validations applicables.
+
+Les standards apportent déjà des réponses complémentaires : ISO pour le management et les risques, OWASP pour les risques agentiques et les contrôles à l’exécution, NIST pour les architectures et catalogues de contrôles, SPIFFE pour l’identité des processus.
+
+L’Agent Control Standard de l’OWASP décrit lui-même une couche déterministe. La question devient celle de son application dans un processus complet.
+
+Une approbation reste-t-elle valable après un changement de bénéficiaire ? Une révocation empêche-t-elle l’action avant son engagement ? Après une réponse perdue, la reprise évite-t-elle un second effet ? L’agent peut-il contourner le contrôle avec un autre outil ?
+
+Ces questions demandent des preuves sur une version, une configuration et un périmètre précis.
+
+Je distingue trois responsabilités : vérifier les règles, protéger les clés et imposer les points de passage vers les effets réels. Leur séparation doit résister aux moyens techniques accessibles à l’agent.
+
+Au 25 octobre 2026, le noyau Biba Rust de Swarm est consigné comme livré localement pour les actions de confiance simulées, avec mandats, accords exacts et mécanismes de reprise. Le raccord global de l’identité et de la mémoire reste à qualifier ; le confinement général prévu par AC-02 n’est pas démarré.
+
+Swarm ne revendique aucune certification de sécurité agentique. Je propose de prolonger sa matrice de contrôles par un profil d’assurance : une exigence explicite, un test nommé, une preuve et une limite déclarée pour chaque garantie recherchée.
+
+Pour les actions critiques, je défends une autonomie d’engagement conditionnée à ces garanties et aux validations requises par le contexte.
+
+Quelles preuves exigez-vous avant de laisser un agent engager une action irréversible ?
+
+Fabrice Pizzi
+
+#Swarm #AgenticAI #AISecurity #Cybersecurity

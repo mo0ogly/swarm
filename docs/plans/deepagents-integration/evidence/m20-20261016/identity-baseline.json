@@ -1,0 +1,17 @@
+{
+  "at_utc": "2026-10-16T20:34:54.384629+00:00",
+  "kind": "documentation scope extension, not implementation",
+  "files": {
+    "docs/plans/actions-confiance/brief.md": "c75208ae86c3ebe42e7ec414d03343491345a3f443ee9266c241d001624d52dc",
+    "docs/plans/actions-confiance/identites-entreprise.md": "5cfc3749caba61f9f23f1d4b370547400d57984f5ba968033a50afac9f11a6f0",
+    "docs/plans/actions-confiance/identites-r13-coverage.md": "0ed2a12343f8e49a50f0d52268a4ea11560d7e1479a077ede0e1c0c3334186b3",
+    "docs/architecture/ACTIONS-CONFIANCE.md": "db2dd084bc211175dfa87bed7790706ca26983b4e14e9a31ee9c2ebdef140f7f",
+    "docs/en/ACTIONS-CONFIANCE.md": "92d2cd9829c9d47083395abfd0260f276a21279f5604b265710a2349d5a074d4",
+    "docs/architecture/actions-confiance-contract.json": "614b85fbe91ae1b0259fba343809ff9e173fa7b2adea78cb9e5e8eea56070e8e",
+    "docs/plans/deepagents-integration/PLAN.md": "115caa0f8857dcf31a3b50ecc7d56ad830b5242a630e323eb66d99e057e88460",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-16.md": "d7d248b323c742d052f87a3b7d24b555b1aea8f50ed39494f352da46eac4ed58"
+  },
+  "new_paths": [
+    "docs/plans/actions-confiance/identites-agents-replan.md"
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-10T19:53:27.562612+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "revision": 82,
+  "operation": "planning revise-recovered-result",
+  "event_id": "T2-traceability-repair-20261010",
+  "original_review": "review-8a5b4d26457e4456353da385",
+  "original_review_outcome": "interrupted provider 429; no semantic final verdict",
+  "repair": {
+    "proof_key": "auto-0f7f61a183068fd63528-repair-7ee30d29ee8d98ec",
+    "replaces_result": "ce754b1814fb922a3baa572a7894ce02bd162f16",
+    "prior_review_id": "review-8a5b4d26457e4456353da385",
+    "event_id": "T2-traceability-repair-20261010",
+    "request_sha256": "7ee30d29ee8d98ec2cad0aaf4a2202a04bf6d50a659a285f027f13f1e1213f71",
+    "agent_id": "auto-0f7f61a183068fd63528",
+    "attempt_id": "a-5fff6319655d0b5b9b34413a",
+    "result_commit": "ccd2f3b902ad132ae34d69db9ecded810df46880",
+    "tree": "4ac77f1d127cf3b410c362201bd6ea2bc971aa44",
+    "actor": "fpizzi/uid:1001",
+    "at": "2026-10-10T19:51:37.140663795Z",
+    "reason": "Correction externe explicite après interruption fournisseur 429, sans prétendre à un refus sémantique : joindre les originaux attribués du rejeu juge (6 tests / 13 PASS, exit 0), les limites de la suite interrompue et une sélection de sources examinable. Code inchangé, tentative et budgets conservés. Les nouveaux contrôles doivent être reçus ; aucune acceptation ni nouvel appel pendant le délai fournisseur.",
+    "original_process_status": "completed"
+  },
+  "controller_candidate": "56ca8cab5bfde7dc9ddf7a7a5d2169231d87c9a9",
+  "controller_receipt": {
+    "path": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-0f7f61a183068fd63528-repair-7ee30d29ee8d98ec/receipt.json",
+    "sha256": "923ade83a2c9a327122b7e509cd7230782b64ca730c1e839fb54b75273cc1604",
+    "controls": [
+      {
+        "task": "plan-ca937edf4e-T1",
+        "total": 7,
+        "passed": 7,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "task": "plan-ca937edf4e-T2",
+        "total": 7,
+        "passed": 7,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "path": "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
+      "bytes": 15108,
+      "sha256": "951a18b22de8e1623dd85ff5205baf9acb0b59ee56885cf439bfcea0ba8902e9"
+    },
+    {
+      "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+      "bytes": 10147,
+      "sha256": "8bd4f53d332dbabbec8cdcabbf5fb7a04404cc9c46f47fedaf461ed632d6ca8e"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/index.json",
+      "bytes": 2722,
+      "sha256": "6487308e2087524051871a492d46a4bc82a50cdc76c87c6a59facce120438d22"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/interrupted-suite-observation.json",
+      "bytes": 1462,
+      "sha256": "25cf8923831e309688a9273aeb938b5de2a8bf958a41bb5f111a66a81273300e"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json",
+      "bytes": 840,
+      "sha256": "5c4e34f1ad35cd1f86f307f317b098150af097f8e4f14eb6c5562fb54d682884"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.jsonl",
+      "bytes": 13181,
+      "sha256": "1d7a3e77b4b20f1542224c50d4264a1daef0b970612815367d9cbd0020c0d362"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-tests.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/suite-failure-events.jsonl",
+      "bytes": 1060,
+      "sha256": "cd49e8f8a91dd2dc7f7d5fe9e6205a2b4fbc11c816cc3ca3510accfd5b6cb02c"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-handoff.md",
+      "bytes": 11691,
+      "sha256": "b427660aee05f4509e32219fe9fb3bad9f34c59d5d54cd77e262430bce6deecf"
+    },
+    {
+      "path": "internal/engine/planning.go",
+      "bytes": 40065,
+      "sha256": "247c7456ef6073e26b66ae59fad01c240b3b9c631510ad22c170b544d33966cb"
+    },
+    {
+      "path": "internal/engine/planning_judge.go",
+      "bytes": 7665,
+      "sha256": "02bfd68ac3cb4e9b1845931bdc8e8696723f8ce1e04bda84e994112f43b67dcb"
+    },
+    {
+      "path": "internal/engine/planning_judge_test.go",
+      "bytes": 13972,
+      "sha256": "63c9f4e6ac8d493a634bc8f40785606412c4dd81bbed68632bbe94ff020699d0"
+    }
+  ],
+  "source_code_unchanged": true,
+  "current_review": null,
+  "reviewer_calls": 9,
+  "t2_attempts": 1,
+  "recovery_command_exit": 2,
+  "recovery_command_limit": "State change and candidate controls completed; provider_cooldown prevented the review call; no acceptance",
+  "provider_reset_utc": "2026-10-10T21:20:00Z",
+  "acceptance": "pending independent review",
+  "new_engine_guard_installation": "locally verified; active server still old binary"
+}

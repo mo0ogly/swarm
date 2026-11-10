@@ -1,0 +1,62 @@
+   Compiling swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+warning: unused import: `verify_candidate`
+  --> crates/swarm-engine/src/managed_repository.rs:19:78
+   |
+19 | pub(crate) use worker::{candidate_worker, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, Mana...
+   |                                                                              ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `process::CommandExt`
+  --> crates/swarm-engine/src/root_store/task_validation/process.rs:20:33
+   |
+20 |     os::unix::{net::UnixStream, process::CommandExt},
+   |                                 ^^^^^^^^^^^^^^^^^^^
+
+warning: function `assemble_managed` is never used
+   --> crates/swarm-engine/src/root_store/review_preview/inputs.rs:288:15
+    |
+288 | pub(super) fn assemble_managed(
+    |               ^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `register` is never used
+  --> crates/swarm-engine/src/root_store/reviewer_native/gate.rs:48:15
+   |
+48 | pub(super) fn register(
+   |               ^^^^^^^^
+
+warning: function `result_inputs` is never used
+   --> crates/swarm-engine/src/root_store/reviewer_native/guard.rs:295:15
+    |
+295 | pub(super) fn result_inputs(
+    |               ^^^^^^^^^^^^^
+
+warning: function `prepare` is never used
+  --> crates/swarm-engine/src/root_store/reviewer_native/material.rs:47:15
+   |
+47 | pub(super) fn prepare(
+   |               ^^^^^^^
+
+warning: function `prepare_for_job` is never used
+  --> crates/swarm-engine/src/root_store/reviewer_native/material.rs:62:15
+   |
+62 | pub(super) fn prepare_for_job(
+   |               ^^^^^^^^^^^^^^^
+
+warning: constant `ATTRIBUTION_MISMATCH` is never used
+  --> crates/swarm-engine/src/root_store/reader_guard.rs:22:18
+   |
+22 | pub(crate) const ATTRIBUTION_MISMATCH: &str = "paea-reader-attribution-mismatch";
+   |                  ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `root_revision` is never used
+   --> crates/swarm-engine/src/root_store/paea_git_agreement.rs:462:8
+    |
+462 |     fn root_revision(f: &Fixture) -> i64 {
+    |        ^^^^^^^^^^^^^
+
+warning: `swarm-engine` (lib test) generated 9 warnings (run `cargo fix --lib -p swarm-engine --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized] target(s) in 5m 04s
+     Running unittests src/lib.rs (.cache/blp-verification-target/debug/deps/swarm_engine-3b6c0be6886c7be4)

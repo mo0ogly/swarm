@@ -1,0 +1,14 @@
+flowchart TD
+  B["Bootstrap fourni indépendamment<br/>pins et Authorizer ; fixtures seulement"] --> O["Open : UID, ancêtres, répertoire 0700<br/>verrou privé ; aucune valeur par défaut"]
+  O --> P["Preview : lecture et autorisation<br/>Projection distincte ; aucune sauvegarde"]
+  O --> A["Create explicite ou Apply<br/>codec strict, autorisation et CAS"]
+  H["Head indépendant fourni<br/>témoin durable protégé non réalisé"] --> A
+  A --> W["Fichier temporaire 0600 vérifié<br/>écriture et fsync fichier"]
+  W --> R["Rename atomique"]
+  R --> D["fsync répertoire"]
+  D --> V["View : configuration sauvegardée<br/>aucune preuve de service effectif"]
+  D -. "erreur après rename" .-> E["ErrIndeterminate<br/>résultat durable incertain"]
+  E --> C["Observer sous checkpoint<br/>retry courant exact et réautorisé"]
+  C --> D
+  A --> F["Distant non implémenté, conflit ou refus<br/>aucun succès vide ni secours permissif"]
+  V -. "raccord encore absent" .-> U["Service isolé, installation et Admin<br/>autorité actuelle et usage final à vérifier"]

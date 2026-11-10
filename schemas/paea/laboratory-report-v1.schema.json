@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PAEA portable laboratory report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "recipe_id",
+    "binary_sha256",
+    "recipe_result_sha256",
+    "source_inventory_sha256",
+    "calls_sha256",
+    "tests",
+    "refuted_claim",
+    "authority",
+    "isolation",
+    "independent_evaluation",
+    "protected_invariants"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "type": "integer"
+    },
+    "scope": {
+      "const": "isolated-laboratory",
+      "type": "string"
+    },
+    "recipe_id": {
+      "const": "paea-pilot-lab",
+      "type": "string"
+    },
+    "refuted_claim": {
+      "const": "raw-invoice-identifiers-guarantee-global-debt-uniqueness",
+      "type": "string"
+    },
+    "authority": {
+      "const": "simulated",
+      "type": "string"
+    },
+    "isolation": {
+      "const": "same-uid",
+      "type": "string"
+    },
+    "independent_evaluation": {
+      "const": "not-established",
+      "type": "string"
+    },
+    "protected_invariants": {
+      "const": "not-established",
+      "type": "string"
+    },
+    "binary_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "recipe_result_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_inventory_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "calls_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "tests": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "enum": [
+              "test_t04_substitution_then_equivalent_json_recovery",
+              "test_t06_t21_crash_new_attempt_exact_marker_and_reconciliation",
+              "test_t05_t17_ordered_revocation_first_use_and_opposite_order",
+              "test_unavailable_oracle_stays_unknown_then_recovers_without_creation",
+              "test_git_stale_and_symbolic_target_refuse_then_recover",
+              "test_output_failure_after_effect_is_unknown_and_reconciles",
+              "test_invoice_alias_is_a_counterexample_without_authoritative_registry",
+              "test_resolved_invoice_aliases_converge_on_one_effect"
+            ]
+          },
+          "status": {
+            "const": "PASS"
+          }
+        }
+      }
+    }
+  }
+}

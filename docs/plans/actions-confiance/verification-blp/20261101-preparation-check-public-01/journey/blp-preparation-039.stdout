@@ -1,0 +1,1 @@
+{"actor":"admin","diagnostic_only":true,"output_classification":{"compartments":["a","b"],"level":"secret"},"policy_revision":"1","prompt_sha256":"530658b31e3fc703cc0ca73f7727f8e908661d208bd12a51b77411c0f8677b9e","runtime_authorized":false,"schema_version":1,"source_count":21}

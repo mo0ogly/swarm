@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "id": "versioned-agent-identity-kernel-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/agent_identity_kernel.rs",
+    "rust/crates/swarm-engine/src/memory_usage_decision.rs",
+    "rust/crates/swarm-engine/src/memory_usage_binding.rs",
+    "rust/crates/swarm-engine/src/memory_summary_selection.rs",
+    "rust/crates/swarm-engine/src/memory_summary_source.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/agent_launch_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_models.rs",
+    "rust/crates/swarm-engine/src/agent_launch_error.rs",
+    "rust/crates/swarm-engine/src/local_path.rs",
+    "rust/crates/swarm-engine/src/models.rs",
+    "rust/crates/swarm-engine/src/work.rs",
+    "rust/crates/swarm-engine/src/project_memory.rs",
+    "rust/crates/swarm-engine/src/fixture_area.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-identity-contract/src/lib.rs",
+    "rust/crates/swarm-wire-json/src/lib.rs",
+    "internal/engine/agent_identity_contract.go",
+    "internal/engine/agent_identity_authority.go",
+    "internal/engine/agent_identity_authority_test.go",
+    "internal/engine/memory_usage_decision.go",
+    "internal/engine/memory_usage_decision_test.go",
+    "internal/engine/memory_usage_binding.go",
+    "internal/engine/memory_usage_binding_test.go",
+    "internal/engine/memory_summary_selection.go",
+    "internal/engine/agents_store.go",
+    "docs/actions-confiance-rust.md",
+    "docs/en/actions-confiance-rust.md",
+    "tools/verification/recipes/versioned-agent-identity-kernel-rust.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "identity-kernel-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "agent_identity_kernel",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 9 tests",
+        "test result: ok. 9 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "usage-decision-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "memory_usage_decision",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 5 tests",
+        "test result: ok. 5 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "usage-binding-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "memory_usage_binding",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 6 tests",
+        "test result: ok. 6 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "identity-kernel-go-parity-reference",
+      "command": [
+        "go",
+        "test",
+        "./internal/engine/",
+        "-run",
+        "TestAgentIdentityAuthority|TestAgentIdentityDecision|TestAgentIdentitySnapshot|TestAgentIdentityTransition|TestAgentIdentityPrincipal|TestMemoryUsageDecision|TestMemoryUsageRequests",
+        "-count=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "ok  "
+      ],
+      "required_stderr": []
+    }
+  ]
+}

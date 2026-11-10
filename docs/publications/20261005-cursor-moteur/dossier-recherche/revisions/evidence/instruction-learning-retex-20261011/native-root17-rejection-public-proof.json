@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-11T12:47:46.887510+00:00",
+  "activation": 17,
+  "work_revision_observed": 233,
+  "failure_absent": true,
+  "diagnostic_pending": true,
+  "scope_holder_absent": true,
+  "review_running": true,
+  "artifacts_verified": [
+    {
+      "path": ".swarm/planning/w-ca937edf4e0abd85f8d3d67b/diagnostic-6e67a77b33240d22b3c5e1c48a4196a8cfe881fa41b67be87536fd126c168652.json",
+      "sha256": "6e67a77b33240d22b3c5e1c48a4196a8cfe881fa41b67be87536fd126c168652"
+    },
+    {
+      "path": ".swarm/planning/w-ca937edf4e0abd85f8d3d67b/planning-claim-a83c32f4c9957e9be6fe49c0-rejected-93c137bfb2219af3bf08524beba8e577d47ddefb5480242325cc313b04a40f29.json",
+      "sha256": "93c137bfb2219af3bf08524beba8e577d47ddefb5480242325cc313b04a40f29"
+    }
+  ],
+  "limits": "Native diagnostic queued; owner reception and correction not yet proven. Integration pending pauses owner scheduling while review runs."
+}

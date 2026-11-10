@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-12T13:56:15.281535+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-inputs-control-diagnostic-public-20261012.bundle",
+  "sha256": "c801d88567db091a5eb5bde2b427eb2269cc84bdeb191507ec0bc942024be364",
+  "commit": "5a6738403efd0e9fa019ddae77fc686ba3632485",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 137,
+  "manifest_sha256": "d2e3f59aabc3f64b77599440a4a95a996487027111226410367275fad978173d",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-inputs-1ut0gzhd",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-import-6mbyucwe",
+  "old134_originals_preserved": true,
+  "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+  "limits": "Qualified public reader of the original failed control extends all 134 prior originals unchanged. Source contract 30 remains unchanged. Authenticated task-bound read only, provenance and freshness verified; no acceptance or reviewer call. Preserve every prior input and history; deferred27 excluded. Native future tasks must verify matching preimages, preserve their own manifest and qualify the cumulative candidate; operator deployment is not native acceptance or autonomous recovery."
+}

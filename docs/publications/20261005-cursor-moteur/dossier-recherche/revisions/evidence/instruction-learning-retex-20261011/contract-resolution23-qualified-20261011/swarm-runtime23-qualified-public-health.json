@@ -1,0 +1,91 @@
+{
+  "state": "ready",
+  "launch_allowed": true,
+  "observed_at": "2026-10-11T21:35:12.413573968Z",
+  "message": "Le stockage est disponible.",
+  "next_step": "Les autres conditions de lancement restent contrôlées par le moteur.",
+  "volumes": [
+    {
+      "kind": "store",
+      "path": "/home/fpizzi/workspace/swarm/.swarm",
+      "available_bytes": 23964049408,
+      "available_inodes": 26322711,
+      "state": "ready"
+    },
+    {
+      "kind": "temporary",
+      "path": "/tmp",
+      "available_bytes": 3265892352,
+      "available_inodes": 1005251,
+      "state": "ready"
+    }
+  ],
+  "version": {
+    "binary": {
+      "version": "devel",
+      "commit": null,
+      "modified": null,
+      "build_date": null,
+      "provenance": "unknown"
+    },
+    "source": {
+      "available": true,
+      "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+      "modified": true,
+      "compared": false,
+      "matches_binary": null
+    },
+    "history": {
+      "schema_version": 1,
+      "available": true,
+      "releases": [
+        {
+          "version": "v0.1.0",
+          "date": "2026-10-06",
+          "summary": {
+            "fr": "Première release expérimentale : édition du graphe avec prévisualisation, automatisation durable, administration des paramètres, validation indépendante et reprise tracée des contrats bloqués.",
+            "en": "First experimental release: graph editing with previews, durable automation, configurable administration, independent validation and audited recovery of blocked contracts."
+          },
+          "commits": [
+            {
+              "sha": "191616999c5f4b30e901042b51898cfbb21a3e06",
+              "url": "https://github.com/mo0ogly/swarm/commit/191616999c5f4b30e901042b51898cfbb21a3e06"
+            },
+            {
+              "sha": "2d08f0510d7f6da36d7f03cb9481dde7de249fe8",
+              "url": "https://github.com/mo0ogly/swarm/commit/2d08f0510d7f6da36d7f03cb9481dde7de249fe8"
+            }
+          ],
+          "release_url": "https://github.com/mo0ogly/swarm/releases/tag/v0.1.0"
+        }
+      ]
+    }
+  },
+  "version_diagnostic": {
+    "installed_cli": {
+      "available": false,
+      "version": null,
+      "commit": null,
+      "modified": null,
+      "provenance": "browser",
+      "hint": "Le navigateur ne peut pas inspecter le CLI local. Lancez swarm version --server URL_DE_SESSION."
+    },
+    "active_server": {
+      "available": true,
+      "version": "devel",
+      "commit": null,
+      "modified": null,
+      "provenance": "unknown"
+    },
+    "candidate": {
+      "available": true,
+      "version": null,
+      "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+      "modified": true,
+      "provenance": "git"
+    },
+    "state": "unknown",
+    "differences": [],
+    "next_step": "Rendez accessibles les identités manquantes (installed_cli, active_server) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+  }
+}

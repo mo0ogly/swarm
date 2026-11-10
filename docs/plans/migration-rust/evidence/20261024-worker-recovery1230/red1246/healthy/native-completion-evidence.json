@@ -1,0 +1,13 @@
+{
+  "file": "native-completion-20feb138f3dde895379e41ff2f427e34b395119efdf3e7548722eb0b94b1bab8.json",
+  "sha256": "dd40fa017cf20ffa5fef17cecf22f02b89d37f57e31d97b2d841b8d09123e00d",
+  "agent_id": "watch-17babd6283a9c054854b2272",
+  "work_id": "w-d723dd1c3d0738a9a18edc70",
+  "reservation": [
+    "w-d723dd1c3d0738a9a18edc70",
+    1.0,
+    "estimated"
+  ],
+  "public_details_equal": true,
+  "required_native_facts_verified": true
+}

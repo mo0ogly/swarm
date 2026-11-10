@@ -1,0 +1,12 @@
+{
+  "error": "blp-classification-required",
+  "failure": {
+    "causes": [
+      "blp-classification-required"
+    ],
+    "code": "blp-classification-required",
+    "message": "blp-classification-required",
+    "retryable": false
+  },
+  "schema_version": 1
+}

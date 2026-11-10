@@ -1,0 +1,5 @@
+{"type":"thread.started","thread_id":"01a143b8-391e-7a53-948d-091643e51055"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."}}
+{"type":"turn.started"}
+{"type":"error","message":"unexpected status 503 Service Unavailable: Local exact-input transport check, url: http://127.0.0.1:39219/v1/responses"}
+{"type":"turn.failed","error":{"message":"unexpected status 503 Service Unavailable: Local exact-input transport check, url: http://127.0.0.1:39219/v1/responses"}}

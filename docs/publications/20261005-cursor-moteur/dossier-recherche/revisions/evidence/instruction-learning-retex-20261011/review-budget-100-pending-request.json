@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "review-budget-100-through-native-retex-20261011",
+  "expected_revision": 326,
+  "limits": {
+    "planning_activations": 60,
+    "planning_decisions": 60,
+    "review_calls": 100
+  },
+  "reason": "Autorisation explicite utilisateur : augmenter droits/budgets nécessaires à ce projet. Prévision mise à jour :23appels avant la revue actuelle,6inspections+2finaux planifiés, puis6remises T3..T8. Au format observé8appels/remise, total estimé79 dépasse70 ; ce scénario est une estimation, pas un minimum garanti. Allocation revue70→100 avec marge de corrections, autres budgets inchangés. Consommations,3tentativesT2, avis/preuves/identités conservés ; aucun plafond financier ou limite de compte fournisseur modifié. Appliquer au premier état sans revue active ni détenteur, conformément à la garde publique actuelle ; ce budget ne décide pas de l'achèvement et n'accepte aucun candidat."
+}

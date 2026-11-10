@@ -1,0 +1,17 @@
+{
+  "error": "Travail w-b1296361b0f028f5d65996f0 révision 4 enregistré ; échec de sortie/fermeture : work state recorded (w-b1296361b0f028f5d65996f0, revision 4); operation refused or failed; re-read before retrying. Vérifier l’état enregistré avant de relancer le contrôle.",
+  "failure": {
+    "causes": [
+      "work-state-preserved",
+      "planning-provider-gate-refused"
+    ],
+    "code": "work-state-preserved",
+    "message": "Travail w-b1296361b0f028f5d65996f0 révision 4 enregistré ; échec de sortie/fermeture : work state recorded (w-b1296361b0f028f5d65996f0, revision 4); operation refused or failed; re-read before retrying. Vérifier l’état enregistré avant de relancer le contrôle.",
+    "retryable": false
+  },
+  "recorded_work": {
+    "id": "w-b1296361b0f028f5d65996f0",
+    "revision": 4
+  },
+  "schema_version": 1
+}

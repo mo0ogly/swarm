@@ -1,0 +1,73 @@
+## Replacement target
+
+Exact block in `rust/crates/swarm-engine/src/work_engine.rs`, inside the `"planning.enable" | …` arm — the final `else` clause (`} else { let provider = … }`) containing the Enable provider bootstrap and the single `apply_planning_control_prepared` call. Replace that whole `else` block with the following (≤65 lines):
+
+```rust
+            } else {
+                // Root-only repository bootstrap: prevalidate the complete
+                // candidate with the repository stripped from a local request,
+                // then run real preparation with the ORIGINAL request. Public
+                // pure calls never reach here; their refusal is unchanged in
+                // planning_control. Replay intent keeps the original request.
+                let stripped = if action == crate::PlanningControlAction::Enable
+                    && request.repository.is_some()
+                {
+                    let mut local = request.clone();
+                    local.repository = None;
+                    Some(local)
+                } else {
+                    None
+                };
+                let validation_request = stripped.as_ref().unwrap_or(request);
+                let provider = if action == crate::PlanningControlAction::Enable
+                    && !request.provider.is_empty()
+                {
+                    crate::planning_control::validate_planning_enable_target(
+                        &candidate,
+                        validation_request,
+                    )
+                    .map_err(WorkEngineError::PlanningControl)?;
+                    #[cfg(target_os = "linux")]
+                    {
+                        Some(
+                            crate::reviewer_bootstrap::prepare(root, request, &at, settings)
+                                .map_err(|e| WorkEngineError::PlanningBootstrap(Box::new(e)))?,
+                        )
+                    }
+                    #[cfg(not(target_os = "linux"))]
+                    {
+                        return Err(WorkEngineError::UnportedStatus);
+                    }
+                } else {
+                    None
+                };
+                candidate = crate::planning_control::apply_planning_control_prepared(
+                    &candidate,
+                    action,
+                    validation_request,
+                    &at,
+                    settings,
+                    provider.as_ref(),
+                )
+                .map_err(WorkEngineError::PlanningControl)?;
+                if let Some(_local) = stripped {
+                    #[cfg(target_os = "linux")]
+                    {
+                        let repo = crate::managed_repository::prepare(
+                            root, &candidate.id, request, settings,
+                        )
+                        .map_err(|e| {
+                            WorkEngineError::PlanningActivation(Box::new(e))
+                        })?;
+                        if let Some(planning) = candidate.planning.as_deref_mut() {
+                            planning.repository = Some(repo);
+                        }
+                    }
+                }
+            }
+```
+
+## What this preserves / adds
+
+- **Pure refusal unchanged**: `validate_planning_enable_target` still refuses `request.repository.is_some()` in `planning_control.rs`; public pure callers (which never take this root path with preparation) keep `planning-enable-repository-unported`.
+- **Original mutation intent**: only the *stripped clone* is used for candidate prevalidation

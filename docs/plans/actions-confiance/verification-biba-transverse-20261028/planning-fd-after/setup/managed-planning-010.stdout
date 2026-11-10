@@ -1,0 +1,331 @@
+{
+  "work": {
+    "planning": {
+      "reviewer_required": true,
+      "reviewer": {
+        "max_context_files": 24,
+        "max_source_bytes": 98304,
+        "max_context_bytes": 131072,
+        "max_files": 100,
+        "provider": "fixture",
+        "provider_digest": "faa70d7974a15c39e002b5a3028d85492d1a33d3fdf665fe6c4180e0d6229f68",
+        "model_route": {
+          "level": "standard",
+          "model": "fixture-standard",
+          "effort": "fixture-medium",
+          "billing": "external",
+          "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+          "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+        },
+        "max_calls": 2,
+        "calls": 0,
+        "authorized": "2026-10-28T17:40:53.860284494Z"
+      },
+      "model_route": {
+        "level": "standard",
+        "model": "fixture-standard",
+        "effort": "fixture-medium",
+        "billing": "external",
+        "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+        "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+      },
+      "checks": {
+        "req-1": [
+          {
+            "inputs": [
+              "handoff.md"
+            ],
+            "id": "actual-handoff",
+            "command": [
+              "python3",
+              "-c",
+              "from pathlib import Path; assert Path('handoff.md').read_text().strip()"
+            ],
+            "criteria": [
+              1
+            ],
+            "justification": "Check owned handoff content",
+            "timeout_seconds": 60
+          }
+        ]
+      },
+      "repository": {
+        "source": "/tmp/swarm-model83-ah8x69sh/source",
+        "storage": "/tmp/swarm-model83-ah8x69sh/.swarm/managed/w-85afc1bc04cf32629e12165b",
+        "base_commit": "2492924b2e7d74321d6535ecc111dff8f747bfed",
+        "candidate_commit": "2492924b2e7d74321d6535ecc111dff8f747bfed",
+        "snapshot_digest": "478c5ed7c74bc184eb0ad82b0a459a2cfd9ab3b056ef5848b89add4324439c6a",
+        "request_digest": "44857e71ce04d382e59eda18dbe1bc3b7cbcace02e4cf93cc2118244ab49ad01"
+      },
+      "provider": "fixture",
+      "provider_digest": "faa70d7974a15c39e002b5a3028d85492d1a33d3fdf665fe6c4180e0d6229f68",
+      "activations": 1,
+      "max_activations": 6,
+      "version": 1,
+      "paused": false,
+      "max_tasks": 2,
+      "max_decisions": 10,
+      "decisions": 1,
+      "scopes": [
+        {
+          "last_model": {
+            "provider": "fixture",
+            "provider_digest": "faa70d7974a15c39e002b5a3028d85492d1a33d3fdf665fe6c4180e0d6229f68",
+            "route": {
+              "level": "standard",
+              "model": "fixture-standard",
+              "effort": "fixture-medium",
+              "billing": "external",
+              "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+              "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+            },
+            "actor": "",
+            "at": "2026-10-28T17:40:54.192047041Z"
+          },
+          "delivery": {
+            "judge_available": true,
+            "judge_cycle": 1,
+            "task_budget": 2,
+            "activation_budget": 6,
+            "closure_unavailable": true,
+            "review_retry_unavailable": true,
+            "production_retry_unavailable": true,
+            "context_sha256": "c7e2e42fcc83eec556e00e0b136acbad77fa0ba40e6f774890d88b2ff2859bb7",
+            "events": [
+              "managed-planning-enable"
+            ],
+            "decision": "planning-decision-8c6de1ec34c7ede41fa7eeb0"
+          },
+          "workflow": {
+            "version": 1,
+            "role": "planner",
+            "methods": [
+              "apex",
+              "audit-pdca",
+              "spec-builder",
+              "spec-audit",
+              "replan",
+              "debug",
+              "product-planning"
+            ],
+            "sha256": "0ee8956b70ffdc7971b868f62666fa89f4cd40edeb68fb9211755de537572e55"
+          },
+          "activations": 1,
+          "id": "root",
+          "objective": "Scoped fixture planning",
+          "requirements": [],
+          "revision": 2,
+          "generation": 2,
+          "state": "waiting"
+        },
+        {
+          "max_tasks": 2,
+          "max_activations": 3,
+          "activations": 0,
+          "id": "child",
+          "parent": "root",
+          "objective": "Owned child scope\nPlan the owned requirement",
+          "requirements": [
+            "req-1"
+          ],
+          "revision": 1,
+          "generation": 0,
+          "state": "ready"
+        }
+      ],
+      "inbox": [
+        {
+          "id": "managed-planning-enable",
+          "scope": "root",
+          "kind": "brief",
+          "message": "Scoped fixture planning",
+          "decision": "planning-decision-8c6de1ec34c7ede41fa7eeb0",
+          "at": "2026-10-28T17:40:53.860284494Z"
+        },
+        {
+          "id": "plan-dade26b26fd12a3852c1f7aea6ea0fb619bc15566c10b0e559daa210b93992a5",
+          "scope": "child",
+          "kind": "delegation",
+          "message": "Owned child scope",
+          "at": "2026-10-28T17:40:54.876117077Z"
+        }
+      ],
+      "judge": {
+        "cycle": 1,
+        "max_cycles": 0,
+        "closed": false
+      }
+    },
+    "schema_version": 1,
+    "id": "w-85afc1bc04cf32629e12165b",
+    "revision": 4,
+    "title": "Public planning bootstrap",
+    "objective": "Scoped fixture planning",
+    "scope": "Owned local bootstrap",
+    "criteria": [
+      "Configuration is persisted without model execution"
+    ],
+    "next": "",
+    "summary": "",
+    "memory": null,
+    "created": "2026-10-28T17:40:53.605394481Z",
+    "updated": "2026-10-28T17:40:54.897009513Z",
+    "git": {
+      "head": "",
+      "branch": "",
+      "changes": ""
+    },
+    "tasks": []
+  },
+  "validation": {
+    "state": "open",
+    "label": "OUVERT",
+    "validated": 0,
+    "historical": 0,
+    "stale": 0,
+    "tasks": {}
+  },
+  "events": [
+    {
+      "id": "managed-planning-create",
+      "work_id": "w-85afc1bc04cf32629e12165b",
+      "revision": 1,
+      "kind": "work.create",
+      "at": "2026-10-28T17:40:53.639154587Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "managed-planning-create",
+        "expected_revision": 0,
+        "title": "Public planning bootstrap",
+        "objective": "Scoped fixture planning",
+        "scope": "Owned local bootstrap",
+        "criteria": [
+          "Configuration is persisted without model execution"
+        ]
+      }
+    },
+    {
+      "id": "managed-planning-enable",
+      "work_id": "w-85afc1bc04cf32629e12165b",
+      "revision": 2,
+      "kind": "planning.enable",
+      "at": "2026-10-28T17:40:54.02589637Z",
+      "payload": {
+        "max_review_calls": 2,
+        "level": "standard",
+        "checks": {
+          "req-1": [
+            {
+              "inputs": [
+                "handoff.md"
+              ],
+              "id": "actual-handoff",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path; assert Path('handoff.md').read_text().strip()"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Check owned handoff content"
+            }
+          ]
+        },
+        "repository": {
+          "path": "source",
+          "committed_only": true
+        },
+        "provider": "fixture",
+        "max_activations": 6,
+        "schema_version": 1,
+        "event_id": "managed-planning-enable",
+        "expected_revision": 1,
+        "max_tasks": 2,
+        "max_decisions": 10
+      }
+    },
+    {
+      "id": "planning-claim-003bc2096bb31200b3d1be67",
+      "work_id": "w-85afc1bc04cf32629e12165b",
+      "revision": 3,
+      "kind": "planning.claim",
+      "at": "2026-10-28T17:40:54.241228003Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "planning-claim-003bc2096bb31200b3d1be67",
+        "expected_revision": 2,
+        "scope": "root",
+        "scope_revision": 1,
+        "holder": "native-planner-7adebd3a9a3de424c39fa985",
+        "lease_seconds": 120
+      }
+    },
+    {
+      "id": "planning-decision-8c6de1ec34c7ede41fa7eeb0",
+      "work_id": "w-85afc1bc04cf32629e12165b",
+      "revision": 4,
+      "kind": "planning.decide",
+      "at": "2026-10-28T17:40:54.897009513Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "planning-decision-8c6de1ec34c7ede41fa7eeb0",
+        "expected_revision": 3,
+        "scope": "root",
+        "scope_revision": 1,
+        "holder": "native-planner-7adebd3a9a3de424c39fa985",
+        "generation": 1,
+        "input_events": [
+          "managed-planning-enable"
+        ],
+        "operations": [
+          {
+            "max_tasks": 2,
+            "max_activations": 3,
+            "kind": "delegate",
+            "id": "child",
+            "title": "Owned child scope",
+            "requirements": [
+              "req-1"
+            ],
+            "next": "Plan the owned requirement"
+          }
+        ],
+        "reason": "Explicit public integration fixture"
+      }
+    }
+  ],
+  "current_gates": {},
+  "current_git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "resume_markdown": "# Public planning bootstrap\n\nTravail : w-85afc1bc04cf32629e12165b | révision 4 | OUVERT\nDernière activité : 2026-10-28T17:40:54.897009513Z\n\n## Objectif et résultat attendu\nScoped fixture planning\nPérimètre : Owned local bootstrap\n- Configuration is persisted without model execution\n\n## Situation actuelle\nnon renseigné\nHEAD enregistré : non renseigné\nBranche enregistrée : non renseigné\nHEAD courant : non renseigné\nBranche courante : non renseigné\nMétadonnée Git indisponible (HEAD) : git-command-failed.\nMétadonnée Git indisponible (branch) : git-command-failed.\nMétadonnée Git indisponible (changes) : git-command-failed.\n\n## Tâches actives et résultats attendus\nAucune tâche active déclarée.\n\n## Travail validé\nTâches acceptées (preuves ou dérogation) : 0/0.\nCe ratio est distinct de la progression des critères d’une gate.\n\n## Travail restant et blocages\n\n## Gates, qualité et progression vérifiée\n\n## Prochaine action du travail\nà définir\n\n## Décisions OODA et mémoire utile\nMémoire spécifique : non renseignée.\n\nLes tentatives enregistrées ne prouvent pas qu’un processus tourne encore.\nUne gate ne remplace pas une autorisation de publication.\n",
+  "git_diagnostics": [
+    {
+      "field": "head",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "branch",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "changes",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    }
+  ]
+}

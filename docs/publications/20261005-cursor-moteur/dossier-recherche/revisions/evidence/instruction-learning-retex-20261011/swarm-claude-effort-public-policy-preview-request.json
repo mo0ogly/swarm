@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "expected_digest": "d6ad84beae4b54a2f8168eb40feadd8c7161e9f912e21fef3caaf6a146725e5f",
+  "policies": {
+    "claude": {
+      "version": 1,
+      "billing": "external",
+      "work_level": "standard",
+      "page_level": "simple",
+      "levels": {
+        "exigeant": {
+          "model": "opus",
+          "effort": ""
+        },
+        "simple": {
+          "model": "haiku",
+          "effort": ""
+        },
+        "standard": {
+          "model": "sonnet",
+          "effort": "medium"
+        }
+      }
+    }
+  },
+  "preview": true
+}

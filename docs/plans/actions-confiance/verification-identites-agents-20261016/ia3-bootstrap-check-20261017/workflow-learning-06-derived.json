@@ -1,0 +1,20 @@
+{
+  "source": "workflow-learning-06.stderr",
+  "counts": {
+    "pass": 2,
+    "fail": 3,
+    "skip": 0
+  },
+  "names": {
+    "pass": [
+      "TestAgentWorkflowRolesAreBounded/reviewer",
+      "TestAgentWorkflowRolesAreBounded/worker"
+    ],
+    "fail": [
+      "TestAgentWorkflowRolesAreBounded",
+      "TestAgentWorkflowRolesAreBounded/planner",
+      "TestAgentWorkflowRolesAreBounded/subplanner"
+    ],
+    "skip": []
+  }
+}

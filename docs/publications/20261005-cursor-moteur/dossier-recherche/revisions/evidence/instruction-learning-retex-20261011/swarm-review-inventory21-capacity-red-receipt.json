@@ -1,0 +1,17 @@
+{
+  "start": "2026-10-11T19:03:45.925810+00:00",
+  "end": "2026-10-11T19:03:56.450932+00:00",
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestManagedFragmentSelectionUsesReceivedEvidenceCapacity",
+    "-count=1",
+    "-timeout=3m"
+  ],
+  "exit": 1,
+  "output": "/tmp/swarm-review-inventory21-capacity-red.out",
+  "sha256": "fe8323a24164deae295eb5d454e48ae541f4fdfff7d216235f320f0ba33aa8d5",
+  "scope": "Expected RED: whole original fits actual final prompt but speculative reserve falsely advertises less room. No native DB, provider or quota."
+}

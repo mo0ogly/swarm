@@ -1,0 +1,10 @@
+{
+  "pid": 1214049,
+  "proc_start_ticks": "2799514",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-group-mapping-index-check.py",
+    "run"
+  ],
+  "at": "2026-10-15T19:46:10.996348+00:00"
+}

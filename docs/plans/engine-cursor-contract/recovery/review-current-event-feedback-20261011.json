@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T11:52:08.052302+00:00",
+  "parent": "planning-exact-envelope-20261011.patch",
+  "parent_sha256": "f719102703429f3a31c4e391e2d7b8b76b65ea7504abaf5be177fad75923fd29",
+  "preimage_tree": "4147881fc49ba8630638aa75003173c807dae7c1",
+  "expanded_preimage": [
+    {
+      "path": "internal/engine/managed_review_fragment_feedback.go",
+      "sha256": "22e3297f535a9be8f2a4c2a81c1b020c7cc581e0deb8b384b1d798fa9a2b54d9",
+      "source": "root HEAD 1169df70bec73d50fd23f640245b8ffd1317b9de"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_feedback_test.go",
+      "sha256": "2314adda856d801141d7ce5977ed8d280b9097b190bbc471b1b2bb8ccf284407",
+      "source": "root HEAD 1169df70bec73d50fd23f640245b8ffd1317b9de"
+    }
+  ],
+  "patch": "docs/plans/engine-cursor-contract/recovery/review-current-event-feedback-20261011.patch",
+  "sha256": "d3c3be3c058a6f5141ddedd1143bd809a4459e053f9a69923018caefacb068b7",
+  "bytes": 23634,
+  "paths": [
+    "internal/engine/planning_context.go",
+    "internal/engine/planning_delivery.go",
+    "internal/engine/planning_schema.go",
+    "internal/engine/planning_context_priority_test.go",
+    "internal/engine/planning_historical_delivery_test.go",
+    "internal/engine/managed_review_fragment_feedback.go",
+    "internal/engine/managed_review_fragment_feedback_test.go",
+    "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+    "docs/en/AGENT-ENGINE-PROTOCOL.md"
+  ],
+  "purpose": "Current exact review result follows latest operator instruction ahead of older instructions; frozen delivery removes review-retry without owned received current protocol-error event. Quote retry diagnostic uses validator exact physical-line rule and explains JSON tab escaping without editing raw response/journal.",
+  "tests": "RED reproduced missing-event schema and current-review starvation; mixed valid midline and invalid escaped-tab RED. Targeted PASS, full/race/vet in progress.",
+  "limits": "Native activation13 paid inference failed atomically at revision190 on missing current review result; original proposal/failures/calls preserved. Local checks do not prove T2 acceptance, autonomous recovery, later tasks or final RETEX."
+}

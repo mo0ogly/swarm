@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T14:38:13.159431+00:00",
+  "parent": "admin-duration-launch-20261011.patch",
+  "parent_sha256": "06429887df1f013f9acea161357b7348760a251df7995fc36231a093e07d34e3",
+  "preimage_tree": "6ee1ccf5d75428e02a8d95b47e0b92c5cbda61ed",
+  "preimage_extensions": [
+    {
+      "path": "internal/engine/managed_review_preflight_retry.go",
+      "blob": "3016ce3b9d28cfc97fc157f40a1b090e299aebc0",
+      "sha256": "06daa8d5cfd3f5f48b48d1ce19fbb3109813fc585187249a5e541fbae20776b1",
+      "origin": "HEAD and qualified11 byte-identical"
+    }
+  ],
+  "result_tree": "48a3f72d50580207a7227eed0e2ffa68636d9191",
+  "patch": "docs/plans/engine-cursor-contract/recovery/source-capacity-recovery-20261011.patch",
+  "sha256": "1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84",
+  "bytes": 16060,
+  "paths": [
+    "internal/engine/managed_review_sources.go",
+    "internal/engine/managed_review_preflight_retry.go",
+    "internal/engine/recovered_result.go",
+    "internal/engine/recovered_result_source_capacity_test.go",
+    "docs/ATTEMPT-RECOVERY.md",
+    "docs/en/ATTEMPT-RECOVERY.md"
+  ],
+  "purpose": "Allow attributable public corrective submission after completed production and an unpaid typed source-capacity refusal. Verify immutable original checkpoint/control receipt and identical refusal; ordinary review retry remains strict. Preserve original result, consumption, attempts; require bounded repaired original evidence, fresh controls and independent review.",
+  "tests": "Real completed-producer source overflow RED; targeted recovery/source/preflight GREEN31.598s. Extended strict ordinary retry, checkpoint/receipt tampering, atomic refusal, replay and immutable original-reference regression PASS1.123s. Full/race/vet/workflows qualification separate.",
+  "limits": "Operator source correction; no live installation or native acceptance asserted. Other invalid input, missing proof, old attempt, changed contract, existing independent refusal and ordinary review bounds remain guarded."
+}

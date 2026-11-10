@@ -1,0 +1,17 @@
+[
+  "TestChangedReviewMethodCannotReuseRecoveredPriorOpinion",
+  "TestDefectCitationProtocolRestartKeepsMethodAndOldEvidence",
+  "TestFragmentNestedDefectRestartKeepsMethodAndOldEvidence",
+  "TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult",
+  "TestPlanningProtocolFailureRejectsProducerRetry",
+  "TestPlanningReviewRetryCanRestartChangedMethod",
+  "TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen",
+  "TestPlanningReviewRetryQueuesSameCandidateWithoutProductionOrSpend",
+  "TestPlanningReviewRetryRejectsInvalidRecoveryAtomically",
+  "TestPlanningReviewRetryRestrictionTracksWholeReducedBatch",
+  "TestReviewMethodRestartRejectsTamperedOriginalsAndSemanticRefusal",
+  "TestReviewMethodRestartRequiresExplicitCorrectionAndKeepsHistory",
+  "TestReviewRetryConnectedWriterRejectsChangedStorageBeforeMutation",
+  "TestReviewRetryDirectiveForeignCandidateCannotReserve",
+  "TestReviewRetryStorageMigrationPreservesQueuedInstruction"
+]

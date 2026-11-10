@@ -1,0 +1,6 @@
+{
+  "status": "FAIL",
+  "cause": "HTTP allowlist rejects existing producer as trust-action-unknown",
+  "limits": "Original raw channels retained. Ad hoc reproducer; no exact source inventory captured before subsequent test additions. Not recipe qualification.",
+  "method_incident": "Ad hoc HTTP reproducer inherited no TMPDIR: tempfile used system temp and deleted its owned fixture. This violates the project location rule; no qualification is claimed. Subsequent retained HTTP recipe enforces configured private fixture TMPDIR and passed. No arbitrary files were removed."
+}

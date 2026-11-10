@@ -1,0 +1,57 @@
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/storage
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/source
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/project_subdir
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/candidate_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/base_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/snapshot_digest
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/pending/included
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/storage
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/source
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/project_subdir
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/candidate_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/base_commit
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/snapshot_digest
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/final/included
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/storage
+    prephase_organization_test.go:763: noncanonical manifest adopted
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/source
+    prephase_organization_test.go:763: noncanonical manifest adopted
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/project_subdir
+    prephase_organization_test.go:763: noncanonical manifest adopted
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/candidate_commit
+    prephase_organization_test.go:763: noncanonical manifest adopted
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/base_commit
+    prephase_organization_test.go:763: noncanonical manifest adopted
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/snapshot_digest
+    prephase_organization_test.go:763: noncanonical manifest adopted
+=== RUN   TestPreparedRepositoryRejectsNonCanonicalManifest/both/included
+    prephase_organization_test.go:763: noncanonical manifest adopted
+--- FAIL: TestPreparedRepositoryRejectsNonCanonicalManifest (2.06s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/storage (0.12s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/source (0.09s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/project_subdir (0.11s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/candidate_commit (0.11s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/base_commit (0.09s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/snapshot_digest (0.10s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/pending/included (0.09s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/storage (0.09s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/source (0.11s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/project_subdir (0.11s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/candidate_commit (0.11s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/base_commit (0.10s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/snapshot_digest (0.09s)
+    --- PASS: TestPreparedRepositoryRejectsNonCanonicalManifest/final/included (0.09s)
+    --- FAIL: TestPreparedRepositoryRejectsNonCanonicalManifest/both/storage (0.10s)
+    --- FAIL: TestPreparedRepositoryRejectsNonCanonicalManifest/both/source (0.09s)
+    --- FAIL: TestPreparedRepositoryRejectsNonCanonicalManifest/both/project_subdir (0.10s)
+    --- FAIL: TestPreparedRepositoryRejectsNonCanonicalManifest/both/candidate_commit (0.09s)
+    --- FAIL: TestPreparedRepositoryRejectsNonCanonicalManifest/both/base_commit (0.09s)
+    --- FAIL: TestPreparedRepositoryRejectsNonCanonicalManifest/both/snapshot_digest (0.10s)
+    --- FAIL: TestPreparedRepositoryRejectsNonCanonicalManifest/both/included (0.09s)
+=== RUN   TestPreparedRepositoryRejectsDivergentManifests
+    prephase_organization_test.go:798: divergent canonical-shaped manifests silently accepted
+--- FAIL: TestPreparedRepositoryRejectsDivergentManifests (0.09s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	2.176s
+FAIL

@@ -1,0 +1,51 @@
+{
+ "schema_version": 1,
+ "id": "trust-delegation-rust",
+ "inputs": [
+  "rust/crates/swarm-engine/src/trust/operations.rs",
+  "rust/crates/swarm-engine/src/trust/state.rs",
+  "rust/crates/swarm-engine/src/trust/mod.rs",
+  "rust/crates/swarm-engine/src/trust/config.rs",
+  "rust/crates/swarm-engine/src/trust/extensions.rs",
+  "rust/crates/swarm-engine/src/trust/response.rs",
+  "rust/crates/swarm-engine/src/trust_types.rs",
+  "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+  "rust/crates/swarm-engine/src/root_store.rs",
+  "rust/crates/swarm-engine/src/lib.rs",
+  "rust/crates/swarm-engine/Cargo.toml",
+  "rust/Cargo.lock",
+  "rust/crates/swarm-engine/config/trust-controls-defaults.json",
+  "rust/crates/swarm-engine/tests/trust_delegation.rs",
+  "tests/rust_trust_delegation_unit.py",
+  "tests/fixture_area.py",
+  "internal/engine/trust_delegation.go",
+  "internal/engine/trust_delegation_test.go",
+  "docs/actions-confiance-rust.md",
+  "docs/en/actions-confiance-rust.md"
+ ],
+ "environment": {},
+ "steps": [
+  {
+   "id": "delegation-unit",
+   "command": [
+    "python3",
+    "tests/rust_trust_delegation_unit.py"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "test result: ok. 9 passed;",
+    "DELEGATION_UNIT_PASS 9 named tests",
+    "test delegation_config_admission_persists_and_rejects_bad_shapes ... ok",
+    "test delegation_depth_zero_and_authority_boundary ... ok",
+    "test delegation_chain_request_approve_commit_and_depth_ceiling ... ok",
+    "test delegation_ancestor_revocation_blocks_boundaries ... ok",
+    "test delegation_rejects_amplification ... ok",
+    "test delegation_default_expiry_bounded_by_parent ... ok",
+    "test delegation_projection_reports_status ... ok",
+    "test mandate_status_projection_propagates_stored_timestamp_error ... ok",
+    "test mandate_status_projection_propagates_stored_depth_error ... ok"
+   ],
+   "required_stderr": []
+  }
+ ]
+}

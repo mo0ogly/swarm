@@ -1,0 +1,21 @@
+{
+  "git_head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "source_sha256": {
+    "internal/engine/model.go": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+    "internal/engine/store.go": "fd1d5775efbade3f664c8f8227c73369d04aabfca334f2ac4e799209724d2ed1",
+    "internal/engine/agent_dialogue.go": "307a68e2c145fdda8f3f6fe6d4dabc31422a13172df513c8b6014b9b074e8f23",
+    "internal/engine/agent_dialogue_test.go": "bea4c518cbc84f49b341c99ed2c7127bb51103a81ba0201af6f3c059fbcff0b1",
+    "internal/engine/console_cli.go": "014a25e57ca2af8f022dbdd7e4caeca432777ee82dcaa7ac63f19ed9ef7a7103",
+    "internal/engine/web_server.go": "dd6109ec1d3c444f86aba4ec2b127597bbd010b82f24bd66b88e98c2b51732c0",
+    "docs/PROJECT-MEMORY.md": "60a0ca32cf41626c6ed25c53f778a497a889d43524a01324eb6a205f0b64feda",
+    "docs/en/PROJECT-MEMORY.md": "66ed08d06ebd972fa801410d102810270654ecd383a83c761e21dfcee614b222",
+    "docs/plans/deepagents-integration/PLAN.md": "e8c87ecbd27ee8a9f4c9a91825fef542f098e2dc39f65dba18abd8711ee9495f",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "c4cf42dfd7c8ae36279cf5ebbaf6f03f2ace8848afa14c3a2a2c9094567e08c5"
+  },
+  "running_server_preserved": {
+    "pid": 1485609,
+    "url": "http://127.0.0.1:38433/"
+  },
+  "model_calls_authorized_this_increment": 0
+}

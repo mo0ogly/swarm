@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT4SealedCancellation
+--- PASS: TestActionsConfianceT4SealedCancellation (0.00s)
+=== RUN   TestActionsConfianceT4SealedTimeoutClosesDescendants
+--- PASS: TestActionsConfianceT4SealedTimeoutClosesDescendants (2.04s)
+PASS
+ok  	swarm.local/companion/internal/engine	3.646s

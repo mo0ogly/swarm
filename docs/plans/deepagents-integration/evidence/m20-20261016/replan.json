@@ -1,0 +1,15 @@
+{
+  "status": "PLAN REVISED",
+  "application_sources_changed": false,
+  "verified_source_files": [
+    "internal/engine/memory_summary_source.go",
+    "internal/engine/memory_summary_selection.go",
+    "tools/memory-evaluation/swarm_source.py",
+    "tools/memory-evaluation/admission.py"
+  ],
+  "tests_run": 0,
+  "model_calls": 0,
+  "ownership_implemented": false,
+  "plan": "INCREMENT-MEMOIRE-16.md",
+  "plan_sha256": "d7d248b323c742d052f87a3b7d24b555b1aea8f50ed39494f352da46eac4ed58"
+}

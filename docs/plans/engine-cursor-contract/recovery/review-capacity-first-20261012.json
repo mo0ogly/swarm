@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "parent_source_digest": "55ca089bb9b8d6986593cd401c898d8194ad3a493eb2407dbe544230bc748300",
+  "candidate_digest": "9790f6f59abd8f723bf5cb51ad45039d0439c93af370c3a9fc4c7227f058d9a9",
+  "preimages": {
+    "internal/engine/managed_review_capacity_first.go": null,
+    "internal/engine/managed_review_capacity_first_test.go": null,
+    "internal/engine/managed_review_capacity_reserve_test.go": null,
+    "internal/engine/managed_review_input_budget.go": "484a7057f5a8764bde9a1b79ab8ca31a5286f8a8acb433be79339803f8fcbf0a",
+    "internal/engine/managed_review_input_provider.go": "f4e6518f37de0edacf770e3fe2ac1c38212a30427cea0d27296a6725cb3db815",
+    "internal/engine/managed_review_fragment_capacity.go": "6a06bb4c9539da513d788f3d71fa42d7afad3b2e8fb1a3638388875e59a6fd87",
+    "internal/engine/managed_review_fragment_plan.go": "c0750747e63901769209f28d771c613ad44473af5c6f170888897a66708787c8",
+    "internal/engine/managed_review_fragment_tokens_store_test.go": "fe33828ac04b8bc8139bc2183818dd14055718b394dafc80d6f567d116bd9053",
+    "docs/REVIEW-FRAGMENTS.md": "6195eef0456f1c022020878ad345d4793b0d18f58f76d62055b82b91c57b970c",
+    "docs/en/REVIEW-FRAGMENTS.md": "d3fd0fbf66e44de9891d617bb7e5aafea25653a29763a8668fd55f27c0570960",
+    "docs/engine-cursor-source-inputs-001.json": "b905c2efec1dae486b69efebcb6e9b94fd051d480a5afd243191636a6ded43e3",
+    "docs/engine-cursor-source-inputs-003.json": "8eb929b44b3827024720faed37185c0860167c081a1e11bdfd19392444960de9",
+    "docs/engine-cursor-source-inputs-004.json": "51afd4d2eb649ed705261292b80cb63caf203d9f36e18888cc82f3244f388c2c",
+    "docs/engine-cursor-source-inputs-005.json": "5ad939baea6c37166d03262a4f933342e926047f8f00bba070510f8b3c7e7e8b",
+    "docs/engine-cursor-source-manifest.json": "14aa235076c5e116ef4d231050159ae499d36e29c84402ca83803369b6636280",
+    "internal/engine/managed_review_fragment_reply.go": "ef328ad5e762bed8aa3e370df745233c0d5cd6e65d5dfd9f0659ce8fa9300602"
+  },
+  "postimages": {
+    "internal/engine/managed_review_capacity_first.go": "d094003bdaf2a845542a4d7c27be905c964ec54d339ce24c936703e592d8c275",
+    "internal/engine/managed_review_capacity_first_test.go": "459343a04dd5d6864836e3d28c3262ae14b6740b2f287442a906c9138deab841",
+    "internal/engine/managed_review_capacity_reserve_test.go": "831081468355ee8aae3811a54041553f321cfcbeeca769e6a53ae2dec839fdc7",
+    "internal/engine/managed_review_input_budget.go": "cf735165be79cff8a5f6ac1cf40da2a416a6970c0b9a71801e02c5245d64255f",
+    "internal/engine/managed_review_input_provider.go": "e56486f586476ade5a3af30f0be0a8f8901b4818deed83f36d68c5b380ae19a4",
+    "internal/engine/managed_review_fragment_capacity.go": "a86160ffcaf772160fb8e43afb0021762a9fdf3bd6aadd1d37960231bee86047",
+    "internal/engine/managed_review_fragment_plan.go": "66a87a389ad8e0ca5a6d1b7eea0f8cc962c12143459b38e573f814f26837855a",
+    "internal/engine/managed_review_fragment_tokens_store_test.go": "60cb662e91e6478cb8ecacc6c6ab0231a367d94d1bcb316ad6330db32d2f0413",
+    "docs/REVIEW-FRAGMENTS.md": "58a060d8a7b7c27e17a8ff844e0f033ada36cea1085a2f3e1a639cdd93099c02",
+    "docs/en/REVIEW-FRAGMENTS.md": "c4f73d56c41d9ed2c7de6fa9978230702b262e919b7cd5cc6f9efbc5b1ab8a3a",
+    "docs/engine-cursor-source-inputs-001.json": "00083528e8c3cf6c82711abc856a6da9f72eea591176a5edce275348b933d4e4",
+    "docs/engine-cursor-source-inputs-003.json": "e48161ed095d9f8efbf4b667da7c9192955b87211a0dbe8c282632598114e463",
+    "docs/engine-cursor-source-inputs-004.json": "ae51111b1ce1155cf6089e7076eaad18024ab68e6f4ba8d8367bac9fe2300f60",
+    "docs/engine-cursor-source-inputs-005.json": "966ad43b74fb9a7cf904fbc06367e287d62fa82a96765217ade88a2c9c2c95c4",
+    "docs/engine-cursor-source-manifest.json": "ce20374a92661d129a396f8f3d647e01221ba5639af229f4f91cdf3485b67cfc",
+    "internal/engine/managed_review_fragment_reply.go": "8bbf3a39698a7de428413ce2416a5481cebcb4180b4a58c82af6734d9035aa0e"
+  },
+  "paths": [
+    "internal/engine/managed_review_capacity_first.go",
+    "internal/engine/managed_review_capacity_first_test.go",
+    "internal/engine/managed_review_capacity_reserve_test.go",
+    "internal/engine/managed_review_input_budget.go",
+    "internal/engine/managed_review_input_provider.go",
+    "internal/engine/managed_review_fragment_capacity.go",
+    "internal/engine/managed_review_fragment_plan.go",
+    "internal/engine/managed_review_fragment_tokens_store_test.go",
+    "docs/REVIEW-FRAGMENTS.md",
+    "docs/en/REVIEW-FRAGMENTS.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_review_fragment_reply.go"
+  ],
+  "patch_sha256": "578ae7c1b3396e4865d0270d2582cbcc822be1dbf14068a39c3bab55341a9b31",
+  "qualified": {
+    "checks": [
+      {
+        "name": "anchors",
+        "argv": [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "^(TestFreshReserveRejectsUnbudgetedHistoricalArray|TestManagedFragmentSelection|TestManagedFragmentRejectsTampering|TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal)$",
+          "-count=1",
+          "-timeout=90s"
+        ],
+        "started": "2026-10-12T18:53:36.643854+00:00",
+        "exit": 0,
+        "seconds": 29.51421604999996,
+        "output_sha256": "87fda9192e05414844bce5daf188cfa3aad65027d33ed7ee0a0e79c7c2ede3e1",
+        "drift": []
+      },
+      {
+        "name": "vet",
+        "argv": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "started": "2026-10-12T18:54:06.158660+00:00",
+        "exit": 0,
+        "seconds": 14.76800583899967,
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": []
+      },
+      {
+        "name": "methods",
+        "argv": [
+          "python3",
+          "tools/agent-workflows/check.py"
+        ],
+        "started": "2026-10-12T18:54:20.927435+00:00",
+        "exit": 0,
+        "seconds": 4.10274344499976,
+        "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+        "drift": []
+      },
+      {
+        "name": "build",
+        "argv": [
+          "go",
+          "build",
+          "-o",
+          "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-qualified-capacity-first-v2",
+          "./cmd/swarm"
+        ],
+        "started": "2026-10-12T18:54:25.030717+00:00",
+        "exit": 0,
+        "seconds": 2.640119304000109,
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": []
+      }
+    ],
+    "owned_source_hashes": {
+      "internal/engine/managed_review_capacity_first.go": "d094003bdaf2a845542a4d7c27be905c964ec54d339ce24c936703e592d8c275",
+      "internal/engine/managed_review_capacity_first_test.go": "459343a04dd5d6864836e3d28c3262ae14b6740b2f287442a906c9138deab841",
+      "internal/engine/managed_review_capacity_reserve_test.go": "831081468355ee8aae3811a54041553f321cfcbeeca769e6a53ae2dec839fdc7",
+      "internal/engine/managed_review_input_budget.go": "cf735165be79cff8a5f6ac1cf40da2a416a6970c0b9a71801e02c5245d64255f",
+      "internal/engine/managed_review_input_provider.go": "e56486f586476ade5a3af30f0be0a8f8901b4818deed83f36d68c5b380ae19a4",
+      "internal/engine/managed_review_fragment_capacity.go": "a86160ffcaf772160fb8e43afb0021762a9fdf3bd6aadd1d37960231bee86047",
+      "internal/engine/managed_review_fragment_plan.go": "66a87a389ad8e0ca5a6d1b7eea0f8cc962c12143459b38e573f814f26837855a",
+      "internal/engine/managed_review_fragment_tokens_store_test.go": "60cb662e91e6478cb8ecacc6c6ab0231a367d94d1bcb316ad6330db32d2f0413",
+      "docs/REVIEW-FRAGMENTS.md": "58a060d8a7b7c27e17a8ff844e0f033ada36cea1085a2f3e1a639cdd93099c02",
+      "docs/en/REVIEW-FRAGMENTS.md": "c4f73d56c41d9ed2c7de6fa9978230702b262e919b7cd5cc6f9efbc5b1ab8a3a",
+      "docs/engine-cursor-source-inputs-001.json": "00083528e8c3cf6c82711abc856a6da9f72eea591176a5edce275348b933d4e4",
+      "docs/engine-cursor-source-inputs-003.json": "e48161ed095d9f8efbf4b667da7c9192955b87211a0dbe8c282632598114e463",
+      "docs/engine-cursor-source-inputs-004.json": "ae51111b1ce1155cf6089e7076eaad18024ab68e6f4ba8d8367bac9fe2300f60",
+      "docs/engine-cursor-source-inputs-005.json": "966ad43b74fb9a7cf904fbc06367e287d62fa82a96765217ade88a2c9c2c95c4",
+      "docs/engine-cursor-source-manifest.json": "ce20374a92661d129a396f8f3d647e01221ba5639af229f4f91cdf3485b67cfc",
+      "internal/engine/managed_review_fragment_reply.go": "8bbf3a39698a7de428413ce2416a5481cebcb4180b4a58c82af6734d9035aa0e"
+    },
+    "binary_sha256": "203c98e2660c2ab31791015df3c3e13dc47f74502393d879987fd29023be8e89",
+    "limitations": "No full suite; no new shared-state algorithm or schema. Native installation/review/acceptance not inferred."
+  },
+  "native_effect": "public cost9/18 ready, current source result unchanged; independent review/acceptance not inferred",
+  "apply_check": "PASS isolated cumulative patch and every resulting source hash",
+  "auxiliary_git": "/home/fpizzi/.cache/swarm-operator-replan-20261011/capacity-first-immutable-patch-h6xd2la7",
+  "main_git_commit_created": false
+}

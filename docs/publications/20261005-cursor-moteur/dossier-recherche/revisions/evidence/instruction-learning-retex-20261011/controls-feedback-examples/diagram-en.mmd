@@ -1,0 +1,18 @@
+flowchart TD
+    P[Candidate production] --> C[Controls on exact inputs]
+    C -->|Controls pass| R[Independent candidate and evidence review]
+    C -->|Failure| I[Incident preserved and delivered]
+    R -->|Defect or missing evidence| I
+    I --> S[Scope supervisor diagnoses and decides]
+    S -->|Cross-scope issue| G[Root supervisor arbitrates]
+    G --> D[Authorized decision]
+    S --> D
+    D --> M[Engine validates and applies]
+    M --> V[Correction and effect observed]
+    V -->|Correction failure| I
+    V --> C
+    R -->|Favorable opinion and fresh evidence| A[Supervisor decides continuation or completion]
+    A --> F[Engine validates and records admissible decision]
+    V --> L[Learning for future tasks]
+    L --> U[Visible addition with user rejection choice]
+    F --> T[Acceptance recipe then agreed RETEX]

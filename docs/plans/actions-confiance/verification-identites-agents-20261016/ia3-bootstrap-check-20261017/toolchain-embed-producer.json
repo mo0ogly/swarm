@@ -1,0 +1,6 @@
+{
+  "path": "/usr/local/go/src/cmd/go/internal/work/exec.go",
+  "sha256": "fcc0df8cfd20354461e5f9eb993ab95ddf5a612c98aa1cf83b689274bced7b1d",
+  "fact": "embed.Files resolves each embedded path through fsys.Actual (overlay)",
+  "source": "installed Go compiler"
+}

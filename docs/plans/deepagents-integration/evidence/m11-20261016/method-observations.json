@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-16",
+  "owner": "Codex",
+  "method": "replan",
+  "incidents": [
+    {
+      "observed": "Read attempted nonexistent recovery_evidence.go and agents.go",
+      "cause": "Assumed paths before locating producer symbols",
+      "changed_precondition": "rg located actual producers in agents_store.go and recovery.go",
+      "verified_effect": "No product mutation from failed reads; relevant declarations and consumers inspected"
+    },
+    {
+      "observed": "apply_patch refused multiple operations targeting agent_dialogue_test.go",
+      "cause": "Tool patch format rejects duplicate targets",
+      "changed_precondition": "Merged changes under one file operation",
+      "verified_effect": "Patch applied and named tests executed"
+    },
+    {
+      "observed": "New historical checkpoint view used current wall clock for waiting time",
+      "original_evidence": "boundary-time-red.json/.log",
+      "cause": "Live summary() reused for a historical snapshot",
+      "changed_precondition": "Shared summaryAt(at), current supervision retains summary() and stored view uses checkpoint date",
+      "verified_effect": "Named red case passes in checkpoint-final and checkpoint-final-race; shared guard/supervisor regressions executed"
+    }
+  ],
+  "no_new_rule_duplication": true,
+  "no_model_calls": true
+}

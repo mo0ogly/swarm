@@ -1,0 +1,201 @@
+[
+  {
+    "argv": [
+      "tests/memory_summary_source.py",
+      "/tmp/swarm-m19-bin-o0uuhvjr/swarm",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/source-flow"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/swarm_source.py",
+      "--source",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-source.json",
+      "--annotations",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-annotations.json",
+      "--output-dir",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-bundle"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/summarization.py",
+      "--history",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-bundle/history.json",
+      "--reference-cutoff",
+      "4",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-candidate.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/summarization.py",
+      "--history",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-bundle/history.json",
+      "--candidate",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-candidate.json",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-reference.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/admission.py",
+      "--source",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-source.json",
+      "--annotations",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-annotations.json",
+      "--reference",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-reference.json",
+      "--reason",
+      "Operator selected attributed history; inspect current evidence",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/first-choice.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-721d716d9c0c6ae95e59fbcd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "context-preview",
+      "w-721d716d9c0c6ae95e59fbcd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-721d716d9c0c6ae95e59fbcd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "start",
+      "w-721d716d9c0c6ae95e59fbcd"
+    ],
+    "exit_code": 2
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-721d716d9c0c6ae95e59fbcd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "task",
+      "update",
+      "w-721d716d9c0c6ae95e59fbcd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "memory",
+      "summary-source"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/swarm_source.py",
+      "--source",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-source.json",
+      "--annotations",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-annotations.json",
+      "--output-dir",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-bundle"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/summarization.py",
+      "--history",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-bundle/history.json",
+      "--reference-cutoff",
+      "4",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-candidate.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/summarization.py",
+      "--history",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-bundle/history.json",
+      "--candidate",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-candidate.json",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-reference.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/admission.py",
+      "--source",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-source.json",
+      "--annotations",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-annotations.json",
+      "--reference",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-reference.json",
+      "--reason",
+      "Operator selected attributed history; inspect current evidence",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m21-20261016/native/current-choice.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "context-preview",
+      "w-721d716d9c0c6ae95e59fbcd"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "fe3274d5-573d-499b-9385-0e0ddb5c4d3e"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "fe3274d5-573d-499b-9385-0e0ddb5c4d3e"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-721d716d9c0c6ae95e59fbcd"
+    ],
+    "exit_code": 0
+  }
+]

@@ -1,0 +1,260 @@
+{
+  "at": "2026-10-16T17:24:23.284917+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "source_hashes": {
+    "internal/engine/agent_dialogue.go": "2ca82544a688b8f5ccee919dd0ed49d4c45051e730d30b08df7adf12918e122a",
+    "internal/engine/dialogue_checkpoint.go": "eac699d5356b39ee9c160824fbbae4300023de0601e19a06707771761c62b0c8",
+    "internal/engine/dialogue_checkpoint_store.go": "50370855602cc7e255646a8d249796754d65cc577ae675e252bdbaeef6cff418",
+    "internal/engine/dialogue_boundary_integrity_test.go": "dfe82ee937cc533ee6e978d23cf9e040f2a7bd3059ede6dae20dc9161b01598f",
+    "locales/en.json": "9335afc1be52b603efa892845857df517fa87a3fdfb8d0472605e40f1dc17628",
+    "web/i18n-en.js": "ece35efe7e14e14f1ce98258e8e9d2936f41f24bf42aabd45a27ed6f4d74f252",
+    "tests/dialogue_recovery_ui.cjs": "3aec181727212c136a7d5ff2a33e84ab542f73fedbdd92750715edf55d080ff3",
+    "docs/PROJECT-MEMORY.md": "0cf0875a3479a6d2af4cc0564a3731cfb828f49a919e2ffe37420d38c4454219",
+    "docs/en/PROJECT-MEMORY.md": "c82155d283bdc67e78ace65c5a16ccaa29b7cefc05fef97a77e2318e81008663",
+    "docs/plans/deepagents-integration/PLAN.md": "639f6cb6894eed532c4e079d98dca8b71ceab71d07fe67d59ea086d163d9d827",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "855da8c0273fb7bf0e9e96741b40340ad61687373e99a6e0cbad50589bf627e7",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-09.md": "9f475717868adb8cc38c702fa3bd2f36dcb371dfcfd7fc0702e0e7e067bb588e",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-09.md": "fd548c6768e67d75d1f4118a745c5ed87824ba02822b3d3ea55b7da307db9a5c"
+  },
+  "checks": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "gofmt",
+        "-l",
+        "internal/engine/agent_dialogue.go",
+        "internal/engine/dialogue_checkpoint.go",
+        "internal/engine/dialogue_checkpoint_store.go",
+        "internal/engine/dialogue_boundary_integrity_test.go"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "node",
+        "--check",
+        "tests/dialogue_recovery_ui.cjs"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "argv": [
+        "node",
+        "scripts/i18n/build.cjs",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": "{\"mode\":\"check\",\"source\":\"locales/en.json\",\"source_sha256\":\"9335afc1be52b603efa892845857df517fa87a3fdfb8d0472605e40f1dc17628\",\"output\":\"web/i18n-en.js\",\"output_sha256\":\"ece35efe7e14e14f1ce98258e8e9d2936f41f24bf42aabd45a27ed6f4d74f252\",\"status\":\"pass\"}\n{\"mode\":\"check\",\"source\":\"locales/trust-actions-en.json\",\"source_sha256\":\"eba1c42e13b08256458813feadc295ce51e17d39abe0ed25281c6689e63563a2\",\"output\":\"web/trust-actions-en.js\",\"output_sha256\":\"74da2a1650960701fa0856e44d61313eecb7df7315d1b5a5c33fb9d4e7f3b8a5\",\"status\":\"pass\"}"
+    },
+    {
+      "check": "owned file whitespace",
+      "files": 13,
+      "result": "PASS"
+    }
+  ],
+  "receipts": {
+    "boundary-final": {
+      "exit_code": 0,
+      "named_tests_ran": [
+        "TestDialogueResumeIdentityAndPermissions",
+        "TestDialogueBoundaryRejectsInconsistentTurnAcrossConsumers",
+        "TestDialogueCheckpointRejectsUnresumableSessionAndInvalidUsage",
+        "TestDialogueConfirmationDoesNotOverwriteChangedSession",
+        "TestDialogueBoundaryAllowsUnconfirmedEndBeforeAnswer",
+        "TestDialogueBoundaryHasDurableStateBeforeHeartbeat",
+        "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+        "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+        "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+        "TestDialogueCheckpointRejectsInvalidOrForeignState",
+        "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+        "TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority",
+        "TestDialogueRecoveryCLIAPIReadOnlyAndScoped",
+        "TestDialogueRecoveryQualifiesIncompleteAndChangedContracts",
+        "TestDialogueRecoverySelectionIgnoresRecentHistoryWindow"
+      ],
+      "input_files": 1010,
+      "log_sha256": "09f35e49980bac470b4562462b6f45ab86fe688b6cf9c6969cd1369e54c8705e"
+    },
+    "boundary-race": {
+      "exit_code": 0,
+      "named_tests_ran": [
+        "TestDialogueBoundaryRejectsInconsistentTurnAcrossConsumers",
+        "TestDialogueConfirmationDoesNotOverwriteChangedSession",
+        "TestDialogueBoundaryAllowsUnconfirmedEndBeforeAnswer",
+        "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+        "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+        "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions"
+      ],
+      "input_files": 1010,
+      "log_sha256": "4b3728a18dd4df1ae81d94a85419cfa516e897de01267d45c840d168bdda6cf9"
+    },
+    "build": {
+      "exit_code": 0,
+      "named_tests_ran": [],
+      "input_files": 1010,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "static": {
+      "exit_code": 0,
+      "named_tests_ran": [],
+      "input_files": 1010,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "i18n": {
+      "exit_code": 0,
+      "named_tests_ran": [],
+      "input_files": 1010,
+      "log_sha256": "23d0852b273fc311a94c30acddc4f7e897ac4e8f2782cabdb417754737419987"
+    },
+    "web-unit": {
+      "exit_code": 0,
+      "named_tests_ran": [],
+      "input_files": 1010,
+      "log_sha256": "14c09f4b7fe1f40d52d235789d9487e62fe11d29655e6bb39e4f9e486f07109f"
+    },
+    "configuration": {
+      "exit_code": 0,
+      "named_tests_ran": [],
+      "input_files": 1010,
+      "log_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+    },
+    "browser-flow": {
+      "exit_code": 0,
+      "named_tests_ran": [],
+      "input_files": 1010,
+      "log_sha256": "0039191c9fdb25715365b695831d58e7e87e15efd497710bd9b1ad26c58ab2cd"
+    }
+  },
+  "distinct_go_tests": 15,
+  "race_tests_included": 6,
+  "local_browser_checks": 6,
+  "links_checked": 5,
+  "runtime_unchanged": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "real_model_calls": 0,
+  "deployed": false,
+  "provider_restoration": "NOT IMPLEMENTED",
+  "evidence_hashes": {
+    "static.json": "74711d917edf29fa885060d83ea953f3561ef997cbef7bf7fafb5adf30fe72db",
+    "browser-flow.json": "593bce8943f127b0c1a42b22df1ce8b8ed7ff23b1c2168f05cdf4b6d9aa21a8d",
+    "binary-path.txt": "8736bc53a9799cae26c782be1035059b99e09564eb43540b012e2f04078d1415",
+    "final-audit-first.json": "9ff7c7c41d859b0289185342c5f86e321d585a4acc0c35470b6c544c6f88d228",
+    "i18n.log": "23d0852b273fc311a94c30acddc4f7e897ac4e8f2782cabdb417754737419987",
+    "boundary-final.json": "1c0b13e05944a282d3e27bb154ceffbb469ad855e794170692f7d85d323eaf3f",
+    "unchanged-live-runtime.json": "dfc4f74b180ba9d65934176ac3ab00b78f3b3ceae1ed5cba700ada1a0d59d6f9",
+    "boundary-red.json": "b8940d3cf682b2d889b7fa9bb2b5a3cd281fa0ff0aa352feac1b37ade2e14493",
+    "static-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "browser.json": "8cf2185ee2194f88296ff79c9037363c286584283c8d13eaf9a3cd44bc74734c",
+    "boundary-race-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "built-binary.json": "3a5ef56635494301b5bfc10fb6cce6de64e4cdccfbfa0f181c1bcd4734c6c41c",
+    "browser-flow-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "web-unit-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "run-check.py": "5c5f8ffbd678a1a02632b7c1c7f87b74f9df87f13ad475b232a6b5d4528809e6",
+    "boundary-red.log": "bd8133373a669c0a4636d1a1d67f81aaa5bee6b765d34eeb44f30f6184109d4a",
+    "browser-final-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "browser-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "browser-final.json": "d5ec5b459283cd01cb40d0f70ae9fc57bec0252567245b48e7f2075827b6a1bd",
+    "browser-flow-inputs-metadata.json": "08068541dfc1c68701a08193f68232b5feaed97b05d42aee8daa6ba451c0d592",
+    "boundary-race.json": "ef24a01fff08d8968d21827937a336ad6d2361ec78e6ff5ae71f3bed4fcab2b3",
+    "web-unit.log": "14c09f4b7fe1f40d52d235789d9487e62fe11d29655e6bb39e4f9e486f07109f",
+    "browser-final-inputs-metadata.json": "f4940e58091c7ec6249962133ee63657cdbf06fee980afb5c9721ba64aecce4b",
+    "boundary-final.log": "09f35e49980bac470b4562462b6f45ab86fe688b6cf9c6969cd1369e54c8705e",
+    "baseline.json": "d0d7222d27168e4c829ba109fc4f0d26c91bac8111a8427a8aa554030aa36b11",
+    "configuration.json": "3280d298e6a7c7467e7f086691b09696df57aaec26eb49393352e0ed0c70a927",
+    "method-observations.json": "b13da7251e6da1f4fd5e0985af9ffd4b3bd72f0feed15562e0f9e071e33c18ba",
+    "boundary-red-inputs.json": "eb3a7217a4331691cb90471c85deeb65fcf57a78f1c7b5c2857173e371d7b359",
+    "browser-flow.log": "0039191c9fdb25715365b695831d58e7e87e15efd497710bd9b1ad26c58ab2cd",
+    "static.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-audit.py": "0c67ddd70c0d3cbcab778f55c1532a8cca0d2f4d6dff87ac01f4e92fcf75330b",
+    "configuration.log": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+    "boundary-green.json": "f6abdffa6552931458ea9b759c35296a35ca96bd30cef2efc0d33bbd943256dc",
+    "browser-final.log": "4801d6a4e89a1f3a3eec598112d6eb1b1caba80c3554c007ab33ae188f9ffd06",
+    "i18n-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "m13-changes.patch": "ee2728fb0fb6206e87888057f4e861d46527a599db9c9657ecde21e3121446f2",
+    "build-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "boundary-green.log": "d7e3949e38413499252605eebaa818e4750e67e42216f84bf5f50567bfdbd700",
+    "boundary-race.log": "4b3728a18dd4df1ae81d94a85419cfa516e897de01267d45c840d168bdda6cf9",
+    "boundary-green-inputs.json": "14c73f5c3d98d33ddb65cd414873657e4a219e55d3e02c30141e7297c9981e61",
+    "configuration-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "build.json": "fdb78c18c2cfc3baffa46bde7c5b6f5346dae76de80a5aba74df512d72bf06d5",
+    "web-unit.json": "e06f849892ae762f993391c79e6f36138b863f1f58546a6da8090ef1c4197fb9",
+    "i18n.json": "6200af83051d3f1bdf1a3a341e74bd3a072122d058f2cdf1207eba163782e546",
+    "boundary-final-inputs.json": "d432e971d89e1074f31fedbb51af5c7c1eea7f23ef6eb04a34ef8e1da4e0983c",
+    "browser.log": "55b8ac545c23442e498e37b29ceb18a930c41b3f93d335674aa621fcd5352a7a",
+    "browser-flow/integrity-en-sombre-320.png": "d88b53803cef1f74ce15fd5cf8d11a011d42de029dce4e67e2b5afc6ffab15f5",
+    "browser-flow/dialogue-fr-sombre-mobile.png": "c2fb3dc69f05705b6abd0f5f78793a557e11fc56226d37596fafc96f606b5187",
+    "browser-flow/integrity-fr-etat-1440.png": "7077512e947753637106875b1c701a4a4d7bdf816afc71691cb2ec23afe09b18",
+    "browser-flow/dialogue-en-sombre.png": "c3a6c73ae45790f5c8a4c80350274880f5fa797c4334a6d337f9cd59a614f460",
+    "browser-flow/integrity-en-etat-1440.png": "04bcab62edfa91c5d7b0b5b49b8ee8178fac4ce9f5b4d3e3a38e2b113da9f713",
+    "browser-flow/dialogue-fr-sombre.png": "76c58597353447aab8a1c679526bb8cd43b28fd3f14ef8cd0558b1ee820bd097",
+    "browser-flow/integrity-fr-sombre-1440.png": "82a2dcff81274eef0fac44bbf18c9c13a33bfcca6234f6e5c6109d0dc7768a09",
+    "browser-flow/dialogue-en-etat.png": "7815864e6e650fd95f7615f6adcb5bb5e5fd8d07666ae0215ba0f302f86c1bea",
+    "browser-flow/dialogue-fr-etat.png": "822213fe5013496bca326a72a851e7840f4b6a5ba59a1ebfb4211829bb463774",
+    "browser-flow/integrity-en-sombre-1440.png": "ccc18aea0352588795ce34543dd46db66a71fcaf9adcd4f1144a53c09cff78af",
+    "browser-flow/dialogue-en-sombre-mobile.png": "6868df3836b52532bb07b2f1193a7ad1979df76d6c9025c145292a2da702b9a0",
+    "browser-flow/integrity-fr-sombre-320.png": "a02ae779ef4f78579dc19ed5d0ef014857e8510634d39cc39b313e3e9af4af38",
+    "browser-flow/result.json": "5fac9d126d44f7ea9373b75c118c6e2acede2194bcad79cb9e9edc384a167b65",
+    "browser-flow/integrity-en-etat-320.png": "0ebe4b3a8972ae1dc916c89abaf9978deddf6e8941d8e657fe05632132d9b97e",
+    "browser-flow/integrity-fr-etat-320.png": "a64d2f08fda9ef07f2d7e0ecca73ecb59945062f647f6c7ca7066e06aca65523",
+    "browser-flow/dialogue-en-etat-mobile.png": "b161bb9e0ebc9f4a8b6ed4eafabe10d92f7e4be8dce2f96afce1b29c787ec2e1",
+    "browser-flow/dialogue-fr-etat-mobile.png": "372ab38ce4ec8326efdf9aea4cc93676a86c87809747f7c1b9421e4ddf42b979",
+    "browser-final/integrity-en-sombre-320.png": "d88b53803cef1f74ce15fd5cf8d11a011d42de029dce4e67e2b5afc6ffab15f5",
+    "browser-final/dialogue-fr-sombre-mobile.png": "c2fb3dc69f05705b6abd0f5f78793a557e11fc56226d37596fafc96f606b5187",
+    "browser-final/integrity-fr-etat-1440.png": "7077512e947753637106875b1c701a4a4d7bdf816afc71691cb2ec23afe09b18",
+    "browser-final/failure.png": "9a1a2a3ed65a87a6d3a586e286e78889322c0cfdf7e2ea740f386873c5cd5325",
+    "browser-final/dialogue-en-sombre.png": "c3a6c73ae45790f5c8a4c80350274880f5fa797c4334a6d337f9cd59a614f460",
+    "browser-final/integrity-en-etat-1440.png": "ba646d9a1cb99a932475930044d72bdd46571449f82954cab6fd4e58bd63f6bd",
+    "browser-final/dialogue-fr-sombre.png": "76c58597353447aab8a1c679526bb8cd43b28fd3f14ef8cd0558b1ee820bd097",
+    "browser-final/integrity-fr-sombre-1440.png": "82a2dcff81274eef0fac44bbf18c9c13a33bfcca6234f6e5c6109d0dc7768a09",
+    "browser-final/dialogue-en-etat.png": "7815864e6e650fd95f7615f6adcb5bb5e5fd8d07666ae0215ba0f302f86c1bea",
+    "browser-final/dialogue-fr-etat.png": "822213fe5013496bca326a72a851e7840f4b6a5ba59a1ebfb4211829bb463774",
+    "browser-final/integrity-en-sombre-1440.png": "ccc18aea0352588795ce34543dd46db66a71fcaf9adcd4f1144a53c09cff78af",
+    "browser-final/dialogue-en-sombre-mobile.png": "6868df3836b52532bb07b2f1193a7ad1979df76d6c9025c145292a2da702b9a0",
+    "browser-final/integrity-fr-sombre-320.png": "a02ae779ef4f78579dc19ed5d0ef014857e8510634d39cc39b313e3e9af4af38",
+    "browser-final/integrity-en-etat-320.png": "0ebe4b3a8972ae1dc916c89abaf9978deddf6e8941d8e657fe05632132d9b97e",
+    "browser-final/integrity-fr-etat-320.png": "a64d2f08fda9ef07f2d7e0ecca73ecb59945062f647f6c7ca7066e06aca65523",
+    "browser-final/dialogue-en-etat-mobile.png": "b161bb9e0ebc9f4a8b6ed4eafabe10d92f7e4be8dce2f96afce1b29c787ec2e1",
+    "browser-final/failure.json": "41a273ef6eae3f4b3c655a59181c15b1c142f21c280c58af3da14e2948722b7a",
+    "browser-final/dialogue-fr-etat-mobile.png": "372ab38ce4ec8326efdf9aea4cc93676a86c87809747f7c1b9421e4ddf42b979",
+    "browser/dialogue-fr-sombre-mobile.png": "b83920f9aaa14b96989df4ea1201b88865f444cc100de081292f772a2a3e20c9",
+    "browser/failure.png": "a409959bcdfa04d8f7f0fc646a699323cc2383acc32df1aac8e6f0124efb757c",
+    "browser/dialogue-en-sombre.png": "c3a6c73ae45790f5c8a4c80350274880f5fa797c4334a6d337f9cd59a614f460",
+    "browser/dialogue-fr-sombre.png": "86bfbcb0b599f1f9c041e78501f760c441e7a073258d37863a874f633b31f9ee",
+    "browser/dialogue-en-etat.png": "7815864e6e650fd95f7615f6adcb5bb5e5fd8d07666ae0215ba0f302f86c1bea",
+    "browser/dialogue-fr-etat.png": "822213fe5013496bca326a72a851e7840f4b6a5ba59a1ebfb4211829bb463774",
+    "browser/dialogue-en-sombre-mobile.png": "6868df3836b52532bb07b2f1193a7ad1979df76d6c9025c145292a2da702b9a0",
+    "browser/dialogue-en-etat-mobile.png": "b161bb9e0ebc9f4a8b6ed4eafabe10d92f7e4be8dce2f96afce1b29c787ec2e1",
+    "browser/failure.json": "79015ea95dfc6955d87f3b24f58126e7f71f250a205d9fc127e98c84d6736f3e",
+    "browser/dialogue-fr-etat-mobile.png": "372ab38ce4ec8326efdf9aea4cc93676a86c87809747f7c1b9421e4ddf42b979",
+    "preimages/docs__PROJECT-MEMORY.md": "06dbd3ca5c73f904efb2e54d5f81c22a3a3d97fac985ef992f62d7e5abfc4cc9",
+    "preimages/dialogue_recovery_integrity_second_browser.cjs.txt": "5dd8f7b39a2302fd421b368e912888a0ce1e85bc097d6d4587b6f769348498f2",
+    "preimages/internal__engine__dialogue_checkpoint_store.go": "7880c508d784fde7e33ac8f960414e1f61cb319ad37795a2b90a29174160b2c1",
+    "preimages/dialogue_boundary_integrity_red_test.go.txt": "7709b45dce7fa5ee1f354a1f03219013bfe53f57767744b9c52b573cdba68e7a",
+    "preimages/internal__engine__dialogue_checkpoint.go": "ef4946276faa0fc60d3e5612a5c2a51557ecefac8ca739aea8f8646e3bd51f3b",
+    "preimages/docs__plans__deepagents-integration__PLAN.md": "f437e2f1dae2bf9e48990744a71db2e97e89cb54dbc7b73583aa98939245d7c7",
+    "preimages/tests__dialogue_recovery_ui.cjs": "8fc94bd7f86e478eea30e411e820f0c8b512cced7f07d68de553014dc7ae162a",
+    "preimages/dialogue_recovery_integrity_first_browser.cjs.txt": "13df0135861bdd72a6a86d655dad6ad9079746e197d428ab189eca832dff1545",
+    "preimages/locales__en.json": "1fcd348bca1ff55626d75998fe496656db63ce669612bb76182cbdd39fcc123a",
+    "preimages/docs__plans__deepagents-integration__cas-evaluation.json": "fb62e996d9a922f384ff6548c21ec5003eaa1e28d205f218b27e6ee595d0f56e",
+    "preimages/internal__engine__agent_dialogue.go": "92c75420174c1ce67e19dc91715ea937f06f36a1ed361b85814ae22840adec65",
+    "preimages/docs__en__PROJECT-MEMORY.md": "49006c0f0e60367ba293e5e54d52082f66d2c487768350a5d120f8d723cfb784",
+    "preimages/web__i18n-en.js": "698a65cf7c531ad625f3a5a913da3b055d1a0abd4c6ca27e6ab0369e84f8b777"
+  }
+}

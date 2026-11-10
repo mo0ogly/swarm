@@ -1,0 +1,156 @@
+{
+  "confidentiality": {
+    "schema_version": 1,
+    "history": [
+      {
+        "revision": 1,
+        "trust_revision": 1,
+        "event_id": "blp-4bb024fd-6a7f-4fc3-884d-c7be08d9c9a5",
+        "actor": "admin",
+        "at": "2026-11-01T08:48:59.536518184Z",
+        "reason": "Positive BLP administration on an owned fixture root",
+        "policy_digest": "f2a5821a39664467d9aa5fcb185ab6714006b9246d4d0c5478649bf3f05f162f",
+        "policy": {
+          "schema_version": 1,
+          "levels": [
+            {
+              "id": "public",
+              "name_fr": "Public",
+              "name_en": "Public"
+            },
+            {
+              "id": "internal",
+              "name_fr": "Interne",
+              "name_en": "Internal"
+            },
+            {
+              "id": "confidential",
+              "name_fr": "Confidentiel",
+              "name_en": "Confidential"
+            },
+            {
+              "id": "restricted",
+              "name_fr": "Restreint",
+              "name_en": "Restricted"
+            }
+          ],
+          "compartments": [],
+          "clearances": {}
+        }
+      }
+    ]
+  },
+  "schema_version": 1,
+  "revision": 1,
+  "policy": {
+    "mandate_ttl_seconds": 3600,
+    "unknown_reconcile_seconds": 0,
+    "evidence_retention_days": 365,
+    "require_separation": true
+  },
+  "identities": [
+    {
+      "subject": "admin",
+      "token_hash": "9a15be1f2e1a5b4e41600f7d58814b0c30aa097b0d4819830219bf15c8cdeecb",
+      "integrity": 3,
+      "roles": [
+        "admin"
+      ]
+    },
+    {
+      "subject": "worker",
+      "token_hash": "eecbee6f990fc47bd045523f400c18b95be2a1121a8dd1d02a02357542a49fcc",
+      "integrity": 1,
+      "roles": [
+        "requester"
+      ]
+    },
+    {
+      "subject": "approver",
+      "token_hash": "e158cea318dc8c5dc4b3ab23c6cafc75a22c81d89a90e8742a273ce8c08608a4",
+      "integrity": 2,
+      "roles": [
+        "approver"
+      ]
+    }
+  ],
+  "history": [
+    {
+      "actor": "local-operator",
+      "at": "2026-11-01T08:48:29.675830037Z",
+      "event_id": "blp-fixture-bootstrap-001",
+      "policy": {
+        "evidence_retention_days": 365,
+        "mandate_ttl_seconds": 3600,
+        "require_separation": true,
+        "unknown_reconcile_seconds": 0
+      },
+      "reason": "Owned isolated BLP fixture root - positive administration experiment",
+      "revision": 1
+    }
+  ],
+  "mandates": {},
+  "actions": {},
+  "connector_receipts": {},
+  "ledger": [],
+  "evidence": [
+    {
+      "policy_context": {
+        "schema_version": 1,
+        "revision": 1,
+        "policy": {
+          "mandate_ttl_seconds": 3600,
+          "unknown_reconcile_seconds": 0,
+          "evidence_retention_days": 365,
+          "require_separation": true
+        },
+        "controls": {"data_policy":{"resources":[],"enabled":false,"classifications":[],"destinations":[],"providers":[],"tools":[]},"delegation":{"max_depth":0},"evidence_signing":{"enabled":false,"key_ttl_seconds":86400},"group_mapping":{"enabled":false,"claim":"groups","rules":[]},"kernel_check":{"enabled":false,"timeout_seconds":15,"ring_bytes":65536},"kernel_observation":{"enabled":false,"window_seconds":5,"timeout_seconds":15,"ring_bytes":65536,"max_events":128},"laboratory":{"enabled":false,"timeout_seconds":30,"max_concurrent_runs":1},"oidc_logout":{"enabled":false,"max_age_seconds":300,"replay_retention_seconds":600},"process_policy":{"enabled":false},"sealed_execution":{"enabled":false,"timeout_seconds":15},"secret_broker":{"enabled":false,"material_ttl_seconds":300,"grant_ttl_seconds":60,"max_material_bytes":4096,"max_entries":16},"step_up":{"enabled":false,"operations":["approve"],"acr_values":[],"max_age_seconds":0,"proof_ttl_seconds":300},"workload_introspection":{"enabled":false,"endpoint":"","client_id":"","timeout_seconds":15,"validation_window_seconds":5,"max_sessions":64,"max_token_bytes":16384}}
+      },
+      "identity_context": {
+        "schema_version": 1,
+        "configuration_revision": 1,
+        "principal_id": "admin",
+        "principal_kind": "local",
+        "issuer": "urn:swarm:local",
+        "subject": "admin",
+        "assurance": {
+          "method": "local_bearer",
+          "provider_authenticated_at": null
+        },
+        "attributes": {
+          "roles": [
+            "admin"
+          ],
+          "integrity": 3
+        },
+        "delegation_id": null,
+        "authenticated_at": "2026-11-01T08:48:59.536518184Z",
+        "expires_at": null,
+        "token_digest": "9a15be1f2e1a5b4e41600f7d58814b0c30aa097b0d4819830219bf15c8cdeecb"
+      },
+      "sequence": 1,
+      "previous_hash": "",
+      "hash": "f272412c091f69b699e14e403dba01f81d5776640a411421d4a550078aaa26a4",
+      "kind": "blp-policy-apply",
+      "actor": "admin",
+      "integrity": 3,
+      "object_id": "blp-policy",
+      "content_digest": "ad5758ec8591d77f8d68cb7a537721c99ee7b4507eab3cd6df2efee8782cc0f2",
+      "original_digest": "c4331434f1803e720647cf83836acfa82c2dd84ed7ba7ec34155d4ff8ba40fbc",
+      "result": "recorded",
+      "reason": "BLP policy recorded; runtime integration not established",
+      "at": "2026-11-01T08:48:59.536518184Z"
+    }
+  ],
+  "originals": {
+    "c4331434f1803e720647cf83836acfa82c2dd84ed7ba7ec34155d4ff8ba40fbc": "eyJzY2hlbWFfdmVyc2lvbiI6MSwiZXZlbnRfaWQiOiJibHAtNGJiMDI0ZmQtNmE3Zi00ZmMzLTg4NGQtYzdiZTA4ZDljOWE1IiwiZXhwZWN0ZWRfcmV2aXNpb24iOjAsImV4cGVjdGVkX3RydXN0X3JldmlzaW9uIjoxLCJyZWFzb24iOiJQb3NpdGl2ZSBCTFAgYWRtaW5pc3RyYXRpb24gb24gYW4gb3duZWQgZml4dHVyZSByb290IiwicG9saWN5Ijp7CiAgInNjaGVtYV92ZXJzaW9uIjogMSwKICAibGV2ZWxzIjogWwogICAgewogICAgICAiaWQiOiAicHVibGljIiwKICAgICAgIm5hbWVfZnIiOiAiUHVibGljIiwKICAgICAgIm5hbWVfZW4iOiAiUHVibGljIgogICAgfSwKICAgIHsKICAgICAgImlkIjogImludGVybmFsIiwKICAgICAgIm5hbWVfZnIiOiAiSW50ZXJuZSIsCiAgICAgICJuYW1lX2VuIjogIkludGVybmFsIgogICAgfSwKICAgIHsKICAgICAgImlkIjogImNvbmZpZGVudGlhbCIsCiAgICAgICJuYW1lX2ZyIjogIkNvbmZpZGVudGllbCIsCiAgICAgICJuYW1lX2VuIjogIkNvbmZpZGVudGlhbCIKICAgIH0sCiAgICB7CiAgICAgICJpZCI6ICJyZXN0cmljdGVkIiwKICAgICAgIm5hbWVfZnIiOiAiUmVzdHJlaW50IiwKICAgICAgIm5hbWVfZW4iOiAiUmVzdHJpY3RlZCIKICAgIH0KICBdLAogICJjb21wYXJ0bWVudHMiOiBbXSwKICAiY2xlYXJhbmNlcyI6IHt9Cn19"
+  },
+  "event_replies": {
+    "blp-4bb024fd-6a7f-4fc3-884d-c7be08d9c9a5": {"applied":true,"current_revision":"0","policy":{"clearances":{},"compartments":[],"levels":[{"id":"public","name_en":"Public","name_fr":"Public"},{"id":"internal","name_en":"Internal","name_fr":"Interne"},{"id":"confidential","name_en":"Confidential","name_fr":"Confidentiel"},{"id":"restricted","name_en":"Restricted","name_fr":"Restreint"}],"schema_version":1},"policy_digest":"f2a5821a39664467d9aa5fcb185ab6714006b9246d4d0c5478649bf3f05f162f","proposed_revision":"1","runtime_enforced":false,"schema_version":1,"trust_revision":"1"},
+    "blp-fixture-bootstrap-001": {"access_ledger":[],"actions":{},"amount_minor_text":{},"biba":{"model":"strict-with-named-endorsement-v1","os_confinement":false,"scope":"trust-actions-only"},"confidentiality":{"authority_current":false,"configured":false,"declassification_available":false,"policy_revision":null,"reason":"blp-producer-and-sink-integration-required","runtime_enforced":false,"schema_version":1,"scope":"policy-administration-and-data-only-diagnostics"},"data_policy":{"classifications":[],"destinations":[],"enabled":false,"providers":[],"resources":[],"tools":[]},"delegation":{"max_depth":0},"effect_receipts":{},"evidence_count":0,"evidence_signing":{"enabled":false,"key_ttl_seconds":86400},"group_mapping":{"claim":"groups","enabled":false,"rules":[]},"identities":[{"disabled":false,"integrity":3,"roles":["admin"],"subject":"admin"},{"disabled":false,"integrity":1,"roles":["requester"],"subject":"worker"},{"disabled":false,"integrity":2,"roles":["approver"],"subject":"approver"}],"identity_authentication":{"held_enrollment":{"http_available":false,"reason":"trusted-enrollment-startup-not-bound","root_api_available":true},"local_bearer":true},"kernel_check":{"enabled":false,"ring_bytes":65536,"timeout_seconds":15},"kernel_observation":{"enabled":false,"max_events":128,"ring_bytes":65536,"timeout_seconds":15,"window_seconds":5},"laboratory":{"enabled":false,"max_concurrent_runs":1,"timeout_seconds":30},"ledger":[],"limits":["aucun paiement réel","identités locales authentifiées","politiques avancées actives non portées : refus fermé"],"mandates":{},"oidc_logout":{"enabled":false,"max_age_seconds":300,"replay_retention_seconds":600},"originals_missing":0,"policy":{"evidence_retention_days":365,"mandate_ttl_seconds":3600,"require_separation":true,"unknown_reconcile_seconds":0},"policy_bounds":{"command_max_bytes":16777216,"evidence_retention_days":{"max":9007199254740991,"min":1},"mandate_ttl_seconds":{"max":9223372036,"min":0},"proof_key_bytes":32,"state_max_bytes":8388608,"unknown_reconcile_seconds":{"max":9223372036,"min":0}},"process_policy":{"enabled":false},"revision":1,"schema_version":1,"sealed_execution":{"enabled":false,"timeout_seconds":15},"secret_broker":{"enabled":false,"grant_ttl_seconds":60,"material_ttl_seconds":300,"max_entries":16,"max_material_bytes":4096},"simulation":true,"step_up":{"acr_values":[],"enabled":false,"max_age_seconds":0,"operations":["approve"],"proof_ttl_seconds":300},"workload_introspection":{"client_id":"","enabled":false,"endpoint":"","max_sessions":64,"max_token_bytes":16384,"timeout_seconds":15,"validation_window_seconds":5}}
+  },
+  "event_digests": {
+    "blp-4bb024fd-6a7f-4fc3-884d-c7be08d9c9a5": "0531406f634cfa7a187976e80e6142363f4f749a41cc59563666e90a2810c3fc",
+    "blp-fixture-bootstrap-001": "fa879d35c8967d645f4ebc5511ca0731f630a6a1829c4dd45274ed3b310ee9a7"
+  }
+}

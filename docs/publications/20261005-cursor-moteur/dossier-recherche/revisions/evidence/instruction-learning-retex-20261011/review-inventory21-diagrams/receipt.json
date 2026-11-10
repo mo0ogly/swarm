@@ -1,0 +1,46 @@
+{
+  "checks": [
+    {
+      "command": [
+        "/home/fpizzi/.npm-global/bin/mmdc",
+        "-i",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-diagrams/fr.mmd",
+        "-o",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-diagrams/fr.png",
+        "-p",
+        "/tmp/swarm-mermaid-puppeteer.json",
+        "-w",
+        "1250",
+        "-b",
+        "white"
+      ],
+      "start": "2026-10-11T19:11:47.079439+00:00",
+      "end": "2026-10-11T19:11:51.209445+00:00",
+      "exit": 0,
+      "image": "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-diagrams/fr.png",
+      "sha256": "5ef7a35725e7fd32ebfa5b8161cf9ae8d495171406a3ae2981af4e3ab64eb574"
+    },
+    {
+      "command": [
+        "/home/fpizzi/.npm-global/bin/mmdc",
+        "-i",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-diagrams/en.mmd",
+        "-o",
+        "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-diagrams/en.png",
+        "-p",
+        "/tmp/swarm-mermaid-puppeteer.json",
+        "-w",
+        "1250",
+        "-b",
+        "white"
+      ],
+      "start": "2026-10-11T19:11:51.209715+00:00",
+      "end": "2026-10-11T19:11:54.635838+00:00",
+      "exit": 0,
+      "image": "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-diagrams/en.png",
+      "sha256": "f46f2abeb3a6673d6e44b01c24ebae41c442f23ae19b952f6e8a2764d166ba57"
+    }
+  ],
+  "scope": "Documentation rendering and visual verification only, no execution/acceptance evidence",
+  "visual_inspection": "PASS FR/EN labels, complete flows, no clipping"
+}

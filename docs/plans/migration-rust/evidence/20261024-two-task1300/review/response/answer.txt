@@ -1,0 +1,18 @@
+## Bounded Integrable Proposal: Two-Worker Sequential Journey Review
+
+**Scope caveat.** Only the four supplied Python fixture files and the recipe manifest were reviewed. No Rust sources (`mission_watch.rs`, `conductor.rs`, engine modules) were provided, so all engine-side claims below are unverified hypotheses requiring code inspection.
+
+**False-positive risks in the planned journey.**
+
+1. **Duplicate dispatch (two same-workspace sequential workers).** The `http-start-alone-launches-real-inert-worker` path proves one worker; the journey assumes the second worker cannot start concurrently, but no fixture assertion covers a second `start` POST while slot 1 is active. The only duplicate guard observed is `mission-lease-already-held` on CLI `watch` — that guards the lease, not HTTP `start` slot admission. Code check needed: `start` must reject when `slots` are exhausted (`agents.len() == slots`) with a typed refusal, and the recipe should add a positive second-`start` refusal assertion.
+
+2. **Missing receipts after server-stop/release.** The journey asserts `stopped_at != ''` post-stop and a surviving provider, but has no equivalent of `rust_workspace_fifo_completion.py`'s `missing_terminal_release` check for the HTTP journey — i.e., a negative test that reconcile/settlement refuses when the turn-release proof or receipt is absent. Without it, a lost `SR1`-style receipt passes silently.
+
+3. **`blocked` vs. accepted.** `task['status']=='blocked'` is asserted post-completion — good — but the fixture never asserts `attempts` count or absence of a second agent row after reopen (`identity-recovered` case checks status only). Code check: reopen path must refuse `start` for a work with an existing completed-but-unaccepted agent turn unless reconcile replays it.
+
+**Recommended code-level checks (in Rust, to verify on inspection).**
+- Idempotency key on `start` (event_id + expected_revision) rejecting replayed/competing starts at the store layer, not just HTTP validation (the 400-on-`unexpected` test only covers schema).
+- Turn-acquire records `(work, task, agent, seq)` uniquely; settlement requires an explicit `released` event before terminal state (mirror `mission-agent-turn-release-missing`).
+- Reopen (`identity-recovered`, `identity-witness`) must preserve root binding v4 inode pairs — the fixture verifies this via `verify_current_root_binding`; confirm engine rejects binding mismatch with the `web-root-binding-changed` cause the fixture greps stderr for.
+
+**Missing evidence.** Engine sources, `rust_mission_worker_recovery.py` (the actual recipe target), and CI execution logs were not supplied. No test was run and no assertion of pass status is made.

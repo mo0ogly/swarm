@@ -1,0 +1,21 @@
+{
+  "executor": "Codex direct audit",
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueResumeIdentityAndPermissions|TestDialogueCumulativeToolsAndIdle|TestRecoveryContextIsBoundedScopedAndRedacted|TestRecoveryFocusPreservesTaskAndAttributedReviewWithoutFreshness|TestRecoveryContextUsesRecentOperationsInsteadOfRepeatedInitialInventory|TestInstructionRevisionOperatorNextRemainsComposable|TestInstructionRevisionOperatorReplacementRetainsLearning|TestInstructionRevisionAmbiguousOperatorEditIsAtomic)$",
+    "-count=1",
+    "-v"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "environment_keys": [
+    "HOME",
+    "PATH"
+  ],
+  "started_at_utc": "2026-10-15T19:25:03.037590+00:00",
+  "ended_at_utc": "2026-10-15T19:26:09.226682+00:00",
+  "exit_code": 0,
+  "log_sha256": "638c15bc287dccd439b5b31e67b44431a76634fe42a4eef355a7441361d88c05"
+}

@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "python3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py",
+    "/tmp/swarm-ia1-build-_bj_x21c/swarm",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/initial",
+    "--require-protection"
+  ],
+  "started_unix": 1792183495.3993795,
+  "ended_unix": 1792183496.0715766,
+  "exit_code": 1,
+  "expectation": "Exit 1 is a reproduced protection failure only if initial/results.json says execution PASS"
+}

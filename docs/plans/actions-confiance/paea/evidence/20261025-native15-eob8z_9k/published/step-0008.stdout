@@ -1,0 +1,8 @@
+
+running 3 tests
+test protection_receipt_report_writer_failure_then_recovery ... ok
+test protection_receipt_report_exact_files_and_legacy_shape_in_both_languages ... ok
+test protection_receipt_report_refuses_invalid_inputs_and_runtime_then_recovers ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+

@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "id": "paea-authenticated-startup",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "two-source-authenticated-startup",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "authenticated_startup",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "10 passed; 0 failed",
+        "authenticated_startup_primary_business_refusal_and_actual_personal_close_fault_both_survive",
+        "authenticated_startup_pinned_real_sources_execute_once_and_reopen"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "v3-protected-declaration",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "authenticated",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "authenticated_loader_read_stat_close_causes_remain_and_valid_recovery_creates_no_locks"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "owned-directory-identity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--lib",
+        "loader::tests::distinct_root_real_owned_descriptor_alias_refuses_after_distinct_control",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "distinct_root_real_owned_descriptor_alias_refuses_after_distinct_control"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "v2-protected-declaration-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "control",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "control_roundtrip_load_and_legacy_schema_stay_distinct_without_locks"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "v1-protected-declaration-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "bootstrap",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "durable-personal-coordinator",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "personal_coordinator",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed",
+        "personal_coordinator_actual_process_exit_after_each_durable_phase_recovers_once",
+        "PROCESS_PROBE phase=IntentDurable crash=true exit=Some(73)",
+        "PROCESS_PROBE phase=JournalApplied crash=true exit=Some(73)",
+        "PROCESS_PROBE phase=CheckpointDurable crash=true exit=Some(73)",
+        "personal_coordinator_actual_writer_contention_recovers_and_account_is_held_until_use_finishes",
+        "personal_coordinator_requires_checkpoint_sync_before_business_callback_then_recovers"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "personal-credential-contract",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "credentials",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "credential_real_argon2_roundtrip_proves_only_exact_password_record",
+        "credential_independent_pin_context_principal_generation_refuse_before_hashing",
+        "credential_explicit_documented_costs_roundtrip_and_preserve_typed_causes"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "exact-proposal-codec",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "personal_proposal",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "exact_personal_proposal_restores_after_reopen_without_storage_access_then_replays_once",
+        "personal_proposal_valid_witness_under_writer_then_bad_wire_signature_context_and_semantics_refuse"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "one-time-personal-source",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "personal",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "personal_post_usage_cancellation_retains_success_or_failure_outcome_without_relabeling_effect"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "control-core-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "control::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "16 passed; 0 failed",
+        "both_authority_and_storage_failures_survive_pending_exact_event_recovery",
+        "authenticated_composition_holds_both_real_authorities_through_one_effect",
+        "authenticated_composition_posteffect_errors_keep_inner_storage_and_outer_outcome",
+        "error_debug_keeps_private_after_storage_response_structured_and_redacts_text",
+        "authenticated_composition_close_keeps_both_independent_failures_and_recovers_idempotently"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

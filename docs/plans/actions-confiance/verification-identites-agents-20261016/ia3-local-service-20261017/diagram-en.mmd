@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant C as Calling controller
+  participant K as Configured Linux channel
+  participant S as Private adapter
+  participant A as Independent authority (unwired)
+  participant W as Coordinator and witness
+  C->>K: Canonical packet and exact request
+  K->>S: Kernel sender and per-message pidfd
+  S->>A: Authenticate and authorize this operation
+  Note over A,W: Authority protection held throughout the operation
+  A->>W: Execute once under the pinned principal
+  W-->>S: Confirmed View or Projection, otherwise error
+  S-->>C: Explicit result or limited code
+  Note over C,W: Reply lost after effect: reauthorized exact retry, no duplicate

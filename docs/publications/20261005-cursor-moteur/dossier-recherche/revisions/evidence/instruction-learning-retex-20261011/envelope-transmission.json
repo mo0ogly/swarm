@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T11:17:41.524625+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "public_transmissions": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "event_id": "planning-exact-envelope-T3-20261011",
+      "before_revision": 168,
+      "after_revision": 169,
+      "next_sha256": "f82d7c4c58aab8b98060ee39766162363908e7c9d8ac6c04877cd2eb4feea6b9",
+      "state": "todo"
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "event_id": "planning-exact-envelope-T4-20261011",
+      "before_revision": 169,
+      "after_revision": 170,
+      "next_sha256": "adf4621755737423bc046a88914581a4b23e6db14e7f01855456915dc3cc870b",
+      "state": "todo"
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "event_id": "planning-exact-envelope-T6-20261011",
+      "before_revision": 170,
+      "after_revision": 171,
+      "next_sha256": "c4942ed5652ba76cfadd616c138de1e7422162189cafb08150b2c3f476906147",
+      "state": "todo"
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "event_id": "planning-exact-envelope-T7-20261011",
+      "before_revision": 171,
+      "after_revision": 172,
+      "next_sha256": "1bcaa8fa9e46932f5c7881fdd876af37951c31a2527488ee057552587e326135",
+      "state": "todo"
+    }
+  ],
+  "patches": [
+    {
+      "schema_version": 1,
+      "at": "2026-10-11T11:11:13.478490+00:00",
+      "parent": "instruction-learning-retex-routing-20261011.patch",
+      "parent_sha256": "8b957486beef8e95e02061e79c678a145f11a4d620086d853a26527c2ee291cc",
+      "preimage_tree": "8b7d8266f13c2e0fe99a14d092b7b35b148a062e",
+      "patch": "docs/plans/engine-cursor-contract/recovery/reviewer-method-source-snapshot-20261011.patch",
+      "sha256": "9c2d11dcf761088bcd9eb45f0cab17c17ffb4e4228a9cbb9da705ce36fe7e4af",
+      "bytes": 740,
+      "purpose": "Include the corrected reviewer method in the current source snapshot; regenerate candidate-specific manifest without rewriting historical acceptance. Packaging change after full Go PASS440.517s, targeted source integrity checked separately."
+    },
+    {
+      "schema_version": 1,
+      "at": "2026-10-11T11:16:49.950583+00:00",
+      "parent": "reviewer-method-source-snapshot-20261011.patch",
+      "parent_sha256": "9c2d11dcf761088bcd9eb45f0cab17c17ffb4e4228a9cbb9da705ce36fe7e4af",
+      "preimage_tree": "b090d80bf35858a31d0768a5dfee95336417f8ec",
+      "patch": "docs/plans/engine-cursor-contract/recovery/planning-exact-envelope-20261011.patch",
+      "sha256": "f719102703429f3a31c4e391e2d7b8b76b65ea7504abaf5be177fad75923fd29",
+      "bytes": 18321,
+      "paths": [
+        "internal/engine/planning.go",
+        "internal/engine/planning_runner.go",
+        "internal/engine/planning_prompt.go",
+        "internal/engine/planning_prompt_envelope_test.go",
+        "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+        "docs/en/AGENT-ENGINE-PROTOCOL.md"
+      ],
+      "purpose": "Use exact shared instruction byte size in claim and runner context allowance, removing guessed 3000-byte overhead while retaining the existing complete-message bound. Whole-event reduction before claim, exact received receipt, latest resume first and no auto-ack.",
+      "tests": "Old behavior reproduced with Go overlay and corrected provider double; current actual complete request62138bytes, methods31688, context25850,7/8whole events, explicit1decision/pending7. Full/race/vet verification in progress.",
+      "limits": "Native root activation12 correctly received latest resume/retry restriction but stopped unpaid on old complete-envelope calculation; original activation and refusals retained, no autonomous RETEX yet."
+    }
+  ],
+  "contract_attempts_dependencies_preserved": true
+}

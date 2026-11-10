@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "id": "paea-ux-component",
+  "inputs": [
+    "web/paea.*", "web/i18n*.js", "web/swarm-design.css", "web/wattson_themes.css", "web/swarm-logo.png",
+    "locales/en.json", "tests/paea_ui_test.cjs", "tests/fixtures/paea/contract-v1.json",
+    "package.json", "package-lock.json", "scripts/i18n/build.cjs", "tools/verification/recipe.py",
+    "docs/architecture/PAEA-CONTRACT.md", "docs/en/PAEA-CONTRACT.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "browser-component-with-http-double",
+      "command": ["python3", "-c", "import os,subprocess; subprocess.run(['node','tests/paea_ui_test.cjs',os.environ['SWARM_PAEA_UI_EVIDENCE']],check=True); print('PAEA_UI_COMPONENT_PASS')"],
+      "expected_exit": 0,
+      "required_stdout": ["PASS en-sombre-320-primary-contrast-AA", "PASS unknown-visible-with-limits", "PASS invalid-utf8-never-sent", "PASS raw-utf8-bom-and-large-integer-retained", "PASS loading-disables-inputs-and-old-report", "PASS duplicate-gesture-no-second-request", "PASS download-input-bound-report", "PASS session-failure-blocks-checks", "PASS no-browser-exceptions", "PAEA_UI_COMPONENT_PASS"],
+      "required_stderr": []
+    }
+  ]
+}

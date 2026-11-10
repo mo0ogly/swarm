@@ -1,0 +1,23 @@
+{
+  "at_utc": "2026-10-15T06:56:33.038888+00:00",
+  "identity": {
+    "pid": 3407194,
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-unicode",
+      "--root",
+      "/home/fpizzi/Documents/ChatGPT/swarm",
+      "mission",
+      "watch",
+      "w-68b50cc82ec3fe55624f9549"
+    ],
+    "started_at_utc": "2026-10-15T06:39:16.550420+00:00",
+    "executable": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-unicode",
+    "binary_sha256": "402fdbee1c507fd8ed98751f94962dcc6880cbd2f9908ff3ba0db122ea7dbee1",
+    "source_proof": "unicode-source-proof.json",
+    "proc_start_ticks": "4678430"
+  },
+  "mission_planning_paused_revision": 370,
+  "direct_children": [],
+  "signal": "SIGTERM",
+  "reason": "General literal-citation diagnostic correction before fresh review resume."
+}

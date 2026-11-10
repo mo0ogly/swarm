@@ -1,0 +1,14 @@
+00s — Open the local catalogue
+Six recipes are available; fictitious workshop with no real payment.
+
+06s — Check Vegetarian only
+Three recipes remain visible.
+
+12s — Order one Margherita with fictitious contact details
+EUR 9.50 excluding delivery: the server rejects an order below EUR 10.
+
+18s — Use Arrow up to set the quantity to two
+EUR 19.00 for pizzas + EUR 2.90 delivery = EUR 21.90.
+
+24s — Confirm then open My tracking
+An order number appears. The initial status is Received.

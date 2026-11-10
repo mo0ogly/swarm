@@ -215,4 +215,64 @@ Custom connections are not implicitly activated for every mission.
 
 ## Templates
 
-[KS mission templates (web and CLI)](PREPARATION-TEMPLATES.md).
+[Guided mission templates (web and CLI)](PREPARATION-TEMPLATES.md).
+
+### Rejected preparation answers
+
+The engine accepts a strict JSON object, optionally wrapped in a single Markdown
+`json` fence. It does not extract objects from free prose and still rejects
+unexpected fields. Byte limits are 8,000 for message, 16,000 for brief or plan,
+and 24,576 for the complete response.
+
+Rejections now identify JSON syntax/type, unexpected fields, an empty message,
+encoding, or size with actual and maximum values. Diagnostics do not echo private
+provider content. A rejected proposal changes no document and triggers no automatic
+retry. Correct the cause before sending again; history and usage remain recorded.
+Old generic errors cannot be diagnosed retrospectively when the original answer
+was not retained.
+
+## Preparation dialogue deadline
+
+Administration → Preparation dialogue exposes the default timeout and maximum,
+in seconds. Both values are editable, previewed before saving, persisted with
+revision, actor and reason, and listed in history. Restore an older setting by
+applying its values as a new revision. CLI: `swarm run-limits preparation
+show|history|preview|apply`; the CLI and authenticated API use the same validation.
+
+Initial values live in `config/preparation-timeout.json`; no 120, 300 or 600-second
+policy ceiling remains in the Go runtime. Positive values must satisfy timeout ≤
+maximum and fit a Go duration. The policy applies to new preparation exchanges;
+each exchange freezes both values. Existing calls retain their original deadline.
+Manual cancellation and absence of automatic retry remain in force. Worker and
+review deadlines are separate settings. Restart with the corrected binary to use
+these controls.
+
+### Sources in manual Rust preparation
+
+Sources opens file discovery and excerpt preview. Enter both inclusive line
+indices explicitly, read, then attach: the server reopens the file and compares
+the full-file digest before recording it. Stored excerpts remain readable after
+the file changes/disappears; removal remains available under restrictive policy.
+Adding/removing invalidates brief adoption and the verdict while preserving
+documents for reconsideration. These operations never start a model call.
+
+The Admin link opens documentary settings under Preparations and documents,
+with help and AI context for all twelve parameters. Truncated results are visible;
+read refusal never becomes a successful empty list. Numeric limits may be null
+(unlimited) or zero according to their documented contract. Older installations
+must explicitly adopt the new settings.
+
+### AI history in Rust preparation
+
+The existing conversation view displays retained turns, provenance and freshness.
+Proposals remain readable without sending, stopping or implicitly adopting them;
+private prompts stay excluded. An active pending/running/stopping turn is
+observed read-only — reading ends no call, releases no reservation and never
+dispatches, adopts a worker or contacts a provider; exact same-event replay
+returns the recorded status, a changed message conflicts (409). See the
+[reference](REFERENCE.md#preparation-conversation-history--rust).
+
+Local pilot: text API dialogue with cancellation and explicit proposal
+comparison, installed and verified; see the preparation AI calls migration record.
+Historical reading remains available when call policy is unconfigured. The form
+must not interpret absence as a default or permission to transmit documents.

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "paea-provisioning-request-cli-native",
+  "inputs": [
+    "tests/paea_provisioning_request_cli_test.py",
+    "schemas/paea/provisioning-request-cli-v1.schema.json",
+    "tools/verification/recipes/paea-provisioning-request-cli-native.json",
+    "tools/verification/recipe.py",
+    "tests/paea_fixture_binding_check.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "verify-frozen-fixture-role-source-and-bytes",
+      "command": [
+        "python3",
+        "tests/paea_fixture_binding_check.py",
+        "provisioning"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "FIXTURE_BINDING_PASS role=provisioning"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-default-private-request-preflight-refusal-and-recovery",
+      "command": [
+        "python3",
+        "tests/paea_provisioning_request_cli_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS fr-en-preflight-and-help",
+        "PASS canonical-pin-uid-refusal-and-recovery",
+        "PASS private-file-link-parent-refusal-and-recovery",
+        "PASS closed-flags-before-input-io",
+        "PASS stdout-enospc-keeps-known-validation",
+        "PROVISIONING_CHECK_NATIVE_PASS cases=5",
+        "PASS private-basename-refusal-and-recovery",
+        "PASS reserved-lock-basename-refusal-and-recovery"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

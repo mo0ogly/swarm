@@ -1,0 +1,3 @@
+{"state": "RUN", "step": "native-managed-delegation-to-two-tasks"}
+{"state": "PASS", "step": "native-managed-delegation-to-two-tasks"}
+{"status": "PASS", "evidence": "docs/plans/migration-rust/evidence/20261024-managed-status1370/recipe1374", "steps": 1}

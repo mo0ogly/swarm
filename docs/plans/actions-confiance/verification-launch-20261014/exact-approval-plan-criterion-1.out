@@ -1,0 +1,2 @@
+{"version":1,"task":"T2","criterion":1,"cases":[{"id":"identity-exact-approval-biba","status":"pass","assertions":9,"observed":{"requester":"alice","wrong_approval":"denied","direct_denials":["denied","denied"],"ledger_before":0}},{"id":"invalid-and-unauthenticated-inputs","status":"pass","assertions":7,"observed":{"foreign_replay_exit":4,"replay_state_unchanged":true,"same_authority_replay":true,"unauthenticated_exit":4,"traversal_exit":2,"missing_mandate":"mandat absent"}}]}
+{"task": "T2", "mode": "c1", "cases": 2, "status": "pass"}

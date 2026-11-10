@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "id": "blp-flow-inventory",
+  "inputs": [
+    "tools/paea/check_blp_inventory.py",
+    "tests/blp_flow_inventory_test.py",
+    "tests/fixture_area.py",
+    "docs/architecture/blp-flow-inventory.json",
+    "rust/crates/swarm-api-client/src/lib.rs",
+    "rust/crates/swarm-biba-linux/src/kernel.rs",
+    "rust/crates/swarm-biba-linux/src/lib.rs",
+    "rust/crates/swarm-cli/src/agent_logs.rs",
+    "rust/crates/swarm-cli/src/preparation_worker.rs",
+    "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+    "rust/crates/swarm-engine/src/agent_native_stream.rs",
+    "rust/crates/swarm-engine/src/agent_worker_context.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "rust/crates/swarm-engine/src/memory_files.rs",
+    "rust/crates/swarm-engine/src/native_provider_exec.rs",
+    "rust/crates/swarm-engine/src/project_context.rs",
+    "rust/crates/swarm-engine/src/project_memory_source.rs",
+    "rust/crates/swarm-engine/src/provider_connection_probe.rs",
+    "rust/crates/swarm-engine/src/root_store/agent_archive_history.rs",
+    "rust/crates/swarm-engine/src/root_store/paea_effect_reconcile.rs",
+    "rust/crates/swarm-engine/src/root_store/paea_git_promote_call.rs",
+    "rust/crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs",
+    "rust/crates/swarm-engine/src/root_store/paea_git_transfer_call.rs",
+    "rust/crates/swarm-engine/src/root_store/paea_settlement/call.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_native.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_attachments.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_capture.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_methods.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_source.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/gate.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/biba.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/process.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-engine/src/telemetry_endpoint.rs",
+    "rust/crates/swarm-engine/src/trust/confidentiality.rs",
+    "rust/crates/swarm-protection-contract/src/types.rs",
+    "rust/crates/swarm-web/src/service/agent_logs.rs",
+    "rust/crates/swarm-web/src/service/api_connection_probe.rs",
+    "rust/crates/swarm-web/src/service/paea.rs",
+    "rust/crates/swarm-web/src/service/paea_git_call_approval.rs",
+    "rust/crates/swarm-web/src/service/paea_git_call_preview.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+    "rust/crates/swarm-engine/src/root_store/reader_guard.rs",
+    "rust/crates/swarm-cli/src/trust.rs",
+    "rust/crates/swarm-web/src/service/trust.rs",
+    "rust/crates/swarm-web/src/service.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "reviewed-source-flow-contracts",
+      "command": [
+        "python3",
+        "tools/paea/check_blp_inventory.py",
+        "--inventory",
+        "docs/architecture/blp-flow-inventory.json"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"reference_count\": 50",
+        "\"flow_count\": 25",
+        "BLP_INVENTORY_CURRENT declared anchors and source hashes only; runtime protection not established"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "inventory-drift-refusal-and-recovery",
+      "command": [
+        "python3",
+        "tests/blp_flow_inventory_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_source_mutation_refuses_then_original_recovers",
+        "test_escape_paths_refuse",
+        "test_wrong_anchor_cannot_be_hidden_by_current_hash",
+        "Ran 5 tests",
+        "OK"
+      ]
+    }
+  ]
+}

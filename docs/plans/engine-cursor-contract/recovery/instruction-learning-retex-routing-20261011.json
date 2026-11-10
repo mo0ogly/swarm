@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T11:03:14.896316+00:00",
+  "parent": "instruction-learning-retex-continuity-20261011.patch",
+  "parent_sha256": "459949e903fdc72b155cdca2bdd06a0a4a6b2cd7eeaeae4f87b67527eabe373c",
+  "preimage_tree": "a69f185c20aa8cf7064a63d03193a428551dc27d",
+  "added_tracked_preimages": [
+    ".claude/skills/code-reviewer/SKILL.md"
+  ],
+  "patch": "docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-routing-20261011.patch",
+  "sha256": "8b957486beef8e95e02061e79c678a145f11a4d620086d853a26527c2ee291cc",
+  "bytes": 19850,
+  "paths": [
+    "internal/engine/planning_context.go",
+    "internal/engine/planning_context_priority_test.go",
+    "internal/engine/planning_delivery.go",
+    "internal/engine/planning_schema.go",
+    "internal/engine/planning_historical_delivery_test.go",
+    ".claude/skills/code-reviewer/SKILL.md",
+    "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+    "docs/en/AGENT-ENGINE-PROTOCOL.md"
+  ],
+  "purpose": "Latest public operator-resume first; freeze omission of unavailable producer retry in provider schema; attribute current review error and retain older blocker as history; exact-quote reviewer instruction. Guards and spent budgets remain unchanged.",
+  "limits": "New targeted RED/GREEN and full/race/vet/workflow checks; native root retry failure revision157 retained; no autonomous completion claimed."
+}

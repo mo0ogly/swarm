@@ -1,0 +1,209 @@
+{
+  "status": "PASS",
+  "at": "2026-10-16T18:09:20.890371+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "checks": [
+    "Passing receipts, original logs and exact current-input differences verified; one final Go formatting delta canonically identical, frontend dependencies unchanged",
+    "42 distinct Go test names; eight race cases included, not added twice",
+    "Initial failing test, fixture, browser and migration evidence preserved with exact source images",
+    "Native CLI/browser receipts bound to final binary and script: nine checks, four scripted calls, seven expected refusals, 28 captures, four read-only version refusals",
+    "Baseline preimages and prior evaluation results unchanged; only M14 evaluation appended",
+    "Owned diff, whitespace, Go formatting, JS syntax, report links, branch and unchanged ready user server verified"
+  ],
+  "receipts": {
+    "restore-final": {
+      "named_tests": [
+        "TestDialogueResumeIdentityAndPermissions",
+        "TestDialogueUsageSnapshotDoesNotMutate",
+        "TestCostSummaryDistinguishesReportedFromSilent",
+        "TestCostSummaryCountsSilentAttemptsWithoutInventing",
+        "TestDialogueBoundaryRejectsInconsistentTurnAcrossConsumers",
+        "TestDialogueCheckpointRejectsUnresumableSessionAndInvalidUsage",
+        "TestDialogueConfirmationDoesNotOverwriteChangedSession",
+        "TestDialogueBoundaryAllowsUnconfirmedEndBeforeAnswer",
+        "TestDialogueBoundaryHasDurableStateBeforeHeartbeat",
+        "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+        "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+        "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+        "TestDialogueCheckpointRejectsInvalidOrForeignState",
+        "TestDialogueCheckpointMigrationPreservesLegacyAndBackup",
+        "TestDialogueCheckpointSurvivesLifecycleDeleteRestore",
+        "TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed",
+        "TestDialogueCheckpointProgressUsesStoredBoundaryTime",
+        "TestDialogueIncompleteTurnCannotBeAnswered",
+        "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+        "TestDialogueConfirmationStorageFailureBlocksContinuation",
+        "TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority",
+        "TestDialogueRecoveryCLIAPIReadOnlyAndScoped",
+        "TestDialogueRecoveryQualifiesIncompleteAndChangedContracts",
+        "TestDialogueRecoverySelectionIgnoresRecentHistoryWindow",
+        "TestDialogueRestorePublicOperationExists",
+        "TestDialogueRestoreKeepsSessionGuardsAndSeparatesExecutionUsage",
+        "TestDialogueRestoreRejectsStaleUnconfirmedAndUnverifiedWithoutMutation",
+        "TestDialogueRestoreRechecksSourceAfterPreflight",
+        "TestDialogueRestoreConcurrentRequestsCreateOneExecution",
+        "TestDialogueRestoreCumulativeToolLimitCannotReset",
+        "TestDialogueRestoreWrongSessionIsNotSuccessful",
+        "TestDialogueRestorePreservesAttemptAndBudgetGuards",
+        "TestDialogueRestoreVersionFencePreservesCheckpointAndBackup",
+        "TestDialogueRestoreStartupRejectsChangedContractAndReceipt",
+        "TestDialogueRestoreHTTPPreviewAuthenticationScopeAndNoMutation",
+        "TestDialogueRestoreRetainsExistingConversationTurnLimit",
+        "TestSuccessfulLaunchPersistsAtomicPreflight",
+        "TestSlowPreflightDoesNotHoldLaunchTransaction",
+        "TestRunLimitsActualLaunchFreezesConfiguration",
+        "TestRunLimitsLaunchCannotRaiseCeilings",
+        "TestInspectionCLIRefusesImplicitStorageUpgrade"
+      ],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go",
+        "internal/engine/storage_inspection.go",
+        "internal/engine/storage_inspection_test.go"
+      ]
+    },
+    "restore-race": {
+      "named_tests": [
+        "TestDialogueConfirmationDoesNotOverwriteChangedSession",
+        "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+        "TestDialogueRestoreKeepsSessionGuardsAndSeparatesExecutionUsage",
+        "TestDialogueRestoreRechecksSourceAfterPreflight",
+        "TestDialogueRestoreConcurrentRequestsCreateOneExecution",
+        "TestDialogueRestoreCumulativeToolLimitCannotReset",
+        "TestDialogueRestoreStartupRejectsChangedContractAndReceipt",
+        "TestDialogueRestoreHTTPPreviewAuthenticationScopeAndNoMutation"
+      ],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go",
+        "internal/engine/storage_inspection.go",
+        "internal/engine/storage_inspection_test.go"
+      ]
+    },
+    "storage-final": {
+      "named_tests": [
+        "TestDialogueRestorePublicOperationExists",
+        "TestDialogueRestoreHTTPPreviewAuthenticationScopeAndNoMutation",
+        "TestInspectionCLIRefusesImplicitStorageUpgrade",
+        "TestInspectionDoesNotCreateMissingStore"
+      ],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go"
+      ]
+    },
+    "build-release": {
+      "named_tests": [],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go"
+      ]
+    },
+    "static": {
+      "named_tests": [],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go"
+      ]
+    },
+    "web-unit": {
+      "named_tests": [],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go",
+        "internal/engine/dialogue_recovery.go",
+        "internal/engine/dialogue_restore.go",
+        "internal/engine/dialogue_restore_test.go",
+        "internal/engine/storage_inspection.go",
+        "internal/engine/storage_inspection_test.go",
+        "internal/engine/web_server.go"
+      ]
+    },
+    "i18n": {
+      "named_tests": [],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go",
+        "internal/engine/dialogue_recovery.go",
+        "internal/engine/dialogue_restore.go",
+        "internal/engine/dialogue_restore_test.go",
+        "internal/engine/storage_inspection.go",
+        "internal/engine/storage_inspection_test.go",
+        "internal/engine/web_server.go"
+      ]
+    },
+    "config": {
+      "named_tests": [],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go"
+      ]
+    },
+    "generated": {
+      "named_tests": [],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go"
+      ]
+    },
+    "browser-final": {
+      "named_tests": [],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go"
+      ]
+    },
+    "preview-storage-green": {
+      "named_tests": [],
+      "current_input_differences": [
+        "internal/engine/agent_terminal_process.go"
+      ]
+    }
+  },
+  "distinct_go_tests": [
+    "TestCostSummaryCountsSilentAttemptsWithoutInventing",
+    "TestCostSummaryDistinguishesReportedFromSilent",
+    "TestDialogueBoundaryAllowsUnconfirmedEndBeforeAnswer",
+    "TestDialogueBoundaryHasDurableStateBeforeHeartbeat",
+    "TestDialogueBoundaryRejectsInconsistentTurnAcrossConsumers",
+    "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+    "TestDialogueCheckpointMigrationPreservesLegacyAndBackup",
+    "TestDialogueCheckpointProgressUsesStoredBoundaryTime",
+    "TestDialogueCheckpointRejectsInvalidOrForeignState",
+    "TestDialogueCheckpointRejectsUnresumableSessionAndInvalidUsage",
+    "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+    "TestDialogueCheckpointSurvivesLifecycleDeleteRestore",
+    "TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed",
+    "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+    "TestDialogueConfirmationDoesNotOverwriteChangedSession",
+    "TestDialogueConfirmationStorageFailureBlocksContinuation",
+    "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+    "TestDialogueIncompleteTurnCannotBeAnswered",
+    "TestDialogueRecoveryCLIAPIReadOnlyAndScoped",
+    "TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority",
+    "TestDialogueRecoveryQualifiesIncompleteAndChangedContracts",
+    "TestDialogueRecoverySelectionIgnoresRecentHistoryWindow",
+    "TestDialogueRestoreConcurrentRequestsCreateOneExecution",
+    "TestDialogueRestoreCumulativeToolLimitCannotReset",
+    "TestDialogueRestoreHTTPPreviewAuthenticationScopeAndNoMutation",
+    "TestDialogueRestoreKeepsSessionGuardsAndSeparatesExecutionUsage",
+    "TestDialogueRestorePreservesAttemptAndBudgetGuards",
+    "TestDialogueRestorePublicOperationExists",
+    "TestDialogueRestoreRechecksSourceAfterPreflight",
+    "TestDialogueRestoreRejectsStaleUnconfirmedAndUnverifiedWithoutMutation",
+    "TestDialogueRestoreRetainsExistingConversationTurnLimit",
+    "TestDialogueRestoreStartupRejectsChangedContractAndReceipt",
+    "TestDialogueRestoreVersionFencePreservesCheckpointAndBackup",
+    "TestDialogueRestoreWrongSessionIsNotSuccessful",
+    "TestDialogueResumeIdentityAndPermissions",
+    "TestDialogueUsageSnapshotDoesNotMutate",
+    "TestInspectionCLIRefusesImplicitStorageUpgrade",
+    "TestInspectionDoesNotCreateMissingStore",
+    "TestRunLimitsActualLaunchFreezesConfiguration",
+    "TestRunLimitsLaunchCannotRaiseCeilings",
+    "TestSlowPreflightDoesNotHoldLaunchTransaction",
+    "TestSuccessfulLaunchPersistsAtomicPreflight"
+  ],
+  "race_tests": 8,
+  "model_calls": 0,
+  "review": "Same-context local review; no independent acceptance or deployment",
+  "runtime": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "candidate_diff_sha256": "b7a26b1bdbae21932e514000dc9033a4f5f8a971f1e565405f0cc5e3f8c1b111"
+}

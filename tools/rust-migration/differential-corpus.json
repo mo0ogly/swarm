@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "scenarios": [
+    {
+      "id": "work-list",
+      "argv": ["work", "list"],
+      "expected_exit": 0,
+      "json_differences": [],
+      "database_tables": ["works"],
+      "readonly": true
+    },
+    {
+      "id": "work-show",
+      "argv": ["work", "show", "{work_id}"],
+      "expected_exit": 0,
+      "json_differences": [],
+      "database_tables": ["works"],
+      "readonly": true
+    }
+  ]
+}

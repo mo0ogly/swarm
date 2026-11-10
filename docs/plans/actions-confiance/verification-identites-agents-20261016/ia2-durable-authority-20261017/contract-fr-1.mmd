@@ -1,0 +1,8 @@
+flowchart TD
+  R["Demande interne JSON"] --> P["Schéma strict : aucune autorité déclarée"]
+  P --> L["Verrou partagé Trust"]
+  L --> I["Résoudre le jeton dans l'état courant"]
+  A["Cadre fourni par le contrôle<br/>source durable IA2.3b ci-dessous"] --> V
+  I --> V["Vérifier plan, instance, octrois et délégation"]
+  V --> D["Décision liée à la demande exacte ou refus"]
+  D -. "IA2.3 / IA3 : non raccordé" .-> E["Engagement atomique, lancement et effets"]

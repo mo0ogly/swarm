@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "recipe": "paea-contract",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "schema-and-python-vectors",
+      "command": [
+        "/usr/bin/python3",
+        "tests/paea_contract_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.32973209899500944,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "rust-contract",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-protection-contract",
+        "--test",
+        "contract",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 10.559752973000286,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "public-cli",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "protection",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 124.81990658299765,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "6badb3ceafab402aa226637fa7b57f5dfaf3040aaf2cd0008d2e935d7d2e361b",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "6f08b3e91bcac478f4701b7dd2a8c3d5d9cfb4482e6b0942db2229ee18aee6f0",
+    "declared-inputs.tar.gz": "ce4c3961b2fef26305b6a9a747f18f3766de90dd626765d382412a207412917b",
+    "environment.json": "7e05f7276ecfb6180d2b4d8f425c3d5db29ce2b5696260d62c4f60cbd93b15e6",
+    "step-0001.stdout": "d53fca3ff301113ffb8c86745e047c354f382738e63311d1f286568a31393fbe",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "66b2fc0d01b11d1a533f41fec912ba628b7b15efde8fd6abd9ae1da6db65ec2e",
+    "step-0002.stdout": "167a8b2cb878dbfa606acbdc69e8639aeca85bc9830f37add61edece3b78f7e9",
+    "step-0002.stderr": "99c52187a3b5976b82c518884ea12736143be559e6cbf9be3818ab2ab0722932",
+    "step-0002.json": "2f22ed2fe7d5e0069e75cc44ed4464a6ab3f31977d396f8c93a2fc0c5856cd58",
+    "step-0003.stdout": "44adde504ff5535f7a5aa1b97cadd5eea51512502aa14f518efb9890d2fb67b6",
+    "step-0003.stderr": "5fded931ab352fa965bfcd335e1654b585c40f270059e196d6944ae1d9c0c516",
+    "step-0003.json": "9778ca3fbc2fbdcc39403a9476a560a29180c1365868eaa39333ed099166f79f",
+    "inputs.after.json": "6f08b3e91bcac478f4701b7dd2a8c3d5d9cfb4482e6b0942db2229ee18aee6f0"
+  }
+}

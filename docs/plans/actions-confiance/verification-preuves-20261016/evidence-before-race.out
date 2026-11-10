@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT6EvidencePublicNamespace
+    trust_evidence_test.go:16: evidence namespace missing: exit 2
+--- FAIL: TestActionsConfianceT6EvidencePublicNamespace (1.34s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.936s
+FAIL

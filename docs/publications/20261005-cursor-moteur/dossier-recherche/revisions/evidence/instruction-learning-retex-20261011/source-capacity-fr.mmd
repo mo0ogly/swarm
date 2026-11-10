@@ -1,0 +1,9 @@
+flowchart TD
+  A[Production terminée et bilan complet] --> C[Contrôles sur candidat immuable]
+  C --> B[Sources dépassant la capacité, aucun appel de revue]
+  B --> V{Checkpoint, reçu et refus typé concordants}
+  V -->|Non| R[Refus sans effet ni appel]
+  V -->|Oui| O[Réparation opérateur attribuée]
+  O --> N[Nouveau résultat, originaux conservés]
+  N --> F[Contrôles frais puis revue indépendante]
+  F --> P[Acceptation seulement si preuves valides]

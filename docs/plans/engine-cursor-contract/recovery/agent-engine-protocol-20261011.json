@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-11T07:38:33.634100+00:00",
+  "patch": "docs/plans/engine-cursor-contract/recovery/agent-engine-protocol-20261011.patch",
+  "sha256": "a9eb1ca8961e446e4d777c3202759c51e02c1c555e8929303853bb1f51f4cb84",
+  "bytes": 241951,
+  "base_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "scope": "Consolidated current engine corrections, shared methods and architecture; preserve native T1..T4 changes when merging.",
+  "supersedes_root_patch_contents": [
+    "review-evidence-20261010.patch",
+    "plan-phases-20261010.patch",
+    "recovery-source-preflight-20261010.patch"
+  ],
+  "separate_required_patch": "provider-wait-20261010.patch",
+  "candidate_integration_required": "After merge, run python3 tools/verification/refresh_engine_source_manifest.py in the owned candidate. Do not import the root generated snapshot or rewrite historical acceptance manifests.",
+  "checks": {
+    "partitioned_complete_go_suite": "1110 discovered default tests/examples/fuzz targets; four disjoint groups all exit 0",
+    "go_vet": "PASS",
+    "race": "PASS; deterministic fixtures",
+    "agent_workflows": "PASS; actual engine-built contexts",
+    "mermaid": "FR/EN render PASS"
+  },
+  "limits": "Local implementation and fixture verification; independent native candidate review and integration remain required."
+}

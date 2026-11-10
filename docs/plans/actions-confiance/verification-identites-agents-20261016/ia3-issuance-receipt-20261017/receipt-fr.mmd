@@ -1,0 +1,11 @@
+flowchart TD
+  A["Autorité fournie par le contrôle<br/>enrôlement réel encore à raccorder"] --> M["Émission authentifiée<br/>session et temps frais"]
+  M --> R["Reçu historique<br/>autorité, session sous empreinte, dates"]
+  R --> H["Tête version 2<br/>candidat exact et reçu liés par empreinte"]
+  H --> T["Intention Trust durable"]
+  T --> Q["COMMIT du journal SQLite"]
+  Q --> F["Finalisation de la tête Trust"]
+  T -.-> X["Reprise exacte après interruption<br/>même reçu, aucune autorisation nouvelle"]
+  Q -.-> X
+  X --> F
+  F --> V["Lecture : checkpoint indépendant<br/>cohérence du reçu et chaîne historique"]

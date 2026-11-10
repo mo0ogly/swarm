@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "work": "w-721d716d9c0c6ae95e59fbcd",
+  "task": "t1",
+  "expected_revision": 6,
+  "dialogues": [
+    {
+      "task": "brain-7e6db7525e68b94f3172",
+      "attempt": "cd60b964-7845-4d0a-bbc9-c1f92d72d501",
+      "sha256": "78b518760afb99c8dc5b2350758d4c5124999f64e5cb97208a71da1dbaecb5a3"
+    },
+    {
+      "task": "brain-932e000c2115a559a1ef",
+      "attempt": "07bd9cd3-698e-47dd-bfd0-7d9d28c97411",
+      "sha256": "3535d00e3709bda52e1723fd2db747fc7109db5bf95707cbeaa26b3df6b8fd17"
+    }
+  ]
+}

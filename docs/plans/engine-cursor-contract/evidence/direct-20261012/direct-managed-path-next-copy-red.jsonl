@@ -1,0 +1,13 @@
+{"Time":"2026-10-12T23:41:03.916107962+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-12T23:41:03.939713866+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasPublishesExistingResultAndPreparesNextCopy"}
+{"Time":"2026-10-12T23:41:03.93979569+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasPublishesExistingResultAndPreparesNextCopy","Output":"=== RUN   TestManagedRootAliasPublishesExistingResultAndPreparesNextCopy\n"}
+{"Time":"2026-10-12T23:41:04.458594048+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasPublishesExistingResultAndPreparesNextCopy","Output":"    managed_root_alias_test.go:180: next copy unavailable  espace de travail absent ou redirigé\n"}
+{"Time":"2026-10-12T23:41:04.463788872+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasPublishesExistingResultAndPreparesNextCopy","Output":"--- FAIL: TestManagedRootAliasPublishesExistingResultAndPreparesNextCopy (0.52s)\n"}
+{"Time":"2026-10-12T23:41:04.46388366+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasPublishesExistingResultAndPreparesNextCopy","Elapsed":0.52}
+{"Time":"2026-10-12T23:41:04.463912925+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasHandoffRefusesChildRootLinkAndExternalCopyAlias"}
+{"Time":"2026-10-12T23:41:04.46392066+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasHandoffRefusesChildRootLinkAndExternalCopyAlias","Output":"=== RUN   TestManagedRootAliasHandoffRefusesChildRootLinkAndExternalCopyAlias\n"}
+{"Time":"2026-10-12T23:41:04.607392444+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasHandoffRefusesChildRootLinkAndExternalCopyAlias","Output":"--- PASS: TestManagedRootAliasHandoffRefusesChildRootLinkAndExternalCopyAlias (0.14s)\n"}
+{"Time":"2026-10-12T23:41:04.607450032+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasHandoffRefusesChildRootLinkAndExternalCopyAlias","Elapsed":0.14}
+{"Time":"2026-10-12T23:41:04.607476592+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-12T23:41:04.613087751+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.697s\n"}
+{"Time":"2026-10-12T23:41:04.61314049+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.697}

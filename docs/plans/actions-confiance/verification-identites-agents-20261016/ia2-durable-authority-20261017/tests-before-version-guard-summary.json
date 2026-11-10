@@ -1,0 +1,23 @@
+{
+  "exit_code": 0,
+  "runs": 180,
+  "passes": 180,
+  "top_level": 42,
+  "fails": [],
+  "skips": [],
+  "changed_inputs": [],
+  "input_files": 1052,
+  "registry_named_passes": 32,
+  "tail": [
+    "--- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/bob (0.05s)\n",
+    "=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service\n",
+    "--- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service (0.04s)\n",
+    "=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin\n",
+    "--- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin (0.05s)\n",
+    "--- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation (0.23s)\n",
+    "=== RUN   TestActionsConfianceT3OIDCLogoutSessionAndSubject\n",
+    "--- PASS: TestActionsConfianceT3OIDCLogoutSessionAndSubject (0.07s)\n",
+    "PASS\n",
+    "ok  \tswarm.local/companion/internal/engine\t7.444s\n"
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product delivery"
+  short_description: "Evidence based research, design and implementation per story"
+  default_prompt: "Use $product-delivery within the current Swarm role and authorised scope."

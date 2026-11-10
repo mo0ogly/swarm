@@ -1,0 +1,14 @@
+{
+  "error": "planning-provider-assistant-unavailable",
+  "failure": {
+    "causes": [
+      "planning-provider-assistant-unavailable",
+      "planning-provider-assistant-unavailable",
+      "planning-provider-assistant-unavailable"
+    ],
+    "code": "planning-provider-assistant-unavailable",
+    "message": "planning-provider-assistant-unavailable",
+    "retryable": false
+  },
+  "schema_version": 1
+}

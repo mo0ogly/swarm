@@ -1,0 +1,49 @@
+{
+  "at": "2026-10-11T18:21:48.388760+00:00",
+  "chain": [
+    {
+      "patch": "unresolved-review-recovery-20261011.patch",
+      "paths": [
+        "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+        "docs/en/AUTORECURSIVE-RECOVERY.md",
+        "internal/engine/model.go",
+        "internal/engine/planning_context.go",
+        "internal/engine/planning_delivery.go",
+        "internal/engine/planning_prompt.go",
+        "internal/engine/planning_review_retry.go",
+        "internal/engine/planning_unresolved_review_recovery_test.go",
+        "internal/engine/review_failure_routing.go",
+        "internal/engine/store.go"
+      ],
+      "preimages_verified": true,
+      "result_tree": "0415ac3a23ed9fe1a48ddd14fc60119bbded0859"
+    },
+    {
+      "patch": "review-missing-result-diagnostic-20261011.patch",
+      "paths": [
+        "internal/engine/managed_review_reply_test.go"
+      ],
+      "preimages_verified": true,
+      "result_tree": "1ad5ba979b668619d35a036b8fd90c6970da27f5"
+    },
+    {
+      "patch": "review-local-negative-recovery-20261011.patch",
+      "paths": [
+        "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+        "docs/en/AUTORECURSIVE-RECOVERY.md",
+        "internal/engine/managed_review_fragment_feedback.go",
+        "internal/engine/managed_review_fragment_resume.go",
+        "internal/engine/managed_review_local_negative_resume_test.go",
+        "internal/engine/managed_review_recovery.go",
+        "tools/verification/refresh_engine_source_manifest.py"
+      ],
+      "preimages_verified": true,
+      "result_tree": "1ed4f832c7f00f5adb72ea1690dac7085c048447"
+    }
+  ],
+  "all_paths_verified": 1179,
+  "candidate_digest": "afc079ad08db70a1c0f18a0e53e6a3081054ecd55e432d0dab965c6099d85690",
+  "full_receipt": "/tmp/swarm-local-negative-recovery-qualified-v2-full-receipt.json",
+  "primary_equals_qualified_snapshot": true,
+  "runtime_install": "pending"
+}

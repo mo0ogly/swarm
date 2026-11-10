@@ -1,0 +1,12 @@
+{
+  "error": "agent-completion-journal-binding-invalid",
+  "failure": {
+    "causes": [
+      "agent-completion-journal-binding-invalid"
+    ],
+    "code": "agent-completion-journal-binding-invalid",
+    "message": "agent-completion-journal-binding-invalid",
+    "retryable": false
+  },
+  "schema_version": 1
+}

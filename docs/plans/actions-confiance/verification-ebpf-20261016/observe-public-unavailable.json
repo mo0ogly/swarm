@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "available": false,
+  "source": "ebpf",
+  "scope": "registered_main_thread",
+  "attribution": {
+    "agent_id": "agent-97a45955a552719b2879972e",
+    "mission_id": "w-0c20a3f66efe086035ba881f",
+    "task_id": "t1",
+    "attempt_id": "a-07c66d7d4df06e7433f2c62a",
+    "pid": 3773708,
+    "pid_start_time": "5930399",
+    "resource_digest": "8517cc85aef0b26b750de5ab8380e622f3388102d625a7a0bb8fd825744f05b5"
+  },
+  "effective_policy": {
+    "enabled": true,
+    "window_seconds": 5,
+    "timeout_seconds": 15,
+    "ring_bytes": 65536,
+    "max_events": 128
+  },
+  "revision": 1,
+  "events": [],
+  "attempts": "0",
+  "emitted": "0",
+  "kernel_lost": "0",
+  "omitted": "0",
+  "cleanup_verified": true,
+  "complete": false,
+  "global_qualification": false,
+  "stop_reason": "unavailable",
+  "diagnostic": "kernel backend ring: creating map: map create: operation not permitted (MEMLOCK may be too low, consider rlimit.RemoveMemlock)"
+}

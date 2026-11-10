@@ -1,0 +1,10 @@
+{
+  "status": 500,
+  "body": {
+    "error": "preparation-root-instance-changed",
+    "failure": {
+      "code": "preparation-root-instance-changed"
+    },
+    "schema_version": 1
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "history": "## Raccord1474 — transcript typé depuis Journaux, en cours\nPropriétaire Codex ; consulter explicitement les métadonnées du flux retenu,\nsans assistant/tool content, exécution, terminal interactif, polling ni adoption.\nRéutiliser typed_transcript existant ; ne modifier aucun fichier Live de Claude.\nFichiers : service.rs + service/agent_transcript.rs (ajouts), cockpit-native-logs.js,\ntests/recette historiques, notes/catalogue et docsFR-EN/schéma. GLM propose route.\nCritères : association Work/agent, états absent/vide/disponible/partiel explicites,\nflags de capture conservés, refus de reçu malformé, aucune fuite du contenu,\nchangement de source/réponse tardive, FR/EN/thèmes/mobile, installation identifiée.\nTests sur fixture CLI existante (230sorties capturées,4lignes cycle de vie),\naucune écriture sur mission réelle ni appel fournisseur métier. Réutiliser les\npreuves du codec inchangé ; recette finale unique après vérifications ciblées.\nRestent1472-BATCH/STATUS et branche terminale status ; aucune garde retirée.\nPreuves attendues : evidence/20261024-transcript1474 ; aucune acceptation globale.\n\nReplan1474a : compilation ciblée refusée E0308 ; notre conversion d’erreur de\nlecture supposait RootStoreError::Work(WorkError), son producteur réel exige\nRecordedWorkError::Work. Conversion complétée sans changer code/statut HTTP ni\nperdre cause. Original web-unit.stderr conservé ; étapes dépendantes non lancées.\nReprise avec cette précondition corrigée et sorties neuves, pas de retry identique.\n\n",
+  "GLM_corrections": "observation missing, nullable fields omitted, bool/Option tuple mismatch, error conversion; corrected before unit execution",
+  "compile_failure": "RootStoreError::Work requires RecordedWorkError, original stderr and exact hash-reconstructed source retained",
+  "resumption": "Actual type corrected, new unit outputs; dependent engine tests/build were not started on failure",
+  "legacy_followup": {
+    "origin": "Installed two sampled historical agents have no native_execution_result receipt",
+    "value": "Recover useful historical observations without inventing a native transcript/provenance",
+    "owner": "Codex",
+    "state": "QUALIFY",
+    "condition": "Audit actually retained legacy stream sources and their schema; explicit provenance/source distinction and fixtures before any projection"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-provenance-public",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "tools/verification/recipe.py",
+    "tests/rust_preparation_cli_calls.py",
+    "tests/rust_preparation_calls.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_project_memory_source.py",
+    "tests/rust_preparation_plan.py",
+    "tests/fixture_area.py",
+    ".cache/local-delivery/rust-e4t0j_65/build/result.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-cli",
+      "command": [
+        "python3",
+        "tests/rust_preparation_cli_calls.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-vtt3bjzt",
+        "--output",
+        "{root}/docs/plans/actions-confiance/verification-blp/20261031-provenance-cli-01"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CLI_PASS",
+        "PASS auto-private-v3-provenance",
+        "PASS explicit-level-private-v3-provenance",
+        "PASS producer-provenance-matches-provider-stdin",
+        "PASS explicit-preexec-recovery"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-http",
+      "command": [
+        "python3",
+        "tests/rust_preparation_calls.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm.candidate-vtt3bjzt",
+        "--output",
+        "{root}/docs/plans/actions-confiance/verification-blp/20261031-provenance-http-01"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CALLS_PASS",
+        "PASS api-explicit-level-refuses-without-contact"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

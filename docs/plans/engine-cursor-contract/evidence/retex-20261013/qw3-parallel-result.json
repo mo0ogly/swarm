@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "work": "w-4cac57c1bf86383814aa3c50",
+  "started": "2026-10-13T20:07:52.609538+00:00",
+  "operator_interventions_after_start": 0,
+  "candidate": "b2455c35a4d262a5e2979a1cac443ce4bab0b769",
+  "root_judge": {
+    "verdict": "end",
+    "reason": "Les nouveaux événements confirment l’intégration et l’acceptation moteur de module_2, module_3 et module_4, ainsi que les revues indépendantes reçues pour le candidat courant. L’état complet contrôlé indique désormais les quatre tâches acceptées, chacune avec une revue passée sur le même candidat b2455c35a4d262a5e2979a1cac443ce4bab0b769, sans tâche hors projection ni incident de revue non résolu. Les rapports producteurs restent des preuves locales et ne sont pas assimilés à eux seuls à une validation, mais les états d’acceptation moteur satisfont toutes les exigences req-1 à req-4. Le besoin initial est donc admissible à la fin du cycle 1 sur ce candidat exact.",
+    "evidence_ref": "b2455c35a4d262a5e2979a1cac443ce4bab0b769",
+    "at": "2026-10-13T20:10:04.939609584Z",
+    "cycle": 1,
+    "max_cycles": 0,
+    "closed": true,
+    "history": [
+      {
+        "verdict": "end",
+        "reason": "Les nouveaux événements confirment l’intégration et l’acceptation moteur de module_2, module_3 et module_4, ainsi que les revues indépendantes reçues pour le candidat courant. L’état complet contrôlé indique désormais les quatre tâches acceptées, chacune avec une revue passée sur le même candidat b2455c35a4d262a5e2979a1cac443ce4bab0b769, sans tâche hors projection ni incident de revue non résolu. Les rapports producteurs restent des preuves locales et ne sont pas assimilés à eux seuls à une validation, mais les états d’acceptation moteur satisfont toutes les exigences req-1 à req-4. Le besoin initial est donc admissible à la fin du cycle 1 sur ce candidat exact.",
+        "evidence_ref": "b2455c35a4d262a5e2979a1cac443ce4bab0b769",
+        "at": "2026-10-13T20:10:04.939609584Z",
+        "cycle": 1
+      }
+    ]
+  },
+  "max_simultaneous_workers": 4,
+  "review_refusals": [],
+  "tasks": 4,
+  "planning_calls": 3,
+  "review_calls": 4,
+  "bundle_sha256": "efdc15ffde278d434e9a425958c6cf40f5c0ae85ea447ef8381f5585786059bd",
+  "functional_check": {
+    "command": [
+      "/usr/bin/python3",
+      "-B",
+      "-c",
+      "import module_1;assert module_1.answer()==1;import module_2;assert module_2.answer()==2;import module_3;assert module_3.answer()==3;import module_4;assert module_4.answer()==4"
+    ],
+    "exit": 0
+  },
+  "scope": "Real Codex campaign at explicit concurrency",
+  "finished": "2026-10-13T20:10:07.369574+00:00",
+  "elapsed_seconds": 134.76036120299977
+}

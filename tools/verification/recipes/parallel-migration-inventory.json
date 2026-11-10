@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "parallel-migration-inventory",
+  "inputs": [
+    "tools/rust-migration/collect_cli_operations.py",
+    "tools/rust-migration/collect_http_contracts.py",
+    "tests/test_cli_operation_inventory.py",
+    "tests/test_http_contract_inventory.py",
+    "rust/crates/swarm-cli/src/*.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/planning.rs",
+    "rust/crates/swarm-web/src/service/quotas.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "cli-source-collector-refusals",
+      "command": [
+        "python3",
+        "-W",
+        "error",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_cli_operation_inventory.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 9 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "http-source-collector-refusals",
+      "command": [
+        "python3",
+        "-W",
+        "error",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_http_contract_inventory.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 4 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "current-reviewed-source-collections",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile,json\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='parallel-migration-inventory-',dir='.cache')).resolve()\nsubprocess.run(['python3','tools/rust-migration/collect_cli_operations.py','--output',str(base/'cli')],check=True)\nsubprocess.run(['python3','tools/rust-migration/collect_http_contracts.py','--inventory',os.environ['SWARM_HTTP_INVENTORY'],'--output',str(base/'http')],check=True)\ncli=json.loads((base/'cli/operations.json').read_bytes());http=json.loads((base/'http/contracts.json').read_bytes())\nassert cli['counts']['named_operations']==38 and http['counts']['routes']==93\nprint('PASS 38 CLI operations and 93 HTTP source contracts, parity open')\nprint('REPLAY_EVIDENCE '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS 38 CLI operations and 93 HTTP source contracts, parity open",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "installed_at": "2026-10-11T09:38:38.361564+00:00",
+  "pid": 1839433,
+  "sha256": "3b523e12b9d71b59f8fb424ea13f50b4c6611fc27eedad6c9dd21960736de2d3",
+  "preflight": "/tmp/swarm-unpaid-source-parts-install-preflight.json",
+  "runtime_health": "/tmp/swarm-unpaid-source-parts-runtime-health.json",
+  "version": {
+    "version": "devel",
+    "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+    "modified": true,
+    "build_date": "2026-10-11T09:35:34Z",
+    "provenance": "injected"
+  },
+  "tests": "1120-target full suite, targeted/race/vet PASS; plain go test ./... still running"
+}

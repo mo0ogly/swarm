@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "action": "save",
+  "preparation_id": "prep-b0f3364296da8a02bb4c7164",
+  "event_id": "plan-brief",
+  "expected_revision": 1,
+  "document": "brief",
+  "text": "Adopted plan brief"
+}

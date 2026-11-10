@@ -1,0 +1,16 @@
+{
+  "name": "frozen-build",
+  "command": [
+    "go",
+    "build",
+    "-overlay",
+    "/tmp/swarm-m24-identity-view-flm5m5vn/overlay.json",
+    "-o",
+    "/tmp/swarm-m24-frozen-bin-q746qzv8/swarm",
+    "./cmd/swarm"
+  ],
+  "start": "2026-10-17T09:07:56.409337+00:00",
+  "end": "2026-10-17T09:08:06.654030+00:00",
+  "exit_code": 0,
+  "log": "frozen-build.log"
+}

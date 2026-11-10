@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-10-23",
+  "purpose": "AC-02 documentary references; no runtime assets or executable policy adoption",
+  "bromure": {
+    "article_url": "https://bromure.io/en/blog/openshell-policies-and-network-lineage",
+    "article_author": "Renaud Deraison",
+    "article_version": "5.4",
+    "manual_landing_version": "5.0.0",
+    "visual_references": [
+      {
+        "id": "connection-lineage",
+        "variants": {
+          "light": {
+            "file": "lineage-denied-light.webp",
+            "source_url": "https://bromure.io/blog/openshell-policies-and-network-lineage/lineage-denied-light.webp",
+            "sha256": "a3b1ce45570b4fb5fdfb490a745403105528761d972d6a30e8beab850ca68d6d",
+            "bytes": 93176,
+            "transformation": "none"
+          },
+          "dark": {
+            "file": "lineage-denied-dark.webp",
+            "source_url": "https://bromure.io/blog/openshell-policies-and-network-lineage/lineage-denied-dark.webp",
+            "sha256": "ff20e154e268386128824ed4462b58e491abc8b0783371a0f5a1aadf1904665c",
+            "bytes": 93904,
+            "transformation": "none"
+          }
+        }
+      },
+      {
+        "id": "denials-drawer",
+        "variants": {
+          "light": {
+            "file": "sandbox-drawer-blocked-light.webp",
+            "source_url": "https://bromure.io/blog/openshell-policies-and-network-lineage/sandbox-drawer-blocked-light.webp",
+            "sha256": "b8717e08d7ca7d64bdb65c998574f6f84581c2e9863468a10a0f567c14aae3ca",
+            "bytes": 35258,
+            "transformation": "none"
+          },
+          "dark": {
+            "file": "sandbox-drawer-blocked-dark.webp",
+            "source_url": "https://bromure.io/blog/openshell-policies-and-network-lineage/sandbox-drawer-blocked-dark.webp",
+            "sha256": "af831175f03071b82d9beeafd2c9ebdf0e3edadd64acc335a26bc45a55a1d23c",
+            "bytes": 32492,
+            "transformation": "none"
+          }
+        }
+      },
+      {
+        "id": "policy-editor",
+        "variants": {
+          "light": {
+            "file": "sandbox-policy-openshell-light.webp",
+            "source_url": "https://bromure.io/blog/openshell-policies-and-network-lineage/sandbox-policy-openshell-light.webp",
+            "sha256": "43e5b014294445343d28eb9f9799a2197040a4d3cff67d8a490ae7761d612bde",
+            "bytes": 138220,
+            "transformation": "none"
+          },
+          "dark": {
+            "file": "sandbox-policy-openshell-dark.webp",
+            "source_url": "https://bromure.io/blog/openshell-policies-and-network-lineage/sandbox-policy-openshell-dark.webp",
+            "sha256": "5052e651c8e9cd9cb4671b371ae6dd6f4605c37a0dc4650ff2271cae0e147365",
+            "bytes": 140430,
+            "transformation": "none"
+          }
+        }
+      },
+      {
+        "id": "security-timeline",
+        "variants": {
+          "light": {
+            "file": "security-timeline-light.png",
+            "sha256": "6d8a3522e55ff890ed5ca56c900ad48a721212b987928cffcdc16d8c7e5f2913",
+            "bytes": 808608,
+            "source_video": {
+              "url": "https://bromure.io/blog/openshell-policies-and-network-lineage/lineage-loop-light.mp4",
+              "sha256": "3ebd8a33c62f9e01d9dd28e6d0a3a5d418f6c44f90c910205d4fccacebffc15c",
+              "bytes": 11726997,
+              "retained_in_repository": false
+            },
+            "transformation": {
+              "tool": "ffmpeg",
+              "time_seconds": 0.5,
+              "argv_template": [
+                "ffmpeg",
+                "-nostdin",
+                "-v",
+                "error",
+                "-ss",
+                "0.5",
+                "-i",
+                "SOURCE_VIDEO",
+                "-frames:v",
+                "1",
+                "-n",
+                "OUTPUT_PNG"
+              ]
+            }
+          },
+          "dark": {
+            "file": "security-timeline-dark.png",
+            "sha256": "63ce7b895b32bbc7627bff62823ced1a39b66f60dd6a64660027733059b17e45",
+            "bytes": 864216,
+            "source_video": {
+              "url": "https://bromure.io/blog/openshell-policies-and-network-lineage/lineage-loop-dark.mp4",
+              "sha256": "3a13de76cb63c2c681cec3e1b03f88f06e5c99e89f0be74a8bfe27609de84cb2",
+              "bytes": 11569245,
+              "retained_in_repository": false
+            },
+            "transformation": {
+              "tool": "ffmpeg",
+              "time_seconds": 0.5,
+              "argv_template": [
+                "ffmpeg",
+                "-nostdin",
+                "-v",
+                "error",
+                "-ss",
+                "0.5",
+                "-i",
+                "SOURCE_VIDEO",
+                "-frames:v",
+                "1",
+                "-n",
+                "OUTPUT_PNG"
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "nvidia_semantic_reference": "v0.1.5; exact differential inputs must be frozen when the deferred project starts",
+  "agentbaseline": {
+    "commit": "d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283",
+    "architecture_version": "Version 1, October 13, 2026",
+    "controls_version": "1.0-draft",
+    "license": "CC BY 4.0",
+    "sources": [
+      {
+        "file": "agentbaseline/software-factory.source.txt",
+        "upstream_path": "software-factory/software-factory.md",
+        "source_url": "https://raw.githubusercontent.com/agentbaseline/agentbaseline/d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283/software-factory/software-factory.md",
+        "commit": "d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283",
+        "sha256": "1ff29872bbb029b5b48f448e3a0e91d89be8feb82bf84a14ef6aaa61ad6a1e47",
+        "bytes": 55168,
+        "transformation": "none"
+      },
+      {
+        "file": "agentbaseline/upstream-readme.source.txt",
+        "upstream_path": "software-factory/README.md",
+        "source_url": "https://raw.githubusercontent.com/agentbaseline/agentbaseline/d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283/software-factory/README.md",
+        "commit": "d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283",
+        "sha256": "fd4b7dfb8fe502ef3822f3d4928c6b381ca6ab910b420c03fb6360ec0e46dfe1",
+        "bytes": 1608,
+        "transformation": "none"
+      },
+      {
+        "file": "agentbaseline/boundaries.yaml",
+        "upstream_path": "software-factory/boundaries.yaml",
+        "source_url": "https://raw.githubusercontent.com/agentbaseline/agentbaseline/d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283/software-factory/boundaries.yaml",
+        "commit": "d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283",
+        "sha256": "2550cfb29fecf178eaf5ad6ae600a085229437faa23611a1aa4c0a1f9ea5c12e",
+        "bytes": 845,
+        "transformation": "none"
+      },
+      {
+        "file": "agentbaseline/levels.yaml",
+        "upstream_path": "software-factory/levels.yaml",
+        "source_url": "https://raw.githubusercontent.com/agentbaseline/agentbaseline/d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283/software-factory/levels.yaml",
+        "commit": "d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283",
+        "sha256": "27add603facfe7b3272a786f9634bc55c343f14d38bf406f6c98b6e61baf0dfa",
+        "bytes": 1231,
+        "transformation": "none"
+      },
+      {
+        "file": "agentbaseline/controls.yaml",
+        "upstream_path": "whitepaper/controls.yaml",
+        "source_url": "https://raw.githubusercontent.com/agentbaseline/agentbaseline/d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283/whitepaper/controls.yaml",
+        "commit": "d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283",
+        "sha256": "06cd3966513c595b7cb455caebc01d9b0c5907f168b7e97ab3b98e1f5c56ae8f",
+        "bytes": 15117,
+        "transformation": "none"
+      },
+      {
+        "file": "agentbaseline/versioning.source.txt",
+        "upstream_path": "VERSIONING.md",
+        "source_url": "https://raw.githubusercontent.com/agentbaseline/agentbaseline/d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283/VERSIONING.md",
+        "commit": "d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283",
+        "sha256": "14dc3ce05710b27ed830854d4f558ff7d2313401e51955e664667927855fa699",
+        "bytes": 4261,
+        "transformation": "none"
+      },
+      {
+        "file": "agentbaseline/LICENSE",
+        "upstream_path": "LICENSE",
+        "source_url": "https://raw.githubusercontent.com/agentbaseline/agentbaseline/d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283/LICENSE",
+        "commit": "d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283",
+        "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+        "bytes": 18657,
+        "transformation": "none"
+      }
+    ]
+  }
+}

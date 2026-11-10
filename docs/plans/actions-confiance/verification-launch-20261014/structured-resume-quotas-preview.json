@@ -1,0 +1,302 @@
+{
+  "current": {
+    "review_manifest_transport_bytes": 8192,
+    "bounds": {
+      "planning_activations": 0,
+      "planning_decisions": 0,
+      "review_calls": null
+    },
+    "revision": 301,
+    "limits": {
+      "review_context_files": 31,
+      "review_source_bytes": 98304,
+      "review_context_bytes": 360448,
+      "review_delivery_files": 100,
+      "planning_scopes": 0,
+      "delegation_depth": 0,
+      "planning_tasks": 20,
+      "planning_activations": 40,
+      "planning_decisions": 40,
+      "review_calls": 64
+    },
+    "consumed": {
+      "planning_scopes": 1,
+      "delegation_depth": 1,
+      "planning_tasks": 8,
+      "planning_activations": 25,
+      "planning_decisions": 20,
+      "review_calls": 60
+    },
+    "remaining": {
+      "planning_tasks": 12,
+      "planning_activations": 15,
+      "planning_decisions": 20,
+      "review_calls": 4
+    },
+    "last_authorization": {
+      "before": {
+        "review_context_files": 30,
+        "review_source_bytes": 98304,
+        "review_context_bytes": 360448,
+        "review_delivery_files": 100,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 20,
+        "planning_activations": 40,
+        "planning_decisions": 40,
+        "review_calls": 64
+      },
+      "after": {
+        "review_context_files": 31,
+        "review_source_bytes": 98304,
+        "review_context_bytes": 360448,
+        "review_delivery_files": 100,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 20,
+        "planning_activations": 40,
+        "planning_decisions": 40,
+        "review_calls": 64
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-15T03:38:51.00704367Z",
+      "reason": "Original brut courant des tests ajouté comme preuve sélectionnable ; 31 fichiers complets, 346648 octets, sous le plafond inchangé de 360448 octets. Autorisation utilisateur existante. Conserver les 50 appels, tentatives et toutes les autres limites."
+    },
+    "scopes": [
+      {
+        "last_model": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-15T03:05:22.051256311Z"
+        },
+        "delivery": {
+          "task_budget": 20,
+          "activation_budget": 40,
+          "closure_unavailable": true,
+          "exploration_available": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "917f466c9a367ab25ceaa99045696921de3d053cba3cb5ac32b3342954c014bb",
+          "events": [
+            "resume-portability-and-exact-quote-2beee412008244f1",
+            "review-fb30671b67eb4d02f1bdd487-result-96e22ed892884b42"
+          ],
+          "decision": "planning-claim-94dd221c24c50202f98cd520-decision"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e537da8f3a71fb180c5eb65db1ef8ade5b4354414aa555c7f6dd95f4e498360b"
+        },
+        "activations": 25,
+        "id": "root",
+        "objective": "Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29",
+          "req-30",
+          "req-31",
+          "req-32"
+        ],
+        "revision": 24,
+        "generation": 79,
+        "state": "ready"
+      }
+    ]
+  },
+  "proposed": {
+    "review_manifest_transport_bytes": 8192,
+    "bounds": {
+      "planning_activations": 0,
+      "planning_decisions": 0,
+      "review_calls": null
+    },
+    "revision": 301,
+    "limits": {
+      "review_context_files": 31,
+      "review_source_bytes": 98304,
+      "review_context_bytes": 368640,
+      "review_delivery_files": 100,
+      "planning_scopes": 0,
+      "delegation_depth": 0,
+      "planning_tasks": 20,
+      "planning_activations": 40,
+      "planning_decisions": 40,
+      "review_calls": 80
+    },
+    "consumed": {
+      "planning_scopes": 1,
+      "delegation_depth": 1,
+      "planning_tasks": 8,
+      "planning_activations": 25,
+      "planning_decisions": 20,
+      "review_calls": 60
+    },
+    "remaining": {
+      "planning_tasks": 12,
+      "planning_activations": 15,
+      "planning_decisions": 20,
+      "review_calls": 20
+    },
+    "last_authorization": {
+      "before": {
+        "review_context_files": 31,
+        "review_source_bytes": 98304,
+        "review_context_bytes": 360448,
+        "review_delivery_files": 100,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 20,
+        "planning_activations": 40,
+        "planning_decisions": 40,
+        "review_calls": 64
+      },
+      "after": {
+        "review_context_files": 31,
+        "review_source_bytes": 98304,
+        "review_context_bytes": 368640,
+        "review_delivery_files": 100,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 20,
+        "planning_activations": 40,
+        "planning_decisions": 40,
+        "review_calls": 80
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-15T04:21:29.987662425Z",
+      "reason": "Insuffisance mesurée après correction de la lecture structurée et des deux défauts R14 : 60 appels conservés, 4 restants contre au moins trois inspections et deux étapes finales pour la nouvelle revue ; 31 sources complètes font 364903 octets, au-dessus des 360448 autorisés. Selon autorisation utilisateur existante, porter les appels à 80 et le contexte à 360 Kio, sans toucher tentatives, consommations, modèle, transport, autres limites ou critères. Cela ne corrige ni ne valide à lui seul la réponse coupée historique."
+    },
+    "scopes": [
+      {
+        "last_model": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-15T03:05:22.051256311Z"
+        },
+        "delivery": {
+          "task_budget": 20,
+          "activation_budget": 40,
+          "closure_unavailable": true,
+          "exploration_available": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "917f466c9a367ab25ceaa99045696921de3d053cba3cb5ac32b3342954c014bb",
+          "events": [
+            "resume-portability-and-exact-quote-2beee412008244f1",
+            "review-fb30671b67eb4d02f1bdd487-result-96e22ed892884b42"
+          ],
+          "decision": "planning-claim-94dd221c24c50202f98cd520-decision"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e537da8f3a71fb180c5eb65db1ef8ade5b4354414aa555c7f6dd95f4e498360b"
+        },
+        "activations": 25,
+        "id": "root",
+        "objective": "Livrer Actions de confiance dans Swarm : pilote Biba, identités d’entreprise, politiques de données, processus métier, preuves durables, simulations adversariales, connecteurs, référentiels et observation eBPF ; recette complète puis RETEX.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29",
+          "req-30",
+          "req-31",
+          "req-32"
+        ],
+        "revision": 24,
+        "generation": 79,
+        "state": "ready"
+      }
+    ]
+  }
+}

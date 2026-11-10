@@ -1,0 +1,2 @@
+Owned inert worker
+Input SHA256: 904cd291441f3bac19fb099fa4084f06d9f05dbf9fb2d595147fdc79749b9833

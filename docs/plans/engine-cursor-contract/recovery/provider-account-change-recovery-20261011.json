@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T15:36:25.244260+00:00",
+  "parent": "source-capacity-recovery-20261011.patch",
+  "parent_sha256": "1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84",
+  "preimage_tree": "ea11ad306cb47c6ad437da8cfa87afed1eed8d3a",
+  "preimage_extensions": [
+    {
+      "path": "internal/engine/provider_cooldown.go",
+      "blob": "366e9047a992cc86670636fc801ad2e0d51c1d99",
+      "sha256": "2c56bdfcef5ce89cf50b788020cf8cd5d3745a912a0356c960f1dda0926ee102",
+      "origin": "HEAD matches qualified11; patch12 did not change these paths"
+    },
+    {
+      "path": "internal/engine/provider_cooldown_test.go",
+      "blob": "7c8eec1869e8f0b8c6b24b6fa95df09ec1b2bd31",
+      "sha256": "5169b9866fccaea1afe2138a0af83db2585089e3be4d53d970fad8c42d78a27d",
+      "origin": "HEAD matches qualified11; patch12 did not change these paths"
+    },
+    {
+      "path": "docs/PROVIDER-QUOTAS.md",
+      "blob": "cb330d52578941905792db49c6f4fe177cacef73",
+      "sha256": "1a2fbb1f3729db439ae78e6bf1f7406185677352f21a4de6e2743a69cb8b996c",
+      "origin": "HEAD matches qualified11; patch12 did not change these paths"
+    },
+    {
+      "path": "docs/en/PROVIDER-QUOTAS.md",
+      "blob": "3dba0890354aa719310687a06010940d2cfca516",
+      "sha256": "4207b2478439fc5ca20205269600c00095c992f65bbe11a6227644a261d43d54",
+      "origin": "HEAD matches qualified11; patch12 did not change these paths"
+    }
+  ],
+  "result_tree": "0cfece74315d21d7619bfe2ff625ebe057123a63",
+  "patch": "docs/plans/engine-cursor-contract/recovery/provider-account-change-recovery-20261011.patch",
+  "sha256": "8945660400f783909b8c0df1647124e9cc9f6840136f74861d705a33d3c8c7ca",
+  "bytes": 10817,
+  "paths": [
+    "internal/engine/provider_cooldown.go",
+    "internal/engine/provider_cooldown_test.go",
+    "docs/PROVIDER-QUOTAS.md",
+    "docs/en/PROVIDER-QUOTAS.md"
+  ],
+  "purpose": "Explicit operator-confirmed changed account may clear former future provider hold; preserve original rejection/history/consumption. Default future holds still guarded, digest CAS and event replay compare confirmation. No automatic launch or account-health assertion.",
+  "tests": "Public legacy refusal reproduced; meaningful regression RED unknown field, GREEN0.059s; provider quota and managed recovery racePASS39.797s, vet/methods/build PASS. Full frozen-source suite running, separate receipt.",
+  "limits": "User asserted changed account, login active is not proof of actual quota. Public new real calls establish availability; 429 blocks anew. Old binaries strict-read new provenance fail closed; install first."
+}

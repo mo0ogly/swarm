@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-11T22:19:40.313508+00:00",
+  "validator": "jsonschema Draft202012Validator",
+  "checks": {
+    "historical_flat_shape_admits_native_unrelated_fields": true,
+    "current_shape_rejects_native_operation": true,
+    "current_shape_accepts_explicit_correction": true,
+    "accept_shape_task": true,
+    "reject_extra_task": true,
+    "accept_shape_delegate": true,
+    "reject_extra_delegate": true,
+    "accept_shape_retry": true,
+    "reject_extra_retry": true,
+    "restrict_retry": true,
+    "accept_shape_close": true,
+    "reject_extra_close": true,
+    "accept_shape_review-plan": true,
+    "reject_extra_review-plan": true,
+    "accept_shape_review-retry": true,
+    "reject_extra_review-retry": true,
+    "restrict_review-retry": true,
+    "accept_shape_continue-run": true,
+    "reject_extra_continue-run": true,
+    "accept_shape_stop-run": true,
+    "reject_extra_stop-run": true,
+    "accept_shape_revise-instructions": true,
+    "reject_extra_revise-instructions": true
+  },
+  "native_diagnostic_sha256": "f84af9a5a959607c5ff79f44cf49760c915b8dc4b1d2ff6548f84e90720cefb1",
+  "schemas": {
+    "planner-current-schema.json": "220949dcd4c040b35df109bebe106b618effb8feb94574b449530d2fb2a4b704",
+    "planner-legacy-schema.json": "26b717ee2d0f16dd7fee447d29464f897ad5e3386b9d3841b7ed8b389abea933",
+    "planner-no-retries-schema.json": "a5656ba32f3632d2c9612c72d0b1273bb05b559927544c45e87261457a64cc70"
+  },
+  "limits": "Local schema counterexample and shape checks; diagnostic shadow only, no native proposal changed or accepted."
+}

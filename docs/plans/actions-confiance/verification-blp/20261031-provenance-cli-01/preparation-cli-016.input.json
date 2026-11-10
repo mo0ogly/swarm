@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "preparation_id": "prep-688350fb6dec4e0d4b1bb93f",
+  "event_id": "codex-success",
+  "expected_revision": 2,
+  "provider": "fixture",
+  "capability_hash": "ba2051a639ccc15bfa888d9e3caac2d977e0dc8e5c9af555409ed62b6474cfb8",
+  "model_policy_hash": "",
+  "level": "auto",
+  "message": "Propose brief",
+  "context_mode": "full"
+}

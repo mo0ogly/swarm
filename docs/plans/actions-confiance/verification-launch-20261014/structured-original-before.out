@@ -1,0 +1,33 @@
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/15999
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/16000
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/16001
+    structured_provider_original_test.go:39: structured original changed: want=16001 received=16037 suffix="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaé\"\n[Réponse tronquée à 16000 octets]"
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/65536
+    structured_provider_original_test.go:39: structured original changed: want=65536 received=16037 suffix="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n[Réponse tronquée à 16000 octets]"
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/codex/65537
+    structured_provider_original_test.go:39: structured original changed: want=65537 received=16037 suffix="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n[Réponse tronquée à 16000 octets]"
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/15999
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/16000
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/16001
+    structured_provider_original_test.go:39: structured original changed: want=16001 received=16037 suffix="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaé\"\n[Réponse tronquée à 16000 octets]"
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/65536
+    structured_provider_original_test.go:39: structured original changed: want=65536 received=16037 suffix="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n[Réponse tronquée à 16000 octets]"
+=== RUN   TestStructuredProviderPreservesCompleteOriginalJSON/claude/65537
+    structured_provider_original_test.go:39: structured original changed: want=65537 received=16037 suffix="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n[Réponse tronquée à 16000 octets]"
+--- FAIL: TestStructuredProviderPreservesCompleteOriginalJSON (0.07s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/codex/15999 (0.01s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/codex/16000 (0.01s)
+    --- FAIL: TestStructuredProviderPreservesCompleteOriginalJSON/codex/16001 (0.01s)
+    --- FAIL: TestStructuredProviderPreservesCompleteOriginalJSON/codex/65536 (0.01s)
+    --- FAIL: TestStructuredProviderPreservesCompleteOriginalJSON/codex/65537 (0.01s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/claude/15999 (0.01s)
+    --- PASS: TestStructuredProviderPreservesCompleteOriginalJSON/claude/16000 (0.01s)
+    --- FAIL: TestStructuredProviderPreservesCompleteOriginalJSON/claude/16001 (0.01s)
+    --- FAIL: TestStructuredProviderPreservesCompleteOriginalJSON/claude/65536 (0.01s)
+    --- FAIL: TestStructuredProviderPreservesCompleteOriginalJSON/claude/65537 (0.01s)
+=== RUN   TestPublicReplyProjectionRemainsBoundedAndExcludesReasoning
+--- PASS: TestPublicReplyProjectionRemainsBoundedAndExcludesReasoning (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.091s
+FAIL

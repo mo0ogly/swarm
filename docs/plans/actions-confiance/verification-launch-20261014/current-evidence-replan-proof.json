@@ -1,0 +1,136 @@
+{
+  "captured_at_utc": "2026-10-15T03:39:34.499007+00:00",
+  "work_id": "w-68b50cc82ec3fe55624f9549",
+  "task_id": "plan-68b50cc82e-T2",
+  "review_before": "review-fb30671b67eb4d02f1bdd487",
+  "candidate_before": "10e3ff0f3a453fe22309aafb0424f315b2abbe1c",
+  "new_tree": "6bba6908bd5a18f609eb187b2a53fc4d39c99bcf",
+  "native_acceptance": "pending",
+  "records": [
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/receipt-native-decision-effect.json",
+      "sha256": "0da9d349c09adcf87b05a2e6a7a8dab809b8148be8e07bccfb9c01047cfa5b00",
+      "bytes": 21108
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/cross-artifact-diagnostic-before.out",
+      "sha256": "6b7162068ec4d7c8e88cb18df75117ced6743987198a40bf12b8f6881288a4a4",
+      "bytes": 842
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/cross-artifact-diagnostic-after.out",
+      "sha256": "9caa7836ff5f336647b22b34bfe4641fa49e06a57209b97496fe692013576879",
+      "bytes": 7139
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/cross-artifact-message-bound-before.out",
+      "sha256": "74b041b15af4df171b7fbed7f83c181d1993c7198b186c124f9b105621b7a96a",
+      "bytes": 281
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/cross-artifact-retry-compat.out",
+      "sha256": "4ba12b60890e48f44d871987efaf98c5a7a3022ff6e53677331078af529e17cc",
+      "bytes": 1369
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/cross-artifact-source-proof.json",
+      "sha256": "363c9dbc03d4166dfd9246b704d093098175abfe11975f07cdf45f8a94606382",
+      "bytes": 77897
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/cross-artifact-final-check.out",
+      "sha256": "8c04620a579e47cabee764425dac9d3c5217c9895d8c22044b9287b990fd646e",
+      "bytes": 1935
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/cross-artifact-methods.out",
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+      "bytes": 97
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t2-resource-guard-before.out",
+      "sha256": "277c605aab084414eb86103f7d01e04c3be04d77736945405ac9e1d1ce509328",
+      "bytes": 860
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t2-resource-full-race.out",
+      "sha256": "685f1feade7d8d911e467016f9c494aadc9823dafd15163173b0821e6cc14461",
+      "bytes": 9750
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t2-resource-portability.out",
+      "sha256": "9ae8cdf5a8ec5f5a86867f1fc289e89d1584791ba7693187559c7fd227998e38",
+      "bytes": 485
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t2-current-evidence-validation.out",
+      "sha256": "0c3826987018c0e0c059a6f31d6e1377491ced9ca6d22d90dee46148e6ce77be",
+      "bytes": 64980
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t2-current-evidence-delivery.out",
+      "sha256": "7c7a275a3d17cead86baaf738a5249bc14ed9dfac53e7bbd62034e089397a690",
+      "bytes": 8147
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t2-current-evidence-vet.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t2-before-current-evidence-report.md",
+      "sha256": "af2feb218d303333ba40dcd6fac9e399c240f0b16e61179a6031f6eb7c89b9bd",
+      "bytes": 16531
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t2-before-current-evidence-metadata.json",
+      "sha256": "8ad251cf757ccb4d2b83e1c50a02ed84bcc8a0ed87b9dd6a63f906cd8ef3d7fe",
+      "bytes": 20406
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t2-current-evidence-tree.txt",
+      "sha256": "534afdcc9f43e833cd0b89b3d55560cbc65a0ff0419543e19672a6455ef66bdd",
+      "bytes": 41
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/current-evidence-quotas-request.json",
+      "sha256": "90ab1ef89b94d2c2e247653df7ca87ba2f55e6f6e502cb8f82195f255da1b7f8",
+      "bytes": 703
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/current-evidence-quotas-preview.json",
+      "sha256": "693edbb86d08bfde20303970c31ad94853c06dcfaa8564e9d76bf6aade9922d7",
+      "bytes": 9470
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/current-evidence-quotas-applied.json",
+      "sha256": "2be4d0b29d76983595b0c71b8f3d56707b49ccd3e0114668e174d61237bce98d",
+      "bytes": 387203
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/current-evidence-resume-request.json",
+      "sha256": "c92d8e9f804824c3f43207567ebf75418119b190a7312254d1ea481c1495ca3e",
+      "bytes": 776
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/current-evidence-revise-request.json",
+      "sha256": "cb7ee5963cb45b13cb9ec177dbe4e611c22b43d6fb50d5560868002a2431605b",
+      "bytes": 816
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/conductor-portable-stopped.json",
+      "sha256": "4bb4594e8ba19f4611c6470ea0962e4d9eb4d180611f85edfb4f6c0c69e511e3",
+      "bytes": 714
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t7-readonly-prerequisites.json",
+      "sha256": "1fb755354c0760f4f39652d602825d2f7aca0a41c27af6397f5cb869826df8f2",
+      "bytes": 455
+    },
+    {
+      "path": "docs/plans/actions-confiance/verification-launch-20261014/t7-readonly-permission-paths.json",
+      "sha256": "b0f2da5821ced94ebeeb8a7b0508490d8d3d6354e2b36b226299e8b470f0114d",
+      "bytes": 343
+    }
+  ]
+}

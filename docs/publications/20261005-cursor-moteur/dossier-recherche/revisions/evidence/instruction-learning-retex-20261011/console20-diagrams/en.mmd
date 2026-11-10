@@ -1,0 +1,10 @@
+flowchart LR
+  A[Public API: logs, activity, decisions] --> B[Page attributed to mission and source]
+  B --> C[Original API data export]
+  B --> D[Read-only Monaco console]
+  D --> E[Search and labelled colours]
+  D --> F[Text fallback if Monaco is unavailable]
+  G[Observed incident] --> H[Sub-supervisor or root supervisor]
+  H --> I[Authorised decision applied by engine]
+  I --> J[Effect requires separate verification]
+  J --> A

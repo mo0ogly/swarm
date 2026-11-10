@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "current_state",
+    "supported_version",
+    "source_sha256",
+    "current_actions",
+    "future_condition",
+    "reason"
+  ],
+  "properties": {
+    "current_state": {
+      "type": "string",
+      "enum": [
+        "blocked",
+        "allowed"
+      ]
+    },
+    "supported_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "source_sha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "inspect_current_source",
+          "prepare_supported_migration",
+          "request_operator_decision",
+          "recheck_compatibility",
+          "edit_database_directly",
+          "launch_now",
+          "accept_task"
+        ]
+      }
+    },
+    "future_condition": {
+      "type": "string",
+      "enum": [
+        "fresh_source_and_compatibility_check",
+        "supported_migration_and_fresh_compatibility_check"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

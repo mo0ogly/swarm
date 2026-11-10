@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "action": "adopt-brief",
+  "preparation_id": "prep-b0f3364296da8a02bb4c7164",
+  "event_id": "plan-adopt",
+  "expected_revision": 2,
+  "sha256": "fb1bce43e6b3cb98cb6d566ff1c35b9f4a54061a0ee095e7f4952cf68c7cf920"
+}

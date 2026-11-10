@@ -1,0 +1,35 @@
+{
+  "review": "GLM tool-free static, two usable responses; no independent runtime acceptance",
+  "accepted": [
+    "Explicit empty decisions differs from absent/null; baseline80 witness and permanent refusal now verified",
+    "Source-cause domain classification reproduced/fixed",
+    "Modified local bytes, same-method revision, HTTP conflict/missing/disabled and source cap recovery: 37 named method checks pass"
+  ],
+  "resolved_by_existing_contract": [
+    "History projection matches Go preparationHistory calling preparation(id)",
+    "Admin default domain restricts canonical five methods; audit_pdca only explicit request alias",
+    "Create unavailable-known method covered in 50-check write recipe",
+    "CLI success retains Go-shaped DTO without sidecar; HTTP owner observation is diagnostic metadata, not different mutation",
+    "Plan-ready is derived and false after verdict removal"
+  ],
+  "deferred": [
+    {
+      "finding": "Potential ancillary source-cause duplicates across BUSY retry",
+      "state": "hypothesis, not reproduced",
+      "owner": "Root preparation/retry",
+      "resume": "Reproducer with forced retry and source cause; do not change business writes speculatively"
+    },
+    {
+      "finding": "Commit uncertainty injection not covered by method-specific new test",
+      "state": "existing unchanged contract, no new qualification claim",
+      "owner": "Root persistence",
+      "resume": "Existing fault-injection contract fixture before broader global qualification"
+    }
+  ],
+  "rejected": [
+    "Reintroducing hardcoded Go caps/default or environment switch contradicts approved persisted Admin policies",
+    "Removing plan_ready=false contradicts derived readiness"
+  ],
+  "usage_reported_total_tokens": 92537,
+  "savings_not_measured": true
+}

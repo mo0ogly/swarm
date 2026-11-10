@@ -1,0 +1,267 @@
+IMPLEMENTATION contract: public planning.enable repository bootstrap ONLY for committed_only=true with empty include_dirty. Existing pure apply refuses repository. Root work_engine strips repository from a local clone solely for prevalidation/provider observation, then calls crate::managed_repository::prepare(root, workid, original_repository_request, settings)->Result<ManagedRepository,AgentLaunchError>; sets resulting planning.repository, validates actual candidate, existing mutation intent/replay retains ORIGINAL request. Root's existing public replay precedes IO. No managed claim/decide/launch/settlement guards removed. No source/index/HEAD mutation, no real model. Saved git_command_timeout_seconds, no 90sec literal. Local private directories and operation lock retained, manifest JSON digest exact Go encode, candidate/base actual immutable commit. Pending manifest before bare no-replace publication, final manifest after; replay verifies commit objects and exact request/paths. Unknown/orphan/changed manifest refuses without overwrite. New helper functions private, use AgentLaunchError typed cause+finish for independent close errors. Deliver code/proposal only, not execution.
+
+FILE rust/crates/swarm-engine/src/models.rs
+a8c19f18815655f84ce6620fd4f78505216842b1d472de29626a5
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ManagedRepository {
+    // Subdir line 26
+    #[serde(rename = "project_subdir")]
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub project_subdir: String,
+    // Source line 27
+    #[serde(rename = "source")]
+    pub source: String,
+    // Storage line 28
+    #[serde(rename = "storage")]
+    pub storage: String,
+    // Base line 29
+    #[serde(rename = "base_commit")]
+    pub base_commit: String,
+    // Candidate line 30
+    #[serde(rename = "candidate_commit")]
+    pub candidate_commit: String,
+    // Snapshot line 31
+    #[serde(rename = "snapshot_digest")]
+    pub snapshot_digest: String,
+    // Included line 32
+    #[serde(rename = "included")]
+    #[serde(skip_serializing_if = "empty_vec")]
+    pub included: Option<Vec<String>>,
+    // RequestDigest line 33
+    #[serde(rename = "request_digest")]
+    pub request_digest: String,
+}
+pub(crate) fn shape_managed_repository() -> Fields {
+    &[
+        ("project_subdir", Kind::String),
+        ("source", Kind::String),
+        ("storage", Kind::String),
+        ("base_commit", Kind::String),
+        ("candidate_commit", Kind::String),
+        ("snapshot_digest", Kind::String),
+        ("included", Kind::Array(&Kind::String)),
+        ("request_digest", Kind::String),
+    ]
+}
+// internal/engine/independent_review.go SHA-256 8
+FILE rust/crates/swarm-engine/src/work.rs
+pub fn encode_model(value: &impl Serialize) -> Result<Vec<u8>, WorkError> {
+    let mut raw = Vec::new();
+    let mut serializer = serde_json::Serializer::new(&mut raw);
+    value
+        .serialize(serde_stacker::Serializer::new(&mut serializer))
+        .map_err(WorkError::Json)?;
+    let raw = serde_json::value::RawValue::from_string(
+        String::from_utf8(raw).expect("JSON serializer emits UTF-8"),
+    )
+    .map_err(WorkError::Json)?;
+    swarm_wire_json::encode(&raw).map_err(WorkError::Json)
+}
+
+
+GO REFERENCE committed preparation
+func (s *Store) configureManagedRepositoryLocked(work string, r ManagedRepositoryRequest) (*ManagedRepository, error) {
+	source, err := resolveWorkspace(s.root, r.Path)
+	if err != nil {
+		return nil, err
+	}
+	top, err := managedGit(source, "rev-parse", "--show-toplevel")
+	if err != nil {
+		return nil, err
+	}
+	subdir, err := filepath.Rel(top, source)
+	if err != nil || strings.HasPrefix(subdir, "..") {
+		return nil, fmt.Errorf("projet hors dépôt Git")
+	}
+	if subdir == "." {
+		subdir = ""
+	}
+	encoded, _ := json.Marshal(r)
+	digest := hash(encoded)
+	storage := filepath.Join(s.root, ".swarm", "managed", work)
+	manifest := filepath.Join(storage, "repository.json")
+	var retained *ManagedRepository
+	var retainedRaw, canonical []byte
+	finalPresent := false
+	for i, path := range []string{manifest, manifest + ".pending"} {
+		raw, err := os.ReadFile(path)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		var prior ManagedRepository
+		if err = json.Unmarshal(raw, &prior); err != nil {
+			return nil, fmt.Errorf("manifeste préparé invalide, conservé pour diagnostic : %w", err)
+		}
+		if err = validatePreparedRepository(prior, storage, source, subdir, digest, r.Include); err != nil {
+			return nil, fmt.Errorf("preuve du dépôt préparé conservée sans réécriture : %w", err)
+		}
+		encoded, err := json.Marshal(prior)
+		if err != nil {
+			return nil, err
+		}
+		if retained != nil && string(canonical) != string(encoded) {
+			return nil, fmt.Errorf("manifestes final et préparé divergents ; conserver les originaux et réconcilier avant reprise")
+		}
+		if retained == nil {
+			retained, retainedRaw, canonical = &prior, raw, encoded
+		}
+		finalPresent = finalPresent || i == 0
+	}
+	if retained != nil {
+		if !finalPresent {
+			if err = atomicWrite(manifest, retainedRaw); err != nil {
+				return nil, err
+			}
+		}
+		return retained, nil
+	}
+	base, err := managedGit(source, "rev-parse", "HEAD")
+	if err != nil {
+		return nil, err
+	}
+	dirty, err := managedGit(source, "status", "--porcelain", "--untracked-files=normal")
+	if err != nil {
+		return nil, err
+	}
+	if dirty != "" && !r.CommittedOnly && len(r.Include) == 0 {
+		return nil, fmt.Errorf("dépôt modifié : choisir le commit enregistré ou nommer les fichiers de l’instantané")
+	}
+	if r.CommittedOnly && len(r.Include) > 0 {
+		return nil, fmt.Errorf("choisir le commit seul ou une liste de fichiers, pas les deux")
+	}
+	staging, err := os.MkdirTemp(storage, "repository-build-")
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(staging)
+	bare := filepath.Join(staging, "repository.git")
+	if _, err = managedGit(storage, "clone", "--bare", "--no-local", "--no-hardlinks", top, bare); err != nil {
+		return nil, err
+	}
+	included := map[string]string{}
+	if len(r.Include) > 0 {
+		copyDir := filepath.Join(staging, "snapshot")
+		if _, err = managedGit(storage, "clone", "--no-local", bare, copyDir); err != nil {
+			return nil, err
+		}
+		if _, err = managedGit(copyDir, "checkout", "--detach", base); err != nil {
+			return nil, err
+		}
+		total := int64(0)
+		for _, name := range r.Include {
+			if name == "" || filepath.IsAbs(name) || filepath.Clean(name) != name || name == ".." || strings.HasPrefix(name, "../") || strings.HasPrefix(name, ".git/") || strings.HasPrefix(name, ".swarm/") || name == ".git" || name == ".swarm" {
+				return nil, fmt.Errorf("chemin d’instantané interdit : %s", name)
+			}
+			if _, err = managedGit(source, "check-ignore", "--", name); err == nil {
+				return nil, fmt.Errorf("fichier ignoré exclu de l’instantané : %s", name)
+			}
+			src := filepath.Join(source, name)
+			dest := filepath.Join(copyDir, subdir, name)
+			for parent := dest; parent != copyDir; parent = filepath.Dir(parent) {
+				if st, e := os.Lstat(parent); e == nil && st.Mode()&os.ModeSymlink != 0 {
+					return nil, fmt.Errorf("lien interdit dans la destination : %s", name)
+				}
+			}
+			stat, statErr := os.Lstat(src)
+			if os.IsNotExist(statErr) {
+				if _, err = managedGit(source, "ls-files", "--error-unmatch", "--", name); err != nil {
+					return nil, err
+				}
+				if err = os.Remove(dest); err != nil && !os.IsNotExist(err) {
+					return nil, err
+				}
+				included[name] = "deleted"
+				continue
+			}
+			if statErr != nil || !stat.Mode().IsRegular() {
+				return nil, fmt.Errorf("fichier régulier requis : %s", name)
+			}
+			if _, err = localFile(source, name); err != nil {
+				return nil, err
+			}
+			total += stat.Size()
+			if total > 64<<20 {
+				return nil, fmt.Errorf("instantané supérieur à 64 Mio")
+			}
+			data, err := os.ReadFile(src)
+			if err != nil {
+				return nil, err
+			}
+			if err = os.MkdirAll(filepath.Dir(dest), 0700); err != nil {
+				return nil, err
+			}
+			if err = os.WriteFile(dest, data, stat.Mode().Perm()); err != nil {
+				return nil, err
+			}
+			included[name] = hash(data)
+		}
+		gitPaths := []string{}
+		for _, name := range r.Include {
+			gitPaths = append(gitPaths, filepath.Join(subdir, name))
+		}
+		if _, err = managedGit(copyDir, append([]string{"add", "-A", "--"}, gitPaths...)...); err != nil {
+			return nil, err
+		}
+		tree, err := managedGit(copyDir, "write-tree")
+		if err != nil {
+			return nil, err
+		}
+		base, err = managedGit(copyDir, "commit-tree", tree, "-p", base, "-m", "Instantané autorisé pour Swarm")
+		if err != nil {
+			return nil, err
+		}
+		if _, err = managedGit(bare, "fetch", "--no-tags", copyDir, base); err != nil {
+			return nil, err
+		}
+	}
+	if _, err = managedGit(bare, "update-ref", "refs/heads/swarm-result", base); err != nil {
+		return nil, err
+	}
+	if _, err = managedGit(bare, "symbolic-ref", "HEAD", "refs/heads/swarm-result"); err != nil {
+		return nil, err
+	}
+	final := filepath.Join(storage, "repository.git")
+	if _, err = os.Lstat(final); err == nil {
+		return nil, fmt.Errorf("dépôt préparé sans manifeste : examiner avant reprise")
+	}
+	snap, _ := json.Marshal(map[string]any{"base": base, "files": included})
+	repo := &ManagedRepository{Subdir: subdir, Source: source, Storage: storage, Base: base, Candidate: base, Snapshot: hash(snap), Included: r.Include, RequestDigest: digest}
+	raw, _ := json.Marshal(repo)
+	if err = atomicWrite(manifest+".pending", raw); err != nil {
+		return nil, err
+	}
+	if err = os.Rename(bare, final); err != nil {
+		return nil, err
+	}
+	if err = atomicWrite(manifest, raw); err != nil {
+		return nil, err
+	}
+	return repo, nil
+}
+func validatePreparedRepository(prior ManagedRepository, storage, source, subdir, digest string, include []string) error {
+	if prior.RequestDigest != digest || prior.Storage != storage || prior.Source != source || prior.Subdir != subdir || !slices.Equal(prior.Included, include) {
+		return fmt.Errorf("manifeste du dépôt incompatible avec la sélection et ses chemins canoniques ; réconcilier avant reprise")
+	}
+	snapshot, err := hex.DecodeString(prior.Snapshot)
+	if err != nil || len(snapshot) != 32 {
+		return fmt.Errorf("empreinte SHA-256 du dépôt préparé absente ou invalide")
+	}
+	for _, oid := range []string{prior.Base, prior.Candidate} {
+		if oid == "" {
+			return fmt.Errorf("identité Git du dépôt préparé absente")
+		}
+		resolved, err := managedGit(filepath.Join(storage, "repository.git"), "rev-parse", "--verify", oid+"^{commit}")
+		if err != nil {
+			return fmt.Errorf("objet Git préparé absent : %w", err)
+		}
+		if resolved != oid {
+			return fmt.Errorf("identité Git préparée non canonique")
+		}
+	}
+	return nil
+}
+

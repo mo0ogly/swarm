@@ -1,0 +1,18 @@
+flowchart TD
+  O["OpenCoordinated<br/>two distinct private directories"] --> A["Reservations and authorization<br/>expected base, exact request"]
+  A --> I["Intent in witness.json<br/>entry and target, file and directory synced"]
+  I --> C["Atomic configuration<br/>write, rename and sync"]
+  C --> W["Confirm witness<br/>committed = target, pending = null"]
+  W --> V["Saved View<br/>not active-service evidence"]
+  I -. "failure" .-> E["No View<br/>cause and failed stage preserved"]
+  C -. "failure" .-> E
+  W -. "failure or uncertain acknowledgement" .-> E
+  E --> S["Reread both states<br/>never learn witness from configuration"]
+  S --> P["Open intent<br/>ordinary Read and Preview denied"]
+  P --> R["Recover or exact pending request<br/>compare base or target, reauthorize, sync intent"]
+  R -- "exact base" --> C
+  R -- "target already visible" --> D["Sync configuration<br/>no second event or rewrite"]
+  D --> W
+  S -- "already confirmed and consistent" --> B["Both directory barriers"]
+  B --> V
+  O -. "remaining integration" .-> F["OS and backup protection, service, API and Admin<br/>not established by these fixtures"]

@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "preparation_id": "prep-90b5e76df052bba38e4699e6",
+  "event_id": "linked-recovery",
+  "expected_revision": 2,
+  "provider": "api-local",
+  "capability_hash": "c1c2d55d795f393d3774580aad8aad187614496b42559e4695c9d63073b7504e",
+  "message": "Shared budget fixture"
+}

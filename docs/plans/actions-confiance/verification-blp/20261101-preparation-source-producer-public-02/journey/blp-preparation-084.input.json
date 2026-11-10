@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "event_id": "policy-quarantine-renewal",
+  "expected_revision": 1,
+  "expected_trust_revision": 1,
+  "reason": "Explicit fixture quarantine and renewal",
+  "policy": {
+    "schema_version": 1,
+    "levels": [
+      {
+        "id": "public",
+        "name_fr": "Public",
+        "name_en": "Public"
+      },
+      {
+        "id": "secret",
+        "name_fr": "Secret",
+        "name_en": "Secret"
+      }
+    ],
+    "compartments": [
+      "a",
+      "b"
+    ],
+    "clearances": {
+      "admin": {
+        "level": "secret",
+        "compartments": [
+          "a",
+          "b"
+        ]
+      },
+      "worker": {
+        "level": "secret",
+        "compartments": [
+          "a"
+        ]
+      }
+    },
+    "preparation_quarantine": true
+  }
+}

@@ -1,0 +1,76 @@
+flowchart TB
+    accTitle: Swarm supervision: observation, decision, application and recovery
+    accDescr: Observations reach the owning AI supervisor. The engine checks and applies process decisions; result acceptance retains policy-required human validation.
+    subgraph G0["OBSERVATION"]
+        S_WORKER["Running attempt<br/>Tools · output · errors · process"]
+        S_OBSERVE["Deterministic observation<br/>Duration · tool wait · silence<br/>Infrastructure · errors and counters"]
+        S_EVENT["Durable run_observation<br/>scope · task · agent · attempt"]
+    end
+    subgraph G1["AI DECISION"]
+        S_INBOX["Owner inbox<br/>Current / historical events"]
+        S_SCOPE["Owning scope supervisor<br/>Scope diagnosis and decision"]
+        S_ROOT["Root supervisor<br/>Own tasks · cross-scope arbitration"]
+        S_WAIT["Unavailable owner<br/>Signal retained · no invented budget"]
+        S_DECIDE["planning decide<br/>continue-run / stop-run · reason<br/>input_events actually received"]
+    end
+    subgraph G2["APPLICATION"]
+        S_ENGINE["DETERMINISTIC RUST ENGINE<br/>Rights · ownership · revision<br/>Lease · generation · attempt · budgets"]
+        S_RECORD["Decision and reason persisted<br/>Idempotent replay · counters retained"]
+        S_CONTINUE["continue-run<br/>Process and counters retained"]
+        S_STOP["stop-run<br/>Request to the owned process"]
+        S_END["Actual process end confirmed<br/>Before release and settlement"]
+    end
+    subgraph G3["RECOVERY"]
+        S_EFFECT["Observe effect and result<br/>Incident / correction / handoff"]
+        S_REVIEW["Candidate checks and AI review<br/>Fresh evidence · required policy"]
+        S_LEARN["Revise future instructions<br/>Attribution · reception · lessons learned"]
+        S_HUMAN["Human validation · human mode<br/>A PASS does not release downstream work"]
+        S_ACCEPT["Checked result acceptance<br/>Criteria · freshness · required decisions"]
+    end
+    subgraph G4["POLICIES"]
+        S_POLICY["Saved policies and Admin<br/>Observation thresholds ≠ budgets"]
+        S_CALL["Structured inference wait<br/>Liveness · renewed lease · own limits"]
+        S_JUDGE["Root cycle judge<br/>continue → renew · separate end"]
+    end
+    S_WORKER --> S_OBSERVE
+    S_POLICY --> S_OBSERVE
+    S_OBSERVE --> S_EVENT
+    S_EVENT --> S_INBOX
+    S_INBOX -->|Child scope| S_SCOPE
+    S_INBOX -->|Root scope| S_ROOT
+    S_SCOPE -->|Cross-scope dependency| S_ROOT
+    S_INBOX -->|No available decision| S_WAIT
+    S_SCOPE --> S_DECIDE
+    S_ROOT --> S_DECIDE
+    S_DECIDE --> S_ENGINE
+    S_ENGINE --> S_RECORD
+    S_RECORD -->|Continue| S_CONTINUE
+    S_CONTINUE --> S_WORKER
+    S_RECORD -->|Stop| S_STOP
+    S_STOP --> S_END
+    S_END --> S_EFFECT
+    S_EFFECT -->|New facts| S_INBOX
+    S_EFFECT --> S_REVIEW
+    S_EFFECT --> S_LEARN
+    S_ROOT --> S_JUDGE
+    S_JUDGE -->|Separate global operation| S_ENGINE
+    S_CALL -->|Call limits and reservation| S_ENGINE
+    S_REVIEW -->|Human mode| S_HUMAN
+    S_REVIEW -->|Automatic mode| S_ACCEPT
+    S_HUMAN -->|Required human decision| S_ACCEPT
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+    classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+    classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+    class S_WORKER,S_WAIT,S_DECIDE,S_EFFECT,S_REVIEW,S_LEARN,S_HUMAN ordinary;
+    class S_ENGINE core;
+    class S_OBSERVE,S_CONTINUE,S_STOP,S_END,S_POLICY,S_CALL,S_ACCEPT control;
+    class S_SCOPE,S_ROOT,S_JUDGE supervisor;
+    class S_EVENT,S_INBOX,S_RECORD data;
+    style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G1 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G2 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G3 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G4 fill:#f5f3ec,stroke:#205e70,color:#062b49

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "scope": "Current FR/EN quarantine documentation and overview links. Historical evidence remains unchanged. Documentation-only edits after qualified build are not compiled resources.",
+  "status": "PASS",
+  "overview_local_links_checked": 38,
+  "files": {
+    "docs/architecture/BELL-LAPADULA.md": "ad90fbfd30194a0483b5531556f0f40baec23d67ae42f274604578ee3098b57b",
+    "docs/en/BELL-LAPADULA.md": "39172f869a012fad0955c19491c16d5b6985b912bf5228e4f4f3e1913dd67ca8",
+    "docs/architecture/BIBA-RUST.md": "a2da30d2dd5639b00c9a045aa928b10f45b1327f09739f7960e1ac4e2b701793",
+    "docs/en/BIBA-RUST.md": "22ab6b75a8dcdaaf1bd4c6c51a97685b4ef8a97fbb8d0481322794f9c20f556c",
+    "docs/architecture/BLP-FLOWS.md": "0d329e0cac20d824b791041ac17bc5ab312f163927e915a10dc82394f39d5041",
+    "docs/en/BLP-FLOWS.md": "635e73b99d8ccaec5f36687e40b175da7513fd2f2de85b03705378467bce786d",
+    "docs/plans/actions-confiance/BLP-APEX.md": "fd765c337cd3d342fee33c58c18d5b9c05e2a626e686f720e72a0bb9e2a09411",
+    "docs/en/plans/actions-confiance/BLP-APEX.md": "af34a376e5b133caace61a3057e32484eb77c35008c9067d070bbb221578ac08",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "b9e0ee4f4f6040fee4b70d1df282a6a0b0ca2f22e59963091097b6cf16133f7a",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "2461aeb20dd3e68135001c7bc248845ffa3c614651ea4bfdf803d3a5af0b7158"
+  },
+  "claim_limits": [
+    "Scoped quarantine installed299, actual normal profile and compiled notes",
+    "28 public,59 fixture Admin,56 installed readonly browser assertions distinct",
+    "25 OPEN flows; no full BLP, real policy activation, declassification or independent acceptance",
+    "Other concurrent implementation changes not included in this review"
+  ]
+}

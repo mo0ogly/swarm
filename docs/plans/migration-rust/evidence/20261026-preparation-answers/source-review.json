@@ -1,0 +1,177 @@
+{
+  "kind": "scoped-semantic-review-not-global-qualification",
+  "reviewer": "Codex principal; GLM reviews unavailable (three gateway504), not independent acceptance",
+  "baseline": "docs/plans/migration-rust/evidence/20261026-preparation-plan/final-inputs.json",
+  "baseline_sha256": "cdbb0a480a8f23574fd9a18a78c3b082d6964b1113d7eadf25416141810e3ffc",
+  "delivered_version": "v0.1.1-dev.95",
+  "binary_sha256": "ba404609f9f5ddd3060b3b6baa2060922b62ab740c6d02e33ab2775e5c01476c",
+  "effective_input_count": 449,
+  "qualified_build": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-69peqv1h",
+  "entries": [
+    {
+      "path": "rust/crates/swarm-engine/src/preparation_command.rs",
+      "sha256": "57562c212a7b61b3be61c5f9b2b9168ade5f8d656a4bc1199b64668a30d13bf1",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_plan.rs",
+      "sha256": "59134459df5aacbd755198355833b0a84a798202b6da6acabf0323c89260a9e4",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+      "sha256": "ed26844e28b2f52d9c7ec26df4ddd7e8f0d63091f42d9159a1e613fcdd9ef1f5",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/preparation.rs",
+      "sha256": "efc2074c8faf59b1e31bce099b19276a032ad0fdaadc13e7a31fd3467c92e1ac",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/lib.rs",
+      "sha256": "bb7806fc20a5e79620b7d31bc839a4cc309a04a6b1cc6caf2709249bd23a4cb1",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service.rs",
+      "sha256": "d712d2881644eb273246f1a1e94d9041358b9c9adbfdbf62f95cba88004b6722",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "tests/rust_preparation_answers.py",
+      "sha256": "c871009fe73ee8f57a504327f075edcded145593a69396648e1c8abb3003706d",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "tools/verification/recipes/preparation-answers-rust.json",
+      "sha256": "a9426ad0372ebaf8a75e00021081073fb878d72ce929872b586c895e9aab535c",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "version_history.json",
+      "sha256": "7c6dafc35ee7484d11b564aec53b0966c7ab0da2980c8fcae735bc2d546a0bb4",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "docs/RUNTIME-RECOVERY.md",
+      "sha256": "62443070b37745aa523b28175351e150000b4cc2976d737334c6bd6a20d2001e",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "docs/en/RUNTIME-RECOVERY.md",
+      "sha256": "dbd2ed86d5dfaa9f6da478fc517b85e6142e13b35790b7900b6ae7fbcb3acff5",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "sha256": "f94a1664a424b88123bb9133b4d46425bda092900e64cf9eda824281a11a41e5",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "docs/en/RUST-MIGRATION.md",
+      "sha256": "c936ef56dce143c24e17cc29098a1d7ae64528b5685ecc5f71826f2f5981ca30",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "docs/plans/migration-rust/REPLAYS.md",
+      "sha256": "71ba6b44d0beaaf21379ae694002565d3c820b96376e07146cf5a0fef25f868a",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    },
+    {
+      "path": "docs/en/RUST-MIGRATION-REPLAYS.md",
+      "sha256": "cad34ab2a6f4e245f5d62ee329f2457f4ef5fbced1c591b0f3aa378ca0d40110",
+      "scope": "answer-questions delta only; preserve unrelated shared-file changes",
+      "axes": {
+        "policies": "No new operator policy. require_answers is action semantics (draft vs verdict), not a configurable execution policy. Existing v43 plan caps and saved mutation_limits.task are consumed from the same borrowed settings snapshot; final pretty document consumes v42 document_max_bytes. None unlimited and zero reject nonempty; no per-answer cap. JSON/action vocabulary is protocol. Live settings preserved.",
+        "functions": "Reviewed decode/validate/empty_decisions, validate/validate_inner/answer_questions, apply/preparation_command, CLI execute/write and both capabilities producers. Pure helper strict-decodes decisions, preserves typed plan fields, allows unanswered drafts and does not enforce final-only method requirement. Writer clones original document, changes text/hash/revision/at, invalidates verdict; history/receipt share transaction. Rustdoc and bilingual operational contracts describe exact scope.",
+        "errors": "New malformed/count/extra-field cases retain request-invalid; changed ordered question/hash retains stale-document; corrupt stored hash refuses digest-mismatch. Encoding/UTF8 causes are preserved safely. Existing CAS/event/disabled/Root binding/rollback/known publication wrappers retained. Public journey verifies unchanged SQL on refusal, storage rollback/recovery, /dev/full receipt recovery, CSRF, stale HTTP409. No provider/launch/conversion authority.",
+        "documentation": "FR/EN runtime/architecture and replay pages, CLI help, version notes and permanent recipe cover partial answers, current policies, provenance preservation and explicit final validation. Existing preparation page is404 on installed profile; its hidden maxlength4000 remains a recorded UX follow-up, not a claimed qualified surface. Current code/functional evidence is scoped and not global migration acceptance."
+      }
+    }
+  ]
+}

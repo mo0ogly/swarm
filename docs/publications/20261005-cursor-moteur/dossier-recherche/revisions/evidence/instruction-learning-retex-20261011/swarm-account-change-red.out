@@ -1,0 +1,5 @@
+--- FAIL: TestProviderCooldownAccountChangeRequiresExplicitAuditedConfirmation (0.03s)
+    provider_cooldown_test.go:476: confirmed changed account remained blocked json: unknown field "confirm_account_change"
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.058s
+FAIL

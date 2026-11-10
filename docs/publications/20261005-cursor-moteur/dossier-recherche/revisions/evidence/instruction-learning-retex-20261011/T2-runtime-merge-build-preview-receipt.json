@@ -1,0 +1,22 @@
+{
+  "preview_only": true,
+  "installed": false,
+  "candidate_accepted": false,
+  "source_tree_T2": "1ded4021e9c822ccb8b2ce3e427f075bfdc9d7ff",
+  "command": [
+    "go",
+    "build",
+    "-ldflags",
+    "-X swarm.local/companion/internal/engine.buildVersion=devel -X swarm.local/companion/internal/engine.buildCommit=1169df70bec73d50fd23f640245b8ffd1317b9de -X swarm.local/companion/internal/engine.buildModified=true -X swarm.local/companion/internal/engine.buildDate=2026-10-11T12:49:19Z -X swarm.local/companion/internal/engine.buildProvenance=injected",
+    "-o",
+    "/tmp/swarm-T2-runtime-integration-preview-candidate",
+    "./cmd/swarm"
+  ],
+  "cwd": "/tmp/swarm-T2-runtime-integration-check-20261011-vmgw26pa",
+  "start": "2026-10-11T12:49:19.133533+00:00",
+  "end": "2026-10-11T12:49:20.590710+00:00",
+  "exit": 0,
+  "binary": "/tmp/swarm-T2-runtime-integration-preview-candidate",
+  "build_date": "2026-10-11T12:49:19Z",
+  "sha256": "9e645131ba24597be9c78af4c0968e3097df6b8831a7357eb6cba2cdf4edd5e9"
+}

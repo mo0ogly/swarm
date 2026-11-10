@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T17:12:39.903494+00:00",
+  "parent": "review-retry-delivery-20261011.patch",
+  "parent_sha256": "ddb7d6ebfdfc9eca7f2aa43e4c5da537a1e20939dfa386379c695dba72e24dba",
+  "parent_tree": "4df897e2d154d23085af28a7dd15ec96c51b70ca",
+  "preimage_tree": "4df897e2d154d23085af28a7dd15ec96c51b70ca",
+  "preimage_extensions": [],
+  "preimages": {
+    "internal/engine/model.go": "d09e6519e43ffd930d6aeda1a8378ac62aa4c163d4fc23b06a5641ded5b82efb",
+    "internal/engine/store.go": "0c6c29b5ad281591edbfec7acb3aaeef6db21f915132769f9e866642cbd4b2f9",
+    "internal/engine/managed_review_retry_storage_test.go": null,
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "377c6852872a034edb7d66e8535840fb21483dd2da2fe9ee583e248b5ac6d824",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "6902e399226b0dec67d43df097131cec9e3206cdd02356c1608c841244984ec3"
+  },
+  "result_tree": "df4d5cde55580e3ab4533eeeb90baca0674031e1",
+  "patch": "docs/plans/engine-cursor-contract/recovery/review-retry-storage-20261011.patch",
+  "patch_sha256": "57b671f05817cef7d56674fb0435c4959e6d15b727a91dc540b52e0e1954c80b",
+  "paths": [
+    "internal/engine/model.go",
+    "internal/engine/store.go",
+    "internal/engine/managed_review_retry_storage_test.go",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md"
+  ],
+  "postimages": {
+    "internal/engine/model.go": "fadce2e824c4f3ba07f11978d0b0ef557bf31e200e7c15ab3746ed1a24325a5b",
+    "internal/engine/store.go": "475c87496faab62e314a6e20ba749ea22ed4f26e15268e5731615f8e8b2741b4",
+    "internal/engine/managed_review_retry_storage_test.go": "dce74d665fe1b263a00a30d9097775665f0f45ec99c7b85f621884d7623fbd87",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "b2e905069f67e5132b947a5f9f8f7f3c121a1cc6794813551e37c3176559fb7e",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "5b6b4f1b670f19fd4e5b660ec90162c5cd35a31d90881f1958a5bd843dd2250c"
+  },
+  "check": "PASS isolated exact preimages, apply--check, apply and exact result tree",
+  "purpose": "Storage28 prevents older binaries dropping queued review-retry directive; backup without rewriting mission; per-transaction schema guard for already-open writers. Old-process shutdown required before public init."
+}

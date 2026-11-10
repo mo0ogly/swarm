@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "cargo",
+    "check",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "swarm-engine",
+    "--offline"
+  ],
+  "exit": 0,
+  "seconds": 54.890592098236084,
+  "global_watchdog": null
+}

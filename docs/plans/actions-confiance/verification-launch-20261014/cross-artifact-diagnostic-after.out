@@ -1,0 +1,96 @@
+=== RUN   TestDefectCitationNativeLegacyOriginalsRemainRejected
+=== RUN   TestDefectCitationNativeLegacyOriginalsRemainRejected/first
+=== RUN   TestDefectCitationNativeLegacyOriginalsRemainRejected/second
+--- PASS: TestDefectCitationNativeLegacyOriginalsRemainRejected (0.06s)
+    --- PASS: TestDefectCitationNativeLegacyOriginalsRemainRejected/first (0.03s)
+    --- PASS: TestDefectCitationNativeLegacyOriginalsRemainRejected/second (0.02s)
+=== RUN   TestDefectCitationNativeUniqueBytesComputePhysicalLine
+--- PASS: TestDefectCitationNativeUniqueBytesComputePhysicalLine (0.08s)
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/short_entire_patch_line
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/invented_trailing_newline
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/inline_Unicode
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/multiline_original
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/space_normalization
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/line_separator_normalization
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/ambiguous
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/overlapping_ambiguous
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/blank
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/separator_start
+--- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/short_entire_patch_line (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/invented_trailing_newline (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/inline_Unicode (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/multiline_original (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/space_normalization (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/line_separator_normalization (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/ambiguous (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/overlapping_ambiguous (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/blank (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/separator_start (0.00s)
+=== RUN   TestDefectCitationQuoteOnlyRejectsUnrequestedLocationAndUnknownVersion
+--- PASS: TestDefectCitationQuoteOnlyRejectsUnrequestedLocationAndUnknownVersion (0.04s)
+=== RUN   TestDefectCitationMissingArtifactCannotDefaultToZero
+--- PASS: TestDefectCitationMissingArtifactCannotDefaultToZero (0.00s)
+=== RUN   TestDefectCitationNewSchemasKeepHistoricalShape
+--- PASS: TestDefectCitationNewSchemasKeepHistoricalShape (0.07s)
+=== RUN   TestDefectCitationProtocolRestartKeepsMethodAndOldEvidence
+    managed_review_fragment_defect_citation_test.go:215: sizes 164551 168167 21899 parts 1
+--- PASS: TestDefectCitationProtocolRestartKeepsMethodAndOldEvidence (3.81s)
+=== RUN   TestFragmentNestedDefectRestartKeepsMethodAndOldEvidence
+    managed_review_fragment_defect_citation_test.go:219: sizes 164551 168165 21899 parts 1
+--- PASS: TestFragmentNestedDefectRestartKeepsMethodAndOldEvidence (3.56s)
+=== RUN   TestDefectCitationCrossArtifactDiagnosticPreservesOpinion
+=== RUN   TestDefectCitationCrossArtifactDiagnosticPreservesOpinion/1
+=== RUN   TestDefectCitationCrossArtifactDiagnosticPreservesOpinion/2
+--- PASS: TestDefectCitationCrossArtifactDiagnosticPreservesOpinion (0.00s)
+    --- PASS: TestDefectCitationCrossArtifactDiagnosticPreservesOpinion/1 (0.00s)
+    --- PASS: TestDefectCitationCrossArtifactDiagnosticPreservesOpinion/2 (0.00s)
+=== RUN   TestFragmentNestedDefectBinding
+--- PASS: TestFragmentNestedDefectBinding (0.00s)
+=== RUN   TestFragmentNestedDefectInvalidBoundaries
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/inspected_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/unknown_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/fail_without_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/fail_with_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/inspected_with_empty_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/unknown_without_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/global_defects
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/global_null
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/foreign_artifact
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/line_supplied
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/string_anchor
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/missing_anchor
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/altered_quote
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/duplicate_claim
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/too_many_claims
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/array_findings
+--- PASS: TestFragmentNestedDefectInvalidBoundaries (0.01s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/inspected_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/unknown_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/fail_without_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/fail_with_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/inspected_with_empty_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/unknown_without_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/global_defects (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/global_null (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/foreign_artifact (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/line_supplied (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/string_anchor (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/missing_anchor (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/altered_quote (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/duplicate_claim (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/too_many_claims (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/array_findings (0.00s)
+=== RUN   TestFragmentNestedDefectSchemaOracle
+--- PASS: TestFragmentNestedDefectSchemaOracle (0.00s)
+=== RUN   TestFragmentNestedDefectLegacyFormatsStayReadable
+--- PASS: TestFragmentNestedDefectLegacyFormatsStayReadable (0.00s)
+=== RUN   TestFragmentNestedDefectRejectedCitationRemainsDiagnostic
+--- PASS: TestFragmentNestedDefectRejectedCitationRemainsDiagnostic (0.00s)
+=== RUN   TestReviewTimeoutConfigurationPreservesBudgetAndHistory
+--- PASS: TestReviewTimeoutConfigurationPreservesBudgetAndHistory (0.35s)
+=== RUN   TestWebRequestsInvalidAuthenticationAndConcurrentRevision
+--- PASS: TestWebRequestsInvalidAuthenticationAndConcurrentRevision (0.21s)
+PASS
+ok  	swarm.local/companion/internal/engine	9.366s

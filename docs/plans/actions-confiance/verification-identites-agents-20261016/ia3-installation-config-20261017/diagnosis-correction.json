@@ -1,0 +1,9 @@
+{
+  "observed": "tempdir-probe.jsonl logs final mode=0775",
+  "initial_documentation_error": "The first diagnosis note said 0755 before consuming the actual probe result",
+  "cause": "Assumed umask instead of binding prose to measured output",
+  "correction": "Canonical plan now says measured 0775; fixture preparation explicitly sets 0700 regardless of umask",
+  "prevention": "Retain exact diagnostic output and derive the report from it, not a conventional environment default",
+  "owner": "Codex",
+  "scope": "Diagnostic documentation only; no production threshold relaxed"
+}

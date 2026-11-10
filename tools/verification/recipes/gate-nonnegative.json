@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "gate-nonnegative",
+  "inputs": [
+    "rust/crates/swarm-engine/src/gate_json.rs",
+    "rust/crates/swarm-engine/src/gate_evaluation.rs",
+    "rust/crates/swarm-engine/src/gate_contract.rs",
+    "rust/crates/swarm-engine/src/local_path.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "tests/rust_gate_nonnegative.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-native-negative-gate-input-refusal",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,hashlib,subprocess,tempfile\nfrom pathlib import Path\nb=Path(os.environ['SWARM_STATUS_CONTRACT_BINARY']);p=json.loads(Path(os.environ['SWARM_STATUS_CONTRACT_PROFILE']).read_text());assert p['status']=='VERIFIED_DEFAULT_NATIVE_PROFILE' and p['no_fixture_feature'] and p['sha256']==hashlib.sha256(b.read_bytes()).hexdigest()\nout=Path(tempfile.mkdtemp(prefix='gate-numeric-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_gate_nonnegative.py','--binary',str(b),'--output',str(out)],check=True)\nr=json.loads((out/'result.json').read_text());assert r['status']=='PASS' and len(r['checks'])==16 and not r['accepted']\nprint('GATE_NONNEGATIVE_RECIPE_PASS '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": ["GATE_NONNEGATIVE_PASS 16 assertions", "GATE_NONNEGATIVE_RECIPE_PASS"],
+      "required_stderr": []
+    }
+  ]
+}

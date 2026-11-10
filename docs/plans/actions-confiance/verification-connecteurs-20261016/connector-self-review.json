@@ -1,0 +1,7 @@
+{
+  "review": "same-session self-review only",
+  "checked": ["legacy nil-selector digest compatibility via T2 and R16", "typed access parameters and exact mandate/approval binding", "current effect authority and admission at shared boundary", "global idempotency and native readback", "no external effect, plugin or runtime privilege", "exact UI decimal encoding and rendered denial translation"],
+  "original_failures_retained": true,
+  "independent_acceptance": false,
+  "residual_limits": ["simulated local registries", "sensitive providers outside R14 qualification", "R19 and eBPF pending", "global acceptance and RETEX pending"]
+}

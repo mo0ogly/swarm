@@ -20,8 +20,39 @@ Object.assign(Mission,{
   host.append(node('p',trMissionInsights('Mesures observées : ')+(c.observed_at||trMissionInsights('non rapporté'))+' · '+trMissionInsights('Source : ')+(c.measurement_source?trMissionInsights('Horaires des processus, activité reçue, usages fournisseurs et historique des revues.'):trMissionInsights('non rapporté'))));
   for(const [kind,label]of [['worker','Exécutants'],['planner','Responsables'],['reviewer','Vérificateur indépendant']]){const box=node('section',undefined,'mission-current field-wide');box.append(node('h3',trMissionInsights(label)));const rows=c.rows.filter(r=>r.kind===kind);if(!rows.length)box.append(node('p',trMissionInsights('Aucun appel enregistré pour ce rôle.')));for(const r of rows){box.append(node('h4',kind==='worker'?r.label:missionText(r.label)),node('p',r.recorded_calls+trMissionInsights(' tentatives ou appels enregistrés · ')+((r.observed_tool_calls===0&&r.attempts_with_incomplete_tool_measurement>0)?trMissionInsights('Appels d’outils non rapportés.'):r.observed_tool_calls+trMissionInsights(' appels d’outils observés'))),node('p',(r.recorded_calls>0&&r.calls_without_usage>=r.recorded_calls)?trMissionInsights('Jetons non rapportés.'):r.input_tokens+' / '+r.output_tokens+trMissionInsights(' jetons entrée/sortie rapportés · ')+r.calls_without_usage+trMissionInsights(' usages absents')),node('p',missionText(r.cost.attempts_with_cost?(r.cost.reported_usd.toFixed(2)+' USD rapportés sur '+r.cost.attempts_with_cost+' tentative(s)'):'coût réel non rapporté')+(r.cost.attempts_without_cost?' · '+r.cost.attempts_without_cost+trMissionInsights(' sans coût rapporté'):'')));if(r.attempts_with_incomplete_tool_measurement)box.append(node('p',r.attempts_with_incomplete_tool_measurement+trMissionInsights(' mesures d’outils incomplètes'),'notice attention'));if(kind==='worker')box.append(node('p',trMissionInsights('Durée cumulée des processus : ')+duration(r.recorded_process_ms)+' · '+r.attempts_without_duration+trMissionInsights(' durée(s) non rapportée(s)')),node('p',r.reviews_recorded+trMissionInsights(' revue(s) enregistrée(s) pour cette tâche · ')+r.task_retries+trMissionInsights(' reprise(s) pour cette tâche')))}host.append(box)}
   host.append(node('p',trMissionInsights('Les durées de processus additionnées ne sont pas la durée écoulée de la mission.'),'notice info'));
-  host.append(this.attemptsView(c.attempts));
+  host.append(this.attemptsView(c.attempts),this.callsView(c.calls));
   host.append(node('h3',trMissionInsights('Moteur')),node('p',c.recorded_control_executions+trMissionInsights(' contrôles enregistrés · ')+c.worker_retries+trMissionInsights(' reprises d’agents')),node('p',missionText(c.note),'notice info'));return host;
+ },
+ callsView(rows){
+  const host=node('details',undefined,'field-wide');host.dataset.callLedger='calls';
+  host.append(node('summary',trMissionInsights('Voir le registre des appels et réservations')+' · '+(rows?.length??trMissionInsights('non rapporté'))));
+  const body=node('section',undefined,'field-wide');host.append(body);let rendered=false;
+  const render=()=>{
+   if(!host.open||rendered)return;rendered=true;
+   body.append(node('p',trMissionInsights('Chaque ligne est une réservation ou tentative enregistrée, pas la preuve d’une inférence envoyée. Les caches restent séparés des jetons bruts et le coût rapporté n’est pas une facture.'),'notice info'));
+   if(!rows)body.append(node('p',trMissionInsights('Registre détaillé indisponible pour cette version.')));
+   else if(!rows.length)body.append(node('p',trMissionInsights('Aucun appel enregistré.')));
+   for(const call of rows||[]){
+    const box=node('article',undefined,'mission-current');box.dataset.providerCall=call.id;
+    const role=trMissionInsights(({worker:'Exécutant',planner:'Responsable',reviewer:'Vérificateur indépendant'})[call.kind]||'Rôle inconnu');
+    box.append(node('h4',role+' · '+call.id));
+    if(call.task)box.append(node('p',trMissionInsights('Tâche : ')+call.task+' · '+trMissionInsights('Tentative : ')+(call.attempt||trMissionInsights('non rapporté'))));
+    if(call.scope)box.append(node('p',trMissionInsights('Périmètre : ')+call.scope));
+    const states=call.record_type==='planning_reservation'?{estimated:'Réservation enregistrée',finished:'Réservation clôturée'}:{completed:'Processus terminé',failed:'Processus en échec',interrupted:'Processus interrompu',running:'Processus en cours',queued:'Démarrage en attente',starting:'Démarrage en cours',stopping:'Arrêt en cours'};
+    box.append(node('p',trMissionInsights('État enregistré : ')+trMissionInsights(states[call.state]||'État du processus inconnu')));
+    if(call.registered_at)box.append(node('p',trMissionInsights('Horodatage enregistré : ')+this.readableDate(call.registered_at)));
+    box.append(node('p',call.provider?trMissionInsights('Fournisseur : ')+call.provider:trMissionInsights('Fournisseur historique non attribuable.')));
+    box.append(node('p',call.requested_model?trMissionInsights('Modèle demandé : ')+call.requested_model:trMissionInsights('Modèle historique non attribuable.')));
+    if(call.observed_model)box.append(node('p',trMissionInsights('Modèle rapporté : ')+call.observed_model));
+    const usage=call.usage;
+    box.append(node('p',usage?usage.input_tokens+' / '+usage.output_tokens+trMissionInsights(' jetons entrée/sortie rapportés'):trMissionInsights('Usage non rapporté.')));
+    if(usage)for(const [key,label]of [['cached_input_tokens','Entrée en cache'],['cache_read_input_tokens','Cache lu'],['cache_creation_input_tokens','Cache créé']]){
+     if(usage[key]!==undefined&&usage[key]!==null)box.append(node('p',trMissionInsights(label)+' : '+usage[key]+trMissionInsights(' jetons déclarés (non additionnés).')));
+    }
+    box.append(node('p',usage?.provider_reported_cost_usd!==undefined&&usage.provider_reported_cost_usd!==null?usage.provider_reported_cost_usd+' USD · '+trMissionInsights('Coût rapporté, facture non vérifiée.'):trMissionInsights('Coût non rapporté.')));
+    body.append(box);
+   }
+  };host.addEventListener('toggle',render);return host;
  },
  attemptsView(rows){
   const host=node('section',undefined,'field-wide');host.append(node('h3',trMissionInsights('Bilan par tentative')),node('p',trMissionInsights('Un départ enregistré n’est pas un appel au modèle. Les appels internes du fournisseur ne sont pas mesurés.'),'notice info'));
@@ -43,6 +74,13 @@ Object.assign(Mission,{
  spending(){this.readOnly(trMissionInsights('Où vont les appels et les coûts ?'),trMissionInsights('Appels IA, outils et contrôles sont présentés séparément.')).append(this.spendingView(snapshot.mission.spending))},
  recoveryPreviewView(p){
   const box=node('section',undefined,'field-wide');box.dataset.recoveryPreview=p.task;box.append(node('h3',trMissionInsights('Avant une relance')));
+  if(p.dialogue){
+   const dialogue=node('section',undefined,'mission-current field-wide');dialogue.dataset.dialogueRecovery=p.dialogue.recommended_path;
+   dialogue.append(node('h4',trMissionInsights('Reprise de conversation')),node('p',missionText(p.dialogue.recommendation),'notice attention'),node('p',trMissionInsights(p.dialogue.resume_supported?'Une reprise explicite crée une nouvelle tentative avec la même conversation ; cet aperçu ne lance aucun agent.':'La restauration de conversation n’est pas disponible ; cet aperçu ne lance aucun agent.')));
+   const labels={pass:'Vérifié',fail:'Bloquant',unknown:'Non vérifié'},checks=node('ul'),passed=node('ul');
+   for(const check of p.dialogue.checks||[]){const row=node('li',trMissionInsights(labels[check.status]||'Non vérifié')+' · '+missionText(check.message));row.dataset.dialogueCheck=check.code;row.dataset.checkStatus=check.status;(check.status==='pass'?passed:checks).append(row)}
+   dialogue.append(checks);if(passed.children.length){const verified=node('details');verified.dataset.dialogueVerified='';verified.append(node('summary',trMissionInsights('Voir les contrôles vérifiés')),passed);dialogue.append(verified)}if(p.dialogue.resume_supported)dialogue.append(this.dialogueRestoreForm(p));box.append(dialogue);
+  }
   box.append(node('h4',trMissionInsights('Depuis le refus')),node('p',missionText(p.refusal_note||'Historique du refus indisponible ; aucun changement n’est supposé.')));
   if(p.since_refusal){const list=node('ul');for(const item of p.since_refusal.items||[])list.append(node('li','r'+item.revision+' · '+item.at+' · '+missionText(item.label)));box.append(list);if(p.since_refusal.more)box.append(node('p',trMissionInsights('Historique partiel : d’autres événements restent à examiner.'),'notice attention'))}
   box.append(node('h4',trMissionInsights('Preuves à reprendre')),node('p',missionText(p.evidence_note||'Aucune preuve liée à un avis disponible ; réutilisation non démontrée.')));
@@ -55,7 +93,25 @@ Object.assign(Mission,{
   for(const [label,items]of [['Ce qui sera conservé',p.kept],['Ce qui sera refait',p.redone],['Critères inchangés',p.criteria]]){box.append(node('h4',trMissionInsights(label)));const list=node('ul');for(const item of items||[])list.append(node('li',label==='Critères inchangés'?item:missionText(item)));box.append(list)}
   box.append(node('h4',trMissionInsights('Correction attendue')),node('p',p.correction||trMissionInsights('À préciser avant confirmation.')),node('p',missionText(p.limits),'notice info'));return box;
  },
- async recoveryPreview(id){const requested=work,host=this.readOnly(trMissionInsights('Avant une relance'),trMissionInsights('Relisez la correction et les critères ; aucune action n’est exécutée ici.')),context=modalContext;host.append(node('p',trMissionInsights('Chargement de l’aperçu de reprise…')));try{const p=await api('/api/v1/recovery-preview?'+new URLSearchParams({work:requested,task:id}));if(modalContext===context&&work===requested&&host.isConnected)host.replaceChildren(this.recoveryPreviewView(p))}catch(e){if(modalContext===context&&host.isConnected)host.replaceChildren(node('p',trMissionInsights('Aperçu de reprise indisponible : ')+e.message,'notice attention'))}},
+ dialogueRestoreForm(p){
+  const details=node('details');details.dataset.dialogueResumeForm='';details.append(node('summary',trMissionInsights('Demander une reprise de conversation')),node('p',trMissionInsights('Les plafonds de tentatives et le budget restent applicables. Les gardes sont cumulées ; la consommation antérieure reste conservée.'),'notice attention'));
+  const reason=node('textarea'),instruction=node('textarea'),confirmation=node('input'),state=node('p');reason.rows=2;instruction.rows=4;confirmation.type='checkbox';state.setAttribute('role','status');
+  reason.id='dialogue-resume-reason-'+p.agent;instruction.id='dialogue-resume-instruction-'+p.agent;confirmation.id='dialogue-resume-confirm-'+p.agent;
+  reason.dataset.dialogueResumeReason='';instruction.dataset.dialogueResumeInstruction='';confirmation.dataset.dialogueResumeConfirm='';state.dataset.dialogueResumeState='';
+  for(const [input,text]of [[reason,'Motif de la reprise'],[instruction,'Nouvelle consigne'],[confirmation,'Je confirme la nouvelle tentative sur cette frontière examinée.']]){const label=node('label',trMissionInsights(text),'field-wide');label.htmlFor=input.id;label.append(input);details.append(label)}
+  const event=crypto.randomUUID(),context=modalContext;
+  const submit=Pilot.command(trMissionInsights('Confirmer et reprendre'),async()=>{
+   if(context!==modalContext||work!==p.work||!details.isConnected)return;
+   if(!confirmation.checked){state.textContent=trMissionInsights('Confirmez la reprise après examen de cette frontière.');state.className='notice attention';confirmation.focus();return}
+   submit.disabled=true;state.textContent=trMissionInsights('Vérification et demande de reprise…');state.className='notice info';
+   try{const reply=await api('/api/v1/dialogue-resume?'+new URLSearchParams({work:p.work,agent:p.agent}),{schema_version:1,event_id:event,expected_revision:p.revision,checkpoint_sha256:p.dialogue.boundary.sha256,facts_sha256:p.dialogue.facts_sha256,confirm:confirmation.checked,reason:reason.value,instruction:instruction.value});
+    if(context!==modalContext||!details.isConnected)return;reason.disabled=true;instruction.disabled=true;confirmation.disabled=true;
+    state.textContent=trMissionInsights('Reprise demandée ; attendre la confirmation de session. Nouvelle tentative : ')+reply.agent.id;state.dataset.dialogueResumeAgent=reply.agent.id;
+    details.append(Pilot.command(trMissionInsights('Voir la tâche et ses tentatives'),()=>{closeModal();Pilot.inspect('task',p.task)}));
+   }catch(e){if(context===modalContext&&details.isConnected){state.textContent=e.message;state.className='notice attention';submit.disabled=false}}
+  });submit.dataset.dialogueResumeSubmit='';details.append(state,submit);return details;
+ },
+ async recoveryPreview(id){const requested=work,host=this.readOnly(trMissionInsights('Avant une relance'),trMissionInsights('Examinez le diagnostic. Une reprise exige une confirmation explicite.')),context=modalContext;host.append(node('p',trMissionInsights('Chargement de l’aperçu de reprise…')));try{const p=await api('/api/v1/recovery-preview?'+new URLSearchParams({work:requested,task:id}));if(modalContext===context&&work===requested&&host.isConnected)host.replaceChildren(this.recoveryPreviewView(p))}catch(e){if(modalContext===context&&host.isConnected)host.replaceChildren(node('p',trMissionInsights('Aperçu de reprise indisponible : ')+e.message,'notice attention'))}},
  insightButtons(controls){for(const [label,action,id]of [['Depuis votre dernière visite',()=>this.changes(),'changes'],['Pourquoi cette tâche attend ?',()=>this.waits(),'waits'],['Où vont les appels et les coûts ?',()=>this.spending(),'spending']]){const b=Pilot.command(trMissionInsights(label),action);b.dataset.missionAction=id;controls.append(b)}},
  taskInsightButtons(row,t){if(t.waiting_on?.length||t.state==='waiting'){const b=Pilot.command(trMissionInsights('Pourquoi cette tâche attend ?'),()=>this.waits(t.id));b.dataset.missionAction='waits-'+t.id;row.append(b)}if(['intervention','review','manual','ready'].includes(t.state)){const b=Pilot.command(trMissionInsights('Avant une relance'),()=>this.recoveryPreview(t.id));b.dataset.missionAction='recovery-preview-'+t.id;row.append(b)}}
 });

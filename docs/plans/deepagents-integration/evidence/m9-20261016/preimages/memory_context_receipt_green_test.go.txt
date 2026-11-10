@@ -1,0 +1,203 @@
+//go:build linux
+
+package engine
+
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func TestMemoryPreparedContextIncludesManagedDelivery(t *testing.T) {
+	s, w := managedFixture(t)
+	r := Launch{Schema: 1, EventID: "memory-managed-context", Revision: w.Revision, TaskID: "first", Provider: "managed-review-fixture", Role: "worker", Instruction: "Inspect the bounded fixture", Timeout: 60}
+	a, _, err := s.prepareLaunch(w.ID, r, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if a.DeliveryVersion != 2 || a.Context == nil {
+		t.Fatal("managed delivery contract not included")
+	}
+	if a.Context.SHA256 != hash([]byte(a.Prompt)) || a.Context.Bytes != len(a.Prompt) {
+		t.Fatalf("prepared manifest excludes engine delivery instructions: manifest bytes=%d prompt bytes=%d", a.Context.Bytes, len(a.Prompt))
+	}
+}
+
+func memoryReceiptFixture(t *testing.T) (*Store, Agent, Agent, string) {
+	t.Helper()
+	s := storeTest(t)
+	w, request := setupAgent(t, s)
+	script := filepath.Join(t.TempDir(), "claude")
+	if err := os.WriteFile(script, []byte("#!/bin/sh\ncat >\"$0.prompt\"\nprintf 'call\\n' >>\"$0.calls\"\nprintf '%s\\n' '{\"type\":\"result\",\"result\":\"fixture completed\"}'\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := json.Marshal(Providers{Schema: 1, Providers: map[string]Provider{"fixture": {Command: script}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	first, _, err := s.prepare(w.ID, request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first.Progress.ToolCalls, first.Progress.ToolResults = 2, 2
+	first.Usage = &Usage{Input: 17, Output: 3}
+	if err := s.finishAgent(first, "failed", "Interrupted fixture; inspect retained effects", nil); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.log(first.ID, "activity", "Write · retained-effect.txt"); err != nil {
+		t.Fatal(err)
+	}
+	w, err = s.get(w.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.EventID, request.Revision = "memory-recovery-receipt", w.Revision
+	second, _, err := s.prepare(w.ID, request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err = s.agent(first.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return s, first, second, script
+}
+
+func TestMemoryRuntimeRecoveryContextMatchesProviderAndPersists(t *testing.T) {
+	s, first, second, script := memoryReceiptFixture(t)
+	before, err := json.Marshal(first)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.supervise(second.ID); err != nil {
+		t.Fatal(err)
+	}
+	reopened, err := openStore(s.root, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.db.Close()
+	stored, err := reopened.agent(second.ID)
+	if err != nil || stored.Status != "completed" {
+		t.Fatal("local provider did not complete", err)
+	}
+	observed, err := os.ReadFile(script + ".prompt")
+	if err != nil || string(observed) != stored.Prompt || !strings.Contains(string(observed), "retained-effect.txt") {
+		t.Fatal("actual recovery input not preserved", err)
+	}
+	if stored.Context == nil || stored.Context.SHA256 != hash(observed) || stored.Context.Bytes != len(observed) {
+		t.Fatalf("runtime manifest excludes recovery input: received %d bytes", len(observed))
+	}
+	if stored.PreparedContext == nil || second.Context == nil || stored.PreparedContext.SHA256 == "" {
+		t.Fatal("prepared receipt absent")
+	}
+	prepared, _ := json.Marshal(stored.PreparedContext)
+	original, _ := json.Marshal(second.Context)
+	if string(prepared) != string(original) || !strings.HasPrefix(stored.Prompt, second.Prompt) || hash([]byte(stored.Prompt[:stored.PreparedContext.Bytes])) != stored.PreparedContext.SHA256 {
+		t.Fatal("prepared receipt or prompt prefix rewritten")
+	}
+	prior, err := reopened.agent(first.ID)
+	after, marshalErr := json.Marshal(prior)
+	if err != nil || marshalErr != nil || string(after) != string(before) || prior.Progress.ToolCalls != 2 || prior.Usage == nil || prior.Usage.Input != 17 || prior.Usage.Output != 3 {
+		t.Fatal("earlier attempt or consumption rewritten", err, marshalErr)
+	}
+	work, err := reopened.get(second.WorkID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, err := work.task(second.TaskID)
+	if err != nil || task.Status == "accepted" || len(task.Attempts) != 2 || task.Attempts[0].ID != first.Attempt || task.Attempts[1].ID != second.Attempt {
+		t.Fatal("attempt history changed or implicitly accepted", err)
+	}
+	calls, err := os.ReadFile(script + ".calls")
+	if err != nil || string(calls) != "call\n" {
+		t.Fatal("local provider repeated", err)
+	}
+	if out := os.Getenv("SWARM_MEMORY_RECEIPT_OUT"); out != "" {
+		if !filepath.IsAbs(out) {
+			t.Fatal("output must be absolute")
+		}
+		if err := os.Mkdir(out, 0700); err != nil {
+			t.Fatal("output must be new", err)
+		}
+		snapshot, err := json.MarshalIndent(stored, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		for name, raw := range map[string][]byte{"prepared-prompt.txt": []byte(second.Prompt), "provider-input.txt": observed, "agent-after-reopen.json": snapshot, "prior-before.json": before, "prior-after.json": after} {
+			if err := os.WriteFile(filepath.Join(out, name), raw, 0600); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+}
+
+func TestMemoryRuntimeContextCapacityStopsBeforeProvider(t *testing.T) {
+	s, _, second, script := memoryReceiptFixture(t)
+	second.Prompt += strings.Repeat("x", agentContextTransportBytes-len(second.Prompt)-1)
+	second.Context.SHA256, second.Context.Bytes = hash([]byte(second.Prompt)), len(second.Prompt)
+	if err := s.saveAgent(second); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.supervise(second.ID); err != nil {
+		t.Fatal(err)
+	}
+	stored, err := s.agent(second.ID)
+	if err != nil || stored.Status != "failed" || !strings.Contains(stored.Activity, "128000") || stored.Prompt != second.Prompt {
+		t.Fatal("capacity refusal lost or mutated original input", err)
+	}
+	if _, err := os.Stat(script + ".calls"); !os.IsNotExist(err) {
+		t.Fatal("provider invoked despite capacity refusal", err)
+	}
+}
+
+func TestMemoryRuntimeContextWriteFailureStopsBeforeProvider(t *testing.T) {
+	s, _, second, script := memoryReceiptFixture(t)
+	// Only the final starting-state input save is rejected. The failure record
+	// remains writable, so the fixture also verifies the observable failure state.
+	_, err := s.db.Exec(`CREATE TRIGGER reject_fixture_input BEFORE UPDATE ON agents
+ WHEN NEW.id='memory-recovery-receipt' AND NEW.status='starting'
+ AND instr(CAST(NEW.body AS TEXT), '"prepared_context"') > 0
+ BEGIN SELECT RAISE(ABORT, 'fixture final context write rejected'); END`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.supervise(second.ID); err != nil {
+		t.Fatal(err)
+	}
+	stored, err := s.agent(second.ID)
+	if err != nil || stored.Status != "failed" || !strings.Contains(stored.Activity, "fixture final context write rejected") {
+		t.Fatal("write refusal not preserved", err)
+	}
+	if _, err := os.Stat(script + ".calls"); !os.IsNotExist(err) {
+		t.Fatal("provider invoked before input was durable", err)
+	}
+}
+
+func TestMemoryContextBindingPreservesMetadataAndRefusesOverflow(t *testing.T) {
+	manifest := &ContextManifest{SHA256: hash([]byte("base")), Bytes: 4, Memory: []MemoryReference{{Work: "source", ID: "lesson", Version: 1, SHA256: strings.Repeat("a", 64)}}, Paths: []string{"memory.txt"}}
+	a := Agent{Prompt: "base", Context: manifest}
+	if err := appendAgentRecoveryContext(&a, "é"); err != nil {
+		t.Fatal(err)
+	}
+	if a.Context.Bytes != 6 || a.Context.SHA256 != hash([]byte("baseé")) || manifest.Bytes != 4 || a.PreparedContext == a.Context || len(a.Context.Memory) != 1 || a.Context.Paths[0] != "memory.txt" {
+		t.Fatal("manifest copied incorrectly")
+	}
+	before, _ := json.Marshal(a)
+	if err := appendAgentRecoveryContext(&a, strings.Repeat("x", agentContextTransportBytes)); err == nil {
+		t.Fatal("overflow accepted")
+	}
+	after, _ := json.Marshal(a)
+	if string(before) != string(after) {
+		t.Fatal("overflow mutated original receipt")
+	}
+	legacy := Agent{Prompt: strings.Repeat("x", agentContextTransportBytes)}
+	if err := appendAgentRecoveryContext(&legacy, ""); err != nil || legacy.Context == nil || legacy.Context.Bytes != agentContextTransportBytes || legacy.PreparedContext != nil {
+		t.Fatal("exact capacity or absent legacy receipt mishandled", err)
+	}
+}

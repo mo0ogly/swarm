@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "go-rust-closed-cutover",
+  "inputs": [
+    "tests/rust_cutover_go_root.py",
+    "tests/rust_agent_model_route.py",
+    "tools/rust-migration/cutover_snapshot.py",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_schema.rs",
+    "docs/architecture/GO-RUST-CUTOVER.md",
+    "docs/en/GO-RUST-CUTOVER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "cold-data-migration-restore",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='cutover-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_cutover_go_root.py','--go-binary',os.environ['SWARM_CUTOVER_GO_BINARY'],'--rust-binary',os.environ['SWARM_CUTOVER_RUST_BINARY'],'--output',str(p)],check=True)\nprint('CUTOVER_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "GO_RUST_CLOSED_CUTOVER_VERIFIED 10"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

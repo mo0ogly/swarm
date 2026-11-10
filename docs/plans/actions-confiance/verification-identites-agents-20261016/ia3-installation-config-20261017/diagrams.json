@@ -1,0 +1,90 @@
+[
+  {
+    "language": "fr",
+    "format": "svg",
+    "command": [
+      "mmdc",
+      "-i",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/config-fr.mmd",
+      "-o",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/config-fr.svg",
+      "-c",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1900",
+      "-H",
+      "2100"
+    ],
+    "start": "2026-10-17T12:48:14.723167+00:00",
+    "end": "2026-10-17T12:48:27.950087+00:00",
+    "exit": 0
+  },
+  {
+    "language": "fr",
+    "format": "png",
+    "command": [
+      "mmdc",
+      "-i",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/config-fr.mmd",
+      "-o",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/config-fr.png",
+      "-c",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1900",
+      "-H",
+      "2100"
+    ],
+    "start": "2026-10-17T12:48:14.724232+00:00",
+    "end": "2026-10-17T12:48:28.524564+00:00",
+    "exit": 0
+  },
+  {
+    "language": "en",
+    "format": "svg",
+    "command": [
+      "mmdc",
+      "-i",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/config-en.mmd",
+      "-o",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/config-en.svg",
+      "-c",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1900",
+      "-H",
+      "2100"
+    ],
+    "start": "2026-10-17T12:48:14.725861+00:00",
+    "end": "2026-10-17T12:48:27.938638+00:00",
+    "exit": 0
+  },
+  {
+    "language": "en",
+    "format": "png",
+    "command": [
+      "mmdc",
+      "-i",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/config-en.mmd",
+      "-o",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/config-en.png",
+      "-c",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1900",
+      "-H",
+      "2100"
+    ],
+    "start": "2026-10-17T12:48:14.728458+00:00",
+    "end": "2026-10-17T12:48:28.504331+00:00",
+    "exit": 0
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "message": "The expression evaluated to a falsy value:\n\n  assert((await page.$eval('#connector-status',e=>e.textContent)).includes(lang==='fr'?'séparation':'separation'))\n",
+  "stack": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert((await page.$eval('#connector-status',e=>e.textContent)).includes(lang==='fr'?'séparation':'separation'))\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_connectors_ui.cjs:21:347",
+  "checks": [
+    "exact integer 9007199254740993 is approved through UI without Number rounding",
+    "fr: Admin creates an exact simulated access mandate",
+    "fr: requester creates distinct access action through public UI",
+    "fr: requester cannot approve, visible refusal and no effect",
+    "fr: separate approver submits connector and parameters exactly",
+    "fr: effect role commits once; repeated operation preserves one access and no billing",
+    "fr: distinct access result, translated parameters, 44px keyboard control and no overflow",
+    "en: Admin creates an exact simulated access mandate",
+    "en: requester creates distinct access action through public UI"
+  ],
+  "errors": [],
+  "status": "séparation demandeur/approbateur ou intégrité insuffisante"
+}

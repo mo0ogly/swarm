@@ -1,0 +1,329 @@
+# IA2 — contrat d'identité, création et délégation des agents
+
+16 octobre 2026. Codex seul, développement direct. Références :
+[plan conservé](identites-agents-replan.md),
+[contre-exemples IA1](verification-identites-agents-20261016/RAPPORT-IA1.md) et
+[variantes de couverture](verification-identites-agents-20261016/COUVERTURE-RISQUES.md).
+
+**Contrat cible non raccordé aux lanceurs et non accepté par le moteur.**
+Le 17 octobre, un noyau privé IA2.2 est implémenté et vérifié localement ; voir
+le [contrat concret FR/EN](../../architecture/AGENT-IDENTITY-CONTRACT.md) et le
+[rapport IA2.2](verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md).
+Ce document conserve les décisions sémantiques. Il ne crée aucun endpoint,
+commande, permission active ou identité réelle.
+IA2 n'est pas terminé par la seule rédaction de ce document.
+
+## Producteurs réels et frontières à préserver
+
+| Contrat actuel inspecté | Réalité observée | Conséquence pour la cible |
+| --- | --- | --- |
+| `TrustIdentityContext`, `trust_identity_context.go` | `principal_kind` est `local`, `human` ou `service` ; issuer, sujet, session, rôles effectifs, révision et assurance sont produits après résolution. | Réutiliser ces résultats côté contrôle ; aucun champ reçu d'un agent ne les remplace. Un service fournisseur partagé n'identifie pas chaque instance. |
+| `TrustIdentityInput`, `validateTrustIdentities` | Identité locale administrée ; rôles actuels `requester`, `approver`, `admin`, `effect`. | Aucun rôle de création d'agent n'existe encore. Ne pas présenter ces rôles métier comme une autorisation de création ou ajouter un rôle contournant le plafond local. |
+| `trustConfig`, `trust_actions_cli.go`, `trust_actions_http.go` | L'administration locale/cockpit configure le producteur d'identité ; `trustConfig` n'accepte pas un principal authentifié comme argument. | Protéger aussi l'administration de l'émetteur, des correspondances et des droits. Vérifier une identité issue d'une configuration que l'agent peut réécrire serait circulaire. |
+| `TrustStepUpPolicy` et liaison de `trust_step_up.go` | Le renforcement existant vise uniquement l'opération `approve` et une action Trust avec digest/mandat/sujet. | Une preuve liée à une ancienne action ne peut pas approuver une création d'agent. Étendre explicitement le contrat sans réinterpréter silencieusement ses champs. |
+| `Launch`, `prepareLaunch` | Identifiant idempotent fourni par le client, fournisseur, rôle et filiation déclarés ; aucun principal de création. | Conserver l'idempotence de la demande mais attribuer séparément l'identité de l'instance et l'autorisation côté contrôle. Authentifier avant de retourner un ancien résultat. |
+| `Agent`, `supervise`, `processStamp`, `hostIdentity` | Tentative, mission, tâche, PID et marque de démarrage ; processus sous le compte actuel. | Les identifiants de processus contribuent à l'ancrage, sans suffire à prouver l'autorité. Le stockage et les clés doivent être inaccessibles aux processus fournisseurs. |
+| `PlanningScope` | Détenteur de bail, génération, version, portée et budget d'activation. | Lier l'autorité à la portée/version ; un détenteur de bail ou un texte de plan ne devient pas un principal. |
+| `Store`, `withTrustPublicationLockUsing` | SQLite mission et JSON Trust séparés, verrou fichier Trust ; un simple enchaînement n'est pas une transaction distribuée. | Définir ordre de verrous, point d'engagement et reprise avant d'intégrer. Aucun contrôle d'identité frais ne doit être rendu périmé par une attente. |
+| `stopAgent` | Persiste une intention d'arrêt ; le superviseur confirme ensuite l'effet. | Ne pas confondre demande d'arrêt, refus des nouveaux droits et extinction réelle du processus. |
+
+Les chemins sont relatifs à la racine du dépôt. Cette inspection ne requalifie
+pas les anciens tests R13 sur le candidat futur.
+
+## Objets à distinguer
+
+Les types privés et leur représentation JSON sont désormais décrits dans le
+contrat concret IA2.2. Ils ne sont pas des champs de `Launch` ni une nouvelle API.
+Le producteur d'autorité protégé, le stockage engagé et les consommateurs de
+lancement restent à raccorder avant l'intégration IA3.
+
+1. **Principal** : humain, service ou accès local vérifié par le mécanisme
+   approprié. L'identité externe est liée à l'émetteur et au sujet vérifiés ;
+   un libellé ou un sujet isolé n'est pas une clé universelle.
+2. **Agent logique** : responsabilité autorisée dans une mission/portée, stable
+   au remplacement d'un exécutant. Il n'est ni le fournisseur, ni le propriétaire
+   métier du cadrage, ni une session humaine.
+3. **Instance** : activation attribuée par le contrôle, rattachée à cet agent
+   logique, sa mission, tâche ou activation de rôle, tentative, génération et
+   contexte exact. Une instance remplacée ne reçoit aucun droit du remplaçant.
+4. **Ancrage d'exécution** : preuve contrôlée de la liaison entre une instance
+   et son canal/processus autorisé. Un secret copiable, le PID seul, un rôle dans
+   un prompt ou un identifiant de bail ne suffisent pas. Les sous-processus
+   autorisés d'outils restent dans le périmètre de l'instance ; ils ne deviennent
+   pas de nouveaux agents Swarm par filiation système.
+5. **Autorisation** : droits exacts et éventuellement délégables, destination,
+   version du plan, capacités, données, réservations et condition de validité.
+   Le contrôle conserve l'autorité dont elle dérive et son état de révocation.
+6. **Demande et décision** : proposition identifiée puis décision attribuée,
+   portant sur un contenu exact. L'identifiant de demande reste distinct de
+   l'identité attribuée à l'instance et de la décision humaine éventuelle.
+7. **Effet observé** : admission durable, départ confirmé, arrêt constaté ou
+   résultat incertain. Ni un journal d'intention ni une réponse perdue ne
+   permettent de fabriquer l'état de l'effet.
+
+Un ancien `Agent.ID` ou `event_id` conserve sa signification historique. Aucune
+migration ne doit réécrire un auteur, une tentative ou une preuve pour fabriquer
+un principal authentifié après coup.
+
+## Décisions sémantiques
+
+### Création et délégation
+
+Une création prévue exige un plan **adopté et courant**, un demandeur authentifié,
+une autorité de création couvrant le contenu exact et les contrôles actuels de
+schéma, prérequis, réservation et fournisseur. Le plan seul n'accorde aucun droit.
+L'admission précède également les précontrôles et métadonnées fournisseur pouvant
+exécuter un programme, pas seulement le processus final de travail.
+
+Un enfant reçoit au plus l'intersection des droits délégués explicitement par
+son parent, de l'autorité locale actuelle et du contenu admis. La filiation
+persistée vient du contrôle ; une filiation déclarée ne crée pas une délégation.
+Le remplacement et la reconnexion exigent une admission actuelle ; ils ne
+réactivent pas automatiquement une autorisation consommée, suspendue ou importée.
+
+La cible inclut workers, responsables racine/enfants, vérificateurs, tours de
+préparation/assistant, reprises, dispatch, terminal/dialogue, sondes et métadonnées.
+Une activation sans ligne `Agent` doit avoir un rattachement d'autorité vérifiable.
+
+### Exception et approbation humaine
+
+Une exception hors plan est une demande motivée **sans départ ni réservation
+de travail implicite**. L'écran et les sorties structurées présentent le
+demandeur, l'enfant proposé, l'écart au plan, les droits, données, ressources,
+coût prévu, risques et empreinte exacte à approuver. Une demande malformée ou
+non dérogeable reste refusée, sans circuit d'approbation qui la rendrait valide.
+
+La décision positive vient d'une personne réellement authentifiée et habilitée,
+distincte du demandeur, avec assurance vérifiée et liée à cette décision précise.
+La session cockpit seule, les accès locaux, les services et les agents ne sont
+pas des preuves de personne. Une identité d'agent ne peut pas se transformer en
+approbateur en appelant un service privilégié ou en choisissant un autre rôle.
+Une authentification renforcée pour une action différente n'est pas transférable.
+
+Aucune identité humaine n'est créée depuis le premier appelant. Le bootstrap
+de l'administrateur et des autorités de création doit être explicite, extérieur
+au canal des agents et protégé après initialisation. Les modifications d'issuer,
+mapping, droits, révocation et récupération passent aussi par cette autorité ;
+le contrôle du seul lancement serait insuffisant.
+
+Une approbation invalide dès qu'un élément couvert change. Refus humain,
+expiration ou absence de réponse ne deviennent jamais une approbation par délai.
+Une absence d'autorité configurée bloque l'opération ; elle ne crée pas de mode
+de secours permettant de désactiver les invariants.
+
+### Révocation des instances actives — résolution de COV-ID-04
+
+La cible retient le **retrait immédiat des droits sur le plan de contrôle**, dès
+la prise en compte durable de la révocation. Aucun nouveau départ, enfant, octroi
+de secret, usage de mémoire ou effet contrôlé ne peut alors être engagé par les
+autorisations révoquées. Les droits dérivés de cette autorité sont révoqués aussi,
+y compris ceux des descendants. La réactivation ultérieure ne les restaure pas.
+
+Pour les instances actives concernées, le contrôle demande l'arrêt via le
+mécanisme supervisé et suit la confirmation d'extinction dans le périmètre de
+processus protégé. L'intention d'arrêt ne vaut pas arrêt. Un refus d'arrêt, un
+descendant encore actif ou un processus impossible à attribuer reste un incident
+ouvert avec propriétaire et effet inconnu ; aucun lancement de remplacement
+susceptible de doubler l'effet n'est permis sans réconciliation.
+
+Les effets déjà engagés sont conservés et réconciliés par leurs mécanismes
+existants ; aucune prétention d'annulation rétroactive d'une opération externe.
+Les ressources nécessaires au contrôle/arrêt restent à son service protégé,
+jamais accordées comme nouvelles permissions de travail à l'agent révoqué.
+Les outils et sorties réseau qui pourraient agir hors contrôle doivent être
+inclus dans la frontière d'exécution ; le changement d'état en base ne suffit pas.
+
+Le point de linéarisation entre départ et révocation doit être défini et exercé
+sous concurrence. Une vérification avant `cmd.Start` sans mécanisme empêchant la
+course restante ne prouve pas « aucun départ après révocation ». Le délai d'un
+émetteur distant conserve les bornes explicites de l'introspection vérifiée ;
+aucune instantanéité intersystèmes n'est revendiquée.
+
+### Registre, jetons volés et frontière hôte
+
+Deux options sont distinguées : bearer d'agent stocké dans son environnement,
+ou identité rattachée à une exécution et à un canal protégés par le contrôle.
+Le premier est insuffisant face à la copie d'un jeton valide et à F07. La cible
+retient la seconde ; son mécanisme hôte exact reste à choisir et à prouver.
+
+Le fournisseur ne doit pas pouvoir lire ou modifier registre, clés, configuration
+de l'autorité, journaux privés ou sessions humaines, directement ou via les
+montages, liens, `/proc`, environnement, héritage de descripteurs et processus
+voisins. Les espaces de travail et données utiles restent explicitement autorisés.
+Une séparation en fichiers 0600 sous le même compte n'établit pas cette frontière.
+
+Évaluer confinement racine/espace de noms et séparation de compte/service, avec
+les capacités réellement disponibles et les adaptateurs fournisseurs. Les mêmes
+opérations publiques doivent rester protégées si le CLI est invoqué par l'agent.
+Ne pas promettre la résistance à un administrateur hôte tout-puissant sans ancre
+ou autorité extérieure démontrée. Une primitive `bwrap` disponible n'est pas une
+recette complète ni une protection portable acquise.
+
+Un jeton valide de personne volé n'est pas distinguable magiquement de son
+titulaire par sa seule signature. La preuve humaine renforcée, sa liaison exacte
+et la protection du canal sont donc requises pour les opérations sensibles ;
+les limites de résistance à un navigateur ou fournisseur d'identité compromis
+doivent être exposées, sans transformer une telle limite en conformité universelle.
+
+### Stockage, rejeu, import et récupération
+
+Conserver les originaux et états historiques. La migration des anciennes lignes
+ne leur ajoute aucun principal, octroi ou accord humain. L'import conserve des
+preuves historiques mais nécessite une nouvelle admission locale pour agir.
+
+La lecture d'un résultat idempotent authentifie et autorise aussi son demandeur.
+Une même décision ne produit qu'un effet ; un autre contenu, projet, principal,
+destinataire ou génération entre en conflit. Les consommations ne sont pas remises
+à zéro par une panne ou un nouvel identifiant de demande.
+
+Le registre d'admission doit fournir des transitions atomiques et un journal
+durable de demande, décision, consommation, départ incertain et effet observé.
+Les modifications de configuration Trust et la réservation SQLite actuelle
+doivent partager un protocole de fraîcheur/engagement documenté ; ne pas supposer
+qu'une empreinte ou deux verrous suffisent à l'atomicité entre deux stockages.
+L'ordre des verrous et les appels existants doivent être inventoriés avant code.
+Toute vérification réseau reste hors du verrou métier, puis revalidée à la
+frontière de décision avec son reçu de fraîcheur.
+
+Une reprise ne recrée pas aveuglément un processus dont le départ est incertain.
+Une ancienne sauvegarde authentique n'active pas les autorisations révoquées
+depuis lors. Définir l'ancre, la détection de restauration et l'autorité de
+récupération ; une clé compromise n'est pas sa propre preuve de santé. Sans preuve
+suffisante, conserver le blocage et traiter les travaux indépendants.
+
+## États et traces attendus
+
+```mermaid
+stateDiagram-v2
+  [*] --> Proposition
+  Proposition --> Refus : identité / schéma / interdiction
+  Proposition --> AttenteHumaine : exception admissible
+  Proposition --> Autorisee : plan courant et autorité exacte
+  AttenteHumaine --> Refus : refus / retrait / expiration
+  AttenteHumaine --> Autorisee : décision humaine attestée
+  Autorisee --> Reservee : revalidation et consommation atomique
+  Reservee --> Execution : départ confirmé et périmètre reçu
+  Reservee --> Incertaine : panne / réponse perdue
+  Incertaine --> Execution : départ retrouvé
+  Incertaine --> Annulee : absence d'effet établie et décision tracée
+  Autorisee --> Revoquee : retrait courant
+  Reservee --> Revoquee : retrait avant départ
+  Execution --> ArretDemande : révocation
+  ArretDemande --> Arretee : extinction vérifiée
+  ArretDemande --> Incertaine : effet / extinction non établi
+```
+
+États sémantiques cibles ; aucune correspondance automatique aux chaînes actuelles
+de `Agent.Status`. L'autorisation révoquée et l'extinction du processus doivent
+rester deux informations distinctes. Une annulation technique ne réécrit pas un
+accord humain en refus et ne rembourse aucune consommation historique. L'UI conserve les causes visibles, la demande
+en attente et les effets inconnus. Aucun succès vide ou « tout est arrêté » déduit
+de la seule acceptation d'une commande.
+
+## Matrice des critères à traduire en contrôles
+
+La qualification **de bout en bout** des lignes suivantes reste NON TESTÉE.
+Le noyau IA2.2 couvre localement certains sous-aspects, détaillés dans le rapport
+du 17 octobre ; aucun PASS local ne devient un PASS global de cette matrice.
+
+| Critère IA2 | Déclencheur / observable attendu | Risques conservés |
+| --- | --- | --- |
+| IA2-C01 | Identité absente, falsifiée, mauvais émetteur/audience/type, suspendue ou expirée : refus avant admission et programme fournisseur, sans réservation de travail. | IDA-01/12/16, COV-ID-02/05 |
+| IA2-C02 | Copie de nom, sujet isolé, PID, parent, jeton ou autorisation vers une autre instance : aucun transfert d'identité/droits. | IDA-02/14/15, COV-ID-01/03 |
+| IA2-C03 | Création prévue et autorisée : exactement une instance, identité attribuée par le contrôle et reçu du périmètre exact. | IDA-04/09/11 |
+| IA2-C04 | Enfant hors autorité, droits plus larges ou filiation déclarée : refus/attente motivés sans enfant ni consommation de travail. | IDA-03/05/06/17 |
+| IA2-C05 | Décision par service/local/agent, soi-même ou accord pour un autre contenu : refus ; vraie personne habilitée et liaison exacte seulement. | IDA-07/08/16, COV-ID-02 |
+| IA2-C06 | Révocation au verrou, entre admission et départ ou pendant exécution : droits retirés, descendants dérivés couverts, arrêt demandé puis vérifié, effets incertains réconciliés. | IDA-10/11, COV-ID-04 |
+| IA2-C07 | Rejeu concurrent, réponse perdue et redémarrage : effet unique ou inconnu conservé, jamais reset des consommations. | IDA-09/11/17 |
+| IA2-C08 | Fournisseur, sonde et outil tentent d'accéder au contrôle par fichiers/processus/API/CLI : refus effectif, aucune fuite de secret. | IDA-12/14, COV-ID-01/05 |
+| IA2-C09 | Import, clonage, remplacement ou restauration d'un état historique : historique inchangé, aucune autorité locale réactivée ; altération/retour d'état détectés dans le modèle d'ancre annoncé. | IDA-15/18, COV-ID-03/06 |
+| IA2-C10 | Consultation/résumé/transmission d'une source hors droits : refus au consommateur et absence du contenu interdit dans prompt/log. Propriétaire, auteur et droits demeurent distincts. | IDA-13 et M20 |
+| IA2-C11 | Administration de l'issuer, mapping, droits ou récupération tentée par un agent, une session cockpit seule ou un rôle déclaré : aucun changement de l'autorité de vérification. | IDA-06/07/14/18, COV-ID-02/06 |
+
+Ces critères incluent le chemin permis, les entrées invalides, l'absence de mutation
+sur refus, la persistance, la concurrence et la récupération concernées. Ils
+ne doivent pas être confondus avec les seuls tests du noyau interne.
+
+## Tranches suivantes et preuve de sortie
+
+| Tranche | Fichiers / propriétaire | Résultat requis |
+| --- | --- | --- |
+| IA2.1 Contrat sémantique | Présent document et plan ; Codex | Objets distincts, décisions de délégation/révocation/bootstrap, couverture IDA et COV. Proposition relue dans cette session, sans revue indépendante. |
+| IA2.2 Contrat concret | `agent_identity_contract.go`, `agent_identity_authority.go` et leurs tests, docs FR/EN, plan et preuves ; Codex | Noyau privé et sérialisation/transitions vérifiés : 16 tests racine, 100 noms avec sous-tests ; 14 contrôles existants supplémentaires PASS. Source d'autorité protégée et stockage atomique de production restent dans IA2.3 ; aucun champ public ne crée sa propre autorité. |
+| IA2.3 Frontière et protocole d'engagement | Producteurs authentifiés, canaux et stockage concernés ; Codex | Choix hôte justifié et expérimenté sur racine isolée ; ordre des verrous, réserve/départ/révocation et panne démontrés. |
+| IA3 Admission commune | CLI/API, lancement et autres exécuteurs inventoriés ; Codex | Raccord effectif de tous les consommateurs, décision humaine, pas de voie secondaire ou mode de contournement. |
+| IA4/IA5 | Mémoire, interface, documentation et qualification | Sources partagées coordonnées avec le chantier mémoire ; effets réels, FR/EN, reprise et RETEX. |
+
+Les politiques opérateur éventuellement nouvelles sont persistées et éditables
+dans Admin avec la même validation CLI/API/Go, les unités et valeurs effectives.
+Les invariants de sécurité ne possèdent pas de commutateur de contournement.
+Les paramètres concrets et opérations publiques ne sont pas inventés dans ce
+contrat sémantique ; ils restent à définir et vérifier dans IA2.2/IA2.3.
+
+Les sept défauts IA1 restent ouverts. La clôture IA2 exige les contrôles du contrat
+concret et la preuve de sa frontière ; IA2.1 seul ne prouve ni leur correction,
+ni le démarrage d'une mission, ni le déploiement ou la régulation automatique.
+
+## Première expérience hôte IA2.3 — 16 octobre
+
+La recette
+`verification-identites-agents-20261016/ia2_isolation.py` construit une nouvelle
+racine jetable par la CLI du binaire IA1, puis compare le même programme scripté
+avec et sans frontière `bwrap`. La fixture possède un vrai stockage Swarm et
+des identités locales fictives ; aucun agent ou modèle fournisseur réel n'est lancé.
+
+Résultat local PASS, dix variantes de contrôle d'accès refusées dans l'espace
+isolé : clé en lecture/ouverture en écriture, registre, `.swarm` du workspace,
+lien symbolique, sous-processus, racine du processus ancêtre via `/proc`, boucle
+réseau de l'hôte, environnement privé et CLI visant le contrôle d'origine.
+L'écriture autorisée dans le workspace est observée sur l'hôte et les empreintes
+du registre, de la clé et de SQLite restent inchangées. La variante sans frontière
+confirme les accès de référence ; voir les originaux pour chaque sous-cas.
+
+Preuves : `verification-identites-agents-20261016/ia2-isolation-initial/`,
+avec `baseline.json`, `isolated.json`, `results.json`, `commands.json` et la recette
+figée. La commande et ses sorties sont dans `ia2-isolation-initial-run.json`.
+Le binaire ancien sert seulement à créer et lire cette fixture ; aucun nouveau
+contrôle de lancement n'y est intégré.
+
+Limites : expérience Linux sur cette machine, réseau isolé sans sortie fournisseur,
+montages de runtime à auditer, aucun courtier/canal d'identité, aucune approbation,
+aucune course départ/révocation ni garantie de portabilité qualifiés. Les appels
+fournisseurs distants nécessitent une sortie contrôlée compatible à concevoir,
+pas un partage implicite du réseau de contrôle. Cette preuve dépasse la seule
+disponibilité d'une primitive OS, sans fermer F07 ni IA2/IA3 dans le moteur.
+
+## Deuxième expérience IA2.3 — canal d'instance, 17 octobre
+
+Le [rapport de canal](verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md)
+conserve 13 contrôles sur deux cages Linux : attributs épinglés avant départ,
+credentials de chaque message, refus d'une connexion B copiée à A, outil restant
+attribué à A, refus de faux PID et de trois joins de namespaces. Le namespace
+utilisateur change pendant le bootstrap ; seuls PID/montage observés stables
+sont utilisés ici.
+
+Registre et révocation sont des fixtures en mémoire. Le prototype n'est raccordé
+ni au noyau Go ni aux lanceurs, au réseau fournisseur ou à la décision humaine.
+Source d'autorité et protocole d'engagement restent requis. Aucun scénario global
+ne devient PASS par cette expérience.
+
+## Portage Go IA2.3a — attribution réelle, autorité encore de fixture
+
+Le [rapport IA2.3a](verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md)
+et les contrats FR/EN décrivent le récepteur Unix et la table de liaisons privée.
+Le contrôle épingle PID/montage avant libération de la porte. Les credentials et
+le pidfd de chaque message déterminent son rattachement ; aucune réouverture du
+PID numérique, adoption par premier message ou identité héritée du pair de
+connexion. Le portage interne rejoint le noyau IA2.2, sans raccord aux lanceurs.
+
+L'ordre vérifié pour ce consommateur est réception hors Trust → Trust partagé →
+registre runtime → namespaces et liaison → temps réel après les attentes →
+évaluation pure. IA2-K03 montre pourquoi lire l'heure avant la dernière attente
+ne suffit pas : conserver ce cas de régression pour tout futur engagement.
+La décision et sa fraîcheur devront encore être revalidées à la frontière de
+consommation/effet ; cette correction ne construit pas l'atomicité Trust/SQLite.
+
+133 noms ciblés passent, dont 19 pour ce portage ; les mêmes 19 passent sous
+`-race`. Source durable d'autorité, bootstrap réel, réserve/départ/révocation,
+panne, décision humaine et consommateurs mémoire restent non livrés. Les preuves
+locales renforcent C02/C06/C08 sans transformer leur qualification globale en PASS.

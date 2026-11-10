@@ -1,0 +1,130 @@
+[
+  {
+    "id": "memory-procedure",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "protection-denied",
+    "ratio": 8.057797055516255
+  },
+  {
+    "id": "identity-suspended",
+    "ratio": 8.057797055516255
+  },
+  {
+    "id": "memory-unknown",
+    "ratio": 8.019744080685664
+  },
+  {
+    "id": "memory-experience",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "memory-procedure",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "memory-dialogue",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "memory-summary",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "memory-knowledge",
+    "ratio": 8.019744080685664
+  },
+  {
+    "id": "version-active",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "version-historical",
+    "ratio": 8.019744080685664
+  },
+  {
+    "id": "version-withdrawn",
+    "ratio": 8.628540827878389
+  },
+  {
+    "id": "version-unavailable",
+    "ratio": 8.057797055516255
+  },
+  {
+    "id": "version-unknown",
+    "ratio": 8.019744080685664
+  },
+  {
+    "id": "protection-unknown",
+    "ratio": 8.019744080685664
+  },
+  {
+    "id": "protection-pending",
+    "ratio": 8.628540827878389
+  },
+  {
+    "id": "protection-allowed",
+    "ratio": 8.212877886646528
+  },
+  {
+    "id": "protection-denied",
+    "ratio": 8.057797055516255
+  },
+  {
+    "id": "protection-revoked",
+    "ratio": 8.057797055516255
+  },
+  {
+    "id": "identity-unknown",
+    "ratio": 8.019744080685664
+  },
+  {
+    "id": "identity-pending",
+    "ratio": 8.628540827878389
+  },
+  {
+    "id": "identity-verified",
+    "ratio": 8.212877886646528
+  },
+  {
+    "id": "identity-suspended",
+    "ratio": 8.057797055516255
+  },
+  {
+    "id": "identity-revoked",
+    "ratio": 8.057797055516255
+  },
+  {
+    "id": "actor-human",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "actor-agent",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "actor-service",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "usage-read",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "usage-summarize",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "usage-transmit",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "attribution-owner",
+    "ratio": 8.565290106757649
+  },
+  {
+    "id": "attribution-author",
+    "ratio": 8.565290106757649
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-12T11:15:40.307356+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-inputs-T3-native-base-cumulative-20261012.bundle",
+  "sha256": "927df36885f0318dc5daa86fa8a8beaf5cb8697d86940086aa6dd61b914ff839",
+  "commit": "7e02c6e18d928e3ad73e4b909cf8ca894ca61f60",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 129,
+  "manifest_sha256": "5b28cc3a9da7f226936a8a01e9d4484252348e148b073c6c0b99a37559b22e4b",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-native-base-cumulative-inputs-aycyqzfy",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-native-base-cumulative-import-1xcxie4r",
+  "old127_originals_preserved": true,
+  "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+  "limits": "Qualified effective-scope provider cooldown correction extends all127 original T3 and priority inputs preserved byte-for-byte. Guard the same provider as the selected role and preserve unrelated waits, counters and replay. Deferred27 remains excluded. Native worker must import original inputs, qualify its own cumulative candidate, deliver architecture and receipts, and obtain independent review. No local test or deployment implies native acceptance."
+}

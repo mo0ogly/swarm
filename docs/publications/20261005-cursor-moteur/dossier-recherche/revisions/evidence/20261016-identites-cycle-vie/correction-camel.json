@@ -1,0 +1,13 @@
+{
+  "source": "https://arxiv.org/html/2503.18813v1",
+  "section": "Abstract, arXiv v1 du 24 mars 2025",
+  "observed_on": "2026-10-16",
+  "previous_unjustified_claim": "77 % des tâches AgentDojo résolues avec sécurité prouvable contre 84 % sans défense",
+  "corrected_claim": "Le résumé v1 annonce 67 % des tâches résolues avec sécurité prouvable ; comparaison à 84 % retirée faute de justification dans le passage consulté.",
+  "consumers_corrected": [
+    "docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md",
+    "docs/publications/20261005-cursor-moteur/dossier-recherche/02-etat-art.md"
+  ],
+  "original_error_cause": "non établie",
+  "swarm_historical_measurements_changed": false
+}

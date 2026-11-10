@@ -1,0 +1,124 @@
+panic: test timed out after 2m0s
+	running tests:
+		TestManagedRecoveryHandoffRejectsAlteredRepair (39s)
+		TestManagedRecoveryHandoffRejectsAlteredRepair/proof-key (6s)
+
+goroutine 6760 [running]:
+testing.(*M).startAlarm.func1()
+	/usr/local/go/src/testing/testing.go:2484 +0x394
+created by time.goFunc
+	/usr/local/go/src/time/sleep.go:215 +0x2d
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0xc0001d88c0, {0x14189b7?, 0xc000571b30?}, 0x4054968)
+	/usr/local/go/src/testing/testing.go:1859 +0x431
+testing.runTests.func1(0xc0001d88c0)
+	/usr/local/go/src/testing/testing.go:2279 +0x37
+testing.tRunner(0xc0001d88c0, 0xc000571c70)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+testing.runTests(0xc000010048, {0x4e61a40, 0x4ba, 0x4ba}, {0x4e6cdc0?, 0x7?, 0x4e6b100?})
+	/usr/local/go/src/testing/testing.go:2277 +0x4b4
+testing.(*M).Run(0xc0002ea3c0)
+	/usr/local/go/src/testing/testing.go:2142 +0x64a
+main.main()
+	_testmain.go:2467 +0x9b
+
+goroutine 6383 [syscall]:
+syscall.Syscall6(0xf7, 0x3, 0xe, 0xc0007cde30, 0x4, 0xc000984510, 0x0)
+	/usr/local/go/src/syscall/syscall_linux.go:95 +0x39
+internal/syscall/unix.Waitid(0xc0007cde5e?, 0xc0007cdf88?, 0x5865eb?, 0xc000259af0?, 0x0?)
+	/usr/local/go/src/internal/syscall/unix/waitid_linux.go:18 +0x39
+os.(*Process).pidfdWait.func1(...)
+	/usr/local/go/src/os/pidfd_linux.go:106
+os.ignoringEINTR(...)
+	/usr/local/go/src/os/file_posix.go:251
+os.(*Process).pidfdWait(0xc0001d68a0?)
+	/usr/local/go/src/os/pidfd_linux.go:105 +0x209
+os.(*Process).wait(0x4e6cdc0?)
+	/usr/local/go/src/os/exec_unix.go:27 +0x25
+os.(*Process).Wait(...)
+	/usr/local/go/src/os/exec.go:358
+os/exec.(*Cmd).Wait(0xc0001f0f00)
+	/usr/local/go/src/os/exec/exec.go:922 +0x45
+os/exec.(*Cmd).Run(0xc0001f0f00)
+	/usr/local/go/src/os/exec/exec.go:626 +0x2d
+os/exec.(*Cmd).CombinedOutput(0xc0001f0f00)
+	/usr/local/go/src/os/exec/exec.go:1039 +0x85
+swarm.local/companion/internal/engine.managedGit({0xc00090e460, 0x95}, {0xc0007cf180, 0x4, 0x33?})
+	/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/integration-4276028698/candidate/internal/engine/managed_git.go:60 +0x3f3
+swarm.local/companion/internal/engine.(*Store).prepareManagedCandidate(_, {0x0, 0xc0006ee1c0, 0x0, {0x0, 0x0, 0x0}, {0x0, 0x0, 0x0}, ...}, ...)
+	/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/integration-4276028698/candidate/internal/engine/managed_integration.go:316 +0x3d0
+swarm.local/companion/internal/engine.(*Store).preparedManagedCandidate(_, {0x0, 0xc0006ee1c0, 0x0, {0x0, 0x0, 0x0}, {0x0, 0x0, 0x0}, ...}, ...)
+	/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/integration-4276028698/candidate/internal/engine/managed_review.go:81 +0x452
+swarm.local/companion/internal/engine.(*Store).integrateManagedAttempt(_, {0x1, 0x0, 0x0, 0x0, {0x0, 0x0}, {0x0, 0x0}, 0x0, ...})
+	/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/integration-4276028698/candidate/internal/engine/managed_integration.go:157 +0x1e10
+swarm.local/companion/internal/engine.(*Store).recoverResult(_, {_, _}, {0x0, {0x0, 0x0}, 0x0, 0x0, 0x0, 0x0, ...}, ...)
+	/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/integration-4276028698/candidate/internal/engine/recovered_result.go:260 +0x2645
+swarm.local/companion/internal/engine.(*Store).planningChange(_, {_, _}, {_, _}, {0x0, {0x0, 0x0}, 0x0, 0x0, ...})
+	/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/integration-4276028698/candidate/internal/engine/planning.go:266 +0x1795
+swarm.local/companion/internal/engine.managedRepairedRefusal(_)
+	/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/integration-4276028698/candidate/internal/engine/managed_recovery_repaired_handoff_test.go:35 +0x8cc
+swarm.local/companion/internal/engine.TestManagedRecoveryHandoffRejectsAlteredRepair.func1(0xc00074aa80)
+	/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/integration-4276028698/candidate/internal/engine/managed_recovery_repaired_handoff_test.go:88 +0x99
+testing.tRunner(0xc00074aa80, 0xc000730018)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+created by testing.(*T).Run in goroutine 4454
+	/usr/local/go/src/testing/testing.go:1851 +0x413
+
+goroutine 4454 [chan receive]:
+testing.(*T).Run(0xc00074a000, {0x1330388?, 0x66b?}, 0xc000730018)
+	/usr/local/go/src/testing/testing.go:1859 +0x431
+swarm.local/companion/internal/engine.TestManagedRecoveryHandoffRejectsAlteredRepair(0xc00074a000)
+	/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/integration-4276028698/candidate/internal/engine/managed_recovery_repaired_handoff_test.go:87 +0x136
+testing.tRunner(0xc00074a000, 0x4054968)
+	/usr/local/go/src/testing/testing.go:1792 +0xf4
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go/src/testing/testing.go:1851 +0x413
+
+goroutine 6384 [select]:
+database/sql.(*DB).connectionOpener(0xc0007a49c0, {0x4292c58, 0xc000128780})
+	/usr/local/go/src/database/sql/sql.go:1261 +0x87
+created by database/sql.OpenDB in goroutine 6383
+	/usr/local/go/src/database/sql/sql.go:841 +0x130
+
+goroutine 6759 [select]:
+os/exec.(*Cmd).watchCtx(0xc0001f0f00, 0xc00036a690)
+	/usr/local/go/src/os/exec/exec.go:789 +0xb2
+created by os/exec.(*Cmd).Start in goroutine 6383
+	/usr/local/go/src/os/exec/exec.go:775 +0x8f3
+
+goroutine 6758 [IO wait]:
+internal/poll.runtime_pollWait(0x70d7a77aea80, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0x85
+internal/poll.(*pollDesc).wait(0xc000987440?, 0xc0002e9200?, 0x1)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x27
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0xc000987440, {0xc0002e9200, 0x200, 0x200})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x27a
+os.(*File).read(...)
+	/usr/local/go/src/os/file_posix.go:29
+os.(*File).Read(0xc000188300, {0xc0002e9200?, 0x41a5c6?, 0x0?})
+	/usr/local/go/src/os/file.go:124 +0x4f
+bytes.(*Buffer).ReadFrom(0xc0004c1d70, {0x428d0c0, 0xc000188320})
+	/usr/local/go/src/bytes/buffer.go:211 +0x98
+io.copyBuffer({0x428d280, 0xc0004c1d70}, {0x428d0c0, 0xc000188320}, {0x0, 0x0, 0x0})
+	/usr/local/go/src/io/io.go:415 +0x151
+io.Copy(...)
+	/usr/local/go/src/io/io.go:388
+os.genericWriteTo(0xc000188300?, {0x428d280, 0xc0004c1d70})
+	/usr/local/go/src/os/file.go:275 +0x4f
+os.(*File).WriteTo(0xc000188300, {0x428d280, 0xc0004c1d70})
+	/usr/local/go/src/os/file.go:253 +0x9c
+io.copyBuffer({0x428d280, 0xc0004c1d70}, {0x428d140, 0xc000188300}, {0x0, 0x0, 0x0})
+	/usr/local/go/src/io/io.go:411 +0x9d
+io.Copy(...)
+	/usr/local/go/src/io/io.go:388
+os/exec.(*Cmd).writerDescriptor.func1()
+	/usr/local/go/src/os/exec/exec.go:596 +0x34
+os/exec.(*Cmd).Start.func2(0xc00036a380?)
+	/usr/local/go/src/os/exec/exec.go:749 +0x2c
+created by os/exec.(*Cmd).Start in goroutine 6383
+	/usr/local/go/src/os/exec/exec.go:748 +0x92b
+FAIL	swarm.local/companion/internal/engine	120.332s
+FAIL

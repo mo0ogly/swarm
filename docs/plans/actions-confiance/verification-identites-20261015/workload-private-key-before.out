@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT3WorkloadPrivateKeysRejectedWhenDisabled
+    trust_workload_test.go:299: private key accepted in disabled configuration
+--- FAIL: TestActionsConfianceT3WorkloadPrivateKeysRejectedWhenDisabled (0.10s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.180s
+FAIL

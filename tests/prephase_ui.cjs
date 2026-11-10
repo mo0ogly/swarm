@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const {spawn,execFileSync}=require('node:child_process');const puppeteer=require(process.env.PUPPETEER_MODULE||'puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-prephase-ui-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-prephase-ui-'));
 const cli=(args,data)=>JSON.parse(execFileSync(binary,['--root',root,...args,...(data?['--input','-']:[])],{encoding:'utf8',input:data?JSON.stringify(data):undefined}));cli(['init']);
 for(const p of ['.claude/skills/apex/SKILL.md','.claude/commands/ks-feature.md','.claude/commands/ks-plan.md','.claude/skills/audit-pdca/SKILL.md','tools/agent-workflows/CONTRACT.md']){const full=path.join(root,p);fs.mkdirSync(path.dirname(full),{recursive:true});fs.writeFileSync(full,'Préparation seulement.');}
 const chord=async(page,key)=>{await page.keyboard.down('Control');await page.keyboard.press(key);await page.keyboard.up('Control')};

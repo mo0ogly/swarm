@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-policy-epoch-resume-20261015-1052",
+  "expected_revision": 447,
+  "reason": "Replan : remise corrective attribuée enregistrée pendant la pause ; reprendre les contrôles frais puis la revue sans réutiliser R20. Le conducteur ciblé unique 423881 est vérifié actif."
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "patch": "docs/plans/engine-cursor-contract/recovery/review-time-policy-documentation-20261011.patch",
+  "sha256": "422e496a2eb5d817d299b6d636516f0086c713b935ce459109bace8f86aa5c9a",
+  "bytes": 1589,
+  "parent_patch": "unpaid-preflight-documentation-20261011.patch",
+  "effect": "Correct stale documentation range using actual CLI/API positive-or-zero policy and Admin UI input; no runtime change",
+  "checks": "Source read: independent_review.go reviewTimeoutSeconds and web/planning.js reviewTimeout, min=0 no max=900; reverse application PASS"
+}

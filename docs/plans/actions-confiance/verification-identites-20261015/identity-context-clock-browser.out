@@ -1,0 +1,16 @@
+fr: OIDC Admin fields fit the mobile dialog and accept keyboard focus
+fr: invalid account mapping is rejected with a localized error
+fr: Admin preview performs no network request; apply persists exact values
+fr: saved configuration reopens
+fr: keyboard identity context matches CLI and verified issuer with local roles, without mutation
+fr: cross-site OIDC callback validates PKCE and creates a business request with local privileges
+fr: refresh displays the request created by the authenticated business API
+fr: explicit logout clears and revokes the business session
+en: OIDC Admin fields fit the mobile dialog and accept keyboard focus
+en: invalid account mapping is rejected with a localized error
+en: Admin preview performs no network request; apply persists exact values
+en: saved configuration reopens
+en: keyboard identity context matches CLI and verified issuer with local roles, without mutation
+en: cross-site OIDC callback validates PKCE and creates a business request with local privileges
+en: refresh displays the request created by the authenticated business API
+en: explicit logout clears and revokes the business session

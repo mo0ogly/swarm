@@ -1,0 +1,249 @@
+'use strict';
+const tr_web_cockpit_js = source => globalThis.SwarmI18n?.t(source) ?? source;
+
+const cockpitStorage={getItem(key){try{return localStorage.getItem(key)}catch{return null}},setItem(key,value){try{localStorage.setItem(key,value)}catch{}}};
+const $=id=>document.getElementById(id);
+const labels={stale:tr_web_cockpit_js('Acceptée — à revalider'),todo:tr_web_cockpit_js('À faire'),running:tr_web_cockpit_js('En cours'),blocked:tr_web_cockpit_js('Bloquée'),submitted:tr_web_cockpit_js('À vérifier'),accepted:tr_web_cockpit_js(tr_web_cockpit_js('Terminée et validée')),waived:tr_web_cockpit_js(tr_web_cockpit_js('Dérogation')),abandoned:tr_web_cockpit_js('Abandonnée'),acknowledged:tr_web_cockpit_js('Acquittée'),queued:tr_web_cockpit_js('En attente'),starting:tr_web_cockpit_js(tr_web_cockpit_js('Démarrage')),stopping:tr_web_cockpit_js('Arrêt demandé'),'queued/unconfirmed':tr_web_cockpit_js('En attente — processus non confirmé'),'starting/unconfirmed':tr_web_cockpit_js('Démarrage — processus non confirmé'),'running/unconfirmed':tr_web_cockpit_js('En cours — processus non confirmé'),'unknown/other-host':tr_web_cockpit_js('Inconnu — autre poste'),'unknown/supervisor-lost':tr_web_cockpit_js('Inconnu — superviseur perdu'),completed:tr_web_cockpit_js(tr_web_cockpit_js('Terminé')),interrupted:tr_web_cockpit_js(tr_web_cockpit_js('Interrompu')),failed:tr_web_cockpit_js(tr_web_cockpit_js('Échec'))};
+const active=a=>['queued','starting','running','stopping'].includes(a.status);
+let csrf='',work='',snapshot=null,stream=null,view='tasks',modalContext=null,returnFocus=null,logCursor=0,logBack=[],logPage=null,follow=false,busy=false,tasksKey='',agentsKey='',decisionsKey='';
+const node=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e};
+function notice(text,error=false){$('message').hidden=!text;$('message').textContent=text;$('message').className='notice '+(error?'alert':'info')}
+function noticeMissionSupprimee(){notice(tr_web_cockpit_js('La mission ouverte par ce lien n’existe plus : elle a été supprimée ou purgée.'));$('message').append(button(tr_web_cockpit_js('Choisir une mission'),()=>{showView('manage');$('manage-search')?.focus()}))}
+async function api(path,data){const opts={headers:{}};if(data!==undefined){opts.method='POST';opts.headers={'Content-Type':'application/json','X-Swarm-CSRF':csrf};opts.body=JSON.stringify(data)}const {response:r,value:text}=await SwarmWebRequests.text(path,opts);let value;try{value=JSON.parse(text)}catch{throw new Error(text||r.statusText)}if(!r.ok){const e=new Error((globalThis.SwarmI18n?.engine(value.error)??value.error)||r.statusText);e.code=value.failure?.code||value.code;e.status=r.status;throw e}return value}
+async function act(kind,fields={}){return PilotActions.send(kind,fields)}
+const escalationLabels={handoff:tr_web_cockpit_js('Rapport à examiner'),gate:tr_web_cockpit_js('Gate à revalider'),conduite:tr_web_cockpit_js('Handoff non relayé'),execution:tr_web_cockpit_js('Tentative infructueuse'),garde:tr_web_cockpit_js('Garde-fou déclenché'),silence:tr_web_cockpit_js('Signal perdu'),budget:tr_web_cockpit_js('Budget estimé'),cout:tr_web_cockpit_js('Coût dépassé')};
+function badge(status){
+ const names={propose:tr_web_cockpit_js('Proposé'),retenu:tr_web_cockpit_js('Retenu'),en_cours:tr_web_cockpit_js('En cours'),verifie:tr_web_cockpit_js('Vérifié'),ecarte:tr_web_cockpit_js('Écarté'),remplace:tr_web_cockpit_js('Remplacé'),...labels};
+ const tone=['accepted','completed','acknowledged','verifie'].includes(status)?'success':['failed'].includes(status)?'alert':['stale','blocked','interrupted','waived','submitted','propose'].includes(status)?'attention':['abandoned','ecarte','remplace','todo'].includes(status)?'neutral':'info';
+ return node('span',names[status]||status,'badge '+tone);
+}
+function selectOptions(select,options,current){select.replaceChildren();for(const [value,label]of options){const o=node('option',label);o.value=value;select.append(o)}if(options.some(x=>x[0]===current))select.value=current}
+function button(text,fn){const b=node('button',text);b.type='button';b.addEventListener('click',fn);return b}
+function taskSessionButton(taskID,location){
+ const session=PilotGraph.taskSession(snapshot.agents,taskID);if(!session)return null;
+ const b=button(session.label,()=>{const current=PilotGraph.taskSession(snapshot.agents,taskID);if(current)AgentTerminal.open(current.agent)});
+ b.className='task-session-button';b.dataset.taskSession=taskID;b.dataset.agentSession=session.agent.id;
+ b.dataset.sessionLocation=location;
+ b.title=tr_web_cockpit_js('Ouvrir la dernière tentative de cette tâche : ')+session.agent.provider+' · '+session.agent.id;
+ return b;
+}
+function field(name,label,value='',options=null,multiline=false,aide=''){const l=node('label',label);const e=node(options?'select':multiline?'textarea':'input');e.name=name;e.id='field-'+name;if(options)selectOptions(e,options,value);else e.value=value;l.htmlFor=e.id;if(aide){const h=node('small',aide,'field-hint');h.id='aide-'+name;e.setAttribute('aria-describedby',h.id);l.append(h)}l.append(e);$('modal-fields').append(l);decorateField(l,e,name);if(multiline&&['instruction','recovery_instruction','next','objective','scope'].includes(name))SwarmTextReader.attach(e);return e}
+function openModal(title,description,context={}){returnFocus=document.activeElement;modalContext={workID:work,revision:snapshot?.work.revision,...context};$('modal-title').textContent=title;$('modal-description').textContent=description;$('modal-context').textContent=snapshot?.work.title||'SWARM';$('modal-fields').replaceChildren();$('preview').hidden=true;$('modal-error').hidden=true;$('confirm').hidden=false;$('confirm').disabled=false;$('confirm').textContent=tr_web_cockpit_js('Confirmer');resetModalPresentation(context);$('modal').showModal()}
+function closeModal(){
+ $('modal').close();
+ // A refresh can replace the button that opened the help while it is open.
+ let target=returnFocus;
+ if(!target?.isConnected){
+  const task=returnFocus?.dataset.missionHelp;
+  const action=returnFocus?.dataset.missionAction;
+  target=task?[...document.querySelectorAll('[data-mission-help]')].find(e=>e.dataset.missionHelp===task):action?[...document.querySelectorAll('[data-mission-action]')].find(e=>e.dataset.missionAction===action):returnFocus?.id?$(returnFocus.id):null;
+ }
+ (target||$('pilot-view'))?.focus();modalContext=null;
+}
+function preview(text){$('preview').textContent=text;$('preview').hidden=false}
+let taskDialogGeneration=0;
+async function taskDialog(id,agentID){const generation=++taskDialogGeneration,requested=work;try{const d=await api('/api/v1/task?work='+encodeURIComponent(work)+'&task='+encodeURIComponent(id));if(generation!==taskDialogGeneration||work!==requested)return;if(agentID&&!snapshot.agents.some(x=>x.agent.id===agentID)){const older=await api('/api/v1/agent-detail?'+new URLSearchParams({work:requested,agent:agentID}));if(generation!==taskDialogGeneration||work!==requested)return;snapshot.agents.push(older)}const t=d.task;openModal(t.title,tr_web_cockpit_js('Mission : ')+snapshot.work.objective,{revision:d.revision,task:t.id,data:d,agent:agentID});preview(d.review);const actions=(d.actions||[]).filter(x=>x.disponible);const advised=actions.find(x=>x.conseillee);const current=labels[t.status]||t.status;const hint=advised?tr_web_cockpit_js('État : ')+current+tr_web_cockpit_js(' — action conseillée : ')+advised.label:tr_web_cockpit_js('État : ')+current+tr_web_cockpit_js(' — aucune action conseillée automatiquement.');$('modal-description').textContent=tr_web_cockpit_js('Mission : ')+snapshot.work.objective+'\n'+hint;const options=actions.map(x=>[x.kind==='accepted'?'accepted':x.kind,tr_web_cockpit_js(x.label)]);const a=field('action','Action',advised?advised.kind:(options[0]?.[0]??''),options);a.addEventListener('change',()=>taskFields(a.value));taskFields(advised?advised.kind:(options[0]?.[0]??''))}catch(e){notice(e.message,true)}}
+function taskFields(action){if(!modalContext?.data||!$('modal').open)return;const d=modalContext.data;const oracle=(d.actions||[]).find(x=>x.kind===action);const actionNode=$('field-action').parentNode;$('modal-fields').replaceChildren(actionNode);$('field-action').value=action;modalContext.action=action;modalContext.modelReady=true;modalContext.gatePreview=false;$('confirm').hidden=false;$('confirm').disabled=false;$('preview').hidden=true;$('confirm').textContent=action==='report'?tr_web_cockpit_js('Ouvrir les conclusions du rapport'):action==='gate'?tr_web_cockpit_js('Examiner la gate'):tr_web_cockpit_js('Confirmer');$('modal-error').hidden=true;updateModalPresentation();
+ if(oracle&&!oracle.disponible){$('confirm').disabled=true;$('modal-error').textContent=oracle.raison||tr_web_cockpit_js('Action indisponible pour cet état.');$('modal-error').hidden=false}
+ if(action!=='report'&&oracle&&!$('modal-error').textContent){const help=(oracle.champs||[]).filter(c=>c.aide).map(c=>c.label+' : '+c.aide).join('\n');if(help)preview(help)}
+ if(['start','retry'].includes(action)){preview(tr_web_cockpit_js('Périmètre : ')+snapshot.work.scope+tr_web_cockpit_js('\nLivrable : ')+d.task.deliverable+tr_web_cockpit_js('\nCritères : ')+(d.task.criteria||[]).join(' ; '));if(action==='start'){field('mode',tr_web_cockpit_js('Mode de session'),'',[['',tr_web_cockpit_js('Automatisé — contrôles d’outils')],['dialogue',tr_web_cockpit_js('Dialogue — contrôles d’outils')],['terminal',tr_web_cockpit_js('Interactif — terminal natif')]],false,tr_web_cockpit_js('Dialogue : échanges successifs et appels observables cumulés. Terminal natif : saisie et sorties conservées (4 Mio), durée surveillée. Appels d’outils et coût non mesurés ; indisponible si le plan impose ces limites.'));field('provider',tr_web_cockpit_js('Fournisseur'),'',Object.keys(snapshot.providers?.providers||{}).sort().map(x=>[x,x]),false,tr_web_cockpit_js('Programme agent à lancer (défini dans .swarm/providers.json).'));field('role',tr_web_cockpit_js('Rôle'),d.task.plan_role||'worker',[['worker',tr_web_cockpit_js('Worker — réalise la tâche')],['planner',tr_web_cockpit_js('Planner — planifie sans coder')],['subplanner',tr_web_cockpit_js('Subplanner — planifie un sous-périmètre')]],false,tr_web_cockpit_js('Worker réalise la tâche ; planner et subplanner planifient sans coder.'));field('workspace',tr_web_cockpit_js('Espace de travail'),snapshot.root,null,false,tr_web_cockpit_js('Répertoire dans lequel l\'agent travaillera.'))}field('instruction',tr_web_cockpit_js('Consigne pour l\'agent'),d.task.next||'',null,true,tr_web_cockpit_js('Transmise telle quelle ; préremplie avec la prochaine action prévue.'));field('capture',tr_web_cockpit_js('Capture détaillée des sorties'),'false',[['false',tr_web_cockpit_js('Désactivée — activité structurée seulement')],['true',tr_web_cockpit_js('Activée — sorties conservées, 1 Mio maximum')]],false,tr_web_cockpit_js('Désactivée par défaut : activité structurée seulement.'))}
+ if(['retry','stop','reconcile'].includes(action)){const agentField=field('agent',tr_web_cockpit_js('Tentative'),modalContext.agent,snapshot.agents.filter(x=>x.agent.task_id===d.task.id&&(action!=='retry'||!active(x.agent))).map(x=>[x.agent.id,x.agent.provider+' · '+(labels[x.observed_status]||x.observed_status)+' · '+x.agent.started]),false,action==='retry'?tr_web_cockpit_js('Reprend le fournisseur et l\'espace de travail de cette tentative.'):action==='stop'?tr_web_cockpit_js('Tentative à arrêter'):tr_web_cockpit_js('Tentative à réconcilier'));if(action==='retry'){const evidence=field('precondition_evidence',tr_web_cockpit_js('Vérification nouvelle des préconditions'),'',null,true,tr_web_cockpit_js('Obligatoire après un échec d’environnement : décrivez le contrôle observé des droits, du montage ou de la ressource. Ne désactivez aucune protection.'));const syncEvidence=()=>{const selected=snapshot.agents.find(x=>x.agent.id===agentField.value)?.agent;const required=(selected?.diagnostic?.items||[]).some(x=>x.category==='environment')&&['failed','interrupted'].includes(selected?.status);evidence.required=required;evidence.parentElement.hidden=!required;if(required)preview(tr_web_cockpit_js('La relance automatique est retenue après cet échec d’environnement. Vérifiez les préconditions, décrivez le résultat observé, puis confirmez explicitement la reprise.'));};agentField.addEventListener('change',syncEvidence);syncEvidence();}}
+ if(['report','submit','gate'].includes(action)){const files=action==='gate'?d.gates:d.reports;field('path',action==='gate'?tr_web_cockpit_js('Document de gate (preuve d\'évaluation)'):action==='submit'?tr_web_cockpit_js('Chemin du rapport soumis'):tr_web_cockpit_js('Rapport disponible'),files[0]||'',files.length?files.map(x=>[x,x.split('/').pop()]):null,false,action==='gate'?tr_web_cockpit_js('Fichier .evidence.json calculé par le moteur ; aperçu avant enregistrement.'):action==='submit'?tr_web_cockpit_js('Fichier produit par l\'agent, listé parmi les rapports détectés.'):'')}
+ if(action==='gate')field('name',tr_web_cockpit_js('Nom de la gate'),'',null,false,tr_web_cockpit_js('Nom humain de cette évaluation, visible dans la console et l\'assistant.'));
+ if(action==='override'){field('note',tr_web_cockpit_js('Motif de la dérogation'),'',null,true,tr_web_cockpit_js('Conservé avec votre compte local et la date ; les contrôles restent non PASS.'));preview(tr_web_cockpit_js('Les contrôles ne deviennent pas PASS. La décision sera conservée avec votre compte local et la date.'))}
+ if(action==='assign')field('owner',tr_web_cockpit_js('Responsable'),d.task.owner,null,false,tr_web_cockpit_js('Humain ou fournisseur chargé du prochain geste sur la tâche.'));
+ if(action==='start'&&(snapshot.providers_error||!Object.keys(snapshot.providers?.providers||{}).length)){$('modal-error').textContent=snapshot.providers_error||tr_web_cockpit_js('Aucun fournisseur installé ou configuré.');$('modal-error').hidden=false;$('confirm').disabled=true;}
+ if(d.task.plan_role&&$('field-role')){$('field-role').disabled=true;$('field-role').setAttribute('aria-label',tr_web_cockpit_js('Rôle fixé par le plan relu'))}
+ if(action==='start' && d.task.model_selection && $('field-provider'))$('field-provider').value=d.task.model_selection.provider;
+ if(['start','retry'].includes(action)&&typeof addModelFields==='function'){const previous=action==='retry'?snapshot.agents.find(x=>x.agent.id===$('field-agent')?.value)?.agent:null;addModelFields('work',action==='retry'?()=>snapshot.agents.find(x=>x.agent.id===$('field-agent')?.value)?.agent.provider||'':'',d.task.model_selection?.route.level||previous?.model_route?.level||'auto')}
+ if(['start','retry'].includes(action))ProjectSkills.mount(modalContext);
+ if(action==='start'){PilotActions.addPreview();const mode=$('field-mode');mode.addEventListener('change',e=>{if(!e.isTrusted)return;$('field-capture').parentElement.hidden=mode.value==='terminal';if($('launch-eligibility'))$('launch-eligibility').textContent=tr_web_cockpit_js('Mode changé : vérifiez les conditions de lancement.')})}
+ if(action==='extend-attempt')PilotActions.extensionFields(d);
+ if(action==='authorize-recovery')PilotActions.recoveryFields(d);
+ if(action==='resume-launch')PilotActions.preparedFields(d);
+ if(['retry','extend-attempt','authorize-recovery','resume-launch'].includes(action)&&PilotActions.addRecoveryPreview)PilotActions.addRecoveryPreview(d);
+ if(action==='accepted')preview(d.review+tr_web_cockpit_js('\n\nConfirmer après examen du rapport et des preuves.'));
+ if(action==='accepted')$('confirm').textContent=tr_web_cockpit_js('Confirmer la validation');
+ if(action==='override'){$('modal-title').textContent=tr_web_cockpit_js('Accepter par dérogation — ')+d.task.title;$('confirm').textContent=tr_web_cockpit_js('Confirmer la dérogation')}
+ if(action==='reopen')preview(tr_web_cockpit_js('La validation courante sera retirée et la tâche revient « À faire ». L’historique des tentatives restera conservé.'));
+ if(action==='reopen')preview(tr_web_cockpit_js('La validation courante sera retirée. L’historique des tentatives restera conservé.'));
+}
+function renderDecisionMetric(){
+ const planning=snapshot.work.planning;
+ $('decision-count-label').textContent=tr_web_cockpit_js(planning?'Retours à traiter':'Alertes non acquittées');
+ $('decision-count').textContent=planning?(planning.inbox||[]).filter(e=>!e.decision).length:snapshot.decisions.filter(d=>!d.resolved_at).length;
+ globalThis.SwarmShell?.updateDecisions(Number($('decision-count').textContent),()=>{if(planning&&typeof Planning!=='undefined')Planning.details();else{showView('decisions');$('main-content')?.focus({preventScroll:true})}},tr_web_cockpit_js(planning?'Retours à traiter':'Décisions à traiter'));
+}
+function renderTaskTable(){
+ if(!snapshot)return;
+ if(tasksKey!==work){$('tasks-body').replaceChildren();tasksKey=work}
+ const taskIDs=new Set(snapshot.work.tasks.map(t=>t.id));
+ const rowsByTask=new Map([...$('tasks-body').children].map(tr=>[tr.dataset.task,tr]));
+ for(const [id,tr] of rowsByTask)if(!taskIDs.has(id))tr.remove();
+ for(const t of snapshot.work.tasks){
+  let tr=rowsByTask.get(t.id);
+  if(!tr){tr=node('tr');tr.dataset.task=t.id;for(let i=0;i<5;i++)tr.append(node('td'));tr.children[0].append(node('strong'),node('small'));tr.children[4].append(button('Piloter',()=>taskDialog(t.id)),button(tr_web_cockpit_js('Configurer les validations'),()=>Mission.validation(t.id)),button(tr_web_cockpit_js('Modèle de la tâche'),()=>TaskModels.open(t.id)));$('tasks-body').append(tr)}
+  {const ta=(snapshot.task_actions||{})[t.id];const advised=(ta||[]).find(x=>x.conseillee);const b=tr.children[4].firstChild;const label=advised?advised.label:'Piloter';if(b.textContent!==label)b.textContent=label;b.title=(ta||[]).filter(x=>!x.disponible&&x.raison).map(x=>x.label+' : '+x.raison).join('\n');}
+  {const state=PilotGraph.taskSession(snapshot.agents,t.id);let b=tr.children[4].querySelector('[data-task-session]');if(!state)b?.remove();else{if(!b){b=taskSessionButton(t.id,'tasks');tr.children[4].append(b)}b.textContent=state.label;b.dataset.agentSession=state.agent.id;b.title=tr_web_cockpit_js('Ouvrir la dernière tentative de cette tâche : ')+state.agent.provider+' · '+state.agent.id;}}
+  tr.children[0].children[0].textContent=t.title;tr.children[0].children[1].textContent=t.id;const validity=snapshot.validation.tasks[t.id];const validityKey=JSON.stringify(validity);if(tr.dataset.validity!==validityKey){tr.dataset.validity=validityKey;tr.children[1].replaceChildren(badge(validity.state));if(validity.blockers.length){const details=node('details');details.append(node('summary',tr_web_cockpit_js('Voir les blocages (')+validity.blockers.length+')'),node('p',tr_web_cockpit_js('Responsable : ')+validity.owner));for(const reason of validity.blockers)details.append(node('p',reason));details.append(node('p',validity.next));tr.children[1].append(details)}}tr.children[2].textContent=t.owner||tr_web_cockpit_js('Non attribué');tr.children[3].textContent=(t.depends||[]).join(', ')||'Aucune';
+ }
+}
+function render(){
+ renderBrainstorm();
+ if(typeof renderConduite==='function')renderConduite();
+ if(typeof renderAssistant==='function')renderAssistant();
+ const validation=snapshot.validation;SwarmStatusContract.renderValidation($('validation-status'),validation,snapshot.work.tasks.length,!!snapshot.mission?.running,tr_web_cockpit_js);
+ $('title').textContent=snapshot.work.title;$('objective').textContent=snapshot.work.objective;
+ $('task-count').textContent=snapshot.work.tasks.length;$('accepted-count').textContent=snapshot.validation.validated;$('active-count').textContent=snapshot.agents.filter(x=>active(x.agent)).length;renderDecisionMetric();$('pause').textContent=snapshot.paused?tr_web_cockpit_js('Autoriser les départs'):tr_web_cockpit_js('Suspendre les départs');
+ if(view==='tasks')renderTaskTable();
+ const nextAgentsKey=JSON.stringify([work,snapshot.agents]);if(nextAgentsKey!==agentsKey){agentsKey=nextAgentsKey;const focusedAgent=document.activeElement?.closest('[data-agent]')?.dataset.agent;
+ $('agents-list').replaceChildren();for(const item of snapshot.agents){const a=item.agent;const c=node('article',undefined,'card');c.dataset.agent=a.id;c.append(node('h3',a.provider+' · '+a.task_id),badge(item.observed_status),node('p',a.model_route?tr_web_cockpit_js('Modèle lancé : ')+routeText(a.model_route):tr_web_cockpit_js('Modèle : non enregistré pour cette ancienne tentative')),ProjectProfiles.badge(a.workflow),node('p',tr_web_cockpit_js('Rôle : ')+a.role+tr_web_cockpit_js(' · tentative ')+a.attempt_id),node('p',(active(a)?tr_web_cockpit_js('Activité : '):tr_web_cockpit_js('Motif enregistré à la fin : '))+a.activity),node('p',tr_web_cockpit_js('État courant de la tâche : ')+(labels[snapshot.work.tasks.find(t=>t.id===a.task_id)?.status]||'Inconnu')),node('p',tr_web_cockpit_js('Dernier signal : ')+(a.heartbeat||tr_web_cockpit_js('Non reçu'))+' · '+(a.ended?tr_web_cockpit_js('Fin : ')+a.ended:tr_web_cockpit_js('Début : ')+a.started)),node('p',tr_web_cockpit_js('Dernière activité détaillée : ')+(a.progress?.detail||a.progress?.action||tr_web_cockpit_js('Non disponible'))),node('p',tr_web_cockpit_js('Outils : ')+(a.progress?.tool_calls||0)+tr_web_cockpit_js(' appels / ')+(a.progress?.tool_results||0)+tr_web_cockpit_js(' résultats')),(()=>{const ta=(snapshot.task_actions||{})[a.task_id]||[];const b=button(tr_web_cockpit_js('Piloter cette tentative'),()=>taskDialog(a.task_id,a.id));const dispo=ta.filter(x=>x.disponible);if(ta.length&&!dispo.length){b.disabled=true;b.title=tr_web_cockpit_js('Aucune action disponible sur cette tâche pour le moment.')}else{b.title=ta.filter(x=>!x.disponible&&x.raison).map(x=>x.label+' : '+x.raison).join('\n')}return b})(),button(tr_web_cockpit_js('Voir ses journaux'),()=>{selectOptions($('log-agent'),snapshot.agents.map(x=>[x.agent.id,x.agent.provider+' · '+x.agent.task_id]),a.id);logCursor=0;logBack=[];showView('logs')}));$('agents-list').append(c)}if(!snapshot.agents.length)$('agents-list').append(node('p',tr_web_cockpit_js('Aucune tentative enregistrée.')));if(focusedAgent)[...$('agents-list').children].find(e=>e.dataset.agent===focusedAgent)?.querySelector('button')?.focus();}
+ $('hierarchy').textContent=snapshot.hierarchy;
+ const nextDecisionsKey=JSON.stringify([work,snapshot.decisions,snapshot.decisions.map(decisionObservation)]);if(nextDecisionsKey!==decisionsKey){decisionsKey=nextDecisionsKey;const focusedDecision=document.activeElement?.closest('[data-decision]')?.dataset.decision;
+ $('decisions-list').replaceChildren();for(const d of snapshot.decisions){const c=node('article',undefined,'card');c.dataset.decision=d.id;c.append(node('h3',(d.task_id||'Travail')+' · '+decisionObservation(d).label),badge(d.resolved_at?'acknowledged':'submitted'),node('p',decisionObservation(d).summary),node('p',d.evidence));if(d.resolved_at)c.append(node('p',d.author+' · '+d.resolved_at+' · '+d.resolution));else if(d.kind==='gate')c.append(button(tr_web_cockpit_js('Revalider cette tâche'),()=>{taskDialog(d.task_id).then(()=>{if(modalContext?.data){taskFields(['accepted','waived'].includes(modalContext.data.task.status)?'reopen':'report');preview(d.evidence)}})}));else c.append(button(tr_web_cockpit_js('Examiner et décider'),()=>{openModal(tr_web_cockpit_js('Décision — ')+d.task_id,tr_web_cockpit_js('L’acquittement ne valide pas la tâche et n’arrête pas l’agent.'),{action:'decision',decision:d.id});preview(decisionObservation(d).summary+'\n'+d.evidence);field('note',tr_web_cockpit_js('Décision motivée'),'',null,true)}));$('decisions-list').append(c)}if(!snapshot.decisions.length)$('decisions-list').append(node('p',tr_web_cockpit_js('Aucune décision à traiter.')));
+if(focusedDecision)[...$('decisions-list').children].find(e=>e.dataset.decision===focusedDecision)?.querySelector('button')?.focus();}
+ const previous=$('log-agent').value;selectOptions($('log-agent'),[...snapshot.agents.map(x=>[x.agent.id,x.agent.provider+' · '+x.agent.task_id+' · '+(labels[x.observed_status]||x.observed_status)]),['__mission__',tr_web_cockpit_js('Moteur · activité')],['__supervision__',tr_web_cockpit_js('Superviseurs · incidents et décisions')]],previous);
+ $('resume-text').textContent=snapshot.resume;if(snapshot.mission?.spending){const existing=$('spending-breakdown');existing?.remove();const b=Mission.spendingView(snapshot.mission.spending);b.id='spending-breakdown';$('budget-info').after(b)}const b=snapshot.budget;$('budget-info').replaceChildren(node('p',b.policy),node('p',tr_web_cockpit_js('Plafond : ')+b.budget.limit_usd+tr_web_cockpit_js(' USD · réservé : ')+b.reserved_usd+tr_web_cockpit_js(' USD · imputé estimé : ')+b.committed_estimate_usd+' USD'),node('p',tr_web_cockpit_js('Source : ')+(b.budget.estimate_source||tr_web_cockpit_js('Non renseignée'))+tr_web_cockpit_js(' · date : ')+(b.budget.reference_date||tr_web_cockpit_js('Non renseignée'))),node('p',tr_web_cockpit_js('Coût rapporté pour les agents et planificateurs : ')+(typeof b.actual_cost_usd==='number'?b.actual_cost_usd.toFixed(2)+' USD':tr_web_cockpit_js('aucun montant rapporté'))));if(b.warning)$('budget-info').append(node('p',tr_web_cockpit_js('Seuil de 80 % atteint.'),'notice attention'));
+ $('budget-info').append(node('p',tr_web_cockpit_js('Les revues indépendantes ont un plafond d’appels distinct. Leur coût monétaire est exclu de cette enveloppe.'),'notice attention'));
+ $('usage-list').replaceChildren();for(const {agent:a}of snapshot.agents){const c=node('article',undefined,'card');c.append(node('h3',a.task_id+' · '+a.provider));c.append(node('p',a.usage?(tr_web_cockpit_js('Jetons déclarés : ')+a.usage.input_tokens+tr_web_cockpit_js(' entrée / ')+a.usage.output_tokens+tr_web_cockpit_js(' sortie · ')+a.usage.scope+' · '+a.usage.source+' · '+a.usage.at):tr_web_cockpit_js('Jetons : indisponibles.')));if(a.usage){for(const [key,label]of [['cache_read_input_tokens',tr_web_cockpit_js('Cache lu')],['cache_creation_input_tokens',tr_web_cockpit_js('Cache créé')],['cached_input_tokens',tr_web_cockpit_js('Entrée en cache')]])if(a.usage[key]!==undefined)c.append(node('p',label+' : '+a.usage[key]+tr_web_cockpit_js(' jetons déclarés (non additionnés).')));if(a.usage.provider_reported_cost_usd!==undefined)c.append(node('p',tr_web_cockpit_js('Coût déclaré par le fournisseur : ')+a.usage.provider_reported_cost_usd+tr_web_cockpit_js(' USD — facture non vérifiée.')));}c.append(node('p',tr_web_cockpit_js('Coût facturé : indisponible.')));$('usage-list').append(c)}
+}
+let refreshGeneration=0,connectionFailure=false;
+async function refresh(force=false){if(!work||(busy&&!force))return;const requested=work,generation=++refreshGeneration;busy=true;try{const data=await api('/api/v1/snapshot?work='+encodeURIComponent(requested));if(work!==requested||generation!==refreshGeneration)return;snapshot=data;render();if(connectionFailure){notice('');connectionFailure=false}$('connection').textContent=tr_web_cockpit_js('Connecté · r')+snapshot.work.revision}catch(e){if(work===requested&&generation===refreshGeneration){connectionFailure=true;notice(tr_web_cockpit_js('Actualisation impossible. Les dernières données reçues restent affichées. Vérifiez la connexion au cockpit puis réessayez.'),true);$('connection').textContent=tr_web_cockpit_js('Non actualisé · dernière lecture ')+new Date(snapshot?.pilotage?.snapshot_as_of||Date.now()).toLocaleTimeString('fr')}}finally{busy=false}}
+async function chooseWork(){stream?.close();taskDialogGeneration++;if(typeof PilotInspector!=='undefined'){$('pilot-inspector')?.close();PilotInspector.generation++;PilotInspector.loaded=null}if($('modal').open)closeModal();marquerVisiteSortie();work=$('work').value;const requested=work;cockpitStorage.setItem('swarm-work',work);logCursor=0;logBack=[];logPage=null;logRequestGeneration++;globalThis.JournalConsole?.clear();if(typeof renderAssistant==='function')renderAssistant();await refresh(true);if(work!==requested||snapshot?.work.id!==requested)return;stream=startCockpitRefresh();visiteTravail=work}
+// Short requests leave browser connections available to other Swarm tabs.
+function startCockpitRefresh(){
+ let stopped=false,timer=null,running=false;
+ async function tick(){
+  if(stopped||running)return;
+  clearTimeout(timer);running=true;
+  try{if(!document.hidden){await refresh();if(!stopped&&follow&&view==='logs')await loadLogs()}}
+  finally{running=false;if(!stopped)timer=setTimeout(tick,2000)}
+ }
+ function visible(){if(!document.hidden)void tick()}
+ document.addEventListener('visibilitychange',visible);
+ timer=setTimeout(tick,2000);
+ return {close(){stopped=true;clearTimeout(timer);document.removeEventListener('visibilitychange',visible)}}
+}
+function showView(name){if(!['manage','conduite','brainstorm','tasks','agents','decisions','logs','resume','budget','automation','providers','admin'].includes(name))name='conduite';view=name;cockpitStorage.setItem('swarm-view',view);if(typeof syncAssistantPage==='function'&&name!=='manage')syncAssistantPage(name);for(const section of document.querySelectorAll('.view'))section.hidden=section.id!==name;for(const b of $('tabs').querySelectorAll('[data-view]')){if(b.dataset.view===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')}globalThis.SwarmShell?.navigate(name);$('validation-status').hidden=name==='manage';if(name==='conduite')document.querySelector('.conduite-principal').after($('assistant'));else document.querySelector('main').insertBefore($('assistant'),$(name));$('assistant').hidden=['providers','manage','automation','admin'].includes(name);if(name==='providers'&&typeof loadProviderAdmin==='function')loadProviderAdmin();if(name==='automation'&&typeof loadAutomationAdmin==='function')loadAutomationAdmin();if(name==='admin'&&typeof loadRunLimitsAdmin==='function')loadRunLimitsAdmin();if(name==='manage')LifecycleManager.load();if(name==='logs')loadLogs();if(name==='tasks')renderTaskTable()}
+let logRequestGeneration=0;
+async function loadLogs(){
+ const agent=$('log-agent').value;
+ if(!work||!agent){globalThis.JournalConsole?.clear();return}
+ const generation=++logRequestGeneration;
+ const coordinates={work,agent,q:$('log-search').value,kind:$('log-kind').value,after:String(logCursor)};
+ const supervision=agent==='__supervision__',mission=agent==='__mission__';
+ const query=mission?{work,limit:'100',...(logCursor?{before:String(logCursor)}:{})}:coordinates;
+ const state=$('journal-console-state');if(state){state.textContent=tr_web_cockpit_js('Lecture du journal…');state.dataset.error='false'}
+ try{
+  let data;
+  if(supervision){
+   const [received,decisions]=await Promise.all([api('/api/v1/snapshot?work='+encodeURIComponent(coordinates.work)),api('/api/v1/planning-history?work='+encodeURIComponent(coordinates.work))]);
+   const all=JournalConsole.supervision(received.work.planning,decisions),offset=Number(coordinates.after)||0;
+   data={entries:all.slice(offset,offset+100),next_cursor:offset+100,more:offset+100<all.length,received_revision:received.work.revision,original_planning:received.work.planning,original_decisions:decisions};
+  }else data=await api((mission?'/api/v1/activity?':'/api/v1/logs?')+new URLSearchParams(query));
+  if(generation!==logRequestGeneration||work!==coordinates.work||$('log-agent').value!==agent)return;
+  logPage={...data,coordinates,after_cursor:mission?coordinates.after:Number(coordinates.after)};
+  let entries=logPage.entries;
+  if(mission||supervision)entries=entries.filter(e=>(!coordinates.kind||e.kind===coordinates.kind)&&(!coordinates.q||[e.message,e.label,e.task_id].some(value=>String(value||'').toLowerCase().includes(coordinates.q.toLowerCase())))).slice().reverse();
+  if(globalThis.JournalConsole)JournalConsole.display(entries,{follow});
+  else $('log-lines').textContent=entries.map(l=>'#'+(l.seq??l.rank)+' '+l.at+' ['+l.kind+'] '+l.message).join('\n')||tr_web_cockpit_js('Aucune ligne correspondante.');
+  $('log-position').textContent=tr_web_cockpit_js('Curseur ')+logCursor+' → '+logPage.next_cursor+(logPage.retention_gap?tr_web_cockpit_js(' · Début antérieur non conservé'):'')+(data.history_truncated?tr_web_cockpit_js(' · Historique antérieur limité'):'');
+  $('log-next').disabled=!logPage.more;$('log-prev').disabled=!logBack.length;
+  if(state)state.textContent=supervision?tr_web_cockpit_js('Incidents et décisions enregistrés · filtres appliqués à cette page · effet à vérifier.'):mission?tr_web_cockpit_js('Journal du moteur · filtres appliqués à cette page.'):tr_web_cockpit_js('Journal de la tentative · données originales conservées à l’export.');
+  if(follow&&!mission&&!supervision&&logPage.more)logCursor=logPage.next_cursor;
+ }catch(e){if(generation!==logRequestGeneration||work!==coordinates.work)return;if(state){state.textContent=tr_web_cockpit_js('Lecture impossible : ')+e.message;state.dataset.error='true'}else notice(e.message,true)}
+}
+
+$('action-form').addEventListener('submit',async event=>{event.preventDefault();if(!modalContext||modalContext.sending)return;const c=modalContext,a=c.action;c.sending=true;const current=()=>modalContext===c&&(a==='lifecycle'||work===c.workID);const f=Object.fromEntries(new FormData(event.target));const oldLabel=$('confirm').textContent,pendingLabel=['report','gate'].includes(a)?tr_web_cockpit_js('Lecture des preuves…'):tr_web_cockpit_js('Envoi de la demande…');$('confirm').textContent=pendingLabel;$('confirm').setAttribute('aria-live','polite');$('confirm').disabled=true;$('modal-error').hidden=true;try{
+ if(c.modelReady===false)throw Error(tr_web_cockpit_js('Attendre la résolution du modèle ou corriger le fournisseur sélectionné.'));
+ if(a==='lifecycle'){await LifecycleManager.submit(c);return}
+ if(a==='project-profile-select'){await ProjectProfiles.submit(c);return}
+ if(a==='role-model'){await RoleModels.submit(c,f);return}
+ if(a==='task-model'){await TaskModels.submit(c,f);return}
+ if(a==='quotas'){await Quotas.submit(c,f);return}
+ if(a==='pricing-save'||a==='pricing-estimate'){await Pricing.submit(c,f);return}
+ if(a==='ai-connection'){await AIConnections.save();return}
+ if(a==='provider-policy'||a==='provider-import'){if(!await submitProviderPolicy(f,c))return;closeModal();return}
+ if(a==='admin-config'){if(!await submitRunLimitsConfig(f,c))return;closeModal();return}
+ if(a==='admin-rollback'){if(!await submitRunLimitsRollback(f,c))return;closeModal();return}
+ if(a==='planning-cleanup'){await Planning.submitCleanup();return}
+ if(a==='planning-enable'){await Planning.submit();return}
+ if(a==='planning-control'){await Planning.submitControl();return}
+ if(a==='extend-attempt'){await PilotActions.extendAttempt(c,f);return}
+ if(a==='authorize-recovery'){await PilotActions.authorizeRecovery(c,f);return}
+ if(a==='resume-launch'){await act('resume-launch',{task:c.task,agent:c.prepared.id});if(!current())return;closeModal();notice(PilotActions.outcome(a));await refresh(true);return}
+ if(a==='mission-start'){if(!await Mission.confirmPreview(c))return;await act('mission-start',Mission.launchFields());if(!current())return;closeModal();notice(tr_web_cockpit_js('Mission continue autorisée. Swarm enchaîne les tâches prêtes ; les décisions nécessaires restent visibles.'));await refresh(true);return}
+ if(a==='validation-policy'){if(!c.validationPreview){const change=Mission.validationFields();const result=await act('validation-policy-preview',{task:c.task,validation_policy:change});if(!current())return;c.validationPreview=result;c.validationSignature=JSON.stringify(change);Mission.validationPreview(result);$('confirm').textContent=tr_web_cockpit_js('Confirmer cet effet');return}const change=Mission.validationFields();if(JSON.stringify(change)!==c.validationSignature){c.validationPreview=null;$('modal-error').textContent=tr_web_cockpit_js('Les réglages ont changé. Examinez le nouvel aperçu avant de confirmer.');$('modal-error').hidden=false;return}change.preview_token=c.validationPreview.preview_token;await act('validation-policy-apply',{task:c.task,event_id:crypto.randomUUID(),validation_policy:change});if(!current())return;closeModal();notice(tr_web_cockpit_js('Politique de validation enregistrée après confirmation de son aperçu.'));await refresh(true);return}
+ if(a==='plan-review'){await submitActionPlan(c);return}
+ if(a==='report'){const report=await api('/api/v1/report?'+new URLSearchParams({path:f.path,work:c.workID,task:c.task}));if(!current())return;preview(report.text);return}
+ if(a==='gate'&&!c.gatePreview){const gate=await act('gate-preview',{task:c.task,path:f.path,name:f.name});if(!current())return;preview(gate.preview);c.gatePreview=true;$('confirm').textContent=tr_web_cockpit_js('Confirmer l’enregistrement');return}
+ if(a==='start'&&!f.provider)throw new Error(tr_web_cockpit_js('Aucun fournisseur configuré. Installez Claude ou Codex, puis configurez .swarm/providers.json.'));
+ if(a==='assist-cancel'){await api('/api/v1/assist/cancel',{work:c.work,id:c.turn});closeModal();await loadAssistTurns();return}
+ if(a==='assist'){if(!await submitAssist(f,c))return;closeModal();notice(tr_web_cockpit_js('Question envoyée à l’IA. La réponse apparaîtra dans l’assistant de la page ; aucune action n’est exécutée automatiquement.'));return}
+ if(a==='brainstorm'){if(!await submitBrainstorm(f,c))return;}
+ else if(a.startsWith('retex-')){if(!await submitRetex(f,c))return;}
+ else if(a==='adopt-brief'){
+  $('confirm').textContent=tr_web_cockpit_js('Enregistrement du brief…');
+  const saved=await act('adopt-brief',{task:c.task,path:c.path,note:c.digest});
+  snapshot.work=saved;renderBrainstorm();closeModal();
+  notice(tr_web_cockpit_js('Brief adopté et enregistré pour « ')+saved.title+tr_web_cockpit_js(' ». Il sera transmis aux prochains agents. Aucune mission de réalisation n’a été lancée.'));
+  const section=$('brief-current');section.querySelector('details').open=true;section.tabIndex=-1;section.focus();section.scrollIntoView({block:'start'});return;
+ }
+ else if(a==='start'){if(!await PilotActions.preview(c,f))return;if(!current())return;const launched=await act('start',{skills:ProjectSkills.selected(f),mode:f.mode,task:c.task,provider:f.provider,role:f.role,workspace:f.workspace,instruction:f.instruction,capture_output:f.capture==='true',level:f.level,model_policy_hash:f.model_policy_hash});if(['terminal','dialogue'].includes(launched.mode))setTimeout(()=>AgentTerminal.open(launched),0);}
+ else if(['retry','stop','reconcile'].includes(a))await act(a,{...(a==='retry'?{skills:ProjectSkills.selected(f)}:{}),task:c.task,agent:f.agent,instruction:f.instruction||'',precondition_evidence:f.precondition_evidence||'',capture_output:f.capture==='true',level:f.level,model_policy_hash:f.model_policy_hash});
+ else if(['submit','gate'].includes(a)){if(a==='gate'&&!(f.name||'').trim())throw new Error(tr_web_cockpit_js('Nom de la gate requis : nom humain de cette évaluation.'));await act(a,{task:c.task,path:f.path,name:(f.name||'').trim()})}
+ else if(['accepted','todo','reopen','assign'].includes(a))await act('task',{task:c.task,request:a==='assign'?{owner:f.owner}:{status:a==='reopen'?'todo':a,next:a==='accepted'?tr_web_cockpit_js('Rapport accepté depuis le cockpit web après revue.'):tr_web_cockpit_js('Tâche rouverte depuis le cockpit web.')}});
+ else if(a==='override')await act('override',{task:c.task,note:f.note});
+ else if(a==='decision')await act('decision',{decision:c.decision,note:f.note});
+ else if(a==='ooda')await act('ooda',{request:{observation:f.observation,orientation:f.orientation,decision:f.decision,result:f.result,next:f.next}});
+ else if(a==='budget'){if(!f.limit.trim()||!f.reserve.trim()||!Number.isFinite(Number(f.limit))||!Number.isFinite(Number(f.reserve)))throw new Error(tr_web_cockpit_js('Saisissez des montants numériques finis.'));const proposed={limit_usd:Number(f.limit),reserve_per_launch_usd:Number(f.reserve),estimate_source:f.source,reference_date:f.date};const signature=JSON.stringify(proposed);if(c.budgetPreview!==signature){const p=await act('budget-preview',{budget:proposed});if(!current())return;preview(tr_web_cockpit_js('Plafond actuel / proposé : ')+p.current.budget.limit_usd+' / '+p.proposed.limit_usd+' USD. '+tr_web_cockpit_js('Engagements conservés : ')+(p.current.reserved_usd+p.current.committed_estimate_usd)+' USD. '+tr_web_cockpit_js('Disponible après modification : ')+(p.proposed_unlimited?tr_web_cockpit_js('Sans plafond'):p.proposed_remaining_usd+' USD')+'. '+tr_web_cockpit_js('Les agents actifs continuent. Les autres conditions de lancement restent applicables.'));c.budgetPreview=signature;$('confirm').textContent=tr_web_cockpit_js('Enregistrer ce budget');return;}await act('budget',{budget:proposed});}
+ if(!current())return;closeModal();notice(c.cancelPending?tr_web_cockpit_js('Démarrage annulé. La tâche est libérée ; vous pouvez maintenant choisir « Relancer cette tâche ».'):PilotActions.outcome(a));await refresh();
+ }catch(e){if(!current())return;$('modal-error').textContent=e.message==='Failed to fetch'?tr_web_cockpit_js('Connexion au cockpit interrompue. Vérifiez le serveur puis réessayez.'):e.message;$('modal-error').hidden=false;if(modalContext?.action==='adopt-brief')$('confirm').textContent=tr_web_cockpit_js('Réessayer l’adoption')}finally{c.sending=false;if(current()){$('confirm').disabled=c.modelReady===false||!!c.lifecyclePreview?.blocked?.length;if($('confirm').textContent===pendingLabel)$('confirm').textContent=oldLabel}}});
+$('close').onclick=closeModal;$('cancel').onclick=closeModal;$('modal').addEventListener('cancel',e=>{e.preventDefault();closeModal()});
+$('work').onchange=chooseWork;$('refresh').onclick=refresh;$('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b?.dataset.view)showView(b.dataset.view)});
+$('manage-search').addEventListener('input',()=>LifecycleManager.render());$('manage-state').addEventListener('change',()=>LifecycleManager.render());$('manage-help').addEventListener('click',()=>LifecycleManager.help());
+$('pause').onclick=async()=>{try{await act(snapshot.paused?'unpause':'pause');await refresh()}catch(e){notice(e.message,true)}};
+function pauseLogFollowing(){follow=false;$('log-live').setAttribute('aria-pressed','false');$('log-live').textContent=tr_web_cockpit_js('Suivre le direct')}
+$('log-form').onsubmit=e=>{e.preventDefault();logCursor=0;logBack=[];loadLogs()};$('log-agent').onchange=()=>{logCursor=0;logBack=[];logPage=null;globalThis.JournalConsole?.clear();loadLogs()};$('log-next').onclick=()=>{pauseLogFollowing();logBack.push(logCursor);logCursor=logPage.next_cursor;loadLogs()};$('log-prev').onclick=()=>{pauseLogFollowing();logCursor=logBack.pop()||0;loadLogs()};$('log-live').onclick=()=>{follow=!follow;$('log-live').setAttribute('aria-pressed',String(follow));if(follow&&['__mission__','__supervision__'].includes($('log-agent').value)){logCursor=0;logBack=[];}$('log-live').textContent=follow?tr_web_cockpit_js('Mettre en pause'):tr_web_cockpit_js('Suivre le direct');loadLogs()};$('log-export').onclick=()=>{if(!logPage)return;const a=node('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(logPage,null,2)],{type:'application/json'}));a.download='swarm-journaux-page.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('journal-search').onclick=()=>globalThis.JournalConsole?.search();
+$('ooda').onclick=()=>{openModal(tr_web_cockpit_js('Consigner une boucle OODA'),tr_web_cockpit_js('Conservez les faits, votre décision et la prochaine action.'),{action:'ooda'});for(const [key,label]of [['observation','Observation'],['orientation','Orientation'],['decision',tr_web_cockpit_js('Décision')],['result',tr_web_cockpit_js('Résultat observé')],['next',tr_web_cockpit_js('Prochaine action')]])field(key,label,'',null,true)};
+// Nommée (pas une fermeture anonyme sur le bouton) : la carte de décision de
+// blocage budget (conduite.js) ouvre exactement ce même réglage, ciblé sur le
+// travail courant, au lieu de dupliquer le formulaire ou d'inventer un accès.
+function openBudgetEdit(){const b=snapshot.budget.budget;openModal(tr_web_cockpit_js('Régler le budget'),tr_web_cockpit_js('Budget estimatif non garanti. Les agents actifs continuent ; les nouveaux départs sont contrôlés.'),{action:'budget'});for(const [key,label,value]of [['limit',tr_web_cockpit_js('Plafond USD — 0 pour désactiver'),b.limit_usd],['reserve',tr_web_cockpit_js('Réservation estimée par départ, USD'),b.reserve_per_launch_usd]]){const e=field(key,label,value);e.type='number';e.min='0';e.step='any';e.required=true;}field('source',tr_web_cockpit_js('Source de l’estimation'),b.estimate_source);field('date',tr_web_cockpit_js('Date de référence — AAAA-MM-JJ'),b.reference_date);$('confirm').textContent=tr_web_cockpit_js('Prévisualiser le budget');$('modal-fields').oninput=()=>{if(modalContext?.action==='budget'){modalContext.budgetPreview=null;$('preview').hidden=true;$('confirm').textContent=tr_web_cockpit_js('Prévisualiser le budget')}}}
+$('budget-edit').onclick=openBudgetEdit;
+$('visit').onclick=async()=>{try{await api('/api/v1/visit?work='+encodeURIComponent(work),{});await refresh();notice(tr_web_cockpit_js('Révision marquée comme vue.'))}catch(e){notice(e.message,true)}};
+$('help').onclick=()=>showCockpitHelp();
+// La visite s'enregistre en QUITTANT un travail, jamais en l'ouvrant : marquée à
+// l'ouverture, elle effacerait le repère que le lecteur vient justement d'ouvrir
+// pour le consulter. Un bouton manuel, lui, finit toujours par être oublié.
+let visiteTravail = '';
+// Sans await à l'appel : attendre l'enregistrement retarderait le changement de
+// travail d'un aller-retour réseau, et céder la main dès la première ligne de
+// chooseWork suffirait à décaler l'ordre d'initialisation de la page.
+function marquerVisiteSortie(){
+ const quitte = visiteTravail;
+ visiteTravail = '';
+ if(!quitte) return;
+ api('/api/v1/visit?work='+encodeURIComponent(quitte),{}).catch(()=>{ /* sortie : ne pas gêner le départ */ });
+}
+// `pagehide` couvre la fermeture et la navigation. `sendBeacon` conviendrait
+// pour survivre à la disparition de la page, mais il ne peut poser aucun
+// en-tête : le garde de session exige `X-Swarm-CSRF` sur tout non-GET, et
+// l'enregistrement repartait en 403 avalé en silence — le repère de visite
+// n'était donc jamais posé à la fermeture. `fetch` avec `keepalive` survit de
+// la même façon et porte l'en-tête.
+addEventListener('pagehide',()=>{
+ const quitte = visiteTravail;
+ visiteTravail = '';
+ if(!quitte) return;
+ try{
+  fetch('/api/v1/visit?work='+encodeURIComponent(quitte),
+   {method:'POST',keepalive:true,headers:{'Content-Type':'application/json','X-Swarm-CSRF':csrf},body:'{}'})
+   .catch(()=>{ /* rien à rattraper à la fermeture */ });
+ }catch{ /* rien à rattraper à la fermeture */ }
+});
+
+function setTheme(theme){document.documentElement.dataset.theme=theme;cockpitStorage.setItem('swarm-theme',theme);$('theme').textContent=theme==='etat'?tr_web_cockpit_js('Passer au thème sombre'):tr_web_cockpit_js('Passer au thème clair')}
+$('theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='etat'?'sombre':'etat');setTheme(cockpitStorage.getItem('swarm-theme')||'etat');
+(async()=>{try{const [session,works]=await Promise.all([api('/api/v1/session'),api('/api/v1/works')]);csrf=session.csrf;$('work').disabled=true;const url=new URL(location.href);const requested=url.searchParams.get('work');const requestedMissing=!!requested&&works.length>0&&!works.some(w=>w.id===requested);selectOptions($('work'),works.map(w=>[w.id,w.title]),requestedMissing?cockpitStorage.getItem('swarm-work'):(requested||cockpitStorage.getItem('swarm-work')));const initial=url.searchParams.get('view')||cockpitStorage.getItem('swarm-view')||'conduite';showView(works.length?(requestedMissing?'manage':initial):'manage');if(works.length)await chooseWork();$('work').disabled=false;if(!works.length)notice(tr_web_cockpit_js('Aucune mission active. Vous pouvez restaurer une mission depuis « Gérer les missions ».'));else if(requestedMissing)noticeMissionSupprimee()}catch(e){notice(e.message,true)}})();

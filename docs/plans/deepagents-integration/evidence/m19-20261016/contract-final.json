@@ -1,0 +1,40 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestMemorySummarySelection.*|TestMemorySummarySource.*|TestContextPreviewFreezesAndRejectsDrift|TestMemoryRuntimeRecoveryContextMatchesProviderAndPersists|TestLaunchAtomicIdempotentAndWorkspaceExclusive|TestProjectMemoryPublicLifecycle)$",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T20:13:54.496026+00:00",
+  "duration_seconds": 19.257,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestLaunchAtomicIdempotentAndWorkspaceExclusive",
+    "TestMemoryRuntimeRecoveryContextMatchesProviderAndPersists",
+    "TestMemorySummarySelectionPublicLaunchContract",
+    "TestMemorySummarySelectionRejectsInvalidChoicesWithoutMutation",
+    "TestMemorySummarySelectionFreshnessAndConfirmation",
+    "TestMemorySummarySelectionConfirmationBindsReason",
+    "TestMemorySummarySelectionRejectsInvalidStoredBoundary",
+    "TestMemorySummarySelectionActualProviderInputAndReopen",
+    "TestMemorySummarySelectionQueuedDriftPreventsProvider",
+    "TestMemorySummarySelectionPreviewCLIAPIAndOldStorage",
+    "TestMemorySummarySelectionAPIAuthentication",
+    "TestMemorySummarySelectionConcurrentConfirmationCreatesOnce",
+    "TestMemorySummarySelectionReceiptWriteFailurePreventsProvider",
+    "TestMemorySummarySourceWrongMethodDoesNotReturnCatalog",
+    "TestMemorySummarySourceInspectionNeverMigratesOldStore",
+    "TestMemorySummarySourceCLIAPIParityAndSessionProtection",
+    "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection",
+    "TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork",
+    "TestMemorySummarySourceCLIExportsExactSelectedSourcesWithoutMutation",
+    "TestContextPreviewFreezesAndRejectsDrift",
+    "TestProjectMemoryPublicLifecycle"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "e2c51178eda6be50ffcd2c3ab5457399ed208dd9a383594a3d2a814c6f1c0a05",
+  "real_model_calls": 0
+}

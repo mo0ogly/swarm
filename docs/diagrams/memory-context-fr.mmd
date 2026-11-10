@@ -1,0 +1,66 @@
+flowchart TB
+    accTitle: Mémoire Swarm : connaissances, contexte et reprise de conversation
+    accDescr: La mémoire de projet, les révisions de consigne, les références extractives, le contexte préparé/final et les frontières de dialogue sont des objets distincts. Les droits d’usage portent sur les sources et destinataires exacts.
+    subgraph G0["CONNAISSANCES"]
+        M_RETEX["RETEX vérifié et tâche acceptée<br/>Sources et preuves fraîches"]
+        M_ADMIT["Admission · preview puis apply<br/>Révision · événement · token"]
+        M_VERSION["Mémoire de projet versionnée<br/>Expérience / procédure · provenance<br/>Un souvenir ne crée aucun droit"]
+        M_SELECT["Sélection explicite pour une tâche<br/>Version · empreinte · conditions"]
+        M_REPLACE["Remplacement · retrait · import<br/>Histoire et contextes reçus conservés"]
+    end
+    subgraph G1["AUTORITÉ"]
+        M_RIGHTS["Contrat d’usage identité · raccord ouvert<br/>read ≠ summarize ≠ transmit<br/>Source et destinataire exacts"]
+        M_ATTRIB["Propriétaire · auteur · récepteur<br/>Trois faits distincts à attester"]
+    end
+    subgraph G2["CONTEXTE"]
+        M_EXTRACT["Sélection extractive confirmée<br/>Citations reconstruites · context_hash"]
+        M_HISTORY["Historique de la même tâche<br/>Activités attribuées · extraits et omissions"]
+        M_INSTRUCT["Révisions de consigne attribuées<br/>revise-instructions · base conservée<br/>Ajouts actifs par défaut<br/>Rejet avant réservation"]
+        M_METHODS["Consignes et contrat de tâche<br/>Méthodes sélectionnées · références"]
+        M_ENGINE["MOTEUR DÉTERMINISTE RUST<br/>Résoudre sources et usages<br/>Composer puis contrôler le prompt"]
+        M_MANIFEST["prepared_context et context final<br/>Texte · octets · SHA · sources reçues"]
+        M_CHECK["Relecture avant départ<br/>Fraîcheur · capacité · reçu enregistré"]
+    end
+    subgraph G3["DIALOGUE"]
+        M_PROVIDER["Contexte transmis à la tentative<br/>Réception distincte de conformité IA"]
+        M_BOUNDARY["Frontière durable du dialogue<br/>Tour · session · usage · confirmation"]
+        M_RECOVERY["Diagnostic de reprise en lecture seule<br/>checkpoint_sha256 · facts_sha256"]
+        M_RECONCILE["Effets incertains à réconcilier<br/>Pas de rejeu implicite"]
+        M_RESUME["Reprise explicitement autorisée<br/>Nouvelle tentative · même conversation"]
+    end
+    M_RETEX --> M_ADMIT
+    M_ADMIT --> M_VERSION
+    M_VERSION --> M_SELECT
+    M_VERSION --> M_REPLACE
+    M_REPLACE -->|Revalider les sélections futures| M_SELECT
+    M_ATTRIB --> M_RIGHTS
+    M_RIGHTS -.->|Raccord global restant| M_ENGINE
+    M_SELECT --> M_ENGINE
+    M_EXTRACT --> M_ENGINE
+    M_HISTORY --> M_ENGINE
+    M_INSTRUCT --> M_ENGINE
+    M_METHODS --> M_ENGINE
+    M_ENGINE --> M_MANIFEST
+    M_MANIFEST --> M_CHECK
+    M_CHECK --> M_PROVIDER
+    M_PROVIDER --> M_BOUNDARY
+    M_BOUNDARY -->|Frontière confirmée| M_RECOVERY
+    M_BOUNDARY -->|Fin non confirmée| M_RECONCILE
+    M_RECONCILE --> M_RECOVERY
+    M_RECOVERY -->|Décision et précontrôle distincts| M_RESUME
+    M_RESUME --> M_CHECK
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+    classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+    classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+    class M_RETEX,M_SELECT,M_EXTRACT,M_HISTORY,M_INSTRUCT,M_METHODS,M_PROVIDER,M_RECOVERY ordinary;
+    class M_ENGINE core;
+    class M_ADMIT,M_ATTRIB,M_CHECK,M_RECONCILE,M_RESUME control;
+    class M_VERSION,M_REPLACE,M_MANIFEST,M_BOUNDARY data;
+    class M_RIGHTS pending;
+    style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G1 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G2 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G3 fill:#f5f3ec,stroke:#205e70,color:#062b49

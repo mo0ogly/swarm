@@ -1,0 +1,70 @@
+{
+  "at": "2026-10-11T17:21:14.952067+00:00",
+  "previous_review": "review-1b5f5ca10548cb55f0830263",
+  "previous_candidate": "d12b8f048a3a8817803cc2dd32149e5b1d9eea52",
+  "base_tree": "9b03d914eadbc6711dd3804b5178e78e7c30f063",
+  "result_tree": "9c99b9bf3ee79a640fcfb8f64e734cb12b2efd2b",
+  "paths": [
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011-receipt.json",
+    "docs/plan-ca937edf4e-T2.md",
+    "docs/plan-ca937edf4e-T2.delivery.json",
+    "docs/plan-ca937edf4e-T2.review-context.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json"
+  ],
+  "preimages": {
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011.out": null,
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011-receipt.json": null,
+    "docs/plan-ca937edf4e-T2.md": "f4bff6d95bc2cdf52c5fc38bc1c453bf48d403ca6aac0219ee44daaa23e4a6f2",
+    "docs/plan-ca937edf4e-T2.delivery.json": "a894aed2e4dfd5042cad37c13b409366910305d82ae73f892a60cca0d98304b9",
+    "docs/plan-ca937edf4e-T2.review-context.json": "5636e68046a811b0a1fdbab7b5b379c6b810a60fabcf4935a2083b375c5b01ba",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json": "9d51a3af66b1d93e2926f8b59887470c3cf6704824a55fb96dc5deb55cf29cea",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json": "904e89a5169245630ba57d3790239b6fcd6f36fb3ac1d3b200e9133a36c0fdc7"
+  },
+  "postimages": {
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011.out": "819e9d284cee57905f99251f21941928211c0a887a00409ab3a9bb3beb1d4bdf",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011-receipt.json": "f195aa6804f9e97a1c243ceddfdf4beb74d9742f7cd28007630449b3d0943e38",
+    "docs/plan-ca937edf4e-T2.md": "51e846248353e79e49f719e431b7d2df87965ae9228452fd4a80d586c5ee8aa7",
+    "docs/plan-ca937edf4e-T2.delivery.json": "0801b313dce42aaf154d46d557989c8509852adeeba732b2ea3b8fafa8003f90",
+    "docs/plan-ca937edf4e-T2.review-context.json": "7530eb991b90e7394ac867d0d2ee692e949d28045b2efbf9571991ff319637fa",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json": "05a4760f8e9e42623289139bc91697ed71660bcd499f7bfda7841a0b35a341f5",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json": "2c340585f4b43df763dfac4dd5242906714f9d81a257c7123eee6a3dba1eeb1f"
+  },
+  "sources": 18,
+  "source_bytes": 126587,
+  "code_identical": true,
+  "full": {
+    "command": [
+      "go",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T17:11:59.541590+00:00",
+    "end": "2026-10-11T17:20:11.934981+00:00",
+    "seconds": 492.3955303210023,
+    "exit": 0,
+    "output_sha256": "819e9d284cee57905f99251f21941928211c0a887a00409ab3a9bb3beb1d4bdf",
+    "qualification_environment": {
+      "TMPDIR": "/tmp",
+      "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+    },
+    "source_manifest_sha256": "781aae84758188233594a94a0082166084e4d6c6700eeb9857dad154d8763ebe",
+    "candidate_digest": "d62229308d111bd7233db5a401d1f130e48238a313d1f32872242cfe7c7fbea9",
+    "paths": 1049,
+    "source_drift": [],
+    "manifest_changed": false,
+    "version": 1,
+    "executor": "Codex operator, own isolated copy code-identical to stopped native T2 producer; no native database used",
+    "stdout_path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011.out",
+    "candidate_source_tree_before_docs": "9b03d914eadbc6711dd3804b5178e78e7c30f063",
+    "previous_review": "review-1b5f5ca10548cb55f0830263",
+    "previous_candidate": "d12b8f048a3a8817803cc2dd32149e5b1d9eea52",
+    "historical_shard_summary_sha256": "ea3662f5da5c777915df43ceb39ae26120e1133b48bc66c2879b2f6d31ea89f6",
+    "observation": "Equal shard cardinalities alone prove neither fabrication nor authenticity. Historical summary and independent refusal are retained. This new raw canonical command supersedes shard summaries as current whole-suite evidence; no historical output reconstructed or edited.",
+    "limits": "Go fixtures and optional skips, not real-model autonomy, browser recipes or candidate acceptance. Fresh public controller checks and independent review of final documentation candidate still required."
+  },
+  "patch_sha256": "b59cbc6af26505c83ff4af148843c55ec04d96eadcbb010a624886dfe76ac97c"
+}

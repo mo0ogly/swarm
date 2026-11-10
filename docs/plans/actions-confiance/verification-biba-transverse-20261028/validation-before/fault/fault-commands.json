@@ -1,0 +1,253 @@
+[
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "init",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json"
+    ],
+    "start": 1793208907.2705824,
+    "end": 1793208907.3304176,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "work",
+      "create",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/validation-before/fault/fault-002.input.json"
+    ],
+    "start": 1793208907.3488555,
+    "end": 1793208907.4443896,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "task",
+      "add",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/validation-before/fault/fault-003.input.json"
+    ],
+    "start": 1793208907.4637697,
+    "end": 1793208907.5539987,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "budget",
+      "apply",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/validation-before/fault/fault-004.input.json"
+    ],
+    "start": 1793208907.5712125,
+    "end": 1793208907.6317163,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "work",
+      "show",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json"
+    ],
+    "start": 1793208907.7857754,
+    "end": 1793208907.8564355,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "task",
+      "update",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/validation-before/fault/fault-006.input.json"
+    ],
+    "start": 1793208907.8741412,
+    "end": 1793208907.9630904,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "agent",
+      "prepare",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/validation-before/fault/fault-007.input.json"
+    ],
+    "start": 1793208907.9808552,
+    "end": 1793208908.0836382,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "agent",
+      "run",
+      "session",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json"
+    ],
+    "start": 1793208908.0956283,
+    "end": 1793208908.5743144,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "work",
+      "show",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json"
+    ],
+    "start": 1793208908.5847473,
+    "end": 1793208908.6698012,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "agent",
+      "show",
+      "session",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json"
+    ],
+    "start": 1793208908.6799035,
+    "end": 1793208908.7488828,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "work",
+      "show",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json"
+    ],
+    "start": 1793208908.7584128,
+    "end": 1793208908.830177,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "work",
+      "show",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json"
+    ],
+    "start": 1793208908.8409808,
+    "end": 1793208908.9222682,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "task",
+      "submit",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/validation-before/fault/fault-013.input.json"
+    ],
+    "start": 1793208908.942712,
+    "end": 1793208909.028903,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/baseline-image",
+      "work",
+      "show",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json"
+    ],
+    "start": 1793208909.0375326,
+    "end": 1793208909.1108527,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d",
+      "work",
+      "show",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json"
+    ],
+    "start": 1793208909.1226974,
+    "end": 1793208909.211635,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d",
+      "task",
+      "validation-preview",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/validation-before/fault/fault-016.input.json"
+    ],
+    "start": 1793208909.22786,
+    "end": 1793208909.3140304,
+    "exit": 0
+  },
+  {
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d",
+      "task",
+      "validate",
+      "w-02b488f106a41ea268035e22",
+      "--root",
+      "/tmp/swarm-model83-nix6gbuc",
+      "--json",
+      "--input",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/validation-before/fault/fault-017.input.json"
+    ],
+    "start": 1793208909.3315735,
+    "end": 1793208909.686363,
+    "exit": 0
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "name": "vet",
+  "argv": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "started": "2026-10-12T14:13:36.460673+00:00",
+  "finished": "2026-10-12T14:14:45.898545+00:00",
+  "exit": 0,
+  "wall_seconds": 69.27954528300324,
+  "output": "/tmp/swarm-control-command-deadline-vet.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "drift": []
+}

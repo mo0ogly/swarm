@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-17T12:09:33.338953+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "owned_docs": {
+    "docs/plans/actions-confiance/identites-agents-replan.md": "c91749c3ffdb911f9e529ca5a56074238d2f21e59d1e91e3c0cf2b28f6a4f35b",
+    "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md": "56e455e07109058675573eccc74caa9640d3b05ee667055e672168ac17014b5c",
+    "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "5d91e8d91e2252cf0f4f8e2e4e0e574b783eac729f4519b734cf0a34d40c3db9",
+    "docs/en/AGENT-IDENTITY-CONTRACT.md": "afc3dd586d6f9bf572d80ed1104ae7926101fa48c6f46219587a66d6073d8597",
+    "INSTALL.md": "e4ea40e7cc8e04af96f0c73aa57ad872049980a517779baf6cb0be75829c0a01",
+    "docs/en/INSTALL.md": "c7f2cc09d89fbcef361795ebe69e5e4101a46393a8fac255ec4177ddf0ff0c96"
+  },
+  "read_only_references": {
+    "install.sh": "d8dce1a19a5d22c02e8d9d6c55d92a97b081360273ad611379becd6819ce5418",
+    "compose.yaml": "6a564d926128e06fd5cfbdad5577671654646fcf77df473086939e228e791eb3",
+    "internal/engine/trust_remote.go": "9f00555f137a9c31cd772d7204faf9a2cee9b7bb2efcde427b4b460568a2c0a8",
+    "internal/engine/trust_actions_http.go": "bc3b06c0b545d87106fa1f125c2c3bf510639e1c81a8a1a3d2c8460349a784b0",
+    "web/admin.js": "c148b619d43d42176af0c6dc10c4723cbd88bb27dac103490664fafd32570dab",
+    "docs/PRODUCT-ARCHITECTURE.md": "e3d946e78513bfd500d6dcf6e1fb153369efd1e0ecf7bb62e45408c5548bfe5d",
+    "docs/UI-DESIGN.md": "5dcc632feefd080849407796346c37cde040f6f1de57d9b8a57dde7312c48d6e",
+    "tools/agent-workflows/CONTRACT.md": "d56566d6e767537e29e23472e3bd7e25f3c322f4a4929a39280a621792c429de",
+    "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "internal/enrollmentauthority/authority.go": "6d051fc5ad657f22097e99b198f59b2bbee39a6b630ddb1c576b3178325ca555",
+    "internal/enrollmentauthority/authority_test.go": "e0bee7e39fe590dbccd8c3e2b46c9080d647ac913cc9554a39dfcc1346803f4c",
+    "internal/enrollmentauthority/reply_version_test.go": "84895baf4ae4331503737a557d03f27d3c9dfbed57b4bea47ac2f7253eb37c11",
+    "internal/enrollmentproof/proof.go": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+    "internal/enrollmentproof/proof_test.go": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "internal/enrollmentrequest/request.go": "9af7c03c69997239ac246fa4f620893c57d3d58bec339f75eeecb16f50ca4f31",
+    "internal/enrollmentrequest/request_test.go": "bd925ac64ae511230a1fcc9132e932935ce741bb16d7a2ed70a60a81a262ba64",
+    "internal/enrollmentstate/journal.go": "b2587484295d0bc54fd4233e7e3a3f25d3912d7c2738c9c913e38ff737ff859a",
+    "internal/enrollmentstate/journal_test.go": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+    "internal/enrollmentstate/recovery_test.go": "648eaa86435154bd94b04740dad651433f5c84970417d1386a2850c12e88a51d",
+    "internal/enrollmentstate/reply.go": "2989216e0b098ce99d81ae43c97ed3e47e75918d468efe4647d74d63eccd3a68",
+    "internal/enrollmentstate/reply_test.go": "822b2ded07b5eaf1c6c470d0f9627509c811a682e56b5e9f3d33d31e8ac34069",
+    "internal/identitycontract/contract.go": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+    "internal/identitycontract/contract_test.go": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7"
+  }
+}

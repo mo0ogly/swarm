@@ -1,0 +1,24 @@
+=== RUN   TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource
+--- PASS: TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource (2.00s)
+=== RUN   TestActionsConfianceT2ReplayBindsAuthenticatedAuthority
+--- FAIL: TestActionsConfianceT2ReplayBindsAuthenticatedAuthority (0.20s)
+panic: interface conversion: interface {} is json.RawMessage, not engine.TrustAction [recovered]
+	panic: interface conversion: interface {} is json.RawMessage, not engine.TrustAction
+
+goroutine 15 [running]:
+testing.tRunner.func1.2({0x1e6bf00, 0xc0005b12f0})
+	/usr/local/go/src/testing/testing.go:1734 +0x3eb
+testing.tRunner.func1()
+	/usr/local/go/src/testing/testing.go:1737 +0x696
+panic({0x1e6bf00?, 0xc0005b12f0?})
+	/usr/local/go/src/runtime/panic.go:792 +0x132
+swarm.local/companion/internal/engine.assertTrustIgnoredClaimsReplay(0xc000493500)
+	/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-2/internal/engine/trust_actions_test.go:153 +0x13ed
+swarm.local/companion/internal/engine.TestActionsConfianceT2ReplayBindsAuthenticatedAuthority(0xc000493500)
+	/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-2/internal/engine/trust_actions_operator_regression_test.go:651 +0x3f
+testing.tRunner(0xc000493500, 0x4d77320)
+	/usr/local/go/src/testing/testing.go:1792 +0x226
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go/src/testing/testing.go:1851 +0x8f3
+FAIL	swarm.local/companion/internal/engine	2.338s
+FAIL

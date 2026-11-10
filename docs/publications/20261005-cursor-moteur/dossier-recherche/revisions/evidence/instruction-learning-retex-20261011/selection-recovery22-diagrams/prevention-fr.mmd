@@ -1,0 +1,14 @@
+flowchart TD
+    A[Incident et preuves originales] --> B[Replan et cause falsifiable]
+    B --> C[Correction du contrat general]
+    C --> D[Cas initial et variantes en regression]
+    D --> E[Controle des entrees invalides]
+    E --> S[Superviseur du perimetre decide]
+    S --> M[Moteur verifie et applique]
+    M --> V[Reception decision application effet observes]
+    V --> L[Apprentissage transmis aux taches futures]
+    L --> U[Ajout visible et rejet possible par utilisateur]
+    V --> N[Reprendre le besoin initial jusqu au RETEX]
+    D -->|Echec| B
+    E -->|Echec| B
+    V -->|Effet non etabli| B

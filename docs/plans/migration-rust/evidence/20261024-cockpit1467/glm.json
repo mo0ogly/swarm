@@ -1,0 +1,43 @@
+{
+  "calls": 2,
+  "total_declared_tokens": 11203,
+  "automatic_retries": 0,
+  "1466": {
+    "usable_response": true,
+    "requested_model": "glm-5.2",
+    "started_at_unix": 1792861513.9004521,
+    "automatic_retries": 0,
+    "reported_model": "glm-5.2",
+    "usage": {
+      "completion_tokens": 1805,
+      "prompt_tokens": 375,
+      "total_tokens": 2180,
+      "completion_tokens_details": {
+        "reasoning_tokens": 6,
+        "text_tokens": 1799
+      }
+    },
+    "finish_reason": "stop",
+    "elapsed_seconds": 7.334
+  },
+  "1467": {
+    "usable_response": true,
+    "requested_model": "glm-5.2",
+    "started_at_unix": 1792861872.9063246,
+    "automatic_retries": 0,
+    "reported_model": "glm-5.2",
+    "usage": {
+      "completion_tokens": 2864,
+      "prompt_tokens": 6159,
+      "total_tokens": 9023,
+      "completion_tokens_details": {
+        "reasoning_tokens": 97,
+        "text_tokens": 2767
+      }
+    },
+    "finish_reason": "stop",
+    "elapsed_seconds": 11.524
+  },
+  "integrated": "Budget/agent renderer and dependency renderer, after explicit principal corrections and tests. No shell/repo tools or acceptance authority delegated.",
+  "model": "User says GLM5.3 backend; API requests/reports glm-5.2, backend version unverified."
+}

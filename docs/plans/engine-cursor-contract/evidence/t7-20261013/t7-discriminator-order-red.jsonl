@@ -1,0 +1,9 @@
+{"Time":"2026-10-13T09:43:46.131407759+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-13T09:43:46.242736636+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaChoosesKindBeforePayload"}
+{"Time":"2026-10-13T09:43:46.242819071+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaChoosesKindBeforePayload","Output":"=== RUN   TestPlanningSchemaChoosesKindBeforePayload\n"}
+{"Time":"2026-10-13T09:43:46.244984422+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaChoosesKindBeforePayload","Output":"    planning_operation_schema_contract_test.go:111: payload determines branch before discriminator: first=criteria err=\u003cnil\u003e\n"}
+{"Time":"2026-10-13T09:43:46.250455948+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaChoosesKindBeforePayload","Output":"--- FAIL: TestPlanningSchemaChoosesKindBeforePayload (0.00s)\n"}
+{"Time":"2026-10-13T09:43:46.250523184+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaChoosesKindBeforePayload","Elapsed":0}
+{"Time":"2026-10-13T09:43:46.250532502+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-13T09:43:46.252386417+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.070s\n"}
+{"Time":"2026-10-13T09:43:46.252403699+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.127}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "repair-audit-and-preview-race-785713e6866e4719",
+  "expected_revision": 236,
+  "task_id": "plan-68b50cc82e-T2",
+  "agent_id": "auto-c8053557575a81bb6164",
+  "attempt_id": "a-b4669e24bbfb91f7a9686499",
+  "review_id": "review-4ce246e4f3db9ce3d191d8fe",
+  "confirm_recovery": true,
+  "result_tree": "73a9703c559fbbf0b22242b54e72569cda53de43",
+  "reason": "Réparation opérateur des deux refus indépendants confirmés : les erreurs métier authentifiées conservent preuve, original et autorité sans changer l’effet ; le rejeu conserve son code après redémarrage. L’aperçu Admin est lié à une génération : saisie, fermeture et réponse plus récente rendent les anciennes réponses inapplicables. Reproductions avant correction conservées ; quatre variantes audit et trois variantes réseau réelles vérifiées. 24 tests principaux/34 sous-cas avec race, validation publique sept cas et 58 cas Go nommés, 18 groupes navigateur et vingt dispositions passent. Producteur commun commandFailure fourni entier. Tentatives et dépenses conservées ; contrôles natifs frais et avis indépendant requis."
+}

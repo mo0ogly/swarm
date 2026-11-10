@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "observed_error": "AssertionError at line 17: global assertion rejected transitions,+contexte",
+  "cause": "The operational-document typo guard also examined the historical RETEX quoting the original typo.",
+  "correction": "Restrict this content assertion to docs/SEMANTIC-SIGNALS.md; preserve the historical quote. Re-run final audit after final browser receipt.",
+  "owner": "Codex memory"
+}

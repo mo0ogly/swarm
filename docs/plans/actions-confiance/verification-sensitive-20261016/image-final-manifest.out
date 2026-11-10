@@ -1,0 +1,4 @@
+=== RUN   TestGraphDeliveryD03QualificationManifest
+--- PASS: TestGraphDeliveryD03QualificationManifest (2.13s)
+PASS
+ok  	swarm.local/companion/internal/engine	3.379s

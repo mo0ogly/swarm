@@ -1,0 +1,664 @@
+IMPLEMENTATION contract: public planning.enable repository bootstrap ONLY for committed_only=true with empty include_dirty. Existing pure apply refuses repository. Root work_engine strips repository from a local clone solely for prevalidation/provider observation, then calls crate::managed_repository::prepare(root, workid, original_repository_request, settings)->Result<ManagedRepository,AgentLaunchError>; sets resulting planning.repository, validates actual candidate, existing mutation intent/replay retains ORIGINAL request. Root's existing public replay precedes IO. No managed claim/decide/launch/settlement guards removed. No source/index/HEAD mutation, no real model. Saved git_command_timeout_seconds, no 90sec literal. Local private directories and operation lock retained, manifest JSON digest exact Go encode, candidate/base actual immutable commit. Pending manifest before bare no-replace publication, final manifest after; replay verifies commit objects and exact request/paths. Unknown/orphan/changed manifest refuses without overwrite. New helper functions private, use AgentLaunchError typed cause+finish for independent close errors. Deliver code/proposal only, not execution.
+
+FILE tests/rust_planning_bootstrap.py
+#!/usr/bin/env python3
+"""Verify public native provider/reviewer bootstrap on an owned root.
+
+No private SQL seeding, model/provider process, scope claim or automatic dispatch.
+The inherited fixture prepares only an inert local executable and model catalogue;
+this recipe creates a separate fresh Work through the supported CLI.
+"""
+import argparse,json,traceback,shutil,os
+from pathlib import Path
+import rust_agent_model_route as m
+
+
+def fresh_work(f,event):
+    """Create a new public Work without tasks; no historical adoption is implied."""
+    return f.ok(['work','create'],dict(schema_version=1,event_id=event,expected_revision=0,title='Public planning bootstrap',objective='Scoped fixture planning',scope='Owned local bootstrap',criteria=['Configuration is persisted without model execution']))['work']['id']
+
+
+def request(event='enable',**patch):
+    """An explicit operator request with independent positive activation/review budgets."""
+    value=dict(schema_version=1,event_id=event,expected_revision=1,provider='fixture',level='standard',max_activations=3,max_tasks=10,max_decisions=10,max_review_calls=2);value.update(patch);return value
+
+
+
+def refused(f,value,expected):
+    """Require the intended safe refusal with Work/events/agent/reservation intact."""
+    before=f.ok(['work','show',f.work]);snapshot=f.snapshot()
+    code,response=f.call(['planning','enable',f.work],value)
+    assert code!=0 and response['failure']['code']==expected,(expected,response)
+    assert 'PRIVATE' not in json.dumps(response)
+    assert f.ok(['work','show',f.work])==before and f.snapshot()==snapshot
+    return dict(code=expected,mutation=False)
+
+
+def negative_cases(f):
+    """Use a healthy public bootstrap before each changed single fault."""
+    cases=[];source=f.providers.read_bytes();program=f.root/'codex'
+    specs=[
+        ('unknown-provider',dict(provider='missing-provider'),'agent-provider-not-configured',None),
+        ('unsafe-name',dict(provider='../PRIVATE'),'planning-provider-name-invalid',None),
+        ('negative-review-budget',dict(max_review_calls=-1),'invalid_review_budget',None),
+        ('review-budget-without-provider',dict(provider=''),'invalid_review_budget',None),
+        ('zero-activation-budget',dict(max_activations=0),'planning-control-invalid',None),
+        ('stale-policy',dict(model_policy_hash='0'*64),'agent-model-policy-hash-changed',None),
+        ('missing-catalogue',{},'agent-provider-catalogue-read','missing'),
+        ('malformed-catalogue',{},'agent-provider-catalogue-invalid','malformed'),
+        ('nonexecutable',{},'planning-provider-assistant-unavailable','mode'),
+    ]
+    for label,patch,expected,fault in specs:
+        f.work=fresh_work(f,'witness-'+label);f.ok(['planning','enable',f.work],request(event='witness-plan-'+label))
+        f.work=fresh_work(f,'refusal-'+label);mode=program.stat().st_mode&0o777
+        try:
+            if fault=='missing':f.providers.unlink()
+            if fault=='malformed':m.publish(f.providers,b'PRIVATE-CATALOGUE malformed')
+            if fault=='mode':os.chmod(program,0o600)
+            cases.append(dict(case=label,**refused(f,request(event='bad-'+label,**patch),expected)))
+        finally:
+            if fault in ['missing','malformed']:m.publish(f.providers,source)
+            if fault=='mode':os.chmod(program,mode)
+        assert not (f.root/'model-received.json').exists()
+    return cases
+
+
+def legacy_adoption(binary,legacy,output):
+    """A real v22 root refuses defaults adoption until the public preview/apply.
+
+    No runtime settings file is rewritten directly. Preserve all old choices and
+    history, then retry the same refused Work event with explicit new defaults.
+    """
+    f=m.Fixture(legacy,output,'legacy');f.binary=binary
+    try:
+        doc=f.ok(['engine-settings','show']);assert doc['schema_version']==22
+        f.work=fresh_work(f,'legacy-bootstrap-create');r=request(event='legacy-bootstrap')
+        refused(f,r,'settings-reviewer-creation-not-configured')
+        defaults=f.ok(['engine-settings','describe'])['defaults'];values=dict(doc['values'])
+        names=['reviewer_default_delivery_files','reviewer_default_context_files','reviewer_default_source_bytes','reviewer_default_context_bytes']
+        values.update({k:defaults[k] for k in names});values['reviewer_default_context_files']='0'
+        change=dict(schema_version=23,event_id='adopt-reviewer-defaults',expected_revision=doc['revision'],values=values,reason='Explicit adoption of initial reviewer configuration',preview_token='')
+        previous=(f.root/'.swarm/engine-settings.json').read_bytes();preview=f.ok(['engine-settings','preview'],change)
+        assert (f.root/'.swarm/engine-settings.json').read_bytes()==previous
+        change['preview_token']=preview['preview_token'];f.ok(['engine-settings','apply'],change)
+        adopted=f.ok(['engine-settings','show']);assert adopted['schema_version']==23 and adopted['history'][:len(doc['history'])]==doc['history']
+        configured=f.ok(['planning','enable',f.work],r);assert configured['planning']['reviewer']['max_context_files']==0
+        assert not (f.root/'model-received.json').exists()
+        m.publish(output/'legacy-adoption.json',dict(status='PASS',original_schema=22,new_schema=23,context_files=0,history_preserved=True,provider_process_started=False))
+        shutil.rmtree(f.root)
+    except BaseException:
+        m.publish(output/'legacy-failure-root.json',dict(root=str(f.root)));raise
+
+def run(f):
+    """Read the actual saved bootstrap and replay after removing only fixture config.
+
+    Canonical provider digest binds the source configuration; route metadata is a
+    request, never authenticated model/account/price or acceptance. Reviewer source
+    limits snapshot creation defaults and do not prove runtime review enforcement.
+    """
+    f.work=fresh_work(f,'bootstrap-create');r=request();result=f.ok(['planning','enable',f.work],r)
+    planning=result['planning'];reviewer=planning['reviewer']
+    assert planning['provider']=='fixture' and planning['reviewer_required'] is True
+    assert planning['provider_digest']==reviewer['provider_digest'] and len(planning['provider_digest'])==64
+    assert reviewer['max_calls']==2 and reviewer.get('calls',0)==0 and reviewer['authorized']
+    for route in [planning['model_route'],reviewer['model_route']]:assert route['level']=='standard' and route['model']=='fixture-standard' and route['effort']=='fixture-medium'
+    values=f.ok(['engine-settings','show'])['values']
+    for field,setting in [('max_files','reviewer_default_delivery_files'),('max_context_files','reviewer_default_context_files'),('max_source_bytes','reviewer_default_source_bytes'),('max_context_bytes','reviewer_default_context_bytes')]:
+        assert reviewer[field]==int(values[setting]),(field,reviewer,values)
+    assert not (f.root/'model-received.json').exists(),'Bootstrap executed a provider'
+    before=f.ok(['work','show',f.work]);source=f.providers.read_bytes();f.providers.unlink()
+    replay=f.ok(['planning','enable',f.work],r);assert replay==result and f.ok(['work','show',f.work])==before
+    m.publish(f.providers,source)
+    # Configuration is not an execution: preserve the active provider refusal.
+    cooldown=f.root/'.swarm/provider-cooldowns';cooldown.mkdir(mode=0o700)
+    file=cooldown/'fixture.json';m.publish(file,dict(provider='fixture',observed_at='2026-10-20T00:00:00Z',source='fixture',signal='backoff'));saved=file.read_bytes()
+    f.work=fresh_work(f,'quota-config-create')
+    configured=f.ok(['planning','enable',f.work],request(event='quota-config',max_review_calls=0))
+    assert configured['planning']['reviewer']['max_calls']==3
+    assert file.read_bytes()==saved and not (f.root/'model-received.json').exists()
+    return dict(provider='fixture',reviewer_calls=0,review_budget=2,provider_process_started=False,replay_after_source_removal=True,requested_model='fixture-standard',runtime_review_caps_enforced=False,configuration_during_cooldown=True,inherited_review_budget=3)
+
+
+def main():
+    """Retain source/binary identity, raw commands and original failure roots."""
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--binary',required=True,type=Path);p.add_argument('--output',required=True,type=Path);p.add_argument('--legacy-binary',type=Path);a=p.parse_args();output=a.output.resolve();output.mkdir(parents=True,exist_ok=False)
+    sources=[Path(__file__).resolve(),Path(m.__file__).resolve(),a.binary.resolve()];before={str(p):m.digest(p.read_bytes()) for p in sources};m.publish(output/'inputs.json',before)
+    if a.legacy_binary is not None:
+        before[str(a.legacy_binary.resolve())]=m.digest(a.legacy_binary.read_bytes());sources.append(a.legacy_binary.resolve());m.publish(output/'inputs.json',before)
+    for p in sources[:2]:m.publish(output/('source-'+p.name),p.read_bytes())
+    f=None
+    try:
+        f=m.Fixture(a.binary.resolve(),output,'bootstrap');result=run(f)
+        result['refusals']=negative_cases(f)
+        if a.legacy_binary is not None:legacy_adoption(a.binary.resolve(),a.legacy_binary.resolve(),output)
+        assert before=={str(p):m.digest(p.read_bytes()) for p in sources}
+        m.publish(output/'result.json',dict(status='PASS',result=result,source_stable=True,global_watchdog=None));shutil.rmtree(f.root);print('PASS public native planning bootstrap without provider execution',flush=True)
+    except BaseException as error:
+        m.publish(output/'result.json',dict(status='FAIL',type=type(error).__name__,cause=str(error),root=str(f.root) if f else None,source_stable=before=={str(p):m.digest(p.read_bytes()) for p in sources}));traceback.print_exc();raise
+
+if __name__=='__main__':main()
+
+FILE rust/crates/swarm-engine/src/planning_request.rs
+//! Generated PlanningRequest data; no action, identity or authority is established.
+use crate::model_wire::{Fields, Kind};
+use crate::{ExchangeArtifact, ValidationControl};
+use serde::ser::SerializeMap;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
+fn is_zero(v: &i64) -> bool {
+    *v == 0
+}
+fn is_false(v: &bool) -> bool {
+    !*v
+}
+fn empty_vec<T>(v: &Option<Vec<T>>) -> bool {
+    v.as_ref().is_none_or(Vec::is_empty)
+}
+fn empty_map<K, V>(v: &Option<BTreeMap<K, V>>) -> bool {
+    v.as_ref().is_none_or(BTreeMap::is_empty)
+}
+// internal/engine/managed_git.go SHA-256 c8a62e0ba38a8c19f18815655f84ce6620fd4f78505216842b1d472de29626a5
+/// Supplied Go-compatible request data; decoding grants no authority or action.
+#[derive(Clone, Default, PartialEq, Deserialize, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ManagedRepositoryRequest {
+    // Go Path, line 21
+    pub path: String,
+    // Go CommittedOnly, line 22
+    pub committed_only: bool,
+    // Go Include, line 23
+    #[serde(skip_serializing_if = "empty_vec")]
+    pub include_dirty: Option<Vec<String>>,
+}
+pub(crate) fn shape_managed_repository_request() -> Fields {
+    &[
+        ("path", Kind::String),
+        ("committed_only", Kind::Bool),
+        ("include_dirty", Kind::Array(&Kind::String)),
+    ]
+}
+// internal/engine/planning.go SHA-256 66ee75df2ce0490e2d362b23030ed033e4e8cf1db402c5448b4464e1af5f62eb
+/// Supplied Go-compatible request data; decoding grants no authority or action.
+#[derive(Clone, Default, PartialEq, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct PlanningOperation {
+    // Go JudgeVerdict, line 81
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub judge_verdict: String,
+    // Go JudgeCycle, line 82
+    #[serde(skip_serializing_if = "is_zero")]
+    pub judge_cycle: i64,
+    // Go ExpectedCandidate, line 83
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub expected_candidate: String,
+    // Go MaxTasks, line 84
+    #[serde(skip_serializing_if = "is_zero")]
+    pub max_tasks: i64,
+    // Go MaxActivations, line 85
+    #[serde(skip_serializing_if = "is_zero")]
+    pub max_activations: i64,
+    // Go Kind, line 86
+    pub kind: String,
+    // Go ID, line 87
+    pub id: String,
+    // Go Title, line 88
+    pub title: String,
+    // Go Requirements, line 89
+    pub requirements: Option<Vec<String>>,
+    // Go Deliverable, line 90
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub deliverable: String,
+    // Go Criteria, line 91
+    #[serde(skip_serializing_if = "empty_vec")]
+    pub criteria: Option<Vec<String>>,
+    // Go Depends, line 92
+    #[serde(skip_serializing_if = "empty_vec")]
+    pub depends: Option<Vec<String>>,
+    // Go Next, line 93
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub next: String,
+}
+pub(crate) fn shape_planning_operation() -> Fields {
+    &[
+        ("judge_verdict", Kind::String),
+        ("judge_cycle", Kind::Int64),
+        ("expected_candidate", Kind::String),
+        ("max_tasks", Kind::Int64),
+        ("max_activations", Kind::Int64),
+        ("kind", Kind::String),
+        ("id", Kind::String),
+        ("title", Kind::String),
+        ("requirements", Kind::Array(&Kind::String)),
+        ("deliverable", Kind::String),
+        ("criteria", Kind::Array(&Kind::String)),
+        ("depends", Kind::Array(&Kind::String)),
+        ("next", Kind::String),
+    ]
+}
+// internal/engine/planning.go SHA-256 66ee75df2ce0490e2d362b23030ed033e4e8cf1db402c5448b4464e1af5f62eb
+/// Supplied Go-compatible request data; decoding grants no authority or action.
+#[derive(Clone, Default, PartialEq, Deserialize, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct PlanningRequest {
+    // Go InstructionRevisionID, line 98
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub instruction_revision_id: String,
+    // Go MissingReport, line 101
+    #[serde(skip_serializing_if = "is_false")]
+    pub missing_report: bool,
+    // Go ScopeFiles, line 104
+    #[serde(skip_serializing_if = "empty_vec")]
+    pub scope_files: Option<Vec<String>>,
+    // Go ConfirmReviewUnknownCorrection, line 105
+    #[serde(skip_serializing_if = "is_false")]
+    pub confirm_review_unknown_correction: bool,
+    // Go ConfirmReviewErrorRepair, line 106
+    #[serde(skip_serializing_if = "is_false")]
+    pub confirm_review_error_repair: bool,
+    // Go MaxReviewCalls, line 107
+    #[serde(skip_serializing_if = "is_zero")]
+    pub max_review_calls: i64,
+    // Go ResultCommit, line 108
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub result_commit: String,
+    // Go ExpectedCandidate, line 109
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub expected_candidate: String,
+    // Go ResultTree, line 110
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub result_tree: String,
+    // Go ConfirmRecovery, line 111
+    #[serde(skip_serializing_if = "is_false")]
+    pub confirm_recovery: bool,
+    // Go ReviewID, line 112
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub review_id: String,
+    // Go RecoveryInstruction, line 113
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub recovery_instruction: String,
+    // Go ReviewTimeoutSeconds, line 114
+    #[serde(skip_serializing_if = "is_zero")]
+    pub review_timeout_seconds: i64,
+    // Go Level, line 115
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub level: String,
+    // Go PolicyHash, line 116
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub model_policy_hash: String,
+    // Go Checks, line 117
+    #[serde(skip_serializing_if = "empty_map")]
+    pub checks: Option<BTreeMap<String, Option<Vec<ValidationControl>>>>,
+    // Go Repository, line 118
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repository: Option<Box<ManagedRepositoryRequest>>,
+    // Go Provider, line 119
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub provider: String,
+    // Go MaxActivations, line 120
+    #[serde(skip_serializing_if = "is_zero")]
+    pub max_activations: i64,
+    // Go Agent, line 121
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub agent_id: String,
+    // Go Task, line 122
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub task_id: String,
+    // Go Attempt, line 123
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub attempt_id: String,
+    // Go Artifacts, line 124
+    #[serde(skip_serializing_if = "empty_vec")]
+    pub artifacts: Option<Vec<ExchangeArtifact>>,
+    // Go Schema, line 125
+    pub schema_version: i64,
+    // Go EventID, line 126
+    pub event_id: String,
+    // Go Revision, line 127
+    pub expected_revision: i64,
+    // Go Scope, line 128
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub scope: String,
+    // Go ScopeRevision, line 129
+    #[serde(skip_serializing_if = "is_zero")]
+    pub scope_revision: i64,
+    // Go Holder, line 130
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub holder: String,
+    // Go Generation, line 131
+    #[serde(skip_serializing_if = "is_zero")]
+    pub generation: i64,
+    // Go LeaseSeconds, line 132
+    #[serde(skip_serializing_if = "is_zero")]
+    pub lease_seconds: i64,
+    // Go MaxTasks, line 133
+    #[serde(skip_serializing_if = "is_zero")]
+    pub max_tasks: i64,
+    // Go MaxDecisions, line 134
+    #[serde(skip_serializing_if = "is_zero")]
+    pub max_decisions: i64,
+    // Go Inputs, line 135
+    #[serde(skip_serializing_if = "empty_vec")]
+    pub input_events: Option<Vec<String>>,
+    // Go Operations, line 136
+    #[serde(skip_serializing_if = "empty_vec")]
+    pub operations: Option<Vec<PlanningOperation>>,
+    // Go Reason, line 137
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub reason: String,
+    // Go JudgeVerdict, line 138
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub judge_verdict: String,
+    // Go JudgeCycle, line 139
+    #[serde(skip_serializing_if = "is_zero")]
+    pub judge_cycle: i64,
+    // Go MaxJudgeCycles, line 140
+    #[serde(skip_serializing_if = "is_zero")]
+    pub max_judge_cycles: i64,
+}
+pub(crate) fn shape_planning_request() -> Fields {
+    &[
+        ("instruction_revision_id", Kind::String),
+        ("missing_report", Kind::Bool),
+        ("scope_files", Kind::Array(&Kind::String)),
+        ("confirm_review_unknown_correction", Kind::Bool),
+        ("confirm_review_error_repair", Kind::Bool),
+        ("max_review_calls", Kind::Int64),
+        ("result_commit", Kind::String),
+        ("expected_candidate", Kind::String),
+        ("result_tree", Kind::String),
+        ("confirm_recovery", Kind::Bool),
+        ("review_id", Kind::String),
+        ("recovery_instruction", Kind::String),
+        ("review_timeout_seconds", Kind::Int64),
+        ("level", Kind::String),
+        ("model_policy_hash", Kind::String),
+        (
+            "checks",
+            Kind::Map(&Kind::Array(&Kind::Object(
+                crate::models::shape_validation_control,
+            ))),
+        ),
+        (
+            "repository",
+            Kind::Pointer(&Kind::Object(shape_managed_repository_request)),
+        ),
+        ("provider", Kind::String),
+        ("max_activations", Kind::Int64),
+        ("agent_id", Kind::String),
+        ("task_id", Kind::String),
+        ("attempt_id", Kind::String),
+        (
+            "artifacts",
+            Kind::Array(&Kind::Object(crate::models::shape_exchange_artifact)),
+        ),
+        ("schema_version", Kind::Int64),
+        ("event_id", Kind::String),
+        ("expected_revision", Kind::Int64),
+        ("scope", Kind::String),
+        ("scope_revision", Kind::Int64),
+        ("holder", Kind::String),
+        ("generation", Kind::Int64),
+        ("lease_seconds", Kind::Int64),
+        ("max_tasks", Kind::Int64),
+        ("max_decisions", Kind::Int64),
+        ("input_events", Kind::Array(&Kind::String)),
+        (
+            "operations",
+            Kind::Array(&Kind::Object(shape_planning_operation)),
+        ),
+        ("reason", Kind::String),
+        ("judge_verdict", Kind::String),
+        ("judge_cycle", Kind::Int64),
+        ("max_judge_cycles", Kind::Int64),
+    ]
+}
+// Actual PlanningOperation.MarshalJSON producer SHA-256 44e9f9fbca6080f927e6163eb1f776860ba390a2124c05e403ecbfdd3f00d04d
+impl Serialize for PlanningOperation {
+    /// Encode the actual Go dependency-revision wire contract: an explicit empty
+    /// depends list is retained only for revise-dependencies. Serializer failures
+    /// propagate; no IO, Work edits, operation or authority is established.
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        let mut out = s.serialize_map(None)?;
+        if !String::is_empty(&self.judge_verdict) {
+            out.serialize_entry("judge_verdict", &self.judge_verdict)?;
+        }
+        if !is_zero(&self.judge_cycle) {
+            out.serialize_entry("judge_cycle", &self.judge_cycle)?;
+        }
+        if !String::is_empty(&self.expected_candidate) {
+            out.serialize_entry("expected_candidate", &self.expected_candidate)?;
+        }
+        if !is_zero(&self.max_tasks) {
+            out.serialize_entry("max_tasks", &self.max_tasks)?;
+        }
+        if !is_zero(&self.max_activations) {
+            out.serialize_entry("max_activations", &self.max_activations)?;
+        }
+        out.serialize_entry("kind", &self.kind)?;
+        out.serialize_entry("id", &self.id)?;
+        out.serialize_entry("title", &self.title)?;
+        out.serialize_entry("requirements", &self.requirements)?;
+        if !String::is_empty(&self.deliverable) {
+            out.serialize_entry("deliverable", &self.deliverable)?;
+        }
+        if !empty_vec(&self.criteria) {
+            out.serialize_entry("criteria", &self.criteria)?;
+        }
+        if !empty_vec(&self.depends) {
+            out.serialize_entry("depends", &self.depends)?;
+        }
+        if !String::is_empty(&self.next) {
+            out.serialize_entry("next", &self.next)?;
+        }
+        if self.kind == "revise-dependencies" && self.depends.as_ref().is_some_and(Vec::is_empty) {
+            out.serialize_entry("depends", &self.depends)?;
+        }
+        out.end()
+    }
+}
+
+GO REFERENCE committed preparation
+func (s *Store) configureManagedRepositoryLocked(work string, r ManagedRepositoryRequest) (*ManagedRepository, error) {
+	source, err := resolveWorkspace(s.root, r.Path)
+	if err != nil {
+		return nil, err
+	}
+	top, err := managedGit(source, "rev-parse", "--show-toplevel")
+	if err != nil {
+		return nil, err
+	}
+	subdir, err := filepath.Rel(top, source)
+	if err != nil || strings.HasPrefix(subdir, "..") {
+		return nil, fmt.Errorf("projet hors dépôt Git")
+	}
+	if subdir == "." {
+		subdir = ""
+	}
+	encoded, _ := json.Marshal(r)
+	digest := hash(encoded)
+	storage := filepath.Join(s.root, ".swarm", "managed", work)
+	manifest := filepath.Join(storage, "repository.json")
+	var retained *ManagedRepository
+	var retainedRaw, canonical []byte
+	finalPresent := false
+	for i, path := range []string{manifest, manifest + ".pending"} {
+		raw, err := os.ReadFile(path)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		var prior ManagedRepository
+		if err = json.Unmarshal(raw, &prior); err != nil {
+			return nil, fmt.Errorf("manifeste préparé invalide, conservé pour diagnostic : %w", err)
+		}
+		if err = validatePreparedRepository(prior, storage, source, subdir, digest, r.Include); err != nil {
+			return nil, fmt.Errorf("preuve du dépôt préparé conservée sans réécriture : %w", err)
+		}
+		encoded, err := json.Marshal(prior)
+		if err != nil {
+			return nil, err
+		}
+		if retained != nil && string(canonical) != string(encoded) {
+			return nil, fmt.Errorf("manifestes final et préparé divergents ; conserver les originaux et réconcilier avant reprise")
+		}
+		if retained == nil {
+			retained, retainedRaw, canonical = &prior, raw, encoded
+		}
+		finalPresent = finalPresent || i == 0
+	}
+	if retained != nil {
+		if !finalPresent {
+			if err = atomicWrite(manifest, retainedRaw); err != nil {
+				return nil, err
+			}
+		}
+		return retained, nil
+	}
+	base, err := managedGit(source, "rev-parse", "HEAD")
+	if err != nil {
+		return nil, err
+	}
+	dirty, err := managedGit(source, "status", "--porcelain", "--untracked-files=normal")
+	if err != nil {
+		return nil, err
+	}
+	if dirty != "" && !r.CommittedOnly && len(r.Include) == 0 {
+		return nil, fmt.Errorf("dépôt modifié : choisir le commit enregistré ou nommer les fichiers de l’instantané")
+	}
+	if r.CommittedOnly && len(r.Include) > 0 {
+		return nil, fmt.Errorf("choisir le commit seul ou une liste de fichiers, pas les deux")
+	}
+	staging, err := os.MkdirTemp(storage, "repository-build-")
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(staging)
+	bare := filepath.Join(staging, "repository.git")
+	if _, err = managedGit(storage, "clone", "--bare", "--no-local", "--no-hardlinks", top, bare); err != nil {
+		return nil, err
+	}
+	included := map[string]string{}
+	if len(r.Include) > 0 {
+		copyDir := filepath.Join(staging, "snapshot")
+		if _, err = managedGit(storage, "clone", "--no-local", bare, copyDir); err != nil {
+			return nil, err
+		}
+		if _, err = managedGit(copyDir, "checkout", "--detach", base); err != nil {
+			return nil, err
+		}
+		total := int64(0)
+		for _, name := range r.Include {
+			if name == "" || filepath.IsAbs(name) || filepath.Clean(name) != name || name == ".." || strings.HasPrefix(name, "../") || strings.HasPrefix(name, ".git/") || strings.HasPrefix(name, ".swarm/") || name == ".git" || name == ".swarm" {
+				return nil, fmt.Errorf("chemin d’instantané interdit : %s", name)
+			}
+			if _, err = managedGit(source, "check-ignore", "--", name); err == nil {
+				return nil, fmt.Errorf("fichier ignoré exclu de l’instantané : %s", name)
+			}
+			src := filepath.Join(source, name)
+			dest := filepath.Join(copyDir, subdir, name)
+			for parent := dest; parent != copyDir; parent = filepath.Dir(parent) {
+				if st, e := os.Lstat(parent); e == nil && st.Mode()&os.ModeSymlink != 0 {
+					return nil, fmt.Errorf("lien interdit dans la destination : %s", name)
+				}
+			}
+			stat, statErr := os.Lstat(src)
+			if os.IsNotExist(statErr) {
+				if _, err = managedGit(source, "ls-files", "--error-unmatch", "--", name); err != nil {
+					return nil, err
+				}
+				if err = os.Remove(dest); err != nil && !os.IsNotExist(err) {
+					return nil, err
+				}
+				included[name] = "deleted"
+				continue
+			}
+			if statErr != nil || !stat.Mode().IsRegular() {
+				return nil, fmt.Errorf("fichier régulier requis : %s", name)
+			}
+			if _, err = localFile(source, name); err != nil {
+				return nil, err
+			}
+			total += stat.Size()
+			if total > 64<<20 {
+				return nil, fmt.Errorf("instantané supérieur à 64 Mio")
+			}
+			data, err := os.ReadFile(src)
+			if err != nil {
+				return nil, err
+			}
+			if err = os.MkdirAll(filepath.Dir(dest), 0700); err != nil {
+				return nil, err
+			}
+			if err = os.WriteFile(dest, data, stat.Mode().Perm()); err != nil {
+				return nil, err
+			}
+			included[name] = hash(data)
+		}
+		gitPaths := []string{}
+		for _, name := range r.Include {
+			gitPaths = append(gitPaths, filepath.Join(subdir, name))
+		}
+		if _, err = managedGit(copyDir, append([]string{"add", "-A", "--"}, gitPaths...)...); err != nil {
+			return nil, err
+		}
+		tree, err := managedGit(copyDir, "write-tree")
+		if err != nil {
+			return nil, err
+		}
+		base, err = managedGit(copyDir, "commit-tree", tree, "-p", base, "-m", "Instantané autorisé pour Swarm")
+		if err != nil {
+			return nil, err
+		}
+		if _, err = managedGit(bare, "fetch", "--no-tags", copyDir, base); err != nil {
+			return nil, err
+		}
+	}
+	if _, err = managedGit(bare, "update-ref", "refs/heads/swarm-result", base); err != nil {
+		return nil, err
+	}
+	if _, err = managedGit(bare, "symbolic-ref", "HEAD", "refs/heads/swarm-result"); err != nil {
+		return nil, err
+	}
+	final := filepath.Join(storage, "repository.git")
+	if _, err = os.Lstat(final); err == nil {
+		return nil, fmt.Errorf("dépôt préparé sans manifeste : examiner avant reprise")
+	}
+	snap, _ := json.Marshal(map[string]any{"base": base, "files": included})
+	repo := &ManagedRepository{Subdir: subdir, Source: source, Storage: storage, Base: base, Candidate: base, Snapshot: hash(snap), Included: r.Include, RequestDigest: digest}
+	raw, _ := json.Marshal(repo)
+	if err = atomicWrite(manifest+".pending", raw); err != nil {
+		return nil, err
+	}
+	if err = os.Rename(bare, final); err != nil {
+		return nil, err
+	}
+	if err = atomicWrite(manifest, raw); err != nil {
+		return nil, err
+	}
+	return repo, nil
+}
+func validatePreparedRepository(prior ManagedRepository, storage, source, subdir, digest string, include []string) error {
+	if prior.RequestDigest != digest || prior.Storage != storage || prior.Source != source || prior.Subdir != subdir || !slices.Equal(prior.Included, include) {
+		return fmt.Errorf("manifeste du dépôt incompatible avec la sélection et ses chemins canoniques ; réconcilier avant reprise")
+	}
+	snapshot, err := hex.DecodeString(prior.Snapshot)
+	if err != nil || len(snapshot) != 32 {
+		return fmt.Errorf("empreinte SHA-256 du dépôt préparé absente ou invalide")
+	}
+	for _, oid := range []string{prior.Base, prior.Candidate} {
+		if oid == "" {
+			return fmt.Errorf("identité Git du dépôt préparé absente")
+		}
+		resolved, err := managedGit(filepath.Join(storage, "repository.git"), "rev-parse", "--verify", oid+"^{commit}")
+		if err != nil {
+			return fmt.Errorf("objet Git préparé absent : %w", err)
+		}
+		if resolved != oid {
+			return fmt.Errorf("identité Git préparée non canonique")
+		}
+	}
+	return nil
+}
+

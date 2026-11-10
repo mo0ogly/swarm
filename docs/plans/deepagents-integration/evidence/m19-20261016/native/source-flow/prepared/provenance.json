@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "swarm_summary_source_binding_v1",
+  "scope": {
+    "work": "w-b879b40e7755f76b772ab5b5",
+    "task": "t1"
+  },
+  "project_sha256": "a62b14514bdb683431cdeeab60cab2e3281dec2e0a412195425c98aa7e2a7891",
+  "work_revision": 6,
+  "source_payload_sha256": "3ac51f78f16bb34b11b1eebba077f4c8fd9aee08ae83784b93bf18b66cf4e386",
+  "history_sha256": "2867b0f3b7de8b9f5280a1632e7f9cf8ddb7105b35176a98f5351375d59c27fe",
+  "annotations_sha256": "265344e12a0a57d8e439a6e7d4e3161c36fed09b7f28fd9dd8a7b5f1c8f7b8ba",
+  "provider_history_complete": false,
+  "audience": "local_operator",
+  "model_effectiveness": "NOT TESTED",
+  "engine_admission": false,
+  "files_sha256": {
+    "source-packet.json": "be5d5c4b5dc1ffd9d935e41147bce9003cc8560f1cff639f0ac2bdb23dd9d5f7",
+    "annotations.json": "5e546cbfbc7190c9b48e4d01de6bd8ac65b79d170af91a1ad723d1fb421f946b",
+    "history.json": "a83c2160dfe2dd89410c7927f1c179af93566773d0e4f9900810b1786a57abb1"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "result": "PASS",
+  "original_run": "existing-controls.json",
+  "top_level": [
+    "TestActionsConfianceT3IdentityContextPublicReadOnly",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation",
+    "TestLaunchAtomicIdempotentAndWorkspaceExclusive",
+    "TestLaunchRejectsEscapeAndUnsatisfiedDependencies"
+  ],
+  "run_and_pass": [
+    "TestActionsConfianceT3IdentityContextPublicReadOnly",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/foreign",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/forged",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/missing",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/null",
+    "TestActionsConfianceT3IdentityContextPublicReadOnly/unknown",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/alice",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/bob",
+    "TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service",
+    "TestLaunchAtomicIdempotentAndWorkspaceExclusive",
+    "TestLaunchRejectsEscapeAndUnsatisfiedDependencies"
+  ],
+  "total_named": 13,
+  "method_incident": {
+    "cause": "Wrapper assumed 8 named cases; original Go run actually executed 4 top-level and 9 subtests",
+    "original_wrapper_exit": 1,
+    "action": "Validated exact expected top-level names and equality of original RUN/PASS sets; did not repeat passing tests"
+  }
+}

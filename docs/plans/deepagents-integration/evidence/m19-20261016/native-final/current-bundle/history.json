@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "scope": {
+    "work": "w-502896527c5b4392c6422ed6",
+    "task": "t1"
+  },
+  "messages": [
+    {
+      "id": "current-task-snapshot",
+      "role": "user",
+      "content": "{\"project_sha256\":\"7b0eb38d25ff00a4488b6acccbb98e4b82b619db7025e792573a98164f2e31a0\",\"work_title\":\"Summary source fixture\",\"work_objective\":\"Keep attributed history\",\"work_scope\":\"Owned fixture\",\"work_criteria\":[\"Sources remain available\"],\"task\":{\"plan_checks\":{\"plan-criterion-1\":\"validation\",\"plan-delivery\":\"delivery\",\"plan-entry\":\"entry\",\"plan-validation\":\"validation\"},\"id\":\"t1\",\"title\":\"Future worker\",\"owner\":\"\",\"deliverable\":\"report.txt\",\"criteria\":[\"Current contract changed after preview; recheck before consuming\"],\"depends\":null,\"status\":\"todo\",\"blocker\":\"\",\"next\":\"Inspect sources\",\"attempts\":[]}}"
+    },
+    {
+      "id": "dialogue-3324dcfb7b8ea3ab5f55819e4e149e6d54ea5db71ee9476765c250d11236fb50-question",
+      "role": "user",
+      "content": "Intention future : vérifier avant de déployer."
+    },
+    {
+      "id": "dialogue-3324dcfb7b8ea3ab5f55819e4e149e6d54ea5db71ee9476765c250d11236fb50-answer",
+      "role": "assistant",
+      "content": "Réponse historique conservée <source> ; aucun succès courant déclaré."
+    },
+    {
+      "id": "dialogue-fc298a9ad5b76380f2e0ac1ac53c13eba716b408b30e111599ff32553348dc07-question",
+      "role": "user",
+      "content": "Incident ouvert : effet incertain à examiner avant reprise."
+    },
+    {
+      "id": "dialogue-fc298a9ad5b76380f2e0ac1ac53c13eba716b408b30e111599ff32553348dc07-answer",
+      "role": "assistant",
+      "content": "Réponse historique conservée <source> ; aucun succès courant déclaré."
+    }
+  ],
+  "protected": [
+    {
+      "id": "snapshot",
+      "message": "current-task-snapshot",
+      "kind": "evidence",
+      "state": "historical"
+    },
+    {
+      "id": "future",
+      "message": "dialogue-3324dcfb7b8ea3ab5f55819e4e149e6d54ea5db71ee9476765c250d11236fb50-question",
+      "kind": "intention",
+      "state": "future"
+    },
+    {
+      "id": "incident",
+      "message": "dialogue-fc298a9ad5b76380f2e0ac1ac53c13eba716b408b30e111599ff32553348dc07-question",
+      "kind": "incident",
+      "state": "open"
+    }
+  ]
+}

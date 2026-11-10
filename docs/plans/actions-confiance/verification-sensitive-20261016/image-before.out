@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_secret_image.py", line 99, in <module>
+    assert not capture.exists() and verdict['real_attestation_matches'],'helper image substitution guard failed'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: helper image substitution guard failed

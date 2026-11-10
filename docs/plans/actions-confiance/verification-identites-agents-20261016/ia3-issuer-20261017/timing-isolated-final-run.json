@@ -1,0 +1,32 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestEngineContractRevisionKillsInferenceOnContractMutation$",
+    "-count=1",
+    "-timeout",
+    "30s",
+    "-json"
+  ],
+  "executor": "Codex alone; isolated fixture stores; local OIDC signed-token fixture, no real provider",
+  "start": "2026-10-17T08:29:32.760678+00:00",
+  "end": "2026-10-17T08:31:26.632190+00:00",
+  "elapsed_seconds": 113.87199096297263,
+  "exit": 0,
+  "input_count": 1060,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 1,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [
+      "TestEngineContractRevisionKillsInferenceOnContractMutation"
+    ],
+    "fail": [],
+    "skip": []
+  }
+}

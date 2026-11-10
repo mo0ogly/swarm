@@ -1,0 +1,22 @@
+=== RUN   TestManagedFragmentRefusalRequiresOriginalProof
+    managed_review_fragment_finish_test.go:73: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentRefusalRequiresOriginalProof (1.99s)
+=== RUN   TestManagedFragmentHistoricalPublicRecovery
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/fail
+--- PASS: TestManagedFragmentHistoricalPublicRecovery (19.93s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/fail (19.93s)
+=== RUN   TestManagedFragmentRuntimeProviderProtocol
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/fail
+    managed_review_fragment_runtime_test.go:68: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/decision-fail
+    managed_review_fragment_runtime_test.go:68: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentRuntimeProviderProtocol (6.07s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/fail (3.21s)
+    --- PASS: TestManagedFragmentRuntimeProviderProtocol/decision-fail (2.86s)
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fail
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift (2.93s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fail (2.93s)
+PASS
+ok  	swarm.local/companion/internal/engine	30.982s

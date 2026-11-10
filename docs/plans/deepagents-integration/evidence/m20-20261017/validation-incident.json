@@ -1,0 +1,6 @@
+{
+  "observed": "first document validation extracted zero criteria",
+  "cause": "regex expected an ID-only table cell; actual cell includes the criterion label",
+  "correction": "extract the ID at the start of the cell; do not alter valid criteria to satisfy the checker",
+  "application_effect": false
+}

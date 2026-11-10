@@ -1,0 +1,559 @@
+{
+  "schema_version": 1,
+  "vectors": [
+    {
+      "name": "payment-control",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "payment.settle",
+          "invoice_id": "invoice-17",
+          "invoice_version": "v7",
+          "amount_minor": "420000",
+          "currency": "EUR",
+          "beneficiary_account_id": "account-17"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"amount_minor\":\"420000\",\"beneficiary_account_id\":\"account-17\",\"currency\":\"EUR\",\"invoice_id\":\"invoice-17\",\"invoice_version\":\"v7\",\"kind\":\"payment.settle\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "95e8e13b7e13e0583105204e129d87b9f215f3136ba92fac8bd8db68af9d5fa8",
+      "intent_id": "a27f336e08a90c170d079fc95df923798a5792449c49f66e54166bf02c77dd22"
+    },
+    {
+      "name": "payment-new-request",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-2",
+        "action": {
+          "kind": "payment.settle",
+          "invoice_id": "invoice-17",
+          "invoice_version": "v7",
+          "amount_minor": "420000",
+          "currency": "EUR",
+          "beneficiary_account_id": "account-17"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"amount_minor\":\"420000\",\"beneficiary_account_id\":\"account-17\",\"currency\":\"EUR\",\"invoice_id\":\"invoice-17\",\"invoice_version\":\"v7\",\"kind\":\"payment.settle\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "95e8e13b7e13e0583105204e129d87b9f215f3136ba92fac8bd8db68af9d5fa8",
+      "intent_id": "a27f336e08a90c170d079fc95df923798a5792449c49f66e54166bf02c77dd22"
+    },
+    {
+      "name": "payment-changed-amount",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "payment.settle",
+          "invoice_id": "invoice-17",
+          "invoice_version": "v7",
+          "amount_minor": "420001",
+          "currency": "EUR",
+          "beneficiary_account_id": "account-17"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"amount_minor\":\"420001\",\"beneficiary_account_id\":\"account-17\",\"currency\":\"EUR\",\"invoice_id\":\"invoice-17\",\"invoice_version\":\"v7\",\"kind\":\"payment.settle\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "8f025f14126cfe6c6aef8e22d7a9cf0ca9f11a5d3a36f0474939beb697074e10",
+      "intent_id": "a27f336e08a90c170d079fc95df923798a5792449c49f66e54166bf02c77dd22"
+    },
+    {
+      "name": "payment-changed-account",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "payment.settle",
+          "invoice_id": "invoice-17",
+          "invoice_version": "v7",
+          "amount_minor": "420000",
+          "currency": "EUR",
+          "beneficiary_account_id": "account-18"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"amount_minor\":\"420000\",\"beneficiary_account_id\":\"account-18\",\"currency\":\"EUR\",\"invoice_id\":\"invoice-17\",\"invoice_version\":\"v7\",\"kind\":\"payment.settle\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "eca1af5e6fb1802a779391bab488ebd26388f4542b6a343490fac0cfb410467b",
+      "intent_id": "a27f336e08a90c170d079fc95df923798a5792449c49f66e54166bf02c77dd22"
+    },
+    {
+      "name": "payment-new-invoice-version",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "payment.settle",
+          "invoice_id": "invoice-17",
+          "invoice_version": "v8",
+          "amount_minor": "420000",
+          "currency": "EUR",
+          "beneficiary_account_id": "account-17"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"amount_minor\":\"420000\",\"beneficiary_account_id\":\"account-17\",\"currency\":\"EUR\",\"invoice_id\":\"invoice-17\",\"invoice_version\":\"v8\",\"kind\":\"payment.settle\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "332d461759956e7ec7b002c992834c543fc3948250e3de02f5e72e03499a89e4",
+      "intent_id": "a27f336e08a90c170d079fc95df923798a5792449c49f66e54166bf02c77dd22"
+    },
+    {
+      "name": "payment-new-policy",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "payment.settle",
+          "invoice_id": "invoice-17",
+          "invoice_version": "v7",
+          "amount_minor": "420000",
+          "currency": "EUR",
+          "beneficiary_account_id": "account-17"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 2,
+        "policy_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"amount_minor\":\"420000\",\"beneficiary_account_id\":\"account-17\",\"currency\":\"EUR\",\"invoice_id\":\"invoice-17\",\"invoice_version\":\"v7\",\"kind\":\"payment.settle\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\",\"policy_revision\":2,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "d370f67389b8260d616a3845c6ba5f9d390c31512637f7d30e3d335346b73504",
+      "intent_id": "a27f336e08a90c170d079fc95df923798a5792449c49f66e54166bf02c77dd22"
+    },
+    {
+      "name": "payment-other-project",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "payment.settle",
+          "invoice_id": "invoice-17",
+          "invoice_version": "v7",
+          "amount_minor": "420000",
+          "currency": "EUR",
+          "beneficiary_account_id": "account-17"
+        }
+      },
+      "context": {
+        "project_id": "project-2",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"amount_minor\":\"420000\",\"beneficiary_account_id\":\"account-17\",\"currency\":\"EUR\",\"invoice_id\":\"invoice-17\",\"invoice_version\":\"v7\",\"kind\":\"payment.settle\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-2\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "4d38dbf1d2877e7cb1b6aa692161adf845b06c2c754fd3b0db8592c6d4e098aa",
+      "intent_id": "3890b3cd2223a86c6acf1e23b9b085a84e4eac209b0a815cb3163b46fc2bedeb"
+    },
+    {
+      "name": "payment-large-exact",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "payment.settle",
+          "invoice_id": "invoice-17",
+          "invoice_version": "v7",
+          "amount_minor": "9223372036854775807",
+          "currency": "EUR",
+          "beneficiary_account_id": "account-17"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"amount_minor\":\"9223372036854775807\",\"beneficiary_account_id\":\"account-17\",\"currency\":\"EUR\",\"invoice_id\":\"invoice-17\",\"invoice_version\":\"v7\",\"kind\":\"payment.settle\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "9868b9556613d1e582224bd73094b1349fe12dc4d9a4b09d3e0b6505f7c703cb",
+      "intent_id": "a27f336e08a90c170d079fc95df923798a5792449c49f66e54166bf02c77dd22"
+    },
+    {
+      "name": "git-control",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "repository.promote",
+          "repository_id": "repository-1",
+          "target_ref": "refs/heads/candidate",
+          "expected_old_oid": "1111111111111111111111111111111111111111",
+          "candidate_oid": "2222222222222222222222222222222222222222"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"candidate_oid\":\"2222222222222222222222222222222222222222\",\"expected_old_oid\":\"1111111111111111111111111111111111111111\",\"kind\":\"repository.promote\",\"repository_id\":\"repository-1\",\"target_ref\":\"refs/heads/candidate\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "03d2161d185dac1fb92df8e240bb0e274294ec19bd3499f6c0497785224159a1",
+      "intent_id": "1656fbe1e2fbbecfb0d1295e41412ede114fa3510e6a76f8bbeba938dfb414ef"
+    },
+    {
+      "name": "git-new-request",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-2",
+        "action": {
+          "kind": "repository.promote",
+          "repository_id": "repository-1",
+          "target_ref": "refs/heads/candidate",
+          "expected_old_oid": "1111111111111111111111111111111111111111",
+          "candidate_oid": "2222222222222222222222222222222222222222"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"candidate_oid\":\"2222222222222222222222222222222222222222\",\"expected_old_oid\":\"1111111111111111111111111111111111111111\",\"kind\":\"repository.promote\",\"repository_id\":\"repository-1\",\"target_ref\":\"refs/heads/candidate\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "03d2161d185dac1fb92df8e240bb0e274294ec19bd3499f6c0497785224159a1",
+      "intent_id": "1656fbe1e2fbbecfb0d1295e41412ede114fa3510e6a76f8bbeba938dfb414ef"
+    },
+    {
+      "name": "git-changed-candidate",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "repository.promote",
+          "repository_id": "repository-1",
+          "target_ref": "refs/heads/candidate",
+          "expected_old_oid": "1111111111111111111111111111111111111111",
+          "candidate_oid": "3333333333333333333333333333333333333333"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"candidate_oid\":\"3333333333333333333333333333333333333333\",\"expected_old_oid\":\"1111111111111111111111111111111111111111\",\"kind\":\"repository.promote\",\"repository_id\":\"repository-1\",\"target_ref\":\"refs/heads/candidate\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "696e9d8a6f0e8c871e463d24d0f77bf56b1de1b0413a3b2eead2a52c2ee9de96",
+      "intent_id": "1656fbe1e2fbbecfb0d1295e41412ede114fa3510e6a76f8bbeba938dfb414ef"
+    },
+    {
+      "name": "git-new-base",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "repository.promote",
+          "repository_id": "repository-1",
+          "target_ref": "refs/heads/candidate",
+          "expected_old_oid": "4444444444444444444444444444444444444444",
+          "candidate_oid": "2222222222222222222222222222222222222222"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"candidate_oid\":\"2222222222222222222222222222222222222222\",\"expected_old_oid\":\"4444444444444444444444444444444444444444\",\"kind\":\"repository.promote\",\"repository_id\":\"repository-1\",\"target_ref\":\"refs/heads/candidate\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "ffb54566bc1db613caacaba3e2ec7953150be4dbe0bd2940df8455b514689f64",
+      "intent_id": "8ec1ff4c6f19e36c9cb1d3a29766901161922727f0d156ccaa0e1c69aa8d8617"
+    },
+    {
+      "name": "git-unicode-ref",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "repository.promote",
+          "repository_id": "repository-1",
+          "target_ref": "refs/heads/déploiement",
+          "expected_old_oid": "1111111111111111111111111111111111111111",
+          "candidate_oid": "2222222222222222222222222222222222222222"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"candidate_oid\":\"2222222222222222222222222222222222222222\",\"expected_old_oid\":\"1111111111111111111111111111111111111111\",\"kind\":\"repository.promote\",\"repository_id\":\"repository-1\",\"target_ref\":\"refs/heads/déploiement\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "29981e8f2c7a85357ac34327e60902b464ac09cc7bb27f671e29f95aa9ff3d2f",
+      "intent_id": "c21995c9ab34125b139dedc8999770d77bcf76d93362b2ab8da40bb2e58a43b5"
+    },
+    {
+      "name": "git-sha256",
+      "proposal": {
+        "schema_version": 1,
+        "request_id": "request-1",
+        "action": {
+          "kind": "repository.promote",
+          "repository_id": "repository-1",
+          "target_ref": "refs/heads/candidate",
+          "expected_old_oid": "1111111111111111111111111111111111111111111111111111111111111111",
+          "candidate_oid": "2222222222222222222222222222222222222222222222222222222222222222"
+        }
+      },
+      "context": {
+        "project_id": "project-1",
+        "principal_id": "requester-1",
+        "instance_id": "instance-1",
+        "mandate_id": "mandate-1",
+        "mandate_revision": 1,
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "sources": [
+          {
+            "source_id": "document-1",
+            "version": "v1",
+            "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "integrity": 0,
+            "confidentiality_labels": [
+              "restricted",
+              "internal"
+            ]
+          }
+        ]
+      },
+      "canonical": "{\"action\":{\"candidate_oid\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"expected_old_oid\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"kind\":\"repository.promote\",\"repository_id\":\"repository-1\",\"target_ref\":\"refs/heads/candidate\"},\"canonicalization\":\"paea-json-v1\",\"context\":{\"instance_id\":\"instance-1\",\"mandate_id\":\"mandate-1\",\"mandate_revision\":1,\"policy_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"policy_revision\":1,\"principal_id\":\"requester-1\",\"project_id\":\"project-1\",\"sources\":[{\"confidentiality_labels\":[\"internal\",\"restricted\"],\"digest\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"integrity\":0,\"source_id\":\"document-1\",\"version\":\"v1\"}],\"tool_manifest_digest\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"schema_version\":1}",
+      "action_digest": "c0aeca4372bd736bbbf34d03e42b2c0e96f8a02bc509459a2391e2fde75989bd",
+      "intent_id": "4d206b4dd75ae3f0a2b99597a90317717f828a560c3f587536dd2599d7578fb6"
+    }
+  ]
+}

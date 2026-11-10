@@ -1,0 +1,14 @@
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/committed
+    trust_actions_operator_regression_test.go:260: terminal effect regressed through approval: engine.TrustAction{ID:"act-370b452109817885583a", MandateID:"terminal-mandate", Requester:"alice", Approver:"bob", Resource:"invoice/acme", Amount:100, Currency:"EUR", Beneficiary:"ACME", IdempotencyKey:"terminal-key", ContentHash:"370b452109817885583af989955c66dfdd3f1b5e3da76a72b1280603eceace82", OriginalHash:"cc9f4a96ea52fc0f974c48ff629565d48fca3faa362dca30e6b1ad93b1bc538c", State:"approved", Reason:"", NextAction:"engager le connecteur simulé", CreatedAt:"2026-10-14T12:00:00Z", UpdatedAt:"2026-10-14T12:00:00Z"}
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/unknown
+    trust_actions_operator_regression_test.go:260: terminal effect regressed through approval: engine.TrustAction{ID:"act-370b452109817885583a", MandateID:"terminal-mandate", Requester:"alice", Approver:"bob", Resource:"invoice/acme", Amount:100, Currency:"EUR", Beneficiary:"ACME", IdempotencyKey:"terminal-key", ContentHash:"370b452109817885583af989955c66dfdd3f1b5e3da76a72b1280603eceace82", OriginalHash:"cc9f4a96ea52fc0f974c48ff629565d48fca3faa362dca30e6b1ad93b1bc538c", State:"approved", Reason:"", NextAction:"engager le connecteur simulé", CreatedAt:"2026-10-14T12:00:00Z", UpdatedAt:"2026-10-14T12:00:00Z"}
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/reconciled
+    trust_actions_operator_regression_test.go:260: terminal effect regressed through approval: engine.TrustAction{ID:"act-370b452109817885583a", MandateID:"terminal-mandate", Requester:"alice", Approver:"bob", Resource:"invoice/acme", Amount:100, Currency:"EUR", Beneficiary:"ACME", IdempotencyKey:"terminal-key", ContentHash:"370b452109817885583af989955c66dfdd3f1b5e3da76a72b1280603eceace82", OriginalHash:"cc9f4a96ea52fc0f974c48ff629565d48fca3faa362dca30e6b1ad93b1bc538c", State:"approved", Reason:"", NextAction:"engager le connecteur simulé", CreatedAt:"2026-10-14T12:00:00Z", UpdatedAt:"2026-10-14T12:00:00Z"}
+--- FAIL: TestActionsConfianceT2ApprovalCannotRegressEffectState (0.05s)
+    --- FAIL: TestActionsConfianceT2ApprovalCannotRegressEffectState/committed (0.02s)
+    --- FAIL: TestActionsConfianceT2ApprovalCannotRegressEffectState/unknown (0.02s)
+    --- FAIL: TestActionsConfianceT2ApprovalCannotRegressEffectState/reconciled (0.02s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.073s
+FAIL

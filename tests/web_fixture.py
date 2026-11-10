@@ -1,6 +1,7 @@
 import json,subprocess,tempfile,uuid,hashlib,sys
+from fixture_area import fixture_area
 from pathlib import Path
-root=Path(tempfile.mkdtemp(prefix='swarm-web-recipe-'));binary=sys.argv[1]
+root=Path(tempfile.mkdtemp(prefix='swarm-web-recipe-', dir=fixture_area()));binary=sys.argv[1]
 def call(*args,data=None):
  p=subprocess.run([binary,'--root',str(root),'--json',*args,*(['--input','-'] if data is not None else [])],input=json.dumps(data) if data else None,text=True,capture_output=True)
  if p.returncode:raise RuntimeError(p.stderr)

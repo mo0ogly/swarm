@@ -1,0 +1,7 @@
+--- FAIL: TestPlanningRejectedProposalReturnsToOwnerWithIntactEvidence (0.06s)
+    planning_rejection_test.go:82: owner cannot receive the exact operation it must correct {<nil>} <nil>
+--- FAIL: TestPlanningUnrelatedNextPreviewsCannotStarveWholeCurrentEvent (0.08s)
+    planning_task_preview_budget_test.go:58: unrelated instruction previews prevented owner activation planification suspendue : contexte et rapport trop volumineux pour une activation ; préciser le périmètre ou fournir une remise plus concise, aucun contenu tronqué ni appel lancé
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.174s
+FAIL

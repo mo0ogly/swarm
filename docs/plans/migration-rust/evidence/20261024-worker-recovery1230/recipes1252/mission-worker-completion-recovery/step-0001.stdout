@@ -1,0 +1,11 @@
+PASS recovery-healthy-worker-control
+{"state": "RUN", "case": "owner", "phase": "waiting-bound"}
+PASS recovery-missing-original-waits-without-settlement
+PASS recovery-rejects-kernel-not-reaped
+PASS recovery-rejects-incomplete-output
+PASS recovery-rejects-wrong-agent
+PASS recovery-rejects-unknown-version
+{"state": "RUN", "case": "reopened", "phase": "waiting-bound"}
+PASS recovery-restored-original-settles-under-new-lease-without-rerun
+MISSION_WORKER_RECOVERY_PASS
+REPLAY_EVIDENCE /home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-mepon9o2

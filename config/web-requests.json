@@ -1,0 +1,5 @@
+{
+  "general_ms": 15000,
+  "snapshot_ms": 60000,
+  "connection_test_ms": 65000
+}

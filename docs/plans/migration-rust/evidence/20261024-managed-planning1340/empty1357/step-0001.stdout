@@ -1,0 +1,4 @@
+PASS managed-committed-copy-excludes-dirty-and-preserves-source
+PASS managed-recorded-replay-precedes-source-io
+PASS managed-dirty-snapshot-refuses-without-work-mutation
+PASS managed-malformed-and-divergent-originals-refuse-unchanged

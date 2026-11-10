@@ -1,0 +1,37 @@
+{
+  "status": "FAIL",
+  "steps": [
+    {
+      "kind": "tests",
+      "command": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "./internal/engine",
+        "-run",
+        "^TestMemorySummarySelectionReceiptDriftPreventsProvider$",
+        "-count=1",
+        "-timeout=0",
+        "-json"
+      ],
+      "start": "2026-10-17T12:41:22.770195+00:00",
+      "end": "2026-10-17T12:41:52.986400+00:00",
+      "exit_code": 1,
+      "log": "red-tests.jsonl"
+    }
+  ],
+  "passed": [],
+  "failed": [
+    "TestMemorySummarySelectionReceiptDriftPreventsProvider/edited-selection",
+    "TestMemorySummarySelectionReceiptDriftPreventsProvider/missing-receipt",
+    "TestMemorySummarySelectionReceiptDriftPreventsProvider",
+    "swarm.local/companion/internal/engine"
+  ],
+  "skipped": [],
+  "inputs_unchanged": true,
+  "changed_inputs": [],
+  "binary": null,
+  "binary_sha256": null,
+  "global_watchdog": "disabled: go test -timeout=0, subprocess without timeout",
+  "toolchain": "go version go1.24.3 linux/amd64"
+}

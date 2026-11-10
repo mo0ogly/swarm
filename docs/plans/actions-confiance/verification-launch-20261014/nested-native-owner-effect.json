@@ -1,0 +1,51 @@
+{
+  "revision": 199,
+  "owner_decision": {
+    "id": "planning-claim-ce05ffd86070f3929fdcf885-decision",
+    "work_id": "w-68b50cc82ec3fe55624f9549",
+    "revision": 197,
+    "kind": "planning.decide",
+    "at": "2026-10-15T01:52:00.198065647Z",
+    "payload": {
+      "schema_version": 1,
+      "event_id": "planning-claim-ce05ffd86070f3929fdcf885-decision",
+      "expected_revision": 196,
+      "scope": "root",
+      "scope_revision": 15,
+      "holder": "planner-0c41fa0e006ace84cc5d1f9a",
+      "generation": 53,
+      "input_events": [
+        "planning-rejected-98f6d7929279052785ef6c9de9ce1cd275cdc51ed9be85a853fa3e2f6c9a3e79",
+        "planning-rejected-3bdf44e99c7aada870294382d3f1defd222b1524a1f9c346c65804aaa937a4c3",
+        "resume-finding-contract2-3a47d859a81440a4",
+        "review-a533e395b07d47d75811ebad-result-0d6b841878822c03",
+        "resume-versioned-baseline-and-actual-originals-adf7a48b321344d4",
+        "resume-proven-originals-427accae7b15fc43"
+      ],
+      "operations": [
+        {
+          "kind": "review-retry",
+          "id": "plan-68b50cc82e-T2",
+          "title": "",
+          "requirements": null,
+          "next": "Reprendre uniquement la méthode de revue du candidat inchangé 671336f40f5e33279a61898131abab2809990c77 sous finding_contract_version2. Produire trois inspections entièrement nouvelles puis deux appels finaux nouveaux, sans réutiliser les anciennes inspections. Un défaut imbriqué doit appartenir à un constat fail et désigner un artefact en échec unique ; un constat unknown doit exclusivement conserver les preuves originales manquantes. Préserver l’erreur de protocole, les avis métier antérieurs, toutes les dépenses et les deux tentatives de production. Contrôler sur les originaux effectivement transmis, dont model.go, store.go et les helpers de main.go, que la nouvelle sélection rend une décision indépendante ; ne présumer ni succès ni acceptation."
+        }
+      ],
+      "reason": "Le premier échec actuel se situe dans le protocole du vérificateur (« defect without unique failed artifact »), pas dans la production. Les deux propositions d’exploration ont été intégralement refusées parce que leur inventaire dépassait le transport ; elles n’ont produit aucune opération et ne doivent pas être répétées. Les reprises apportent désormais une précondition différente et ciblée : contrat de constats version 2, originaux complétés, qualification annoncée sur 15 tests/25 sous-cas, précontrôle public method_restart_ready et capacité annoncée de 28 appels. La reprise de revue est donc l’action autorisée la plus petite ; elle conserve le candidat, les refus métier, l’historique et les consommations, et exige des inspections fraîches avant toute décision."
+    }
+  },
+  "review": "review-4ce246e4f3db9ce3d191d8fe",
+  "candidate_unchanged": true,
+  "new_plan": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-581cec8704c8ecf3/review-4ce246e4f3db9ce3d191d8fe-plan.json",
+  "new_plan_sha256": "ab5841468253ffb5fe8117a4ac6a4410a7126fe53a5524ee9be7580f8fcdcf69",
+  "finding_contract_versions": [
+    2,
+    2,
+    2
+  ],
+  "historical_review": "review-a533e395b07d47d75811ebad",
+  "historical_journal_sha256": "895e48cd23f35dd1d4f216d270f99a5b9b48c3ebce2677bf4db8bce0f460c635",
+  "historical_intact": true,
+  "producer_attempts_preserved": 2,
+  "observed_effect": "review running, first call reserved; valid inspection and final verdict pending"
+}

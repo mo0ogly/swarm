@@ -1,0 +1,9 @@
+{"Time":"2026-10-17T11:31:06.123056611+02:00","Action":"start","Package":"swarm.local/companion/internal/enrollmentproof"}
+{"Time":"2026-10-17T11:31:06.12773718+02:00","Action":"run","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestChallengeValueCopyCannotDuplicateConsumption"}
+{"Time":"2026-10-17T11:31:06.127942055+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestChallengeValueCopyCannotDuplicateConsumption","Output":"=== RUN   TestChallengeValueCopyCannotDuplicateConsumption\n"}
+{"Time":"2026-10-17T11:31:06.129631608+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestChallengeValueCopyCannotDuplicateConsumption","Output":"    proof_test.go:390: copied challenge duplicated consumption:  \u003cnil\u003e\n"}
+{"Time":"2026-10-17T11:31:06.129729522+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestChallengeValueCopyCannotDuplicateConsumption","Output":"--- FAIL: TestChallengeValueCopyCannotDuplicateConsumption (0.00s)\n"}
+{"Time":"2026-10-17T11:31:06.129749329+02:00","Action":"fail","Package":"swarm.local/companion/internal/enrollmentproof","Test":"TestChallengeValueCopyCannotDuplicateConsumption","Elapsed":0}
+{"Time":"2026-10-17T11:31:06.129765219+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Output":"FAIL\n"}
+{"Time":"2026-10-17T11:31:06.130694073+02:00","Action":"output","Package":"swarm.local/companion/internal/enrollmentproof","Output":"FAIL\tswarm.local/companion/internal/enrollmentproof\t0.007s\n"}
+{"Time":"2026-10-17T11:31:06.130757732+02:00","Action":"fail","Package":"swarm.local/companion/internal/enrollmentproof","Elapsed":0.008}

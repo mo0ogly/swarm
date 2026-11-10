@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:http-payment-check:v1",
+  "title": "PAEA HTTP data-only invoice resolution request",
+  "description": "Registry and request are exact UTF-8 strings, never parsed JavaScript numbers. No Root, path, approval or effect. Returns the shared payment-resolution-v1 report; supplied registry remains unauthenticated.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "registry", "request"],
+  "properties": {
+    "schema_version": {"const": 1, "type": "integer"},
+    "registry": {"type": "string"},
+    "request": {"type": "string"}
+  }
+}

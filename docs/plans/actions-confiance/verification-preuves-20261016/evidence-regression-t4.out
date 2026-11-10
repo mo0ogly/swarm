@@ -1,0 +1,236 @@
+=== RUN   TestActionsConfianceT4DataPolicyPublicContract
+--- PASS: TestActionsConfianceT4DataPolicyPublicContract (0.83s)
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/url
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/path
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/symlink
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/binary
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/provider
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/confidential
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/restricted
+=== RUN   TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/absent
+--- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture (7.28s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/url (1.15s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/path (0.88s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/symlink (0.91s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/binary (0.85s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/provider (0.91s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/confidential (0.81s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/restricted (0.86s)
+    --- PASS: TestActionsConfianceT4DataPolicyAdmissionRejectsWithoutCapture/absent (0.91s)
+=== RUN   TestActionsConfianceT4DataPolicyExactActionAndRecovery
+--- PASS: TestActionsConfianceT4DataPolicyExactActionAndRecovery (1.16s)
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/enabled-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/enabled-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/classifications-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/classifications-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/destinations-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/destinations-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/providers-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/providers-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/tools-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/tools-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/resources-missing
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/resources-null
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-classification
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-destination
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-provider
+=== RUN   TestActionsConfianceT4DataPolicyStrictValidation/context-tool
+--- PASS: TestActionsConfianceT4DataPolicyStrictValidation (4.71s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/enabled-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/enabled-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/classifications-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/classifications-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/destinations-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/destinations-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/providers-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/providers-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/tools-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/tools-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/resources-missing (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/resources-null (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-classification (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-destination (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-provider (0.00s)
+    --- PASS: TestActionsConfianceT4DataPolicyStrictValidation/context-tool (0.00s)
+=== RUN   TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect
+=== RUN   TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/approve
+=== RUN   TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/commit
+--- PASS: TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect (1.74s)
+    --- PASS: TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/approve (0.84s)
+    --- PASS: TestActionsConfianceT4DataPolicyChecksApprovalAndFirstEffect/commit (0.90s)
+=== RUN   TestActionsConfianceT4DataPolicyPersistenceAndDisabled
+--- PASS: TestActionsConfianceT4DataPolicyPersistenceAndDisabled (0.90s)
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification/uncatalogued
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification/downgraded
+=== RUN   TestActionsConfianceT4DataPolicyResourceClassification/empty-rules
+--- PASS: TestActionsConfianceT4DataPolicyResourceClassification (6.66s)
+    --- PASS: TestActionsConfianceT4DataPolicyResourceClassification/uncatalogued (0.97s)
+    --- PASS: TestActionsConfianceT4DataPolicyResourceClassification/downgraded (0.87s)
+    --- PASS: TestActionsConfianceT4DataPolicyResourceClassification/empty-rules (0.93s)
+=== RUN   TestActionsConfianceT4RemoteDestination
+--- PASS: TestActionsConfianceT4RemoteDestination (0.73s)
+=== RUN   TestActionsConfianceT4RemoteAuthenticatedPost
+--- PASS: TestActionsConfianceT4RemoteAuthenticatedPost (0.72s)
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/https://127.0.0.1:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://localhost:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://192.0.2.1:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:0
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:65536
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://user:password@127.0.0.1:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/session/private
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/?token=private
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/#private
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/%2f
+--- PASS: TestActionsConfianceT4RemoteInvalidOrigins (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/https://127.0.0.1:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://localhost:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://192.0.2.1:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:0 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:65536 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://user:password@127.0.0.1:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/session/private (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/?token=private (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/#private (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/%2f (0.00s)
+=== RUN   TestActionsConfianceT4RemoteRefusals
+=== RUN   TestActionsConfianceT4RemoteRefusals/missing-session
+=== RUN   TestActionsConfianceT4RemoteRefusals/wrong-session
+=== RUN   TestActionsConfianceT4RemoteRefusals/missing-bearer
+=== RUN   TestActionsConfianceT4RemoteRefusals/wrong-bearer
+=== RUN   TestActionsConfianceT4RemoteRefusals/header-injection
+--- PASS: TestActionsConfianceT4RemoteRefusals (0.88s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/missing-session (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/wrong-session (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/missing-bearer (0.02s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/wrong-bearer (0.02s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/header-injection (0.00s)
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/html
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/empty
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/null
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/empty-object
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/array
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/trailing
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/unstructured-error
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/structured-error
+--- PASS: TestActionsConfianceT4RemoteResponseBoundaries (0.03s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/html (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/empty (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/null (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/empty-object (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/array (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/trailing (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/unstructured-error (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/structured-error (0.00s)
+=== RUN   TestActionsConfianceT4RemoteNoRedirect
+--- PASS: TestActionsConfianceT4RemoteNoRedirect (0.00s)
+=== RUN   TestActionsConfianceT4RemoteCancellation
+--- PASS: TestActionsConfianceT4RemoteCancellation (0.00s)
+=== RUN   TestActionsConfianceT4RemoteUnavailableAndLocal
+--- PASS: TestActionsConfianceT4RemoteUnavailableAndLocal (0.89s)
+=== RUN   TestActionsConfianceT4SecretBrokerPolicy
+--- PASS: TestActionsConfianceT4SecretBrokerPolicy (1.08s)
+=== RUN   TestActionsConfianceT4SecretBrokerScope
+--- PASS: TestActionsConfianceT4SecretBrokerScope (1.21s)
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-1.5
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-<nil>
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries--1
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-0
+=== RUN   TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-1.5
+--- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy (0.02s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/enabled-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/material_ttl_seconds-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/grant_ttl_seconds-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_material_bytes-1.5 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-<nil> (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries- (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries--1 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-0 (0.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerInvalidPolicy/max_entries-1.5 (0.00s)
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/restart
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/revoke
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/expired
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/failed-consumer
+=== RUN   TestActionsConfianceT4SecretBrokerClosedRecovery/configuration
+--- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery (5.00s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/restart (1.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/revoke (0.94s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/expired (1.02s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/failed-consumer (1.02s)
+    --- PASS: TestActionsConfianceT4SecretBrokerClosedRecovery/configuration (1.00s)
+=== RUN   TestActionsConfianceT4SecretBrokerConcurrency
+--- PASS: TestActionsConfianceT4SecretBrokerConcurrency (0.93s)
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/not-ready
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/wrong-role
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/oversized
+=== RUN   TestActionsConfianceT4SecretBrokerLoadBoundaries/cancelled
+--- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries (0.99s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/not-ready (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/wrong-role (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/oversized (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerLoadBoundaries/cancelled (0.02s)
+=== RUN   TestActionsConfianceT4SecretBrokerStatusAfterRestart
+--- PASS: TestActionsConfianceT4SecretBrokerStatusAfterRestart (0.98s)
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/digest
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/destination
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/connector
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/action
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/ref
+=== RUN   TestActionsConfianceT4SecretBrokerGrantBoundaries/role
+--- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries (1.15s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/digest (0.02s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/destination (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/connector (0.01s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/action (0.02s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/ref (0.02s)
+    --- PASS: TestActionsConfianceT4SecretBrokerGrantBoundaries/role (0.02s)
+=== RUN   TestActionsConfianceT4SecretBrokerPreparation
+--- PASS: TestActionsConfianceT4SecretBrokerPreparation (0.01s)
+PASS
+ok  	swarm.local/companion/internal/engine	39.397s

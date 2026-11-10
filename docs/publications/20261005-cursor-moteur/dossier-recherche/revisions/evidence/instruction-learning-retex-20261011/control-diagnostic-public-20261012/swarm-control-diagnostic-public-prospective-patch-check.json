@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-12T13:24:55.197768+00:00",
+  "parent": "control-infrastructure-recovery-20261012.patch",
+  "parent_tree": "9058acc6fd169349e2c50fa3b0b0b9f596017bb6",
+  "preimage_tree": "9058acc6fd169349e2c50fa3b0b0b9f596017bb6",
+  "preimage_extensions": [],
+  "preimages": {
+    "internal/engine/managed_control_diagnostic_api.go": null,
+    "internal/engine/managed_control_diagnostic_api_test.go": null,
+    "internal/engine/planning_api.go": "6680491c81a1b0d6b73f84d33128281a1352217ddf687fc49e435c80846e1027",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "c24cecdee8744eebd5950f03f3763e6231f037af7be5b7cea6840fc3e00e5a95",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "301a64e736d2aee57adf9c24a603a39cb25278d8d37b6b0c65257d233caf9c76",
+    "docs/engine-cursor-source-manifest.json": "954b910b0c986f07f1c8da7359258bc305a78f5f94ea1398b5835284c15d0d57",
+    "docs/engine-cursor-source-inputs-001.json": "c8716802cf49dce1a6641f7530521512baaa2e63e9f9c0ce037536f24f93f199",
+    "docs/engine-cursor-source-inputs-005.json": "bc73c465dd57e3bcaad19b34aee7ca498b10cb9e1997b1eac0bc8e4f175f16e2",
+    "docs/engine-cursor-source-inputs-004.json": "17b415e2d0e4979e6381f5953ee3b0ee519c554c54937b2b234d8e0c67e60f6e",
+    "docs/engine-cursor-source-inputs-003.json": "f301d1de39f70f61b5fc4f0ead4230aa763dfbf8ce0bcef70456a5828c06c76c"
+  },
+  "postimages": {
+    "internal/engine/managed_control_diagnostic_api.go": "adee0d146b55c7abcd803bc709c6da1ad35aa400ac31061ec5b4b903ae1caa73",
+    "internal/engine/managed_control_diagnostic_api_test.go": "7790dab1b8c48a32dff8b1dd0f1e43e3350a374048da7ec1625592d7ccbbf051",
+    "internal/engine/planning_api.go": "22e7ab79259945688fa7703feb487fa643b4e3589cab7b15b670021abd3f6d10",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "44370936dcfc675075fcc8896748e2014aa3e71875a0472ba03547a340555c4a",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "618c29654358ae50ee952d62fee686f20e98a0705935882599c6afe8c1ccd567",
+    "docs/engine-cursor-source-manifest.json": "aa17cd27815aa4c8b96f69c3146db271121b0b8336d7512652d46a67cd4845fb",
+    "docs/engine-cursor-source-inputs-001.json": "bbf95fa31afc8671197d2e486421e135c1694324f3da23f50c93f956933ec358",
+    "docs/engine-cursor-source-inputs-005.json": "eff907c870585defeda4be4f6e7796fb63e0865f10640e5fc3d0d50a8055ca47",
+    "docs/engine-cursor-source-inputs-004.json": "c5f0afa7a2721ffb5f1be825b708cd0b1dadf276b99e70c01979478996486ae8",
+    "docs/engine-cursor-source-inputs-003.json": "afeb2611617ba7fbbca7d4462f5625db68dd7b26e5f446cfb7079f84b1b9047d"
+  },
+  "result_tree": "63430cb27bf8345af1eaec1a7fe442bea88fba7a",
+  "patch": "/tmp/swarm-control-diagnostic-public-prospective.patch",
+  "patch_sha256": "a9765504eddf5069bda5f959f1dd5e1c18a4a19eb6328b3b3e348de0cb3c62d6",
+  "paths": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_control_diagnostic_api.go",
+    "internal/engine/managed_control_diagnostic_api_test.go",
+    "internal/engine/planning_api.go"
+  ],
+  "candidate_digest": "aab13f48c96996f90af06a9f3c5b19ccdedea66eed5271e3b554151e9cc0b986",
+  "check": "PASS exact path diff, isolated refreshed-index apply, result tree and all postimages",
+  "qualification": {
+    "state": "running; no installation permitted until complete local qualification"
+  },
+  "purpose": "Authenticated read-only diagnostic of the current refused control: engine-owned provenance, output hash, unchanged state and stale/corrupt/foreign-task rejection. Extends qualified contract30 without deferred27 or acceptance.",
+  "preimage_scope": "Exact current primary preimages checked; any divergence from historical24 external packaging tree explicitly extended without rewriting its old objects."
+}

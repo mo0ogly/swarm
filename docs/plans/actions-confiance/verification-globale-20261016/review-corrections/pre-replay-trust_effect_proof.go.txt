@@ -1,0 +1,176 @@
+//go:build linux
+
+package engine
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+)
+
+// Optional contexts extend new records; absent fields preserve historical bytes.
+type TrustProofPolicyContext struct {
+	Schema   int             `json:"schema_version"`
+	Revision int             `json:"revision"`
+	Policy   TrustPolicy     `json:"policy"`
+	Controls json.RawMessage `json:"controls"`
+}
+
+type TrustEffectProof struct {
+	Schema      int                `json:"schema_version"`
+	ConnectorID string             `json:"connector_id"`
+	Intent      *TrustEffectIntent `json:"intent,omitempty"`
+	Result      *TrustEffectResult `json:"result,omitempty"`
+	Native      json.RawMessage    `json:"native_result"`
+	Legacy      bool               `json:"legacy_receipt,omitempty"`
+}
+
+func trustProofPolicyContext(st *trustState) *TrustProofPolicyContext {
+	controls, _ := json.Marshal(map[string]any{
+		"data_policy": effectiveTrustDataPolicy(st), "delegation": effectiveTrustDelegation(st),
+		"step_up": effectiveTrustStepUp(st), "group_mapping": effectiveTrustGroupMapping(st),
+		"workload_introspection": trustIntrospectionPolicyValue(st.WorkloadIntrospection),
+		"process_policy":         trustProcessPolicyValue(st.ProcessPolicy), "secret_broker": trustSecretPolicyValue(st.SecretBroker),
+		"sealed_execution": trustSealedPolicyValue(st.SealedExecution), "evidence_signing": trustEvidencePolicy(st.EvidenceSigning),
+		"laboratory": laboratoryPolicy(st.Laboratory), "kernel_check": trustKernelPolicy(st.KernelCheck),
+		"kernel_observation": kernelObservePolicy(st.KernelObservation), "oidc_logout": effectiveTrustOIDCLogout(st),
+	})
+	return &TrustProofPolicyContext{Schema: 1, Revision: st.Revision, Policy: st.Policy, Controls: controls}
+}
+
+func verifyTrustEvidenceChain(exp TrustProofExport) error {
+	if err := verifyTrustOriginals(exp); err != nil {
+		return err
+	}
+	previous := ""
+	for i, ev := range exp.Evidence {
+		if ev.Sequence != i+1 || ev.PreviousHash != previous || trustEvidenceHash(ev) != ev.Hash {
+			return fmt.Errorf("chaîne de preuves altérée à la séquence %d", i+1)
+		}
+		if err := verifyTrustEffectContext(ev, exp.Evidence[:i]); err != nil {
+			return err
+		}
+		previous = ev.Hash
+	}
+	return nil
+}
+
+func trustEffectProofSnapshot(st *trustState, actionID string) *TrustEffectProof {
+	a := st.Actions[actionID]
+	r, ok := st.Receipts[a.IdempotencyKey]
+	if !ok {
+		return nil
+	}
+	p := TrustEffectProof{Schema: 1, ConnectorID: trustConnectorID(a.Connector), Intent: r.Intent, Result: r.Result, Legacy: r.Intent == nil && r.Result == nil}
+	if p.ConnectorID == "local-access-simulation" {
+		for _, e := range st.AccessLedger {
+			if e.IdempotencyKey == a.IdempotencyKey {
+				p.Native, _ = json.Marshal(e)
+			}
+		}
+	} else {
+		for _, e := range st.Ledger {
+			if e.IdempotencyKey == a.IdempotencyKey {
+				p.Native, _ = json.Marshal(e)
+			}
+		}
+	}
+	// Receipts are updated during reconciliation. Evidence keeps immutable values.
+	raw, _ := json.Marshal(p)
+	var snapshot TrustEffectProof
+	if json.Unmarshal(raw, &snapshot) != nil {
+		return nil
+	}
+	return &snapshot
+}
+
+func verifyTrustEffectContext(ev TrustEvidence, prior []TrustEvidence) error {
+	bad := func() error { return fmt.Errorf("contexte de preuve incohérent à la séquence %d", ev.Sequence) }
+	p, e := ev.PolicyContext, ev.EffectReceipt
+	if p == nil {
+		if e != nil {
+			return bad()
+		}
+		return nil
+	}
+	if p.Schema != 1 || p.Revision < 1 || validateTrustPolicy(p.Policy) != nil {
+		return bad()
+	}
+	var controls map[string]json.RawMessage
+	if json.Unmarshal(p.Controls, &controls) != nil || len(controls) != 13 {
+		return bad()
+	}
+	for _, key := range []string{"data_policy", "delegation", "step_up", "group_mapping", "workload_introspection", "process_policy", "secret_broker", "sealed_execution", "evidence_signing", "laboratory", "kernel_check", "kernel_observation", "oidc_logout"} {
+		v, ok := controls[key]
+		if !ok || bytes.Equal(bytes.TrimSpace(v), []byte("null")) || !json.Valid(v) {
+			return bad()
+		}
+	}
+	committed := (ev.Kind == "commit" || ev.Kind == "reconcile") && (ev.Result == "committed" || ev.Result == "unknown" || ev.Result == "reconciled")
+	if e == nil {
+		if committed {
+			return bad()
+		}
+		return nil
+	}
+	if !committed || e.Schema != 1 || len(e.Native) == 0 || !json.Valid(e.Native) {
+		return bad()
+	}
+	var actionID, content, key, resource, at string
+	var parameters any
+	switch e.ConnectorID {
+	case "local-ledger-simulation":
+		var n TrustLedgerEntry
+		if strict(e.Native, &n) != nil || !n.Simulation || n.Sequence < 1 {
+			return bad()
+		}
+		actionID, content, key, resource, at = n.ActionID, n.ContentHash, n.IdempotencyKey, n.Resource, n.CommittedAt
+		parameters = trustLedgerConnector{}.parameters(TrustAction{Amount: n.Amount, Currency: n.Currency, Beneficiary: n.Beneficiary})
+	case "local-access-simulation":
+		var n TrustAccessEntry
+		if strict(e.Native, &n) != nil || !n.Simulation || n.Sequence < 1 {
+			return bad()
+		}
+		actionID, content, key, resource, at = n.ActionID, n.ContentHash, n.IdempotencyKey, n.Resource, n.CommittedAt
+		parameters = n.Access
+	default:
+		return bad()
+	}
+	if actionID != ev.ObjectID || content != ev.ContentHash || !safeName(key) || !validTrustResource(resource) {
+		return bad()
+	}
+	if e.Legacy {
+		if e.Intent != nil || e.Result != nil || e.ConnectorID != "local-ledger-simulation" {
+			return bad()
+		}
+		return nil
+	}
+	i, r := e.Intent, e.Result
+	if i == nil || r == nil || i.Schema != 1 || r.Schema != 1 || i.ID != "intent-"+content || i.ActionHash != content || i.ConnectorID != e.ConnectorID || i.ConnectorVersion != 1 || i.Resource != resource || i.IdempotencyKey != key || hashMust(i.Parameters) != hashMust(parameters) || r.IntentID != i.ID || r.Receipt != "receipt-"+hashMust(i) || r.Digest != hashMust(e.Native) || r.State != ev.Result || r.CommittedAt != at || r.ObservedAt != ev.At {
+		return bad()
+	}
+	if len(i.ApprovalHashes) == 0 {
+		return bad()
+	}
+	mandateFound := false
+	for _, previous := range prior {
+		if previous.Kind == "mandate-create" && previous.Result == "admitted" && previous.ContentHash == i.MandateHash {
+			mandateFound = true
+		}
+	}
+	if !mandateFound {
+		return bad()
+	}
+	for _, digest := range i.ApprovalHashes {
+		found := false
+		for _, previous := range prior {
+			if previous.Hash == digest && previous.Kind == "approve" && previous.Result == "approved" && previous.ObjectID == actionID && previous.ContentHash == content {
+				found = true
+			}
+		}
+		if !found {
+			return bad()
+		}
+	}
+	return nil
+}

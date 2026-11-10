@@ -1,0 +1,9 @@
+{
+  "error": "reprise de revue fragmentée indisponible pour cette tâche",
+  "failure": {
+    "code": "command_failed",
+    "message": "reprise de revue fragmentée indisponible pour cette tâche",
+    "retryable": false
+  },
+  "schema_version": 1
+}

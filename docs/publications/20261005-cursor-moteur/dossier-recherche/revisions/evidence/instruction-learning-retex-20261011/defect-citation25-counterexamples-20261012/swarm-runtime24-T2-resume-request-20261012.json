@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "expected_revision": 606,
+  "event_id": "T2-provider-reset-resume-889df94eccf648fe932227de72d614d7",
+  "task_id": "plan-ca937edf4e-T2",
+  "review_id": "review-44f2da6a502adf1b1853484b",
+  "reason": "Replan après dépendance externe : délai quota Claude annoncé au2026-10-12 01hUTC maintenant écoulé, vérifié sur horloge UTC. Candidat, contrat de constat1, six paquets et originaux authentifiés inchangés ; prévisualisation native8appels requis30disponibles. Reprendre uniquement les inspections manquantes de cette revue, sans nouvelle production, remboursement ni verdict prescrit. Le premier véritable appel doit vérifier la disponibilité ; un nouveau refus sera diagnostiqué, pas répété sans nouvelle précondition."
+}

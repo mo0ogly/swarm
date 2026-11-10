@@ -1,0 +1,26 @@
+{
+  "rust/crates/swarm-engine/src/lib.rs": {
+    "tested_sha256": "765c0bacc9c240492f126e25864a76b6760db86e3d3bfed804e16b469a96151c",
+    "workspace_sha256": "585050d51467cebeda9bb92bdb2c6d71013eda673df60fc5efa57510966049a0",
+    "scope_unchanged": true,
+    "excluded": "review-check module/export/help and its release note only; not compiled or accepted by preparation lot"
+  },
+  "rust/crates/swarm-engine/src/root_store.rs": {
+    "tested_sha256": "d27376b1a30eed9b8094ab081a95f867b7194a32b6572e4b19af8b3cbbf393a9",
+    "workspace_sha256": "cd849b10c7b6073cda12176b72f40c6132914760eb3dbc5b764ea869c86a21c4",
+    "scope_unchanged": true,
+    "excluded": "review-check module/export/help and its release note only; not compiled or accepted by preparation lot"
+  },
+  "rust/crates/swarm-cli/src/lib.rs": {
+    "tested_sha256": "21448cc8a23ceed96d27b32de36ba77997c55a4f5aa86f70c0bba4dccb458bdb",
+    "workspace_sha256": "df7b2623ebcf2268f6201ff9a3e64b738295555ac45dacd995bcd2648f437acd",
+    "scope_unchanged": true,
+    "excluded": "review-check module/export/help and its release note only; not compiled or accepted by preparation lot"
+  },
+  "version_history.json": {
+    "tested_sha256": "08841c697d659fa85e33d583741d3027c30fbf2c17819dd4d71ba1cff78e42ff",
+    "workspace_sha256": "4c782a774f8e1ddac019c6131995948ea823f553de8c91dba38e427b42d5516f",
+    "scope_unchanged": true,
+    "excluded": "review-check module/export/help and its release note only; not compiled or accepted by preparation lot"
+  }
+}

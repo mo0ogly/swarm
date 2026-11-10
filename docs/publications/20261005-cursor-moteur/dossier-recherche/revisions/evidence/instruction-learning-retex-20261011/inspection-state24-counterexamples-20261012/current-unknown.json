@@ -1,0 +1,74 @@
+{
+  "candidate_commit": "95e2afb9ca56b48ae2f393396cb2d83e0ba7b309",
+  "context_sha256": "f01653114085721584f9ee3ba137fe6271155cb325afe3274e3066f17bca6223",
+  "defects": [],
+  "findings": {
+    "0": {
+      "e": 0,
+      "n": [
+        "applyJudgeVerdict non fourni ici",
+        "normalizePlanningChecks non fourni ici",
+        "mutateWithHook non fourni ici",
+        "planningDeliveryContext non fourni ici"
+      ],
+      "r": "cohérent local",
+      "v": "unknown"
+    },
+    "1": {
+      "e": 0,
+      "n": [
+        "managedScopePreview non fourni ici",
+        "managedReviewDossier non fourni ici"
+      ],
+      "r": "handlers ok ici",
+      "v": "unknown"
+    },
+    "2": {
+      "e": 0,
+      "n": [
+        "localFile non fourni ici",
+        "requiredPlanChecks non fourni ici",
+        "revalidationGate non fourni ici"
+      ],
+      "r": "calcul cohérent",
+      "v": "unknown"
+    },
+    "3": {
+      "e": 0,
+      "n": [
+        "preuve vet absente ou tronquée",
+        "commande go vet non consignée ici"
+      ],
+      "r": "fichier vide",
+      "v": "unknown"
+    },
+    "4": {
+      "e": 0,
+      "n": [
+        "checkLaunchBudget non fourni ici",
+        "type Budget non fourni ici"
+      ],
+      "r": "budget correct",
+      "v": "unknown"
+    },
+    "5": {
+      "e": 0,
+      "n": [
+        "currentTaskAttempt non fourni ici",
+        "guardBlock non fourni ici"
+      ],
+      "r": "projection ok",
+      "v": "unknown"
+    },
+    "6": {
+      "e": 0,
+      "n": [
+        "planning_judge.go absent de ce paquet",
+        "tests TestPlanningJudge* non vus ici"
+      ],
+      "r": "claims non vus",
+      "v": "unknown"
+    }
+  },
+  "packet_sha256": "cb120eb9879f2b172ea371ea9839ae40ffc693aeff91251f705c4b9f7becbe94"
+}

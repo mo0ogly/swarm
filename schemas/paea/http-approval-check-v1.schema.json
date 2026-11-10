@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:http-approval-check:v1",
+  "title": "PAEA supplied approval check transport v1",
+  "description": "Two original UTF8 JSON strings; framing only, no authority or server paths.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document",
+    "approval"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "document": {
+      "type": "string"
+    },
+    "approval": {
+      "type": "string"
+    }
+  }
+}

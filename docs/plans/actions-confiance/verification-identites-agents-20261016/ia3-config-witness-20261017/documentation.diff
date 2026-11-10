@@ -1,0 +1,388 @@
+--- before/docs/plans/actions-confiance/identites-agents-replan.md
++++ after/docs/plans/actions-confiance/identites-agents-replan.md
+@@ -1494,3 +1494,109 @@
+ aucun résultat Go élargi ou relancé sans raison. Amélioration I2f02a-08 :
+ périmètre des transformations documentaires vérifié par le diff et les sections
+ originales ; propriétaire Codex, correction vérifiée, apprentissage dans le rapport.
++
++
++## IA3c.2f-02b — témoin durable et reprise coordonnée, 17 octobre
++
++Replan/APEX, Codex seul. Besoin repris : un Head fourni en mémoire ne maintient
++pas son actualité durable après redémarrage. IA3c.2f-02a laisse explicitement ce
++contrat ouvert. Les huit entrées de sa preuve finale sont inchangées à la reprise.
++Comparer : écrire config puis une simple tête séparée, ou préparer une intention
++durable puis appliquer et confirmer. La première perd la décision exacte dans
++les fenêtres de panne ; retenir la seconde, sans timer, TTL ni retry implicite.
++
++Périmètre avant code : nouveau coordinateur/témoin et tests dans enrollmentconfig ;
++extraction interne de lecture/persistance de fichier pour partager les contrôles
++existants sans copier un autre Store ; fonctions publiques antérieures conservées.
++Plan/cible, contrats FR/EN, guides installation et preuves actualisés dans le même
++incrément. Aucune source moteur, UX, mémoire, processus ou mission modifiée.
++
++Le témoin porte schéma/pins, Head confirmé et intention exacte facultative (entrée
++et tête cible). Il vit dans un répertoire explicite distinct et non imbriqué,
++vérifié avec les mêmes règles Linux ; même inode refusé. Un répertoire séparé ne
++prouve pas une indépendance de compte, sauvegarde ou hôte. Restaurer les deux
++stockages et leurs protections ensemble reste une limite à annoncer.
++
++Contrat : Coordinator ouvre les deux réservations non bloquantes ; bootstrap
++explicite seulement si config et témoin absents. Jamais de témoin appris d’une
++config existante. Intention durable avant config ; config et barrière de durabilité
++avant confirmation ; aucune View exposée avec une intention ouverte. Read/Preview
++ordinaires bloquent en attente de reprise. Recover ou retry exact de la demande
++pendante revalide l’autorité et compare les octets/empreintes attendus : base
++exacte ou cible exacte seulement, aucune acceptation d’une troisième histoire.
++Une configuration manquante hors genèse est refusée, pas reconstruite en silence.
++
++Une erreur d’écriture peut laisser un fichier visible : conserver l’intention et
++la cause, retourner un résultat nul. Une confirmation visible mais non acquittée
++se reprend par les barrières et le retry courant exact sans seconde mutation.
++Les callbacks restent des fixtures ; aucune authentification OIDC ni protection
++d’un fournisseur réel n’en découle. API Go interne seulement, pas de raccourci
++CLI/HTTP ou activation sans Admin.
++
++Critères : codec strict du témoin, init/read/reopen, rollback du seul config,
++absence/mauvais pins du témoin, répertoires identiques/imbriqués/alias, chacune
++des fenêtres avant/après config et confirmation, refus d’autorité à la reprise,
++conflit/tamper/pending, annulation, concurrence et retry sans doublon. Tests avant
++code du nouveau contrat ; archives et sorties originales conservées. Normal/race
++du paquet y compris les 70 noms précédents, vet/build ; -timeout=0. Les opérations
++protégées publiques et le déploiement restent ouverts après ces seules fixtures.
++
++
++### Replan IA3c.2f-02b — contexte d’erreur de la coordination
++
++Après 91 puis 99 noms PASS normal/race, un cas ciblé injecte une faute E/S
++générique lors de la préparation du témoin. stage-red-01 exécute un test et
++l’échoue : la cause et ErrIndeterminate sont préservés, mais aucune indication
++« prepare witness » ne distingue l’étape de reprise. Le source et l’original sont
++conservés avant correction. Défaut de diagnostic du candidat, pas fausse preuve
++de mutation ni faille publique démontrée.
++
++Correction générale : enrichir les frontières préparation du témoin, écriture
++configuration, confirmation et barrières avec leur rôle, sans chemins privés ni
++écrasement de cause via errors.Is. Propriétaire Codex ; reprise : garde ciblée
++et ensemble normal/race. I2f02b-01 conserve origine, valeur de diagnostic,
++périmètre et preuve ; aucun retry inchangé ou nouveau plafond.
++
++
++### Preuve complémentaire justifiée — sortie de processus
++
++Le lot 03 vérifie 100 noms en normal/race. Pour distinguer une reprise durable
++d’une reprise du même objet Go, ajouter une fixture enfant du binaire de test :
++intention écrite, barrière en faute, sortie os.Exit sans Close, puis reconstruction
++par un nouveau coordinateur depuis les fichiers. Aucun autre processus n’est
++interrompu. Ce cas prouve réception de l’état après sortie de processus, pas
++panne matérielle, redémarrage machine ou isolation d’un compte fournisseur.
++Watchdogs parent/enfant explicitement désactivés ; suivre la progression.
++
++
++### Transmission au dossier scientifique
++
++Actualiser également la note identités-autorite-cycle-vie du dossier scientifique,
++restée à IA3c.2e : choix local pilote et distant prévu, noyau de configuration
++02a puis témoin coordonné 02b. Capturer la note avant append, préserver le reste.
++Les 101 noms incluent les 70 précédents ; aucun cumul trompeur d’attaques.
++Déploiement, séparation UID, panne matérielle et supériorité comparative non prouvés.
++
++
++### Résultat IA3c.2f-02b — témoin local reçu, protection encore partielle
++
++101 noms PASS normal/race-04, zéro FAIL/SKIP ; vet/build ciblés PASS, douze
++entrées stables, dont les 70 gardes antérieures rejouées. Six des huit sources
++de référence sont inchangées ; deux modifications prévues (commentaire de paquet,
++extraction privée I/O), quatre nouveaux fichiers du coordinateur et tests.
++Contrôle de configuration des workflows PASS, sans modifier ses sources.
++
++Le [rapport](verification-identites-agents-20261016/ia3-config-witness-20261017/RAPPORT-IA3c2f02b.md)
++conserve le défaut de contexte d’erreur FAIL avant/PASS après, les fenêtres de
++faute et la sortie de processus enfant sans Close. Contrats et schémas FR/EN,
++guides d’installation et note scientifique identité actualisés ; anciens blocs
++opérationnels préservés. Pas de binaire déployé, d’authentification humaine réelle
++ou de preuve indépendante. Les rendus sont inspectés, pas une validation UX.
++
++Le maintien du témoin est réalisé localement ; protéger les comptes/sauvegardes
++et prouver l’usage final restent ouverts. Restaurer les deux fichiers ensemble
++retire la détection : EP-06 et F07 non clos. Aucune annulation automatique d’une
++intention en cas de refus ; conserver propriétaire et condition de reprise.
++Le prochain raccord est le service local protégé, puis ses opérations publiques
++et la configuration installation/Admin ; aucun raccourci depuis un projet ou
++le cookie cockpit ne doit fournir l’autorité. F01–F07, IDA, IA3–IA5 et RETEX ouverts.
+--- before/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
++++ after/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
+@@ -305,3 +305,23 @@
+ la configuration UX et le raccord d’usage restent ouverts. Le proposed Head de
+ Preview n’est jamais un checkpoint sauvegardé. Le futur mode distant est refusé
+ par le codec courant ; son évolution devra préserver les versions historiques.
++
++
++## IA3c.2f-02b — témoin local coordonné, protection réelle encore ouverte
++
++Coordinator ajoute un témoin durable local dans un répertoire distinct non
++imbriqué. Intention exacte avant config, puis confirmation ; jamais de témoin
++appris d’une config importée. Pending bloque Read/Preview ; Recover ou demande
++pendante exacte réautorise et n’accepte que la base ou la cible exactes. Les
++contrôles fichiers sont partagés avec Store, dont les 70 gardes sont rejouées.
++101 noms PASS normal/race, vet/build ciblés PASS, 12 entrées stables. Reprise
++après sortie d’un processus enfant vérifiée ; pas de panne matérielle ni
++confinement fournisseur. [Rapport et preuves](verification-identites-agents-20261016/ia3-config-witness-20261017/RAPPORT-IA3c2f02b.md).
++
++Les mentions antérieures de témoin manquant désignent l’état avant ce noyau ou
++sa protection réelle non livrée. Le maintien durable existe en fixtures ; la
++protection contre restauration conjointe, la séparation OS, les sauvegardes, le
++service, les opérations publiques et Admin restent ouverts. Restaurer les deux
++stockages retire encore la détection : EP-06/F07 restent partiels/ouverts.
++Pas de reset ni abandon automatique d’intention. Le principal humain initial
++reste à désigner avant activation ; callbacks de test ne prouvent aucun humain.
+--- before/docs/architecture/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/architecture/AGENT-IDENTITY-CONTRACT.md
+@@ -1015,3 +1015,92 @@
+ neuf et restauration ; Create n’est pas un endpoint de remise à zéro.
+ L’évolution vers le distant devra conserver les octets et règles des versions
+ historiques, pas recalculer discrètement leur chaîne avec un nouveau codec.
++
++## Témoin local et reprise coordonnée — IA3c.2f-02b
++
++Le même paquet fournit maintenant `Coordinator`, ouvert par OpenCoordinated avec
++les chemins explicites de configuration et de témoin, l’UID réel, les pins et
++Authorizer. Les répertoires égaux, imbriqués, ou de même inode sont refusés ; les
++contrôles Linux existants de propriétaire, mode, liens et type de fichier sont
++partagés, sans nouvelle copie de Store. Deux répertoires distincts ne prouvent
++pas deux domaines d’administration ou de sauvegarde. Ce coordinateur reste une
++API Go interne, sans service, installateur, CLI/HTTP ou Admin raccordé.
++
++`witness.json` a quatre champs canoniques exacts : `schema_version:1`, `pins`,
++`committed` (Head confirmé) et `pending` (null ou intention). Une intention contient
++`entry` (change, actor, at) et `target` (Head calculé de cette entrée et des pins).
++La base de change doit égaler committed, acteur/date/schéma sont vérifiés ; le
++codec refuse champs inconnus, doublons, casse, nulls/omissions, trailing et cible
++contradictoire. Le témoin est un état local protégé par les contrôles de stockage,
++pas une signature ni un compteur matériel monotone. Pins restent indépendants.
++
++| Opération coordonnée | Comportement réel |
++| --- | --- |
++| Create | Bootstrap explicite seulement si les deux états sont absents ; préparer une intention durable avant config, puis confirmer ; retry exact de l’initialisation encore courante reconnu |
++| Apply | Réserver config puis témoin sans attente/retry interne ; vérifier le Head confirmé, autoriser, préparer l’intention, écrire config, confirmer |
++| Read | Vérifier config contre committed, refuser toute intention ouverte, vérifier les barrières des deux répertoires avant View |
++| Preview | Même validation/autorisation, aucune écriture d’état ; refuser pending ; genèse projetée seulement si les deux états sont absents |
++| Recover | Si pending, comparer uniquement base/cible exactes, réautoriser et synchroniser l’intention avant effet ; si déjà confirmé, observation et barrières seulement |
++
++L’absence de témoin avec une config existante retourne ErrWitnessMissing, sans
++le reconstruire depuis cette config. Une config manquante hors genèse est refusée.
++Une divergence de Head, même cohérente syntaxiquement, est refusée ; restaurer
++seulement config OU témoin est détecté. Un appel au Store bas niveau hors du
++protocole ne fait pas avancer le témoin et reste refusé par Coordinator. Le futur
++service doit consommer Coordinator, pas contourner ces comparaisons.
++
++Une intention conserve l’entrée exacte et son instant. Si config est encore à la
++base, reprise de cette entrée après nouvelle autorisation ; si la cible est déjà
++visible, synchronisation sans second événement ni réécriture. Une autre histoire,
++une demande différente pendant pending ou une autorité refusée ne déclenche
++aucune réparation implicite ; l’intention est conservée. Read/Preview restent
++fermés avec ErrPending. Aucun View partiel n’est retourné en cas d’erreur.
++
++Une confirmation visible mais dont le fsync échoue reste un résultat incertain :
++relire, comparer puis synchroniser les deux répertoires, ou reprendre l’événement
++courant exact avec autorisation. L’erreur conserve ErrIndeterminate, sa cause et
++l’étape (prepare witness / write configuration / confirm witness ou barrière).
++Un échec de préparation avant rename peut laisser les deux fichiers absents :
++il faut alors un bootstrap explicite, jamais déduire un succès. Annuler après
++l’intention et avant config conserve la décision en attente ; une annulation
++concurrente plus tard ne prouve pas l’absence de mutation.
++
++```mermaid
++flowchart TD
++  O["OpenCoordinated<br/>deux répertoires privés distincts"] --> A["Réservations et autorisation<br/>base attendue, demande exacte"]
++  A --> I["Intention dans witness.json<br/>entrée et cible, fichier et répertoire synchronisés"]
++  I --> C["Configuration atomique<br/>écriture, rename et synchronisation"]
++  C --> W["Confirmer le témoin<br/>committed = cible, pending = null"]
++  W --> V["View sauvegardée<br/>pas une preuve de service actif"]
++  I -. "erreur" .-> E["Aucun View<br/>cause et étape conservées"]
++  C -. "erreur" .-> E
++  W -. "erreur ou acquittement incertain" .-> E
++  E --> S["Relire les deux états<br/>ne jamais apprendre le témoin de la configuration"]
++  S --> P["Intention ouverte<br/>Read et Preview ordinaires refusés"]
++  P --> R["Recover ou demande pendante exacte<br/>comparer base ou cible, réautoriser, sync intention"]
++  R -- "base exacte" --> C
++  R -- "cible déjà visible" --> D["Sync configuration<br/>sans second événement ni réécriture"]
++  D --> W
++  S -- "déjà confirmé et cohérent" --> B["Barrières des deux répertoires"]
++  B --> V
++  O -. "raccord restant" .-> F["Protection OS et sauvegardes, service, API et Admin<br/>pas réalisés par ces fixtures"]
++```
++
++Les 70 gardes précédentes sont rejouées dans un lot final de 101 noms PASS en
++normal/race, vet/build ciblés PASS, 12 entrées stables. Une fixture enfant écrit
++une intention, rencontre une barrière en faute et sort sans Close ; un nouveau
++coordinateur reconstruit la reprise depuis les fichiers. Ce n’est ni SIGKILL,
++ni panne électrique, ni preuve de séparation d’UID. Le même inode par bind mount
++est contrôlé dans le code mais non monté dans ces fixtures. Le [rapport](../plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/RAPPORT-IA3c2f02b.md)
++conserve les fenêtres de faute injectées, le défaut de contexte d’erreur reproduit
++puis corrigé, sources et limites.
++
++Restaurer les deux stockages ensemble reste accepté dans le cas limite conservé :
++la protection de l’hôte, des copies de sauvegarde et du témoin ne vient pas du
++nom du répertoire. La livraison du noyau local ne clôt donc pas F07 ni EP-06.
++Aucune annulation/abandon automatique d’intention n’est livré : si reprise refusée
++ou histoire manquante, garder le blocage, sa cause et son propriétaire ; une
++restauration ou migration doit passer par une opération autorisée à concevoir,
++pas une édition d’état privé. Propriétaire : opérateur pour protection/identité,
++Codex pour service et parcours publics. Distant toujours refusé par le codec
++courant ; aucun secours permissif ou nouveau timeout/budget ajouté.
+--- before/docs/en/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/en/AGENT-IDENTITY-CONTRACT.md
+@@ -964,3 +964,88 @@
+ service must distinguish new bootstrap from restoration; Create is not a reset
+ endpoint. Future remote support must preserve historical bytes and version rules,
+ not silently recompute the chain using a new codec.
++
++## Local witness and coordinated recovery — IA3c.2f-02b
++
++The package now provides `Coordinator`, opened with OpenCoordinated and explicit
++configuration/witness paths, actual UID, pins and Authorizer. Equal, nested and
++same-inode directories are rejected; existing Linux ownership, mode, link and
++file-type checks are shared without copying another Store. Separate directories
++do not establish separate administration or backup domains. This remains an
++internal Go API without service, installer, CLI/HTTP or Admin integration.
++
++`witness.json` has four exact canonical fields: `schema_version:1`, `pins`,
++`committed` (confirmed Head) and `pending` (null or intent). Intent contains `entry`
++(change, actor, at) and `target` (Head derived from the entry and pins). The change
++base must equal committed; actor, time and schema are checked. Unknown, duplicate,
++folded, null/missing, trailing and contradictory-target input is rejected. The
++witness is local state protected by storage checks, not a signature or hardware
++monotonic counter. Pins remain independently supplied.
++
++| Coordinated operation | Actual behavior |
++| --- | --- |
++| Create | Explicit bootstrap only if both states are absent; durable intent before config, then confirmation; recognizes exact retry of initial event still current |
++| Apply | Reserve config then witness without internal wait/retry; check confirmed Head, authorize, prepare intent, write config, confirm |
++| Read | Compare config with committed, reject open intent, check both directory barriers before returning View |
++| Preview | Same validation/authorization, no state write; reject pending; project genesis only when both states are absent |
++| Recover | With pending, compare only exact base/target, reauthorize and sync intent before effect; already-confirmed state requires observation/barriers only |
++
++Missing witness with existing config returns ErrWitnessMissing; it is never
++reconstructed from config. Missing config outside genesis is denied. Divergent
++Heads, even from coherent data, are rejected; restoring config OR witness alone
++is detected. A raw Store call outside the protocol cannot advance the witness
++and is rejected by Coordinator. The future service must consume Coordinator
++without bypassing these comparisons.
++
++Intent retains the exact entry and time. If config is still at base, apply that
++entry after fresh authorization. If target is already visible, sync without a
++second event or rewrite. Other history, a different request while pending, or
++denied authority causes no implicit repair; intent is retained. Ordinary Read and
++Preview remain closed with ErrPending. Errors return no partial View.
++
++Visible confirmation with failed fsync remains uncertain: reread, compare and
++sync both directories, or retry the exact current event with authorization.
++Errors preserve ErrIndeterminate, the cause and stage (prepare witness / write
++configuration / confirm witness or barrier). Preparation failure before rename
++may leave both files absent: explicit bootstrap is then required, never inferred
++success. Cancellation after intent and before config retains the pending decision;
++later concurrent cancellation does not establish absence of mutation.
++
++```mermaid
++flowchart TD
++  O["OpenCoordinated<br/>two distinct private directories"] --> A["Reservations and authorization<br/>expected base, exact request"]
++  A --> I["Intent in witness.json<br/>entry and target, file and directory synced"]
++  I --> C["Atomic configuration<br/>write, rename and sync"]
++  C --> W["Confirm witness<br/>committed = target, pending = null"]
++  W --> V["Saved View<br/>not active-service evidence"]
++  I -. "failure" .-> E["No View<br/>cause and failed stage preserved"]
++  C -. "failure" .-> E
++  W -. "failure or uncertain acknowledgement" .-> E
++  E --> S["Reread both states<br/>never learn witness from configuration"]
++  S --> P["Open intent<br/>ordinary Read and Preview denied"]
++  P --> R["Recover or exact pending request<br/>compare base or target, reauthorize, sync intent"]
++  R -- "exact base" --> C
++  R -- "target already visible" --> D["Sync configuration<br/>no second event or rewrite"]
++  D --> W
++  S -- "already confirmed and consistent" --> B["Both directory barriers"]
++  B --> V
++  O -. "remaining integration" .-> F["OS and backup protection, service, API and Admin<br/>not established by these fixtures"]
++```
++
++The previous 70 guards run in a final set of 101 named PASS results in normal/race
++modes; targeted vet/build pass, with 12 stable inputs. A child fixture writes intent,
++encounters a barrier fault and exits without Close; a fresh coordinator rebuilds
++recovery from the files. This is not SIGKILL, power loss or UID separation evidence.
++Same-inode bind mounts are checked in code but not mounted in these fixtures.
++The [report](../plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/RAPPORT-IA3c2f02b.md)
++retains injected fault windows, the reproduced/corrected error-context defect,
++sources and limits.
++
++Restoring both stores together remains accepted in the preserved limitation case.
++Host, backup and witness protection does not follow from a directory name. This
++local kernel therefore closes neither F07 nor EP-06. No automatic intent abort is
++provided: denied recovery or missing history keeps its cause/owner and blocks
++progress. Restoration or migration must use an authorized operation still to be
++designed, not private-state edits. Owners: operator for protection/identity,
++Codex for the service and public flows. Remote mode remains rejected by the
++current codec; no permissive fallback or new timeout/budget is added.
+--- before/INSTALL.md
++++ after/INSTALL.md
+@@ -32,6 +32,12 @@
+ Le noyau de persistance de cette configuration est vérifié en fixtures locales ;
+ il n’est pas encore raccordé à l’installateur ni au modal Admin. Ces vérifications
+ ne constituent pas une installation de l’autorité ou une preuve de confinement.
++
++Le coordinateur local conserve désormais un témoin dans un répertoire distinct
++et vérifie la reprise après interruption en fixtures. Il n’est pas installé par
++ce script. Restaurer configuration et témoin ensemble peut masquer un retour
++arrière : leur protection et leur stratégie de sauvegarde restent à qualifier
++avant déploiement. Voir le contrat d’identité lié ci-dessus.
+ 
+ ## Formation embarquée et identité visuelle
+ 
+--- before/docs/en/INSTALL.md
++++ after/docs/en/INSTALL.md
+@@ -33,6 +33,11 @@
+ it is not connected to the installer or Admin modal yet. These checks establish
+ neither an authority deployment nor agent confinement.
+ 
++The local coordinator now retains a witness in a separate directory and verifies
++interruption recovery in fixtures. This script does not install it. Restoring
++configuration and witness together can hide rollback: their protection and backup
++strategy remain to be qualified before deployment. See the identity contract above.
++
+ ## Included training resources and branding
+ 
+ After opening the cockpit, choose **Cockpit help → Casa Pizza training**. The reader provides videos, GIF previews, transcripts, a 38-page PDF and a downloadable offline kit. The selected cockpit language chooses French or English resources; the reader language control updates every resource link. Word files remain editable sources.
+--- before/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
++++ after/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
+@@ -576,3 +576,32 @@
+ Cette évolution ne démontre pas une exploitation publique, une actualité de source
+ ou une nouveauté scientifique. Interopérabilité réelle, absence de downgrade au
+ raccord et état frais à l’usage restent leurs propres critères expérimentaux.
++
++### IA3c.2f — installation locale, témoin et limites de la preuve
++
++Le choix adopté est un service local sous compte distinct avec confinement pour
++le développement/pilote, et une autorité sur machine/administration séparées
++prévue pour l’avenir. Le besoin probable de clients est une hypothèse utilisateur,
++pas une observation de marché. Configuration initiale et Admin restent à livrer.
++Le [noyau de configuration](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/RAPPORT-IA3c2f02a.md)
++vérifie format strict, CAS, droits fournis par callback et persistance Linux en
++fixtures ; ses trois défauts de candidat sont reproduits puis corrigés. Le
++[coordinateur avec témoin](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/RAPPORT-IA3c2f02b.md)
++ajoute intention durable avant config, confirmation et reprise de la base/cible
++exactes après nouvelle autorisation. 101 noms PASS normal/race incluent les 70
++précédents : ni 171 cas indépendants ni autant d’attaques démontrées.
++
++Une sortie réelle de processus enfant sans Close puis une reconstruction depuis
++fichiers vérifie une réception de l’état dans un nouveau contexte. Les fautes
++fsync sont injectées ; cela ne vérifie ni reboot/panne électrique, ni identité
++OIDC réelle, ni séparation de comptes ou sauvegardes. Le témoin local n’est pas
++un compteur matériel ou une signature. Restaurer config et témoin ensemble reste
++accepté dans le cas limite conservé : protection de l’hôte et administration
++restent des hypothèses à tester, même avec deux répertoires distincts.
++
++Valeur expérimentale : contre-exemples reproductibles, fenêtres de panne et
++limites explicitement séparées des garanties. Aucune priorité scientifique ou
++supériorité comparative n’est établie. Une expérience intégrée devra encore relier
++authentification, délégation, décision courante, application et effet, en comparant
++local/distant selon une menace et des métriques explicites, sans réécrire les
++preuves historiques ni assimiler la configuration souhaitée au service effectif.

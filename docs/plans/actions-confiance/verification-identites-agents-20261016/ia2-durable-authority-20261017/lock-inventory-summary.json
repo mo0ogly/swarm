@@ -1,0 +1,9 @@
+{
+  "source_functions": 1938,
+  "lock_functions": 83,
+  "candidate_paths": 0,
+  "method": "Actual platform GoFiles; receiver/parameter and struct-field names resolved; top-level calls bounded by first Begin/last syntactic Commit; local function shadows excluded; not a typed control-flow or callback proof",
+  "producer_go_exit_code": 0,
+  "wrapper_summary_failure": "Go emitted null for a nil slice; the Python display tried len(None). Original JSON retained; normalized summary only, no engine/test failure.",
+  "limits": "No receiver/closure typed control-flow proof; callbacks unresolved, manual review and integration checks still required"
+}

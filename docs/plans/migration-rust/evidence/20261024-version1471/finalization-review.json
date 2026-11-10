@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "source_hashes_verified": 19,
+  "untracked_whitespace_checked": [
+    "web/cockpit-native-version.js",
+    "tests/rust_existing_version_flow.cjs",
+    "tests/rust_installed_version_read.cjs"
+  ],
+  "method_replan": "Finalization used check=True for git diff --no-index --check. New file differences return1 even with no whitespace diagnostics; treating it as whitespace failure was incorrect. Evidence/doc writes already complete, not rerun. Separate read-only check accepts0/1 only with empty stdout/stderr; actual whitespace diagnostics or code2 still refuse. No production source or tested behavior changed."
+}

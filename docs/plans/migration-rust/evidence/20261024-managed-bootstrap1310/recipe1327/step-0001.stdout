@@ -1,0 +1,10 @@
+PASS managed-committed-copy-excludes-dirty-and-preserves-source
+PASS managed-recorded-replay-precedes-source-io
+PASS managed-dirty-snapshot-refuses-without-work-mutation
+PASS managed-malformed-and-divergent-originals-refuse-unchanged
+PASS managed-binding-missing-object-and-orphans-refuse-with-originals
+PASS managed-pending-original-recovers-after-publication-refusal
+{"state": "RUN", "case": "managed-http", "phase": "waiting-bound"}
+PASS managed-protected-http-subproject-and-claim-refusal-match-cli
+MANAGED_REPOSITORY_BOOTSTRAP_PASS
+REPLAY_EVIDENCE /home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-sn4fb44n

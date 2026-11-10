@@ -1,0 +1,8 @@
+=== RUN   TestGraphDeliveryD02Migration
+--- PASS: TestGraphDeliveryD02Migration (0.10s)
+=== RUN   TestGraphDeliveryD02ArchiveCompatibility
+--- PASS: TestGraphDeliveryD02ArchiveCompatibility (0.15s)
+=== RUN   TestGraphDeliveryD02BackupRestoreSafety
+--- PASS: TestGraphDeliveryD02BackupRestoreSafety (0.05s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.345s

@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "service_restarted_by_increment": true,
+  "service_restarted_by_readonly_probe": false,
+  "version": "v0.1.1-dev.296",
+  "binary_sha256": "e4a802c4dc4d32d90d036169604168c64db15196695d692885369b748686ca72",
+  "artifacts": {
+    "build.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "help-fr.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "browser.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "restart.stdout": "97f48a7852bb3bce555198a3a6b89ab819b852eb2a3a8e0f463b125f096c36ed",
+    "build.stdout": "d5a2319ddca0c493dfbfca28c11655bef2b4b7301b47826f84919de5884f3c9c",
+    "status.json": "6adccb19baff32118b231c4cbadba04643291fc1c21397640f7fcad92daf0a07",
+    "version.json": "828007497b803b55e291565dedf623f014217fc790360d71b50719a305815b68",
+    "help-en.stdout": "89cdefb0265fabe2300e5143a58274d3e77e8165d04d0f6f30aa0ca396ee4f99",
+    "qualified-profile.json": "77f45b181594c7ae61bd4bf15cfd9bf1e870508c0fa82ead5e5b41917958b659",
+    "restart.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compiled-version-history.json": "792f45220ce3ad9bd0ac5b52569ef7923138e78c651580e2251dcbce08e02734",
+    "browser.stdout": "010672f44acfb1058a0123a13a891805a8fe17b0dbbe4cd5a5183f47e593c226",
+    "profile-inputs.json": "0996abaca4b92d8aa63798e69e68c980c2eb1d8998280c225da48e17188bb2fb",
+    "result.json": "ae9f505e87ab9a4fa4b123d7de599a3112d1988486dab7d2cdf043f92f4dc851",
+    "probe.py": "425eb6d7dfa641bd969ba51b3278d6a14cbb1cdc5f2d9c12d3b647dd8dd0d062",
+    "help-en.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "help-fr.stdout": "bb971151c169774c71e8497742bbaa8d253c87777562845784164ec8c05d4c13"
+  },
+  "scope": "normal image qualified,26 public source-check assertions,13 runtime source hashes,actual installed image and readonly version/PAEA resources; no global BLP acceptance"
+}

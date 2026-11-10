@@ -1,0 +1,3 @@
+{"state": "RUN", "step": "native-boundary"}
+{"state": "PASS", "step": "native-boundary"}
+{"status": "PASS", "evidence": "docs/plans/actions-confiance/verification-biba-transverse-20261028/native-permanent-recipe", "steps": 1}

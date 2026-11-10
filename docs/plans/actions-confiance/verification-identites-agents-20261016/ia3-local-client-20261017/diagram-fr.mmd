@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant B as Lanceur de confiance (raccord restant)
+  participant C as Client privé
+  participant S as Service privé
+  participant W as Coordinateur et témoin
+  B->>C: pidfd serveur indépendant, UID et pins
+  C->>S: V2, challenge frais, pins, opération et Change
+  S->>S: Comparer pins et autoriser l’émetteur de la demande
+  S->>W: Exécuter sous contrôle d’autorité maintenu
+  W-->>S: État confirmé ou refus
+  S-->>C: V2 et empreinte de demande, résultat ou code
+  S->>S: Fermer le canal sur toute issue
+  C->>C: Comparer processus noyau, UID et demande exacte
+  C->>C: Valider tête, projection, pins et Change puis fermer
+  Note over C,W: Réponse perdue après mutation : résultat nul, issue incertaine
+  Note over C,W: Retry métier exact sur nouveau canal, challenge frais et nouvelle autorisation

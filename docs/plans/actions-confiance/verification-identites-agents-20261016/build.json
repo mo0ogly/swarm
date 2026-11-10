@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "go",
+    "build",
+    "-o",
+    "/tmp/swarm-ia1-build-_bj_x21c/swarm",
+    "./cmd/swarm"
+  ],
+  "started_unix": 1792183476.0835285,
+  "ended_unix": 1792183479.1970477,
+  "exit_code": 0,
+  "binary": "/tmp/swarm-ia1-build-_bj_x21c/swarm",
+  "inputs_manifest_sha256": "c08163e2ee37bd380919f875ac45daeddda37844239b911cad03e3e432f65a37",
+  "binary_sha256": "026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2"
+}

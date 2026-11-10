@@ -1,0 +1,62 @@
+{
+  "method": "Reverse the recorded project-binding edit and gofmt; accept only exact matches with the pre-fix recorded hashes. Go sources retained as .go.txt to avoid creating a package.",
+  "temporary_candidate": "/tmp/swarm-ia2-source-recovery-5hl952yo",
+  "files": [
+    {
+      "path": "agent_identity_contract.go",
+      "matches_recorded_before_hash": true,
+      "sha256": "6f00b2f93c45cc2319ce3f4fca76301ac68dc5897613df56326ed2541cbff121",
+      "expected": "6f00b2f93c45cc2319ce3f4fca76301ac68dc5897613df56326ed2541cbff121"
+    },
+    {
+      "path": "agent_identity_authority.go",
+      "matches_recorded_before_hash": true,
+      "sha256": "4cf14e20bf340adca602c967439ace733a60c0f00a62d23f81f6e3639dad7f53",
+      "expected": "4cf14e20bf340adca602c967439ace733a60c0f00a62d23f81f6e3639dad7f53"
+    },
+    {
+      "path": "agent_identity_contract_test.go",
+      "matches_recorded_before_hash": true,
+      "sha256": "3143b34c6308c4bb60f268532f4ad494ff8fd2083e2c560b9c1b6bf0970b70f0",
+      "expected": "3143b34c6308c4bb60f268532f4ad494ff8fd2083e2c560b9c1b6bf0970b70f0"
+    },
+    {
+      "path": "agent_identity_authority_test.go",
+      "matches_recorded_before_hash": true,
+      "sha256": "e9a11c9f53f7db208edcbac4e353eea154546a9d6efc887e5ba911e07db475b2",
+      "expected": "e9a11c9f53f7db208edcbac4e353eea154546a9d6efc887e5ba911e07db475b2"
+    }
+  ],
+  "verified": true,
+  "cached_caller": {
+    "method": "Reverse later changes and gofmt; accept only exact original recorded hashes. Reconstructed source, not a new execution.",
+    "temporary_candidate": "/tmp/swarm-ia2-cache-source-vm72v19j",
+    "files": [
+      {
+        "path": "agent_identity_contract.go",
+        "matches_recorded_before_hash": true,
+        "sha256": "7a3d4da261aa1ef94d35be376e76af09d9d119b32636e6fe8a111573bc9a4d18",
+        "expected": "7a3d4da261aa1ef94d35be376e76af09d9d119b32636e6fe8a111573bc9a4d18"
+      },
+      {
+        "path": "agent_identity_authority.go",
+        "matches_recorded_before_hash": true,
+        "sha256": "cf3335787743d4458f1b80eaf67d6ec94057f89cfe3d9845badcec3a0c689efc",
+        "expected": "cf3335787743d4458f1b80eaf67d6ec94057f89cfe3d9845badcec3a0c689efc"
+      },
+      {
+        "path": "agent_identity_contract_test.go",
+        "matches_recorded_before_hash": true,
+        "sha256": "33b33cf3d0c676c244352b69a05f2c7e0bd8a911d6c489e288fb70aab7dca1f2",
+        "expected": "33b33cf3d0c676c244352b69a05f2c7e0bd8a911d6c489e288fb70aab7dca1f2"
+      },
+      {
+        "path": "agent_identity_authority_test.go",
+        "matches_recorded_before_hash": true,
+        "sha256": "a473d096e752d10a97f135aa1805e05c84ead1a9695ffb33802d33d56b3f6dde",
+        "expected": "a473d096e752d10a97f135aa1805e05c84ead1a9695ffb33802d33d56b3f6dde"
+      }
+    ],
+    "verified": true
+  }
+}

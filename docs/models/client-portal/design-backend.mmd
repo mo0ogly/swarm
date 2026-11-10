@@ -1,0 +1,20 @@
+flowchart TD
+  C["Contrats communs / Shared contracts<br/>Tenant, rôles, API, erreurs, composants"]
+  C --> D1["D1 · Parcours client et admin / Client and admin journeys<br/>Connexion, refus, documents, révocation"]
+  D1 --> D2["D2 · Maquettes / Screen designs<br/>Vide, chargement, erreur, succès<br/>Mobile, clavier, focus, contraste"]
+  D2 --> D3["D3 · Prototype / Prototype<br/>Tester compréhension, droits visibles, reprise"]
+  D3 --> DG{"Revue design / Design review<br/>Parcours et états couverts ?"}
+  DG -->|"Non / No"| D2
+  C --> B1["B1 · Contrats API / API contracts<br/>Schémas, erreurs, pagination, limites"]
+  B1 --> B2["B2 · Identité et isolation / Identity and isolation<br/>Tenant côté serveur, droits par ressource<br/>Sessions, expiration, révocation"]
+  B2 --> B3["B3 · Données et documents / Data and documents<br/>Migrations, stockage privé, téléchargement autorisé<br/>Intégrité, reprise, traces sans secrets"]
+  B3 --> B4["B4 · Tests backend / Backend tests<br/>Client A interdit sur ressources B<br/>Session révoquée, URL directe, entrée invalide<br/>Doublon, interruption, panne stockage"]
+  B4 --> BG{"Revue backend / Backend review<br/>Contrats et sécurité vérifiés ?"}
+  BG -->|"Non / No : diagnostic et correction"| B2
+  DG -->|"Oui / Yes"| I["Intégration / Integration<br/>UI réelle et API sur le même candidat"]
+  BG -->|"Oui / Yes"| I
+  I --> E["Tests de bout en bout / End-to-end checks<br/>Connexion → liste → document → déconnexion<br/>Admin → retrait du droit → accès refusé"]
+  E --> R{"Revue indépendante / Independent review<br/>Preuves fraîches et critères remplis ?"}
+  R -->|"Écart design / Design finding"| D2
+  R -->|"Écart backend / Backend finding"| B2
+  R -->|"Oui / Yes"| L["Préparer la livraison / Prepare delivery<br/>Autorisation distincte pour publier"]

@@ -1,0 +1,7 @@
+--- FAIL: TestManagedReviewProducerStatusContractReachesProvider (0.01s)
+    managed_review_status_contract_test.go:38: provider did not receive the producer/fragment boundaries: state= err=inspection de fragment : réponse structurée invalide
+--- FAIL: TestManagedReviewProducerStatusContractSharedByFinalPrefix (0.00s)
+    managed_review_status_contract_test.go:53: final and unfragmented reviews lack the producer's exact status semantics
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.030s
+FAIL

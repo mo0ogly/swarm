@@ -1,0 +1,9 @@
+{"stage": "connectors", "exit_code": 0, "observed_results": 11}
+{"stage": "evidence", "exit_code": 0, "observed_results": 18}
+{"stage": "laboratory", "exit_code": 0, "observed_results": 8}
+{"stage": "secrets", "exit_code": 0, "observed_results": 16}
+{"stage": "secret-data", "exit_code": 0, "observed_results": 17}
+{"stage": "helper-image", "exit_code": 0, "observed_results": 4}
+{"stage": "pilot", "exit_code": 0, "observed_results": 7}
+{"stage": "processes", "exit_code": 0, "observed_results": 4}
+{"stage": "controls", "exit_code": 0, "observed_results": 13}

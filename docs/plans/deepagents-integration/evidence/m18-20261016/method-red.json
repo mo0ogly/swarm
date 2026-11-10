@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestMemorySummarySourceWrongMethod",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T19:48:58.160841+00:00",
+  "duration_seconds": 16.31,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "TestMemorySummarySourceWrongMethodDoesNotReturnCatalog"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "907da795c50277e8729655073d96d190b8d2ef6343c6e84f891dafdc865939b1",
+  "real_model_calls": 0
+}

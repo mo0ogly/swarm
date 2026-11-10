@@ -1,0 +1,17 @@
+M	docs/plan-ca937edf4e-T2.delivery.json
+M	docs/plan-ca937edf4e-T2.md
+M	docs/plan-ca937edf4e-T2.review-context.json
+M	docs/plans/engine-cursor-contract/evidence/T1-handoff.md
+M	docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011-receipt.json
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-canonical-20261011.out
+M	docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/historical-case-receipt.json
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/historical-case.out
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/own-scope-budget-harness.go.txt
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/own-scope-budget-receipt.json
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/own-scope-budget.out
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/producer-targeted-v2-receipt.json
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/producer-targeted-v2.out
+A	docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/traceability-repair-receipt.json
+M	docs/plans/engine-cursor-contract/evidence/T2-handoff.md

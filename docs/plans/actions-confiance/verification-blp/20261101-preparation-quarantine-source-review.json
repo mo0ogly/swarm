@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "scope": "Same-context semantic review of preparation quarantine additions only; not independent acceptance, whole-file/global BLP conformance or delivered runtime proof. Concurrent Graph/Authority additions are excluded.",
+  "status": "REVIEWED_LOCAL_QUARANTINE_INCREMENT_VERIFIED_INSTALLED",
+  "files": [
+    {
+      "path": "rust/crates/swarm-confidentiality/src/lib.rs",
+      "sha256": "caecf56c92f73677c232359adce551fe3836db575c4703192c62f9bb70358548",
+      "functions_or_contracts": [
+        "Policy::preparation_quarantine",
+        "is_false"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_confidentiality.rs",
+      "sha256": "171c02d79bc1b253fe74618acb00eb0382e0b6494eccd926a199d9218153bc0b",
+      "functions_or_contracts": [
+        "released",
+        "RootStore::with_preparation_egress",
+        "RootStore::preparation_quarantine_snapshot"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/local_storage.rs",
+      "sha256": "61298c08ec9665102cf8b198ad21a5ec61b5df119e6d097a11a4e3c24d284524",
+      "functions_or_contracts": [
+        "LocalDirectory::reserve_preparation_egress"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+      "sha256": "71ed5917ea0a84e77574fbae609eeda6fc928e682183099564b0576e8f74c3df",
+      "functions_or_contracts": [
+        "RootStore::preparation_send",
+        "RootStore::preparation_send_unquarantined",
+        "RootStore::preparation_worker_claim",
+        "RootStore::preparation_worker_claim_unquarantined"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
+      "sha256": "69aeeb4b5eda0c43d41b330b99b7fa16b84dcc4060316d13cbf9d5ccba0c98c7",
+      "functions_or_contracts": [
+        "RootStore::preparation_worker_run_cli",
+        "RootStore::preparation_worker_run_cli_unquarantined"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/preparation_worker.rs",
+      "sha256": "57dd4786cf832b2cbf5e063eed4951717e502207b6cef09bbb22cb59d48304d0",
+      "functions_or_contracts": [
+        "execute"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+      "sha256": "4dcfc08ec162c8c17286cfc08a1cd5ffc44ef793df7ea99207c44534274d0ca6",
+      "functions_or_contracts": [
+        "RootStore::trust_scoped",
+        "RootStore::with_preparation_control",
+        "RootStore::preparation_control_preflight",
+        "RootStore::trust_scoped_reserved"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/trust_enrollment.rs",
+      "sha256": "b046b879c5209101ab91b2a434b6836ab32efed490702f8a3ff494bef6806a98",
+      "functions_or_contracts": [
+        "RootStore::trust_as_enrolled"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/trust/authentication.rs",
+      "sha256": "ce792e367cbb560049a68acde1f2ab8e9a685cfcfadccbf504ed0fec8f0b9e8c",
+      "functions_or_contracts": [
+        "require_administrator"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/trust/confidentiality.rs",
+      "sha256": "0a43d76e9284de852ee734ea8bd72ecc1af94269e367a77732fef110bd72160a",
+      "functions_or_contracts": [
+        "capability",
+        "execute (canonical administrator check)"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service.rs",
+      "sha256": "fe238d4fbef71c11d76662a7ac7356e7fdbfeb4848e16d96523ea6900c187d29",
+      "functions_or_contracts": [
+        "HttpServiceError::status (typed quarantine branch)"
+      ]
+    },
+    {
+      "path": "web/trust-confidentiality.js",
+      "sha256": "dca3532d0c3f7e681312290a20c48ce7e798039667512d9e4b6231b2afd3b338",
+      "functions_or_contracts": [
+        "install",
+        "load",
+        "preview/save callbacks"
+      ]
+    },
+    {
+      "path": "rust/crates/swarm-engine/examples/preparation_quarantine_fixture.rs",
+      "sha256": "4b9d8734f7c2b6fecfe158675bbe1efcee85af3fa335e51015a86c7d5dd32679",
+      "functions_or_contracts": [
+        "production_binary",
+        "fixture_root",
+        "closed",
+        "observed",
+        "main"
+      ]
+    },
+    {
+      "path": "tests/blp_quarantine_public.py",
+      "sha256": "69efba963233cbaa795e2c14cf9d8408c9d3a3b0eaa8945296e858aae208f714",
+      "functions_or_contracts": [
+        "main and documented local helpers/receiver"
+      ]
+    },
+    {
+      "path": "tests/blp_quarantine_ui.cjs",
+      "sha256": "288dbcaae899b7ae2c1a00335943ec36ae8c4af34a8523197e6c9933a30a2d1b",
+      "functions_or_contracts": [
+        "documented journey helpers/check/read/open/edit/preview/save"
+      ]
+    },
+    {
+      "path": "tests/blp_quarantine_installed.py",
+      "sha256": "35d84d14fabdfc4c241d7c87156ce30b376152b0a36fb9682a4147941c65da3b",
+      "functions_or_contracts": [
+        "module docstring: readonly installed identity/assets/version probe; no live policy write or provider"
+      ]
+    }
+  ],
+  "policies": [
+    {
+      "item": "preparation_quarantine absent/false/true",
+      "category": "operator policy",
+      "trace": "persisted Policy bool -> serde/model validation -> existing Admin JSON/Trust API/CLI preview/apply -> descriptor-bound snapshot -> send/claim/actual API and CLI guard",
+      "default": "false is legacy behavior, omitted from legacy encoding; true explicit quarantine, no classified allow-path",
+      "proof_pending": "public saved/reopened and inert actual egress journey"
+    },
+    {
+      "item": "lock basename, operation tags, exact I3/admin",
+      "category": "existing protocol invariants",
+      "reason": "separate descriptor-bound coordination file, canonical existing control authorization, no adjustable wait/retry ceiling"
+    },
+    {
+      "item": "test fixture labels, budgets, model, observation cadence, 65536-byte hash buffer and 1px rendering tolerance",
+      "category": "test inputs/technical buffering",
+      "reason": "no production operator policy; no whole-test watchdog"
+    },
+    {
+      "item": "MAX_STATE",
+      "category": "existing technical representation bound",
+      "reason": "reuses original bounded Trust state read, no new limit"
+    }
+  ],
+  "functions": {
+    "review": "Purpose, inputs, refusal/side effects/limits documented on newly extracted functions; wrappers inherit unchanged inner behavior. API branch uses documented public egress contract. Fixture helper and journey docstrings do not claim actor authority.",
+    "limits": "Rustdoc compilation not established by source review; actual profile and named tests tracked separately."
+  },
+  "errors": [
+    "Invalid/unsupported Trust state or storage errors refuse callback; absence alone retains legacy behavior, explicit prior quarantine survives stale authority.",
+    "Callback/release causes preserved; callback success plus release failure carries operation-completed, admission additionally preserves receipt.",
+    "Config writer preflight rejects unauthorized caller before waiting, final canonical authority check repeats under current Trust reservation; enrolled writer acquires egress before SQL.",
+    "HTTP403 only exact typed quarantine refusal and preparation-call; wrapped cleanup remains500.",
+    "Worker claim refusal settles unstarted reservation via existing finish path; no estimated-consumption refund invented.",
+    "Fixture cleanup retains primary and secondary errors; receiver errors fail, no ignored provider/Root-close cause accepted."
+  ],
+  "open": [
+    "Classified allow-path, source producer and fixed recipient authority",
+    "Result inheritance and protected consumers",
+    "Filesystem/network/descendant mediation",
+    "Existing-data migration and human declassification",
+    "Independent acceptance"
+  ],
+  "verified_evidence": [
+    "20261101-preparation-quarantine-locks-03: 1+15+4 named tests and current helper build",
+    "20261101-preparation-quarantine-public-02: 28 public assertions, 59 browser assertions; actual normal image and inert receivers",
+    "20261101-preparation-quarantine-inventory-01: 54 references, 25 OPEN flows, 5 checker regressions",
+    "20261101-preparation-quarantine-installed-01: actual image/version299, protected quarantine assets, 56 readonly browser checks, FR/EN help; restart via exact prepared SHA. No live policy activation."
+  ],
+  "self_review_verdict": "No confirmed introduced defect remains in the scoped quarantine additions; global BLP and independent acceptance remain open."
+}

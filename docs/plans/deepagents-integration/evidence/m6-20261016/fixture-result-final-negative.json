@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "fixture",
+    "description": "Hand-authored controls of the grader; no model invocation"
+  },
+  "results": [
+    {
+      "case_id": "missing-recoverable-without",
+      "scenario": "missing-recoverable",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "missing-recoverable-with",
+      "scenario": "missing-recoverable",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "changed-unrecoverable-without",
+      "scenario": "changed-unrecoverable",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "changed-unrecoverable-with",
+      "scenario": "changed-unrecoverable",
+      "treatment": "with",
+      "result": "FAIL",
+      "violations": [
+        "decision",
+        "actions",
+        "admission"
+      ],
+      "measurements": {
+        "elapsed_seconds": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost": null
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "scenario": "changed-unrecoverable",
+      "without": "PASS",
+      "with": "FAIL",
+      "observed_answer_change": "regression"
+    },
+    {
+      "scenario": "missing-recoverable",
+      "without": "PASS",
+      "with": "PASS",
+      "observed_answer_change": "same"
+    }
+  ],
+  "result": "FAIL",
+  "model_effectiveness": "NOT TESTED",
+  "scope": "Grades proposed decisions only; no autonomous execution or statistical improvement established",
+  "pack_sha256": "9301038101558075a8e46e5e4aa86257be7f77193eaa28c805de850a06ad339d",
+  "answers_sha256": "16fae05ccf5e79878358810c836ee0250e9747700ea9e53f16c45f549a438b48"
+}

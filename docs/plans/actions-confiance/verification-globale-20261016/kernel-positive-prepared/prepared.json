@@ -1,0 +1,33 @@
+{
+  "prepared_at_unix": 1792128401.5121033,
+  "root": "/tmp/swarm-kernel-positive-prepared-j98wvu80",
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+  "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "policy": {
+    "enabled": true,
+    "timeout_seconds": 17,
+    "ring_bytes": 131072
+  },
+  "state_sha256": "6e0e6a4e22bbe264699d9623cca439e8adfd061ae028508af51674d3ea8c44f1",
+  "private_token_file": "/tmp/swarm-kernel-positive-prepared-j98wvu80/positive-admin-token",
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+    "--root",
+    "/tmp/swarm-kernel-positive-prepared-j98wvu80",
+    "--json",
+    "trust",
+    "kernel-check"
+  ],
+  "token_environment_key": "SWARM_TRUST_TOKEN",
+  "environment": {
+    "uid": 1001,
+    "kernel": "6.17.0-41-generic",
+    "machine": "x86_64",
+    "cap_eff": "0000000000000000",
+    "unprivileged_bpf_disabled": "2",
+    "perf_event_paranoid": "4"
+  },
+  "bpf_executed": false,
+  "authority_to_change_linux": false,
+  "expected_exit": 0
+}

@@ -1,0 +1,392 @@
+//go:build linux
+
+package engine
+
+import (
+	"bytes"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestDialogueBoundaryHasDurableStateBeforeHeartbeat(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	if _, err := runDialogueReceiptWrapper(t, s, a, "second question\n/fin\n"); err != nil {
+		t.Fatal(err)
+	}
+	assertDialoguePublicCheckpoint(t, s, a, true, 20)
+}
+
+func loadDialogueCheckpointTest(t *testing.T, s *Store, a Agent) dialogueCheckpoint {
+	t.Helper()
+	var raw []byte
+	if err := s.db.QueryRow("SELECT checkpoint FROM agent_dialogue_turns WHERE agent_id=? ORDER BY rowid DESC LIMIT 1", a.ID).Scan(&raw); err != nil {
+		t.Fatal(err)
+	}
+	var c dialogueCheckpoint
+	if err := json.Unmarshal(raw, &c); err != nil {
+		t.Fatal(err)
+	}
+	return c
+}
+
+func TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"guard-session"}`, `{"type":"item.started","item":{"id":"tool_0","type":"command_execution","command":"fixture-command"}}`, `{"type":"item.completed","item":{"id":"tool_0","type":"command_execution","status":"failed","exit_code":1,"aggregated_output":"fixture failure"}}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	a.Limits, _ = (RunLimits{MaxToolCalls: 5, MaxRepeatedCalls: 3, MaxConsecutiveErrors: 3}).normalized()
+	if err := s.saveAgent(a); err != nil {
+		t.Fatal(err)
+	}
+	monitor, err := runDialogueReceiptWrapper(t, s, a, "follow-up\n/fin\n")
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := loadDialogueCheckpointTest(t, s, a)
+	g, err := c.restoreGuard(a, s.root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, _ := json.Marshal(checkpointGuard(g))
+	want, _ := json.Marshal(checkpointGuard(monitor.sink.guard))
+	if !bytes.Equal(got, want) || g.calls != 2 || g.errors != 2 || g.repeated != 2 || len(g.failures) != 2 || g.totalRepeats != 1 {
+		t.Fatal("guard state reset", string(got), string(want))
+	}
+	before, _ := json.Marshal(c)
+	g.call("third-turn:tool_0", "command_execution", "fixture-command", time.Now())
+	if g.reason == "" || g.calls != 3 || g.totalRepeats != 2 {
+		t.Fatal("restored repetition guard lost its decision", g.reason)
+	}
+	after, _ := json.Marshal(c)
+	if !bytes.Equal(before, after) || monitor.sink.guard.calls != 2 {
+		t.Fatal("restored guard mutated retained snapshot or original monitor")
+	}
+}
+
+func TestDialogueCheckpointWriteFailureStopsBeforeNextProvider(t *testing.T) {
+	for _, phase := range []string{"running", "confirmed"} {
+		t.Run(phase, func(t *testing.T) {
+			s, a, script := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+			trigger := fmt.Sprintf(`CREATE TRIGGER reject_checkpoint BEFORE UPDATE OF checkpoint ON agent_dialogue_turns WHEN json_extract(NEW.checkpoint,'$.phase')='%s' BEGIN SELECT RAISE(ABORT,'fixture checkpoint failure'); END`, phase)
+			if _, err := s.db.Exec(trigger); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := runDialogueReceiptWrapper(t, s, a, "must-not-start\n/fin\n"); err == nil {
+				t.Fatal("checkpoint write failure allowed continuation")
+			}
+			calls, err := os.ReadFile(script + ".calls")
+			if phase == "running" && (!os.IsNotExist(err) || len(calls) != 0) || phase == "confirmed" && (err != nil || string(calls) != "call\n") {
+				t.Fatal("provider ran beyond durable boundary", phase, string(calls), err)
+			}
+			var answered int
+			if err := s.db.QueryRow("SELECT count(*) FROM agent_dialogue_turns WHERE agent_id=? AND status='answered'", a.ID).Scan(&answered); err != nil || answered != 0 {
+				t.Fatal("failed checkpoint became answered", err)
+			}
+		})
+	}
+}
+
+func TestDialogueCheckpointAPIReadAndForeignWorkRefusal(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"public-checkpoint-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	if _, err := runDialogueReceiptWrapper(t, s, a, "/fin\n"); err != nil {
+		t.Fatal(err)
+	}
+	before := loadDialogueCheckpointTest(t, s, a).SHA256
+	handler := newWebHandler(s, "localhost:18787", "checkpoint-fixture-token")
+	for _, work := range []string{a.WorkID, "foreign-work"} {
+		req := httptest.NewRequest(http.MethodGet, "http://localhost:18787/api/v1/agent-detail?work="+work+"&agent="+a.ID, nil)
+		req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "checkpoint-fixture-token"})
+		response := httptest.NewRecorder()
+		handler.ServeHTTP(response, req)
+		if work != a.WorkID {
+			if response.Code != http.StatusForbidden || strings.Contains(response.Body.String(), "public-checkpoint-session") {
+				t.Fatal("checkpoint crossed work ownership")
+			}
+			continue
+		}
+		var result struct {
+			State DialogueBoundaryView `json:"dialogue"`
+		}
+		if response.Code != http.StatusOK || json.Unmarshal(response.Body.Bytes(), &result) != nil || !result.State.Available || !result.State.Confirmed || result.State.RestartSupported || result.State.SHA256 != before || result.State.Usage == nil || result.State.Usage.Input != 10 {
+			t.Fatal("API lost stored boundary", response.Code, response.Body.String())
+		}
+		if strings.Contains(response.Body.String(), "SignatureCounts") {
+			t.Fatal("private guard details exposed")
+		}
+	}
+	if loadDialogueCheckpointTest(t, s, a).SHA256 != before {
+		t.Fatal("inspection mutated checkpoint")
+	}
+}
+
+func TestDialogueCheckpointRejectsInvalidOrForeignState(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"turn.completed"}`})
+	if _, err := runDialogueReceiptWrapper(t, s, a, "/fin\n"); err != nil {
+		t.Fatal(err)
+	}
+	original := loadDialogueCheckpointTest(t, s, a)
+	for _, kind := range []string{"digest", "version", "agent", "project", "launch", "turn", "negative", "repetition_history", "phase"} {
+		t.Run(kind, func(t *testing.T) {
+			raw, _ := json.Marshal(original)
+			var c dialogueCheckpoint
+			if err := json.Unmarshal(raw, &c); err != nil {
+				t.Fatal(err)
+			}
+			switch kind {
+			case "digest":
+				c.Session = "altered"
+			case "version":
+				c.Schema++
+			case "agent":
+				c.Agent = "foreign-agent"
+			case "project":
+				c.Project = "foreign-project"
+			case "launch":
+				c.Launch = "foreign-launch"
+			case "turn":
+				c.Turn = "foreign-turn"
+			case "negative":
+				c.Guard.Calls = -1
+			case "repetition_history":
+				c.Guard.Calls = 1
+				c.Guard.Unclassified = 1
+			case "phase":
+				c.Phase = "running"
+			}
+			if kind != "digest" {
+				c.SHA256 = c.digest()
+			}
+			raw, _ = json.Marshal(c)
+			if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint=? WHERE agent_id=?", raw, a.ID); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := s.dialogueBoundary(a); err == nil {
+				t.Fatal("invalid state became available", kind)
+			}
+		})
+	}
+	if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint='' WHERE agent_id=?", a.ID); err != nil {
+		t.Fatal(err)
+	}
+	legacy, err := s.dialogueBoundary(a)
+	if err != nil || legacy.Available || legacy.Confirmed || legacy.Usage != nil || legacy.Scope == "" {
+		t.Fatal("missing legacy checkpoint invented known state", legacy, err)
+	}
+}
+
+func TestDialogueCheckpointMigrationPreservesLegacyAndBackup(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", nil)
+	if _, err := s.db.Exec("INSERT INTO agent_dialogue_turns(id,agent_id,question,status,session_id) VALUES('legacy-turn',?,'legacy question','answered','legacy-session')", a.ID); err != nil {
+		t.Fatal(err)
+	}
+	var before []byte
+	if err := s.db.QueryRow("SELECT body FROM agents WHERE id=?", a.ID).Scan(&before); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.db.Exec("ALTER TABLE agent_dialogue_turns DROP COLUMN checkpoint"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.db.Exec("PRAGMA user_version=33"); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.db.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if old, err := openStoreWithMigration(s.root, false, false); err == nil {
+		old.db.Close()
+		t.Fatal("inspection migrated legacy store")
+	}
+	migrated, err := openStore(s.root, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer migrated.db.Close()
+	var after []byte
+	var version int
+	var question, status, session string
+	if err := migrated.db.QueryRow("SELECT body FROM agents WHERE id=?", a.ID).Scan(&after); err != nil || !bytes.Equal(before, after) {
+		t.Fatal("migration changed agent", err)
+	}
+	if err := migrated.db.QueryRow("PRAGMA user_version").Scan(&version); err != nil || version != 34 {
+		t.Fatal("migration version", version, err)
+	}
+	if err := migrated.db.QueryRow("SELECT question,status,session_id FROM agent_dialogue_turns WHERE id='legacy-turn'").Scan(&question, &status, &session); err != nil || question != "legacy question" || status != "answered" || session != "legacy-session" {
+		t.Fatal("migration changed legacy turn", err)
+	}
+	v, err := migrated.dialogueBoundary(a)
+	if err != nil || v.Available || v.Usage != nil {
+		t.Fatal("migration fabricated checkpoint", err)
+	}
+	backups, err := filepath.Glob(filepath.Join(s.root, ".swarm/state-pre-v34-*.db"))
+	if err != nil || len(backups) != 1 {
+		t.Fatal("migration backup missing", backups, err)
+	}
+	info, err := os.Stat(backups[0])
+	if err != nil || info.Mode().Perm() != 0600 {
+		t.Fatal("backup is not private", err)
+	}
+	backup, err := sql.Open("sqlite", backups[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer backup.Close()
+	if err := backup.QueryRow("PRAGMA user_version").Scan(&version); err != nil || version != 33 {
+		t.Fatal("backup is not pre-migration", version, err)
+	}
+	var fields int
+	if err := backup.QueryRow("SELECT count(*) FROM pragma_table_info('agent_dialogue_turns') WHERE name='checkpoint'").Scan(&fields); err != nil || fields != 0 {
+		t.Fatal("backup contains migrated column", err)
+	}
+}
+
+func TestDialogueCheckpointSurvivesLifecycleDeleteRestore(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"retained-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	m, err := runDialogueReceiptWrapper(t, s, a, "/fin\n")
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.Progress, a.Usage, _, _ = m.snapshot()
+	if err := s.finishAgent(a, "completed", "fixture ended without acceptance", nil); err != nil {
+		t.Fatal(err)
+	}
+	before := loadDialogueCheckpointTest(t, s, a).SHA256
+	w, err := s.get(a.WorkID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, err := s.lifecyclePreview(w.ID, LifecycleRequest{Schema: 1, Revision: w.Revision, Action: "delete"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.lifecycleApply(w.ID, lifecycleRequest(p, "delete-checkpoint-fixture")); err != nil {
+		t.Fatal(err)
+	}
+	p, err = s.lifecyclePreview(w.ID, LifecycleRequest{Schema: 1, Revision: w.Revision, Action: "restore"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.lifecycleApply(w.ID, lifecycleRequest(p, "restore-checkpoint-fixture")); err != nil {
+		t.Fatal(err)
+	}
+	if loadDialogueCheckpointTest(t, s, a).SHA256 != before {
+		t.Fatal("lifecycle changed checkpoint")
+	}
+	v, err := s.dialogueBoundary(a)
+	if err != nil || !v.Confirmed || v.Usage == nil || v.Usage.Input != 10 {
+		t.Fatal("restored checkpoint unavailable", err)
+	}
+}
+
+func TestDialoguePendingBoundaryHasDurableUsage(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"item.started","item":{"id":"item_0","type":"command_execution","command":"fixture effect"}}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	if _, err := runDialogueReceiptWrapper(t, s, a, "/fin\n"); err == nil {
+		t.Fatal("pending result was confirmed")
+	}
+	assertDialoguePublicCheckpoint(t, s, a, false, 10)
+}
+
+func assertDialoguePublicCheckpoint(t *testing.T, s *Store, a Agent, confirmed bool, input int64) {
+	t.Helper()
+	var out, stderr bytes.Buffer
+	if code := run([]string{"--root", s.root, "--json", "agent", "show", a.ID}, &out, &stderr); code != 0 {
+		t.Fatal("public inspection failed", code, stderr.String())
+	}
+	var result struct {
+		Agent Agent `json:"agent"`
+		State *struct {
+			Available bool   `json:"available"`
+			Confirmed bool   `json:"boundary_confirmed"`
+			Usage     *Usage `json:"usage"`
+		} `json:"dialogue"`
+	}
+	if err := json.Unmarshal(out.Bytes(), &result); err != nil {
+		t.Fatal(err)
+	}
+	if result.State == nil || !result.State.Available || result.State.Confirmed != confirmed || result.State.Usage == nil || result.State.Usage.Input != input {
+		t.Fatalf("dialogue boundary lost before supervisor heartbeat: checkpoint=%+v agent_usage=%+v", result.State, result.Agent.Usage)
+	}
+}
+
+func TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed(t *testing.T) {
+	s, a, script := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"unconfirmed-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	if _, err := s.db.Exec(`CREATE TRIGGER reject_answered BEFORE UPDATE ON agent_dialogue_turns WHEN NEW.status='answered' BEGIN SELECT RAISE(ABORT,'fixture status failure'); END`); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := runDialogueReceiptWrapper(t, s, a, "must-not-start\n/fin\n"); err == nil {
+		t.Fatal("status write failure allowed continuation")
+	}
+	v, err := s.dialogueBoundary(a)
+	if err != nil || !v.Available || v.Phase != "confirmed" || v.Status != "running" || v.Confirmed || v.RestartSupported || v.Usage == nil || v.Usage.Input != 10 {
+		t.Fatal("end snapshot advertised uncommitted answer", v, err)
+	}
+	calls, err := os.ReadFile(script + ".calls")
+	if err != nil || string(calls) != "call\n" {
+		t.Fatal("provider repeated after status failure", err)
+	}
+}
+
+func TestDialogueStartCheckpointDoesNotDescribeLaterEffects(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", nil)
+	if _, err := s.db.Exec("INSERT INTO agent_dialogue_turns(id,agent_id,question,status,session_id) VALUES('active-turn',?,'fixture','running','')", a.ID); err != nil {
+		t.Fatal(err)
+	}
+	reader, writer := io.Pipe()
+	authRead, authWrite := io.Pipe()
+	m := newDialogueMonitor(s, a)
+	m.authorize = authWrite
+	done := make(chan struct{})
+	go func() { m.consume(reader); close(done) }()
+	defer func() {
+		writer.Close()
+		authRead.Close()
+		authWrite.Close()
+		reader.Close()
+		select {
+		case <-done:
+		case <-time.After(3 * time.Second):
+			t.Error("monitor failed to stop")
+		}
+	}()
+	if err := json.NewEncoder(writer).Encode(dialogueEvent{Kind: "start", Turn: "active-turn"}); err != nil {
+		t.Fatal(err)
+	}
+	var ack [1]byte
+	if _, err := io.ReadFull(authRead, ack[:]); err != nil || ack[0] != 1 {
+		t.Fatal("start not authorized", err)
+	}
+	v, err := s.dialogueBoundary(a)
+	if err != nil || !v.Available || v.Phase != "running" || v.Confirmed || v.RestartSupported || v.Usage != nil || !strings.Contains(v.Scope, "inconnus") {
+		t.Fatal("start snapshot invented later effects", v, err)
+	}
+}
+
+func TestDialogueCheckpointProgressUsesStoredBoundaryTime(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"frozen-session"}`, `{"type":"item.started","item":{"id":"tool_0","type":"command_execution","command":"fixture effect"}}`, `{"type":"turn.completed"}`})
+	if _, err := runDialogueReceiptWrapper(t, s, a, "/fin\n"); err == nil {
+		t.Fatal("pending turn confirmed")
+	}
+	c := loadDialogueCheckpointTest(t, s, a)
+	started := time.Now().UTC().Add(-48 * time.Hour)
+	for id := range c.Guard.Pending {
+		c.Guard.Pending[id] = started
+	}
+	c.At = started.Add(2 * time.Second).Format(time.RFC3339Nano)
+	c.SHA256 = c.digest()
+	raw, err := json.Marshal(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint=? WHERE agent_id=?", raw, a.ID); err != nil {
+		t.Fatal(err)
+	}
+	v, err := s.dialogueBoundary(a)
+	if err != nil || v.Progress == nil || v.Progress.ToolWaitSeconds != 2 {
+		t.Fatal("historical wait grew after interruption", v, err)
+	}
+}

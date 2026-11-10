@@ -1,0 +1,245 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "input_events": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 0,
+      "type": "array"
+    },
+    "operations": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "criteria": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "deliverable": {
+                "type": "string"
+              },
+              "depends": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "task"
+                ],
+                "type": "string"
+              },
+              "next": {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              "requirements": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "title": {
+                "maxLength": 500,
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "title",
+              "requirements",
+              "deliverable",
+              "criteria",
+              "depends",
+              "next"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "delegate"
+                ],
+                "type": "string"
+              },
+              "max_activations": {
+                "maximum": 200,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "max_tasks": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "next": {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              "requirements": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "title": {
+                "maxLength": 500,
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "title",
+              "requirements",
+              "next",
+              "max_tasks",
+              "max_activations"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "enum": [
+                  "close"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "maxLength": 500,
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "title"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "deliverable": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "review-plan"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "deliverable"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "continue-run"
+                ],
+                "type": "string"
+              },
+              "next": {
+                "maxLength": 2000,
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "next"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "stop-run"
+                ],
+                "type": "string"
+              },
+              "next": {
+                "maxLength": 2000,
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "next"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "revise-instructions"
+                ],
+                "type": "string"
+              },
+              "next": {
+                "maxLength": 2000,
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "next"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "type": "array"
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "input_events",
+    "reason",
+    "operations"
+  ],
+  "type": "object"
+}

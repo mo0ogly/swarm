@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "envelope": [
+    "schema_version",
+    "event_id",
+    "expected_revision",
+    "origin"
+  ],
+  "operations": {
+    "work.create": [
+      "title",
+      "objective",
+      "scope",
+      "criteria",
+      "requirement_prerequisites",
+      "next"
+    ],
+    "work.update": [
+      "title",
+      "objective",
+      "scope",
+      "criteria",
+      "requirement_prerequisites"
+    ],
+    "task.add": [
+      "id",
+      "title",
+      "deliverable",
+      "criteria",
+      "owner",
+      "depends",
+      "next"
+    ],
+    "task.update": [
+      "id",
+      "title",
+      "deliverable",
+      "criteria",
+      "owner",
+      "depends",
+      "status",
+      "blocker",
+      "next",
+      "outcome",
+      "max_attempts",
+      "max_tool_calls",
+      "validation_policy",
+      "confirm_contract_revision",
+      "expected_contract",
+      "contract_revision_reason"
+    ],
+    "checkpoint": [
+      "summary",
+      "next",
+      "memory"
+    ],
+    "ooda": [
+      "observation",
+      "orientation",
+      "decision",
+      "owner",
+      "next",
+      "result"
+    ]
+  },
+  "conditions": {
+    "task.update": {
+      "outcome": "exits-running-attempt",
+      "confirm_contract_revision": "hierarchical-definition-amendment",
+      "expected_contract": "hierarchical-definition-amendment",
+      "contract_revision_reason": "hierarchical-definition-amendment"
+    }
+  }
+}

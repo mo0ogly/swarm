@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "type": "ValueError",
+  "reason": "profile-effective-input-changed:rust/crates/swarm-web/src/service.rs",
+  "scope": "Build unqualified; inspect original Cargo channels",
+  "global_watchdog": null
+}

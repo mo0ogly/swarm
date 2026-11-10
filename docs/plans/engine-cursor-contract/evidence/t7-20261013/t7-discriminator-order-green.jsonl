@@ -1,0 +1,28 @@
+{"Time":"2026-10-13T09:44:26.725872402+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-13T09:44:26.922771522+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestConfiguredHierarchyLimitsAndCycleGuard"}
+{"Time":"2026-10-13T09:44:26.922838978+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestConfiguredHierarchyLimitsAndCycleGuard","Output":"=== RUN   TestConfiguredHierarchyLimitsAndCycleGuard\n"}
+{"Time":"2026-10-13T09:44:27.383436002+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestConfiguredHierarchyLimitsAndCycleGuard","Output":"--- PASS: TestConfiguredHierarchyLimitsAndCycleGuard (0.46s)\n"}
+{"Time":"2026-10-13T09:44:27.383502848+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestConfiguredHierarchyLimitsAndCycleGuard","Elapsed":0.46}
+{"Time":"2026-10-13T09:44:27.383720317+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal"}
+{"Time":"2026-10-13T09:44:27.383732059+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal","Output":"=== RUN   TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal\n"}
+{"Time":"2026-10-13T09:44:28.02706624+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal","Output":"--- PASS: TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal (0.64s)\n"}
+{"Time":"2026-10-13T09:44:28.027136492+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal","Elapsed":0.64}
+{"Time":"2026-10-13T09:44:28.027149356+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeStructuredSchemaMatchesCurrentRootCycle"}
+{"Time":"2026-10-13T09:44:28.027155498+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeStructuredSchemaMatchesCurrentRootCycle","Output":"=== RUN   TestPlanningJudgeStructuredSchemaMatchesCurrentRootCycle\n"}
+{"Time":"2026-10-13T09:44:28.39329966+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeStructuredSchemaMatchesCurrentRootCycle","Output":"--- PASS: TestPlanningJudgeStructuredSchemaMatchesCurrentRootCycle (0.37s)\n"}
+{"Time":"2026-10-13T09:44:28.393372607+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeStructuredSchemaMatchesCurrentRootCycle","Elapsed":0.37}
+{"Time":"2026-10-13T09:44:28.393606677+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningOperationSchemaSeparatesMutationKinds"}
+{"Time":"2026-10-13T09:44:28.393615334+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningOperationSchemaSeparatesMutationKinds","Output":"=== RUN   TestPlanningOperationSchemaSeparatesMutationKinds\n"}
+{"Time":"2026-10-13T09:44:28.396184073+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningOperationSchemaSeparatesMutationKinds","Output":"--- PASS: TestPlanningOperationSchemaSeparatesMutationKinds (0.00s)\n"}
+{"Time":"2026-10-13T09:44:28.396309849+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningOperationSchemaSeparatesMutationKinds","Elapsed":0}
+{"Time":"2026-10-13T09:44:28.396318936+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaChoosesKindBeforePayload"}
+{"Time":"2026-10-13T09:44:28.396328474+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaChoosesKindBeforePayload","Output":"=== RUN   TestPlanningSchemaChoosesKindBeforePayload\n"}
+{"Time":"2026-10-13T09:44:28.404003783+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaChoosesKindBeforePayload","Output":"--- PASS: TestPlanningSchemaChoosesKindBeforePayload (0.01s)\n"}
+{"Time":"2026-10-13T09:44:28.404110083+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaChoosesKindBeforePayload","Elapsed":0.01}
+{"Time":"2026-10-13T09:44:28.404301122+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaAdmitsOnlyCurrentEventBatch"}
+{"Time":"2026-10-13T09:44:28.404309828+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaAdmitsOnlyCurrentEventBatch","Output":"=== RUN   TestPlanningSchemaAdmitsOnlyCurrentEventBatch\n"}
+{"Time":"2026-10-13T09:44:28.411106976+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaAdmitsOnlyCurrentEventBatch","Output":"--- PASS: TestPlanningSchemaAdmitsOnlyCurrentEventBatch (0.01s)\n"}
+{"Time":"2026-10-13T09:44:28.411161328+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningSchemaAdmitsOnlyCurrentEventBatch","Elapsed":0.01}
+{"Time":"2026-10-13T09:44:28.416847658+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-13T09:44:29.432542939+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t2.706s\n"}
+{"Time":"2026-10-13T09:44:29.475853538+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":2.75}

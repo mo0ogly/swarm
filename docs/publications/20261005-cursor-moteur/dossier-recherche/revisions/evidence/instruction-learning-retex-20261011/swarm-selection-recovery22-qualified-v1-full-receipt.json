@@ -1,0 +1,44 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T19:39:17.485086+00:00",
+  "end": "2026-10-11T19:48:56.858152+00:00",
+  "seconds": 579.3730456439953,
+  "exit": 0,
+  "output": "/tmp/swarm-selection-recovery22-qualified-v1-full.out",
+  "output_sha256": "a26d1f0c47e1bf6fa60a265810f9b54062f5e0388b089192d71561c12b095905",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "a4acd582cc9177b6f856ceff10427b59e9761067863df85d77f0e72d2325e169",
+  "candidate_digest": "5238f34c3c8c61b983dc220f75352078ae5f728f721db24332042dba881332bd",
+  "paths": 1189,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T19:39:17.485086+00:00",
+    "driver_pid": 3284135,
+    "pgid": 3284135,
+    "sid": 3284135,
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "manifest_sha256": "a4acd582cc9177b6f856ceff10427b59e9761067863df85d77f0e72d2325e169",
+    "source_digest": "5238f34c3c8c61b983dc220f75352078ae5f728f721db24332042dba881332bd",
+    "paths": 1189,
+    "precondition": "Qualified21 plus generic guarded historical selection-capacity recovery, no mission-ID exceptions; fresh receipt/authorized supervisor decision, immutable originals and spending, actual negative verdict preserved for root/child. Projection avoids DB connection reacquisition; producer termination guarded in commit transaction. Personal common directives/planner/worker prevention updated, reviewer method unchanged. Native read-only counterexample PASS11sources14618to79564 with54calls available. Full before install; source and runtime evidence separate.",
+    "go_pid": 3284140
+  }
+}

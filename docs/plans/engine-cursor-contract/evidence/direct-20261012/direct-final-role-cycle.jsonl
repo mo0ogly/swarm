@@ -1,0 +1,32 @@
+{"Time":"2026-10-12T22:32:08.382157172+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-12T22:32:08.46147085+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded"}
+{"Time":"2026-10-12T22:32:08.461603648+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded","Output":"=== RUN   TestAgentWorkflowRolesAreBounded\n"}
+{"Time":"2026-10-12T22:32:08.461621231+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner"}
+{"Time":"2026-10-12T22:32:08.461630138+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner","Output":"=== RUN   TestAgentWorkflowRolesAreBounded/planner\n"}
+{"Time":"2026-10-12T22:32:08.462007823+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner","Output":"    agent_workflow_test.go:44: planner workflow: 32084 bytes\n"}
+{"Time":"2026-10-12T22:32:08.475208659+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner","Output":"--- PASS: TestAgentWorkflowRolesAreBounded/planner (0.00s)\n"}
+{"Time":"2026-10-12T22:32:08.475295862+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner","Elapsed":0}
+{"Time":"2026-10-12T22:32:08.475316401+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner"}
+{"Time":"2026-10-12T22:32:08.47532127+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner","Output":"=== RUN   TestAgentWorkflowRolesAreBounded/subplanner\n"}
+{"Time":"2026-10-12T22:32:08.475326139+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner","Output":"    agent_workflow_test.go:44: subplanner workflow: 32090 bytes\n"}
+{"Time":"2026-10-12T22:32:08.475334855+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner","Output":"--- PASS: TestAgentWorkflowRolesAreBounded/subplanner (0.00s)\n"}
+{"Time":"2026-10-12T22:32:08.475340015+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner","Elapsed":0}
+{"Time":"2026-10-12T22:32:08.475345485+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker"}
+{"Time":"2026-10-12T22:32:08.475365071+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker","Output":"=== RUN   TestAgentWorkflowRolesAreBounded/worker\n"}
+{"Time":"2026-10-12T22:32:08.47536974+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker","Output":"    agent_workflow_test.go:44: worker workflow: 31147 bytes\n"}
+{"Time":"2026-10-12T22:32:08.4753752+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker","Output":"--- PASS: TestAgentWorkflowRolesAreBounded/worker (0.00s)\n"}
+{"Time":"2026-10-12T22:32:08.475380681+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker","Elapsed":0}
+{"Time":"2026-10-12T22:32:08.47538547+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer"}
+{"Time":"2026-10-12T22:32:08.475389738+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer","Output":"=== RUN   TestAgentWorkflowRolesAreBounded/reviewer\n"}
+{"Time":"2026-10-12T22:32:08.475394597+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer","Output":"    agent_workflow_test.go:44: reviewer workflow: 18586 bytes\n"}
+{"Time":"2026-10-12T22:32:08.47542329+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer","Output":"--- PASS: TestAgentWorkflowRolesAreBounded/reviewer (0.00s)\n"}
+{"Time":"2026-10-12T22:32:08.47542825+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer","Elapsed":0}
+{"Time":"2026-10-12T22:32:08.475433479+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded","Output":"--- PASS: TestAgentWorkflowRolesAreBounded (0.00s)\n"}
+{"Time":"2026-10-12T22:32:08.475440022+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded","Elapsed":0}
+{"Time":"2026-10-12T22:32:08.47544477+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal"}
+{"Time":"2026-10-12T22:32:08.475449259+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal","Output":"=== RUN   TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal\n"}
+{"Time":"2026-10-12T22:32:08.672910397+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal","Output":"--- PASS: TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal (0.21s)\n"}
+{"Time":"2026-10-12T22:32:08.673021314+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeProviderReceivesCycleAndAppliesRenewal","Elapsed":0.21}
+{"Time":"2026-10-12T22:32:08.673036362+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-12T22:32:08.687684502+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t0.251s\n"}
+{"Time":"2026-10-12T22:32:08.687789989+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":0.306}

@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T21:27:40.571354+00:00",
+  "parent": "selection-capacity-recovery-20261011.patch",
+  "parent_tree": "0c8d8da8b17846d37da8d2bbe27a803ccb345ac9",
+  "preimage_tree": "68448590500723b950fe5770ce196712b34e93eb",
+  "preimage_extensions": [
+    {
+      "path": "internal/engine/independent_review_runtime.go",
+      "sha256": "c7cb36203b36c1c19f143ffd239ab7ba842be44b568019ab1f5418a67fe6d4d0",
+      "blob": "01b0df8fb764c988902e778146844550620c3f4b",
+      "parent_sha256": null,
+      "reason": "Current primary preimage, including existing user instruction templates; historical parent unchanged"
+    },
+    {
+      "path": "docs/engine-cursor-source-manifest.json",
+      "sha256": "a4acd582cc9177b6f856ceff10427b59e9761067863df85d77f0e72d2325e169",
+      "blob": "949d707f9bfa94aced05b51b07838a39f105088f",
+      "parent_sha256": null,
+      "reason": "Current primary preimage, including existing user instruction templates; historical parent unchanged"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-001.json",
+      "sha256": "674d6dffe655be19098609d2a77874b3092e3fdb766cca9678be7ea8be8fff1e",
+      "blob": "ce4475157613590438336ca71c31cc4d9b67bf94",
+      "parent_sha256": null,
+      "reason": "Current primary preimage, including existing user instruction templates; historical parent unchanged"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-002.json",
+      "sha256": "3546515d60988d5c0b823bbaaac61557baef5df7c03f7be9b217351160ac4faa",
+      "blob": "706b6b0ce0be4bbcea396156744072f8f1274cff",
+      "parent_sha256": null,
+      "reason": "Current primary preimage, including existing user instruction templates; historical parent unchanged"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-003.json",
+      "sha256": "2b403048df6662e7935747e2db355bc6939bde94c714832d4face46f0147776d",
+      "blob": "e32303d6c1ac6f039b18288f0fb96ec40ac8f84b",
+      "parent_sha256": null,
+      "reason": "Current primary preimage, including existing user instruction templates; historical parent unchanged"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-004.json",
+      "sha256": "900507ab0012999f637a8801eaeb33dd78dcf17183bfe3cd476814bed2ce2f1c",
+      "blob": "d526ae72dac3838a19cfa161c54fc10ecb65e22b",
+      "parent_sha256": null,
+      "reason": "Current primary preimage, including existing user instruction templates; historical parent unchanged"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-005.json",
+      "sha256": "b707522b0a65daae11f8cafea5f7e7b6675273c52ae30c58590b80e44255521f",
+      "blob": "43aa3f65b3d70c08be091e050f9c5ecc211553eb",
+      "parent_sha256": null,
+      "reason": "Current primary preimage, including existing user instruction templates; historical parent unchanged"
+    }
+  ],
+  "preimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "65ae311929dcd64c6ca036ce15506a856bccdba6124be6594d2d08308a7826ca",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "3067123caef597e5f503c542a02554b3e048371808649fcfee0dff58ef047d01",
+    "internal/engine/agent_workflow.go": "8631dcc9f931d234f5acc98f917f0437950df01802b701ab503a05c1f53bb990",
+    "internal/engine/independent_review_runtime.go": "c7cb36203b36c1c19f143ffd239ab7ba842be44b568019ab1f5418a67fe6d4d0",
+    "internal/engine/managed_review.go": "24cf580e55d01d64de5ea6163f2b2e42c1ad9dcbc0eaabd7f683f8b878134c77",
+    "internal/engine/managed_review_fragment_contract_evidence_test.go": null,
+    "internal/engine/managed_review_fragment_decision.go": "9607bd43a4e8e38a6369d6d18c89b00d42185c04cd83080d1110c02c68df30de",
+    "internal/engine/managed_review_fragment_questions.go": "21ae032bf44bbf1b9d5d72a18f8d6126e9d87f696a742d7b631c43fb70c4cb47",
+    "tools/agent-workflows/templates/HANDOFF.md": "e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2",
+    "tools/agent-workflows/templates/TRACKING.md": "af685085922ac538b9c8301ffda126dff03e1de54a5bf68c7ff6ba0601ea0b99",
+    "tools/verification/refresh_engine_source_manifest.py": "cd225cf0ece0a9f024b1d4e1923ac84b787d28172238860336a97b1828a07d4d",
+    "docs/engine-cursor-source-manifest.json": "a4acd582cc9177b6f856ceff10427b59e9761067863df85d77f0e72d2325e169",
+    "docs/engine-cursor-source-inputs-001.json": "674d6dffe655be19098609d2a77874b3092e3fdb766cca9678be7ea8be8fff1e",
+    "docs/engine-cursor-source-inputs-002.json": "3546515d60988d5c0b823bbaaac61557baef5df7c03f7be9b217351160ac4faa",
+    "docs/engine-cursor-source-inputs-003.json": "2b403048df6662e7935747e2db355bc6939bde94c714832d4face46f0147776d",
+    "docs/engine-cursor-source-inputs-004.json": "900507ab0012999f637a8801eaeb33dd78dcf17183bfe3cd476814bed2ce2f1c",
+    "docs/engine-cursor-source-inputs-005.json": "b707522b0a65daae11f8cafea5f7e7b6675273c52ae30c58590b80e44255521f"
+  },
+  "postimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "070cad54ed1ad57568671b4247183b7a9aa8cc89aa6ab646960725c2765b03bb",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "31821b14f5866391d506ebcce8ab093d6232fd068d2c16c4dc816d3bd2929a78",
+    "internal/engine/agent_workflow.go": "237a24bba0ec5411939729cecf14ec9e81f422aea840a55b19800efecd5d97c2",
+    "internal/engine/independent_review_runtime.go": "ac61dcf342d60564ff9fdbfaae152b8b917313435a476c6dd9383aeded6ec5d3",
+    "internal/engine/managed_review.go": "c595e413e2e27b8eea848df7c7decdbf1689b3e2a6e5d328ac9cf385936628e5",
+    "internal/engine/managed_review_fragment_contract_evidence_test.go": "671eae9b9a7a131b2cb6ee22b7007db922c7e36d6eca80245f2227a0181e02c2",
+    "internal/engine/managed_review_fragment_decision.go": "c5dc788b276ac6fbeaf98f0cbd95d62be6ac8b494c1cf965b23c971694909217",
+    "internal/engine/managed_review_fragment_questions.go": "b1de119d145e4ec5538027ea8efc08a2680f737607bc0448b2759f5d74efc181",
+    "tools/agent-workflows/templates/HANDOFF.md": "c84b441c4713cf90b7a09b100d58b01ec53fe4f09eb3378b7ca480051c1d3a65",
+    "tools/agent-workflows/templates/TRACKING.md": "16eb84f3960b2eb468ac79bb16fa8e42609aef32d1183f8b14e33693afd09a43",
+    "tools/verification/refresh_engine_source_manifest.py": "beb7ae0ae38376ec82a1bf312a725c90f327d73eaef2d757b8f65f8bf07d0cda",
+    "docs/engine-cursor-source-manifest.json": "2cebef4a773349478dc0ff5f0de50834b1d8977f3f846145e489a3db811558a7",
+    "docs/engine-cursor-source-inputs-001.json": "fb489e69593a183204990857185acea354cb41b4d3c6a8bca3e32e21892a1157",
+    "docs/engine-cursor-source-inputs-002.json": "6d64b72dd2d7ce81bbe3e995e345c668232546b276e91ce28176f640e02cf714",
+    "docs/engine-cursor-source-inputs-003.json": "1225ac13293c51ef6ecf8d624089050ff9affa8c98538bb6e05278956e76295a",
+    "docs/engine-cursor-source-inputs-004.json": "045a7bcb1095867990a69172a10543594eb0a6fc7bf8ce3f793b31199ed7ea0c",
+    "docs/engine-cursor-source-inputs-005.json": "0a3512b8af3e01e388713d3549a78fb8e45b7e829c0c3965435d1cc803fd268b"
+  },
+  "result_tree": "5e4dd21d1f9b98c37880e90b9a71c44bd0fae4a5",
+  "patch": "typed-original-evidence-recovery-20261011.patch",
+  "patch_sha256": "1d3d035c49ebd9185e77d41c775b34352540e9fa93b98d46ce8fe24fb1389afa",
+  "paths": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "internal/engine/agent_workflow.go",
+    "internal/engine/independent_review_runtime.go",
+    "internal/engine/managed_review.go",
+    "internal/engine/managed_review_fragment_contract_evidence_test.go",
+    "internal/engine/managed_review_fragment_decision.go",
+    "internal/engine/managed_review_fragment_questions.go",
+    "tools/agent-workflows/templates/HANDOFF.md",
+    "tools/agent-workflows/templates/TRACKING.md",
+    "tools/verification/refresh_engine_source_manifest.py",
+    "docs/engine-cursor-source-manifest.json",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-002.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json"
+  ],
+  "candidate_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+  "check": "PASS exact path diff, isolated refreshed-index apply, result tree and all postimages",
+  "qualification": {
+    "at": "2026-10-11T21:34:30.484215+00:00",
+    "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-preview-9nhe432y",
+    "candidate_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+    "checks": [
+      {
+        "state": "finished",
+        "started": "2026-10-11T21:26:07.346178+00:00",
+        "finished": "2026-10-11T21:34:24.304869+00:00",
+        "argv": [
+          "go",
+          "test",
+          "./...",
+          "-count=1",
+          "-timeout=12m"
+        ],
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-preview-9nhe432y",
+        "candidate_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+        "manifest_sha256": "2cebef4a773349478dc0ff5f0de50834b1d8977f3f846145e489a3db811558a7",
+        "frozen_paths": 2108,
+        "wall_seconds": 496.9586934189938,
+        "exit": 0,
+        "output": "/tmp/swarm-contract-resolution23-full.out",
+        "output_sha256": "f7130e58123cea742b517309e297ea6a1b72673d49202e668904c02ea09ce5bc",
+        "drift": [],
+        "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+      },
+      {
+        "state": "finished",
+        "started": "2026-10-11T21:34:24.702549+00:00",
+        "finished": "2026-10-11T21:34:26.476100+00:00",
+        "argv": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-preview-9nhe432y",
+        "candidate_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+        "manifest_sha256": "2cebef4a773349478dc0ff5f0de50834b1d8977f3f846145e489a3db811558a7",
+        "frozen_paths": 2108,
+        "wall_seconds": 1.773569982004119,
+        "exit": 0,
+        "output": "/tmp/swarm-contract-resolution23-vet.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": [],
+        "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+      },
+      {
+        "state": "finished",
+        "started": "2026-10-11T21:34:26.800390+00:00",
+        "finished": "2026-10-11T21:34:28.523291+00:00",
+        "argv": [
+          "python3",
+          "tools/agent-workflows/check.py"
+        ],
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-preview-9nhe432y",
+        "candidate_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+        "manifest_sha256": "2cebef4a773349478dc0ff5f0de50834b1d8977f3f846145e489a3db811558a7",
+        "frozen_paths": 2108,
+        "wall_seconds": 1.722919414001808,
+        "exit": 0,
+        "output": "/tmp/swarm-contract-resolution23-methods.out",
+        "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+        "drift": [],
+        "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+      },
+      {
+        "state": "finished",
+        "started": "2026-10-11T21:34:28.844293+00:00",
+        "finished": "2026-10-11T21:34:30.213121+00:00",
+        "argv": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/swarm-qualified23-build",
+          "./cmd/swarm"
+        ],
+        "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-preview-9nhe432y",
+        "candidate_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+        "manifest_sha256": "2cebef4a773349478dc0ff5f0de50834b1d8977f3f846145e489a3db811558a7",
+        "frozen_paths": 2108,
+        "wall_seconds": 1.368841165000049,
+        "exit": 0,
+        "output": "/tmp/swarm-contract-resolution23-build.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "drift": [],
+        "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance.",
+        "binary_sha256": "f9f5d5152e6e791c55166ee218ec765e3133ae4fd8aef8fb9e8a3fceb95d7bb9"
+      }
+    ],
+    "result": "PASS local qualification",
+    "limits": "Primary/runtime unchanged; public installation, reception, decision and effect remain required."
+  },
+  "purpose": "General typed original-evidence validation: current task contract resolves questions only, authenticated selected source body available literally, code/JSON and per-file boundaries preserved. Worker handoff redundancy reduced within existing capacity; supervisor remains responsible for completion. Source inventory includes observed go:embed resources. No original native proof, method, journal, spending or business refusal changed.",
+  "preimage_scope": "Exact current primary17paths; two existing operator templates may differ from historical22 tree and are supplied explicitly without rewriting that parent."
+}

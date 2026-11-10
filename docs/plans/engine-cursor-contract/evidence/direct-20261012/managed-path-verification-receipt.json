@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-12T21:50:27.675575+00:00",
+  "status": "MANAGED_PROJECT_ALIAS_AND_COPY_OWNERSHIP_VERIFIED_ON_FIXTURES_NOT_NATIVE_MIGRATION",
+  "base_head": "eff242b955e95a9be3fe1595736d25507fd91329",
+  "source_sha256": {
+    "internal/engine/model.go": "5c619dc7757aa314a268887d28c1204efb742994b4ae86392d1a0adea00b5021",
+    "internal/engine/agent_exchange.go": "73e0991f3f455f6d7cd6c5016799c26940abb60d69d6bd2f45691c1405f3fa92",
+    "internal/engine/managed_delivery.go": "029a88427af8e200cd51a0462dd2fa3a40a6426fe75ce0f3e77c1ce650aca09a",
+    "internal/engine/managed_git.go": "68a90c5707a4a7b262dcf8bd3eaeba5f719f98d077ef2e877d1e2fb9375b95b1",
+    "internal/engine/managed_preparation.go": "31d21ed4d3c8d4065f250fa10934ae8fc04c5895cf828d1dce2f3b22186430dc",
+    "internal/engine/managed_result_staging.go": "25610302433c1a846273c17717de7916d35599c7441a4c027376559cd2caaf2b",
+    "internal/engine/managed_root_alias_test.go": "3eaf4fd1caacf641e735c06f8ee11d831934ed767bb5a2da0d987442bb491d46",
+    "docs/engine-cursor-source-manifest.json": "03e2a2cf8d2fcf9559db842ec7a8a8a55988e0585e5513a0dc561d8ded7cac7d"
+  },
+  "fixture_binary": {
+    "path": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-direct-managed-path",
+    "sha256": "c615d6f90c32b67ee18e6ba6decb69f9620d553ff25fb558badc873333697938"
+  },
+  "checks": {
+    "command": "go test -race ./internal/engine -run '^(TestManagedRootAlias.*|TestManagedRepositorySupportsProjectBelowGitRoot|TestManagedPublicationLaneRetainsSiblingWithoutPaidReview|TestManagedPublicationStagingPreservesPauseAndIdentity|TestManagedPreparedLaunchResumeRetainsCopyAndDoesNotDuplicate|TestEngineContractOwnershipHandoff.*Redirect.*|TestProjectRootAlias.*)$' -count=1 -timeout=90s -json",
+    "passed_tests_and_subcases": [
+      "TestEngineContractOwnershipHandoffCrashRecoveryRefusesRedirectedCopy",
+      "TestEngineContractOwnershipHandoffEffectiveWorkspaceCannotRedirect/replay",
+      "TestEngineContractOwnershipHandoffEffectiveWorkspaceCannotRedirect/crash-recovery",
+      "TestEngineContractOwnershipHandoffEffectiveWorkspaceCannotRedirect",
+      "TestEngineContractOwnershipHandoffNewCopyRejectsRedirectedWorkspace",
+      "TestManagedRepositorySupportsProjectBelowGitRoot",
+      "TestManagedPreparedLaunchResumeRetainsCopyAndDoesNotDuplicate",
+      "TestManagedPublicationLaneRetainsSiblingWithoutPaidReview",
+      "TestManagedPublicationStagingPreservesPauseAndIdentity/global-pause",
+      "TestManagedPublicationStagingPreservesPauseAndIdentity/planning-pause",
+      "TestManagedPublicationStagingPreservesPauseAndIdentity/active",
+      "TestManagedPublicationStagingPreservesPauseAndIdentity/foreign-attempt",
+      "TestManagedPublicationStagingPreservesPauseAndIdentity/foreign-copy",
+      "TestManagedPublicationStagingPreservesPauseAndIdentity",
+      "TestManagedRootAliasRetainsRepositoryCopyAndPublicBundle",
+      "TestManagedRootAliasPreparedCopyIsReused",
+      "TestManagedRootAliasStillRejectsInnerRedirectedCopy",
+      "TestManagedRootAliasPublishesExistingResultAndPreparesNextCopy",
+      "TestManagedRootAliasHandoffRefusesChildRootLinkAndExternalCopyAlias",
+      "TestManagedRootAliasStagingRefusesForeignInputAndGitMetadata/input-workspace",
+      "TestManagedRootAliasStagingRefusesForeignInputAndGitMetadata/git-metadata",
+      "TestManagedRootAliasStagingRefusesForeignInputAndGitMetadata",
+      "TestProjectRootAliasPreservesOwnedBoundaries/file",
+      "TestProjectRootAliasPreservesOwnedBoundaries/artifact",
+      "TestProjectRootAliasPreservesOwnedBoundaries/workspace",
+      "TestProjectRootAliasPreservesOwnedBoundaries",
+      "TestProjectRootAliasPublicReportAndEscapeRefusal"
+    ],
+    "vet": "PASS",
+    "executable_build": "PASS",
+    "diff_check": "PASS"
+  },
+  "proof_sha256": {
+    "direct-managed-path-ownership-red.jsonl": "540cd45ef289d3714d1b14b798c4a524f0fbb2871a7c9607cb544b9b59b204cc",
+    "direct-managed-path-ownership-contracts.jsonl": "141b24fe9885a0f856d41ba86fdf88a399a81ac35ce0928fbe05bc3f4e1769d2",
+    "direct-managed-path-next-copy-red.jsonl": "d22438fcbbf94eba9f2be6e20973db1f0089e4972c103276853c2e7c06d8728d",
+    "direct-managed-path-full-contracts.jsonl": "7771b9a1a8a9b72f8b2b58e0ca4c1d9aafd738c9e076e18f1a44ae83c33a74df",
+    "direct-managed-path-final-race.jsonl": "4a2b5ae0744bf303eec883366339f0f2229cc40ba8913a15efef5f4e8affccf1",
+    "direct-managed-path-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "direct-managed-path-source-manifest.out": "61c2a819b5fd5f96bf9e7f05f1c51403373935336814482285c5238f8b6773ee"
+  },
+  "limits": [
+    "Physical relocation of temporary fixture roots only; native database/binary unchanged",
+    "Review fixtures and prepared-launch bookkeeping prove no real model execution or autonomy",
+    "Original red source was not separately archived; the prior committed baseline is eff242b and original failing output is preserved",
+    "Relocation requires a retained project-root alias; no automatic host link creation or path-history rewrite",
+    "Real-provider T7, independent review, UX-GRAPH-01 and final quick wins/RETEX remain incomplete"
+  ]
+}

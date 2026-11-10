@@ -1,0 +1,6 @@
+--- FAIL: TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal (5.85s)
+    managed_review_capacity_first_test.go:14: sizes 164551 168165 21899 parts 1
+    managed_review_capacity_first_test.go:47: observed capacity not attempted after legacy refusal: pièce indivisible trop grande : diff --git a/large.json b/large.json
+FAIL
+FAIL	swarm.local/companion/internal/engine	6.099s
+FAIL

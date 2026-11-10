@@ -1,0 +1,9 @@
+flowchart TD
+  W["Insert or update Work"] --> T["SQLite transaction<br/>v1 projection and contract generation"]
+  T --> S["Work and plan stamp<br/>committed together"]
+  S --> R["Identity reader<br/>SQLite writer reserved"]
+  H["Trust head and current checkpoint<br/>issuer still a fixture"] --> R
+  R --> C{"Same generation<br/>and digest?"}
+  C -->|Yes| V["Runtime binding and rights evaluation"]
+  C -->|No| N["Reject: return no authority"]
+  V --> F["COMMIT without a business effect"]

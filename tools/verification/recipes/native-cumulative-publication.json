@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "id": "native-cumulative-publication",
+  "inputs": [
+    "docs/architecture/NATIVE-REVIEWER.md",
+    "docs/en/NATIVE-REVIEWER.md",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/task_validation.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/managed_publication_record.rs",
+    "rust/crates/swarm-engine/src/managed_publication_record/*.rs",
+    "rust/crates/swarm-engine/src/managed_repository_controls.rs",
+    "rust/crates/swarm-engine/src/managed_repository_result.rs",
+    "rust/crates/swarm-engine/src/managed_repository_worker.rs",
+    "rust/crates/swarm-engine/src/review_evidence.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/managed_baseline.rs",
+    "rust/crates/swarm-engine/src/root_store/managed_publication.rs",
+    "rust/crates/swarm-engine/src/root_store/managed_publication/*.rs",
+    "rust/crates/swarm-engine/src/root_store/native_review_context.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/*.rs",
+    "rust/crates/swarm-engine/src/task_lifecycle.rs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_managed_auto_worker.py",
+    "tests/rust_managed_planning.py",
+    "tests/rust_managed_repository_bootstrap.py",
+    "tests/rust_managed_result_recovery.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_native_baseline.py",
+    "tests/rust_native_cumulative_policies.py",
+    "tests/rust_native_cumulative_publication.py",
+    "tests/rust_native_first_publication.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_native_http_mission.py",
+    "tests/rust_native_managed_candidate.py",
+    "tests/rust_native_managed_review_inputs.py",
+    "tests/rust_native_managed_reviewer.py",
+    "tests/rust_native_managed_validation.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_reviewer.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_post_publication_worker.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "tests/test_native_cumulative_restoration.py"
+  ],
+  "environment": {
+    "PYTHONPATH": "tests"
+  },
+  "steps": [
+    {
+      "id": "compound-fixture-restoration-causes",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "-v",
+        "test_native_cumulative_restoration"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 4 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "actual-two-publications-saved-policies-and-next-worker",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='native-cumulative-',dir='.cache')).resolve()\ncommon=['--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE']]\ncommand=['python3','tests/rust_native_cumulative_publication.py',*common,'--output',str(base/'publication'),'--rollback-sdk',os.environ['SWARM_CUMULATIVE_ROLLBACK_SDK']]\nif os.environ.get('SWARM_CUMULATIVE_BASELINE_FROM'):command.extend(['--baseline-from',os.environ['SWARM_CUMULATIVE_BASELINE_FROM']])\nsubprocess.run(command,check=True)\nr=json.loads((base/'publication/result.json').read_bytes());assert r['status']=='PASS' and r['cumulative_publication'] and not r['paid_provider'] and len(r['checks'])==9\nsubprocess.run(['python3','tests/rust_native_cumulative_policies.py',*common,'--output',str(base/'policies'),'--published-from',str(base/'publication'),'--ensure-review-capacity'],check=True)\ns=json.loads((base/'policies/result.json').read_bytes());assert s['status']=='PASS' and len(s['checks'])==2 and s['work_unchanged'] and s['settings_values_restored'] and s['settings_history_preserved']\ncommand=['python3','tests/rust_post_publication_worker.py',*common,'--output',str(base/'dependent'),'--published-from',str(base/'publication'),'--ensure-review-capacity']\nif os.environ.get('SWARM_CUMULATIVE_BASELINE_FROM'):command.extend(['--native-from',os.environ['SWARM_CUMULATIVE_BASELINE_FROM']])\nsubprocess.run(command,check=True)\nt=json.loads((base/'dependent/result.json').read_bytes());assert t['status']=='PASS' and t['cumulative_publication'] and t['accepted_task_count']==2 and len(t['checks'])==4 and t['candidate_commit']==r['candidate_commit'] and not t['mission_accepted']\nprint('NATIVE_CUMULATIVE_RECIPE_VERIFIED '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_CUMULATIVE_RECIPE_VERIFIED"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

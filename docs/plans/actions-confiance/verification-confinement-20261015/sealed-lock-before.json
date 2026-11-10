@@ -1,0 +1,10 @@
+{
+  "mode": "before",
+  "observed": "waited on busy lock and only completed after release",
+  "exit_code": 0,
+  "state_unchanged": true,
+  "elapsed_seconds": 0.3691332850030449,
+  "fixture_root": "/tmp/swarm-sealed-lock-p9eiuy_g",
+  "binary_sha256": "fa0789108bf96218629e2ab5cfd6e14c80711d41851314393dd8cd265b1297a9",
+  "at": "2026-10-15T20:49:28.970027+00:00"
+}

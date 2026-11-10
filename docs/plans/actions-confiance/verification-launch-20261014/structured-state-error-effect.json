@@ -1,0 +1,8 @@
+{
+  "revision": 310,
+  "review_id": "review-f5b1b04170c262cb710b41e6",
+  "state": "error",
+  "failure_code": "review_fragment_protocol",
+  "reason": "inspection de fragment : citation de la pièce 12 : texte cité invalide pour cette pièce ; ne pas confondre texte introuvable et champ JSON absent. Diagnostic non validant : {\"artifact\":12,\"error\":\"ambiguous quote\",\"literal_matches_elsewhere\":[],\"matching_artifact_count\":0,\"other_originals\":[],\"packet\":1,\"quote_field_empty\":false,\"quote_sha256\":\"a5cdc2e13436f6cceec18ce784bbc93587f6424aceb3d22c19d5da11f06a8ba0\",\"rejected_quote\":\"result = trustDenied(st, actor, operation, cmd.Resource, \\\"\\\", originalHash, \\\"action absente\\\", now)\"}\nConstat PARTIEL conservé ; aucun verdict final : Correction demandée : diff --git a/internal/engine/trust_actions.go b/internal/engine/trust_actions.go, ligne de la pièce 689 : Dans la branche request, les erreurs de mandat construisent un objet denied puis sortent du switch sans affecter rejected. trustOperate renvoie donc une valeur avec erreur nulle : HTTP répond 200 et le CLI sort avec succès, contrairement au contrat documentaire affirmant que le code d’erreur est conservé. Reproduction : Soumettre request avec authentification valide mais mandate_id absent ou révoqué. La branche fixe reason, appelle trustDenied, puis renvoie sans erreur; les appelants HTTP/CLI traitent donc le refus comme un succès. Attendu : Un refus métier authentifié doit conserver sa preuve tout en renvoyant le code d’erreur CLI/API annoncé, par exemple via auditRejection et CommandError.",
+  "consumed_review_calls": 62
+}

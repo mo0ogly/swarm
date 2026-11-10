@@ -1,0 +1,7 @@
+{
+  "at": "2026-10-16T19:55:02.577503+00:00",
+  "reason": "Native/public reader audit found that the new inspection command was missing from the shared no-migration classifier; isolated red test observed 34 -> 35.",
+  "files": {
+    "internal/engine/storage_inspection.go": "c7c7f96a1d901c1ec1f2f6f5cc8c908b46e6fe6eb44db26d83e509ed92cdb345"
+  }
+}

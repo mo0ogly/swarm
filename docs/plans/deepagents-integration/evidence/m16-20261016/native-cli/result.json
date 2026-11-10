@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "root": "/tmp/swarm-recovery-projection-p8x2af6l",
+  "checks": [
+    "Public launch retains a failed source with three completed scripted operations",
+    "Actual provider input equals the persisted final prompt and both context receipts match their bytes",
+    "Source log sequences preserve distinct shortened operations; counters explain all retained rows without raw results or secrets",
+    "Shortened current criterion is explicitly attributed and still requires verification",
+    "Original source record, observed consumption and retained logs remain identical after recovery",
+    "Reopened compiled API returns the same receipt and rejects another work with HTTP 403",
+    "Two attempts and two local script invocations; no implicit task acceptance or model call"
+  ],
+  "local_scripted_invocations": 2,
+  "model_calls": 0,
+  "binary_sha256": "3c029c352bac4e2bc9995c1a522ef76a4eb3dfd5d469ca815a836eb3aadf253c",
+  "script_sha256": "8e186f504b4e0b8b06cdae4f7d4dfe9338d195ba4509ff41c82e5d48fbf20d01"
+}

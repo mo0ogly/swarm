@@ -1,0 +1,29 @@
+{
+  "stage": "processes",
+  "argv": [
+    "python3",
+    "tests/actions_confiance_t5.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-attempt-source",
+    "--timeout-seconds",
+    "120",
+    "--criterion",
+    "0",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/processes"
+  ],
+  "pid": 3625587,
+  "start_ticks": "5743395",
+  "started_unix": 1792123009.8052757,
+  "status": "passed",
+  "binary_sha256": "4b60f2637fd526b7a9aefe990507404d46cf7fb953989c3849c368ea3a690f24",
+  "exit_code": 0,
+  "ended_unix": 1792123046.2036796,
+  "stdout_sha256": "4dd47bbfb2afcc9065b86c73c6caf8d441eb6cffd72fd2e3534bdbadc242df17",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observed_results": 4,
+  "result_path": "docs/plans/actions-confiance/verification-globale-20261016/processes.stdout",
+  "result_sha256": "4dd47bbfb2afcc9065b86c73c6caf8d441eb6cffd72fd2e3534bdbadc242df17"
+}

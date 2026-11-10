@@ -1,0 +1,10 @@
+{
+  "files": [
+    "reply-fr.png",
+    "reply-en.png"
+  ],
+  "inspection": "Both rendered PNGs viewed during this increment before context compaction",
+  "result": "Readable labels and complete diagrams, no observed clipping",
+  "scope": "Static documentation diagrams only, no browser/runtime acceptance",
+  "source_render_commands": "diagrams.json"
+}

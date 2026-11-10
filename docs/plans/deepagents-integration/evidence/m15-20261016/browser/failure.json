@@ -1,0 +1,16 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n3 !== 2\n\n    at refused (/home/fpizzi/Documents/ChatGPT/swarm/tests/dialogue_recovery_ui.cjs:106:106)\n    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/dialogue_recovery_ui.cjs:109:3",
+  "errors": [],
+  "failures": [],
+  "focus": {
+    "active": {
+      "id": "",
+      "action": "recovery-preview-t1"
+    },
+    "returnTarget": {
+      "id": "",
+      "connected": false,
+      "action": "recovery-preview-t1"
+    }
+  }
+}

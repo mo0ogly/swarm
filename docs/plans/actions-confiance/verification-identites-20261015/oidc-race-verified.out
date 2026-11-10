@@ -1,0 +1,76 @@
+=== RUN   TestActionsConfianceT3OIDCConfigurationRejectsUnsafeInputs
+--- PASS: TestActionsConfianceT3OIDCConfigurationRejectsUnsafeInputs (1.10s)
+=== RUN   TestActionsConfianceT3OIDCLoginBusinessPersistenceAndRevocation
+--- PASS: TestActionsConfianceT3OIDCLoginBusinessPersistenceAndRevocation (1.29s)
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/expired
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/wrong-azp
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/unmapped-subject
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/signature
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/audience
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/nonce
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-iat
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/missing-iat
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-nbf
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/multiple-audiences-without-azp
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/issuer
+--- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures (9.79s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/expired (1.00s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/wrong-azp (1.01s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/unmapped-subject (1.33s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/signature (0.89s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/audience (0.78s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/nonce (0.76s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-iat (0.71s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/missing-iat (0.87s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-nbf (0.73s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/multiple-audiences-without-azp (0.87s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/issuer (0.84s)
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/browser-binding
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/configuration-revokes-pending
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/key-rotation
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/one-consumer
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/unavailable-provider
+=== RUN   TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/logout
+--- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency (4.76s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/browser-binding (0.78s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/configuration-revokes-pending (0.75s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/key-rotation (0.74s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/one-consumer (0.83s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/unavailable-provider (0.83s)
+    --- PASS: TestActionsConfianceT3OIDCBindingRevisionRotationAndConcurrency/logout (0.83s)
+=== RUN   TestActionsConfianceT3OIDCPublicAPIAndCLI
+--- PASS: TestActionsConfianceT3OIDCPublicAPIAndCLI (0.92s)
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/duplicate-mapping
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/unknown-local-subject
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/issuer-credentials
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/zero-timeout
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/negative-session
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/zero-login
+=== RUN   TestActionsConfianceT3OIDCConfigurationValidationAndPreview/remote-http-redirect
+--- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview (0.87s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/duplicate-mapping (0.02s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/unknown-local-subject (0.01s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/issuer-credentials (0.01s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/zero-timeout (0.01s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/negative-session (0.01s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/zero-login (0.01s)
+    --- PASS: TestActionsConfianceT3OIDCConfigurationValidationAndPreview/remote-http-redirect (0.01s)
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/null
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/"true"
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/1
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/{}
+=== RUN   TestActionsConfianceT3OIDCEnabledRequiresBoolean/[]
+--- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/null (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/"true" (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/1 (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/{} (0.00s)
+    --- PASS: TestActionsConfianceT3OIDCEnabledRequiresBoolean/[] (0.00s)
+=== RUN   TestActionsConfianceT3OIDCRequestDeadline
+--- PASS: TestActionsConfianceT3OIDCRequestDeadline (1.78s)
+PASS
+ok  	swarm.local/companion/internal/engine	22.261s

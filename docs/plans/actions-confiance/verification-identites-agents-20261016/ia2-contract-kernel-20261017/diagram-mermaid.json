@@ -1,0 +1,11 @@
+{
+  "theme": "neutral",
+  "securityLevel": "strict",
+  "flowchart": {
+    "htmlLabels": false
+  },
+  "themeVariables": {
+    "fontFamily": "Arial, sans-serif",
+    "fontSize": "18px"
+  }
+}

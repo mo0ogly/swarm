@@ -1,0 +1,11 @@
+{
+  "observed_at": "2026-10-17T11:35:22.706768+00:00",
+  "changed_after_check": [
+    "internal/engine/memory_usage_binding.go",
+    "internal/engine/memory_usage_binding_test.go",
+    "internal/engine/memory_usage_decision_test.go"
+  ],
+  "historical_check_changed_inputs": [],
+  "owner": "memory workstream; preserved without edits",
+  "decision": "retain 02 as historical and verify current compiler inputs under 03"
+}

@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "id": "paea-atomic-controller",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tests/fixtures/paea_provisioning_request.json",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-personal-service-core.json",
+    "schemas/paea/personal-service-response-v1.schema.json",
+    "tests/paea_service_response_schema_test.py",
+    "rust/crates/swarm-linux-identity-channel/**/*",
+    "tools/verification/recipes/paea-controller-packet.json",
+    "tests/paea_controller_rustdoc_test.py",
+    "tests/paea_initial_rustdoc_test.py",
+    "tests/paea_spawned_rustdoc_test.py",
+    "tools/verification/recipes/paea-spawned-controller.json",
+    "tools/verification/recipes/paea-atomic-controller.json",
+    "tests/paea_atomic_rustdoc_test.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "native-atomic-subject-env-cwd-signals-fd-and-exec",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--test",
+        "atomic_spawn",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "atomic_spawn_actual_subject_explicit_environment_directory_signals_and_wait ... ok",
+        "atomic_spawn_exec_refusal_then_fresh_control ... ok",
+        "atomic_spawn_fast_exit_and_preflight_refusal_keep_explicit_state ... ok",
+        "atomic_spawn_closes_unrelated_inheritable_descriptor ... ok",
+        "4 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "post-spawn-failure-keeps-owned-child-and-causes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--lib",
+        "atomic_spawn::tests::atomic_post_spawn_error_retains_actual_child_and_all_causes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "atomic_post_spawn_error_retains_actual_child_and_all_causes ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "isolated-sigchld-autoreap-keeps-atomic-handle",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "--lib",
+        "kernel::atomic_spawn::tests::atomic_handle_survives_sigchld_autoreap_in_isolated_worker",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "atomic_handle_survives_sigchld_autoreap_in_isolated_worker ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-atomic-composition-before-decode-and-domain",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "personal_service::controller_packet::tests::atomic_packet_",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "atomic_packet_subject_binding_keeps_all_existing_stages ... ok",
+        "atomic_packet_matching_process_does_not_bypass_domain ... ok",
+        "2 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-atomic-service-uid-before-exited-handle",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "personal_service",
+        "personal_service_atomic_dispatch_uid_before_finished_controller",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "personal_service_atomic_dispatch_uid_before_finished_controller ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "strict-atomic-library-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-linux-identity-channel",
+        "-p",
+        "swarm-enrollment-authority",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Generated"
+      ]
+    },
+    {
+      "id": "exact-atomic-source-and-contract-pages",
+      "command": [
+        "python3",
+        "tests/paea_atomic_rustdoc_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "SOURCE_BOUND_RUSTDOC_PASS sources=6 pages=3"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

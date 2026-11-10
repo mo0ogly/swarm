@@ -1,0 +1,12 @@
+diff --git a/tools/verification/refresh_engine_source_manifest.py b/tools/verification/refresh_engine_source_manifest.py
+index 690f34bd1de585fd1fd72ebd185bb247d6cb2dfc..a8f62b331d4d426903d3f96711dbc6f48cb67a1f 100644
+--- a/tools/verification/refresh_engine_source_manifest.py
++++ b/tools/verification/refresh_engine_source_manifest.py
+@@ -42,6 +42,7 @@ def main():
+         "tools/agent-workflows/check.py": "harness",
+         ".claude/skills/apex/SKILL.md": "source",
+         ".claude/skills/replan/SKILL.md": "source",
++        ".claude/skills/code-reviewer/SKILL.md": "source",
+         ".claude/skills/product-planning/SKILL.md": "source",
+         "web/instruction-revisions.js": "source",
+         "web/post-delivery.js": "source",

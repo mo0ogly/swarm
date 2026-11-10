@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT3StepUpPolicySurface
+    trust_step_up_test.go:25: required step-up configuration surface absent json: unknown field "step_up"
+--- FAIL: TestActionsConfianceT3StepUpPolicySurface (0.08s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.184s
+FAIL

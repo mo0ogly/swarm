@@ -1,0 +1,12 @@
+<section id="confiance" data-transition="fade" style="background:#F6F4EE;color:#14213D;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<h2 style="font-size:72px;font-weight:600">Ce qui protège la télémétrie</h2>
+<table style="font-size:28px;color:#14213D">
+<tr><th style="width:30%">Garde</th><th style="width:70%">Effet</th></tr>
+<tr><td>Jeton par tentative</td><td>Seule son empreinte sha256 est stockée ; jamais journalisé.</td></tr>
+<tr><td>Rattachement par jeton</td><td>Un corps qui prétend « agent B » reste attribué à l’agent du jeton.</td></tr>
+<tr style="background:#EFEADF"><td>Liste blanche</td><td>Prompt, réponse et sortie d’outil ne sont jamais conservés.</td></tr>
+<tr><td>Base séparée</td><td>Le schéma mission 37 n’est pas modifié.</td></tr>
+<tr style="background:#EFEADF"><td>Refus codés</td><td>401, 405, 415, 400, 413, 503 : rien n’est accepté en silence.</td></tr>
+</table>
+<aside>Limite connue : un client au jeton bien formé fait lire un corps borné avant le refus. À examiner en revue indépendante.</aside>
+</section>

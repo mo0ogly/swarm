@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "checks": [
+    "fr-installed-version",
+    "fr-installed-commit",
+    "fr-installed-all-current-notes",
+    "fr-installed-dirty-disclosure",
+    "fr-installed-commit-link",
+    "fr-installed-escape-focus",
+    "en-installed-version",
+    "en-installed-commit",
+    "en-installed-all-current-notes",
+    "en-installed-dirty-disclosure",
+    "en-installed-commit-link",
+    "en-installed-escape-focus",
+    "installed-no-page-errors",
+    "installed-no-POST"
+  ],
+  "errors": [],
+  "posts": [],
+  "browser": "Chrome/130.0.6723.116",
+  "global_watchdog": null
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "T3-fourth-public-recovered-result-684a6b605e4f43d0ad20000a149b4ed9",
+  "expected_revision": 759,
+  "task_id": "plan-ca937edf4e-T3",
+  "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+  "attempt_id": "a-cd4afa7836a7687fe0e466c5",
+  "result_tree": "a37df1271a3e649a88dbb0cec2f6756a161b928a",
+  "confirm_recovery": true,
+  "reason": "Processus interrompu par erreurs bwrap sur montages CIFS, source et rapport conservés. Recette T3/race/vet/méthodes natifs pass, contrôles documentaires relus hors sandbox pass ; Go entier en qualification isolée sur les mêmes fichiers. Déclaration supplémentaire curatée à9 fichiers/121127octets, originaux conservés dans candidat complet et backups ; aucun code ou critère changé. Arbre examiné en index externe, pas de cinquième production. Soumettre uniquement pour contrôles/coordination et revue du candidat entier, sans acceptation fabriquée ; préserver interruption et dépenses."
+}

@@ -1,0 +1,1199 @@
+{
+  "schema_version": 1,
+  "id": "native-manual-agent-execution",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/*.md",
+    "rust/crates/swarm-engine/config/*.json",
+    "tools/rust-migration/generate_agent_models.py",
+    "tools/rust-migration/test_generate_agent_models.py",
+    "frontend/engine-settings/admin.js",
+    "web/i18n-en.js",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "tests/rust_web_policy_admin_ui.cjs",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tests/helpers/engine_settings_admin_state.cjs",
+    "tests/helpers/verification_cleanup.cjs",
+    "tests/verification_cleanup_test.cjs",
+    "tests/rust_native_http_cli.py",
+    "web/access.html",
+    "web/access.css",
+    "web/access.js",
+    "web/wattson_themes.css",
+    "web/swarm-design.css",
+    "web/swarm-logo.png",
+    "tests/rust_native_login_browser.py",
+    "tests/rust_native_login_ui.cjs",
+    "web/native-runtime.html",
+    "web/native-runtime.css",
+    "web/native-runtime.js",
+    "web/i18n.js",
+    "web/processes.css",
+    "frontend/engine-settings/admin.css",
+    "scripts/i18n/build.cjs",
+    "package.json",
+    "package-lock.json",
+    "tests/i18n_test.cjs",
+    "web/pilot-graph.js",
+    "tests/engine_settings_apply_ack_test.cjs",
+    "tests/native_settings_http_adapter_test.cjs",
+    "tests/rust_native_admin_ui.cjs",
+    "tests/rust_native_fixture_failures.py",
+    "tools/agent-workflows/check.py",
+    "tests/rust_native_completion_recovery.py",
+    "tests/rust_scoped_worker.py",
+    ".gitignore",
+    "tools/verification/verify_npm_archive.py",
+    "tests/browser_verification_runtime_test.cjs",
+    "tests/browser_npm_baseline_test.cjs",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_lease.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_provider_guard.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_call_contract.py",
+    "tests/rust_planning_output.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_planning_context_evolution.py",
+    "tests/rust_planning_wait.py",
+    "tests/rust_planning_step.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_unadmitted_recovery.py",
+    "tests/rust_planning_unadmitted_legacy.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_preview.py",
+    "tools/verification/recipe.py",
+    "tools/verification/test_recipe.py",
+    "tools/agent-workflows/test_check.py",
+    "tools/verification/recipes/agent-native-runtime.json",
+    "tools/verification/native_no_go.py",
+    "tools/verification/test_native_no_go.py",
+    "contracts/agent-wire-layout.v1.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r97",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "native-units",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--lib"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "129 passed; 0 failed",
+        "real_settings_lock_budget_refuses_without_callback_then_recovers ... ok",
+        "heartbeat_threshold_future_legacy_and_corruption_are_distinct ... ok",
+        "private_gate_diagnostics_are_strict_and_empty_eof_is_ambiguous ... ok",
+        "shared_runner_refuses_plain_text_exec_without_implicit_shell_and_recovers ... ok",
+        "usage_replaces_without_summing_and_keeps_missing_distinct_from_zero ... ok",
+        "usage_invalid_fields_preserve_history_and_recover ... ok",
+        "model_declarations_reject_controls_and_preserve_engine_timestamp ... ok",
+        "legacy_terminal_kind_requires_complete_witness ... ok",
+        "output_gap_preserves_history_without_canonical_fallback ... ok",
+        "diagnostic_counter_refuses_overflow_and_keeps_typed_cause ... ok",
+        "stream_metadata_refusals_do_not_hide_tools_or_become_empty_success ... ok",
+        "stream_metadata_gaps_partial_lines_and_actual_eof_are_distinct ... ok",
+        "preflight_output_claims_before_permission_refuse_and_recover ... ok",
+        "codex_replaces_all_conflicting_forms_without_losing_stdin_or_sandbox ... ok",
+        "malformed_flags_refuse_without_consuming_a_following_option ... ok",
+        "generic_single_dash_flags_are_not_codex_attached_model_aliases ... ok",
+        "model_source_receipt_refuses_missing_duplicate_changed_and_false_verification ... ok",
+        "unrouted_custom_receipt_has_no_invented_model_source_or_fallback ... ok",
+        "connection_catalogue_accepts_unrelated_empty_and_go_shapes ... ok",
+        "connection_catalogue_refuses_invalid_sources_with_safe_causes ... ok",
+        "connection_catalogue_preserves_conflicts_disabled_and_api_refusal ... ok",
+        "provider_configuration_retains_explicit_data_without_model_defaults ... ok",
+        "provider_configuration_refuses_invalid_schema_and_shape_safely ... ok",
+        "provider_configuration_empty_maps_and_source_hash_are_explicit ... ok",
+        "provider_configuration_changes_require_exactly_one_strict_proposal ... ok",
+        "provider_configuration_snapshot_references_never_accept_arbitrary_paths ... ok",
+        "task_model::tests::task_model_request_strict_and_explicit ... ok",
+        "task_model::tests::task_model_launch_choice_is_not_client_override ... ok",
+        "provider_policy_import::tests::provider_policy_request_go_projection_and_native_token ... ok",
+        "provider_policy_import::tests::provider_policy_request_refusals_keep_explicit_nonempty_contract ... ok",
+        "provider_model_route::tests::configuration_model_metadata_is_not_execution_permission ... ok",
+        "root_store::provider_policy_store::tests::policy_outer_release_retains_known_published_state ... ok",
+        "task_report::tests::task_report_request_is_strict_and_status_is_derived ... ok",
+        "work_outer_release_retains_known_recorded_state ... ok",
+        "settings_outer_release_retains_known_recorded_configuration ... ok",
+        "directory_binding_duplicate_preserves_identity_and_cloexec ... ok",
+        "session_forced_publication_collision_adopts_complete_winner ... ok",
+        "session_entropy_and_generator_format_refuse_without_publication_then_recover ... ok",
+        "receipt_read_snapshot_holds_settings_reservation_until_rollback ... ok",
+        "agent_worker_context::scoped_tests::delegated_worker_identity_and_contract_exclude_root_and_sibling_context ... ok",
+        "agent_worker_context::scoped_tests::root_worker_shared_brief_keeps_own_requirement_and_contract ... ok",
+        "agent_worker_context::scoped_tests::scoped_worker_invalid_index_ownership_identity_refuse_and_recover ... ok",
+        "agent_worker_context::scoped_tests::native_scoped_worker_without_manual_plan_has_current_assigned_contract ... ok",
+        "durable_recovery_refuses_live_or_foreign_supervisor ... ok",
+        "closed_scope_receives_terminal_evidence_without_reopening_and_conflicts_refuse ... ok",
+        "clean_absence_excludes_cleanup_and_other_observation_failures ... ok",
+        "readonly_adapter_before_model_arguments_preserves_effort_and_sandbox ... ok",
+        "decision_inherited_checks_preserve_original_authorization ... ok",
+        "scope_claim_renewal_and_decision_late_clock_refuse_before_publication ... ok",
+        "planning_lease_renewal_respects_persisted_mission_pause_and_recovers ... ok",
+        "planning_transaction_hooks_pause_archive_and_corrupt_controls_are_atomic ... ok",
+        "planning_claim_input_schema_refuses_atomically_then_recovers ... ok",
+        "scope_context_contract_freshness_matches_rendered_owned_fields ... ok",
+        "known_decision_survives_late_release_failure ... ok",
+        "feedback_release_keeps_newer_work_and_original_cause ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "role-workflow-framing",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "agent_workflow",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed",
+        "frozen_workflows_bind_exact_body_and_role_without_local_override ... ok",
+        "workflow_body_policy_is_exact_saved_and_recoverable ... ok",
+        "workflow_project_composition_preserves_primary_and_full_prompt_bindings ... ok",
+        "workflow_legacy_absence_requires_explicit_body_policy_adoption ... ok",
+        "workflow_freshness_checks_full_prompt_and_current_policy ... ok",
+        "frozen_role_planner_contract ... ok",
+        "frozen_role_subplanner_contract ... ok",
+        "frozen_role_worker_contract ... ok",
+        "frozen_role_reviewer_contract ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-source-evidence-fixtures",
+      "command": [
+        "python3",
+        "tools/verification/test_recipe.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 7 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "native-context-checker-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/agent-workflows",
+        "-p",
+        "test_check.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 8 tests",
+        "OK",
+        "test_public_checker_native_shim_rejects_missing_role_without_go"
+      ]
+    },
+    {
+      "id": "native-no-go-wrapper-guards",
+      "command": [
+        "python3",
+        "tools/verification/test_native_no_go.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "mission-organization-contract",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "mission_organization",
+        "--test",
+        "mission_dispatch_policy",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "organization_requires_independent_reviewer_even_with_declared_human_review ... ok",
+        "organization_checks_hierarchy_controls_and_task_validation ... ok",
+        "organization_separates_reviewer_capacity_failure_and_consumption ... ok",
+        "2 passed; 0 failed",
+        "mission_dispatch_explicit_defaults_boundaries_unlimited_and_no_clamp ... ok",
+        "mission_dispatch_history_explicit_adoption_and_invalid_groups ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "manual-admission",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "agent_launch"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "26 passed; 0 failed",
+        "leased_manual_launch_preview_receipt_replay_and_binding ... ok",
+        "leased_manual_launch_expiry_after_staging_rolls_back_and_recovers ... ok",
+        "leased_manual_launch_receipt_failure_rolls_back_and_recovers ... ok",
+        "planned_launch_preserves_organization_and_reviewer_refusals ... ok",
+        "malformed_provider_cooldown_clearance_refuses_public_admission_without_mutation ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "agent_launch"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "13 passed; 0 failed",
+        "native_agent_pre_exec_refusal_releases_only_confirmed_unstarted_estimate ... ok",
+        "native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision ... ok",
+        "native_agent_run_public_stop_term_kill_and_admin_edit_are_owned ... ok",
+        "native_manual_agent_run_has_real_input_kernel_identity_and_no_task_acceptance ... ok",
+        "native_agent_incomplete_drain_keeps_active_lease_and_reserved_estimate ... ok",
+        "native_agent_declared_usage_model_invalid_and_recovery_preserve_budget ... ok",
+        "native_agent_running_facts_refuse_then_recover_in_same_owned_process ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "cli-diagnostics",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--lib"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "nested_guard_causes_are_classified_without_private_text ... ok",
+        "cli_compound_cleanup_retains_primary_and_secondary_causes ... ok",
+        "typed_same_address_source_is_not_mistaken_for_a_cycle ... ok",
+        "9 passed; 0 failed",
+        "cli_retains_root_recorded_work_through_compound_cleanup ... ok",
+        "cli_settings_publication_survives_late_close_in_json_and_text ... ok",
+        "cli_preserved_state_wrapped_in_io_keeps_work_and_config_markers ... ok",
+        "cli_configuration_marker_survives_own_io_and_cleanup_wrappers ... ok",
+        "late_web_summary_failure_retains_report_effects_and_safe_causes ... ok",
+        "cli_native_commit_projection_retains_both_causes_without_private_text ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "frozen-policy-budget-identity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "agent_tool_guard",
+        "--test",
+        "agent_execution_policy",
+        "--test",
+        "agent_execution_snapshot",
+        "--test",
+        "agent_process_identity",
+        "--test",
+        "financial_budget",
+        "--test",
+        "engine_settings_catalog"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "7 passed; 0 failed",
+        "4 passed; 0 failed",
+        "3 passed; 0 failed",
+        "17 passed; 0 failed",
+        "1 passed; 0 failed",
+        "financial_budget_combines_four_ledgers_and_reserves_without_reset ... ok",
+        "financial_budget_unlimited_has_zero_planning_estimate_and_checked_duplicates ... ok",
+        "financial_budget_refuses_invalid_policy_and_ledger_then_recovers ... ok",
+        "financial_budget_codec_and_validation_preserve_canonical_contract ... ok",
+        "financial_budget_configuration_is_atomic_engine_owned_and_replay_safe ... ok",
+        "financial_budget_ignored_sql_writes_refuse_rollback_and_recover ... ok",
+        "financial_budget_two_connections_cannot_reserve_the_same_remaining_estimate ... ok",
+        "financial_budget_operator_failure_preserves_cause_and_recovers_same_intent ... ok",
+        "reserved_agent_start_counts_its_existing_estimate_once_without_reset ... ok",
+        "reserved_agent_budget_refuses_inconsistent_or_excessive_ledgers_and_recovers ... ok",
+        "reserved_agent_budget_unlimited_keeps_absence_distinct_from_corruption ... ok",
+        "reserved_agent_budget_sql_failure_is_not_an_empty_success_and_recovers ... ok",
+        "reserved_planning_start_counts_existing_estimate_once ... ok",
+        "reserved_planning_start_refuses_missing_foreign_observed_or_corrupt_rows ... ok",
+        "reserved_planning_start_rechecks_policy_change_and_keeps_old_reservation ... ok",
+        "reserved_planning_start_refuses_increased_reserve_without_upgrading_old_row ... ok",
+        "reserved_planning_start_requires_active_transaction_without_mutation ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "model-routing-policy",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "model_routing_policy"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "saved_model_policy_public_apply_reopen_preserves_history_and_effect ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "model-policy-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "model_policy"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed",
+        "public_model_check_observes_saved_policy_without_mutation_or_execution ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "provider-create-storage",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "--all-features",
+        "local_storage::tests"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "create_only_publication_preserves_existing_regular_and_symlink_targets ... ok",
+        "create_only_racing_publishers_never_overwrite_the_winning_bytes ... ok",
+        "provider_configuration_directory_names_preserve_bytes_and_fresh_cursor ... ok",
+        "provider_configuration_lock_refuses_contention_then_recovers ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "provider-configuration-root",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "provider_configuration",
+        "--all-features",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed",
+        "provider_file_initialize_reopen_and_no_overwrite_preserve_state ... ok",
+        "PASS provider-file-fault PartialWriteNoSpace",
+        "PASS provider-file-fault SyncDirectory",
+        "provider_file_preview_apply_restore_and_noop_preserve_snapshots_and_sql ... ok",
+        "provider_file_stale_policy_lock_and_unsafe_restore_refuse_then_recover ... ok",
+        "provider_file_corrupt_source_is_inspected_and_repaired_with_original_retained ... ok",
+        "PASS provider-update-fault backup=true fault=PartialWriteNoSpace",
+        "PASS provider-update-fault backup=false fault=SyncDirectory",
+        "provider_file_preview_token_is_bound_to_actual_root_and_policy_values ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "provider-configuration-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "provider_configuration"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "provider_config_output_and_flush_failure_keep_created_state_and_safe_cause ... ok",
+        "provider_config_update_output_failures_preserve_new_and_prior_content ... ok",
+        "public_provider_config_update_restore_and_inspect_repair_preserve_exact_history ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "task-model-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "task_model",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed",
+        "task_model_output_failures_preserve_committed_choice_and_replay ... ok",
+        "task_model_schema_refusal_preserves_work_then_same_request_recovers ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "provider-policy-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "provider_policy",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed",
+        "provider_policy_output_faults_preserve_applied_state_and_original ... ok",
+        "provider_policy_preview_and_readonly_cannot_apply ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "task-report-transaction",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "task_report",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "task_report_event_failure_rolls_back_and_identical_intent_recovers ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "task-report-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "task_report",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "task_report_output_faults_preserve_submission_and_replay ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "agent-reader-identity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "agent_runtime",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "agent_readers_bind_body_identity_to_selected_sql_key_and_recover ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "protected-http-boundary",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-web",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "ipv6_address_unit_keeps_brackets_cookie_scope_and_protected_origin ... ok",
+        "protected_task_action_uses_root_and_replays_without_forged_origin ... ok",
+        "action_wire_go_case_null_and_duplicate_struct_merge_reach_the_real_task ... ok",
+        "root_recorded_state_survives_http_close_and_json_response ... ok",
+        "initialized_empty_work_list_is_distinct_from_root_failure ... ok",
+        "7 passed; 0 failed",
+        "9 passed; 0 failed",
+        "configured_project_does_not_follow_a_replaced_root_path ... ok",
+        "persisted_session_bootstrap_authorizes_then_refuses_csrf_and_preserves_work ... ok",
+        "persisted_session_marker_survives_startup_close_and_error_rendering ... ok",
+        "3 passed; 0 failed",
+        "native_settings_preview_apply_replay_and_real_consumer_follow_saved_values ... ok",
+        "native_settings_refusals_preserve_history_and_never_return_empty_success ... ok",
+        "native_settings_routes_recheck_the_retained_root_descriptor_before_access ... ok",
+        "settings_recorded_state_survives_http_close_json_and_delivery_metadata ... ok",
+        "root_runtime_failure_is_server_error ... ok",
+        "header_map_capacity_matches_declared_representation_bound ... ok",
+        "hyper_minimum_buffer_ceiling_is_distinct_from_operator_header_limit ... ok",
+        "tokio_permit_representation_matches_declared_constraint ... ok",
+        "2 passed; 0 failed",
+        "4 passed; 0 failed",
+        "1 passed; 0 failed",
+        "csrf_hmac_matches_independent_vector_and_is_scoped_not_bearer ... ok",
+        "departed_read_receiver_is_counted_and_typed_service_failure_retained ... ok",
+        "native_server_bootstrap_binds_observed_address_and_closes_without_stopping_agents ... ok",
+        "native_server_disabled_and_occupied_bind_refuse_without_new_session_or_policy_change ... ok",
+        "native_transport_real_tcp_gates_before_root_and_drains_owned_jobs ... ok",
+        "native_transport_enforces_saved_header_and_body_limits_then_recovers ... ok",
+        "native_transport_root_admin_lanes_and_pre_root_shutdown_are_distinct ... ok",
+        "native_transport_connection_cap_is_persisted_consumed_and_released ... ok",
+        "native_session_returns_scoped_csrf_without_exposing_bearer_authority ... ok",
+        "queued_diagnostic_retains_connection_reservation_until_owner_consumes_it ... ok",
+        "observer_panic_and_deferred_outcomes_preserve_causes_without_retry ... ok",
+        "late_service_error_retains_configuration_without_upgrading_refusal ... ok",
+        "failed_observer_retains_all_completed_effects_without_retry_or_early_permit_release ... ok",
+        "late_error_correlation_survives_response_encoding_and_owner_failure ... ok",
+        "queued_job_is_refused_and_observed_before_permit_release_without_root_execution ... ok",
+        "native_observer_write_and_flush_failure_retain_actual_settings_publication ... ok",
+        "native_tcp_settings_preview_apply_replay_use_real_saved_consumer ... ok",
+        "native_tcp_observer_write_and_flush_failure_preserve_committed_settings_and_replay ... ok",
+        "native_tcp_client_disconnect_after_commit_keeps_owner_outcome_and_saved_effect ... ok",
+        "native_tcp_task_action_observes_recorded_work_and_replays_without_forged_origin ... ok",
+        "18 passed; 0 failed",
+        "native_server_failure_remains_a_typed_send_sync_io_cause ... ok",
+        "native_login_unknown_template_is_a_server_failure_not_partial_html ... ok",
+        "native_login_public_page_assets_keep_host_and_private_api_gates ... ok",
+        "native_login_saved_cookie_policy_restart_and_redirects_are_real_consumers ... ok",
+        "native_login_wrong_origin_key_and_ambiguous_forms_refuse_without_mutation ... ok",
+        "native_cookie_policy_keeps_the_server_snapshot_when_saved_values_change ... ok",
+        "browser_resources_wait_for_existing_lane_and_cancel_without_capacity_leak ... ok",
+        "closed_worker_admission_retains_original_causes_without_saturation_fallback ... ok",
+        "native_admin_landing_and_assets_are_protected_without_secret_or_path_fallback ... ok",
+        "native_admin_assets_keep_host_csrf_method_and_no_mutation_contract ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-session-persistence",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "web_session",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "session_invalid_bytes_permissions_and_links_refuse_without_replacement_then_recover ... ok",
+        "session_concurrent_creators_share_one_private_complete_credential ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-session-storage-faults",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "--all-features",
+        "web_session::tests::session_atomic_faults_preserve_publication_and_recovery_contract",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "session_atomic_faults_preserve_publication_and_recovery_contract ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settings-output-state",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "settings_output",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "settings_apply_output_failure_retains_recorded_state_and_replay_in_all_diagnostics ... ok",
+        "initialized_configuration_survives_output_write_and_flush_failure ... ok",
+        "readonly_and_refused_settings_operations_do_not_claim_publication ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-policy-values",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "web_policy",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "web_policy_preserves_original_v19_and_refuses_missing_or_partial_adoption ... ok",
+        "web_policy_saved_preview_replay_and_readback_keep_original_history ... ok",
+        "web_policy_address_and_count_causes_are_preserved_without_private_values ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "generator",
+      "command": [
+        "python3",
+        "tools/rust-migration/test_generate_agent_models.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 5 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "i18n",
+      "command": [
+        "npm",
+        "run",
+        "test:i18n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS i18n locale, fallback, interpolation, engine formats and catalogue parity",
+        "PASS i18n build check accepts current output and refuses stale output without mutation"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "verification-cleanup",
+      "command": [
+        "node",
+        "tests/verification_cleanup_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS cleanup success preserves order",
+        "PASS cleanup primary retained",
+        "PASS cleanup all secondary and evidence failures retained",
+        "PASS cleanup thrown undefined stays failure",
+        "PASS cleanup malformed callback does not skip later cleanup",
+        "PASS cleanup invalid primary preserves input and closes resources",
+        "PASS verification cleanup 6 cases"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-web-cli-bootstrap",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "web_bootstrap",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed",
+        "web_cli_bound_write_and_flush_failures_keep_private_session_and_safe_diagnostics ... ok",
+        "web_cli_invalid_arguments_refuse_without_session_or_saved_policy_change ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settings-apply-ack",
+      "command": [
+        "node",
+        "tests/engine_settings_apply_ack_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS apply ACK 21 cases"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-settings-http-adapter",
+      "command": [
+        "node",
+        "tests/native_settings_http_adapter_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native HTTP adapter 5 cases"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "mission-supervision-leases",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "mission_supervision",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "31 passed; 0 failed",
+        "mission_clock_boundaries_invalid_and_large_values ... ok",
+        "mission_lease_same_label_stop_reclaim_and_persistence ... ok",
+        "mission_lease_expiry_future_corruption_and_recovery ... ok",
+        "mission_lease_root_readonly_sql_refusal_and_recovery ... ok",
+        "mission_lease_settings_save_freeze_and_new_claim_consumer ... ok",
+        "mission_lease_concurrent_claim_has_one_winner ... ok",
+        "mission_lease_commit_refusal_and_checked_rollback_recovery ... ok",
+        "mission_lease_epoch_retention_exhaustion_and_legacy_refusal ... ok",
+        "mission_settings_history_absence_partial_null_and_invalid ... ok",
+        "mission_reader_absence_unknown_work_and_readonly_nonmutation ... ok",
+        "mission_reader_native_clock_deadline_stop_and_private_debug ... ok",
+        "mission_reader_corruption_schema_and_legacy_do_not_adopt_policy ... ok",
+        "mission_reader_sql_failure_retains_cause_and_recovers ... ok",
+        "mission_reader_epoch_object_kind_refuses_before_query ... ok",
+        "mission_fence_current_stop_replacement_and_exact_work_effect ... ok",
+        "mission_fence_other_root_and_bad_clock_refuse_without_mutation ... ok",
+        "mission_fence_expiry_during_budget_mutation_rolls_back_all_effects ... ok",
+        "mission_fence_replacement_between_clock_and_writer_refuses ... ok",
+        "mission_claim_provenance_roundtrip_and_history_mismatch_refusal ... ok",
+        "mission_work_receipt_tracks_two_revisions_replay_and_reopen ... ok",
+        "mission_work_receipt_failure_rolls_back_and_recovers ... ok",
+        "mission_claim_detached_epoch_refuses_without_legacy_downgrade ... ok",
+        "mission_claim_v1_revision_remains_unknown_without_mutation ... ok",
+        "mission_cycle_error_transition_recovery_and_reopen ... ok",
+        "mission_cycle_refusal_preserves_state_and_new_owner_recovers ... ok",
+        "mission_cycle_journal_failure_rolls_back_then_recovers ... ok",
+        "mission_controls_absence_latest_revocation_and_reopen ... ok",
+        "mission_controls_bad_consent_refuses_without_fallback_or_mutation ... ok",
+        "mission_controls_corruption_sql_refusal_and_recovery ... ok",
+        "mission_dispatch_saved_settings_consumer_absence_and_reopen ... ok",
+        "mission_dispatch_outside_policy_refuses_without_clamp_and_recovers ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "scoped-lifecycle-and-assistant-adapters",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "task_lifecycle",
+        "--test",
+        "assistant_provider",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed",
+        "3 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "reviewer-creation-defaults",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "reviewer_creation_policy",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed",
+        "reviewer_creation_defaults_require_complete_explicit_values_and_preserve_zero ... ok",
+        "reviewer_creation_history_requires_explicit_v23_adoption ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "browser-npm-source-reuse",
+      "command": [
+        "node",
+        "tests/browser_npm_baseline_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS initial archive/readback"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "planning-action-and-decision-policy",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "planning_action_policy",
+        "--test",
+        "planning_decision_policy",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "scope_lease_policy_boundaries_projection_caps_and_legacy_are_explicit ... ok",
+        "planning_decision_policy_caps_defaults_partial_and_historical_are_explicit ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "planning-proposal",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "planning_proposal",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "planning-response-policy",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "planning_response_policy",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "planning-output",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "planning_output",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "13 passed; 0 failed",
+        "provider_response_nonplanning_domain_preserves_exact_terminal_bytes ... ok",
+        "provider_response_explicit_cap_and_saved_event_policy_are_distinct ... ok",
+        "provider_response_terminal_failures_and_nonjson_text_remain_explicit ... ok",
+        "planning_output_tool_events_refuse_and_latch_without_restricting_generic_transport ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "planning-wait-policy",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "planning_wait_policy",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "planning-boot-clock",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "planning_boot_clock",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "review-response-stream",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "review_output",
+        "--test",
+        "review_reply",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "review_stream_claude_codex_chunks_preserve_reply_and_unverified_facts ... ok",
+        "review_stream_domain_refusal_retains_safe_cause_and_prevents_reuse ... ok",
+        "review_stream_explicit_response_cap_and_saved_text_policy_have_no_fallback ... ok",
+        "review_stream_unknown_criterion_is_changes_requested_and_missing_reply_refuses ... ok",
+        "review_stream_tool_and_incomplete_transport_refuse_before_domain_success ... ok",
+        "5 passed; 0 failed",
+        "4 passed; 0 failed",
+        "reply_parsing_preserves_verdicts_order_and_literal_or_markdown_evidence ... ok",
+        "invalid_replies_refuse_and_recover_without_private_diagnostics ... ok",
+        "reply_byte_limits_and_explicit_normalized_minimum_have_observable_effects ... ok",
+        "v6_journal_replays_and_v7_adoption_preserves_history_and_refuses_partial_groups ... ok"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

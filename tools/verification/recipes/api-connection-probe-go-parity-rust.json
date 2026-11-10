@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "api-connection-probe-go-parity-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/provider_connection_probe.rs",
+    "rust/crates/swarm-engine/src/provider_connections_write.rs",
+    "rust/crates/swarm-engine/src/provider_connection_change.rs",
+    "rust/crates/swarm-engine/src/provider_connection_catalogue.rs",
+    "rust/crates/swarm-engine/src/provider_wait.rs",
+    "rust/crates/swarm-engine/src/provider_wait_store.rs",
+    "rust/crates/swarm-web/src/service/api_connection_probe.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/transport.rs",
+    "rust/crates/swarm-web/src/service/observation.rs",
+    "rust/crates/swarm-web/src/service/listener.rs",
+    "rust/crates/swarm-cli/src/native_web.rs",
+    "rust/crates/swarm-api-client/src/lib.rs",
+    "rust/crates/swarm-api-client/src/strict_json.rs",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "docs/architecture/NATIVE-API-CONNECTION-PROBE.md",
+    "docs/en/NATIVE-API-CONNECTION-PROBE.md",
+    "tests/rust_api_connection_probe_go_parity.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-protected-owned-flow",
+      "expected_exit": 0,
+      "required_stdout": [
+        "API_CONNECTION_PROBE_GO_PARITY_VERIFIED 5"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='api-connection-probe-go-parity-rust-',dir='.cache')).resolve()/'flow'\nargs=['python3','tests/rust_api_connection_probe_go_parity.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nargs+=['--go-reference',os.environ['SWARM_GO_REFERENCE_RESULT']]\nsubprocess.run(args,check=True)"
+      ]
+    }
+  ]
+}

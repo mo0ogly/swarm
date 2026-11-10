@@ -1,0 +1,12 @@
+{
+  "policy_reopened": true,
+  "exact_policy": {
+    "enabled": true,
+    "timeout_seconds": 17,
+    "ring_bytes": 131072
+  },
+  "state_unchanged": true,
+  "bpf_executed": false,
+  "environment_changed": false,
+  "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79"
+}

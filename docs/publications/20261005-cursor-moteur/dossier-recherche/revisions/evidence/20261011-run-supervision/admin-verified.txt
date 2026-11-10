@@ -1,0 +1,20 @@
+fr: état vide portée rôle "qa-fr" (aucune valeur, aucun historique)
+fr: aucun secret affiché à l’écran
+fr: aperçu affiché sans écriture (validation moteur avant confirmation)
+fr: Échap ferme sans écrire et restitue le focus au bouton d’origine
+fr: configuration enregistrée en révision 1 (prochains départs uniquement)
+fr: révision périmée détectée et refusée (aucune écriture silencieuse)
+fr: rechargement de la portée reflète le changement externe (révision 2)
+fr: retour à la révision 1 confirmé, historique conservé (révision 3)
+fr: effectif d’un futur départ résolu pour mission/rôle/tâche (REQ-ADM-05)
+fr: observation enabled and disabled through preview and confirmation; both themes captured
+en: état vide portée rôle "qa-en" (aucune valeur, aucun historique)
+en: aucun secret affiché à l’écran
+en: aperçu affiché sans écriture (validation moteur avant confirmation)
+en: Échap ferme sans écrire et restitue le focus au bouton d’origine
+en: configuration enregistrée en révision 1 (prochains départs uniquement)
+en: révision périmée détectée et refusée (aucune écriture silencieuse)
+en: rechargement de la portée reflète le changement externe (révision 2)
+en: retour à la révision 1 confirmé, historique conservé (révision 3)
+en: effectif d’un futur départ résolu pour mission/rôle/tâche (REQ-ADM-05)
+en: observation enabled and disabled through preview and confirmation; both themes captured

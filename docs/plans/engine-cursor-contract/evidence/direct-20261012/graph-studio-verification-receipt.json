@@ -1,0 +1,168 @@
+{
+  "status": "VERIFIED_LOCAL_SOURCE_DELIVERY_NOT_NATIVE_ACCEPTANCE",
+  "at": "2026-10-12T22:09:42.640291+00:00",
+  "base_commit": "4f837add0e014abb7cd0b38b1920769de5c555f2",
+  "inputs": {
+    "web/graph-studio.js": "3a1b28646df002e443b5e9c1e081772e2eb684638c76b1704ca54981d2ac843f",
+    "web/graph.js": "92c760ac2d4417110852bf090a59aa2353f10af2beb00926842e927e70b28d28",
+    "web/graph-draft.js": "2ce47b4300806202f98d8f2103fcb16a76bb058886b0fb84115c1270393f4478",
+    "web/pilotage.js": "fedc96ce1f5784ca0c62ee2d71248b923d5e33e8e0001c7797cfc62859ca9e3e",
+    "web/swarm-design.css": "9a15b7bfa9163f32c8542d50e0ad62c8acb346a4e2e61a7a8f110c831c9740d3",
+    "web/log-console.js": "bbc2db46ce9d4735658c724e058a10774a509309461f8471cf49e17c80212c3f",
+    "web/web-requests.js": "03dedcfd1b05078d607670c27ca682fb967fc7532d58dd7a5ed040d95d85f5c2",
+    "web/prephase-editor.js": "b6378db5f10427040ddcebf9f330399f3301a0f8dd78ea6c21aa8415e9bfc905",
+    "web/index.html": "cfd2e863b6fb8cec62c1c86ec60027bc299bc1efe70b7c11eac020f07623b8d9",
+    "web/i18n-en.js": "a99dd2a260fc4af8775f6f6efca63b6bd7f2569dc1738bf3fedba4b841d6eb20",
+    "locales/en.json": "484b46bfcda91e8fdc14e6f5f48a5982952bd18bdc20fd681988be63364cf1a0",
+    "tests/graph_studio_ui.cjs": "1516be5c6c3769e655b9fb6b128eddd934416e460abff368f15e8d7cbdf2e97f",
+    "tests/graph_studio_test.cjs": "cbf25c1d25cd5069b6104403f03ed2fe457383749a5eed0a23e3512acf48226b",
+    "tests/asset_loading_policy_test.cjs": "54dcd1a9cea1708b5fb1891069cabc8b810488e76cf5f16ed106571349564165",
+    "tests/preparation_editor_policy_ui.cjs": "4c570d8ccc9ab9d538209edfdddf02e54945f66ca43712948752e8a32e4979b7",
+    "tests/graph_draft_ui.cjs": "fe5937b05cf04d34aecedd83078be3775793da50e143f30359c16ea29b661881"
+  },
+  "binary_sha256": "6ec01e2040038eed69a55581072d8a0697724a4ca56bdbf9a3ddce20fae06332",
+  "browser_variants": [
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "fullscreen": true,
+      "keyboard_position_persisted": true,
+      "curved_links": true,
+      "dependency_added_and_deleted": true,
+      "cycle_refused_without_mutation": true,
+      "inspector_visible": true,
+      "reconnected_atomically": true,
+      "pointer_cancelled_and_moved": true,
+      "pointer_connection": true,
+      "mobile_fullscreen": true,
+      "agents": 0,
+      "errors": []
+    },
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "fullscreen": true,
+      "keyboard_position_persisted": true,
+      "curved_links": true,
+      "dependency_added_and_deleted": true,
+      "cycle_refused_without_mutation": true,
+      "inspector_visible": true,
+      "reconnected_atomically": true,
+      "pointer_cancelled_and_moved": true,
+      "pointer_connection": true,
+      "mobile_fullscreen": true,
+      "agents": 0,
+      "errors": []
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "fullscreen": true,
+      "keyboard_position_persisted": true,
+      "curved_links": true,
+      "dependency_added_and_deleted": true,
+      "cycle_refused_without_mutation": true,
+      "inspector_visible": true,
+      "reconnected_atomically": true,
+      "pointer_cancelled_and_moved": true,
+      "pointer_connection": true,
+      "mobile_fullscreen": true,
+      "agents": 0,
+      "errors": []
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "fullscreen": true,
+      "keyboard_position_persisted": true,
+      "curved_links": true,
+      "dependency_added_and_deleted": true,
+      "cycle_refused_without_mutation": true,
+      "inspector_visible": true,
+      "reconnected_atomically": true,
+      "pointer_cancelled_and_moved": true,
+      "pointer_connection": true,
+      "mobile_fullscreen": true,
+      "agents": 0,
+      "errors": []
+    }
+  ],
+  "engine_tests": {
+    "top_level": 6,
+    "including_subcases": 12,
+    "passed_names": [
+      "TestGraphDraftB01HTTPPreviewApply",
+      "TestGraphDraftB01HTTPGuardsAndStatus",
+      "TestGraphDraftB01Persistence/migration-from-v23",
+      "TestGraphDraftB01Persistence",
+      "TestGraphDraftB01InvalidDependencies/unknown",
+      "TestGraphDraftB01InvalidDependencies/duplicate",
+      "TestGraphDraftB01InvalidDependencies/cycle",
+      "TestGraphDraftB01InvalidDependencies",
+      "TestGraphDraftB01ConcurrentApply",
+      "TestGraphDraftB01ActiveScope/active-before-preview",
+      "TestGraphDraftB01ActiveScope/active-after-preview",
+      "TestGraphDraftB01ActiveScope"
+    ],
+    "scope": "unchanged Go graph draft dependency validation; isolated tests"
+  },
+  "editor_policy": {
+    "checks": [
+      {
+        "configured_ms": 250,
+        "delayed_module_ms": 900,
+        "result": "fallback editable and saved through CLI",
+        "errors": []
+      },
+      {
+        "configured_ms": 0,
+        "delayed_module_ms": 900,
+        "result": "Monaco loaded without an asset deadline",
+        "errors": []
+      }
+    ],
+    "real_models": 0
+  },
+  "console_recipe": [
+    "Actual embedded Monaco, four distinct semantic colours in both themes, keyboard search, untrusted text remains literal",
+    "Server search coordinates, exact multiline originals, live/pause and original API page export",
+    "Engine and supervisor sources, actual empty state, acknowledged incident remains unresolved in presentation",
+    "Network refusal preserves readable data; delayed foreign mission response rejected",
+    "FR/EN, desktop/tablet/mobile, no global overflow",
+    "Monaco unavailable: original text fallback remains accessible"
+  ],
+  "load50": {
+    "cards": 50,
+    "samples": 5,
+    "first_open_ms": 917,
+    "first_open_method": "one cold geometry observation including session-link redirect; excluded from the historical five reload p95 samples",
+    "initial_method": "five page reloads in the same tab; optional geometry cache can be warm",
+    "initial_p95_ms": 739,
+    "keyboard_p95_ms": 31.90000000037253,
+    "initial_samples_ms": [
+      512,
+      739,
+      508,
+      632,
+      549
+    ],
+    "keyboard_samples_ms": [
+      28.300000000745058,
+      30.299999998882413,
+      31.100000001490116,
+      31.300000000745058,
+      31.90000000037253
+    ],
+    "keyboard_method": "trusted keydown timestamp to second animation frame",
+    "expected_reload_aborts": [],
+    "arrows": true,
+    "focus_recovered": true
+  },
+  "limits": [
+    "No real model calls or independent verdict. Native historical server unchanged.",
+    "Four graph browser variants assert page exceptions; load harness separately asserts console and network diagnostics.",
+    "50-card local measurement only; 200/500-card performance not requalified in this change.",
+    "Editor/browser and console receipts preceded final graph-only presentation adjustments; their own relevant inputs remained unchanged.",
+    "General timer helper and graph save recovery unit guards also passed; command output in this conversation."
+  ]
+}

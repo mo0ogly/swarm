@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-11-01T09:29:29.269120+00:00",
+  "head": "18bb6bb6b5ee987e12a1f51c5ccda70fcd9db508",
+  "scope": "historical evidence integrity and selected source comparison only; not qualification of v290",
+  "sources": [
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+      "proof": "20261031-prompt-provenance-04",
+      "proven_sha256": "86d08b88a025ba481bd7665aaab92d17257086de41180eb3ff68ad4163cd88c4",
+      "current_sha256": "86d08b88a025ba481bd7665aaab92d17257086de41180eb3ff68ad4163cd88c4",
+      "unchanged": true
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+      "proof": "20261031-prompt-provenance-04",
+      "proven_sha256": "615fcf28f61903a3baeeb8363b0966cda7bac96a1e4ccbffb36a36f24050d2d1",
+      "current_sha256": "615fcf28f61903a3baeeb8363b0966cda7bac96a1e4ccbffb36a36f24050d2d1",
+      "unchanged": true
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store.rs",
+      "proof": "20261031-prompt-provenance-04",
+      "proven_sha256": "3e83e3c0cb1043d574773b30ad06bb48e5d5b078e2ba0ff4d58d4a6ec2ad8bc0",
+      "current_sha256": "4428858ce3fd73b27f6f37ae82818f0be212946f066d6bbd549a07e7255f48b9",
+      "unchanged": false
+    },
+    {
+      "path": "tests/rust_preparation_cli_calls.py",
+      "proof": "20261031-provenance-public-02",
+      "proven_sha256": "7d0ffdd8d1e983370cd7e5263af5f481d1ecfb9c21898ca7d9ac2b95d1dfd575",
+      "current_sha256": "7d0ffdd8d1e983370cd7e5263af5f481d1ecfb9c21898ca7d9ac2b95d1dfd575",
+      "unchanged": true
+    },
+    {
+      "path": "tests/rust_project_memory_source.py",
+      "proof": "20261031-provenance-public-02",
+      "proven_sha256": "e5f3530c67dc22bf93a1ac28685f983e215f58aaad71097a6936346044fa5d82",
+      "current_sha256": "e5f3530c67dc22bf93a1ac28685f983e215f58aaad71097a6936346044fa5d82",
+      "unchanged": true
+    },
+    {
+      "path": "rust/crates/swarm-engine/examples/memory_source_fixture.rs",
+      "proof": "20261031-provenance-public-02",
+      "proven_sha256": "5dfb1b3d211724eab108b3736a5648ad7fd21d305942f88983ba1064d09c9e7f",
+      "current_sha256": "5dfb1b3d211724eab108b3736a5648ad7fd21d305942f88983ba1064d09c9e7f",
+      "unchanged": true
+    }
+  ]
+}

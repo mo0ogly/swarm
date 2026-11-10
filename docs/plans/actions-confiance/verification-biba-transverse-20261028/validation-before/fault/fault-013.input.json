@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "event_id": "submit",
+  "expected_revision": 6,
+  "id": "task",
+  "agent_id": "session",
+  "report_path": "handoff.md",
+  "report_sha256": "59048923ef5d49477c9be3908f6d93af92c6d859a453d38a1a0122679f3da362"
+}

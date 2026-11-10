@@ -1,0 +1,10 @@
+{
+  "git_head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "source_sha256": {
+    "internal/engine/agent_dialogue.go": "9560564e0c409e446e33f4f14055251e42d6beac1b804fb859b631f1b600b25c",
+    "internal/engine/agent_dialogue_test.go": "199b3d13ec7107e14b1986d222405ab33a73760e8ab50d87bdb1d38d82328869",
+    "internal/engine/agent_terminal_process.go": "3521a9313a5ef4df6ef7fec296d13d72e58627c0c9f625efdf4759635060dee9",
+    "docs/PROJECT-MEMORY.md": "76029f8bd8187fb12c3cac38a8b126631956e1d0e65a981b9a62be8d2d2990d5",
+    "docs/en/PROJECT-MEMORY.md": "5649569a6d6ce7c5781d0591d3eb015b68cd3f70d7b2a6144896e44274eed645"
+  }
+}

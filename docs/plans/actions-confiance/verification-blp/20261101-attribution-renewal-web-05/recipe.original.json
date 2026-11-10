@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "id": "blp-attribution-renewal-web",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "rust/crates/swarm-engine/tests/confidentiality.rs",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-web/tests/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/tests/**/*",
+    "web/**/*",
+    "locales/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/common/**/*",
+    "tools/verification/bind_cargo_test_binary.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_BUILD_JOBS": "1"
+  },
+  "steps": [
+    {
+      "id": "compile-web-regression-with-retained-diagnostics",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "confidentiality_http",
+        "--no-run"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished",
+        "confidentiality_http"
+      ]
+    },
+    {
+      "id": "bind-built-web-test-image",
+      "command": [
+        "python3",
+        "tools/verification/bind_cargo_test_binary.py",
+        "--deps",
+        "{root}/.cache/blp-verification-target/debug/deps",
+        "--target",
+        "confidentiality_http",
+        "--output",
+        "{root}/.cache/blp-attribution-renewal-web-binary.json"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"status\":\"BOUND\""
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "fresh-http-history-control-refusal-and-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "confidentiality_http",
+        "policy_renewal_and_poisoned_history_refuse_through_http",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "policy_renewal_and_poisoned_history_refuse_through_http",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "verify-same-web-test-image",
+      "command": [
+        "python3",
+        "tools/verification/bind_cargo_test_binary.py",
+        "--deps",
+        "{root}/.cache/blp-verification-target/debug/deps",
+        "--target",
+        "confidentiality_http",
+        "--output",
+        "{root}/.cache/blp-attribution-renewal-web-binary.json",
+        "--verify-stable"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"status\": \"STABLE\""
+      ],
+      "required_stderr": []
+    }
+  ]
+}

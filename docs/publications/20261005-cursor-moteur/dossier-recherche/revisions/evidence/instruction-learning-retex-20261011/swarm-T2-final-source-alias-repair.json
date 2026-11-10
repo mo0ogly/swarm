@@ -1,0 +1,25 @@
+{
+  "base_candidate": "6089c4fb54e72b344e2950628ca8662da38c1b07",
+  "base_tree": "e1491d4539518ab4bd0955a41b8aee6d0d85e87f",
+  "result_tree": "201b3a8e2e0f724a7cc88fef7107bf2d41569316",
+  "paths": [
+    "docs/plan-ca937edf4e-T2.md",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted-receipt.json"
+  ],
+  "preimages": {
+    "docs/plan-ca937edf4e-T2.md": "8ca028daaa85b31afeeab556a8201f901e1ae3b32aa76f5c40e2f0bfafa0baf0",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json": "1aacdd4729ca4ab72d0c4979955451e7c82cf1003e9a32cf5ecf75172e8f5d57",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted.out": null,
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted-receipt.json": null
+  },
+  "postimages": {
+    "docs/plan-ca937edf4e-T2.md": "916e32f5e0121dc61c20d06cec0dc3e99ed8cc61be0fffd2dec547c64c342d42",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json": "834a5897d26c92b2e86477edd0517d96d3a3bb1d446a3ae42322d9bcea7eb54f",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted.out": "20a5231bb6e125999159510686de3096a238d4a1a6dd734b44debebf350937fa",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted-receipt.json": "0066d3170d28626ffde753cdb365b30c8a4c50d1dde0cc877ffccddfb7b0b4b4"
+  },
+  "patch_sha256": "c0698a69bc00be2fa5d58f47fa1b1403285633e019c25a0f8594bf33a0e2a899",
+  "no_go_changed": true
+}

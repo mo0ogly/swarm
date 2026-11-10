@@ -1,0 +1,102 @@
+[
+  {
+    "id": "auto-a23c60f03a732c02841f",
+    "task_id": "plan-ca937edf4e-T2",
+    "task": null,
+    "attempt": null,
+    "status": "running",
+    "activity": "9 appels · 8 résultats · dernier outil : Bash",
+    "workspace": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3",
+    "limits": {
+      "silence_seconds": 180,
+      "tool_seconds": 300,
+      "max_tool_calls": 80,
+      "max_repeated_calls": 4,
+      "max_consecutive_errors": 3
+    },
+    "progress": {
+      "elapsed_seconds": 114,
+      "tool_wait_seconds": 27,
+      "action": "Annonce de l’agent : Run plan-validation control with -v to see each matched test name",
+      "detail": "\\ mkdir -p docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ EV=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ GOCACHE=/tmp/gocache-T2-3 GOTMPDIR=/tmp TMPDIR=/tmp timeout 60 go test ./internal/engine -run 'TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestPlanningJudge' -count=1 -timeout 25s -v > \"$EV/go-test-plan-validation.out\" 2>&1; echo \"EXIT:$?\" | tee \"$EV/go-test-plan-validation.exit\"",
+      "tool_calls": 9,
+      "tool_results": 8,
+      "pending_tools": 1,
+      "last_tool": "Bash",
+      "last_result_at": "2026-10-11T14:13:19.26552572Z",
+      "last_output_at": "2026-10-11T14:13:34.737606689Z",
+      "output_state": "recent",
+      "tool_state": "waiting",
+      "provider_vitality": "unknown",
+      "metrics_version": 1,
+      "tool_unclassified": 9
+    }
+  },
+  {
+    "id": "auto-f2abbcfe6bed66fd1a5e",
+    "task_id": "plan-ca937edf4e-T2",
+    "task": null,
+    "attempt": null,
+    "status": "interrupted",
+    "activity": "Budget de temps atteint ; fin du processus confirmée",
+    "workspace": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-2",
+    "limits": {
+      "silence_seconds": 180,
+      "tool_seconds": 300,
+      "max_tool_calls": 80,
+      "max_repeated_calls": 4,
+      "max_consecutive_errors": 3
+    },
+    "progress": {
+      "action": "Annonce de l’agent : Run full engine suite on clean base to check if panic is pre-existing",
+      "detail": "\\ timeout 280 env GOCACHE=/tmp/gocache-T2-2-base GOTMPDIR=/tmp TMPDIR=/tmp go test ./internal/engine -count=1 -timeout 270s > /tmp/baseline-full-engine.out 2>&1; echo \"exit=$?\"; tail -40 /tmp/baseline-full-engine.out",
+      "tool_calls": 78,
+      "tool_results": 78,
+      "pending_tools": 0,
+      "last_tool": "Bash",
+      "last_result_at": "2026-10-11T08:36:25.639328399Z",
+      "last_output_at": "2026-10-11T08:36:25.639274648Z",
+      "output_state": "recent",
+      "tool_state": "idle",
+      "provider_vitality": "unknown",
+      "metrics_version": 1,
+      "tool_reads": 9,
+      "tool_writes": 19,
+      "tool_unclassified": 50,
+      "tool_errors_total": 3
+    }
+  },
+  {
+    "id": "auto-0f7f61a183068fd63528",
+    "task_id": "plan-ca937edf4e-T2",
+    "task": null,
+    "attempt": null,
+    "status": "completed",
+    "activity": "Processus terminé ; résultat à examiner, tâche non acceptée",
+    "workspace": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-1",
+    "limits": {
+      "silence_seconds": 180,
+      "tool_seconds": 300,
+      "max_tool_calls": 80,
+      "max_repeated_calls": 4,
+      "max_consecutive_errors": 3
+    },
+    "progress": {
+      "action": "Annonce de l’agent : Final status of changed/new files this attempt",
+      "detail": "git status --short",
+      "tool_calls": 76,
+      "tool_results": 76,
+      "pending_tools": 0,
+      "last_tool": "Bash",
+      "last_result_at": "2026-10-10T19:07:35.550054292Z",
+      "last_output_at": "2026-10-10T19:07:55.756516425Z",
+      "output_state": "recent",
+      "tool_state": "idle",
+      "provider_vitality": "unknown",
+      "metrics_version": 1,
+      "tool_reads": 17,
+      "tool_writes": 25,
+      "tool_unclassified": 34
+    }
+  }
+]

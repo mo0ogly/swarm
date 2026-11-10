@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "framing_date": "2026-10-15",
+  "captured_at_utc": "2026-10-15T18:56:01.579987+00:00",
+  "scope": "Memory code and documentation audit; active priority requested by user",
+  "upstream": {
+    "repository": "https://github.com/langchain-ai/deepagents",
+    "commit": "29d646fd2d832a44c476964333eddecb0ec1c0cd",
+    "sdk_declared_version": "0.7.25",
+    "checkout_path": "/tmp/swarm-deepagents-audit-944lMS",
+    "clean": true,
+    "recovery": "If the temporary checkout is absent, fetch this exact commit into a separate audit checkout; do not replace the reference with main.",
+    "files": [
+      {
+        "path": "README.md",
+        "bytes": 7043,
+        "sha256": "24666c576b54e1e1ed9793b97971f8cb0e16ebb9d0ab9a887989c6e4dfece4ac"
+      },
+      {
+        "path": "libs/ARCHITECTURE.md",
+        "bytes": 11326,
+        "sha256": "a2657562c0c28a61c0b8c1ff335b29c714b31f601558d92abcfc8977a987bb2c"
+      },
+      {
+        "path": "libs/deepagents/pyproject.toml",
+        "bytes": 6555,
+        "sha256": "81eb9f1a4799be75691ee6e4ad73d4475a31a416afc5ab62397b5c96855b4aaa"
+      },
+      {
+        "path": "libs/deepagents/LICENSE",
+        "bytes": 1067,
+        "sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478"
+      },
+      {
+        "path": "libs/deepagents/deepagents/graph.py",
+        "bytes": 49903,
+        "sha256": "7622719323a9909aa35d71c60d9396b3c102a3dfe2561d1ec73868ce387d9a16"
+      },
+      {
+        "path": "libs/deepagents/deepagents/middleware/memory.py",
+        "bytes": 18047,
+        "sha256": "425d9927a0874a0ea55a23182875eb1f3dc1b7452e0a74feb7ca3f994d37a1ee"
+      },
+      {
+        "path": "libs/deepagents/deepagents/backends/state.py",
+        "bytes": 14413,
+        "sha256": "85860ab208714ae20adff7fc308bebb5707fa54c006ae89eef6dbc0dd4bcecef"
+      },
+      {
+        "path": "libs/deepagents/deepagents/backends/store.py",
+        "bytes": 26424,
+        "sha256": "506eced5ca748713996cd7a576b6233e0e805b39446e1052473c489d916ca342"
+      },
+      {
+        "path": "libs/deepagents/deepagents/backends/filesystem.py",
+        "bytes": 71904,
+        "sha256": "bb08bac99d188cd7da1a55d53ce14f6beb1856d178ea815220df4e0533ba9b08"
+      },
+      {
+        "path": "libs/deepagents/deepagents/backends/composite.py",
+        "bytes": 42183,
+        "sha256": "13b9852b4a6b6b414cb57a72a4977844e0437259ed366214434aa51e543880a5"
+      },
+      {
+        "path": "libs/deepagents/tests/unit_tests/middleware/test_memory_middleware.py",
+        "bytes": 44942,
+        "sha256": "1bd531c447d053747ceaafa37e226993c056ced5ff84636d139bcaf6d6f764a8"
+      },
+      {
+        "path": "libs/deepagents/tests/unit_tests/middleware/test_memory_middleware_async.py",
+        "bytes": 14214,
+        "sha256": "eff943f07bb2847036a999686e10bffc7787d85bc2fd9834d888a9d03eb10152"
+      },
+      {
+        "path": "libs/code/deepagents_code/agent.py",
+        "bytes": 153227,
+        "sha256": "7b3ea2e9a9f9f797aa56dbceb21bdab7eb3b26b0c5934d31a9e8fb4c8b9b5042"
+      },
+      {
+        "path": "libs/code/deepagents_code/memory_guard.py",
+        "bytes": 19743,
+        "sha256": "2b008b41e9bfe70b71ad30ad46701d22bcc519795bacf7329225b8bc8b95f1f6"
+      },
+      {
+        "path": "libs/code/examples/extensions/memory_store.py",
+        "bytes": 530,
+        "sha256": "36352ef356df445dabfc087a4974cb1cc223bd90ea24e063e02e67be3d0c7d77"
+      },
+      {
+        "path": "openwiki/concepts/backends.md",
+        "bytes": 20993,
+        "sha256": "84fd76779c56166f8ffd19ee113899c980586eae1593eef4c9fd9370d3cee3e1"
+      }
+    ]
+  },
+  "swarm": {
+    "checkout_path": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+    "branch": "codex/clear-product-method-names",
+    "preexisting_dirty_state": true,
+    "working_tree_status_sha256": "b9c820c4c0968a949df78c5f5da19ee5eda9c51e0f41c5f34c9e4bc57a47e9ba",
+    "selected_diff_sha256": "33e33d9ade818ee0df6b5b25fe8b198847e1a5ff874150a241682379c21bb7a9",
+    "files": [
+      {
+        "path": "GUIDE-UTILISATEUR.md",
+        "bytes": 40664,
+        "sha256": "6b315d2beccfa9571859dced80db56b54994741779196fcd690c1c7b6d2ba7df"
+      },
+      {
+        "path": "docs/AGENT-METHODS.md",
+        "bytes": 16125,
+        "sha256": "733bbda6d08f6414311d462651b3362e39f4b1870344171a48fb75e434fee45b"
+      },
+      {
+        "path": "docs/architecture/INSTRUCTION-LEARNING.md",
+        "bytes": 5660,
+        "sha256": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038"
+      },
+      {
+        "path": "docs/PRODUCT-ARCHITECTURE.md",
+        "bytes": 7930,
+        "sha256": "e3d946e78513bfd500d6dcf6e1fb153369efd1e0ecf7bb62e45408c5548bfe5d"
+      },
+      {
+        "path": "docs/UI-DESIGN.md",
+        "bytes": 12249,
+        "sha256": "f3d1cd28781054fa862d30d1a8144938ef5dd2c587aa19cbc9b9cc964ea03ba3"
+      },
+      {
+        "path": "internal/engine/retex.go",
+        "bytes": 9724,
+        "sha256": "0112c6e2b1d31de4f7d8c829f046cbe86c4cb2588123b8bfa13b6ff9f2b3f0ec"
+      },
+      {
+        "path": "internal/engine/agents_store.go",
+        "bytes": 55917,
+        "sha256": "b9bbcceccd835be1237c3b45ead0b00b2235a75bf8a6dc846853c096d04c0cc5"
+      },
+      {
+        "path": "internal/engine/project_profile.go",
+        "bytes": 9744,
+        "sha256": "9682ba15292dd5ed91a93394e3e353a01ff9f17f01820cc26b87e2a80c9b1824"
+      },
+      {
+        "path": "internal/engine/project_profile_catalog.go",
+        "bytes": 3719,
+        "sha256": "a4e58896353360e78db771f75a160bebbc507bc76657b55ff4d3806c69409b25"
+      },
+      {
+        "path": "internal/engine/dialogue_context.go",
+        "bytes": 3367,
+        "sha256": "b8885e9d6e6f7681307cf42b10dc76cca7774df43319974a8fbb521a2970e2ab"
+      },
+      {
+        "path": "internal/engine/worker_context.go",
+        "bytes": 3247,
+        "sha256": "972a8be5eb8bfc19ede1300f19e0843c4499e2e2a5b2c90e2250075f15a84857"
+      },
+      {
+        "path": "internal/engine/store.go",
+        "bytes": 27269,
+        "sha256": "31fea4b7f69f932b28354a9605cfe05e11b4335e918e504f4dad361435317502"
+      },
+      {
+        "path": "internal/engine/archive.go",
+        "bytes": 11287,
+        "sha256": "23a38bedd8a2990daeb2af27172973302ccbadd3ddb0af5660687cb9e941dc9f"
+      },
+      {
+        "path": "internal/engine/memory_test.go",
+        "bytes": 8336,
+        "sha256": "6d344f9ba09eb7448221016610ceb69c99219b886a37d9198e831bb1ddc5f557"
+      },
+      {
+        "path": "internal/engine/instruction_revision_test.go",
+        "bytes": 7090,
+        "sha256": "e6a3c4d1869b2c8fdb235d5d111912f3b07a266e24f35df9f96cfa86b0b7bc08"
+      },
+      {
+        "path": "web/instruction-revisions.js",
+        "bytes": 3683,
+        "sha256": "afa5c9e894b1b9aaf63c4ed1347cca44a5a3589bc45db3205cf03fd669fd3893"
+      },
+      {
+        "path": "web/retex.js",
+        "bytes": 6597,
+        "sha256": "2bb1a9ecbf8b70b65b765988fb4beffb1b92698ddfa8c301d0d4a1d58d631ee9"
+      }
+    ],
+    "limitation": "Hashes detect drift; they do not reconstruct uncommitted local changes. This audit is a static observation, not runtime acceptance."
+  },
+  "web_documentation": {
+    "consulted_on": "2026-10-15",
+    "urls": [
+      "https://docs.langchain.com/oss/python/deepagents/overview",
+      "https://docs.langchain.com/oss/python/deepagents/memory",
+      "https://docs.langchain.com/oss/python/deepagents/backends",
+      "https://docs.langchain.com/oss/python/deepagents/context-engineering"
+    ],
+    "version_relation": "Live documentation is not assumed to match the pinned SDK. Capture the relevant page before a behavioral experiment."
+  },
+  "executed_checks": {
+    "python_prerequisites": {
+      "pytest": "available",
+      "langchain": "missing",
+      "langgraph": "missing",
+      "langchain_anthropic": "missing"
+    },
+    "go_toolchain": "go1.24.3 linux/amd64",
+    "upstream_runtime_tests": "NOT TESTED",
+    "swarm_runtime_tests": "NOT TESTED",
+    "application_code_changes": false,
+    "documentation_verification": {
+      "result": "PASS",
+      "source_hashes_verified": 33,
+      "exact_upstream_test_names_verified": 4,
+      "checks": [
+        "JSON parse",
+        "UTF-8 and trailing whitespace",
+        "git diff --check",
+        "git diff --no-index --check on new Markdown files"
+      ],
+      "method_recovery": "Initial checker treated git diff --no-index exit 1 as an error. Confirmed exit 1 with empty stdout/stderr for a new file, then accepted 0/1 only with no whitespace diagnostics. This is a documentation check, not a runtime test."
+    }
+  },
+  "iterations": [
+    {
+      "id": "M1-20261015",
+      "recorded_at_utc": "2026-10-15T19:15:57.001895+00:00",
+      "evidence": "evidence/m1-20261015/resultats.json",
+      "result": "Targeted technical audit completed with stated runtime limits",
+      "additional_upstream_sources": [
+        {
+          "path": "libs/deepagents/deepagents/middleware/filesystem.py",
+          "sha256": "61e46cc7ee8fe7bdc1f71bc2a40c66c8579ae3b53bc9451d093e0f7540e1916e",
+          "bytes": 170803
+        },
+        {
+          "path": "libs/deepagents/tests/unit_tests/chat_model.py",
+          "sha256": "43c7f675cfb91f817f604650f7db6ae973c6ba2131b5d7f09c9ea66738c96f86",
+          "bytes": 10373
+        },
+        {
+          "path": "libs/deepagents/tests/unit_tests/conftest.py",
+          "sha256": "6b5a317d303eee152a22e237f8c4c56bbd9ac7ddd3f8a78e4bab962a59955900",
+          "bytes": 4004
+        },
+        {
+          "path": "libs/deepagents/tests/unit_tests/backends/test_store_backend.py",
+          "sha256": "2fa8f87da6d73dd78fccc9bd7260e84487809a5002fa3b086b19bac5aa5ab71b",
+          "bytes": 27511
+        },
+        {
+          "path": "libs/code/deepagents_code/project_utils.py",
+          "sha256": "c86a98e2a20b4b584c2e754677502a5382881954545c16cb8634da8f788d5cd7",
+          "bytes": 8245
+        },
+        {
+          "path": "libs/code/deepagents_code/_paths.py",
+          "sha256": "9ce59d8f11f369d7c98b22993b6163f212330ff57397a447b269be53869ff029",
+          "bytes": 36450
+        },
+        {
+          "path": "libs/code/deepagents_code/btw.py",
+          "sha256": "1d3e027abe774a5c3d5a9bebf09a142b09c227b1498e94e7a0ff1aa65af4e579",
+          "bytes": 22768
+        },
+        {
+          "path": "libs/code/tests/unit_tests/test_memory_guard.py",
+          "sha256": "bc6af8a8da601f21098de41240286762ff118ee308806a3391817c179ab1a5ee",
+          "bytes": 15578
+        },
+        {
+          "path": "libs/evals/tests/evals/test_memory.py",
+          "sha256": "42c17e687917cfb2e9a198d088a46cf2ffe212c62e44df2544465d2fdd43b035",
+          "bytes": 18248
+        },
+        {
+          "path": "libs/evals/tests/evals/test_memory_multiturn.py",
+          "sha256": "645e441f330e788e91f3802bfe5fea652a72fdd483087a66c3e1ee348d334100",
+          "bytes": 10314
+        },
+        {
+          "path": "examples/deploy-content-writer/AGENTS.md",
+          "sha256": "2dde117b7fde78e95acafb041f310f6fe010aaad23d8efdd759420755bc31f0d",
+          "bytes": 2029
+        },
+        {
+          "path": "examples/deploy-content-writer/test_user_memory.py",
+          "sha256": "6622ac4fbdf4731cca8bf652fb5a50f67ee72154f98f2481c3bbc0203935d21b",
+          "bytes": 3872
+        }
+      ],
+      "additional_swarm_sources": [
+        {
+          "path": "docs/PROJECT-PROFILE.md",
+          "sha256": "23ca98203a581d6861b1cdb38bb959137f619c2c750ef7d216aaaee97389a3f7",
+          "bytes": 8267
+        },
+        {
+          "path": "web/project-profile-settings.js",
+          "sha256": "678c5f95bc9207dff2fe4f045a74bec872b670499b58b7fbeebe322d42b184a7",
+          "bytes": 5066
+        },
+        {
+          "path": "web/project-profile.js",
+          "sha256": "b372bd35fd2094d1ed4859d10c38afc108fce741d5ad923159e0daf9ec745bbb",
+          "bytes": 2204
+        },
+        {
+          "path": "internal/engine/web_prephase.go",
+          "sha256": "96ff3aba31188d3f01ed72e6af29730a7555e813b1a979e96f6bf640e0579776",
+          "bytes": 7228
+        },
+        {
+          "path": "internal/engine/project_profile_cli.go",
+          "sha256": "a81d7391ede0a9f0d2c06ab367a75db6b3d8b7ee3f9901c43c061162fab45c9c",
+          "bytes": 2264
+        },
+        {
+          "path": "internal/engine/agents_test.go",
+          "sha256": "e6bc74b2164b625a2cc56b0e2d4236e2b914c316bba053f9c1e22b169f5f5055",
+          "bytes": 13432
+        },
+        {
+          "path": "internal/engine/project_profile_test.go",
+          "sha256": "9483e4bb219ce08a1c50fb070abe6dc0933106d354dec8f8527b960383b9521c",
+          "bytes": 9266
+        },
+        {
+          "path": "internal/engine/companion_test.go",
+          "sha256": "432de600d183455ce95ab9c1b4bc436cb11ca360de76e9b68914539b3a887799",
+          "bytes": 13725
+        }
+      ],
+      "counts": {
+        "upstream": 55,
+        "additional_upstream_scenarios": 8,
+        "swarm_final_top_level": 12
+      },
+      "source_snapshot": {
+        "initial_selected_sources_unchanged": true,
+        "final_go_sources_stable": true
+      },
+      "decision": "DECISION-MEMOIRE.md; proposal pending product choice"
+    },
+    {
+      "id": "M2-20261015",
+      "date": "2026-10-15",
+      "evidence": "evidence/m2-20261015/resultats.json",
+      "sources": "evidence/m2-20261015/sources.json",
+      "result": "Memory-use framing with source-bound probes; not an implemented memory feature",
+      "upstream_probes": 7,
+      "swarm_targeted_tests": 8,
+      "proposal": "CADRAGE-MEMOIRE.md",
+      "evaluation_cases": "cas-evaluation.json"
+    },
+    {
+      "id": "M2-PROCEDURAL-20261015",
+      "date": "2026-10-15",
+      "source_manifest": "evidence/m2-procedural-20261015/sources.json",
+      "upstream": "https://github.com/langchain-ai/langmem",
+      "upstream_commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "result": "Static procedural source audit and explicit guide coverage; no new runtime test or real-model result",
+      "effect": "Reopen priority before M3; add MEM-U10/MEM-U11 and proposed MEM-C11..MEM-C14",
+      "report": "CADRAGE-MEMOIRE.md"
+    },
+    {
+      "id": "M2-HOWTO-20261015",
+      "date": "2026-10-15",
+      "source_manifest": "evidence/m2-howto-20261015/sources.json",
+      "user_content": "User-provided full text titled Memory; source langgraph/add-memory, distinct from concepts/memory",
+      "upstream_local_probes": 2,
+      "execution_evidence": "evidence/m2-howto-20261015/context-boundaries.json",
+      "result": "2 actual LangGraph in-memory boundary probes passed; guide section inventory and selected code inspection; no new Swarm runtime or real-provider evidence",
+      "effect": "Add MEM-U12..MEM-U14 and proposed MEM-C15..MEM-C18; distinguish continuation, model-context projection, state history and long-term store",
+      "report": "CADRAGE-MEMOIRE.md"
+    }
+  ],
+  "framing_updates": [
+    {
+      "date": "2026-10-15",
+      "source": "https://docs.langchain.com/oss/python/concepts/memory",
+      "snapshot": "evidence/m1-20261015/langchain-memory-concepts.json",
+      "effect": "Reopen M2 framing before selecting first increment; preserve M1 evidence and UI proposal",
+      "linked_repositories_opened": [
+        "https://github.com/langchain-ai/memory-template",
+        "https://github.com/langchain-ai/memory-agent"
+      ],
+      "linked_repository_code_audited": false
+    },
+    {
+      "date": "2026-10-15",
+      "source": "https://docs.langchain.com/oss/python/concepts/memory",
+      "snapshot": "evidence/m2-procedural-20261015/memory-overview.md",
+      "effect": "User asks about full coverage and procedural memory; distinguish page read, linked implementation inspection, runtime checks and remaining gaps",
+      "coverage_report": "CADRAGE-MEMOIRE.md#complément-m2--couverture-du-guide-et-mémoire-procédurale",
+      "additional_procedural_source_inspection": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "all_linked_code_audited": false
+    },
+    {
+      "date": "2026-10-15",
+      "source": "https://docs.langchain.com/oss/python/langgraph/add-memory",
+      "snapshot": "evidence/m2-howto-20261015/user-provided-memory-guide.md",
+      "effect": "Resolve document identity from user-provided title, sections and source link, then audit practical memory mechanisms",
+      "all_external_backend_examples_executed": false
+    }
+  ]
+}

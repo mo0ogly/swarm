@@ -1,0 +1,244 @@
+[
+  {
+    "argv": [
+      "init"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "create"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "task",
+      "add",
+      "w-502896527c5b4392c6422ed6"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "start",
+      "w-502896527c5b4392c6422ed6"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "fe49fc47-c645-4da0-a07c-f875e27319ec"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-502896527c5b4392c6422ed6"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "fe49fc47-c645-4da0-a07c-f875e27319ec"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-502896527c5b4392c6422ed6"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "start",
+      "w-502896527c5b4392c6422ed6"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "9464c8a2-06f6-4ca5-8360-a59e27503094"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-502896527c5b4392c6422ed6"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "9464c8a2-06f6-4ca5-8360-a59e27503094"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-502896527c5b4392c6422ed6"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "memory",
+      "summary-source"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/swarm_source.py",
+      "--source",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/source-cli.json",
+      "--annotations",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/annotations.json",
+      "--output-dir",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/prepared"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/summarization.py",
+      "--history",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/prepared/history.json",
+      "--reference-cutoff",
+      "4",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/candidate.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/summarization.py",
+      "--history",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/prepared/history.json",
+      "--candidate",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/candidate.json",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/reference.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-502896527c5b4392c6422ed6"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "fe49fc47-c645-4da0-a07c-f875e27319ec"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "9464c8a2-06f6-4ca5-8360-a59e27503094"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "task",
+      "update",
+      "w-502896527c5b4392c6422ed6"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "memory",
+      "summary-source"
+    ],
+    "exit_code": 3
+  },
+  {
+    "argv": [
+      "memory",
+      "summary-source"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/swarm_source.py",
+      "--source",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/source-current.json",
+      "--annotations",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/annotations.json",
+      "--output-dir",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/stale-annotations"
+    ],
+    "exit_code": 2
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/swarm_source.py",
+      "--source",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/source-current.json",
+      "--annotations",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/annotations-current.json",
+      "--output-dir",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/current"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/summarization.py",
+      "--history",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/current/history.json",
+      "--reference-cutoff",
+      "4",
+      "--previous",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/reference.json",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/candidate-current.json"
+    ],
+    "exit_code": 2
+  },
+  {
+    "argv": [
+      "tools/memory-evaluation/summarization.py",
+      "--history",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/current/history.json",
+      "--candidate",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/stale-parent-candidate.json",
+      "--previous",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/reference.json",
+      "--output",
+      "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m19-20261016/native-final/source-flow/fallback.json"
+    ],
+    "exit_code": 1
+  }
+]

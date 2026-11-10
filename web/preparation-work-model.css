@@ -1,0 +1,12 @@
+#template-work-model{margin-block:1.5rem;border-block:1px solid var(--wattson-ligne);padding-block:1rem}
+.template-work-graph{overflow:auto;max-height:420px;background:var(--wattson-carte-creuse);border:1px solid var(--wattson-ligne);border-radius:6px;margin-block:1rem}
+.template-work-graph svg{display:block;margin-inline:auto;max-width:none}
+.template-edge{fill:none;stroke:var(--wattson-lien);stroke-width:2}
+.template-edge-head{fill:var(--wattson-lien)}
+.template-work-node{cursor:pointer;outline:none}
+.template-work-node rect{fill:var(--wattson-carte);stroke:var(--wattson-ligne);stroke-width:2}
+.template-work-node text{fill:var(--wattson-texte);font:14px system-ui,sans-serif;pointer-events:none}
+.template-work-node[aria-pressed=true] rect,.template-work-node:focus rect{stroke:var(--wattson-lien);stroke-width:3}
+#template-work-inspector dl{margin-block:1rem}
+#template-work-inspector dt{font-weight:600;margin-top:.7rem;color:var(--wattson-titre)}
+#template-work-inspector dd{margin:0;white-space:pre-line;overflow-wrap:anywhere}

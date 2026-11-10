@@ -1,0 +1,5 @@
+--- FAIL: TestBinaryPreflightScopeInspectionPreservesRefusalAndSpending (3.40s)
+    managed_binary_preflight_inspection_test.go:45: scope inventory blocked by unreadable binary: revue retenue : modification binaire non examinable par ce vérificateur
+FAIL
+FAIL	swarm.local/companion/internal/engine	3.546s
+FAIL

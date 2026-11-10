@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T13:27:45.924135+00:00",
+  "parent": "planning-rejection-artifact-preservation-20261011.patch",
+  "parent_sha256": "fc912259ef23d257645c298e496fdba6e920ab6f99940e81081cec9b289a8f36",
+  "preimage_tree": "d8a7bfcd680b2fc98bdaae7abb69b7971206fe42",
+  "result_tree": "e762659d424074805badd16241344377f3828660",
+  "patch": "docs/plans/engine-cursor-contract/recovery/review-status-owner-context-20261011.patch",
+  "sha256": "9d70e9fd8eab43bfd73c365c082f87187937aa8b01577ef46899ca55b8118b72",
+  "bytes": 31073,
+  "paths": [
+    "internal/engine/managed_review.go",
+    "internal/engine/managed_review_fragment_prompt.go",
+    "internal/engine/managed_review_status_contract_test.go",
+    "internal/engine/planning_delivery.go",
+    "internal/engine/planning_rejection.go",
+    "internal/engine/planning_rejection_test.go",
+    "internal/engine/planning_task_preview_budget_test.go",
+    ".claude/skills/code-reviewer/SKILL.md",
+    "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+    "docs/en/AGENT-ENGINE-PROTOCOL.md",
+    "docs/architecture/REVIEW-EVIDENCE.md",
+    "docs/en/REVIEW-EVIDENCE.md"
+  ],
+  "purpose": "Shared producer-local pass/complete semantics with independent review, fragment missing-original unknown/needs; complete rejected failed operation supplied to tool-free owner; lossless current-event context by omitting inactive non-selected next previews, persisted instructions unchanged. No acceptance, refund, automatic end or provider verdict rewriting.",
+  "tests": "RED reproduced all missing transmissions/context overflow. Targeted/race/vet/workflows pass; full Go suite underway, qualification receipt separate.",
+  "limits": "Provider doubles establish exact receipt, not real model understanding. Native installation and fresh T2 independent review pending; T3/T5/T7/T8 own cumulative hierarchy, UX, qualification and RETEX."
+}

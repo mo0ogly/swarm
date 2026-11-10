@@ -1,0 +1,14 @@
+.context-help-button{background:var(--wattson-carte);color:var(--wattson-lien);border:1px solid var(--wattson-ligne);border-radius:.4rem;padding:.45rem .7rem;margin:.35rem;cursor:pointer;font:inherit;font-size:.9rem}
+dialog.context-help{box-sizing:border-box;width:min(640px,calc(100vw - 24px));max-height:85vh;padding:0;border:1px solid var(--wattson-ligne);border-radius:.7rem;background:var(--wattson-carte);color:var(--wattson-texte);overflow:auto}
+dialog.context-help::backdrop{background:color-mix(in srgb,var(--wattson-fond) 75%,transparent)}
+.context-help header,.context-help footer{padding:1rem 1.2rem;background:var(--wattson-carte-appuyee);color:var(--wattson-texte)}
+.context-help header{border-bottom:1px solid var(--wattson-ligne)}
+.context-help footer{border-top:1px solid var(--wattson-ligne);display:flex;justify-content:flex-end}
+.context-help h2,.context-help h3{color:var(--wattson-titre);text-transform:none;margin:0 0 .5rem}
+.context-help h2{font-size:1.25rem}
+.context-help h3{font-size:1rem}
+.context-help-body{padding:1rem;display:grid;gap:.8rem}
+.context-help-body section{padding:.85rem;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:.4rem}
+.context-help-body p{margin:0;line-height:1.55;overflow-wrap:anywhere}
+.context-help footer button{padding:.6rem 1rem;font:inherit;border:1px solid var(--wattson-action-bordure);border-radius:.4rem;background:var(--wattson-action-fond);color:var(--wattson-action-encre);cursor:pointer}
+.context-help-button:focus-visible,.context-help button:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:3px}

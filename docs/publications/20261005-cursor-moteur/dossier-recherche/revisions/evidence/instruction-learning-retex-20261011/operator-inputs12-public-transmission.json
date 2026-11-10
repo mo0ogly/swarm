@@ -1,0 +1,75 @@
+{
+  "at": "2026-10-11T14:40:45.891323+00:00",
+  "bundle": {
+    "at": "2026-10-11T14:38:49.269438+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-capacity-20261011.bundle",
+    "sha256": "ad021a0d34ee90e34b8d826747019d876411ead734c1e2be389273b54ea3016c",
+    "bytes": 329838,
+    "ref": "refs/heads/operator-inputs",
+    "commit": "702a96e9bb82051388365910849b49e5b589673e",
+    "manifest_sha256": "6c331b815e3c7fe37460e174662364980523b4e48b671c8376d2a3fd1d523c6a",
+    "input_files": 51,
+    "source": "/tmp/swarm-operator-capacity-inputs-20261011-jk6xmje4",
+    "isolated_import_check": "/tmp/swarm-operator-capacity-input-check-o3414ras",
+    "verification": "PASS isolated fetch, exact commit, manifest and all51 declared full input bytes/hash recovered",
+    "limits": "Immutable operator input only. Full source qualification and native input use/acceptance are separate."
+  },
+  "receipts": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "before": 307,
+      "after": 308,
+      "next_sha256": "751741b327ba4d74eb1105a00fd586d35d8b3ff968cf91a16a1ddb29f2eada95",
+      "existing_learning_preserved": 1,
+      "operator_base_present": true,
+      "calls": 23,
+      "verification": "Normalized composed instruction preserved new operator base and attributed learning, corrected verifier assumption"
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "before": 308,
+      "after": 309,
+      "next_sha256": "67d348e843655bf96582162007952373b6035a102bd3ad486781ec8e0d3aeb2a",
+      "existing_learning_preserved": 0,
+      "operator_base_present": false,
+      "calls": 23
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "before": 309,
+      "after": 310,
+      "next_sha256": "f410a67d57b044fe1c200d5d36010b6027316c3f740a8280fcc3f06acbc427c3",
+      "existing_learning_preserved": 0,
+      "operator_base_present": false,
+      "calls": 23
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "before": 310,
+      "after": 311,
+      "next_sha256": "53abf3abae1effe6c4fa2e1ef44f8de0ed03d411dd65024d4e942a5849bb19fe",
+      "existing_learning_preserved": 1,
+      "operator_base_present": true,
+      "calls": 23
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "before": 311,
+      "after": 312,
+      "next_sha256": "d393c7b408a94afcbcebf203cd6aa4611ace1a3be10389ab4c170a9ec4fa08ee",
+      "existing_learning_preserved": 1,
+      "operator_base_present": true,
+      "calls": 23
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "before": 312,
+      "after": 313,
+      "next_sha256": "e745443a051f53c7035376e194c8b216b118cefcc450baee4edd9c3b27008e49",
+      "existing_learning_preserved": 1,
+      "operator_base_present": true,
+      "calls": 23
+    }
+  ],
+  "effect": "Public future-task inputs preserved; no producer context received until actual launch, no acceptance"
+}

@@ -1,0 +1,6 @@
+
+running 1 test
+test agent_completion_journal::tests::durable_recovery_refuses_live_or_foreign_supervisor ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 450 filtered out; finished in 0.00s
+

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "native-reviewer-regression",
+  "inputs": [
+    "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/native_diagnostics.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/agent_execution_origin.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_producer.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/*.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/tests/financial_budget.rs",
+    "tests/fixtures/native-review-public-v1.json",
+    "tests/fixtures/native-review-public-v1.provenance.json",
+    "tests/normal_profile_archive_test.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_reviewer.py",
+    "tests/rust_native_reviewer_cases.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_review_budget_result_cases.py",
+    "tests/rust_review_context_units.py",
+    "tests/rust_review_departed_owner.py",
+    "tests/rust_review_departed_owner_cases.py",
+    "tests/rust_review_failure_reconciliation.py",
+    "tests/rust_review_financial_start_guards.py",
+    "tests/rust_review_public_certificate.py",
+    "tests/rust_review_public_context.py",
+    "tests/rust_review_publication.py",
+    "tests/rust_review_raw_capture.py",
+    "tests/rust_review_required_receipt_guard.py",
+    "tests/rust_review_retained_evidence_test.py",
+    "tests/rust_review_stale_original_cases.py",
+    "tests/rust_review_streaming_capture.py",
+    "tests/rust_reviewer_claim_candidate.py",
+    "tools/agent-workflows/check.py",
+    "tools/agent-workflows/test_check.py",
+    "tools/verification/native_no_go.py",
+    "tools/verification/recipe.py",
+    "tools/verification/verify_native_profile.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "qualified-normal-public-reviewer-seven-cases",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess,sys\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='native-review-regression-',dir='.cache')).resolve()\nsubprocess.run([sys.executable,'tests/rust_native_reviewer_cases.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'cases')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS normal reviewer 7 cases",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

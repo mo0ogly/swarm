@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "managed-auto-planning-pause",
+  "expected_revision": 9,
+  "reason": "Isolate public worker cycles from planner roles"
+}

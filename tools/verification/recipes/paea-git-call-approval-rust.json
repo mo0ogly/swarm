@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "id": "paea-git-call-approval-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-web/src/**/*",
+    "rust/crates/swarm-web/tests/paea_git_call.rs",
+    "rust/crates/swarm-enrollment-*/src/**/*",
+    "rust/crates/swarm-enrollment-authority/tests/common/authenticated_fixture.rs",
+    "rust/crates/swarm-identity-contract/src/**/*",
+    "rust/crates/swarm-protection-contract/src/**/*",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-git-call-approval-rust.json",
+    ".swarm-fixtures/source-fixture-approval-fresh-regen-20261031/result.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "SWARM_PAEA_SOURCE_FIXTURE": "{root}/.swarm-fixtures/source-fixture-approval-fresh-regen-20261031"
+  },
+  "steps": [
+    {
+      "id": "engine-agreement-observation",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "--",
+        "root_store::paea_git_agreement",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "7 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-approval-captures-agreement-and-refuses-wrong-body",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--",
+        "--ignored",
+        "--exact",
+        "approval_route_captures_project_agreement_and_refuses_wrong_body_revision"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "approval_route_captures_project_agreement_and_refuses_wrong_body_revision ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-approval-wrong-physical-project-root-refuses-without-effects",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--",
+        "--ignored",
+        "--exact",
+        "approval_route_wrong_physical_project_root_refuses_without_effects"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "approval_route_wrong_physical_project_root_refuses_without_effects ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-approval-wrong-role-denies-then-recovers-legitimately",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--",
+        "--ignored",
+        "--exact",
+        "approval_route_wrong_role_denies_without_approval_or_service_effects"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "approval_route_wrong_role_denies_without_approval_or_service_effects ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-consumes-with-captured-agreement-still-passes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--",
+        "--ignored",
+        "--exact",
+        "git_call_http_consumes_with_captured_agreement"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "git_call_http_consumes_with_captured_agreement ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-agreement-void-after-revision-change-still-passes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--",
+        "--ignored",
+        "--exact",
+        "git_call_http_agreement_void_after_revision_change"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "git_call_http_agreement_void_after_revision_change ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-preview-bound-action-still-passes",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--",
+        "--ignored",
+        "--exact",
+        "preview_route_presents_exact_bound_action_with_current_state"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "preview_route_presents_exact_bound_action_with_current_state ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-status-siblings-serve-no-classified-digest",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--",
+        "--exact",
+        "--nocapture",
+        "status_siblings_serve_no_classified_digest_to_bare_session"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "status_siblings_serve_no_classified_digest_to_bare_session ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-status-does-not-discriminate-two-prepared-intentions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--",
+        "--exact",
+        "--ignored",
+        "--nocapture",
+        "status_does_not_discriminate_two_prepared_intentions"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "status_does_not_discriminate_two_prepared_intentions ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

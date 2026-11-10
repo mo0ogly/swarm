@@ -1,0 +1,16 @@
+{
+  "cause": "Unrequested Python product-adjacent extension based on misinterpreting no-compilation as no-Rust-writing",
+  "decision": "Withdraw maintained Python comparator; preserve tests and source as history; implement Rust in existing contract crate without compilation",
+  "user_correction": [
+    "pourquoi python ?",
+    "oui cest quoi cette histoire de python???"
+  ],
+  "original_proofs": [
+    "recipe",
+    "recipe-02",
+    "recipe-03"
+  ],
+  "documentation_error": "Assumed docs/en/plans/FILE-APEX.md absent; actual docs/en/APEX-QUEUE.md; no EN queue edit applied",
+  "owner": "Codex root",
+  "qualification": "Rust must remain uncompiled and unqualified until compilation authorized"
+}

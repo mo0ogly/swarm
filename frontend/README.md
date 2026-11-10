@@ -12,7 +12,7 @@ npm run build
 ```
 
 Le build remplace uniquement `../web/lib/monaco/`. Il produit des modules ESM,
-CSS, polices, workers et licences locaux. Le binaire Go les embarque au build ;
+CSS, polices, workers et licences locaux. L’ancienne interface Go les embarquait au build ; le serveur Rust ne sert que son inventaire de ressources explicitement raccordées. Le parcours éditeur complet reste à porter ;
 aucun npm ni accès Internet n’est nécessaire sur le poste qui utilise la page.
 `bundle-meta.json` conserve l’inventaire. Le bundle généré est du code tiers :
 il n’est pas présenté comme conforme au scanner de couleurs du code applicatif.

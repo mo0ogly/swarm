@@ -1,0 +1,19 @@
+{
+  "rust/crates/swarm-engine/src/preparation_command.rs": "57562c212a7b61b3be61c5f9b2b9168ade5f8d656a4bc1199b64668a30d13bf1",
+  "rust/crates/swarm-engine/src/root_store/preparation_plan.rs": "59134459df5aacbd755198355833b0a84a798202b6da6acabf0323c89260a9e4",
+  "rust/crates/swarm-engine/src/root_store/preparation_write.rs": "ed26844e28b2f52d9c7ec26df4ddd7e8f0d63091f42d9159a1e613fcdd9ef1f5",
+  "rust/crates/swarm-cli/src/preparation.rs": "efc2074c8faf59b1e31bce099b19276a032ad0fdaadc13e7a31fd3467c92e1ac",
+  "rust/crates/swarm-cli/src/lib.rs": "bb7806fc20a5e79620b7d31bc839a4cc309a04a6b1cc6caf2709249bd23a4cb1",
+  "rust/crates/swarm-web/src/service.rs": "d712d2881644eb273246f1a1e94d9041358b9c9adbfdbf62f95cba88004b6722",
+  "tests/rust_preparation_answers.py": "c871009fe73ee8f57a504327f075edcded145593a69396648e1c8abb3003706d",
+  "tools/verification/recipes/preparation-answers-rust.json": "a9426ad0372ebaf8a75e00021081073fb878d72ce929872b586c895e9aab535c",
+  "version_history.json": "7c6dafc35ee7484d11b564aec53b0966c7ab0da2980c8fcae735bc2d546a0bb4",
+  "docs/RUNTIME-RECOVERY.md": "62443070b37745aa523b28175351e150000b4cc2976d737334c6bd6a20d2001e",
+  "docs/en/RUNTIME-RECOVERY.md": "dbd2ed86d5dfaa9f6da478fc517b85e6142e13b35790b7900b6ae7fbcb3acff5",
+  "docs/architecture/RUST-MIGRATION.md": "f94a1664a424b88123bb9133b4d46425bda092900e64cf9eda824281a11a41e5",
+  "docs/en/RUST-MIGRATION.md": "c936ef56dce143c24e17cc29098a1d7ae64528b5685ecc5f71826f2f5981ca30",
+  "docs/plans/migration-rust/REPLAYS.md": "71ba6b44d0beaaf21379ae694002565d3c820b96376e07146cf5a0fef25f868a",
+  "docs/en/RUST-MIGRATION-REPLAYS.md": "cad34ab2a6f4e245f5d62ee329f2457f4ef5fbced1c591b0f3aa378ca0d40110",
+  "docs/plans/migration-rust/PLAN.md": "7b9147322af119ad43c43b9dec039a4f2403714a1b4c46170c080db29efa74b4",
+  "docs/plans/migration-rust/PREPARATION-ANSWERS-20261026.md": "6624bc829138c9819efe8a770829384d8464ba69726472f9eb463dc10039e480"
+}

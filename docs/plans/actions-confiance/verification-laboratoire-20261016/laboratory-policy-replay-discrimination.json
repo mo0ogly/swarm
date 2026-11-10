@@ -1,0 +1,22 @@
+{
+  "semantic_reply_equal": true,
+  "state_bytes_unchanged": true,
+  "first": {
+    "applied": true,
+    "policy": {
+      "enabled": true,
+      "timeout_seconds": 17,
+      "max_concurrent_runs": 2
+    },
+    "revision": 2
+  },
+  "replay": {
+    "applied": true,
+    "policy": {
+      "enabled": true,
+      "max_concurrent_runs": 2,
+      "timeout_seconds": 17
+    },
+    "revision": 2
+  }
+}

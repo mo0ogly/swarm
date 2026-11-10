@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T09:39:27.003699+00:00",
+  "patch": "docs/plans/engine-cursor-contract/recovery/unpaid-preflight-revision-20261011.patch",
+  "sha256": "f754c1bcc3d4c619b7b9a63edf936c6f14934a4a23a94d58fe16b78c944d0333",
+  "bytes": 4667,
+  "parent_patch": {
+    "path": "docs/plans/engine-cursor-contract/recovery/run-supervision-20261011.patch",
+    "sha256": "576d9fd0d3826415ec2698bb6a124e2fc40ac3179649a45385094574311a63b2"
+  },
+  "files": [
+    "internal/engine/recovered_result.go",
+    "internal/engine/recovered_result_unpaid_test.go"
+  ],
+  "effect": "Explicit revise-recovered-result for verified retained no-call preflight on a confirmed stopped interrupted/failed externally repaired attempt; immutable checkpoint/receipt/attribution guards preserved; fresh checks/review; no duplicate replay call.",
+  "checks": {
+    "targeted": "PASS 36.669s",
+    "race": "PASS 93.513s; altered checkpoint and receipt rejected",
+    "full_suite": "PASS 1120 targets, 19 disjoint processes exit 0",
+    "vet": "PASS exit 0",
+    "patch_reverse": "PASS"
+  },
+  "source_partition": "T2 candidate supplies complete SHA-verified source-input parts and loader/harness. Preserve T2 and regenerate its manifest after integration.",
+  "limits": "Root correction only; native independent acceptance still pending; no extra attempts, calls or context limit."
+}

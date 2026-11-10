@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "verified_at_utc": "2026-10-23T15:27:31.805517+00:00",
+  "editorial_date": "2026-10-23 Europe/Paris",
+  "result": "PASS — completed explanatory video, not an application demo",
+  "media": {
+    "duration_seconds": 120.0,
+    "frames": 3600,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "codec": "h264",
+    "pixel_format": "yuv420p",
+    "audio": false,
+    "captions": "French, burned in; 24 reusable SRT cues",
+    "complete_decode": "PASS",
+    "bytes": 3005756,
+    "sha256": "1355a1a627c756ec13c2b7e38a0d6ec5556d36abddfaf592afc079ddd46ae0ba",
+    "file": "/home/fpizzi/Documents/ChatGPT/swarm/docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4",
+    "commands": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/video-render-01/commands.json"
+  },
+  "checks": {
+    "rendered_chapters": 8,
+    "rendered_frame_states": 24,
+    "decoded_frames": 3600,
+    "decoded_chapter_samples_visually_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "srt_cues": 24,
+    "srt_texts_match_scenes": true,
+    "local_links": 40,
+    "complete_decode": "PASS",
+    "codec": "h264/yuv420p",
+    "no_audio": true
+  },
+  "recovery": {
+    "expected": "A video file corresponding to the prior video discussion",
+    "observed": "Only article, Word and storyboard existed when the user asked where the video was.",
+    "cause": "Editorial preparation had been used as the response to the media objective.",
+    "options": [
+      "Stop at the existing document, which does not provide a video.",
+      "Render a captioned explanatory MP4 using the already researched supervision, identity and memory material."
+    ],
+    "chosen": "Create and verify the actual MP4; clearly disclose that it is silent explanatory animation, not a software recording.",
+    "owner": "Root Codex",
+    "verified_effect": "120-second MP4 exists, complete 3600-frame decode passes, eight decoded chapter images inspected.",
+    "remaining": "No live application capture or audio narration; those are distinct deliverables, not implied by this version."
+  },
+  "review": {
+    "policies": "No Swarm operator policy, rights, budgets, retention or runtime settings changed. Scene durations, codec settings and two encoder threads are editorial/media resource choices only.",
+    "functions": "No Swarm function modified. Temporary render/encode helpers document purpose and boundaries; persistent inputs are documentary JSON/Mermaid.",
+    "errors": "Media steps retain exact argv/stdout/stderr and stop on errors. Candidate is published after stream, duration, frame-count and full-decode checks. No failed runtime result is reclassified.",
+    "documentation": "Editorial index, storyboard and video README updated together. French media; no shared product contract or English product page changed.",
+    "build": "No Rust/Go build, application test, deployment, live-state access, provider, commit or publication.",
+    "acceptance": "Same-session media QA; not independent product acceptance. Existing supervision fixture results remain historical with original scope."
+  },
+  "files": [
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md",
+      "sha256": "ec0f3fda046a808aab0143b84720277f78cc5db1f6e432a3487e2fde19d7b8b6",
+      "bytes": 5295
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/storyboard-video-fr.md",
+      "sha256": "9c138def40c372df7801d0bdfb4de69c46e86ac9252c379c6a4f8286e89f8c6f",
+      "bytes": 6241
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md",
+      "sha256": "e80a3492eba814941ca381ec479bcf3489213f0ee1be3aad8170bde9695cd439",
+      "bytes": 5089
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/scenes.json",
+      "sha256": "dd1dc929beae08799335bb10e9f80a3b5e6cae2724819f80f7be5dbc1de073af",
+      "bytes": 7297
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4",
+      "sha256": "1355a1a627c756ec13c2b7e38a0d6ec5556d36abddfaf592afc079ddd46ae0ba",
+      "bytes": 3005756
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.srt",
+      "sha256": "9bae9818d5004585e7dfcc956c63a18a973601870fe9b1c128fb60346c03162d",
+      "bytes": 3276
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/conduite.mmd",
+      "sha256": "a59b68dd514d573e81b4166f80c246ff526593b6480f34db24f056a408406050",
+      "bytes": 642
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/identite.mmd",
+      "sha256": "48f3e91543f1fbf7346ab6941f8fd2279bc7c2b1ced02082cb85c846cab662eb",
+      "bytes": 644
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/memoire.mmd",
+      "sha256": "0aff32698592f82abdba8fa24af824769a5d94fdcd16a36e62ba14734d78e498",
+      "bytes": 615
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/supervision.mmd",
+      "sha256": "d9c6849c6778252f36b6974e77efe9c485435b6b398e06d53e2b5306b5b86815",
+      "bytes": 706
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/conduite.svg",
+      "sha256": "f3c2fcb346c8db1ba0aa295575c26907c027c07965efb91f17509773d1616779",
+      "bytes": 11904
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/identite.svg",
+      "sha256": "faaf80ba276db2df30588a6f49443a63230b8da0feb8a5c46d681465a61aeec4",
+      "bytes": 10463
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/memoire.svg",
+      "sha256": "8bea118acdf43222a516a60e89f6ca5f78abd02be4b7df546ec2fd1a5284a2d3",
+      "bytes": 11862
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/video/supervision.svg",
+      "sha256": "b020223908280b73dc222fe42eaf1149fe7e66f72cb7c348f457342c698350c1",
+      "bytes": 12386
+    }
+  ]
+}

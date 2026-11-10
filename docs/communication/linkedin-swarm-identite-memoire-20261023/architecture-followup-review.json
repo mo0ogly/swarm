@@ -1,0 +1,405 @@
+{
+  "date": "2026-10-23",
+  "objective": "Complete the architecture documentation requested alongside the bilingual README refresh.",
+  "parent_review": {
+    "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/readme-refresh-review.json",
+    "sha256": "6d438f605541a19540a5d0529282526dcba97981f22509e6fb969c2cd12c9d15",
+    "bytes": 20014
+  },
+  "replan": {
+    "observed": "Previous delivery revised README architecture presentation, but provided no linked consolidated technical architecture overview.",
+    "owner": "Root Codex, documentation only.",
+    "options": [
+      "Expand every detailed contract, risking concurrent migration work and duplicated status.",
+      "Add a bilingual technical overview anchored to actual crate manifests and existing specialized contracts, with entry links."
+    ],
+    "decision": "Second option: preserve specialized contracts, historical proofs and runtime work; keep product targets explicit.",
+    "verified_outcome": "FR/EN overview pages are saved and linked from both README files and the product architecture decision; local links and diagrams checked."
+  },
+  "head_at_review": "553593a2ffa3823d16784a6fedc291eebf390837",
+  "files": [
+    {
+      "path": "docs/architecture/OVERVIEW.md",
+      "sha256": "41a64dc8fc116ce32620f6ece74f34e13dd589fededd39b482071d40584eab38",
+      "bytes": 11514
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "sha256": "2d247236444bba243d2a52f62231d4797a8cc6343449c11f820a11fe4e367176",
+      "bytes": 10440
+    },
+    {
+      "path": "README.md",
+      "sha256": "9ecf771546098b156d6b45677e63e8568b77d397e451d128aa95601029ee5a35",
+      "bytes": 17884
+    },
+    {
+      "path": "README.en.md",
+      "sha256": "3896daa67df651735bbd77eb8a66dd9889daf5ec31f951df2feeb5beabe83699",
+      "bytes": 16565
+    },
+    {
+      "path": "docs/PRODUCT-ARCHITECTURE.md",
+      "sha256": "f4ec4877422af5279c2a2774651f11a46311f8a6ab61d49f7ee6f6047b635539",
+      "bytes": 8303
+    },
+    {
+      "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md",
+      "sha256": "82cf96c594de284bdb9672a23ebe8bad5927aa7b1a91a356548078dd0fbdc27c",
+      "bytes": 5820
+    }
+  ],
+  "before": {
+    "README.md": {
+      "sha256": "bdffd08875568a92b158f2e0abe17c588ac22626ad073b992566a280e75fdf0d",
+      "bytes": 17813
+    },
+    "README.en.md": {
+      "sha256": "48237bc9d0e898468e73c28b916a5a8abb7556a2fbc3b7ef2ba8349013f05389",
+      "bytes": 16503
+    },
+    "docs/PRODUCT-ARCHITECTURE.md": {
+      "sha256": "e3d946e78513bfd500d6dcf6e1fb153369efd1e0ecf7bb62e45408c5548bfe5d",
+      "bytes": 7930
+    },
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md": {
+      "sha256": "d9019379b4d1a8e43bfa490164f3688008e025e71a0d25f2f1b48144e0692924",
+      "bytes": 5625
+    }
+  },
+  "owned_patch": {
+    "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/architecture-followup.patch",
+    "sha256": "81f0920d806bcc11a91ab1998fc581b43d8adcc4e2d7ea21a29b394262464ba6",
+    "bytes": 25449
+  },
+  "source_basis": [
+    {
+      "path": "rust/Cargo.toml",
+      "sha256": "ebdb31e8f7adc847d07cc09d6ad8c906d763aec6aea917c216df2838ae43c7e4",
+      "bytes": 335
+    },
+    {
+      "path": "rust/crates/swarm-identity-contract/Cargo.toml",
+      "sha256": "8269ae598365ca6d84d8edc228bba40ad49899b173cbdfc068874f59c6e3e5bd",
+      "bytes": 244
+    },
+    {
+      "path": "rust/crates/swarm-identity-contract/src/lib.rs",
+      "sha256": "e1257094aac54c52738dcfd1c0471139c196d5571de2662aaa32a751e4c0a1af",
+      "bytes": 3354
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-proof/Cargo.toml",
+      "sha256": "c767a1ac026a40d3dfb513a03171a05c8e33ba8b4588cc57d8c488a702e9c487",
+      "bytes": 648
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-proof/src/lib.rs",
+      "sha256": "6fb9f8e136506e8da717d56bc1b644588f6ec87dd6731680a7b27cb2d21d3d7b",
+      "bytes": 9728
+    },
+    {
+      "path": "rust/crates/swarm-wire-json/Cargo.toml",
+      "sha256": "a66ddac998b0a1d7d8a57bf7a58e62896bd6603c563231669daabd18e0cc6a32",
+      "bytes": 399
+    },
+    {
+      "path": "rust/crates/swarm-wire-json/src/lib.rs",
+      "sha256": "c65788600c8e00e2bd51f5d0bc55c89b1765ec647419919837cb6f946d5e812d",
+      "bytes": 6025
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-state/Cargo.toml",
+      "sha256": "84716492466e3e8dc3d0aaeca41abe3d2882ec6ab65aa6268be6c30fa8a2d2a3",
+      "bytes": 579
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-state/src/lib.rs",
+      "sha256": "a88ebeeacf9f1444e9ce38b416820dc8e90613cdd6b3aef5178cf0f7457f5ffd",
+      "bytes": 19267
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-authority/Cargo.toml",
+      "sha256": "9a9fd87ffd450b5acfd4e225ed6764f266056e95e4912b619fbaf6de67ba5aa1",
+      "bytes": 801
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-authority/src/lib.rs",
+      "sha256": "6fd4291dc21c7b91a84dca07afaffa22d9abe000ca6787c2c3fc579f9f0fb76a",
+      "bytes": 7275
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-config/Cargo.toml",
+      "sha256": "ad2a4649bb366680b0ab0a21bb3be311491849c7373cab3eb638f2a675c9aa20",
+      "bytes": 889
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-config/src/lib.rs",
+      "sha256": "c3e8d23f668a09b0a939fe43e452ef7d9ad522849a14d16ef110699d5621e642",
+      "bytes": 14579
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-bootstrap/Cargo.toml",
+      "sha256": "d75ed1d318d24f92c053dad9dca658a24715929cdca88b9e6b2e30ffd8e82c2c",
+      "bytes": 709
+    },
+    {
+      "path": "rust/crates/swarm-enrollment-bootstrap/src/lib.rs",
+      "sha256": "c8603de6c88ed862e19b16cfe49369bb2651946e70105696e1ad0942be1a0c7f",
+      "bytes": 4653
+    },
+    {
+      "path": "rust/crates/swarm-cli/Cargo.toml",
+      "sha256": "f71c724ee8ec9a4286c34634d387238674cc1c83c618fb5861fe35691be88558",
+      "bytes": 911
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/lib.rs",
+      "sha256": "fa29e7e661ce6aebab6e4872ea992d7ab422191e65ff8501f1ed024d55addb61",
+      "bytes": 88851
+    },
+    {
+      "path": "rust/crates/swarm-engine/Cargo.toml",
+      "sha256": "f811a85422deedaf9168457c20dd9eba65734c20261a0f2a97ce67836b88d583",
+      "bytes": 4343
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/lib.rs",
+      "sha256": "c50ff9f25e9acec81be37b17910f4f7b070641d921555046d8a11f1265e9c064",
+      "bytes": 24012
+    },
+    {
+      "path": "rust/crates/swarm-web/Cargo.toml",
+      "sha256": "16d5d0daaf189048e71bc42d67de263b12bd4588f002158094bff94a9f224377",
+      "bytes": 1050
+    },
+    {
+      "path": "rust/crates/swarm-web/src/lib.rs",
+      "sha256": "fcb29b30b20fc43b1ea3421b67574e6b400e0618045027c6ae72d283cf1670e5",
+      "bytes": 746
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store.rs",
+      "sha256": "b4923f65f5eb05cccc11e4d6247551e8ac90450f3ca36c8137d23b644aa238a7",
+      "bytes": 151108
+    },
+    {
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "sha256": "61946176c05856b2488a8a2d998bbb39f0c7d7a8e0c0e242a3419091233c0db5",
+      "bytes": 561018
+    },
+    {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "sha256": "fd65dcd2cb2afcbb59dac935fa232e57a3c84f033fb85181a82bede6740e94ae",
+      "bytes": 53028
+    },
+    {
+      "path": "docs/architecture/RUN-SUPERVISION.md",
+      "sha256": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e",
+      "bytes": 19670
+    },
+    {
+      "path": "docs/architecture/NATIVE-MISSION-WORKER.md",
+      "sha256": "5e7563e354b8444dd9d948a84e88cbe1ddeef6a107b6bb179c17341743066805",
+      "bytes": 72256
+    },
+    {
+      "path": "docs/architecture/NATIVE-MISSION-CYCLE.md",
+      "sha256": "ff92651f27baa32474cca68f2bb4c838a099c42288ff49c8268034b70003aef8",
+      "bytes": 7173
+    },
+    {
+      "path": "docs/architecture/NATIVE-REVIEWER.md",
+      "sha256": "f51b28ed49bfc51bef26d1bdceab66be999b626fda305f30ca346d69bd3ce5de",
+      "bytes": 51124
+    },
+    {
+      "path": "docs/architecture/NATIVE-GLOBAL-JUDGE.md",
+      "sha256": "6a90926bdc8f3531ebbb9daa8cab4e691e5c0f7c6f390bc7bcd3a8a3141980ff",
+      "bytes": 9044
+    },
+    {
+      "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59",
+      "bytes": 99353
+    },
+    {
+      "path": "docs/PROJECT-MEMORY.md",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13",
+      "bytes": 45994
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-apex.md",
+      "sha256": "07a3b77b0fb8b72a0e51e0074fdb82121491707fc0b4efd5dcd7d7041e6bfafb",
+      "bytes": 34663
+    }
+  ],
+  "source_inspection_scope": "Crate public/module documentation, Cargo production/target dependency declarations, RootStore boundary, specialized contract scopes and active migration plan. Not a code audit or renewed runtime qualification.",
+  "checks": {
+    "workspace_crates": 10,
+    "linux_dependency_edges_verified": [
+      [
+        "swarm-cli",
+        "swarm-web"
+      ],
+      [
+        "swarm-cli",
+        "swarm-engine"
+      ],
+      [
+        "swarm-web",
+        "swarm-engine"
+      ],
+      [
+        "swarm-cli",
+        "swarm-enrollment-bootstrap"
+      ],
+      [
+        "swarm-engine",
+        "swarm-identity-contract"
+      ],
+      [
+        "swarm-engine",
+        "swarm-wire-json"
+      ],
+      [
+        "swarm-web",
+        "swarm-identity-contract"
+      ],
+      [
+        "swarm-web",
+        "swarm-wire-json"
+      ]
+    ],
+    "documents": {
+      "scope": "Local documentation links and GitHub-like rendering only; no application execution.",
+      "checks": [
+        {
+          "file": "README.md",
+          "links": 102,
+          "localLinks": 98,
+          "localLinksPass": true
+        },
+        {
+          "file": "README.en.md",
+          "links": 102,
+          "localLinks": 98,
+          "localLinksPass": true
+        },
+        {
+          "file": "docs/PRODUCT-ARCHITECTURE.md",
+          "links": 4,
+          "localLinks": 4,
+          "localLinksPass": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "links": 35,
+          "localLinks": 35,
+          "localLinksPass": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "links": 35,
+          "localLinks": 35,
+          "localLinksPass": true
+        }
+      ],
+      "previews": [
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "theme": "light",
+          "layout": "desktop",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "theme": "light",
+          "layout": "mobile",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "theme": "dark",
+          "layout": "desktop",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "theme": "dark",
+          "layout": "mobile",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "theme": "light",
+          "layout": "desktop",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "theme": "light",
+          "layout": "mobile",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "theme": "dark",
+          "layout": "desktop",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "theme": "dark",
+          "layout": "mobile",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        }
+      ],
+      "mermaid": "11.12.0"
+    },
+    "visual_samples": [
+      "fr-light-desktop-components",
+      "en-dark-desktop-sequence",
+      "fr-dark-mobile-components",
+      "en-light-mobile-top"
+    ],
+    "diagram_readability": "Bootstrap crate label breaks at a hyphen after visual inspection; final source and rendering rechecked.",
+    "whitespace": {
+      "tracked_diff_exit": 0,
+      "all_six_markdown_files": true
+    },
+    "final_inventory": "All six document hashes match; editorial index links resolve, including this review receipt; no implementation sources changed."
+  },
+  "review_axes": {
+    "policies": "No execution policy changed; preview dimensions and Mermaid colors are documentation inputs. No new numeric operator setting introduced.",
+    "functions": "No maintained function created or changed; crate responsibilities and caveats documented in both languages. Temporary rendering/check helpers are outside product sources.",
+    "errors": "No product error path changed. The overview preserves refusal, uncertain post-write effects, reconciliation and separation of process exit from acceptance.",
+    "build_inputs": "No build or application tests executed. Diagram arrows explicitly show only a subset of Linux compile dependencies, validated against actual manifests. No production/fixture parity or installation claim."
+  },
+  "maturity_contract": "Historical Go, scoped native Rust and future AC-02 remain distinct. Reviewer component availability does not prove watch integration; global judge/end remains refused under its current contract; identity and memory global integration remain open.",
+  "documentation_transmission": "New French/English pages; two README links; product-architecture historical/target scope; editorial index links this review. Existing migration and detailed contract files untouched.",
+  "version_history": "Unchanged because this is a documentation-only update, not an installed runtime delivery.",
+  "limits": [
+    "No new application execution, provider call, live mission change, restart, commit, push or publication.",
+    "Local Markdown previews approximate GitHub rendering; hosted GitHub behavior was not exercised.",
+    "No independent review or user editorial acceptance claimed.",
+    "Historical parent review remains bound to its old bytes; this receipt covers the follow-up changes.",
+    "AC-02 stays saved and not started; the update grants no authority and qualifies no global security boundary."
+  ]
+}

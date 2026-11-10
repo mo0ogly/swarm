@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "assertions": [
+    "two-task-cycle-1-settles-once-with-durable-original",
+    "two-task-paused-reopen-retains-first-completion",
+    "two-task-cycle-2-settles-once-with-durable-original",
+    "two-task-final-reopen-has-no-third-agent-or-fake-acceptance"
+  ],
+  "agent_ids": [
+    "watch-6174c7c9eb48ecbb80520c0c",
+    "watch-41e277b16427812cb1a10379"
+  ],
+  "task_ids": [
+    "task",
+    "task-2"
+  ],
+  "binary_sha256": "61f08c78bd030a813d9c10722b7505b41d5f808bcba32835eecd5d42d90c0796",
+  "accepted": false,
+  "installed": false,
+  "global_watchdog": null,
+  "paid_provider": false
+}

@@ -1,0 +1,5 @@
+--- FAIL: TestPlanningCompleteEnvelopeAdmitsWholeEventsBeforeClaim (0.05s)
+    planning_prompt_envelope_test.go:57: fitting whole-event batch failed before provider planification suspendue : Contexte supérieur à 64 Kio ; aucune troncature ni nouvel appel.
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.070s
+FAIL

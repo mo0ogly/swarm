@@ -1,0 +1,7 @@
+{
+  "compiled_files": 369,
+  "selector_sites": 168,
+  "literal_sql_sites": 40,
+  "limits": "Syntactic selectors get/list and literal SELECT FROM works only; dynamic SQL, indirect calls and caller error propagation are not fully audited",
+  "tool": "/tmp/swarm-m28-inventory-ec5hxi8_/main.go"
+}

@@ -1,0 +1,303 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_memory_s*.py",
+    "-v"
+  ],
+  "started_at": "2026-10-16T21:02:36.026036+00:00",
+  "finished_at": "2026-10-16T21:02:38.307941+00:00",
+  "exit_code": 0,
+  "named_cases": [
+    {
+      "method": "test_all_three_relations_and_source_freshness",
+      "class": "test_memory_storage_plan.StoragePlan.test_all_three_relations_and_source_freshness",
+      "result": "ok"
+    },
+    {
+      "method": "test_equal_version_never_requires_upgrade_or_grants_launch",
+      "class": "test_memory_storage_plan.StoragePlan.test_equal_version_never_requires_upgrade_or_grants_launch",
+      "result": "ok"
+    },
+    {
+      "method": "test_guard_does_not_launder_unsafe_or_wrong_actions",
+      "class": "test_memory_storage_plan.StoragePlan.test_guard_does_not_launder_unsafe_or_wrong_actions",
+      "result": "ok"
+    },
+    {
+      "method": "test_invalid_schema_and_duplicate_conditions",
+      "class": "test_memory_storage_plan.StoragePlan.test_invalid_schema_and_duplicate_conditions",
+      "result": "ok"
+    },
+    {
+      "method": "test_missing_duplicate_hash_and_measurement_refused",
+      "class": "test_memory_storage_plan.StoragePlan.test_missing_duplicate_hash_and_measurement_refused",
+      "result": "ok"
+    },
+    {
+      "method": "test_newer_storage_needs_compatible_cli_and_no_downgrade",
+      "class": "test_memory_storage_plan.StoragePlan.test_newer_storage_needs_compatible_cli_and_no_downgrade",
+      "result": "ok"
+    },
+    {
+      "method": "test_pack_requires_all_six_pairs_and_intact_snapshots",
+      "class": "test_memory_storage_plan.StoragePlan.test_pack_requires_all_six_pairs_and_intact_snapshots",
+      "result": "ok"
+    },
+    {
+      "method": "test_safe_unused_memory_is_conforming_and_unresolved",
+      "class": "test_memory_storage_plan.StoragePlan.test_safe_unused_memory_is_conforming_and_unresolved",
+      "result": "ok"
+    },
+    {
+      "method": "test_same_upgrade_is_rejected_when_asserted_immediately_without_source",
+      "class": "test_memory_storage_plan.StoragePlan.test_same_upgrade_is_rejected_when_asserted_immediately_without_source",
+      "result": "ok"
+    },
+    {
+      "method": "test_unknown_and_changed_sources_cannot_certify_a_guessed_value",
+      "class": "test_memory_storage_plan.StoragePlan.test_unknown_and_changed_sources_cannot_certify_a_guessed_value",
+      "result": "ok"
+    },
+    {
+      "method": "test_unknown_contract_accepts_guarded_upgrade_without_current_claim",
+      "class": "test_memory_storage_plan.StoragePlan.test_unknown_contract_accepts_guarded_upgrade_without_current_claim",
+      "result": "ok"
+    },
+    {
+      "method": "test_wrong_source_and_version_are_not_knowledge",
+      "class": "test_memory_storage_plan.StoragePlan.test_wrong_source_and_version_are_not_knowledge",
+      "result": "ok"
+    },
+    {
+      "method": "test_changed_old_source_refuses_progression_even_with_new_candidate_hash",
+      "class": "test_memory_summarization.SummaryReference.test_changed_old_source_refuses_progression_even_with_new_candidate_hash",
+      "result": "ok"
+    },
+    {
+      "method": "test_changed_or_invented_quote_is_refused",
+      "class": "test_memory_summarization.SummaryReference.test_changed_or_invented_quote_is_refused",
+      "result": "ok"
+    },
+    {
+      "method": "test_cli_existing_output_and_invalid_history_are_explicit_errors",
+      "class": "test_memory_summarization.SummaryReference.test_cli_existing_output_and_invalid_history_are_explicit_errors",
+      "result": "ok"
+    },
+    {
+      "method": "test_cli_invalid_json_duplicate_fields_and_nonfinite_values_fall_back",
+      "class": "test_memory_summarization.SummaryReference.test_cli_invalid_json_duplicate_fields_and_nonfinite_values_fall_back",
+      "result": "ok"
+    },
+    {
+      "method": "test_contradictory_intention_evidence_and_incident_states_are_refused",
+      "class": "test_memory_summarization.SummaryReference.test_contradictory_intention_evidence_and_incident_states_are_refused",
+      "result": "ok"
+    },
+    {
+      "method": "test_duplicate_or_added_claim_is_refused",
+      "class": "test_memory_summarization.SummaryReference.test_duplicate_or_added_claim_is_refused",
+      "result": "ok"
+    },
+    {
+      "method": "test_empty_candidate_cannot_erase_history",
+      "class": "test_memory_summarization.SummaryReference.test_empty_candidate_cannot_erase_history",
+      "result": "ok"
+    },
+    {
+      "method": "test_empty_tool_messages_are_valid_source_records",
+      "class": "test_memory_summarization.SummaryReference.test_empty_tool_messages_are_valid_source_records",
+      "result": "ok"
+    },
+    {
+      "method": "test_invalid_boundaries_never_drop_recent_messages",
+      "class": "test_memory_summarization.SummaryReference.test_invalid_boundaries_never_drop_recent_messages",
+      "result": "ok"
+    },
+    {
+      "method": "test_invalid_candidate_schema_is_not_empty_success",
+      "class": "test_memory_summarization.SummaryReference.test_invalid_candidate_schema_is_not_empty_success",
+      "result": "ok"
+    },
+    {
+      "method": "test_invalid_source_schema_or_tool_sequence_is_an_error",
+      "class": "test_memory_summarization.SummaryReference.test_invalid_source_schema_or_tool_sequence_is_an_error",
+      "result": "ok"
+    },
+    {
+      "method": "test_missing_open_incident_cannot_be_accepted",
+      "class": "test_memory_summarization.SummaryReference.test_missing_open_incident_cannot_be_accepted",
+      "result": "ok"
+    },
+    {
+      "method": "test_model_failure_preserves_all_original_messages",
+      "class": "test_memory_summarization.SummaryReference.test_model_failure_preserves_all_original_messages",
+      "result": "ok"
+    },
+    {
+      "method": "test_non_progressive_boundary_is_refused",
+      "class": "test_memory_summarization.SummaryReference.test_non_progressive_boundary_is_refused",
+      "result": "ok"
+    },
+    {
+      "method": "test_parallel_tool_results_remain_one_complete_group",
+      "class": "test_memory_summarization.SummaryReference.test_parallel_tool_results_remain_one_complete_group",
+      "result": "ok"
+    },
+    {
+      "method": "test_progressive_summary_preserves_old_and_new_protections",
+      "class": "test_memory_summarization.SummaryReference.test_progressive_summary_preserves_old_and_new_protections",
+      "result": "ok"
+    },
+    {
+      "method": "test_real_cli_progression_and_contradiction_preserve_source_files",
+      "class": "test_memory_summarization.SummaryReference.test_real_cli_progression_and_contradiction_preserve_source_files",
+      "result": "ok"
+    },
+    {
+      "method": "test_reference_preserves_types_quotes_recent_messages_and_sources",
+      "class": "test_memory_summarization.SummaryReference.test_reference_preserves_types_quotes_recent_messages_and_sources",
+      "result": "ok"
+    },
+    {
+      "method": "test_returned_projection_does_not_alias_originals",
+      "class": "test_memory_summarization.SummaryReference.test_returned_projection_does_not_alias_originals",
+      "result": "ok"
+    },
+    {
+      "method": "test_scope_change_refuses_parent_reuse",
+      "class": "test_memory_summarization.SummaryReference.test_scope_change_refuses_parent_reuse",
+      "result": "ok"
+    },
+    {
+      "method": "test_stale_source_hash_is_refused",
+      "class": "test_memory_summarization.SummaryReference.test_stale_source_hash_is_refused",
+      "result": "ok"
+    },
+    {
+      "method": "test_tampered_parent_and_fallback_parent_are_refused",
+      "class": "test_memory_summarization.SummaryReference.test_tampered_parent_and_fallback_parent_are_refused",
+      "result": "ok"
+    },
+    {
+      "method": "test_tool_call_and_result_cannot_be_split",
+      "class": "test_memory_summarization.SummaryReference.test_tool_call_and_result_cannot_be_split",
+      "result": "ok"
+    },
+    {
+      "method": "test_wrong_parent_is_refused",
+      "class": "test_memory_summarization.SummaryReference.test_wrong_parent_is_refused",
+      "result": "ok"
+    },
+    {
+      "method": "test_cli_invalid_json_is_an_explicit_error_without_output",
+      "class": "test_memory_summary_admission.SummaryAdmission.test_cli_invalid_json_is_an_explicit_error_without_output",
+      "result": "ok"
+    },
+    {
+      "method": "test_cli_preserves_inputs_private_output_and_refuses_replacement",
+      "class": "test_memory_summary_admission.SummaryAdmission.test_cli_preserves_inputs_private_output_and_refuses_replacement",
+      "result": "ok"
+    },
+    {
+      "method": "test_cli_refuses_relabelled_source_without_output_or_input_changes",
+      "class": "test_memory_summary_admission.SummaryAdmission.test_cli_refuses_relabelled_source_without_output_or_input_changes",
+      "result": "ok"
+    },
+    {
+      "method": "test_prepares_declarative_selection_without_operator_text_or_authority",
+      "class": "test_memory_summary_admission.SummaryAdmission.test_prepares_declarative_selection_without_operator_text_or_authority",
+      "result": "ok"
+    },
+    {
+      "method": "test_rejects_changed_unrelated_or_fallback_receipt",
+      "class": "test_memory_summary_admission.SummaryAdmission.test_rejects_changed_unrelated_or_fallback_receipt",
+      "result": "ok"
+    },
+    {
+      "method": "test_requires_reason_and_a_protected_dialogue_in_prefix",
+      "class": "test_memory_summary_admission.SummaryAdmission.test_requires_reason_and_a_protected_dialogue_in_prefix",
+      "result": "ok"
+    },
+    {
+      "method": "test_selection_refuses_relabelled_source_even_with_matching_reference",
+      "class": "test_memory_summary_admission.SummaryAdmission.test_selection_refuses_relabelled_source_even_with_matching_reference",
+      "result": "ok"
+    },
+    {
+      "method": "test_cli_refuses_relabelled_source_without_creating_output",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_cli_refuses_relabelled_source_without_creating_output",
+      "result": "ok"
+    },
+    {
+      "method": "test_cli_writes_new_private_bundle_and_preserves_sources",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_cli_writes_new_private_bundle_and_preserves_sources",
+      "result": "ok"
+    },
+    {
+      "method": "test_dialogue_reference_object_order_is_not_source_identity",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_dialogue_reference_object_order_is_not_source_identity",
+      "result": "ok"
+    },
+    {
+      "method": "test_does_not_mutate_inputs",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_does_not_mutate_inputs",
+      "result": "ok"
+    },
+    {
+      "method": "test_legacy_empty_attempt_preserves_content_binding_without_authority",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_legacy_empty_attempt_preserves_content_binding_without_authority",
+      "result": "ok"
+    },
+    {
+      "method": "test_new_current_task_snapshot_invalidates_previous_reference",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_new_current_task_snapshot_invalidates_previous_reference",
+      "result": "ok"
+    },
+    {
+      "method": "test_preserves_exact_quotes_scope_and_provenance_for_reference",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_preserves_exact_quotes_scope_and_provenance_for_reference",
+      "result": "ok"
+    },
+    {
+      "method": "test_refuses_wrong_scope_roles_duplicates_and_completeness",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_refuses_wrong_scope_roles_duplicates_and_completeness",
+      "result": "ok"
+    },
+    {
+      "method": "test_rejects_changed_dialogue_pair_even_after_text_rehash",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_rejects_changed_dialogue_pair_even_after_text_rehash",
+      "result": "ok"
+    },
+    {
+      "method": "test_rejects_duplicate_dialogue_under_distinct_message_ids",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_rejects_duplicate_dialogue_under_distinct_message_ids",
+      "result": "ok"
+    },
+    {
+      "method": "test_rejects_payload_and_text_tampering",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_rejects_payload_and_text_tampering",
+      "result": "ok"
+    },
+    {
+      "method": "test_rejects_relabelled_sources_after_all_hashes_and_annotations_change",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_rejects_relabelled_sources_after_all_hashes_and_annotations_change",
+      "result": "ok"
+    },
+    {
+      "method": "test_requires_annotations_bound_to_packet_and_current_task",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_requires_annotations_bound_to_packet_and_current_task",
+      "result": "ok"
+    },
+    {
+      "method": "test_source_ids_match_retained_go_json_vectors",
+      "class": "test_memory_swarm_source.SwarmSummarySource.test_source_ids_match_retained_go_json_vectors",
+      "result": "ok"
+    }
+  ]
+}

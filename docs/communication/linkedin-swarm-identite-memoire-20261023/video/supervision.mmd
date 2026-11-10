@@ -1,0 +1,10 @@
+%%{init:{"theme":"base","fontFamily":"Arial, sans-serif","themeVariables":{"fontFamily":"Arial, sans-serif","fontSize":"28px","lineColor":"#526976","edgeLabelBackground":"#f5f3ec"},"flowchart":{"htmlLabels":true,"wrappingWidth":300,"nodeSpacing":32,"rankSpacing":65}}}%%
+flowchart LR
+  R["Superviseur racine<br/>Objectif global"] --> S["Sous-superviseur<br/>Périmètre confié"]
+  S --> W["Exécutant<br/>Travail et preuves"]
+  W -. "Observations attribuées" .-> S
+  S -. "Remise et arbitrage" .-> R
+  classDef controle fill:#dbeafe,color:#173d66,stroke:#1b5f7a,stroke-width:3px;
+  classDef execution fill:#ccfbf1,color:#134e4a,stroke:#0f766e,stroke-width:3px;
+  class R,S controle;
+  class W execution;

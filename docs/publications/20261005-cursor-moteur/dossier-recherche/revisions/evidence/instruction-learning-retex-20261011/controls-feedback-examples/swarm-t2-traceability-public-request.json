@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-traceability-account-restored-2e1ad4e5c7fd4780b4badc763b5b808c",
+  "expected_revision": 498,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "review_id": "review-14a105dc677c088e4121afb7",
+  "result_tree": "f7382a0f0ab3f311a0fb779eb9c3711d33f608e2",
+  "reason": "Réparation externe de la copie attribuée arrêtée, liée à l'erreur courante et aux constats PARTIELS conservés : nouveau reçu local daté avec argv complet, stdout original/SHA et distinction paquet7.274s/mur17.491583s/contrôle natif11.434s ;9citations date/source vérifiées intégralement,5contre-exemples et préimages conservés. Code Go517sources inchangé, contrôle documentaire et Git diff--check passent. Les originaux complets sont déclarés dans le contexte, aucune ancienne preuve, dépense ou tentative modifiée. L'utilisateur confirme Claude rétabli et autorise la reprise ; attente levée par l'opération publique auditée, disponibilité réelle et acceptation non présumées. Demander contrôles frais et revue indépendante complète du nouvel arbre."
+}

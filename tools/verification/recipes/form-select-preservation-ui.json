@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "form-select-preservation-ui",
+  "inputs": [
+    "web/cockpit.js",
+    "web/providers.js",
+    "web/i18n-en.js",
+    "web/i18n.js",
+    "locales/en.json",
+    "tests/form_select_preservation_ui.cjs",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/NATIVE-PROVIDER-ADMIN.md",
+    "docs/en/NATIVE-PROVIDER-ADMIN.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "historical-source-fr-en-themes-keyboard-and-saved-values",
+      "expected_exit": 0,
+      "required_stdout": [
+        "FORM_SELECT_PRESERVATION_PASS 48"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import subprocess,json,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='form-select-ui-',dir='.cache')).resolve()/'browser'\nsubprocess.run(['node','tests/form_select_preservation_ui.cjs'],input=json.dumps({'output':str(p)}).encode(),check=True)\nr=json.loads((p/'result.json').read_bytes());assert len(r['checks'])==48 and r['mode']=='source-component' and not r['full_cockpit']"
+      ]
+    }
+  ]
+}

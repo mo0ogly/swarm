@@ -186,7 +186,7 @@ time.sleep(2)
 function escapeRegExp(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
 
 (async()=>{
- const browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox'],userDataDir:fs.mkdtempSync(path.join(os.tmpdir(),'swarm-t7-browser-'))});
+ const browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox'],userDataDir:fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-t7-browser-'))});
  try{
   await partSummary(browser);
   await partDiagnostic(browser);

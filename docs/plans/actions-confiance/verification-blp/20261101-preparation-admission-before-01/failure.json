@@ -1,0 +1,7 @@
+{
+  "status": "EXPECTED_BASELINE_FAILURE",
+  "baseline_version": "v0.1.1-dev.304",
+  "feature": "blp-preparation-admit absent; valid fixture config and sentinel control completed",
+  "runtime_data": "isolated synthetic fixture only",
+  "live_state_changed": false
+}

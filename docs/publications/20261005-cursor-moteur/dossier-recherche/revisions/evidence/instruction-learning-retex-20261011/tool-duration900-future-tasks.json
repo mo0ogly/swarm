@@ -1,0 +1,217 @@
+{
+  "at": "2026-10-11T13:49:43.183415+00:00",
+  "authorization": "Explicit user: raise insufficient rights/budgets",
+  "allocations": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "before": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T3",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 0,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 0,
+        "actor": "",
+        "reason": "",
+        "updated": ""
+      },
+      "after": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T3",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 900,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 1,
+        "actor": "fpizzi/uid:1001",
+        "reason": "Autorisation utilisateur explicite d’augmenter les budgets nécessaires. Deux suites complètes Go récentes prennent471.958s/479.223s, au-delà du délai d’outil effectif300s et de sa directive de commande. Allouer900s à cette tâche future pour permettre go test ./... -timeout12m et sa remise, valeur de politique enregistrée visible Admin/CLI, pas constante Go ni couperet de fin. Les observations de durée restent soumises au responsable; silence, appels, répétitions et erreurs conservent leurs valeurs, contrats/consommations inchangés. Aucun processus actif ni revue courante n’est modifié.",
+        "updated": "2026-10-11T13:49:42.837496845Z"
+      },
+      "effective": {
+        "silence_seconds": 180,
+        "tool_seconds": 900,
+        "max_tool_calls": 100,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      }
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "before": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T4",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 0,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 0,
+        "actor": "",
+        "reason": "",
+        "updated": ""
+      },
+      "after": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T4",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 900,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 1,
+        "actor": "fpizzi/uid:1001",
+        "reason": "Autorisation utilisateur explicite d’augmenter les budgets nécessaires. Deux suites complètes Go récentes prennent471.958s/479.223s, au-delà du délai d’outil effectif300s et de sa directive de commande. Allouer900s à cette tâche future pour permettre go test ./... -timeout12m et sa remise, valeur de politique enregistrée visible Admin/CLI, pas constante Go ni couperet de fin. Les observations de durée restent soumises au responsable; silence, appels, répétitions et erreurs conservent leurs valeurs, contrats/consommations inchangés. Aucun processus actif ni revue courante n’est modifié.",
+        "updated": "2026-10-11T13:49:42.907714944Z"
+      },
+      "effective": {
+        "silence_seconds": 180,
+        "tool_seconds": 900,
+        "max_tool_calls": 100,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      }
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "before": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T5",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 0,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 0,
+        "actor": "",
+        "reason": "",
+        "updated": ""
+      },
+      "after": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T5",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 900,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 1,
+        "actor": "fpizzi/uid:1001",
+        "reason": "Autorisation utilisateur explicite d’augmenter les budgets nécessaires. Deux suites complètes Go récentes prennent471.958s/479.223s, au-delà du délai d’outil effectif300s et de sa directive de commande. Allouer900s à cette tâche future pour permettre go test ./... -timeout12m et sa remise, valeur de politique enregistrée visible Admin/CLI, pas constante Go ni couperet de fin. Les observations de durée restent soumises au responsable; silence, appels, répétitions et erreurs conservent leurs valeurs, contrats/consommations inchangés. Aucun processus actif ni revue courante n’est modifié.",
+        "updated": "2026-10-11T13:49:42.980396591Z"
+      },
+      "effective": {
+        "silence_seconds": 180,
+        "tool_seconds": 900,
+        "max_tool_calls": 100,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      }
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "before": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T6",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 0,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 0,
+        "actor": "",
+        "reason": "",
+        "updated": ""
+      },
+      "after": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T6",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 900,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 1,
+        "actor": "fpizzi/uid:1001",
+        "reason": "Autorisation utilisateur explicite d’augmenter les budgets nécessaires. Deux suites complètes Go récentes prennent471.958s/479.223s, au-delà du délai d’outil effectif300s et de sa directive de commande. Allouer900s à cette tâche future pour permettre go test ./... -timeout12m et sa remise, valeur de politique enregistrée visible Admin/CLI, pas constante Go ni couperet de fin. Les observations de durée restent soumises au responsable; silence, appels, répétitions et erreurs conservent leurs valeurs, contrats/consommations inchangés. Aucun processus actif ni revue courante n’est modifié.",
+        "updated": "2026-10-11T13:49:43.07755153Z"
+      },
+      "effective": {
+        "silence_seconds": 180,
+        "tool_seconds": 900,
+        "max_tool_calls": 100,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      }
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "before": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T7",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 0,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 0,
+        "actor": "",
+        "reason": "",
+        "updated": ""
+      },
+      "after": {
+        "scope": "task",
+        "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+        "scope_key": "plan-ca937edf4e-T7",
+        "values": {
+          "silence_seconds": 0,
+          "tool_seconds": 900,
+          "max_tool_calls": 0,
+          "max_repeated_calls": 0,
+          "max_consecutive_errors": 0
+        },
+        "revision": 1,
+        "actor": "fpizzi/uid:1001",
+        "reason": "Autorisation utilisateur explicite d’augmenter les budgets nécessaires. Deux suites complètes Go récentes prennent471.958s/479.223s, au-delà du délai d’outil effectif300s et de sa directive de commande. Allouer900s à cette tâche future pour permettre go test ./... -timeout12m et sa remise, valeur de politique enregistrée visible Admin/CLI, pas constante Go ni couperet de fin. Les observations de durée restent soumises au responsable; silence, appels, répétitions et erreurs conservent leurs valeurs, contrats/consommations inchangés. Aucun processus actif ni revue courante n’est modifié.",
+        "updated": "2026-10-11T13:49:43.152326226Z"
+      },
+      "effective": {
+        "silence_seconds": 180,
+        "tool_seconds": 900,
+        "max_tool_calls": 100,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      }
+    }
+  ],
+  "limit": "Future-task configurations only; current T2review/producer history untouched. Task80callcap still unchanged."
+}

@@ -1,0 +1,12 @@
+{
+  "active": true,
+  "cooldown": {
+    "provider": "claude",
+    "observed_at": "2026-10-11T19:51:22.255557233Z",
+    "resets_at": 1791750000,
+    "source": "fragment-final-cad05763af0dfb7d313a2e0d",
+    "signal": "result.api_error_status.429"
+  },
+  "digest": "e48048ff49c414b7f98b8d71135e00a2970d729e0f3310c3664e1d7799d95f8a",
+  "provider": "claude"
+}

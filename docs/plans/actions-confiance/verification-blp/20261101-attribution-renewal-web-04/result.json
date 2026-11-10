@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-attribution-renewal-web",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "compile-web-regression-with-retained-diagnostics",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "--no-run"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 4.200305092002964,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    },
+    {
+      "id": "bind-built-web-test-image",
+      "command": [
+        "/usr/bin/python3",
+        "tools/verification/bind_cargo_test_binary.py",
+        "--deps",
+        "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-verification-target/debug/deps",
+        "--target",
+        "paea_git_call",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-attribution-renewal-web-binary.json"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 0.4927409140072996,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    },
+    {
+      "id": "preview_reader_guard_enforces_produced_attribution",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea_git_call",
+        "preview_reader_guard_enforces_produced_attribution",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 101,
+      "seconds": 0.23573659799876623,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-unexpected-exit",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "84e5070f6bd9141b10ed9984a50709083cca10264c654a9e208d891bab34819f",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "3a919c24a0c587a8197f4cf9c3f95399e101b00dc81c1cfd21437b2b0d8ae37f",
+    "declared-inputs.tar.gz": "cc8f6da6429cc98bf5dd679a1e813d527ffa77c8de1253ba23a11e54dcf261e0",
+    "environment.json": "5bb3210e002c55a567147892b20d4eb8449de3a250e9a119554abecea3f95608",
+    "step-0001.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.stderr": "c16529a12dd59a808c29946512c390d3eed7d543fb54fa7bdcba0eb59ee5a638",
+    "step-0001.json": "35dc1ffa9201d122884853828f1d37155fb4599186bf92d320e580d851a54c96",
+    "step-0002.stdout": "c37b08a766abe34e55be30cd3543a6d11b632a6104340b37c299b8303287a6a4",
+    "step-0002.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0002.json": "28aca84531ae533445ddcb4caaf089843b46271b1aef14d763cf7da2a258b47c",
+    "step-0003.stdout": "352d80573bcd86b72831182de38fb6f7ef90f3fd02c03abeed6b4b254b207126",
+    "step-0003.stderr": "bb7e82c6259b5d0dd3490938a067e5760cd14b4b8248d512bbd9202141302d96",
+    "step-0003.json": "1de6595de04bc098806696c66f63cffb292222c35fe008e0fdfc3ea5fb12db20",
+    "inputs.after.json": "3a919c24a0c587a8197f4cf9c3f95399e101b00dc81c1cfd21437b2b0d8ae37f"
+  }
+}

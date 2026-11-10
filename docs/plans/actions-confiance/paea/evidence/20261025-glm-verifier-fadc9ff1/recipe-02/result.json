@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "recipe": "paea-canonical-verifier",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "canonical-export-correspondence",
+      "command": [
+        "/usr/bin/python3",
+        "tests/paea_canonical_verifier_test.py"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 12.835677285009297,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "7832cbb4d9b963787b80963f9df68547b80a2c9be8121e47fdc07f44632eff6d",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "e756366d81aa41139a0de1c972d4199cff69e9debb372d1235ec77e4421af16d",
+    "declared-inputs.tar.gz": "2596035d6544b2dc1c5ca29af5872b414ccd3bd38665d08d9c7cdd06a086970b",
+    "environment.json": "cb3a738b7d96ca75572d65422586652162f34bfacfaf4c7dc08b13c1822a17f2",
+    "step-0001.stdout": "ff71c5413846ccdc07fcb509b1abcaacbe6aed054ec8385dc125666f26b688e4",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "08c6535feb09d0e86000d74297d198db6973a556f1c43b1476266f18f603191d",
+    "inputs.after.json": "e756366d81aa41139a0de1c972d4199cff69e9debb372d1235ec77e4421af16d"
+  }
+}

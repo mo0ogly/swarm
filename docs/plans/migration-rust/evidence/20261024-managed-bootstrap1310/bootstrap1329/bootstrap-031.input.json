@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "refusal-negative-review-budget",
+  "expected_revision": 0,
+  "title": "Public planning bootstrap",
+  "objective": "Scoped fixture planning",
+  "scope": "Owned local bootstrap",
+  "criteria": [
+    "Configuration is persisted without model execution"
+  ]
+}

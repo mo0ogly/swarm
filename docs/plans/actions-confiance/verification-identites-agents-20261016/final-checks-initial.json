@@ -1,0 +1,23 @@
+{
+  "wrapper_result": "FAIL",
+  "cause": "Wrapper treated git diff --no-index --check exit 1 as whitespace failure; the three nonempty new files differ from /dev/null and emitted no diagnostics",
+  "observed": {
+    "git_diff_check": {
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "owned_no_index_checks": {
+      "exit_codes": [
+        1,
+        1,
+        1
+      ],
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "owner": "Codex",
+  "application_changed": false,
+  "resumption": "Interpret no-index comparison exit separately and check whitespace content explicitly; do not rerun Go or runtime probes"
+}

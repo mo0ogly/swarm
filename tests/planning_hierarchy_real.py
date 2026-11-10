@@ -1,7 +1,8 @@
 """Real recursive responsibility and two independent coding branches."""
 import json,pathlib,subprocess,sys,tempfile,time,uuid
+from fixture_area import fixture_area
 binary=str(pathlib.Path(sys.argv[1]).resolve());out=pathlib.Path(sys.argv[2]).resolve();out.mkdir(parents=True,exist_ok=True)
-root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-hierarchy-real-'));project=root/'project';project.mkdir()
+root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-hierarchy-real-', dir=fixture_area()));project=root/'project';project.mkdir()
 provider=json.loads(pathlib.Path(sys.argv[3]).read_text())['providers']['claude'];provider['args']=['-p','--output-format','stream-json','--verbose','--allowedTools','Read,Write,Edit,Bash(python3:*),Bash(git:*),Bash(mkdir:*)']
 def cli(args,data=None):
  p=subprocess.run([binary,'--root',str(root),'--json',*args]+(['--input','-'] if data is not None else []),input=json.dumps(data) if data is not None else None,text=True,capture_output=True,timeout=30)

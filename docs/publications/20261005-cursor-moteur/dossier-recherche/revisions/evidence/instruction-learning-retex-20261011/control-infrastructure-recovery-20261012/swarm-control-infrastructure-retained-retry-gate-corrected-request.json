@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "retained-control-runtime-gate-retry-8344e5c37549470db6d4fc9a8c3bbd3d",
+  "expected_revision": 765,
+  "scope": "root",
+  "task_id": "plan-ca937edf4e-T3",
+  "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+  "attempt_id": "a-cd4afa7836a7687fe0e466c5",
+  "result_commit": "61693d4413607770cfff22508236f3986c20bd33",
+  "expected_candidate": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "confirm_recovery": true,
+  "reason": "Replan : résultat T3 récupéré et qualifié conservé, refus de contrôle T1 à30s avant sortie. Précondition corrigée par budget Admin validation explicite révision1/180s plus récent que le refus, reçu dans chaque contrôle ; même commande et options, même base, même tentative et résultat. Reprendre contrôles cumulés puis coordination et revue indépendante, sans cinquième worker ni verdict fabriqué."
+}

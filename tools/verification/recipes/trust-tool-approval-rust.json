@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "trust-tool-approval-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*.rs",
+    "rust/crates/*/config/**/*",
+    "rust/crates/swarm-engine/tests/trust_biba.rs",
+    ".cargo/config.toml",
+    ".cargo/storage-policy.json",
+    "tools/verification/cargo_space_guard.py",
+    "tools/verification/recipe.py",
+    "tests/fixture_area.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/rust-native-version846-target"
+  },
+  "steps": [
+    {
+      "id": "tool-result-no-authority",
+      "command": [
+        "flock",
+        "--nonblock",
+        "{root}/deploy/.local-build.lock",
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "trust_biba",
+        "biba_tool_result_cannot_authorize_effect",
+        "--message-format=json-render-diagnostics",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 1 test",
+        "test result: ok. 1 passed;",
+        "PW_R1_PASS 3 cases; 21 named assertions; local Trust simulated ledger only",
+        "PW_ASSERT forged valid-control PASS",
+        "PW_ASSERT forged original-read PASS",
+        "PW_ASSERT forged data-not-authority PASS",
+        "PW_ASSERT forged effect-needs-approval PASS",
+        "PW_ASSERT forged wrong-target-approval PASS",
+        "PW_ASSERT forged approved-target-bound PASS",
+        "PW_ASSERT forged recovery-persistent-once PASS",
+        "PW_ASSERT quoted valid-control PASS",
+        "PW_ASSERT quoted original-read PASS",
+        "PW_ASSERT quoted data-not-authority PASS",
+        "PW_ASSERT quoted effect-needs-approval PASS",
+        "PW_ASSERT quoted wrong-target-approval PASS",
+        "PW_ASSERT quoted approved-target-bound PASS",
+        "PW_ASSERT quoted recovery-persistent-once PASS",
+        "PW_ASSERT claims valid-control PASS",
+        "PW_ASSERT claims original-read PASS",
+        "PW_ASSERT claims data-not-authority PASS",
+        "PW_ASSERT claims effect-needs-approval PASS",
+        "PW_ASSERT claims wrong-target-approval PASS",
+        "PW_ASSERT claims approved-target-bound PASS",
+        "PW_ASSERT claims recovery-persistent-once PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),os=require('nod
 const {spawn,spawnSync}=require('node:child_process');
 const puppeteer=require(process.env.PUPPETEER_MODULE||'puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-q6-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-q6-'));
 const run=(args,input)=>{const r=spawnSync(binary,['--root',root,...args],{encoding:'utf8',input,timeout:10000});if(r.status!==0||r.signal||r.error)throw Object.assign(r.error||Error(r.stderr),{result:r});return r.stdout};
 const json=(args,input)=>JSON.parse(run(['--json',...args,...(input!==undefined?['--input','-']:[])],input===undefined?undefined:JSON.stringify(input)));
 const id=()=>require('node:crypto').randomUUID().replaceAll('-','');

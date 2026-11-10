@@ -1,0 +1,30 @@
+{
+  "packages": {
+    "swarm.local/companion/internal/enrollmentauthority": 0
+  },
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/enrollmentauthority",
+    "-run",
+    "^TestActiveReplyRejectsAuthenticUnsupportedFormats$",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 1,
+  "start": "2026-10-17T11:56:07.353546+00:00",
+  "end": "2026-10-17T11:56:08.341758+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 14
+}

@@ -1,0 +1,80 @@
+{
+  "internal/identitycontract/contract_test.go": {
+    "before": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7",
+    "after": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/identitycontract/contract.go": {
+    "before": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+    "after": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentauthority/authority_test.go": {
+    "before": "a84c64b128b230eb4b31bee02cab765b27fccddd8b4a527efc2d3b9a4230bf93",
+    "after": "e0bee7e39fe590dbccd8c3e2b46c9080d647ac913cc9554a39dfcc1346803f4c",
+    "planned_change": true,
+    "unchanged": false
+  },
+  "internal/enrollmentauthority/authority.go": {
+    "before": "4e8db4b72bd2c333c5b54cd71e6bc987158ae320b635946719556351e5d3c019",
+    "after": "6d051fc5ad657f22097e99b198f59b2bbee39a6b630ddb1c576b3178325ca555",
+    "planned_change": true,
+    "unchanged": false
+  },
+  "internal/enrollmentstate/recovery_test.go": {
+    "before": "648eaa86435154bd94b04740dad651433f5c84970417d1386a2850c12e88a51d",
+    "after": "648eaa86435154bd94b04740dad651433f5c84970417d1386a2850c12e88a51d",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentstate/journal_test.go": {
+    "before": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+    "after": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentstate/journal.go": {
+    "before": "13b4b7b94e5d1ee2df2a47a9810756eeffba724c07a37f1ba4ab425c5f6aca87",
+    "after": "b2587484295d0bc54fd4233e7e3a3f25d3912d7c2738c9c913e38ff737ff859a",
+    "planned_change": true,
+    "unchanged": false
+  },
+  "internal/enrollmentproof/proof_test.go": {
+    "before": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "after": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentproof/proof.go": {
+    "before": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+    "after": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentrequest/request.go": {
+    "before": "9af7c03c69997239ac246fa4f620893c57d3d58bec339f75eeecb16f50ca4f31",
+    "after": "9af7c03c69997239ac246fa4f620893c57d3d58bec339f75eeecb16f50ca4f31",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentrequest/request_test.go": {
+    "before": "3767ddf48a34bceaa09badec35a83d3e410ca7c99338f92a22361c1e607b7b46",
+    "after": "bd925ac64ae511230a1fcc9132e932935ce741bb16d7a2ed70a60a81a262ba64",
+    "planned_change": true,
+    "unchanged": false
+  },
+  "go.mod": {
+    "before": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "after": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "go.sum": {
+    "before": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "after": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "planned_change": false,
+    "unchanged": true
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "result": {
+    "provider": "fixture",
+    "reviewer_calls": 0,
+    "review_budget": 2,
+    "provider_process_started": false,
+    "replay_after_source_removal": true,
+    "requested_model": "fixture-standard",
+    "runtime_review_caps_enforced": false,
+    "configuration_during_cooldown": true,
+    "inherited_review_budget": 3,
+    "refusals": [
+      {
+        "case": "unknown-provider",
+        "code": "agent-provider-not-configured",
+        "mutation": false
+      },
+      {
+        "case": "unsafe-name",
+        "code": "planning-provider-name-invalid",
+        "mutation": false
+      },
+      {
+        "case": "negative-review-budget",
+        "code": "invalid_review_budget",
+        "mutation": false
+      },
+      {
+        "case": "review-budget-without-provider",
+        "code": "invalid_review_budget",
+        "mutation": false
+      },
+      {
+        "case": "zero-activation-budget",
+        "code": "planning-control-invalid",
+        "mutation": false
+      },
+      {
+        "case": "stale-policy",
+        "code": "agent-model-policy-hash-changed",
+        "mutation": false
+      },
+      {
+        "case": "missing-catalogue",
+        "code": "agent-provider-catalogue-read",
+        "mutation": false
+      },
+      {
+        "case": "malformed-catalogue",
+        "code": "agent-provider-catalogue-invalid",
+        "mutation": false
+      },
+      {
+        "case": "nonexecutable",
+        "code": "planning-provider-assistant-unavailable",
+        "mutation": false
+      }
+    ]
+  },
+  "source_stable": true,
+  "global_watchdog": null
+}

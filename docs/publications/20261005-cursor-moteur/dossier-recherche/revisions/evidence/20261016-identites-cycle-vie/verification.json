@@ -1,0 +1,392 @@
+{
+  "created_at": "2026-10-16T21:29:14.350022+00:00",
+  "result": "PASS_DOCUMENTATION_ONLY",
+  "revision": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "scope": "Documentation/recherche ; 0 appel fournisseur Swarm, pas de changement de code applicatif ni déploiement par cette livraison.",
+  "reading_status": "Lectures partielles qualifiées dans la note ; aucune reproduction de publication ou de produit concurrent.",
+  "local_links_missing": [],
+  "whitespace_findings": [],
+  "git_diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "figures": [
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-amelioration.svg",
+      "viewBox": "0.5 0 828.66015625 2256",
+      "xml_valid": true,
+      "visual_inspection": "PASS après correction des titres ; filiation et boucle inspectées",
+      "source_mmd_sha256": "1580eaaf212e08dcb52703df64a6c9083cd8178283608ca57bcd109df957e03d"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-filiation.svg",
+      "viewBox": "0 0 2325.703125 598.5",
+      "xml_valid": true,
+      "visual_inspection": "PASS après correction des titres ; filiation et boucle inspectées",
+      "source_mmd_sha256": "4539221221393ead24025df40d3fdacda8661dbfda6e9e5ce0e27aa9baf056e6"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-mediation.svg",
+      "viewBox": "0 0 1368.07421875 1666",
+      "xml_valid": true,
+      "visual_inspection": "PASS après correction des titres ; filiation et boucle inspectées",
+      "source_mmd_sha256": "bc7a9c510abbdae5a033da9c9aaed32d4f3b4252063a6fbb24fb1b9c4e5dcfb0"
+    }
+  ],
+  "renders": {
+    "render.json": [
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-mediation.mmd",
+          "-o",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-mediation.svg",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-b",
+          "white"
+        ],
+        "start": "2026-10-16T21:25:13.018873+00:00",
+        "end": "2026-10-16T21:25:19.504351+00:00",
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-filiation.mmd",
+          "-o",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-filiation.svg",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-b",
+          "white"
+        ],
+        "start": "2026-10-16T21:25:19.505040+00:00",
+        "end": "2026-10-16T21:25:24.721945+00:00",
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-amelioration.mmd",
+          "-o",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-amelioration.svg",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-b",
+          "white"
+        ],
+        "start": "2026-10-16T21:25:24.722488+00:00",
+        "end": "2026-10-16T21:25:29.604747+00:00",
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      }
+    ],
+    "raster-preview.json": [
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-mediation.mmd",
+          "-o",
+          "/tmp/swarm-recherche-identite-mmaopejn/identites-mediation.png",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-s",
+          "1",
+          "-b",
+          "white"
+        ],
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-filiation.mmd",
+          "-o",
+          "/tmp/swarm-recherche-identite-mmaopejn/identites-filiation.png",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-s",
+          "1",
+          "-b",
+          "white"
+        ],
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-amelioration.mmd",
+          "-o",
+          "/tmp/swarm-recherche-identite-mmaopejn/identites-amelioration.png",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-s",
+          "1",
+          "-b",
+          "white"
+        ],
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      }
+    ],
+    "render-corrections.json": [
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-mediation.mmd",
+          "-o",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-mediation.svg",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-b",
+          "white"
+        ],
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-mediation.mmd",
+          "-o",
+          "/tmp/swarm-recherche-identite-mmaopejn/identites-mediation.png",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-b",
+          "white"
+        ],
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-amelioration.mmd",
+          "-o",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-amelioration.svg",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-b",
+          "white"
+        ],
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "mmdc",
+          "-i",
+          "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-amelioration.mmd",
+          "-o",
+          "/tmp/swarm-recherche-identite-mmaopejn/identites-amelioration.png",
+          "-c",
+          "/tmp/swarm-recherche-identite-mmaopejn/mermaid.json",
+          "-p",
+          "/tmp/swarm-recherche-identite-mmaopejn/puppeteer.json",
+          "-w",
+          "1800",
+          "-H",
+          "1200",
+          "-b",
+          "white"
+        ],
+        "exit_code": 0,
+        "stdout": "Generating single mermaid chart\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "renderer_version": "11.12.0",
+  "checks_and_recovery": [
+    {
+      "observation": "Recherche de configuration trop large dans /tmp ; quelques répertoires privés illisibles.",
+      "decision": "Ne pas réessayer ; vérifier les chemins de navigateur connus. Chrome présent, rendu réussi."
+    },
+    {
+      "observation": "Le texte direct AgentRail est plus réduit que la page indexée.",
+      "decision": "Détails qualifiés comme annonces indexées ; reconfirmation ouverte. Aucun comportement déduit absent."
+    },
+    {
+      "observation": "Chevauchement de deux titres de sous-graphe au premier rendu.",
+      "decision": "Titres raccourcis, SVG et PNG régénérés puis inspectés."
+    },
+    {
+      "observation": "Patch CaMeL refusé pour contexte de ligne incorrect ; aucune mutation constatée.",
+      "decision": "Lignes relues, contexte corrigé, correction appliquée et vérifiée."
+    },
+    {
+      "observation": "Premier contrôle pendant le rendu : troisième SVG encore absent.",
+      "decision": "Contrôle final après la fin des trois rendus : aucun lien manquant."
+    },
+    {
+      "observation": "Construction initiale de cet index bloquée par son propre lien encore absent.",
+      "decision": "Déclarer le fichier comme BUILDING sans verdict, vérifier les liens puis écrire les résultats réels. Contrôle final répété sur le fichier final."
+    }
+  ],
+  "scientific_acceptance": false,
+  "engine_identity_qualification": false,
+  "application_tests": "Non exécutés pour cette livraison documentaire ; preuves IA1/IA2 citées dans leur périmètre historique.",
+  "preimages": {
+    "created_at": "2026-10-16T21:21:39.763949+00:00",
+    "files": [
+      {
+        "path": "docs/publications/20261005-cursor-moteur/article-scientifique/PLAN.md",
+        "sha256": "a1a5ab5a1b8bae333404223b1daf75357309baf5e6a313b4c1d5290ea481d384",
+        "preimage": "/tmp/swarm-recherche-identite-mmaopejn/docs/publications/20261005-cursor-moteur/article-scientifique/PLAN.md"
+      },
+      {
+        "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/02-etat-art.md",
+        "sha256": "38b87e118b34cab688be85f2d146912da6e153ee560f885598faf58bb84ca492",
+        "preimage": "/tmp/swarm-recherche-identite-mmaopejn/docs/publications/20261005-cursor-moteur/dossier-recherche/02-etat-art.md"
+      },
+      {
+        "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/90-bibliographie.md",
+        "sha256": "511df7e0e986536d61d184d020e575816438f8b27a502f88d8ae7373c932cbfa",
+        "preimage": "/tmp/swarm-recherche-identite-mmaopejn/docs/publications/20261005-cursor-moteur/dossier-recherche/90-bibliographie.md"
+      },
+      {
+        "path": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+        "sha256": "cfd3031e94068398f56600db8f1faac6990a9b5f0a7e97f8fe0600495faf099f",
+        "preimage": "/tmp/swarm-recherche-identite-mmaopejn/docs/publications/20261005-cursor-moteur/programme-recherche.md"
+      },
+      {
+        "path": "docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md",
+        "sha256": "32164e0e760ab64e284fb20ed03c1988771fd29be1ff2e75751a9b14a8bc7800",
+        "preimage": "/tmp/swarm-recherche-identite-mmaopejn/docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md"
+      }
+    ]
+  },
+  "current_files": [
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/PLAN.md",
+      "sha256": "e6df73d9da7467482dbea7925f8058cd48902e491150af0fe3f5f3187a68ede2"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/02-etat-art.md",
+      "sha256": "75a4982ccb2658213c389d3bbfdcf7d2d9e15b85d2affc604d88322df3f8ec70"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/90-bibliographie.md",
+      "sha256": "ea65148d17814614380c91784fd6437caee5d372f83345a5ba0a17ce8eb23994"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "sha256": "85f70bece9ef25ae9fa863aa39c9cea8eeeba4be7f62a1c20ccd38b734982446"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md",
+      "sha256": "b89691dde2d69078c9ca45a4d950eb24bf886227ddd94eb880ab40dfc4bffe70"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "sha256": "db3147544e57c1f54837efb6a6f1a75d47567aca187881cfc5b37e1ebafff495"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-amelioration.mmd",
+      "sha256": "1580eaaf212e08dcb52703df64a6c9083cd8178283608ca57bcd109df957e03d"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-filiation.mmd",
+      "sha256": "4539221221393ead24025df40d3fdacda8661dbfda6e9e5ce0e27aa9baf056e6"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-mediation.mmd",
+      "sha256": "bc7a9c510abbdae5a033da9c9aaed32d4f3b4252063a6fbb24fb1b9c4e5dcfb0"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-amelioration.svg",
+      "sha256": "a2266fd132c6d530be3e7fb5c1e447d8959281f6213425f6642c0fbad7e230ce"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-filiation.svg",
+      "sha256": "f3bf2aea85268f621bd7d69d6bcd42c522c533b12cfdb479e02aa9fea197242a"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/article-scientifique/figures/identites-mediation.svg",
+      "sha256": "ee6c7e4cdae4a88b40ac8c764f623a7b611eae057e185961caf5f6c8c5b36cd4"
+    }
+  ],
+  "owned_patch": {
+    "path": "/tmp/swarm-recherche-identite-mmaopejn/owned-changes.patch",
+    "sha256": "0aa848b2549a1b9575241cd07782579d66677a2e2ebff18e72f830fb4fc32fa2"
+  }
+}

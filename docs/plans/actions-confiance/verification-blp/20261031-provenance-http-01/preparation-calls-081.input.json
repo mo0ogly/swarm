@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "action": "create",
+  "event_id": "memory-preparation",
+  "expected_revision": 0,
+  "title": "Memory guard fixture",
+  "text": "Need memory fixture"
+}

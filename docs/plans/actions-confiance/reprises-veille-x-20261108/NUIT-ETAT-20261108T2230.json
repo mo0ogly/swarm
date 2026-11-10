@@ -1,0 +1,25 @@
+{
+  "observed_at": "2026-11-08T21:30:10.776669+00:00",
+  "kind": "status_audit_no_dispatch",
+  "git": {
+    "local_head": "d084c1487726f0d240de84d521d19d14d7938250",
+    "remote_main": "b4e07cb26066cffdb20b36ac2fc9c60f758cb23e",
+    "source": "git rev-parse/log/status + git ls-remote origin refs/heads/main",
+    "push": "Refus PR et checks/install rapporté par final Design UX ; divergence confirmée par référence distante."
+  },
+  "sessions": {
+    "Gi.eth": "active, correction qualification historique Go directement demandée par Fabrice ; pas clôturée",
+    "Design UX": "idle, d084c1487726 local ; push rejeté",
+    "Peter": "idle, travaux antérieurs déclarés terminés",
+    "Mikhail": "idle, sans reprise",
+    "Qualification vrai modèle": "idle, blocage antérieur non levé",
+    "Réserves A1 à A4": "idle, accueil seulement"
+  },
+  "automation": "ACTIVE, intervalle 30 min",
+  "new_dispatches": 0,
+  "limits": [
+    "Observation des sessions par wait_threads ; dernier tour Gi.eth lu en lecture seule.",
+    "Aucun test, build, installation ou commit lancé pour ce statut.",
+    "Dépôt partagé sale, propriété des changements préservée."
+  ]
+}

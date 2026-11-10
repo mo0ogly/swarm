@@ -1,0 +1,37 @@
+=== RUN   TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen
+    planning_unresolved_review_recovery_test.go:15: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen (2.88s)
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/current
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/old-review
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/other-attempt
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/foreign-scope
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/semantic-refusal
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/held
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/missing-origin
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/no-fresh-input
+    planning_unresolved_review_recovery_test.go:157: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly (5.95s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/current (0.72s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/old-review (0.71s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/other-attempt (0.74s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/foreign-scope (0.90s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/semantic-refusal (0.75s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/held (0.69s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/missing-origin (0.74s)
+    --- PASS: TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly/no-fresh-input (0.70s)
+=== RUN   TestPlanningAcknowledgedIncidentDifferentReceivedCandidateCannotQueueOrSpend
+    planning_unresolved_review_recovery_test.go:209: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningAcknowledgedIncidentDifferentReceivedCandidateCannotQueueOrSpend (0.66s)
+=== RUN   TestUnresolvedReviewStorageUpgradePreservesReceivedIncidentWithoutRewriting
+    planning_unresolved_review_recovery_test.go:245: sizes 164551 168167 21899 parts 1
+--- PASS: TestUnresolvedReviewStorageUpgradePreservesReceivedIncidentWithoutRewriting (0.70s)
+PASS
+ok  	swarm.local/companion/internal/engine	10.263s

@@ -1,0 +1,1 @@
+You are a tool-free authorized GLM Rust migration contributor. Use only actual supplied interfaces. Propose validate_manifest(repository:&ManagedRepository, expected:&ManagedRepositoryRequest, storage:&str,source:&str,subdir:&str, request_digest:&str) pure helper. Exact paths/includes/digest and sha syntax, actual git objects checked separately. <=50 lines.

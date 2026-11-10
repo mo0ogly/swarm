@@ -1,0 +1,23 @@
+{
+  "result": {
+    "usable_response": true,
+    "requested_model": "glm-5.2",
+    "started_at_unix": 1792861513.9004521,
+    "automatic_retries": 0,
+    "reported_model": "glm-5.2",
+    "usage": {
+      "completion_tokens": 1805,
+      "prompt_tokens": 375,
+      "total_tokens": 2180,
+      "completion_tokens_details": {
+        "reasoning_tokens": 6,
+        "text_tokens": 1799
+      }
+    },
+    "finish_reason": "stop",
+    "elapsed_seconds": 7.334
+  },
+  "integrated": "web/cockpit-native-panels.js with principal corrections: placeholder removed, real French source labels, null policy, Work/schema/agent binding checks",
+  "backend": "GLM5.3 according user, API requested/reported glm-5.2; backend unverified",
+  "automatic_retries": 0
+}

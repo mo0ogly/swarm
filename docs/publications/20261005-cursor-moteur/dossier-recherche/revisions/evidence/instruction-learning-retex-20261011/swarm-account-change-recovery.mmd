@@ -1,0 +1,9 @@
+flowchart TD
+    Refus[Ancien compte : refus429 et échéance conservés] --> Garde[Garde des nouveaux appels]
+    Humain[Utilisateur confirme un compte changé et demande la reprise] --> Public[Clear public : digest + motif + confirmation]
+    Garde --> Public
+    Public --> Histoire[Archivage original et attribution opérateur]
+    Histoire --> Reprise[Retry public : même candidat, preuves et budget vérifiés]
+    Reprise --> Inspections[Inspections manquantes et verdict indépendant]
+    Inspections -->|Nouveau429| Garde
+    Inspections -->|Avis frais| Proprio[Propriétaire examine et poursuit T3..T8]

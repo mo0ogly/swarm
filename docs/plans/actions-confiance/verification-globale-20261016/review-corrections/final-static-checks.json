@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-16T07:27:36.924129+00:00",
+  "checks": [
+    {
+      "argv_description": "npm run test:i18n",
+      "exit_code_observed": 0,
+      "output_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/i18n-lexical-final.out",
+      "output_sha256": "23d0852b273fc311a94c30acddc4f7e897ac4e8f2782cabdb417754737419987"
+    },
+    {
+      "argv_description": "CGO_ENABLED=0 go vet ./internal/engine",
+      "exit_code_observed": 0,
+      "output_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/vet-final.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv_description": "python3 tools/agent-workflows/check.py",
+      "exit_code_observed": 0,
+      "output_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/contexts-final.out",
+      "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+    },
+    {
+      "argv_description": "go test -race -v ./internal/engine -run ^TestGraphDeliveryD03QualificationManifest$ -count=1",
+      "exit_code_observed": 0,
+      "output_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/manifest-lexical-final.out",
+      "output_sha256": "7ecb0ddb58ce3785b453b777db95cb76130b39dcea6a8ee5296b9f40993a8aef"
+    },
+    {
+      "argv_description": "git diff --check",
+      "exit_code_observed": 0,
+      "output_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/diff-final.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source": "actual tool completion results; no inferred command exit"
+}

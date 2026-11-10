@@ -1,0 +1,390 @@
+--- before/docs/architecture/OVERVIEW.md
++++ after/docs/architecture/OVERVIEW.md
+@@ -0,0 +1,171 @@
++# Architecture de Swarm
++
++[English](../en/ARCHITECTURE.md) · [Présentation du dépôt](../../README.md)
++
++Vue d’ensemble relue le **23 octobre 2026**. Elle relie les composants et leurs
++contrats ; les documents spécialisés restent les références détaillées.
++**Le portage Rust est partiel.** La présence d’un module, d’une commande ou d’une
++preuve locale ne signifie ni qualification de son parcours complet ni bascule
++du service utilisateur. L’[état de migration](RUST-MIGRATION.md) et le
++[plan actif](../plans/migration-rust/PLAN.md) conservent les critères ouverts.
++
++## Responsabilités et frontières
++
++[![Architecture logique, raccords d’identité et confinement futur](../diagrams/architecture-overview-fr.svg)](../diagrams/architecture-overview-fr.svg)
++
++[Ouvrir en grand](../diagrams/architecture-overview-fr.svg) · [Source Mermaid](../diagrams/architecture-overview-fr.mmd)
++
++| Couche | Responsabilité | Frontière à conserver |
++| --- | --- | --- |
++| Humain | Objectif, autorisations, limites et arbitrages qui lui appartiennent | Une adoption ne vaut pas départ ; une identité locale ne vaut pas identité humaine attestée |
++| Supervision IA | Planifier, décomposer, apprécier l’avancement, décider des suites | Le superviseur racine porte le besoin global ; un responsable de périmètre ne décide pas hors de sa portée |
++| Moteur déterministe | État durable, observations, dépendances, réservations, budgets et application des décisions autorisées | Le moteur contrôle le contrat ; le texte d’un agent ne crée pas un droit |
++| Exécution | Lancer et suivre les tentatives et les outils fournisseurs | Fin de processus, remise de rapport et acceptation restent distinctes |
++| Vérification | Contrôles, fraîcheur des preuves et revue du candidat | Revue indépendante d’un candidat et jugement global d’un cycle sont deux contrats |
++| Contexte | Instructions, exigences, références et versions mémoire sélectionnées | Le contexte reçu conserve sa provenance ; il ne confère aucune autorité |
++| Accès public | CLI et routes HTTP prises en charge | La présence d’une opération CLI ne prouve pas sa parité HTTP ou web |
++
++Le contrôle applicatif des droits et des chemins ne constitue pas un confinement
++système d’un fournisseur hostile. La séparation du service de contrôle sous un
++compte OS distinct et la médiation obligatoire des accès appartiennent au
++[chantier AC-02 différé](../plans/actions-confiance/securite-execution-apex.md).
++
++## Organisation native du code
++
++Le [workspace Cargo](../../rust/Cargo.toml) contient dix crates. Le graphique
++ci-dessous montre un **sous-ensemble des dépendances de compilation sous Linux**, lu dans
++les manifestes, pas un flux d’autorisation ni une liste de services déployés.
++
++```mermaid
++flowchart TB
++    CLI["swarm-cli<br/>Binaire swarm-rust"] --> WEB["swarm-web<br/>Frontière HTTP native"]
++    CLI --> ENGINE["swarm-engine<br/>RootStore et contrats métier"]
++    WEB --> ENGINE
++    CLI --> BOOT["swarm-enrollment-<br/>bootstrap<br/>Observation d’installation"]
++    ENGINE --> ID["swarm-identity-contract<br/>Validation de données"]
++    ENGINE --> WIRE["swarm-wire-json<br/>Compatibilité d’encodage"]
++    WEB --> ID
++    WEB --> WIRE
++    classDef entry fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
++    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
++    classDef data fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px;
++    class CLI,WEB entry;
++    class ENGINE core;
++    class BOOT,ID,WIRE data;
++```
++
++| Source | Rôle et limite |
++| --- | --- |
++| [swarm-cli](../../rust/crates/swarm-cli/src/lib.rs) | Décode et rend les commandes natives ; ne relance pas le moteur Go |
++| [swarm-web](../../rust/crates/swarm-web/src/lib.rs) | Frontière HTTP, sessions et routes natives raccordées ; remplacement Go incomplet |
++| [swarm-engine](../../rust/crates/swarm-engine/src/lib.rs) | Modèles, transitions, planification, exécution, supervision, contrôles et réglages selon le périmètre porté |
++| [RootStore](../../rust/crates/swarm-engine/src/root_store.rs) | Accès au projet et aux réglages persistés ; ne vaut ni authentification humaine ni permission de partager une racine Go vivante |
++| [swarm-identity-contract](../../rust/crates/swarm-identity-contract/src/lib.rs) | Validation des données d’identité ; une donnée valide n’authentifie pas un principal |
++| [swarm-enrollment-proof](../../rust/crates/swarm-enrollment-proof/src/lib.rs) | Preuves signées compatibles avec le format Go ; signer des octets n’accorde pas de droits métier |
++| [swarm-enrollment-state](../../rust/crates/swarm-enrollment-state/src/lib.rs) | Journal signé natif ; ancre de confiance et fraîcheur au dernier usage restent des obligations distinctes |
++| [swarm-enrollment-authority](../../rust/crates/swarm-enrollment-authority/src/lib.rs) | Documents d’autorité versionnés ; leurs données ne sont pas une capacité d’exécution |
++| [swarm-enrollment-config](../../rust/crates/swarm-enrollment-config/src/lib.rs) | Configuration d’installation et stockage protégé local ; pas une preuve d’opérateur authentifié |
++| [swarm-enrollment-bootstrap](../../rust/crates/swarm-enrollment-bootstrap/src/lib.rs) | Déclaration et observation Linux ; libellé humain, clé ou UID distinct ne prouvent pas l’autorité |
++| [swarm-wire-json](../../rust/crates/swarm-wire-json/src/lib.rs) | Comportements d’encodage partagés ; chaque protocole conserve son schéma et sa canonicalité |
++
++Les ressources de présentation sont dans `web/`, `frontend/` et `locales/`.
++La CLI et HTTP consomment les opérations du moteur, avec leurs propres frontières
++d’entrée et de sortie. Les ressources réellement servies, le profil de build et
++le binaire exercé doivent être vérifiés pour chaque livraison ; tester seulement
++les fichiers du workspace ne prouve pas leur intégration dans un exécutable.
++
++## Du plan à une tentative supervisée
++
++Ce parcours expose le contrat logique commun. Les branches Rust effectivement
++vérifiées sont recensées dans le plan ; le diagramme ne clôt pas G1/G3 ni les
++raccords de revue, validation et interface encore ouverts.
++
++```mermaid
++sequenceDiagram
++    participant S as Superviseur
++    participant E as Moteur / RootStore
++    participant D as État durable
++    participant W as Tentative fournisseur
++    participant V as Contrôles / revue
++    S->>E: Proposition liée au contexte reçu
++    E->>D: Vérifier portée, révision, bail et préconditions
++    alt Départ refusé
++        E-->>S: Refus structuré et cause sûre
++    else Départ autorisé
++        E->>D: Réserver et conserver l’intention
++        E->>W: Lancer la tentative autorisée
++        W-->>E: Activité, résultat ou incident
++        E->>D: Conserver observations et état connu
++        E-->>S: Remettre les faits et incertitudes
++        S->>E: Décision de suite dans ses droits
++        E->>V: Examiner le candidat et ses preuves
++        V-->>E: Résultats et avis liés au candidat
++        E-->>S: État après application vérifiée
++    end
++    Note over S,V: Une fin de processus ne vaut pas acceptation
++```
++
++Les durées, silences et attentes d’outil sont des observations. L’arrêt demandé
++et l’arrêt constaté sont distincts. Une erreur peut survenir après une écriture :
++elle ne prouve pas l’absence de mutation. Les effets incertains doivent être
++réconciliés avant tout rejeu ; les consommations et preuves historiques restent
++conservées. Le conducteur et la supervision d’un worker ont des cycles de vie
++distincts : la fin du conducteur ne démontre pas la fin des workers déjà libérés.
++
++Contrats : [supervision](RUN-SUPERVISION.md), [admission des workers](NATIVE-MISSION-WORKER.md),
++[maintien du bail](NATIVE-MISSION-CYCLE.md), [reviewer](NATIVE-REVIEWER.md),
++[juge global](NATIVE-GLOBAL-JUDGE.md). Le juge global natif possède des preuves
++ciblées de `continue`/`renew` ; `judge/end` reste refusé dans son contrat actuel.
++Un composant reviewer porté n’établit pas son intégration complète à `mission watch`.
++
++## Identité et mémoire
++
++L’identité sépare **principal initiateur, agent logique et instance d’exécution**.
++Le contrat lie les octrois à une portée, une révision, un contenu et des conditions
++de délégation, d’expiration et de révocation. Les empreintes relient les données ;
++elles n’authentifient ni un humain ni un effet futur. Les composants d’enrôlement,
++les observations de processus et la session web ne doivent pas être confondus
++avec l’autorité métier finale. Le [contrat d’identité](AGENT-IDENTITY-CONTRACT.md)
++conserve les raccords publics et la source humaine protégée encore ouverts.
++
++[![Mémoire historique Go et intégration d’identité restante](../diagrams/memory-identity-fr.svg)](../diagrams/memory-identity-fr.svg)
++
++La mémoire suit **RETEX vérifié → admission → version → sélection explicite →
++contexte reçu** dans le socle historique Go. Les versions, sources, conditions
++et contextes déjà transmis sont conservés. Retirer une mémoire affecte les
++sélections futures, sans effacer les prompts déjà remis aux fournisseurs.
++Les droits `read`, `summarize` et `transmit` restent à raccorder globalement ;
++G8 mémoire/projet Rust est ouvert. Voir [mémoire](../PROJECT-MEMORY.md) et
++[contrat des usages](../plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md).
++
++## Deux interfaces et sécurité future
++
++La [décision produit](../PRODUCT-ARCHITECTURE.md) prévoit **Projets et développement**
++et **Processus métier** sur un moteur commun, avec frontends construisibles et
++déployables séparément. Les routes proposées, l’UX métier complète et les effets
++externes ne sont pas déclarés livrés. Une simulation de facturation n’autorise
++aucun paiement réel.
++
++L’[architecture cible des actions de confiance](ACTIONS-CONFIANCE.md) et le
++[plan AC-02](../plans/actions-confiance/securite-execution-apex.md) précisent le
++confinement Linux, le réseau TCP/REST, les secrets, les preuves de filiation,
++la reprise et les menus. **AC-02 A0–A7 est enregistré, non démarré.** Ses quatre
++vues sont l’éditeur de politique, les refus, la chaîne de connexion et la timeline.
++Le sous-ensemble OpenShell visé doit être explicite et vérifié ; les YAML d’Agent
++Baseline servent de catalogue de contrôles, sans fournir un confinement exécutable.
++Les sources et leurs versions sont conservées dans ce plan.
++
++## État de preuve et lecture des documents
++
++| Domaine | État à retenir |
++| --- | --- |
++| Go historique | Référence fonctionnelle des parcours documentés ; pas une preuve de parité native |
++| Rust | Composants et parcours ciblés vérifiés ; couverture globale, installation et bascule ouvertes |
++| Identité et mémoire | Fondations et protocoles documentés ; protection publique globale et parité mémoire non établies |
++| Deux UX et AC-02 | Cibles conservées ; séparabilité complète et confinement non déclarés disponibles |
++
++Les preuves 213/224/244 citées dans la [vidéo explicative](../communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
++portent sur des fournisseurs de fixture ; la vidéo n’est pas une capture du logiciel.
++Pour l’état courant, suivre le plan actif plutôt que déduire une qualification
++d’une chronologie ancienne. Cette synthèse documentaire ne modifie aucun binaire,
++réglage, service, contexte d’agent ou mission.
+--- before/docs/en/ARCHITECTURE.md
++++ after/docs/en/ARCHITECTURE.md
+@@ -0,0 +1,167 @@
++# Swarm architecture
++
++[Français](../architecture/OVERVIEW.md) · [Repository overview](../../README.en.md)
++
++Overview reviewed on **October 23, 2026**. It connects components to their
++contracts; specialized documents retain the detailed requirements.
++**Rust porting is partial.** A module, command or local proof does not establish
++qualification of its complete journey or cutover of the user service. The
++[migration status](RUST-MIGRATION.md) and [active plan, FR](../plans/migration-rust/PLAN.md)
++retain outstanding criteria.
++
++## Responsibilities and boundaries
++
++[![Logical architecture, pending identity integration and future confinement](../diagrams/architecture-overview-en.svg)](../diagrams/architecture-overview-en.svg)
++
++[Open at full size](../diagrams/architecture-overview-en.svg) · [Mermaid source](../diagrams/architecture-overview-en.mmd)
++
++| Layer | Responsibility | Boundary to preserve |
++| --- | --- | --- |
++| Human | Objective, permissions, limits and decisions within their authority | Adoption does not start execution; a local identity does not attest a human identity |
++| AI supervision | Plan, decompose, assess progress and decide next steps | The root supervisor owns the overall objective; scope owners stay within their scope |
++| Deterministic engine | Durable state, observations, dependencies, reservations, budgets and authorized application | The engine checks the contract; agent prose creates no authority |
++| Execution | Launch and monitor attempts and provider tools | Process completion, report delivery and acceptance remain distinct |
++| Verification | Checks, evidence freshness and candidate review | Independent candidate review and global cycle judgment are separate contracts |
++| Context | Instructions, requirements, references and selected memory versions | Received context retains provenance; it grants no authority |
++| Public access | Supported CLI operations and HTTP routes | An implemented CLI operation does not establish HTTP or web parity |
++
++Application-level permission and path checks do not establish OS confinement of
++a hostile provider. Running the control service under a separate OS account and
++mandatory access mediation belong to the [deferred AC-02 work](plans/actions-confiance/securite-execution-apex.md).
++
++## Native code organization
++
++The [Cargo workspace](../../rust/Cargo.toml) contains ten crates. The graph shows
++a **subset of Linux build dependencies** read from their manifests, not authorization
++flow or a set of deployed services.
++
++```mermaid
++flowchart TB
++    CLI["swarm-cli<br/>swarm-rust binary"] --> WEB["swarm-web<br/>Native HTTP boundary"]
++    CLI --> ENGINE["swarm-engine<br/>RootStore and business contracts"]
++    WEB --> ENGINE
++    CLI --> BOOT["swarm-enrollment-<br/>bootstrap<br/>Installation observation"]
++    ENGINE --> ID["swarm-identity-contract<br/>Data validation"]
++    ENGINE --> WIRE["swarm-wire-json<br/>Encoding compatibility"]
++    WEB --> ID
++    WEB --> WIRE
++    classDef entry fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
++    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
++    classDef data fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px;
++    class CLI,WEB entry;
++    class ENGINE core;
++    class BOOT,ID,WIRE data;
++```
++
++| Source | Role and limitation |
++| --- | --- |
++| [swarm-cli](../../rust/crates/swarm-cli/src/lib.rs) | Decode and render native commands; never call the Go engine |
++| [swarm-web](../../rust/crates/swarm-web/src/lib.rs) | HTTP boundary, sessions and connected native routes; incomplete Go replacement |
++| [swarm-engine](../../rust/crates/swarm-engine/src/lib.rs) | Models, transitions, planning, execution, supervision, checks and settings within the ported scope |
++| [RootStore](../../rust/crates/swarm-engine/src/root_store.rs) | Project and persisted-settings access; neither human authentication nor permission to share a live Go root |
++| [swarm-identity-contract](../../rust/crates/swarm-identity-contract/src/lib.rs) | Identity data validation; valid data does not authenticate a principal |
++| [swarm-enrollment-proof](../../rust/crates/swarm-enrollment-proof/src/lib.rs) | Signed proofs compatible with the Go format; signing bytes grants no business rights |
++| [swarm-enrollment-state](../../rust/crates/swarm-enrollment-state/src/lib.rs) | Native signed journal; trusted anchoring and freshness at final use remain separate obligations |
++| [swarm-enrollment-authority](../../rust/crates/swarm-enrollment-authority/src/lib.rs) | Versioned authority documents; payloads are not execution capabilities |
++| [swarm-enrollment-config](../../rust/crates/swarm-enrollment-config/src/lib.rs) | Installation configuration and protected local storage; no proof of an authenticated operator |
++| [swarm-enrollment-bootstrap](../../rust/crates/swarm-enrollment-bootstrap/src/lib.rs) | Declaration and Linux observation; human labels, keys or distinct UIDs do not establish authority |
++| [swarm-wire-json](../../rust/crates/swarm-wire-json/src/lib.rs) | Shared encoding behavior; each protocol retains its schema and canonicality rules |
++
++Presentation assets live in `web/`, `frontend/` and `locales/`. CLI and HTTP
++consume engine operations through their own input and output boundaries. Actual
++served assets, build profile and exercised binary must be checked for each
++delivery; testing workspace files alone does not establish their inclusion in
++an executable.
++
++## From a plan to a supervised attempt
++
++This flow presents the shared logical contract. The plan lists native branches
++actually verified; the diagram closes neither G1/G3 nor remaining review,
++validation and interface integrations.
++
++```mermaid
++sequenceDiagram
++    participant S as Supervisor
++    participant E as Engine / RootStore
++    participant D as Durable state
++    participant W as Provider attempt
++    participant V as Checks / review
++    S->>E: Proposal bound to received context
++    E->>D: Check scope, revision, lease and preconditions
++    alt Start refused
++        E-->>S: Structured refusal and safe cause
++    else Start authorized
++        E->>D: Reserve and retain the intention
++        E->>W: Launch the authorized attempt
++        W-->>E: Activity, result or incident
++        E->>D: Retain observations and known state
++        E-->>S: Deliver facts and uncertainty
++        S->>E: Next-step decision within authority
++        E->>V: Examine candidate and evidence
++        V-->>E: Candidate-bound results and opinion
++        E-->>S: State after verified application
++    end
++    Note over S,V: Process completion does not establish acceptance
++```
++
++Duration, silence and tool waits are observations. Requested and observed stops
++are distinct. An error may follow a write: it does not prove no mutation occurred.
++Uncertain effects must be reconciled before retry; historical usage and evidence
++are preserved. The conductor and worker supervision have separate lifecycles:
++the conductor ending does not establish termination of workers already released.
++
++Contracts: [supervision](RUN-SUPERVISION.md), [worker admission](NATIVE-MISSION-WORKER.md),
++[lease maintenance](NATIVE-MISSION-CYCLE.md), [reviewer](NATIVE-REVIEWER.md),
++[global judge](NATIVE-GLOBAL-JUDGE.md). The native global judge has scoped proofs
++for `continue`/`renew`; `judge/end` remains refused under its current contract.
++A ported reviewer component does not establish complete `mission watch` integration.
++
++## Identity and memory
++
++Identity separates **initiating principal, logical agent and execution instance**.
++The contract binds grants to scope, revision, content and delegation, expiry and
++revocation conditions. Digests bind data; they authenticate neither a human nor
++a future effect. Enrollment components, process observations and web sessions
++must remain distinct from final business authority. The [identity contract](AGENT-IDENTITY-CONTRACT.md)
++retains outstanding public integration and protected human-authority requirements.
++
++[![Historical Go memory and pending identity integration](../diagrams/memory-identity-en.svg)](../diagrams/memory-identity-en.svg)
++
++Memory follows **verified lessons learned → admission → version → explicit
++selection → received context** in the historical Go foundation. Versions,
++sources, conditions and already received contexts are preserved. Withdrawal
++affects future selection without erasing prompts already delivered to providers.
++Global `read`, `summarize` and `transmit` enforcement remains pending; the Rust
++G8 project/memory journey is open. See [memory](PROJECT-MEMORY.md) and the
++[usage contract, FR](../plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md).
++
++## Two interfaces and future security
++
++The [product decision, FR](../PRODUCT-ARCHITECTURE.md) plans **Projects and
++development** and **Business processes** over a shared engine, with separately
++buildable and deployable frontends. Proposed routes, a complete business UX and
++external effects are not declared delivered. A billing simulation authorizes
++no real payment.
++
++The [trusted actions target](ACTIONS-CONFIANCE.md) and [AC-02 plan](plans/actions-confiance/securite-execution-apex.md)
++cover Linux confinement, TCP/REST networking, secrets, lineage evidence, recovery
++and menus. **AC-02 A0–A7 is saved, not started.** Its four views are the policy
++editor, blocked actions, connection lineage and security timeline. The intended
++OpenShell subset must be explicit and verified; Agent Baseline YAML files are
++control catalogues, not executable confinement. Sources and versions are retained
++in the plan.
++
++## Evidence status and reading guidance
++
++| Domain | Status to retain |
++| --- | --- |
++| Historical Go | Functional reference for documented journeys; no evidence of native parity |
++| Rust | Verified components and scoped journeys; overall coverage, installation and cutover remain open |
++| Identity and memory | Documented foundations and protocols; global public protection and memory parity are unproven |
++| Two UX applications and AC-02 | Retained targets; complete separability and confinement are not declared available |
++
++Proofs 213/224/244 cited in the [explainer video](../communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
++use fixture providers; the video does not record the application. For current
++status, follow the active plan rather than infer qualification from an old
++chronology. This documentation overview changes no binary, setting, service,
++agent context or mission.
+--- before/README.md
++++ after/README.md
+@@ -89,7 +89,7 @@
+ Le schéma présente les responsabilités communes ; leur intégration Rust reste en
+ cours. Les pointillés identifient les raccords d’identité et le confinement futur.
+ Les flèches décrivent des échanges logiques, pas des permissions déjà garanties.
+-[Ouvrir le schéma en grand](docs/diagrams/architecture-overview-fr.svg) · [Source Mermaid](docs/diagrams/architecture-overview-fr.mmd).
++[Ouvrir le schéma en grand](docs/diagrams/architecture-overview-fr.svg) · [Source Mermaid](docs/diagrams/architecture-overview-fr.mmd) · [Architecture technique détaillée](docs/architecture/OVERVIEW.md).
+ 
+ - **L’humain** fixe l’objectif, les limites et les décisions qui lui appartiennent.
+ - **Le superviseur racine** porte le besoin global. Les responsables de périmètre
+--- before/README.en.md
++++ after/README.en.md
+@@ -88,7 +88,7 @@
+ The diagram presents shared responsibilities; Rust integration is in progress.
+ Dashed links identify pending identity integration and future confinement.
+ Arrows represent logical exchanges, not permissions already guaranteed.
+-[Open the diagram at full size](docs/diagrams/architecture-overview-en.svg) · [Mermaid source](docs/diagrams/architecture-overview-en.mmd).
++[Open the diagram at full size](docs/diagrams/architecture-overview-en.svg) · [Mermaid source](docs/diagrams/architecture-overview-en.mmd) · [Detailed technical architecture](docs/en/ARCHITECTURE.md).
+ 
+ - **The human** sets the objective, limits and decisions within their authority.
+ - **The root supervisor** owns the overall objective. Scope owners guide their
+--- before/docs/PRODUCT-ARCHITECTURE.md
++++ after/docs/PRODUCT-ARCHITECTURE.md
+@@ -1,4 +1,10 @@
+ # Deux interfaces pour le moteur Swarm
++
++[Vue technique du moteur et état Go/Rust](architecture/OVERVIEW.md) · [English technical overview](en/ARCHITECTURE.md).
++
++Cette page conserve la décision produit des deux UX. Les mentions de catalogue
++et de parcours déjà implémentés ci-dessous décrivent le socle historique Go ;
++leur parité Rust reste soumise au [plan de migration](plans/migration-rust/PLAN.md).
+ 
+ Décision produit et architecture adoptée avec l’utilisateur le 10 octobre 2026.
+ Swarm reste un produit autonome : Wattson est entièrement séparé et ne fait pas
+--- before/docs/communication/linkedin-swarm-identite-memoire-20261023/README.md
++++ after/docs/communication/linkedin-swarm-identite-memoire-20261023/README.md
+@@ -27,6 +27,8 @@
+ bleu contrôle, violet mémoire, vert bleuté exécution/preuves, orange travail à
+ construire. Les textes et pointillés portent aussi les limites ; la couleur
+ seule n’indique jamais une qualification.
++
++Architecture détaillée consolidée après la reprise utilisateur : [FR](../../architecture/OVERVIEW.md), [EN](../../en/ARCHITECTURE.md), [revue de portée](architecture-followup-review.json).
+ 
+ ## Base factuelle et portée des affirmations
+ 

@@ -1,0 +1,28 @@
+{
+  "at_utc": "2026-10-17T08:12:31.054833+00:00",
+  "files": {
+    "docs/UI-DESIGN.md": "f3d1cd28781054fa862d30d1a8144938ef5dd2c587aa19cbc9b9cc964ea03ba3",
+    "docs/PROJECT-MEMORY.md": "cff1d0aeaa15159ff9b8e906786a63e5e0c9b2ae9a99e28485753d1b7f010e87",
+    "docs/en/PROJECT-MEMORY.md": "94092512ad081e6a1f74702aa1d0e3b3471ad68491d5042502d6a44788fab221",
+    "docs/plans/deepagents-integration/PLAN.md": "4da14cf852079eb5694d99fcbe1c97072759422d67c6c31c3d84cd1df328592d"
+  },
+  "new": [
+    "frontend/signals/signals.js",
+    "frontend/signals/signals.css",
+    "frontend/signals/catalogue.html",
+    "frontend/signals/catalogue.js",
+    "frontend/signals/catalogue.css",
+    "frontend/build-signals.mjs",
+    "tests/semantic_signals_ui.cjs",
+    "docs/SEMANTIC-SIGNALS.md",
+    "docs/en/SEMANTIC-SIGNALS.md",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-18.md",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-18.md"
+  ],
+  "scope": "shared presentation component and isolated catalogue; no web/ generated files while identity owner is active",
+  "read_only_tokens": {
+    "web/wattson_themes.css": "0055edad2bcfa30d65b63eee8c522cd53d6953353f0a98f34024c364a08f0a59",
+    "web/swarm-design.css": "9a15b7bfa9163f32c8542d50e0ad62c8acb346a4e2e61a7a8f110c831c9740d3",
+    "web/swarm-logo.png": "d8ad9094dd879b42f213cea10c471696af378679c0634a044b7fe312de7ae9bb"
+  }
+}

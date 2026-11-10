@@ -1,0 +1,6 @@
+{
+  "result": "PASS",
+  "original_green_test_source_sha256": "607b35497de0be5fd6f8421b61d095e154a8724f0a1588579f8c96ecf5127c71",
+  "preserved_file": "docs/plans/deepagents-integration/evidence/m9-20261016/preimages/memory_context_receipt_green_test.go.txt",
+  "change_since_green": "Only added public CLI/API read test and its imports; all original test functions and production sources remain unchanged. Runtime checks and public read are also executed with -race against the final test file."
+}

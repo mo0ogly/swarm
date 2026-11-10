@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_preparation_check.py", line 169, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/blp_preparation_check.py", line 101, in main
+    preparation_id=p['id'],turn_id=turn['id'],expected_turn_revision=turn['revision'],source_index=parts.index(part),
+                                                                     ~~~~^^^^^^^^^^^^
+KeyError: 'revision'

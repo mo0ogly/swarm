@@ -1,0 +1,745 @@
+--- before/web/project-memory.html
++++ web/project-memory.html
+@@ -1,6 +1,6 @@
+ <!doctype html>
+ <html lang="fr" data-theme="etat">
+-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mémoire du projet — Swarm</title><link rel="icon" href="/swarm-logo.png"><link rel="stylesheet" href="/wattson_themes.css"><link rel="stylesheet" href="/cockpit.css"><link rel="stylesheet" href="/swarm-design.css"><link rel="stylesheet" href="/project-memory.css"><script src="/api/v1/web-requests/script.js" defer></script><script src="/web-requests.js" defer></script><script src="/i18n-en.js" defer></script><script src="/i18n.js" defer></script><script src="/project-memory.js" defer></script></head>
++<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mémoire du projet — Swarm</title><link rel="icon" href="/swarm-logo.png"><link rel="stylesheet" href="/wattson_themes.css"><link rel="stylesheet" href="/cockpit.css"><link rel="stylesheet" href="/swarm-design.css"><link rel="stylesheet" href="/signals.css"><link rel="stylesheet" href="/project-memory.css"><script src="/api/v1/web-requests/script.js" defer></script><script src="/web-requests.js" defer></script><script src="/i18n-en.js" defer></script><script src="/i18n.js" defer></script><script src="/signals.js" defer></script><script src="/project-memory.js" defer></script></head>
+ <body class="memory-page"><a class="skip-link" href="#main-content">Aller au contenu</a>
+ <header class="memory-header"><a class="brand" href="/"><img src="/swarm-logo.png" width="40" height="40" alt=""> SWARM</a><nav aria-label="Navigation"><a id="memory-back" href="/?view=retex">Revenir aux RETEX</a><button id="memory-theme" type="button">Changer le thème</button></nav></header>
+ <main id="main-content" tabindex="-1"><h1>Mémoire du projet</h1><p>Conservez une expérience ou une procédure sourcée, puis choisissez les versions utiles à une tâche future.</p>
+--- before/web/project-memory.js
++++ web/project-memory.js
+@@ -21,18 +21,22 @@
+   $('memory-selection-state').textContent=!selectedTask()?tr('Aucune tâche exécutante future dans cette mission.'):missing?tr('La sélection comprend des versions non affichées ou indisponibles : vérifiez l’aperçu.'):tr('Seules les versions actives cochées seront transmises.');
+  }
+  function renderEntries(){
++  const lang=globalThis.SwarmI18n?.language==='en'?'en':'fr';
+   const list=$('memory-list');list.replaceChildren();
+   if(!entries.length){list.append(text('p',tr('Aucune leçon trouvée. Admettez une leçon depuis un RETEX vérifié.')));return}
+   for(const e of entries){
+    const v=e.version,card=document.createElement('article');card.className='card';card.dataset.memory=e.ref.id;card.dataset.state=e.status;
+-   const choice=document.createElement('label');choice.className='memory-choice';const check=document.createElement('input');check.type='checkbox';check.dataset.memoryChoice='true';check.dataset.ref=JSON.stringify(e.ref);check.disabled=e.status!=='active';check.setAttribute('aria-label',tr('Sélectionner la leçon')+' '+e.ref.id+' v'+e.ref.version);check.addEventListener('change',()=>{chosen=chosen.filter(ref=>!(ref.work===e.ref.work&&ref.id===e.ref.id));if(check.checked)chosen.push(e.ref);restoreSelection();resetPreview()});choice.append(check,text('span',e.ref.id+' · v'+e.ref.version+' · '+(e.status==='active'?tr('Active'):e.status==='historical'?tr('Historique'):tr('Indisponible'))));
+-   card.append(choice,text('p',e.source_title),text('pre',v.body),text('p',v.conditions),text('p',globalThis.SwarmI18n?.engine(e.reason)||e.reason),text('p',v.kind==='procedure'?tr('Procédure'):tr('Expérience')));
++   const versionState=v.action==='withdraw'?'withdrawn':['active','historical','unavailable'].includes(e.status)?e.status:'unknown';
++   const choice=document.createElement('label');choice.className='memory-choice';const check=document.createElement('input');check.type='checkbox';check.dataset.memoryChoice='true';check.dataset.ref=JSON.stringify(e.ref);check.disabled=e.status!=='active';check.setAttribute('aria-label',tr('Sélectionner la leçon')+' '+e.ref.id+' v'+e.ref.version);check.addEventListener('change',()=>{chosen=chosen.filter(ref=>!(ref.work===e.ref.work&&ref.id===e.ref.id));if(check.checked)chosen.push(e.ref);restoreSelection();resetPreview()});choice.append(check,text('span',e.ref.id+' · v'+e.ref.version),SwarmSignals.state('version',versionState,{lang}));
++   card.append(choice,text('p',e.source_title),text('pre',v.body),text('p',v.conditions),text('p',globalThis.SwarmI18n?.engine(e.reason)||e.reason));
+    if(e.used_by?.length){card.append(text('p',tr('Tentatives concernées :')+' '+e.used_by.length,'notice attention'));for(const use of e.used_by){const link=text('a',use.work+' · '+use.task+' · '+use.agent);link.href='/?view=agents&work='+encodeURIComponent(use.work);card.append(link)}}
+    const details=document.createElement('details');details.append(text('summary',tr('Sources et historique de la décision')),text('p',e.ref.work+' · RETEX '+v.source_retex+' · '+v.actor+' · '+v.at,'memory-receipt'),text('p',v.reason),text('p','SHA-256 '+e.ref.sha256,'memory-receipt'));card.append(details);
+    if(e.status!=='historical'){
+     const actions=document.createElement('div');actions.className='memory-actions';
+     for(const [action,label]of [['replace','Remplacer cette version'],['withdraw','Retirer cette leçon']]){const button=text('button',tr(label));button.type='button';button.disabled=action==='withdraw'&&v.action==='withdraw';button.addEventListener('click',()=>edit(e,action).catch(error=>message(error.message,true)));actions.append(button)}card.append(actions);
+    }
++   // Catalogue metadata carries no attested owner/author or usage decision yet.
++   card.append(SwarmSignals.seal({memory:v.kind,lang,reference:e.ref.work+' / '+e.ref.id+' · v'+e.ref.version}));
+    list.append(card);
+   }
+   restoreSelection();
+--- before/web/project-memory.css
++++ web/project-memory.css
+@@ -7,7 +7,7 @@
+ .memory-page form{display:grid;gap:1rem}
+ .memory-page #memory-content-fields{display:grid;gap:1rem}
+ .memory-page .toolbar{display:flex}
+-.memory-page .memory-choice{display:flex;align-items:start;gap:.75rem}
++.memory-page .memory-choice{display:flex;align-items:center;flex-wrap:wrap;gap:.75rem}
+ .memory-page .memory-choice input{width:1.25rem;min-width:1.25rem;height:1.25rem}
+ .memory-page .memory-receipt{overflow-wrap:anywhere;color:var(--wattson-texte-discret)}
+ .memory-page .memory-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+--- before/tests/project_memory_ui.cjs
++++ tests/project_memory_ui.cjs
+@@ -2,9 +2,14 @@
+ // Isolated project, supported CLI/HTTP/browser operations, deterministic local provider.
+ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+ const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
+-const [binaryArg,bundleArg,outArg]=process.argv.slice(2),binary=path.resolve(binaryArg),bundle=path.resolve(bundleArg),out=path.resolve(outArg);
+-fs.mkdirSync(out,{recursive:true});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-memory-ui-'));
+-let app,browser,lastPage,completed=false;const checks=[],errors=[],failed=[],responses=[],navigationCancelled=[];const requestOrigins=new WeakMap();
++const [binaryArg,bundleArg,outArg,assetsArg]=process.argv.slice(2),binary=path.resolve(binaryArg),bundle=path.resolve(bundleArg),out=path.resolve(outArg);
++fs.mkdirSync(out,{recursive:false});const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-memory-ui-'));
++const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
++// Optional frontend-only verification against a retained engine; actions use its real API.
++const assetNames=['project-memory.html','project-memory.js','project-memory.css','signals.js','signals.css'];
++const assets=assetsArg?Object.fromEntries(assetNames.map(name=>[name,fs.readFileSync(path.join(path.resolve(assetsArg),name))])):null;
++const inputs={binary:hash(fs.readFileSync(binary)),bundle:hash(fs.readFileSync(bundle)),recipe:hash(fs.readFileSync(__filename)),assets:assets&&Object.fromEntries(Object.entries(assets).map(([name,bytes])=>[name,hash(bytes)]))};
++let app,browser,lastPage,completed=false;const checks=[],errors=[],failed=[],responses=[],navigationCancelled=[],consoleErrors=[],rendering=[];const requestOrigins=new WeakMap();
+ function cli(args,input){const value=execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined});return value?JSON.parse(value):null}
+ const workOf=v=>v.work||v;
+ const request=(w,extra={})=>({schema_version:1,event_id:crypto.randomUUID(),expected_revision:w.revision,...extra});
+@@ -12,6 +17,26 @@
+ async function preview(page,form){assert(await page.$eval('#'+form,n=>n.checkValidity()),'Invalid preview form');await page.$eval('#'+form,n=>n.requestSubmit());await page.waitForFunction(()=>!document.querySelector('#memory-preview').hidden||document.querySelector('#memory-message').classList.contains('alert'));if(await page.$eval('#memory-preview',n=>n.hidden))throw Error('Preview rejected: '+await page.$eval('#memory-message',n=>n.textContent))}
+ async function apply(page){await page.click('#memory-apply');await page.waitForFunction(()=>document.querySelector('#memory-preview').hidden&&document.querySelector('#memory-message').textContent.includes('Décision enregistrée'))}
+ async function waitForFile(file){const deadline=Date.now()+30000;while(Date.now()<deadline){if(fs.existsSync(file)&&fs.readFileSync(file,'utf8').length)return fs.readFileSync(file,'utf8');await new Promise(r=>setTimeout(r,100))}throw Error('No provider context captured')}
++async function seals(page,versions,types=versions.map(()=>'procedure')){
++ const state=await page.$$eval('#memory-list article',cards=>cards.map(card=>({
++  seals:card.querySelectorAll('.swarm-context-seal').length,
++  last:card.lastElementChild?.classList.contains('swarm-context-seal'),
++  type:card.querySelector('.swarm-context-seal [data-signal^="memory-"]')?.dataset.signal,
++  version:card.querySelector('[data-signal^="version-"]')?.dataset.signal,
++  identity:card.querySelector('[data-signal^="identity-"]')?.dataset.signal,
++  protection:card.querySelector('[data-signal^="protection-"]')?.dataset.signal,
++  positive:card.querySelectorAll('.swarm-signal--success').length,
++  attribution:card.querySelector('.swarm-context-seal__attribution')?.textContent,
++  reference:card.querySelector('.swarm-context-seal__reference')?.textContent
++ })));
++ assert.equal(state.length,versions.length);
++ for(let i=0;i<state.length;i++){
++  const s=state[i];assert.equal(s.seals,1,'Each memory card must contain its shared context seal');assert.equal(s.last,true,'Seal at the foot of the card');
++  assert.equal(s.type,'memory-'+types[i]);assert.equal(s.version,'version-'+versions[i]);assert.equal(s.identity,'identity-unknown');assert.equal(s.protection,'protection-unknown');assert.equal(s.positive,0);
++  const language=await page.$eval('html',n=>n.lang);assert.equal(s.attribution,language==='en'?'Owner : Not supplied · Author : Not supplied':'Propriétaire : Non renseigné · Auteur : Non renseigné');assert(s.reference.includes('lesson-ui'));
++ }
++ return state;
++}
+ (async()=>{try{
+  cli(['init']);
+  // The prior source bundle was generated by the Go fixture, not a live mission.
+@@ -28,9 +53,18 @@
+  fs.writeFileSync(path.join(root,'.swarm/providers.json'),JSON.stringify({schema_version:1,providers:{fixture:{command:provider,args:[]}}}));
+  app=spawn(binary,['--root',root,'web','127.0.0.1:0']);
+  const url=await new Promise((resolve,reject)=>{let text='';app.stdout.on('data',b=>{text+=b;const match=text.match(/http:\/\/[^\s]+/);if(match)resolve(match[0])});app.on('error',reject);app.on('exit',code=>reject(Error('Server exited '+code)))});
+- fs.writeFileSync(path.join(out,'environment.json'),JSON.stringify({root,binary,bundle,url},null,2));
++ fs.writeFileSync(path.join(out,'environment.json'),JSON.stringify({root,binary,bundle,url,mode:assets?'candidate frontend over retained real API':'embedded candidate',assets:assetsArg&&path.resolve(assetsArg),inputs},null,2));
+  browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});
+  const page=await browser.newPage();lastPage=page;page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requestOrigins.set(r,page.url()));page.on('requestfailed',r=>{const entry={url:r.url(),error:r.failure().errorText,origin:requestOrigins.get(r)};let initial=false;try{initial=new URL(entry.origin).pathname==='/'}catch{}if(initial&&entry.error==='net::ERR_ABORTED')navigationCancelled.push(entry);else failed.push(entry)});page.on('response',r=>{if(r.status()>=400)responses.push({url:r.url(),status:r.status()})});
++ const served=new Set();let transportVariant=null;
++ page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text())});
++ await page.setRequestInterception(true);page.on('request',request=>{
++  const target=new URL(request.url()),name=target.pathname.slice(1);
++  if(transportVariant&&target.origin===new URL(url).origin&&target.pathname==='/api/v1/project-memory'&&request.method()==='GET')return void request.respond({status:200,contentType:'application/json',body:JSON.stringify(transportVariant)});
++  if(assets&&target.origin===new URL(url).origin&&Object.hasOwn(assets,name)){
++   served.add(name);void request.respond({status:200,contentType:name.endsWith('.html')?'text/html':name.endsWith('.css')?'text/css':'application/javascript',body:assets[name]});
++  }else void request.continue();
++ });
+  await page.goto(url);await page.goto(new URL('/project-memory.html?work='+source.id+'&lang=fr',url).href);
+  await page.waitForFunction(()=>document.querySelector('#memory-message').textContent.includes('actualisée'));
+  assert.equal(await page.$$eval('#memory-list article',n=>n.length),0);checks.push('Empty catalogue and authenticated loading');
+@@ -40,37 +74,53 @@
+  await page.keyboard.press('Escape');assert.equal(await page.evaluate(()=>document.activeElement.id),'memory-examine');
+  await preview(page,'memory-editor');await apply(page);
+  assert.equal(await page.$$eval('#memory-list article[data-state="active"]',n=>n.length),1);assert.equal(await page.$$eval('#memory-list img',n=>n.length),0);checks.push('Admission preview, Escape/focus, application and text-only rendering');
++ await seals(page,['active']);await page.setViewport({width:1440,height:1000});await(await page.$('#memory-list article')).screenshot({path:path.join(out,'memory-seal-active.png')});
++ checks.push('Real admitted procedure has one footer seal, active version and unknown rights/identity without invented attribution');
+  await page.select('#memory-work',destination.id);await page.click('[data-memory-choice]:not(:disabled)');await fill(page,'memory-selection-reason','Même type de correction');
+  await preview(page,'memory-selection');assert((await page.$eval('#memory-preview-content',n=>n.textContent)).includes(body));await apply(page);
+  destination=workOf(cli(['work','show',destination.id]));assert.equal(destination.tasks[0].memory_selections.length,1);
+  const launched=cli(['agent','start',destination.id],request(destination,{task_id:'target',provider:'fixture',role:'worker',workspace:'.',capture_output:true}));const agent=launched.agent||launched;
+  const captured=await waitForFile(path.join(root,'captured.txt'));assert(captured.includes(body));assert(captured.includes('Conditions à revérifier'));assert(captured.includes(source.id));checks.push('Selected source, exact content and conditions received by a real local provider process');
+- await page.click('article[data-state="active"] .memory-actions button');await fill(page,'memory-body','Nouvelle procédure : vérifier la réception et le résultat.');await fill(page,'memory-reason','Correction de la méthode');await preview(page,'memory-editor');await apply(page);
++ await page.click('article[data-state="active"] .memory-actions button');await page.select('#memory-kind','experience');await fill(page,'memory-body','Expérience : vérifier la réception et le résultat.');await fill(page,'memory-reason','Correction de la méthode');await preview(page,'memory-editor');await apply(page);
+  assert.equal(await page.$$eval('article[data-state="historical"]',n=>n.length),1);assert.equal(await page.$$eval('article[data-state="active"]',n=>n.length),1);checks.push('Replacement retains the first version');
++ await seals(page,['historical','active'],['procedure','experience']);
+  await page.$$eval('article[data-state="active"] .memory-actions button',buttons=>buttons[1].click());await fill(page,'memory-reason','Procédure devenue inadaptée');await preview(page,'memory-editor');await apply(page);
+  assert.equal(await page.$$eval('article[data-state="active"]',n=>n.length),0);assert.equal(await page.$$eval('article[data-state="historical"]',n=>n.length),2);assert.equal(await page.$$eval('[data-memory-choice]:not(:disabled)',n=>n.length),0);
+  const observed=cli(['agent','show',agent.id]);const retained=observed.agent||observed;assert(retained.prompt.includes(body));assert.equal(retained.context.memory[0].version,1);checks.push('Withdrawal prevents new selection while retaining the original received context');
++ await seals(page,['historical','historical','withdrawn'],['procedure','experience','experience']);checks.push('Real replacement changes procedure to experience; withdrawal updates the badge while retaining historical context and disabling selection');
+  for(const language of ['fr','en']){
+   await page.goto(new URL('/project-memory.html?work='+destination.id+'&lang='+language,url).href);await page.waitForFunction(()=>!document.querySelector('#memory-refresh').disabled&&document.querySelectorAll('#memory-list article').length===3);
+   assert.equal(await page.$eval('h1',n=>n.textContent),language==='fr'?'Mémoire du projet':'Project memory');assert((await page.$eval('#memory-list',n=>n.textContent)).includes(body));
++  await seals(page,['historical','historical','withdrawn'],['procedure','experience','experience']);assert.equal(await page.$eval('.swarm-context-seal__title',n=>n.textContent),language==='fr'?'Cachet de contexte':'Context seal');
+   for(const theme of ['etat','sombre']){
+    await page.evaluate(t=>{document.documentElement.dataset.theme=t;localStorage.setItem('swarm-theme',t)},theme);
+-   for(const width of [1440,1024,760,390,320]){await page.setViewport({width,height:1000});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${language}/${theme}/${width}: overflow`)}
++   for(const width of [1440,1024,760,390,320]){await page.setViewport({width,height:1000});const noOverflow=await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1);assert(noOverflow,`${language}/${theme}/${width}: overflow`);rendering.push({language,theme,width,noOverflow})}
+    const contrasts=await page.evaluate(()=>{
+     const rgb=value=>{const m=value.match(/[0-9.]+/g);return m?m.slice(0,3).map(Number):null};
+     const luminance=rgb=>rgb.map(v=>{v/=255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4)}).reduce((sum,v,i)=>sum+v*[0.2126,0.7152,0.0722][i],0);
+     const result=[];
+-    for(const node of document.querySelectorAll('.memory-header a,main p,label,summary,input,textarea,button.primary')){
++    for(const node of document.querySelectorAll('.memory-header a,main p,label,summary,input,textarea,button.primary,.swarm-signal')){
+      if(!node.getClientRects().length||node.matches(':disabled')||!getComputedStyle(node).color.startsWith('rgb'))continue;
+      let parent=node,background=null;while(parent){const value=getComputedStyle(parent).backgroundColor;if(value!=='rgba(0, 0, 0, 0)'&&value!=='transparent'){background=rgb(value);break}parent=parent.parentElement}
+      if(!background)continue;const foreground=rgb(getComputedStyle(node).color),a=luminance(foreground),b=luminance(background);result.push({element:node.id||node.tagName,ratio:(Math.max(a,b)+0.05)/(Math.min(a,b)+0.05)});
+     }return result;
+    });
+    assert(contrasts.length>10);assert(contrasts.every(c=>c.ratio>=4.5),JSON.stringify(contrasts.filter(c=>c.ratio<4.5)));
++   fs.writeFileSync(path.join(out,`contrast-${language}-${theme}.json`),JSON.stringify(contrasts,null,2));
+    await page.screenshot({path:path.join(out,`memory-${language}-${theme}.png`),fullPage:true});
+   }
+  }
+  checks.push('FR/EN, both themes, 1440/1024/760/390/320 widths and rendered text contrast >= 4.5:1; user text unchanged');
++ // Explicit synthetic transport variants: these are renderer checks, not engine receipts.
++ const catalog=JSON.parse(execFileSync(binary,['--root',root,'--json','memory','list'],{encoding:'utf8'}));
++ const variants=structuredClone(catalog);const sample=variants.entries.find(e=>e.version.action!=='withdraw');sample.status='unavailable';sample.version.kind='future-kind';sample.version.actor='<img src=x onerror=alert(1)>';variants.entries[1].status='future-state';
++ transportVariant=variants;
++ await page.click('#memory-refresh');await page.waitForFunction(()=>document.querySelector('#memory-list [data-signal="memory-unknown"]'));
++ assert.equal(await page.$$eval('#memory-list [data-signal="version-unavailable"]',n=>n.length),1);assert.equal(await page.$$eval('#memory-list img',n=>n.length),0);
++ assert.equal(await page.$$eval('#memory-list [data-signal="version-unknown"]',n=>n.length),1);assert(await page.$eval('#memory-list [data-signal="version-unknown"]',n=>n.closest('article').querySelector('input').disabled));
++ checks.push('Synthetic unavailable/future-kind transport stays unavailable/unknown; historical actor is rendered only as text');
++ transportVariant=null;
++ assert.deepEqual(consoleErrors,[],'No console errors before the deliberate stale-preview rejection');
+  // A source work changes after preview: the displayed decision must fail visibly.
+  await page.goto(new URL('/project-memory.html?work='+source.id+'&lang=fr',url).href);await page.waitForFunction(()=>document.querySelector('#memory-message').textContent.includes('actualisée'));
+  await fill(page,'memory-id','stale-ui');await fill(page,'memory-body','Candidate with stale preview');await fill(page,'memory-conditions','Current evidence');await fill(page,'memory-reason','Check freshness');await preview(page,'memory-editor');
+@@ -78,5 +128,9 @@
+  await page.click('#memory-apply');await page.waitForFunction(()=>document.querySelector('#memory-message').classList.contains('alert'));
+  assert.equal(await page.$eval('#memory-body',n=>n.value),'Candidate with stale preview');assert.equal((workOf(cli(['work','show',source.id]))).project_memory.length,1);checks.push('Stale preview rejected visibly without losing input or adding a lesson');
+  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);assert(responses.every(r=>r.url.includes('/api/v1/project-memory')&&r.status===409),JSON.stringify(responses));
+- fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({checks,errors,failed,responses,navigationCancelled},null,2));completed=true;console.log(checks.join('\n'));
++ assert(consoleErrors.every(e=>e.includes('409 (Conflict)')),JSON.stringify(consoleErrors));
++ if(assets)assert.deepEqual([...served].sort(),assetNames.slice().sort());
++ assert.equal(hash(fs.readFileSync(binary)),inputs.binary);assert.equal(hash(fs.readFileSync(bundle)),inputs.bundle);assert.equal(hash(fs.readFileSync(__filename)),inputs.recipe);
++ if(assets)for(const name of assetNames)assert.equal(hash(fs.readFileSync(path.join(path.resolve(assetsArg),name))),inputs.assets[name]);
++ fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({status:'PASS',checks,errors,failed,responses,navigationCancelled,consoleErrors,rendering,inputs,input_unchanged:true,served_candidate_assets:[...served],model_calls:0},null,2));completed=true;console.log(checks.join('\n'));
+ }finally{if(!completed&&lastPage){try{const state=await lastPage.evaluate(()=>({message:document.querySelector('#memory-message')?.textContent,forms:[...document.querySelectorAll('form input,form select,form textarea')].map(n=>({id:n.id,value:n.value,valid:n.checkValidity(),validation:n.validationMessage}))}));fs.writeFileSync(path.join(out,'browser-state.json'),JSON.stringify({state,checks,errors,failed,responses,navigationCancelled},null,2));await lastPage.screenshot({path:path.join(out,'failure.png'),fullPage:true})}catch{}}if(browser)await browser.close();if(app)app.kill('SIGTERM')}})().catch(error=>{fs.writeFileSync(path.join(out,'failure.txt'),error.stack||String(error));console.error(error);process.exitCode=1});
+--- before/docs/SEMANTIC-SIGNALS.md
++++ docs/SEMANTIC-SIGNALS.md
+@@ -1,8 +1,8 @@
+ # Cachets de contexte et repères partagés
+ 
+ Composant de présentation réutilisable, inspiré d'un cachet de cire au bas d'un
+-parchemin. **Le composant et le catalogue isolé sont livrés ; les écrans métier
+-existants ne les chargent pas encore.** Aucun cachet n'émet de droit, ne signe un
++parchemin. **Le composant, le catalogue isolé et le raccord à la page mémoire
++sont livrés dans les sources.** Aucun cachet n'émet de droit, ne signe un
+ document et ne certifie une identité. [English](en/SEMANTIC-SIGNALS.md).
+ 
+ ## Forme et vocabulaire
+@@ -59,10 +59,29 @@
+ ## Réutilisation par la session identité et les autres vues
+ 
+ Charger `signals.css` après les jetons et `signals.js` comme script local avant
+-le consommateur. Pour intégrer aux vues embarquées, ajouter ces deux fichiers
+-par le chemin de livraison frontend convenu, puis reconstruire et vérifier les
+-écrans concernés. Ne pas recopier les pictogrammes dans chaque vue, ni modifier
+-un fichier généré à la main. La démo n'a pas besoin d'être livrée avec l'application.
++le consommateur. Le chemin de génération des deux copies embarquées est :
++
++```sh
++node frontend/embed-signals.mjs
++node frontend/embed-signals.mjs --check
++```
++
++Le premier copie les deux assets canoniques vers `web/` ; le second refuse une
++copie absente ou différente sans la modifier. Ne pas modifier ces copies à la
++main. Leur génération précède la compilation Go (`go build -o /tmp/swarm-candidat
++./cmd/swarm`) et doit être coordonnée avec toute compilation consommant les
++mêmes ressources. Le catalogue n'est pas embarqué. La session identité peut
++charger ces mêmes URL locales sans dupliquer les icônes ; son raccord reste à
++réaliser et à vérifier dans son propre périmètre.
++
++`project-memory.html` charge les deux assets. Chaque fiche termine par un
++cachet dont le type vient de `version.kind`, et une référence travail/leçon/version.
++Le badge près de la sélection distingue `active`, `historical`, `unavailable` ;
++`version.action === 'withdraw'` donne « Retirée ». Un type ou état inconnu reste
++inconnu. Les cases demeurent sélectionnables uniquement pour `status === 'active'`.
++Les droits et l'identité restent inconnus ; le propriétaire et l'auteur sont
++« Non renseigné ». `version.actor` conserve sa place dans l'historique, sans
++devenir une attribution certifiée.
+ 
+ ```js
+ // Dans un fichier JS local de la vue, après chargement du composant.
+@@ -114,5 +133,15 @@
+ étant fermés en fin de recette. Elle vérifie les états, le retour à inconnu,
+ les textes malveillants, FR/EN, les deux thèmes, 1440/1024/760/390/320 px, le
+ contraste des badges, le clavier, le focus et les erreurs/réseau. Les résultats
+-et captures sont conservés. Il reste à vérifier chaque écran réel lors de son
+-intégration ; ce test isolé ne prouve pas l'application des droits du moteur.
++et captures sont conservés. Ce test isolé ne prouve pas l'application des droits.
++
++La recette de page `tests/project_memory_ui.cjs BINAIRE BUNDLE SORTIE_NEUVE`
++vérifie les ressources embarquées du binaire fourni. Son quatrième argument
++optionnel `DOSSIER_ASSETS` sert les cinq assets mémoire candidats dans le
++navigateur, au-dessus de l'API réelle du binaire conservé. Ce mode frontend est
++explicitement inscrit dans `environment.json` et ne prouve pas une compilation
++Go actuelle. Les variantes de transport synthétiques restent distinguées des
++admissions/remplacements/retraits réels. Elle conserve empreintes, transitions,
++contexte reçu par un fournisseur local scripté et diagnostics. Voir le
++[rapport M23](plans/deepagents-integration/RESULTATS-MEMOIRE-19.md) pour le mode
++effectivement exécuté et la limite du serveur utilisateur non redémarré.
+--- before/docs/en/SEMANTIC-SIGNALS.md
++++ docs/en/SEMANTIC-SIGNALS.md
+@@ -1,8 +1,8 @@
+ # Shared context seals and semantic signals
+ 
+ A reusable presentation component inspired by a wax seal at the foot of a
+-parchment. **The component and isolated catalogue are delivered; existing
+-application screens do not load them yet.** A seal grants no rights, signs no
++parchment. **The component, isolated catalogue and memory-page integration are
++delivered in source.** A seal grants no rights, signs no
+ document and certifies no identity. [Français](../SEMANTIC-SIGNALS.md).
+ 
+ ## Shape and meaning
+@@ -53,9 +53,27 @@
+ ## Reuse by the identity workstream and other views
+ 
+ Load `signals.css` after theme tokens and `signals.js` as a local script before
+-the consumer. For embedded views, deliver these two assets through the agreed
+-frontend path, rebuild, then verify the affected screen. Reuse the component;
+-do not duplicate icons or edit generated copies. Shipping the demo is optional.
++the consumer. Generate the two embedded copies with:
++
++```sh
++node frontend/embed-signals.mjs
++node frontend/embed-signals.mjs --check
++```
++
++The first command copies canonical assets into `web/`; the second rejects
++missing or different copies without modifying them. Do not edit generated copies.
++Generate before compiling Go (`go build -o /tmp/swarm-candidate ./cmd/swarm`),
++coordinating with any build consuming these resources. The demo is not embedded.
++The identity workstream can load the same local URLs; its own integration and
++verification remain separate work.
++
++`project-memory.html` loads both assets. Each card ends with a seal whose type
++comes from `version.kind`, and a work/lesson/version reference. The badge beside
++selection distinguishes `active`, `historical`, `unavailable`; an explicit
++`version.action === 'withdraw'` displays Withdrawn. Unknown types/states remain
++unknown. Selection still requires `status === 'active'`. Rights and identity
++remain unknown, with Owner and Author marked Not supplied. `version.actor`
++remains in the historical sources without becoming a certified attribution.
+ 
+ ```js
+ // In the view's local JS after loading the shared component.
+@@ -99,5 +117,15 @@
+ temporary build and a test static server; browser/server are closed afterwards.
+ It checks states, reset, hostile text, FR/EN, both themes, widths
+ 1440/1024/760/390/320, badge contrast, keyboard/focus and console/network errors.
+-Receipts and screenshots are retained. Each real screen still needs integration
++Receipts and screenshots are retained. Each real screen needs integration
+ testing; this isolated check does not establish engine permission enforcement.
++
++The page recipe `tests/project_memory_ui.cjs BINARY BUNDLE NEW_OUTPUT` verifies
++the supplied binary's embedded resources. Its optional fourth argument
++`ASSETS_DIRECTORY` serves five candidate memory assets in the browser over the
++retained binary's real API. This frontend-only mode is explicit in
++`environment.json` and does not verify a current Go build. Synthetic transport
++variants remain separate from real admissions, replacements and withdrawals.
++The recipe preserves hashes, transitions, context received by a scripted local
++provider and diagnostics. See the [M23 report](../plans/deepagents-integration/RESULTATS-MEMOIRE-19.md)
++(French) for the actual mode and the unchanged user server.
+--- before/docs/PROJECT-MEMORY.md
++++ docs/PROJECT-MEMORY.md
+@@ -312,10 +312,17 @@
+ du plan. Une autorité explicite avant plan reste à fournir ; aucune permission
+ n'est déduite du rôle, du cookie, d'un texte ou de l'absence de plan.
+ 
+-Une [bibliothèque de cachets et de repères](SEMANTIC-SIGNALS.md) est disponible
+-pour les futures vues mémoire et identité, avec descriptions FR/EN et inconnus
+-par défaut. Son catalogue interactif est isolé ; la page mémoire actuelle ne
+-charge pas encore ces assets. Ce composant de présentation ne délivre aucun droit.
++La page mémoire charge la [bibliothèque de cachets et de repères](SEMANTIC-SIGNALS.md).
++Au pied de chaque fiche, le cachet distingue expérience/procédure, droits et
++identité ; près de la sélection, un badge distingue version active, historique,
++retirée ou indisponible. Le type et l'état viennent du catalogue, sans confondre
++version active et autorisation. Propriétaire/auteur restent non renseignés,
++identité/droits non attestés ; l'acteur historique reste dans les sources.
++Les types ou états non reconnus restent inconnus. Ce composant FR/EN réutilisable
++par la vue identité ne délivre aucun droit. Le catalogue interactif reste isolé.
++Générer les assets avant compilation via `node frontend/embed-signals.mjs` ;
++voir le [rapport M23](plans/deepagents-integration/RESULTATS-MEMOIRE-19.md) pour les
++preuves frontend sur API conservée et la limite du serveur non redémarré.
+ 
+ ```mermaid
+ flowchart LR
+--- before/docs/en/PROJECT-MEMORY.md
++++ docs/en/PROJECT-MEMORY.md
+@@ -282,10 +282,17 @@
+ pre-plan authority remains required; no permission follows from a role, cookie,
+ text or the absence of a plan.
+ 
+-A [shared seal and signal library](SEMANTIC-SIGNALS.md) is available for future
+-memory and identity views, with FR/EN descriptions and unknown defaults. Its
+-interactive catalogue is isolated; the current memory page does not load these
+-assets yet. This presentation component issues no permission.
++The memory page loads the [shared seal and signal library](SEMANTIC-SIGNALS.md).
++Each card ends with a seal separating experience/procedure, rights and identity.
++A badge beside selection distinguishes active, historical, withdrawn and
++unavailable versions. Type and state come from the catalogue; an active version
++grants no permission. Owner/author stay Not supplied, identity/rights unattested,
++and the historical actor remains in the sources. Unrecognized types/states stay
++unknown. This bilingual component can be reused by the identity view; it grants
++no rights. Its interactive catalogue remains isolated. Generate assets before
++compilation with `node frontend/embed-signals.mjs`; see the
++[M23 report](../plans/deepagents-integration/RESULTATS-MEMOIRE-19.md) (French) for
++frontend evidence over the retained API and the unchanged user server.
+ 
+ ```mermaid
+ flowchart LR
+--- before/docs/UI-DESIGN.md
++++ docs/UI-DESIGN.md
+@@ -212,7 +212,10 @@
+ 
+ Le composant canonique est `frontend/signals/signals.js` et sa feuille
+ `signals.css`. Un catalogue interactif isolé démontre thèmes, états et variantes.
+-Les écrans actuels ne le chargent pas encore : intégrer les assets par le
+-chemin de livraison convenu et vérifier chaque vue, sans dupliquer les icônes.
++La page mémoire le charge : cachet au pied de la fiche, état de version près de
++la sélection. Générer les deux assets `web/signals.*` avec
++`node frontend/embed-signals.mjs`, puis `--check`, avant compilation. Les autres
++vues, dont l'identité, peuvent consommer cette API ; vérifier chaque intégration
++sans dupliquer les icônes. Le catalogue de démonstration reste hors application.
+ Sans données attestées, montrer identité/droits inconnus. Ni cachet, ni nom,
+ ni version active ne constitue une signature ou une autorisation.
+--- before/docs/plans/deepagents-integration/PLAN.md
++++ docs/plans/deepagents-integration/PLAN.md
+@@ -54,6 +54,7 @@
+ | M20 Propriété et droits du cadrage | Replan : identité et autorité préalables à l’extension hiérarchique | Attribution technique distinguée de la responsabilité et des droits ; ordre révisé dans `INCREMENT-MEMOIRE-16.md`, lié à R01/R13 et aux 18 scénarios IDA de `../actions-confiance/identites-agents-replan.md`. Création hors plan bloquée avec explication et décision humaine : exigence à réaliser, aucun code M20 ni partage activé. |
+ | M21 Liaison des citations et références | Correction vérifiée dans la préparation mémoire | Alias et doublons reproduits puis refusés par le validateur partagé, y compris le choix extractif ; 57 tests Python et parcours source → référence → worker scripté sur binaire M19 conservé. Voir `INCREMENT-MEMOIRE-17.md` et `RESULTATS-MEMOIRE-17.md`. M20/IA2–IA3 restent ouverts ; aucune identité ou autorisation déduite des empreintes. |
+ | M22 Cachets de contexte et repères | Composant et démonstration isolée vérifiés | Direction « cachet de cire au bas d'un parchemin », 29 repères FR/EN et descriptions, états inconnus par défaut. API réutilisable pour la session identité ; deux thèmes, cinq largeurs et contrastes vérifiés. Voir `RESULTATS-MEMOIRE-18.md` ; intégration aux écrans réels et droits moteur encore distincts. |
++| M23 Cachets dans la page mémoire | Intégration frontend vérifiée sur API conservée | Deux types et transitions réelles, identités/droits inconnus, 11 groupes de contrôle et 20 configurations FR/EN/thèmes/largeurs. Assets générés communs ; voir `RESULTATS-MEMOIRE-19.md` pour l'embarquement, les preuves et la limite du serveur non redémarré. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -233,6 +234,17 @@
+ inconnus, texte non fiable, deux thèmes et cinq largeurs ; aucune activation de
+ droit ou intégration aux écrans existants n'en est déduite. Documentation partagée
+ et RETEX : `RESULTATS-MEMOIRE-18.md`.
++
++Reprise suivante « merci la suite » : M23 intègre le composant à la page mémoire
++et ses états aux métadonnées réellement fournies. La recette de l'ancienne page
++échoue sur l'absence de cachet, puis onze groupes passent sur les cinq assets
++candidats avec l'API M19 isolée conservée ; vingt configurations sont vérifiées.
++Les ressources communes sont appliquées après la fin du processus Go observé.
++La documentation FR/EN précise génération et réutilisation, sans attestation
++inventée ni message à l'autre session. Résultat et RETEX :
++`RESULTATS-MEMOIRE-19.md`. Serveur utilisateur non redémarré, moteur identité
++courant non validé par cette recette. M20.2 et ses dix critères restent ouverts
++jusqu'au raccord des autorités publiques, dont le cadrage avant plan.
+ 
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+--- /dev/null
++++ frontend/embed-signals.mjs
+@@ -0,0 +1,19 @@
++// Generated web copies: edit frontend/signals, then run this script before building Go.
++import {readFile,writeFile} from 'node:fs/promises';
++import {fileURLToPath} from 'node:url';
++import path from 'node:path';
++import {createHash} from 'node:crypto';
++const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
++const args = process.argv.slice(2);
++if (args.length && (args.length !== 1 || args[0] !== '--check')) throw Error('Usage: node frontend/embed-signals.mjs [--check]');
++const check = args[0] === '--check', assets = {};
++for (const name of ['signals.js','signals.css']) {
++ const source = await readFile(path.join(root,'frontend','signals',name));
++ const destination = path.join(root,'web',name);
++ if (check) {
++  const copy = await readFile(destination);
++  if (!source.equals(copy)) throw Error('Stale generated web/'+name+': run node frontend/embed-signals.mjs');
++ } else await writeFile(destination,source);
++ assets[name] = createHash('sha256').update(source).digest('hex');
++}
++console.log(JSON.stringify({mode:check?'check':'generate',assets}));
+--- /dev/null
++++ web/signals.js
+@@ -0,0 +1,137 @@
++/* Local presentation vocabulary. No identity, permission or signature is issued here. */
++(function (root, factory) {
++ 'use strict';
++ const api = factory();
++ if (typeof module === 'object' && module.exports) module.exports = api;
++ else root.SwarmSignals = api;
++})(globalThis, function () {
++ 'use strict';
++ const paths = Object.freeze({
++  book: ['M4 4h6l2 2 2-2h6v15h-6l-2 2-2-2H4z', 'M12 6v15M7 8h2M7 11h2M15 8h2M15 11h2'],
++  flow: ['M9 3h6v5H9zM3 16h6v5H3zM15 16h6v5h-6z', 'M12 8v4H6v4M12 12h6v4'],
++  dialogue: ['M3 4h15v11H9l-5 4v-4H3z', 'M18 8h3v12h-3l-4 2v-4M6 8h9M6 11h6'],
++  summary: ['M6 3h12v18H6zM9 7h6M9 11h6M9 15h3', 'M2 9l3 3-3 3M22 9l-3 3 3 3'],
++  bulb: ['M8 16c0-3-3-4-3-8a7 7 0 0 1 14 0c0 4-3 5-3 8zM9 19h6M10 22h4', 'M12 5v7M9 8l3 4 3-4'],
++  layers: ['M12 3 2 8l10 5 10-5zM3 13l9 5 9-5M3 18l9 5 9-5'],
++  clock: ['M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z', 'M12 7v6l4 2'],
++  question: ['M4 4h16v16H4z', 'M9 8a3 3 0 1 1 5 2c-2 1-2 2-2 3M12 17h.01'],
++  check: ['M4 12l5 5L20 6'],
++  cross: ['M6 6l12 12M18 6 6 18'],
++  minus: ['M4 12h16'],
++  shield: ['M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6z'],
++  person: ['M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM4 22v-3a8 8 0 0 1 16 0v3'],
++  agent: ['M5 6h14v13H5zM9 10h.01M15 10h.01M9 15h6M12 3v3M2 10h3M19 10h3M2 15h3M19 15h3'],
++  service: ['M3 3h18v7H3zM3 14h18v7H3zM6 6h.01M6 17h.01M10 6h7M10 17h7M12 10v4'],
++  pen: ['m4 16 12-12 4 4L8 20l-5 1zM13 7l4 4'],
++  key: ['M11 8a5 5 0 1 1-10 0 5 5 0 0 1 10 0zM10 11l10 10M15 16l3-3M18 19l3-3'],
++  eye: ['M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z', 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'],
++  send: ['m3 3 19 9-19 9 4-9zM7 12h15'],
++  pause: ['M8 4v16M16 4v16']
++ });
++ const definitions = Object.create(null);
++ function add(id, family, glyph, tone, fr, en, detailFr, detailEn) {
++  definitions[id] = Object.freeze({id, family, glyph, tone,
++   label: Object.freeze({fr, en}), description: Object.freeze({fr: detailFr, en: detailEn})});
++ }
++ add('memory-unknown','memory','question','neutral','Type inconnu','Unknown type','La catégorie de mémoire n’est pas renseignée.','The memory category has not been supplied.');
++ add('memory-experience','memory','book','info','Expérience','Experience','Une expérience passée, à revalider avant réemploi.','A past experience to recheck before reuse.');
++ add('memory-procedure','memory','flow','info','Procédure','Procedure','Une méthode réutilisable avec ses conditions et limites.','A reusable method with conditions and limits.');
++ add('memory-dialogue','memory','dialogue','info','Cadrage','Framing','Une question et une réponse conservées dans leur contexte.','A question and answer retained in context.');
++ add('memory-summary','memory','summary','info','Résumé extractif','Extractive summary','Des extraits attribués ; les sources restent distinctes du résumé.','Attributed excerpts; sources remain distinct from the summary.');
++ add('memory-knowledge','concept','bulb','neutral','Faits · repère conceptuel','Facts · conceptual marker','Repère de mémoire sémantique ; ce n’est pas un nouveau type persistant disponible.','A semantic-memory marker, not a newly available persisted type.');
++ add('version-active','version','layers','info','Version active','Active version','Version courante du catalogue ; ce statut ne donne pas de droit d’usage.','Current catalogue version; this status grants no usage right.');
++ add('version-historical','version','clock','neutral','Historique','Historical','Version conservée pour comprendre le passé, sans actualité présumée.','Retained to explain the past, with no presumed current validity.');
++ add('version-withdrawn','version','minus','warning','Retirée','Withdrawn','Retirée du réemploi ; les textes et réceptions historiques sont conservés.','Withdrawn from reuse; historical text and receipts remain retained.');
++ add('version-unavailable','version','cross','danger','Indisponible','Unavailable','La source ne peut pas être utilisée dans ce contexte.','The source cannot be used in this context.');
++ add('version-unknown','version','question','neutral','État inconnu','Unknown state','Aucun état de version exploitable n’a été fourni.','No usable version state has been supplied.');
++ add('protection-unknown','protection','shield-question','neutral','Droits non établis','Rights not established','Aucun contrôle courant fourni ; aucune autorisation ne peut être déduite.','No current check supplied; no permission can be inferred.');
++ add('protection-pending','protection','shield-clock','warning','Décision attendue','Decision pending','L’usage attend une décision ; l’attente n’autorise pas l’action.','Use awaits a decision; waiting does not authorize the action.');
++ add('protection-allowed','protection','shield-check','success','Usage autorisé','Use authorized','Autorisation pour le contenu, le destinataire et la durée contrôlés, à vérifier dans la preuve.','Permission for the checked content, recipient and duration; consult its evidence.');
++ add('protection-denied','protection','shield-cross','danger','Usage refusé','Use denied','Le contrôle refuse cet usage ; le motif doit rester visible.','The check denies this use; its reason must remain visible.');
++ add('protection-revoked','protection','shield-minus','danger','Autorisation révoquée','Permission revoked','Un ancien accord ne permet plus un nouvel usage.','An earlier permission no longer permits new use.');
++ add('identity-unknown','identity','question','neutral','Identité non attestée','Identity not attested','Un nom ou un fournisseur ne prouve pas l’identité de l’intervenant.','A name or provider does not prove the actor’s identity.');
++ add('identity-pending','identity','clock','warning','Identité à vérifier','Identity check pending','La vérification est attendue ; ne pas afficher une identité attestée.','Verification is pending; do not show an attested identity.');
++ add('identity-verified','identity','person-check','success','Identité attestée','Attested identity','Identité attestée par le contrôle concerné ; aucun droit implicite.','Attested by the relevant check; no implicit rights follow.');
++ add('identity-suspended','identity','person-pause','danger','Identité suspendue','Identity suspended','Les droits courants sont suspendus ; l’auteur historique reste conservé.','Current rights are suspended; historical authorship is preserved.');
++ add('identity-revoked','identity','person-minus','danger','Identité révoquée','Identity revoked','La liaison ne peut plus autoriser de nouveaux usages.','The binding can no longer authorize new uses.');
++ add('actor-human','actor','person','info','Personne','Person','Catégorie d’acteur ; ce pictogramme ne prouve pas l’authentification.','Actor category; this icon does not prove authentication.');
++ add('actor-agent','actor','agent','info','Agent','Agent','Instance d’agent, à distinguer du fournisseur et de ses droits.','An agent instance, distinct from its provider and rights.');
++ add('actor-service','actor','service','info','Service','Service','Identité de service ; elle ne remplace pas un accord humain.','A service identity cannot substitute for human approval.');
++ add('usage-read','usage','eye','info','Consulter','Read','Droit de lecture ; il ne permet pas de rediffuser.','Read permission does not permit redistribution.');
++ add('usage-summarize','usage','summary','info','Résumer','Summarize','Droit de synthèse distinct de la consultation et de la transmission.','Summarization is distinct from reading and transmission.');
++ add('usage-transmit','usage','send','info','Transmettre','Transmit','Droit de transmettre au destinataire précisément autorisé.','Permission to transmit to the specifically authorized recipient.');
++ add('attribution-owner','attribution','key','info','Propriétaire','Owner','Responsabilité et autorité de gestion, distinctes de l’auteur.','Responsibility and management authority, distinct from authorship.');
++ add('attribution-author','attribution','pen','info','Auteur','Author','Origine de l’intervention ; elle ne donne pas tous les droits d’usage.','Origin of the contribution; it does not grant all usage rights.');
++ Object.freeze(definitions);
++ const words = Object.freeze({
++  fr: Object.freeze({seal:'Cachet de contexte',owner:'Propriétaire',author:'Auteur',unknown:'Non renseigné',reference:'Référence'}),
++  en: Object.freeze({seal:'Context seal',owner:'Owner',author:'Author',unknown:'Not supplied',reference:'Reference'})
++ });
++ function options(value = {}) {
++  const lang = value.lang || 'fr';
++  if (!Object.hasOwn(words,lang)) throw new RangeError('Unsupported signal language');
++  const doc = value.document || globalThis.document;
++  if (!doc?.createElementNS) throw new TypeError('A DOM document is required');
++  return {...value, lang, document: doc};
++ }
++ function element(doc, tag, className, text) {
++  const node = doc.createElement(tag); node.className = className;
++  if (text !== undefined) node.textContent = String(text);
++  return node;
++ }
++ function svgNode(doc, tag, attributes) {
++  const node = doc.createElementNS('http://www.w3.org/2000/svg', tag);
++  for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
++  return node;
++ }
++ function glyph(doc, name) {
++  const group = svgNode(doc,'g',{}), [base, mark] = name.split('-');
++  for (const d of paths[base]) group.append(svgNode(doc,'path',{d}));
++  if (mark) {
++   const overlay = svgNode(doc,'g',{transform:'translate(10 11) scale(.58)'});
++   for (const d of paths[mark]) overlay.append(svgNode(doc,'path',{d}));
++   group.append(overlay);
++  }
++  return group;
++ }
++ function icon(doc, name) {
++  const svg = svgNode(doc,'svg',{viewBox:'0 0 24 24',fill:'none',stroke:'currentColor','stroke-width':'1.7','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true',focusable:'false',class:'swarm-signal__icon'});
++  svg.append(glyph(doc,name));return svg;
++ }
++ function badge(id, config) {
++  const o = options(config), item = definitions[id];
++  if (!item) throw new RangeError('Unknown semantic signal');
++  const span = element(o.document,'span','swarm-signal swarm-signal--'+item.tone);
++  span.dataset.signal = id;span.title = item.description[o.lang];span.append(icon(o.document,item.glyph));
++  if (o.iconOnly) {span.setAttribute('role','img');span.setAttribute('aria-label',item.label[o.lang]);}
++  else span.append(element(o.document,'span','swarm-signal__label',item.label[o.lang]));
++  return span;
++ }
++ function state(family, value, config) {
++  if (!['identity','protection','version'].includes(family)) throw new RangeError('Unknown state family');
++  return badge(family+'-'+(value == null || value === '' ? 'unknown' : value),config);
++ }
++ function memory(kind, config) {
++  const id = 'memory-'+kind;
++  return badge(definitions[id]?.family === 'memory' || definitions[id]?.family === 'concept' ? id : 'memory-unknown',config);
++ }
++ function seal(config = {}) {
++  const o = options(config), doc = o.document, w = words[o.lang];
++  const memoryBadge = memory(o.memory,o), protection = state('protection',o.protection,o), identity = state('identity',o.identity,o);
++  const footer = element(doc,'footer','swarm-context-seal');
++  const mark = svgNode(doc,'svg',{viewBox:'0 0 80 80',fill:'none',stroke:'currentColor','stroke-width':'1.15','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true',focusable:'false',class:'swarm-context-seal__wax'});
++  const points = Array.from({length:72},(_,i)=>{const a=i*Math.PI/36,r=34+1.6*Math.sin(i*2.4)+.7*Math.cos(i*1.2);return (40+Math.cos(a)*r).toFixed(2)+','+(40+Math.sin(a)*r).toFixed(2)}).join(' ');
++  mark.append(svgNode(doc,'polygon',{points,fill:'currentColor','fill-opacity':'.12'}));
++  mark.append(svgNode(doc,'circle',{cx:'40',cy:'40',r:'28'}));
++  mark.append(svgNode(doc,'circle',{cx:'40',cy:'40',r:'24','stroke-dasharray':'1 3'}));
++  const imprint = svgNode(doc,'g',{transform:'translate(25 25) scale(1.25)'});
++  imprint.append(glyph(doc,definitions[memoryBadge.dataset.signal].glyph));mark.append(imprint);
++  const content = element(doc,'div','swarm-context-seal__content');
++  content.append(element(doc,'p','swarm-context-seal__title',w.seal));
++  const signals = element(doc,'div','swarm-context-seal__signals');signals.append(memoryBadge,protection,identity);content.append(signals);
++  content.append(element(doc,'p','swarm-context-seal__attribution',w.owner+' : '+(o.owner || w.unknown)+' · '+w.author+' : '+(o.author || w.unknown)));
++  if (o.reference) content.append(element(doc,'p','swarm-context-seal__reference',w.reference+' : '+o.reference));
++  footer.append(mark,content);return footer;
++ }
++ return Object.freeze({definitions,badge,state,memory,seal});
++});
+--- /dev/null
++++ web/signals.css
+@@ -0,0 +1,15 @@
++/* Semantic pairs come from Swarm's shared theme tokens. */
++.swarm-signal{display:inline-flex;align-items:center;gap:.45rem;max-width:100%;padding:.3rem .55rem;border:1px solid currentColor;border-radius:.35rem;vertical-align:middle;line-height:1.35;font-size:.875rem;overflow-wrap:anywhere}
++.swarm-signal__icon{flex:none;width:1.2rem;height:1.2rem}
++.swarm-signal--neutral{color:var(--wattson-texte-discret);background:var(--wattson-carte)}
++.swarm-signal--info{color:var(--wattson-info-encre);background:var(--wattson-info-fond)}
++.swarm-signal--success{color:var(--wattson-succes-encre);background:var(--wattson-succes-fond)}
++.swarm-signal--warning{color:var(--wattson-attention-encre);background:var(--wattson-attention-fond)}
++.swarm-signal--danger{color:var(--wattson-alerte-encre);background:var(--wattson-alerte-fond)}
++.swarm-context-seal{display:flex;align-items:center;gap:1.2rem;border-top:1px dashed var(--wattson-ligne);padding:1.25rem 0 .3rem;margin-top:1.5rem;color:var(--wattson-texte)}
++.swarm-context-seal__wax{flex:none;width:6.5rem;height:6.5rem;color:var(--wattson-accent-encre);filter:drop-shadow(0 2px 1px var(--wattson-carte-creuse))}
++.swarm-context-seal__content{min-width:0}
++.swarm-context-seal__title{font-family:Georgia,serif;font-size:1.25rem;color:var(--wattson-titre);margin:0 0 .6rem}
++.swarm-context-seal__signals{display:flex;flex-wrap:wrap;gap:.45rem}
++.swarm-context-seal__attribution,.swarm-context-seal__reference{font-size:.85rem;line-height:1.5;overflow-wrap:anywhere;margin:.65rem 0 0;color:var(--wattson-texte-discret)}
++@media(max-width:480px){.swarm-context-seal{align-items:flex-start;gap:.5rem}.swarm-context-seal__wax{width:4.1rem;height:4.1rem}.swarm-context-seal__signals{gap:.4rem}.swarm-signal{padding:.25rem .4rem}}
+--- /dev/null
++++ docs/plans/deepagents-integration/INCREMENT-MEMOIRE-19.md
+@@ -0,0 +1,55 @@
++# M23 — cachets dans la vue mémoire
++
++Reprise du 17 octobre 2026 après « merci la suite ». Propriétaire : Codex,
++développement direct, sans délégation ni orchestration native.
++
++## État et décision
++
++M22 a vérifié le composant isolé ; `project-memory.html` ne le charge pas encore.
++Le producteur `projectMemoryCatalog` fournit type, version, état et action de
++retrait, sans propriétaire ni auteur attestés ou décision de droit d'usage.
++Le champ `MemoryVersion.Actor` reste une attribution historique affichée dans
++les sources, sans être converti en identité certifiée.
++
++Deux options : recopier des pictogrammes propres à la page, ou livrer les deux
++assets canoniques et consommer leur API commune. Choix : seconde option, par
++génération explicite de `web/signals.js` et `web/signals.css` depuis
++`frontend/signals/`. Le catalogue de démonstration n'est pas embarqué.
++Les contrôles et actions mémoire existants sont conservés ; le cachet est au
++pied de la fiche. Une version active n'induit aucun droit d'usage.
++
++La compilation Go observée dans la session identité interdit une mutation
++concurrente des ressources embarquées. Préparer les fichiers hors de ces
++ressources, puis contrôler la fin du processus avant leur application. Ne pas
++modifier les sources identité ni arrêter son processus. Le serveur utilisateur
++reste inchangé ; aucun déploiement implicite.
++
++## Critères et séquence
++
++| ID | Observable | Vérification prévue |
++| --- | --- | --- |
++| M23-01 | Cachet au pied de chaque fiche réelle, type expérience/procédure provenant de `version.kind`. | Admission et changement de type par le parcours CLI/API/navigateur isolé. |
++| M23-02 | Active, historique, retirée, indisponible distincts ; type inconnu sans fausse expérience. | Remplacement, retrait et projection synthétique explicitement séparée des réponses réelles. |
++| M23-03 | Identité/droits inconnus et aucune attribution certifiée inventée. | Vérifier les badges, textes et l'absence de succès vert ; `actor` reste dans les sources. |
++| M23-04 | Sélection, aperçu, clavier, retrait, contexte reçu et refus périmé conservés. | Recette existante enrichie ; fournisseur local scripté, zéro appel modèle. |
++| M23-05 | FR/EN, deux thèmes, cinq largeurs, contraste et erreurs navigateur. | Mesures et captures des fiches réelles. |
++| M23-06 | Assets générés identiques aux sources et documentation FR/EN courante. | Génération et `--check`, lecture du diff et `git diff --check`. |
++
++Préserver les préimages et empreintes dans `evidence/m23-20261017/`, ajouter les
++assertions avant l'intégration, vérifier le contre-exemple sur les anciens
++assets puis le candidat. Choisir le plus petit environnement démontrant le
++parcours : binaire isolé actuel si ses entrées peuvent être figées ; sinon API
++M19 conservée et ressources frontend candidates explicitement servies dans
++la recette, sans déclarer une compilation Go actuelle vérifiée.
++
++## Limites maintenues
++
++M20/IA3 restent ouverts : aucune protection réelle ni nouvelle autorité n'est
++activée ici. La revue locale n'est pas une revue indépendante. Le résultat et
++le RETEX seront conservés dans `RESULTATS-MEMOIRE-19.md` avec les contrôles
++effectivement exécutés et les critères non vérifiés.
++
++Résultat : l'intégration frontend et les parcours sur API M19 conservée passent
++dans onze groupes, dont vingt configurations de rendu. L'embarquement Go est
++contrôlé séparément ; aucune validation du moteur identité courant ou du serveur
++utilisateur n'est déduite. Voir [résultats et RETEX](RESULTATS-MEMOIRE-19.md).
+--- /dev/null
++++ docs/plans/deepagents-integration/RESULTATS-MEMOIRE-19.md
+@@ -0,0 +1,104 @@
++# M23 — cachets intégrés à la page mémoire
++
++17 octobre 2026. Codex seul, développement direct, `replan` puis livraison
++bornée suivant APEX ; recette publique suivant `verify-fix`. Revue locale de
++l'auteur, sans revue indépendante ni acceptation par une mission Swarm.
++
++## Résultat et périmètre réel
++
++Les sources de `project-memory.html` chargent le composant commun. Chaque fiche
++se termine par son cachet de cire, son type réel et sa référence. Un badge près
++de la sélection distingue version active, historique, retirée et indisponible.
++Le passage procédure → expérience est vérifié par remplacement réel. Les types
++et états nouveaux restent inconnus ; les cases ne deviennent pas sélectionnables.
++
++L'API actuelle ne fournit pas les attestations M20. Propriétaire et auteur
++restent donc non renseignés, identité et droits inconnus, sans succès vert.
++`version.actor` reste du texte historique dans les sources. Aucun champ technique,
++nom, rôle, hash ou version active ne devient une preuve d'identité ou de droit.
++
++`frontend/embed-signals.mjs` copie seulement les deux assets canoniques vers
++`web/signals.*`. `--check` contrôle leur égalité sans modifier les copies. Le
++catalogue M22 reste hors application. Documentation et exemple de réutilisation :
++[FR](../../SEMANTIC-SIGNALS.md), [EN](../../en/SEMANTIC-SIGNALS.md).
++
++## Preuves et limites d'environnement
++
++Préimages, branche, HEAD et état sale : `evidence/m23-20261017/baseline.json`,
++`before/` et `status-before.txt`. Le code identité et les travaux préexistants
++sont préservés. Le processus Go identité observé a terminé avant l'application
++des assets ; l'instantané est dans `embed-generation.json`. Aucune interruption
++de processus tiers ni aucun message envoyé à l'autre session.
++
++La recette utilise l'API/CLI réelle du binaire M19 conservé, SHA-256
++`026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2`,
++et un bundle isolé produit par la fixture Go M3, jamais une base de mission
++réelle. Les cinq fichiers frontend candidats sont servis par interception
++bornée dans le navigateur ; leurs octets et empreintes sont conservés et
++contrôlés après exécution. Les opérations mémoire réelles ne sont pas simulées.
++Un contrôle de rendu distinct injecte les seuls états indisponible/inconnu et
++un acteur malveillant. Il ne constitue pas une décision du moteur.
++
++Le fournisseur est un sous-processus Python local recevant le contexte réel,
++sans appel de modèle. Cette recette ne compile pas le moteur identité actuel.
++La sonde Go de ressources vérifie séparément l'embarquement des cinq assets.
++Le serveur utilisateur n'a pas été redémarré ; aucun déploiement ni validation
++du moteur courant n'est déclaré.
++
++## Matrice de vérification
++
++| Critère | Résultat | Preuve |
++| --- | --- | --- |
++| M23-01 Cachet et types réels | PASS frontend/API M19 | Admission procédure, remplacement expérience et cachet en pied de chaque fiche. |
++| M23-02 États distincts | PASS dans le périmètre testé | Active/historique/retrait par opérations réelles ; indisponible/type et état inconnus par projection synthétique déclarée. |
++| M23-03 Aucune attestation inventée | PASS frontend | Droits/identité inconnus, attribution exacte non renseignée FR/EN, aucun badge de succès ni HTML issu de `actor`. |
++| M23-04 Parcours conservé | PASS API/CLI/navigateur M19 | Aperçu, Échap/focus, sélection, contexte reçu, historique après retrait ; aperçu périmé refusé sans écriture ni perte de saisie. |
++| M23-05 Langues et rendu | PASS | 20 configurations FR/EN × deux thèmes × 1440/1024/760/390/320 px ; contraste texte minimal 5,75:1 clair et 8,02:1 sombre. Captures inspectées en clair bureau et sombre anglais mobile. |
++| M23-06 Génération et documentation | Vérification finale dans `audit-final.json` | `--check`, sonde d'embarquement, égalité des octets, docs FR/EN, liens, diff propre. |
++| Moteur courant complet, serveur utilisateur, droits M20 | NOT TESTED dans ce lot | Pas de nouvelle compilation moteur ou de déploiement ; le chantier identité conserve la responsabilité des attestations. |
++
++Onze groupes d'assertions passent dans `browser-final/checks.json`, avec
++commandes/dates/codes dans `browser-final-run.json` et sortie originale dans
++`browser-final.log`. Aucune exception de page ni requête échouée. Le seul
++HTTP 409 et son message console sont le refus périmé intentionnel, observé après
++vérification d'une console vide. Les entrées pertinentes sont inchangées.
++
++## Contre-exemple, incidents et récupération
++
++- `browser-red/` reproduit l'absence de cachet sur l'ancienne page : attendu 1,
++  observé 0. Les hashes des assets consommés figurent dans son environnement ;
++  leurs originaux restent dans `before/web/` et les sources canoniques M22.
++- `browser-candidate/` vérifie le premier candidat ; la couverture est ensuite
++  élargie aux deux types persistants et à l'état inconnu. `browser-verified/`
++  puis `browser-final/` sont liés aux fichiers `web/` effectivement livrés ;
++  `browser-final/` porte la source finale de la recette.
++- Un patch documentaire groupé est refusé parce qu'une phrase anglaise attendue
++  n'existait pas. Aucun fichier de ce patch n'est appliqué. Lecture de la fin
++  réelle, correction du contexte puis application réussie ; une coquille locale
++  `transitions,+contexte` est retirée avant contrôle final. Ce défaut de méthode
++  ne modifie aucun code ni preuve de test.
++- Le premier audit documentaire refuse cette même chaîne dans le RETEX, où elle
++  décrit volontairement l'incident historique. Le garde est restreint aux pages
++  opérationnelles concernées ; la preuve originale n'est pas effacée. La revue
++  locale clarifie aussi un commentaire de recette : les actions utilisent l'API
++  réelle, tandis que les variantes de lecture sont explicitement synthétiques.
++  La recette est relancée sur cette source finale.
++
++## RETEX et reprise
++
++La séparation type/version/identité/droits évite d'assimiler disponibilité et
++autorisation. La documentation commune transmet les mappings, les valeurs
++inconnues et le chemin de génération à la session identité, sans prétendre
++qu'elle a déjà adopté le composant. Les prochains consommateurs doivent relier
++leurs états à des reçus vérifiés ; le cachet ne peut ni fabriquer ni remplacer
++ces reçus. Le présent lot ne ferme pas M20/IA3.
++
++La compilation partagée rend nécessaire une vérification bornée et traçable :
++préparer hors ressources communes, attendre la fin observée du consommateur,
++vérifier les octets livrés et distinguer frontend sur API conservée, embarquement
++Go et binaire moteur réellement servi. Le build courant et son éventuel
++redémarrage restent un incrément distinct à coordonner avec le chantier identité.
++La reprise fonctionnelle suivante demeure M20.2 : persistance de la propriété,
++auteur attesté et droits de lecture/résumé/transmission au niveau des producteurs
++et consommateurs, selon `CONTRAT-USAGES-MEMOIRE.md`, après disponibilité des
++opérations publiques d'autorité nécessaires, notamment avant adoption d'un plan.

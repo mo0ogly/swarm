@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "mission-priority",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/src/**/*.rs",
+    "rust/crates/swarm-engine/tests/mission_control.rs",
+    "rust/crates/swarm-cli/src/*.rs",
+    "tools/verification/recipe.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_priority.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-staged-audit-failure-rollback-and-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,hashlib,subprocess\nfrom pathlib import Path\nbinary=Path(os.environ['SWARM_PRIORITY_AUDIT_TEST_BINARY']).resolve()\np=json.loads(Path(os.environ['SWARM_PRIORITY_AUDIT_TEST_PROFILE']).read_bytes())\nif hashlib.sha256(binary.read_bytes()).hexdigest()!=p['executable_sha256']:raise ValueError('audit-test-binary-mismatch')\nartifact=p['core_artifact']\nif artifact['target']['name']!='mission_control' or artifact['features']!=[] or not artifact['profile']['test']:raise ValueError('audit-test-profile-invalid')\nsubprocess.run([str(binary),'--exact','priority_audit_refusal_rolls_back_saved_value_and_recovers','--nocapture'],check=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "priority_audit_refusal_rolls_back_saved_value_and_recovers ... ok",
+        "1 passed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-cli-ordinal-metadata-and-persisted-consumer",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-priority-',dir='.cache')).resolve()\nargs=['python3','tests/rust_mission_priority.py']\nfor key,var in [('binary','SWARM_PRIORITY_BINARY'),('profile','SWARM_PRIORITY_PROFILE')]:\n value=Path(os.environ[var]).resolve()\n if not value.is_file():raise ValueError('priority-input-missing:'+var)\n args+=['--'+key,str(value)]\nsubprocess.run(args+['--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS exact persisted priority, canonical replay, refusals and actual order",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

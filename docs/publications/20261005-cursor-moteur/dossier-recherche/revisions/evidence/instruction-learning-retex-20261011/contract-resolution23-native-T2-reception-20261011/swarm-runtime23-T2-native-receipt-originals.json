@@ -1,0 +1,62 @@
+{
+  "at": "2026-10-11T21:37:18.720038+00:00",
+  "event_id": "T2-own-scope-original-proof-repair-01ee70df3a1449e890353fd945033a56",
+  "native_revision": 565,
+  "native_review": "review-aac9c2070e72abe2a655eb12",
+  "native_candidate": "95e2afb9ca56b48ae2f393396cb2d83e0ba7b309",
+  "native_context_sha256": "f01653114085721584f9ee3ba137fe6271155cb325afe3274e3066f17bca6223",
+  "original_helper_received_sha256": "4e190bce0ee367c5b490b495b0c1f1c6c4a821df11ab8a33f7568289fb6c586d",
+  "originals_in_diff": [
+    "own-scope-budget-harness.go.txt",
+    "own-scope-budget-receipt.json",
+    "own-scope-budget.out"
+  ],
+  "controls": [
+    {
+      "id": "plan-entry",
+      "exit": 0,
+      "wall_duration_ms": 28,
+      "stdout_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-validation",
+      "exit": 0,
+      "wall_duration_ms": 13830,
+      "stdout_sha256": "9b4865a76754f439697584a0c8f4b9324cf926318da5c1d803d9a9a31299eacd"
+    },
+    {
+      "id": "plan-delivery",
+      "exit": 0,
+      "wall_duration_ms": 26,
+      "stdout_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-criterion-1",
+      "exit": 0,
+      "wall_duration_ms": 29,
+      "stdout_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-criterion-2",
+      "exit": 0,
+      "wall_duration_ms": 32,
+      "stdout_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-criterion-3",
+      "exit": 0,
+      "wall_duration_ms": 25,
+      "stdout_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "id": "plan-criterion-4",
+      "exit": 0,
+      "wall_duration_ms": 25,
+      "stdout_sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    }
+  ],
+  "review_workflow_digest": "0b5d056832b3443734c933d91b6681c63439e70d3e6f886e4215fe47988ca809",
+  "reviewer_calls": 65,
+  "old5_three_originals_unchanged": true,
+  "limits": "HTTP timeout occurred after applied repair; no replay. Original helper provided to native inspection context, not yet final selection/verdict/acceptance."
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "event_id": "duplicate-2",
+  "expected_revision": 2,
+  "expected_trust_revision": 1,
+  "canonical_digest": "52496607b734d45a6cf5aebc775596f79ca5a14fe6c4483aa2676358d92d1fbd",
+  "project_path": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm-fixtures/swarm-blp-history-dkd7bc3r",
+  "classification": {
+    "level": "confidential",
+    "compartments": [
+      "client-a"
+    ]
+  },
+  "reason": "PRIVATE_BLP_HISTORY_FIXTURE"
+}

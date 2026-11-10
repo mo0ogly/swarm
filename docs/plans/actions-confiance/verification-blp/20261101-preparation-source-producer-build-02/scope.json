@@ -1,0 +1,9 @@
+{
+  "status": "FAIL",
+  "installed": false,
+  "cause": "profile-effective-input-changed:rust/crates/swarm-authority/src/audit.rs,rust/crates/swarm-authority/src/server.rs",
+  "compilation_exit": 0,
+  "owner": "Authority concurrent session",
+  "resumption": "finish or pause concurrent effective-source edits before another qualification",
+  "public_cli_http_recipe": "NOT_RUN: requires a VERIFIED_DEFAULT_NATIVE_PROFILE image"
+}

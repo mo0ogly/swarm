@@ -1,0 +1,9 @@
+--- FAIL: TestInstructionRevisionOperatorNextRemainsComposable (0.04s)
+    instruction_revision_operator_test.go:19: operator input made rejection unavailable consigne déjà transmise ou modifiée ; rejet indisponible
+--- FAIL: TestInstructionRevisionOperatorNextAllowsFurtherLearning (0.03s)
+    instruction_revision_operator_test.go:31: operator input disabled further learning opération 1 revise-instructions[future] : consigne modifiée depuis les ajouts ; réexaminer le contexte actuel
+--- FAIL: TestInstructionRevisionLegacyOperatorPrefixReconciles (0.03s)
+    instruction_revision_operator_test.go:43: recognizable persisted composition cannot recover consigne déjà transmise ou modifiée ; rejet indisponible
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.148s
+FAIL

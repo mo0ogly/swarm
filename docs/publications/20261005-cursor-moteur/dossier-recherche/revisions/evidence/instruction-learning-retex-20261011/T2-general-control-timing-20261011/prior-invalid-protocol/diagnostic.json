@@ -1,0 +1,28 @@
+{
+  "at": "2026-10-11T20:44:41.700575+00:00",
+  "classification": "Invalid original model reply, diagnostic only; not a validated verdict and not reusable review proof",
+  "cause_observed": "Two resolved citations join separate source lines, violating literal original-evidence requirement",
+  "comparisons": [
+    {
+      "packet": 4,
+      "artifact": 4,
+      "selected_artifact_sha256": "e169aece1b673877d64c62aae56c784494e17c5a351ce2e0f30cf663688924d4",
+      "original_slice": "nable` (0 = défaut 20, borne 1..500),\npersisté dans le travail exactement comme `max_activations`/`max_tasks`/\n`max_decisions` sur la même requête. Le défaut 20 et la borne technique 500\nsont des valeurs Go explicites ; le",
+      "invalid_quote": "Le défaut 20 et la borne technique 500 sont des valeurs Go explicites",
+      "literal_in_original": false
+    },
+    {
+      "packet": 4,
+      "artifact": 5,
+      "selected_artifact_sha256": "7e79eee442ff190c4ffe56827d06d476c4b86a39e37284aaae6e6e8634d53993",
+      "original_slice": "nable` (0 = default 20, bound 1..500), persisted in the work exactly like\n`max_activations`/`max_tasks`/`max_decisions` on the same request. The default\n20 and technical bound 500 are currently explicit Go values; their Ad",
+      "invalid_quote": "The default 20 and technical bound 500 are currently explicit Go values",
+      "literal_in_original": false
+    }
+  ],
+  "hypotheses_falsified": [
+    "Go function signatures were actually present literally in selected artifacts; no fabricated signature established",
+    "Do not relax original-proof matching to admit these paraphrases"
+  ],
+  "limits": "Other resolutions and business findings remain independent; this diagnosis is not a final review."
+}

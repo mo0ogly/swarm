@@ -1,0 +1,6 @@
+=== RUN   TestDefectCitationMissingArtifactCannotDefaultToZero
+    managed_review_fragment_defect_citation_test.go:179: missing artifact silently interpreted as zero
+--- FAIL: TestDefectCitationMissingArtifactCannotDefaultToZero (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.020s
+FAIL

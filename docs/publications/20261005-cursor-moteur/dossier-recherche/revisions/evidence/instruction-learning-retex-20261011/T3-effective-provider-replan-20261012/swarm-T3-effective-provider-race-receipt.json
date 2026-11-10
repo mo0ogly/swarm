@@ -1,0 +1,21 @@
+{
+  "state": "finished",
+  "started": "2026-10-12T10:49:20.565756+00:00",
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "TestCursorEngineT3ClaimUsesEffectiveScopeProviderCooldown|TestProviderCooldownGuardsDoNotReserveAgentsPlannerOrReviewer|TestRoleModelIndependentRoutesPreserveCounters",
+    "-count=1",
+    "-timeout=120s"
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-3el54ztk",
+  "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+  "finished": "2026-10-12T10:50:15.150844+00:00",
+  "exit": 0,
+  "wall_seconds": 54.58635891000449,
+  "output_sha256": "72d14ee7a3e442b786b2fc53602d504b282fb00309c8e5f50abaf038746dbc50",
+  "drift": []
+}

@@ -1,0 +1,226 @@
+GO producer:
+// provenReport retient le rapport produit par cette tentative : lisible, non
+// vide et modifié après son départ. Aucun contenu n'est interprété — la
+// lecture du fond reste humaine. Plusieurs candidats restent ambigus : choisir
+// à la place de l'opérateur reviendrait à soumettre une preuve non désignée.
+func (s *Store) provenReport(task, started string) (string, string) {
+	since, e := time.Parse(time.RFC3339Nano, started)
+	if e != nil {
+		return "", "date de départ de la tentative illisible"
+	}
+	// Tolérance de dérive : l'horloge murale et la date de modification d'un
+	// fichier ne viennent pas de la même source et peuvent se croiser de
+	// quelques instants. Une tentative réelle dure bien plus que cette marge,
+	// donc elle n'affaiblit pas le refus d'un rapport d'une tentative passée.
+	since = since.Add(-reportClockSkew)
+	fresh := []string{}
+	stale := 0
+	for _, rel := range s.taskReports(task) {
+		p, e := safeReport(s.root, rel)
+		if e != nil {
+			continue
+		}
+		info, e := os.Stat(p)
+		if e != nil || info.Size() == 0 {
+			continue
+		}
+		if info.ModTime().Before(since) {
+			stale++
+			continue
+		}
+		fresh = append(fresh, rel)
+	}
+	switch {
+	case len(fresh) == 1:
+		return fresh[0], ""
+	case len(fresh) > 1:
+		return "", "plusieurs rapports candidats pour cette tentative (" + strings.Join(fresh, ", ") + ")"
+	case stale > 0:
+		return "", fmt.Sprintf("aucun rapport produit par cette tentative ; %d rapport(s) antérieur(s) ignoré(s)", stale)
+	}
+	return "", "aucun rapport lisible et non vide sous docs/ pour cette tâche"
+
+SOURCE rust/crates/swarm-engine/src/root_store/mission_status_reports.rs
+/// for docs alone proves an empty listing. Contained regular file symlinks are
+/// included; directory symlinks are never traversed. Directory/file owners need
+/// not match the process. Permission, outside-Root/nonregular targets, child
+/// races, IO and explicit close failures preserve their causes and refuse.
+/// No directory is created and no report content or attribution is inferred.
+pub(super) fn task_reports(root: &Path, task: &str) -> Result<Vec<String>, E> {
+    if !swarm_identity_contract::name(task.as_bytes()) {
+        return Err(E::Refused("mission-status-report-task-invalid"));
+    }
+    let path = root.join("docs");
+    let file: File = match fs::open(
+        &path,
+        OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+        Mode::empty(),
+    ) {
+        Ok(fd) => fd.into(),
+        Err(rustix::io::Errno::NOENT) => return Ok(Vec::new()),
+        Err(e) => return Err(cause("mission-status-reports-open", e)),
+    };
+    let result = (|| {
+        let before = directory(&file)?;
+        let mut found = Vec::new();
+        walk(root, &file, "docs", task, &mut found)?;
+        let current = std::fs::symlink_metadata(&path)
+            .map_err(|e| cause("mission-status-reports-path", e))?;
+        if !current.is_dir() || before.dev() != current.dev() || before.ino() != current.ino() {
+            return Err(E::Refused("mission-status-reports-directory-changed"));
+        }
+        found.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+        Ok(found.into_iter().map(|(path, _)| path).collect())
+    })();
+    close(result, file)
+}
+/// Go operationText masking and terminal-cell clipping for fallback traces.
+/// Sanitization and sensitivity masking precede the Go-compatible 600-cell
+/// representation bound. Whole clusters are preserved; checked width overflow
+/// retains its typed cause. Pure presentation, no execution/permission policy.
+fn trace(reason: &str) -> Result<String, E> {
+    let text = crate::agent_terminal_text::terminal_text(reason);
+    let lower = text.to_lowercase();
+    if [
+
+SOURCE rust/crates/swarm-engine/src/gate_evaluation.rs
+/// Observe metadata under the contained regular-artifact path contract used by
+/// gate hashing. Selected file symlinks may resolve to regular files inside the
+/// project through local_file; no UID, private-mode or content-read requirement
+/// is added. Linux uses an O_PATH descriptor (metadata access only), checks its
+/// regular type and closes explicitly; other platforms use their stat operation.
+/// Returned metadata is a point-in-time observation, not content, attribution,
+/// a later-action lease or an atomic pathname/SQL snapshot. Path/open/metadata/
+/// type/close failures retain their original causes, including both failures.
+pub(crate) fn artifact_metadata(
+    root: &Path,
+    name: &str,
+) -> Result<(std::path::PathBuf, std::fs::Metadata)> {
+    let path =
+        local_file(root, name).map_err(|e| GateEvaluationError::caused("artifact-path", e))?;
+    #[cfg(target_os = "linux")]
+    {
+        let file = File::from(
+            rustix::fs::open(
+                &path,
+                rustix::fs::OFlags::PATH
+                    | rustix::fs::OFlags::CLOEXEC
+                    | rustix::fs::OFlags::NOFOLLOW,
+                rustix::fs::Mode::empty(),
+            )
+            .map_err(|e| GateEvaluationError::caused("artifact-open", io::Error::from(e)))?,
+        );
+        let result = (|| {
+            let metadata = file
+                .metadata()
+                .map_err(|e| GateEvaluationError::caused("artifact-metadata", e))?;
+            if !metadata.is_file() {
+                return Err(invalid("artifact-regular-file-required"));
+            }
+            Ok(metadata)
+        })();
+        let closed = nix::unistd::close(file).map_err(io::Error::from);
+        match (result, closed) {
+            (Ok(metadata), Ok(())) => Ok((path, metadata)),
+            (Err(error), Ok(())) => Err(error),
+            (Ok(_), Err(e)) => Err(GateEvaluationError::caused("artifact-close", e)),
+            (Err(mut error), Err(e)) => {
+                error.cleanup = Some(e);
+                Err(error)
+            }
+        }
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let metadata = std::fs::metadata(&path)
+            .map_err(|e| GateEvaluationError::caused("artifact-metadata", e))?;
+        if !metadata.is_file() {
+            return Err(invalid("artifact-regular-file-required"));
+        }
+        Ok((path, metadata))
+    }
+}
+/// Read the bytes that a context consumer will hash and parse from the same buffer.
+/// Allocation is fallible, there is no implicit truncation/cap, and close errors
+/// prevent success. The caller must compare the buffer's digest before parsing.
+
+SOURCE rust/crates/swarm-engine/src/root_store/mission_status_reports.rs
+/// Observe the real current review before building result facts. Complete Work,
+/// settings and full-history/view eligibility must already be checked by Root.
+/// Semantic causes stay in the supplied sidecar; facts causes are also retained.
+/// No new authority, defaults, launch or mutation follows. Unknown read/close
+/// errors refuse, and caller still verifies its enclosing material snapshot.
+pub(super) fn observed_result_inputs(root:&Path,work:&crate::Work,task:&crate::Task,agent:Option<&Agent>,settings:&crate::EngineSettingsDocument,causes:&mut Vec<E>,mut facts:super::TaskFreshnessEvidence)->Result<crate::mission_status_tasks::ResultObservation,E> {
+    causes.append(&mut facts.causes);
+    let review=match agent {
+        Some(agent) if task.status!="accepted"=>Some(super::mission_status_review::observe(root,work,task,agent,settings,causes)?),
+        Some(_)=>Some(crate::mission_status_tasks::ReviewObservation::NotApplicable),
+        None=>None,
+    };
+    result_inputs_with_review(root,task,agent,facts.freshness,facts.gate,review)
+}
+
+/// Test-only constructor adapter: unsupported non-passed opinions still refuse
+/// without a real producer. Supplied facts establish no actual Root evidence.
+#[cfg(test)]
+pub(super) fn result_inputs(root:&Path,task:&crate::Task,agent:Option<&Agent>,freshness:crate::mission_status_tasks::FreshnessObservation,gate:crate::mission_status_tasks::GateObservation)->Result<crate::mission_status_tasks::ResultObservation,E> {
+    result_inputs_with_review(root,task,agent,freshness,gate,None)
+}
+
+/// Observe only facts consumed by the applicable ordinary terminal result branch.
+/// Accepted results consume the supplied current gate/freshness before any
+/// report/review/readiness projection. This producer never accepts a task.
+/// Active and failed/interrupted results use the real docs walk; early reports
+/// remain unverified. Completed/submitted results
+/// consume the retained submitted report path and do not scan docs or attribute a
+/// fresh report; reports/attribution/incomplete remain explicitly NotObserved.
+/// Callers must run supported() on full history: ordinary Work or the bounded
+/// nonmanaged planned active, failed/interrupted or submitted branches admitted
+/// there. Display-window absence of an Agent cannot establish eligibility;
+/// supported_view() must also establish the selected branch's required facts.
+/// Current review is absent or passed before NotApplicable is supplied, matching
+/// Go’s passed-opinion fallthrough. Previous opinions still refuse; non-passed
+/// opinions require the actual supplied projection.
+/// This is no verdict check. Accepted freshness separately checks native originals;
+/// no IO or permission is inferred from skipping the review presentation.
+fn result_inputs_with_review(
+    root: &Path,
+    task: &crate::Task,
+    agent: Option<&Agent>,
+    freshness: crate::mission_status_tasks::FreshnessObservation,
+    gate: crate::mission_status_tasks::GateObservation,
+    observed_review: Option<crate::mission_status_tasks::ReviewObservation>,
+) -> Result<crate::mission_status_tasks::ResultObservation, E> {
+    use crate::mission_status_tasks::*;
+    if let Some(agent) = agent {
+        if (review_requires_projection(task) && observed_review.is_none())
+            || task
+                .previous_reviews
+                .as_ref()
+                .is_some_and(|rows| !rows.is_empty())
+        {
+            return Err(E::Refused("mission-status-terminal-review-unported"));
+        }
+        if agent.status == "completed" && !matches!(task.status.as_str(), "submitted" | "accepted")
+            && !(task.status=="blocked" && matches!(&observed_review,Some(ReviewObservation::Presented(_)))) {
+            return Err(E::Refused("mission-status-completed-unsubmitted-unported"));
+        }
+    }
+    Ok(ResultObservation {
+        freshness,
+        gate,
+        reports: if agent.is_some_and(|agent| {
+            agent.is_active() || matches!(agent.status.as_str(), "failed" | "interrupted")
+        }) {
+            ReportListing::Observed(task_reports(root, &task.id)?)
+        } else {
+            ReportListing::NotObserved
+        },
+        attribution: ReportAttribution::NotObserved,
+        incomplete_report: IncompleteReport::NotObserved,
+        review: observed_review.unwrap_or_else(|| if agent.is_some() {
+            ReviewObservation::NotApplicable
+        } else {
+            ReviewObservation::NotObserved
+        }),
+    })

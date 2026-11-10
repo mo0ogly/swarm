@@ -1,0 +1,16 @@
+{
+  "base_commit": "d4539e0041000a38acb162a17f053e318fb3db5d",
+  "binary_sha256": "30763335512de76808611fb3647d9f719b7e44f43ad285b868fba940e47383a7",
+  "files": {
+    "docs/training/casa-pizza/tutoriels/build_player.py": "b393de4be73385a8415c4e12acc8f5b79362f58cc59ac34e0382f08bb657b0f5",
+    "docs/training/casa-pizza/tutoriels/build_media.py": "6f6dbafaf1096a3944e63e8312373066f99c31db2dfb9778db1912a738e35cf5",
+    "docs/training/casa-pizza/tutoriels/build_graph_overview.py": "ff48f42ed96b83df0ef56773957eac931e44c765220bff4b0f22c35fab45b077",
+    "docs/training/casa-pizza/tutoriels/index.html": "54e8d368f8a8e8e608544ed3d7da9302621eef386ce6477bf84db19c552c194c",
+    "docs/training/casa-pizza/tutoriels/player.js": "e998022f1fe534621cf1c3d84830fd4b8dc09c9cda03db18127eea61ce183666",
+    "docs/training/casa-pizza/tutoriels/storyboard.json": "9b834ff498ac5e1e4f58c1235114ecf58e5fbe137f2296caf1b48cb2f9268b56",
+    "docs/training/casa-pizza/tutoriels/manifest.json": "07aec1197f332748a77b04af4766e322903db106f55739daae8a52d763b9624e",
+    "docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip": "b29008bf3b6c810ab5067b4877386cb1d33ef6949a6eb3360e78cb023fabcd67",
+    "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip": "cd8f95bb91584d154e0b82d209a130f3a552bd6aeb476957e4c3bde39984497f",
+    "tests/training_design_ui.cjs": "64c0c3eb387417c03dd4e0ae1b09a3ef7004d48c1c7d638e570185f8048b8a86"
+  }
+}

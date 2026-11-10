@@ -1,0 +1,20 @@
+{
+  "git_head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "source_sha256": {
+    "internal/engine/mission_insights.go": "1e98afcf0fc899e719165eae0b480d43d3e469ab7fd858d4d85bc96ed1b788d2",
+    "internal/engine/dialogue_checkpoint_store.go": "cb8241a597a1b33cf59449234353207290e99ff42c3e0a42e2c345c2a23da35d",
+    "web/mission-insights.js": "d291a341b41a7292efab5b93457282bf8ee282f07fc978f39c99ae5ea7cf306f",
+    "locales/en.json": "78190a1d2656bc714c9e61a1d7c578640a3baba72f4e6a2f34176d7927aca4a1",
+    "web/i18n-en.js": "6470d7766ea3f86ed7106d681f4620512eb6c8655e01a7ab0b283518500d78fa",
+    "tests/recovery_evidence_test.cjs": "e0533384f58427e567976ece438cce9328b9fb99c5ca8e91908930fb6596290d",
+    "docs/PROJECT-MEMORY.md": "de7e0edc7e0cc31f984f182a62564f3d77f1db050a6b0b8c898b73952159652a",
+    "docs/en/PROJECT-MEMORY.md": "62faff3276f1365638278d50674a69be9bdf3a42952fc098d210e6fdba83f5b8",
+    "docs/plans/deepagents-integration/PLAN.md": "b1821172918dd5f370613e075fd30d0a2a0520b8d28ff1740bb3aa6aad7ac6bf",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "3e8044d653f10217a2542c1d3e9e15b14f5cd265b597a3f00c2a117f02b5627d"
+  },
+  "running_server_preserved": {
+    "pid": 2186583,
+    "url": "http://127.0.0.1:38433/"
+  },
+  "model_calls": 0
+}

@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-17T13:15:41.184393+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "preimages": [
+    "internal/engine/store.go",
+    "internal/engine/memory_work.go",
+    "docs/PROJECT-MEMORY.md",
+    "docs/en/PROJECT-MEMORY.md",
+    "docs/plans/deepagents-integration/PLAN.md",
+    "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md"
+  ],
+  "read_only": {
+    "internal/engine/agents_store.go": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+    "internal/engine/agents_process.go": "00d74a35555c8c4fb2f2ac56d5482bc3b8a8ca0bbb97755a14f5cb02dfec256f",
+    "internal/engine/agent_identity_plan_schema_linux.go": "1e25bd7910c2a5c037caa2eb63248a1ce7045aab2f4531af287d11b39cc1f4b0",
+    "internal/engine/agent_identity_registry_store.go": "5caa3e567df9646ade66026bd1c3a0e46e85bb3b022e3f0dbff8490789d04609",
+    "internal/engine/archive.go": "7affca0bbc15f4878497696ba7b0fdffe0d5ac440008ea2dd6f5d6c4225b63da",
+    "internal/engine/project_memory.go": "16aa64873f1a26f102a9c1e26d4021425bf063ea7ff1b58c7634a423ec77070d",
+    "internal/engine/project_memory_public.go": "356c0244289d7bfa406db87606c567796dabfb326d365eca611f00160511b2b4"
+  },
+  "watchdog": "No justified global bound: go test -timeout=0 and subprocess without timeout; observe progress"
+}

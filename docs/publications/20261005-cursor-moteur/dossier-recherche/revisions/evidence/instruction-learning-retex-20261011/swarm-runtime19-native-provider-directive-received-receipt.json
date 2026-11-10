@@ -1,0 +1,62 @@
+{
+  "at": "2026-10-11T18:32:10.330063+00:00",
+  "revision": 460,
+  "review": "review-14a105dc677c088e4121afb7",
+  "review_state": "running",
+  "candidate_commit": "b3cdfcf607d0466cace8cc27de4325ee5a1d75e8",
+  "source_result": "review-14a105dc677c088e4121afb7-result-535af40f3d61106c",
+  "decision": "planning-claim-0a755bd9fb948a65f580ded9-decision",
+  "journal_path": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-f61e23cf5a02b03f/fragment-journal-1b701b7578f2fe511017a6b92df4268410a417704338be31b3c66e5edd9d6a6d.json",
+  "journal_sha256": "1b701b7578f2fe511017a6b92df4268410a417704338be31b3c66e5edd9d6a6d",
+  "call_entries": [
+    {
+      "call_id": "fragment-call-f22b0f58f6a8d8d63205d0d2",
+      "packet": 0,
+      "state": "unknown",
+      "prompt_sha256": null,
+      "retry_directive": null
+    },
+    {
+      "call_id": "fragment-call-eec14fd3aef2d0ddf5813be9",
+      "packet": 1,
+      "state": "interrupted",
+      "prompt_sha256": null,
+      "retry_directive": null
+    },
+    {
+      "call_id": "fragment-call-80ca44c819e6c48e09024714",
+      "packet": 1,
+      "state": "unknown",
+      "prompt_sha256": "05fd7f78710ecaab9d36cf898a3bd020d2e6d59cf26a44d38ef288728d1326c6",
+      "retry_directive": {
+        "decision": "planning-claim-0a755bd9fb948a65f580ded9-decision",
+        "scope": "root",
+        "result_event": "review-14a105dc677c088e4121afb7-result-535af40f3d61106c",
+        "review": "review-14a105dc677c088e4121afb7",
+        "candidate_commit": "b3cdfcf607d0466cace8cc27de4325ee5a1d75e8",
+        "attempt": "a-2f9e1debb1548be96273f0d3",
+        "failure_code": "review_fragment_protocol",
+        "cause": "inspection de fragment : extrait original absent ou preuve encore demandée",
+        "instruction": "Correction adressée au vérificateur pour la revue review-14a105dc677c088e4121afb7 sur le candidat inchangé b3cdfcf607d0466cace8cc27de4325ee5a1d75e8, sous les identités actuelles (review_id, attempt a-2f9e1debb1548be96273f0d3, contexte déjà reçu) : la précédente classification de 3 artefacts sur 23 comme « inspected » avec une liste de besoins (needs) non vide est un défaut de protocole, pas un refus sémantique valide. Le statut inspected exige needs=[]. Si un extrait original manque réellement pour ces 3 artefacts, reclasser explicitement chacun en unknown et nommer précisément l'extrait original manquant, son chemin/fragment attendu et la vérification qui le rendrait disponible — le rapport indique qu'un original existe dans un autre fragment déjà transmis, donc vérifier d'abord cette localisation avant de conclure à une absence réelle. Ne pas inventer de contenu manquant ni transformer ce doute en refus du producteur : rejouer l'inspection sur les mêmes sources jointes, sans nouvelle preuve demandée au producteur tant que la reclassification needs/inspected n'a pas été corrigée."
+      }
+    },
+    {
+      "call_id": "fragment-call-23234abf9899f11a8de8972c",
+      "packet": 2,
+      "state": "reserved",
+      "prompt_sha256": "27d37743830b4b847cb703225dee26571fdc239ee84241a179ddcf631d48cd81",
+      "retry_directive": {
+        "decision": "planning-claim-0a755bd9fb948a65f580ded9-decision",
+        "scope": "root",
+        "result_event": "review-14a105dc677c088e4121afb7-result-535af40f3d61106c",
+        "review": "review-14a105dc677c088e4121afb7",
+        "candidate_commit": "b3cdfcf607d0466cace8cc27de4325ee5a1d75e8",
+        "attempt": "a-2f9e1debb1548be96273f0d3",
+        "failure_code": "review_fragment_protocol",
+        "cause": "inspection de fragment : extrait original absent ou preuve encore demandée",
+        "instruction": "Correction adressée au vérificateur pour la revue review-14a105dc677c088e4121afb7 sur le candidat inchangé b3cdfcf607d0466cace8cc27de4325ee5a1d75e8, sous les identités actuelles (review_id, attempt a-2f9e1debb1548be96273f0d3, contexte déjà reçu) : la précédente classification de 3 artefacts sur 23 comme « inspected » avec une liste de besoins (needs) non vide est un défaut de protocole, pas un refus sémantique valide. Le statut inspected exige needs=[]. Si un extrait original manque réellement pour ces 3 artefacts, reclasser explicitement chacun en unknown et nommer précisément l'extrait original manquant, son chemin/fragment attendu et la vérification qui le rendrait disponible — le rapport indique qu'un original existe dans un autre fragment déjà transmis, donc vérifier d'abord cette localisation avant de conclure à une absence réelle. Ne pas inventer de contenu manquant ni transformer ce doute en refus du producteur : rejouer l'inspection sur les mêmes sources jointes, sans nouvelle preuve demandée au producteur tant que la reclassification needs/inspected n'a pas été corrigée."
+      }
+    }
+  ],
+  "limits": "Durable native actual call receipt has exact directive and prompt hash; independent review/global acceptance still pending. Provider raw stdin equality is covered by isolated actual-process regression, not a native stdin capture."
+}

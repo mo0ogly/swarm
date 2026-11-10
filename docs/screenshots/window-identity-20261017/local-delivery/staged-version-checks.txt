@@ -1,0 +1,44 @@
+=== RUN   TestAgentWorkflowRolesAreBounded
+=== RUN   TestAgentWorkflowRolesAreBounded/planner
+    agent_workflow_test.go:44: planner workflow: 32117 bytes
+=== RUN   TestAgentWorkflowRolesAreBounded/subplanner
+    agent_workflow_test.go:44: subplanner workflow: 32123 bytes
+=== RUN   TestAgentWorkflowRolesAreBounded/worker
+    agent_workflow_test.go:44: worker workflow: 31276 bytes
+=== RUN   TestAgentWorkflowRolesAreBounded/reviewer
+    agent_workflow_test.go:44: reviewer workflow: 18715 bytes
+--- PASS: TestAgentWorkflowRolesAreBounded (0.02s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/planner (0.01s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/subplanner (0.00s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/worker (0.00s)
+    --- PASS: TestAgentWorkflowRolesAreBounded/reviewer (0.00s)
+=== RUN   TestVersionTwoBackupRestoresContextBeforeTrackingMigration
+--- PASS: TestVersionTwoBackupRestoresContextBeforeTrackingMigration (1.67s)
+=== RUN   TestVersionHistoryLocalChangesAreSeparateFromPublishedReleases
+--- PASS: TestVersionHistoryLocalChangesAreSeparateFromPublishedReleases (0.00s)
+=== RUN   TestVersionCLIIsStableAndDoesNotOpenStorage
+--- PASS: TestVersionCLIIsStableAndDoesNotOpenStorage (0.04s)
+=== RUN   TestVersionDiagnosticDistinguishesThreeValuesAndMissingValue
+--- PASS: TestVersionDiagnosticDistinguishesThreeValuesAndMissingValue (0.00s)
+=== RUN   TestVersionRejectsExtraArgumentsBeforeStorage
+--- PASS: TestVersionRejectsExtraArgumentsBeforeStorage (0.00s)
+=== RUN   TestBinaryVersionDegradesInvalidInjectedValues
+--- PASS: TestBinaryVersionDegradesInvalidInjectedValues (0.00s)
+=== RUN   TestReleaseBuildRequiresCompleteIdentity
+=== RUN   TestReleaseBuildRequiresCompleteIdentity/semantic_version
+=== RUN   TestReleaseBuildRequiresCompleteIdentity/commit
+=== RUN   TestReleaseBuildRequiresCompleteIdentity/modified
+=== RUN   TestReleaseBuildRequiresCompleteIdentity/build_date
+--- PASS: TestReleaseBuildRequiresCompleteIdentity (0.07s)
+    --- PASS: TestReleaseBuildRequiresCompleteIdentity/semantic_version (0.01s)
+    --- PASS: TestReleaseBuildRequiresCompleteIdentity/commit (0.02s)
+    --- PASS: TestReleaseBuildRequiresCompleteIdentity/modified (0.03s)
+    --- PASS: TestReleaseBuildRequiresCompleteIdentity/build_date (0.01s)
+=== RUN   TestEmbeddedVersionHistoryMatchesPublishedReleaseManifest
+--- PASS: TestEmbeddedVersionHistoryMatchesPublishedReleaseManifest (0.00s)
+=== RUN   TestVersionHistoryAcceptsOnlyBoundedCoherentGitHubData
+--- PASS: TestVersionHistoryAcceptsOnlyBoundedCoherentGitHubData (0.00s)
+=== RUN   TestServerVersionJSONSeparatesBinarySourceAndHistoryWithoutGit
+--- PASS: TestServerVersionJSONSeparatesBinarySourceAndHistoryWithoutGit (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	1.879s

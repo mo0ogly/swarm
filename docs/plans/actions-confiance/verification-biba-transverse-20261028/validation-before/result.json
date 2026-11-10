@@ -1,0 +1,24 @@
+{
+  "status": "REPRODUCED_CONTROL_WRITE_UP",
+  "cases": [
+    {
+      "label": "valid",
+      "root": "/tmp/swarm-model83-xcm8zswe",
+      "private_write": false,
+      "controls_passed": true,
+      "accepted": false,
+      "before_sha256": "9d3346aebb56f76fdb1d58415475aef500e7f569d01258081afcb00f8e7fb272",
+      "after_sha256": "909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d"
+    },
+    {
+      "label": "fault",
+      "root": "/tmp/swarm-model83-nix6gbuc",
+      "private_write": true,
+      "controls_passed": true,
+      "accepted": false,
+      "before_sha256": "9d3346aebb56f76fdb1d58415475aef500e7f569d01258081afcb00f8e7fb272",
+      "after_sha256": "909ae5d8726f5fa1d305b3b33c2f48e01579ac9502d46e66bcf7d03abce4f03d"
+    }
+  ],
+  "scope": "Owned synthetic report code; no real state/secret or acceptance"
+}

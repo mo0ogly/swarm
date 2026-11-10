@@ -1,0 +1,50 @@
+{
+  "go.mod": {
+    "before": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "current": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb"
+  },
+  "go.sum": {
+    "before": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "current": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b"
+  },
+  "internal/enrollmentconfig/config.go": {
+    "before": "f945356d943962d3219c202c861f0e18c1f7f5f84008260603d6460cafeca687",
+    "current": "f945356d943962d3219c202c861f0e18c1f7f5f84008260603d6460cafeca687"
+  },
+  "internal/enrollmentconfig/config_test.go": {
+    "before": "d6d6e1d0f8a600b7e6b97bfe2c785129c0c0c5b8b75114317f491c89f0ef4977",
+    "current": "d6d6e1d0f8a600b7e6b97bfe2c785129c0c0c5b8b75114317f491c89f0ef4977"
+  },
+  "internal/enrollmentconfig/coordinator_linux.go": {
+    "before": "2223b0c6327194830660d160db7f2c5dd20aa529a33c9bd9cff68f718004154b",
+    "current": "2223b0c6327194830660d160db7f2c5dd20aa529a33c9bd9cff68f718004154b"
+  },
+  "internal/enrollmentconfig/coordinator_linux_test.go": {
+    "before": "3b7c7dbb73b0bd6997afb8f275017c2e96012a9879e783b3b0af08ab6b4ea312",
+    "current": "3b7c7dbb73b0bd6997afb8f275017c2e96012a9879e783b3b0af08ab6b4ea312"
+  },
+  "internal/enrollmentconfig/store_linux.go": {
+    "before": "35042fb579104287fd7a7c2cbbc452aa41c80969caf0bafa132100cd6d664bc0",
+    "current": "35042fb579104287fd7a7c2cbbc452aa41c80969caf0bafa132100cd6d664bc0"
+  },
+  "internal/enrollmentconfig/store_linux_test.go": {
+    "before": "975833b2ba07e1a54bf432867025e7a5db0e9f56c7860d3b720f25f056db6706",
+    "current": "975833b2ba07e1a54bf432867025e7a5db0e9f56c7860d3b720f25f056db6706"
+  },
+  "internal/enrollmentconfig/witness_linux.go": {
+    "before": "a7cdb1a5f4f33ceba740522092a1a9aa630b0a0ab779958dad31f348090684bd",
+    "current": "a7cdb1a5f4f33ceba740522092a1a9aa630b0a0ab779958dad31f348090684bd"
+  },
+  "internal/enrollmentconfig/witness_linux_test.go": {
+    "before": "7c00c7ed8e27e881d203a295ed87639b09f39d4aa69ab435d4365cd858c3cc5b",
+    "current": "7c00c7ed8e27e881d203a295ed87639b09f39d4aa69ab435d4365cd858c3cc5b"
+  },
+  "internal/identitycontract/contract.go": {
+    "before": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8",
+    "current": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8"
+  },
+  "internal/identitycontract/contract_test.go": {
+    "before": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7",
+    "current": "3ca9b1020401471a5a3a887d063def73019eb32485f6b023277de776ae859ea7"
+  }
+}

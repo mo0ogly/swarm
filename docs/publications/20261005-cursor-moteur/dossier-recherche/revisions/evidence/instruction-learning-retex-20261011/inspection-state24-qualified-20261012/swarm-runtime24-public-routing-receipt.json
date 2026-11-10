@@ -1,0 +1,59 @@
+{
+  "at": "2026-10-11T22:30:05.144676+00:00",
+  "bundle": {
+    "at": "2026-10-11T22:29:55.666803+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-inspection-state-contract-20261012.bundle",
+    "sha256": "256a46f21919d7f1e66667c642a819a38b72380ff81f5cb74827035a97e23c9a",
+    "commit": "6aac4410ae60da0dafaac1c95df16cbe226deb9d",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 114,
+    "manifest_sha256": "bf041cc7c691f2875f2b6476aa719ba74057695b253b9b4c0e945cff7fb384e0",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/inspection-state24-inputs-whkcx82v",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/inspection-state24-import-grvc1dd0",
+    "old110_originals_preserved": true,
+    "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+    "limits": "Cumulative110 originals preserved byte-for-byte, including six-example controls/feedback documentation, plus qualified24 inspector-state and supervisor operation output contracts with exact versioned preimages. Apply a patch only to its verified recorded preimage. T3 integrates all cumulative fixes then qualifies its own complete candidate; T4 checks invalid and legacy proof/operation variants; T7 verifies actual reception, decision, application and effect; T8 RETEX after recipe. No native acceptance inferred; original methods, schema29, budgets, refusals and spending preserved."
+  },
+  "updates": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "revision": 590,
+      "operator_base_sha256": "29315d960af8e1b2c425385fdc4e0a48e9101439d2bd726dda0dbb509b7be8d8",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision": 591,
+      "operator_base_sha256": "7d56a8b9e2211e5302447be170ad6b283e9a38de84284461ab56a2b1f290a801",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision": 592,
+      "operator_base_sha256": "043765028e23d8dcc5ff7babb1083f537ac10a4da1e66dad2a798d71732eb7ad",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "revision": 593,
+      "operator_base_sha256": "7015bfc558a8d8bb4f76b58cb42ffb92617f749d89b47cf2b5c10594a4378eab",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision": 594,
+      "operator_base_sha256": "53911df79477919dfdc20b9fd4f418a5157d97e4eeda715d51f838361943b606",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "revision": 595,
+      "operator_base_sha256": "1a14c45d96c7bf3403669425a0f99e99542b0940a765b08afde823d584ad64ba",
+      "criteria_dependencies_attempts_learning_preserved": true
+    }
+  ],
+  "native_revision": 595,
+  "paused": false,
+  "t2_original_preserved": true,
+  "limits": "Inputs saved by public operations; future worker reception and native acceptance remain required."
+}

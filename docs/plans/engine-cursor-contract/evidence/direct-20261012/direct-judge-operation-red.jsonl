@@ -1,0 +1,9 @@
+{"Time":"2026-10-12T22:09:06.570634739+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-12T22:09:06.597243486+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeOperationIsReceivedAndRenewsFreshContext"}
+{"Time":"2026-10-12T22:09:06.597311296+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeOperationIsReceivedAndRenewsFreshContext","Output":"=== RUN   TestPlanningJudgeOperationIsReceivedAndRenewsFreshContext\n"}
+{"Time":"2026-10-12T22:09:06.64517568+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeOperationIsReceivedAndRenewsFreshContext","Output":"    planning_judge_operations_test.go:25: root cannot submit a structured global judgment opération 1 judge[] : opération non autorisée : judge\n"}
+{"Time":"2026-10-12T22:09:06.646166582+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeOperationIsReceivedAndRenewsFreshContext","Output":"--- FAIL: TestPlanningJudgeOperationIsReceivedAndRenewsFreshContext (0.05s)\n"}
+{"Time":"2026-10-12T22:09:06.646185037+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestPlanningJudgeOperationIsReceivedAndRenewsFreshContext","Elapsed":0.05}
+{"Time":"2026-10-12T22:09:06.646267605+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-12T22:09:06.650950116+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.080s\n"}
+{"Time":"2026-10-12T22:09:06.65105719+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.08}

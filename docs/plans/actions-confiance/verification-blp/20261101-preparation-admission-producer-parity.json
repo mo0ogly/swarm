@@ -1,0 +1,7 @@
+{
+  "status": "IDENTICAL_PRODUCER_BODY",
+  "baseline": "qualified304 effective source archive",
+  "baseline_body_sha256": "9fa5e1124395835ad033ab209bdae921d5ca4516c27db8fe854c4aad7c99c1dc",
+  "current_body_sha256": "9fa5e1124395835ad033ab209bdae921d5ca4516c27db8fe854c4aad7c99c1dc",
+  "scope": "Exact common capture body; wrapper receives the same owned id/time/nonce/hash and borrowed validated intent, send still owns save/reserve/verify. New snapshot reader does not save/reserve. Not a runtime result or independent acceptance."
+}

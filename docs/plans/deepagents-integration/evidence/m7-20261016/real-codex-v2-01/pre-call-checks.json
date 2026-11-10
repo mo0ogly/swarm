@@ -1,0 +1,25 @@
+{
+  "at_utc": "2026-10-16T07:58:54.555569+00:00",
+  "result": "PASS",
+  "semantic_request_body_equivalent_after_normalization": true,
+  "normalization": [
+    "exact experimental input",
+    "isolated cwd",
+    "client_metadata session IDs and start timestamp",
+    "input item IDs",
+    "prompt_cache_key"
+  ],
+  "nested_metadata_varying_fields": [
+    "context_window_id",
+    "installation_id",
+    "root_turn_id",
+    "session_id",
+    "thread_id",
+    "turn_id",
+    "turn_started_at_unix_ms",
+    "window_id"
+  ],
+  "remaining_semantic_differences": [],
+  "real_model_calls_so_far": 0,
+  "limits": "Local unauthenticated request inspection only; remote authenticated request bodies not captured. Cache state and independent sampling remain uncontrolled. No causal or statistical generalization."
+}

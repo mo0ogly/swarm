@@ -2,18 +2,19 @@
 
 Les agents fondés sur des grands modèles de langage ne se contentent plus de produire du texte :
 ils préparent des actions qui modifient le monde, dont certaines sont irréversibles, comme un
-virement. Les organisations d'agents décrites par l'industrie acceptent une part d'erreur et la
-corrigent après coup ; cette tolérance convient au code, qu'un commit suivant répare, mais pas à
-un paiement, qu'aucune revue finale ne rattrape. Ce dossier défend une thèse simple : sur un
+virement. Certaines organisations d’agents tolèrent des erreurs dans les artefacts
+intermédiaires, puis les corrigent avant livraison. Cette tolérance ne suffit pas lorsque
+l’effet externe précède la correction : une revue ultérieure ne garantit pas sa récupération. Ce dossier défend une thèse simple : sur un
 processus à effet irréversible, les agents doivent seulement proposer, un moteur déterministe doit
 médiatiser chaque lancement, chaque reprise et chaque acceptation, et un exécutant déterministe
 doit seul produire l'effet. Nous formalisons cette séparation par huit invariants du moteur et
 trois propriétés de l'exécutant, la mettons en œuvre dans Swarm, moteur ouvert écrit en Go, et
-l'évaluons sur un banc de facturation simulé soumis à des fautes injectées. Sur 9 000 exécutions
-avec des agents scriptés, le moteur ne produit aucun paiement inexact ni aucun faux succès, là où
-une chaîne sans moteur déclare réussi un règlement démenti par le grand livre dans 1 900 cas sur
-3 000 ; la clé d'idempotence reste indispensable contre les doublons, et le contrôle coûte un
-facteur 8 à 30 en durée. Avec un agent réel, aucune exécution ne produit d'effet faux, mais un
+l'évaluons sur un banc de facturation simulé soumis à des fautes injectées. La campagne comprend 9 000 exécutions
+avec des agents scriptés. Parmi les 2 968 exécutions Swarm valides sur 3 000, aucun paiement
+inexact ni faux succès n’est observé ; les 32 erreurs ou délais restent des échecs à expliquer. Une
+chaîne sans moteur déclare réussi un règlement démenti par le grand livre dans 1 900 cas sur
+3 000 ; la clé d'idempotence reste indispensable contre les doublons, et l’implémentation mesurée coûte un
+facteur 8 à 30 en durée dans ce banc, avec des niveaux de parallélisme différents. Avec un agent réel, aucune exécution ne produit d'effet faux, mais un
 workflow fixe reprenant les mêmes contrôles fait jeu égal avec le moteur. L'évaluation a enfin
 retourné la méthode contre le moteur lui-même : elle y a révélé cinq défauts, corrigés puis
 soumis à une campagne de vérification. Le dossier se termine par le programme de recherche qui
@@ -36,19 +37,24 @@ Ces organisations reposent sur un compromis assumé. Un intégrateur central, ch
 vérifier avant chaque modification, est devenu un goulot d'étranglement ; exiger une correction
 complète avant chaque commit sérialisait le travail. Le système accepte donc un taux d'erreur
 faible mais non nul, en comptant sur des corrections ultérieures [Lin 2026a]. Ce compromis est
-raisonnable pour du code : une erreur introduite aujourd'hui se corrige demain, et son coût se
-limite au temps perdu.
+applicable à des modifications intermédiaires conservées dans un dépôt : elles peuvent être
+corrigées avant diffusion. Cursor demande aussi une branche verte avant livraison. Il ne s’agit
+pas d’une opposition générale entre code réversible et finance irréversible : du code déployé
+peut lui aussi produire des dommages externes. La distinction porte sur le moment où un effet
+est autorisé, et sur les garanties de récupération après cet effet.
 
 ## 1.2 L'effet irréversible change la question
 
 Le même raisonnement ne tient plus lorsque l'action produit un effet qu'on ne peut pas annuler.
-Un virement émis ne se rappelle pas ; une facture payée deux fois se récupère, au mieux, par une
-procédure longue et incertaine ; un paiement adressé à un mauvais bénéficiaire peut être perdu.
+La récupération d’un virement déjà exécuté n’est pas garantie ; elle dépend du moyen de
+paiement et des conditions de traitement. Un doublon ou un paiement à un mauvais bénéficiaire
+peut nécessiter une compensation distincte. Le banc simule ces effets ; il ne constitue pas une
+validation d’un système bancaire réel.
 Pour ces processus, l'erreur « faible mais non nulle » n'est plus un coût de productivité : c'est
 une perte, parfois une fraude réussie.
 
-Or les protections habituelles des systèmes d'agents agissent soit trop tôt, soit trop tard. Trop
-tôt, lorsqu'elles portent sur la qualité de la réponse du modèle : un bon prompt, un modèle plus
+Certaines protections agissent sur la réponse du modèle ou après l’effet, sans médiation de
+chaque transition. C’est le cas lorsqu’elles portent sur la qualité de la réponse du modèle : un bon prompt, un modèle plus
 fort ou une consigne de prudence réduisent la probabilité d'erreur sans l'annuler. Trop tard,
 lorsqu'elles prennent la forme d'une revue finale : la revue découvre le doublon une fois le
 second virement parti. Entre les deux, un ensemble de fautes ordinaires de tout système distribué,
@@ -71,6 +77,13 @@ assez petite pour être vérifiée [Anderson 1972]. Elle relève aussi du motif 
 exécuter » recensé pour la sécurité des agents [Beurer-Kellner 2025]. Sa contribution tient à
 son application précise au cycle de vie d'un travail d'agents (tentatives, preuves, reprises,
 acceptation) et à son évaluation sous fautes, avec et sans moteur.
+
+
+### Qualification de la thèse — révision du 10 octobre 2026
+
+La formulation précédente décrit une architecture à évaluer, pas une impossibilité universelle ni une garantie bancaire déjà démontrée. L'hypothèse opérationnelle est conditionnelle : **si les règles sont correctes, la médiation non contournable et l'effet lié au candidat effectivement contrôlé, un orchestrateur durable peut préserver des invariants malgré certaines fautes de ses agents et de son environnement.** Il faut aussi mesurer les erreurs du moniteur, les blocages à tort, la progression et le coût du contrôle. Un moteur déterministe ne prouve pas à lui seul que la règle métier est juste ; un contrôle final correct ne remplace pas les gardes avant l'effet.
+
+L'apport propre du moteur doit être isolé par comparaison avec un workflow fixe doté des mêmes contrôles et du même exécutant, puis par ablations. Augmenter le nombre de répétitions d'un scénario scripté précise ses observations ; cela ne démontre ni la généralité à d'autres processus ni l'autonomie d'un collectif LLM.
 
 ## 1.4 Questions de recherche
 

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "actual-public-send-with-inert-provider",
+    "passed": true
+  },
+  {
+    "name": "actual-producer-provenance",
+    "passed": true
+  },
+  {
+    "name": "complete-byte-coverage",
+    "passed": true
+  },
+  {
+    "name": "unattributed-source-refuses",
+    "passed": true
+  },
+  {
+    "name": "missing-attribution-does-not-mutate",
+    "passed": true
+  }
+]

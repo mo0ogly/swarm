@@ -1,0 +1,137 @@
+{
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+  "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "input_count": 1056,
+  "stages": [
+    {
+      "name": "connectors",
+      "argv": [
+        "python3",
+        "tests/actions_confiance_connectors.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--timeout-seconds",
+        "180",
+        "--evidence-dir",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-prepared/connectors"
+      ]
+    },
+    {
+      "name": "evidence",
+      "argv": [
+        "python3",
+        "tests/actions_confiance_evidence.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--timeout-seconds",
+        "180",
+        "--evidence-dir",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-prepared/evidence",
+        "--archive",
+        "--checkpoint"
+      ]
+    },
+    {
+      "name": "laboratory",
+      "argv": [
+        "python3",
+        "tests/actions_confiance_laboratory.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--timeout-seconds",
+        "180",
+        "--evidence-dir",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-prepared/laboratory"
+      ]
+    },
+    {
+      "name": "secrets",
+      "argv": [
+        "python3",
+        "tests/actions_confiance_remote.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--timeout-seconds",
+        "180",
+        "--evidence-dir",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-prepared/secrets",
+        "--secret-broker"
+      ]
+    },
+    {
+      "name": "secret-data",
+      "argv": [
+        "python3",
+        "tests/actions_confiance_secret_data.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--timeout-seconds",
+        "180",
+        "--evidence-dir",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-prepared/secret-data"
+      ]
+    },
+    {
+      "name": "helper-image",
+      "argv": [
+        "python3",
+        "tests/actions_confiance_secret_image.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--timeout-seconds",
+        "180",
+        "--evidence-dir",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-prepared/helper-image",
+        "--secret-broker"
+      ]
+    },
+    {
+      "name": "pilot",
+      "argv": [
+        "python3",
+        "tests/actions_confiance_t2.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--timeout-seconds",
+        "180",
+        "--criterion",
+        "0",
+        "--root",
+        "/home/fpizzi/Documents/ChatGPT/swarm",
+        "--evidence-dir",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-prepared/pilot"
+      ]
+    },
+    {
+      "name": "processes",
+      "argv": [
+        "python3",
+        "tests/actions_confiance_t5.py",
+        "--binary",
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+        "--timeout-seconds",
+        "180",
+        "--criterion",
+        "0",
+        "--root",
+        "/home/fpizzi/Documents/ChatGPT/swarm",
+        "--evidence-dir",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-prepared/processes"
+      ]
+    },
+    {
+      "name": "controls",
+      "argv": [
+        "python3",
+        "tests/actions_confiance_controls.py",
+        "--root",
+        "/home/fpizzi/Documents/ChatGPT/swarm",
+        "--evidence-dir",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/candidate-prepared/controls",
+        "--timeout-seconds",
+        "180"
+      ]
+    }
+  ],
+  "executed": false
+}

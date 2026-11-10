@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-claude-confirmed-account-change-review-resume-20261011",
+  "expected_revision": 345,
+  "task_id": "plan-ca937edf4e-T2",
+  "reason": "Précondition modifiée confirmée par utilisateur : compte Claude changé et reset ; auth active, verrou ancien compte levé publiquement et attribué, serveur correctif a5696bdf prêt. Reprendre uniquement les inspections manquantes, même candidat39e89b16 et originaux ; tous appels et tentatives conservés. Aucune disponibilité ni acceptation inventée."
+}

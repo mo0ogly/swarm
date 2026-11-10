@@ -1,0 +1,82 @@
+{
+  "records": [
+    {
+      "schema_version": 1,
+      "event": "web-bound",
+      "address": "127.0.0.1:44011",
+      "settings_revision": "2",
+      "runtime_ready": false
+    },
+    {
+      "schema_version": 1,
+      "event": "web-outcome",
+      "outcome": {
+        "schema_version": 1,
+        "status": 200,
+        "error": null,
+        "recorded_work": null,
+        "configuration_may_be_recorded": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "event": "web-outcome",
+      "outcome": {
+        "schema_version": 1,
+        "status": 200,
+        "error": null,
+        "recorded_work": null,
+        "configuration_may_be_recorded": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "event": "web-outcome",
+      "outcome": {
+        "schema_version": 1,
+        "status": 500,
+        "error": "blp-access-denied",
+        "recorded_work": null,
+        "configuration_may_be_recorded": false
+      }
+    },
+    {
+      "schema_version": 1,
+      "event": "web-stopped",
+      "accepted_connections": 3,
+      "completed_jobs": 3,
+      "rejected_requests": 0,
+      "rejected_connections": 0,
+      "rejected_queued_jobs": 0,
+      "connection_failures": 0,
+      "disconnected_replies": 0,
+      "observed_outcomes": 3,
+      "configuration_outcomes": 0,
+      "work_outcomes": 0,
+      "provider_contact_may_have_occurred": false,
+      "first_request_failure": null,
+      "first_service_failure": "blp-access-denied",
+      "first_connection_failure": null,
+      "last_recorded_work": null,
+      "last_recorded_configuration": null
+    }
+  ],
+  "requests": [
+    {
+      "path": "/api/v1/native-session",
+      "method": "GET",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "response": {
+        "csrf_format": "hmac-sha256-v1",
+        "csrf_token": "<redacted>",
+        "host": "127.0.0.1:44011",
+        "legacy_csrf_header": true,
+        "schema_version": 1
+      }
+    }
+  ],
+  "exit": 0,
+  "start": 1793533078.9630888,
+  "end": 1793533079.6068432
+}

@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestPlanningScopeOwnActivationBudgetDiscriminant$",
+    "-count=1",
+    "-timeout=2m",
+    "-v"
+  ],
+  "started": "2026-10-11T21:16:31.838860+00:00",
+  "finished": "2026-10-11T21:16:43.334228+00:00",
+  "exit": 0,
+  "wall_seconds": 11.495349665005051,
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T2-own-scope-budget-discriminant-43n9jz25",
+  "original_go_sources": 519,
+  "original_go_drift": [],
+  "output_sha256": "4c099033561aca4f94767cb7eea7370af7621a1c0cdb567d114bf10eeda67319",
+  "extra_harness_sha256": "2b8ed0b754f68d87debd0f331d8988d0e796421a788331d8d9cadae370baea18",
+  "limits": "Local public planning handler fixture, no real model, native database or candidate edit. Extra harness separate from historical full suite."
+}

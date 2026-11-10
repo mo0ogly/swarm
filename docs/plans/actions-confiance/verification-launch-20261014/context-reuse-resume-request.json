@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "context-reuse-verified-resume-20261015",
+  "expected_revision": 432,
+  "reason": "Prédicat de réutilisation corrigé et vérifié : méthode différente impose une revue fraîche du candidat corrigé ; reprise inchangée toujours refusée. Binaire qualifié installé ; rejouer la remise publique attribuée, contrôles et compteurs conservés."
+}

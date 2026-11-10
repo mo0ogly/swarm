@@ -1,0 +1,10 @@
+{
+  "pid": 1559634,
+  "proc_start_ticks": "3217419",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-sealed-timeout-witness-check.py",
+    "run"
+  ],
+  "at": "2026-10-15T20:55:50.044165+00:00"
+}

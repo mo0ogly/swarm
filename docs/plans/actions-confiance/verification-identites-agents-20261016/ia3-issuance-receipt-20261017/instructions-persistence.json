@@ -1,0 +1,10 @@
+{
+  "files": {
+    "/home/fpizzi/.codex/AGENTS.md": "c66cc3e9af072c4c4dd2f0276d236f4688985e4d1214f5ecb86a299e65797b99",
+    "/home/fpizzi/Documents/ChatGPT/swarm/AGENTS.md": "eda4ec1d6a934885bebe422bc2354f4489376c35a72f2ee11648e4b185091436"
+  },
+  "claude_personal_import": true,
+  "running_process_context_updated": false,
+  "embedded_contract_changed": false,
+  "scope": "caution with temporal timeouts and other test guards until code limits are understood; preserve security, authority and budgets"
+}

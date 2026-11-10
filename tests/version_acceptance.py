@@ -3,6 +3,7 @@ import json
 import pathlib
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 
 def execute(command):
     print('COMMAND ' + json.dumps(command), flush=True)
@@ -13,7 +14,7 @@ def execute(command):
     print('exit_code=0', flush=True)
     return result.stdout
 
-with tempfile.TemporaryDirectory(prefix='swarm-r1-controls-') as root:
+with tempfile.TemporaryDirectory(prefix='swarm-r1-controls-', dir=fixture_area()) as root:
     binary = str(pathlib.Path(root) / 'swarm')
     execute(['sh', 'build.sh', binary])
     output = execute(['go', 'test', '-v', './...', '-run',

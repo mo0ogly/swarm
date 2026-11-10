@@ -1,0 +1,165 @@
+{
+  "at": "2026-10-12T08:36:28.049787+00:00",
+  "revision": 696,
+  "decision": {
+    "id": "planning-claim-2335f039b45897fbafec4dbe-decision",
+    "at": "2026-10-12T08:31:44.519024701Z",
+    "scope": "root",
+    "reason": "Événement operator_resume de continuité : T2 (essai 4/4, running, agent auto-5aee345f1c5aa09f51fb) est réellement repris par action publique resume-launch de l'opérateur après vérification du manifest de préparation (.git/swarm-recovery.json, refs/swarm/recovery/previous) ; aucune production, aucun retry ni modification de la consigne de T2 n'est proposé ici — l'agent poursuit en arrière-plan juge/anciens échecs/suite complète, à suivre jusqu'à remise. Les trois apprentissages généraux capitalisés par l'opérateur pour T4 (reprise de préparation persistée sans agent, jamais réattribuer une action moteur à l'utilisateur, gardes de concurrence/identité/un seul appel), T5 (exposer préparations/périmètres disponibles, contraindre la génération au type d'événement courant, remettre les refus avec contexte, corriger projection UTC/reprise fournisseur) et T7 (distinguer identités typées SHA256 de sources vs commit/arbre Git, previous_candidate historique ≠ candidat courant, correspondance partielle si des documents diffèrent) sont transmis en revise-instructions sur ces tâches todo de mon périmètre, sans toucher aux critères, dépendances ou acceptation. Aucune clôture ni action hors périmètre proposée.",
+    "operations": [
+      {
+        "kind": "revise-instructions",
+        "id": "plan-ca937edf4e-T4",
+        "title": "",
+        "requirements": null,
+        "next": "Correction générale (reprises/préparations/publication) : reproduire la frontière où une préparation automatique reste publique Ready=true et persistée (.git/swarm-recovery.json, refs/swarm/recovery/previous) sans agent actif ni tentative réservée ; organiser sa reprise uniquement pour une intention autorisée et identifiée du conducteur, après vérification fraîche des droits, du budget, du contrat, de la révision, du fournisseur et du bail. Conserver une reprise explicite propre aux préparations de l'opérateur (même ID/copie, pas de doublon, pas de remise à zéro) et le refus des entrées périmées. Ne jamais réattribuer à l'utilisateur une action en réalité exécutée par le moteur. Ajouter des gardes de concurrence, de redémarrage, de vérification d'identité/copie et garantir un seul appel/agent actif. Correction de code et effet observé requis ; la documentation seule ne suffit pas."
+      },
+      {
+        "kind": "revise-instructions",
+        "id": "plan-ca937edf4e-T5",
+        "title": "",
+        "requirements": null,
+        "next": "Correction générale (contrats/prompts par rôle) : exposer au responsable les préparations, périmètres et actions réellement disponibles dans son contexte ; contraindre la génération de décision au type d'événement effectivement reçu pour empêcher un continue-run proposé sur une tâche en réalité bloquée ; remettre tout refus au propriétaire avec un contexte exploitable (cause, preuve, action attendue) plutôt qu'un simple constat. Corriger également la projection de l'heure UTC et de la reprise fournisseur déjà signalées comme transmises mais non reflétées dans les contrats/prompts actuels."
+      },
+      {
+        "kind": "revise-instructions",
+        "id": "plan-ca937edf4e-T7",
+        "title": "",
+        "requirements": null,
+        "next": "Clarification de l'apprentissage existant sur la réconciliation des reçus 'superseding' : distinguer explicitement les identités typées — SHA256 de sources déclarées versus SHA1 de commit/arbre Git — et ne jamais traiter le previous_candidate d'un reçu historique comme équivalent au candidat couramment en revue. Exiger un mapping prouvé entre ces identités avant de clore un critère, et la fermeture nommée de chaque échec cité (pas seulement sa mention). Une correspondance démontrée sur une partie des éléments (ex. une entrée sur plusieurs) reste partielle si d'autres documents ou champs liés diffèrent : exiger alors un nouveau test et un contrôle/revue sur le candidat final avant d'accepter la réconciliation."
+      }
+    ]
+  },
+  "future_instruction_revisions": {
+    "4": [
+      {
+        "id": "instruction-c2c2bc242d3850c4636efabb",
+        "addition": "Correction générale (reprises/préparations/publication) : reproduire la frontière où une préparation automatique reste publique Ready=true et persistée (.git/swarm-recovery.json, refs/swarm/recovery/previous) sans agent actif ni tentative réservée ; organiser sa reprise uniquement pour une intention autorisée et identifiée du conducteur, après vérification fraîche des droits, du budget, du contrat, de la révision, du fournisseur et du bail. Conserver une reprise explicite propre aux préparations de l'opérateur (même ID/copie, pas de doublon, pas de remise à zéro) et le refus des entrées périmées. Ne jamais réattribuer à l'utilisateur une action en réalité exécutée par le moteur. Ajouter des gardes de concurrence, de redémarrage, de vérification d'identité/copie et garantir un seul appel/agent actif. Correction de code et effet observé requis ; la documentation seule ne suffit pas.",
+        "reason": "Événement operator_resume de continuité : T2 (essai 4/4, running, agent auto-5aee345f1c5aa09f51fb) est réellement repris par action publique resume-launch de l'opérateur après vérification du manifest de préparation (.git/swarm-recovery.json, refs/swarm/recovery/previous) ; aucune production, aucun retry ni modification de la consigne de T2 n'est proposé ici — l'agent poursuit en arrière-plan juge/anciens échecs/suite complète, à suivre jusqu'à remise. Les trois apprentissages généraux capitalisés par l'opérateur pour T4 (reprise de préparation persistée sans agent, jamais réattribuer une action moteur à l'utilisateur, gardes de concurrence/identité/un seul appel), T5 (exposer préparations/périmètres disponibles, contraindre la génération au type d'événement courant, remettre les refus avec contexte, corriger projection UTC/reprise fournisseur) et T7 (distinguer identités typées SHA256 de sources vs commit/arbre Git, previous_candidate historique ≠ candidat courant, correspondance partielle si des documents diffèrent) sont transmis en revise-instructions sur ces tâches todo de mon périmètre, sans toucher aux critères, dépendances ou acceptation. Aucune clôture ni action hors périmètre proposée.",
+        "scope": "root",
+        "holder": "planner-21bb31e549ff25b9367d86b5",
+        "generation": 162,
+        "input_events": [
+          "operator-prepared-intent-and-typed-identity-replan-8948f9182567412b9431e46f53798657"
+        ],
+        "decision": "planning-claim-2335f039b45897fbafec4dbe-decision",
+        "at": "2026-10-12T08:31:44.518697706Z",
+        "state": "applied",
+        "attempts_at_creation": 0,
+        "before_sha256": "386f368353b36000d35850a8fc537931b4325562fce5ef3c182023853af1ebff",
+        "after_sha256": "341441e22b57a72aee17234bf9022aec7cfac27f4d9b6d1f2ac8b3153711e0ed"
+      }
+    ],
+    "5": [
+      {
+        "id": "instruction-1ff7e25a1038d77e2f679147",
+        "addition": "Correction générale (contrats/prompts par rôle) : exposer au responsable les préparations, périmètres et actions réellement disponibles dans son contexte ; contraindre la génération de décision au type d'événement effectivement reçu pour empêcher un continue-run proposé sur une tâche en réalité bloquée ; remettre tout refus au propriétaire avec un contexte exploitable (cause, preuve, action attendue) plutôt qu'un simple constat. Corriger également la projection de l'heure UTC et de la reprise fournisseur déjà signalées comme transmises mais non reflétées dans les contrats/prompts actuels.",
+        "reason": "Événement operator_resume de continuité : T2 (essai 4/4, running, agent auto-5aee345f1c5aa09f51fb) est réellement repris par action publique resume-launch de l'opérateur après vérification du manifest de préparation (.git/swarm-recovery.json, refs/swarm/recovery/previous) ; aucune production, aucun retry ni modification de la consigne de T2 n'est proposé ici — l'agent poursuit en arrière-plan juge/anciens échecs/suite complète, à suivre jusqu'à remise. Les trois apprentissages généraux capitalisés par l'opérateur pour T4 (reprise de préparation persistée sans agent, jamais réattribuer une action moteur à l'utilisateur, gardes de concurrence/identité/un seul appel), T5 (exposer préparations/périmètres disponibles, contraindre la génération au type d'événement courant, remettre les refus avec contexte, corriger projection UTC/reprise fournisseur) et T7 (distinguer identités typées SHA256 de sources vs commit/arbre Git, previous_candidate historique ≠ candidat courant, correspondance partielle si des documents diffèrent) sont transmis en revise-instructions sur ces tâches todo de mon périmètre, sans toucher aux critères, dépendances ou acceptation. Aucune clôture ni action hors périmètre proposée.",
+        "scope": "root",
+        "holder": "planner-21bb31e549ff25b9367d86b5",
+        "generation": 162,
+        "input_events": [
+          "operator-prepared-intent-and-typed-identity-replan-8948f9182567412b9431e46f53798657"
+        ],
+        "decision": "planning-claim-2335f039b45897fbafec4dbe-decision",
+        "at": "2026-10-12T08:31:44.518697706Z",
+        "state": "applied",
+        "attempts_at_creation": 0,
+        "before_sha256": "0f276c3de09bfabc43567f497b69733b7d8c6bd4f2bfa6f025c1ec7d87e9ca52",
+        "after_sha256": "0be671cefe736e4c8ba5ee1ab1d8d99e9a3e7193931ca83d53319045a93e1ba2"
+      }
+    ],
+    "7": [
+      {
+        "id": "instruction-3321e112e9e8e8dc97bfb234",
+        "addition": "Lors de toute revue indépendante (méthode code-reviewer) exécutée pour cette tâche, citer les octets contigus et la ligne physique exacte de la source testée, espaces et signes de ponctuation inclus (ex. espace avant un point-virgule). Une divergence de citation est une erreur de protocole du vérificateur, pas un refus sémantique valide ni un défaut du producteur : elle doit être diagnostiquée comme telle avant toute décision, comme observé sur review-6eadd171c67897f10f4ec754 / candidat d405c0ee9479fb26521fc6041cc6932f9929a3a1.",
+        "reason": "Événement traité : operator-strict-current-protocol-through-retex-20261011. Diagnostic : la revue qu'il cite (review-6eadd171c67897f10f4ec754, candidat d405c0ee9479fb26521fc6041cc6932f9929a3a1) ne correspond pas au current_review réel de plan-ca937edf4e-T2 (review-f5cb258178e80a4bdc4778d3, candidat 1ce2af045bef41baf4af808c610a921c7fe71224, état changes_requested). La condition posée par l'événement lui-même ( « proposer review-retry uniquement lorsque l'événement de la revue actuelle figure dans events reçus ; sinon acquitter puis continuer les lots suivants » ) n'est donc pas remplie : ce n'est pas la revue actuelle de T2 mais une revue antérieure du même attempt. De plus review_retry_unavailable=true et production_retry_unavailable=true sont explicitement posés dans ce contexte, T2 a ses tentatives épuisées (2/2), et le schéma d'opérations disponible ne contient ni retry ni review-retry (confirmant « retry absent du schéma »). Aucune opération retry/review-retry n'est donc proposée pour T2, conformément à « aucune nouvelle production T2 pour cette erreur ». La tâche finale plan-ca937edf4e-T8 demandée par l'événement existe déjà dans existing_task_ids/tasks avec le bon contenu (req-29, dépendance T7) : pas de recréation, conformément à task_creation_rule. T3..T7 conservent déjà leurs IDs, critères, dépendances et compléments opérateur dans next depuis les activations précédentes ; aucune opération d'édition n'existe dans le schéma, donc aucun changement n'est proposé sur ces tâches sinon via revise-instructions. L'apprentissage concret et distinct tiré de cet événement — correction de méthode code-reviewer (citer octets contigus et ligne physique exacte, espaces/signes inclus, pour éviter qu'une erreur de citation soit prise pour un refus sémantique) — est transmis via revise-instructions à plan-ca937edf4e-T7 (todo, périmètre courant), qui porte la revue indépendante et la recette réelle cumulative (req-26..req-29) où ce risque se reproduira. Aucune autre action n'est utile : la chaîne de dépendances (T3→T8) reste bloquée en amont par T2, qui n'a reçu aucune preuve nouvelle justifiant une reprise ; les 8 autres événements en attente (pending_events_total=9) ne figurent pas dans events reçus et seront traités aux activations suivantes.",
+        "scope": "root",
+        "holder": "planner-1f48fad1e56bfeb5f0dc0a39",
+        "generation": 46,
+        "input_events": [
+          "operator-strict-current-protocol-through-retex-20261011"
+        ],
+        "decision": "planning-claim-526b44204191a2a7b6a72230-decision",
+        "at": "2026-10-11T13:05:27.83310883Z",
+        "state": "applied",
+        "attempts_at_creation": 0,
+        "before_sha256": "7af0d666393676a458ebd5fb3e4d6a06178164464febdcc0a1e43ba9d3208af6",
+        "after_sha256": "dfdbfb89a1adc13fbba1ce882d3e08d12656ca0e13d132219de40a5db66031bc"
+      },
+      {
+        "id": "instruction-8a9d2ce316778a5ad8bb7034",
+        "addition": "Lors d'une revue de fragments multi-paquets, tout verdict fail doit être appuyé par une entrée defects portant une citation exacte prélevée sur l'artefact précisément concerné. Si aucune entrée defects ne correspond à l'artefact évalué (findings fail sans defect attribué sur cette pièce), le reviewer doit renvoyer unknown pour cette pièce et nommer l'original manquant à fournir, plutôt que de déclarer fail sans défaut démontré ou de fusionner plusieurs artefacts distincts sous un même verdict.",
+        "reason": "Diagnostic confirmé : le paquet1 du contrat de citation (revue review-8e5cc55c66eca0c86032c505, candidat 4af006a35e56d799a26eae29dd197326bf6288f5) déclare fail sur findings10 (motif 'exit code 1') sans aucune entrée defects qui lui soit attribuée ; seule artifact11 porte une entrée defects avec citation exacte ('panic: test timed out after 4m30s') correspondant à findings11. C'est une incohérence du protocole de revue (correspondance défaut↔pièce rompue), pas un défaut de code démontré sur artifact10 : conforme à review_failure_routing (failure_code=review_fragment_protocol, owner=reviewer_protocol, producer_correction_required=false). review_retry_unavailable=false et production_retry_unavailable=true confirment que seule une reprise côté revue est possible, en conservant les 3 tentatives, l'avis et les dépenses déjà engagés sur plan-ca937edf4e-T2. Les deux événements integration_failed (plan-f399... sur la fragmentation périmée de T1, plan-765b5d98... sur le refus de la revue de fragments) documentent la même chaîne de cause et ne requièrent aucune action distincte au-delà de la correction proposée. J'ajoute un apprentissage persisté pour la tâche T7 (revue indépendante et recette réelle cumulative) afin que tout futur contrôle de fragments exige une entrée defects attribuée par pièce, sous peine de retourner unknown plutôt que fail non étayé.",
+        "scope": "root",
+        "holder": "planner-b970170b37871207bbabe21b",
+        "generation": 148,
+        "input_events": [
+          "operator-T2-fail-artifact-correspondence-f668ba315c2741f1b83b7d796dde218b",
+          "review-8e5cc55c66eca0c86032c505-result-117cf964e765b5e8",
+          "plan-f399eea776f213a4bc9c9f948287918529179e5b8c641f721d4240015ed80b5d",
+          "plan-765b5d98131e4a9f73ad023784fb7706444a065e2774631bbe895c17c0df8ce2"
+        ],
+        "decision": "planning-claim-dad525ac37fe927a4c493902-decision",
+        "at": "2026-10-12T07:50:57.017585577Z",
+        "state": "applied",
+        "attempts_at_creation": 0,
+        "before_sha256": "7c2bbbf70e134063f2108e4c81c5ece8c5c7be1409d369d7ddd568e5a50b7ba6",
+        "after_sha256": "376f8173aaf124ead71d9dfe3769a8f998efaa7c9ecf880476e5a3bbb6cb800e"
+      },
+      {
+        "id": "instruction-d6e9bd08f8e6669b65808ce3",
+        "addition": "Avant d'accepter qu'un reçu de test 'superseding' répare un échec nommé constaté sur un commit candidat donné, vérifier explicitement que les champs candidate_digest/previous_candidate de ce reçu correspondent à candidate_commit exact de la revue en cours. Si cette correspondance n'est pas démontrée, ou si le résumé du reçu superseding ne réconcilie pas nommément les échecs cités (ex : stale-input failure, panic timeout), traiter l'échec original comme non résolu pour ce commit et ne pas s'appuyer sur ce reçu pour clore le critère correspondant.",
+        "reason": "La revue indépendante sur plan-ca937edf4e-T2 (candidat 4af006a35e56d799a26eae29dd197326bf6288f5) constate un défaut réel et démontré dans la preuve fournie par le producteur, pas une erreur de protocole du vérificateur : le critère 3 (suite complète + tests du juge) s'appuie sur un reçu (go-test-full-engine.out) montrant exit=1 avec échec stale-input et panic timeout, et le reçu censé le superseder (« full-suite-canonical-20261011 ») a des champs candidate_digest/previous_candidate qui ne correspondent pas à ce candidate_commit exact, donc non liés formellement à cette révision. integration_failed confirme ce refus. Comme attempts_used=3=attempts_max et production_retry_unavailable=true et review_retry_unavailable=true, aucune reprise de production ni de revue n'est disponible sur cette tâche dans cette activation : T2 reste bloquée, sans opération possible la concernant, en attente d'une décision de périmètre (nouvelle tentative autorisée, replanification structurelle ou arrêt) qui dépasse le budget actuel. Je capitalise cependant l'apprentissage général pour les tâches futures de preuve/revue qui citeront des reçus superseding : exiger que candidate_digest/previous_candidate du reçu correspondent explicitement au candidate_commit exact testé avant de s'appuyer sur lui pour réconcilier un échec nommé, sinon traiter l'échec original comme non résolu. Je cible plan-ca937edf4e-T7 (revue indépendante et recette réelle cumulative, encore todo) car c'est la tâche de mon périmètre la plus directement concernée par la liaison preuve/candidat lors d'une recette réelle. Aucune autre opération n'est possible : pas de retry (budget épuisé, routes de reprise indisponibles), pas de nouvelle tâche, pas de clôture (T2 bloquée, T3-T8 todo).",
+        "scope": "root",
+        "holder": "planner-8e532041a0cc4cfaae14a1d3",
+        "generation": 150,
+        "input_events": [
+          "review-8e5cc55c66eca0c86032c505-result-702fe3b4fdda8084",
+          "plan-6bda2e8fe9f746619a037e81fe2d473d731afa54cf3082f12bf34498b96cdebb"
+        ],
+        "decision": "planning-claim-f02e46a0a913a5863673f83d-decision",
+        "at": "2026-10-12T08:04:19.111144075Z",
+        "state": "applied",
+        "attempts_at_creation": 0,
+        "before_sha256": "1c7acb7d2578fe020a6740d25ccfbf3126e5241f3a893a86073257b3f1be9108",
+        "after_sha256": "971586e1d7796a78d70f4c99f0f7891c6316a05b5b56bf9c13e25e6a4eca3d5c"
+      },
+      {
+        "id": "instruction-74d6bf69f58986858273b82a",
+        "addition": "Lors de la vérification d'un reçu de test « superseding » invoqué pour réparer un échec nommé constaté sur un commit candidat donné : SHA256 de sources, commit/arbre Git SHA1 et previous_candidate historique sont des identités distinctes. Exiger la preuve explicite de leur correspondance (ex. correspondance démontrée entre les champs candidate_digest/previous_candidate du reçu et le candidate_commit exact de la revue en cours), jamais leur égalité littérale de chaîne. Si cette correspondance n'est pas démontrée, ou si le résumé du reçu superseding ne réconcilie pas nommément les échecs cités (ex. stale-input failure, panic timeout), traiter l'échec original comme non résolu pour ce commit et ne pas s'appuyer sur ce reçu pour clore le critère correspondant, sans supprimer le refus indépendant déjà rendu ni ses originaux.",
+        "reason": "Événement traité : reprise opérateur avec instructions de recovery pour T2 et clarification demandée pour l'apprentissage de T7. État constaté : T2 (running) a épuisé ses tentatives (4/4) sur un verdict current_review legitimate « changes_requested » (critère 3 non réconcilié : échec stale-input et panic timeout non liés de façon démontrée au commit candidat par le reçu superseding cité). Ce n'est pas une erreur de protocole du vérificateur (pas unknown/error) : la route review-retry/review_failure_routing ne s'applique donc pas, et review_retry_unavailable=true de toute façon. Le champ production_retry_unavailable=true, conjugué à la mention explicite de l'événement que « la pause globale sera levée immédiatement après cette reprise de planification », indique que l'opération retry sur une tâche de production (T2) n'est pas disponible pendant cette activation de planification elle-même : je ne peux donc pas proposer retry sur T2 maintenant sans contourner ce plafond opérationnel, même si l'utilisateur a déjà autorisé par ailleurs la hausse de droits/budgets insuffisants du projet et que « PlanningRetry est armé ». Ce blocage est transmis tel quel : dès que le moteur lève la pause globale et rend la reprise de production disponible, le prochain tour de planification devra émettre retry sur plan-ca937edf4e-T2 avec les instructions précises déjà données par l'opérateur (reprendre via .git/swarm-recovery.json et refs/swarm/recovery/previous, nouvelle suite complète en copie isolée, tests nommés de l'ancien échec stale-input/panic timeout, remise typée liant explicitement candidate_digest/previous_candidate au nouveau candidate_commit, revue indépendante fraîche). Aucune tentative, quota ni critère n'est modifié ici ; aucun contournement de plafond n'est proposé. Dans l'immédiat, seule l'action de planification demandée explicitement par l'événement est exécutée : clarifier l'apprentissage ambigu déjà inséré dans T7 (todo, dans mon périmètre) sur la distinction entre SHA256 de sources, SHA1 commit/arbre Git et previous_candidate historique — ce sont des identités distinctes dont il faut prouver la correspondance, jamais exiger leur égalité littérale — sans supprimer le refus indépendant déjà rendu sur T2 ni ses originaux. T3..T8 restent todo/dépendants de T2 et ne peuvent avancer avant sa résolution ; aucune autre opération n'est donc utile ce tour.",
+        "scope": "root",
+        "holder": "planner-c03be787d181381317260279",
+        "generation": 159,
+        "input_events": [
+          "runtime26-qualified-plan-resume-6681f033285a43dcb362d480be5a8758"
+        ],
+        "decision": "planning-claim-28743039eedde9cfe2341ef8-decision",
+        "at": "2026-10-12T08:23:06.153457547Z",
+        "state": "applied",
+        "attempts_at_creation": 0,
+        "before_sha256": "971586e1d7796a78d70f4c99f0f7891c6316a05b5b56bf9c13e25e6a4eca3d5c",
+        "after_sha256": "ab790a0edcb265520ed5466186cf9d6c9980ce994c1566da1859c79b0c63d50e"
+      },
+      {
+        "id": "instruction-db1225221754c55c937f9790",
+        "addition": "Clarification de l'apprentissage existant sur la réconciliation des reçus 'superseding' : distinguer explicitement les identités typées — SHA256 de sources déclarées versus SHA1 de commit/arbre Git — et ne jamais traiter le previous_candidate d'un reçu historique comme équivalent au candidat couramment en revue. Exiger un mapping prouvé entre ces identités avant de clore un critère, et la fermeture nommée de chaque échec cité (pas seulement sa mention). Une correspondance démontrée sur une partie des éléments (ex. une entrée sur plusieurs) reste partielle si d'autres documents ou champs liés diffèrent : exiger alors un nouveau test et un contrôle/revue sur le candidat final avant d'accepter la réconciliation.",
+        "reason": "Événement operator_resume de continuité : T2 (essai 4/4, running, agent auto-5aee345f1c5aa09f51fb) est réellement repris par action publique resume-launch de l'opérateur après vérification du manifest de préparation (.git/swarm-recovery.json, refs/swarm/recovery/previous) ; aucune production, aucun retry ni modification de la consigne de T2 n'est proposé ici — l'agent poursuit en arrière-plan juge/anciens échecs/suite complète, à suivre jusqu'à remise. Les trois apprentissages généraux capitalisés par l'opérateur pour T4 (reprise de préparation persistée sans agent, jamais réattribuer une action moteur à l'utilisateur, gardes de concurrence/identité/un seul appel), T5 (exposer préparations/périmètres disponibles, contraindre la génération au type d'événement courant, remettre les refus avec contexte, corriger projection UTC/reprise fournisseur) et T7 (distinguer identités typées SHA256 de sources vs commit/arbre Git, previous_candidate historique ≠ candidat courant, correspondance partielle si des documents diffèrent) sont transmis en revise-instructions sur ces tâches todo de mon périmètre, sans toucher aux critères, dépendances ou acceptation. Aucune clôture ni action hors périmètre proposée.",
+        "scope": "root",
+        "holder": "planner-21bb31e549ff25b9367d86b5",
+        "generation": 162,
+        "input_events": [
+          "operator-prepared-intent-and-typed-identity-replan-8948f9182567412b9431e46f53798657"
+        ],
+        "decision": "planning-claim-2335f039b45897fbafec4dbe-decision",
+        "at": "2026-10-12T08:31:44.518697706Z",
+        "state": "applied",
+        "attempts_at_creation": 0,
+        "before_sha256": "ab790a0edcb265520ed5466186cf9d6c9980ce994c1566da1859c79b0c63d50e",
+        "after_sha256": "7ce889d367760cb3f67e601be6b8b7db0950bdfb565217dd0d140347e870ab9f"
+      }
+    ]
+  },
+  "result": "PASS three lessons applied by native root; corrections of T4/T5 not yet implemented"
+}

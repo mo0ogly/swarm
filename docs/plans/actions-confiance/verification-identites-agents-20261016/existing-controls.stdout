@@ -1,0 +1,28 @@
+=== RUN   TestLaunchAtomicIdempotentAndWorkspaceExclusive
+--- PASS: TestLaunchAtomicIdempotentAndWorkspaceExclusive (0.10s)
+=== RUN   TestLaunchRejectsEscapeAndUnsatisfiedDependencies
+--- PASS: TestLaunchRejectsEscapeAndUnsatisfiedDependencies (0.09s)
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/missing
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/unknown
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/forged
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/null
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/foreign
+--- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly (0.08s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/missing (0.00s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/unknown (0.00s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/forged (0.00s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/null (0.00s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/foreign (0.00s)
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/alice
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/bob
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin
+--- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation (0.21s)
+    --- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/alice (0.06s)
+    --- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/bob (0.04s)
+    --- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service (0.06s)
+    --- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin (0.05s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.531s

@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-12T10:18:03.078323+00:00",
+  "candidate_digest": "26bd4c93b437e4d2a0d084f4c15b4dbab94bb353672710c8ec0c8e9126381335",
+  "paths_transferred": [
+    "docs/T3-operator-development.md",
+    "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+    "docs/en/CURSOR-ENGINE-CONTRACT.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/cursor_engine_t3_concurrent_test.go",
+    "internal/engine/cursor_engine_t3_exploration_test.go",
+    "internal/engine/planning.go",
+    "internal/engine/planning_api.go",
+    "internal/engine/planning_context.go",
+    "internal/engine/planning_delivery.go",
+    "internal/engine/planning_dependency_revision.go",
+    "internal/engine/planning_exploration.go",
+    "internal/engine/planning_judge.go",
+    "internal/engine/planning_judge_test.go",
+    "internal/engine/planning_prompt.go",
+    "internal/engine/planning_schema.go",
+    "internal/engine/task_definition.go"
+  ],
+  "source_inputs_verified": 1220,
+  "preimages_verified": true,
+  "backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-exploration-concurrent-primary-preimages",
+  "operator_patch": "T3-exploration-concurrent-recovery-20261012.patch",
+  "patch_sha256": "6fad7ca98d4060652f3a1b7d49145fb668501717a923c8c5792acc351594482a",
+  "runtime": "26 unchanged; qualification of runtime-T3 does not install it"
+}

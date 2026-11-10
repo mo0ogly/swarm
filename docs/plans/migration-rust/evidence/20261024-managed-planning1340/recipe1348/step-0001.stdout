@@ -1,0 +1,7 @@
+PASS managed-native-planner-delegates-without-worker
+PASS managed-missing-copy-refuses-without-spend-or-provider
+PASS managed-restored-copy-resumes-child-and-creates-two-todo-tasks
+PASS managed-candidate-capabilities-delivered-without-source-paths
+PASS managed-worker-launch-still-refuses-without-mutation
+MANAGED_PLANNING_PASS
+REPLAY_EVIDENCE /home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-planning-rips_jcz

@@ -1,0 +1,212 @@
+//go:build linux
+
+package engine
+
+import (
+	"encoding/binary"
+	"fmt"
+	"io"
+	"net"
+	"os"
+
+	"golang.org/x/sys/unix"
+)
+
+// _IO(0xff, n) from Linux v6.17 include/uapi/linux/pidfd.h. x/sys v0.31.0
+// lacks these two names. Preserve the architecture-specific _IO high bits
+// from its generated NS_GET_NSTYPE = _IO(0xb7, 3). These are kernel transport
+// capabilities, not configurable execution policies.
+const (
+	agentIdentityPIDNS   = (unix.NS_GET_NSTYPE &^ 0xffff) | 0xff05
+	agentIdentityMountNS = (unix.NS_GET_NSTYPE &^ 0xffff) | 0xff03
+)
+
+// A message owns a kernel-supplied process handle. The connection peer and any
+// PID/identity in the JSON body are deliberately not attribution sources.
+type agentIdentityMessage struct {
+	raw     []byte
+	process *os.File
+	uid     uint32
+	pid     int32 // diagnostic only; never reopened through /proc
+}
+
+func (m *agentIdentityMessage) Close() error {
+	if m == nil || m.process == nil {
+		return nil
+	}
+	return m.process.Close()
+}
+
+// Configure before receiving or releasing a worker. No PID-number fallback is
+// permitted if the kernel cannot attach a process handle to each packet.
+func configureAgentIdentityChannel(conn *net.UnixConn) error {
+	if conn == nil {
+		return agentIdentityError("agent_identity_channel_required")
+	}
+	raw, err := conn.SyscallConn()
+	if err != nil {
+		return err
+	}
+	var setupErr error
+	err = raw.Control(func(fd uintptr) {
+		kind, e := unix.GetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_TYPE)
+		if e != nil {
+			setupErr = e
+			return
+		}
+		if kind != unix.SOCK_SEQPACKET {
+			setupErr = agentIdentityError("agent_identity_packet_channel_required")
+			return
+		}
+		if setupErr = unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_PASSCRED, 1); setupErr == nil {
+			setupErr = unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_PASSPIDFD, 1)
+		}
+	})
+	if err != nil {
+		return err
+	}
+	if setupErr != nil {
+		return fmt.Errorf("canal d'identité indisponible : %w", setupErr)
+	}
+	return nil
+}
+
+// The caller owns the transport buffer and deadline. An oversized or incomplete
+// packet is rejected, never decoded from a prefix. The small ancillary buffer
+// holds precisely credentials and one process handle; unexpected SCM_RIGHTS
+// are closed even on rejection/truncation. Linux closes excess truncated FDs.
+func receiveAgentIdentityMessage(conn *net.UnixConn, buffer []byte) (*agentIdentityMessage, error) {
+	if conn == nil || len(buffer) == 0 {
+		return nil, agentIdentityError("agent_identity_channel_required")
+	}
+	raw, err := conn.SyscallConn()
+	if err != nil {
+		return nil, err
+	}
+	oob := make([]byte, unix.CmsgSpace(unix.SizeofUcred)+unix.CmsgSpace(4))
+	var n, oobn, flags int
+	var receiveErr error
+	err = raw.Read(func(fd uintptr) bool {
+		n, oobn, flags, _, receiveErr = unix.Recvmsg(int(fd), buffer, oob, unix.MSG_CMSG_CLOEXEC)
+		return receiveErr != unix.EAGAIN && receiveErr != unix.EWOULDBLOCK && receiveErr != unix.EINTR
+	})
+	if err != nil {
+		return nil, err
+	}
+	if receiveErr != nil {
+		return nil, receiveErr
+	}
+	message, controlErr := parseAgentIdentityControl(oob[:oobn])
+	if controlErr != nil {
+		return nil, controlErr
+	}
+	if flags&(unix.MSG_TRUNC|unix.MSG_CTRUNC) != 0 || n == 0 {
+		message.Close()
+		if n == 0 && flags&(unix.MSG_TRUNC|unix.MSG_CTRUNC) == 0 {
+			return nil, io.EOF
+		}
+		return nil, agentIdentityError("agent_identity_packet_truncated")
+	}
+	message.raw = append([]byte(nil), buffer[:n]...)
+	return message, nil
+}
+
+func parseAgentIdentityControl(oob []byte) (*agentIdentityMessage, error) {
+	controls, err := unix.ParseSocketControlMessage(oob)
+	if err != nil {
+		return nil, fmt.Errorf("métadonnées du canal d'identité : %w", err)
+	}
+	var credential *unix.Ucred
+	var processes []int
+	invalid := false
+	for _, c := range controls {
+		switch {
+		case c.Header.Level == unix.SOL_SOCKET && c.Header.Type == unix.SCM_CREDENTIALS:
+			value, e := unix.ParseUnixCredentials(&c)
+			if e != nil || credential != nil {
+				invalid = true
+			} else {
+				credential = value
+			}
+		case c.Header.Level == unix.SOL_SOCKET && c.Header.Type == unix.SCM_PIDFD:
+			if len(c.Data) != 4 {
+				invalid = true
+			} else {
+				processes = append(processes, int(int32(binary.NativeEndian.Uint32(c.Data))))
+			}
+		case c.Header.Level == unix.SOL_SOCKET && c.Header.Type == unix.SCM_RIGHTS:
+			fds, e := unix.ParseUnixRights(&c)
+			for _, fd := range fds {
+				unix.Close(fd)
+			}
+			invalid = true
+			if e != nil {
+				invalid = true
+			}
+		default:
+			invalid = true
+		}
+	}
+	if invalid || credential == nil || credential.Pid <= 0 || len(processes) != 1 || processes[0] < 0 {
+		for _, fd := range processes {
+			unix.Close(fd)
+		}
+		return nil, agentIdentityError("agent_identity_message_unattributed")
+	}
+	return &agentIdentityMessage{process: os.NewFile(uintptr(processes[0]), "identity-message-pidfd"), uid: credential.Uid, pid: credential.Pid}, nil
+}
+
+type agentIdentityNamespace struct{ device, inode uint64 }
+
+func agentIdentityNamespaceOf(file *os.File) (agentIdentityNamespace, error) {
+	var stat unix.Stat_t
+	raw, err := file.SyscallConn()
+	if err != nil {
+		return agentIdentityNamespace{}, err
+	}
+	var statErr error
+	if err = raw.Control(func(fd uintptr) { statErr = unix.Fstat(int(fd), &stat) }); err != nil {
+		return agentIdentityNamespace{}, err
+	}
+	if statErr != nil {
+		return agentIdentityNamespace{}, statErr
+	}
+	return agentIdentityNamespace{uint64(stat.Dev), stat.Ino}, nil
+}
+
+// Operate through the file's RawConn so concurrent Close cannot recycle the
+// descriptor under an ioctl. pidfd namespace lookup refers to the held process,
+// not to a potentially reused numeric PID. An exited sender is denied.
+func agentIdentityProcessNamespaces(process *os.File) ([2]*os.File, error) {
+	var result [2]*os.File
+	if process == nil {
+		return result, agentIdentityError("agent_identity_process_required")
+	}
+	raw, err := process.SyscallConn()
+	if err != nil {
+		return result, err
+	}
+	var lookupErr error
+	err = raw.Control(func(fd uintptr) {
+		for i, operation := range []uint{agentIdentityPIDNS, agentIdentityMountNS} {
+			nsfd, e := unix.IoctlRetInt(int(fd), operation)
+			if e != nil {
+				lookupErr = e
+				return
+			}
+			result[i] = os.NewFile(uintptr(nsfd), "identity-namespace")
+		}
+	})
+	if err != nil || lookupErr != nil {
+		for _, file := range result {
+			if file != nil {
+				file.Close()
+			}
+		}
+		if err != nil {
+			return [2]*os.File{}, err
+		}
+		return [2]*os.File{}, fmt.Errorf("namespaces du processus indisponibles : %w", lookupErr)
+	}
+	return result, nil
+}

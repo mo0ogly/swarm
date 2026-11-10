@@ -1,0 +1,13 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "start": "2026-10-11T14:37:21.678135+00:00",
+  "end": "2026-10-11T14:37:21.738192+00:00",
+  "seconds": 0.060076304001995595,
+  "exit": 0,
+  "output": "/tmp/swarm-source-capacity-recovery-diff.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

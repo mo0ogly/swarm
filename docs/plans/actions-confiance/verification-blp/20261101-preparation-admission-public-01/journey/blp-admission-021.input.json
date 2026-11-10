@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "event_id": "input-5",
+  "expected_revision": 1,
+  "expected_trust_revision": 1,
+  "intent": {
+    "version": 1,
+    "event_id": "unsent-intent",
+    "preparation_id": "prep-fa8847b0c33183273f594550",
+    "expected_revision": 2,
+    "provider": "fixture",
+    "capability_hash": "f3775f8a2c307cacf786a4933fba1952f11970d1908485a2a0eb42193b7e796d",
+    "message": "PRIVATE_ADMISSION_INPUT",
+    "context_mode": "full"
+  },
+  "source_index": 5,
+  "classification": {
+    "level": "secret",
+    "compartments": [
+      "a",
+      "b"
+    ]
+  },
+  "reason": "Explicit per-slice classification fixture"
+}

@@ -1,0 +1,69 @@
+{
+  "at": "2026-10-11T12:20:51.250331+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "patch": {
+    "schema_version": 1,
+    "at": "2026-10-11T12:20:02.942523+00:00",
+    "parent": "review-current-event-feedback-20261011.patch",
+    "parent_sha256": "d3c3be3c058a6f5141ddedd1143bd809a4459e053f9a69923018caefacb068b7",
+    "preimage_tree": "cf019f0d29b8c5f53222c41728af8f0dbe945415",
+    "patch": "docs/plans/engine-cursor-contract/recovery/planning-owner-rejection-diagnostic-20261011.patch",
+    "sha256": "3ab9828491f7d5b5056da906c8b329e3b16fd86e09e4bc0e834489b1d2d8314b",
+    "bytes": 36043,
+    "paths": [
+      "internal/engine/planning.go",
+      "internal/engine/planning_context.go",
+      "internal/engine/planning_runner.go",
+      "internal/engine/planning_rejection.go",
+      "internal/engine/planning_rejection_state.go",
+      "internal/engine/planning_rejection_test.go",
+      "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+      "docs/en/AGENT-ENGINE-PROTOCOL.md"
+    ],
+    "purpose": "Route parsed transaction-refused proposal to owner with immutable adapter response, claim/workflow/receipt, failed operation index/kind/ID and complete operation-identity inventory. No global Failure for this category. Diagnostic-first next inference; identical operation/cause under unchanged relevant state becomes scoped persistent wait, claims guarded, leases/counters/unrelated scopes do not constitute new evidence. No automatic completion/acceptance/refund.",
+    "tests": "Behavioral RED using old runner overlay; successful correction and restart; same-proposal duplicate inventory, scoped wait/public claim, stale generation and competing valid-decision race; full/race/vet verification in progress.",
+    "limits": "Actual activation14 received current review event but failed task-already-present at revision203; old response was not retained by old pipeline, failing ID cannot honestly be reconstructed. This prototype handles parsed proposal transaction failures; provider/configuration/transport failure recovery and native cumulative qualification remain T3/T7."
+  },
+  "public_transmissions": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "event_id": "planning-owner-rejection-T3-20261011",
+      "before_revision": 203,
+      "after_revision": 204,
+      "next_sha256": "baa32f739fe1b032f741121c734667e874d00494f0395344a16fef895ed2c599",
+      "state": "todo"
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "event_id": "planning-owner-rejection-T4-20261011",
+      "before_revision": 204,
+      "after_revision": 205,
+      "next_sha256": "ad9ba638c3b6a1a32830581ba8cb6a18850864f7f11571680a3cb5f40ad10c92",
+      "state": "todo"
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "event_id": "planning-owner-rejection-T5-20261011",
+      "before_revision": 205,
+      "after_revision": 206,
+      "next_sha256": "6efde29f996e6f312782ec65f6d541c444c062d2fc55a5a479069b9f253d90d2",
+      "state": "todo"
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "event_id": "planning-owner-rejection-T6-20261011",
+      "before_revision": 206,
+      "after_revision": 207,
+      "next_sha256": "6ed70bc57c82838dae468d5e703a8ab04cedbfb188ecd296491e9937d50ad8b2",
+      "state": "todo"
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "event_id": "planning-owner-rejection-T7-20261011",
+      "before_revision": 207,
+      "after_revision": 208,
+      "next_sha256": "9b28274ba71692fc1138eabd93328df93cca052c725f0b315ca99b7c95701f98",
+      "state": "todo"
+    }
+  ]
+}

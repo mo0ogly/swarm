@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "checks": [
+    "M18 actual persisted source flow passes; verified M17 reference prepares a declarative choice without source text",
+    "CLI preview is read-only, reports one omitted original and never injects the operator task snapshot",
+    "Authenticated API preview equals CLI; missing confirmation and changed selection reason refuse without launch or mutation",
+    "Public criteria update makes prior confirmation stale; no worker invocation occurs and current sources are prepared again",
+    "Actual API launch checks queued sources; scripted worker receives exact persisted prompt and reference quotes; replay, originals, profile and acceptance boundaries hold"
+  ],
+  "m18_public_checks": 5,
+  "source_scripted_invocations": 2,
+  "worker_scripted_invocations": 1,
+  "model_calls": 0,
+  "root": "/tmp/swarm-summary-source-tnco0ncu",
+  "binary_sha256": "026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2",
+  "script_sha256": "a6793da414fd8a499316f13a51591f67d6d161a5704f0315c1c28dd6944d1d15"
+}

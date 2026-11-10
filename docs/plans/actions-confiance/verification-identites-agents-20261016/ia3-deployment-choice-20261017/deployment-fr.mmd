@@ -1,0 +1,12 @@
+flowchart TD
+  I["Installation initiale<br/>cible, non livrée"] --> C["Choix explicite de l'autorité"]
+  A["Modal Admin<br/>cible, non livré"] --> V["Droits, validation commune<br/>révision attendue et preview"]
+  C --> V
+  V --> S["Configuration protégée persistante<br/>hors sources agents/import"]
+  S --> L["Adaptateur local adopté<br/>service sous compte distinct et confinement"]
+  S -. "évolution prévue" .-> R["Adaptateur distant non implémenté<br/>machine et administration séparées"]
+  L --> K["Même contrat métier<br/>identité, délégation, source courante et révocation"]
+  R -.-> K
+  K --> E["État effectif et preuves d'usage<br/>distincts du choix sauvegardé"]
+  L --> F["Indisponible ou demande interdite<br/>refus, aucun secours permissif"]
+  R -.-> F

@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "id": "paea-payment-http",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-protection-contract/Cargo.toml",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-protection-contract/tests/*.rs",
+    "rust/crates/swarm-identity-contract/Cargo.toml",
+    "rust/crates/swarm-identity-contract/src/*.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/crates/swarm-cli/src/*.rs",
+    "rust/crates/swarm-cli/src/*/*.rs",
+    "rust/crates/swarm-cli/tests/protection.rs",
+    "rust/crates/swarm-cli/tests/protection_receipt.rs",
+    "tests/fixtures/paea/*.json",
+    "schemas/paea/*.json",
+    "tests/paea_contract_schema_test.py",
+    "tools/paea/*.py",
+    "tools/verification/recipe.py",
+    "docs/architecture/PAEA-CONTRACT.md",
+    "docs/en/PAEA-CONTRACT.md",
+    "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+    "rust/crates/swarm-web/Cargo.toml",
+    "rust/crates/swarm-web/src/*.rs",
+    "rust/crates/swarm-web/src/service/*.rs",
+    "rust/crates/swarm-web/tests/paea.rs",
+    "web/paea.*",
+    "web/trust-native.html",
+    "locales/en.json",
+    "web/i18n*.js",
+    "rust/crates/**/*",
+    "web/*",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    "version_history.json",
+    "tests/paea_payment_schema_test.py",
+    "web/paea-payment.html",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "web/lib/**/*",
+    "web/paea-examples/v1/*.json",
+    "web/paea-inspect.html",
+    "rust/crates/swarm-cli/tests/protection_inspection.rs",
+    "tests/paea_inspection_schema_test.py",
+    "web/paea-approval.html",
+    "schemas/paea/approval-report-v1.schema.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "payment-schema",
+      "command": [
+        "python3",
+        "tests/paea_payment_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "Ran 4 tests",
+        "OK"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-paea-http",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "12 passed; 0 failed",
+        "paea_http_exact_both_domains_and_unknown_are_data_only",
+        "paea_http_refusal_recovery_and_private_menu_assets",
+        "paea_payment_http_exact_resolution_and_integer_bytes_are_data_only",
+        "paea_payment_http_refusals_recover_without_mutation",
+        "paea_envelope_type_and_conflicting_duplicates_are_redacted_and_recover",
+        "paea_comparison_http_matches_shared_report_and_preserves_root",
+        "paea_comparison_http_refusals_recover_without_root_mutation",
+        "paea_example_assets_are_private_exact_and_semantically_usable",
+        "paea_inspection_http_matches_shared_exact_content_without_root_mutation",
+        "paea_inspection_http_refusals_recover_and_preserve_private_assets",
+        "paea_approval_http_matches_shared_report_and_private_examples_without_root_mutation",
+        "paea_approval_http_refusals_keep_causes_and_recover_without_partial_report"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

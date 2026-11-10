@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-11T11:42:29.789837+00:00",
+  "revision": 187,
+  "activation": 13,
+  "decisions": 7,
+  "failure": null,
+  "holder": "planner-2ad8178b0bb6462ed86fc9c7",
+  "generation": 30,
+  "delivery": {
+    "production_retry_unavailable": true,
+    "context_sha256": "aad009bbc4cfb8ca8bfffad80f36b73531b05e7b705f48a470c218eb7849d175",
+    "events": [
+      "operator-exact-envelope-tab-feedback-through-retex-20261011",
+      "operator-strict-current-protocol-through-retex-20261011"
+    ]
+  },
+  "state": "Real inference active; latest resume admitted, retry omitted by frozen delivery. No T8 or applied operations yet."
+}

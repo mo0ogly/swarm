@@ -1,0 +1,51 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityIssuer",
+    "-count=1",
+    "-timeout",
+    "90s",
+    "-json"
+  ],
+  "executor": "Codex alone; isolated fixture stores; local OIDC signed-token fixture, no real provider",
+  "start": "2026-10-17T08:22:27.641049+00:00",
+  "end": "2026-10-17T08:28:12.531340+00:00",
+  "elapsed_seconds": 344.89089001499815,
+  "exit": 1,
+  "input_count": 1058,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 19,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [
+      "TestAgentIdentityIssuerAuthenticatedHumanExactPermit",
+      "TestAgentIdentityIssuerAuthorityCannotComeFromJSON",
+      "TestAgentIdentityIssuerExpirationDuringPublicationWait",
+      "TestAgentIdentityIssuerPublicationRejectsDifferentHumanSession",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/different-principal",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/foreign-project",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/foreign-work",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/homonym-issuer",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/homonym-subject",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/local-admin",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/local-approver",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/local-requester",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/missing-authority",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/missing-enrollment",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/missing-token",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/stale-trust",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/unknown-token",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/wrong-plan-digest",
+      "TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority/wrong-plan-generation"
+    ],
+    "fail": [],
+    "skip": []
+  }
+}

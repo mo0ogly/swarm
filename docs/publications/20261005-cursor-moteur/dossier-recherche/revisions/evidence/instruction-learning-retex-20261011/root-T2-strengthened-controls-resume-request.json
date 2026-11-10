@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-root-T2-strengthened-controls-third-attempt-20261011",
+  "expected_revision": 297,
+  "scope": "root",
+  "reason": "Replan : refus f613 payé conservé dans previous_reviews. La politique T2 a été renforcée publiquement : plan-validation sélectionne maintenant les cinq familles historiques ET TestPlanningJudge, autres contrôles intacts. Budget T2 passé2→3 sur autorisation utilisateur, deux consommées conservées ; instruction précise de reprise dans T2.next, tool_seconds900 enregistré. T2 reste blocked, produire via retry dans le périmètre root puis laisser les contrôles/revue nouveaux décider. Ancien review_retry_unavailable est historique : production_retry est maintenant disponible après correction effective. Ne pas recommencer le juge : reprendre le résultat réparé attribué via .git/swarm-recovery.json, vérifier le candidat et refaire la couverture manquante. Le défaut global de composition des ajouts opérateur/IA est reproduit et correction locale ciblée verte, pas encore installée : ne pas tenter de contourner un refus revise-instructions ; poursuivre la correction T2 indépendante. Garder T8 et la hiérarchie prévue ; après acceptation T2 continuer T3..T8 sans clôture arbitraire."
+}

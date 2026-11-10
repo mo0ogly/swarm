@@ -1,0 +1,4 @@
+=== RUN   TestFreshCapacityCurrentPublicDossier
+    managed_review_capacity_first_test.go:151: précontrôle complet (281 pièces, 7 paquets): aucune capacité restante pour les preuves finales
+--- FAIL: TestFreshCapacityCurrentPublicDossier (29.63s)
+FAIL

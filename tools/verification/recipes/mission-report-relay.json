@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "mission-report-relay",
+  "inputs": [
+    "rust/crates/swarm-cli/src/mission_watch.rs",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_report_relay.rs",
+    "rust/crates/swarm-engine/src/task_report.rs",
+    "rust/crates/swarm-engine/src/work_engine.rs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "tests/test_rust_report_relay_guards.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "running-barrier-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_report_relay_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_starting_is_not_success_and_actual_running_is_required",
+        "test_observation_and_cleanup_causes_both_survive",
+        "Ran 2 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "actual-worker-handoff",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='mission-report-relay-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_report_relay.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public watch relays actual report, refuses ambiguity and consumes saved clock policy",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

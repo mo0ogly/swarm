@@ -1,0 +1,21 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.000
+Open the local catalogue
+Six recipes are available; fictitious workshop with no real payment.
+
+00:00:06.000 --> 00:00:12.000
+Check Vegetarian only
+Three recipes remain visible.
+
+00:00:12.000 --> 00:00:18.000
+Order one Margherita with fictitious contact details
+EUR 9.50 excluding delivery: the server rejects an order below EUR 10.
+
+00:00:18.000 --> 00:00:24.000
+Use Arrow up to set the quantity to two
+EUR 19.00 for pizzas + EUR 2.90 delivery = EUR 21.90.
+
+00:00:24.000 --> 00:00:30.000
+Confirm then open My tracking
+An order number appears. The initial status is Received.

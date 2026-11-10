@@ -1,0 +1,268 @@
+/* Jetons d'apparence Wattson.
+ *
+ * Un theme se change en reassignant ces variables : aucun template n'est duplique.
+ * `:root` porte le SOCLE (WATTSON_THEME_SOCLE) : le jeu de jetons dont herite
+ * toute page, y compris sans JavaScript. Il n'est pas forcement le theme
+ * propose par defaut a l'utilisateur (WATTSON_THEME_DEFAUT) — la coquille DSFR
+ * de wattson_global.css etant conditionnee a [data-theme="etat"], le socle
+ * reste l'apparence historique.
+ *
+ * Les valeurs du theme "etat" proviennent de dsfr.min.css 1.13.2, releve le
+ * 2026-08-21 : elles ne sont pas approchees a l'oeil.
+ *
+ * Modifications :
+ * - 2026-08-21 : Creation — jetons sombre et DSFR, selecteur d'en-tete
+ * - 2026-08-22 : Jetons du bloc-marque (bleu, blanc, rouge), invariants
+ * - 2026-08-22 : Le theme Etat devient celui propose par defaut ; le socle
+ *   `:root` reste l'apparence historique
+ */
+
+:root {
+  /* Bloc-marque de l'Etat — invariant par theme, fixe par la charte. */
+  --wattson-marque-bleu: #000091;
+  --wattson-marque-blanc: #ffffff;
+  --wattson-marque-rouge: #e1000f;
+
+  /* Coquille — corps de page et barre de navigation (valeurs actuelles) */
+  --wattson-page-fond: #ffffff;
+  --wattson-nav-fond: #343a40;
+
+  /* Fonds */
+  --wattson-fond: #111b26;
+  --wattson-fond-barre: #0d151d;
+  --wattson-carte: #1b2a3a;
+  --wattson-carte-appuyee: #223448;
+  --wattson-champ: #132130;
+
+  --wattson-carte-creuse: #152433;
+  --wattson-piste: #dfe7ed;
+  --wattson-fond-decor:
+    radial-gradient(circle at 88% 3%, rgba(78, 165, 232, .14), transparent 28rem),
+    linear-gradient(145deg, #101923 0%, #111b26 48%, #142230 100%);
+  --wattson-heros: linear-gradient(125deg, #1b3045, #172637 62%, #173646);
+
+  /* Traits */
+  --wattson-ligne: #395069;
+  --wattson-ligne-tableau: rgba(57, 80, 105, .6);
+
+  /* Textes */
+  --wattson-texte: #edf4fa;
+  --wattson-titre: #edf4fa;
+  --wattson-texte-discret: #aebdca;
+  --wattson-libelle: #dce8f1;
+
+  --wattson-texte-faible: #8297a8;
+
+  /* Etats — encre et fond vont par paire, chaque paire tenant le seuil AA */
+  --wattson-succes-encre: #a9e9c9;
+  --wattson-succes-fond: #1f5b44;
+  --wattson-attention-encre: #f3d89c;
+  --wattson-attention-fond: #5b441c;
+  --wattson-alerte-encre: #ffc0c5;
+  --wattson-alerte-fond: #5d262f;
+  --wattson-info-encre: #c8dceb;
+  --wattson-lien-encre: #9cd2f7;
+  --wattson-accent-encre: #9ff5ea;
+  --wattson-info-fond: #1f435e;
+
+  /* Accents — la teinte porte un sens, elle n'est pas decorative */
+  --wattson-accent: #51d3c8;
+  --wattson-accent-secondaire: #b18ae8;
+  --wattson-lien: #4ea5e8;
+  --wattson-succes: #63d6a0;
+  --wattson-alerte: #ef6b73;
+  --wattson-attention: #f3b85b;
+
+  /* Actions */
+  --wattson-action-fond: linear-gradient(135deg, #287fbe, #1f6698);
+  --wattson-action-encre: #ffffff;
+  --wattson-action-bordure: transparent;
+  --wattson-encre-sur-accent: #0d1b27;
+  --wattson-alerte-aplat: linear-gradient(135deg, #b32517, #8c1d12);
+
+  /* Geometrie et typographie : un theme n'est pas qu'une palette */
+  --wattson-rayon: 18px;
+  --wattson-rayon-carte: 14px;
+  --wattson-rayon-controle: 10px;
+  --wattson-ombre: 0 18px 50px rgba(0, 0, 0, .22);
+  --wattson-padding-bouton: 12px 17px;
+  --wattson-police: "Segoe UI", system-ui, sans-serif;
+  --wattson-lien-decoration: none;
+  --wattson-entete-casse: uppercase;
+}
+
+:root[data-theme="etat"] {
+  /* Bloc-marque de l'Etat — invariant par theme, fixe par la charte. */
+  --wattson-marque-bleu: #000091;
+  --wattson-marque-blanc: #ffffff;
+  --wattson-marque-rouge: #e1000f;
+
+  --wattson-page-fond: #ffffff;
+  --wattson-nav-fond: #ffffff;
+
+  --wattson-fond: #ffffff;
+  --wattson-fond-barre: #ffffff;
+  --wattson-carte: #ffffff;
+  --wattson-carte-appuyee: #f6f6f6;
+  --wattson-champ: #eeeeee;
+
+  --wattson-carte-creuse: #f6f6f6;
+  --wattson-piste: #dddddd;
+  --wattson-fond-decor: #ffffff;
+  --wattson-heros: #f6f6f6;
+
+  --wattson-ligne: #dddddd;
+  --wattson-ligne-tableau: #dddddd;
+
+  --wattson-texte: #3a3a3a;
+  --wattson-titre: #161616;
+  --wattson-texte-discret: #666666;
+  --wattson-libelle: #161616;
+
+  --wattson-texte-faible: #5f5f5f;
+
+  --wattson-succes-encre: #18753c;
+  --wattson-succes-fond: #b8fec9;
+  --wattson-attention-encre: #b34000;
+  --wattson-attention-fond: #ffe9e6;
+  --wattson-alerte-encre: #ce0500;
+  --wattson-alerte-fond: #ffe9e9;
+  --wattson-info-encre: #0063cb;
+  --wattson-lien-encre: #000091;
+  --wattson-accent-encre: #00777c;
+  --wattson-info-fond: #e8edff;
+
+  --wattson-accent: #000091;
+  --wattson-accent-secondaire: #a558a0;
+  --wattson-lien: #000091;
+  --wattson-succes: #18753c;
+  --wattson-alerte: #ce0500;
+  --wattson-attention: #b34000;
+
+  --wattson-action-fond: #000091;
+  --wattson-action-encre: #ffffff;
+  --wattson-action-bordure: #000091;
+  --wattson-encre-sur-accent: #ffffff;
+  --wattson-alerte-aplat: #ce0500;
+
+  /* Le DSFR est a angles droits et sans ombre portee. */
+  --wattson-rayon: 0;
+  --wattson-rayon-carte: 0;
+  --wattson-rayon-controle: 0;
+  --wattson-ombre: none;
+  --wattson-padding-bouton: .5rem 1rem;
+  --wattson-police: Marianne, arial, sans-serif;
+  --wattson-lien-decoration: underline;
+  --wattson-entete-casse: none;
+}
+
+/* Selecteur d'apparence — groupe de champs, pas un interrupteur : le choix se
+ * fait entre options nommees, et la semantique tient si un theme s'ajoute. */
+.wattson-theme-picker {
+  border: 0;
+  /* Colle au bandeau d'environnement, a gauche du menu : visible a toutes les
+     largeurs, y compris quand le menu est replie derriere le hamburger. */
+  margin: 0 auto 0 14px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Le menu deplie se superpose a la barre : sans plan de superposition, ses
+     liens interceptent les clics destines au selecteur. */
+  position: relative;
+  z-index: 1055;
+  /* .navbar-expand-xxl impose flex-wrap: nowrap au-dela de 1400px : sans refus
+     de compression, le menu long de 1300px ecrasait le selecteur jusqu'a ses
+     seules bordures, 2px de large, et ses options debordaient hors du clic. */
+  flex: 0 0 auto;
+}
+
+/* Annoncee aux lecteurs d'ecran, retiree du rendu : un <legend> n'est pas un
+   element flex fiable et decalait les options hors de la boite du groupe. */
+.wattson-theme-picker__legende {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.wattson-theme-picker__titre {
+  color: var(--wattson-texte-discret);
+  font-size: .8rem;
+  white-space: nowrap;
+}
+
+.wattson-theme-picker__group {
+  display: flex;
+  flex: 0 0 auto;
+  border: 1px solid var(--wattson-ligne);
+  border-radius: var(--wattson-rayon-controle);
+  overflow: hidden;
+}
+
+.wattson-theme-picker__option {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  margin: 0;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--wattson-texte-discret);
+  cursor: pointer;
+}
+
+.wattson-theme-picker__option:hover {
+  color: var(--wattson-texte);
+}
+
+/* L'input reste dans le flux pour le clavier et les lecteurs d'ecran :
+ * il est rendu invisible, jamais retire de l'arbre d'accessibilite. */
+.wattson-theme-picker__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.wattson-theme-picker__input:checked + .wattson-theme-picker__option {
+  background: var(--wattson-action-fond);
+  color: var(--wattson-action-encre);
+}
+
+.wattson-theme-picker__input:focus-visible + .wattson-theme-picker__option {
+  outline: 2px solid #0a76f6;
+  outline-offset: -2px;
+}
+
+.wattson-theme-picker__check {
+  width: 13px;
+  height: 13px;
+  opacity: 0;
+}
+
+.wattson-theme-picker__input:checked + .wattson-theme-picker__option .wattson-theme-picker__check {
+  opacity: 1;
+}
+
+/* Le menu remplissait deja la largeur a lui seul : lui laisser une seconde
+   ligne est la seule facon d'y ajouter le selecteur sans pousser ses derniers
+   liens hors de l'ecran. */
+.navbar .navbar-collapse {
+  min-width: 0;
+}
+
+.navbar .navbar-nav {
+  flex-wrap: wrap;
+}

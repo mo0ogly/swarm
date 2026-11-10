@@ -1,0 +1,46 @@
+[
+  {
+    "cell": 2,
+    "code": "from langgraph.store.memory import InMemoryStore\n\nstore = InMemoryStore()\nstore.put((\"instructions\",), key=\"agent_instructions\", value={\"prompt\": \"Write good emails.\"})"
+  },
+  {
+    "cell": 3,
+    "code": "from langgraph.prebuilt import create_react_agent\nfrom langgraph.config import get_store\n\ndef draft_email(to: str, subject: str, body: str):\n    \"\"\"Submit an email draft.\"\"\"\n    return \"Draft saved successfully.\"\n\ndef prompt(state):\n    item = store.get((\"instructions\",), key=\"agent_instructions\")\n    instructions = item.value[\"prompt\"]\n    sys_prompt = {\"role\": \"system\", \"content\": f\"## Instructions\\n\\n{instructions}\"}\n    return [sys_prompt] + state['messages']\n\nagent = create_react_agent(\"anthropic:claude-3-5-sonnet-latest\", prompt=prompt, tools=[draft_email], store=store)"
+  },
+  {
+    "cell": 6,
+    "code": "from langmem import create_prompt_optimizer\n\noptimizer = create_prompt_optimizer(\"anthropic:claude-3-5-sonnet-latest\")"
+  },
+  {
+    "cell": 7,
+    "code": "current_prompt = store.get((\"instructions\",), key=\"agent_instructions\").value[\"prompt\"]\nfeedback = {\"request\": \"Always sign off from 'William'; for meeting requests, offer to schedule on Zoom or Google Meet\"}\n\noptimizer_result = optimizer.invoke({\"prompt\": current_prompt, \"trajectories\": [(result[\"messages\"], feedback)]})"
+  },
+  {
+    "cell": 8,
+    "code": "print(optimizer_result)"
+  },
+  {
+    "cell": 9,
+    "code": "store.put((\"instructions\",), key=\"agent_instructions\", value={\"prompt\": optimizer_result})"
+  },
+  {
+    "cell": 14,
+    "code": "from langgraph.store.memory import InMemoryStore\nfrom langgraph.prebuilt import create_react_agent\nfrom langgraph.config import get_store\n\nstore = InMemoryStore()\n\nstore.put((\"instructions\",), key=\"email_agent\", value={\"prompt\": \"Write good emails. Repeat your draft content to the user after submitting.\"})\nstore.put((\"instructions\",), key=\"twitter_agent\", value={\"prompt\": \"Write fire tweets. Repeat the tweet content to the user upon submission.\"})\n\n## Email agent\ndef draft_email(to: str, subject: str, body: str):\n    \"\"\"Submit an email draft.\"\"\"\n    return \"Draft saved successfully.\"\n\ndef prompt_email(state):\n    item = store.get((\"instructions\",), key=\"email_agent\")\n    instructions = item.value[\"prompt\"]\n    sys_prompt = {\"role\": \"system\", \"content\": f\"## Instructions\\n\\n{instructions}\"}\n    return [sys_prompt] + state['messages']\n\nemail_agent = create_react_agent(\n    \"anthropic:claude-3-5-sonnet-latest\", \n    prompt=prompt_email, \n    tools=[draft_email], \n    store=store,\n    name=\"email_assistant\",\n)\n\n## Tweet\n\ndef tweet(to: str, subject: str, body: str):\n    \"\"\"Post a tweet.\"\"\"\n    return \"Legendary.\"\n\ndef prompt_social_media(state):\n    item = store.get((\"instructions\",), key=\"twitter_agent\")\n    instructions = item.value[\"prompt\"]\n    sys_prompt = {\"role\": \"system\", \"content\": f\"## Instructions\\n\\n{instructions}\"}\n    return [sys_prompt] + state['messages']\n\nsocial_media_agent = create_react_agent(\n    \"anthropic:claude-3-5-sonnet-latest\", \n    prompt=prompt_social_media, \n    tools=[tweet], \n    store=store,\n    name=\"social_media_agent\",\n)"
+  },
+  {
+    "cell": 18,
+    "code": "from langmem import create_multi_prompt_optimizer\n\nfeedback = {\"request\": \"Always sign off emails from 'William'; for meeting requests, offer to schedule on Zoom or Google Meet\"}\n\noptimizer = create_multi_prompt_optimizer(\"anthropic:claude-3-5-sonnet-latest\")"
+  },
+  {
+    "cell": 20,
+    "code": "email_prompt = store.get((\"instructions\",), key=\"email_agent\").value['prompt']\ntweet_prompt = store.get((\"instructions\",), key=\"twitter_agent\").value['prompt']\n\nemail_prompt = {\n    \"name\": \"email_prompt\",\n    \"prompt\": email_prompt,\n    \"when_to_update\": \"Only if feedback is provided indicating email writing performance needs improved.\"\n}\ntweet_prompt = {\n    \"name\": \"tweet_prompt\",\n    \"prompt\": tweet_prompt,\n    \"when_to_update\": \"Only if tweet writing generation needs improvement.\"\n}\n\n\noptimizer_result = optimizer.invoke({\"prompts\": [tweet_prompt, email_prompt], \"trajectories\": [(result[\"messages\"], feedback)]})"
+  },
+  {
+    "cell": 21,
+    "code": "optimizer_result"
+  },
+  {
+    "cell": 22,
+    "code": "store.put((\"instructions\",), key=\"email_agent\", value={\"prompt\": optimizer_result[1]['prompt']})"
+  }
+]

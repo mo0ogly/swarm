@@ -1,0 +1,35 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite$/^missing-work$",
+    "-count=1",
+    "-timeout",
+    "30s"
+  ],
+  "start": "2026-10-17T07:13:19.824202+00:00",
+  "end": "2026-10-17T07:13:50.117838+00:00",
+  "exit_code": 1,
+  "identity_sources": {
+    "internal/engine/agent_identity_registry_schema.go": "62e2e666cecd49740bf07275836f2542529adaa80a9cfa2c027928c2ecf42516",
+    "internal/engine/agent_identity_registry_atomic_test.go": "4abb521296a971d5c4ca01f5b68f6d92166216afb81817b21c3bb5ee43f8fb6e",
+    "internal/engine/agent_identity_authority.go": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+    "internal/engine/agent_identity_registry_types.go": "31e18f0fe132fd499e08dcb61914135a6f396da26675301b2209accd1d540391",
+    "internal/engine/agent_identity_registry_publish.go": "c22587c0a3b0ce5afb478d15d5e48e54c274e20bba6be91392df50dae0dec10f",
+    "internal/engine/agent_identity_authority_test.go": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808",
+    "internal/engine/agent_identity_contract_test.go": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9",
+    "internal/engine/agent_identity_contract.go": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+    "internal/engine/agent_identity_runtime_linux_test.go": "8ff373547cd9ce2be571b258c44df6cd0ee3d41e499c85500cff609ba5a8bcf0",
+    "internal/engine/agent_identity_runtime_linux.go": "74ccc6b2c91aecf0c9fe87c818eca43c23e79c14c133dae07574f0232241c2e7",
+    "internal/engine/agent_identity_registry_test.go": "3c48a00550e75384e82e038e81ff681ff097322730e037228045cdf8ffda83ad",
+    "internal/engine/agent_identity_channel_linux_test.go": "d4a0eb6debdb63ae5f795a8e58015d66926b09519a23644fdc58d6b998c3dab8",
+    "internal/engine/agent_identity_channel_linux.go": "3528f0eed5ce77171d4e5506c387f50936314b8f24296c566e16c7045f2a91e3",
+    "internal/engine/agent_identity_registry_store.go": "0fbbba9906af8be31c74edea3c8fe5d746cb4e9ec9490a7e185597e0df030c63",
+    "internal/engine/model.go": "4e622d923673dc3f8d06102959755751dface79a6417a83cc4ca6bfbd5cfab46",
+    "internal/engine/store.go": "fc5ebf3b2ffd3a12cf561e032f733618c92db2467e3d029b6bf112496eba044d",
+    "internal/engine/trust_actions.go": "0c7df052d315a49fc6785787d41b3954a7b13da82afb7b6346e4177e80c10744"
+  }
+}

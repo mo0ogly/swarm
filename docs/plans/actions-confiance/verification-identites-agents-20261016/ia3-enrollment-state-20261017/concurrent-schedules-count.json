@@ -1,0 +1,8 @@
+{
+  "independent_fixture_executions": 32,
+  "writers_per_fixture": 8,
+  "unique_test_names": 1,
+  "global_watchdog": 0,
+  "bound_inputs": "concurrent-schedules-03-inputs.json",
+  "production_and_selected_test_unchanged_since_03": true
+}

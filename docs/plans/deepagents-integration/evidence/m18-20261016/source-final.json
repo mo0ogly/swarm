@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestMemorySummarySource.*|TestProjectMemoryPublicLifecycle|TestContextPreviewFreezesAndRejectsDrift|TestInspectionCLIRefusesImplicitStorageUpgrade|TestInspectionDoesNotCreateMissingStore)$",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T19:55:02.876971+00:00",
+  "duration_seconds": 19.328,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestMemorySummarySourceWrongMethodDoesNotReturnCatalog",
+    "TestMemorySummarySourceInspectionNeverMigratesOldStore",
+    "TestMemorySummarySourceCLIAPIParityAndSessionProtection",
+    "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection",
+    "TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork",
+    "TestMemorySummarySourceCLIExportsExactSelectedSourcesWithoutMutation",
+    "TestContextPreviewFreezesAndRejectsDrift",
+    "TestProjectMemoryPublicLifecycle",
+    "TestInspectionCLIRefusesImplicitStorageUpgrade",
+    "TestInspectionDoesNotCreateMissingStore"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "31f9e84b4a0797447a73d2a2a44992f949b391de6b6fef2f6320e74f544fbd80",
+  "real_model_calls": 0
+}

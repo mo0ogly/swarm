@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "prepared-local-delivery-rust",
+  "inputs": [
+    "tools/swarm_local.py",
+    "tools/swarm_version.py",
+    "tools/rust-migration/build_native.py",
+    "tools/verification/verify_native_profile.py",
+    "tests/test_swarm_prepared_build.py",
+    "tests/rust_agent_model_route.py",
+    "deploy/local-build.json"
+  ],
+  "environment": {
+    "SWARM_TEST_BUILD_STATE": "deploy/local-build.json"
+  },
+  "steps": [
+    {
+      "id": "prepared-refusal-and-real-lifecycle",
+      "command": [
+        "python3",
+        "tests/test_swarm_prepared_build.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARED_LIFECYCLE_VERIFIED"
+      ],
+      "required_stderr": [
+        "Ran 5 tests",
+        "OK"
+      ]
+    }
+  ]
+}

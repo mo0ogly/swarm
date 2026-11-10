@@ -1,0 +1,68 @@
+{
+  "candidate": "f715c17eaacde8cfda0d1e26ecd7278cff929631",
+  "review_id": "review-ccf9e3a44811222ac65d2748",
+  "baseline_version": 2,
+  "context": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-1d6a208d64179e68/review-ccf9e3a44811222ac65d2748-context.json",
+  "context_sha256": "d7c01b7624d9abf367b3efdf2f6579450383900c8f0db92b8f6b58debb97dc3b",
+  "declared_sources_exactly_received": 31,
+  "controls": [
+    {
+      "id": "plan-entry",
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "output_bytes": 107,
+      "output_sha256": "8e1f8e17c1c209af10f1be09cdb9acdb6bc5cbeff61cb69b66456f10eb69b42d"
+    },
+    {
+      "id": "plan-validation",
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "output_bytes": 64975,
+      "output_sha256": "f01a2cb834f719ac23931b2429cd5b4ae12d90f629b6dbd82a8c7c9827641f33"
+    },
+    {
+      "id": "plan-delivery",
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "output_bytes": 8147,
+      "output_sha256": "7b3eaf97e29933b9cdf94ef991404c916156537edeae996ba0dd18f430dd8e7e"
+    },
+    {
+      "id": "plan-criterion-1",
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "output_bytes": 541,
+      "output_sha256": "9b605d7ba8c4b71ae79eced1f0367c0ed6c447e3cb2a7a7e3661e59ac465f551"
+    },
+    {
+      "id": "plan-criterion-2",
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "output_bytes": 595,
+      "output_sha256": "2441240306d324359a9aa6bee4a1739e1958458de337ae0f21577ed0504f6f6f"
+    },
+    {
+      "id": "plan-criterion-3",
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "output_bytes": 517,
+      "output_sha256": "90b301f6acc6976080182910a007dda9292199befe41e0a55649c1b15be5ebb2"
+    },
+    {
+      "id": "plan-criterion-4",
+      "passed": true,
+      "executed": true,
+      "exit_code": 0,
+      "output_bytes": 6815,
+      "output_sha256": "f88beec6c8054b3a9ef741c6c6ae5c1e7047cf306d586ea867cc912a2b133033"
+    }
+  ],
+  "named_go_tests": 58,
+  "independent_verdict": "pending"
+}

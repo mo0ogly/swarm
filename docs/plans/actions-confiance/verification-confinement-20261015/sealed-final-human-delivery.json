@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "node",
+    "tests/actions_confiance_oidc_ui.cjs",
+    "bin/swarm-actions-confiance-sealed",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-human-browser",
+    "--group-mapping"
+  ],
+  "started_at": "2026-10-15T20:55:39.259973+00:00",
+  "ended_at": "2026-10-15T20:55:56.099240+00:00",
+  "exit_code": 0,
+  "sources_unchanged": true,
+  "output_sha256": "ca9b0fb321c33f8305e937c7cd56eeee4a291a1f91784195eb37ecd2f1272dd3",
+  "input_sha256": {
+    "bin/swarm-actions-confiance-sealed": "77e92112aca0dec7e031388ad804d21bdfdaeb5ae5a5c9b323f507c609e403c8",
+    "web/trust-actions.js": "b57df2af16dd1891f443066d2a10f546140af6b58941886ef7489be2ff31ee6e",
+    "web/trust-actions.html": "2018714038e406b495252b800ed7dd7e50ca94d57d9978639efd06aaf5a1cdef",
+    "web/trust-actions-en.js": "28a4e562e8277639847a44a98cfa923ef6d2ff1aa9ade41a8752f632106ffd8e"
+  }
+}

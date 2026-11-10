@@ -2,8 +2,9 @@
 import os
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 
-with tempfile.TemporaryDirectory(prefix="swarm-qw6-controls-") as evidence:
+with tempfile.TemporaryDirectory(prefix="swarm-qw6-controls-", dir=fixture_area()) as evidence:
     env = dict(os.environ, SWARM_QW6_EVIDENCE=evidence)
     for command in [
         ["go", "test", "-v", "./...", "-run", "TestFirstTaskLaunch|TestManualTaskLimitDoes|TestMissionClosedHistory|TestClosedPlanningKeeps", "-count=1"],

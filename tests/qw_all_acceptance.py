@@ -1,6 +1,7 @@
 """Four quick wins; real public operations and UI, isolated labeled fixtures."""
 import os,pathlib,subprocess,tempfile,json
-with tempfile.TemporaryDirectory(prefix='swarm-four-qw-') as tmp:
+from fixture_area import fixture_area
+with tempfile.TemporaryDirectory(prefix='swarm-four-qw-', dir=fixture_area()) as tmp:
     binary=str(pathlib.Path(tmp)/'swarm')
     commands=[['sh','build.sh',binary],
       ['node','tests/qw5_resolve_blocking_limit_ui.cjs',binary,tmp+'/budget'],

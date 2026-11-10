@@ -1,0 +1,24 @@
+{
+  "role": "Bounded Rust HTTP pricing adapter proposal, no repository/tools/acceptance authority",
+  "result": {
+    "usable_response": true,
+    "requested_model": "glm-5.2",
+    "started_at_unix": 1792865137.890282,
+    "automatic_retries": 0,
+    "reported_model": "glm-5.2",
+    "usage": {
+      "completion_tokens": 1652,
+      "prompt_tokens": 10135,
+      "total_tokens": 11787,
+      "completion_tokens_details": {
+        "reasoning_tokens": 403,
+        "text_tokens": 1249
+      }
+    },
+    "finish_reason": "stop",
+    "elapsed_seconds": 8.613
+  },
+  "integration": "pricing.rs based on proposal; principal moved decode/validation before writable open, removed unused witness/import, corrected operation-based HTTP mapping and integrated existing renderer/hooks/tests/docs.",
+  "backend_version": "GLM5.3 per user; requested/reported API identifier glm-5.2 does not attest backend version.",
+  "cost_or_savings_established": false
+}

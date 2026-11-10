@@ -1,0 +1,14 @@
+{
+  "name": "methods",
+  "argv": [
+    "python3",
+    "tools/agent-workflows/check.py"
+  ],
+  "started": "2026-10-12T14:15:01.210948+00:00",
+  "finished": "2026-10-12T14:15:36.088464+00:00",
+  "exit": 0,
+  "wall_seconds": 34.88270118999935,
+  "output": "/tmp/swarm-control-command-deadline-methods.out",
+  "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+  "drift": []
+}

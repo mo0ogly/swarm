@@ -1,0 +1,6 @@
+{
+  "reason": "Old binary has completed synchronization with pending registered completion; test barrier lacked this terminal observation",
+  "synchronized": true,
+  "recovery_observed": false,
+  "stop_owned_watch": true
+}

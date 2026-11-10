@@ -1,0 +1,82 @@
+flowchart TB
+    accTitle: Architecture interne Swarm : moteur, responsabilités et preuves
+    accDescr: Le moteur déterministe Rust relie contrats, identité, politiques, réservations, contextes, contrôles, revue et validation humaine selon la politique. La qualification Rust est suivie séparément.
+    subgraph G0["ENTRÉES"]
+        A_INPUT["Humain · CLI · API · cockpit"]
+        A_PLAN["Besoin adopté · exigences<br/>Plan · tâches · dépendances"]
+    end
+    subgraph G1["SUPERVISION"]
+        A_ROOT["Superviseur racine<br/>Objectif global · arbitrages"]
+        A_SCOPE["Sous-superviseurs<br/>Propriétaires de périmètre"]
+        A_CYCLE["Juge global<br/>continue · renew · fin sous preuves"]
+    end
+    subgraph G2["CŒUR RUST"]
+        A_ENGINE["MOTEUR DÉTERMINISTE RUST<br/>swarm-engine · RootStore<br/>Contrats · transitions · attribution"]
+        A_ID["Identité · autorité · délégation<br/>Voir vue I"]
+        A_POLICY["Politiques persistées<br/>Admin · preview · validation commune"]
+        A_SCHEDULE["Admissibilité · réservations<br/>Baux · budgets · espaces de travail"]
+        A_CONTEXT["Composition du contexte<br/>Méthodes · mémoire · contrat · SHA"]
+    end
+    subgraph G3["PRODUCTION"]
+        A_WORK["Conducteur et superviseur technique<br/>Tentative · processus · fournisseur"]
+        A_DELIVERY["Remise du worker<br/>Candidat Git · rapport · originaux"]
+    end
+    subgraph G4["PREUVES"]
+        A_GATE["Contrôles autorisés<br/>Commandes · entrées · sorties · reçus"]
+        A_REVIEW["Revue IA indépendante<br/>Même candidat · sources reçues"]
+        A_ACCEPT["Fraîcheur · critères · validations<br/>Transition d’acceptation contrôlée"]
+        A_HUMAN["Validation humaine · mode human<br/>Résultat et preuves à examiner<br/>En attente : aval bloqué"]
+    end
+    subgraph G5["PERSISTANCE"]
+        A_STATE["État durable du projet<br/>Work · tâches · décisions · événements"]
+        A_MEMORY["Mémoire et contexte Swarm<br/>RETEX · dialogues · consignes · vue M"]
+        A_LOG["Journaux · télémétrie · registre<br/>Observabilité et attribution · vue L"]
+    end
+    subgraph G6["SUITE"]
+        A_AC02["AC-02 · futur non démarré<br/>Confinement · réseau · secrets"]
+    end
+    A_INPUT --> A_PLAN
+    A_PLAN --> A_ROOT
+    A_ROOT --> A_SCOPE
+    A_ROOT -->|Décisions proposées| A_ENGINE
+    A_ID -->|Contrat d’autorité| A_ENGINE
+    A_POLICY --> A_ENGINE
+    A_ENGINE --> A_SCHEDULE
+    A_SCHEDULE --> A_CONTEXT
+    A_MEMORY -->|Sources et usages à contrôler| A_CONTEXT
+    A_CONTEXT --> A_WORK
+    A_WORK --> A_DELIVERY
+    A_DELIVERY --> A_GATE
+    A_GATE --> A_REVIEW
+    A_REVIEW -->|Mode automatic| A_ACCEPT
+    A_ACCEPT --> A_STATE
+    A_ENGINE --> A_STATE
+    A_WORK --> A_LOG
+    A_STATE --> A_LOG
+    A_LOG -->|Faits attribués| A_ENGINE
+    A_REVIEW -->|Écart ou preuve manquante| A_SCOPE
+    A_ACCEPT -->|RETEX et admission distincte| A_MEMORY
+    A_AC02 -.->|Frontière d’accès à réaliser| A_WORK
+    A_ENGINE <-->|Événements / décisions| A_SCOPE
+    A_ENGINE <-->|État / verdict de cycle| A_CYCLE
+    A_REVIEW -->|Mode human| A_HUMAN
+    A_HUMAN -->|Décision humaine requise| A_ACCEPT
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+    classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+    classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+    class A_INPUT,A_PLAN,A_WORK,A_DELIVERY,A_REVIEW,A_HUMAN ordinary;
+    class A_ENGINE core;
+    class A_ID,A_POLICY,A_SCHEDULE,A_CONTEXT,A_GATE,A_ACCEPT control;
+    class A_ROOT,A_SCOPE,A_CYCLE supervisor;
+    class A_STATE,A_MEMORY,A_LOG data;
+    class A_AC02 pending;
+    style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G1 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G2 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G3 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G4 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G5 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G6 fill:#f5f3ec,stroke:#205e70,color:#062b49

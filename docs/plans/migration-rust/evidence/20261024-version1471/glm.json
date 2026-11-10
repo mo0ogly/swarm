@@ -1,0 +1,25 @@
+{
+  "role": "Bounded native Version read-hook proposal, no tools/repository/acceptance authority",
+  "result": {
+    "usable_response": true,
+    "requested_model": "glm-5.2",
+    "started_at_unix": 1792865788.2414374,
+    "automatic_retries": 0,
+    "reported_model": "glm-5.2",
+    "usage": {
+      "completion_tokens": 1142,
+      "prompt_tokens": 23835,
+      "total_tokens": 24977,
+      "completion_tokens_details": {
+        "reasoning_tokens": 9,
+        "text_tokens": 1133
+      }
+    },
+    "finish_reason": "stop",
+    "elapsed_seconds": 5.755
+  },
+  "integration": "Principal integrated validation/native hook and retained IO/JSON/HTTP causes, restricted links to existing Github renderer contract, connected shared dialog/startup/errors/tests/docs.",
+  "model_version": "GLM5.3 per user; requested/reported API model glm-5.2 does not attest backend.",
+  "cost_or_savings_established": false,
+  "preparation_failure": "Before network request: supplied nonexistent version.rs context; corrected actual version_identity.rs before the one complete call."
+}

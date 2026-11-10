@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "source_sha256": "bf65d3e5f2cb4bcedc2fee931d085cbe1a84d784ae9ef0a6b6c56c9e54bcfb5c",
+  "dialogues": [
+    {
+      "task": "brain-fbab05c7dcd30de1307d",
+      "attempt": "b7e4189e-6d80-4b41-b037-ef83a6888baf",
+      "sha256": "78b518760afb99c8dc5b2350758d4c5124999f64e5cb97208a71da1dbaecb5a3"
+    },
+    {
+      "task": "brain-4ba76c84e4a306ac19d0",
+      "attempt": "9ac7bd24-bbaa-4f3e-82b8-ebc2a144cbd9",
+      "sha256": "3535d00e3709bda52e1723fd2db747fc7109db5bf95707cbeaa26b3df6b8fd17"
+    }
+  ],
+  "cutoff": 4,
+  "protected": [
+    {
+      "id": "snapshot",
+      "message": "current-task-snapshot",
+      "kind": "evidence",
+      "state": "historical"
+    },
+    {
+      "id": "future",
+      "message": "dialogue-e5238dc6898371b80f6f7b876056dddec7cac2164bcbbf86dba373557e5baf94-question",
+      "kind": "intention",
+      "state": "future"
+    },
+    {
+      "id": "incident",
+      "message": "dialogue-fa1f16836b7faa16801dad08f2c0d4951824af367394b678f6e577f217fad01d-question",
+      "kind": "incident",
+      "state": "open"
+    }
+  ],
+  "reason": "Operator selected attributed history; inspect current evidence"
+}

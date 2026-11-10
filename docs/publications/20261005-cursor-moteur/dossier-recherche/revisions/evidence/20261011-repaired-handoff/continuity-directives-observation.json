@@ -1,0 +1,23 @@
+{
+  "observed_at": "2026-10-11T08:21:56.848007+00:00",
+  "public_operation": {
+    "event": "continuity-directives-T5-20261011",
+    "revision_before": 107,
+    "revision_after": 108,
+    "next_prefix_characters": 556,
+    "original_next_preserved": true
+  },
+  "patch_sha256": "c644c794682b6878b278c7b3d9f4604051e350f3a7320cf930c3047c91738755",
+  "personal_directives": {
+    "Codex": "/home/fpizzi/.codex/AGENTS.md",
+    "Claude": "/home/fpizzi/.claude/CLAUDE.md imports that file",
+    "personal_replan": "/home/fpizzi/.codex/skills/replan/SKILL.md"
+  },
+  "checks": {
+    "role_contexts_and_worker_delivery_exit": 0,
+    "source_manifest_exit": 0,
+    "skill_validation": "personal/project both valid"
+  },
+  "initial_failures": "First continuity addition and first reduction exceeded the unchanged planner/subplanner body cap; compressed repeated guidance, then actual role checks passed. No truncation or cap increase.",
+  "limits": "Not a native acceptance receipt. Running T2 frozen prompt and installed server bundle unchanged; T5 integration pending."
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "paea-git-pack-protocol",
+  "inputs": [
+    "tests/paea_git_pack_protocol_test.py",
+    "tests/rust_native*.py",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-git-pack-protocol.json",
+    "docs/architecture/PAEA-GIT-TRANSACTION.md",
+    "docs/en/PAEA-GIT-TRANSACTION.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "real-git-disk-pack-no-ref-import-refusal-and-recovery",
+      "command": [
+        "python3",
+        "tests/paea_git_pack_protocol_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_GIT_PACK_PROTOCOL_PASS 6 named assertions"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

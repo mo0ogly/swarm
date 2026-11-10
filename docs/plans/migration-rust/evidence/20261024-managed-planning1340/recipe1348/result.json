@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recipe": "managed-native-planning",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "native-managed-delegation-to-two-tasks",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='managed-planning-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_managed_planning.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 2.2793599879951216,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "15b8dc1e4ec47598735ff82258eb07b424c4340d10da17859c97543407c5ebea",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "21d5038342d2f5472304a2a4f06479baf9b3cb4f94d21585c26f3c02ddb6f4ff",
+    "declared-inputs.tar.gz": "a9e2a55e101530403ba96903cbe08789b527b5c94aba6c0013048cc81ce77899",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "0fb6e3bd192c88142372e478aa4a7c59f7fed7b9889bbd9666b930eaf1de0182",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "57c1e732693721e97caee8123a1b59b02837d999651b4b2e7a2ffdb06c89808d",
+    "inputs.after.json": "21d5038342d2f5472304a2a4f06479baf9b3cb4f94d21585c26f3c02ddb6f4ff"
+  }
+}

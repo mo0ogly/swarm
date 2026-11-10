@@ -1,0 +1,10 @@
+{
+  "status": "REFUSED_BEFORE_TEST_EXECUTION",
+  "cause": "FileNotFoundError: missing recipes1355 parent; recipe runner creates only its fresh output leaf",
+  "affected": [
+    "planning",
+    "bootstrap"
+  ],
+  "tests_executed": 0,
+  "recovery": "Create fresh recipes1356 parent explicitly, then fresh leaves; no prior evidence overwritten"
+}

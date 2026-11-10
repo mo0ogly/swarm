@@ -1,0 +1,480 @@
+//go:build linux
+
+package engine
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"reflect"
+	"testing"
+	"time"
+)
+
+type agentIdentityIssuerFixture struct {
+	agentIdentityRegistryFixture
+	oidc      *oidcFixture
+	token     string
+	authority agentIdentityIssuerAuthority
+}
+
+func issuerFixture(t *testing.T) agentIdentityIssuerFixture {
+	t.Helper()
+	f := registryFixture(t)
+	oidc := newOIDCFixture(t)
+	change := lifecycleChange(t, "alice", false, 1)
+	change.OIDC = &TrustOIDCConfig{Enabled: true, Issuer: oidc.server.URL, ClientID: "swarm", RedirectURI: "http://127.0.0.1/trust-oidc-callback.html", RequestTimeoutSeconds: 5, LoginTTLSeconds: 300, SessionTTLSeconds: 600, Mappings: []TrustOIDCMapping{{ExternalSubject: "employee-1", Subject: "alice"}}}
+	if _, err := f.store.trustConfig(change, false); err != nil {
+		t.Fatal(err)
+	}
+	value, err := f.store.trustOIDCFinish(context.Background(), oidcAuthorize(t, f.store))
+	if err != nil {
+		t.Fatal(err)
+	}
+	token := value.(map[string]any)["session_token"].(string)
+	var caller agentIdentityCaller
+	_, err = f.store.withTrustLock(false, func(st *trustState) (any, error) {
+		var err error
+		caller, err = resolveAgentIdentityCaller(f.store.root, st, token, time.Now().UTC())
+		return nil, err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for id, grant := range f.snapshot.Grants {
+		grant.Issuer.Principal, grant.Holder.Principal = caller.actor.Principal, caller.actor.Principal
+		grant.TrustRevision = caller.trustRevision
+		f.snapshot.Grants[id] = grant
+	}
+	for id, instance := range f.snapshot.Instances {
+		instance.Principal = caller.actor.Principal
+		f.snapshot.Instances[id] = instance
+	}
+	f.actor.Principal, f.permit.publisher, f.permit.trustRevision = caller.actor.Principal, caller.actor.Principal, caller.trustRevision
+	registryApproveFixture(t, &f)
+	at := time.Now().UTC()
+	permission := agentIdentityPermission{f.request.Operation, f.request.Resource}
+	// Explicit fixture of the protected enrollment authority. The OIDC session
+	// above is real protocol execution against a local signed-token fixture;
+	// enrollment itself is neither an operator action nor an external service.
+	a := agentIdentityIssuerAuthority{projectRoot: f.store.root, principal: caller.actor.Principal, scope: f.permit.scope, trustRevision: caller.trustRevision,
+		enrollmentDigest: hash([]byte("explicit-controller-enrollment-fixture")), permissions: []agentIdentityPermission{permission}, delegable: []agentIdentityPermission{permission},
+		notBefore: at.Add(-2 * time.Minute), expiresAt: at.Add(2 * time.Hour)}
+	return agentIdentityIssuerFixture{f, oidc, token, a}
+}
+
+func issuerMint(t *testing.T, f agentIdentityIssuerFixture) agentIdentityRegistryPermit {
+	t.Helper()
+	permit, err := f.store.mintAgentIdentityRegistryPermit(registryContext(t), registryRaw(t, f.snapshot), f.token, f.authority, f.permit.base, f.permit.eventID, f.permit.roots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return permit
+}
+
+func TestAgentIdentityIssuerAuthenticatedHumanExactPermit(t *testing.T) {
+	f := issuerFixture(t)
+	before := registryTrustBytes(t, f.store)
+	permit := issuerMint(t, f)
+	registryAssertUnchanged(t, f.store, before, 0, 0)
+	if permit.issuer == nil || permit.publisher.Kind != "human" || permit.publisher != f.authority.principal || permit.nextDigest != f.permit.nextDigest ||
+		permit.scope != f.permit.scope || permit.trustRevision != 2 || permit.issuer.authorizedUntil.After(f.authority.expiresAt) {
+		t.Fatal("issued permit lost verified human, exact content or scope")
+	}
+	// Authority data is owned by the permit, not aliased to controller slices.
+	f.authority.permissions[0].Resource = "mutated-after-issuance"
+	f.authority.delegable[0].Resource = "mutated-after-issuance"
+	if permit.issuer.authority.permissions[0].Resource == "mutated-after-issuance" || permit.issuer.authority.delegable[0].Resource == "mutated-after-issuance" {
+		t.Fatal("controller retained a mutable alias into the issued permit")
+	}
+	cp, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.token, permit, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reopened, err := openStore(f.store.root, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.db.Close()
+	snapshot, _, err := reopened.readAgentIdentityRegistry(registryContext(t), cp)
+	if err != nil || !reflect.DeepEqual(snapshot, f.snapshot) {
+		t.Fatal("human permit did not publish exact durable snapshot: ", err)
+	}
+}
+
+func TestAgentIdentityIssuerPublicationRejectsDifferentHumanSession(t *testing.T) {
+	f := issuerFixture(t)
+	permit := issuerMint(t, f)
+	value, err := f.store.trustOIDCFinish(context.Background(), oidcAuthorize(t, f.store))
+	if err != nil {
+		t.Fatal(err)
+	}
+	other := value.(map[string]any)["session_token"].(string)
+	if other == f.token {
+		t.Fatal("fixture did not create a distinct authenticated session")
+	}
+	before := registryTrustBytes(t, f.store)
+	_, err = f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), other, permit, nil)
+	if identityPlanFailure(err).Code != "agent_identity_issuer_authority_stale" {
+		t.Fatal("permit transferred to another session of the same human: ", err)
+	}
+	registryAssertUnchanged(t, f.store, before, 0, 0)
+}
+
+func TestAgentIdentityIssuerExpirationDuringPublicationWait(t *testing.T) {
+	f := issuerFixture(t)
+	f.authority.expiresAt = time.Now().UTC().Add(time.Second)
+	for id, grant := range f.snapshot.Grants {
+		grant.ExpiresAt = f.authority.expiresAt
+		f.snapshot.Grants[id] = grant
+	}
+	permit := issuerMint(t, f)
+	connection, err := f.store.db.Conn(registryContext(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	released := false
+	defer func() {
+		if !released {
+			connection.Close()
+		}
+	}()
+	before := registryTrustBytes(t, f.store)
+	waits := f.store.db.Stats().WaitCount
+	raw := registryRaw(t, f.snapshot)
+	done := make(chan error, 1)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	go func() {
+		_, err := f.store.publishAgentIdentityRegistry(ctx, raw, f.token, permit, nil)
+		done <- err
+	}()
+	for f.store.db.Stats().WaitCount == waits {
+		if ctx.Err() != nil {
+			t.Fatal("publication did not wait for SQLite: ", ctx.Err())
+		}
+		time.Sleep(time.Millisecond)
+	}
+	if wait := time.Until(f.authority.expiresAt); wait > 0 {
+		time.Sleep(wait)
+	}
+	if err = connection.Close(); err != nil {
+		t.Fatal(err)
+	}
+	released = true
+	err = <-done
+	if identityPlanFailure(err).Code != "agent_identity_issuer_authority_stale" {
+		t.Fatal("publication accepted issuer authority expired during SQLite wait: ", err)
+	}
+	registryAssertUnchanged(t, f.store, before, 0, 0)
+}
+
+func TestAgentIdentityIssuerAuthorityCannotComeFromJSON(t *testing.T) {
+	var authority agentIdentityIssuerAuthority
+	if err := json.Unmarshal([]byte(`{"projectRoot":"/tmp","principal":{"principal_kind":"human"},"enrollmentDigest":"self-asserted"}`), &authority); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(authority, agentIdentityIssuerAuthority{}) {
+		t.Fatal("JSON populated the private enrollment authority")
+	}
+}
+
+func TestAgentIdentityIssuerRejectsUnenrolledOrExpandedAuthority(t *testing.T) {
+	cases := []struct {
+		name string
+		code string
+		edit func(*agentIdentityIssuerFixture)
+	}{
+		{"missing-authority", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority = agentIdentityIssuerAuthority{} }},
+		{"local-requester", "agent_identity_human_issuer_required", func(f *agentIdentityIssuerFixture) { f.token = trustRequesterToken }},
+		{"local-admin", "agent_identity_human_issuer_required", func(f *agentIdentityIssuerFixture) { f.token = trustAdminToken }},
+		{"local-approver", "agent_identity_human_issuer_required", func(f *agentIdentityIssuerFixture) { f.token = trustApproverToken }},
+		{"missing-token", "authorization_required", func(f *agentIdentityIssuerFixture) { f.token = "" }},
+		{"unknown-token", "authorization_required", func(f *agentIdentityIssuerFixture) { f.token = "unrecognized-issuer-token-012345" }},
+		{"homonym-issuer", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.principal.Issuer += "/other" }},
+		{"homonym-subject", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.principal.Subject += "-other" }},
+		{"different-principal", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.principal.ID = "another-human" }},
+		{"foreign-project", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.projectRoot += "-other" }},
+		{"foreign-work", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.scope.WorkID = "other-work" }},
+		{"wrong-plan-generation", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.scope.PlanVersion++ }},
+		{"wrong-plan-digest", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.scope.PlanDigest = hash([]byte("other-plan")) }},
+		{"stale-trust", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.trustRevision-- }},
+		{"missing-enrollment", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.enrollmentDigest = "" }},
+		{"no-rights", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.permissions = nil }},
+		{"duplicate-right", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) {
+			f.authority.permissions = append(f.authority.permissions, f.authority.permissions[0])
+		}},
+		{"wildcard", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) { f.authority.permissions[0].Resource = "task/*" }},
+		{"delegation-outside-ceiling", "agent_identity_issuer_authority_required", func(f *agentIdentityIssuerFixture) {
+			f.authority.delegable = []agentIdentityPermission{{"effect.execute", "another-effect"}}
+		}},
+		{"expired", "agent_identity_issuer_authority_stale", func(f *agentIdentityIssuerFixture) { f.authority.expiresAt = time.Now().UTC().Add(-time.Second) }},
+		{"not-yet-valid", "agent_identity_issuer_authority_stale", func(f *agentIdentityIssuerFixture) { f.authority.notBefore = time.Now().UTC().Add(time.Minute) }},
+		{"empty-interval", "agent_identity_issuer_authority_stale", func(f *agentIdentityIssuerFixture) { f.authority.expiresAt = f.authority.notBefore }},
+		{"root-start-before-authority", "agent_identity_issuer_ceiling_exceeded", func(f *agentIdentityIssuerFixture) { f.authority.notBefore = time.Now().UTC().Add(-10 * time.Second) }},
+		{"root-outlives-authority", "agent_identity_issuer_ceiling_exceeded", func(f *agentIdentityIssuerFixture) { f.authority.expiresAt = time.Now().UTC().Add(time.Minute) }},
+		{"undelegable-authority", "agent_identity_issuer_ceiling_exceeded", func(f *agentIdentityIssuerFixture) { f.authority.delegable = nil }},
+		{"root-rights-expanded", "agent_identity_issuer_ceiling_exceeded", func(f *agentIdentityIssuerFixture) {
+			g := f.snapshot.Grants["grant-root"]
+			g.Permissions = append(g.Permissions, agentIdentityPermission{"effect.execute", "foreign-effect"})
+			f.snapshot.Grants[g.ID] = g
+		}},
+		{"root-issuer-forged", "agent_identity_issuer_ceiling_exceeded", func(f *agentIdentityIssuerFixture) {
+			g := f.snapshot.Grants["grant-root"]
+			g.Issuer.Principal.Subject = "another-human"
+			f.snapshot.Grants[g.ID] = g
+		}},
+		{"unlisted-root-expanded", "agent_identity_issuer_ceiling_exceeded", func(f *agentIdentityIssuerFixture) {
+			g := f.snapshot.Grants["grant-root"]
+			g.ID = "unlisted-root"
+			g.Permissions, g.Delegable = []agentIdentityPermission{{"effect.execute", "foreign-effect"}}, nil
+			f.snapshot.Grants[g.ID] = g
+		}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			f := issuerFixture(t)
+			tc.edit(&f)
+			before := registryTrustBytes(t, f.store)
+			permit, err := f.store.mintAgentIdentityRegistryPermit(registryContext(t), registryRaw(t, f.snapshot), f.token, f.authority, f.permit.base, f.permit.eventID, f.permit.roots)
+			if identityPlanFailure(err).Code != tc.code || !reflect.DeepEqual(permit, agentIdentityRegistryPermit{}) {
+				t.Fatalf("expected %s and zero permit; got %v, %+v", tc.code, err, permit)
+			}
+			registryAssertUnchanged(t, f.store, before, 0, 0)
+		})
+	}
+}
+
+func TestAgentIdentityIssuerWorkloadNeverBecomesHuman(t *testing.T) {
+	w := newWorkloadFixture(t)
+	s := workloadConfiguredStore(t, w)
+	value, err := s.trustWorkloadLogin(context.Background(), workloadAssertion(t, w, nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	token := value.(map[string]any)["session_token"].(string)
+	_, err = s.withTrustLock(false, func(st *trustState) (any, error) {
+		at := time.Now().UTC()
+		caller, err := resolveAgentIdentityCaller(s.root, st, token, at)
+		if err != nil {
+			return nil, err
+		}
+		if caller.actor.Principal.Kind != "service" {
+			t.Fatal("fixture did not authenticate a real workload session")
+		}
+		err = validateAgentIdentityIssuer(s.root, caller, agentIdentityIssuerAuthority{principal: caller.actor.Principal}, agentIdentityScope{}, at)
+		if identityPlanFailure(err).Code != "agent_identity_human_issuer_required" {
+			t.Fatal("workload became a human issuer: ", err)
+		}
+		return nil, nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAgentIdentityIssuerRejectsReactivatedRootOutsideCurrentCeiling(t *testing.T) {
+	f := issuerFixture(t)
+	extra := agentIdentityPermission{"tool.invoke", "tool/exact"}
+	f.authority.permissions = append(f.authority.permissions, extra)
+	g := f.snapshot.Grants["grant-root"]
+	g.ID, g.Permissions, g.Delegable = "dormant-root", []agentIdentityPermission{extra}, nil
+	f.snapshot.Grants[g.ID] = g
+	permit := issuerMint(t, f)
+	cp, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.token, permit, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.snapshot.Revision++
+	f.permit.base, f.permit.eventID, f.permit.roots = cp, "activate-dormant", []string{"grant-root", "dormant-root"}
+	f.authority.permissions = f.authority.permissions[:1]
+	before := registryTrustBytes(t, f.store)
+	_, err = f.store.mintAgentIdentityRegistryPermit(registryContext(t), registryRaw(t, f.snapshot), f.token, f.authority, f.permit.base, f.permit.eventID, f.permit.roots)
+	if identityPlanFailure(err).Code != "agent_identity_issuer_ceiling_exceeded" {
+		t.Fatal("retained unlisted root bypassed new authority ceiling: ", err)
+	}
+	registryAssertUnchanged(t, f.store, before, 1, 1)
+}
+
+func TestAgentIdentityIssuerRejectsChangedSnapshotAndAmendedPlan(t *testing.T) {
+	for _, name := range []string{"snapshot", "plan"} {
+		t.Run(name, func(t *testing.T) {
+			f := issuerFixture(t)
+			permit := issuerMint(t, f)
+			if name == "snapshot" {
+				g := f.snapshot.Grants["grant-root"]
+				g.ExpiresAt = g.ExpiresAt.Add(-time.Second)
+				f.snapshot.Grants[g.ID] = g
+			} else {
+				identityPlanEdit(t, f.agentIdentityRegistryFixture, func(w *Work) { w.Objective += " amended" })
+			}
+			before := registryTrustBytes(t, f.store)
+			_, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.token, permit, nil)
+			code := "agent_identity_snapshot_changed"
+			if name == "plan" {
+				code = "agent_identity_plan_mismatch"
+			}
+			if identityPlanFailure(err).Code != code {
+				t.Fatal("changed approved content accepted: ", err)
+			}
+			registryAssertUnchanged(t, f.store, before, 0, 0)
+		})
+	}
+}
+
+func TestAgentIdentityIssuerRecoveryRetainsDecisionAfterSessionExpiry(t *testing.T) {
+	f := issuerFixture(t)
+	permit := issuerMint(t, f)
+	interrupted := errors.New("fixture durable intent interruption")
+	_, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.token, permit, func(stage string) error {
+		if stage == "intent_persisted" {
+			return interrupted
+		}
+		return nil
+	})
+	if !errors.Is(err, interrupted) {
+		t.Fatal("did not persist the original authorized intent: ", err)
+	}
+	_, err = f.store.withTrustLock(true, func(st *trustState) (any, error) {
+		session := st.OIDCSessions[trustTokenHash(f.token)]
+		session.ExpiresAt = time.Now().UTC().Add(-time.Second)
+		st.OIDCSessions[trustTokenHash(f.token)] = session
+		return nil, nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	cp, err := f.store.recoverAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), permit)
+	if err != nil {
+		t.Fatal("exact historical intent could not recover: ", err)
+	}
+	if _, _, err = f.store.readAgentIdentityRegistry(registryContext(t), cp); err != nil {
+		t.Fatal(err)
+	}
+	before := registryTrustBytes(t, f.store)
+	if _, err = f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.token, permit, nil); err == nil {
+		t.Fatal("expired session replay gained fresh publication authority")
+	}
+	registryAssertUnchanged(t, f.store, before, 1, 1)
+}
+
+func TestAgentIdentityIssuerMintReadsAfterSQLiteWait(t *testing.T) {
+	for _, name := range []string{"expiry", "amended-plan"} {
+		t.Run(name, func(t *testing.T) {
+			f := issuerFixture(t)
+			if name == "expiry" {
+				f.authority.expiresAt = time.Now().UTC().Add(time.Second)
+				for id, grant := range f.snapshot.Grants {
+					grant.ExpiresAt = f.authority.expiresAt
+					f.snapshot.Grants[id] = grant
+				}
+			}
+			connection, err := f.store.db.Conn(registryContext(t))
+			if err != nil {
+				t.Fatal(err)
+			}
+			released := false
+			defer func() {
+				if !released {
+					connection.Close()
+				}
+			}()
+			before := registryTrustBytes(t, f.store)
+			waits := f.store.db.Stats().WaitCount
+			raw := registryRaw(t, f.snapshot)
+			type outcome struct {
+				permit agentIdentityRegistryPermit
+				err    error
+			}
+			done := make(chan outcome, 1)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			go func() {
+				p, err := f.store.mintAgentIdentityRegistryPermit(ctx, raw, f.token, f.authority, f.permit.base, f.permit.eventID, f.permit.roots)
+				done <- outcome{p, err}
+			}()
+			for f.store.db.Stats().WaitCount == waits {
+				if ctx.Err() != nil {
+					t.Fatal("mint did not wait for SQLite: ", ctx.Err())
+				}
+				time.Sleep(time.Millisecond)
+			}
+			code := "agent_identity_issuer_authority_stale"
+			if name == "expiry" {
+				if wait := time.Until(f.authority.expiresAt); wait > 0 {
+					time.Sleep(wait)
+				}
+			} else {
+				// Isolated fixture mutation through the held SQL connection; its
+				// real Work triggers run before the waiting issuer can read it.
+				var body []byte
+				if err = connection.QueryRowContext(ctx, `SELECT body FROM works WHERE id=?`, f.permit.scope.WorkID).Scan(&body); err != nil {
+					t.Fatal(err)
+				}
+				var work Work
+				if err = json.Unmarshal(body, &work); err != nil {
+					t.Fatal(err)
+				}
+				work.Revision++
+				work.Objective += " amended while issuer waits"
+				body, err = json.Marshal(work)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if _, err = connection.ExecContext(ctx, `UPDATE works SET revision=?,body=? WHERE id=?`, work.Revision, body, work.ID); err != nil {
+					t.Fatal(err)
+				}
+				code = "agent_identity_issuer_authority_required"
+			}
+			if err = connection.Close(); err != nil {
+				t.Fatal(err)
+			}
+			released = true
+			result := <-done
+			if identityPlanFailure(result.err).Code != code || !reflect.DeepEqual(result.permit, agentIdentityRegistryPermit{}) {
+				t.Fatal("mint used authority or plan from before its SQLite wait: ", result.err)
+			}
+			registryAssertUnchanged(t, f.store, before, 0, 0)
+		})
+	}
+}
+
+func TestAgentIdentityIssuerPublicationRejectsDisabledHuman(t *testing.T) {
+	f := issuerFixture(t)
+	permit := issuerMint(t, f)
+	if _, err := f.store.trustConfig(lifecycleChange(t, "alice", true, 2), false); err != nil {
+		t.Fatal(err)
+	}
+	before := registryTrustBytes(t, f.store)
+	_, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.token, permit, nil)
+	if identityPlanFailure(err).Code != "authorization_required" {
+		t.Fatal("disabled human retained publication authority: ", err)
+	}
+	registryAssertUnchanged(t, f.store, before, 0, 0)
+}
+
+func TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup(t *testing.T) {
+	for _, name := range []string{"missing-token", "unenrolled-human", "local-admin"} {
+		t.Run(name, func(t *testing.T) {
+			f := issuerFixture(t)
+			f.permit.base.workID = "undisclosed-work"
+			code := "authorization_required"
+			switch name {
+			case "missing-token":
+				f.token = ""
+			case "unenrolled-human":
+				f.authority = agentIdentityIssuerAuthority{}
+				code = "agent_identity_issuer_authority_required"
+			case "local-admin":
+				f.token = trustAdminToken
+				code = "agent_identity_human_issuer_required"
+			}
+			before := registryTrustBytes(t, f.store)
+			permit, err := f.store.mintAgentIdentityRegistryPermit(registryContext(t), registryRaw(t, f.snapshot), f.token, f.authority, f.permit.base, f.permit.eventID, f.permit.roots)
+			if identityPlanFailure(err).Code != code || !reflect.DeepEqual(permit, agentIdentityRegistryPermit{}) {
+				t.Fatalf("work lookup preceded authorization: expected %s, got %v", code, err)
+			}
+			registryAssertUnchanged(t, f.store, before, 0, 0)
+		})
+	}
+}

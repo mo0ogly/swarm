@@ -1,0 +1,12 @@
+{
+  "error": "preparation-send-invalid",
+  "failure": {
+    "causes": [
+      "preparation-send-invalid"
+    ],
+    "code": "preparation-send-invalid",
+    "message": "preparation-send-invalid",
+    "retryable": false
+  },
+  "schema_version": 1
+}

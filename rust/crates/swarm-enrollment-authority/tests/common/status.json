@@ -1,0 +1,9 @@
+{
+  "updated_utc": "2026-10-30T10:31:00+00:00",
+  "target": "PA08 navigateur réel aperçu avec source liée fraîche puis périmée",
+  "owner": "GLM",
+  "phase": "analyse",
+  "observed": "Bootstrap réel identifié: la liaison source au serveur n'existe qu'en test (open_git_call) et en préparation CLI paea transfer-call; aucun raccord CLI serveur avec source liée. Harnais cjs actuel qualifie seulement available:false. Fixture retenue /tmp/swarm-model83-lne5t7vx (result.json PASS, root+work intégrés). Trust révision = .swarm/trust-actions.json revision; péremption = publication Trust appliquée après préparation (révision+1), voie contractuelle existante.",
+  "next": "Regénérer fixture source (tmpfs perdue), écrire harnais possédé de serveur lié (reprise du bootstrap de test paea_git_call.rs), vérifier UI fraîche puis périmée, recette permanente",
+  "blockers": []
+}

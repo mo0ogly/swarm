@@ -1,0 +1,21 @@
+{
+  "checks": [
+    "disabled policy explains why checking is unavailable",
+    "fr: preview does not mutate and Admin persists selected execution policy",
+    "fr: duration reopens correctly with keyboard focus restored on mobile",
+    "fr: CLI executes all fourteen kernel checks without business mutation or broader qualification",
+    "fr: public API and UI prove the sealed helper while retaining provider and secret limitations",
+    "fr: extra caller fields are refused without mutation",
+    "fr: translated result, keyboard target and theme render without mobile overflow",
+    "en: preview does not mutate and Admin persists selected execution policy",
+    "en: duration reopens correctly with keyboard focus restored on mobile",
+    "en: CLI executes all fourteen kernel checks without business mutation or broader qualification",
+    "en: public API and UI prove the sealed helper while retaining provider and secret limitations",
+    "en: extra caller fields are refused without mutation",
+    "en: translated result, keyboard target and theme render without mobile overflow"
+  ],
+  "errors": [],
+  "expected_denials": 2,
+  "root": "/tmp/swarm-sealed-ui-IERqY4",
+  "at": "2026-10-15T22:21:10.219Z"
+}

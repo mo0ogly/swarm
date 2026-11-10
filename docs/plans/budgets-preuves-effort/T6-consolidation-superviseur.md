@@ -1,5 +1,14 @@
 # T6 — consolidation manuelle, validation non obtenue
 
+## Repère APEX — 24 octobre 2026
+
+La [file APEX FR](../FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) conserve le dernier état documenté de
+cette mission : 5/6, consolidation T6 non validée. La clôture ultérieure d’une
+autre mission de supervision ne la clôt pas par transfert. Codex racine possède
+la conservation des preuves ; une éventuelle reprise exige de relire l’état
+public courant et l’autorité applicable, sans recréer la mission ni inventer
+un avis. Aucun état natif courant n’est inspecté ou modifié par cette note.
+
 Les quatre corrections ont des recettes isolées réussies et T1–T5 sont acceptées par le moteur. La mission reste 5/6 : les deux producteurs T6 ont été interrompus et aucun avis indépendant T6 ne valide cette consolidation.
 
 ## Provenance et preuves

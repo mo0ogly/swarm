@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "native-profile-cache-integrity",
+  "inputs": [
+    "tools/verification/verify_native_profile.py",
+    "tools/verification/recipe.py",
+    "tests/normal_profile_archive_test.py",
+    "tests/normal_profile_cache_test.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "declared-producer-archive-and-stale-cache-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "normal_profile_*_test.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_archive_has_exact_original_members",
+        "test_source_drift_refuses_without_replacing_witness_then_recovers",
+        "test_prior_depfile_does_not_promote_stale_snapshot_input",
+        "test_checkout_cargo_config_is_retained_as_exact_effective_bytes",
+        "test_invocation_requires_exact_config_and_declared_environment_when_present",
+        "Ran 8 tests",
+        "\nOK\n"
+      ]
+    },
+    {
+      "id": "actual-default-profile-in-owned-fresh-target",
+      "command": [
+        "python3",
+        "-c",
+        "import sys,tempfile,subprocess,json; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-profile-cache-',dir='.cache')).resolve(); subprocess.run([sys.executable,'tools/verification/verify_native_profile.py','--target-dir',str(base/'target'),'--output',str(base/'profile')],check=True); p=json.loads((base/'profile/result.json').read_bytes()); assert p['actual_dependencies_stable'] and p['no_fixture_feature']; print('REPLAY_EVIDENCE '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "VERIFIED_DEFAULT_NATIVE_PROFILE",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

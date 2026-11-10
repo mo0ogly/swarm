@@ -1,0 +1,10 @@
+{
+  "error": "Error: Execution context was destroyed, most likely because of a navigation.\n    at rewriteError (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/ExecutionContext.js:457:15)\n    at async #evaluate (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/ExecutionContext.js:389:60)\n    at async ExecutionContext.evaluateHandle (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/ExecutionContext.js:329:16)\n    at async IsolatedWorld.evaluateHandle (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/IsolatedWorld.js:89:16)\n    at async CdpJSHandle.evaluateHandle (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/JSHandle.js:157:20)\n    at async CdpElementHandle.evaluateHandle (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:354:20)\n    at async CSSQueryHandler.queryOne (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/common/QueryHandler.js:138:59)\n    at async CdpElementHandle.$ (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:409:21)\n    at async CdpElementHandle.<anonymous> (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:133:24)\n    at async CdpElementHandle.$eval (/home/fpizzi/Documents/ChatGPT/swarm/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:497:70)",
+  "checks": [
+    "fr/etat: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, log navigation, pause, find, responsive and empty",
+    "fr/sombre: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, log navigation, pause, find, responsive and empty"
+  ],
+  "errors": [],
+  "httpErrors": [],
+  "root": "/tmp/swarm-dense-reading-TefJCz"
+}

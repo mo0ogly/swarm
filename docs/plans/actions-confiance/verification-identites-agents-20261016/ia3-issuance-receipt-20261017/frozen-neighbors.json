@@ -1,0 +1,22 @@
+{
+  "reason": "concurrent memory source edits invalidated before-01; compiler view only; checkout untouched",
+  "files": {
+    "internal/engine/memory_context_receipt_test.go": "9a7ed77c3e4bbe08c04b2688ca34756949f8fce0c31201eb3b32f57362311c3e",
+    "internal/engine/memory_summary_selection.go": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+    "internal/engine/memory_summary_selection_test.go": "3a674a68f3a5b737f2aba163674a698b73f7e4cbbc0d83062d85f336b510aea3",
+    "internal/engine/memory_summary_source.go": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+    "internal/engine/memory_summary_source_test.go": "75cd9da2655931ac592620ece5a8beccdb7fa2d22c19fe2fb15ef1965d4b7c68",
+    "internal/engine/memory_test.go": "6d344f9ba09eb7448221016610ceb69c99219b886a37d9198e831bb1ddc5f557",
+    "internal/engine/memory_usage_binding.go": "dbfbd664bcdf3c7df39bec54fe7ccb98233205db126fcf89e48ebd1443d75501",
+    "internal/engine/memory_usage_binding_test.go": "91aff4cd99f9be89929784a0288dbbb0c7de7eb080e203cb2e0a1d942c7d5fa8",
+    "internal/engine/project_memory.go": "84873dfb728b17f34c0c3d2522fe6b77c220f664c4148f3bdbc1e87a9b2a5d35",
+    "internal/engine/project_memory_comparison_test.go": "c1a4cf4c353d84c6004dff80d698615001facaf52f9909e6a6ea87d8160bdb6c",
+    "internal/engine/project_memory_dialogue.go": "9350ad70e6e97ab25183ea24bc7e956082d694aeed642a6b3dc97bfd68186f51",
+    "internal/engine/project_memory_dialogue_test.go": "928b85704d5bbc225f6614b7f77ed9601970f55e7eaca475bac3de85ae65fc4f",
+    "internal/engine/project_memory_knowledge_test.go": "7da5e10cd8350c38ecbf0527f3a2dc10872a557d918a5cd612fba2668f1b890b",
+    "internal/engine/project_memory_public.go": "63188a921136b061166e4066dd7203ae509bd7fa3f9f3ef8847b9738fb52ccb7",
+    "internal/engine/project_memory_storage_plan_test.go": "72cc3f4e645cb5164e8b9aa6bc1ca70f0c7bcaefef65d51a0d15715923f663d0",
+    "internal/engine/project_memory_test.go": "4796d13d16840d34cc2b21490caaebbfa62b02acd9f3dd2e7ba614c4560806f1"
+  },
+  "web_view_reference": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-embed-view.json"
+}

@@ -1,0 +1,39 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueIncompleteTurnCannotBeAnswered|TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions|TestDialogueCompletionRejectsContradictoryAndPrivateFailures|TestDialogueConfirmationStorageFailureBlocksContinuation|TestDialogueCumulativeToolsAndIdle|TestDialogueResumeIdentityAndPermissions|TestDialogueUsageSnapshotDoesNotMutate|TestStructuredProviderFailurePreservesSafeCause)$",
+    "-count=1",
+    "-v",
+    "-timeout=90s"
+  ],
+  "started_at_utc": "2026-10-16T10:24:14.151579+00:00",
+  "ended_at_utc": "2026-10-16T10:24:35.717475+00:00",
+  "elapsed_seconds": 21.56516100699082,
+  "exit_code": 0,
+  "named_tests_expected": [
+    "TestDialogueIncompleteTurnCannotBeAnswered",
+    "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+    "TestDialogueCompletionRejectsContradictoryAndPrivateFailures",
+    "TestDialogueConfirmationStorageFailureBlocksContinuation",
+    "TestDialogueCumulativeToolsAndIdle",
+    "TestDialogueResumeIdentityAndPermissions",
+    "TestDialogueUsageSnapshotDoesNotMutate",
+    "TestStructuredProviderFailurePreservesSafeCause"
+  ],
+  "named_tests_ran": [
+    "TestDialogueCumulativeToolsAndIdle",
+    "TestDialogueResumeIdentityAndPermissions",
+    "TestDialogueUsageSnapshotDoesNotMutate",
+    "TestDialogueIncompleteTurnCannotBeAnswered",
+    "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+    "TestDialogueCompletionRejectsContradictoryAndPrivateFailures",
+    "TestDialogueConfirmationStorageFailureBlocksContinuation",
+    "TestStructuredProviderFailurePreservesSafeCause"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "3ff74708fb87b949175b1cc4363d427772c733fb5d13d553c767704ff53e0ab0",
+  "real_model_calls": 0
+}

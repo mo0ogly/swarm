@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "build-target-transfer",
+  "inputs": [
+    "tools/rust-migration/move_build_target.py",
+    "tests/rust_build_target_move_test.py",
+    "tools/verification/recipes/build-target-transfer.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "rename-only-target",
+      "command": [
+        "python3",
+        "tests/rust_build_target_move_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_missing_parent_copy_reproducer_and_rename_fix",
+        "test_existing_destination_preserves_both",
+        "test_cross_device_has_no_copy_fallback",
+        "Ran 3 tests",
+        "OK"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-12T07:58:08.678296+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-paused-settlement-20261012.bundle",
+  "sha256": "19ee4d26fc009f9469985737451644396d0e8f28034068037eedfea9ed316755",
+  "commit": "264ba4ecd8dc4111619953c2cd20889a3933c64e",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 120,
+  "manifest_sha256": "0622c1afbf383814e913197cddfe2bddb3083c88d17efb2de7510df233b22248",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-inputs-2jo_5orc",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-import-74ox_pn_",
+  "old116_originals_preserved": true,
+  "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+  "limits": "Cumulative116 original inputs unchanged, plus qualified26 pause settlement gate and FR/EN architecture. Public retry while either pause is active retains intent and counters; after both clear, same candidate resumes under existing controls/review. T3 integrates the full cumulative corrections and qualifies its own candidate; T4 covers pause variants and review recovery. T5 addresses observed UTC-clock/provider recovery projection and role communication constraints. T7 verifies actual native receipt/decision/application/effect, including correlation of fail to attributed defect and distinction between historical failures and current receipts. T8 RETEX after recipe. No native acceptance or runtime26 installation inferred."
+}

@@ -1,0 +1,8 @@
+%%{init:{"theme":"base","fontFamily":"Arial, sans-serif","themeVariables":{"fontFamily":"Arial, sans-serif","fontSize":"28px","lineColor":"#526976","edgeLabelBackground":"#f5f3ec"},"flowchart":{"htmlLabels":true,"wrappingWidth":300,"nodeSpacing":32,"rankSpacing":65}}}%%
+flowchart LR
+  P["Initiateur<br/>Personne ou service"] -->|Attribuer| L["Agent logique<br/>Mission et tâche"]
+  L -->|Rattacher| I["Instance<br/>Tentative concernée"]
+  classDef principal fill:#dbeafe,color:#173d66,stroke:#1b5f7a,stroke-width:3px;
+  classDef instance fill:#ccfbf1,color:#134e4a,stroke:#0f766e,stroke-width:3px;
+  class P,L principal;
+  class I instance;

@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "tools/memory-evaluation/compare.py",
+    "--pack",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m6-20261016/pack",
+    "--answers",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m6-20261016/fixture-answers-correct.json",
+    "--output",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m6-20261016/fixture-result-final-correct.json"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "started_at_utc": "2026-10-16T06:36:19.115893+00:00",
+  "ended_at_utc": "2026-10-16T06:36:19.241920+00:00",
+  "exit_code": 0,
+  "expected_exit_code": 0,
+  "sources": {
+    "tools/memory-evaluation/compare.py": "2d0277366d5f6772aecdf6a344d769a0c21131c65d8eb5ac0b0261dd50e9f041",
+    "tests/test_memory_comparison.py": "b5805aeb7784e21764ead0983532653c0b02174cbe5d31698a6355f6a660fb7c"
+  },
+  "log_sha256": "84f0561b678ad224a383a5939053f5d55e97ad7b6b8093fd97a7d570da1a1416"
+}

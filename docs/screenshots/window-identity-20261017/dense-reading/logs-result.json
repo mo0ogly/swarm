@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "binary_sha256": "4d8089164e720a55f9e649c99677a59e1da9186d2909643abb45e747a6a67ea6",
+  "fixture_root": "/tmp/swarm-log-console-ui-OGg2uD",
+  "checks": [
+    "Actual embedded Monaco, four distinct semantic colours in both themes, keyboard search, untrusted text remains literal",
+    "Server search coordinates, exact multiline originals, live/pause and original API page export",
+    "Engine and supervisor sources, actual empty state, acknowledged incident remains unresolved in presentation",
+    "Network refusal preserves readable data; delayed foreign mission response rejected",
+    "FR/EN, desktop/tablet/mobile, no global overflow",
+    "Monaco unavailable: original text fallback remains accessible"
+  ],
+  "errors": [],
+  "csp": [],
+  "limits": "UI controlled provider/API fixtures; no model called, no native mission DB used; not autonomous recovery acceptance."
+}

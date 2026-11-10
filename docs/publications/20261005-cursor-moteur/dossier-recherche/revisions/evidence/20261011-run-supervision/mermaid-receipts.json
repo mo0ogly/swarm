@@ -1,0 +1,63 @@
+[
+  {
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-1.mmd",
+      "-o",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-1.svg",
+      "-p",
+      "/tmp/swarm-time-supervision-puppeteer.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-2.mmd",
+      "-o",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-2.svg",
+      "-p",
+      "/tmp/swarm-time-supervision-puppeteer.json"
+    ],
+    "exit_code": 1
+  },
+  {
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-1.mmd",
+      "-o",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-1.svg",
+      "-p",
+      "/tmp/swarm-time-supervision-puppeteer.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-2.mmd",
+      "-o",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/en-2.svg",
+      "-p",
+      "/tmp/swarm-time-supervision-puppeteer.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-2.mmd",
+      "-o",
+      "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-run-supervision/fr-2.svg",
+      "-p",
+      "/tmp/swarm-time-supervision-puppeteer.json"
+    ],
+    "exit_code": 0,
+    "correction": "Remove Mermaid sequence-label semicolon, parsed as statement separator. Failed original retained."
+  }
+]

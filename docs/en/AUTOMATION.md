@@ -6,6 +6,12 @@ The engine has an internal service for durable resume requests, time schedules,
 and local HTTP reception of external events. Program CLI and web administration
 belong to C04.
 
+Target work reads check the SQL key, matching positive revision and schema 1
+UTF-8/JSON body together before business checks. `unknown_target` means an absent
+target; a read failure or inconsistent body retains its original error instead
+of being reported as missing. These refusals create no schedule or resume effect.
+See the [Work row contract](WORK-ROW-CONTRACT.md).
+
 A C01 request contains:
 
 - a stable idempotency key selected by the caller;

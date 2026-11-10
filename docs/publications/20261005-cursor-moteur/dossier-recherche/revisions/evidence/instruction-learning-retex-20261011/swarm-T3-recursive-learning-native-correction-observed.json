@@ -1,0 +1,27 @@
+{
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "revision": 381,
+  "instruction": {
+    "id": "instruction-fff5f627c40868ef40ff5bb8",
+    "addition": "Correction récursive de l'ajout précédent (instruction-eb2db1e922c733c93f3ce330), reçue via l'événement root-owner-recursive-learning-correction-and-retex-continuity-20261011 : ne pas interpréter la limite comme « 128 Kio par fichier/source ». Limites exactes à respecter pour toute preuve ou contexte additionnel transmis (delivery.criteria[].evidence, docs/TASK-ID.review-context.json, paquets opérateur) : (1) chaque source textuelle individuelle ≤ 96 Kio ; (2) l'union de toutes les sources jointes pour une même tâche ≤ 128 Kio ; (3) maximum 24 fichiers par tâche ; (4) tout cumul dépassant ces bornes doit être partitionné en plusieurs remises ciblées et pertinentes plutôt qu'un paquet unique non tronqué, pour éviter un blocage d'intégration comme celui observé sur plan-ca937edf4e-T2. Cette correction s'ajoute en complément de l'ajout déjà présent dans le champ next de T3, elle ne le remplace pas ; ce n'est pas un rejet utilisateur mais une correction récursive attribuée à l'événement root-owner-recursive-learning-correction-and-retex-continuity-20261011.",
+    "reason": "La proposition précédente de revise-instructions[T3] a été rejetée pour format invalide (title/requirements interdits pour cette opération) ; je resoumets uniquement id+next avec le contenu correctif reçu via l'événement opérateur root-owner-... : les limites exactes sont 96Kio par source individuelle, 128Kio pour l'union des sources d'une même tâche, 24 fichiers max, cumul à partitionner — et non « 128Kio par fichier » comme le laissait entendre l'ajout précédent (instruction-eb2db1e922c733c93f3ce330). Cet ajout vient en complément du next existant de T3, sans le remplacer ; T3 est todo avec 0 tentative utilisée, donc aucune consigne déjà reçue par un agent n'est réécrite. T3 reste cependant dépendante de T2 et ne pourra s'exécuter qu'après déblocage de T2.\n\nConcernant T2 (événements review-dd11fa...-a0ad5fe1 quota 429, plan-ca48d866... intégration échouée sur ce même quota) : cette erreur de quota est antérieure et dépassée par le verdict réel obtenu ensuite sur le même candidat 39e89b169fc55255e828e66e765a0fee4ef91530 (review-dd11fa...-3b4e47c6, changes_requested motivé sur le fond — contradiction entre T1-handoff.md ligne JAN-4 et CURSOR-ENGINE-EVOLUTION-20261010.md sur l'implémentation du juge en Lot T2), répercuté dans plan-c01de433.... Ce n'est pas une erreur de protocole du vérificateur mais un constat de fond réel : review-retry ne s'applique pas ici, et review_retry_unavailable=true l'interdit de toute façon. Or T2 a maintenant attempts_used=3/attempts_max=3 : ses tentatives sont épuisées, donc retry ne peut pas être proposé (la limite ne le permet pas). La correction nécessaire (aligner T1-handoff.md JAN-4 sur l'implémentation réelle du Lot T2) est concrète mais aucune opération disponible ne permet de relever le budget de tentatives de T2 sans autorisation explicite de l'utilisateur ; je ne crée pas de tâche de remplacement pour contourner ce plafond. Ce besoin de décision reste donc transmis à l'utilisateur/opérateur, en conservant tentatives et budgets consommés ; aucune autre action autorisée n'est disponible sur T2 dans cette activation.",
+    "scope": "root",
+    "holder": "planner-a9369203a6583a61a3551813",
+    "generation": 70,
+    "input_events": [
+      "planning-rejected-55952d8edd8b68607a618d3299fefa72a6c7cafc13d43ac02117d442146d4e32",
+      "root-owner-recursive-learning-correction-and-retex-continuity-20261011",
+      "review-dd11fa7937a5314dd9b58538-result-3b4e47c66b6856fe",
+      "review-dd11fa7937a5314dd9b58538-result-a0ad5fe14ed117c3",
+      "plan-ca48d866cd30d1b1481a5d1a1220ba61d2cc43831fd56c835ac2551708dc154c",
+      "plan-c01de433c014411941a88159ee54e72d08f9e9f2b91d90412efce8afd0e0ef0d"
+    ],
+    "decision": "planning-claim-180442929a303a27c558f1a9-decision",
+    "at": "2026-10-11T15:55:36.667578323Z",
+    "state": "applied",
+    "attempts_at_creation": 0,
+    "before_sha256": "2f5d34882852d4632fae79460ab71f1b328a33c271b0a9a151371da06edc777c",
+    "after_sha256": "c4646a8e6614b9269845b5157057298cc9f60cecee50ae46b7d7de971eb874b9"
+  },
+  "limit": "Real native attributed correction to earlier instruction preserved with input events and decision; does not prove worker has received it."
+}

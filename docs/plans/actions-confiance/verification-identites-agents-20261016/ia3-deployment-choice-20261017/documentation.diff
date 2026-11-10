@@ -1,0 +1,503 @@
+--- before/docs/plans/actions-confiance/identites-agents-replan.md
++++ after/docs/plans/actions-confiance/identites-agents-replan.md
+@@ -14,6 +14,11 @@
+ Le [contrat concret FR/EN](../../architecture/AGENT-IDENTITY-CONTRACT.md) décrit
+ types, source Trust, délégation, révocation, rejeu et contexte de projet.
+ **Aucun lanceur n'est raccordé : F01–F07, IA2.3 et IA3–IA5 restent ouverts.**
++
++Décision du 17 octobre : service local isolé pour le développement/pilote,
++autorité distante prévue via configuration initiale et UX Admin. Voir IA3c.2f
++en fin de plan ; choix adopté, service et écrans non livrés. Les mentions plus
++anciennes de frontière à choisir conservent leur état historique.
+ 
+ ## Besoin et périmètre
+ 
+@@ -1302,3 +1307,59 @@
+ Cette correction documentaire ne nécessite pas de relancer les tests Go inchangés.
+ Le choix opérateur et le principal initial restent ouverts ; poursuivre les briques
+ indépendantes ne vaut pas activation ni clôture des risques F01–F07.
++
++
++## IA3c.2f — décision adoptée : local pilote, autorité distante prévue
++
++17 octobre 2026. Précondition modifiée par la décision explicite de l’utilisateur :
++« on fait 1 mais on prévoit 2 possible pour l’avenir ». La frontière choisie n’est
++plus en attente : service local sous compte système distinct avec confinement
++vérifié pour le développement/pilote ; transport et configuration conçus pour une
++autorité sur machine/administration séparées à l’avenir. Le souhait probable des
++futurs clients motive cette cible ; ce n’est pas une demande client mesurée.
++Le principal humain initial reste à désigner ; le choix de frontière n’active pas
++un service et ne fait pas de l’Admin ou du premier appelant son autorité humaine.
++Les mentions antérieures « choix en attente » sont l’historique avant cette décision.
++
++Méthode : replan/APEX, Codex seul, checkout et travaux existants préservés.
++Comparer deux réalisations : coder un accès local direct au journal, ou garder
++un contrat d’autorité commun et un adaptateur de canal. Retenir le second : la
++frontière locale doit être réelle dès le pilote, et le mode distant ne doit pas
++nécessiter de réécrire les contrôles métier. Écarter un simple booléen « distant »
++ou un réglage d’URL sans authentification, autorisation et source courante.
++
++Constat source : install.sh connaît Docker/natif, compose.yaml ne définit qu’un
++service Swarm sous l’UID/GID opérateur ; ni l’un ni l’autre ne configure l’autorité
++d’enrôlement dédiée. trustRemoteOrigin ne permet qu’une origine HTTP de boucle
++locale pour le client Trust existant ; ce n’est pas l’adaptateur distant futur
++de l’autorité d’enrôlement. L’Admin propose déjà des réglages révisés et des
++prévisualisations ; cela ne prouve pas une configuration d’autorité existante.
++
++Périmètre de cette décision : plan, cible d’enrôlement, contrats FR/EN et guides
++d’installation FR/EN. Pas de modification d’install.sh, Compose, frontend ou
++source moteur pendant ce cadrage. Aucune création de compte, clé, service ni
++modification de processus. Les exigences et leur état sont dans le contrat cible.
++
++| Suite dépendante | Propriétaire / livrable | Critère et reprise |
++| --- | --- | --- |
++| IA3c.2f-01, décision et parcours | Codex ; contrats FR/EN et installation | Même choix local pilote, distant prévu ; aucune capacité distante annoncée comme livrée |
++| IA3c.2f-02, configuration protégée | Codex ; schéma et stockage d’installation, validation commune setup/API/CLI/Admin | Persistance/réouverture, révision attendue, preview sans mutation, refus des sources agents/import ; condition : design des opérations publiques et droits validé |
++| IA3c.2f-03, service local | Codex ; commande/service séparé, canal authentifié, clés et témoin protégés | Depuis un fournisseur réel de fixture : ni accès au contrôle ni demande hors droits ; vérification des frontières OS et des erreurs ; aucun compte initial inféré |
++| IA3c.2f-04, configuration UX | Codex ; installation initiale et modal Admin commun aux UX | Choix enregistré/état effectif distincts, FR/EN, thèmes, clavier, refus, sauvegarde/réouverture ; dépend de -02 et des états publics réels de -03 |
++| IA3c.2f-05, raccord moteur | Codex ; source courante et admission publique | EP-04/05/10 : révocation concurrente, descendant, panne et reprise incertaine, aucun secours permissif ; dépend de -03 |
++| IA3c.2f-06, mode distant et migration | Codex/opérateur ; adaptateur et procédure ultérieurs | Authentification mutuelle et droits identiques, partitions/reprise, continuité des preuves et anciennes racines ; aucune remise à zéro ni clé apprise du pair ; non implémenté |
++
++Amélioration I2f-01 : origine décision utilisateur ; valeur : éviter un verrouillage
++local du produit et une promesse de sécurité non démontrée. Périmètre : contrat,
++installation et UX ; propriétaire : Codex. Décision adoptée et documentée ;
++interopérabilité et migration réelles ouvertes jusqu’à une preuve entre deux
++déploiements distincts. Amélioration I2f-02 : distinguer configuration souhaitée,
++configuration appliquée et preuve d’isolation ; critère : un réglage sauvegardé ou
++un healthcheck ne doit pas afficher une protection vérifiée. Documentée, effet
++runtime/UX non réalisé. F01–F07 et l’objectif global restent ouverts.
++
++La vérification de cette tranche porte sur cohérence des décisions, liens, rendus
++FR/EN et préservation des sources ; aucune recette runtime n’est inventée pour une
++modification documentaire. Les contrôles de configuration, UI et moteur seront
++requis dans les tranches qui les modifient. Preuves dans
++[le rapport de décision](verification-identites-agents-20261016/ia3-deployment-choice-20261017/RAPPORT-IA3c2f.md).
+--- before/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
++++ after/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
+@@ -3,7 +3,9 @@
+ 17 octobre 2026 — protocole d’authenticité IA3c.2a, journal IA3c.2b, schéma
+ d’autorité IA3c.2c, demande complète IA3c.2d et lecture versionnée IA3c.2e
+ vérifiés en fixtures ; service protégé, bootstrap et consommateur moteur
+-**non réalisés**. Choix opérateur en attente.
++**non réalisés**. Frontière adoptée le 17 octobre : service local isolé pour
++développement/pilote ; autorité distante prévue pour une évolution. Principal
++humain initial et activation encore ouverts.
+ 
+ ## Besoin et état observé
+ 
+@@ -66,18 +68,23 @@
+ payload sans jeton brut ni clé privée, avec un transport protégé et une politique
+ d’accès cohérente. Un payload vide authentique ne constitue pas un enrôlement.
+ 
+-## Frontière de déploiement à choisir
+-
+-L’opérateur est sollicité dans cette conversation : compte système distinct sur
+-cette machine, ou autorité sur une machine séparée. Aucun choix par défaut n’est
+-activé. Les deux doivent protéger aussi leur administration et ne doivent pas
+-être reconstruits depuis une base importée ou une réponse reçue.
+-
+-| Option proposée, non activée | Valeur attendue et preuves nécessaires | Risques résiduels et conséquences |
+-| --- | --- | --- |
+-| Service local, compte distinct et confinement vérifié | Pas de nouvelle machine ; séparer clés, journal et témoin des agents ; vérifier permissions, processus, montages, descripteurs et accès au canal | Même noyau et administration hôte : une compromission root peut atteindre les deux. Le compte distinct seul ne confine pas les agents. Installer, maintenir et vérifier le service et le confinement restent nécessaires. |
+-| Autorité sur une machine séparée | Viser la résistance à une compromission de l’hôte Swarm ; protéger clés et témoin ailleurs, avec administration réellement distincte et contrôles propres de chaque demande | Infrastructure et exploitation supplémentaires : authentification mutuelle, certificats/rotation/révocation, sauvegarde/reprise, disponibilité réseau. Des accès administrateurs, montages ou sauvegardes partagés peuvent annuler la séparation. Un contrôleur compromis peut encore demander une opération interdite si l’autorité lui fait confiance sans contrôle métier. |
+-| Continuer les briques locales sans activation | Préparer et tester sans nouvelle infrastructure ni changement de service réel | Les risques des lanceurs publics et F01–F07 restent ouverts ; aucune garantie d’isolation réelle, d’admission ou de révocation appliquée ne découle des fixtures. Cette option reporte la protection opérationnelle. |
++## Frontière de déploiement adoptée — local pilote, distant prévu
++
++L’utilisateur choisit le 17 octobre 2026 un service local sous compte système
++distinct et avec confinement vérifié pour le développement et le pilote.
++L’autorité sur une machine et une administration séparées reste une cible
++prévue pour les installations futures, notamment clientes ; son besoin commercial
++reste une hypothèse utilisateur, pas une validation de marché. La configuration
++initiale et l’UX Admin doivent gérer cette distinction et son état réel.
++Le choix est adopté ; les services et écrans ne sont pas encore livrés.
++Les deux modes doivent protéger leur administration et ne peuvent reconstruire
++leur racine depuis une base importée ou une réponse reçue.
++
++| Option et décision, aucune activation | Valeur attendue et preuves nécessaires | Risques résiduels et conséquences |
++| --- | --- | --- |
++| **Local adopté pour développement/pilote** : compte distinct et confinement vérifié | Pas de nouvelle machine ; séparer clés, journal et témoin des agents ; vérifier permissions, processus, montages, descripteurs et accès au canal | Même noyau et administration hôte : une compromission root peut atteindre les deux. Le compte distinct seul ne confine pas les agents. Installer, maintenir et vérifier le service et le confinement restent nécessaires. |
++| **Distant prévu, non implémenté** : machine et administration séparées | Viser la résistance à une compromission de l’hôte Swarm ; protéger clés et témoin ailleurs, avec administration réellement distincte et contrôles propres de chaque demande | Infrastructure et exploitation supplémentaires : authentification mutuelle, certificats/rotation/révocation, sauvegarde/reprise, disponibilité réseau. Des accès administrateurs, montages ou sauvegardes partagés peuvent annuler la séparation. Un contrôleur compromis peut encore demander une opération interdite si l’autorité lui fait confiance sans contrôle métier. |
++| Préparation sans activation : état transitoire, pas la cible retenue | Préparer et tester sans nouvelle infrastructure ni changement de service réel | Les risques des lanceurs publics et F01–F07 restent ouverts ; aucune garantie d’isolation réelle, d’admission ou de révocation appliquée ne découle des fixtures. Cette étape reporte la protection opérationnelle. |
+ 
+ Dans les deux architectures de service, identifier le pair ne suffit pas :
+ l’autorité doit contrôler elle-même principal, portée, délégation, état courant
+@@ -94,19 +101,85 @@
+ la révocation reste à prouver ; aucune révocation instantanée distante ni aucun
+ TTL ou lease n’est fixé par ce choix d’hébergement.
+ 
+-Recommandation à confirmer, pas décision opérateur : commencer par un service
+-local réellement confiné si l’administrateur et le noyau de l’hôte sont dans la
+-base de confiance ; retenir une machine et une administration séparées si la
+-menace inclut la compromission de l’hôte Swarm. Garder le contrat indépendant
+-du transport permettrait ensuite de comparer ces frontières dans la recherche ;
+-cette portabilité n’est pas encore démontrée entre services réels. Propriétaire
+-du choix : opérateur ; condition de reprise de l’activation : frontière, principal
+-initial et autorités de déploiement explicitement décidés.
++La base de confiance du pilote inclut le noyau et l’administration hôte.
++Le contrat métier reste commun ; seuls le transport et les preuves d’hébergement
++diffèrent. Cette portabilité et une éventuelle migration ne sont pas encore
++démontrées entre services réels. La frontière est désormais décidée ; désignation
++du principal initial, configuration protégée, service vérifié et autorité de
++déploiement restent des préconditions d’activation. Le contexte pilote n’autorise
++aucune dérogation aux contrôles d’identité, de délégation ou de révocation.
+ 
+ Le principal humain initial (issuer, sujet externe et liaison locale) doit être
+ désigné explicitement avant enrôlement réel. Le nom du compte local ou d’un rôle
+ ne le remplace pas. L’absence de ce choix ne bloque pas les tests du format,
+ mais bloque toute activation que ces tests ne pourraient pas autoriser.
++
++## Installation initiale et UX Admin — contrat cible IA3c.2f
++
++**Cible adoptée, non implémentée.** install.sh propose actuellement Docker ou
++natif ; compose.yaml contient un seul service sous l’UID/GID opérateur. Aucun
++de ces choix n’installe l’autorité d’enrôlement séparée. Le client Trust dit
++« remote » exige aujourd’hui une origine HTTP de boucle locale ; il ne constitue
++pas le futur adaptateur d’autorité distante. Docker/natif désigne le déploiement
++de Swarm ; local/distant désigne celui de l’autorité : deux choix distincts.
++
++La configuration initiale prépare le mode local adopté. Elle devra aussi pouvoir
++sélectionner le mode distant lorsque son adaptateur et ses preuves seront livrés ;
++avant cela, l’UX le présente comme prévu et ne permet pas une fausse activation.
++L’état affiché distingue choix enregistré, configuration appliquée et dernière
++vérification effective, avec sa portée. Un enregistrement ou un service joignable
++ne prouve pas l’isolation des agents ni l’autorisation de leurs demandes.
++
++| Élément de configuration prévu | Source et validation autoritaires attendues | Présentation et refus attendus |
++| --- | --- | --- |
++| Mode et canal de l’autorité | Configuration d’installation protégée et révisée, hors projet importable ; chemin local explicite ou origine distante validée selon l’adaptateur | Local pilote ou distant ; capacité non livrée signalée et refusée, jamais convertie en accès direct au journal |
++| Racine publique, contexte et témoin | Épinglage approuvé indépendamment de la réponse ; projet et checkpoints explicitement liés ; clé privée détenue par le service | Empreinte et portée affichables ; aucun secret dans le navigateur, l’environnement fournisseur ou les exports de projet |
++| Principal humain initial | Issuer, sujet externe et liaison locale désignés explicitement ; preuve d’autorité de bootstrap | Aucun premier appelant, UID, localhost, rôle Admin ou cookie cockpit transformé implicitement en autorité humaine |
++| Configuration souhaitée et effective | Même validation dans setup, API, CLI et modal Admin ; révision attendue et état réel lu au service | Prévisualisation sans mutation, refus des écritures périmées, sauvegarde/réouverture et erreurs visibles ; sauvegarder ne marque pas « protégé » |
++| Changement de mode ou de racine | Opération autorisée conservant preuves, consommation, réservations et continuité des checkpoints ; revalidation avant usage | Effets et prérequis montrés avant application ; aucun effacement/réenrôlement implicite, aucune clé apprise automatiquement du pair |
++
++Le modal Admin est le point de gestion après installation, partagé au niveau du
++contrat par les UX Projet et Processus sans imposer le déploiement de l’autre UX.
++Il affiche mode demandé/effectif, état de vérification et prochaine action utile.
++Les détails techniques restent dans une aide explicite ; le choix, ses effets et
++les causes de refus restent visibles. FR/EN, thèmes et navigation clavier doivent
++être vérifiés. Aucun écran n’est modifié dans cette tranche documentaire.
++
++La configuration de l’autorité ne peut pas se créer ses propres droits : son
++initialisation passe par le bootstrap autorisé et ses modifications par des
++droits d’administration déjà vérifiés. La requête métier complète, ses contrôles
++et ses preuves restent les mêmes dans les deux modes. L’accès réseau futur à
++l’autorité ne change pas l’écoute de boucle locale du cockpit actuel.
++
++Pour le local, vérifier aussi le refus depuis un fournisseur confiné qui connaît
++le chemin du canal ; la confidentialité du chemin ne fait pas autorisation.
++Pour le distant, authentification mutuelle, rotation/révocation, partitions et
++reprise sont des critères supplémentaires ; aucune bascule automatique vers
++local ne doit contourner une indisponibilité ou une révocation. Le passage
++local → distant est une migration explicite avec historique conservé et preuves
++à produire, pas une portabilité déjà acquise ni une copie implicite de clés.
++
++```mermaid
++flowchart TD
++  I["Installation initiale<br/>cible, non livrée"] --> C["Choix explicite de l'autorité"]
++  A["Modal Admin<br/>cible, non livré"] --> V["Droits, validation commune<br/>révision attendue et preview"]
++  C --> V
++  V --> S["Configuration protégée persistante<br/>hors sources agents/import"]
++  S --> L["Adaptateur local adopté<br/>service sous compte distinct et confinement"]
++  S -. "évolution prévue" .-> R["Adaptateur distant non implémenté<br/>machine et administration séparées"]
++  L --> K["Même contrat métier<br/>identité, délégation, source courante et révocation"]
++  R -.-> K
++  K --> E["État effectif et preuves d'usage<br/>distincts du choix sauvegardé"]
++  L --> F["Indisponible ou demande interdite<br/>refus, aucun secours permissif"]
++  R -.-> F
++```
++
++Les critères EP-01 à EP-10 restent inchangés. IA3c.2f-01 formalise la décision ;
++-02 à -06 dans le plan canonique couvrent configuration, service, UX, admission
++et migration. Leur documentation ne vaut pas livraison. Le prochain travail
++technique est le contrat de configuration protégée et de ses opérations publiques,
++puis le service local et ses contre-exemples OS ; l’activation attend encore
++le principal humain exact et les preuves de ces frontières.
+ 
+ ## Vérification et portée scientifique
+ 
+@@ -143,12 +216,11 @@
+ après panne matérielle, une disponibilité sous verrou hostile ou la cohérence
+ d’un témoin externe mis à jour séparément.
+ 
+-Prochain contrat commun préparatoire : schéma strict de l’autorité d’enrôlement
+-(principal OIDC complet, portée, permissions, délégation, dates et génération),
+-validé à son producteur et son consommateur. La désignation du principal, la
+-racine réelle, la frontière d’hébergement et toute activation attendent les
+-décisions explicites de l’opérateur. Le raccord ne doit pas accepter un simple
+-booléen actif ni un payload signé sans ces contrôles.
++Le schéma strict de l’autorité d’enrôlement (principal OIDC complet, portée,
++permissions, délégation, dates et génération) est désormais vérifié localement
++en IA3c.2c ci-dessous. La frontière locale est adoptée en IA3c.2f ; principal
++initial, racine réelle et activation restent ouverts. Le raccord ne doit pas
++accepter un simple booléen actif ni un payload signé sans ces contrôles.
+ 
+ 
+ ## IA3c.2c — document strict, génération dérivée de l’histoire
+@@ -171,8 +243,9 @@
+ 
+ Une ancienne tête fournie comme attendue peut encore authentifier son ancienne
+ réponse ; aucun test ne prétend prouver une fraîcheur finale ou un enrôlement
+-réel. Le choix de frontière, le principal initial, le témoin externe durable et
+-le point de linéarisation d’usage restent des préconditions explicites.
++réel. La frontière locale est désormais adoptée ; le principal initial, le témoin
++externe durable et le point de linéarisation d’usage restent des préconditions
++explicites à réaliser et vérifier.
+ 
+ 
+ ## IA3c.2d — demande complète et référence exacte de session
+--- before/docs/architecture/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/architecture/AGENT-IDENTITY-CONTRACT.md
+@@ -487,7 +487,7 @@
+ 
+ ```mermaid
+ flowchart TD
+-  B["Bootstrap indépendant<br/>cible : choix opérateur en attente"] -.-> K["Clé publique épinglée<br/>NewVerifier"]
++  B["Bootstrap indépendant<br/>cible : principal initial à désigner"] -.-> K["Clé publique épinglée<br/>NewVerifier"]
+   K --> Q["Challenge local neuf<br/>clé, projet, demande complète, nonce"]
+   S["Service protégé courant<br/>cible : non raccordée"] -.-> R["SignResponse<br/>format testé avec clé de fixture"]
+   Q --> R
+@@ -541,7 +541,7 @@
+ 
+ ```mermaid
+ flowchart TD
+-  B["Bootstrap et protection OS<br/>cible : décision opérateur attendue"] -.-> K["Clé publique et projet épinglés"]
++  B["Bootstrap et protection OS<br/>cible : principal initial et service à établir"] -.-> K["Clé publique et projet épinglés"]
+   K --> J["Journal SQLite dédié<br/>chaîne signée et tête vérifiées"]
+   H["Head retenu indépendamment<br/>protection durable : cible"] --> A["Apply : comparer puis ajouter<br/>ou reconnaître le retry exact courant"]
+   J --> A
+@@ -851,22 +851,62 @@
+ conserve le contre-exemple sans version, les refus, sources et limites. Aucun
+ TTL, timeout, budget ou politique opérateur nouveau n’est ajouté.
+ 
+-## Choix de frontière du service — décision ouverte
+-
+-Trois suites sont proposées, sans activation : service local sous compte distinct
+-avec confinement vérifié, autorité sur une machine et une administration séparées,
+-ou poursuite des seules briques locales. Le [plan d’enrôlement](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
+-compare bénéfices, risques et conséquences. La première conserve le noyau et
+-l’administration hôte dans la base de confiance ; la seconde vise une séparation
+-face à la compromission de l’hôte Swarm, sous réserve de ne pas partager les
+-accès administratifs et de vérifier la politique propre du service. La troisième
+-laisse la protection opérationnelle ouverte. Ces résultats ne sont pas déployés.
++## Frontière adoptée — local pilote, distant prévu
++
++Décision utilisateur du 17 octobre 2026 : service local sous compte système
++distinct avec confinement vérifié pour le développement et le pilote. Une
++autorité sur une machine et une administration séparées est prévue pour les
++installations futures, notamment clientes. Leur demande commerciale reste une
++hypothèse utilisateur ; aucun service ni parcours de configuration n’est encore
++livré. Le [plan d’enrôlement](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
++détaille la configuration initiale, le modal Admin et les critères IA3c.2f-01 à -06.
++Le choix n’est plus en attente ; principal humain initial et activation restent ouverts.
++
++Le local conserve noyau et administration hôte dans la base de confiance.
++Le distant vise une séparation face à la compromission de l’hôte Swarm, sous
++réserve d’administration distincte et de contrôles propres à l’autorité. Le
++contrat métier reste commun : demande exacte, identité, délégation, source
++courante et révocation. Les adaptateurs de transport ne remplacent aucun de ces
++contrôles. Portabilité et migration entre services réels restent à prouver.
++
++L’installation initiale devra préparer le mode retenu, puis le modal Admin gérer
++une configuration protégée, persistante et révisée. Setup, API, CLI et UX doivent
++utiliser la même validation ; preview sans mutation, refus des révisions périmées
++et conservation de l’historique sont requis. Choix enregistré, configuration
++appliquée et preuve effective restent distincts. Aucun secret dans le navigateur,
++les sources agents ou l’export d’un projet ; aucune racine apprise du pair.
++L’option distante sera indiquée comme prévue tant que non implémentée.
++Docker/natif décrit l’installation de Swarm, pas la frontière de son autorité.
+ 
+ La protection de la clé et l’identification du pair ne suffisent pas : l’autorité
+ doit contrôler les droits de la demande exacte et son état courant. SO_PEERCRED
+ rapporte des credentials de processus, pas un rôle de workflow
+ ([Linux unix(7)](https://man7.org/linux/man-pages/man7/unix.7.html)). Un canal
+-accessible à un agent sous le même UID peut donc défaire la séparation recherchée.
+-Une indisponibilité ne peut ouvrir de secours permissif pour une opération
+-exigeant l’autorité courante. Hébergement, principal initial et déploiement restent
+-à décider par l’opérateur ; aucune option présélectionnée ne vaut accord.
++accessible à un agent sous le même UID peut défaire la séparation recherchée.
++Aucune indisponibilité n’ouvre de secours permissif ni de bascule automatique
++vers local. Le passage local → distant sera une migration autorisée conservant
++preuves, consommation, réservations et checkpoints ; aucun effacement ou
++réenrôlement implicite. Le contexte pilote ne dispense d’aucun contrôle.
++
++```mermaid
++flowchart TD
++  I["Installation initiale<br/>cible, non livrée"] --> C["Choix explicite de l'autorité"]
++  A["Modal Admin<br/>cible, non livré"] --> V["Droits, validation commune<br/>révision attendue et preview"]
++  C --> V
++  V --> S["Configuration protégée persistante<br/>hors sources agents/import"]
++  S --> L["Adaptateur local adopté<br/>service sous compte distinct et confinement"]
++  S -. "évolution prévue" .-> R["Adaptateur distant non implémenté<br/>machine et administration séparées"]
++  L --> K["Même contrat métier<br/>identité, délégation, source courante et révocation"]
++  R -.-> K
++  K --> E["État effectif et preuves d'usage<br/>distincts du choix sauvegardé"]
++  L --> F["Indisponible ou demande interdite<br/>refus, aucun secours permissif"]
++  R -.-> F
++```
++
++État vérifié de cette tranche : décision et documentation seulement. install.sh
++connaît Docker/natif, compose.yaml ne définit qu’un service Swarm sous l’UID/GID
++opérateur, et trustRemoteOrigin n’accepte qu’une origine HTTP de boucle locale
++pour Trust. Aucun ne fournit ce nouveau service ni son adaptateur distant.
++Les modules IA3c.2a à .2e restent vérifiés en fixtures ; F01–F07 et EP-01 à EP-10
++ne sont pas clos par la décision d’hébergement. Le [rapport IA3c.2f](../plans/actions-confiance/verification-identites-agents-20261016/ia3-deployment-choice-20261017/RAPPORT-IA3c2f.md)
++lie la décision, les sources observées, les rendus et les contrôles documentaires.
+--- before/docs/en/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/en/AGENT-IDENTITY-CONTRACT.md
+@@ -458,7 +458,7 @@
+ 
+ ```mermaid
+ flowchart TD
+-  B["Independent bootstrap<br/>target: operator choice pending"] -.-> K["Pinned public key<br/>NewVerifier"]
++  B["Independent bootstrap<br/>target: initial principal to designate"] -.-> K["Pinned public key<br/>NewVerifier"]
+   K --> Q["New local challenge<br/>key, project, full request, nonce"]
+   S["Current protected service<br/>target: not connected"] -.-> R["SignResponse<br/>format tested with fixture key"]
+   Q --> R
+@@ -511,7 +511,7 @@
+ 
+ ```mermaid
+ flowchart TD
+-  B["Bootstrap and OS protection<br/>target: operator decision pending"] -.-> K["Pinned public key and project"]
++  B["Bootstrap and OS protection<br/>target: initial principal and service to establish"] -.-> K["Pinned public key and project"]
+   K --> J["Dedicated SQLite journal<br/>verified signed chain and head"]
+   H["Independently retained Head<br/>durable protection: target"] --> A["Apply: compare and append<br/>or recognize exact current retry"]
+   J --> A
+@@ -806,22 +806,62 @@
+ retains the unversioned counterexample, rejections, sources and limits. No TTL,
+ timeout, budget or new operator policy is introduced.
+ 
+-## Service boundary choice — decision open
+-
+-Three next steps are proposed without activation: a local service under a separate
+-account with verified confinement, an authority on a separate machine with separate
+-administration, or continued local module preparation. The [enrollment plan](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
+-compares benefits, risks and consequences. The first keeps the host kernel and
+-administration in the trusted computing base. The second aims to withstand a
+-compromised Swarm host, provided administrative access is not shared and the
+-service enforces its own authorization policy. The third leaves operational
+-protection open. None of these deployment outcomes is established.
++## Adopted boundary — local pilot, remote planned
++
++User decision on 17 October 2026: a local service under a separate system account
++with verified confinement for development and pilot use. An authority on a
++separate machine with separate administration is planned for future installations,
++including customer deployments. Customer demand remains a user hypothesis;
++neither the service nor its configuration flow is delivered yet. The
++[enrollment plan](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
++details initial setup, the Admin modal and criteria IA3c.2f-01 through -06.
++Hosting is now decided; the initial human principal and activation remain open.
++
++Local mode keeps the host kernel and administration in the trusted computing
++base. Remote mode aims to withstand a compromised Swarm host, subject to separate
++administration and the authority's own checks. The business contract remains
++common: exact request, identity, delegation, current state and revocation.
++Transport adapters replace none of these checks. Portability and migration
++between real services remain unproven.
++
++Initial setup must prepare the selected mode, followed by an Admin modal managing
++protected, persistent and revisioned configuration. Setup, API, CLI and UX must
++share validation; non-mutating preview, stale-revision rejection and preserved
++history are required. Saved choice, applied configuration and observed evidence
++remain distinct. No secrets in the browser, agent sources or project exports;
++no root learned from the peer. The remote option must be labelled as planned
++until implemented. Docker/native describes Swarm installation, not its authority's
++security boundary.
+ 
+ Protecting the key and identifying a peer are insufficient: the authority must
+ check the exact request's rights and current state. SO_PEERCRED reports process
+ credentials, not a workflow role
+ ([Linux unix(7)](https://man7.org/linux/man-pages/man7/unix.7.html)). A channel
+-accessible to an agent sharing the controller's UID may defeat the intended
+-separation. Unavailability cannot enable permissive fallback for an operation
+-requiring current authority. Hosting, initial principal and deployment remain
+-operator decisions; a preselected option is not consent.
++accessible to an agent sharing the controller's UID may defeat the separation.
++Unavailability cannot enable permissive fallback or automatic local failover.
++Moving from local to remote will require an authorized migration preserving
++evidence, consumption, reservations and checkpoints, with no implicit reset or
++re-enrollment. Pilot use exempts none of these controls.
++
++```mermaid
++flowchart TD
++  I["Initial setup<br/>target, not delivered"] --> C["Explicit authority choice"]
++  A["Admin modal<br/>target, not delivered"] --> V["Rights, shared validation<br/>expected revision and preview"]
++  C --> V
++  V --> S["Persistent protected configuration<br/>outside agent/import sources"]
++  S --> L["Adopted local adapter<br/>separate service account and confinement"]
++  S -. "planned evolution" .-> R["Remote adapter not implemented<br/>separate machine and administration"]
++  L --> K["Same business contract<br/>identity, delegation, current state and revocation"]
++  R -.-> K
++  K --> E["Effective state and usage evidence<br/>distinct from saved choice"]
++  L --> F["Unavailable or forbidden request<br/>deny, no permissive fallback"]
++  R -.-> F
++```
++
++Verified scope of this increment: decision and documentation only. install.sh
++supports Docker/native, compose.yaml defines only one Swarm service under the
++operator's UID/GID, and trustRemoteOrigin accepts only an HTTP loopback origin
++for Trust. None provides this new authority service or its remote adapter.
++IA3c.2a through .2e modules retain their fixture evidence; F01–F07 and EP-01 through
++EP-10 are not closed by this hosting decision. The [IA3c.2f report](../plans/actions-confiance/verification-identites-agents-20261016/ia3-deployment-choice-20261017/RAPPORT-IA3c2f.md)
++links the decision, observed sources, rendered diagrams and documentation checks.
+--- before/INSTALL.md
++++ after/INSTALL.md
+@@ -5,6 +5,28 @@
+ Swarm propose deux installations **sous Linux** : Docker pour un environnement dédié, ou un binaire natif pour utiliser les outils déjà installés sur votre machine. Le script ne demande pas `sudo`, ne modifie pas votre profil shell et n’installe pas Docker à votre place.
+ 
+ Après installation, suivre le [guide utilisateur](GUIDE-UTILISATEUR.md) pour connecter une IA, préparer une mission et lire ses résultats.
++
++## Autorité d’identité — développement et pilote
++
++Le mode retenu pour le développement et le pilote est une **autorité locale sous
++compte système distinct, avec confinement vérifié des agents**. Une autorité sur
++machine et administration séparées est prévue pour les installations futures.
++Ce choix local/distant concerne l’autorité ; il est distinct du choix Docker/natif
++de Swarm décrit ci-dessous.
++
++**Cette séparation et son parcours de configuration ne sont pas encore livrés.**
++L’installateur actuel ne crée pas le compte ni le service d’autorité dédiés ; le
++conteneur actuel utilise votre UID/GID. Il ne faut pas interpréter une installation
++réussie comme une preuve d’isolation de l’identité ou de contrôle des créations.
++
++Le parcours prévu propose le mode à l’installation initiale, puis sa gestion dans
++un modal Admin : configuration persistante, racine de confiance explicitement
++approuvée, principal humain initial désigné et état effectif distinct du choix
++enregistré. L’option distante restera indiquée comme prévue jusqu’à sa livraison ;
++elle ne réutilise pas simplement une URL du cockpit ou le client Trust existant.
++Aucun échec de connexion ne devra déclencher une bascule permissive vers le local.
++Voir le [contrat et les limites](docs/architecture/AGENT-IDENTITY-CONTRACT.md) et
++le [plan de configuration et de migration](docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md).
+ 
+ ## Formation embarquée et identité visuelle
+ 
+--- before/docs/en/INSTALL.md
++++ after/docs/en/INSTALL.md
+@@ -5,6 +5,28 @@
+ The supported installation path is Linux. Choose Docker for a dedicated runtime,
+ or a native binary to use tools already installed on your machine. The installer
+ does not request sudo, modify shell profiles or install Docker for you.
++
++## Identity authority — development and pilot
++
++The selected development and pilot target is a **local authority under a separate
++system account, with verified agent confinement**. An authority on a separate
++machine with separate administration is planned for future installations.
++Local/remote describes the authority; it is distinct from Swarm's Docker/native
++installation choice below.
++
++**This separation and its configuration flow are not delivered yet.** The current
++installer creates neither a dedicated authority account nor its service; the
++current container uses your UID/GID. Successful installation does not establish
++identity isolation or control of agent creation.
++
++The planned flow selects the mode at initial setup, then manages it in an Admin
++modal: persistent configuration, an explicitly approved trust root, a designated
++initial human principal, and effective status separate from the saved choice.
++The remote option will remain labelled as planned until implemented; it cannot
++be obtained by entering a cockpit URL or reusing the existing Trust client.
++Connection failure must never trigger permissive local fallback. See the
++[contract and limits](AGENT-IDENTITY-CONTRACT.md) and the
++[configuration and migration plan](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md).
+ 
+ ## Included training resources and branding
+ 

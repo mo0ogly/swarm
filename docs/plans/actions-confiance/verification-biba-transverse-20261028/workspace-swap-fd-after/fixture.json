@@ -1,0 +1,7 @@
+{
+  "root": "/tmp/swarm-biba-swap-54hkv7dv",
+  "driver_sha256": "ffecfef222802119dd907f0676ec75932d9ff4b73a8be3f5837fa20c8573c5d4",
+  "shim_source_sha256": "606ff3cb9a14dbadea777e4af484c34c0ec3a8de240d977baa6ddb7ccad699ae",
+  "shim_sha256": "3cbfaecb7dde137506d9c4ae91bebeb69e8abc58c893719d2542f533b20a4cf2",
+  "scope": "Owned synthetic inode swap only"
+}

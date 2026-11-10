@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestMemorySummarySelectionRejectsInvalidStoredBoundary$",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T20:12:04.555990+00:00",
+  "duration_seconds": 16.44,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "TestMemorySummarySelectionRejectsInvalidStoredBoundary"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "1ebe9b51c1aac4f794f2b9dc1237112237bf4e3dc1272c4753e2f091e3295f68",
+  "real_model_calls": 0
+}

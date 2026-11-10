@@ -1,0 +1,130 @@
+{
+  "scope": "targeted same-session review; not independent/migration global qualification",
+  "inputs": {
+    "tests/paea_public_contract_test.py": "3796ecff39c9f21b4a484a5c642ad563bdc8a31f6c2ffb95c174ad13e466e3c2",
+    "tools/verification/recipes/paea-public-existing-binary.json": "9a0293c9520f84c8bc88e27a04a027c870dd322dae70c1873b717b53635f6e23",
+    "docs/architecture/PAEA-CONTRACT.md": "c716ef073596f916bdf897f2010dbeb3b2041509d1fabbdb0f1572f753d9e9a6",
+    "docs/en/PAEA-CONTRACT.md": "140d06cbbdd23a0a023e8ebeff76871f31157af19a5444f8697b72ed8d7e59e4",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "d04763dd93efa44ec154ebb95520243d5665dedd8501f431161e9aa13bb489a7",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "2f9eaf38f04c77dc65e8dd75901f35302d360a3704f5f2a3dbb18f0958b72cca",
+    "docs/plans/actions-confiance/paea/INCREMENT-03.md": "2f91ef6489d133beec0c8961352acd94cc3a6f10aabf4b2ceee8766aa4a38542",
+    "docs/en/plans/actions-confiance/paea/INCREMENT-03.md": "61679b4a684535a6f4988eaf0c5ad8e470a1080e14ee04c796cfa32acdfe8aa0",
+    "docs/plans/FILE-APEX.md": "f3d34029d6dfc83ee6cd5057c0b5eba9ab8f0949e3fcd0d3f1c5cd4cbe130d2b",
+    "docs/en/APEX-QUEUE.md": "06b60b7632256c6d5159c268730320fc4bb809dcce9c8ad7e4c9c9716e91f065"
+  },
+  "observed_producers": {
+    "rust/crates/swarm-cli/src/protection.rs": "76fe7de23fefd85fd6417fa8f716d476089ba1520e0dbf5fc7c2b4374936c775",
+    "rust/crates/swarm-cli/src/lib.rs": "efda8fd632fcb072999c568894a9332083cf738f428d88ddf6031a588ec57486",
+    "rust/crates/swarm-engine/src/command_input.rs": "891a00b25f0e7f0ae126466286c4328bedc136aa5423fa233e42e075615a82b8"
+  },
+  "functions": [
+    {
+      "name": "encode",
+      "line": 27,
+      "documented": true
+    },
+    {
+      "name": "replace_once",
+      "line": 32,
+      "documented": true
+    },
+    {
+      "name": "main",
+      "line": 228,
+      "documented": true
+    },
+    {
+      "name": "setUpClass",
+      "line": 44,
+      "documented": true
+    },
+    {
+      "name": "setUp",
+      "line": 50,
+      "documented": true
+    },
+    {
+      "name": "document",
+      "line": 56,
+      "documented": true
+    },
+    {
+      "name": "invoke",
+      "line": 61,
+      "documented": true
+    },
+    {
+      "name": "accepted",
+      "line": 92,
+      "documented": true
+    },
+    {
+      "name": "test_all_frozen_vectors_match_public_bytes_in_both_languages",
+      "line": 106,
+      "documented": true
+    },
+    {
+      "name": "test_raw_ambiguities_refuse_between_valid_control_and_recovery",
+      "line": 114,
+      "documented": true
+    },
+    {
+      "name": "test_equivalent_input_encodings_preserve_exact_content",
+      "line": 148,
+      "documented": true
+    },
+    {
+      "name": "refused",
+      "line": 161,
+      "documented": true
+    },
+    {
+      "name": "test_active_operations_and_runtime_options_refuse_then_recover",
+      "line": 170,
+      "documented": true
+    },
+    {
+      "name": "test_input_failures_refuse_without_mutation_then_recover",
+      "line": 196,
+      "documented": true
+    },
+    {
+      "name": "test_output_failure_is_nonzero_after_valid_control_then_recovers",
+      "line": 217,
+      "documented": true
+    }
+  ],
+  "policies": {
+    "reviewed": "existing offline guards and input transport codes; counts are test corpus inventory, hashes artifact identity; no new operator setting, watchdog, retry, server or runtime policy"
+  },
+  "errors": {
+    "reviewed": "Usage and CommandInput to report.failure.code, exit2, empty stdout, retryable false, no canary, valid recovery; subprocess and atomic publisher failures propagate; missing files/directories scoped to temporary roots"
+  },
+  "documentation": {
+    "reviewed": "FR/EN contract, plan, increment and queue; function contracts current; no runtime version note because only test/recipe/docs changed; no embedded context or running session updated"
+  },
+  "recipe": "PASS, integrity VERIFIED, all declared current inputs match retained hashes",
+  "binary": "existing candidate addcc5eb6b32dd7d2ed963a01a80062155ccd9613985fb518c079f5a461f794f stable; no compilation or installed-server claim",
+  "checks": {
+    "named_tests": 6,
+    "invocations": 248,
+    "expected_refusals": 69,
+    "successes": 179,
+    "git_diff_check_exit": 0,
+    "local_links_checked_before_review": 36,
+    "missing_links": []
+  },
+  "glm": {
+    "calls": 1,
+    "input_tokens": 4218,
+    "output_tokens": 1682,
+    "total_tokens": 5900,
+    "requested_reported_model": "glm-5.2",
+    "contribution": "server/phase/missing-input control-recovery suggestions adapted; inconsistent patch not executed; replan retained"
+  },
+  "open": {
+    "PA-00/01": "partial",
+    "PA-02/03": "need IA3 producers and qualifiable candidate plus explicit lifting of no-compilation instruction",
+    "PA-11/13": "sponsor independent evaluator and team missing; global RETEX open"
+  }
+}

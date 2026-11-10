@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "id": "mission-watch-planning",
+  "inputs": [
+    "rust/crates/swarm-cli/src/mission_watch.rs",
+    "rust/crates/swarm-cli/src/mission_status.rs",
+    "rust/crates/swarm-cli/src/mission.rs",
+    "rust/crates/swarm-cli/src/mission_worker_entry.rs",
+    "rust/crates/swarm-engine/src/mission_worker_dispatch.rs",
+    "rust/crates/swarm-engine/src/mission_worker_continuation.rs",
+    "rust/crates/swarm-engine/src/agent_supervision.rs",
+    "rust/crates/swarm-engine/src/agent_completion_journal.rs",
+    "tests/rust_*.py",
+    "tests/test_rust_mission_watch_public_guards.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-engine/src/mission_cycle_runner.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_read.rs",
+    "tools/agent-workflows/check_workflow_size.py",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/*.md",
+    ".claude/skills/*/SKILL.md",
+    ".claude/skills/apex/references/rust-migration.md",
+    "rust/crates/swarm-engine/config/agent-workflow-descriptor.json",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "tests/test_workflow_size_preflight.py",
+    "tests/test_rust_mission_watch_planning_guards.py",
+    "rust/crates/swarm-engine/src/root_store/planning_step.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_native.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_run_binding.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_rejection_feedback.rs",
+    "rust/crates/swarm-engine/src/planning_budget.rs",
+    "rust/crates/swarm-engine/src/planning_activation.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "planning-watch-evidence-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_mission_watch_planning_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_two_real_claim_witness",
+        "test_wrong_scope_claim_input_and_revision_refuse",
+        "OK",
+        "test_terminal_replay_requires_real_work_after_valid_control",
+        "test_backup_failure_preserves_original_and_partial_copy",
+        "test_directory_sync_failure_is_not_swallowed",
+        "test_backup_busy_locked_refuse_without_counter_success",
+        "test_setting_count_string_control_refusal_recovery",
+        "test_ancestor_activation_control_refusal_recovery",
+        "test_move_only_swap_body_refusal_and_recovery",
+        "test_move_only_install_rename_failures_restore_original",
+        "test_move_only_sync_failures_restore_staged_original",
+        "test_move_only_restore_refusal_preserves_original_then_recovers",
+        "Ran 16 tests"
+      ]
+    },
+    {
+      "id": "shared-public-cleanup-ownership-and-terminal-race-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_mission_watch_public_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_cleanup_helper_live_terminal_and_replaced_stamp_are_distinct",
+        "Ran 12 tests",
+        "OK",
+        "test_optional_idle_planning_exact_record_refusal_and_recovery"
+      ]
+    },
+    {
+      "id": "automatic-planning-through-inert-worker-completion",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-watch-planning-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_watch_planning.py','--binary',os.environ['SWARM_WATCH_PLANNING_BINARY'],'--profile',os.environ['SWARM_WATCH_PLANNING_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS watch plans root child task and completes actual inert worker",
+        "REPLAY_EVIDENCE",
+        "PASS failed planner copied instance refuses before feedback then restores settlement"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+flowchart LR
+  H["Principal authentifié<br/>propriétaire responsable"]
+  D["Délégation vérifiée<br/>droits déléguables, durée, périmètre<br/>plan et politique versionnés"]
+  A["Agent logique A<br/>identité distincte de son nom"]
+  A1["Instance A.1 terminée<br/>histoire conservée"]
+  A2["Instance A.2 active<br/>ancrage d'exécution vérifié"]
+  C["Contrôle de création<br/>parent habilité + plan courant<br/>ou exception humaine exacte"]
+  B["Agent B / instance B.1<br/>droits effectifs atténués"]
+  O["Chaque opération médiatisée<br/>identité + instance + délégation<br/>action exacte + état courant"]
+  H --> D --> A
+  A --> A1
+  A --> A2
+  A2 --> C --> B
+  A2 --> O
+  B --> O
+  V["Révocation du mandat<br/>retire les droits dérivés<br/>arrêt à confirmer, effets à réconcilier"]
+  D --> V
+  V -. "A.2 et B.1 concernés" .-> O

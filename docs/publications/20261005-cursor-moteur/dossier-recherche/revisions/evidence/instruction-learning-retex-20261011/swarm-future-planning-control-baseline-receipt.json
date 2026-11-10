@@ -1,0 +1,19 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestPreparedOrganizationManagedRepository|TestPlanning|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff",
+    "-count=1",
+    "-timeout=150s"
+  ],
+  "root": "/tmp/swarm-T2-complement9-runtime-preview-20261011-graijm4m",
+  "start": "2026-10-11T15:21:45.735101+00:00",
+  "end": "2026-10-11T15:22:14.412149+00:00",
+  "seconds": 28.677026852998097,
+  "exit": 0,
+  "output": "/tmp/swarm-future-planning-control-baseline.out",
+  "sha256": "4585511014e6b305b425915139296e8bfcfdbd78e44704e77784f6ea1e546250",
+  "purpose": "Validate stronger future immutable planning controls before producers start; all new slice tests must be covered, unlike historical missed Judge filter"
+}

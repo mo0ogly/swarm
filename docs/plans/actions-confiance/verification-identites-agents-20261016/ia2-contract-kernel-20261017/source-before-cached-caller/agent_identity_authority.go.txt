@@ -1,0 +1,143 @@
+//go:build linux
+
+package engine
+
+import "time"
+
+func agentIdentityPermissionSet(permissions []agentIdentityPermission) (map[agentIdentityPermission]bool, bool) {
+	set := make(map[agentIdentityPermission]bool, len(permissions))
+	for _, p := range permissions {
+		if !p.valid() || set[p] {
+			return nil, false
+		}
+		set[p] = true
+	}
+	return set, true
+}
+
+func agentIdentitySubset(child []agentIdentityPermission, parent map[agentIdentityPermission]bool) bool {
+	for _, p := range child {
+		if !parent[p] {
+			return false
+		}
+	}
+	return true
+}
+
+// The caller must provide a fresh, protected frame and time under the eventual
+// commitment protocol. This pure evaluator neither locks nor commits either
+// Trust JSON or mission SQLite. There is intentionally no implicit root role,
+// unconfigured fallback, external self-asserted actor or imported authority.
+func evaluateAgentIdentity(snapshot agentIdentitySnapshot, authority agentIdentityAuthority, caller agentIdentityCaller, request agentIdentityRequest, at time.Time) (agentIdentityDecision, error) {
+	var result agentIdentityDecision
+	deny := func(code string) (agentIdentityDecision, error) { return result, agentIdentityError(code) }
+	if at.IsZero() {
+		return deny("agent_identity_clock_required")
+	}
+	if !request.valid() {
+		return deny("agent_identity_request_invalid")
+	}
+	if !caller.actor.valid() || caller.trustRevision <= 0 || caller.trustRevision != authority.trustRevision ||
+		(caller.expiresAt != nil && !at.Before(*caller.expiresAt)) {
+		return deny("agent_identity_caller_stale")
+	}
+	if snapshot.Schema != 1 || snapshot.Revision <= 0 || snapshot.Revision != authority.snapshotRevision ||
+		!agentIdentityHashValid(authority.snapshotDigest) || !authority.scope.valid() || request.Scope != authority.scope {
+		return deny("agent_identity_authority_unavailable")
+	}
+	digest, err := agentIdentityDigest(snapshot)
+	if err != nil || digest != authority.snapshotDigest {
+		return deny("agent_identity_snapshot_changed")
+	}
+	if snapshot.Grants == nil || snapshot.Instances == nil || len(authority.roots) == 0 {
+		return deny("agent_identity_authority_unavailable")
+	}
+	grant, ok := snapshot.Grants[request.GrantID]
+	if !ok || grant.Holder != caller.actor {
+		return deny("agent_identity_holder_mismatch")
+	}
+	if caller.actor.InstanceID == "" {
+		if caller.bindingID != "" {
+			return deny("agent_identity_binding_mismatch")
+		}
+	} else {
+		instance, ok := snapshot.Instances[caller.actor.InstanceID]
+		if !ok || instance.ID != caller.actor.InstanceID || !safeName(instance.LogicalAgentID) ||
+			instance.Principal != caller.actor.Principal || instance.Scope != request.Scope || instance.GrantID != grant.ID ||
+			!agentIdentityText(instance.BindingID) || caller.bindingID != instance.BindingID || instance.RevokedAt != nil {
+			return deny("agent_identity_binding_mismatch")
+		}
+	}
+	permission := agentIdentityPermission{request.Operation, request.Resource}
+	permissions, valid := agentIdentityPermissionSet(grant.Permissions)
+	if !valid || !permissions[permission] {
+		return deny("agent_identity_permission_denied")
+	}
+	expires := grant.ExpiresAt
+	if caller.expiresAt != nil && caller.expiresAt.Before(expires) {
+		expires = *caller.expiresAt
+	}
+	seen := map[string]bool{}
+	id := request.GrantID
+	for {
+		current, ok := snapshot.Grants[id]
+		if !ok || current.ID != id || seen[id] || !safeName(id) || !current.Issuer.valid() || !current.Holder.valid() ||
+			current.Scope != request.Scope || current.TrustRevision != authority.trustRevision || current.RevokedAt != nil || current.NotBefore.IsZero() ||
+			current.ExpiresAt.IsZero() || !current.NotBefore.Before(current.ExpiresAt) || at.Before(current.NotBefore) || !at.Before(current.ExpiresAt) {
+			return deny("agent_identity_grant_inactive")
+		}
+		seen[id] = true
+		rights, rightsValid := agentIdentityPermissionSet(current.Permissions)
+		_, delegableValid := agentIdentityPermissionSet(current.Delegable)
+		if !rightsValid || len(rights) == 0 || !delegableValid || !agentIdentitySubset(current.Delegable, rights) {
+			return deny("agent_identity_delegation_invalid")
+		}
+		if current.ExpiresAt.Before(expires) {
+			expires = current.ExpiresAt
+		}
+		if current.ParentID == "" {
+			if !authority.roots[id] {
+				return deny("agent_identity_root_untrusted")
+			}
+			break
+		}
+		parent, ok := snapshot.Grants[current.ParentID]
+		if !ok || current.Issuer != parent.Holder || current.Scope != parent.Scope || current.NotBefore.Before(parent.NotBefore) ||
+			current.ExpiresAt.After(parent.ExpiresAt) {
+			return deny("agent_identity_delegation_invalid")
+		}
+		parentDelegable, parentValid := agentIdentityPermissionSet(parent.Delegable)
+		if !parentValid || !agentIdentitySubset(current.Permissions, parentDelegable) || !agentIdentitySubset(current.Delegable, parentDelegable) {
+			return deny("agent_identity_delegation_invalid")
+		}
+		// Referencing a parent's old instance is not permission to delegate on
+		// its behalf after that instance was revoked or replaced.
+		if parent.Holder.InstanceID != "" {
+			instance, ok := snapshot.Instances[parent.Holder.InstanceID]
+			if !ok || instance.ID != parent.Holder.InstanceID || instance.Principal != parent.Holder.Principal ||
+				instance.Scope != parent.Scope || instance.GrantID != parent.ID || instance.RevokedAt != nil {
+				return deny("agent_identity_delegation_invalid")
+			}
+		}
+		id = current.ParentID
+	}
+	requestDigest, err := agentIdentityDigest(request)
+	if err != nil {
+		return deny("agent_identity_request_invalid")
+	}
+	return agentIdentityDecision{EventID: request.EventID, Actor: caller.actor, RequestDigest: requestDigest,
+		SnapshotDigest: digest, SnapshotRevision: snapshot.Revision, TrustRevision: caller.trustRevision, ExpiresAt: expires}, nil
+}
+
+// Reuse authenticates and reevaluates first, then compares the entire binding.
+// It does not mark the decision consumed; the transactional consumer must do so.
+func reuseAgentIdentityDecision(previous agentIdentityDecision, snapshot agentIdentitySnapshot, authority agentIdentityAuthority, caller agentIdentityCaller, request agentIdentityRequest, at time.Time) (agentIdentityDecision, error) {
+	current, err := evaluateAgentIdentity(snapshot, authority, caller, request, at)
+	if err != nil {
+		return agentIdentityDecision{}, err
+	}
+	if current != previous {
+		return agentIdentityDecision{}, agentIdentityError("agent_identity_decision_stale")
+	}
+	return current, nil
+}

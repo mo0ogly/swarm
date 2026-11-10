@@ -4,9 +4,10 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+from fixture_area import fixture_area
 
 binary = os.environ['SWARM_BINARY']
-with tempfile.TemporaryDirectory() as td:
+with tempfile.TemporaryDirectory(dir=fixture_area()) as td:
     root = Path(td) / 'project'; root.mkdir()
     other = Path(td) / 'transported'; other.mkdir()
     def call(*args, data=None, target=root, expected=0):

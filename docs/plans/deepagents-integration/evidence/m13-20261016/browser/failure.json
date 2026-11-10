@@ -1,0 +1,15 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Session du tour différente/. Input:\n\n'Recovery preview unavailable: Turn session differs from retained state; no recovery authorized'\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/dialogue_recovery_ui.cjs:75:73",
+  "errors": [],
+  "failures": [],
+  "focus": {
+    "active": {
+      "id": "close"
+    },
+    "returnTarget": {
+      "id": "",
+      "connected": true,
+      "action": "recovery-preview-t1"
+    }
+  }
+}

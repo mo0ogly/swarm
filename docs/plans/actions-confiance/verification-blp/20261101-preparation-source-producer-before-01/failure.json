@@ -1,0 +1,6 @@
+{
+  "status": "FAIL",
+  "cause": "test wire key revision absent; actual key source_revision",
+  "binary_sha256": "75ad879faf4807d33b6b9c3ff5a71e570aa76d252f394da3b309d95ecadda5e9",
+  "source_mutation": false
+}

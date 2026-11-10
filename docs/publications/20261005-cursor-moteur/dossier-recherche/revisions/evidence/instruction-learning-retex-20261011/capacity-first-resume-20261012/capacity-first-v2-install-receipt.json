@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-12T18:54:42.143475+00:00",
+  "pid": 387919,
+  "binary_sha256": "203c98e2660c2ab31791015df3c3e13dc47f74502393d879987fd29023be8e89",
+  "public_work_bodies_preserved": true,
+  "review_calls": 82,
+  "health": "ready",
+  "schema": 31,
+  "mission": "paused for fresh cost preview and supervisor coordination",
+  "owned_paths": [
+    "internal/engine/managed_review_capacity_first.go",
+    "internal/engine/managed_review_capacity_first_test.go",
+    "internal/engine/managed_review_capacity_reserve_test.go",
+    "internal/engine/managed_review_input_budget.go",
+    "internal/engine/managed_review_input_provider.go",
+    "internal/engine/managed_review_fragment_capacity.go",
+    "internal/engine/managed_review_fragment_plan.go",
+    "internal/engine/managed_review_fragment_tokens_store_test.go",
+    "docs/REVIEW-FRAGMENTS.md",
+    "docs/en/REVIEW-FRAGMENTS.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_review_fragment_reply.go"
+  ],
+  "private_log_read": false
+}

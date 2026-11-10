@@ -1,0 +1,13 @@
+{
+  "command": [
+    "sh",
+    "./build.sh",
+    "/tmp/swarm-account-change-recovery-candidate"
+  ],
+  "start": "2026-10-11T15:31:49.069729+00:00",
+  "end": "2026-10-11T15:31:59.599983+00:00",
+  "seconds": 10.53028108899889,
+  "exit": 0,
+  "output": "/tmp/swarm-account-change-recovery-build.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,176 @@
+# Application creation workflow
+
+Swarm ships three role-specific methods: `product-planning`, `product-delivery`
+and `product-review`. Application, interface and new-product templates select
+**Application creation workflow**. Canonical sources and generic document templates are versioned and
+embedded; a new project does not need its own `.claude` directory.
+
+## Stages and methods
+
+The workflow separates product framing from the work on each feature:
+
+### Product framing: five stages
+
+| Stage | Preserved logic |
+| --- | --- |
+| 1. PRD | Existing/greenfield/replacement mode, users, problem, operating context, value loop, scope/exclusions, measurable success; verified optional external reference |
+| 2. Journeys/stories | End-to-end user value, stable IDs, observable criteria, dependencies, complexity; split a 5, document a 4's risk |
+| 3. Story review | PRD coverage, scope leaks, overlaps, criteria and executable order, distinct review context and retained findings |
+| 4. Architecture | Inspect existing architecture first; smallest justified delta; explicit greenfield choice and ADR before scaffolding |
+| 5. Design system | Existing or explicit visual direction, tokens, components, interaction patterns and states; unresolved required elements block readiness |
+
+### Delivery: six stages per feature
+
+| Stage | Preserved logic |
+| --- | --- |
+| 6. Research | Current code, exact symbols/signatures, callers, persistence, impact, checks and open questions |
+| 7. Screen design | Required system and story, exact actions and four states, responsiveness and accessibility; an external brief waits for its returned result |
+| 8. Plan | Bounded owned tasks, dependencies, evidence, gates, rollback, explicit adoption and return to Plan on drift |
+| 9. Implementation | Authorised slice, meaningful failing check where relevant, actual components, scope checks and handoff |
+| 10. Review | Same candidate and test evidence, verified APIs, design compliance, regressions, severity and missing evidence |
+| 11. Delivery | Explicit authority, fresh checks/review, existing PR handling, branch protections and proven merge/deployment |
+
+Frame a focused change before entering its feature cycle. Status must reflect the
+actual stage, missing evidence and next action. **Persistent tracking of all eleven
+stages and automatic transitions between them are not yet implemented.**
+
+Sources: [canonical skills](../../.claude/skills) and
+[generic document structures](../../tools/agent-workflows/templates/ks).
+No private application instructions, provider configuration or credentials are copied.
+
+### Role adaptations
+
+Swarm planners have no execution tools: actual repository research and document
+production belong to authorised worker tasks. Its independent reviewer inspects
+supplied evidence without tools and must not claim to rerun tests. Executable
+checks and integration belong to the engine. An authorised native review session
+can run its own checks.
+
+Markdown `validated: yes`, `Stories ready` or `Ship allowed` cannot replace engine
+adoption, fresh evidence, review policies or dispatch authority. The pack supplies
+methods; it is not a new scheduler automatically running eleven workflow stages.
+All three methods reach product preparation; launched roles receive their complete
+assigned method with a workflow fingerprint. This proves framing delivery, not
+model obedience or autonomous delivery of a whole application.
+
+## Frontend, backend and shared work
+
+A story delivers user value, such as placing an order. Frontend, API, persistence
+and tests are tasks within that slice rather than separate technical-layer stories.
+Architecture, design system and contracts can be common tasks. Screen design covers
+exact fields/actions, empty/loading/error/success, keyboard, responsive layouts and
+feedback; implementation uses actual application components instead of copied mockups.
+A replacement explicitly defines existing behaviour, parity scope, preserved data,
+migration checks and rollback. Never claim a complete replacement from framing alone.
+
+## One graph at a time
+
+1. **Application:** aggregate map and searchable journey list, 20 items per page.
+2. **Journey:** its stories and declared story dependencies.
+3. **Story:** the existing task graph filtered by explicit mappings, with objective,
+   criteria, shared-task notice, external prerequisites and dependent tasks elsewhere.
+
+Shared tasks keep one ID and one state. Counts use current engine validation;
+they do not independently certify story or product completion. A story without
+tasks is explicitly unplanned. Unassigned tasks are shown under **Common and
+unclassified tasks**; a foundation role is never inferred from a title.
+**All tasks**, **All dependencies** and **Find my selection** restore access to work
+outside the current view. Navigation does not mutate a mission or create agents.
+
+Journey links aggregate actual task dependencies and can be bidirectional without
+a task cycle. Story links describe the roadmap; executable prerequisites must also
+appear in task `depends`. A visual link never authorises dispatch.
+
+## Plan structure and compatibility
+
+Action-plan JSON version 1 accepts optional `product`, containing `mode`
+(`existing`, `greenfield`, `replacement`), `journeys` and `stories`. Each journey has
+`id`, `title`, `goal`, `story_ids`. Each story has `id` (`sN-slug`), `title`, `user`,
+`value`, `criteria`, `complexity`, `depends`, `task_ids`; a complexity of 4 also needs
+`risk`. Task IDs reference local IDs in the same plan. A task or story may be shared.
+
+The engine rejects missing/duplicate references, story cycles, invalid IDs, absent
+criteria, complexity 5 and a 4 without a risk. Adoption stores canonical task mappings.
+Contract changes invalidate linked tasks and dependents through existing revision
+rules; renaming a journey label does not alter execution evidence.
+
+Optional task `phase`: `frame`, `requirements`, `stories`, `story-review`,
+`architecture`, `design-system`, `research`, `design`, `plan`, `implement`, `review`,
+`deliver`. Existing plans remain compatible. The limits of eight tasks per action
+plan and 16,000 bytes per document remain unchanged. Use bounded increments; future
+stories can remain unplanned. Legacy task titles never fabricate stories.
+
+See the [French guide's JSON example](../PRODUCT-WORKFLOW.md#ajouter-la-structure-au-plan).
+
+## Reproduce the isolated recipe
+
+```sh
+sh build.sh .swarm-fixtures/swarm-product
+python3 tests/product_recipe.py .swarm-fixtures/swarm-product .swarm-fixtures/swarm-product-empty-project
+.swarm-fixtures/swarm-product --root .swarm-fixtures/swarm-product-empty-project web 127.0.0.1:18844
+```
+
+Use a free port and an empty root. Open the local session link, then Application →
+Acheter une pizza → Commander une pizza. The explicit fixture creates 25 journeys,
+26 stories and six launch-held tasks through public CLI operations. No AI call,
+agent execution, publishing or acceptance is performed; this recipe does not
+demonstrate autonomous full-application delivery by a real provider.
+
+With **Application creation workflow**, the `product` structure is required before plan validation and adoption. Missing structure preserves the draft without marking it ready. It remains optional for legacy methods.
+
+## Verified views
+
+Isolated UI recipe screenshots: no model call or task execution; pizza data only exercise the views.
+
+![Journey and stories](../screenshots/ks-product/journey-fr-light.jpg)
+
+![Shared task context and prerequisites](../screenshots/ks-product/story-en-light.jpg)
+
+![Canonical task graph](../screenshots/ks-product/tasks-en-light.jpg)
+
+## Compatibility identifiers
+
+The user-facing name is **Application creation workflow**. Existing `ks-product`,
+`ks-feature` identifiers and `ks-*` command files remain technical aliases for
+existing calls. They do not designate another engine. Existing preparations remain
+readable; changed method content must be reapplied and its plan revalidated before
+launch.
+
+## After acceptance: retrospective & quick wins
+
+An optional phase follows the accepted recipe. The cockpit offers a framed
+retrospective and quick wins area. The engine reads current acceptance evidence
+on every snapshot; hierarchical work also requires the root supervisor's closure.
+Stale evidence makes the offer unavailable despite retained historical acceptance.
+
+The user records a sourced fact or hypothesis, selects a quick win or structural
+evolution, and supplies the proposal, user value, effort, risk, criterion and
+proof. It remains a suggestion. **Prepare this evolution** opens a prefilled need
+with the suggestion and recipe hash; creation/adoption and execution authority
+are still required for the new increment. Viewing or saving starts no agent and
+preserves the accepted result. Dismissed suggestions cannot start this preparation.
+
+`planning post-delivery WORK` and snapshot `post_delivery` expose the same
+availability. `retex-save` with `source_kind: "acceptance"` requires the exact,
+still-fresh source. `GET /api/v1/retex-evolution?work=WORK&retex=ID` passes it to
+preparation without creating a mission. The optional plan phase `retex` is
+supported; executable ordering requires task `depends`, not just the phase label.
+The eleven core stages remain a method, with no automatic stage scheduler.
+
+```mermaid
+flowchart TD
+  R[Recipe: required checks and decision] --> F{Fresh evidence and supervisor closure?}
+  F -->|No| C[Correct and resume recipe]
+  F -->|Yes| T[Optional retrospective and quick wins]
+  T --> P[Fact or hypothesis, value, effort, risk, criterion]
+  P --> U{User choice}
+  U -->|Keep or dismiss| H[Preserved history]
+  U -->|Evolve| B[Prepare next increment]
+  B --> A[Adopt plan and authorize launch]
+  A --> E[Implement, verify and accept]
+  E --> T
+```
+
+[Instruction learning](INSTRUCTION-LEARNING.md) is a distinct recursive path:
+additions to future task instructions are validated by default and rejectable
+before reservation. This does not accept or execute project evolution suggestions.

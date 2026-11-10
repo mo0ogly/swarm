@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "event_id": "public-watch-start",
+  "expected_revision": 7,
+  "reason": "Owned public conductor fixture",
+  "slots": 1,
+  "profile": {
+    "provider": "fixture",
+    "role": "worker",
+    "workspace": "watch-worker",
+    "level": "standard",
+    "capture_output": true
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-11T16:23:31.549268+00:00",
+  "before": 380,
+  "after": 381,
+  "scope": "root",
+  "state_after_save": "ready",
+  "event": "root-global-errors-replan-medium-and-current-review-20261011",
+  "message_exact": true,
+  "calls_after": 32,
+  "response_sha256": "c41d8c9025e59c285ac43fe8485ffca1082cabf604c4af17d574a877eacb37bb",
+  "verification_recovery": "Mutation exit0 and revision381 preserved. Original verifier assumed nested work and raised KeyError; corrected verifier reads plain public Work response without repeating mutation. Native reception and decision still to verify."
+}

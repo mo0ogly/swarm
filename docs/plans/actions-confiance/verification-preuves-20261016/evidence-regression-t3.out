@@ -1,0 +1,122 @@
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/missing
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/unknown
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/forged
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/null
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly/foreign
+--- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly (0.97s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/missing (0.02s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/unknown (0.01s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/forged (0.01s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/null (0.01s)
+    --- PASS: TestActionsConfianceT3IdentityContextPublicReadOnly/foreign (0.01s)
+=== RUN   TestActionsConfianceT3IdentityContextLegacyAndExpiry
+--- PASS: TestActionsConfianceT3IdentityContextLegacyAndExpiry (1.14s)
+=== RUN   TestActionsConfianceT3IdentityContextVerifiedSessions
+=== RUN   TestActionsConfianceT3IdentityContextVerifiedSessions/human
+=== RUN   TestActionsConfianceT3IdentityContextVerifiedSessions/service
+--- PASS: TestActionsConfianceT3IdentityContextVerifiedSessions (2.35s)
+    --- PASS: TestActionsConfianceT3IdentityContextVerifiedSessions/human (1.16s)
+    --- PASS: TestActionsConfianceT3IdentityContextVerifiedSessions/service (1.20s)
+=== RUN   TestActionsConfianceT3IdentityContextEvidenceAndDelegation
+--- PASS: TestActionsConfianceT3IdentityContextEvidenceAndDelegation (0.98s)
+=== RUN   TestActionsConfianceT3IdentityContextHistoricalHash
+--- PASS: TestActionsConfianceT3IdentityContextHistoricalHash (0.00s)
+=== RUN   TestActionsConfianceT3IdentityContextCLIAndSuspension
+--- PASS: TestActionsConfianceT3IdentityContextCLIAndSuspension (0.69s)
+=== RUN   TestActionsConfianceT3IdentityContextInvalidProviderAuthTime
+=== RUN   TestActionsConfianceT3IdentityContextInvalidProviderAuthTime/1969-12-31T23:59:59Z
+=== RUN   TestActionsConfianceT3IdentityContextInvalidProviderAuthTime/2026-10-16T00:33:47Z
+--- PASS: TestActionsConfianceT3IdentityContextInvalidProviderAuthTime (1.71s)
+    --- PASS: TestActionsConfianceT3IdentityContextInvalidProviderAuthTime/1969-12-31T23:59:59Z (0.81s)
+    --- PASS: TestActionsConfianceT3IdentityContextInvalidProviderAuthTime/2026-10-16T00:33:47Z (0.90s)
+=== RUN   TestActionsConfianceT3IdentityContextClockAfterLock
+=== RUN   TestActionsConfianceT3IdentityContextClockAfterLock/identity-context
+=== RUN   TestActionsConfianceT3IdentityContextClockAfterLock/request
+--- PASS: TestActionsConfianceT3IdentityContextClockAfterLock (2.43s)
+    --- PASS: TestActionsConfianceT3IdentityContextClockAfterLock/identity-context (1.16s)
+    --- PASS: TestActionsConfianceT3IdentityContextClockAfterLock/request (1.27s)
+=== RUN   TestActionsConfianceT3IntrospectionPolicyContract
+--- PASS: TestActionsConfianceT3IntrospectionPolicyContract (0.76s)
+=== RUN   TestActionsConfianceT3IntrospectionActiveRevokedAndRestart
+--- PASS: TestActionsConfianceT3IntrospectionActiveRevokedAndRestart (1.40s)
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/inactive
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/null-active
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/string-active
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/audience
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/extended
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/missing-exp
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-nbf
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/issuer
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/subject
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/client
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/multiple-audiences
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/expired
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-iat
+--- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity (0.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/inactive (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/null-active (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/string-active (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/audience (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/extended (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/missing-exp (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-nbf (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/issuer (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/subject (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/client (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/multiple-audiences (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/expired (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-iat (0.00s)
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/enabled
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/endpoint
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/client_id
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/timeout_seconds
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/validation_window_seconds
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/max_sessions
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/max_token_bytes
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-timeout_seconds
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-validation_window_seconds
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-max_sessions
+=== RUN   TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-max_token_bytes
+--- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs (1.12s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/enabled (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/endpoint (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/client_id (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/timeout_seconds (0.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/validation_window_seconds (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/max_sessions (0.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/max_token_bytes (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-timeout_seconds (0.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-validation_window_seconds (0.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-max_sessions (0.02s)
+    --- PASS: TestActionsConfianceT3IntrospectionPolicyInvalidInputs/zero-max_token_bytes (0.01s)
+=== RUN   TestActionsConfianceT3IntrospectionNoNetworkLockAndFreshDecision
+--- PASS: TestActionsConfianceT3IntrospectionNoNetworkLockAndFreshDecision (1.22s)
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/unauthorized
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/redirect
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/malformed
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/oversized
+=== RUN   TestActionsConfianceT3IntrospectionTransportFailsClosed/timeout
+--- PASS: TestActionsConfianceT3IntrospectionTransportFailsClosed (6.97s)
+    --- PASS: TestActionsConfianceT3IntrospectionTransportFailsClosed/unauthorized (1.12s)
+    --- PASS: TestActionsConfianceT3IntrospectionTransportFailsClosed/redirect (0.89s)
+    --- PASS: TestActionsConfianceT3IntrospectionTransportFailsClosed/malformed (0.94s)
+    --- PASS: TestActionsConfianceT3IntrospectionTransportFailsClosed/oversized (1.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionTransportFailsClosed/timeout (3.01s)
+=== RUN   TestActionsConfianceT3IntrospectionDestinationAndCapacity
+=== RUN   TestActionsConfianceT3IntrospectionDestinationAndCapacity/https://other.example/introspect
+=== RUN   TestActionsConfianceT3IntrospectionDestinationAndCapacity/http://issuer.example/introspect
+=== RUN   TestActionsConfianceT3IntrospectionDestinationAndCapacity/https://issuer.example/introspect?token=x
+=== RUN   TestActionsConfianceT3IntrospectionDestinationAndCapacity/https://issuer.example/introspect#fragment
+=== RUN   TestActionsConfianceT3IntrospectionDestinationAndCapacity/https://user@issuer.example/introspect
+--- PASS: TestActionsConfianceT3IntrospectionDestinationAndCapacity (1.13s)
+    --- PASS: TestActionsConfianceT3IntrospectionDestinationAndCapacity/https://other.example/introspect (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionDestinationAndCapacity/http://issuer.example/introspect (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionDestinationAndCapacity/https://issuer.example/introspect?token=x (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionDestinationAndCapacity/https://issuer.example/introspect#fragment (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionDestinationAndCapacity/https://user@issuer.example/introspect (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	24.429s

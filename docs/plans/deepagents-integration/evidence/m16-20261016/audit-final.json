@@ -1,0 +1,56 @@
+{
+  "status": "PASS",
+  "at": "2026-10-16T19:24:31.576586+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "go_tests": 18,
+  "new_named_subtests": 10,
+  "native_checks": 7,
+  "native_scripted_invocations": 2,
+  "model_calls": 0,
+  "current_inputs_verified": true,
+  "entrypoint_and_recipe_tracked": true,
+  "runtime": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "receipts": {
+    "projection-green": [
+      "TestRecoveryProjectionSignalsTruncatedOperation",
+      "TestRecoveryProjectionSignalsEveryTruncatedFocusField",
+      "TestRecoveryProjectionRetainsDistinctLongOperations",
+      "TestRecoveryProjectionPropagatesCriterionOmission",
+      "TestRecoveryProjectionRejectsMissingTask"
+    ],
+    "projection-contract": [
+      "TestOperationDescriptions",
+      "TestMemoryPreparedContextIncludesManagedDelivery",
+      "TestMemoryRuntimeRecoveryContextMatchesProviderAndPersists",
+      "TestMemoryRuntimeContextCapacityStopsBeforeProvider",
+      "TestMemoryRuntimeContextWriteFailureStopsBeforeProvider",
+      "TestMemoryContextBindingPreservesMetadataAndRefusesOverflow",
+      "TestMemoryContextReceiptReadThroughCLIAndAPI",
+      "TestRecoveryContextIsBoundedScopedAndRedacted",
+      "TestRecoverySelectsPreviousRecordNotCurrentOrFuture",
+      "TestRecoveryFocusPreservesTaskAndAttributedReviewWithoutFreshness",
+      "TestRecoveryContextUsesRecentOperationsInsteadOfRepeatedInitialInventory",
+      "TestRecoveryProjectionSignalsTruncatedOperation",
+      "TestRecoveryProjectionSignalsEveryTruncatedFocusField",
+      "TestRecoveryProjectionRetainsDistinctLongOperations",
+      "TestRecoveryProjectionPropagatesCriterionOmission",
+      "TestRecoveryProjectionAccountsForEveryRetainedActivityRow",
+      "TestRecoveryProjectionSanitizationIsNotReportedAsWidthTruncation",
+      "TestRecoveryProjectionRejectsMissingTask"
+    ],
+    "static": [],
+    "config": [],
+    "build-cli": [],
+    "build-final": [],
+    "native-cli": []
+  },
+  "candidate_diff_sha256": "a2fab2e83b3721ebc7a710a3741e6969486bfe9504441a8d4012876b874fad5a",
+  "review": "Local review in the author's context; no independent acceptance or deployment"
+}

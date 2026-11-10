@@ -1,0 +1,33 @@
+{
+  "status": "VERIFIED_LOCAL_MANAGED_SCOPED_PLANNING_AND_EMPTY_LIST_RECOVERY",
+  "profile": "normal1361",
+  "binary_sha256": "47004de67ffe9e321e358c27c2430953784dcc7f9c13569d87d36eb23140dc0e",
+  "public_recipes": {
+    "planning": "recipes1364/planning",
+    "bootstrap": "recipes1364/bootstrap"
+  },
+  "named_public_assertions": 14,
+  "rust_tests": {
+    "managed": 3,
+    "scope": 5
+  },
+  "nonmanaged_preview": "preview1364",
+  "empty_list_same_original_red": "empty1358",
+  "empty_list_same_original_green": "empty1363",
+  "clippy": "clippy1361",
+  "rustdoc": "doc1361",
+  "effective_inputs": 340,
+  "reviewed_changed_inputs": 8,
+  "glm_calls_added": 0,
+  "installed": false,
+  "independent_acceptance": false,
+  "global_acceptance": false,
+  "remaining": [
+    "managed worker copies and provenance",
+    "managed execution/result retention/settlement",
+    "controls/review/publication",
+    "dirty snapshots",
+    "legacy Go prepared-repository adoption",
+    "G1-G12 and R6/R7/RETEX"
+  ]
+}

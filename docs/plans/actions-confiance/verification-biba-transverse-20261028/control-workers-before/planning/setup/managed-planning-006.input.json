@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "event_id": "managed-planning-enable",
+  "expected_revision": 1,
+  "provider": "fixture",
+  "level": "standard",
+  "max_activations": 6,
+  "max_tasks": 2,
+  "max_decisions": 10,
+  "max_review_calls": 2,
+  "repository": {
+    "path": "source",
+    "committed_only": true
+  },
+  "checks": {
+    "req-1": [
+      {
+        "id": "biba-control",
+        "command": [
+          "python3",
+          "-c",
+          "from pathlib import Path\nimport os,json,hashlib\nassert Path('tracked.txt').read_bytes()==b'Committed planning input\\n'\nroot=next(p.parent for p in Path.cwd().parents if p.name=='.swarm')\nfacts={}\ntry:\n with (root/'.swarm/engine-settings.json').open('rb') as f:facts['private_read']=bool(f.read(1))\nexcept OSError:facts['private_read']=False\ntry:\n fd=os.open(root/'.swarm/state.db',os.O_RDWR);os.close(fd);facts['database_write']=True\nexcept OSError:facts['database_write']=False\ntry:\n with (root/'.swarm'/('biba-control-'+str(os.getpid()))).open('xb') as f:f.write(b'OWNED_SYNTHETIC_LOW_CONTROL')\n facts['private_write']=True\nexcept OSError:facts['private_write']=False\ntry:\n fd=os.open(root/'source/tracked.txt',os.O_WRONLY);os.close(fd);facts['official_write']=True\nexcept OSError:facts['official_write']=False\nwith Path('biba-control-result-'+str(os.getpid())+'.json').open('x') as f:json.dump(facts,f)\nprint('OWNED_BIBA_CONTROL '+json.dumps(facts),flush=True)\n"
+        ],
+        "criteria": [
+          1
+        ],
+        "inputs": [
+          "tracked.txt"
+        ],
+        "justification": "Observe only owned synthetic Biba boundaries; never accept a task",
+        "review_output": true
+      }
+    ]
+  }
+}

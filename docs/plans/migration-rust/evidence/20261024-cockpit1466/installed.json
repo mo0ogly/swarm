@@ -1,0 +1,74 @@
+{
+  "status": "VERIFIED_INSTALLED_LOCAL",
+  "runtime": {
+    "running": true,
+    "pid": 655109,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true,
+    "engine": "rust",
+    "binary": {
+      "build_date": "2026-10-24T17:06:36Z",
+      "commit": "298640e07a9738ff4a36f1cf4b46751a6dc79989",
+      "modified": true,
+      "provenance": "injected",
+      "version": "v0.1.1-dev.22"
+    },
+    "binary_sha256": "35a7f6fec24a09cf6a9247b588bf8e273e481058d3fdccc4a1bb1cd85c5f51ec"
+  },
+  "binary_sha256": "35a7f6fec24a09cf6a9247b588bf8e273e481058d3fdccc4a1bb1cd85c5f51ec",
+  "served_assets": {
+    "/cockpit.css": "4ea7507c1277c63d3b0269c7cd8f9e6cbfef6532147ff8bc83b24da8b67c9a11",
+    "/cockpit-ux.css": "2ab9b765a5d58e2fba1f58c7b3ae9413fbda4f8c8ddbd168d29472fb8deaada6",
+    "/agent-terminal.css": "edcb26f0efedd2f62bb248d91cd2919b1267d5cabb9b229ed12208dd54e1b675",
+    "/log-console.css": "88d7bbcd3f46f54e8d9ca61857898026a465ba5d9e09bfe841fdd081e8f8eb09",
+    "/product-views.css": "132665d8159c06db6528054186ddd80064510704e5cb9a2719f347a9296e3c06",
+    "/mission.css": "5a5dd39a1e96c0909ec175be72a42ab285d27ccab7846dcd5d4ddf9bb3262e42",
+    "/pilotage.css": "71dedb20ce6517e612e73d326b5843888ab9e4ef3fe341e2272aba743882a569",
+    "/conduite.css": "83aed086ddffd9f092b8ca57d954a62ebaa60177ea207bf2080960988fe1a470",
+    "/graph.css": "6fd7640121fe1cf9b14a5fc00eef4ac08dc124aba500e8e7a13e38fe217f4074",
+    "/plan.css": "1d1739cbee215a97ece6dcf0cd6ef5839f571f9ef8eba94284426ee4d34c27a3",
+    "/assistant.css": "73709dcbaa463dd40870a13eb1f9981f757b9e5c4a21f0bf579139ae1fed7e1d",
+    "/project-profile-settings.css": "45ed746be25550010d8b6ed4123183385c54720c76de1f3d434c2e0132fd1660",
+    "/providers.css": "eaeb7dc5bc745b962d42ea98000cad9c611acbd1c4939602961ea84a3036b04a",
+    "/preparation-timeout-admin.css": "f6cc26ce6c4583dc3314f09a509055b441762b665d3b9b28f00d9f68de442083",
+    "/context-help.css": "40bd809dfacabe587e40179381a926ef05b95c35a18cd4e1c320f3fe5d4797b7",
+    "/i18n-en.js": "0cb1b22a7d6c788b5e0e3fb242689e3482611eb1abdc1c1b27617324e755497f",
+    "/i18n.js": "7bd0842eead0ceba3bbcaee7ac28a7b92c4c5086cdf169255da8db8ca3e7646e",
+    "/swarm-shell.js": "ec5974b717991c3b4e10b67270e69a96d2be4c36f16c25b9253ddf4611a879a4",
+    "/cockpit-native-read.js": "15f833f3f0f844deffdca56bb8f12243976471a083af72918490c8c7b8931151",
+    "/cockpit-native-panels.js": "aec6b037572b3b9aee6204e479b5ccb46efeb3c2fb5f878b126e9599fae07e45",
+    "/cockpit-native.js": "4e58d5a91fbd90e080fd78c5a8cf0777c0cb4c8396adbd317949b2fec099506e",
+    "/native-runtime/base.css": "421af5ca9b957b1004573bb3ff4d7f9ab958767e8e072ff518828bcac35d21e5",
+    "/native-runtime/admin.css": "aed2833e25b9b29f8810239060c5d881ed1a4f108bae3fec2cd770f625582d45",
+    "/native-runtime/app.css": "41050bd803896afb2e61560587bf54c13dda9b0baa40a7ff0fb946c01e87ab24",
+    "/native-runtime/english.js": "0cb1b22a7d6c788b5e0e3fb242689e3482611eb1abdc1c1b27617324e755497f",
+    "/native-runtime/i18n.js": "7bd0842eead0ceba3bbcaee7ac28a7b92c4c5086cdf169255da8db8ca3e7646e",
+    "/native-runtime/settings.js": "d782a9528da5a15cdd92769bb51b61371fb69f212f4f16e965e4f96b1d47dd2e",
+    "/native-runtime/quotas.js": "909e0a10de68ee6c9a84645e271ee5194cf72471c50955d06941f173a235729f",
+    "/native-runtime/cockpit.js": "ea6883a3b2b676f846e57c236a1081d08b13e38081a1bfdda44dd19906775eef",
+    "/native-runtime/app.js": "ab652acfcbb05693b98efab44c5be121575c29f73c6d1c52c2a97c896bd4d306",
+    "/access.css": "d500fb61f7c0ebdfd4c0de80e44596f2ac2725a79d8996667500e3f426bed345",
+    "/access.js": "85d1d5f226245683f71b338dea4456e2d1eb3f4e81b6a14796dc9f552422e5d5",
+    "/wattson_themes.css": "0055edad2bcfa30d65b63eee8c522cd53d6953353f0a98f34024c364a08f0a59",
+    "/swarm-design.css": "d16f095be28059d4cb9ec55073c41a57d15bf9ea612d1b556e66196757d188f7",
+    "/favicon.ico": "d8ad9094dd879b42f213cea10c471696af378679c0634a044b7fe312de7ae9bb"
+  },
+  "compiled_local_changes_match": true,
+  "historical_missions": [
+    {
+      "work_id": "w-a77d9f4799712a6c6d96c662",
+      "paused": true,
+      "recorded_attempt_count": 5,
+      "policy_absent": true
+    },
+    {
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "paused": true,
+      "recorded_attempt_count": 3,
+      "policy_absent": true
+    }
+  ],
+  "provider_calls": false,
+  "limits": "Original version dialog remains unconnected; compiled identity/notes verified through protected native-version."
+}

@@ -1,0 +1,44 @@
+{
+  "at_utc": "2026-10-17T08:10:44.067612+00:00",
+  "status": "M20 CONSUMER CONTRACT PREPARED; USAGE ENFORCEMENT OPEN",
+  "method": [
+    "replan",
+    "spec-builder"
+  ],
+  "docs_changed": 6,
+  "source_contracts_inspected": 9,
+  "externally_changed_and_revalidated": [
+    "internal/engine/agent_identity_registry_types.go"
+  ],
+  "additional_changes_since_revalidation": [],
+  "source_recheck_and_coordination_required_before_implementation": true,
+  "local_links_resolved": 19,
+  "criteria": [
+    "M20-U01",
+    "M20-U02",
+    "M20-U03",
+    "M20-U04",
+    "M20-U05",
+    "M20-U06",
+    "M20-U07",
+    "M20-U08",
+    "M20-U09",
+    "M20-U10"
+  ],
+  "criteria_execution": "NOT TESTED; target acceptance cases",
+  "new_application_tests": 0,
+  "reason_no_application_tests": "documentation/specification only; no production change or new runnable consumer; identity owner actively editing",
+  "m21_test_inputs_unchanged": true,
+  "m21_reused_result": "57 Python methods, not rerun and not proof of new identity integration",
+  "findings": [
+    "plan digest omits response/answers/contexts/project_memory: separate content freshness required",
+    "current identity plan reader requires adopted plan; retained public memory fixture has two brainstorms with no plans/planning: explicit pre-plan authority required"
+  ],
+  "source_observation": "preplan-observation.json",
+  "application_sources_changed_by_this_chat": false,
+  "model_calls": 0,
+  "new_processes": 0,
+  "deployment": false,
+  "inter_chat_message": false,
+  "pending_owner": "memory for resource/content consumer; identity for explicit pre-plan authority, protected issuer/checkpoint and host boundary"
+}

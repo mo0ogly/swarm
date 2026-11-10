@@ -1,0 +1,165 @@
+{
+  "status": "VERIFIED_OPERATOR_POLICY_AND_LOCAL_PERFORMANCE_NOT_NATIVE_ACCEPTANCE",
+  "at": "2026-10-12T22:23:18.662721+00:00",
+  "base_commit": "e7436eb76b804d54864c59744e75debad46786d5",
+  "input_sha256": {
+    "internal/engine/graph_performance_config.go": "9a4635cbc635da9907522e8bb755b55436570aa57b37a58798f32ba5f342e672",
+    "internal/engine/graph_performance_config_test.go": "e1645d748560c0009cbe94aa127053a56487887c0f0a3e685af3af052a6066be",
+    "web/admin.js": "c148b619d43d42176af0c6dc10c4723cbd88bb27dac103490664fafd32570dab",
+    "locales/en.json": "dacad200c2093b98ce2ee3f101eb9319042ade539388fc543d682304a10db1f4",
+    "web/i18n-en.js": "10f9d0c52d3ff2879c47d184b282dcfa5a765a0d442d8741dcdf8778f18dc041",
+    "tests/graph_performance_ui.cjs": "e12c19c03eea5d747fb037f197e10a985acd7085048498f2bf8ad70ff3c91ecd",
+    "tests/graph_performance_admin_ui.cjs": "156f31780f171eaf250d5903b24276e8594bf481ab04e8ea688e4d3d320f3d1d",
+    "tests/graph_performance_adapter_test.cjs": "0874aa166b477b8a9f36d3d35fdbe398a06a7193b2ef587a9a03da001b642732"
+  },
+  "candidate_binary_sha256": "51ac2dc25fd9b2ba2575459c3479bc6c35f6be02fe904105a4d584ab8ebec5ab",
+  "go": {
+    "race": true,
+    "top_level": 6,
+    "with_subcases": 11,
+    "passed_names": [
+      "TestGraphPerformancePersistencePreviewReplayAndConflict",
+      "TestGraphPerformanceConcurrentInvalidAndSymlink",
+      "TestGraphPerformanceCLIHTTPParityAuthAndPreview",
+      "TestGraphPerformanceOperatorTargetsWithoutHistoricalCeilings/keyboard",
+      "TestGraphPerformanceOperatorTargetsWithoutHistoricalCeilings/samples",
+      "TestGraphPerformanceOperatorTargetsWithoutHistoricalCeilings/cards",
+      "TestGraphPerformanceOperatorTargetsWithoutHistoricalCeilings/render",
+      "TestGraphPerformanceOperatorTargetsWithoutHistoricalCeilings/profiles",
+      "TestGraphPerformanceOperatorTargetsWithoutHistoricalCeilings",
+      "TestGraphPerformanceRepresentationAndTransportBounds",
+      "TestGraphPerformanceOversizePreviewAndApplyAgree"
+    ]
+  },
+  "checks": [
+    "Go vet internal/engine passed",
+    "candidate CLI build passed",
+    "i18n catalogue parity passed",
+    "generated adapter verdict strict/relaxed/equal/custom workload + source hashes passed",
+    "TestGraphDeliveryD03QualificationManifest: current source integrity and missing/stale/incomplete input guards passed; not historical acceptance"
+  ],
+  "admin_variants": [
+    {
+      "variant": "fr-sombre",
+      "preview_no_write": true,
+      "persistence": true,
+      "cli_web_parity": true,
+      "stale_conflict": true,
+      "escape_focus": true,
+      "errors": [],
+      "expected_http_conflict": [
+        [
+          409,
+          "/api/v1/graph-performance/preview"
+        ]
+      ],
+      "config_revision": 2,
+      "saved_focus": true,
+      "new_workload_target_retained": true,
+      "historical_caps_removed": true,
+      "saved_samples": 101,
+      "saved_loads": 11
+    },
+    {
+      "variant": "fr-etat",
+      "preview_no_write": true,
+      "persistence": true,
+      "cli_web_parity": true,
+      "stale_conflict": true,
+      "escape_focus": true,
+      "errors": [],
+      "expected_http_conflict": [
+        [
+          409,
+          "/api/v1/graph-performance/preview"
+        ]
+      ],
+      "config_revision": 2,
+      "saved_focus": true,
+      "new_workload_target_retained": true,
+      "historical_caps_removed": true,
+      "saved_samples": 101,
+      "saved_loads": 11
+    },
+    {
+      "variant": "en-sombre",
+      "preview_no_write": true,
+      "persistence": true,
+      "cli_web_parity": true,
+      "stale_conflict": true,
+      "escape_focus": true,
+      "errors": [],
+      "expected_http_conflict": [
+        [
+          409,
+          "/api/v1/graph-performance/preview"
+        ]
+      ],
+      "config_revision": 2,
+      "saved_focus": true,
+      "new_workload_target_retained": true,
+      "historical_caps_removed": true,
+      "saved_samples": 101,
+      "saved_loads": 11
+    },
+    {
+      "variant": "en-etat",
+      "preview_no_write": true,
+      "persistence": true,
+      "cli_web_parity": true,
+      "stale_conflict": true,
+      "escape_focus": true,
+      "errors": [],
+      "expected_http_conflict": [
+        [
+          409,
+          "/api/v1/graph-performance/preview"
+        ]
+      ],
+      "config_revision": 2,
+      "saved_focus": true,
+      "new_workload_target_retained": true,
+      "historical_caps_removed": true,
+      "saved_samples": 101,
+      "saved_loads": 11
+    }
+  ],
+  "load500": {
+    "cards": 500,
+    "samples": 5,
+    "first_open_ms": 1691,
+    "first_open_method": "one cold geometry observation including session-link redirect; excluded from the historical five reload p95 samples",
+    "initial_method": "five page reloads in the same tab; optional geometry cache can be warm",
+    "initial_p95_ms": 1342,
+    "keyboard_p95_ms": 31,
+    "initial_samples_ms": [
+      1330,
+      1253,
+      1157,
+      1342,
+      1051
+    ],
+    "keyboard_samples_ms": [
+      27.100000001490116,
+      31,
+      29.200000001117587,
+      23.300000000745058,
+      22
+    ],
+    "keyboard_method": "trusted keydown timestamp to second animation frame",
+    "expected_reload_aborts": [],
+    "arrows": true,
+    "focus_recovered": true
+  },
+  "load500_binary_sha256": "6ec01e2040038eed69a55581072d8a0697724a4ca56bdbf9a3ddce20fae06332",
+  "load500_generated_recipe_sha256": "2808687b2a6de98630fddbebd86de1f2d9b94df43f9d82742cc7fe6148249590",
+  "frozen_load500_policy_sha256": "0942befaaac9eaf85a03e3aacba7da55aad09f2c98be32246d1e3ca7c7fe1a3c",
+  "limits": [
+    "500-card measurement used the previous binary; graph renderer unchanged in the settings fix. Binary identities remain separate.",
+    "200-card performance not requalified. Five samples select the maximum as p95, not a representative distribution estimate.",
+    "Controlled adapter observations are not browser latency measurements. Original adapter mismatch and shape-corrected legacy verdict counterexample are distinct.",
+    "Current adapter adds source-fingerprint metadata; the original 500-card frozen policy is kept unchanged.",
+    "No real model or independent review; native service and historical mission unchanged."
+  ],
+  "source_manifest_check_sha256": "428c559570ac28e1fbf68a6f53f87a8a1af385d5617385a0f5a74578f75c7cf4"
+}

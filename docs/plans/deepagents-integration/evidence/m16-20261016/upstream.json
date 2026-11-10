@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/langchain-ai/deepagents",
+  "commit": "29d646fd2d832a44c476964333eddecb0ec1c0cd",
+  "path": "libs/deepagents/deepagents/middleware/summarization.py",
+  "sha256": "976c2d1b1e604802a2f05046f188b6b0509be06ba2f14013d9d21b3ad29f7c7f",
+  "observed_lines": [
+    1606,
+    1625
+  ],
+  "observation": "Backend offload failure warns but summarization still proceeds; do not infer a guarantee that original history remains recoverable. No upstream code executed in M16."
+}

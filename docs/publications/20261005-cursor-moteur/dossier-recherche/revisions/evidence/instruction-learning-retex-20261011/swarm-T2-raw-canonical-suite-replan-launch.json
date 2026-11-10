@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-11T17:11:59.472501+00:00",
+  "pid": 1823560,
+  "script": "/tmp/swarm-T2-raw-canonical-suite-replan.py",
+  "log": "/tmp/swarm-T2-raw-canonical-suite-replan-driver.out",
+  "native_code_identical": true,
+  "no_native_db_write": true
+}

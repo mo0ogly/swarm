@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-transport-public",
+  "inputs": [
+    "tests/blp_attribution_history_cli.py",
+    "tests/fixture_area.py",
+    "tests/rust_agent_model_route.py",
+    "tools/verification/recipe.py",
+    "tests/rust_native_http_cli.py",
+    "tests/blp_transport_public.py",
+    "rust/crates/swarm-engine/src/root_store/preparation_transport.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_admission.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_budget.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "fixed-transport-actual-cli-http",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,sys; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=Path(os.environ['SWARM_BLP_PROOF_OUTPUT']) if 'SWARM_BLP_PROOF_OUTPUT' in os.environ else fixture_root('blp-transport-proof-')/'journey'; subprocess.run(['python3','tests/blp_transport_public.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',str(out)],check=True); print('BLP_TRANSPORT_CLI_HTTP_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS destination-binding-recorded",
+        "PASS transport-granted-fixed-fields",
+        "PASS transport-explicitly-non-emissive",
+        "PASS transport-replay-is-identical",
+        "PASS transport-no-write-down-refuses",
+        "PASS settings-change-refuses-transport",
+        "PASS revoked-identity-transport-refuses",
+        "PASS http-granted-decision-maps-200",
+        "PASS no-provider-launch-or-business-mutation",
+        "BLP_TRANSPORT_PUBLIC_PASS",
+        "BLP_TRANSPORT_JOURNEY_SHA256"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

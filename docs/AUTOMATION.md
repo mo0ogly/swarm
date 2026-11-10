@@ -6,6 +6,13 @@ Le moteur possède un service interne de demandes de reprise durables, de
 programmes horaires et une réception HTTP locale d'événements externes. Le CLI
 et l'administration web des programmes appartiennent au lot C04.
 
+Les lectures du travail cible contrôlent ensemble clé SQL, révision positive et
+corps UTF-8/JSON de schéma 1, avant les contrôles métier. `unknown_target` désigne
+une cible absente ; une panne de lecture ou un corps incohérent conserve son
+erreur d'origine, sans être présenté comme une absence. Aucun programme ou effet
+de reprise n'est créé lors de ces refus. Voir le
+[contrat Work](architecture/WORK-ROW-CONTRACT.md).
+
 Une demande C01 contient :
 
 - une clé d'idempotence stable choisie par l'appelant ;

@@ -1,0 +1,22 @@
+{
+  "executor": "Codex direct audit",
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestAgentWorkflow|^TestProjectMemoryPublicLifecycle$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "environment_keys": [
+    "HOME",
+    "PATH"
+  ],
+  "started_at_utc": "2026-10-15T20:34:59.514860+00:00",
+  "ended_at_utc": "2026-10-15T20:35:46.211476+00:00",
+  "exit_code": 1,
+  "log_sha256": "58830c928e714e1c1a08d48b3a02cbda90498e5a5f0b7b7e23b9c452e80c63e0"
+}

@@ -1,0 +1,8 @@
+{
+  "docs/plans/migration-rust/PLAN.md": "46ad980c2aac91e3471fd5865733617c9861aa3e7c3ec58013536c3eb2d858c9",
+  "docs/plans/migration-rust/REPLAYS.md": "2deb6a4195a58fba829d1537e889ccc94b292ce33c01e3992bfcb22d0e7d6d27",
+  "docs/architecture/NATIVE-WORKER-RECOVERY.md": "60434a8fef8f0506a71401817fabbb9a9540002de8f323d0de7ba927f1743c86",
+  "docs/en/NATIVE-WORKER-RECOVERY.md": "27d231d930e5658d3288114c1d080a5b274873b553693fb79cc26e50f962dc43",
+  "tests/rust_mission_worker_recovery.py": "dd088ec39c13423d6bce212193c69b71f8498e7552dfb117b9d6b513a12a9d8d",
+  "tools/verification/recipes/mission-worker-completion-recovery.json": "22684ea2b3d906a849b2e0269ef0985d9525549b86b4466704b9888b01ba2efb"
+}

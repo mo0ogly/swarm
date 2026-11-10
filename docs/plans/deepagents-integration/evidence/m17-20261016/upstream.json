@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "python3",
+    "docs/plans/deepagents-integration/evidence/m17-20261016/upstream-boundary-probe.py"
+  ],
+  "started_at_utc": "2026-10-16T19:30:53.401765+00:00",
+  "duration_seconds": 0.109,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "a31619a5bafb1972143c6cfddcf27aba91558a7d80e7bc6276b25b331d0cc014",
+  "model_calls": 0
+}

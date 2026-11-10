@@ -1,0 +1,44 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T17:01:48.567093+00:00",
+  "end": "2026-10-11T17:10:09.632924+00:00",
+  "seconds": 501.0664185479982,
+  "exit": 0,
+  "output": "/tmp/swarm-review-retry-delivery-qualified-v4-full.out",
+  "output_sha256": "ad26ed45a9cf7fe8502a238d6dad87dc2ecf5e7c27422650f03fa18f13b5e057",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "cd2fa1cb98ded543f40fa626570d79f82106f9e3632520e7b764c96dbe5ad92b",
+  "candidate_digest": "559483bd8fcba9ef9172403f744a9991d98cc074644c52549d47c3a88eb97716",
+  "paths": 1174,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T17:01:48.567093+00:00",
+    "driver_pid": 1697723,
+    "pgid": 1697723,
+    "sid": 1697723,
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "manifest_sha256": "cd2fa1cb98ded543f40fa626570d79f82106f9e3632520e7b764c96dbe5ad92b",
+    "source_digest": "559483bd8fcba9ef9172403f744a9991d98cc074644c52549d47c3a88eb97716",
+    "paths": 1174,
+    "precondition": "Dedicated detached session for operator-owned qualification; previous coupled-session driver exited143 without a Go fail/package result. Same frozen source and12m test timeout.",
+    "go_pid": 1697736
+  }
+}

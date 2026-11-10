@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "bootstrap_digest": "e6cc0379b9b61ab99f5fbe2d8ca0368fe7ff21983a8a7fed020408fa45d14731",
+  "bootstrap": {
+    "schema_version": 1,
+    "pins": {
+      "installation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "authority_public_key": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc",
+      "bootstrap_principal": {
+        "principal_id": "operator",
+        "principal_kind": "human",
+        "issuer": "https://issuer.example",
+        "subject": "fixture-human"
+      }
+    },
+    "service_uid": 0,
+    "controller_uid": 4294967295,
+    "configuration_directory": "/tmp/fixture/config",
+    "witness_directory": "/tmp/fixture/witness"
+  },
+  "storage_verified": true,
+  "human_authentication_verified": false,
+  "confinement_verified": false,
+  "service_started": false
+}

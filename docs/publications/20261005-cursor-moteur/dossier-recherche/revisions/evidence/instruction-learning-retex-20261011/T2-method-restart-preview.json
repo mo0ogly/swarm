@@ -1,0 +1,17 @@
+{
+  "revision": 157,
+  "task_id": "plan-ca937edf4e-T2",
+  "review_id": "review-6eadd171c67897f10f4ec754",
+  "candidate_commit": "d405c0ee9479fb26521fc6041cc6932f9929a3a1",
+  "state": "method_restart_ready",
+  "cause": "inspection de fragment : defect quote absent at original line (artifact 1, line 42)",
+  "next_step": "Méthode modifiée : nouvelle revue complète du même candidat ; anciens avis et appels conservés, aucune observation réutilisée.",
+  "actor": "operator",
+  "inspections_remaining": 5,
+  "inspections_reusable": 0,
+  "calls_required": 7,
+  "calls_available": 15,
+  "calls_missing": 0,
+  "minimum_review_limit": 22,
+  "timeout_seconds": 0
+}

@@ -1,0 +1,14 @@
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+2026/10/11 23:14:07 http: TLS handshake error from 127.0.0.1:45848: remote error: tls: bad certificate
+--- FAIL: TestGraphDeliveryD04InstallVersion (0.00s)
+    graph_delivery_install_test.go:95: native install v0.0.0-d04 failed: fork/exec ./install.sh: no such file or directory
+--- FAIL: TestGraphDeliveryD04RollbackSafety (0.00s)
+    graph_delivery_install_test.go:137: native install v0.0.0-d04-old failed: fork/exec ./install.sh: no such file or directory
+--- FAIL: TestReviewInputTokensMatchIndependentPythonVectors (0.00s)
+    managed_review_input_budget_test.go:21: open /home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-preview-9nhe432y/testdata/review_tokens_o200k.json: no such file or directory
+--- FAIL: TestReplayGLMRetryEventShapes (0.00s)
+    stream_regression_test.go:76: open /home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-preview-9nhe432y/tests/testdata/glm-retry-event-shapes.json: no such file or directory
+FAIL
+FAIL	swarm.local/companion/internal/engine	486.634s
+FAIL

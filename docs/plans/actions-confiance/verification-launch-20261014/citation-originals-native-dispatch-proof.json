@@ -1,0 +1,20 @@
+{
+  "revision": 407,
+  "review": "review-648b1d25ee01e0532390cff9",
+  "candidate_commit": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+  "citation_contract_version": 2,
+  "context_sha256": "bf272d6978e85aa9fc593d7cfd9c2bc6c56b78900b0f06a6a1a441e5ba0bb30f",
+  "plan_sha256": "44c72043b4471efb5173b5e95f5debca63d38e0b6daf11677cc8c4278ae3ff1a",
+  "workflow_prompt_sha256": "5b3c40dc12f077ee1a0b31bf5e33819691bc23d43057bcf1a060211dba5a5939",
+  "packets": 3,
+  "journal_entries": [
+    {
+      "packet": 0,
+      "state": "reserved",
+      "call_id": "fragment-call-bc7c4ed78597540b9263c714"
+    }
+  ],
+  "calls": 81,
+  "review_limit": 85,
+  "scope": "Observed native context and reserved first inspection. No independent verdict or task acceptance yet."
+}

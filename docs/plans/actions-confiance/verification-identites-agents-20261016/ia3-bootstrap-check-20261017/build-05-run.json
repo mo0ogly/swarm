@@ -1,0 +1,27 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-overlay",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/overlay.json",
+    "-o",
+    "/tmp/swarm-identity-bootstrap-03d-fixture-05",
+    "./cmd/swarm"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T16:41:37.225755+00:00",
+  "end": "2026-10-17T16:41:53.940819+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 1123,
+  "overlay": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/overlay.json"
+}

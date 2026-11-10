@@ -1,0 +1,15 @@
+{
+  "source_sha256": "bbce05793f46df3cbbcfc362b2ea972a16360f0c5b9c010624ab5b26935822ba",
+  "source_words": 2493,
+  "authority": "Latest user attachment is the author base; user explicitly authorizes merging with the assistant contribution.",
+  "strategy": "Preserve every original block verbatim and in order. Add complementary blocks and linked sources without shortening.",
+  "acceptance": [
+    "All author paragraphs retained in order",
+    "Title and PAEA retained",
+    "Additions mapped to source blocks",
+    "Word text matches merged Markdown",
+    "Every rendered page inspected"
+  ],
+  "status": "MERGED_AND_VERIFIED",
+  "verification": "verification.json"
+}

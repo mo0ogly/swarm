@@ -1,0 +1,6 @@
+=== RUN   TestManagedBatchRuntimeNegativeVerdicts
+=== RUN   TestManagedBatchRuntimeNegativeVerdicts/unknown
+--- PASS: TestManagedBatchRuntimeNegativeVerdicts (1.34s)
+    --- PASS: TestManagedBatchRuntimeNegativeVerdicts/unknown (1.34s)
+PASS
+ok  	swarm.local/companion/internal/engine	1.370s

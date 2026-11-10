@@ -1,0 +1,8 @@
+{
+  "normal_completion": true,
+  "timeout_rejected": true,
+  "child_not_running": true,
+  "observed_child_state": "gone",
+  "source_sha256": "0cd61412546cec4962bb63e7d8301b70868a3d41a408eb21f719675ac09c38a0",
+  "at": "2026-10-15T20:11:29.193106+00:00"
+}

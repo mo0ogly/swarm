@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-11T19:21:55.059610+00:00",
+  "paths_transferred": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "internal/engine/managed_review_evidence_inventory.go",
+    "internal/engine/managed_review_evidence_inventory_test.go",
+    "internal/engine/managed_review_fragment_final_journal.go",
+    "internal/engine/managed_review_fragment_final_journal_test.go",
+    "internal/engine/managed_review_fragment_final_store.go",
+    "internal/engine/managed_review_fragment_final_store_test.go",
+    "internal/engine/managed_review_fragment_request_prompt.go",
+    "internal/engine/managed_review_fragment_request_prompt_test.go",
+    "internal/engine/managed_review_fragment_runtime.go",
+    "internal/engine/planning_delivery.go"
+  ],
+  "preimages_verified": true,
+  "all_source_paths_verified": 1187,
+  "source_digest": "06064eea1d5decca52c2e964268886053637bb3a786346351d53b819939348ad",
+  "full_receipt": "/tmp/swarm-review-inventory21-qualified-v1-full-receipt.json",
+  "operator_patch": "review-evidence-capacity-20261011.patch",
+  "runtime": "Console20 still running; deployment deferred until qualified supervisor selection-recovery22 completes the actual recovery path. No native state change, provider or database migration."
+}

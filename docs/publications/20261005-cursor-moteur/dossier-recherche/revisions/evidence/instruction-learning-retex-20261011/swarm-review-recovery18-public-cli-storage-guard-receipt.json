@@ -1,0 +1,28 @@
+{
+  "root": "/tmp/swarm-review-recovery18-cli-compatibility-check",
+  "old28_init": {
+    "exit": 0,
+    "stdout": "{\n  \"root\": \"/tmp/swarm-review-recovery18-cli-compatibility-check\",\n  \"schema_version\": 1,\n  \"state\": \".swarm/state.db\"\n}\n",
+    "stderr": ""
+  },
+  "new29_init": {
+    "exit": 0,
+    "stdout": "{\n  \"root\": \"/tmp/swarm-review-recovery18-cli-compatibility-check\",\n  \"schema_version\": 1,\n  \"state\": \".swarm/state.db\"\n}\n",
+    "stderr": ""
+  },
+  "old28_read": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "{\n  \"error\": \"version de stockage non support\u00e9e : 29\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"version de stockage non support\u00e9e : 29\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+  },
+  "new29_read": {
+    "exit": 0,
+    "stdout": "[]\n",
+    "stderr": ""
+  },
+  "private_backup": {
+    "path": "/tmp/swarm-review-recovery18-cli-compatibility-check/.swarm/state-pre-v29-684a8efe3ed55afda4ccfe78.db",
+    "mode": "0600"
+  },
+  "limits": "Isolated empty root; proves CLI/storage compatibility only, no native migration or AI acceptance."
+}

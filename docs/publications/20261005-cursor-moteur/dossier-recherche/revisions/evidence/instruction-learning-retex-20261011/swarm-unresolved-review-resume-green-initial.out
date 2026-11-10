@@ -1,0 +1,7 @@
+=== RUN   TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen
+    planning_unresolved_review_recovery_test.go:14: sizes 164551 168167 21899 parts 1
+    planning_unresolved_review_recovery_test.go:107: revue de fragments non favorable : origine de l'inspection finale absente
+--- FAIL: TestPlanningAcknowledgedProtocolIncidentRemainsRecoverableWithFreshInputAfterReopen (3.28s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	3.320s
+FAIL

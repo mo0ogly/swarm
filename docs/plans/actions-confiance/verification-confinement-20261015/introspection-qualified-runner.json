@@ -1,0 +1,10 @@
+{
+  "pid": 1936331,
+  "proc_start_ticks": "3678488",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-introspection-qualified.py",
+    "run"
+  ],
+  "at": "2026-10-15T22:12:40.738346+00:00"
+}

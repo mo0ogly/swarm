@@ -1,0 +1,6 @@
+{
+  "root": "/tmp/swarm-biba-boundary-j35dx9zz",
+  "driver_sha256": "ffecfef222802119dd907f0676ec75932d9ff4b73a8be3f5837fa20c8573c5d4",
+  "source_sha256": "a4c4dffb6cf05918f81464cb62b412b25a118a36e16570a8e79d492cb345d9c6",
+  "global_watchdog": null
+}

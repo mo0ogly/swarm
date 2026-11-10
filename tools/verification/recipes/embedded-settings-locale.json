@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "embedded-settings-locale",
+  "inputs": [
+    "tests/rust_embedded_settings_locale.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "web/i18n-en.js",
+    "locales/en.json",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-embedded-static-asset-and-settings-catalog",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='embedded-locale-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_embedded_settings_locale.py','--binary',os.environ['SWARM_EMBEDDED_LOCALE_BINARY'],'--profile',os.environ['SWARM_EMBEDDED_LOCALE_PROFILE'],'--baseline',os.environ['SWARM_EMBEDDED_LOCALE_BASELINE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS actual embedded Admin locale matches qualified binary and setting labels",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

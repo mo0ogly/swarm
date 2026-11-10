@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "id": "native-mission-quotas",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/*.md",
+    "rust/crates/swarm-engine/config/*.json",
+    "tools/rust-migration/generate_agent_models.py",
+    "tools/rust-migration/test_generate_agent_models.py",
+    "frontend/engine-settings/admin.js",
+    "web/i18n-en.js",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "tests/rust_web_policy_admin_ui.cjs",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tests/helpers/engine_settings_admin_state.cjs",
+    "tests/helpers/verification_cleanup.cjs",
+    "tests/verification_cleanup_test.cjs",
+    "tests/rust_native_http_cli.py",
+    "web/access.html",
+    "web/access.css",
+    "web/access.js",
+    "web/wattson_themes.css",
+    "web/swarm-design.css",
+    "web/swarm-logo.png",
+    "tests/rust_native_login_browser.py",
+    "tests/rust_native_login_ui.cjs",
+    "web/native-runtime.html",
+    "web/native-runtime.css",
+    "web/native-runtime.js",
+    "web/i18n.js",
+    "web/processes.css",
+    "frontend/engine-settings/admin.css",
+    "scripts/i18n/build.cjs",
+    "package.json",
+    "package-lock.json",
+    "tests/i18n_test.cjs",
+    "web/pilot-graph.js",
+    "tests/engine_settings_apply_ack_test.cjs",
+    "tests/native_settings_http_adapter_test.cjs",
+    "tests/rust_native_admin_ui.cjs",
+    "tests/rust_native_fixture_failures.py",
+    "tools/agent-workflows/check.py",
+    "tests/rust_native_completion_recovery.py",
+    "tests/rust_scoped_worker.py",
+    ".gitignore",
+    "tools/verification/verify_npm_archive.py",
+    "tests/browser_verification_runtime_test.cjs",
+    "tests/browser_npm_baseline_test.cjs",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_lease.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_provider_guard.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_call_contract.py",
+    "tests/rust_planning_output.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_planning_context_evolution.py",
+    "tests/rust_planning_wait.py",
+    "tests/rust_planning_step.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_unadmitted_recovery.py",
+    "tests/rust_planning_unadmitted_legacy.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_preview.py",
+    "tools/verification/recipe.py",
+    "tools/verification/test_recipe.py",
+    "tools/agent-workflows/test_check.py",
+    "tools/verification/recipes/agent-native-runtime.json",
+    "tools/verification/native_no_go.py",
+    "tools/verification/test_native_no_go.py",
+    "contracts/agent-wire-layout.v1.json",
+    "web/native-quotas.js",
+    "tests/rust_native_quotas.py",
+    "tests/rust_native_quotas_ui.cjs"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r97",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "quota-data-and-saved-policy",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "quotas",
+        "--test",
+        "engine_settings_catalog",
+        "--test",
+        "engine_settings",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "7 passed; 0 failed",
+        "1 passed; 0 failed",
+        "quota_saved_reason_policy_is_effective_and_legacy_absence_refuses ... ok",
+        "quota_scope_zero_restores_inheritance_without_bypassing_ancestor_budget ... ok",
+        "catalog_covers_all_actual_values_and_nullable_fields_match_authoritative_validation ... ok",
+        "4 passed; 0 failed",
+        "preview_is_pure_apply_requires_exact_token_and_replay_does_not_add_history ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "quota-transaction",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "work_engine",
+        "quotas_transaction_rollback_replay_and_policy",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "quotas_transaction_rollback_replay_and_policy ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "quota-url",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--lib",
+        "quota_",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "quota_work_query_refuses_ambiguity_without_default ... ok",
+        "quota_status_preserves_client_conflict_and_internal_failures ... ok",
+        "2 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-admin-asset-guards",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "native_admin",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed",
+        "native_admin_landing_and_assets_are_protected_without_secret_or_path_fallback ... ok",
+        "native_admin_assets_keep_host_csrf_method_and_no_mutation_contract ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-build",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--bin",
+        "swarm-rust"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "native-lint",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "-p",
+        "swarm-web",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "native-doc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "-p",
+        "swarm-web",
+        "-p",
+        "swarm-cli",
+        "--no-deps"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "native-http-js",
+      "command": [
+        "node",
+        "tests/native_settings_http_adapter_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native HTTP adapter 5 cases"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-native-role-contexts",
+      "command": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 native roles, 9 named native tests",
+        "frozen_role_planner_contract ... ok",
+        "frozen_role_subplanner_contract ... ok",
+        "frozen_role_worker_contract ... ok",
+        "frozen_role_reviewer_contract ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-cli-http",
+      "command": [
+        "python3",
+        "-c",
+        "import tempfile,subprocess,sys,json,os,hashlib; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-quotas-cli-http-',dir='.cache')).resolve(); source=Path('rust/target/r97/debug/swarm-rust'); raw=source.read_bytes(); binary=base/'swarm-rust'; stream=binary.open('xb'); stream.write(raw); stream.flush(); os.fsync(stream.fileno()); stream.close(); binary.chmod(0o700); assert hashlib.sha256(binary.read_bytes()).digest()==hashlib.sha256(raw).digest(); subprocess.run([sys.executable,'tests/rust_native_quotas.py','--binary',str(binary),'--output',str(base/'public')],check=True); result=json.loads((base/'public/result.json').read_bytes()); assert result['status']=='PASS'; print('NATIVE_QUOTAS_PUBLIC_REPLAY_PASS'+' '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_QUOTAS_PUBLIC_REPLAY_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-browser",
+      "command": [
+        "python3",
+        "-c",
+        "import tempfile,subprocess,sys,json,os,hashlib; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-quotas-browser-',dir='.cache')).resolve(); source=Path('rust/target/r97/debug/swarm-rust'); raw=source.read_bytes(); binary=base/'swarm-rust'; stream=binary.open('xb'); stream.write(raw); stream.flush(); os.fsync(stream.fileno()); stream.close(); binary.chmod(0o700); assert hashlib.sha256(binary.read_bytes()).digest()==hashlib.sha256(raw).digest(); subprocess.run([sys.executable,'tests/rust_native_login_browser.py','--binary',str(binary),'--output',str(base/'public'),'--scenario','quotas'],check=True); result=json.loads((base/'public/result.json').read_bytes()); assert result['status']=='PASS'; print('NATIVE_QUOTAS_BROWSER_REPLAY_PASS'+' '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_QUOTAS_BROWSER_REPLAY_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "i18n-contract",
+      "command": [
+        "npm",
+        "run",
+        "test:i18n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

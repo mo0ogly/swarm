@@ -1,0 +1,66 @@
+=== RUN   TestActionsConfianceT3GroupMappingPublicPolicy
+--- PASS: TestActionsConfianceT3GroupMappingPublicPolicy (0.90s)
+=== RUN   TestActionsConfianceT3GroupMappingHumanRolesAndPersistence
+--- PASS: TestActionsConfianceT3GroupMappingHumanRolesAndPersistence (1.41s)
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/absent
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/null
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/scalar
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/object
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/empty
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/unknown
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/outside-ceiling
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/mixed-types
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/empty-element
+=== RUN   TestActionsConfianceT3GroupMappingRejectsSignedClaims/null-element
+--- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims (11.76s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/absent (1.12s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/null (1.05s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/scalar (1.10s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/object (1.64s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/empty (1.35s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/unknown (1.21s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/outside-ceiling (0.96s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/mixed-types (1.12s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/empty-element (1.07s)
+    --- PASS: TestActionsConfianceT3GroupMappingRejectsSignedClaims/null-element (1.12s)
+=== RUN   TestActionsConfianceT3GroupMappingServiceUsesAccessToken
+=== RUN   TestActionsConfianceT3GroupMappingServiceUsesAccessToken/signed-access-token
+=== RUN   TestActionsConfianceT3GroupMappingServiceUsesAccessToken/assertion-ignored
+--- PASS: TestActionsConfianceT3GroupMappingServiceUsesAccessToken (2.19s)
+    --- PASS: TestActionsConfianceT3GroupMappingServiceUsesAccessToken/signed-access-token (1.14s)
+    --- PASS: TestActionsConfianceT3GroupMappingServiceUsesAccessToken/assertion-ignored (1.04s)
+=== RUN   TestActionsConfianceT3GroupMappingStepUpUsesDerivedRoles
+=== RUN   TestActionsConfianceT3GroupMappingStepUpUsesDerivedRoles/requester-only
+=== RUN   TestActionsConfianceT3GroupMappingStepUpUsesDerivedRoles/approver
+--- PASS: TestActionsConfianceT3GroupMappingStepUpUsesDerivedRoles (2.87s)
+    --- PASS: TestActionsConfianceT3GroupMappingStepUpUsesDerivedRoles/requester-only (1.34s)
+    --- PASS: TestActionsConfianceT3GroupMappingStepUpUsesDerivedRoles/approver (1.53s)
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/null-rules
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/null-role
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/unknown-role
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/duplicate-role
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/duplicate-group
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/active-empty
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/null-enabled
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/missing-claim
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/blank-claim
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/null-claim
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/unknown-key
+=== RUN   TestActionsConfianceT3GroupMappingInvalidConfiguration/empty-role
+--- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration (1.04s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/null-rules (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/null-role (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/unknown-role (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/duplicate-role (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/duplicate-group (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/active-empty (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/null-enabled (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/missing-claim (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/blank-claim (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/null-claim (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/unknown-key (0.00s)
+    --- PASS: TestActionsConfianceT3GroupMappingInvalidConfiguration/empty-role (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	21.634s

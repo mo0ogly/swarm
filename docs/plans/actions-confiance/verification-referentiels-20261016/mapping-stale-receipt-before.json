@@ -1,0 +1,9 @@
+{
+  "historical_receipt": "secret-broker-verification.json",
+  "source": "internal/engine/trust_secret_broker.go",
+  "historical_sha256": "4bf373768f55aae55bbe51a8a96e060240954c7f40bc4a09f14680bdf66785a9",
+  "current_sha256": "45589af949826a822888903985d90305ea6a4adf8a0dff2353d7099b4d2f5404",
+  "observed": "generation refused stale binding",
+  "retained_without_mutation": true,
+  "later_receipt": "introspection-verification.json"
+}

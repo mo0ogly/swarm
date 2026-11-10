@@ -1,0 +1,7 @@
+{
+ "schema_version": 1,
+ "id": "version-focus-escape",
+ "inputs": ["web/swarm-shell.js", "web/runtime-health.js", "tests/swarm_shell_escape_test.cjs"],
+ "environment": {},
+ "steps": [{"id":"shell-escape-ownership", "command":["node","tests/swarm_shell_escape_test.cjs"],"expected_exit":0,"required_stdout":["PASS navigation-alone-escape-closes-and-focuses-toggle","PASS modal-escape-preserves-navigation-and-focus-ownership","PASS consumed-escape-preserves-navigation","PASS other-key-preserves-navigation","PASS closed-navigation-escape-has-no-focus-effect","5/5 shell Escape checks passed"],"required_stderr":[]}]
+}

@@ -1,0 +1,5 @@
+{"type":"thread.started","thread_id":"01a14379-f423-7991-88df-488ca09b0355"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"{\"decision\":\"rebuild_evidence\",\"actions\":[\"block_admission\",\"request_fresh_evidence\",\"evaluate_current\"],\"admission\":\"after_fresh_pass\",\"acceptance\":\"unchanged\",\"reason\":\"L’archive est indisponible et la cible actuelle diffère de l’artefact historiquement accepté ; l’acceptation passée n’est donc pas transférable. Il faut produire puis évaluer une preuve fraîche sur la cible actuelle avant toute admission.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":16548,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":201,"reasoning_output_tokens":97}}

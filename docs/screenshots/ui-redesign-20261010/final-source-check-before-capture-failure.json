@@ -1,0 +1,6 @@
+{
+  "status": "FAIL",
+  "command": "go test ./internal/engine -run 'TestWebTrainingAssetsAndAuthentication|TestGraphDeliveryD03QualificationManifest' -count=1",
+  "reason": "preview-final-training.png was recaptured after the integrity snapshot, while the test was running",
+  "repair": "Finish the browser capture, refresh the source integrity snapshot, then repeat the targeted check."
+}

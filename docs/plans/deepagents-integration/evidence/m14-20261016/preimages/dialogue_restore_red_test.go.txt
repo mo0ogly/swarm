@@ -1,0 +1,30 @@
+//go:build linux
+
+package engine
+
+import (
+	"bytes"
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+func TestDialogueRestorePublicOperationExists(t *testing.T) {
+	s, a, _ := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"restore-session"}`, `{"type":"turn.completed"}`})
+	p, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request := map[string]any{"schema_version": 1, "event_id": "restore-public", "expected_revision": p.Revision, "checkpoint_sha256": p.Dialogue.Boundary.SHA256, "facts_sha256": p.Dialogue.FactsSHA256, "confirm": true, "reason": "Examine the same retained session", "instruction": "Continue the retained conversation after this confirmed boundary"}
+	raw, _ := json.Marshal(request)
+	file := filepath.Join(t.TempDir(), "request.json")
+	if err := os.WriteFile(file, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	var out, stderr bytes.Buffer
+	code := run([]string{"--root", s.root, "--json", "agent", "resume-dialogue-preview", a.ID, "--input", file}, &out, &stderr)
+	if code != 0 {
+		t.Fatalf("explicit dialogue restoration preview is unavailable: %s%s", out.String(), stderr.String())
+	}
+}

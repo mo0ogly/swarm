@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "legacy-go-source-archive",
+  "inputs": [
+    "tools/verification/go_source_inputs.py",
+    "tools/verification/test_go_source_inputs.py",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/legacy-go-source-archive.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "historical-go-archive-fixtures",
+      "command": [
+        "python3",
+        "tools/verification/test_go_source_inputs.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "Go input archive:"
+      ],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK",
+        "test_actual_embed_retained_and_verified_delta_replay",
+        "test_changed_input_is_incomplete_and_restored_source_recovers",
+        "test_bad_baseline_refuses_without_replacing_valid_source"
+      ]
+    }
+  ]
+}

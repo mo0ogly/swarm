@@ -1,0 +1,21 @@
+# The three levels of autonomy, as the page shows them, one at a time: the
+# paper's name for each level, one plain sentence of the page's own that opens
+# the same way at every level (who chooses the next step) and stands alone,
+# since a reader can open any tab first, and the paper's figure for the level
+# with its caption, so the page and the PDF number and caption one drawing one
+# way. Typographic quotes (’), as the page sets them; check-copy holds names and
+# captions to software-factory.md with quotes normalised. Change the paper
+# first, then this file.
+levels:
+  - name: Human-Orchestrated
+    lead: A developer chooses the next step and reviews what the agent produces.
+    figure: 3
+    caption: Level 1, where a developer gives an agent room to work without giving it everything the developer can reach
+  - name: Workflow-Orchestrated
+    lead: A predefined workflow chooses the next step, and the factory becomes a shared service.
+    figure: 4
+    caption: Level 2, where a workflow orchestrates
+  - name: Agent-Orchestrated
+    lead: An agent chooses the next step, so its plans must not become its permissions.
+    figure: 5
+    caption: Level 3, where an agent orchestrates but can’t grant itself access

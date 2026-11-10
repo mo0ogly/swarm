@@ -1,0 +1,918 @@
+{
+  "status": "PASS_TARGETED_PRIVATE_HUMAN_ISSUER_GLOBAL_ADMISSION_OPEN",
+  "project_complete": false,
+  "normal_issuer_pass_count": 47,
+  "race_issuer_pass_count": 47,
+  "ordinary_batch": {
+    "pass": 278,
+    "fail": 1,
+    "skip": 0
+  },
+  "timing_retry": {
+    "pass": 1,
+    "fail": 0,
+    "skip": 0
+  },
+  "timing_under_load": "OPEN",
+  "original_race_group": "TIMEOUT_INCOMPLETE_19_PASSED",
+  "input_view": {
+    "overlay": "/tmp/swarm-identity-issuer-embed-hdn1ucjp/overlay.json",
+    "directory": "/tmp/swarm-identity-issuer-embed-hdn1ucjp",
+    "scope": "compiler-only snapshot of current embedded web assets; primary Go sources remain in shared checkout",
+    "web_count": 136,
+    "web_sha256": {
+      "web/access.css": "d500fb61f7c0ebdfd4c0de80e44596f2ac2725a79d8996667500e3f426bed345",
+      "web/access.html": "92fe04fcb0bc35f209afda22049e569649a0e874f1e921b1d2c9fbe409ce8497",
+      "web/access.js": "85d1d5f226245683f71b338dea4456e2d1eb3f4e81b6a14796dc9f552422e5d5",
+      "web/action-skills.js": "edd42afe88b61675cd82e6d66b10d8e34e936d10c5132b7b233cc12434220d05",
+      "web/activity.js": "9e434fc3959bea5f7022ef537623046473de3d84d224e5ed11d28e9071bcc1e3",
+      "web/admin.js": "c148b619d43d42176af0c6dc10c4723cbd88bb27dac103490664fafd32570dab",
+      "web/agent-terminal.css": "edcb26f0efedd2f62bb248d91cd2919b1267d5cabb9b229ed12208dd54e1b675",
+      "web/agent-terminal.js": "49f92c5c40544f7322c1d52eb047efd98449c70764c59e6ed79795100ae56ab0",
+      "web/ai-connections.js": "623d9cf675c4e612da024da2414b71fa4b4c402170379c2df736080b84492a9b",
+      "web/assistant.css": "73709dcbaa463dd40870a13eb1f9981f757b9e5c4a21f0bf579139ae1fed7e1d",
+      "web/assistant.js": "61ef14fde20d12396b46d20970ccd0979220703d40494905bde814b0bf19b890",
+      "web/automation.js": "2778f1430e557b25c0d822fa2b5616caf0319605015984e88322e8cf5ab12eb3",
+      "web/brainstorm.js": "f9737b8998d3a11b379962cb3b7cc0bdfd65fb573f61d4a710118b5b4cf6a364",
+      "web/cockpit-help.js": "f4c40581fc459692b93e7b094cfa4b138764d8ee1b9df4da03e78bf1fbaffc44",
+      "web/cockpit-ux.css": "2ab9b765a5d58e2fba1f58c7b3ae9413fbda4f8c8ddbd168d29472fb8deaada6",
+      "web/cockpit.css": "4ea7507c1277c63d3b0269c7cd8f9e6cbfef6532147ff8bc83b24da8b67c9a11",
+      "web/cockpit.js": "f9b0d4d22ac70a24a62b9af99e20c2017d0b999a10d3292a4c063b2e51ad4ae4",
+      "web/conduite.css": "83aed086ddffd9f092b8ca57d954a62ebaa60177ea207bf2080960988fe1a470",
+      "web/conduite.js": "735b206a1c783f22b54a3f07ed62b812e6f9d75d4d582436cfa58801aeaf0bb0",
+      "web/context-help.css": "40bd809dfacabe587e40179381a926ef05b95c35a18cd4e1c320f3fe5d4797b7",
+      "web/context-help.js": "825775b1e20f179ff52f3eb8465770af9dd3a459ea0d5d4840b5ba4e4d5938b1",
+      "web/evidence-contract.js": "30f755cb7386db088a5fcbec9c755f55baa57266992063b011f3204b0f01d9d7",
+      "web/favicon.svg": "65d5fef89446810d6fcf64cb61d9a57e6985fa2399da93fd9761b392f85b2186",
+      "web/graph-draft.js": "2ce47b4300806202f98d8f2103fcb16a76bb058886b0fb84115c1270393f4478",
+      "web/graph-studio.js": "3a1b28646df002e443b5e9c1e081772e2eb684638c76b1704ca54981d2ac843f",
+      "web/graph.css": "6fd7640121fe1cf9b14a5fc00eef4ac08dc124aba500e8e7a13e38fe217f4074",
+      "web/graph.js": "92c760ac2d4417110852bf090a59aa2353f10af2beb00926842e927e70b28d28",
+      "web/i18n-en.js": "2f8a9bfbe9f59ff01e6b84eb70a2115a7887502aa78e1b2163c49a651e930a02",
+      "web/i18n.js": "7bd0842eead0ceba3bbcaee7ac28a7b92c4c5086cdf169255da8db8ca3e7646e",
+      "web/index.html": "cfd2e863b6fb8cec62c1c86ec60027bc299bc1efe70b7c11eac020f07623b8d9",
+      "web/instruction-revisions.js": "afa5c9e894b1b9aaf63c4ed1347cca44a5a3589bc45db3205cf03fd669fd3893",
+      "web/journal-console.js": "aa532ecbfcf0c911767775e09851814e7a322657a5b3a8ff449d66204e2ba4e8",
+      "web/lib/dagre.LICENSE.txt": "6a349742a6cb219d5a2fc8d0844f6d89a6efc62e20c664450d884fc7ff2d6015",
+      "web/lib/dagre.min.js": "62eb9787ccfdbdf4148d4d99d31dbf9ee4770eafee81e637d759b52aac22cd51",
+      "web/lib/monaco/LICENSE.txt": "33e4ff1a06ef62ba21788ea162564ee8165269a24a9ce6ef301837447eab0ac6",
+      "web/lib/monaco/ThirdPartyNotices.txt": "790537262fc78a764e121e6b92b959bcd3f5c310b47d9d9b9e92e17fe0af5336",
+      "web/lib/monaco/chunk-6NYP3BCE.js": "84e78159c030cbc9c51f95bb620cf51b52ae9558d8e046ddb287203c82c67b4f",
+      "web/lib/monaco/chunk-LB5NC5KB.js": "daf521c85198597ce0285b2194950a3225a4e2f49e5463e4ca5119257cf7cc57",
+      "web/lib/monaco/chunk-RFRKVIMS.js": "c688a46370194b0e72e1388509b723b67aa7bae86a40ee3f58531317ee20b8ff",
+      "web/lib/monaco/chunk-SYF7BLLQ.js": "96807eefdc1d703037f2c7cf63c12a7cf9aa1bd6a97b06074ea45e3e71cae7f7",
+      "web/lib/monaco/codicon-KP4OV2OO.ttf": "cc2472e239e17062e7760af87f8f5997720cc0d94aa014a615c418baaf6333a8",
+      "web/lib/monaco/editor.css": "226731d9f973e1622b706415beebf19f2ca71479394f77c1f1e0331108c648f2",
+      "web/lib/monaco/editor.js": "384632ad369e562ee2255919cae155a1e5c09aa73f9819c7534a6ee2d91c7048",
+      "web/lib/monaco/json-worker.js": "e2090fd9d61977080c3e9dfc91bbabf7d6995feaba4852659a04d2e1be097ec7",
+      "web/lib/monaco/jsonMode-FCANVPFQ.js": "7a6f98cc901b1413f9ce13a45f1e18a7feccdb5ef2754ac3be4b7f0e10a52014",
+      "web/lib/monaco/jsonMode-K4MMNWJG.css": "432340b511f46df6ea8bb4eecd3a0f7237fcc63924f372532736c968ce66bb93",
+      "web/lib/monaco/markdown-MIPYNTKF.js": "f92c7cefa19805b7532c451088e5b0d2df70fe2213effe8987b92cad571ca405",
+      "web/lib/monaco/worker.js": "06e3c5df04b487eb6a0f85585b97858a061eef3d7efb82920559daa413cc1fed",
+      "web/lib/preparation-security.js": "e8253734306f316f47d6f6ce1a326340c5f0d8a10ee8ea308438518347df52ab",
+      "web/lib/terminal/LICENSE-fit.txt": "e256f01188af527e4d06d21d06fbf785ae9c50d4b328bf03cbe0ba7f0aa4228f",
+      "web/lib/terminal/LICENSE-xterm.txt": "b569f629d00f2626a8100df2a1798210535621e42164dfd426a6fe5aac7b0ccd",
+      "web/lib/terminal/terminal.js": "de51876e8ba728520c6e56742a0ace9761bbfd62fab7626530a5ea05704e06ce",
+      "web/lib/terminal/terminal.js.LEGAL.txt": "ec15111a7d7c12bbf81a44dd9c43d7b7bda3ebe93ae163e890afc33eb5e031ce",
+      "web/lib/terminal/xterm.css": "ef04f40aaa45ba4cf2ed4887791cc932a4e1571cd128f498aa2a0947780efa1c",
+      "web/lifecycle-manager.js": "a4b3f64e0b3b97beaf12f1d352acabc4d3ffc6e013bfc60eee26c3c6710d25f0",
+      "web/log-console.css": "0508c806f17af18bb7526ad438911b244c6b42585b3c7c4c3a8c072116f93ffe",
+      "web/log-console.html": "10e2739932667b79c361c91392888f7b22edd91567b78d5bd9d73cb576fd3685",
+      "web/log-console.js": "bbc2db46ce9d4735658c724e058a10774a509309461f8471cf49e17c80212c3f",
+      "web/mission-help.js": "fa4f93bfc82443c31255cdd904cbb131bd86938b7bfc8515f1711e27bf2f964d",
+      "web/mission-insights.js": "946621def0e8ae088eaf6c28986b68dbacbec72f97668a8e902c005d9c7fed49",
+      "web/mission.css": "5a5dd39a1e96c0909ec175be72a42ab285d27ccab7846dcd5d4ddf9bb3262e42",
+      "web/mission.js": "7dc576612eb5e023178ad6215b45316e5b41745abf08cfcd79d75ac06e707413",
+      "web/pilot-actions.js": "55bf5c3a85db92ded11d6f675cf6f7066099ae7d65fb8c642ba9bdbf9a7f5fd0",
+      "web/pilot-batch.js": "f01a674ae04f2187e7b969c4ce4476b4f3f0097f0aa3cdf1bb268ce33ba34b91",
+      "web/pilot-graph.js": "864e3e7eb5544397ce76ead566d17943b5aeb972a26b57d8dfa91220a1845ae8",
+      "web/pilot-inspector.js": "549090914dd16ee62dc5fe0985c5dbf55488094f4950850fa09b73ca4edd600f",
+      "web/pilotage.css": "71dedb20ce6517e612e73d326b5843888ab9e4ef3fe341e2272aba743882a569",
+      "web/pilotage.js": "fedc96ce1f5784ca0c62ee2d71248b923d5e33e8e0001c7797cfc62859ca9e3e",
+      "web/plan.css": "1d1739cbee215a97ece6dcf0cd6ef5839f571f9ef8eba94284426ee4d34c27a3",
+      "web/plan.js": "3f2a6873a5ec58b1cf2d0e6d86cd098c5bbff1daa735f701766694db297bbb06",
+      "web/planning.js": "9588279d684a9f653381e20b3baa9405e7b13558216936ce18e8d103b3782aad",
+      "web/post-delivery.js": "4ff6020b760e9db17d2d02f6d605d888c13f841d1264d7412abb84158fde0688",
+      "web/preparation-timeout-admin.css": "f6cc26ce6c4583dc3314f09a509055b441762b665d3b9b28f00d9f68de442083",
+      "web/preparation-timeout-admin.js": "b9b8c0a4f0d428844ebdb7e8d17eea4d63d63e1af36739584c188be0d7ee2f33",
+      "web/preparation-work-graph.js": "1031d4a2f0f6037b13765c9559e859c894443af6dd6a7aab6d3bcb2af8cffc50",
+      "web/preparation-work-model.css": "41400774fcbf409acbcb4d0515ab5e749e4b3bc118aa45a4a1fa32d48534de48",
+      "web/prepare.html": "7e3d0603a3600de6252a289af41bc69131c13151888aedfbda756bdfea0cb6f2",
+      "web/prephase-conversion.js": "c009b494ffb4d1e594e54cddade342a10068d20e0cb2d87c41079fa22ac801e6",
+      "web/prephase-decisions.js": "a37568c23257f950096e4a1527716329b6c38a3093925bf4a30967f0b2946341",
+      "web/prephase-dialogue.js": "a11ba6273a2b8d8aecc43f3f68c8f16f825145e1f8ac3467c92ce4af8cc0425c",
+      "web/prephase-editor.js": "b6378db5f10427040ddcebf9f330399f3301a0f8dd78ea6c21aa8415e9bfc905",
+      "web/prephase-missions.js": "6ad4599ca898a8cc6d52a300f7504229f3804f96927226aa88d94021466b33e9",
+      "web/prephase-resources.js": "06a9a7a59ce4a30f986651d29c69c7a8a21fcd8d96b7c97e9cd32a2e6b3ba5bc",
+      "web/prephase-templates.js": "5b32152c97f5f35d248cc33b5913bacc014389cdaf7ec7d6d61c4ce386e025d2",
+      "web/prephase.css": "c8e01abf61de43935a2ca414f0fc3061bcf2c0fd5012a15e1b1744f7fb64b990",
+      "web/prephase.js": "73c973a45226dfab8cd93f8e238939db0068d9f832b5d070ee5dcea0f0c905a9",
+      "web/pricing.js": "8e8550d099ed05c3eb5e5f6e0e93612e89733f4eb6b53384a65a537a9a689467",
+      "web/processes.css": "421af5ca9b957b1004573bb3ff4d7f9ab958767e8e072ff518828bcac35d21e5",
+      "web/processes.html": "5f5de4b669b7c2020e4fdb6d51f993164c72182525265d6cc543fc706d30ee42",
+      "web/processes.js": "6fe51c7f3d96eaf9ca07b18f215c896f67d4f3a0cdab58556829c298049c80ae",
+      "web/product-graph.js": "567580e1549902e29c7ae77e6d970baa06722482e8d53cb8ff2a84c039ad86e0",
+      "web/product-views.css": "132665d8159c06db6528054186ddd80064510704e5cb9a2719f347a9296e3c06",
+      "web/product-views.js": "71a80c63f0538ea43315d4ecb0b32c827ecd508981cc61febd29d710b8162615",
+      "web/project-memory.css": "32404c65ddd6075386cb9ab1a72a30865d7ef2b69f667ad70616258045e04fdd",
+      "web/project-memory.html": "26bc72ba4551db35d89ecfe4e617f2fb7063763d2e59e8f68435be357e3a217a",
+      "web/project-memory.js": "644c51f5cef3b18118c004446925c2de4814177c245d315ad47a7ceb31fe2b18",
+      "web/project-profile-settings.css": "45ed746be25550010d8b6ed4123183385c54720c76de1f3d434c2e0132fd1660",
+      "web/project-profile-settings.js": "678c5f95bc9207dff2fe4f045a74bec872b670499b58b7fbeebe322d42b184a7",
+      "web/project-profile.js": "b372bd35fd2094d1ed4859d10c38afc108fce741d5ad923159e0daf9ec745bbb",
+      "web/projects.css": "af40ed42aa967494e6fe4883ef92418e0c6f5c31c209ccb24e2bbccbfbf38846",
+      "web/projects.html": "2ca1e58a4e14ddda65fa101c8c289bb71444f8a5a64889b7863c46e74b5ff1c2",
+      "web/projects.js": "187a33e827e7ad929038a31ca0d0af6200154b91ba99afb66a876bf86c57a944",
+      "web/provider-wait-admin.js": "fe82dd53e6859bee899ff8a1eab8468b04be5ea5ff6e499d786170cce317a663",
+      "web/providers.css": "eaeb7dc5bc745b962d42ea98000cad9c611acbd1c4939602961ea84a3036b04a",
+      "web/providers.js": "ff6c117423822cc67d63273fb88f02cf46833ffa96ea8027fff78e6ba083903a",
+      "web/quotas.js": "cc22a36005156776b62310f941a40d8956205c5260391c6471d506b39e44ccfa",
+      "web/report-summary.js": "9037124fd4b683494a44df8a95653a480fbbaba5d7f392af250f9a2ccedc691f",
+      "web/retex.js": "83b32fd27c6ddc7c892f7f2707ce5349a3714b49aa77604ba0eef843907199f3",
+      "web/role-models.js": "f99a1254dc62fcfc309e12cb68bc1fe228e095b2713b7de6569e60e1c577d2ec",
+      "web/runtime-health.js": "8b356f3bc111c5a1be99a420e1e770fdebc5acb56012783194718f4960c212fc",
+      "web/session-console.js": "645ef292c1bf7bd122febeb5dbae04d045e8d281979bab44505c09793dfdf8bc",
+      "web/signals.css": "69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a",
+      "web/signals.js": "38fa9e333b2b874d165f33436823ce6bb6dc4fe37e04a80637239d961c39cb99",
+      "web/status-contract.js": "f9ba0690f8dace61990ddab69c40daf5194d539615b9cc4ccd6aa2c383a88012",
+      "web/swarm-design.css": "9a15b7bfa9163f32c8542d50e0ad62c8acb346a4e2e61a7a8f110c831c9740d3",
+      "web/swarm-logo.png": "d8ad9094dd879b42f213cea10c471696af378679c0634a044b7fe312de7ae9bb",
+      "web/swarm-shell.js": "21e025f6f4b08c103da54c0a4d9013fbf0a172cbd9a7ce3cc03743c0ec4a68a1",
+      "web/task-models.js": "7af3c5745d8b066549629d4993c0e24b948fbbb185d7153b440a272e2f7ebdca",
+      "web/terminal.html": "2b82c603ea5342c55693e8189c969e85f87f1dd8975d6714fd79df7305a72748",
+      "web/trust-actions-en.js": "74da2a1650960701fa0856e44d61313eecb7df7315d1b5a5c33fb9d4e7f3b8a5",
+      "web/trust-actions.css": "76c346b4b5d2b52fec941fc9da8ed2400e1e725ef17770d831a9d3f54514a0c1",
+      "web/trust-actions.html": "4bdde01cc1f1062e16e703d6e84f2516a07725e37017bb5c191855d9f9c6d1fa",
+      "web/trust-actions.js": "5e09ff21549302a98a7d0e4c93d1c7ad015a1118d609983dc0cd8d682aac265d",
+      "web/trust-connectors.js": "67398800f63c2607445e966eb4836edf7e5b59f06ee902476ff9f9468250e1dc",
+      "web/trust-controls.js": "976d30e02f4198f5a5c1f71fc0d0960355f838b30f9fcca81b9de376e41a6479",
+      "web/trust-controls.json": "8485dfce968e9ca73cc9f6192f6ab8c472421f93093da7e4f7133c141f5389d1",
+      "web/trust-evidence.js": "5c97519bc562639fdafb5c336c6da49a0abf4f675e423e421a2bdc7ea6f00073",
+      "web/trust-kernel.js": "79fedcfa4cf7a6fead5ebfbf89d94e60e33e1a914de68a51c4e5df5a156d0045",
+      "web/trust-laboratory.js": "d9e1671e4679d7cb5d4fcd3d76a77f7ca209610bc644075b3d4a2a85fcc6b77c",
+      "web/trust-observe.js": "6d4f944c09af3661d0bd5287d29840a35117e8dfabc4f94231f110a2d1267d50",
+      "web/trust-oidc-callback.html": "5100eaf4951d02f6b97f4dc8a3f7bd479a505020947799c4ff126bc5c770921c",
+      "web/trust-oidc-callback.js": "e06812a409b04c8853339221ab959c06facd086ad0eb39f2208fd65bf0ce18c8",
+      "web/trust-secrets.js": "132532e28f08bca6099e029bb992e9f403aaa37f67cc8395d34bc8476b0e5fbd",
+      "web/wattson_themes.css": "0055edad2bcfa30d65b63eee8c522cd53d6953353f0a98f34024c364a08f0a59",
+      "web/web-requests-admin.js": "fba07b14e52e21cb5b011bc80708310571aaec257a527a422a13f023e37459e1",
+      "web/web-requests.js": "03dedcfd1b05078d607670c27ca682fb967fc7532d58dd7a5ed040d95d85f5c2"
+    },
+    "original_resource_sha256": "b5c75f94ab0176cb200e4717e9a818178b72111a48c7dadb7602ceb18416af13",
+    "virtual_resource_sha256": "ce7e6f95c4971ab4499797d1bdcd88289bdcad3a8636784b2ab09e826442a83c",
+    "equivalence": "same explicit embed file set at capture; only web/* expanded to that list",
+    "workspace_files_modified": []
+  },
+  "input_count": 1060,
+  "source_inputs_unchanged": true,
+  "links": [
+    {
+      "source": "AGENTS.md",
+      "href": ".claude/skills/swarm-model-design/SKILL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/AGENT-METHODS.md",
+      "href": "en/AGENT-METHODS.md",
+      "exists": true
+    },
+    {
+      "source": "docs/AGENT-METHODS.md",
+      "href": "../GUIDE-UTILISATEUR.md",
+      "exists": true
+    },
+    {
+      "source": "docs/AGENT-METHODS.md",
+      "href": "../README.md",
+      "exists": true
+    },
+    {
+      "source": "docs/AGENT-METHODS.md",
+      "href": "PRODUCT-WORKFLOW.md",
+      "exists": true
+    },
+    {
+      "source": "docs/AGENT-METHODS.md",
+      "href": "AGENT-COMMUNICATION.md",
+      "exists": true
+    },
+    {
+      "source": "docs/AGENT-METHODS.md",
+      "href": "../tools/agent-workflows/CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/AGENT-METHODS.md",
+      "href": "ENGINE-ACCEPTANCE.md",
+      "exists": true
+    },
+    {
+      "source": "docs/AGENT-METHODS.md",
+      "href": "plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-METHODS.md",
+      "href": "../AGENT-METHODS.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-METHODS.md",
+      "href": "USER-GUIDE.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-METHODS.md",
+      "href": "../../README.en.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-METHODS.md",
+      "href": "PRODUCT-WORKFLOW.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-METHODS.md",
+      "href": "AGENT-COMMUNICATION.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-METHODS.md",
+      "href": "../../tools/agent-workflows/CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-METHODS.md",
+      "href": "ENGINE-ACCEPTANCE.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-METHODS.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../en/AGENT-IDENTITY-CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md",
+      "exists": true
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md",
+      "exists": true
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../architecture/AGENT-IDENTITY-CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "href": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "verification-identites-agents-20261016/RAPPORT-IA1.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "../../architecture/AGENT-IDENTITY-CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "../deepagents-integration/INCREMENT-MEMOIRE-16.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "verification-identites-agents-20261016/COUVERTURE-RISQUES.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "identites-agents-contrat-IA2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "../../architecture/AGENT-IDENTITY-CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "../../publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "verification-identites-agents-20261016/ia2-runtime-binding-20261017/checks-documentation-final.json",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-replan.md",
+      "href": "verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "identites-agents-replan.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "verification-identites-agents-20261016/RAPPORT-IA1.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "verification-identites-agents-20261016/COUVERTURE-RISQUES.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "../../architecture/AGENT-IDENTITY-CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "href": "verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "fiches-lecture.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "figures/identites-mediation.mmd",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "figures/identites-mediation.svg",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "figures/identites-filiation.svg",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "figures/identites-amelioration.svg",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/COUVERTURE-RISQUES.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/identites-agents-contrat-IA2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../architecture/AGENT-IDENTITY-CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-isolation-initial/results.json",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/identites-agents-replan.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../dossier-recherche/revisions/evidence/20261016-identites-cycle-vie/verification.json",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/checks-documentation-final.json",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "href": "../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "href": "article-scientifique/fiches-lecture.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "href": "dossier-recherche/02-etat-art.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "href": "dossier-recherche/07-moniteur.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "href": "dossier-recherche/revisions/20261010-vivacite-supervision.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "href": "dossier-recherche/revisions/20261010-refus-contexte-revue.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "href": "article-scientifique/identites-autorite-cycle-vie.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "href": "../../plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md",
+      "exists": true
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/programme-recherche.md",
+      "href": "../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "href": "../../../../architecture/AGENT-IDENTITY-CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "href": "../../../../en/AGENT-IDENTITY-CONTRACT.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "href": "../../identites-agents-contrat-IA2.md",
+      "exists": true
+    },
+    {
+      "source": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md",
+      "href": "../../identites-agents-replan.md",
+      "exists": true
+    }
+  ],
+  "diagrams_inspected": 2,
+  "method_pack_pass": "OK: 12 shared Claude/Codex skills, preparation commands, contract and engine-built role contexts",
+  "global_preference_sha256": "9aabdeec74905b382aaca635429cc7bbfeebd7fc94f16c6a341a5cbb1e612634",
+  "git_head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "created_at": "2026-10-17T08:45:56.068972+00:00",
+  "artifacts_sha256": {
+    "AGENTS.md": "8101298729b533a9d91baf60467d9be43f437269a7072441147b48f23843b8d9",
+    "tools/agent-workflows/CONTRACT.md": "d56566d6e767537e29e23472e3bd7e25f3c322f4a4929a39280a621792c429de",
+    "docs/AGENT-METHODS.md": "f08dcc256e283b7f27a9cec74d12f9d116e6654cf33d6219bc57ef7bfd511bc6",
+    "docs/en/AGENT-METHODS.md": "84c69b782e9a0fed2277ea3d38e92c9934e9cf3af45a2fbd85d6fe7d24c00bad",
+    "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "70f65346030af9872f51f78c2b8d42bc2cf0b5515f961bdd4db3727fffec0aad",
+    "docs/en/AGENT-IDENTITY-CONTRACT.md": "de3fbb9ec690ce4fd3a3fd3cea12f10a2b1fa99097bdfc6a436160455398ee3f",
+    "docs/plans/actions-confiance/identites-agents-replan.md": "11bcd012c7611cfa0f9da6be3f1a685e882b4479d9041a6cd4b84d163a6308a4",
+    "docs/plans/actions-confiance/identites-agents-contrat-IA2.md": "67e2c1d8cc4716bd138cfec67f9c4307ef2e848c059582fdd80f66a813bcf36a",
+    "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md": "cb61603f8ef4223fc0a2f8f6f08956fa8b5fab53f50398aa824ed5c4735c67d5",
+    "docs/publications/20261005-cursor-moteur/programme-recherche.md": "28562bc7bad19fa497b5589c417a37ddf25b5e32913bc909e469fd765b5efc7b",
+    "/home/fpizzi/.codex/AGENTS.md": "9aabdeec74905b382aaca635429cc7bbfeebd7fc94f16c6a341a5cbb1e612634",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-vet-final-run.json": "dd5eb040678e11556973fcbf0583b53c813ab40dda8514976b43d6a074d23c87",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack-condensation-insufficient.stderr": "ded8210b74de38fcb09ddd3708744f0ac2020a86561034df5f3620063a88ea00",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-before-run.json": "3c869b7927395fa956ca43530736eafba8703c6b897c5452b4f02cc8c8067264",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/lookup-before.jsonl": "d5cf0dedf89eca86438ca537a5886a7e2b6097e99655543e9286c771ad3cb373",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack.stderr": "1eeec2a444a1146270ed4c45d5ea171c78577ad0a36ed19ff517bad2240b8432",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-race-build-inputs.json": "c27cdfaf2d74dc190543fefaf27756c9bfdc88094cd6909910f83b22f83d04b9",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/lookup-after-inputs.json": "03a6ea669476905a013c36df75efa8fe8d5b1a2794a4248d30f5eca425b08e05",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/run_checks.py": "f9eff57d805b22d1b504fa9d847358ba818c6b141cf457cecd41b0054b5e40f4",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-normal-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/vet-before-lookup-fix-run.json": "798576f6308e40d80632c31cc76eb1fdd836f21d8713f8c49d64be7027362201",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/tests-before-lookup-fix-inputs.json": "0325a5b8d1454e5ef53e6ee6a7992f8ce335e2f9902b2830bed8315b0d881804",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/race-final-inputs.json": "03a6ea669476905a013c36df75efa8fe8d5b1a2794a4248d30f5eca425b08e05",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-binaries.json": "d6b98b2b0166a025ad4e3993abac95bce03ccfc29c4b9b400e99554f6b2b3723",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-race-final-run.json": "ea402fcde93136e01c8642c5811519caa919cf4fb41f45e5a2c005b71c6eaa06",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-before-inputs.json": "33e826ddebfe9945ff7a6c46cf80fa9ad0f721c854d496303e19c0cfac75c2e8",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/existing-code-phase.diff": "1d32c8e5c2aa6cc702a6cef75929794436d281a21e8cfea2a2ec2215c5157e2d",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/build-final.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-en.mmd": "87006e0f2e09f6369aa82fcd217cf2e26fd538414f2bc1ceef53f0477391dc1a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/build-before-lookup-fix-inputs.json": "0325a5b8d1454e5ef53e6ee6a7992f8ce335e2f9902b2830bed8315b0d881804",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/race-final-run.json": "3f7dcce5f573ff5b8eb13abab7b3ddebc9c3da44fb9a5f51645c0d88d15df913",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-vet-final-inputs.json": "c27cdfaf2d74dc190543fefaf27756c9bfdc88094cd6909910f83b22f83d04b9",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-normal-final-run.json": "ecde62aa1f14297ac56abc6ef6e0c3b91bc345f735507c235bf7f9609b5e28d1",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/build-before-lookup-fix-run.json": "9d5818a2b6e0a08d88239bddd864a6df682a463251baa3577527cace2a82480b",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/tests-before-lookup-fix.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/lookup-after-run.json": "dcae4db5864e8740749c6a981b23b26a51c67c956477dfdd116bc06b18f7588a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-after.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/build-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/binary-final.json": "a51b7c601a214c751b27398dd599e098ca40b449c245c9559196e5a72db8d1f5",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-candidate-275.json": "80ef691d166b8abc0a8381b72ec0b17da70c8ecf66df183a5bc790526393fe92",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/run_race_groups.py": "2afdf56c7fd4a8b78d14413fd657d5b92716523cd209411b9d238ca94f34a0a6",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/tests-final.jsonl": "9b83d4f26d08c1b5ea3eb0b70f88f926b52edf2ae342fe62bafccaa7d6ac137e",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/tests-before-lookup-fix.jsonl": "fb9e315eb7eedb3b9c84e1ef5e67aed3556e8761a3e304d83d9e83627f5b812a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/preservation.json": "e6437c09f658f134bd2e558f7a2a83bad6ca2438385e20f4d1f6f652a511d5ac",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/vet-before-lookup-fix.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-race-build.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-vet-final.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/diagrams.json": "ee4fb22da97caaa102b844818a4bf69f4e52849d863c42d0c91523bc933bc13d",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final.json": "09eb7cdf6caa904176f8de8980c725078005db49024932ebf80d20dd9f884e71",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/race-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-normal-build-run.json": "d33dccb59e3c6a469c3402e1846fd7bb74ad01d437790d7adac14fac88db6795",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/race-before-lookup-fix.jsonl": "8f349ec42540041b92a96e59a6b616caa939a720e17aac96bf6a6b96f1a87752",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/lookup-before-inputs.json": "b825b8849832d637ab6c18a7fe93d601e22af55452744bc77d2ad2397b18a585",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/lookup-after.jsonl": "37554e5cdc7ff72dcbe61c1a4b8e0fab5664c34135dc2b2b4101fb2c5846147c",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-race-final-inputs.json": "c27cdfaf2d74dc190543fefaf27756c9bfdc88094cd6909910f83b22f83d04b9",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/lookup-after.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack-condensation-2.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/timing-isolated-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-normal-build-inputs.json": "c27cdfaf2d74dc190543fefaf27756c9bfdc88094cd6909910f83b22f83d04b9",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/baseline.json": "540bf8b078a1c0fbe9c0f86d90d1c2a7bd54b94c59f956be9a810f84296bff5e",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/build-before-lookup-fix.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack-condensation-2.stderr": "b3295398577805488dc4b1e4d991fce9c3e58f9c27fc810127ef7a60a073bfcf",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-en.svg": "280f200b476d2f3aab9e97527566317c107420ed041a92ec6658d239b81757a0",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/vet-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/contract-before-framing-fix.md.txt": "76150496f036ee842a4b4e3ff854ebb530a9f9586eb9b9a075509047f3f24dc7",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-race-build.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/timing-isolated-final-inputs.json": "ff57f2407dc25ea026bd190574eed211058b25dcd54059091e30a29fc09055ff",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-before.jsonl": "bde1f897d9b262e9be4b844a951669b626745684380d227a1287d699b84ea101",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-en.png": "7a1528ef09049aab22070e6451092a7f6da14859be7a2dadc2c215f5597d2d8e",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack-unchanged-retry.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-after.jsonl": "52cb8fd276e826a5d33d87d56d1af34e872542a3d8dd2e1dc114a117041c1056",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-normal-final-inputs.json": "c27cdfaf2d74dc190543fefaf27756c9bfdc88094cd6909910f83b22f83d04b9",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/vet-final-inputs.json": "03a6ea669476905a013c36df75efa8fe8d5b1a2794a4248d30f5eca425b08e05",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/build-final-run.json": "61d6d54d6f6ee6ecd6dc8298a959b039d015b6851e7e094d5c31079f0956e95a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/tests-before-lookup-fix-run.json": "fb73dee33b1a0ca9d8962265cd40bdba43a49d2bdc10b5fa8456cb0360159901",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/finalize.py": "5f079aaa98be4a8c904b9568c1fd844dea62ce3b85f3d3a76eef9aff3a467278",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/lookup-before-run.json": "47d6f9cb0d14d3948239066d7f0efba232da3e34ca5636c60e3fd9d9609a6342",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/timing-isolated-final-run.json": "ac3b804f1e1f4d69998d0cf1da1dc7fc4e451e8d242c340c3707d2ecb749600f",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/race-before-lookup-fix-run.json": "5f19aaa950384f4ac3d3bd2b8ffce2d8d838650a06570b464da7e1f02c041d34",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/lookup-before.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/timing-isolated-final.jsonl": "f2ba0b02708ca1f1be1f2ff4531e07ee004f4864a2516b2ba156e97f56367b37",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-normal-final.jsonl": "d233183e9f9f21716aff6128da0fe2baf34ade76008cd9e56763a6fb075249cf",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/contract-condensation-insufficient.md.txt": "405ef291a7802966ba3c5651987688b54b9418ebc1415f5ca96045e67649477b",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/tests-final-inputs.json": "03a6ea669476905a013c36df75efa8fe8d5b1a2794a4248d30f5eca425b08e05",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/vet-before-lookup-fix-inputs.json": "0325a5b8d1454e5ef53e6ee6a7992f8ce335e2f9902b2830bed8315b0d881804",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/vet-final-run.json": "e88306e9ab1c4e2c2483dc2bdff5ac28430e5bbf839ee2bfa120dde27970118f",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/vet-final.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-after-inputs.json": "8787482b5e29dde4078b6c6c4d25c30cec91f580b327dea369c8e29d21ce484f",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen_checks.py": "4ad5f5b2972ba7396b6594c31b9c99ce3163962e5c8ab651fba9c3159c5d2940",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/git-status-before.txt": "740891323abec7a99bb366f003fed7ee983f9d61b94d84541fda23becf5cec7e",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/race-before-lookup-fix.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-race-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/vet-before-lookup-fix.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/retained-web-view.json": "27d38f603a7553aa66af91d25cf7e1ca17d3ba0d4e9733a51af8e30721ae0823",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/framing-diagnosis.json": "16cfbd04c94185a2538833b592fd1f6aeaf3a46c83131b022536002b9facb631",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-after-run.json": "0892c6c83c7884d269116ce3e9c121dc39129c6f3c3979d974a88c6b623158b6",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-normal-build.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack-unchanged-retry.stderr": "4fd7348f9d7dbc566195956d3be53ce996a46674dc52bf5581bc4e8c1a4003c1",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/race-before-lookup-fix-inputs.json": "0325a5b8d1454e5ef53e6ee6a7992f8ce335e2f9902b2830bed8315b0d881804",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-fr.png": "5146754bf1fe727076f4595d33dee90a3381f8e1764ba150bff566a48baaa0b6",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/build-before-lookup-fix.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-embed-view.json": "8228d796cbd5c1e6750755303cc37d35f64c250190f13b70bbfa4105831bb8f2",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/selection.json": "fc6f7f4831266d868a2d2ad2f084d4bdeeebc632151b3000ccf70a8776330c92",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/race-final.jsonl": "2fd6e1a3b1a5bdd7522a3534f779df659eba1ce915c228e35dc8393978c848cb",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md": "5e6beba993d4bd5587a36fd0169f5ca72e6548fd1de29edf2c8cce9815a22f4c",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack-condensation-insufficient.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-normal-build.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/build-final-inputs.json": "03a6ea669476905a013c36df75efa8fe8d5b1a2794a4248d30f5eca425b08e05",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-before.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-fr.mmd": "f6340ea416008d6495a206b2c8b8562f379c1f35e99fd4d5ea6c49b37fd1896c",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/tests-final-run.json": "0c1193c027249ec05e075450fd0551e0d227f634eec73e1a05e2efde4135cfd6",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-race-final.jsonl": "683b09112d804dcfc877a5c3f63f6c7c6a72cd1f090b430ad7adeb08ccc2daae",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/resources-virtual.go.txt": "ce7e6f95c4971ab4499797d1bdcd88289bdcad3a8636784b2ab09e826442a83c",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-vet-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-race-build-run.json": "8acd0e3782259a76f428fd3ee12b6065fd6b88c3f1c7598e715a660f4eb26276",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/binary-before-lookup-fix.json": "34f7566a9b513a6f9d0e5dbc2ea4371787bd309059ba028d884bb8a8c858af93",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/preservation-diagnosis.json": "f24ff550fbf0aa9b691f231b2fef7e0a0bf48588895d95e7061d6cd379de247c",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/method-pack-final.stdout": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/tests-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/issuer-fr.svg": "819117aebe8f3053cc13f5744888c2367088df95768cdd9db052a24e337ebbaf",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-candidate-275/internal__engine__agent_identity_issuer_linux.go.txt": "fb97e80daf0fddad8ce3606a78f01e4ef16c6e4c9be8cff54b81a03605008b22",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-candidate-275/internal__engine__agent_identity_issuer_linux_test.go.txt": "82d107858e68155b08368bee0b2125da74bcb4edd752b47b5d719dcf5b1f8a8a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_plan_freshness_linux_test.go.txt": "31f929d94514faa1b7eb50674e0b63a89ffcd59ae825d0e492e7f3dac8669692",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_issuer_linux.go.txt": "7761ac4fe4323a9b32bde176d4b1d6e02ce2a58294a8ea8697d2ed0ae85253d3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_contract_test.go.txt": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_registry_publish.go.txt": "a81f304ec3c42044c6536a2311cee58954151feeecd370024aa7a4a4aea18a65",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_registry_atomic_test.go.txt": "cdc32524318d093ca7da41bf05c5d3706e89ff03665129ca1bdfe77a249691eb",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_contract.go.txt": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_registry_types.go.txt": "20f04785449e42af3e1715c955cb9d7fd1de782c372c669b93030c694d2a153e",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_runtime_linux_test.go.txt": "8ff373547cd9ce2be571b258c44df6cd0ee3d41e499c85500cff609ba5a8bcf0",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_issuer_linux_test.go.txt": "3e42434cd7afa5ad27815e42954d14cdf58ac1efcc8795c3a1c8ab8cfe7df7f5",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_plan_linux.go.txt": "d4c19975145926a24b7e60df731034f92d52474fd7a8aac7baaba8730b916381",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_registry_test.go.txt": "b47f101b511d2cbd020bcb47317f4f1698598874f8f9e1d42230ad501749eb45",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_plan_schema_linux.go.txt": "1e25bd7910c2a5c037caa2eb63248a1ce7045aab2f4531af287d11b39cc1f4b0",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/tools__agent-workflows__CONTRACT.md.txt": "d56566d6e767537e29e23472e3bd7e25f3c322f4a4929a39280a621792c429de",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_authority_test.go.txt": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_registry_schema.go.txt": "62e2e666cecd49740bf07275836f2542529adaa80a9cfa2c027928c2ecf42516",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_registry_store.go.txt": "28b3ea847f75b80945b6167c389397401b1ee7d203dc76d215776f5db27a5bfd",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_authority.go.txt": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_runtime_linux.go.txt": "74ccc6b2c91aecf0c9fe87c818eca43c23e79c14c133dae07574f0232241c2e7",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_channel_linux_test.go.txt": "d4a0eb6debdb63ae5f795a8e58015d66926b09519a23644fdc58d6b998c3dab8",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_plan_linux_test.go.txt": "1cbddc400c18f06913240798b207becc1cbe6c854d2ff014ca8e07f7c1063762",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-final/internal__engine__agent_identity_channel_linux.go.txt": "3528f0eed5ce77171d4e5506c387f50936314b8f24296c566e16c7045f2a91e3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/docs__plans__actions-confiance__identites-agents-contrat-IA2.md.txt": "daab8368ebfea40804021635999b3af0eb43405a728fe655b5c872fa6dda3170",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/internal__engine__agent_identity_registry_publish.go.txt": "7fe0ccf79a7f47f0fab28a896069980990af1c7ea13d6c5d222dc927253419c1",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/internal__engine__agent_identity_registry_types.go.txt": "31e18f0fe132fd499e08dcb61914135a6f396da26675301b2209accd1d540391",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/__home__fpizzi__.codex__AGENTS.md.txt": "ba7084f1a404dd82cd6719e44c5a5d2627094875948480a37abc841ba0f97e31",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/docs__architecture__AGENT-IDENTITY-CONTRACT.md.txt": "7136d0a2cfd24f777aaacb67415b7c9db9a5393993f40da8e529c748281680e7",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/tools__agent-workflows__CONTRACT.md.txt": "864062887b694e005c15ce12c68f4c8fd8a3be05f1a912b1f2c2c0ddb37b6827",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/docs__AGENT-METHODS.md.txt": "58a82902c00a0220c67c3cd1b076deb1e58eea220dca9547582efcb5185be327",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/docs__plans__actions-confiance__identites-agents-replan.md.txt": "52305baa10783d74eed1784a57a179a475e34c2e1d6252440c0dafa95a7468d2",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/docs__en__AGENT-METHODS.md.txt": "7f8c7e3f22aecd50aa7c73a9c39e4a6b8263fdec1239a1b7f47f09b4bddf37f2",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/docs__en__AGENT-IDENTITY-CONTRACT.md.txt": "8afda8b9317fe17174fd09486ff328cb92dba8a3c0c56045792b2ab2542cfbbb",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/internal__engine__trust_actions.go.txt": "0c7df052d315a49fc6785787d41b3954a7b13da82afb7b6346e4177e80c10744",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before/AGENTS.md.txt": "8423908d7dbf58d0357d57bc82e920a7cf468428e661b314d1c5930365368727",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before-publication-fix/internal__engine__agent_identity_issuer_linux.go.txt": "fb97e80daf0fddad8ce3606a78f01e4ef16c6e4c9be8cff54b81a03605008b22",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before-publication-fix/internal__engine__agent_identity_registry_publish.go.txt": "7fe0ccf79a7f47f0fab28a896069980990af1c7ea13d6c5d222dc927253419c1",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before-publication-fix/internal__engine__agent_identity_registry_types.go.txt": "20f04785449e42af3e1715c955cb9d7fd1de782c372c669b93030c694d2a153e",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before-publication-fix/internal__engine__agent_identity_issuer_linux_test.go.txt": "834453c6dd8496c1bf1a0e0aef81a5a2a09baabaa086fc3e2ff841cfd097cfff",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before-lookup-fix/internal__engine__agent_identity_issuer_linux.go.txt": "fb97e80daf0fddad8ce3606a78f01e4ef16c6e4c9be8cff54b81a03605008b22",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before-lookup-fix/internal__engine__agent_identity_issuer_linux_test.go.txt": "4c2e84ab34e611b8f8be973a72eababb91405e487a26b0840d7d34cf26ec5978",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/source-before-fixture-reuse/agent_identity_issuer_linux_test.go.txt": "4c2e84ab34e611b8f8be973a72eababb91405e487a26b0840d7d34cf26ec5978",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-laboratory.js": "d9e1671e4679d7cb5d4fcd3d76a77f7ca209610bc644075b3d4a2a85fcc6b77c",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/status-contract.js": "f9ba0690f8dace61990ddab69c40daf5194d539615b9cc4ccd6aa2c383a88012",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/context-help.js": "825775b1e20f179ff52f3eb8465770af9dd3a459ea0d5d4840b5ba4e4d5938b1",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/pilot-inspector.js": "549090914dd16ee62dc5fe0985c5dbf55488094f4950850fa09b73ca4edd600f",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-connectors.js": "67398800f63c2607445e966eb4836edf7e5b59f06ee902476ff9f9468250e1dc",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/project-memory.js": "644c51f5cef3b18118c004446925c2de4814177c245d315ad47a7ceb31fe2b18",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/web-requests-admin.js": "fba07b14e52e21cb5b011bc80708310571aaec257a527a422a13f023e37459e1",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/post-delivery.js": "4ff6020b760e9db17d2d02f6d605d888c13f841d1264d7412abb84158fde0688",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/cockpit-ux.css": "2ab9b765a5d58e2fba1f58c7b3ae9413fbda4f8c8ddbd168d29472fb8deaada6",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/cockpit.css": "4ea7507c1277c63d3b0269c7cd8f9e6cbfef6532147ff8bc83b24da8b67c9a11",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/agent-terminal.js": "49f92c5c40544f7322c1d52eb047efd98449c70764c59e6ed79795100ae56ab0",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/conduite.js": "735b206a1c783f22b54a3f07ed62b812e6f9d75d4d582436cfa58801aeaf0bb0",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/product-views.css": "132665d8159c06db6528054186ddd80064510704e5cb9a2719f347a9296e3c06",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/quotas.js": "cc22a36005156776b62310f941a40d8956205c5260391c6471d506b39e44ccfa",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/preparation-work-graph.js": "1031d4a2f0f6037b13765c9559e859c894443af6dd6a7aab6d3bcb2af8cffc50",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-oidc-callback.js": "e06812a409b04c8853339221ab959c06facd086ad0eb39f2208fd65bf0ce18c8",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/processes.js": "6fe51c7f3d96eaf9ca07b18f215c896f67d4f3a0cdab58556829c298049c80ae",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/task-models.js": "7af3c5745d8b066549629d4993c0e24b948fbbb185d7153b440a272e2f7ebdca",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/cockpit.js": "f9b0d4d22ac70a24a62b9af99e20c2017d0b999a10d3292a4c063b2e51ad4ae4",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/swarm-logo.png": "d8ad9094dd879b42f213cea10c471696af378679c0634a044b7fe312de7ae9bb",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/product-views.js": "71a80c63f0538ea43315d4ecb0b32c827ecd508981cc61febd29d710b8162615",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/projects.js": "187a33e827e7ad929038a31ca0d0af6200154b91ba99afb66a876bf86c57a944",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/log-console.html": "10e2739932667b79c361c91392888f7b22edd91567b78d5bd9d73cb576fd3685",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/pilotage.js": "fedc96ce1f5784ca0c62ee2d71248b923d5e33e8e0001c7797cfc62859ca9e3e",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prephase.css": "c8e01abf61de43935a2ca414f0fc3061bcf2c0fd5012a15e1b1744f7fb64b990",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/mission-help.js": "fa4f93bfc82443c31255cdd904cbb131bd86938b7bfc8515f1711e27bf2f964d",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/access.css": "d500fb61f7c0ebdfd4c0de80e44596f2ac2725a79d8996667500e3f426bed345",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/project-profile.js": "b372bd35fd2094d1ed4859d10c38afc108fce741d5ad923159e0daf9ec745bbb",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prephase.js": "73c973a45226dfab8cd93f8e238939db0068d9f832b5d070ee5dcea0f0c905a9",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/report-summary.js": "9037124fd4b683494a44df8a95653a480fbbaba5d7f392af250f9a2ccedc691f",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-actions.js": "5e09ff21549302a98a7d0e4c93d1c7ad015a1118d609983dc0cd8d682aac265d",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/activity.js": "9e434fc3959bea5f7022ef537623046473de3d84d224e5ed11d28e9071bcc1e3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/project-memory.html": "26bc72ba4551db35d89ecfe4e617f2fb7063763d2e59e8f68435be357e3a217a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/graph-studio.js": "3a1b28646df002e443b5e9c1e081772e2eb684638c76b1704ca54981d2ac843f",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prepare.html": "7e3d0603a3600de6252a289af41bc69131c13151888aedfbda756bdfea0cb6f2",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/agent-terminal.css": "edcb26f0efedd2f62bb248d91cd2919b1267d5cabb9b229ed12208dd54e1b675",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/mission.css": "5a5dd39a1e96c0909ec175be72a42ab285d27ccab7846dcd5d4ddf9bb3262e42",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/preparation-work-model.css": "41400774fcbf409acbcb4d0515ab5e749e4b3bc118aa45a4a1fa32d48534de48",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/terminal.html": "2b82c603ea5342c55693e8189c969e85f87f1dd8975d6714fd79df7305a72748",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-oidc-callback.html": "5100eaf4951d02f6b97f4dc8a3f7bd479a505020947799c4ff126bc5c770921c",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/signals.js": "38fa9e333b2b874d165f33436823ce6bb6dc4fe37e04a80637239d961c39cb99",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/access.js": "85d1d5f226245683f71b338dea4456e2d1eb3f4e81b6a14796dc9f552422e5d5",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/projects.html": "2ca1e58a4e14ddda65fa101c8c289bb71444f8a5a64889b7863c46e74b5ff1c2",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/mission.js": "7dc576612eb5e023178ad6215b45316e5b41745abf08cfcd79d75ac06e707413",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/project-profile-settings.css": "45ed746be25550010d8b6ed4123183385c54720c76de1f3d434c2e0132fd1660",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/automation.js": "2778f1430e557b25c0d822fa2b5616caf0319605015984e88322e8cf5ab12eb3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/mission-insights.js": "946621def0e8ae088eaf6c28986b68dbacbec72f97668a8e902c005d9c7fed49",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/session-console.js": "645ef292c1bf7bd122febeb5dbae04d045e8d281979bab44505c09793dfdf8bc",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prephase-editor.js": "b6378db5f10427040ddcebf9f330399f3301a0f8dd78ea6c21aa8415e9bfc905",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/runtime-health.js": "8b356f3bc111c5a1be99a420e1e770fdebc5acb56012783194718f4960c212fc",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/admin.js": "c148b619d43d42176af0c6dc10c4723cbd88bb27dac103490664fafd32570dab",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/favicon.svg": "65d5fef89446810d6fcf64cb61d9a57e6985fa2399da93fd9761b392f85b2186",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-actions.html": "4bdde01cc1f1062e16e703d6e84f2516a07725e37017bb5c191855d9f9c6d1fa",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prephase-templates.js": "5b32152c97f5f35d248cc33b5913bacc014389cdaf7ec7d6d61c4ce386e025d2",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/evidence-contract.js": "30f755cb7386db088a5fcbec9c755f55baa57266992063b011f3204b0f01d9d7",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-kernel.js": "79fedcfa4cf7a6fead5ebfbf89d94e60e33e1a914de68a51c4e5df5a156d0045",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/i18n-en.js": "2f8a9bfbe9f59ff01e6b84eb70a2115a7887502aa78e1b2163c49a651e930a02",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/retex.js": "83b32fd27c6ddc7c892f7f2707ce5349a3714b49aa77604ba0eef843907199f3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/graph.css": "6fd7640121fe1cf9b14a5fc00eef4ac08dc124aba500e8e7a13e38fe217f4074",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/index.html": "cfd2e863b6fb8cec62c1c86ec60027bc299bc1efe70b7c11eac020f07623b8d9",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prephase-conversion.js": "c009b494ffb4d1e594e54cddade342a10068d20e0cb2d87c41079fa22ac801e6",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/pilotage.css": "71dedb20ce6517e612e73d326b5843888ab9e4ef3fe341e2272aba743882a569",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/assistant.css": "73709dcbaa463dd40870a13eb1f9981f757b9e5c4a21f0bf579139ae1fed7e1d",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-actions-en.js": "74da2a1650960701fa0856e44d61313eecb7df7315d1b5a5c33fb9d4e7f3b8a5",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/conduite.css": "83aed086ddffd9f092b8ca57d954a62ebaa60177ea207bf2080960988fe1a470",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/providers.js": "ff6c117423822cc67d63273fb88f02cf46833ffa96ea8027fff78e6ba083903a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prephase-dialogue.js": "a11ba6273a2b8d8aecc43f3f68c8f16f825145e1f8ac3467c92ce4af8cc0425c",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/pricing.js": "8e8550d099ed05c3eb5e5f6e0e93612e89733f4eb6b53384a65a537a9a689467",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/plan.js": "3f2a6873a5ec58b1cf2d0e6d86cd098c5bbff1daa735f701766694db297bbb06",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/journal-console.js": "aa532ecbfcf0c911767775e09851814e7a322657a5b3a8ff449d66204e2ba4e8",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-secrets.js": "132532e28f08bca6099e029bb992e9f403aaa37f67cc8395d34bc8476b0e5fbd",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/wattson_themes.css": "0055edad2bcfa30d65b63eee8c522cd53d6953353f0a98f34024c364a08f0a59",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/planning.js": "9588279d684a9f653381e20b3baa9405e7b13558216936ce18e8d103b3782aad",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/processes.css": "421af5ca9b957b1004573bb3ff4d7f9ab958767e8e072ff518828bcac35d21e5",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/provider-wait-admin.js": "fe82dd53e6859bee899ff8a1eab8468b04be5ea5ff6e499d786170cce317a663",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-observe.js": "6d4f944c09af3661d0bd5287d29840a35117e8dfabc4f94231f110a2d1267d50",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/project-profile-settings.js": "678c5f95bc9207dff2fe4f045a74bec872b670499b58b7fbeebe322d42b184a7",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/preparation-timeout-admin.js": "b9b8c0a4f0d428844ebdb7e8d17eea4d63d63e1af36739584c188be0d7ee2f33",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/i18n.js": "7bd0842eead0ceba3bbcaee7ac28a7b92c4c5086cdf169255da8db8ca3e7646e",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/pilot-batch.js": "f01a674ae04f2187e7b969c4ce4476b4f3f0097f0aa3cdf1bb268ce33ba34b91",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-actions.css": "76c346b4b5d2b52fec941fc9da8ed2400e1e725ef17770d831a9d3f54514a0c1",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/role-models.js": "f99a1254dc62fcfc309e12cb68bc1fe228e095b2713b7de6569e60e1c577d2ec",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/instruction-revisions.js": "afa5c9e894b1b9aaf63c4ed1347cca44a5a3589bc45db3205cf03fd669fd3893",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/swarm-design.css": "9a15b7bfa9163f32c8542d50e0ad62c8acb346a4e2e61a7a8f110c831c9740d3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/signals.css": "69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/swarm-shell.js": "21e025f6f4b08c103da54c0a4d9013fbf0a172cbd9a7ce3cc03743c0ec4a68a1",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/log-console.js": "bbc2db46ce9d4735658c724e058a10774a509309461f8471cf49e17c80212c3f",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/log-console.css": "0508c806f17af18bb7526ad438911b244c6b42585b3c7c4c3a8c072116f93ffe",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/web-requests.js": "03dedcfd1b05078d607670c27ca682fb967fc7532d58dd7a5ed040d95d85f5c2",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-evidence.js": "5c97519bc562639fdafb5c336c6da49a0abf4f675e423e421a2bdc7ea6f00073",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-controls.json": "8485dfce968e9ca73cc9f6192f6ab8c472421f93093da7e4f7133c141f5389d1",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/pilot-actions.js": "55bf5c3a85db92ded11d6f675cf6f7066099ae7d65fb8c642ba9bdbf9a7f5fd0",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prephase-decisions.js": "a37568c23257f950096e4a1527716329b6c38a3093925bf4a30967f0b2946341",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/providers.css": "eaeb7dc5bc745b962d42ea98000cad9c611acbd1c4939602961ea84a3036b04a",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prephase-missions.js": "6ad4599ca898a8cc6d52a300f7504229f3804f96927226aa88d94021466b33e9",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/context-help.css": "40bd809dfacabe587e40179381a926ef05b95c35a18cd4e1c320f3fe5d4797b7",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/assistant.js": "61ef14fde20d12396b46d20970ccd0979220703d40494905bde814b0bf19b890",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/access.html": "92fe04fcb0bc35f209afda22049e569649a0e874f1e921b1d2c9fbe409ce8497",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/projects.css": "af40ed42aa967494e6fe4883ef92418e0c6f5c31c209ccb24e2bbccbfbf38846",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/plan.css": "1d1739cbee215a97ece6dcf0cd6ef5839f571f9ef8eba94284426ee4d34c27a3",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/graph.js": "92c760ac2d4417110852bf090a59aa2353f10af2beb00926842e927e70b28d28",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lifecycle-manager.js": "a4b3f64e0b3b97beaf12f1d352acabc4d3ffc6e013bfc60eee26c3c6710d25f0",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/prephase-resources.js": "06a9a7a59ce4a30f986651d29c69c7a8a21fcd8d96b7c97e9cd32a2e6b3ba5bc",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/action-skills.js": "edd42afe88b61675cd82e6d66b10d8e34e936d10c5132b7b233cc12434220d05",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/cockpit-help.js": "f4c40581fc459692b93e7b094cfa4b138764d8ee1b9df4da03e78bf1fbaffc44",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/ai-connections.js": "623d9cf675c4e612da024da2414b71fa4b4c402170379c2df736080b84492a9b",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/preparation-timeout-admin.css": "f6cc26ce6c4583dc3314f09a509055b441762b665d3b9b28f00d9f68de442083",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/product-graph.js": "567580e1549902e29c7ae77e6d970baa06722482e8d53cb8ff2a84c039ad86e0",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/pilot-graph.js": "864e3e7eb5544397ce76ead566d17943b5aeb972a26b57d8dfa91220a1845ae8",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/graph-draft.js": "2ce47b4300806202f98d8f2103fcb16a76bb058886b0fb84115c1270393f4478",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/brainstorm.js": "f9737b8998d3a11b379962cb3b7cc0bdfd65fb573f61d4a710118b5b4cf6a364",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/project-memory.css": "32404c65ddd6075386cb9ab1a72a30865d7ef2b69f667ad70616258045e04fdd",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/processes.html": "5f5de4b669b7c2020e4fdb6d51f993164c72182525265d6cc543fc706d30ee42",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/trust-controls.js": "976d30e02f4198f5a5c1f71fc0d0960355f838b30f9fcca81b9de376e41a6479",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/dagre.LICENSE.txt": "6a349742a6cb219d5a2fc8d0844f6d89a6efc62e20c664450d884fc7ff2d6015",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/dagre.min.js": "62eb9787ccfdbdf4148d4d99d31dbf9ee4770eafee81e637d759b52aac22cd51",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/preparation-security.js": "e8253734306f316f47d6f6ce1a326340c5f0d8a10ee8ea308438518347df52ab",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/terminal/xterm.css": "ef04f40aaa45ba4cf2ed4887791cc932a4e1571cd128f498aa2a0947780efa1c",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/terminal/LICENSE-fit.txt": "e256f01188af527e4d06d21d06fbf785ae9c50d4b328bf03cbe0ba7f0aa4228f",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/terminal/terminal.js.LEGAL.txt": "ec15111a7d7c12bbf81a44dd9c43d7b7bda3ebe93ae163e890afc33eb5e031ce",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/terminal/LICENSE-xterm.txt": "b569f629d00f2626a8100df2a1798210535621e42164dfd426a6fe5aac7b0ccd",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/terminal/terminal.js": "de51876e8ba728520c6e56742a0ace9761bbfd62fab7626530a5ea05704e06ce",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/worker.js": "06e3c5df04b487eb6a0f85585b97858a061eef3d7efb82920559daa413cc1fed",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/editor.js": "384632ad369e562ee2255919cae155a1e5c09aa73f9819c7534a6ee2d91c7048",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/chunk-6NYP3BCE.js": "84e78159c030cbc9c51f95bb620cf51b52ae9558d8e046ddb287203c82c67b4f",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/chunk-RFRKVIMS.js": "c688a46370194b0e72e1388509b723b67aa7bae86a40ee3f58531317ee20b8ff",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/jsonMode-K4MMNWJG.css": "432340b511f46df6ea8bb4eecd3a0f7237fcc63924f372532736c968ce66bb93",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/markdown-MIPYNTKF.js": "f92c7cefa19805b7532c451088e5b0d2df70fe2213effe8987b92cad571ca405",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/chunk-SYF7BLLQ.js": "96807eefdc1d703037f2c7cf63c12a7cf9aa1bd6a97b06074ea45e3e71cae7f7",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/jsonMode-FCANVPFQ.js": "7a6f98cc901b1413f9ce13a45f1e18a7feccdb5ef2754ac3be4b7f0e10a52014",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/ThirdPartyNotices.txt": "790537262fc78a764e121e6b92b959bcd3f5c310b47d9d9b9e92e17fe0af5336",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/editor.css": "226731d9f973e1622b706415beebf19f2ca71479394f77c1f1e0331108c648f2",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/chunk-LB5NC5KB.js": "daf521c85198597ce0285b2194950a3225a4e2f49e5463e4ca5119257cf7cc57",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/codicon-KP4OV2OO.ttf": "cc2472e239e17062e7760af87f8f5997720cc0d94aa014a615c418baaf6333a8",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/json-worker.js": "e2090fd9d61977080c3e9dfc91bbabf7d6995feaba4852659a04d2e1be097ec7",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/frozen-web/web/lib/monaco/LICENSE.txt": "33e4ff1a06ef62ba21788ea162564ee8165269a24a9ce6ef301837447eab0ac6"
+  }
+}

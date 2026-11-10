@@ -1,0 +1,5 @@
+
+> test:i18n
+> node tests/i18n_test.cjs
+
+PASS i18n locale, fallback, interpolation, engine formats and catalogue parity

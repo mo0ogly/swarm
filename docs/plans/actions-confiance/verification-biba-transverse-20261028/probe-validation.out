@@ -1,0 +1,2 @@
+OBSERVED valid private_write=False
+OBSERVED fault private_write=True

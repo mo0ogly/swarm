@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-11T17:53:24.813446+00:00",
+  "original_failure": "/tmp/swarm-unresolved-review-resume-green-initial.out",
+  "observed": "Recovery after acknowledgement delivered correction and produced final passed journal, but finalization rejected absent inspection origin.",
+  "cause": "Own regression reused legacy journal-only fragmentStoreFixture, which deliberately omits initialization producer/task/attempt anchors. Extending that fixture to final publication was invalid.",
+  "correction": "New fixture uses actual beginManagedFragmentReview initialization and original protocol-error result, preserving final publication guard. No production validation weakened.",
+  "owner": "Operator regression setup",
+  "next": "Fresh run through public ACK/resume/reopen/claim/decision/provider input and finalization."
+}

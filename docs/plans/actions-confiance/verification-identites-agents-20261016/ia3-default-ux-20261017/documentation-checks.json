@@ -1,0 +1,114 @@
+{
+  "date_utc": "2026-10-17T17:38:44.375960+00:00",
+  "scope": "documentation decision only; no application tests or activation",
+  "head": "06481f15e677285b789cfb81ba8e02e351bfdc27",
+  "checks": {
+    "new_sections_present": 7,
+    "local_links_in_checked_sections": 21,
+    "fr_en_graph_topology": "PASS",
+    "rendered_and_visually_inspected_diagrams": 3,
+    "git_diff_check": "PASS"
+  },
+  "documents_sha256": {
+    "docs/plans/actions-confiance/identites-agents-replan.md": "b7f8bed817a683665dabc9e32e1f98efbeee3400fc0b8ae906449eee0d59ff0c",
+    "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md": "117d603ccb7f222d6b889a69dd27b9a37ab08c57e64c22511fc1f58f7ac4a6f2",
+    "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59",
+    "docs/en/AGENT-IDENTITY-CONTRACT.md": "d3556e9a3084bb320ea5f30df2ee552d3a4f3abb0f857e0f19cd50cda519405f",
+    "INSTALL.md": "a12bb2b6ea903f93ed5e5ed85bfe09fc4768bbcad6b9b480d56dd0ce3a04be4e",
+    "docs/en/INSTALL.md": "f815f3db216cd1914ce13bdec3566d7ea8ffc94242544f0b1da183337758a8bc",
+    "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md": "191d40c6e650b01543e116a23144830686681cbd1e8729ecfb6bd244aada11c2"
+  },
+  "local_links": [
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "verification-identites-agents-20261016/ia3-enrollment-proof-20261017/RAPPORT-IA3c2a.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "../../architecture/AGENT-IDENTITY-CONTRACT.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "verification-identites-agents-20261016/ia3-enrollment-state-20261017/RAPPORT-IA3c2b.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "../../architecture/AGENT-IDENTITY-CONTRACT.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "verification-identites-agents-20261016/ia3-enrollment-authority-20261017/RAPPORT-IA3c2c.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "verification-identites-agents-20261016/ia3-enrollment-request-20261017/RAPPORT-IA3c2d.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "verification-identites-agents-20261016/ia3-enrollment-reply-20261017/RAPPORT-IA3c2e.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "../../architecture/AGENT-IDENTITY-CONTRACT.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "verification-identites-agents-20261016/ia3-installation-config-20261017/RAPPORT-IA3c2f02a.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "verification-identites-agents-20261016/ia3-config-witness-20261017/RAPPORT-IA3c2f02b.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "verification-identites-agents-20261016/ia3-local-service-20261017/RAPPORT-IA3c2f03a.md"
+    },
+    {
+      "source": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md",
+      "target": "verification-identites-agents-20261016/ia3-local-client-20261017/RAPPORT-IA3c2f03b.md"
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "target": "../plans/actions-confiance/identites-agents-enrolement-IA3c2.md"
+    },
+    {
+      "source": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+      "target": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-deployment-choice-20261017/RAPPORT-IA3c2f.md"
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "target": "../plans/actions-confiance/identites-agents-enrolement-IA3c2.md"
+    },
+    {
+      "source": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+      "target": "../plans/actions-confiance/verification-identites-agents-20261016/ia3-deployment-choice-20261017/RAPPORT-IA3c2f.md"
+    },
+    {
+      "source": "INSTALL.md",
+      "target": "docs/architecture/AGENT-IDENTITY-CONTRACT.md"
+    },
+    {
+      "source": "INSTALL.md",
+      "target": "docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md"
+    },
+    {
+      "source": "docs/en/INSTALL.md",
+      "target": "AGENT-IDENTITY-CONTRACT.md"
+    },
+    {
+      "source": "docs/en/INSTALL.md",
+      "target": "../plans/actions-confiance/identites-agents-enrolement-IA3c2.md"
+    },
+    {
+      "source": "docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md",
+      "target": "../../../plans/actions-confiance/identites-agents-enrolement-IA3c2.md"
+    }
+  ],
+  "runtime_criteria": {
+    "IA3c.2f-04-UX1..UX7": "NOT TESTED"
+  },
+  "account_created": false,
+  "service_started": false,
+  "workflow_started": false,
+  "independent_review": false
+}

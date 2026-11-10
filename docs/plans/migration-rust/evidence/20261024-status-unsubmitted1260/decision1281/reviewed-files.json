@@ -1,0 +1,10 @@
+{
+  "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs": "61527754ded1c7b450b7d3f0e1124d5b7d1607ec8ca969da4967460cf40aa8c8",
+  "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs": "96eb83e2ced515829c9d87938052fefe5ed845da772cb8b37bf4fa887b4f4663",
+  "version_history.json": "81458ba4ca19409b8df87bdf3cd75d9596d7453d81573716d7a6f8e31bcc2655",
+  "tests/rust_mission_worker_recovery.py": "6ed2053182e018be4f36b19801045ae3ebb6531ba056b032435e17ae8f7e5679",
+  "tools/verification/recipes/mission-worker-completion-recovery.json": "2efa308739acc2cf38183960ebf7e82035e9404ad859ce42c439fa924b46b283",
+  "docs/architecture/NATIVE-WORKER-RECOVERY.md": "8c4faedf2e422c622e671d698cc3fa0dbf8ba6d7f8d53fadd458c9d23ecc7b93",
+  "docs/en/NATIVE-WORKER-RECOVERY.md": "7f3b9ed880bb12ec028d86f195efd61297d3e83dc647e2390361ec1204426a63",
+  "docs/plans/migration-rust/REPLAYS.md": "a1378ccd256f03e58b77d34eaeddc3882cc63e852fba9385812ce66c3d02f6b3"
+}

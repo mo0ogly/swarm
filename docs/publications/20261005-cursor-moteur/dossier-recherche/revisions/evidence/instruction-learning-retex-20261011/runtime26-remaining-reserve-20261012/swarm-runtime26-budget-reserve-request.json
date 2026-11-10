@@ -1,0 +1,14 @@
+{
+  "kind": "quotas",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "event_id": "authorized-reserve-after-replan-f6f16b53d5eb4345bf8a27fed5107114",
+  "expected_revision": 696,
+  "quotas": {
+    "limits": {
+      "planning_activations": 79,
+      "planning_decisions": 62,
+      "review_calls": 100
+    },
+    "reason": "Autorisation utilisateur explicite de relever budgets insuffisants. Même règle de réserve déjà appliquée à628 : deux activations/décisions par tâche non acceptée (décision et replan), plus clôture sous preuves. Sept tâches encore ouvertes =>15. Consommées64activations/47décisions, disponibles8/13 ; déficit7/2. Relever seulement plafonds à79/62 ; préserver64/47consommées,82appels et plafond100revues, quatre tentativesT2 dont3historiques, critères et dépendances. Aucun droit fournisseur, acceptation ou nouvelle mission."
+  }
+}

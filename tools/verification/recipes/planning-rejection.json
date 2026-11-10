@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "planning-rejection-preconditions",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "*.go",
+    "go.mod",
+    "go.sum",
+    "internal/**/*.go",
+    "tools/agent-workflows/templates/*.md",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "tools/agent-workflows/CONTRACT.md"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r25",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "native-rejection-preconditions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "planning_rejection",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "planning_rejection_fingerprint_is_readonly_and_wait_is_explicit ... ok",
+        "planning_rejection_ignores_counters_leases_and_unrelated_activity ... ok",
+        "planning_rejection_recognizes_changed_owned_inputs_and_policy ... ok",
+        "planning_rejection_invalid_state_refuses_then_recovers ... ok",
+        "planning_rejection_preserves_nullable_shapes_and_policy_changes ... ok",
+        "5 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "go-rejection-preconditions",
+      "command": [
+        "go",
+        "test",
+        "./internal/engine",
+        "-run",
+        "^TestPlanningRejectionWaitIgnoresUnrelatedActivity$",
+        "-v",
+        "-count=1",
+        "-timeout=0"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "--- PASS: TestPlanningRejectionWaitIgnoresUnrelatedActivity",
+        "PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

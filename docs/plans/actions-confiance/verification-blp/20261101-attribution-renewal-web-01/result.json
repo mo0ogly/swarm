@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-attribution-renewal-web",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": false,
+  "steps": [],
+  "failure": {
+    "type": "KeyboardInterrupt",
+    "cause": "",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "7554b632804d06694d4bc2b989e1527960416adba6b5f1ab99dd7a2bd4de3807",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "6350a1dc9bf088521d50bae560cdafac4665056f83a5013761acb7905d3b6cf3",
+    "declared-inputs.tar.gz": "7d2967b0d4241d2ce581047905fdc07bce6d2e9e65685a1a0ee67079ec28d091",
+    "environment.json": "3e8fa0f79406ea53103c26fe13edbe05e64764bc5acb094ffb9c7a21e361e8bc",
+    "step-0001.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.stderr": "9e5c27dc0526de2d6bf4264f5e267d5cd9f9d74df8ef9b6648eaf322b841f31b",
+    "inputs.after.json": "e26ddb29be6b444756388c63725d93ea7ba2455bb82542970eb31a035db1265e"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-11T11:52:08.052302+00:00",
+  "patch": "docs/plans/engine-cursor-contract/recovery/review-current-event-feedback-20261011.patch",
+  "sha256": "d3c3be3c058a6f5141ddedd1143bd809a4459e053f9a69923018caefacb068b7",
+  "preimage_tree": "4147881fc49ba8630638aa75003173c807dae7c1",
+  "check": "PASS git apply --check --cached using isolated index",
+  "expanded_preimage": [
+    {
+      "path": "internal/engine/managed_review_fragment_feedback.go",
+      "sha256": "22e3297f535a9be8f2a4c2a81c1b020c7cc581e0deb8b384b1d798fa9a2b54d9",
+      "source": "root HEAD 1169df70bec73d50fd23f640245b8ffd1317b9de"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_feedback_test.go",
+      "sha256": "2314adda856d801141d7ce5977ed8d280b9097b190bbc471b1b2bb8ccf284407",
+      "source": "root HEAD 1169df70bec73d50fd23f640245b8ffd1317b9de"
+    }
+  ]
+}

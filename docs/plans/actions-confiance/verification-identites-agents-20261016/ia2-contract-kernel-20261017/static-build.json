@@ -1,0 +1,28 @@
+[
+  {
+    "command": [
+      "go",
+      "vet",
+      "./internal/engine"
+    ],
+    "start": "2026-10-17T05:48:28.791406+00:00",
+    "end": "2026-10-17T05:48:33.635547+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "go",
+      "build",
+      "-o",
+      "/tmp/swarm-ia2-kernel-build-qhjbrlc1/swarm",
+      "./cmd/swarm"
+    ],
+    "start": "2026-10-17T05:48:33.636228+00:00",
+    "end": "2026-10-17T05:48:45.162679+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

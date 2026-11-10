@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-own-scope-original-proof-repair-01ee70df3a1449e890353fd945033a56",
+  "expected_revision": 560,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "review_id": "review-5babe9b01cf21741eaf92ca4",
+  "result_tree": "b64901e7c9f3b75d81420a80f0103a3911c4fe82",
+  "reason": "Replan par preuve nouvelle : planningAncestors commence par le scope courant ; le constat partiel de la revue5 sur un budget enfant non compté est réfuté. Helper original inchangé et test isolé passant par planningChange, limites enfant1/2, comptage propre et parents une fois, refus budget_exhausted sans mutation : harnais .go.txt, stdout et reçu daté entiers joints. Code Go original519fichiers inchangé. La livraison distingue observations, simulation locale et acceptation native, et indique la précision arrondie des temps depuis les reçus entiers ; aucun temps de contrôle futur prédit.23sources130989octets, plafond inchangé. La réponse5 normalisait le stdout Go : elle reste invalide, aucun pass réutilisé. Runtime23 qualifié conserve types et frontières des originaux, rend disponible le corps authentifié effectivement sélectionné et le contrat courant pour résolution seulement ; aucune acceptation par métadonnées seules. Préimages, rejets, appels et tentatives historiques conservés. Demander contrôles frais, sélection effective des originaux nécessaires et véritable verdict indépendant."
+}

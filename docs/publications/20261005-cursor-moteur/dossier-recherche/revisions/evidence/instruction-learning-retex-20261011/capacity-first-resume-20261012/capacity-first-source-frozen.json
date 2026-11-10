@@ -1,0 +1,18 @@
+{
+  "internal/engine/managed_review_capacity_first.go": "d094003bdaf2a845542a4d7c27be905c964ec54d339ce24c936703e592d8c275",
+  "internal/engine/managed_review_capacity_first_test.go": "459343a04dd5d6864836e3d28c3262ae14b6740b2f287442a906c9138deab841",
+  "internal/engine/managed_review_capacity_reserve_test.go": "831081468355ee8aae3811a54041553f321cfcbeeca769e6a53ae2dec839fdc7",
+  "internal/engine/managed_review_input_budget.go": "cf735165be79cff8a5f6ac1cf40da2a416a6970c0b9a71801e02c5245d64255f",
+  "internal/engine/managed_review_input_provider.go": "e56486f586476ade5a3af30f0be0a8f8901b4818deed83f36d68c5b380ae19a4",
+  "internal/engine/managed_review_fragment_capacity.go": "a86160ffcaf772160fb8e43afb0021762a9fdf3bd6aadd1d37960231bee86047",
+  "internal/engine/managed_review_fragment_plan.go": "66a87a389ad8e0ca5a6d1b7eea0f8cc962c12143459b38e573f814f26837855a",
+  "internal/engine/managed_review_fragment_tokens_store_test.go": "60cb662e91e6478cb8ecacc6c6ab0231a367d94d1bcb316ad6330db32d2f0413",
+  "docs/REVIEW-FRAGMENTS.md": "58a060d8a7b7c27e17a8ff844e0f033ada36cea1085a2f3e1a639cdd93099c02",
+  "docs/en/REVIEW-FRAGMENTS.md": "c4f73d56c41d9ed2c7de6fa9978230702b262e919b7cd5cc6f9efbc5b1ab8a3a",
+  "docs/engine-cursor-source-inputs-001.json": "00083528e8c3cf6c82711abc856a6da9f72eea591176a5edce275348b933d4e4",
+  "docs/engine-cursor-source-inputs-003.json": "e48161ed095d9f8efbf4b667da7c9192955b87211a0dbe8c282632598114e463",
+  "docs/engine-cursor-source-inputs-004.json": "ae51111b1ce1155cf6089e7076eaad18024ab68e6f4ba8d8367bac9fe2300f60",
+  "docs/engine-cursor-source-inputs-005.json": "966ad43b74fb9a7cf904fbc06367e287d62fa82a96765217ade88a2c9c2c95c4",
+  "docs/engine-cursor-source-manifest.json": "ce20374a92661d129a396f8f3d647e01221ba5639af229f4f91cdf3485b67cfc",
+  "internal/engine/managed_review_fragment_reply.go": "8bbf3a39698a7de428413ce2416a5481cebcb4180b4a58c82af6734d9035aa0e"
+}

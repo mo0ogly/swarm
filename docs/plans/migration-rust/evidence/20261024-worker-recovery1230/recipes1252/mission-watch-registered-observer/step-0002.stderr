@@ -1,0 +1,9 @@
+test_close_failure_never_turns_valid_read_into_success (test_rust_mission_control_helpers.ControlReadGuards.test_close_failure_never_turns_valid_read_into_success)
+A successful observation with failed close remains a failure. ... ok
+test_positive_read_before_primary_and_close_fault (test_rust_mission_control_helpers.ControlReadGuards.test_positive_read_before_primary_and_close_fault)
+A valid read precedes simultaneous failures; retain exact cause objects. ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.009s
+
+OK

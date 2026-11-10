@@ -1,0 +1,16 @@
+{
+  "name": "AssertionError",
+  "message": "403 == 200",
+  "stack": "AssertionError [ERR_ASSERTION]: 403 == 200\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_workload_ui.cjs:23:708",
+  "checks": [
+    "fr: service settings render on mobile with visible keyboard focus",
+    "fr: invalid local service mapping is rejected in the selected language",
+    "fr: preview performs no discovery, then exact configuration persists",
+    "fr: introspection policy reopens and public-only ephemeral key agrees in UI and CLI",
+    "fr: saved public keys and durations reopen"
+  ],
+  "errors": [
+    "Expected values to be loosely deep-equal:\n\n'http://127.0.0.1:38075/introspect'\n\nshould loosely deep-equal\n\n[\n  'http://127.0.0.1:38075/introspect'\n]",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+  ]
+}

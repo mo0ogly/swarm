@@ -1,0 +1,46 @@
+=== RUN   TestActionsConfianceT6ConnectorContract
+=== RUN   TestActionsConfianceT6ConnectorContract/false
+=== RUN   TestActionsConfianceT6ConnectorContract/true
+--- PASS: TestActionsConfianceT6ConnectorContract (2.22s)
+    --- PASS: TestActionsConfianceT6ConnectorContract/false (1.08s)
+    --- PASS: TestActionsConfianceT6ConnectorContract/true (1.15s)
+=== RUN   TestActionsConfianceT6ConnectorGuards
+=== RUN   TestActionsConfianceT6ConnectorGuards/false
+=== RUN   TestActionsConfianceT6ConnectorGuards/false/direct-bypass
+=== RUN   TestActionsConfianceT6ConnectorGuards/false/wrong-role
+=== RUN   TestActionsConfianceT6ConnectorGuards/false/content-drift
+=== RUN   TestActionsConfianceT6ConnectorGuards/false/concurrency
+=== RUN   TestActionsConfianceT6ConnectorGuards/false/readback-alteration
+=== RUN   TestActionsConfianceT6ConnectorGuards/true
+=== RUN   TestActionsConfianceT6ConnectorGuards/true/direct-bypass
+=== RUN   TestActionsConfianceT6ConnectorGuards/true/wrong-role
+=== RUN   TestActionsConfianceT6ConnectorGuards/true/content-drift
+=== RUN   TestActionsConfianceT6ConnectorGuards/true/concurrency
+=== RUN   TestActionsConfianceT6ConnectorGuards/true/readback-alteration
+--- PASS: TestActionsConfianceT6ConnectorGuards (2.60s)
+    --- PASS: TestActionsConfianceT6ConnectorGuards/false (1.19s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/false/direct-bypass (0.01s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/false/wrong-role (0.01s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/false/content-drift (0.01s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/false/concurrency (0.22s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/false/readback-alteration (0.02s)
+    --- PASS: TestActionsConfianceT6ConnectorGuards/true (1.40s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/true/direct-bypass (0.01s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/true/wrong-role (0.01s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/true/content-drift (0.01s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/true/concurrency (0.22s)
+        --- PASS: TestActionsConfianceT6ConnectorGuards/true/readback-alteration (0.02s)
+=== RUN   TestActionsConfianceT6ConnectorInvalid
+=== RUN   TestActionsConfianceT6ConnectorInvalid/{"id":"production","version":1}
+=== RUN   TestActionsConfianceT6ConnectorInvalid/{"id":"local-access-simulation","version":2,"access":{"subject":"a","role":"b"}}
+=== RUN   TestActionsConfianceT6ConnectorInvalid/{"id":"local-access-simulation","version":1}
+=== RUN   TestActionsConfianceT6ConnectorInvalid/{"id":"local-ledger-simulation","version":1,"access":{"subject":"a","role":"b"}}
+=== RUN   TestActionsConfianceT6ConnectorInvalid/{"id":"local-access-simulation","version":1,"access":{"subject":"../a","role":"b"}}
+--- PASS: TestActionsConfianceT6ConnectorInvalid (0.00s)
+    --- PASS: TestActionsConfianceT6ConnectorInvalid/{"id":"production","version":1} (0.00s)
+    --- PASS: TestActionsConfianceT6ConnectorInvalid/{"id":"local-access-simulation","version":2,"access":{"subject":"a","role":"b"}} (0.00s)
+    --- PASS: TestActionsConfianceT6ConnectorInvalid/{"id":"local-access-simulation","version":1} (0.00s)
+    --- PASS: TestActionsConfianceT6ConnectorInvalid/{"id":"local-ledger-simulation","version":1,"access":{"subject":"a","role":"b"}} (0.00s)
+    --- PASS: TestActionsConfianceT6ConnectorInvalid/{"id":"local-access-simulation","version":1,"access":{"subject":"../a","role":"b"}} (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	6.367s

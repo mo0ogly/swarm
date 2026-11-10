@@ -1,0 +1,24 @@
+=== RUN   TestActionsConfianceT2RevocationBindsUpdatedMandate
+--- PASS: TestActionsConfianceT2RevocationBindsUpdatedMandate (0.02s)
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/revoked
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/expired
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/missing
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/not_started
+--- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate (0.10s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/revoked (0.04s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/expired (0.02s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/missing (0.02s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/not_started (0.02s)
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked
+--- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba (0.04s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent (0.00s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired (0.00s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked (0.01s)
+=== RUN   TestActionsConfianceT2IdempotencyRestartAndReconciliation
+--- PASS: TestActionsConfianceT2IdempotencyRestartAndReconciliation (0.12s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.302s

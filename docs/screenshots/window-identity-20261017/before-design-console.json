@@ -1,0 +1,351 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error',\n+   'JSHandle@error'\n+ ]\n- []\n\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/design_system_ui.cjs:217:9",
+  "errors": [
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error",
+    "JSHandle@error"
+  ],
+  "consoleDiagnostics": [
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    },
+    {
+      "text": "JSHandle@error",
+      "location": {
+        "url": "http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js",
+        "lineNumber": 203,
+        "columnNumber": 38173
+      },
+      "details": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "name": "TypeError",
+            "message": "Cannot read properties of undefined (reading 'top')",
+            "stack": "TypeError: Cannot read properties of undefined (reading 'top')\n    at gR (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38338)\n    at SZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:38115)\n    at CZ (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:36562)\n    at Object.finalize (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:204:35212)\n    at f0._constructLines (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:45655)\n    at f0.setWrappingSettings (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:48128)\n    at b0._onConfigurationChanged (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:69876)\n    at Pt.value (http://127.0.0.1:37617/lib/monaco/chunk-6NYP3BCE.js:235:67073)\n    at J._deliver (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3022)\n    at J.fire (http://127.0.0.1:37617/lib/monaco/chunk-RFRKVIMS.js:7:3340)"
+          }
+        }
+      ]
+    }
+  ],
+  "networkErrors": [],
+  "fixtureRoot": "/tmp/swarm-design-1tvkkC"
+}

@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestActionsConfiance(T2|T4)",
+    "-count=1"
+  ],
+  "pid": 361557,
+  "start_ticks": "6836753",
+  "started_unix": 1792133943.3844235,
+  "status": "passed",
+  "exit_code": 0,
+  "ended_unix": 1792134481.6054587,
+  "inputs_unchanged": true
+}

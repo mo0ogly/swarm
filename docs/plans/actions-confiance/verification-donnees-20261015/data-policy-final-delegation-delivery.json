@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "node",
+    "tests/actions_confiance_delegation_ui.cjs",
+    "bin/swarm-actions-confiance-data-policy-resources",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-donnees-20261015/data-policy-final-delegation-browser"
+  ],
+  "started_at": "2026-10-15T20:19:18.299277+00:00",
+  "ended_at": "2026-10-15T20:19:32.686226+00:00",
+  "exit_code": 0,
+  "sources_unchanged": true,
+  "output_sha256": "4b6ad62e27b348adf65beb2cb890ede33f4d4d4e396a4b832c2357c4d08ba75a",
+  "input_sha256": {
+    "bin/swarm-actions-confiance-data-policy-resources": "1a7a69aed6f2aa153413b628c525895a77b8e2fe0aea0a84cf621aabad110d31",
+    "web/trust-actions.js": "fd9122502f4412ff25532e9048d3fbb281c24a97270d779a9be434e2640f46b7",
+    "web/trust-actions.html": "b43635cbe17e2775b4fcae223b4857c7c77ad72e517032456ed330d6828d570e",
+    "web/trust-actions-en.js": "5f101a2f5cfb5a11a93f02b50169d6456dcdd24c1a98f314997186645b5e1361"
+  }
+}

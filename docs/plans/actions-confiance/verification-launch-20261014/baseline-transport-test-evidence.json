@@ -1,0 +1,74 @@
+{
+  "at_utc": "2026-10-15T04:01:29.495848+00:00",
+  "runs": [
+    {
+      "path": "baseline-transport-after-v2.out",
+      "passed_main": [
+        "TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts",
+        "TestManagedFragmentSelectionSchemaBindsOriginalReference"
+      ],
+      "passed_subcases": [
+        "TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/1",
+        "TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/2",
+        "TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/3",
+        "TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/4",
+        "TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/5"
+      ],
+      "failed_main": [],
+      "sha256": "cae2234886c8084c9e33cb886e4afda0755fcd66687786a18c1391ddc5deff14"
+    },
+    {
+      "path": "baseline-transport-targeted.out",
+      "passed_main": [
+        "TestIncrementalFinalTransportDistinguishesOmittedAndEmptyDiff",
+        "TestIncrementalHistoricalPrefixRemainsStable",
+        "TestIncrementalReviewRejectsUnverifiedBaseline",
+        "TestIncrementalBaselineScopeReachesFragmentInspection",
+        "TestIncrementalFittingContextRefusesCorruptedAcceptedBaseline",
+        "TestManagedFragmentSelectorIdentifiesCompleteOriginalAlreadySupplied",
+        "TestManagedFragmentSelectorRejectsChangedOriginalMetadata"
+      ],
+      "passed_subcases": [
+        "TestIncrementalReviewRejectsUnverifiedBaseline/missing-proof",
+        "TestIncrementalReviewRejectsUnverifiedBaseline/policy",
+        "TestIncrementalReviewRejectsUnverifiedBaseline/verdict",
+        "TestIncrementalBaselineScopeReachesFragmentInspection/0",
+        "TestIncrementalBaselineScopeReachesFragmentInspection/1",
+        "TestIncrementalBaselineScopeReachesFragmentInspection/2",
+        "TestIncrementalBaselineScopeReachesFragmentInspection/3"
+      ],
+      "failed_main": [
+        "TestIncrementalReviewNewVerdictAndHistoricalEvidence",
+        "TestIncrementalReviewStillRequiresFreshPass",
+        "TestIncrementalReviewUsesVerifiedBaselineWhenContextFits"
+      ],
+      "sha256": "488159f18424de59742c2b05a082a5df32ebd36a25505e976b60d458b3267a49"
+    },
+    {
+      "path": "baseline-transport-final-race.out",
+      "passed_main": [
+        "TestIncrementalFinalTransportDistinguishesOmittedAndEmptyDiff",
+        "TestIncrementalHistoricalPrefixRemainsStable",
+        "TestIncrementalReviewNewVerdictAndHistoricalEvidence",
+        "TestIncrementalReviewRejectsUnverifiedBaseline",
+        "TestIncrementalReviewStillRequiresFreshPass",
+        "TestIncrementalReviewUsesVerifiedBaselineWhenContextFits",
+        "TestIncrementalBaselineScopeReachesFragmentInspection",
+        "TestIncrementalFittingContextRefusesCorruptedAcceptedBaseline"
+      ],
+      "passed_subcases": [
+        "TestIncrementalReviewRejectsUnverifiedBaseline/missing-proof",
+        "TestIncrementalReviewRejectsUnverifiedBaseline/policy",
+        "TestIncrementalReviewRejectsUnverifiedBaseline/verdict",
+        "TestIncrementalBaselineScopeReachesFragmentInspection/0",
+        "TestIncrementalBaselineScopeReachesFragmentInspection/1",
+        "TestIncrementalBaselineScopeReachesFragmentInspection/2",
+        "TestIncrementalBaselineScopeReachesFragmentInspection/3"
+      ],
+      "failed_main": [],
+      "sha256": "14ae0d17b72963a74fbfe07f1467e7b0d3804ddeb631050d1fbae64cdf4d6136"
+    }
+  ],
+  "reused_checks_reason": "The final change replaces one baseline-version validation with the shared predicate. Historical nil/0/1 prompt, selection and integrity inputs stay unchanged. Final race exercises every incremental scenario, version2 full-chain validation/reopen and corrupted baseline refusal. Selector tests and historical versions remain separately evidenced.",
+  "not_claimed": "No full package rerun or independent core code review."
+}

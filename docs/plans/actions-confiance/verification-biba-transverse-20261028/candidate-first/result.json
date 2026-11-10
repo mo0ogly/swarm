@@ -1,0 +1,21 @@
+{
+  "status": "VERIFIED_NATIVE_CANDIDATE",
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-d78b3c22ab989069f5d7ffc5cd7d184ebb5b96b88f9f4250513753c028b96087",
+  "sha256": "d78b3c22ab989069f5d7ffc5cd7d184ebb5b96b88f9f4250513753c028b96087",
+  "metadata": {
+    "schema_version": 1,
+    "version": "devel",
+    "commit": "86c5ab2f3b60512eecb46729c47ac02924aaf65b",
+    "modified": true,
+    "build_date": "2026-10-28T16:23:01Z"
+  },
+  "metadata_sha256": "31639f2e0df6586d90479dbf63ef752c21bcc96233e89dceb90a25795eab1bef",
+  "git_observations_stable": true,
+  "git_metadata_stable": true,
+  "profile": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/candidate-first/profile/result.json",
+  "runtime_forgery_ignored": true,
+  "cold_root_not_created": true,
+  "installed": false,
+  "published": false,
+  "global_watchdog": null
+}

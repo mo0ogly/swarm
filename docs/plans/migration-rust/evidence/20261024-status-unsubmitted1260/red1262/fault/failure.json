@@ -1,0 +1,4 @@
+{
+  "status": "FAIL",
+  "cause": "Traceback (most recent call last):\n  File \"/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_mission_worker_recovery.py\", line 184, in fault\n    status=request(server,'GET','/api/v1/mission?'+urlencode(dict(work=f.work,action='status')))\n  File \"/home/fpizzi/Documents/ChatGPT/swarm/tests/rust_native_http_mission.py\", line 45, in request\n    assert status==expected, (method,path,status,data[:300])\n           ^^^^^^^^^^^^^^^^\nAssertionError: ('GET', '/api/v1/mission?work=w-bafc8cc3dc9f29c239b9f66a&action=status', 500, b'{\"error\":\"mission-status-planning-unported\",\"failure\":{\"code\":\"mission-status-planning-unported\"},\"schema_version\":1}')\n"
+}

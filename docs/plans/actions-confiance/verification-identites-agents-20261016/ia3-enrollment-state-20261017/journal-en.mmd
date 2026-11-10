@@ -1,0 +1,11 @@
+flowchart TD
+  B["Bootstrap and OS protection<br/>target: operator decision pending"] -.-> K["Pinned public key and project"]
+  K --> J["Dedicated SQLite journal<br/>verified signed chain and head"]
+  H["Independently retained Head<br/>durable protection: target"] --> A["Apply: compare and append<br/>or recognize exact current retry"]
+  J --> A
+  A --> D["COMMIT event and head<br/>unique enroll or irreversible revoke"]
+  D --> L["WithActive: BEGIN IMMEDIATE<br/>reread full chain and compare Head"]
+  H --> L
+  L --> S["SignActive under local reservation<br/>challenge-bound response"]
+  S --> V["enrollmentproof.Verify<br/>authenticated bytes"]
+  V -.-> E["Business schema and final freshness<br/>engine adapter: not implemented"]

@@ -1,0 +1,299 @@
+{
+  "at": "2026-10-13T08:20:43.577004+00:00",
+  "works": [
+    {
+      "work": "w-a77d9f4799712a6c6d96c662",
+      "revision": 43,
+      "paused": true,
+      "enabled": false,
+      "autonomy": "autonome",
+      "slots": 2,
+      "planning_activations": 5,
+      "planning_decisions": 4,
+      "review_calls": 6,
+      "task_statuses": [
+        [
+          "plan-a77d9f4799-F1",
+          "accepted"
+        ],
+        [
+          "plan-a77d9f4799-F2",
+          "accepted"
+        ],
+        [
+          "plan-a77d9f4799-F3",
+          "accepted"
+        ],
+        [
+          "plan-a77d9f4799-F4",
+          "accepted"
+        ],
+        [
+          "plan-a77d9f4799-F5",
+          "accepted"
+        ]
+      ],
+      "active_agents": 0,
+      "uncertain_agents": 0,
+      "held": [],
+      "reviews": [],
+      "assist_busy": [],
+      "candidate": null
+    },
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 839,
+      "paused": true,
+      "enabled": false,
+      "autonomy": "autonome",
+      "slots": 2,
+      "planning_activations": 86,
+      "planning_decisions": 66,
+      "review_calls": 82,
+      "task_statuses": [
+        [
+          "plan-ca937edf4e-T1",
+          "accepted"
+        ],
+        [
+          "plan-ca937edf4e-T2",
+          "blocked"
+        ],
+        [
+          "plan-ca937edf4e-T3",
+          "blocked"
+        ],
+        [
+          "plan-ca937edf4e-T4",
+          "todo"
+        ],
+        [
+          "plan-ca937edf4e-T5",
+          "todo"
+        ],
+        [
+          "plan-ca937edf4e-T6",
+          "todo"
+        ],
+        [
+          "plan-ca937edf4e-T7",
+          "todo"
+        ],
+        [
+          "plan-ca937edf4e-T8",
+          "todo"
+        ]
+      ],
+      "active_agents": 0,
+      "uncertain_agents": 0,
+      "held": [],
+      "reviews": [],
+      "assist_busy": [],
+      "candidate": null
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "enabled": false,
+      "autonomy": "autonome",
+      "slots": 2,
+      "planning_activations": 5,
+      "planning_decisions": 3,
+      "review_calls": null,
+      "task_statuses": [
+        [
+          "r1-preuves",
+          "accepted"
+        ],
+        [
+          "r2-git",
+          "accepted"
+        ],
+        [
+          "r3-diagnostic",
+          "accepted"
+        ],
+        [
+          "r4-responsable",
+          "accepted"
+        ],
+        [
+          "r5-interface",
+          "blocked"
+        ],
+        [
+          "r6-recette",
+          "todo"
+        ],
+        [
+          "r7-livraison",
+          "todo"
+        ]
+      ],
+      "active_agents": 0,
+      "uncertain_agents": 0,
+      "held": [],
+      "reviews": [],
+      "assist_busy": [],
+      "candidate": null
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "enabled": false,
+      "autonomy": "autonome",
+      "slots": 2,
+      "planning_activations": 8,
+      "planning_decisions": 5,
+      "review_calls": null,
+      "task_statuses": [
+        [
+          "p0-cursor",
+          "accepted"
+        ],
+        [
+          "p1-etats",
+          "accepted"
+        ],
+        [
+          "p2-preuves",
+          "accepted"
+        ],
+        [
+          "p3-parcours",
+          "accepted"
+        ],
+        [
+          "p4-reprise",
+          "blocked"
+        ],
+        [
+          "p5-recette",
+          "todo"
+        ],
+        [
+          "p6-livraison",
+          "todo"
+        ]
+      ],
+      "active_agents": 0,
+      "uncertain_agents": 0,
+      "held": [],
+      "reviews": [],
+      "assist_busy": [],
+      "candidate": null
+    }
+  ],
+  "preparations": [
+    {
+      "id": "prep-f968d735f5b9493a975b3764",
+      "states": []
+    },
+    {
+      "id": "prep-b60afcff64ef71f4e1f9ecf8",
+      "states": []
+    },
+    {
+      "id": "prep-a9d06c4844e9da0563731f85",
+      "states": [
+        "failed",
+        "answered",
+        "interrupted",
+        "answered"
+      ]
+    }
+  ],
+  "health": {
+    "state": "ready",
+    "launch_allowed": true,
+    "observed_at": "2026-10-13T08:20:43.618648021Z",
+    "message": "Le stockage est disponible.",
+    "next_step": "Les autres conditions de lancement restent contr\u00f4l\u00e9es par le moteur.",
+    "volumes": [
+      {
+        "kind": "store",
+        "path": "/home/fpizzi/workspace/swarm/.swarm",
+        "available_bytes": 38848000000,
+        "available_inodes": 25542507,
+        "state": "ready"
+      },
+      {
+        "kind": "temporary",
+        "path": "/tmp",
+        "available_bytes": 4395466752,
+        "available_inodes": 955787,
+        "state": "ready"
+      }
+    ],
+    "version": {
+      "binary": {
+        "version": "devel",
+        "commit": null,
+        "modified": null,
+        "build_date": null,
+        "provenance": "unknown"
+      },
+      "source": {
+        "available": true,
+        "commit": "6bfd1005b663319021be60745a38c66c4d5e20c5",
+        "modified": false,
+        "compared": false,
+        "matches_binary": null
+      },
+      "history": {
+        "schema_version": 1,
+        "available": true,
+        "releases": [
+          {
+            "version": "v0.1.0",
+            "date": "2026-10-06",
+            "summary": {
+              "fr": "Premi\u00e8re release exp\u00e9rimentale : \u00e9dition du graphe avec pr\u00e9visualisation, automatisation durable, administration des param\u00e8tres, validation ind\u00e9pendante et reprise trac\u00e9e des contrats bloqu\u00e9s.",
+              "en": "First experimental release: graph editing with previews, durable automation, configurable administration, independent validation and audited recovery of blocked contracts."
+            },
+            "commits": [
+              {
+                "sha": "191616999c5f4b30e901042b51898cfbb21a3e06",
+                "url": "https://github.com/mo0ogly/swarm/commit/191616999c5f4b30e901042b51898cfbb21a3e06"
+              },
+              {
+                "sha": "2d08f0510d7f6da36d7f03cb9481dde7de249fe8",
+                "url": "https://github.com/mo0ogly/swarm/commit/2d08f0510d7f6da36d7f03cb9481dde7de249fe8"
+              }
+            ],
+            "release_url": "https://github.com/mo0ogly/swarm/releases/tag/v0.1.0"
+          }
+        ]
+      }
+    },
+    "version_diagnostic": {
+      "installed_cli": {
+        "available": false,
+        "version": null,
+        "commit": null,
+        "modified": null,
+        "provenance": "browser",
+        "hint": "Le navigateur ne peut pas inspecter le CLI local. Lancez swarm version --server URL_DE_SESSION."
+      },
+      "active_server": {
+        "available": true,
+        "version": "devel",
+        "commit": null,
+        "modified": null,
+        "provenance": "unknown"
+      },
+      "candidate": {
+        "available": true,
+        "version": null,
+        "commit": "6bfd1005b663319021be60745a38c66c4d5e20c5",
+        "modified": false,
+        "provenance": "git"
+      },
+      "state": "unknown",
+      "differences": [],
+      "next_step": "Rendez accessibles les identit\u00e9s manquantes (installed_cli, active_server) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+    }
+  }
+}

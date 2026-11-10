@@ -1,0 +1,131 @@
+{
+  "at": "2026-10-11T14:19:25.703946+00:00",
+  "full": {
+    "command": [
+      "go",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T14:10:56.856594+00:00",
+    "end": "2026-10-11T14:18:59.558016+00:00",
+    "seconds": 482.7014384239992,
+    "exit": 0,
+    "output": "/tmp/swarm-instruction-operator-composition-full.out",
+    "output_sha256": "475b3fd86584c014ef10361b2ea5b2d4e2ba4b9420a33198d0b5f2cdcf542441",
+    "source_manifest_sha256": "4fc441b341d4f705f503b752658294793c18f2e209aa79320be42cfbaa477d21",
+    "candidate_digest": "88f9ab5b8113673818e6c97a6787823c1847a90c2a6c599d1f8f071af3b66583",
+    "paths": 1170,
+    "source_drift": [],
+    "manifest_changed": false
+  },
+  "checks": [
+    {
+      "label": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "./internal/engine",
+        "-run",
+        "TestInstructionRevision",
+        "-count=1",
+        "-timeout=120s"
+      ],
+      "start": "2026-10-11T14:10:58.037859+00:00",
+      "seconds": 29.6857656079992,
+      "exit": 0,
+      "output": "/tmp/swarm-instruction-operator-composition-race.out",
+      "sha256": "b15e26c336001a8fbbf2f993cdef43eb7c74f6b900ef3240c19c206a351ada8d"
+    },
+    {
+      "label": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "start": "2026-10-11T14:11:27.724088+00:00",
+      "seconds": 2.22674288500275,
+      "exit": 0,
+      "output": "/tmp/swarm-instruction-operator-composition-vet.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "workflows",
+      "command": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "start": "2026-10-11T14:11:29.951141+00:00",
+      "seconds": 2.1654701469997235,
+      "exit": 0,
+      "output": "/tmp/swarm-instruction-operator-composition-workflows.out",
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+    }
+  ],
+  "build": {
+    "at": "2026-10-11T14:14:50.837771+00:00",
+    "binary": "/tmp/swarm-instruction-operator-composition-candidate",
+    "sha256": "a58e2791621fbe2bacd21a4d8836ce8b9ba7f35c4128ccb21b8a4d1e267922ed",
+    "version": {
+      "schema_version": 1,
+      "binary": {
+        "version": "devel",
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "build_date": "2026-10-11T14:12:24Z",
+        "provenance": "injected"
+      },
+      "diagnostic": {
+        "installed_cli": {
+          "available": true,
+          "version": "devel",
+          "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+          "modified": true,
+          "provenance": "injected"
+        },
+        "active_server": {
+          "available": false,
+          "version": null,
+          "commit": null,
+          "modified": null,
+          "provenance": "runtime_health",
+          "hint": "Fournissez l\u2019URL de session du serveur actif avec --server."
+        },
+        "candidate": {
+          "available": true,
+          "version": null,
+          "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+          "modified": true,
+          "provenance": "git"
+        },
+        "state": "unknown",
+        "differences": [],
+        "next_step": "Rendez accessibles les identit\u00e9s manquantes (active_server) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+      }
+    }
+  },
+  "patch": {
+    "before": "857853d0f395f378099804367d6e0d80656fc599",
+    "after": "339d20a7b2d47c229ce1febea2285b02b46565b4",
+    "applied_tree": "339d20a7b2d47c229ce1febea2285b02b46565b4",
+    "sha256": "48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd",
+    "paths": [
+      "internal/engine/model.go",
+      "internal/engine/store.go",
+      "internal/engine/instruction_revision.go",
+      "internal/engine/instruction_revision_operator_test.go",
+      "docs/architecture/INSTRUCTION-LEARNING.md",
+      "docs/en/INSTRUCTION-LEARNING.md"
+    ],
+    "preimage_extension": {
+      "path": "internal/engine/store.go",
+      "blob": "0ad8e9dbf372fdb405d1b121d362784ba5bf76d1",
+      "source_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+      "reason": "Sparse patch lineage had not tracked this existing, previously unchanged file."
+    }
+  },
+  "status": "QUALIFIED_LOCAL_NOT_INSTALLED_OR_NATIVE_ACCEPTED"
+}

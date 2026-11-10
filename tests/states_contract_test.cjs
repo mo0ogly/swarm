@@ -64,9 +64,10 @@ assert.equal(states.review({reviewer},[{independent_review:{state:'passed'}}],fa
 // Exercise the real Planning.roles DOM builder, not a source-text assertion.
 const planningCode=fs.readFileSync('web/planning.js','utf8')+';Planning';
 function renderRoles(planning,tasks=[],paused=false){
- const context={SwarmStatusContract:states,node,snapshot:{paused,work:{tasks}},tr_web_planning_js:s=>s};
+ const context={SwarmStatusContract:states,node,snapshot:{paused,work:{tasks}},tr_web_planning_js:s=>s,
+  Pilot:{command:label=>node('button',label)}};
  const Planning=vm.runInNewContext(planningCode,context);
- const panel=new Element('section');Planning.roles(panel,planning);return panel.children[0].children.filter(x=>x?.dataset?.role==='reviewer')[0];
+ const panel=new Element('section');Planning.roles(panel,{scopes:[],...planning});return panel.children[0].children.filter(x=>x?.dataset?.role==='reviewer')[0];
 }
 const absent=renderRoles({provider:'fixture',decisions:0,reviewer_required:true});
 assert.equal(absent.dataset.reviewAvailability,'absent');

@@ -1,0 +1,17 @@
+{
+  "archive": "/media/fpizzi/Lexar/swarm-evidence/x-veille/nuit-20261108T2208.tar.gz",
+  "sha256": "c2721c487c93d1f1d6e4d8c152d102ea076cbf204f4bc41db3cb46198c0fc9a9",
+  "readback_verified": true,
+  "originals_retained": true,
+  "restore_command": "tar -xzf /media/fpizzi/Lexar/swarm-evidence/x-veille/nuit-20261108T2208.tar.gz -C /path/to/empty-restore",
+  "members": [
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/04-transmission-supervision/ANALYSE-NUIT.md",
+      "sha256": "242b268886deff74d3c3e06e838fa7066b9ed1dddc2f6a12219ea400395d6f83"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/NUIT-QUEUE.json",
+      "sha256": "d23129e617151ee4bd03bc8204b01f444847723ae89b9ca61c6f3f4325556ac9"
+    }
+  ]
+}

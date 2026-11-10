@@ -1,0 +1,154 @@
+{
+  "status": "PASS_LOCAL_UI",
+  "time": "2026-10-17T16:56:46.129417+00:00",
+  "base_commit": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6",
+  "binary": "/tmp/swarm-dense-reading-20261017-release",
+  "binary_sha256": "4d8089164e720a55f9e649c99677a59e1da9186d2909643abb45e747a6a67ea6",
+  "executions": [
+    {
+      "command": "node tests/dense_text_ui.cjs /tmp/swarm-dense-reading-20261017-release EVIDENCE_DIRECTORY",
+      "exit": 0,
+      "result": "dense-result.json"
+    },
+    {
+      "command": "node tests/instruction_retex_ui.cjs /tmp/swarm-dense-reading-20261017-release EVIDENCE_DIRECTORY",
+      "exit": 0,
+      "result": "instructions-result.json"
+    },
+    {
+      "command": "node tests/log_console_ui.cjs /tmp/swarm-dense-reading-20261017-release EVIDENCE_DIRECTORY",
+      "exit": 0,
+      "result": "logs-result.json"
+    },
+    {
+      "command": "node tests/log_console_visibility_ui.cjs /tmp/swarm-dense-reading-20261017-release EVIDENCE_DIRECTORY",
+      "exit": 0,
+      "result": "visibility-result.json"
+    },
+    {
+      "command": "node tests/design_system_ui.cjs /tmp/swarm-dense-reading-20261017-release EVIDENCE_DIRECTORY",
+      "exit": 0,
+      "result": "design-result.json"
+    }
+  ],
+  "other_checks": [
+    {
+      "command": "node tests/text_reader_test.cjs",
+      "exit": 0,
+      "named_cases": 8
+    },
+    {
+      "command": "npm run test:i18n",
+      "exit": 0
+    },
+    {
+      "command": "GOMAXPROCS=2 GOFLAGS=-p=1 python3 tools/agent-workflows/check.py",
+      "exit": 0,
+      "skills": 12,
+      "tests_and_subtests": 5
+    },
+    {
+      "command": "GOMAXPROCS=2 GOFLAGS=-p=1 go test ./internal/engine -run '^TestGraphDeliveryD03QualificationManifest$' -count=1 -v -timeout=0",
+      "exit": 0,
+      "named_tests": 1,
+      "output": "manifest-verification.txt"
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    }
+  ],
+  "inputs": [
+    {
+      "path": "web/cockpit.js",
+      "sha256": "1150c46e22ad124dbebba0f8a03a358960bdd371a7238c5b6e9628f07d9298bc"
+    },
+    {
+      "path": "web/pilot-inspector.js",
+      "sha256": "f80868784977dcda43cabd615eeab59633e3d1fab5fb9be719f3c6674ceb3394"
+    },
+    {
+      "path": "web/instruction-revisions.js",
+      "sha256": "1c77e19b9d566e7214ec7b4efd911cdc2e15a69d3fc13149eee7cb738302ff13"
+    },
+    {
+      "path": "web/mission.js",
+      "sha256": "5513609e1b732d2084a34f21d4867108b9b099f79877821edda900477b3542d1"
+    },
+    {
+      "path": "web/pilot-actions.js",
+      "sha256": "8fda8f46aa384c99228e5ce0b1ea9de07ee908030b4573ae0d8b4587eed1f15d"
+    },
+    {
+      "path": "web/journal-console.js",
+      "sha256": "fa81f8eac2140b9888ed7b2db1dfab7e0e80253a95753fafc63e9cf3fc133d83"
+    },
+    {
+      "path": "web/text-reader.js",
+      "sha256": "daa5da1156a45ea1aaa41e2e4d1e868e74e5006ca1fa882d6ee793ca5478c6a7"
+    },
+    {
+      "path": "web/i18n-en.js",
+      "sha256": "1e1651a9bd995a68f892ea4001f44497de5bc40ae6f55b22c85add95ea59c310"
+    },
+    {
+      "path": "web/swarm-shell.js",
+      "sha256": "ec5974b717991c3b4e10b67270e69a96d2be4c36f16c25b9253ddf4611a879a4"
+    },
+    {
+      "path": "tests/dense_text_ui.cjs",
+      "sha256": "4673fd9e2075932b1046e4f3c76df98164a769f4ac683351363545dc87fc8fca"
+    },
+    {
+      "path": "tests/instruction_retex_ui.cjs",
+      "sha256": "94f108d967f7865630642fda41df5d158c6760faf0626a80d17e43041979ecb0"
+    },
+    {
+      "path": "tests/log_console_ui.cjs",
+      "sha256": "9ec67115dc1e95f47e24e20bea45a2540042271c17abfa1fe8477cd79b841704"
+    },
+    {
+      "path": "tests/design_system_ui.cjs",
+      "sha256": "d3728a57a2c4dab63c23a197165dd61c7d537c38aeb2d221d3e2de110173642b"
+    },
+    {
+      "path": "tests/log_console_visibility_ui.cjs",
+      "sha256": "cd249f77efd4f9e73e6cd5dea5529e176e4379f109b07ecec6d94aceb6582c12"
+    },
+    {
+      "path": "tests/text_reader_test.cjs",
+      "sha256": "5072b993852553085b0a04affb1f64a8c88602afa33247eeb3420494d7b280dd"
+    },
+    {
+      "path": "web/index.html",
+      "sha256": "bedd416520212a0dd543ca3550739c77213de989ed6454a4cbb5acc104a42562"
+    },
+    {
+      "path": "web/log-console.html",
+      "sha256": "5943c5988bda37d95aaf5f3cb36ce57988f8d19edb3af42577038c8ebbbc977e"
+    },
+    {
+      "path": "web/log-console.css",
+      "sha256": "88d7bbcd3f46f54e8d9ca61857898026a465ba5d9e09bfe841fdd081e8f8eb09"
+    },
+    {
+      "path": "web/swarm-design.css",
+      "sha256": "368af3f66815af113ae4115f40d8996cdcde174f49f6c1ebfbd58047c7f1e760"
+    },
+    {
+      "path": "locales/en.json",
+      "sha256": "77c3b4a4e3d6580fd00ff23289cc920b015be4ca2f7731772ac88d6fbc5b3740"
+    },
+    {
+      "path": "package.json",
+      "sha256": "7bc32506f0c65c6c196f48905377411ed7ae75d1e4d0115e023332a6f7ec8b75"
+    }
+  ],
+  "limits": [
+    "Author verification, no independent review",
+    "Projected log API, clipboard and common/prepared render fixtures are identified in results",
+    "No paid provider, no live database, no user server restart",
+    "Interrupted earlier candidates are not PASS",
+    "Unrelated dirty engine inputs are observed without authorship or acceptance"
+  ]
+}

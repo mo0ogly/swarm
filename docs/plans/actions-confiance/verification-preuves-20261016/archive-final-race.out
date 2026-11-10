@@ -1,0 +1,96 @@
+=== RUN   TestActionsConfianceT6ArchiveLifecycle
+--- PASS: TestActionsConfianceT6ArchiveLifecycle (1.44s)
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles/missing
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles/corrupt
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles/link
+=== RUN   TestActionsConfianceT6ArchiveRejectsDamagedFiles/directory-link
+--- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles (4.57s)
+    --- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles/missing (1.30s)
+    --- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles/corrupt (1.19s)
+    --- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles/link (1.06s)
+    --- PASS: TestActionsConfianceT6ArchiveRejectsDamagedFiles/directory-link (1.02s)
+=== RUN   TestActionsConfianceT6ArchiveOrphanAndPolicy
+--- PASS: TestActionsConfianceT6ArchiveOrphanAndPolicy (1.06s)
+=== RUN   TestActionsConfianceT6ArchiveConcurrentReplay
+--- PASS: TestActionsConfianceT6ArchiveConcurrentReplay (1.11s)
+=== RUN   TestActionsConfianceT6ArchiveLargeRetention
+--- PASS: TestActionsConfianceT6ArchiveLargeRetention (0.00s)
+=== RUN   TestActionsConfianceT6ArchiveInvalidInputs
+=== RUN   TestActionsConfianceT6ArchiveInvalidInputs/wrong-hash
+=== RUN   TestActionsConfianceT6ArchiveInvalidInputs/wrong-sequence
+=== RUN   TestActionsConfianceT6ArchiveInvalidInputs/wrong-signature
+=== RUN   TestActionsConfianceT6ArchiveInvalidInputs/stale-revision
+--- PASS: TestActionsConfianceT6ArchiveInvalidInputs (3.93s)
+    --- PASS: TestActionsConfianceT6ArchiveInvalidInputs/wrong-hash (1.14s)
+    --- PASS: TestActionsConfianceT6ArchiveInvalidInputs/wrong-sequence (1.01s)
+    --- PASS: TestActionsConfianceT6ArchiveInvalidInputs/wrong-signature (0.93s)
+    --- PASS: TestActionsConfianceT6ArchiveInvalidInputs/stale-revision (0.85s)
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint/equal
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint/rotation-extension
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint/rollback-signed-old-bundle
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint/missing
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint/null
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint/bad-signature
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint/revoked-pin
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint/wrong-pin
+=== RUN   TestActionsConfianceT6EvidenceCheckpoint/signed-divergent-history
+--- PASS: TestActionsConfianceT6EvidenceCheckpoint (1.21s)
+    --- PASS: TestActionsConfianceT6EvidenceCheckpoint/equal (0.01s)
+    --- PASS: TestActionsConfianceT6EvidenceCheckpoint/rotation-extension (0.02s)
+    --- PASS: TestActionsConfianceT6EvidenceCheckpoint/rollback-signed-old-bundle (0.01s)
+    --- PASS: TestActionsConfianceT6EvidenceCheckpoint/missing (0.01s)
+    --- PASS: TestActionsConfianceT6EvidenceCheckpoint/null (0.01s)
+    --- PASS: TestActionsConfianceT6EvidenceCheckpoint/bad-signature (0.01s)
+    --- PASS: TestActionsConfianceT6EvidenceCheckpoint/revoked-pin (0.01s)
+    --- PASS: TestActionsConfianceT6EvidenceCheckpoint/wrong-pin (0.01s)
+    --- PASS: TestActionsConfianceT6EvidenceCheckpoint/signed-divergent-history (0.03s)
+=== RUN   TestActionsConfianceT6EvidencePublicNamespace
+--- PASS: TestActionsConfianceT6EvidencePublicNamespace (0.92s)
+=== RUN   TestActionsConfianceT6EvidenceRotationRevokeAndRestart
+--- PASS: TestActionsConfianceT6EvidenceRotationRevokeAndRestart (1.33s)
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/domain
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/signature
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/wrong-key
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/payload
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/pin-revoked
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/pin-inconsistent-revocation
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/key-period
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/truncation
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/reorder
+=== RUN   TestActionsConfianceT6EvidenceVerifyRejectsCorruption/empty
+--- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption (0.95s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/domain (0.00s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/signature (0.00s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/wrong-key (0.00s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/payload (0.00s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/pin-revoked (0.00s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/pin-inconsistent-revocation (0.00s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/key-period (0.00s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/truncation (0.01s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/reorder (0.01s)
+    --- PASS: TestActionsConfianceT6EvidenceVerifyRejectsCorruption/empty (0.01s)
+=== RUN   TestActionsConfianceT6EvidencePolicyStrictAndPreserved
+=== RUN   TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":null,"key_ttl_seconds":10}
+=== RUN   TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":true,"key_ttl_seconds":0}
+=== RUN   TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":false}
+=== RUN   TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":false,"key_ttl_seconds":null}
+=== RUN   TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":true,"key_ttl_seconds":1.5}
+--- PASS: TestActionsConfianceT6EvidencePolicyStrictAndPreserved (0.95s)
+    --- PASS: TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":null,"key_ttl_seconds":10} (0.00s)
+    --- PASS: TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":true,"key_ttl_seconds":0} (0.00s)
+    --- PASS: TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":false} (0.00s)
+    --- PASS: TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":false,"key_ttl_seconds":null} (0.00s)
+    --- PASS: TestActionsConfianceT6EvidencePolicyStrictAndPreserved/{"enabled":true,"key_ttl_seconds":1.5} (0.00s)
+=== RUN   TestActionsConfianceT6EvidencePrivateMaterialNotPersisted
+--- PASS: TestActionsConfianceT6EvidencePrivateMaterialNotPersisted (0.97s)
+=== RUN   TestActionsConfianceT6EvidenceExpiryAndCancellation
+--- PASS: TestActionsConfianceT6EvidenceExpiryAndCancellation (1.98s)
+=== RUN   TestActionsConfianceT6EvidenceRevokeWhileDisabled
+--- PASS: TestActionsConfianceT6EvidenceRevokeWhileDisabled (1.02s)
+=== RUN   TestActionsConfianceT6EvidenceConcurrentPrepare
+--- PASS: TestActionsConfianceT6EvidenceConcurrentPrepare (1.09s)
+PASS
+ok  	swarm.local/companion/internal/engine	24.161s

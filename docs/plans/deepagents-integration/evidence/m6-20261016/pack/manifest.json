@@ -1,0 +1,167 @@
+{
+  "cases": [
+    {
+      "context": {
+        "sha256": "4d6e277698dcd6f364c9c3d4ff9f63e514897918a9e6875c683be54c1e6f8762",
+        "bytes": 39714,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "archive_available": true,
+        "archive_sha256": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7",
+        "artifact": "proof.txt",
+        "historical_task_status": "accepted",
+        "required_sha256": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7",
+        "target_sha256": null,
+        "target_state": "missing"
+      },
+      "id": "missing-recoverable-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "missing-recoverable-without.txt",
+      "prompt_sha256": "aec3eec888a2d13d442c93abde379b4f9595f73bf077718b3ba330d9d76a2aec",
+      "raw_prompt": "missing-recoverable-without.engine.txt",
+      "scenario": "missing-recoverable",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-ba040019edafdaaf35ca3dbc",
+            "id": "import-proof-procedure",
+            "version": 1,
+            "sha256": "8861271c1013ae7a68535a8597fa7411d9828653961caa9e4ee0a2677cc4dcd8"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-c35c167efb032c4812eed98f",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Procédure pertinente à confronter aux observations courantes",
+          "at": "2026-10-16T06:31:53.72263765Z"
+        },
+        "sha256": "1a2b253691740e59185ed14b786753325809c27622892c6ce31807be7287c625",
+        "bytes": 41041,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "archive_available": true,
+        "archive_sha256": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7",
+        "artifact": "proof.txt",
+        "historical_task_status": "accepted",
+        "required_sha256": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7",
+        "target_sha256": null,
+        "target_state": "missing"
+      },
+      "id": "missing-recoverable-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "missing-recoverable-with.txt",
+      "prompt_sha256": "7c361beb6b7e9df0efada9ee5162706b1af3019b6487027d77a7dff47b5ac963",
+      "raw_prompt": "missing-recoverable-with.engine.txt",
+      "scenario": "missing-recoverable",
+      "source_revision": 3,
+      "treatment": "with"
+    },
+    {
+      "context": {
+        "sha256": "2ea35a7417dd4998f2302fb691b07afd11b01171595a72b3248eaa031ec4111e",
+        "bytes": 39717,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "archive_available": false,
+        "archive_sha256": null,
+        "artifact": "proof.txt",
+        "historical_task_status": "accepted",
+        "required_sha256": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7",
+        "target_sha256": "53f87adfc0babf8d474f71de94b32a15f2180be61475548390d51aafa213ff91",
+        "target_state": "different"
+      },
+      "id": "changed-unrecoverable-without",
+      "normalization": "work-revision-only-v1",
+      "prompt": "changed-unrecoverable-without.txt",
+      "prompt_sha256": "5f7da0222796c68cdf5aeed9d774260351d8291b5895c0ea4f7ed260cd36e042",
+      "raw_prompt": "changed-unrecoverable-without.engine.txt",
+      "scenario": "changed-unrecoverable",
+      "source_revision": 2,
+      "treatment": "without"
+    },
+    {
+      "context": {
+        "memory": [
+          {
+            "work": "w-ba040019edafdaaf35ca3dbc",
+            "id": "import-proof-procedure",
+            "version": 1,
+            "sha256": "8861271c1013ae7a68535a8597fa7411d9828653961caa9e4ee0a2677cc4dcd8"
+          }
+        ],
+        "memory_decision": {
+          "event_id": "memory-c7006a6dad208e3bc8c6a87e",
+          "actor": "fpizzi/uid:1001",
+          "reason": "Procédure pertinente à confronter aux observations courantes",
+          "at": "2026-10-16T06:31:53.909119844Z"
+        },
+        "sha256": "57650ea3d0addd692976047727ea77d874a0c12cabcf635ba0da7770cbac611d",
+        "bytes": 41044,
+        "included": [],
+        "excluded": [],
+        "references": null,
+        "paths": null
+      },
+      "facts": {
+        "archive_available": false,
+        "archive_sha256": null,
+        "artifact": "proof.txt",
+        "historical_task_status": "accepted",
+        "required_sha256": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7",
+        "target_sha256": "53f87adfc0babf8d474f71de94b32a15f2180be61475548390d51aafa213ff91",
+        "target_state": "different"
+      },
+      "id": "changed-unrecoverable-with",
+      "normalization": "work-revision-only-v1",
+      "prompt": "changed-unrecoverable-with.txt",
+      "prompt_sha256": "9b3f625b4a957fe70be4abe8b8ca17f894aa57e7f50de199270d1924e04bbe9b",
+      "raw_prompt": "changed-unrecoverable-with.engine.txt",
+      "scenario": "changed-unrecoverable",
+      "source_revision": 3,
+      "treatment": "with"
+    }
+  ],
+  "gate_replays": {
+    "changed-unrecoverable": {
+      "before_ship_allowed": false,
+      "fixture_only": true
+    },
+    "missing-recoverable": {
+      "after_ship_allowed": true,
+      "before_ship_allowed": false,
+      "fixture_only": true
+    }
+  },
+  "lesson": {
+    "version": 1,
+    "action": "admit",
+    "kind": "procedure",
+    "body": "Une archive importée conserve des preuves historiques sans installer nécessairement les artefacts dans la racine cible. Avant admission, comparer les empreintes de l'original récupérable. Si elles correspondent, vérifier l'archive, restaurer l'artefact puis évaluer la cible actuelle. Sans original vérifiable, bloquer l'admission et demander une preuve fraîche. Ne pas remplacer une preuve courante différente par une copie non vérifiée ; une ancienne acceptation ne valide pas la cible.",
+    "conditions": "Archive et cible distinctes ; vérifier disponibilité, empreintes et contexte courant. Une restauration n'est possible que depuis un original vérifié.",
+    "source_retex": "memory-source",
+    "source_sha256": "c7908263f2c28b945b2955aef4385cf4314dc3d72fb051e47779bf4a4390d4c3",
+    "project_sha256": "f3a4f5389984893b854fd2cd6aed173e40c4368d315f245c88dc533ee76c9325",
+    "actor": "fpizzi/uid:1001",
+    "reason": "Comparer une décision et sa variante, sans généraliser l'ancienne réussite",
+    "at": "2026-10-16T06:31:53.643522234Z",
+    "sha256": "8861271c1013ae7a68535a8597fa7411d9828653961caa9e4ee0a2677cc4dcd8"
+  },
+  "provenance": "engine-preview-fixture; no provider invocation",
+  "schema_version": 1
+}

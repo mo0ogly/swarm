@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-17T11:29:22.898492+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "preimages": [
+    "docs/PROJECT-MEMORY.md",
+    "docs/en/PROJECT-MEMORY.md",
+    "docs/plans/deepagents-integration/PLAN.md",
+    "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+    "internal/engine/memory_usage_binding.go",
+    "internal/engine/memory_usage_binding_test.go"
+  ],
+  "read_only": {
+    "internal/engine/memory_summary_source.go": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+    "internal/engine/memory_summary_selection.go": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+    "internal/engine/agent_identity_contract.go": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+    "internal/engine/agent_identity_authority.go": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53"
+  },
+  "watchdog": "No justified global bound for these local checks: go test -timeout=0, monitored progress; keep functional deadlines intact"
+}

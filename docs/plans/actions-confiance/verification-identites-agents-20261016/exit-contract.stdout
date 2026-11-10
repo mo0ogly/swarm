@@ -1,0 +1,8 @@
+{"probe": "IA1-F01", "execution": "PASS", "security": "FAIL"}
+{"probe": "IA1-F02", "execution": "PASS", "security": "FAIL"}
+{"probe": "IA1-F03", "execution": "PASS", "security": "FAIL"}
+{"probe": "IA1-F04", "execution": "PASS", "security": "FAIL"}
+{"probe": "IA1-F05", "execution": "PASS", "security": "FAIL"}
+{"probe": "IA1-F06", "execution": "PASS", "security": "FAIL"}
+{"probe": "IA1-F07", "execution": "PASS", "security": "FAIL"}
+{"execution": "PASS", "security": "FAIL", "counterexamples": 7, "existing_controls": 2, "scripted_processes": 8, "model_calls": 0}

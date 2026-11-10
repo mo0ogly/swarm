@@ -1,0 +1,22 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityRejectsCachedCaller$",
+    "-count=1",
+    "-timeout",
+    "30s"
+  ],
+  "start": "2026-10-17T05:43:13.045617+00:00",
+  "end": "2026-10-17T05:43:37.176512+00:00",
+  "exit_code": 1,
+  "source_sha256": {
+    "internal/engine/agent_identity_authority.go": "cf3335787743d4458f1b80eaf67d6ec94057f89cfe3d9845badcec3a0c689efc",
+    "internal/engine/agent_identity_authority_test.go": "a473d096e752d10a97f135aa1805e05c84ead1a9695ffb33802d33d56b3f6dde",
+    "internal/engine/agent_identity_contract_test.go": "33b33cf3d0c676c244352b69a05f2c7e0bd8a911d6c489e288fb70aab7dca1f2",
+    "internal/engine/agent_identity_contract.go": "7a3d4da261aa1ef94d35be376e76af09d9d119b32636e6fe8a111573bc9a4d18"
+  }
+}

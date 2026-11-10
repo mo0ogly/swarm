@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T18:08:34.831362+00:00",
+  "parent": "unresolved-review-recovery-20261011.patch",
+  "parent_tree": "0415ac3a23ed9fe1a48ddd14fc60119bbded0859",
+  "preimage_tree": "6db659f3aaae42f55ae1ca426874e5ab076f3bd1",
+  "preimage_extensions": [
+    {
+      "path": "internal/engine/managed_review_reply_test.go",
+      "sha256": "0047e6ef1f14c3dfc516235ac1e0c165290ebacfe8fbd89e592f2b5313cd8142",
+      "blob": "257cc513ad2b6ab4b36d1cdf17ea6831af56b358"
+    }
+  ],
+  "preimages": {
+    "internal/engine/managed_review_reply_test.go": "0047e6ef1f14c3dfc516235ac1e0c165290ebacfe8fbd89e592f2b5313cd8142"
+  },
+  "postimages": {
+    "internal/engine/managed_review_reply_test.go": "d7062852787ee0a18221430f4d32e33ea478ac6400cbeb50a341c44f62e0a948"
+  },
+  "result_tree": "1ad5ba979b668619d35a036b8fd90c6970da27f5",
+  "patch": "review-missing-result-diagnostic-20261011.patch",
+  "patch_sha256": "fde5f92e74c2f5aa06c95866a5759813b07ceb62bd1c7fd6229e10d236336c99",
+  "paths": [
+    "internal/engine/managed_review_reply_test.go"
+  ],
+  "check": "PASS exact preimage, apply check/apply and exact result tree",
+  "purpose": "Retain first boundary: missing IndependentReview must report actual task/blocker/managed-attempt detail instead of a nil panic. Original cause not captured/unattributed. Quote rejection, raw reply and acceptance guards unchanged. Diagnostic alone/preceding sequence/20x PASS, cumulative full19 pending.",
+  "qualification": {
+    "cumulative_source_digest": "afc079ad08db70a1c0f18a0e53e6a3081054ecd55e432d0dab965c6099d85690",
+    "full_receipt": "/tmp/swarm-local-negative-recovery-qualified-v2-full-receipt.json",
+    "full_exit": 0,
+    "full_seconds": 495.57582037799875,
+    "source_drift": [],
+    "targeted": "/tmp/swarm-local-negative-recovery-qualified-v2-targeted.out",
+    "race": "/tmp/swarm-local-negative-recovery-qualified-v2-race.out",
+    "limits": "Cumulative17+18+18b+19 qualified.18 initial nil-review panic and19 initial temporary-storage guard failures remain original evidence; native supervisor delivery/effect and T3..RETEX still pending. No independent native acceptance inferred."
+  }
+}

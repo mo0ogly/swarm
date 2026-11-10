@@ -1,0 +1,9 @@
+{
+  "automation_id": "superviser-swarm-actions-de-confiance",
+  "status": "ACTIVE",
+  "at": "2026-10-16T01:40:56.197209+00:00",
+  "result": "R18 locally verified",
+  "next": "R19 applicability matrix, then eBPF, global qualification and RETEX",
+  "notification_policy": "meaningful changes only; quiet if unchanged/non-actionable",
+  "independent_global_acceptance": false
+}

@@ -1,0 +1,85 @@
+{
+  "observed_at": "2026-11-09T06:06:30.523227+00:00",
+  "authority": "Fabrice autorise une branche de livraison unique et une PR sans toucher aux protections ; développement sérialisé main ; facturation différée",
+  "branch": "codex/delivery-swarm-20261109",
+  "head": "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a",
+  "pr": "https://github.com/mo0ogly/swarm/pull/22",
+  "state": "OPEN",
+  "merge_state": "BLOCKED",
+  "merged": false,
+  "checks": [
+    {
+      "link": "https://github.com/mo0ogly/swarm/actions/runs/42570757206/job/129007326327",
+      "name": "checks",
+      "state": "IN_PROGRESS"
+    },
+    {
+      "link": "https://github.com/mo0ogly/swarm/actions/runs/42570757206/job/129007326605",
+      "name": "install",
+      "state": "IN_PROGRESS"
+    }
+  ],
+  "protection": {
+    "enforce_admins": true,
+    "strict": true,
+    "contexts": [
+      "checks",
+      "install"
+    ],
+    "required_pull_request_reviews": true,
+    "required_approving_review_count": 0,
+    "changed": false
+  },
+  "local_checkout": "main",
+  "uncommitted_work": "preserved, excluded from branch push",
+  "commits_pushed": [
+    "d084c1487726f0d240de84d521d19d14d7938250",
+    "5efab9fcbcbe6b6f01f598b05e0ecf79a414b85f",
+    "7e8cca69076a60a7671d2179eec0f0f536392e8e",
+    "9d40b7e60648756ed1082b7991f6288e0063bf51",
+    "8549dcc42f8e924db76685a8d0d0d7292cefafca",
+    "1d69f956b7201f6266e773831700f3fb3b1da005",
+    "a547d8e0519e4bf5620842e991b535889e59be85",
+    "79b8d854a8e1aab4cc5d6f896b6cdb116918a34a"
+  ],
+  "ui365": {
+    "authenticated_session": "frontdoor38433 Fabrice session observed",
+    "version_fr_en": "v0.1.1-dev.365",
+    "build_commit": "a547d8e0519e4bf5620842e991b535889e59be85",
+    "modified_disclosure": "visible FR/EN, base commit and GitHub link exact",
+    "recorded_history": "Historique reçu — statut opérationnel non évalué. Separate Vérifier le statut actuel button visible",
+    "calculated_summary": "revision881, T1 fresh/passed/accepted; T2 unknown/not_accepted; no task launched",
+    "limits": "Read-only observation, not independent acceptance or provider test. No claim that UI text proves every listed function.",
+    "proofs": [
+      {
+        "path": ".cache/integration-code-20261109/version365-fr.jpg",
+        "sha256": "5b45336da4b3f304611ee37e9e03f8d9e2333683b5a77631ba9679a6027b607a"
+      },
+      {
+        "path": ".cache/integration-code-20261109/version365-en-ui.txt",
+        "sha256": "1825aea15479736ea128b01959be5515f25a8ce8534d60bbd5eeeb5703080445"
+      },
+      {
+        "path": ".cache/integration-code-20261109/resume365-fr-ui.txt",
+        "sha256": "6fd0f4279be846e27f90ce82a2869ed4cf089f31cb2053a00a332bce4837a21a"
+      },
+      {
+        "path": ".cache/integration-code-20261109/history365-fr-ui.txt",
+        "sha256": "c4072bc71e616e0c46e7d67eb79039c84443a88b6982bd4727b069be2ba1e866"
+      }
+    ],
+    "method_diagnostics": "Semantic Langue and Appearance selectors did not match; observed explicit ID/native AX routes used after fresh state. No authority or product code changed."
+  },
+  "automation": "Existing heartbeat updated and reread; PR22 only, no other delivery branch, no merge authority inferred, billing deferred",
+  "next": "Follow checks/install for exact head, diagnose failures within owned scope; no merge implicitly authorized",
+  "CI_history": [
+    {
+      "at": "2026-11-09T06:16:26.696693+00:00",
+      "head": "254e1bc8b7eb77b99d3847e66ce1db2a1b7c852d",
+      "checks": "FAILURE",
+      "install": "SUCCESS",
+      "report": "CI-PR22-20261109.md",
+      "fix": "pending new exact head verification"
+    }
+  ]
+}

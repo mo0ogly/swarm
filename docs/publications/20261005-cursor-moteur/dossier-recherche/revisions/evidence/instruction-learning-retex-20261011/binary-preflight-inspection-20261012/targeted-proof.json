@@ -1,0 +1,15 @@
+{
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/binary-preflight-inspection-ypkxu18q",
+  "selected_contract_source_hashes": {
+    "internal/engine/managed_review.go": "9fe00c135d1dbff86cf1a829e4c0e0863c53d6181411ce67ba813e5fa5e7044f",
+    "internal/engine/managed_review_preflight_retry.go": "d42fd3644bc2659252b1f0ba387326d4db9c092c2c80aef87e98751896f08b4d",
+    "internal/engine/managed_scope.go": "502d3eaea01ba0e087aa53b798490a09a46bac53d3abe5438dab8ccf9a1823d2",
+    "internal/engine/managed_binary_preflight_inspection_test.go": "af3359990793dd9e2d929d0ebfaafd6bba10b194d2e51baebd75733060bec5d5"
+  },
+  "red_exit": 1,
+  "red_output": "/tmp/swarm-binary-preflight-inspection-red.out",
+  "targeted_exit": 0,
+  "targeted_output": "/tmp/swarm-binary-preflight-inspection-targeted.out",
+  "targeted_package_seconds": 50.854,
+  "limits": "Real isolated engine checkpoint and binary file; reviewer double, no model/native database. No visual verdict."
+}

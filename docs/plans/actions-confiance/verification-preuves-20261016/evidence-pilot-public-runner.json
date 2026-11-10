@@ -1,0 +1,10 @@
+{
+  "pid": 2329513,
+  "proc_start_ticks": "4149234",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-evidence-pilot-public.py",
+    "run"
+  ],
+  "at": "2026-10-15T23:31:08.198910+00:00"
+}

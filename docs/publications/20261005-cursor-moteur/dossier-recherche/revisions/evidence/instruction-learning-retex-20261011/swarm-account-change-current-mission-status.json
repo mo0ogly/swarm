@@ -1,0 +1,1097 @@
+{
+  "changes_since_visit": {
+    "from_revision": 0,
+    "to_revision": 357,
+    "first_visit": true,
+    "more": false,
+    "items": []
+  },
+  "spending": {
+    "observed_at": "2026-10-11T15:44:53.69860705Z",
+    "measurement_source": "agent.lifecycle + agent.progress + provider.result + task.review-history + planning_calls + events",
+    "rows": [
+      {
+        "kind": "planner",
+        "id": "root",
+        "label": "Responsable : root",
+        "recorded_calls": 29,
+        "observed_tool_calls": 0,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 58,
+        "output_tokens": 308119,
+        "calls_without_usage": 2,
+        "cost": {
+          "reported_usd": 6.3602526,
+          "attempts_with_cost": 27,
+          "attempts_without_cost": 2
+        },
+        "reviews_recorded": 0,
+        "task_retries": 0,
+        "recorded_process_ms": null,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "reviewer",
+        "id": "reviewer",
+        "label": "Vérificateur indépendant",
+        "recorded_calls": 29,
+        "observed_tool_calls": 0,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 76,
+        "output_tokens": 1117205,
+        "calls_without_usage": 2,
+        "cost": {
+          "reported_usd": 22.405102,
+          "attempts_with_cost": 27,
+          "attempts_without_cost": 2
+        },
+        "reviews_recorded": 0,
+        "task_retries": 0,
+        "recorded_process_ms": null,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "plan-ca937edf4e-T1",
+        "label": "Confirmer les écarts et décider l’architecture de l’évolution",
+        "recorded_calls": 2,
+        "observed_tool_calls": 75,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 130,
+        "output_tokens": 97186,
+        "calls_without_usage": 0,
+        "cost": {
+          "reported_usd": 3.5797526,
+          "attempts_with_cost": 2,
+          "attempts_without_cost": 0
+        },
+        "reviews_recorded": 2,
+        "task_retries": 0,
+        "recorded_process_ms": 1458627,
+        "attempts_without_duration": 0
+      },
+      {
+        "kind": "worker",
+        "id": "plan-ca937edf4e-T2",
+        "label": "Implémenter le juge global et le renouvellement des cycles",
+        "recorded_calls": 3,
+        "observed_tool_calls": 195,
+        "attempts_with_incomplete_tool_measurement": 0,
+        "input_tokens": 210,
+        "output_tokens": 134517,
+        "calls_without_usage": 1,
+        "cost": {
+          "reported_usd": 6.099574399999999,
+          "attempts_with_cost": 2,
+          "attempts_without_cost": 1
+        },
+        "reviews_recorded": 4,
+        "task_retries": 1,
+        "recorded_process_ms": 4059404,
+        "attempts_without_duration": 0
+      }
+    ],
+    "recorded_control_executions": 0,
+    "worker_retries": 1,
+    "note": "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.",
+    "attempts": [
+      {
+        "task": "plan-ca937edf4e-T1",
+        "label": "Confirmer les écarts et décider l’architecture de l’évolution",
+        "agent": "auto-12f5d63624b255c3e70a",
+        "attempt": "a-d01bafdfcfe21d50ef1d7d8c",
+        "role": "worker",
+        "requested_model": "sonnet",
+        "observed_model": "claude-sonnet-5",
+        "process_state": "completed",
+        "task_acceptance_recorded": true,
+        "measurement": "observed",
+        "recorded_calls": 1,
+        "observed_tool_calls": 46,
+        "measured": true,
+        "tool_reads": 9,
+        "tool_writes": 7,
+        "tool_unclassified": 30,
+        "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+        "tool_errors_total": 1,
+        "tool_repeats_total": 1,
+        "input_tokens": 76,
+        "output_tokens": 55679,
+        "usage_missing": false,
+        "cost": {
+          "reported_usd": 2.0615524,
+          "attempts_with_cost": 1,
+          "attempts_without_cost": 0
+        },
+        "started": "2026-10-10T17:01:27.73414579Z",
+        "ended": "2026-10-10T17:15:33.665536067Z",
+        "recorded_process_ms": 845931
+      },
+      {
+        "task": "plan-ca937edf4e-T1",
+        "label": "Confirmer les écarts et décider l’architecture de l’évolution",
+        "agent": "auto-ed3d6ce2b54e02740a68",
+        "attempt": "a-29a7a2f21ea5f1f764409e08",
+        "role": "worker",
+        "requested_model": "sonnet",
+        "observed_model": "claude-sonnet-5",
+        "process_state": "completed",
+        "task_acceptance_recorded": true,
+        "measurement": "observed",
+        "recorded_calls": 1,
+        "observed_tool_calls": 29,
+        "measured": true,
+        "tool_reads": 4,
+        "tool_writes": 7,
+        "tool_unclassified": 18,
+        "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+        "tool_errors_total": 0,
+        "tool_repeats_total": 0,
+        "input_tokens": 54,
+        "output_tokens": 41507,
+        "usage_missing": false,
+        "cost": {
+          "reported_usd": 1.5182001999999997,
+          "attempts_with_cost": 1,
+          "attempts_without_cost": 0
+        },
+        "started": "2026-10-10T17:34:48.887156123Z",
+        "ended": "2026-10-10T17:45:01.58399704Z",
+        "recorded_process_ms": 612696
+      },
+      {
+        "task": "plan-ca937edf4e-T2",
+        "label": "Implémenter le juge global et le renouvellement des cycles",
+        "agent": "auto-0f7f61a183068fd63528",
+        "attempt": "a-5fff6319655d0b5b9b34413a",
+        "role": "worker",
+        "requested_model": "sonnet",
+        "observed_model": "claude-sonnet-5",
+        "process_state": "completed",
+        "task_acceptance_recorded": false,
+        "measurement": "observed",
+        "recorded_calls": 1,
+        "observed_tool_calls": 76,
+        "measured": true,
+        "tool_reads": 17,
+        "tool_writes": 25,
+        "tool_unclassified": 34,
+        "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+        "tool_errors_total": 0,
+        "tool_repeats_total": 0,
+        "input_tokens": 130,
+        "output_tokens": 101820,
+        "usage_missing": false,
+        "cost": {
+          "reported_usd": 4.363437799999999,
+          "attempts_with_cost": 1,
+          "attempts_without_cost": 0
+        },
+        "started": "2026-10-10T18:40:16.176497123Z",
+        "ended": "2026-10-10T19:07:59.090679536Z",
+        "recorded_process_ms": 1662914
+      },
+      {
+        "task": "plan-ca937edf4e-T2",
+        "label": "Implémenter le juge global et le renouvellement des cycles",
+        "agent": "auto-a23c60f03a732c02841f",
+        "attempt": "a-2f9e1debb1548be96273f0d3",
+        "role": "worker",
+        "requested_model": "sonnet",
+        "observed_model": "claude-sonnet-5",
+        "process_state": "completed",
+        "task_acceptance_recorded": false,
+        "measurement": "observed",
+        "recorded_calls": 1,
+        "observed_tool_calls": 41,
+        "measured": true,
+        "tool_reads": 12,
+        "tool_writes": 5,
+        "tool_unclassified": 24,
+        "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+        "tool_errors_total": 1,
+        "tool_repeats_total": 1,
+        "input_tokens": 80,
+        "output_tokens": 32697,
+        "usage_missing": false,
+        "cost": {
+          "reported_usd": 1.7361366,
+          "attempts_with_cost": 1,
+          "attempts_without_cost": 0
+        },
+        "started": "2026-10-11T14:12:02.469807917Z",
+        "ended": "2026-10-11T14:21:56.918328529Z",
+        "recorded_process_ms": 594448
+      },
+      {
+        "task": "plan-ca937edf4e-T2",
+        "label": "Implémenter le juge global et le renouvellement des cycles",
+        "agent": "auto-f2abbcfe6bed66fd1a5e",
+        "attempt": "a-a349f9134d355713576b7166",
+        "role": "worker",
+        "requested_model": "sonnet",
+        "observed_model": "claude-sonnet-5",
+        "process_state": "interrupted",
+        "task_acceptance_recorded": false,
+        "measurement": "observed",
+        "recorded_calls": 1,
+        "observed_tool_calls": 78,
+        "measured": true,
+        "tool_reads": 9,
+        "tool_writes": 19,
+        "tool_unclassified": 50,
+        "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+        "tool_errors_total": 3,
+        "tool_repeats_total": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "usage_missing": true,
+        "cost": {
+          "reported_usd": 0,
+          "attempts_with_cost": 0,
+          "attempts_without_cost": 1
+        },
+        "started": "2026-10-11T08:06:25.430999347Z",
+        "ended": "2026-10-11T08:36:27.473812792Z",
+        "recorded_process_ms": 1802042
+      }
+    ]
+  },
+  "guidance": {
+    "what": "Le rapport est conservé ; le vérificateur indépendant examine le candidat testé.",
+    "next": "Attendre l’avis indépendant ; le résultat n’est pas encore accepté.",
+    "actor": "Le superviseur",
+    "primary": {
+      "kind": "task",
+      "label": "Voir les contrôles en cours",
+      "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+      "task": "plan-ca937edf4e-T2",
+      "tone": "info"
+    }
+  },
+  "runtime": {
+    "state": "ready",
+    "launch_allowed": true,
+    "observed_at": "2026-10-11T15:44:53.55785345Z",
+    "message": "Le stockage est disponible.",
+    "next_step": "Les autres conditions de lancement restent contrôlées par le moteur.",
+    "volumes": [
+      {
+        "kind": "store",
+        "path": "/home/fpizzi/workspace/swarm/.swarm",
+        "available_bytes": 34371633152,
+        "available_inodes": 26340535,
+        "state": "ready"
+      },
+      {
+        "kind": "temporary",
+        "path": "/tmp",
+        "available_bytes": 1284988928,
+        "available_inodes": 1015909,
+        "state": "ready"
+      }
+    ],
+    "version": {
+      "binary": {
+        "version": "devel",
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "build_date": "2026-10-11T15:31:49Z",
+        "provenance": "injected"
+      },
+      "source": {
+        "available": true,
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "compared": true,
+        "matches_binary": true
+      },
+      "history": {
+        "schema_version": 1,
+        "available": true,
+        "releases": [
+          {
+            "version": "v0.1.0",
+            "date": "2026-10-06",
+            "summary": {
+              "fr": "Première release expérimentale : édition du graphe avec prévisualisation, automatisation durable, administration des paramètres, validation indépendante et reprise tracée des contrats bloqués.",
+              "en": "First experimental release: graph editing with previews, durable automation, configurable administration, independent validation and audited recovery of blocked contracts."
+            },
+            "commits": [
+              {
+                "sha": "191616999c5f4b30e901042b51898cfbb21a3e06",
+                "url": "https://github.com/mo0ogly/swarm/commit/191616999c5f4b30e901042b51898cfbb21a3e06"
+              },
+              {
+                "sha": "2d08f0510d7f6da36d7f03cb9481dde7de249fe8",
+                "url": "https://github.com/mo0ogly/swarm/commit/2d08f0510d7f6da36d7f03cb9481dde7de249fe8"
+              }
+            ],
+            "release_url": "https://github.com/mo0ogly/swarm/releases/tag/v0.1.0"
+          }
+        ]
+      }
+    },
+    "version_diagnostic": {
+      "installed_cli": {
+        "available": false,
+        "version": null,
+        "commit": null,
+        "modified": null,
+        "provenance": "browser",
+        "hint": "Le navigateur ne peut pas inspecter le CLI local. Lancez swarm version --server URL_DE_SESSION."
+      },
+      "active_server": {
+        "available": true,
+        "version": "devel",
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "provenance": "injected"
+      },
+      "candidate": {
+        "available": true,
+        "version": null,
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "provenance": "git"
+      },
+      "state": "unknown",
+      "differences": [],
+      "next_step": "Rendez accessibles les identités manquantes (installed_cli) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+    }
+  },
+  "evidence_stage": "Parcours de cette mission non encore vérifié jusqu’à la clôture. Une recette isolée ou une installation ne vaut pas cette preuve.",
+  "organization": {
+    "ready": true,
+    "label": "Organisation autonome configurée",
+    "issues": [],
+    "next": "Consulter les responsables et les contrôles autorisés.",
+    "verification": "Vérificateur IA indépendant : claude · 29/100 appels. Avis requis avant acceptation. Contrôles configurés ; aucune revue IA indépendante implicite."
+  },
+  "authorized": true,
+  "enabled": true,
+  "paused": false,
+  "summary": "1/8 résultats validés · 1 à examiner · 0 tâche(s) en cours · 0 agent(s) actif(s) confirmé(s) · 0 état(s) agent incertain(s)",
+  "next": "Attendre l’avis indépendant ; le résultat n’est pas encore accepté.",
+  "validated": 1,
+  "review": 1,
+  "running": 0,
+  "active_agents": 0,
+  "uncertain_agents": 0,
+  "total": 8,
+  "supervision": {
+    "state": "active",
+    "source": "serveur web",
+    "observed_at": "2026-10-11T15:44:51.785696169Z",
+    "last_check_at": "2026-10-11T15:44:51.785696169Z",
+    "last_check_relative": "à l’instant",
+    "reconciled_at": "2026-10-11T15:34:15.835975707Z",
+    "next_check_at": "2026-10-11T15:44:53.785696169Z",
+    "next_check_relative": "dans moins de 2 s",
+    "late": false,
+    "last_action": {
+      "at": "2026-10-11T14:12:02.546148489Z",
+      "relative": "il y a environ 2 h",
+      "actor": "Conducteur Swarm",
+      "kind": "dispatch",
+      "summary": "plan-ca937edf4e-T2 : départ automatique · claude · rôle worker · espace /home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T2-3"
+    }
+  },
+  "understanding": {
+    "what": "Le rapport est conservé ; le vérificateur indépendant examine le candidat testé.",
+    "next_step": "Attendre l’avis indépendant ; le résultat n’est pas encore accepté.",
+    "actor": "Le superviseur",
+    "actor_kind": "supervisor",
+    "situation": "attente_normale"
+  },
+  "coordination": [
+    {
+      "kind": "work",
+      "label": "Travail",
+      "summary": "Aucune tâche n’est actuellement déclarée en cours.",
+      "actor": "Personne pour le moment",
+      "next_step": "Suivre la prochaine action indiquée."
+    },
+    {
+      "kind": "wait",
+      "label": "Attente",
+      "summary": "Implémenter exploration et sous-planification concurrente — Attend Implémenter le juge global et le renouvellement des cycles · 5 autre(s) attente(s)",
+      "actor": "Le superviseur",
+      "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie."
+    },
+    {
+      "kind": "exchange",
+      "label": "Échanges",
+      "summary": "Aucun échange structuré enregistré.",
+      "actor": "Personne pour le moment",
+      "next_step": "Les remises et demandes d’aide apparaîtront ici."
+    },
+    {
+      "kind": "validation",
+      "label": "Vérification",
+      "summary": "1 résultat(s) attendent leurs contrôles automatiques autorisés.",
+      "actor": "Le superviseur",
+      "next_step": "Exécuter les contrôles puis publier une décision avec des preuves fraîches."
+    }
+  ],
+  "tasks": [
+    {
+      "waiting_on": [],
+      "recovery_preview": {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "task": "plan-ca937edf4e-T1",
+        "revision": 357,
+        "agent": "auto-ed3d6ce2b54e02740a68",
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Fournisseur et espace de la tentative sélectionnée, sous réserve des règles du lancement.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative.",
+          "Une nouvelle tentative d’agent ; l’ancienne reste dans l’historique."
+        ],
+        "correction": "Résultat intégré et vérifié : e32388fda21e7c225c3b2416d230d6f5450230cd",
+        "criteria": [
+          "Matrice JAN-1..JAN-7 et FEB-1..FEB-4 avec faits, hypothèses et preuves distincts.",
+          "Comparer cycles explicites et hiérarchie continue avec points de jugement ; les deux doivent couvrir le juge global et le renouvellement requis.",
+          "Décision motivée sur reprise, débit, qualité, effort et compatibilité. Examiner juillet Cursor et les sources complémentaires avant de décider.",
+          "Documenter la séparation avec la finalisation historique et le lancement public en copie isolée sans remise à zéro ; architecture cible, migrations, reprise et risques consignés."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Voir le résultat",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-ca937edf4e-T1",
+        "tone": "attention"
+      },
+      "attempts_used": 2,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-ca937edf4e-T1",
+      "title": "Confirmer les écarts et décider l’architecture de l’évolution",
+      "state": "validated",
+      "reason": "Gate delivery et preuves actuelles ; la tâche est acceptée.",
+      "action": "report",
+      "label": "Voir le résultat",
+      "target": "plan-ca937edf4e-T1",
+      "impact": 7,
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T1-handoff.md",
+      "validation_mode": "automatic",
+      "validation_receipt": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/requalification-61bc3250eb5a9a9be27b4e4ffcac9689/receipt.json",
+      "result": {
+        "process_label": "Processus terminé",
+        "report_label": "Rapport soumis, contenu à vérifier",
+        "validation_label": "Preuves actuelles",
+        "state": "validated",
+        "label": "Validé",
+        "process_state": "completed",
+        "report_state": "submitted",
+        "validation_state": "fresh",
+        "reason": "Gate delivery et preuves actuelles ; la tâche est acceptée.",
+        "next_step": "Consulter le résultat ; revalider si une preuve change.",
+        "attempt_id": "a-29a7a2f21ea5f1f764409e08",
+        "gate_id": "Contrôles sur révision intégrée",
+        "receipt_id": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/requalification-61bc3250eb5a9a9be27b4e4ffcac9689/receipt.json"
+      },
+      "understanding": {
+        "what": "Gate delivery et preuves actuelles ; la tâche est acceptée.",
+        "next_step": "Aucune action requise ; le résultat reste consultable.",
+        "actor": "Personne pour le moment",
+        "actor_kind": "none",
+        "situation": "termine"
+      },
+      "attempt": {
+        "agent_id": "auto-ed3d6ce2b54e02740a68",
+        "attempt_id": "a-29a7a2f21ea5f1f764409e08",
+        "role": "worker",
+        "process_state": "completed",
+        "activity": "Processus terminé ; résultat à examiner, tâche non acceptée",
+        "validation_state": "accepted",
+        "requested_model": "sonnet",
+        "observed_model": "claude-sonnet-5",
+        "cost_state": "reported"
+      }
+    },
+    {
+      "waiting_on": [],
+      "recovery_preview": {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "task": "plan-ca937edf4e-T2",
+        "revision": 357,
+        "agent": "auto-a23c60f03a732c02841f",
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Fournisseur et espace de la tentative sélectionnée, sous réserve des règles du lancement.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative.",
+          "Une nouvelle tentative d’agent ; l’ancienne reste dans l’historique."
+        ],
+        "correction": "Le responsable doit proposer une correction sur la révision actuelle.",
+        "criteria": [
+          "Verdict global de poursuivre ou finir distinct de la revue indépendante de candidat.",
+          "Transition durable entre cycles, contexte reconstruit, objectif, preuves, tentatives et limites conservés.",
+          "Rejeu, verdict périmé, panne, quota et limite refusent les effets ou appels doubles.",
+          "Aucune clôture globale sans les preuves fraîches requises. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Voir les contrôles en cours",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-ca937edf4e-T2",
+        "tone": "info"
+      },
+      "attempts_used": 3,
+      "attempts_allowed": 3,
+      "attempt_limit_reached": false,
+      "id": "plan-ca937edf4e-T2",
+      "title": "Implémenter le juge global et le renouvellement des cycles",
+      "state": "review",
+      "reason": "Le rapport est conservé ; le vérificateur indépendant examine le candidat testé.",
+      "action": "report",
+      "label": "Examiner le résultat",
+      "target": "plan-ca937edf4e-T2",
+      "impact": 6,
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T2-handoff.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Processus terminé",
+        "report_label": "Rapport soumis, contenu à vérifier",
+        "validation_label": "Revue indépendante en cours",
+        "state": "review_in_progress",
+        "label": "Examen en cours",
+        "process_state": "completed",
+        "report_state": "submitted",
+        "validation_state": "pending_review",
+        "reason": "Le rapport est conservé ; le vérificateur indépendant examine le candidat testé.",
+        "next_step": "Attendre l’avis indépendant ; le résultat n’est pas encore accepté.",
+        "attempt_id": "a-2f9e1debb1548be96273f0d3",
+        "report_id": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-2bbeaadc0037b40b/review-dd11fa7937a5314dd9b58538-report-948e0a7f068fb4715f6285e8f731219e20b268ca3c584f906614fe26524dabb5.md",
+        "receipt_id": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-2bbeaadc0037b40b/receipt.json"
+      },
+      "understanding": {
+        "what": "Le rapport est conservé ; le vérificateur indépendant examine le candidat testé.",
+        "next_step": "Attendre l’avis indépendant ; le résultat n’est pas encore accepté.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "diagnostic": {
+        "agent_id": "auto-a23c60f03a732c02841f",
+        "attempt_id": "a-2f9e1debb1548be96273f0d3",
+        "observed_errors": 1,
+        "consecutive_error_limit": 3,
+        "limit_reached": false,
+        "consecutive_error_limit_reached": false,
+        "summary": "1 erreur d’outil observée pendant cette tentative. Le plafond configuré est de 3 erreurs consécutives ; ce plafond est distinct du nombre total constaté.",
+        "items": [
+          {
+            "category": "check",
+            "label": "Contrôle en échec",
+            "count": 1,
+            "cause": "Un test ou contrôle observable a échoué.",
+            "consequence": "Le critère couvert par ce contrôle reste non validé.",
+            "action": "Examiner la trace, corriger la cause, puis rejouer le même contrôle avec les mêmes options avant toute validation.",
+            "action_kind": "fix_and_rerun_check",
+            "traces": [
+              "Annonce de l’agent : Archive new judge-coverage evidence set and keep the old stale receipt for comparison · \\ DEST=docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011 && \\ mkdir -p \"$DEST\" && \\ SRC=docs/plans/engine-cursor-contract/evidence/T2-execution-3 && \\ cp \"$SRC/go-test-plan-validation.out\" \"$DEST/go-test-plan-validation.out\" && \\ cp \"$SRC/go-test-plan-validation.exit\" \"$DEST/go-test-plan-validation.exit\" && \\ cp \"$SRC/check-evolution-docs.out\" \"$DEST/check-evolution-docs.out\" && \\ cp \"$SRC/check-evolution-docs.exit\" \"$DEST/check-evolution-docs.exit\" &&…"
+            ]
+          }
+        ]
+      },
+      "attempt": {
+        "agent_id": "auto-a23c60f03a732c02841f",
+        "attempt_id": "a-2f9e1debb1548be96273f0d3",
+        "role": "worker",
+        "process_state": "completed",
+        "activity": "Processus terminé ; résultat à examiner, tâche non acceptée",
+        "validation_state": "blocked",
+        "requested_model": "sonnet",
+        "observed_model": "claude-sonnet-5",
+        "cost_state": "reported"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-ca937edf4e-T2",
+          "title": "Implémenter le juge global et le renouvellement des cycles",
+          "state": "blocked",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "task": "plan-ca937edf4e-T3",
+        "revision": 357,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Leçon tirée de l'échec d'intégration de T2 (sources de contexte supérieures à 128 Kio ; aucun contenu tronqué) : avant toute remise de preuves ou de contexte additionnel (delivery.criteria[].evidence, docs/TASK-ID.review-context.json, paquets opérateur transmis), vérifier que chaque source textuelle jointe reste sous la limite de 128 Kio et fragmenter toute preuve volumineuse en plusieurs fichiers ciblés et pertinents plutôt qu'un paquet unique non tronqué, pour éviter un blocage d'intégration identique à celui observé sur plan-ca937edf4e-T2 (tentative a-2f9e1debb1548be96273f0d3).\n\nREPLAN entrées13 : paquet cumulatif53 fichiers autorisé remplace les anciens paquets comme entrée à lire, sans effacer leur historique : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-account-20261011.bundle, SHA256 bdf4a6d75d679ac06b45d1922e77c2514658016297795a24e53968fc5b4f99d1, ref refs/heads/operator-inputs, commit af878d99337e45da0948208b2becffe098adea6c, operator-inputs.json SHA256 671363c02c3168a386a30131edc08173eacae9ae506b61c1ab3f171a410dfe60. Depuis votre copie uniquement, fetch vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes et extraire seuls chemins déclarés ; aucune lecture/écriture du code hôte ou voisin. Après12 appliquer13 provider-account-change-recovery-20261011.patch SHA256 8945660400f783909b8c0df1647124e9cc9f6840136f74861d705a33d3c8c7ca, préimages/extensions/parent dans JSON. Nouvelle précondition utilisateur : compte Claude changé, reprise demandée ; API publique confirm_account_change conserve refus original/échéance/dépenses, garde active par défaut, aucun appel ni acceptation implicite. Runtime13 installé et vérifiéa5696bdf ; regression/race/vet/build PASS, full en cours à cet instant. T3 doit préserver cette correction et fencing des anciens contrôleurs ; T5 exposer reprise de compte clairement attribuée et historique dans Admin/UX FR/EN. T2 reprend même candidat39e89b16,4 inspections réutilisables+4 appels nécessaires, pas une nouvelle production. Contrôles futurs renforcés configurés publiquement (vrais nouveaux tests TestCursorEngineTn, tous TestPlanning/Judge) ; respecter les argv réellement reçus. L’autorisation utilisateur de hausse droits/budgets est explicite, besoin concret/public API et consommation conservée.\n\nCouverture obligatoire des contrôles du lot T3 : politique publique renforcée avant production, tous TestPlanning (Judge compris) et nouveaux tests nommés TestCursorEngineT3*. Nommer les nouveaux tests comportementaux sous ce préfixe ou proposer une politique explicite couvrant leurs vrais noms avant revue ; conserver les originaux exécutés. Go150s/contrôle180s, six contrôles docs20s (budget technique cumulé300s). Le baseline plus large PASS28.677s est une mesure antérieure, pas une preuve de vos nouvelles fonctions. Si budget/droits réellement insuffisants, transmettre un besoin concret à l’opérateur autorisé à augmenter par parcours public, conserver les consommations.\n\nDiagnostic précis de la fusion Judge T2+op12 qualifiée en copie isolée (1174sources,c01c2cbf,full485s/race/vet/méthodes PASS, pas installée) : Judge s'initialise seulement dans enable, scope schema du responsable doit exposer jugement/renouvellement IA ; mission existante a Judge nil. Le commentaire applyJudgeRenewal propose augmenter MaxCycles via enable, mais enable est réservé au plan non initialisé. Implémenter le parcours public/Admin de configuration des cycles pour plan existant, sans reset de Cycle/History, compteurs/tentatives/acceptations ; limites actuelles défaut20/borne500 à inventorier/configurer comme toutes politiques. Root IA décide continue/end après contexte frais, moteur protègepreuves/CAS/droits, ni fermeture automatique ni quota lu comme achèvement. Storage version doit empêcher anciens writers de perdre Judge/InstructionOperatorBase. Cette limite est une dépendance T3 explicite, pas une correction primaire installée.\n\nDiagnostic de l'apprentissage appliqué instruction-eb2db1e922c733c93f3ce330 : sa formulation 'chaque source sous128Kio' confond limites. Le code actuel limite une source96Kio, l'union des sources d'UNE tâche128Kio et24fichiers ; les tâches cumulées sont partitionnées, pas sommées contre128Kio. Conserver ce retour attribué/historique ; une nouvelle consigne de correction reçue du propriétaire doit donner les valeurs et périmètres exacts, pas répéter la fausse règle. Le bundle Git est entrée d'import, pas source de revue à joindre entière. Autorisation utilisateur d'augmenter droits/budgets relève de l'opérateur public quand le rôle IA sans outils ne peut pas appliquer le réglage ; signaler shortfall concret au propriétaire, pas abandonner le plan.\n\nREPLAN entrées12 — le paquet cumulatif51fichiers remplace comme source autorisée les anciens paquets45/47/49 : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-capacity-20261011.bundle, SHA256 ad021a0d34ee90e34b8d826747019d876411ead734c1e2be389273b54ea3016c, ref refs/heads/operator-inputs, commit 702a96e9bb82051388365910849b49e5b589673e, operator-inputs.json SHA256 6c331b815e3c7fe37460e174662364980523b4e48b671c8376d2a3fd1d523c6a. Depuis VOTRE copie seulement, git fetch du paquet vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes, extraire uniquement les chemins déclarés avec git show. Droit borné de lecture du paquet transmis ; aucune exploration/modification du code hôte ou voisin. Fusionner sans écraser Judge T2/changements propres, préimages/extensions explicites vérifiées. Après complément9 appliquer10 instruction-operator-composition (SHA48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd),11 admin-duration-launch (SHA06429887df1f013f9acea161357b7348760a251df7995fc36231a093e07d34e3),12 source-capacity-recovery (SHA1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84).10 sépare base opérateur et apprentissage/rejet ;11 gèle900s Admin explicites pour nouveaux agents sans perdre plafonds appels/erreurs ni réécrire sessions ;12 répare refus impayé de capacité seulement après preuve originale checkpoint/reçu/refus typé concordants, contrôles frais et revue indépendante. Garder originaux/tentatives/consommation ; jamais inventer acceptation. Full10/11 PASS482,701s/470,955s, race/vet/méthodes PASS, runtime11 réellement installé0f619612 ;12 GREEN31,598s+garde1,123s, full en qualification. Paquet input intègre sources, pas avis.\n\nT3 : préserver les champs persistés nouveaux, assurer version de stockage et refus des anciens writers avant intégration Judge/InstructionOperatorBase ; initialiser/faire tourner le juge IA pour mission existante, pas seulement lors enable. Deux vrais sous-superviseurs, parallélisme et budgets atomiques exigés.\n\nInstructions antérieures conservées :\nRemise opérateur bornée des entrées, autorisée par l’utilisateur (droits/budgets nécessaires): unique paquet externe /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-20261011.bundle SHA25647463691a600a5ef5f80f4ab6c7446f87fda4ceecdfa7c8c5bd2edab500ca8c3, ref refs/heads/operator-inputs, commit 30171f7b07b881b5999faf5d4216e849f0dc72b4. Depuis VOTRE copie, importer en lecture seule via git fetch du bundle vers refs/swarm/operator-inputs; vérifier commit et operator-inputs.json (SHA2569dc5371901f2c7dfc2d1bba912350dc64a6e66bd0940de6dfca1c0424f0ff737), puis extraire les seuls chemins déclarés docs/plans/engine-cursor-contract/recovery dans VOTRE copie via git show. Cette lecture du paquet transmis est l’unique extension de droit; aucune lecture/modification/exploration du code du dépôt hôte ou des copies voisines. Les anciens chemins absolus de patchs désignent désormais les entrées de ce paquet à lire localement après import. Le paquet contient les originaux et leur filiation, pas une acceptation ni un candidat de code. Vérifier préimages, fusionner sans écraser T2/changements propres, régénérer source snapshot et qualifier candidat exact. Le test isolé de fetch et toutes empreintes passent; réception/usage par worker réel reste à démontrer. ToolSeconds900s enregistré pour T3..T7,80appels propres inchangés, pas couperet automatique de durée.\n\nInstructions antérieures conservées :\nREPLAN complément9 T3: docs/plans/engine-cursor-contract/recovery/review-status-owner-context-20261011.patch SHA2569d70e9fd8eab43bfd73c365c082f87187937aa8b01577ef46899ca55b8118b72, après planning-rejection-artifact-preservation, filiation JSON vérifiée. Partager avec la revue le sens local de pass/complete; absence dans un fragment→unknown/needs pour originaux finaux, pas fail présumé. Fournir opération refusée complète au propriétaire sans outils; réduire seulement les aperçus next des todo/accepted non concernés, préserver entrées entières, identités et consignes persistées. Rouge/vert, race/vet/workflows PASS; fullGo en cours, reçu final de qualification à vérifier. Intégrer sans écraser correctifs1..8/jugeT2, source snapshot et candidat exact à qualifier. Natif:activation18 a reçu/acquitté diagnostic17 mais aucune revision de consigne appliquée; échec préflight254 sans appel; T2 f5 refus valide avec19appels, nouvelle portée des reçus documentée, pas acceptée. T7 vérifie réellement réception/décision/effets; T5 expose état actuel, T8 conserve limites/interventions/quickwins sans adoption implicite.\n\nInstructions antérieures conservées :\nDiagnostic réel activation15 (décision planning-claim-31093d2cda849be9e3c96387-decision) : T8 est créée mais l’opération review-retry mentionnée dans le motif est absente de operations. Reprise publique opérateur attribuée226, journal f5 inchangé candidat1ce2,4inspections/6appels, étatrunning19appels. Le motif IA présente encore le doublon InputParts d’une ancienne revue du même attempt comme non corrigé ; la réparation candidate d405 puis1ce2 est attestée. planningContextLimit ne classe comme historiques que tâche absente/ancienne tentative : les revues d’anciens candidats du même attempt restent actionnables. Étendre l’attribution candidate/reviewID pour rendre les anciens refus en lecture seule, sans effacer ni acquitter automatiquement les événements et sans décider la reprise ou l’acceptation à la place du responsable. Distinguer intention dans reason, opération proposée, reçu appliqué et état réel. Tester ancien refus sémantique → correction candidate → erreur protocole actuelle et paquet réduit, puis qualifier la décision réellement reçue. Préparation de fusion du juge T2 avec les huit correctifs opérateur en copie isolée, sans prétendre T2 acceptée ; réception/intégration/installation réelles et revue indépendante restent requises.\n\nInstructions antérieures conservées :\nComplément de préservation T3 : planning-rejection-artifact-preservation-20261011.patch SHA256fc912259ef23d257645c298e496fdba6e920ab6f99940e81081cec9b289a8f36 après planning-owner-rejection-diagnostic-20261011.patch. Source/filiation /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Chaque refus, même répété, garde événement distinct et artefacts diagnostic+réponse avec hashes ; clé du problème uniquement pour éligibilité. Export/import préserve originaux et attente ; preuves importées restent archivées, aucune certification active. Reproduction rouge puis verte, tests des deux refus et chemins/hashes ; contrôle complet final en cours. Fusionner, régénérer source snapshot, qualifier candidat exact/réception réelle T7.\n\nInstructions antérieures conservées :\nREPLAN T3 : activation14 a reçu la revue exacte puis été refusée à révision203 pour doublon, réponse perdue par ancien pipeline. Intégrer planning-owner-rejection-diagnostic-20261011.patch SHA256 3ab9828491f7d5b5056da906c8b329e3b16fd86e09e4bc0e834489b1d2d8314b après review-current-event-feedback-20261011.patch ; chaîne et sources dans /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Proposition JSON refusée : réponse adaptateur conservée intacte, reçu/méthodes, opération fautive index/type/ID et inventaire complet des identités. planning_rejected revient au propriétaire en tête ; pas de Failure globale pour cette catégorie. Refus identique/état inchangé : attente locale persistée, claim vérifie ; baux, consommations et autre périmètre ne simulent pas progrès. Nouvel input/état pertinent/config explicite rouvre ; aucun remboursement/acceptation/fin moteur. Inventaire global IDs : task seulement nouveau, unique dans la proposition. Tests publics/doubles/race, fusion préserver juge T2 et candidat exact, régénérer manifeste (désormais5pièces). T3 complète autres catégories configuration/fournisseur/protocole et rôle juge/renew/hierarchie, qualification réelle T7.\n\nInstructions antérieures conservées :\nREPLAN T3 : activation13 refusée à révision190, review-retry proposé sans événement actuel reçu. Intégrer review-current-event-feedback-20261011.patch SHA256 d3c3be3c058a6f5141ddedd1143bd809a4459e053f9a69923018caefacb068b7 après planning-exact-envelope-20261011.patch ; filiation conservée dans /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Dernière consigne puis résultat de revue actuel, avant anciennes consignes ; schéma gelé retire review-retry si résultat exact absent du lot réellement reçu. Diagnostic de citation aligné sur validateur : milieu de ligne valide, tabulation JSON préservée, aucun verdict brut corrigé. Fusionner sans écraser juge T2, autonomie T3 et changements natifs. Tests RED/GREEN PASS, contrôles complets en cours ; vérifier nouveau candidat et effets réels, pas seulement fixtures. Consommation et historique conservés, poursuite jusqu’au RETEX.\n\nInstructions antérieures conservées :\nREPLAN T3 : réception native activation12 a confirmé latest operator_resume en tête et retry interdit, puis arrêté avant appel car réserve arbitraire3000 insuffisante. Intégrer planning-exact-envelope-20261011.patch (SHA256 f719102703429f3a31c4e391e2d7b8b76b65ea7504abaf5be177fad75923fd29) après reviewer-method-source-snapshot-20261011.patch (SHA256 9c2d11dcf761088bcd9eb45f0cab17c17ffb4e4228a9cbb9da705ce36fe7e4af), parents précédents conservés. Sources et filiation : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Claim et runner calculent la taille exacte des mêmes instructions/méthodes, sans relever la borne existante ni tronquer ; lot entier réduit avant réservation, événements restants non consommés. Test CLI fournisseur double RED/GREEN : message62138octets,7/8events entiers, receipt exact et7pending. Inclure méthode code-reviewer corrigée dans snapshot source. T3 conserve aussi obligation de récupération diagnostique autonome après proposition refusée ; T6/T7 doivent mesurer réception/effets avec preuve réelle, apprentissage/rejet/RETEX et simultanéité, séparer fixtures et fournisseur réel. Suite complète précédente PASS440.517s avant ce dernier calcul ; nouvelle suite en cours. Pas d’acceptation prétendue ni de base directe modifiée.\n\nInstructions antérieures conservées :\nREPLAN T3 — autonomie de la récupération : planningStep refuse actuellement tout départ si Planning.Failure est non vide ; planningFailure transforme une proposition IA refusée en panne globale, même pour un défaut corrigeable du protocole. Cas réel : révision157, activation11, retry interdit pour erreur de revue. Implémenter une remise diagnostique attribuée au responsable propriétaire afin qu’il corrige/repropose dans les droits et budgets ; préserver la proposition/refus bruts, génération, CAS, consommation, événements non acquittés et distinction absence de progrès/achèvement. Ne pas simplement relancer la même inférence ni effacer Failure sans nouvelle entrée vérifiable. Contrôler les répétitions identiques et les dépendances réellement impossibles, configuration persistée/Admin si une politique est ajoutée. Tests publics + fournisseur réel T7 : correction reçue, nouvelle décision appliquée, autres périmètres non bloqués. Le moteur ne choisit jamais fin, nouvelle production ou acceptation.\n\nInstructions antérieures conservées :\nREPLAN T3 : complément instruction-learning-retex-routing-20261011.patch après les deux compléments apprentissage/continuité précédents, source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-routing-20261011.patch, SHA256 8b957486beef8e95e02061e79c678a145f11a4d620086d853a26527c2ee291cc. La consigne operator_resume la plus récente passe en tête du lot ; le schéma gelé retire retry sans tâche éligible (erreur de protocole, tentatives épuisées ou réservations), conserve review-retry ; current_review attribue l’erreur actuelle et previous_blocker conserve un ancien refus. Citations byte-for-byte, espaces et signes du patch exacts. Régressions rouge/vert, race, vet et méthodes vérifiées ; suite complète en cours, aucune acceptation native prétendue. Fusionner avec T2/T3 sans écraser leurs changements ; vérifier candidat et réception réels. Révision native157 : mauvaise proposition retry refusée, pas un verdict sémantique ni T8 achevée.\n\nInstructions antérieures conservées :\nREPLAN T3 : ajouter instruction-learning-retex-continuity-20261011.patch après instruction-learning-retex-20261011.patch. Après le dernier lot historique acquitté, historical_acknowledged rend la main au responsable IA, sans décision moteur de fin ni acceptation implicite. Les tests utilisent exactement les IDs admis et conservent la garde de budget de reprise. Source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-continuity-20261011.patch, SHA256 459949e903fdc72b155cdca2bdd06a0a4a6b2cd7eeaeae4f87b67527eabe373c ; parents dans son JSON. Fusionner T2/T3, revérifier le candidat exact ; la suite complète précédente a signalé un test de l’ancien protocole, correction ciblée/race vérifiées, nouveau contrôle complet en cours. Réception du contexte et RETEX final restent nécessaires.\n\nInstructions antérieures conservées :\nREPLAN T3 : intégrer la séparation events courants/historical_events en lecture seule et historical_only sans opération, avec schéma fournisseur strict et acquittement explicite ; préserver le juge/renew/global_cycle T2. Ajouter revise-instructions attribué aux retours reçus pour une tâche future du périmètre ; aucune consigne active ni critère réécrit, rejet utilisateur transmis au propriétaire. Prouver réception/concurrence/rejeu. Incorporer les portions pertinentes du complément, puis transmettre les dépendances de la chaîne T4 et l’UX T5. Complément opérateur vérifiable : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-20261011.patch, SHA256 6c202d64b1261082d78842c3ccc5d554437135c862197f0b4edaa30929aae13b, filiation/instructions dans son JSON ; ne pas écraser les changements natifs. Architecture INSTRUCTION-LEARNING.md et AGENT-ENGINE-PROTOCOL.md FR/EN, PRODUCT-WORKFLOW.md avec Mermaid. Autorisation nouvelle du propriétaire : augmenter droits/budgets Swarm si insuffisance diagnostiquée, par opérations publiques en conservant toutes les dépenses et refus ; les anciennes interdictions implicites ne retirent pas cette autorisation.\n\nInstructions antérieures conservées :\nREPLAN T3 : intégrer réellement le juge global et le renouvellement aux décisions IA natives strictes ; T2 fournit planning judge/renew et global_cycle, pas encore les opérations du schéma fournisseur. Préserver acceptedFresh, droits/lease/périmètre, replay et compteurs ; le moteur applique un verdict attribué, ne décide pas de la fin. Prouver deux sous-superviseurs distincts simultanés ; résoudre la réorganisation des tâches déjà affectées via un parcours public sans perdre IDs/preuves. Architecture FR/EN et preuves de réception/effet ; T7 vérifiera avec fournisseur réel.\n\nInstructions antérieures conservées :\nREPLAN T3 : hiérarchie JAN/FEB non exercée : mission root seule, 29 exigences déjà affectées. delegate refuse une exigence confiée à une tâche ; auditer la réorganisation publique des tâches existantes, sans nouveaux IDs, budget ni perte de preuves. Implémenter la correction justifiée dans ce lot, avec droits/états/concurrence contrôlés ; préserver T1/T2 et la revue active. Prouver les deux sous-planificateurs distincts simultanés ; T7 doit exercer la hiérarchie avec fournisseur réel. Détails et originaux dans /home/fpizzi/workspace/swarm, AUTORECURSIVE-RECOVERY.md et dossier recherche.\n\nInstructions antérieures conservées :\nREPLAN T3 : découverte → diagnostic → décision de périmètre → vérification → réexamen. Traiter aussi un refus de proposition ou un contexte manquant comme problème lié, sans répéter l’échec. Vérifier deux sous-superviseurs concurrents et décisions persistées. Repères TR-2/3/4, architecture AUTORECURSIVE-RECOVERY.md et TRACEABILITY.md dans le dépôt source /home/fpizzi/workspace/swarm. Détails et preuves ci-dessous.\n\nInstructions historiques et détaillées conservées :\nPérimètre : internal/engine/planning_runner.go, planning_context.go, planning.go, mission.go et adaptateurs de lecture. JAN-1/JAN-2/FEB-1. Pas de commandes de codage par les planificateurs. Documentation d’architecture des changements de ce lot incluse.\nPreuves : Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.\nGate entry : Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.\nGate validation : Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.\nGate delivery : Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.\nConditions d’arrêt : Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.\nHypothèses : Les constats d’audit sont à confirmer sur le checkout et la révision candidate, avec distinction simulations/fournisseurs réels. ; Janvier et février sont retenus ; JAN-4/JAN-5 restent des exigences Swarm, sans les attribuer au système final de février. ; La comparaison inclut les sources de recherche du 10 octobre, Cursor prioritaire, Google/Gemini, OpenAI et Anthropic ; leurs résultats ne sont pas des preuves Swarm. ; Objectif distinct de la finalisation historique w-fff7368010d114f6e2578985, dont tâches, tentatives, preuves et budgets restent inchangés. La préparation d’origine est conservée et référencée ; aucune réinitialisation de mission. ; Tous les réglages de politique ajoutés sont persistés, exposés dans Admin FR/EN et utilisés par le moteur.\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n\n\nPrécision opérateur autorisée le 10 octobre 2026 : traiter le parallélisme des superviseurs ET les dépendances du plan. Pour les critères existants de découverte/adaptation et de sous-planification concurrente, démontrer deux sous-planificateurs actifs simultanément sur des périmètres distincts et une découverte conduisant à une adaptation persistée par les opérations publiques réellement disponibles. Justifier chaque dépendance par les entrées, écritures communes et preuves nécessaires ; conserver les dépendances réelles. Documenter les refus du contrat hiérarchique géré et des modifications pendant une tâche active. Utiliser des racines isolées pour les tests, aucune mutation directe de la base active. La mission actuelle reste séquentielle ; ne pas prétendre que ces instructions changent son graphe. Consulter dans le dépôt source /home/fpizzi/workspace/swarm la note docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-parallelisme-plan.md et reporter l’architecture pertinente dans votre candidat. Configuration réglable persistée et Admin FR/EN avec T5, aucune constante arbitraire ni hausse de plafond.\n\nDocumentation demandée par le propriétaire le 10 octobre 2026 : consulter dans le dépôt source /home/fpizzi/workspace/swarm docs/architecture/AGENT-PARALLELISM.md et docs/en/AGENT-PARALLELISM.md. Intégrer ces documents FR/EN et leurs liens pertinents au candidat de T3, puis actualiser les comportements effectivement livrés, les cibles restantes et les preuves. Six schémas Mermaid par langue : responsabilités, dépendances, admission, publication, supervision/reprise, comparaison séquentiel/concurrent. Conserver la distinction production parallèle/publication exclusive, les contraintes nécessaires et les politiques persistées/Admin ; justifier les dépendances. Ces documents inspectent le moteur source et ne prouvent pas la conformité du candidat géré ni une autonomie déjà observée. Sources figées à cette remise : docs/architecture/AGENT-PARALLELISM.md SHA256 a12a9d1230524e86590f0bdf9c4665d08b6ad70621e49fa77206d390ce1103f0; docs/en/AGENT-PARALLELISM.md SHA256 cfc18e92c33fb8fe100889c4481ad07541621404208d68e731863b6e876db33c. Vérifier les fichiers originaux ; les déclarer en preuves quand nécessaires à la revue. Transmettre les limites et attentes T4..T7 dans votre handoff.\n\nPrécision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-2/TR-3/TR-4 : fournir aux responsables un inventaire attribué des preuves reçues/manquantes ; relier découvertes et décisions au propriétaire, périmètre et révision. Vérifier deux périmètres concurrents, décisions atomiques, refus de révision périmée, persistance et réservations sans effets doubles. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.\n\nSources actualisées de démarche, à intégrer et vérifier sur le candidat : docs/architecture/AUTORECURSIVE-RECOVERY.md SHA256 713a6e87f41b0ba262ad34a14c66e987e972f08a94bf48c1d9697217aa9c597a, docs/en/AUTORECURSIVE-RECOVERY.md SHA256 454343c2304489c8d58d2305a169b2fbba861a4dd0a323b888b9c78254c43a73, docs/architecture/TRACEABILITY.md SHA256 fbd86fb95d15bcdc266cb6df54b85aa9d761b52da1c53362bb088c729071d741, docs/en/TRACEABILITY.md SHA256 f3b32ca7185903651fe7051eb405e59747d741151ad116d9371897cc95f65c2d, tools/agent-workflows/CONTRACT.md SHA256 8af3236ad60b5102df3ae8c30ebcb2c2fa4774ac4c73263fca2727cc531f03ee, .claude/skills/apex/SKILL.md SHA256 5910f2c12111109d67824a5b44a4ad762808b935e4b22447d6177759d00a4dde, .claude/skills/replan/SKILL.md SHA256 035ddb8a95d0cff95e2f3d43b48c7b98457840e69b17d11484ab2ae03afdb350, tools/agent-workflows/templates/TRACKING.md SHA256 af685085922ac538b9c8301ffda126dff03e1de54a5bf68c7ff6ba0601ea0b99. Replan est obligatoire sur reprise/blocage/échec/preuve insuffisante/hypothèse modifiée, sauf arrêt ou report explicite de l’utilisateur. Ne pas se limiter à une remontée ou un journal : une action autorisée, sa vérification et un réexamen sont requis. Ces précisions ne changent pas les critères, dépendances ou budgets adoptés.",
+        "criteria": [
+          "Exploration en lecture réellement utilisable par le planificateur, liée à une révision et un périmètre.",
+          "Nouvelle découverte produit une adaptation persistée de tâches.",
+          "Deux sous-planificateurs de périmètres distincts peuvent être actifs simultanément, décisions atomiques et budgets partagés conservés.",
+          "Arrêt, reprise et réservations périmées ne doublent ni tâches ni dépenses. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-ca937edf4e-T3",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-ca937edf4e-T3",
+      "title": "Implémenter exploration et sous-planification concurrente",
+      "state": "waiting",
+      "reason": "Attend Implémenter le juge global et le renouvellement des cycles",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-ca937edf4e-T2",
+      "impact": 5,
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T3-handoff.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Implémenter le juge global et le renouvellement des cycles",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-ca937edf4e-T3",
+          "title": "Implémenter exploration et sous-planification concurrente",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "task": "plan-ca937edf4e-T4",
+        "revision": 357,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "REPLAN entrées13 : paquet cumulatif53 fichiers autorisé remplace les anciens paquets comme entrée à lire, sans effacer leur historique : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-account-20261011.bundle, SHA256 bdf4a6d75d679ac06b45d1922e77c2514658016297795a24e53968fc5b4f99d1, ref refs/heads/operator-inputs, commit af878d99337e45da0948208b2becffe098adea6c, operator-inputs.json SHA256 671363c02c3168a386a30131edc08173eacae9ae506b61c1ab3f171a410dfe60. Depuis votre copie uniquement, fetch vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes et extraire seuls chemins déclarés ; aucune lecture/écriture du code hôte ou voisin. Après12 appliquer13 provider-account-change-recovery-20261011.patch SHA256 8945660400f783909b8c0df1647124e9cc9f6840136f74861d705a33d3c8c7ca, préimages/extensions/parent dans JSON. Nouvelle précondition utilisateur : compte Claude changé, reprise demandée ; API publique confirm_account_change conserve refus original/échéance/dépenses, garde active par défaut, aucun appel ni acceptation implicite. Runtime13 installé et vérifiéa5696bdf ; regression/race/vet/build PASS, full en cours à cet instant. T3 doit préserver cette correction et fencing des anciens contrôleurs ; T5 exposer reprise de compte clairement attribuée et historique dans Admin/UX FR/EN. T2 reprend même candidat39e89b16,4 inspections réutilisables+4 appels nécessaires, pas une nouvelle production. Contrôles futurs renforcés configurés publiquement (vrais nouveaux tests TestCursorEngineTn, tous TestPlanning/Judge) ; respecter les argv réellement reçus. L’autorisation utilisateur de hausse droits/budgets est explicite, besoin concret/public API et consommation conservée.\n\nCouverture obligatoire des contrôles du lot T4 : politique publique renforcée avant production, tous TestPlanning (Judge compris) et nouveaux tests nommés TestCursorEngineT4*. Nommer les nouveaux tests comportementaux sous ce préfixe ou proposer une politique explicite couvrant leurs vrais noms avant revue ; conserver les originaux exécutés. Go150s/contrôle180s, six contrôles docs20s (budget technique cumulé300s). Le baseline plus large PASS28.677s est une mesure antérieure, pas une preuve de vos nouvelles fonctions. Si budget/droits réellement insuffisants, transmettre un besoin concret à l’opérateur autorisé à augmenter par parcours public, conserver les consommations.\n\nObservation native à intégrer dans T4/T6 : review-dd11fa inspecte6paquets puis réserve2appels finaux ; la boucle runManagedFragmentReview traite les inspections l'une après l'autre. Les premières inspections prennent plusieurs minutes et le préflight source-capacité est déjà réparé. Étudier/exécuter le parallélisme des inspections indépendantes avec dépendances explicites choisies par le responsable IA, plafond de concurrence Admin, réservations atomiques partagé budget, journal/empreintes et résultats indépendants puis réunion finale après tous les prérequis. Ne pas paralléliser les dépendances ni publier avant l'avis final ; conserver appel ambigu/reprise/rejeu et contexte/provider gelés. Prouver latence/débit/coût et observation propriétaire publique pendant ces appels. Limite de preuve : aucun parallélisme natif n'est encore établi ici.\n\nREPLAN entrées12 — le paquet cumulatif51fichiers remplace comme source autorisée les anciens paquets45/47/49 : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-capacity-20261011.bundle, SHA256 ad021a0d34ee90e34b8d826747019d876411ead734c1e2be389273b54ea3016c, ref refs/heads/operator-inputs, commit 702a96e9bb82051388365910849b49e5b589673e, operator-inputs.json SHA256 6c331b815e3c7fe37460e174662364980523b4e48b671c8376d2a3fd1d523c6a. Depuis VOTRE copie seulement, git fetch du paquet vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes, extraire uniquement les chemins déclarés avec git show. Droit borné de lecture du paquet transmis ; aucune exploration/modification du code hôte ou voisin. Fusionner sans écraser Judge T2/changements propres, préimages/extensions explicites vérifiées. Après complément9 appliquer10 instruction-operator-composition (SHA48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd),11 admin-duration-launch (SHA06429887df1f013f9acea161357b7348760a251df7995fc36231a093e07d34e3),12 source-capacity-recovery (SHA1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84).10 sépare base opérateur et apprentissage/rejet ;11 gèle900s Admin explicites pour nouveaux agents sans perdre plafonds appels/erreurs ni réécrire sessions ;12 répare refus impayé de capacité seulement après preuve originale checkpoint/reçu/refus typé concordants, contrôles frais et revue indépendante. Garder originaux/tentatives/consommation ; jamais inventer acceptation. Full10/11 PASS482,701s/470,955s, race/vet/méthodes PASS, runtime11 réellement installé0f619612 ;12 GREEN31,598s+garde1,123s, full en qualification. Paquet input intègre sources, pas avis.\n\nT4 : exécuter parallélisme/handoff/publication/restart sur ce cumul exact ; ne pas coordonner travailleurs directement ; garder métriques publiques et observation propriétaire pendant revue.\n\nInstructions antérieures conservées :\nRemise opérateur bornée des entrées, autorisée par l’utilisateur (droits/budgets nécessaires): unique paquet externe /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-20261011.bundle SHA25647463691a600a5ef5f80f4ab6c7446f87fda4ceecdfa7c8c5bd2edab500ca8c3, ref refs/heads/operator-inputs, commit 30171f7b07b881b5999faf5d4216e849f0dc72b4. Depuis VOTRE copie, importer en lecture seule via git fetch du bundle vers refs/swarm/operator-inputs; vérifier commit et operator-inputs.json (SHA2569dc5371901f2c7dfc2d1bba912350dc64a6e66bd0940de6dfca1c0424f0ff737), puis extraire les seuls chemins déclarés docs/plans/engine-cursor-contract/recovery dans VOTRE copie via git show. Cette lecture du paquet transmis est l’unique extension de droit; aucune lecture/modification/exploration du code du dépôt hôte ou des copies voisines. Les anciens chemins absolus de patchs désignent désormais les entrées de ce paquet à lire localement après import. Le paquet contient les originaux et leur filiation, pas une acceptation ni un candidat de code. Vérifier préimages, fusionner sans écraser T2/changements propres, régénérer source snapshot et qualifier candidat exact. Le test isolé de fetch et toutes empreintes passent; réception/usage par worker réel reste à démontrer. ToolSeconds900s enregistré pour T3..T7,80appels propres inchangés, pas couperet automatique de durée.\n\nInstructions antérieures conservées :\nDiagnostic de conduite des revues: planning_runner.go ignore tout propriétaire avec managedIntegrationPending, y compris pendant une revue longue. Le reviewer structuré est un processus distinct, non un worker Agent actif, donc continue-run/stop-run ne doivent pas forger un agent. Ajouter des observations publiques attribuées rôle/call/review/candidat, métriques bornées sans secret ni texte de raisonnement, distinguer activité I/O et progression sémantique. Permettre au responsable de traiter une observation utile ou une consigne future pendant la revue, avec admission dédiée aux actions compatibles; garder interdits retry doublé, production/contrat du candidat actif, acceptation/fin pendant intégration. Si décision de conduite de revue, capacité publique explicite avec identité courante/CAS/droits/budget/originals, pas décision moteur d’achèvement ni timeout arbitraire. Préserver suppression des doubles reprises; rythme de politique à exposer dans T5, réception et effets réels à qualifier T7. Observation actuelle f613:inspection0unknown,inspection1réservée,21appels; les mesures noyau n’attestent que l’activité. Ces précisions portent sur conduite, traçabilité et reprise des critères existants.\n\nInstructions antérieures conservées :\nREPLAN complément9 T4: docs/plans/engine-cursor-contract/recovery/review-status-owner-context-20261011.patch SHA2569d70e9fd8eab43bfd73c365c082f87187937aa8b01577ef46899ca55b8118b72, après planning-rejection-artifact-preservation, filiation JSON vérifiée. Partager avec la revue le sens local de pass/complete; absence dans un fragment→unknown/needs pour originaux finaux, pas fail présumé. Fournir opération refusée complète au propriétaire sans outils; réduire seulement les aperçus next des todo/accepted non concernés, préserver entrées entières, identités et consignes persistées. Rouge/vert, race/vet/workflows PASS; fullGo en cours, reçu final de qualification à vérifier. Intégrer sans écraser correctifs1..8/jugeT2, source snapshot et candidat exact à qualifier. Natif:activation18 a reçu/acquitté diagnostic17 mais aucune revision de consigne appliquée; échec préflight254 sans appel; T2 f5 refus valide avec19appels, nouvelle portée des reçus documentée, pas acceptée. T7 vérifie réellement réception/décision/effets; T5 expose état actuel, T8 conserve limites/interventions/quickwins sans adoption implicite.\n\nInstructions antérieures conservées :\nObservation réelle de traçabilité : la reprise T2 du journal f5, call19 réservé vers12:42UTC, reste en cours sans résultat public intermédiaire. Deux mesures kernel I/O à12:55:55 et12:57:01 montrent rchar+2508/wchar+11646/syscr+66/syscw+174 ; ceci prouve activité système, ni progression sémantique ni verdict. Aucun flux stdout lu par un second consommateur. Le lecteur runStructuredProviderPolicyClock possède déjà des métriques bornées (octets/événements/types/retries/thinking), exposées seulement dans son diagnostic terminal ; rendre une progression publique attribuée au call/role/scope/tâche/tentative, sans contenu privé, sans nouvelle inférence et sans convertir activité en acceptation. Exercer persistance/concurrence et absence de double réservation. La fréquence éventuelle est une politique persistée à exposer en Admin avec T5, jamais un couperet de fin ; T7 qualifiera sur fournisseur réel. La limite maximale de cette revue reste0 : aucun arrêt arbitraire ni appel dupliqué ajouté. Les scripts et les résultats isolés du juge restent une préparation ; T2 demeure non acceptée.\n\nInstructions antérieures conservées :\nComplément de préservation T4 : planning-rejection-artifact-preservation-20261011.patch SHA256fc912259ef23d257645c298e496fdba6e920ab6f99940e81081cec9b289a8f36 après planning-owner-rejection-diagnostic-20261011.patch. Source/filiation /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Chaque refus, même répété, garde événement distinct et artefacts diagnostic+réponse avec hashes ; clé du problème uniquement pour éligibilité. Export/import préserve originaux et attente ; preuves importées restent archivées, aucune certification active. Reproduction rouge puis verte, tests des deux refus et chemins/hashes ; contrôle complet final en cours. Fusionner, régénérer source snapshot, qualifier candidat exact/réception réelle T7.\n\nInstructions antérieures conservées :\nREPLAN T4 : activation14 a reçu la revue exacte puis été refusée à révision203 pour doublon, réponse perdue par ancien pipeline. Intégrer planning-owner-rejection-diagnostic-20261011.patch SHA256 3ab9828491f7d5b5056da906c8b329e3b16fd86e09e4bc0e834489b1d2d8314b après review-current-event-feedback-20261011.patch ; chaîne et sources dans /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Proposition JSON refusée : réponse adaptateur conservée intacte, reçu/méthodes, opération fautive index/type/ID et inventaire complet des identités. planning_rejected revient au propriétaire en tête ; pas de Failure globale pour cette catégorie. Refus identique/état inchangé : attente locale persistée, claim vérifie ; baux, consommations et autre périmètre ne simulent pas progrès. Nouvel input/état pertinent/config explicite rouvre ; aucun remboursement/acceptation/fin moteur. Inventaire global IDs : task seulement nouveau, unique dans la proposition. Tests publics/doubles/race, fusion préserver juge T2 et candidat exact, régénérer manifeste (désormais5pièces).\n\nInstructions antérieures conservées :\nREPLAN T4 : activation13 refusée à révision190, review-retry proposé sans événement actuel reçu. Intégrer review-current-event-feedback-20261011.patch SHA256 d3c3be3c058a6f5141ddedd1143bd809a4459e053f9a69923018caefacb068b7 après planning-exact-envelope-20261011.patch ; filiation conservée dans /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Dernière consigne puis résultat de revue actuel, avant anciennes consignes ; schéma gelé retire review-retry si résultat exact absent du lot réellement reçu. Diagnostic de citation aligné sur validateur : milieu de ligne valide, tabulation JSON préservée, aucun verdict brut corrigé. Fusionner sans écraser juge T2, autonomie T3 et changements natifs. Tests RED/GREEN PASS, contrôles complets en cours ; vérifier nouveau candidat et effets réels, pas seulement fixtures. Consommation et historique conservés, poursuite jusqu’au RETEX.\n\nInstructions antérieures conservées :\nREPLAN T4 : réception native activation12 a confirmé latest operator_resume en tête et retry interdit, puis arrêté avant appel car réserve arbitraire3000 insuffisante. Intégrer planning-exact-envelope-20261011.patch (SHA256 f719102703429f3a31c4e391e2d7b8b76b65ea7504abaf5be177fad75923fd29) après reviewer-method-source-snapshot-20261011.patch (SHA256 9c2d11dcf761088bcd9eb45f0cab17c17ffb4e4228a9cbb9da705ce36fe7e4af), parents précédents conservés. Sources et filiation : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Claim et runner calculent la taille exacte des mêmes instructions/méthodes, sans relever la borne existante ni tronquer ; lot entier réduit avant réservation, événements restants non consommés. Test CLI fournisseur double RED/GREEN : message62138octets,7/8events entiers, receipt exact et7pending. Inclure méthode code-reviewer corrigée dans snapshot source. T3 conserve aussi obligation de récupération diagnostique autonome après proposition refusée ; T6/T7 doivent mesurer réception/effets avec preuve réelle, apprentissage/rejet/RETEX et simultanéité, séparer fixtures et fournisseur réel. Suite complète précédente PASS440.517s avant ce dernier calcul ; nouvelle suite en cours. Pas d’acceptation prétendue ni de base directe modifiée.\n\nInstructions antérieures conservées :\nREPLAN T4 : complément instruction-learning-retex-routing-20261011.patch après les deux compléments apprentissage/continuité précédents, source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-routing-20261011.patch, SHA256 8b957486beef8e95e02061e79c678a145f11a4d620086d853a26527c2ee291cc. La consigne operator_resume la plus récente passe en tête du lot ; le schéma gelé retire retry sans tâche éligible (erreur de protocole, tentatives épuisées ou réservations), conserve review-retry ; current_review attribue l’erreur actuelle et previous_blocker conserve un ancien refus. Citations byte-for-byte, espaces et signes du patch exacts. Régressions rouge/vert, race, vet et méthodes vérifiées ; suite complète en cours, aucune acceptation native prétendue. Fusionner avec T2/T3 sans écraser leurs changements ; vérifier candidat et réception réels. Révision native157 : mauvaise proposition retry refusée, pas un verdict sémantique ni T8 achevée.\n\nInstructions antérieures conservées :\nREPLAN T4 : ajouter instruction-learning-retex-continuity-20261011.patch après instruction-learning-retex-20261011.patch. Après le dernier lot historique acquitté, historical_acknowledged rend la main au responsable IA, sans décision moteur de fin ni acceptation implicite. Les tests utilisent exactement les IDs admis et conservent la garde de budget de reprise. Source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-continuity-20261011.patch, SHA256 459949e903fdc72b155cdca2bdd06a0a4a6b2cd7eeaeae4f87b67527eabe373c ; parents dans son JSON. Fusionner T2/T3, revérifier le candidat exact ; la suite complète précédente a signalé un test de l’ancien protocole, correction ciblée/race vérifiées, nouveau contrôle complet en cours. Réception du contexte et RETEX final restent nécessaires.\n\nInstructions antérieures conservées :\nREPLAN T4 : intégrer instruction-learning-retex-20261011.patch après la chaîne run-supervision/unpaid-preflight/review-time déjà prescrite. Fusionner T2/T3 ; garder le découpage et la correction des alias de sources déjà livrés par T2. Préserver juge/renew, preuves/consommations ; tester l’apprentissage de consignes et les entrées courantes/historiques, puis régénérer le snapshot et qualifier le candidat exact. Complément : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-20261011.patch, SHA256 6c202d64b1261082d78842c3ccc5d554437135c862197f0b4edaa30929aae13b, parents dans son JSON ; fusionner sans écraser les changements natifs. Architecture INSTRUCTION-LEARNING.md et AGENT-ENGINE-PROTOCOL.md FR/EN, PRODUCT-WORKFLOW.md et Mermaid. Nouvelle autorisation explicite du propriétaire : augmenter droits/budgets Swarm en cas d’insuffisance diagnostiquée, via opérations publiques, dépenses et historique conservés.\n\nInstructions antérieures conservées :\nREPLAN T4 : après run-supervision-20261011.patch, intégrer unpaid-preflight-revision-20261011.patch puis unpaid-preflight-documentation-20261011.patch (empreinte et parent dans son JSON). Il corrige la révision explicite d’un résultat interrompu après précontrôle sans appel, en vérifiant checkpoint/reçus/fin du processus ; tests/race/suite1120 PASS. Préserver les modifications T2/T3 et leurs preuves ; T2 fournit déjà le découpage complet du manifeste source. Regénérer le snapshot après fusion, sans changer le manifeste historique ni relever les budgets. Source : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/.\n\nInstructions antérieures conservées :\nREPLAN T4 : conduite de production par IA propriétaire. Intégrer run-supervision-20261011.patch après agent-engine-protocol-20261011.patch, agent-engine-protocol-resumption-20261011-git.patch (copie de packaging corrigée, original conservé) et agent-continuity-20261011.patch. Seuils de durée = observations, continue-run/stop-run attribués ; budgets inchangés. Réparation ancienne ne bloque plus une tentative courante. Préserver T1..T4 ; source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/ ; RUN-SUPERVISION.md FR/EN, détails et hashes dans run-supervision-20261011.json. Regénérer le manifeste sur votre candidat. \n\nInstructions antérieures conservées :\nREPLAN T4 : diagnostiquer remises incomplètes, contrôles ou reprises en échec ; corriger leur cause et revenir à l’exigence initiale. Attribuer les originaux et remises concurrentes, vérifier même candidat et effets uniques. Garder historique et consommations. Repères TR-1/3/4/5 ; architecture AUTORECURSIVE-RECOVERY.md et TRACEABILITY.md dans /home/fpizzi/workspace/swarm. Détails ci-dessous.\n\nInstructions historiques et détaillées conservées :\nPérimètre : internal/engine/managed_publication_lane.go, managed_integration.go et contrats/relay de remise. JAN-3/JAN-6/FEB-1/FEB-2/FEB-4. Contrôles et revue indépendante conservés. Documentation d’architecture des changements de ce lot incluse.\nPreuves : Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.\nGate entry : Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.\nGate validation : Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.\nGate delivery : Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.\nConditions d’arrêt : Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.\nHypothèses : Les constats d’audit sont à confirmer sur le checkout et la révision candidate, avec distinction simulations/fournisseurs réels. ; Janvier et février sont retenus ; JAN-4/JAN-5 restent des exigences Swarm, sans les attribuer au système final de février. ; La comparaison inclut les sources de recherche du 10 octobre, Cursor prioritaire, Google/Gemini, OpenAI et Anthropic ; leurs résultats ne sont pas des preuves Swarm. ; Objectif distinct de la finalisation historique w-fff7368010d114f6e2578985, dont tâches, tentatives, preuves et budgets restent inchangés. La préparation d’origine est conservée et référencée ; aucune réinitialisation de mission. ; Tous les réglages de politique ajoutés sont persistés, exposés dans Admin FR/EN et utilisés par le moteur.\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n\n\nPrécision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-1/TR-3/TR-4/TR-5 : relier les remises et exécutions à mission/tâche/tentative/agent/candidat, arguments, dates, codes et originaux. Deux remises concurrentes restent attribuées à leurs propriétaires. Même candidat pour contrôles/revue/publication ; reprise publique après correction identifiée, refus et consommations conservés. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.\n\nSources actualisées de démarche, à intégrer et vérifier sur le candidat : docs/architecture/AUTORECURSIVE-RECOVERY.md SHA256 713a6e87f41b0ba262ad34a14c66e987e972f08a94bf48c1d9697217aa9c597a, docs/en/AUTORECURSIVE-RECOVERY.md SHA256 454343c2304489c8d58d2305a169b2fbba861a4dd0a323b888b9c78254c43a73, docs/architecture/TRACEABILITY.md SHA256 fbd86fb95d15bcdc266cb6df54b85aa9d761b52da1c53362bb088c729071d741, docs/en/TRACEABILITY.md SHA256 f3b32ca7185903651fe7051eb405e59747d741151ad116d9371897cc95f65c2d, tools/agent-workflows/CONTRACT.md SHA256 8af3236ad60b5102df3ae8c30ebcb2c2fa4774ac4c73263fca2727cc531f03ee, .claude/skills/apex/SKILL.md SHA256 5910f2c12111109d67824a5b44a4ad762808b935e4b22447d6177759d00a4dde, .claude/skills/replan/SKILL.md SHA256 035ddb8a95d0cff95e2f3d43b48c7b98457840e69b17d11484ab2ae03afdb350, tools/agent-workflows/templates/TRACKING.md SHA256 af685085922ac538b9c8301ffda126dff03e1de54a5bf68c7ff6ba0601ea0b99. Replan est obligatoire sur reprise/blocage/échec/preuve insuffisante/hypothèse modifiée, sauf arrêt ou report explicite de l’utilisateur. Ne pas se limiter à une remontée ou un journal : une action autorisée, sa vérification et un réexamen sont requis. Ces précisions ne changent pas les critères, dépendances ou budgets adoptés.",
+        "criteria": [
+          "Workers isolés sans coordination directe ; remise unique au responsable exact avec changements, limites, découvertes et décisions attendues.",
+          "Responsable exploite une découverte et se réactive après redémarrage.",
+          "Mesurer la voie exclusive ; réduire l’attente centrale selon T1 sans accepter un candidat différent de celui contrôlé.",
+          "Publication concurrente, conflit, preuve périmée et échec de revue ont des refus et reprises observables ; aucune autoacceptation. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-ca937edf4e-T4",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-ca937edf4e-T4",
+      "title": "Corriger publication, conflits et richesse des remises",
+      "state": "waiting",
+      "reason": "Attend Implémenter exploration et sous-planification concurrente",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-ca937edf4e-T3",
+      "impact": 4,
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T4-handoff.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Implémenter exploration et sous-planification concurrente",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-ca937edf4e-T4",
+          "title": "Corriger publication, conflits et richesse des remises",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "task": "plan-ca937edf4e-T5",
+        "revision": 357,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "REPLAN entrées13 : paquet cumulatif53 fichiers autorisé remplace les anciens paquets comme entrée à lire, sans effacer leur historique : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-account-20261011.bundle, SHA256 bdf4a6d75d679ac06b45d1922e77c2514658016297795a24e53968fc5b4f99d1, ref refs/heads/operator-inputs, commit af878d99337e45da0948208b2becffe098adea6c, operator-inputs.json SHA256 671363c02c3168a386a30131edc08173eacae9ae506b61c1ab3f171a410dfe60. Depuis votre copie uniquement, fetch vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes et extraire seuls chemins déclarés ; aucune lecture/écriture du code hôte ou voisin. Après12 appliquer13 provider-account-change-recovery-20261011.patch SHA256 8945660400f783909b8c0df1647124e9cc9f6840136f74861d705a33d3c8c7ca, préimages/extensions/parent dans JSON. Nouvelle précondition utilisateur : compte Claude changé, reprise demandée ; API publique confirm_account_change conserve refus original/échéance/dépenses, garde active par défaut, aucun appel ni acceptation implicite. Runtime13 installé et vérifiéa5696bdf ; regression/race/vet/build PASS, full en cours à cet instant. T3 doit préserver cette correction et fencing des anciens contrôleurs ; T5 exposer reprise de compte clairement attribuée et historique dans Admin/UX FR/EN. T2 reprend même candidat39e89b16,4 inspections réutilisables+4 appels nécessaires, pas une nouvelle production. Contrôles futurs renforcés configurés publiquement (vrais nouveaux tests TestCursorEngineTn, tous TestPlanning/Judge) ; respecter les argv réellement reçus. L’autorisation utilisateur de hausse droits/budgets est explicite, besoin concret/public API et consommation conservée.\n\nCouverture obligatoire des contrôles T5 : politique publique renforcée avant production, tous TestPlanning (Judge compris) et nouveaux tests nommés TestCursorEngineT5*. Nommer les nouveaux tests comportementaux sous ce préfixe ou proposer une politique explicite couvrant leurs vrais noms avant revue ; conserver les originaux exécutés. Go150s/contrôle180s, autres contrôles docs17s, total<=300s. Baseline plus large PASS28.677s est antérieur, pas preuve de vos nouvelles fonctions. Budget/droits insuffisants : besoin concret à l’opérateur autorisé à augmenter par parcours public ; conserver les consommations.\n\nExigence utilisateur sans hardcoding de politique : inventorier aussi bornes de transport de preuves/revue (source96Kio, union par tâche128Kio,24fichiers actuellement techniques). Distinguer capacités fournisseur et choix d'administration ; rendre les politiques configurables persistées/Admin/preview/CAS/historique aux portées pertinentes, contexte gelé et préflight réel concordants, bornes fournisseur explicites. Aucune troncature silencieuse ; concurrence et filiation de sources conservées.\n\nREPLAN entrées12 — le paquet cumulatif51fichiers remplace comme source autorisée les anciens paquets45/47/49 : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-capacity-20261011.bundle, SHA256 ad021a0d34ee90e34b8d826747019d876411ead734c1e2be389273b54ea3016c, ref refs/heads/operator-inputs, commit 702a96e9bb82051388365910849b49e5b589673e, operator-inputs.json SHA256 6c331b815e3c7fe37460e174662364980523b4e48b671c8376d2a3fd1d523c6a. Depuis VOTRE copie seulement, git fetch du paquet vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes, extraire uniquement les chemins déclarés avec git show. Droit borné de lecture du paquet transmis ; aucune exploration/modification du code hôte ou voisin. Fusionner sans écraser Judge T2/changements propres, préimages/extensions explicites vérifiées. Après complément9 appliquer10 instruction-operator-composition (SHA48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd),11 admin-duration-launch (SHA06429887df1f013f9acea161357b7348760a251df7995fc36231a093e07d34e3),12 source-capacity-recovery (SHA1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84).10 sépare base opérateur et apprentissage/rejet ;11 gèle900s Admin explicites pour nouveaux agents sans perdre plafonds appels/erreurs ni réécrire sessions ;12 répare refus impayé de capacité seulement après preuve originale checkpoint/reçu/refus typé concordants, contrôles frais et revue indépendante. Garder originaux/tentatives/consommation ; jamais inventer acceptation. Full10/11 PASS482,701s/470,955s, race/vet/méthodes PASS, runtime11 réellement installé0f619612 ;12 GREEN31,598s+garde1,123s, full en qualification. Paquet input intègre sources, pas avis.\n\nT5 : UI/Admin FR/EN vérifient valeurs vraiment gelées, héritage/durée/silence, base opérateur+apprentissage/rejet, états locaux séparés de l'acceptation et reprise de capacité sans nouvelle production.\n\nInstructions antérieures conservées :\nRemise opérateur bornée des entrées, autorisée par l’utilisateur (droits/budgets nécessaires): unique paquet externe /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-20261011.bundle SHA25647463691a600a5ef5f80f4ab6c7446f87fda4ceecdfa7c8c5bd2edab500ca8c3, ref refs/heads/operator-inputs, commit 30171f7b07b881b5999faf5d4216e849f0dc72b4. Depuis VOTRE copie, importer en lecture seule via git fetch du bundle vers refs/swarm/operator-inputs; vérifier commit et operator-inputs.json (SHA2569dc5371901f2c7dfc2d1bba912350dc64a6e66bd0940de6dfca1c0424f0ff737), puis extraire les seuls chemins déclarés docs/plans/engine-cursor-contract/recovery dans VOTRE copie via git show. Cette lecture du paquet transmis est l’unique extension de droit; aucune lecture/modification/exploration du code du dépôt hôte ou des copies voisines. Les anciens chemins absolus de patchs désignent désormais les entrées de ce paquet à lire localement après import. Le paquet contient les originaux et leur filiation, pas une acceptation ni un candidat de code. Vérifier préimages, fusionner sans écraser T2/changements propres, régénérer source snapshot et qualifier candidat exact. Le test isolé de fetch et toutes empreintes passent; réception/usage par worker réel reste à démontrer. ToolSeconds900s enregistré pour T3..T7,80appels propres inchangés, pas couperet automatique de durée.\n\nInstructions antérieures conservées :\nDiagnostic de budget opérateur autorisé: quotas conduite publics60/60/70 modifiables sans remboursement. Distinction actuelle à corriger dans le périmètre Admin/politiques: PlanToolLimit80 sur T3..T7 borne agent; run-limits effective donne100 par défaut, borne normalisation10000, mais task_definition.go max_tool_calls1..100 et store.go/validateHierarchicalContractRevision interdisent toute révision du contrat géré. extend-attempt n’autorise qu’une tentative supplémentaire après épuisement, jamais l’ajustement des outils. Prévoir une opération publique dédiée pour autoriser des budgets futurs d’une tâche gérée avec CAS/motif/acteur/historique; critère, rôle, périmètre, preuves, tentatives et consommations conservés, plafond technique justifié distinct de politique Admin. Contexte et contrôle du superviseur doivent connaître la capacité effective; une narration d’autorisation n’ouvre aucun droit. Ne pas modifier silencieusement les limites gelées d’un processus actif, ses prompts ou une acceptation. Aucun manque de80 outils n’est encore observé pour T3, ne pas affirmer une hausse actuelle ni un minimum garanti.\n\nInstructions antérieures conservées :\nREPLAN complément9 T5: docs/plans/engine-cursor-contract/recovery/review-status-owner-context-20261011.patch SHA2569d70e9fd8eab43bfd73c365c082f87187937aa8b01577ef46899ca55b8118b72, après planning-rejection-artifact-preservation, filiation JSON vérifiée. Partager avec la revue le sens local de pass/complete; absence dans un fragment→unknown/needs pour originaux finaux, pas fail présumé. Fournir opération refusée complète au propriétaire sans outils; réduire seulement les aperçus next des todo/accepted non concernés, préserver entrées entières, identités et consignes persistées. Rouge/vert, race/vet/workflows PASS; fullGo en cours, reçu final de qualification à vérifier. Intégrer sans écraser correctifs1..8/jugeT2, source snapshot et candidat exact à qualifier. Natif:activation18 a reçu/acquitté diagnostic17 mais aucune revision de consigne appliquée; échec préflight254 sans appel; T2 f5 refus valide avec19appels, nouvelle portée des reçus documentée, pas acceptée. T7 vérifie réellement réception/décision/effets; T5 expose état actuel, T8 conserve limites/interventions/quickwins sans adoption implicite.\n\nInstructions antérieures conservées :\nComplément de préservation T5 : planning-rejection-artifact-preservation-20261011.patch SHA256fc912259ef23d257645c298e496fdba6e920ab6f99940e81081cec9b289a8f36 après planning-owner-rejection-diagnostic-20261011.patch. Source/filiation /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Chaque refus, même répété, garde événement distinct et artefacts diagnostic+réponse avec hashes ; clé du problème uniquement pour éligibilité. Export/import préserve originaux et attente ; preuves importées restent archivées, aucune certification active. Reproduction rouge puis verte, tests des deux refus et chemins/hashes ; contrôle complet final en cours. Fusionner, régénérer source snapshot, qualifier candidat exact/réception réelle T7.\n\nInstructions antérieures conservées :\nREPLAN T5 : activation14 a reçu la revue exacte puis été refusée à révision203 pour doublon, réponse perdue par ancien pipeline. Intégrer planning-owner-rejection-diagnostic-20261011.patch SHA256 3ab9828491f7d5b5056da906c8b329e3b16fd86e09e4bc0e834489b1d2d8314b après review-current-event-feedback-20261011.patch ; chaîne et sources dans /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Proposition JSON refusée : réponse adaptateur conservée intacte, reçu/méthodes, opération fautive index/type/ID et inventaire complet des identités. planning_rejected revient au propriétaire en tête ; pas de Failure globale pour cette catégorie. Refus identique/état inchangé : attente locale persistée, claim vérifie ; baux, consommations et autre périmètre ne simulent pas progrès. Nouvel input/état pertinent/config explicite rouvre ; aucun remboursement/acceptation/fin moteur. Inventaire global IDs : task seulement nouveau, unique dans la proposition. Tests publics/doubles/race, fusion préserver juge T2 et candidat exact, régénérer manifeste (désormais5pièces). T5 expose attente/diagnostic actuel et références/historique, FR/EN, aucun réglage arbitraire ajouté : idempotence du refus.\n\nInstructions antérieures conservées :\nREPLAN UX T5 : défaut confirmé par inspection web/pilot-inspector.js : la tâche reste blocked pendant une revue corrigée running et affiche encore t.blocker (ancien refus). Présenter état/revue/candidat actuels et action réellement disponible ; ancien motif reste dans historique attribué. Vérifier FR/EN, thèmes, chargement/erreurs et contexte de revue réel, sans modifier état métier ou masquer refus. Intégrer consignes appliquées par défaut/rejetables et RETEX après recette déjà transmis.\n\nInstructions antérieures conservées :\nREPLAN T5 : complément instruction-learning-retex-routing-20261011.patch après les deux compléments apprentissage/continuité précédents, source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-routing-20261011.patch, SHA256 8b957486beef8e95e02061e79c678a145f11a4d620086d853a26527c2ee291cc. La consigne operator_resume la plus récente passe en tête du lot ; le schéma gelé retire retry sans tâche éligible (erreur de protocole, tentatives épuisées ou réservations), conserve review-retry ; current_review attribue l’erreur actuelle et previous_blocker conserve un ancien refus. Citations byte-for-byte, espaces et signes du patch exacts. Régressions rouge/vert, race, vet et méthodes vérifiées ; suite complète en cours, aucune acceptation native prétendue. Fusionner avec T2/T3 sans écraser leurs changements ; vérifier candidat et réception réels. Révision native157 : mauvaise proposition retry refusée, pas un verdict sémantique ni T8 achevée.\n\nInstructions antérieures conservées :\nREPLAN T5 : ajouter instruction-learning-retex-continuity-20261011.patch après instruction-learning-retex-20261011.patch. Après le dernier lot historique acquitté, historical_acknowledged rend la main au responsable IA, sans décision moteur de fin ni acceptation implicite. Les tests utilisent exactement les IDs admis et conservent la garde de budget de reprise. Source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-continuity-20261011.patch, SHA256 459949e903fdc72b155cdca2bdd06a0a4a6b2cd7eeaeae4f87b67527eabe373c ; parents dans son JSON. Fusionner T2/T3, revérifier le candidat exact ; la suite complète précédente a signalé un test de l’ancien protocole, correction ciblée/race vérifiées, nouveau contrôle complet en cours. Réception du contexte et RETEX final restent nécessaires.\n\nInstructions antérieures conservées :\nREPLAN T5 : intégrer/vérifier le complément instruction-learning-retex après T4, préserver T2/T3. Cadre cyan Consignes améliorées, appliquées par défaut, bouton Rejeter avant réservation, origine/motif/historique, rejet persistant/CAS visible et notification au responsable. Phase facultative RETEX & quick wins après recette fraîche, valeur/effort/risque/critères/preuves ; préparation d’évolution sans lancement implicite. Vérifier FR/EN, deux thèmes, clavier et mobile avec tests/instruction_retex_ui.cjs sur votre candidat ; architecture/Mermaid et politiques Admin persistées. Complément : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-20261011.patch, SHA256 6c202d64b1261082d78842c3ccc5d554437135c862197f0b4edaa30929aae13b, parents dans son JSON ; fusionner sans écraser les changements natifs. Architecture INSTRUCTION-LEARNING.md et AGENT-ENGINE-PROTOCOL.md FR/EN, PRODUCT-WORKFLOW.md et Mermaid. Nouvelle autorisation explicite du propriétaire : augmenter droits/budgets Swarm en cas d’insuffisance diagnostiquée, via opérations publiques, dépenses et historique conservés.\n\nInstructions antérieures conservées :\nREPLAN T5 : compléter T2/T3/T4 : politiques du juge exposées/persistées via Admin FR/EN et API/CLI ; initialiser les missions historiques sans réactiver enable ni effacer plan, compteurs ou preuves. Aucun réglage de politique caché. Conserver schéma IA strict et décisions du responsable. Intégrer unpaid-preflight-revision-20261011.patch puis unpaid-preflight-documentation-20261011.patch puis review-time-policy-documentation-20261011.patch après run-supervision (JSON/parents dans recovery/ du dépôt source). UX de précontrôle impayé : diagnostic vérifié, résultat arrêté attribuable, correction explicite, nouvelle revue ; jamais forcer un booléen. Tester refus et parcours FR/EN réel.\n\nInstructions antérieures conservées :\nREPLAN T5 : conduite de production par IA propriétaire. Intégrer run-supervision-20261011.patch après agent-engine-protocol-20261011.patch, agent-engine-protocol-resumption-20261011-git.patch (copie de packaging corrigée, original conservé) et agent-continuity-20261011.patch. Seuils de durée = observations, continue-run/stop-run attribués ; budgets inchangés. Réparation ancienne ne bloque plus une tentative courante. Préserver T1..T4 ; source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/ ; RUN-SUPERVISION.md FR/EN, détails et hashes dans run-supervision-20261011.json. Regénérer le manifeste sur votre candidat. UX Admin et départs FR/EN : seuils observables, droits/propriétaire/motif, aucune hausse de budget ; recette réelle des refus et reprises. \n\nInstructions antérieures conservées :\nREPLAN T5 : fusionner agent-engine-protocol-20261011.patch, agent-engine-protocol-resumption-20261011.patch, agent-continuity-20261011.patch puis provider-wait-20261010.patch ; préserver T1..T4. Statut/jalon ne clôt pas le besoin : poursuivre dans les droits, suivre le résultat natif ; clore sur besoin vérifié, arrêt explicite ou dépendance concrète sans action utile. Les 4 contextes doivent rester bornés, sans hausse de limite. Sources /home/fpizzi/workspace/swarm ; manifeste à régénérer sur votre candidat. UX/reprise : détails conservés ci-dessous.\n\nInstructions antérieures conservées :\nREPLAN T5 : fusionner agent-engine-protocol-20261011.patch puis agent-engine-protocol-resumption-20261011.patch et provider-wait-20261010.patch ; préserver T1..T4. Revue : confirmation si method_restart_ready. Lancement préparé : confirmation des skills, mêmes chemins/empreintes actuelles via agent resume-launch ; originaux conservés. UX FR/EN sans booléen forcé ; tester refus/reprises. Générer le manifeste dans votre candidat : tools/verification/refresh_engine_source_manifest.py. Source /home/fpizzi/workspace/swarm ; contrat AGENT-ENGINE-PROTOCOL.md FR/EN.\n\nInstructions antérieures conservées :\nREPLAN T5 : intégrer agent-engine-protocol-20261011.patch et provider-wait-20261010.patch sans perdre T1..T4. UX FR/EN : lire recovery-preview ; si method_restart_ready, afficher candidat/appels et exiger une confirmation avant confirm_review_error_repair=true. Aucun booléen forcé ni budget codé. Tester refus, reprise ordinaire et verdict final. Générer le manifeste dans votre candidat : tools/verification/refresh_engine_source_manifest.py ; ne pas importer celui de la racine. Source /home/fpizzi/workspace/swarm ; contrat AGENT-ENGINE-PROTOCOL.md.\n\nInstructions antérieures conservées :\nREPLAN T5 : fusionner agent-engine-protocol-20261011.patch (correctifs consolidés de revue/preuves/phases/précontrôle) et provider-wait-20261010.patch ; préserver T1..T4. Source /home/fpizzi/workspace/swarm. Protocole strict, routage review-retry et reprise complète si méthode changée : AGENT-ENGINE-PROTOCOL.md FR/EN. Après fusion, générer le manifeste des sources dans votre candidat avec tools/verification/refresh_engine_source_manifest.py ; ne pas importer celui de la racine. Aucun avis ancien réutilisé, aucune hausse de budget.\n\nInstructions antérieures conservées :\nREPLAN T5 : fusionner recovery-source-preflight-20261010.patch avec les correctifs déjà transmis ; contrôler les sources avant mutation de reprise. Reprendre le CONTRACT.md compact actuel et les méthodes APEX/replan ; check.py vérifie les quatre contextes réels. Régressions : 22 tests / 46 PASS, exit 0, fournisseur simulé. Source : /home/fpizzi/workspace/swarm ; détail et statut dans REVIEW-EVIDENCE.md et la mise à jour de recherche 20261010-tracabilite-developpement.md. Préserver les corrections T1..T4, quotas et historique.\n\nInstructions antérieures conservées :\nREPLAN T5 : intégrer les consignes APEX/replan et contrat commun actualisés. Diagnostic et prochaine action en tête des projections bornées ; distinguer résumé reçu et originaux joints. Préserver les patches transmis, fusionner T1..T4. Vérifier API/CLI/Admin FR/EN, persistance et provenance des nouvelles politiques. AUTORECURSIVE-RECOVERY.md et TRACEABILITY.md dans /home/fpizzi/workspace/swarm ; détails ci-dessous.\n\nInstructions historiques et détaillées conservées :\nPérimètre : Configuration et API/CLI publiques, web/admin.js et modules Admin dédiés, traduction FR/EN ; workflows planner/subplanner/worker/reviewer/juge. JAN-7 et politiques T2..T4. Documentation d’architecture des changements de ce lot incluse.\nPreuves : Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.\nGate entry : Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.\nGate validation : Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.\nGate delivery : Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.\nConditions d’arrêt : Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.\nHypothèses : Les constats d’audit sont à confirmer sur le checkout et la révision candidate, avec distinction simulations/fournisseurs réels. ; Janvier et février sont retenus ; JAN-4/JAN-5 restent des exigences Swarm, sans les attribuer au système final de février. ; La comparaison inclut les sources de recherche du 10 octobre, Cursor prioritaire, Google/Gemini, OpenAI et Anthropic ; leurs résultats ne sont pas des preuves Swarm. ; Objectif distinct de la finalisation historique w-fff7368010d114f6e2578985, dont tâches, tentatives, preuves et budgets restent inchangés. La préparation d’origine est conservée et référencée ; aucune réinitialisation de mission. ; Tous les réglages de politique ajoutés sont persistés, exposés dans Admin FR/EN et utilisés par le moteur.\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n\nComplément opérateur du 10 octobre 2026 après défaut observé : le serveur actif a reçu la correction de surveillance des planificateurs/reviewers, postérieure au snapshot de départ. L’intégrer et la vérifier dans le candidat géré de ce lot, afin que le résultat final conserve cette réparation. Patch de référence en lecture : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/provider-wait-20261010.patch, SHA256 f83ca08f01a3e32665a9222a7826190ed7d41e1c7d80632f2dc4ac731c3ee340 ; manifeste adjacent .json. Construit contre le base_commit 6e8fcc7b69c4b5e4638cb36ec680be0f45ce5dc1 ; git apply --check vérifié en copie isolée. Examiner le diff, adapter explicitement les conflits avec T2..T4 ; ne pas écraser leurs changements. Politiques dans config/provider-wait.json, Admin FR/EN, durée totale 0, silence 300, bail 120 renouvelé : ces valeurs sont configurables, pas des constantes Go. Rejouer tests ciblés/race et les recettes navigateur isolées ; conserver budget et contrôle indépendant. Ne pas installer un autre serveur pendant une mission active. La note de recherche et les preuves réelles sont en lecture dans /home/fpizzi/workspace/swarm/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-vivacite-supervision.md et le JSON adjacent 20261010-vivacite-observation.json ; actualiser la documentation d’architecture dans le même candidat. Les sources de recherche ont aussi été mises à jour après le snapshot (chapitres 6,7,9 et programme-recherche.md) : les consulter et reporter le contenu pertinent avec sa provenance sans altérer les campagnes historiques.\nPrécision eBPF vérifiée lors de la reprise : corriger le relevé T1 qui interprète kernel.unprivileged_bpf_disabled=2 comme une désactivation permanente. Selon https://docs.kernel.org/admin-guide/sysctl/kernel.html#unprivileged-bpf-disabled (consulté le 10 octobre 2026), 2 désactive les appels non privilégiés mais reste modifiable par un administrateur ; 1 est irréversible sur le noyau en cours d’exécution. Reporter cette distinction dans les documents FR/EN du candidat de ce lot. Ne modifier aucun sysctl ni privilège pour cet ajustement documentaire ; l’étude du collecteur reste optionnelle et sans déploiement privilégié autorisé.\nPreuve de revue : le critère unknown de T1 a persisté car des citations ne transmettaient pas leur original. Pour toute source inchangée nécessaire à une vérification, livrer docs/plan-ca937edf4e-T5.review-context.json (version 1, files relatifs au dépôt) ; le moteur joint le texte intégral du candidat testé avec blob/SHA256. Sur le moteur corrigé, les fichiers déclarés dans delivery.criteria[].evidence sont joints intégralement depuis le candidat ; le manifeste ajoute les sources complémentaires. Vérifier la complétude du dossier ; aucune acceptation autonome déclarée par le producteur. Étudier ce cas dans /home/fpizzi/workspace/swarm/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-refus-contexte-revue.md : expliciter ce mécanisme dans les consignes de remise et le diagnostic de revue, couvrir source absente, citations fausses, preuve inchangée, limites et récupération par les opérations publiques. Documenter l’architecture FR/EN et les limites ; aucun remboursement ou relèvement de budget. Cette consigne complète le périmètre existant T5 sur workflows et API/CLI/Admin.\nCorrectif GLOBAL de transmission des preuves installé sur le serveur, postérieur à votre instantané : intégrer /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/review-evidence-20261010.patch (SHA256 491ff5bfd43043e3d54a91b2b39414d6633af3d0c1b5c2b476dd18ad6e8c3fd1), après provider-wait-20261010.patch. Manifeste adjacent .json : application contrôlée sur base 6e8fcc7b69c4b5e4638cb36ec680be0f45ce5dc1. Conserver et fusionner les évolutions de T1..T4, traiter les conflits et vérifier le résultat. Le moteur joint désormais delivery.criteria[].evidence depuis le candidat et transmet un inventaire de revue aux responsables racine/enfants et aux reprises. Documentation d’architecture FR/EN, recherche et schémas Mermaid inclus ; consignes communes replan/rapport. Installation du serveur ne vaut pas acceptation de ce lot ; contrôles et revue indépendante frais, budgets inchangés.\nCorrectif global supplémentaire, phases de gate importées : intégrer docs/plans/engine-cursor-contract/recovery/plan-phases-20261010.patch depuis le dépôt source /home/fpizzi/workspace/swarm, SHA256 3a61e3d43fff9e1e9535aba76b911bb98f2e71da2c267a6ac6a7516b89c3e5fe, après les patches provider-wait puis review-evidence déjà transmis. Application vérifiée sur base 6e8fcc7b69c4b5e4638cb36ec680be0f45ce5dc1 ; manifeste adjacent .json. Fusionner avec les changements T1..T4 et conserver toutes leurs preuves. Le contrôleur reprend Task.PlanChecks pour chaque phase et vérifie requiredPlanChecks avant publication. planning requalify supporte la gate périmée malgré avis passed, avec confirmation et identité exactes, nouveaux contrôles et nouvelle revue sans nouvel exécutant. Aucun budget ou tentative remboursé. Consulter docs/architecture/MANAGED-PLAN-GATES.md, docs/en/MANAGED-PLAN-GATES.md et la note de recherche revisions/20261010-phases-plan-integration.md dans le dossier-recherche existant. Le moteur installé et l’intervention T1 ne valent pas acceptation de T5 ; livrer code, architecture et preuves sur votre candidat avec revue indépendante.\n\nPrécision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-2/TR-5 : intégrer les consignes communes et le modèle de remise actualisés dans votre candidat, en fusionnant les évolutions précédentes. Distinguer traces locales, reçus contrôleur et verdict indépendant ; diagnostic du sous-superviseur dans son périmètre, arbitrage racine entre périmètres. API/CLI/Admin FR/EN, provenance et persistance pour toute nouvelle politique ; aucune constante de politique arbitraire. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.\n\nSources actualisées de démarche, à intégrer et vérifier sur le candidat : docs/architecture/AUTORECURSIVE-RECOVERY.md SHA256 713a6e87f41b0ba262ad34a14c66e987e972f08a94bf48c1d9697217aa9c597a, docs/en/AUTORECURSIVE-RECOVERY.md SHA256 454343c2304489c8d58d2305a169b2fbba861a4dd0a323b888b9c78254c43a73, docs/architecture/TRACEABILITY.md SHA256 fbd86fb95d15bcdc266cb6df54b85aa9d761b52da1c53362bb088c729071d741, docs/en/TRACEABILITY.md SHA256 f3b32ca7185903651fe7051eb405e59747d741151ad116d9371897cc95f65c2d, tools/agent-workflows/CONTRACT.md SHA256 8af3236ad60b5102df3ae8c30ebcb2c2fa4774ac4c73263fca2727cc531f03ee, .claude/skills/apex/SKILL.md SHA256 5910f2c12111109d67824a5b44a4ad762808b935e4b22447d6177759d00a4dde, .claude/skills/replan/SKILL.md SHA256 035ddb8a95d0cff95e2f3d43b48c7b98457840e69b17d11484ab2ae03afdb350, tools/agent-workflows/templates/TRACKING.md SHA256 af685085922ac538b9c8301ffda126dff03e1de54a5bf68c7ff6ba0601ea0b99. Replan est obligatoire sur reprise/blocage/échec/preuve insuffisante/hypothèse modifiée, sauf arrêt ou report explicite de l’utilisateur. Ne pas se limiter à une remontée ou un journal : une action autorisée, sa vérification et un réexamen sont requis. Ces précisions ne changent pas les critères, dépendances ou budgets adoptés.",
+        "criteria": [
+          "Chaque nouveau réglage est visible, modifiable et enregistré dans Admin ; moteur et CLI lisent la même valeur.",
+          "Aperçu sans écriture, validation, révision concurrente, historique et restauration vérifiés.",
+          "Paramètres de politique absents des constantes Go ; les bornes techniques sont distinguées des choix configurables.",
+          "Routes modèles et prompts effectifs identifiés par rôle ; aucune montée de gamme ni relance silencieuse.",
+          "Parcours clavier/mobile, thèmes clair/sombre, FR/EN et erreurs vérifiés. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-ca937edf4e-T5",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-ca937edf4e-T5",
+      "title": "Exposer les politiques et adapter les prompts par rôle",
+      "state": "waiting",
+      "reason": "Attend Corriger publication, conflits et richesse des remises",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-ca937edf4e-T4",
+      "impact": 3,
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T5-handoff.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Corriger publication, conflits et richesse des remises",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-ca937edf4e-T5",
+          "title": "Exposer les politiques et adapter les prompts par rôle",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "task": "plan-ca937edf4e-T6",
+        "revision": 357,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Avant de citer une exécution de tests comme preuve d'un critère de livraison, vérifier que le motif -run utilisé couvre réellement les noms exacts des fonctions de test ciblées par ce critère (comparer avec les noms définis dans les fichiers *_test.go concernés) ; si la commande citée ne couvre pas ces fonctions, ne pas la citer comme preuve et marquer le critère non démontré plutôt que 'pass'.\n\nREPLAN entrées13 : paquet cumulatif53 fichiers autorisé remplace les anciens paquets comme entrée à lire, sans effacer leur historique : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-account-20261011.bundle, SHA256 bdf4a6d75d679ac06b45d1922e77c2514658016297795a24e53968fc5b4f99d1, ref refs/heads/operator-inputs, commit af878d99337e45da0948208b2becffe098adea6c, operator-inputs.json SHA256 671363c02c3168a386a30131edc08173eacae9ae506b61c1ab3f171a410dfe60. Depuis votre copie uniquement, fetch vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes et extraire seuls chemins déclarés ; aucune lecture/écriture du code hôte ou voisin. Après12 appliquer13 provider-account-change-recovery-20261011.patch SHA256 8945660400f783909b8c0df1647124e9cc9f6840136f74861d705a33d3c8c7ca, préimages/extensions/parent dans JSON. Nouvelle précondition utilisateur : compte Claude changé, reprise demandée ; API publique confirm_account_change conserve refus original/échéance/dépenses, garde active par défaut, aucun appel ni acceptation implicite. Runtime13 installé et vérifiéa5696bdf ; regression/race/vet/build PASS, full en cours à cet instant. T3 doit préserver cette correction et fencing des anciens contrôleurs ; T5 exposer reprise de compte clairement attribuée et historique dans Admin/UX FR/EN. T2 reprend même candidat39e89b16,4 inspections réutilisables+4 appels nécessaires, pas une nouvelle production. Contrôles futurs renforcés configurés publiquement (vrais nouveaux tests TestCursorEngineTn, tous TestPlanning/Judge) ; respecter les argv réellement reçus. L’autorisation utilisateur de hausse droits/budgets est explicite, besoin concret/public API et consommation conservée.\n\nCouverture obligatoire des contrôles T6 : politique publique renforcée avant production, tous TestPlanning (Judge compris) et nouveaux tests nommés TestCursorEngineT6*. Nommer les nouveaux tests comportementaux sous ce préfixe ou proposer une politique explicite couvrant leurs vrais noms avant revue ; conserver les originaux exécutés. Go150s/contrôle180s, autres contrôles docs20s, total<=300s. Baseline plus large PASS28.677s est antérieur, pas preuve de vos nouvelles fonctions. Budget/droits insuffisants : besoin concret à l’opérateur autorisé à augmenter par parcours public ; conserver les consommations.\n\nREPLAN entrées12 — le paquet cumulatif51fichiers remplace comme source autorisée les anciens paquets45/47/49 : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-capacity-20261011.bundle, SHA256 ad021a0d34ee90e34b8d826747019d876411ead734c1e2be389273b54ea3016c, ref refs/heads/operator-inputs, commit 702a96e9bb82051388365910849b49e5b589673e, operator-inputs.json SHA256 6c331b815e3c7fe37460e174662364980523b4e48b671c8376d2a3fd1d523c6a. Depuis VOTRE copie seulement, git fetch du paquet vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes, extraire uniquement les chemins déclarés avec git show. Droit borné de lecture du paquet transmis ; aucune exploration/modification du code hôte ou voisin. Fusionner sans écraser Judge T2/changements propres, préimages/extensions explicites vérifiées. Après complément9 appliquer10 instruction-operator-composition (SHA48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd),11 admin-duration-launch (SHA06429887df1f013f9acea161357b7348760a251df7995fc36231a093e07d34e3),12 source-capacity-recovery (SHA1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84).10 sépare base opérateur et apprentissage/rejet ;11 gèle900s Admin explicites pour nouveaux agents sans perdre plafonds appels/erreurs ni réécrire sessions ;12 répare refus impayé de capacité seulement après preuve originale checkpoint/reçu/refus typé concordants, contrôles frais et revue indépendante. Garder originaux/tentatives/consommation ; jamais inventer acceptation. Full10/11 PASS482,701s/470,955s, race/vet/méthodes PASS, runtime11 réellement installé0f619612 ;12 GREEN31,598s+garde1,123s, full en qualification. Paquet input intègre sources, pas avis.\n\nT6 : qualification complète, race, cas publics, parallélisme réel distinct des doubles, régressions10/11/12 et source snapshot exact de la fusion.\n\nInstructions antérieures conservées :\nRemise opérateur bornée des entrées, autorisée par l’utilisateur (droits/budgets nécessaires): unique paquet externe /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-20261011.bundle SHA25647463691a600a5ef5f80f4ab6c7446f87fda4ceecdfa7c8c5bd2edab500ca8c3, ref refs/heads/operator-inputs, commit 30171f7b07b881b5999faf5d4216e849f0dc72b4. Depuis VOTRE copie, importer en lecture seule via git fetch du bundle vers refs/swarm/operator-inputs; vérifier commit et operator-inputs.json (SHA2569dc5371901f2c7dfc2d1bba912350dc64a6e66bd0940de6dfca1c0424f0ff737), puis extraire les seuls chemins déclarés docs/plans/engine-cursor-contract/recovery dans VOTRE copie via git show. Cette lecture du paquet transmis est l’unique extension de droit; aucune lecture/modification/exploration du code du dépôt hôte ou des copies voisines. Les anciens chemins absolus de patchs désignent désormais les entrées de ce paquet à lire localement après import. Le paquet contient les originaux et leur filiation, pas une acceptation ni un candidat de code. Vérifier préimages, fusionner sans écraser T2/changements propres, régénérer source snapshot et qualifier candidat exact. Le test isolé de fetch et toutes empreintes passent; réception/usage par worker réel reste à démontrer. ToolSeconds900s enregistré pour T3..T7,80appels propres inchangés, pas couperet automatique de durée.\n\nInstructions antérieures conservées :\nREPLAN complément9 T6: docs/plans/engine-cursor-contract/recovery/review-status-owner-context-20261011.patch SHA2569d70e9fd8eab43bfd73c365c082f87187937aa8b01577ef46899ca55b8118b72, après planning-rejection-artifact-preservation, filiation JSON vérifiée. Partager avec la revue le sens local de pass/complete; absence dans un fragment→unknown/needs pour originaux finaux, pas fail présumé. Fournir opération refusée complète au propriétaire sans outils; réduire seulement les aperçus next des todo/accepted non concernés, préserver entrées entières, identités et consignes persistées. Rouge/vert, race/vet/workflows PASS; fullGo en cours, reçu final de qualification à vérifier. Intégrer sans écraser correctifs1..8/jugeT2, source snapshot et candidat exact à qualifier. Natif:activation18 a reçu/acquitté diagnostic17 mais aucune revision de consigne appliquée; échec préflight254 sans appel; T2 f5 refus valide avec19appels, nouvelle portée des reçus documentée, pas acceptée. T7 vérifie réellement réception/décision/effets; T5 expose état actuel, T8 conserve limites/interventions/quickwins sans adoption implicite.\n\nInstructions antérieures conservées :\nComplément de préservation T6 : planning-rejection-artifact-preservation-20261011.patch SHA256fc912259ef23d257645c298e496fdba6e920ab6f99940e81081cec9b289a8f36 après planning-owner-rejection-diagnostic-20261011.patch. Source/filiation /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Chaque refus, même répété, garde événement distinct et artefacts diagnostic+réponse avec hashes ; clé du problème uniquement pour éligibilité. Export/import préserve originaux et attente ; preuves importées restent archivées, aucune certification active. Reproduction rouge puis verte, tests des deux refus et chemins/hashes ; contrôle complet final en cours. Fusionner, régénérer source snapshot, qualifier candidat exact/réception réelle T7.\n\nInstructions antérieures conservées :\nREPLAN T6 : activation14 a reçu la revue exacte puis été refusée à révision203 pour doublon, réponse perdue par ancien pipeline. Intégrer planning-owner-rejection-diagnostic-20261011.patch SHA256 3ab9828491f7d5b5056da906c8b329e3b16fd86e09e4bc0e834489b1d2d8314b après review-current-event-feedback-20261011.patch ; chaîne et sources dans /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Proposition JSON refusée : réponse adaptateur conservée intacte, reçu/méthodes, opération fautive index/type/ID et inventaire complet des identités. planning_rejected revient au propriétaire en tête ; pas de Failure globale pour cette catégorie. Refus identique/état inchangé : attente locale persistée, claim vérifie ; baux, consommations et autre périmètre ne simulent pas progrès. Nouvel input/état pertinent/config explicite rouvre ; aucun remboursement/acceptation/fin moteur. Inventaire global IDs : task seulement nouveau, unique dans la proposition. Tests publics/doubles/race, fusion préserver juge T2 et candidat exact, régénérer manifeste (désormais5pièces).\n\nInstructions antérieures conservées :\nREPLAN T6 : activation13 refusée à révision190, review-retry proposé sans événement actuel reçu. Intégrer review-current-event-feedback-20261011.patch SHA256 d3c3be3c058a6f5141ddedd1143bd809a4459e053f9a69923018caefacb068b7 après planning-exact-envelope-20261011.patch ; filiation conservée dans /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Dernière consigne puis résultat de revue actuel, avant anciennes consignes ; schéma gelé retire review-retry si résultat exact absent du lot réellement reçu. Diagnostic de citation aligné sur validateur : milieu de ligne valide, tabulation JSON préservée, aucun verdict brut corrigé. Fusionner sans écraser juge T2, autonomie T3 et changements natifs. Tests RED/GREEN PASS, contrôles complets en cours ; vérifier nouveau candidat et effets réels, pas seulement fixtures. Consommation et historique conservés, poursuite jusqu’au RETEX.\n\nInstructions antérieures conservées :\nREPLAN T6 : réception native activation12 a confirmé latest operator_resume en tête et retry interdit, puis arrêté avant appel car réserve arbitraire3000 insuffisante. Intégrer planning-exact-envelope-20261011.patch (SHA256 f719102703429f3a31c4e391e2d7b8b76b65ea7504abaf5be177fad75923fd29) après reviewer-method-source-snapshot-20261011.patch (SHA256 9c2d11dcf761088bcd9eb45f0cab17c17ffb4e4228a9cbb9da705ce36fe7e4af), parents précédents conservés. Sources et filiation : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Claim et runner calculent la taille exacte des mêmes instructions/méthodes, sans relever la borne existante ni tronquer ; lot entier réduit avant réservation, événements restants non consommés. Test CLI fournisseur double RED/GREEN : message62138octets,7/8events entiers, receipt exact et7pending. Inclure méthode code-reviewer corrigée dans snapshot source. T3 conserve aussi obligation de récupération diagnostique autonome après proposition refusée ; T6/T7 doivent mesurer réception/effets avec preuve réelle, apprentissage/rejet/RETEX et simultanéité, séparer fixtures et fournisseur réel. Suite complète précédente PASS440.517s avant ce dernier calcul ; nouvelle suite en cours. Pas d’acceptation prétendue ni de base directe modifiée.\n\nInstructions antérieures conservées :\nREPLAN T6 : éprouver la boucle sur un défaut connu, puis une erreur de diagnostic ou de transmission ; preuve discriminante, correction attribuée et réexamen de l’exigence. Couvrir concurrence/persistance, coût et absence de reprises inchangées ; garder originaux et codes. TR-1/6 et architecture AUTORECURSIVE-RECOVERY.md/TRACEABILITY.md dans /home/fpizzi/workspace/swarm. Distinguer doubles, fournisseur réel et opérateur.\n\nInstructions historiques et détaillées conservées :\nPérimètre : internal/engine/*_test.go, tests de parcours et scripts de mesure dans racines temporaires isolées. Aucun état de mission active utilisé comme fixture. Documentation d’architecture des changements de ce lot incluse.\nPreuves : Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.\nGate entry : Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.\nGate validation : Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.\nGate delivery : Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.\nConditions d’arrêt : Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.\nHypothèses : Les constats d’audit sont à confirmer sur le checkout et la révision candidate, avec distinction simulations/fournisseurs réels. ; Janvier et février sont retenus ; JAN-4/JAN-5 restent des exigences Swarm, sans les attribuer au système final de février. ; La comparaison inclut les sources de recherche du 10 octobre, Cursor prioritaire, Google/Gemini, OpenAI et Anthropic ; leurs résultats ne sont pas des preuves Swarm. ; Objectif distinct de la finalisation historique w-fff7368010d114f6e2578985, dont tâches, tentatives, preuves et budgets restent inchangés. La préparation d’origine est conservée et référencée ; aucune réinitialisation de mission. ; Tous les réglages de politique ajoutés sont persistés, exposés dans Admin FR/EN et utilisés par le moteur.\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n\n\nPrécision opérateur autorisée le 10 octobre 2026 pour les mesures de débit/contexte/coût : comparer le même scénario séquentiel et concurrent en racines temporaires ; prouver le chevauchement de travaux indépendants par leurs identités et événements, mesurer temps total, attente centrale, livraisons acceptées, coût connu/inconnu, conflits et reprise. Ne pas déduire un gain de débit du nombre d’appels d’outils. Documenter les dépendances restantes et toute intervention humaine. Consulter la note source docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-parallelisme-plan.md dans /home/fpizzi/workspace/swarm. Consulter aussi 20261010-audit-suite-go.md et .json : suite Go complète observée en 504.624s, 1090 pass/8 skip/1 fail manifeste historique, sans timeout avec -timeout15m. Ces résultats sont ceux de la révision source auditée, pas de votre candidat. Préserver la qualification historique, séparer le défaut de manifeste et les régressions ; un timeout est celui du paquet, pas la preuve d’un test individuel bloqué. Rejouer les contrôles autorisés et remettre commandes/options/codes de sortie exacts.\n\nPrécision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-1/TR-6 : mesurer couverture des exécutions et sources, inconnus, attribution, reprises, attente centrale et coût connu/inconnu. Garder arguments exacts, candidat, exécutant, dates, stdout/stderr, codes et empreintes. Séparer tests avec doubles, fournisseur réel et intervention opérateur. Une commande annoncée sans original ne suffit pas. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.\n\nSources actualisées de démarche, à intégrer et vérifier sur le candidat : docs/architecture/AUTORECURSIVE-RECOVERY.md SHA256 713a6e87f41b0ba262ad34a14c66e987e972f08a94bf48c1d9697217aa9c597a, docs/en/AUTORECURSIVE-RECOVERY.md SHA256 454343c2304489c8d58d2305a169b2fbba861a4dd0a323b888b9c78254c43a73, docs/architecture/TRACEABILITY.md SHA256 fbd86fb95d15bcdc266cb6df54b85aa9d761b52da1c53362bb088c729071d741, docs/en/TRACEABILITY.md SHA256 f3b32ca7185903651fe7051eb405e59747d741151ad116d9371897cc95f65c2d, tools/agent-workflows/CONTRACT.md SHA256 8af3236ad60b5102df3ae8c30ebcb2c2fa4774ac4c73263fca2727cc531f03ee, .claude/skills/apex/SKILL.md SHA256 5910f2c12111109d67824a5b44a4ad762808b935e4b22447d6177759d00a4dde, .claude/skills/replan/SKILL.md SHA256 035ddb8a95d0cff95e2f3d43b48c7b98457840e69b17d11484ab2ae03afdb350, tools/agent-workflows/templates/TRACKING.md SHA256 af685085922ac538b9c8301ffda126dff03e1de54a5bf68c7ff6ba0601ea0b99. Replan est obligatoire sur reprise/blocage/échec/preuve insuffisante/hypothèse modifiée, sauf arrêt ou report explicite de l’utilisateur. Ne pas se limiter à une remontée ou un journal : une action autorisée, sa vérification et un réexamen sont requis. Ces précisions ne changent pas les critères, dépendances ou budgets adoptés.",
+        "criteria": [
+          "Scénarios normaux, invalides, concurrence, redémarrage et refus d’acceptation sur candidat changé.",
+          "Tests ciblés, package pertinent, go test ./..., go vet ./... et -race sur synchronisation ; échecs préexistants séparés sans falsifier de manifeste.",
+          "Comparer plusieurs niveaux de concurrence dans les limites existantes : temps de travail, attente des verrous, revue, publication, tokens/cache et débit accepté.",
+          "Relier toute preuve au commit et au diff exacts ; ne pas transformer les résultats simulés en autonomie réelle. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-ca937edf4e-T6",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-ca937edf4e-T6",
+      "title": "Vérifier les transitions et mesurer débit, contexte et coût",
+      "state": "waiting",
+      "reason": "Attend Exposer les politiques et adapter les prompts par rôle",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-ca937edf4e-T5",
+      "impact": 2,
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T6-handoff.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Exposer les politiques et adapter les prompts par rôle",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-ca937edf4e-T6",
+          "title": "Vérifier les transitions et mesurer débit, contexte et coût",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "task": "plan-ca937edf4e-T7",
+        "revision": 357,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Lors de toute revue indépendante (méthode code-reviewer) exécutée pour cette tâche, citer les octets contigus et la ligne physique exacte de la source testée, espaces et signes de ponctuation inclus (ex. espace avant un point-virgule). Une divergence de citation est une erreur de protocole du vérificateur, pas un refus sémantique valide ni un défaut du producteur : elle doit être diagnostiquée comme telle avant toute décision, comme observé sur review-6eadd171c67897f10f4ec754 / candidat d405c0ee9479fb26521fc6041cc6932f9929a3a1.\n\nREPLAN entrées13 : paquet cumulatif53 fichiers autorisé remplace les anciens paquets comme entrée à lire, sans effacer leur historique : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-account-20261011.bundle, SHA256 bdf4a6d75d679ac06b45d1922e77c2514658016297795a24e53968fc5b4f99d1, ref refs/heads/operator-inputs, commit af878d99337e45da0948208b2becffe098adea6c, operator-inputs.json SHA256 671363c02c3168a386a30131edc08173eacae9ae506b61c1ab3f171a410dfe60. Depuis votre copie uniquement, fetch vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes et extraire seuls chemins déclarés ; aucune lecture/écriture du code hôte ou voisin. Après12 appliquer13 provider-account-change-recovery-20261011.patch SHA256 8945660400f783909b8c0df1647124e9cc9f6840136f74861d705a33d3c8c7ca, préimages/extensions/parent dans JSON. Nouvelle précondition utilisateur : compte Claude changé, reprise demandée ; API publique confirm_account_change conserve refus original/échéance/dépenses, garde active par défaut, aucun appel ni acceptation implicite. Runtime13 installé et vérifiéa5696bdf ; regression/race/vet/build PASS, full en cours à cet instant. T3 doit préserver cette correction et fencing des anciens contrôleurs ; T5 exposer reprise de compte clairement attribuée et historique dans Admin/UX FR/EN. T2 reprend même candidat39e89b16,4 inspections réutilisables+4 appels nécessaires, pas une nouvelle production. Contrôles futurs renforcés configurés publiquement (vrais nouveaux tests TestCursorEngineTn, tous TestPlanning/Judge) ; respecter les argv réellement reçus. L’autorisation utilisateur de hausse droits/budgets est explicite, besoin concret/public API et consommation conservée.\n\nCouverture obligatoire des contrôles T7 : politique publique renforcée avant production, tous TestPlanning (Judge compris) et nouveaux tests nommés TestCursorEngineT7*. Nommer les nouveaux tests comportementaux sous ce préfixe ou proposer une politique explicite couvrant leurs vrais noms avant revue ; conserver les originaux exécutés. Go150s/contrôle180s, autres contrôles docs20s, total<=300s. Baseline plus large PASS28.677s est antérieur, pas preuve de vos nouvelles fonctions. Budget/droits insuffisants : besoin concret à l’opérateur autorisé à augmenter par parcours public ; conserver les consommations.\n\nREPLAN entrées12 — le paquet cumulatif51fichiers remplace comme source autorisée les anciens paquets45/47/49 : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-capacity-20261011.bundle, SHA256 ad021a0d34ee90e34b8d826747019d876411ead734c1e2be389273b54ea3016c, ref refs/heads/operator-inputs, commit 702a96e9bb82051388365910849b49e5b589673e, operator-inputs.json SHA256 6c331b815e3c7fe37460e174662364980523b4e48b671c8376d2a3fd1d523c6a. Depuis VOTRE copie seulement, git fetch du paquet vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes, extraire uniquement les chemins déclarés avec git show. Droit borné de lecture du paquet transmis ; aucune exploration/modification du code hôte ou voisin. Fusionner sans écraser Judge T2/changements propres, préimages/extensions explicites vérifiées. Après complément9 appliquer10 instruction-operator-composition (SHA48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd),11 admin-duration-launch (SHA06429887df1f013f9acea161357b7348760a251df7995fc36231a093e07d34e3),12 source-capacity-recovery (SHA1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84).10 sépare base opérateur et apprentissage/rejet ;11 gèle900s Admin explicites pour nouveaux agents sans perdre plafonds appels/erreurs ni réécrire sessions ;12 répare refus impayé de capacité seulement après preuve originale checkpoint/reçu/refus typé concordants, contrôles frais et revue indépendante. Garder originaux/tentatives/consommation ; jamais inventer acceptation. Full10/11 PASS482,701s/470,955s, race/vet/méthodes PASS, runtime11 réellement installé0f619612 ;12 GREEN31,598s+garde1,123s, full en qualification. Paquet input intègre sources, pas avis.\n\nT7 : preuve fournisseur réel du cumul, deux sous-superviseurs, reprise/rejet consignes et seuil Admin900 effectivement reçu, Judge mission existante, gardes source-capacité et acceptation indépendante du même candidat. Préserver apprentissage existant sans le rejeter artificiellement.\n\nInstructions antérieures conservées :\nRemise opérateur bornée des entrées, autorisée par l’utilisateur (droits/budgets nécessaires): unique paquet externe /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-20261011.bundle SHA25647463691a600a5ef5f80f4ab6c7446f87fda4ceecdfa7c8c5bd2edab500ca8c3, ref refs/heads/operator-inputs, commit 30171f7b07b881b5999faf5d4216e849f0dc72b4. Depuis VOTRE copie, importer en lecture seule via git fetch du bundle vers refs/swarm/operator-inputs; vérifier commit et operator-inputs.json (SHA2569dc5371901f2c7dfc2d1bba912350dc64a6e66bd0940de6dfca1c0424f0ff737), puis extraire les seuls chemins déclarés docs/plans/engine-cursor-contract/recovery dans VOTRE copie via git show. Cette lecture du paquet transmis est l’unique extension de droit; aucune lecture/modification/exploration du code du dépôt hôte ou des copies voisines. Les anciens chemins absolus de patchs désignent désormais les entrées de ce paquet à lire localement après import. Le paquet contient les originaux et leur filiation, pas une acceptation ni un candidat de code. Vérifier préimages, fusionner sans écraser T2/changements propres, régénérer source snapshot et qualifier candidat exact. Le test isolé de fetch et toutes empreintes passent; réception/usage par worker réel reste à démontrer. ToolSeconds900s enregistré pour T3..T7,80appels propres inchangés, pas couperet automatique de durée.\n\nInstructions antérieures conservées :\nREPLAN complément9 T7: docs/plans/engine-cursor-contract/recovery/review-status-owner-context-20261011.patch SHA2569d70e9fd8eab43bfd73c365c082f87187937aa8b01577ef46899ca55b8118b72, après planning-rejection-artifact-preservation, filiation JSON vérifiée. Partager avec la revue le sens local de pass/complete; absence dans un fragment→unknown/needs pour originaux finaux, pas fail présumé. Fournir opération refusée complète au propriétaire sans outils; réduire seulement les aperçus next des todo/accepted non concernés, préserver entrées entières, identités et consignes persistées. Rouge/vert, race/vet/workflows PASS; fullGo en cours, reçu final de qualification à vérifier. Intégrer sans écraser correctifs1..8/jugeT2, source snapshot et candidat exact à qualifier. Natif:activation18 a reçu/acquitté diagnostic17 mais aucune revision de consigne appliquée; échec préflight254 sans appel; T2 f5 refus valide avec19appels, nouvelle portée des reçus documentée, pas acceptée. T7 vérifie réellement réception/décision/effets; T5 expose état actuel, T8 conserve limites/interventions/quickwins sans adoption implicite.\n\nInstructions antérieures conservées :\nDiagnostic réel activation15 (décision planning-claim-31093d2cda849be9e3c96387-decision) : T8 est créée mais l’opération review-retry mentionnée dans le motif est absente de operations. Reprise publique opérateur attribuée226, journal f5 inchangé candidat1ce2,4inspections/6appels, étatrunning19appels. Le motif IA présente encore le doublon InputParts d’une ancienne revue du même attempt comme non corrigé ; la réparation candidate d405 puis1ce2 est attestée. planningContextLimit ne classe comme historiques que tâche absente/ancienne tentative : les revues d’anciens candidats du même attempt restent actionnables. Étendre l’attribution candidate/reviewID pour rendre les anciens refus en lecture seule, sans effacer ni acquitter automatiquement les événements et sans décider la reprise ou l’acceptation à la place du responsable. Distinguer intention dans reason, opération proposée, reçu appliqué et état réel. Tester ancien refus sémantique → correction candidate → erreur protocole actuelle et paquet réduit, puis qualifier la décision réellement reçue. Préparation de fusion du juge T2 avec les huit correctifs opérateur en copie isolée, sans prétendre T2 acceptée ; réception/intégration/installation réelles et revue indépendante restent requises.\n\nInstructions antérieures conservées :\nComplément de préservation T7 : planning-rejection-artifact-preservation-20261011.patch SHA256fc912259ef23d257645c298e496fdba6e920ab6f99940e81081cec9b289a8f36 après planning-owner-rejection-diagnostic-20261011.patch. Source/filiation /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Chaque refus, même répété, garde événement distinct et artefacts diagnostic+réponse avec hashes ; clé du problème uniquement pour éligibilité. Export/import préserve originaux et attente ; preuves importées restent archivées, aucune certification active. Reproduction rouge puis verte, tests des deux refus et chemins/hashes ; contrôle complet final en cours. Fusionner, régénérer source snapshot, qualifier candidat exact/réception réelle T7.\n\nInstructions antérieures conservées :\nREPLAN T7 : activation14 a reçu la revue exacte puis été refusée à révision203 pour doublon, réponse perdue par ancien pipeline. Intégrer planning-owner-rejection-diagnostic-20261011.patch SHA256 3ab9828491f7d5b5056da906c8b329e3b16fd86e09e4bc0e834489b1d2d8314b après review-current-event-feedback-20261011.patch ; chaîne et sources dans /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Proposition JSON refusée : réponse adaptateur conservée intacte, reçu/méthodes, opération fautive index/type/ID et inventaire complet des identités. planning_rejected revient au propriétaire en tête ; pas de Failure globale pour cette catégorie. Refus identique/état inchangé : attente locale persistée, claim vérifie ; baux, consommations et autre périmètre ne simulent pas progrès. Nouvel input/état pertinent/config explicite rouvre ; aucun remboursement/acceptation/fin moteur. Inventaire global IDs : task seulement nouveau, unique dans la proposition. Tests publics/doubles/race, fusion préserver juge T2 et candidat exact, régénérer manifeste (désormais5pièces).\n\nInstructions antérieures conservées :\nREPLAN T7 : activation13 refusée à révision190, review-retry proposé sans événement actuel reçu. Intégrer review-current-event-feedback-20261011.patch SHA256 d3c3be3c058a6f5141ddedd1143bd809a4459e053f9a69923018caefacb068b7 après planning-exact-envelope-20261011.patch ; filiation conservée dans /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Dernière consigne puis résultat de revue actuel, avant anciennes consignes ; schéma gelé retire review-retry si résultat exact absent du lot réellement reçu. Diagnostic de citation aligné sur validateur : milieu de ligne valide, tabulation JSON préservée, aucun verdict brut corrigé. Fusionner sans écraser juge T2, autonomie T3 et changements natifs. Tests RED/GREEN PASS, contrôles complets en cours ; vérifier nouveau candidat et effets réels, pas seulement fixtures. Consommation et historique conservés, poursuite jusqu’au RETEX.\n\nInstructions antérieures conservées :\nREPLAN T7 : réception native activation12 a confirmé latest operator_resume en tête et retry interdit, puis arrêté avant appel car réserve arbitraire3000 insuffisante. Intégrer planning-exact-envelope-20261011.patch (SHA256 f719102703429f3a31c4e391e2d7b8b76b65ea7504abaf5be177fad75923fd29) après reviewer-method-source-snapshot-20261011.patch (SHA256 9c2d11dcf761088bcd9eb45f0cab17c17ffb4e4228a9cbb9da705ce36fe7e4af), parents précédents conservés. Sources et filiation : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/. Claim et runner calculent la taille exacte des mêmes instructions/méthodes, sans relever la borne existante ni tronquer ; lot entier réduit avant réservation, événements restants non consommés. Test CLI fournisseur double RED/GREEN : message62138octets,7/8events entiers, receipt exact et7pending. Inclure méthode code-reviewer corrigée dans snapshot source. T3 conserve aussi obligation de récupération diagnostique autonome après proposition refusée ; T6/T7 doivent mesurer réception/effets avec preuve réelle, apprentissage/rejet/RETEX et simultanéité, séparer fixtures et fournisseur réel. Suite complète précédente PASS440.517s avant ce dernier calcul ; nouvelle suite en cours. Pas d’acceptation prétendue ni de base directe modifiée.\n\nInstructions antérieures conservées :\nREPLAN T7 : complément instruction-learning-retex-routing-20261011.patch après les deux compléments apprentissage/continuité précédents, source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-routing-20261011.patch, SHA256 8b957486beef8e95e02061e79c678a145f11a4d620086d853a26527c2ee291cc. La consigne operator_resume la plus récente passe en tête du lot ; le schéma gelé retire retry sans tâche éligible (erreur de protocole, tentatives épuisées ou réservations), conserve review-retry ; current_review attribue l’erreur actuelle et previous_blocker conserve un ancien refus. Citations byte-for-byte, espaces et signes du patch exacts. Régressions rouge/vert, race, vet et méthodes vérifiées ; suite complète en cours, aucune acceptation native prétendue. Fusionner avec T2/T3 sans écraser leurs changements ; vérifier candidat et réception réels. Révision native157 : mauvaise proposition retry refusée, pas un verdict sémantique ni T8 achevée.\n\nInstructions antérieures conservées :\nREPLAN T7 : ajouter instruction-learning-retex-continuity-20261011.patch après instruction-learning-retex-20261011.patch. Après le dernier lot historique acquitté, historical_acknowledged rend la main au responsable IA, sans décision moteur de fin ni acceptation implicite. Les tests utilisent exactement les IDs admis et conservent la garde de budget de reprise. Source /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-continuity-20261011.patch, SHA256 459949e903fdc72b155cdca2bdd06a0a4a6b2cd7eeaeae4f87b67527eabe373c ; parents dans son JSON. Fusionner T2/T3, revérifier le candidat exact ; la suite complète précédente a signalé un test de l’ancien protocole, correction ciblée/race vérifiées, nouveau contrôle complet en cours. Réception du contexte et RETEX final restent nécessaires.\n\nInstructions antérieures conservées :\nREPLAN T7 : qualifier le candidat exact puis exercer réellement deux sous-superviseurs, une décision de conduite/juge attribuée et l’apprentissage revise-instructions à partir d’un retour reçu. Vérifier réception de la consigne complète, rejet/historique ; distinguer vrai fournisseur et fixtures/opérateur. Vérifier la phase RETEX après recette puis remettre au responsable pour la tâche finale T8 ; ne pas clore sur un test/doc. Complément : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/instruction-learning-retex-20261011.patch, SHA256 6c202d64b1261082d78842c3ccc5d554437135c862197f0b4edaa30929aae13b, parents dans son JSON ; fusionner sans écraser les changements natifs. Architecture INSTRUCTION-LEARNING.md et AGENT-ENGINE-PROTOCOL.md FR/EN, PRODUCT-WORKFLOW.md et Mermaid. Nouvelle autorisation explicite du propriétaire : augmenter droits/budgets Swarm en cas d’insuffisance diagnostiquée, via opérations publiques, dépenses et historique conservés.\n\nInstructions antérieures conservées :\nREPLAN T7 : recette indépendante sur le candidat exact : superviseur racine et deux sous-superviseurs IA réels, simultanéité/attribution, réception des observations, continue-run/stop-run motivés, juge/renouvellement réellement utilisés. Préserver toutes les consommations et les reçus ; distinguer intervention opérateur T2, fournisseurs doubles et autonomie réelle. Une primitive CLI ou un nom de rôle ne démontre pas le comportement global. Documenter architecture et limites du même candidat.\n\nInstructions antérieures conservées :\nREPLAN T7 : recette indépendante sur candidat exact, fournisseur réel. Vérifier que les superviseurs exploitent réellement les retours, diagnostiquent un échec lié et corrigent avant réexamen ; distinguer autonomie et opérateur. Aucune acceptation à partir de documentation seule. TR-6 et architecture AUTORECURSIVE-RECOVERY.md/TRACEABILITY.md dans /home/fpizzi/workspace/swarm. Limites et originaux ci-dessous.\n\nInstructions historiques et détaillées conservées :\nPérimètre : Même révision candidate que T6, preuves et rapports de la mission. Contexte de vérification indépendant, sans modification du candidat. Documentation d’architecture des changements de ce lot incluse.\nPreuves : Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.\nGate entry : Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.\nGate validation : Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.\nGate delivery : Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.\nConditions d’arrêt : Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.\nHypothèses : Les constats d’audit sont à confirmer sur le checkout et la révision candidate, avec distinction simulations/fournisseurs réels. ; Janvier et février sont retenus ; JAN-4/JAN-5 restent des exigences Swarm, sans les attribuer au système final de février. ; La comparaison inclut les sources de recherche du 10 octobre, Cursor prioritaire, Google/Gemini, OpenAI et Anthropic ; leurs résultats ne sont pas des preuves Swarm. ; Objectif distinct de la finalisation historique w-fff7368010d114f6e2578985, dont tâches, tentatives, preuves et budgets restent inchangés. La préparation d’origine est conservée et référencée ; aucune réinitialisation de mission. ; Tous les réglages de politique ajoutés sont persistés, exposés dans Admin FR/EN et utilisés par le moteur.\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n\n\nPrécision opérateur autorisée le 10 octobre 2026 pour le critère de délégation parallèle avec fournisseur réel : observer deux travaux indépendants réellement simultanés, leur supervision et leurs remises au propriétaire ; citer identités, événements et chevauchement temporel. Une simulation, deux rôles déclarés ou un nombre de créneaux ne prouvent pas ce résultat. Examiner la justification des dépendances et les décisions persistées d’adaptation du plan. Distinguer l’intervention humaine ayant précisé les remises de l’autonomie effectivement observée ; aucun PASS sans preuve sur votre candidat exact. Consulter docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-parallelisme-plan.md dans le dépôt source /home/fpizzi/workspace/swarm. Conserver la revue indépendante, les contrôles et les limites existantes.\n\nPrécision opérateur autorisée le 10 octobre 2026 : cette analyse guide le développement, pas seulement la documentation. TR-6 : vérifier indépendamment les preuves du candidat exact et l’usage réel des remises et diagnostics par les sous-superviseurs/racine. Distinguer mécanisme disponible et parcours observé, traces locales et reçus du moteur. Tester la concurrence réelle avec identités et événements ; ne pas déclarer une autonomie à partir de documentation ou de fixtures. Références du dépôt source /home/fpizzi/workspace/swarm : docs/architecture/TRACEABILITY.md et docs/en/TRACEABILITY.md (six Mermaid par langue), repères TR-1..TR-6 ; note de recherche revisions/20261010-tracabilite-developpement.md dans le dossier-recherche existant. Examiner l’écart sur votre candidat puis livrer changements et preuves. Ces repères précisent vos critères existants, sans nouvelles gates, changement de dépendances, remboursement ni hausse de budget. Sources : docs/architecture/TRACEABILITY.md SHA256 a4741f1c1b61c7ffa3a4d4234e150e99be3f9c7d31ee9d04f9f2dc859f45e10c, docs/en/TRACEABILITY.md SHA256 7238a5efefef1727537f00d74401483910f89dc7c472ec7e94b0cd11416bf23a, docs/architecture/AGENT-PARALLELISM.md SHA256 c08ebece6bf26122654bb0ec50250b78c3c8e76546432d3f3c4560e5d2c39c4d, docs/en/AGENT-PARALLELISM.md SHA256 83500e48e9b9aeb5ca4e644449e26979deb31097ee73717626d0c88f32b59c40, tools/agent-workflows/CONTRACT.md SHA256 85fb497a074fdac3b05a6f18a8a2e1633813358759800274292a262bf7be590b, tools/agent-workflows/templates/HANDOFF.md SHA256 e8cc0e1cc5d12c25aa3117f819d0b2e539399fb335e43534d0a24987e3fac1b2.\n\nSources actualisées de démarche, à intégrer et vérifier sur le candidat : docs/architecture/AUTORECURSIVE-RECOVERY.md SHA256 713a6e87f41b0ba262ad34a14c66e987e972f08a94bf48c1d9697217aa9c597a, docs/en/AUTORECURSIVE-RECOVERY.md SHA256 454343c2304489c8d58d2305a169b2fbba861a4dd0a323b888b9c78254c43a73, docs/architecture/TRACEABILITY.md SHA256 fbd86fb95d15bcdc266cb6df54b85aa9d761b52da1c53362bb088c729071d741, docs/en/TRACEABILITY.md SHA256 f3b32ca7185903651fe7051eb405e59747d741151ad116d9371897cc95f65c2d, tools/agent-workflows/CONTRACT.md SHA256 8af3236ad60b5102df3ae8c30ebcb2c2fa4774ac4c73263fca2727cc531f03ee, .claude/skills/apex/SKILL.md SHA256 5910f2c12111109d67824a5b44a4ad762808b935e4b22447d6177759d00a4dde, .claude/skills/replan/SKILL.md SHA256 035ddb8a95d0cff95e2f3d43b48c7b98457840e69b17d11484ab2ae03afdb350, tools/agent-workflows/templates/TRACKING.md SHA256 af685085922ac538b9c8301ffda126dff03e1de54a5bf68c7ff6ba0601ea0b99. Replan est obligatoire sur reprise/blocage/échec/preuve insuffisante/hypothèse modifiée, sauf arrêt ou report explicite de l’utilisateur. Ne pas se limiter à une remontée ou un journal : une action autorisée, sa vérification et un réexamen sont requis. Ces précisions ne changent pas les critères, dépendances ou budgets adoptés.",
+        "criteria": [
+          "Fournisseur réellement disponible et politique de modèle figés ; absence de quota ou configuration bloque l’appel sans essai de contournement.",
+          "Observer découverte, délégation parallèle, remise, correction, jugement global, contexte frais et reprise avec fournisseur réel.",
+          "Avis indépendant et contrôles couvrent le même candidat ; échec bloque acceptation et clôture.",
+          "Rapport cumulatif JAN/FEB avec interventions humaines, coût connu ou inconnu, échecs et critères non démontrés. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-ca937edf4e-T7",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-ca937edf4e-T7",
+      "title": "Revue indépendante et recette réelle cumulative",
+      "state": "waiting",
+      "reason": "Attend Vérifier les transitions et mesurer débit, contexte et coût",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-ca937edf4e-T6",
+      "impact": 1,
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T7-handoff.md",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Vérifier les transitions et mesurer débit, contexte et coût",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    },
+    {
+      "waiting_on": [
+        {
+          "task": "plan-ca937edf4e-T7",
+          "title": "Revue indépendante et recette réelle cumulative",
+          "state": "todo",
+          "reason": "Ce résultat n’est pas encore validé."
+        }
+      ],
+      "recovery_preview": {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "task": "plan-ca937edf4e-T8",
+        "revision": 357,
+        "kept": [
+          "Historique des tentatives, rapports et avis précédents.",
+          "Critères et dépendances du plan.",
+          "Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée."
+        ],
+        "redone": [
+          "Vérification des conditions de lancement et du candidat courant.",
+          "Contrôles et revue requis pour la nouvelle tentative."
+        ],
+        "correction": "Avant de livrer des documents bilingues FR/EN décrivant le même fait d'implémentation (ex. valeurs par défaut/bornes de configuration), relire les deux versions côte à côte et vérifier l'absence de toute affirmation contradictoire sur ce fait avant de les citer comme preuve pour le même candidat.\n\nREPLAN entrées13 : paquet cumulatif53 fichiers autorisé remplace les anciens paquets comme entrée à lire, sans effacer leur historique : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-account-20261011.bundle, SHA256 bdf4a6d75d679ac06b45d1922e77c2514658016297795a24e53968fc5b4f99d1, ref refs/heads/operator-inputs, commit af878d99337e45da0948208b2becffe098adea6c, operator-inputs.json SHA256 671363c02c3168a386a30131edc08173eacae9ae506b61c1ab3f171a410dfe60. Depuis votre copie uniquement, fetch vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes et extraire seuls chemins déclarés ; aucune lecture/écriture du code hôte ou voisin. Après12 appliquer13 provider-account-change-recovery-20261011.patch SHA256 8945660400f783909b8c0df1647124e9cc9f6840136f74861d705a33d3c8c7ca, préimages/extensions/parent dans JSON. Nouvelle précondition utilisateur : compte Claude changé, reprise demandée ; API publique confirm_account_change conserve refus original/échéance/dépenses, garde active par défaut, aucun appel ni acceptation implicite. Runtime13 installé et vérifiéa5696bdf ; regression/race/vet/build PASS, full en cours à cet instant. T3 doit préserver cette correction et fencing des anciens contrôleurs ; T5 exposer reprise de compte clairement attribuée et historique dans Admin/UX FR/EN. T2 reprend même candidat39e89b16,4 inspections réutilisables+4 appels nécessaires, pas une nouvelle production. Contrôles futurs renforcés configurés publiquement (vrais nouveaux tests TestCursorEngineTn, tous TestPlanning/Judge) ; respecter les argv réellement reçus. L’autorisation utilisateur de hausse droits/budgets est explicite, besoin concret/public API et consommation conservée.\n\nContrôles RETEX T8 : conserver ses quatre contrôles documentaires prévus, le même candidat et la recette T7 acceptée/fraîche. Le lot T8 n’ajoute pas de code ; les lots T3..T7 ont reçu les filtres Go couvrant tous TestPlanning/Judge et nouveaux tests TestCursorEngineTn*. La politique T8 garde tous ses IDs/critères, avec délais documentaires40s et total160s ; cela ne prouve ni RETEX exécuté ni acceptation. Préserver quick wins proposés et choix utilisateur, sans adoption implicite.\n\nREPLAN entrées12 — le paquet cumulatif51fichiers remplace comme source autorisée les anciens paquets45/47/49 : /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-capacity-20261011.bundle, SHA256 ad021a0d34ee90e34b8d826747019d876411ead734c1e2be389273b54ea3016c, ref refs/heads/operator-inputs, commit 702a96e9bb82051388365910849b49e5b589673e, operator-inputs.json SHA256 6c331b815e3c7fe37460e174662364980523b4e48b671c8376d2a3fd1d523c6a. Depuis VOTRE copie seulement, git fetch du paquet vers refs/swarm/operator-inputs, vérifier commit/manifeste/tous hashes, extraire uniquement les chemins déclarés avec git show. Droit borné de lecture du paquet transmis ; aucune exploration/modification du code hôte ou voisin. Fusionner sans écraser Judge T2/changements propres, préimages/extensions explicites vérifiées. Après complément9 appliquer10 instruction-operator-composition (SHA48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd),11 admin-duration-launch (SHA06429887df1f013f9acea161357b7348760a251df7995fc36231a093e07d34e3),12 source-capacity-recovery (SHA1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84).10 sépare base opérateur et apprentissage/rejet ;11 gèle900s Admin explicites pour nouveaux agents sans perdre plafonds appels/erreurs ni réécrire sessions ;12 répare refus impayé de capacité seulement après preuve originale checkpoint/reçu/refus typé concordants, contrôles frais et revue indépendante. Garder originaux/tentatives/consommation ; jamais inventer acceptation. Full10/11 PASS482,701s/470,955s, race/vet/méthodes PASS, runtime11 réellement installé0f619612 ;12 GREEN31,598s+garde1,123s, full en qualification. Paquet input intègre sources, pas avis.\n\nT8 : RETEX final lié à T7 réellement accepté, historique10/11/12/refus source-capacité/T2 réparation opérateur et limites de preuve, coûts/tentatives conservés, quick wins sans adoption implicite.\n\nInstructions antérieures conservées :\nRemise opérateur bornée des entrées, autorisée par l’utilisateur (droits/budgets nécessaires): unique paquet externe /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-20261011.bundle SHA25647463691a600a5ef5f80f4ab6c7446f87fda4ceecdfa7c8c5bd2edab500ca8c3, ref refs/heads/operator-inputs, commit 30171f7b07b881b5999faf5d4216e849f0dc72b4. Depuis VOTRE copie, importer en lecture seule via git fetch du bundle vers refs/swarm/operator-inputs; vérifier commit et operator-inputs.json (SHA2569dc5371901f2c7dfc2d1bba912350dc64a6e66bd0940de6dfca1c0424f0ff737), puis extraire les seuls chemins déclarés docs/plans/engine-cursor-contract/recovery dans VOTRE copie via git show. Cette lecture du paquet transmis est l’unique extension de droit; aucune lecture/modification/exploration du code du dépôt hôte ou des copies voisines. Les anciens chemins absolus de patchs désignent désormais les entrées de ce paquet à lire localement après import. Le paquet contient les originaux et leur filiation, pas une acceptation ni un candidat de code. Vérifier préimages, fusionner sans écraser T2/changements propres, régénérer source snapshot et qualifier candidat exact. Le test isolé de fetch et toutes empreintes passent; réception/usage par worker réel reste à démontrer. ToolSeconds900s enregistré pour T3..T7,80appels propres inchangés, pas couperet automatique de durée.\n\nInstructions antérieures conservées :\nREPLAN complément9 T8: docs/plans/engine-cursor-contract/recovery/review-status-owner-context-20261011.patch SHA2569d70e9fd8eab43bfd73c365c082f87187937aa8b01577ef46899ca55b8118b72, après planning-rejection-artifact-preservation, filiation JSON vérifiée. Partager avec la revue le sens local de pass/complete; absence dans un fragment→unknown/needs pour originaux finaux, pas fail présumé. Fournir opération refusée complète au propriétaire sans outils; réduire seulement les aperçus next des todo/accepted non concernés, préserver entrées entières, identités et consignes persistées. Rouge/vert, race/vet/workflows PASS; fullGo en cours, reçu final de qualification à vérifier. Intégrer sans écraser correctifs1..8/jugeT2, source snapshot et candidat exact à qualifier. Natif:activation18 a reçu/acquitté diagnostic17 mais aucune revision de consigne appliquée; échec préflight254 sans appel; T2 f5 refus valide avec19appels, nouvelle portée des reçus documentée, pas acceptée. T7 vérifie réellement réception/décision/effets; T5 expose état actuel, T8 conserve limites/interventions/quickwins sans adoption implicite.\n\nInstructions antérieures conservées :\nProduire le RETEX final exigé par req-29 une fois plan-ca937edf4e-T7 (revue indépendante et recette réelle cumulative) accepté avec preuve fraîche. Ne pas se substituer à la revue indépendante de T7 ni certifier un contrôle moteur non encore effectué. Documenter explicitement : interventions humaines, coûts connus/inconnus, échecs et critères non démontrés sur l'ensemble JAN-1..JAN-7/FEB-1..FEB-4, en distinguant faits, hypothèses et preuves comme pour req-1. Proposer des quick wins selon le format product-planning (observation sourcée, valeur utilisateur, effort, risque, critère de succès), sans les adopter soi-même. Produire les deux langues FR/EN et mettre à jour les schémas Mermaid avec le SHA du candidat réellement accepté. Note de reprise : req-29 apparaît aussi dans la liste de requirements actuelle de plan-ca937edf4e-T7 (recette réelle cumulative) ; cette création ne retire rien à T7, la réconciliation de propriété de l'exigence appartient au moteur.\nPrécisions de réalisation proposées : Rapport FR et rapport EN tous deux présents et alignés sur le même candidat ; Chaque limite, échec ou critère non démontré listé avec sa preuve ou son absence explicite, sans falsification ; Interventions humaines et coûts distingués entre connus et inconnus ; Quick wins proposés avec effort, risque et critère de succès observable, sans agent ni budget engagés implicitement ; Schémas Mermaid mis à jour cohérents avec le candidat accepté de plan-ca937edf4e-T7",
+        "criteria": [
+          "Rapport cumulatif JAN/FEB avec interventions humaines, coût connu ou inconnu, échecs et critères non démontrés. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+        ],
+        "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+        "remaining_criteria": null,
+        "refusal_note": "",
+        "evidence_note": ""
+      },
+      "primary_action": {
+        "kind": "task",
+        "label": "Examiner le prérequis",
+        "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+        "task": "plan-ca937edf4e-T8",
+        "tone": "attention"
+      },
+      "attempts_used": 0,
+      "attempts_allowed": 2,
+      "attempt_limit_reached": false,
+      "id": "plan-ca937edf4e-T8",
+      "title": "RETEX final cumulatif JAN/FEB : preuves, limites, quick wins, docs FR/EN/Mermaid",
+      "state": "waiting",
+      "reason": "Attend Revue indépendante et recette réelle cumulative",
+      "action": "inspect",
+      "label": "Examiner le prérequis",
+      "target": "plan-ca937edf4e-T7",
+      "impact": 0,
+      "deliverable": "Rapport RETEX final (FR et EN) consolidant JAN-1..JAN-7 et FEB-1..FEB-4 : interventions humaines, coûts connus et inconnus, échecs observés, critères non démontrés, quick wins proposés avec effort/risque/critère de succès sans adoption implicite, schémas Mermaid à jour, le tout lié au candidat réellement accepté de plan-ca937edf4e-T7.",
+      "validation_mode": "automatic",
+      "result": {
+        "process_label": "Pas encore commencé",
+        "report_label": "Aucun rapport soumis",
+        "validation_label": "Pas encore commencé",
+        "state": "not_started",
+        "label": "Pas encore commencé",
+        "process_state": "not_started",
+        "report_state": "absent",
+        "validation_state": "not_started",
+        "reason": "Aucune tentative terminée ni validation actuelle n’est établie.",
+        "next_step": "Lancer la tâche lorsque ses conditions sont réunies."
+      },
+      "understanding": {
+        "what": "Attend Revue indépendante et recette réelle cumulative",
+        "next_step": "La tâche reprendra automatiquement lorsque la condition sera remplie.",
+        "actor": "Le superviseur",
+        "actor_kind": "supervisor",
+        "situation": "attente_normale"
+      },
+      "attempt": {
+        "validation_state": "todo",
+        "cost_state": "unknown"
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "status": "FAIL",
+  "recorded_at": "2026-10-17T11:42:17.583386+00:00",
+  "observed_error": "AssertionError: agent_identity_contract.go changed since ownership baseline; audit-final.json was not written",
+  "cause": "Read-only ownership baseline was incorrectly treated as immutable compile input. Identity types/validators were extracted before red/candidate/final tests, which all used stable current dependency inputs.",
+  "evidence": "read-only-contract-revalidation.json",
+  "revalidation": {
+    "actual_compiled_contract_hash": "009643397dfb11afda7edb764d780758c207ce6047b917ad401efa7fc045840c",
+    "current_hash": "009643397dfb11afda7edb764d780758c207ce6047b917ad401efa7fc045840c",
+    "delegate": "internal/identitycontract/contract.go",
+    "inspection": "Relevant field types/JSON tags, names, text/digest validators and six operation names preserved"
+  },
+  "decision": "Keep the original baseline; compare current files with final tested input hashes and retain/review pre-test drift. Do not rerun unchanged passing tests or restore peer files.",
+  "owner": "Codex memory verification method"
+}

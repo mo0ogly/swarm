@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "id": "paea-operator-package-core",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "tests/fixtures/paea_provisioning_request.json",
+    "schemas/paea/operator-package-cli-v1.schema.json",
+    "tests/paea_operator_package_schema_test.py",
+    "tools/verification/recipes/paea-operator-package-core.json",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "rust/crates/swarm-linux-identity-channel/**/*"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "private-source-target-cleanup-and-nonce",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--lib",
+        "provisioning::operator_handoff::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "operator_input_late_release_close_keep_decode_and_withhold_keys_then_recover",
+        "operator_wrong_role_and_close_keep_primary_refusal_without_handoff",
+        "operator_export_visible_then_cleanup_failure_reconciles_exact_bytes",
+        "operator_reconcile_read_ack_failure_keeps_pin_and_all_cleanup",
+        "operator_temporary_nonce_failure_refuses_then_retries_same_material"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "closed-operator-report-phase-and-authority-schema",
+      "command": [
+        "python3",
+        "tests/paea_operator_package_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "private-operator-cli-and-request-borrow-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Documenting swarm-enrollment-authority",
+        "Finished"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "paea-existing-cli-ux",
+  "inputs": [
+    "tests/paea_cli_ui_test.cjs", "tests/fixtures/paea/contract-v1.json",
+    "web/paea.*", "web/i18n*.js", "web/swarm-design.css", "web/wattson_themes.css", "web/swarm-logo.png",
+    "locales/en.json", "package.json", "package-lock.json", "tools/verification/recipe.py",
+    "rust/crates/swarm-cli/src/protection.rs", "rust/crates/swarm-protection-contract/src/*.rs",
+    "schemas/paea/*.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "browser-through-existing-cli-bridge",
+      "command": ["python3", "-c", "import os,subprocess; subprocess.run(['node','tests/paea_cli_ui_test.cjs',os.environ['SWARM_PAEA_UI_EVIDENCE']],check=True)"],
+      "expected_exit": 0,
+      "required_stdout": ["PASS fr-0-exact-checker-report", "PASS en-8-exact-checker-report", "PASS en-8-actual-unknown-visible", "PASS actual-checker-protection-receipt-binding", "PASS actual-checker-protection-transition-invalid", "PASS actual-checker-protection-document-invalid", "PASS en-8-actual-input-identity-distinct", "PASS existing-binary-stable", "PASS no-bridge-browser-errors", "PAEA_REAL_CLI_UI_PASS"],
+      "required_stderr": []
+    }
+  ]
+}

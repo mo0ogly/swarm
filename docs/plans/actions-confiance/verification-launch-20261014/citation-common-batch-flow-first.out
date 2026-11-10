@@ -1,0 +1,8 @@
+=== RUN   TestManagedBatchRuntimePublishesOnlyCompleteCandidate
+--- PASS: TestManagedBatchRuntimePublishesOnlyCompleteCandidate (2.23s)
+=== RUN   TestManagedBatchReferenceFailureDoesNotRetryUnchanged
+--- PASS: TestManagedBatchReferenceFailureDoesNotRetryUnchanged (1.42s)
+=== RUN   TestReferencedCitationOrdinaryRetryRequiresChangedPrecondition
+--- PASS: TestReferencedCitationOrdinaryRetryRequiresChangedPrecondition (0.40s)
+PASS
+ok  	swarm.local/companion/internal/engine	4.068s

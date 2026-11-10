@@ -1,0 +1,25 @@
+    Checking swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+error: large size difference between variants
+  --> crates/swarm-engine/src/mission_worker_recovery.rs:9:1
+   |
+ 9 | / pub enum MissionWorkerRecovery {
+10 | |     /// Complete terminal proof, possibly an idempotent replay; not a new-commit claim.
+11 | |     Finalized { agent: Agent },
+   | |     -------------------------- the largest variant contains at least 1560 bytes
+12 | |     /// No recovery is applied. Cause distinguishes missing original and live owner;
+13 | |     /// malformed/unreadable originals are errors, never this waiting observation.
+14 | |     Waiting { reason: &'static str, cause: RootStoreError },
+   | |     ------------------------------------------------------- the second-largest variant contains at least 104 bytes
+15 | | }
+   | |_^ the entire enum is at least 1560 bytes
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#large_enum_variant
+   = note: `-D clippy::large-enum-variant` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::large_enum_variant)]`
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+   |
+11 -     Finalized { agent: Agent },
+11 +     Finalized { agent: Box<Agent> },
+   |
+
+error: could not compile `swarm-engine` (lib) due to 1 previous error

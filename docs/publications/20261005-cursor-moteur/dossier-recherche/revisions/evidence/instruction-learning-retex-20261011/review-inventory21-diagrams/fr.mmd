@@ -1,0 +1,12 @@
+flowchart TD
+    A[Contexte original admis et empreinte] --> B[Lecture entiere et verification du candidat]
+    B --> C[Inventaire des sources avec origine exacte]
+    D[Avis courant acquitte] --> E[Rappel en lecture seule sur entree fraiche]
+    E --> C
+    C --> S[Superviseur du perimetre]
+    S --> R[Correction autorisee puis controle de son effet]
+    P[Inspections originales immuables] --> Q[Capacite finale mesuree sur les donnees recues]
+    Q --> F[Selection de pieces originales entieres]
+    F --> G[Message final recontrole avant appel]
+    G --> V[Avis independant puis controles de publication]
+    R --> P

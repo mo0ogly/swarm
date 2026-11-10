@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "managed-auto-initial-pause",
+  "expected_revision": 8,
+  "reason": "Observe paused startup before first managed departure"
+}

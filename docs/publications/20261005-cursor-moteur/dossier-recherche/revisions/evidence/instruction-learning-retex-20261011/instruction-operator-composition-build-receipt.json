@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-11T14:14:50.837771+00:00",
+  "binary": "/tmp/swarm-instruction-operator-composition-candidate",
+  "sha256": "a58e2791621fbe2bacd21a4d8836ce8b9ba7f35c4128ccb21b8a4d1e267922ed",
+  "version": {
+    "schema_version": 1,
+    "binary": {
+      "version": "devel",
+      "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+      "modified": true,
+      "build_date": "2026-10-11T14:12:24Z",
+      "provenance": "injected"
+    },
+    "diagnostic": {
+      "installed_cli": {
+        "available": true,
+        "version": "devel",
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "provenance": "injected"
+      },
+      "active_server": {
+        "available": false,
+        "version": null,
+        "commit": null,
+        "modified": null,
+        "provenance": "runtime_health",
+        "hint": "Fournissez l\u2019URL de session du serveur actif avec --server."
+      },
+      "candidate": {
+        "available": true,
+        "version": null,
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "provenance": "git"
+      },
+      "state": "unknown",
+      "differences": [],
+      "next_step": "Rendez accessibles les identit\u00e9s manquantes (active_server) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+    }
+  }
+}

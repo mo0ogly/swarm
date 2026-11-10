@@ -1,0 +1,30 @@
+{
+  "folder": "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-public-originals-nvpvgah_",
+  "files": [
+    {
+      "name": "context",
+      "original_path": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-f61e23cf5a02b03f/review-14a105dc677c088e4121afb7-context.json",
+      "sha256": "d1682458e31ca9cd0e3e3edb4f62e3320c965409298a8519c0987425c9b80a8b",
+      "bytes": 759750
+    },
+    {
+      "name": "plan",
+      "original_path": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-f61e23cf5a02b03f/review-14a105dc677c088e4121afb7-plan.json",
+      "sha256": "6ff03ad9284818b7616f0ca461273a8c2a53380815d131e03e8597a91f4d26d5",
+      "bytes": 802333
+    },
+    {
+      "name": "journal",
+      "original_path": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-f61e23cf5a02b03f/fragment-journal-f7270da4bab3f932bf9fef35f152d30bf2f7f47d3e1bddfa0d75d0cc469113b5.json",
+      "sha256": "f7270da4bab3f932bf9fef35f152d30bf2f7f47d3e1bddfa0d75d0cc469113b5",
+      "bytes": 24525
+    },
+    {
+      "name": "final",
+      "original_path": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-a23c60f03a732c02841f-repair-f61e23cf5a02b03f/fragment-final-763721e130d1c97eb3756d02c770edaab4c4659b45baa633f0b3353622858f46.json",
+      "sha256": "763721e130d1c97eb3756d02c770edaab4c4659b45baa633f0b3353622858f46",
+      "bytes": 3119
+    }
+  ],
+  "scope": "Copied immutable declared public proof originals only; no mission DB, credential, runtime log or provider input used as fixture."
+}

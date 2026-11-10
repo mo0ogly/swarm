@@ -1,0 +1,215 @@
+// Package enrollmentproof authenticates controller statements for one exact
+// challenge. It establishes neither current enrollment nor business authority.
+// The protected service must decide what to sign; its root key must be pinned
+// independently of responses, agent input and imported project data.
+package enrollmentproof
+
+import (
+	"bytes"
+	"crypto/ed25519"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"io"
+	"sync"
+)
+
+const protocol = "swarm-enrollment-statement-v1"
+
+var (
+	ErrKey       = errors.New("enrollment proof: independent pinned key required")
+	ErrChallenge = errors.New("enrollment proof: challenge does not belong to this verifier")
+	ErrSpent     = errors.New("enrollment proof: challenge already consumed")
+	ErrResponse  = errors.New("enrollment proof: malformed response")
+	ErrBinding   = errors.New("enrollment proof: response belongs to another challenge")
+	ErrSignature = errors.New("enrollment proof: invalid signature")
+)
+
+// Verifier contains only a public key, supplied by the trusted bootstrap.
+// Private fields are not an OS boundary against unconfined same-UID agents.
+type Verifier struct {
+	key     ed25519.PublicKey
+	project [sha256.Size]byte
+}
+
+// Request is safe to send to the authority. None of its fields grants a right.
+// RequestDigest must cover the entire resolved request, including the human,
+// session reference, plan, publication event, snapshot and previous checkpoint.
+type Request struct {
+	Protocol      string `json:"protocol"`
+	KeyID         string `json:"authority_key_id"`
+	ProjectDigest string `json:"project_context_digest"`
+	RequestDigest string `json:"request_digest"`
+	Nonce         string `json:"nonce"`
+}
+
+// Challenge is process-local, single-use state. JSON/import cannot reconstruct
+// its owner or consumption state. Restart requires a new challenge.
+type Challenge struct {
+	mu      sync.Mutex
+	owner   *Verifier
+	request Request
+	spent   bool
+}
+
+type response struct {
+	Protocol  string `json:"protocol"`
+	Challenge string `json:"challenge_digest"`
+	Payload   string `json:"payload"`
+	Signature string `json:"signature"`
+}
+
+// Statement authenticates bytes and their request binding. Payload contents
+// still need authoritative schema, permissions and freshness validation.
+type Statement struct {
+	payload []byte
+	request Request
+}
+
+func (s Statement) Payload() []byte { return append([]byte(nil), s.payload...) }
+func (s Statement) Request() Request { return s.request }
+
+func NewVerifier(key ed25519.PublicKey, project [sha256.Size]byte) (*Verifier, error) {
+	if len(key) != ed25519.PublicKeySize {
+		return nil, ErrKey
+	}
+	return &Verifier{key: append(ed25519.PublicKey(nil), key...), project: project}, nil
+}
+
+func keyID(key ed25519.PublicKey) string {
+	digest := sha256.Sum256(key)
+	return hex.EncodeToString(digest[:])
+}
+
+func (v *Verifier) NewChallenge(requestDigest [sha256.Size]byte) (*Challenge, error) {
+	return v.newChallenge(requestDigest, rand.Reader)
+}
+
+func (v *Verifier) newChallenge(requestDigest [sha256.Size]byte, random io.Reader) (*Challenge, error) {
+	if v == nil || len(v.key) != ed25519.PublicKeySize {
+		return nil, ErrKey
+	}
+	var nonce [sha256.Size]byte
+	if _, err := io.ReadFull(random, nonce[:]); err != nil {
+		return nil, err
+	}
+	return &Challenge{owner: v, request: Request{Protocol: protocol, KeyID: keyID(v.key), ProjectDigest: hex.EncodeToString(v.project[:]),
+		RequestDigest: hex.EncodeToString(requestDigest[:]), Nonce: base64.RawURLEncoding.EncodeToString(nonce[:])}}, nil
+}
+
+func (c *Challenge) Request() Request {
+	if c == nil {
+		return Request{}
+	}
+	return c.request
+}
+
+func digestRequest(r Request) string {
+	raw, _ := json.Marshal(r) // Fixed string fields, with no fallible custom marshaler.
+	digest := sha256.Sum256(raw)
+	return hex.EncodeToString(digest[:])
+}
+
+func signedBytes(r response) []byte {
+	r.Signature = ""
+	raw, _ := json.Marshal(r)
+	return append([]byte(protocol+"\x00response\x00"), raw...)
+}
+
+// SignResponse authenticates a service-supplied payload; it makes no enrollment
+// decision. The protected service must validate and serialize its own current
+// state before calling it. No private key is created, imported or persisted here.
+func SignResponse(request Request, payload []byte, key ed25519.PrivateKey) ([]byte, error) {
+	if len(key) != ed25519.PrivateKeySize {
+		return nil, ErrKey
+	}
+	if request.Protocol != protocol || request.KeyID != keyID(key.Public().(ed25519.PublicKey)) || !validDigest(request.ProjectDigest) || !validDigest(request.RequestDigest) {
+		return nil, ErrChallenge
+	}
+	nonce, err := base64.RawURLEncoding.Strict().DecodeString(request.Nonce)
+	if err != nil || len(nonce) != sha256.Size || base64.RawURLEncoding.EncodeToString(nonce) != request.Nonce {
+		return nil, ErrChallenge
+	}
+	r := response{Protocol: protocol, Challenge: digestRequest(request), Payload: base64.RawURLEncoding.EncodeToString(payload)}
+	r.Signature = base64.RawURLEncoding.EncodeToString(ed25519.Sign(key, signedBytes(r)))
+	return json.Marshal(r)
+}
+
+func validDigest(value string) bool {
+	raw, err := hex.DecodeString(value)
+	return err == nil && len(raw) == sha256.Size && hex.EncodeToString(raw) == value
+}
+
+// Parse the flat string envelope explicitly: encoding/json alone accepts
+// duplicate and case-folded keys. Payload remains opaque signed bytes.
+func decodeResponse(raw []byte) (response, error) {
+	var result response
+	d := json.NewDecoder(bytes.NewReader(raw))
+	start, err := d.Token()
+	if err != nil || start != json.Delim('{') {
+		return result, ErrResponse
+	}
+	seen := map[string]bool{}
+	for d.More() {
+		key, err := d.Token()
+		name, ok := key.(string)
+		if err != nil || !ok || seen[name] {
+			return response{}, ErrResponse
+		}
+		seen[name] = true
+		var value string
+		if err = d.Decode(&value); err != nil {
+			return response{}, ErrResponse
+		}
+		switch name {
+		case "protocol": result.Protocol = value
+		case "challenge_digest": result.Challenge = value
+		case "payload": result.Payload = value
+		case "signature": result.Signature = value
+		default: return response{}, ErrResponse
+		}
+	}
+	if end, err := d.Token(); err != nil || end != json.Delim('}') || len(seen) != 4 {
+		return response{}, ErrResponse
+	}
+	if _, err = d.Token(); err != io.EOF || result.Protocol != protocol || !validDigest(result.Challenge) {
+		return response{}, ErrResponse
+	}
+	return result, nil
+}
+
+// Verify consumes a challenge only on a valid response. Invalid data cannot
+// burn it; concurrent valid replays yield exactly one local Statement. This
+// local uniqueness is not a durable publication or process-start reservation.
+// A delayed authentic response can describe subsequently revoked authority:
+// fresh source validation and revocation linearization remain mandatory.
+func (v *Verifier) Verify(challenge *Challenge, raw []byte) (Statement, error) {
+	if v == nil || challenge == nil || challenge.owner != v {
+		return Statement{}, ErrChallenge
+	}
+	challenge.mu.Lock()
+	defer challenge.mu.Unlock()
+	if challenge.spent {
+		return Statement{}, ErrSpent
+	}
+	r, err := decodeResponse(raw)
+	if err != nil {
+		return Statement{}, err
+	}
+	if r.Challenge != digestRequest(challenge.request) {
+		return Statement{}, ErrBinding
+	}
+	signature, err := base64.RawURLEncoding.Strict().DecodeString(r.Signature)
+	if err != nil || len(signature) != ed25519.SignatureSize || base64.RawURLEncoding.EncodeToString(signature) != r.Signature || !ed25519.Verify(v.key, signedBytes(r), signature) {
+		return Statement{}, ErrSignature
+	}
+	payload, err := base64.RawURLEncoding.Strict().DecodeString(r.Payload)
+	if err != nil || base64.RawURLEncoding.EncodeToString(payload) != r.Payload {
+		return Statement{}, ErrResponse
+	}
+	challenge.spent = true
+	return Statement{payload: payload, request: challenge.request}, nil
+}

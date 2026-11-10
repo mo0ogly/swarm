@@ -1,0 +1,173 @@
+{
+ "schema_version": 1,
+ "id": "blp-aggregate-public",
+ "inputs": [
+  "tools/paea/check_blp_inventory.py",
+  "tests/blp_flow_inventory_test.py",
+  "tests/fixture_area.py",
+  "docs/architecture/blp-flow-inventory.json",
+  "rust/crates/swarm-api-client/src/lib.rs",
+  "rust/crates/swarm-biba-linux/src/kernel.rs",
+  "rust/crates/swarm-biba-linux/src/lib.rs",
+  "rust/crates/swarm-cli/src/agent_logs.rs",
+  "rust/crates/swarm-cli/src/preparation_worker.rs",
+  "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+  "rust/crates/swarm-engine/src/agent_native_stream.rs",
+  "rust/crates/swarm-engine/src/agent_worker_context.rs",
+  "rust/crates/swarm-engine/src/local_storage.rs",
+  "rust/crates/swarm-engine/src/memory_files.rs",
+  "rust/crates/swarm-engine/src/native_provider_exec.rs",
+  "rust/crates/swarm-engine/src/project_context.rs",
+  "rust/crates/swarm-engine/src/project_memory_source.rs",
+  "rust/crates/swarm-engine/src/provider_connection_probe.rs",
+  "rust/crates/swarm-engine/src/root_store/agent_archive_history.rs",
+  "rust/crates/swarm-engine/src/root_store/paea_effect_reconcile.rs",
+  "rust/crates/swarm-engine/src/root_store/paea_git_promote_call.rs",
+  "rust/crates/swarm-engine/src/root_store/paea_git_repository/transfer.rs",
+  "rust/crates/swarm-engine/src/root_store/paea_git_transfer_call.rs",
+  "rust/crates/swarm-engine/src/root_store/paea_settlement/call.rs",
+  "rust/crates/swarm-engine/src/root_store/planning_native.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_attachments.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_capture.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_methods.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_source.rs",
+  "rust/crates/swarm-engine/src/root_store/reviewer_native/gate.rs",
+  "rust/crates/swarm-engine/src/root_store/task_validation/biba.rs",
+  "rust/crates/swarm-engine/src/root_store/task_validation/process.rs",
+  "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+  "rust/crates/swarm-engine/src/telemetry_endpoint.rs",
+  "rust/crates/swarm-engine/src/trust/confidentiality.rs",
+  "rust/crates/swarm-protection-contract/src/types.rs",
+  "rust/crates/swarm-web/src/service/agent_logs.rs",
+  "rust/crates/swarm-web/src/service/api_connection_probe.rs",
+  "rust/crates/swarm-web/src/service/paea.rs",
+  "rust/crates/swarm-web/src/service/paea_git_call_approval.rs",
+  "rust/crates/swarm-web/src/service/paea_git_call_preview.rs",
+  "rust/crates/swarm-web/src/service/preparations.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+  "rust/crates/swarm-engine/src/root_store/reader_guard.rs",
+  "rust/crates/swarm-cli/src/trust.rs",
+  "rust/crates/swarm-web/src/service/trust.rs",
+  "rust/crates/swarm-web/src/service.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_confidentiality.rs",
+  "rust/crates/swarm-engine/src/root_store/trust_enrollment.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_attribution.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_admission.rs",
+  "rust/crates/swarm-engine/src/root_store/preparation_transport.rs",
+  "rust/crates/swarm-engine/src/trust/security.rs",
+  "web/security-proofs.js",
+  "tests/blp_attribution_history_cli.py",
+  "tests/rust_agent_model_route.py",
+  "tools/verification/recipe.py",
+  "tests/blp_preparation_check.py",
+  "tests/rust_native_http_cli.py",
+  "tests/blp_admission_public.py",
+  "tests/blp_dialogue_reader_public.py",
+  "tests/blp_transport_public.py",
+  "rust/crates/swarm-engine/src/root_store/preparation_call_budget.rs",
+  "tests/blp_object_attribute_public.py",
+  "tests/blp_object_attribute_ui.cjs",
+  "package.json",
+  "package-lock.json",
+  "web/trust-native.html",
+  "web/trust-confidentiality.js",
+  "locales/en.json",
+  "web/i18n-en.js",
+  "tools/verification/recipes/blp-flow-inventory.json",
+  "tools/verification/recipes/blp-preparation-check-public.json",
+  "tools/verification/recipes/blp-preparation-admission-public.json",
+  "tools/verification/recipes/blp-dialogue-reader-public.json",
+  "tools/verification/recipes/blp-preparation-transport-public.json",
+  "tools/verification/recipes/blp-object-attribute-public.json"
+ ],
+ "environment": {},
+ "steps": [
+  {
+   "id": "child-01-blp-flow-inventory",
+   "command": [
+    "python3",
+    "-c",
+    "import os,subprocess,sys,uuid;from pathlib import Path;sys.path.insert(0,'tests');from fixture_area import configured_area;area=configured_area();out=area/('blp-aggr-01-'+uuid.uuid4().hex[:8]);env=dict(os.environ);env['SWARM_BLP_PROOF_OUTPUT']=str(out/'journey');subprocess.run(['python3','tools/verification/recipe.py','run','--recipe','tools/verification/recipes/blp-flow-inventory.json','--output',str(out)],env=env,check=True);print('BLP_AGGREGATE_CHILD_01_PASS '+str(out))"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "BLP_AGGREGATE_CHILD_01_PASS ",
+    "\"status\": \"PASS\""
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "child-02-blp-preparation-check-public",
+   "command": [
+    "python3",
+    "-c",
+    "import os,subprocess,sys,uuid;from pathlib import Path;sys.path.insert(0,'tests');from fixture_area import configured_area;area=configured_area();out=area/('blp-aggr-02-'+uuid.uuid4().hex[:8]);env=dict(os.environ);env['SWARM_BLP_PROOF_OUTPUT']=str(out/'journey');subprocess.run(['python3','tools/verification/recipe.py','run','--recipe','tools/verification/recipes/blp-preparation-check-public.json','--output',str(out)],env=env,check=True);print('BLP_AGGREGATE_CHILD_02_PASS '+str(out))"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "BLP_AGGREGATE_CHILD_02_PASS ",
+    "\"status\": \"PASS\""
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "child-03-blp-preparation-admission-public",
+   "command": [
+    "python3",
+    "-c",
+    "import os,subprocess,sys,uuid;from pathlib import Path;sys.path.insert(0,'tests');from fixture_area import configured_area;area=configured_area();out=area/('blp-aggr-03-'+uuid.uuid4().hex[:8]);env=dict(os.environ);env['SWARM_BLP_PROOF_OUTPUT']=str(out/'journey');subprocess.run(['python3','tools/verification/recipe.py','run','--recipe','tools/verification/recipes/blp-preparation-admission-public.json','--output',str(out)],env=env,check=True);print('BLP_AGGREGATE_CHILD_03_PASS '+str(out))"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "BLP_AGGREGATE_CHILD_03_PASS ",
+    "\"status\": \"PASS\""
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "child-04-blp-dialogue-reader-public",
+   "command": [
+    "python3",
+    "-c",
+    "import os,subprocess,sys,uuid;from pathlib import Path;sys.path.insert(0,'tests');from fixture_area import configured_area;area=configured_area();out=area/('blp-aggr-04-'+uuid.uuid4().hex[:8]);env=dict(os.environ);env['SWARM_BLP_PROOF_OUTPUT']=str(out/'journey');subprocess.run(['python3','tools/verification/recipe.py','run','--recipe','tools/verification/recipes/blp-dialogue-reader-public.json','--output',str(out)],env=env,check=True);print('BLP_AGGREGATE_CHILD_04_PASS '+str(out))"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "BLP_AGGREGATE_CHILD_04_PASS ",
+    "\"status\": \"PASS\""
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "child-05-blp-preparation-transport-public",
+   "command": [
+    "python3",
+    "-c",
+    "import os,subprocess,sys,uuid;from pathlib import Path;sys.path.insert(0,'tests');from fixture_area import configured_area;area=configured_area();out=area/('blp-aggr-05-'+uuid.uuid4().hex[:8]);env=dict(os.environ);env['SWARM_BLP_PROOF_OUTPUT']=str(out/'journey');subprocess.run(['python3','tools/verification/recipe.py','run','--recipe','tools/verification/recipes/blp-preparation-transport-public.json','--output',str(out)],env=env,check=True);print('BLP_AGGREGATE_CHILD_05_PASS '+str(out))"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "BLP_AGGREGATE_CHILD_05_PASS ",
+    "\"status\": \"PASS\""
+   ],
+   "required_stderr": []
+  },
+  {
+   "id": "child-06-blp-object-attribute-public",
+   "command": [
+    "python3",
+    "-c",
+    "import os,subprocess,sys,uuid;from pathlib import Path;sys.path.insert(0,'tests');from fixture_area import configured_area;area=configured_area();out=area/('blp-aggr-06-'+uuid.uuid4().hex[:8]);env=dict(os.environ);env['SWARM_BLP_PROOF_OUTPUT']=str(out/'journey');subprocess.run(['python3','tools/verification/recipe.py','run','--recipe','tools/verification/recipes/blp-object-attribute-public.json','--output',str(out)],env=env,check=True);print('BLP_AGGREGATE_CHILD_06_PASS '+str(out))"
+   ],
+   "expected_exit": 0,
+   "required_stdout": [
+    "BLP_AGGREGATE_CHILD_06_PASS ",
+    "\"status\": \"PASS\""
+   ],
+   "required_stderr": []
+  }
+ ]
+}

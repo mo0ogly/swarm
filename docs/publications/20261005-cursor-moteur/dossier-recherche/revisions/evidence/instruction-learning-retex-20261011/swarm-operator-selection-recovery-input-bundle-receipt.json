@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T19:49:11.797465+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-selection-recovery-20261011.bundle",
+  "sha256": "0ddd5aff5de569af99c44e6bf3c3e4cbb385f4214df70ed8b5dda8958039658a",
+  "commit": "853769099a41aa953e1d7b312d8ae7ed4d3149e8",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 98,
+  "manifest_sha256": "043baac34e0bcbbe95e0eafafd2b15906003006898be4ce283f4ab78f841491a",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-inputs-iqs9iscs",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-import-f4ciec55",
+  "verification": "PASS fetch and every original input byte/hash; old95 preserved",
+  "limits": "Cumulative95 unchanged qualified recovery inputs plus22 guarded selection-capacity recovery and exact preimages. Full1189 qualification receipt and source digest in canonical22metadata; targeted root/child actual-process negative chain and16invalid guards, race274.632s, vet/methods, immutable native read-only originals PASS. Common personal Codex/Claude directives and planner/worker prevention updated without changing historical reviewer method. No original ACK/unknown/inspection/cost refunded, no implicit acceptance or production. Runtime22 installation verified separately. T3 merges all patches and native Judge and qualifies its own complete candidate; T4 allincidentclasses; T7 root/twochildren native end-to-end; T8 RETEX still required."
+}

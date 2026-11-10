@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "paea-namespace-owner",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-linux-identity-channel/**/*",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-linux-identity-channel.json",
+    "tests/fixtures/paea_namespace_owner.py",
+    "tools/verification/recipes/paea-namespace-owner.json",
+    "tests/paea_namespace_owner_profile_test.py",
+    "tests/paea_namespace_owner_integrity_test.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings",
+    "SWARM_PAEA_NAMESPACE_OWNER_EVIDENCE": "",
+    "SWARM_PAEA_NAMESPACE_OWNER_EVIDENCE_PARENT": "{root}/docs/plans/actions-confiance/paea/evidence"
+  },
+  "steps": [
+    {
+      "id": "frozen-normal-library-owner-test-harness",
+      "command": [
+        "python3",
+        "tests/paea_namespace_owner_profile_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NAMESPACE_OWNER_PROFILE_PASS named_tests=2 profiles=2 stages=6 channel_features_empty=true harness_test=true",
+        "NAMESPACE_OWNER_EVIDENCE_SHA256=",
+        "NAMESPACE_OWNER_EVIDENCE_PATH=",
+        "NAMESPACE_OWNER_INTEGRITY_PASS controls=5 refusals=3 original_intact=true"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

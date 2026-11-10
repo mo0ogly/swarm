@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^(TestMemorySummarySelectionConcurrentConfirmationCreatesOnce|TestMemorySummarySelectionActualProviderInputAndReopen)$",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T20:14:35.323367+00:00",
+  "duration_seconds": 35.775,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestMemorySummarySelectionActualProviderInputAndReopen",
+    "TestMemorySummarySelectionConcurrentConfirmationCreatesOnce"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "40fe8a5a7b3cdc81e86037075651209020a6e5c24beced62547988af53af8c52",
+  "real_model_calls": 0
+}

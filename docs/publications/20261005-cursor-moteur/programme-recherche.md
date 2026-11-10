@@ -21,7 +21,55 @@ mécanisme déterministe qui médiatise chaque lancement, chaque reprise et chaq
 selon le principe du moniteur de référence (Anderson, 1972) : les agents proposent, le moteur
 autorise, un exécutant déterministe agit. Ce contrôle a un coût, qui doit être mesuré.
 
+Corpus moteur actualisé le 10 octobre 2026 à la demande de l’utilisateur : Cursor en priorité,
+avec janvier, février, avril, juillet et septembre ; Google/Gemini, OpenAI et Anthropic en
+comparaison. Voir les [fiches de lecture et essais proposés](article-scientifique/fiches-lecture.md#5-moteur-swarm--sources-industrielles-actualisées-au-10-octobre-2026)
+et l’[état de l’art actualisé](dossier-recherche/02-etat-art.md#26-actualisation-du-corpus-moteur--10-octobre-2026).
+Cette extension du corpus ne change pas les résultats déjà mesurés ni les critères d’acceptation.
+
+Observation moteur ajoutée le 10 octobre 2026 : les plafonds fixes de 90 secondes
+coupaient la revue et le diagnostic du responsable. La correction distingue
+activité, silence, durée totale facultative et bail renouvelé, avec réglages
+persistés dans Admin. La reprise réelle a produit un verdict puis une décision de
+correction automatique. Voir le [chapitre sur le moniteur](dossier-recherche/07-moniteur.md#76-vivacité-des-superviseurs--observation-du-10-octobre-2026)
+et la [note de recherche datée](dossier-recherche/revisions/20261010-vivacite-supervision.md).
+Ce cas hors campagne ne modifie pas les résultats de facturation ni les causes
+inconnues des cinq délais historiques.
+
+Autre observation du 10 octobre : deux refus `unknown` persistent parce que les
+citations sont transmises sans leur source complète. La [note sur le dossier de revue](dossier-recherche/revisions/20261010-refus-contexte-revue.md)
+étudie la correction supervisée insuffisante, la réparation externe explicite et
+les mesures à pré-enregistrer. Ce cas ne requalifie aucun verdict historique.
+
 ## 2. Questions de recherche
+
+Extension du 16 octobre 2026 : [identité et autorité pendant tout le cycle de vie](article-scientifique/identites-autorite-cycle-vie.md).
+Elle propose QR-ID1–4, une comparaison avec contrôles équivalents et trois
+schémas. Les précédents scientifiques interdisent de présenter l'identité ou
+le contrôle continu comme nouveaux en eux-mêmes. L'audit IA1 et l'expérience
+d'isolation IA2 restent distincts d'une intégration ou d'une évaluation complète.
+Les tableaux historiques ci-dessous gardent leur périmètre de facturation/moteur.
+
+Actualisation locale du 17 octobre : la même note relie le noyau privé Go IA2.2
+(114 noms de tests/sous-tests réussis, dont 100 propres au noyau) et un prototype
+Linux séparé (13 contrôles réussis). Le transfert réel d'une connexion entre
+instances fournit un cas d'attribution à reproduire au futur courtier. Aucun
+lanceur n'est raccordé ; F01–F07 restent ouverts. Ces preuves de composants ne
+répondent pas encore à l'évaluation comparative QR-ID1–4 et n'établissent aucune
+priorité scientifique.
+
+Le portage Go IA2.3a ajoute depuis une attribution réelle au vérificateur interne :
+133 noms de tests/sous-tests ciblés réussis, dont 19 nouveaux, avec répétition de
+ces 19 sous `-race`. Le dossier identité lie le cas d'expiration durant l'attente
+du registre à son échec initial et à sa correction. L'autorité demeure une fixture
+dans ces essais ; les lanceurs et les effets métier ne sont pas raccordés.
+
+La source durable IA2.3b lit depuis SQLite sous une tête Trust et un checkpoint
+distincts ; une publication interrompue est reprise sans doublon. 181 noms de
+tests/sous-tests ciblés passent, dont 33 du registre, avec 52 répétitions sous
+`-race`. Le témoin courant et le permis restent émis par les fixtures. Ces
+résultats préparent la réplication du protocole ; ils ne qualifient ni l'admission
+publique, ni un témoin externe déployé, ni une contribution originale démontrée.
 
 | Question | Énoncé | État |
 |---|---|---|
@@ -121,8 +169,80 @@ Un article est à portée ; une thèse demande davantage. Manques identifiés :
 | `article-scientifique/PLAN.md` | Plan détaillé de l'article |
 | `article-scientifique/brouillon-*.md` | Sections rédigées (résumé, 2 à 7, 9 à 11, annexes) |
 | `article-scientifique/fiches-lecture.md` | Travaux liés vérifiés |
+| `dossier-recherche/revisions/20261010-vivacite-supervision.md` | Coupures de durée, rôle du superviseur, correction, reprise réelle et protocole de comparaison proposé |
+| `dossier-recherche/revisions/20261010-refus-contexte-revue.md` | Deux refus par manque de source complète, limite de la correction supervisée, réparation explicite et essai comparatif proposé |
+| `dossier-recherche/revisions/20261010-correction-globale-preuves.md` | Transmission automatique des preuves, inventaire aux superviseurs, vérifications et installation ; schémas d’architecture FR/EN |
 | `docs/benchmarks/billing/conception.md`, `plan-implementation.md` | Conception et réalisation du banc |
 | `docs/benchmarks/billing/observations.md`, `defauts-moteur.md` | Comportements du moteur et défauts |
 | `docs/benchmarks/billing/verification-correctifs.md` | Vérification des correctifs (pré-enregistrement) |
 | `docs/benchmarks/billing/conception-collectif.md` | Étude S-collectif |
 | `docs/benchmarks/billing/resultats/` | Données brutes de toutes les campagnes |
+
+Le [raccord IA3a au contrat enregistré](../../plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md)
+ajoute une génération persistée à chaque amendement, y compris suivi du retour
+à un ancien contenu. Une nouvelle course entre lecture SQL et verrou runtime
+est reproduite puis corrigée par sérialisation de la décision pure. 232 noms
+ciblés passent, dont 32 du plan ; ils ne constituent ni 232 attaques distinctes
+ni un résultat comparatif. Les émetteurs humains, le témoin du watermark de
+plan, les effets publics et la mesure des coûts restent ouverts. Les précédents
+et l’absence de preuve d’originalité sont inchangés.
+
+Le [producteur interne IA3b](../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md)
+relie une session OIDC à une autorité explicite de publication. Les expériences
+locales distinguent transfert entre sessions, expiration pendant attente et
+lecture du travail avant autorisation. Enrôlement et témoin courants restent
+des prérequis ; IA3c.1 traite désormais le reçu historique durable dans le noyau
+privé, avec résultats et limites dans son rapport. Aucun
+résultat de sécurité des lanceurs publics ou de nouveauté scientifique n'en
+découle. La documentation doit accompagner chaque modification : règle persistée
+pour Codex/Claude et assemblage du pack contrôlé, sans preuve de déploiement.
+
+
+Le [reçu durable IA3c.1](../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md)
+lie l’autorité fournie, la session sous empreinte et les dates à la tête du
+registre. Les tests couvrent réouverture, altération et reprise ; l’autorité
+courante et la preuve d’enrôlement restent distinctes de ce reçu historique.
+Les résultats sont des fixtures locales, sans compte humain externe ni admission
+publique. Aucune nouveauté scientifique ou supériorité comparative n’est établie.
+
+
+IA3c.2a ajoute un format de réponse signée isolé, avec clé épinglée, challenge
+et anti-rejeu local ; il n’est pas raccordé au moteur. Le
+[contrat d’enrôlement cible](../../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
+conserve explicitement origine authentifiée versus autorité courante, décisions
+de déploiement et exigences de révocation. Aucune nouveauté scientifique n’est
+déduite de ces mécanismes classiques ni des tests du candidat.
+
+
+IA3c.2b ajoute un [journal local d’enrôlement](../../plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-state-20261017/RAPPORT-IA3c2b.md)
+avec chaîne signée et révocation irréversible, testé en normal/race. Le témoin
+externe reste fourni, sa protection durable non réalisée. La lecture active
+est sérialisée localement ; la fraîcheur au moment d’un usage moteur et la
+révocation distribuée restent ouvertes. Le rapport conserve l’échec concurrent
+initial, sa limite de diagnostic et les résultats ultérieurs sans les confondre
+avec une validation comparative ou une nouveauté scientifique. Le futur protocole
+d’évaluation doit mesurer aussi coût de relecture de l’histoire, contention,
+retour arrière du témoin et délai entre réponse authentique et usage effectif.
+
+
+IA3c.2c apporte un [schéma local strict d’autorité](../../plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-authority-20261017/RAPPORT-IA3c2c.md)
+et une génération liée à l’événement de création du journal. La validation
+producteur/consommateur réutilise les primitives moteur. Les tests distinguent
+signature, cohérence, contexte attendu et fraîcheur ; l’acceptation d’une ancienne
+preuve avec son ancien témoin reste une limite explicite. Demande complète EP-02,
+service protégé, intégration publique et mesure comparative restent ouverts.
+Aucune nouveauté scientifique ou garantie globale ne découle des tests locaux.
+
+
+IA3c.2d lie une [demande complète](../../plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-request-20261017/RAPPORT-IA3c2d.md)
+à son challenge : candidat entier, contexte humain/session, plan, événement,
+racines, checkpoints et document exact. Le protocole expérimental doit distinguer
+couverture du contenu, provenance vérifiée des faits, actualité et autorité d’usage.
+Les tests locaux ne qualifient ni le service protégé ni le workflow public ;
+aucune nouveauté scientifique n’est déduite du digest avec domaine/version.
+
+
+IA3c.2e ajoute une [version explicite au cadre de lecture](../../plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-reply-20261017/RAPPORT-IA3c2e.md)
+et un décodeur commun. Les paquets authentiques non reconnus sont refusés sans
+fallback ; l’interopérabilité des vrais pairs reste à tester avant activation.
+Les preuves locales ne démontrent ni autorité courante ni nouveauté scientifique.

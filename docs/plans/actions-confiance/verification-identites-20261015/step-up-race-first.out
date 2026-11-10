@@ -1,0 +1,70 @@
+=== RUN   TestActionsConfianceT3StepUpPolicySurface
+--- PASS: TestActionsConfianceT3StepUpPolicySurface (0.89s)
+=== RUN   TestActionsConfianceT3StepUpExactApprovalPersistenceAndConsumption
+--- PASS: TestActionsConfianceT3StepUpExactApprovalPersistenceAndConsumption (1.54s)
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/missing-auth-time
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/missing-acr
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/weak-acr
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/invalid-acr-type
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/changed-subject
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/old-auth-time
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/future-auth-time
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/invalid-auth-time-type
+=== RUN   TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/wrong-nonce
+--- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims (9.32s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/missing-auth-time (1.24s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/missing-acr (1.11s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/weak-acr (1.26s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/invalid-acr-type (0.96s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/changed-subject (0.94s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/old-auth-time (0.98s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/future-auth-time (0.89s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/invalid-auth-time-type (1.04s)
+    --- PASS: TestActionsConfianceT3StepUpRejectsWeakOrChangedClaims/wrong-nonce (0.90s)
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/other-action
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/expiry
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/revoked-mandate
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/suspended-identity
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/changed-revision
+=== RUN   TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/logout
+--- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation (6.66s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/other-action (1.11s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/expiry (1.01s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/revoked-mandate (1.04s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/suspended-identity (1.19s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/changed-revision (1.20s)
+    --- PASS: TestActionsConfianceT3StepUpWrongActionExpiryAndRevocation/logout (1.11s)
+=== RUN   TestActionsConfianceT3StepUpStartRequiresAuthorityBeforeNetwork
+--- PASS: TestActionsConfianceT3StepUpStartRequiresAuthorityBeforeNetwork (0.88s)
+=== RUN   TestActionsConfianceT3StepUpNormalOIDCIsNotActionProof
+--- PASS: TestActionsConfianceT3StepUpNormalOIDCIsNotActionProof (1.03s)
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/negative-age
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/zero-proof-duration
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/unknown-operation
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/no-operation
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/duplicate-operation
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/empty-acr
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/whitespace-acr
+=== RUN   TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/duplicate-acr
+--- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/negative-age (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/zero-proof-duration (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/unknown-operation (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/no-operation (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/duplicate-operation (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/empty-acr (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/whitespace-acr (0.00s)
+    --- PASS: TestActionsConfianceT3StepUpPolicyRejectsInvalidInputs/duplicate-acr (0.00s)
+=== RUN   TestActionsConfianceT3StepUpFiniteAuthenticationAge
+--- PASS: TestActionsConfianceT3StepUpFiniteAuthenticationAge (0.00s)
+=== RUN   TestActionsConfianceT3StepUpWorkloadApproverCannotBypass
+--- PASS: TestActionsConfianceT3StepUpWorkloadApproverCannotBypass (1.08s)
+=== RUN   TestActionsConfianceT3StepUpConcurrentApprovalConsumesOnce
+--- PASS: TestActionsConfianceT3StepUpConcurrentApprovalConsumesOnce (1.10s)
+=== RUN   TestActionsConfianceT3StepUpMandateRevokedBeforeFinish
+--- PASS: TestActionsConfianceT3StepUpMandateRevokedBeforeFinish (0.94s)
+PASS
+ok  	swarm.local/companion/internal/engine	24.996s

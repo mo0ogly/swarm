@@ -1,0 +1,20 @@
+{"Time":"2026-10-12T23:38:42.203216261+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-12T23:38:42.232841034+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRepositorySupportsProjectBelowGitRoot"}
+{"Time":"2026-10-12T23:38:42.232946062+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRepositorySupportsProjectBelowGitRoot","Output":"=== RUN   TestManagedRepositorySupportsProjectBelowGitRoot\n"}
+{"Time":"2026-10-12T23:38:42.713056011+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRepositorySupportsProjectBelowGitRoot","Output":"--- PASS: TestManagedRepositorySupportsProjectBelowGitRoot (0.48s)\n"}
+{"Time":"2026-10-12T23:38:42.713129409+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRepositorySupportsProjectBelowGitRoot","Elapsed":0.48}
+{"Time":"2026-10-12T23:38:42.713143516+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasRetainsRepositoryCopyAndPublicBundle"}
+{"Time":"2026-10-12T23:38:42.713149677+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasRetainsRepositoryCopyAndPublicBundle","Output":"=== RUN   TestManagedRootAliasRetainsRepositoryCopyAndPublicBundle\n"}
+{"Time":"2026-10-12T23:38:42.901169999+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasRetainsRepositoryCopyAndPublicBundle","Output":"--- PASS: TestManagedRootAliasRetainsRepositoryCopyAndPublicBundle (0.19s)\n"}
+{"Time":"2026-10-12T23:38:42.901253276+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasRetainsRepositoryCopyAndPublicBundle","Elapsed":0.19}
+{"Time":"2026-10-12T23:38:42.90128169+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasPreparedCopyIsReused"}
+{"Time":"2026-10-12T23:38:42.901296738+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasPreparedCopyIsReused","Output":"=== RUN   TestManagedRootAliasPreparedCopyIsReused\n"}
+{"Time":"2026-10-12T23:38:43.074700172+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasPreparedCopyIsReused","Output":"--- PASS: TestManagedRootAliasPreparedCopyIsReused (0.17s)\n"}
+{"Time":"2026-10-12T23:38:43.074760716+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasPreparedCopyIsReused","Elapsed":0.17}
+{"Time":"2026-10-12T23:38:43.074914536+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasStillRejectsInnerRedirectedCopy"}
+{"Time":"2026-10-12T23:38:43.074924495+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasStillRejectsInnerRedirectedCopy","Output":"=== RUN   TestManagedRootAliasStillRejectsInnerRedirectedCopy\n"}
+{"Time":"2026-10-12T23:38:43.26192852+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasStillRejectsInnerRedirectedCopy","Output":"--- PASS: TestManagedRootAliasStillRejectsInnerRedirectedCopy (0.19s)\n"}
+{"Time":"2026-10-12T23:38:43.262048987+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRootAliasStillRejectsInnerRedirectedCopy","Elapsed":0.19}
+{"Time":"2026-10-12T23:38:43.262206875+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-12T23:38:43.268235721+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t1.065s\n"}
+{"Time":"2026-10-12T23:38:43.268298349+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":1.065}

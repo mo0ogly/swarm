@@ -1,0 +1,19 @@
+{
+  "recorded_at_utc": "2026-10-15T19:27:24.974423+00:00",
+  "selected_sources_stable": true,
+  "additional_upstream_audit_probes": 7,
+  "swarm_targeted_tests": 8,
+  "source_models": {
+    "memory-agent": "Actual graph, fake model and InMemoryStore",
+    "memory-template": "Actual adapter and consumer, spy substituted only for unexecuted langmem factory"
+  },
+  "original_run_metadata": [
+    "../m1-20261015/m2-models.json",
+    "../m1-20261015/swarm-m2.json"
+  ],
+  "warnings": "Two deprecations in archived template: config_schema instead of context_schema",
+  "full_langmem_manager": "NOT TESTED",
+  "real_model_learning_quality": "NOT TESTED",
+  "native_provider_resume_semantics": "NOT TESTED with real Codex or Claude; argument and state guards checked",
+  "application_code_modified": false
+}

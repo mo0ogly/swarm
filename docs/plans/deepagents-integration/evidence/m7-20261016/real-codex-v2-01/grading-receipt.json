@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "tools/memory-evaluation/knowledge.py",
+    "--pack",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/pack-safe",
+    "--answers",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/real-codex-v2-01/answers.json",
+    "--output",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/real-codex-v2-01/graded-results.json"
+  ],
+  "started_at_utc": "2026-10-16T08:00:36.061993+00:00",
+  "ended_at_utc": "2026-10-16T08:00:36.219669+00:00",
+  "exit_code": 1,
+  "grader_sha256": "af2a85696f512c99cc563136b9c823533050bd2d03a3b43c075f9e37f2000696",
+  "reader_sha256": "176fa733e8e025a674d08e54a9ba01c01566b2a9c193deca0182775d72f22b63",
+  "answers_sha256": "1eb3321fdc35218a623ac4a73603ed9d9a4ffb96d51d3f4984eefa02e76d3fea",
+  "result_sha256": "01de998559c838d6cc183287734ae0fcbd17643d11c210c7baca1f6ce6fa52f1",
+  "log_sha256": "d9e569996b8a0db17289c1abd52a76f4a5dcba08b336a0b80207e3f4c9788a82",
+  "note": "Exit 0 is four conforming answers; exit 1 is a preserved rubric failure, not automatically an execution failure."
+}

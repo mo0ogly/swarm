@@ -1,0 +1,6 @@
+=== RUN   TestNativeReferenceSelectionSizingProbe
+    native_reference_selection_sizing_probe_test.go:6: méthode de revue des fragments modifiée
+--- FAIL: TestNativeReferenceSelectionSizingProbe (0.04s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.069s
+FAIL

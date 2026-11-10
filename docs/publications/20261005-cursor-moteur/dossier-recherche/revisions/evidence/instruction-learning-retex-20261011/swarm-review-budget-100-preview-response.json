@@ -1,0 +1,226 @@
+{
+  "current": {
+    "revision": 332,
+    "limits": {
+      "planning_activations": 60,
+      "planning_decisions": 60,
+      "review_calls": 70
+    },
+    "consumed": {
+      "planning_activations": 28,
+      "planning_decisions": 20,
+      "review_calls": 28
+    },
+    "remaining": {
+      "planning_activations": 32,
+      "planning_decisions": 40,
+      "review_calls": 42
+    },
+    "last_authorization": {
+      "before": {
+        "planning_activations": 30,
+        "planning_decisions": 30,
+        "review_calls": 70
+      },
+      "after": {
+        "planning_activations": 60,
+        "planning_decisions": 60,
+        "review_calls": 70
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-11T13:27:45.709786469Z",
+      "reason": "Autorisation explicite utilisateur pour augmenter les droits/budgets nécessaires au projet jusqu’au RETEX. Observation:22 activations/30 et14 décisions/30, T2 non acceptée,6 tâches T3..T8 futures plus retours de revue et conduite hiérarchique. Les8 activations restantes offrent une marge insuffisante au format observé, estimation de conduite et corrections, pas minimum garanti. Allocation planification30→60 et décisions30→60; revue70 conservée avec19 appels utilisés. Conserver toutes consommations, tentatives, preuves et refus; aucune acceptation, réinitialisation ou limite de compte fournisseur contournée. Les décisions restent au propriétaire IA; plafond administrable, pas critère de fin."
+    },
+    "scopes": [
+      {
+        "last_model": {
+          "provider": "claude",
+          "provider_digest": "a27bf0998ace86f44a53996649f88f3d0859bd8292b8deb2946e0896885e9459",
+          "route": {
+            "level": "standard",
+            "model": "sonnet",
+            "effort": "",
+            "billing": "external",
+            "policy_hash": "1cb0234143e9aa8ed95f3cd427d818ab0066d8c33139ce7f75a31f670f609b17",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-11T14:22:30.842914014Z"
+        },
+        "delivery": {
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "94f12d6a44958a2f481b01f9fa78264cb5a7d6fc26d68b8d05e2209499a19bed",
+          "events": [
+            "plan-855f5036f12c79dff7db51cc93885743d042b8457665bf8216fda5d71852c8f4",
+            "plan-1c22d00ede7b05ddd6d9d0d2d41a5bb8e1e71b29f01162f6058b4947d6f80094"
+          ],
+          "decision": "planning-claim-7cba2c8b6297ea590d34fdd7-decision"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e00de7d4fc29b0246805fc44ef26d09b10d9c95c5b528bceec11db56b7719869"
+        },
+        "activations": 28,
+        "id": "root",
+        "objective": "Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29"
+        ],
+        "revision": 22,
+        "generation": 67,
+        "state": "ready"
+      }
+    ]
+  },
+  "proposed": {
+    "revision": 332,
+    "limits": {
+      "planning_activations": 60,
+      "planning_decisions": 60,
+      "review_calls": 100
+    },
+    "consumed": {
+      "planning_activations": 28,
+      "planning_decisions": 20,
+      "review_calls": 28
+    },
+    "remaining": {
+      "planning_activations": 32,
+      "planning_decisions": 40,
+      "review_calls": 72
+    },
+    "last_authorization": {
+      "before": {
+        "planning_activations": 60,
+        "planning_decisions": 60,
+        "review_calls": 70
+      },
+      "after": {
+        "planning_activations": 60,
+        "planning_decisions": 60,
+        "review_calls": 100
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-11T15:18:45.27156778Z",
+      "reason": "Autorisation explicite utilisateur : augmenter droits/budgets nécessaires à ce projet. Prévision mise à jour :23appels avant la revue actuelle,6inspections+2finaux planifiés, puis6remises T3..T8. Au format observé8appels/remise, total estimé79 dépasse70 ; ce scénario est une estimation, pas un minimum garanti. Allocation revue70→100 avec marge de corrections, autres budgets inchangés. Consommations,3tentativesT2, avis/preuves/identités conservés ; aucun plafond financier ou limite de compte fournisseur modifié. Appliquer au premier état sans revue active ni détenteur, conformément à la garde publique actuelle ; ce budget ne décide pas de l'achèvement et n'accepte aucun candidat."
+    },
+    "scopes": [
+      {
+        "last_model": {
+          "provider": "claude",
+          "provider_digest": "a27bf0998ace86f44a53996649f88f3d0859bd8292b8deb2946e0896885e9459",
+          "route": {
+            "level": "standard",
+            "model": "sonnet",
+            "effort": "",
+            "billing": "external",
+            "policy_hash": "1cb0234143e9aa8ed95f3cd427d818ab0066d8c33139ce7f75a31f670f609b17",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-11T14:22:30.842914014Z"
+        },
+        "delivery": {
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "94f12d6a44958a2f481b01f9fa78264cb5a7d6fc26d68b8d05e2209499a19bed",
+          "events": [
+            "plan-855f5036f12c79dff7db51cc93885743d042b8457665bf8216fda5d71852c8f4",
+            "plan-1c22d00ede7b05ddd6d9d0d2d41a5bb8e1e71b29f01162f6058b4947d6f80094"
+          ],
+          "decision": "planning-claim-7cba2c8b6297ea590d34fdd7-decision"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e00de7d4fc29b0246805fc44ef26d09b10d9c95c5b528bceec11db56b7719869"
+        },
+        "activations": 28,
+        "id": "root",
+        "objective": "Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29"
+        ],
+        "revision": 22,
+        "generation": 67,
+        "state": "ready"
+      }
+    ]
+  }
+}

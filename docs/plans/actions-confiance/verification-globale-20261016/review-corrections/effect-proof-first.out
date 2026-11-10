@@ -1,0 +1,37 @@
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/reason
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/sequence
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/previous
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/approval
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/direct
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/false/replay
+    trust_effect_proof_test.go:41: contexte de preuve incohérent à la séquence 4
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/reason
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/sequence
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/previous
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/approval
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/direct
+=== RUN   TestActionsConfianceT6CorruptChainStopsEffects/true/replay
+    trust_effect_proof_test.go:41: contexte de preuve incohérent à la séquence 4
+--- FAIL: TestActionsConfianceT6CorruptChainStopsEffects (13.59s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/reason (1.30s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/sequence (1.04s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/previous (1.07s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/approval (1.20s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/false/direct (0.97s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/false/replay (0.89s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/reason (1.14s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/sequence (1.19s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/previous (1.16s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/approval (1.23s)
+    --- PASS: TestActionsConfianceT6CorruptChainStopsEffects/true/direct (1.13s)
+    --- FAIL: TestActionsConfianceT6CorruptChainStopsEffects/true/replay (1.23s)
+=== RUN   TestActionsConfianceT6ExportBindsEffectAndPolicy
+=== RUN   TestActionsConfianceT6ExportBindsEffectAndPolicy/false
+=== RUN   TestActionsConfianceT6ExportBindsEffectAndPolicy/true
+--- PASS: TestActionsConfianceT6ExportBindsEffectAndPolicy (2.63s)
+    --- PASS: TestActionsConfianceT6ExportBindsEffectAndPolicy/false (1.18s)
+    --- PASS: TestActionsConfianceT6ExportBindsEffectAndPolicy/true (1.45s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	16.750s
+FAIL

@@ -1,0 +1,14 @@
+{
+  "validator": "jsonschema 4.25.1",
+  "valid_mixed_reply": true,
+  "rejected": [
+    "inspected defect",
+    "unknown defect",
+    "missing fail details",
+    "global defect",
+    "wrong artifact",
+    "line supplied",
+    "unknown empty",
+    "string anchor"
+  ]
+}

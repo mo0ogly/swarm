@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT4DataPolicyPublicContract
+    trust_data_policy_test.go:39: data policy contract missing json: unknown field "data_policy"
+--- FAIL: TestActionsConfianceT4DataPolicyPublicContract (1.25s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.885s
+FAIL

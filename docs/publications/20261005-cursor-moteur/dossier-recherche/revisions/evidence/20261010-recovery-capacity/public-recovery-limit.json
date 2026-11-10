@@ -1,0 +1,9 @@
+{
+  "error": "Fournisseur claude : quota refusé (429). Nouveaux appels suspendus jusqu’au 2026-10-10 21:20:00 UTC. Les tentatives et budgets déjà consommés restent conservés.",
+  "failure": {
+    "code": "provider_cooldown",
+    "message": "Fournisseur claude : quota refusé (429). Nouveaux appels suspendus jusqu’au 2026-10-10 21:20:00 UTC. Les tentatives et budgets déjà consommés restent conservés.",
+    "retryable": false
+  },
+  "schema_version": 1
+}

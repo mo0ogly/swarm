@@ -1,0 +1,23 @@
+{"state": "RUN", "case": "web", "phase": "waiting-bound"}
+PASS protected-mission-reads-before-start
+STAGE awaiting-server-owned-provider
+PASS http-start-alone-launches-real-inert-worker
+PASS http-status-responds-during-active-session
+PASS competing-cli-watch-refused-without-duplicate-agent
+{"state": "RUN", "case": "contending-web", "phase": "waiting-bound"}
+PASS second-web-server-remains-usable-without-owning-or-releasing-first-lease
+PASS invalid-and-unauthorized-controls-refuse-without-work-mutation-and-read-recovers
+PASS all-six-http-writers-remain-responsive-and-stop-revokes-consent
+PASS server-shutdown-releases-lease-and-granted-worker-survives
+{"state": "RUN", "case": "reopened", "phase": "waiting-bound"}
+PASS reopen-preserves-revocation-and-no-duplicate-agent
+PASS independent-worker-completes-after-server-without-fake-acceptance
+{"state": "RUN", "case": "identity-witness", "phase": "waiting-bound"}
+PASS foreign-datastore-stops-coordinator-and-preserves-original
+{"state": "RUN", "case": "identity-recovered", "phase": "waiting-bound"}
+PASS restored-original-reopens-with-retained-completion-and-revocation
+WEB_WORKER_JOURNEY_PASS
+{"state": "RUN", "case": "held-planner", "phase": "waiting-bound"}
+PASS web-owned-held-planner-shutdown-retains-actual-TERM-failed-receipt
+NATIVE_WEB_CONDUCTOR_PASS
+REPLAY_EVIDENCE /home/fpizzi/Documents/ChatGPT/swarm/.cache/native-http-mission-sftzftk6

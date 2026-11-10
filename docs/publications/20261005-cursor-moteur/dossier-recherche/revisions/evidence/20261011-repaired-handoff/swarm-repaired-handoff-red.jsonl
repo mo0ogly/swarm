@@ -1,0 +1,9 @@
+{"Time":"2026-10-11T09:56:28.841560231+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-11T09:56:28.86642664+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair"}
+{"Time":"2026-10-11T09:56:28.866461816+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair","Output":"=== RUN   TestManagedRecoveryHandoffAfterExternalRepair\n"}
+{"Time":"2026-10-11T09:56:29.978538627+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair","Output":"    managed_recovery_repaired_handoff_test.go:63: repaired-result handoff refused false reprise : résultat Git absent ou attribution modifiée\n"}
+{"Time":"2026-10-11T09:56:29.985561606+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair","Output":"--- FAIL: TestManagedRecoveryHandoffAfterExternalRepair (1.12s)\n"}
+{"Time":"2026-10-11T09:56:29.985680039+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestManagedRecoveryHandoffAfterExternalRepair","Elapsed":1.12}
+{"Time":"2026-10-11T09:56:29.986090283+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-11T09:56:29.994328574+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t1.152s\n"}
+{"Time":"2026-10-11T09:56:29.994372337+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":1.153}

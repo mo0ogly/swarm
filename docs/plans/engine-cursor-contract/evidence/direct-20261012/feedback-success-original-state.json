@@ -1,0 +1,36 @@
+{
+  "work": "w-e8e6c635f401f6b4e951587f",
+  "revision": 5,
+  "instructions": [
+    {
+      "id": "future",
+      "status": "todo",
+      "attempts": [],
+      "next": "Original instruction",
+      "additions": [
+        {
+          "id": "instruction-0ef2128c008308dbd5db2b3e",
+          "addition": "Keep <source> and verify the actual received context before retry.",
+          "reason": "Feedback indicates missing receipt verification",
+          "scope": "root",
+          "holder": "fixture-supervisor",
+          "generation": 1,
+          "input_events": [
+            "666e3d07-6554-4e15-8359-59079274e520"
+          ],
+          "decision": "18697b6c-4b4e-488c-b99b-c088a548c940",
+          "at": "2026-10-12T20:27:45.869244216Z",
+          "state": "rejected",
+          "attempts_at_creation": 0,
+          "before_sha256": "272e32db06894c62131f9b01d6be2cf5c851be2780c6da6d4b4b4654857714e5",
+          "after_sha256": "335a255fcb0d339095e5f56a4e7e524444bc8a8cc58f01fe7c2df19d25adefb4",
+          "rejected_at": "2026-10-12T20:27:47.508365677Z",
+          "rejected_reason": "Ajout rejeté par l’utilisateur depuis le pilotage."
+        }
+      ]
+    }
+  ],
+  "feedback": [],
+  "errors": [],
+  "failed": []
+}

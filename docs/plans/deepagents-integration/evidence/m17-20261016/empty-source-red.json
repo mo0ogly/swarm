@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "tests/test_memory_summarization.py",
+    "-k",
+    "empty_tool"
+  ],
+  "started_at_utc": "2026-10-16T19:30:32.701924+00:00",
+  "duration_seconds": 0.142,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "test_empty_tool_messages_are_valid_source_records"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "c26c8c5e1db2d37d65bf907fc2ea357167ed5aa89f51f911f867970eb0d4f2e5",
+  "model_calls": 0
+}

@@ -1,0 +1,62 @@
+{
+  "at_utc": "2026-10-14T22:27:38.711277+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-current",
+  "binary_sha256": "41ac4bda64e205e71f158ced5186498f889c330e74576074fa3daac5485d10fe",
+  "default_binary_sha256": "81dc165a8234cddb46918359c4cf33bfac3271b83698658914e29a839ad39ef1",
+  "source_sha256": {
+    "internal/engine/agents_store.go": "b03c4c780417213b569b885a83c1486ddda72029d0bdd6614fe0d4956559533b",
+    "internal/engine/attempt_diagnostic.go": "a81ab0cf1d190a472c0672ac8f7bd42cf94c6e68c4b6e7dc8268fb90d7c00316",
+    "internal/engine/automatic_validation.go": "27000902d4d3893a0c1d204f3549af930566fc4a506b34b4c3d107167f2ba05a",
+    "internal/engine/corrective_recovery.go": "032a71d86ebb2d1fc40ef4b3cbdaa68e01feb6362d8de44368578cbb20049696",
+    "internal/engine/execution_replan_test.go": "a13bdd67a15f8da1f560c1d8c205918353389442aa941f7a8bb2e4f91a1920aa",
+    "internal/engine/infrastructure_supervision_test.go": "1f6bbd72a46a31479925fc82a60750756d27319fefe4f48039b89607949a9761",
+    "internal/engine/interruption_record_test.go": "1d26114d75c84f4f77de98fbc491ac9c78c34fc04b374e9b2a4dc3b8e1f01b0f",
+    "internal/engine/loop_guard.go": "86e719adcbeda313b2d1912370347d03574e4a70acd7cc6911bd67cf5c132ac6",
+    "internal/engine/loop_guard_test.go": "287a7bfeb8e655f3c8268b63d44b6d02d677ce42244f1b6226469211a4f6ed26",
+    "internal/engine/managed_delivery_contract.go": "9023530a342d4bf15277cc0ef2fafacdb6f0a041d6d36bcb140f740a3917efa4",
+    "internal/engine/managed_delivery_ready_test.go": "c5c2d921b4205f595d415968a96164f73c18a89eba84ab3155205e0d722acc8c",
+    "internal/engine/managed_git.go": "459dbf3f3bcab25753dd957dc5a0f1b760e755ae1c9d9bca07c1a091bf114ad8",
+    "internal/engine/managed_interrupted_recovery.go": "47818b50fdd2411c5b764931e9ef6758233757baf79dfbccabf1cdfa604eb791",
+    "internal/engine/managed_interrupted_recovery_test.go": "76993cab530a1367e770a8ea2bdc46523fc7cc36bc79fa6b1a25440c9f52ea0b",
+    "internal/engine/managed_recovery_handoff.go": "9b2871e5622fa65ae2b5701e8abc56668653fc3a9790bccf1d999951ee751da6",
+    "internal/engine/planning.go": "820c802cb94aefd460cae03de307bc3e3af9e2bcb97ccac4cbd90ff95cd6aea9",
+    "internal/engine/preflight.go": "f514435ab9c8227834ac4ac038d3adc9927af02111c2e517f5dfa0cba3ba0cba",
+    "internal/engine/prephase_contract.go": "07cd35ad5d554cfc501c627ab4159a0156d5bf6b8a3721bd2a4818055afddbf5",
+    "internal/engine/prephase_conversion.go": "2129488a6c22418cd404dc21042305b255c9b5821062885f0b534c0290040112",
+    "internal/engine/prephase_conversion_test.go": "a1320824b880d5b0ec75acaddfb3a63ad664b7ac59c1a56d0ac704ebd5848b16",
+    "internal/engine/prephase_organization.go": "ae6bdb7ee1faa2da05ef294337f3b6df66f75498d89454031a40fede6e77672a",
+    "internal/engine/prephase_organization_test.go": "2bc7d936ac0ff0b44f5d051147726192887b6e8b4d9a773b9938bc950c9a9020",
+    "internal/engine/prephase_repository.go": "e386c133b695a2f4e4aa7fd727748e296bb66f51b0c1fa1cb5fee7d2984057b7",
+    "internal/engine/prephase_store.go": "dd8bc57857bbc691c53b3753c350f2cc998192953cf51a5358ee18ea41da2e6d",
+    "internal/engine/recovered_result.go": "979825c4fb555065cbbdd0e85398a94a21adb0e0ce87683e62b19dc916abe573",
+    "internal/engine/recovered_result_evidence_test.go": "e7e11c8c308678cd2f383ee019040d92020f7c08a8303a80345753bc31d8f119",
+    "internal/engine/run_limits.go": "6bb48452ed56abe5984c4759ca2105aaf2b15098eaa2511a5de8c8a88daf9157",
+    "internal/engine/run_supervision.go": "c4b53f49951102f8fe9778ac3b8b8a8f1868ef63ba38b601bd8e07343b84c01f",
+    "locales/en.json": "de5c25dd4937c060046d57fce219cc2ee5efbb844c677a4cd04d34a06cfb3a5c",
+    "web/i18n-en.js": "3ffc442a0b9758cc68d97895b7643366405cec899fc6f273fde5ed002f8a052b"
+  },
+  "overlay": null,
+  "initial_existing_sources": {
+    "internal/engine/planning.go": "820c802cb94aefd460cae03de307bc3e3af9e2bcb97ccac4cbd90ff95cd6aea9",
+    "internal/engine/recovered_result.go": "979825c4fb555065cbbdd0e85398a94a21adb0e0ce87683e62b19dc916abe573",
+    "internal/engine/recovered_result_evidence_test.go": "59edc706e4b666b12758302a67c2d3b438eec81f960face35f933b5cd2aec34d"
+  },
+  "test_fixture_amendment": "Required delivery manifest added; original preserved in original-recovered-result-evidence-test.go",
+  "checks": {
+    "control-observation-after.out": "0fb0125b26e86b777be693dd9fcdc8d781776e5b6de2990c9ac1888b057a5a06",
+    "unknown-repair-corrected-fixture.out": "2012901dbee25e43ebe75c0427bed3062cad1975da855b38fdc29727fdda3d92",
+    "full-source-vet-final.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "full-source-methods.out": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+    "current-source-build.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "current-local-install.out": "072e88582c2ba7d99d96240374b66515a5c4eb288e1fd057a2ade860f30be27c"
+  },
+  "prior_general_checks": "62 top-level cases and 67 subcases, execution-replan-race-final.out; new changed contracts and dependencies verified by targeted full-source runs; original failure logs retained",
+  "native_effect": {
+    "review": "review-18d40d0f807c447c34a3ff50",
+    "original_output_bytes": 13349,
+    "truncated": false,
+    "previous_review": "review-97ee81b76a1096d0e7b7525e",
+    "review_outcome_pending": true
+  }
+}

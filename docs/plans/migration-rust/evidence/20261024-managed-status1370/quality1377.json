@@ -1,0 +1,42 @@
+[
+  {
+    "name": "clippy1377",
+    "argv": [
+      "cargo",
+      "clippy",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--offline",
+      "--locked",
+      "-p",
+      "swarm-engine",
+      "-p",
+      "swarm-cli",
+      "-p",
+      "swarm-web",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "doc1377",
+    "argv": [
+      "cargo",
+      "doc",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--offline",
+      "--locked",
+      "-p",
+      "swarm-engine",
+      "-p",
+      "swarm-cli",
+      "-p",
+      "swarm-web",
+      "--no-deps"
+    ],
+    "exit": 0
+  }
+]

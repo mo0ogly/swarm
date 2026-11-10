@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "preparation_id": "prep-f846d64d9d9caa8a04737dee",
+  "event_id": "over-budget",
+  "expected_revision": 3,
+  "provider": "api-local",
+  "capability_hash": "4f64daa963d34e7a370f08b8978223c9686f6c0edb09cebe7933119a47642742",
+  "message": "Propose a brief",
+  "context_mode": "full"
+}

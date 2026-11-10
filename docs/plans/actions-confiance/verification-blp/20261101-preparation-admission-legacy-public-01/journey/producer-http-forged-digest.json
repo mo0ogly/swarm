@@ -1,0 +1,10 @@
+{
+  "status": 400,
+  "body": {
+    "error": "format",
+    "failure": {
+      "code": "format"
+    },
+    "schema_version": 1
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "observations": [
+    {
+      "transcript_state": "unavailable",
+      "transcript_reason": "receipt-absent",
+      "typed_event_count": null,
+      "work_id": "w-a77d9f4799712a6c6d96c662",
+      "agent_id_sha256": "fedccbebf4504876a4ad0f7158d9eaa20f99d2f545591de33b134417546340ef",
+      "rows": 34,
+      "CLI_HTTP_equal": true,
+      "messages_retained": false
+    },
+    {
+      "transcript_state": "unavailable",
+      "transcript_reason": "receipt-absent",
+      "typed_event_count": null,
+      "work_id": "w-68b50cc82ec3fe55624f9549",
+      "agent_id_sha256": "ab011d71c3256842d32c6446d2802874f55c53ebba52f35e589938bd411693fb",
+      "rows": 200,
+      "CLI_HTTP_equal": true,
+      "messages_retained": false
+    }
+  ],
+  "provider_execution": false,
+  "live_mutations": false
+}

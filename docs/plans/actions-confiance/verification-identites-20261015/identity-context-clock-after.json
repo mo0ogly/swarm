@@ -1,0 +1,12 @@
+{
+  "fixture_root": "/tmp/swarm-identity-clock-dk7n28jl",
+  "fixture_kind": "synthetic isolated session; not an issuer authentication proof",
+  "binary_sha256": "8e05fbd6c6d611c317ce0225bf514c86bc478f026603f106227be17da7876e46",
+  "operation": "CLI identity-context",
+  "blocked_wchan": "locks_lock_inode_wait",
+  "exit_code": 4,
+  "expired_before_unlock": true,
+  "returned_context": false,
+  "state_unchanged": true,
+  "at": "2026-10-15T19:24:40.226848+00:00"
+}

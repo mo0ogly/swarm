@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-11T21:34:34.980514+00:00",
+  "candidate_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+  "paths_transferred": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "internal/engine/agent_workflow.go",
+    "internal/engine/independent_review_runtime.go",
+    "internal/engine/managed_review.go",
+    "internal/engine/managed_review_fragment_contract_evidence_test.go",
+    "internal/engine/managed_review_fragment_decision.go",
+    "internal/engine/managed_review_fragment_questions.go",
+    "tools/agent-workflows/templates/HANDOFF.md",
+    "tools/agent-workflows/templates/TRACKING.md",
+    "tools/verification/refresh_engine_source_manifest.py",
+    "docs/engine-cursor-source-manifest.json",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-002.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json"
+  ],
+  "source_inputs_verified": 1208,
+  "preimages_verified": true,
+  "backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-primary-preimages",
+  "operator_patch": "typed-original-evidence-recovery-20261011.patch",
+  "patch_sha256": "1d3d035c49ebd9185e77d41c775b34352540e9fa93b98d46ce8fe24fb1389afa",
+  "runtime": "22 unchanged; installation pending"
+}

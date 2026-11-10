@@ -1,0 +1,23 @@
+{
+  "exit_code": 0,
+  "runs": 231,
+  "passes": 231,
+  "top_level": 71,
+  "plan_named_passes": 31,
+  "fails": [],
+  "skips": [],
+  "changed_inputs": [],
+  "stderr": "",
+  "errors": [
+    "agent_identity_runtime_linux_test.go:444: message_pid=3849827 permission=true actor=instance-child error=<nil>",
+    "agent_identity_runtime_linux_test.go:463: message_pid=3849827 permission=false actor= error=identit\u00e9 ou autorit\u00e9 d'agent absente, incompatible ou p\u00e9rim\u00e9e",
+    "agent_identity_runtime_linux_test.go:474: message_pid=3849831 permission=false actor= error=identit\u00e9 ou autorit\u00e9 d'agent absente, incompatible ou p\u00e9rim\u00e9e",
+    "agent_identity_runtime_linux_test.go:488: message_pid=3849831 permission=false actor= error=identit\u00e9 ou autorit\u00e9 d'agent absente, incompatible ou p\u00e9rim\u00e9e",
+    "project_memory_storage_plan_test.go:199: matched pair adds 1769 bytes of memory and attribution",
+    "project_memory_storage_plan_test.go:199: matched pair adds 1769 bytes of memory and attribution",
+    "project_memory_storage_plan_test.go:199: matched pair adds 1769 bytes of memory and attribution",
+    "project_memory_storage_plan_test.go:199: matched pair adds 1769 bytes of memory and attribution",
+    "project_memory_storage_plan_test.go:199: matched pair adds 1769 bytes of memory and attribution",
+    "project_memory_storage_plan_test.go:199: matched pair adds 1769 bytes of memory and attribution"
+  ]
+}

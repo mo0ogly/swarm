@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T18:14:06.355308+00:00",
+  "parent": "review-missing-result-diagnostic-20261011.patch",
+  "parent_tree": "1ad5ba979b668619d35a036b8fd90c6970da27f5",
+  "preimage_tree": "1ad5ba979b668619d35a036b8fd90c6970da27f5",
+  "preimage_extensions": [],
+  "preimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "a897360d9086b60e6ecd03128fd13c4a4d7657ac9690e2d6ad372bc154830797",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "5c25bf18ee4481330cfe678fb08dd85b7bde186a109cd48cb1dabbc7c490c44c",
+    "internal/engine/managed_review_fragment_feedback.go": "336c258ee22ebfa16d3252b82cf073e3e77df12398ad3daf9d76ed4bda9129e6",
+    "internal/engine/managed_review_fragment_resume.go": "c36cfd8856359391b45c8386e34616dbce74fafd44af235c9cb4cdef63b1752e",
+    "internal/engine/managed_review_local_negative_resume_test.go": null,
+    "internal/engine/managed_review_recovery.go": "14822c05917bdf841eb92ab6a48e92324ff15bb84db2940be2ea23a5b3851807",
+    "tools/verification/refresh_engine_source_manifest.py": "6e8edaf357ee1c1dd4e1bbdab59b12735089f8882154c23919b98accc89acf7d"
+  },
+  "postimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "de198c974fd936693d6acb940bea32478fa1a92a6a1a6ee6cdbb5b34c5b6505f",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "accbb321e5dcaecb3fd9a52a4707fbfb82782df9e704fcab744249226e695e37",
+    "internal/engine/managed_review_fragment_feedback.go": "2a8d3c6f618cb10aadb8f85845543308d389b3d0ae9112b577dec26c4b7b6c09",
+    "internal/engine/managed_review_fragment_resume.go": "02d8fcf814396e45738d91f4688a27b08feec91b29917585554dc10d65d83524",
+    "internal/engine/managed_review_local_negative_resume_test.go": "fa015a97b0ca9d00c6ba585e9709da517f89dd220d021542c0317cc322c778b7",
+    "internal/engine/managed_review_recovery.go": "8535c66b0227e28dab29c656bd197d8019a7181f65316b3137050c3b98bf0aa9",
+    "tools/verification/refresh_engine_source_manifest.py": "0d55e36e5bc4bc4611e9b18f44609c175ec41b5bc1ce1b6c74c3897f26b685f6"
+  },
+  "result_tree": "1ed4f832c7f00f5adb72ea1690dac7085c048447",
+  "patch": "review-local-negative-recovery-20261011.patch",
+  "patch_sha256": "0d08025643e6c84489fd9d073677b997cf4bfa470d4b2c584e7d6ebd8401cbf5",
+  "paths": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "internal/engine/managed_review_fragment_feedback.go",
+    "internal/engine/managed_review_fragment_resume.go",
+    "internal/engine/managed_review_local_negative_resume_test.go",
+    "internal/engine/managed_review_recovery.go",
+    "tools/verification/refresh_engine_source_manifest.py"
+  ],
+  "check": "PASS exact preimages, isolated apply--check/apply and result tree",
+  "purpose": "Same-candidate local-negative/transport retry preserves original opinion and consumed reservations through independent final verdict; accurate inspected+n feedback; FR review doc included in source snapshot. Full qualification19v2 pending after actual temporary-storage correction, original failures retained.",
+  "qualification": {
+    "cumulative_source_digest": "afc079ad08db70a1c0f18a0e53e6a3081054ecd55e432d0dab965c6099d85690",
+    "full_receipt": "/tmp/swarm-local-negative-recovery-qualified-v2-full-receipt.json",
+    "full_exit": 0,
+    "full_seconds": 495.57582037799875,
+    "source_drift": [],
+    "targeted": "/tmp/swarm-local-negative-recovery-qualified-v2-targeted.out",
+    "race": "/tmp/swarm-local-negative-recovery-qualified-v2-race.out",
+    "limits": "Cumulative17+18+18b+19 qualified.18 initial nil-review panic and19 initial temporary-storage guard failures remain original evidence; native supervisor delivery/effect and T3..RETEX still pending. No independent native acceptance inferred."
+  }
+}

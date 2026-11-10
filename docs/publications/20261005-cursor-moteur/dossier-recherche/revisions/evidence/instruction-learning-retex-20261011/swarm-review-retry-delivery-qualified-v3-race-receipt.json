@@ -1,0 +1,22 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "TestPlanningReviewRetry|TestReviewRetryDirective|TestFragmentRetryFeedback|TestManagedFragmentStore|TestManagedFragmentFinalOrphanReservationResume|TestManagedFragmentInspectionOrphanResume",
+    "-count=1",
+    "-timeout=150s"
+  ],
+  "start": "2026-10-11T16:55:48.911015+00:00",
+  "end": "2026-10-11T16:57:22.519412+00:00",
+  "seconds": 93.60841804299707,
+  "exit": 0,
+  "output": "/tmp/swarm-review-retry-delivery-qualified-v3-race.out",
+  "output_sha256": "5f892eb389b3ea68db6904192d7219b7f6f361f972403999b3864d53035f0520",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "event_id": "future-T6-planning-control-coverage-20261011",
+  "expected_revision": 340,
+  "task_id": "plan-ca937edf4e-T6",
+  "intent": "replace",
+  "policy": {
+    "mode": "automatic",
+    "controls": [
+      {
+        "review_output": true,
+        "id": "plan-entry",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T6"
+        ],
+        "criteria": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+        "timeout_seconds": 20
+      },
+      {
+        "review_output": true,
+        "id": "plan-validation",
+        "command": [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestPreparedOrganizationManagedRepository|TestPlanning|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestCursorEngineT6",
+          "-count=1",
+          "-timeout=150s"
+        ],
+        "criteria": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "justification": "Exécute tous les tests de planification et Judge, régressions de copies/reprise et nouveaux tests du lot nommés TestCursorEngineT6. Le même candidat doit fournir les preuves comportementales et passer la revue indépendante.",
+        "timeout_seconds": 180
+      },
+      {
+        "review_output": true,
+        "id": "plan-delivery",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T6"
+        ],
+        "criteria": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+        "timeout_seconds": 20
+      },
+      {
+        "review_output": true,
+        "id": "plan-criterion-1",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T6"
+        ],
+        "criteria": [
+          1
+        ],
+        "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+        "timeout_seconds": 20
+      },
+      {
+        "review_output": true,
+        "id": "plan-criterion-2",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T6"
+        ],
+        "criteria": [
+          2
+        ],
+        "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+        "timeout_seconds": 20
+      },
+      {
+        "review_output": true,
+        "id": "plan-criterion-3",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T6"
+        ],
+        "criteria": [
+          3
+        ],
+        "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+        "timeout_seconds": 20
+      },
+      {
+        "review_output": true,
+        "id": "plan-criterion-4",
+        "command": [
+          "python3",
+          "docs/plans/engine-cursor-contract/check-evolution-docs.py",
+          "T6"
+        ],
+        "criteria": [
+          4
+        ],
+        "justification": "Contrôle mécanique de traçabilité et documentation, ou régression du lancement/reprise ; la couverture comportementale et sémantique du critère exige les preuves du lot et la revue indépendante du même candidat.",
+        "timeout_seconds": 20
+      }
+    ]
+  },
+  "preview_token": "885a07e7505bd8182a617c18a2e1a18a6a3495d4cf3572a8274f8ae880157a76"
+}

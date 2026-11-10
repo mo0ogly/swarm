@@ -1,0 +1,3705 @@
+
+FILE rust/crates/swarm-engine/src/root_store/mission_status_reports.rs SHA256 ce07821f8ddeeb462bcdfbd041d100911ea8f3f5b7d33c36e2f992758ed97501
+//! Real active/terminal report discovery and Go fallback diagnostics. No
+//! provider/process/SQL writes or acceptance. Reports are filenames for inspection,
+//! never evidence of completion. No Go5000-entry silent search cutoff is copied.
+use super::{finished, RootStoreError as E};
+use crate::{Agent, AttemptDiagnostic, DiagnosticItem};
+use rustix::fs::{self, AtFlags, FileType, Mode, OFlags};
+use std::{
+    error::Error,
+    fs::File,
+    os::{fd::IntoRawFd, unix::fs::MetadataExt},
+    path::Path,
+};
+
+/// Preserve the original typed IO/encoding cause behind the safe existing error.
+fn cause(code: &'static str, cause: impl Error + Send + Sync + 'static) -> E {
+    E::Mutation(crate::WorkEngineError::Mission(Box::new(
+        crate::MissionSupervisionError::Cause {
+            code,
+            cause: Box::new(cause),
+        },
+    )))
+}
+/// Close the owned directory explicitly, preserving primary and close causes.
+fn close<T>(result: Result<T, E>, file: File) -> Result<T, E> {
+    finished(
+        result,
+        nix::unistd::close(file.into_raw_fd())
+            .map_err(|e| cause("mission-status-reports-close", e)),
+    )
+}
+/// Require an actual opened directory, allowing every OS-readable owner/mode.
+/// Project-private datastore ownership remains the outer Root guard's contract.
+fn directory(file: &File) -> Result<std::fs::Metadata, E> {
+    let metadata = file
+        .metadata()
+        .map_err(|e| cause("mission-status-reports-metadata", e))?;
+    if !metadata.is_dir() {
+        return Err(E::Refused("mission-status-reports-not-directory"));
+    }
+    Ok(metadata)
+}
+/// Walk descriptor-anchored directories without following directory symlinks.
+/// Selected file symlinks use the shared contained regular-artifact reader, so
+/// an OS-readable regular target inside Root is accepted regardless of owner.
+/// All selected filenames/entry-mtimes are retained as Go DirEntry.Info does
+/// (lstat for a symlink). Target metadata establishes regular containment only;
+/// no contents are read or trusted and content-read permission is unnecessary.
+/// Directory device/inode/mtime/ctime checks detect observed traversal changes;
+/// they are sequential observations, not an atomic snapshot or ABA protection.
+fn walk(
+    root: &Path,
+    file: &File,
+    prefix: &str,
+    task: &str,
+    found: &mut Vec<(String, i128)>,
+) -> Result<(), E> {
+    let before = directory(file)?;
+    let mut buffer = vec![
+        std::mem::MaybeUninit::<u8>::uninit();
+        usize::from(u16::MAX) + 1 + std::mem::align_of::<u64>()
+    ];
+    let mut reader = fs::RawDir::new(file, &mut buffer);
+    while let Some(entry) = reader.next() {
+        let entry = entry.map_err(|e| cause("mission-status-reports-read", e))?;
+        let raw = entry.file_name().to_bytes();
+        if matches!(raw, b"." | b"..") {
+            continue;
+        }
+        let name = std::str::from_utf8(raw).map_err(|e| cause("mission-status-reports-name", e))?;
+        let selected = name == format!("{task}.md")
+            || (name.starts_with(&format!("{task}-"))
+                && name.contains("handoff")
+                && name.ends_with(".md"));
+        let stat = fs::statat(file, entry.file_name(), AtFlags::SYMLINK_NOFOLLOW)
+            .map_err(|e| cause("mission-status-reports-stat", e))?;
+        let kind = FileType::from_raw_mode(stat.st_mode);
+        let path = format!("{prefix}/{name}");
+        if kind == FileType::Directory {
+            let child: File = fs::openat(
+                file,
+                entry.file_name(),
+                OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+                Mode::empty(),
+            )
+            .map_err(|e| cause("mission-status-reports-open-directory", e))?
+            .into();
+            let result = (|| {
+                let actual = directory(&child)?;
+                if actual.dev() != stat.st_dev || actual.ino() != stat.st_ino {
+                    return Err(E::Refused("mission-status-reports-directory-changed"));
+                }
+                walk(root, &child, &path, task, found)?;
+                let after = fs::statat(file, entry.file_name(), AtFlags::SYMLINK_NOFOLLOW)
+                    .map_err(|e| cause("mission-status-reports-restat", e))?;
+                if stat.st_dev != after.st_dev || stat.st_ino != after.st_ino {
+                    return Err(E::Refused("mission-status-reports-directory-changed"));
+                }
+                Ok(())
+            })();
+            close(result, child)?;
+        } else if selected {
+            let (_, metadata) = crate::gate_evaluation::artifact_metadata(root, &path)
+                .map_err(|cause| E::Gate(crate::GateContractError::Evaluation(cause)))?;
+            let after = fs::statat(file, entry.file_name(), AtFlags::SYMLINK_NOFOLLOW)
+                .map_err(|e| cause("mission-status-reports-restat", e))?;
+            if (
+                stat.st_dev,
+                stat.st_ino,
+                stat.st_mode,
+                stat.st_mtime,
+                stat.st_mtime_nsec,
+                stat.st_ctime,
+                stat.st_ctime_nsec,
+            ) != (
+                after.st_dev,
+                after.st_ino,
+                after.st_mode,
+                after.st_mtime,
+                after.st_mtime_nsec,
+                after.st_ctime,
+                after.st_ctime_nsec,
+            ) {
+                return Err(E::Refused("mission-status-reports-file-changed"));
+            }
+            // A regular source path and its checked target must name the same
+            // inode. For a symlink, local_file supplies the containment check.
+            if kind == FileType::RegularFile
+                && (metadata.dev() != stat.st_dev || metadata.ino() != stat.st_ino)
+            {
+                return Err(E::Refused("mission-status-reports-file-changed"));
+            }
+            found.push((
+                path,
+                i128::from(stat.st_mtime) * 1_000_000_000 + i128::from(stat.st_mtime_nsec),
+            ));
+        }
+    }
+    let after = directory(file)?;
+    let signature = |m: &std::fs::Metadata| {
+        (
+            m.dev(),
+            m.ino(),
+            m.mtime(),
+            m.mtime_nsec(),
+            m.ctime(),
+            m.ctime_nsec(),
+        )
+    };
+    if signature(&before) != signature(&after) {
+        return Err(E::Refused("mission-status-reports-directory-changed"));
+    }
+    Ok(())
+}
+/// Observe actual docs reports, newest mtime first with lexical tie order. ENOENT
+/// for docs alone proves an empty listing. Contained regular file symlinks are
+/// included; directory symlinks are never traversed. Directory/file owners need
+/// not match the process. Permission, outside-Root/nonregular targets, child
+/// races, IO and explicit close failures preserve their causes and refuse.
+/// No directory is created and no report content or attribution is inferred.
+pub(super) fn task_reports(root: &Path, task: &str) -> Result<Vec<String>, E> {
+    if !swarm_identity_contract::name(task.as_bytes()) {
+        return Err(E::Refused("mission-status-report-task-invalid"));
+    }
+    let path = root.join("docs");
+    let file: File = match fs::open(
+        &path,
+        OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+        Mode::empty(),
+    ) {
+        Ok(fd) => fd.into(),
+        Err(rustix::io::Errno::NOENT) => return Ok(Vec::new()),
+        Err(e) => return Err(cause("mission-status-reports-open", e)),
+    };
+    let result = (|| {
+        let before = directory(&file)?;
+        let mut found = Vec::new();
+        walk(root, &file, "docs", task, &mut found)?;
+        let current = std::fs::symlink_metadata(&path)
+            .map_err(|e| cause("mission-status-reports-path", e))?;
+        if !current.is_dir() || before.dev() != current.dev() || before.ino() != current.ino() {
+            return Err(E::Refused("mission-status-reports-directory-changed"));
+        }
+        found.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+        Ok(found.into_iter().map(|(path, _)| path).collect())
+    })();
+    close(result, file)
+}
+/// Go operationText masking and terminal-cell clipping for fallback traces.
+/// Sanitization and sensitivity masking precede the Go-compatible 600-cell
+/// representation bound. Whole clusters are preserved; checked width overflow
+/// retains its typed cause. Pure presentation, no execution/permission policy.
+fn trace(reason: &str) -> Result<String, E> {
+    let text = crate::agent_terminal_text::terminal_text(reason);
+    let lower = text.to_lowercase();
+    if [
+        "password",
+        "passwd",
+        "secret",
+        "token",
+        "api_key",
+        "api-key",
+        "authorization",
+        "private key",
+    ]
+    .iter()
+    .any(|m| lower.contains(m))
+    {
+        return Ok("[détail masqué : donnée potentiellement sensible]".into());
+    }
+    crate::terminal_clip::clip(&text, 600)
+        .map_err(|error| cause("mission-status-diagnostic-width", error))
+}
+/// Go failureCategory over the actual retained terminal cause, never task prose.
+fn category(reason: &str) -> &'static str {
+    let text = reason.to_lowercase();
+    if [
+        "permission denied",
+        "operation not permitted",
+        "read-only file system",
+        "sandbox denied",
+        "sandbox violation",
+        "mount failed",
+        "bwrap: can't bind mount",
+        "unable to apply mount flags",
+        "mount: permission denied",
+        "cifs error",
+        "socket: operation not permitted",
+        "network is unreachable",
+    ]
+    .iter()
+    .any(|m| text.contains(m))
+    {
+        "environment"
+    } else if [
+        "go test",
+        "pytest",
+        "unittest",
+        "npm test",
+        "node --test",
+        "diff --check",
+        "lint",
+        "check_",
+        "check-",
+        "validation",
+    ]
+    .iter()
+    .any(|m| text.contains(m))
+    {
+        "check"
+    } else if [
+        "not configured",
+        "non configur",
+        "configuration",
+        "executable",
+        "exécutable",
+        "command not found",
+        "no such file or directory",
+    ]
+    .iter()
+    .any(|m| text.contains(m))
+    {
+        "configuration"
+    } else {
+        "unknown"
+    }
+}
+/// Construct the single real fallback item (no structured tool failure supplied).
+/// The text/category is the Go template, not a new execution policy or diagnosis.
+fn item(category: &str, reason: &str, trace: String) -> DiagnosticItem {
+    let (label,cause,consequence,action,kind)=match category {
+        "configuration"=>("Configuration","La configuration nécessaire au lancement ou à l’outil est absente, invalide ou indisponible.","L’étape concernée n’a pas pu démarrer ou s’exécuter ; son résultat n’est pas démontré.","Corriger la configuration indiquée, vérifier qu’elle est relue, puis demander explicitement une nouvelle tentative.","correct_configuration"),
+        "environment"=>("Environnement d’exécution","Les traces signalent un refus d’accès ou une ressource indisponible dans l’environnement.","La tentative ne peut pas prouver le résultat dans cet environnement ; répéter sans changement de précondition risque le même échec.","Faire vérifier les droits et l’accès aux ressources sur la machine qui exécute l’agent ; reprendre après correction vérifiée.","verify_environment"),
+        "check"=>("Contrôle en échec","Un test ou contrôle observable a échoué.","Le critère couvert par ce contrôle reste non validé.","Examiner la trace, corriger la cause, puis rejouer le même contrôle avec les mêmes options avant toute validation.","fix_and_rerun_check"),
+        "limit"=>("Limite atteinte",reason,"Le superviseur a interrompu la tentative ; cette interruption ne valide ni le livrable ni la tâche.","Examiner les erreurs précédentes et les préconditions ; reprendre explicitement sans relever arbitrairement les protections.","review_limit"),
+        _=>("Cause inconnue","La cause exacte n’est pas disponible dans les événements structurés de cette tentative.","Le résultat de la tentative reste indéterminé ; aucune reprise automatique sûre ne peut être déduite.","Ouvrir les traces conservées et établir la cause avant de choisir une reprise.","inspect_traces"),
+    };
+    DiagnosticItem {
+        category: category.into(),
+        label: label.into(),
+        count: 1,
+        cause: cause.into(),
+        consequence: consequence.into(),
+        action: action.into(),
+        action_kind: kind.into(),
+        unknown: category == "unknown",
+        traces: Some(vec![trace]),
+    }
+}
+/// Produce Go fallbackAttemptDiagnostic from actual stored terminal fields.
+/// Existing structured diagnostics take precedence. Explicit operator interruption
+/// produces Go's empty diagnostic value; completed Agents without structured
+/// diagnostics also produce Go's empty value, regardless of activity prose.
+/// Failed/nonoperator-interrupted causes receive the real fallback.
+/// Fallback traces use whole-cluster cell clipping; width overflow retains its cause.
+pub(super) fn terminal_diagnostics(agents: &[Agent]) -> Result<Vec<AttemptDiagnostic>, E> {
+    agents
+        .iter()
+        .map(|agent| {
+            if !matches!(
+                agent.status.as_str(),
+                "failed" | "interrupted" | "completed"
+            ) {
+                return Err(E::Refused("mission-status-agent-classification-unported"));
+            }
+            if agent
+                .diagnostic
+                .items
+                .as_ref()
+                .is_some_and(|v| !v.is_empty())
+                || agent.diagnostic.observed_errors > 0
+            {
+                return Ok(agent.diagnostic.clone());
+            }
+            if agent.status == "completed"
+                || (agent.status == "interrupted" && agent.stop_kind == "operateur")
+            {
+                return Ok(AttemptDiagnostic::default());
+            }
+            let mut reason = crate::text::trim_space(&agent.activity);
+            if reason.is_empty() {
+                reason = "Tentative terminée sans motif technique enregistré";
+            }
+            let lower = reason.to_lowercase();
+            let limited = ["limite", "délai", "budget de temps"]
+                .iter()
+                .any(|m| lower.contains(m));
+            let consecutive = limited && lower.contains("erreurs d'outils consécutives");
+            let category = if limited { "limit" } else { category(reason) };
+            let item = item(category, &format!("{reason}."), trace(reason)?);
+            let cap = agent.limits.max_consecutive_errors;
+            let mut summary = "Aucune erreur d’outil structurée n’a été observée.".to_string();
+            if cap > 0 {
+                summary.push_str(&format!(
+                    " Le plafond configuré est de {cap} erreurs consécutives"
+                ));
+                summary.push_str(if consecutive {
+                    " et il a interrompu la tentative."
+                } else {
+                    " ; ce plafond est distinct du nombre total constaté."
+                });
+            }
+            if limited && !consecutive {
+                summary.push_str(&format!(
+                    " Une autre limite d’exécution a interrompu la tentative : {reason}."
+                ));
+            }
+            Ok(AttemptDiagnostic {
+                agent_id: agent.id.clone(),
+                attempt_id: agent.attempt_id.clone(),
+                observed_errors: 0,
+                consecutive_error_limit: cap,
+                limit_reached: limited,
+                consecutive_error_limit_reached: consecutive,
+                limit_reason: if limited {
+                    reason.into()
+                } else {
+                    String::new()
+                },
+                summary,
+                items: Some(vec![item]),
+            })
+        })
+        .collect()
+}
+/// Go recoveryCategoryFor environment branch and its terminal-limit precedence.
+/// Other recovery categories are irrelevant to the supported stopped result path.
+pub(super) fn environment_recovery(agent: &Agent, diagnostic: &AttemptDiagnostic) -> bool {
+    agent.provider_cooldown.is_none()
+        && !(agent.stop_kind == "garde" && diagnostic.limit_reached)
+        && diagnostic.items.as_ref().is_some_and(|items| {
+            items
+                .iter()
+                .any(|item| matches!(item.category.as_str(), "environment" | "configuration"))
+        })
+}
+
+/// Preserve complete row order while observing active diagnostics without a
+/// terminal fallback. Real structured items/errors are retained; active activity
+/// prose never fabricates a failure. Nonactive rows use the strict terminal
+/// producer, whose unsupported-state errors and original causes propagate.
+pub(super) fn diagnostics(agents: &[Agent]) -> Result<Vec<AttemptDiagnostic>, E> {
+    agents
+        .iter()
+        .map(|agent| {
+            if agent.is_active() {
+                Ok(
+                    if agent
+                        .diagnostic
+                        .items
+                        .as_ref()
+                        .is_some_and(|v| !v.is_empty())
+                        || agent.diagnostic.observed_errors > 0
+                    {
+                        agent.diagnostic.clone()
+                    } else {
+                        AttemptDiagnostic::default()
+                    },
+                )
+            } else {
+                terminal_diagnostics(std::slice::from_ref(agent)).map(|mut values| values.remove(0))
+            }
+        })
+        .collect()
+}
+/// Supported nonmanaged planned lifecycle pairs, never liveness or permission.
+/// Full recorded history must agree with its task; Root separately validates
+/// original rows, organization, supported review shape and current process observations.
+/// No IO, mutation, hidden policy or fallback to success for unknown states.
+fn planned_pair(task: &crate::Task, agent: &Agent) -> bool {
+    task.id == agent.task_id && match task.status.as_str() {
+        "running" => agent.is_active(),
+        "blocked" => matches!(agent.status.as_str(),"failed" | "interrupted") || (agent.status=="completed" && matching_review(task,agent)),
+        "submitted" | "accepted" => agent.status == "completed",
+        _ => false,
+    }
+}
+
+
+/// A non-passed current opinion requires the real review display producer.
+/// Go skips passed opinions before projecting them; skipping proves
+/// neither validity nor acceptance. Actual accepted freshness independently
+/// rechecks current native originals, gate, report and dependency evidence.
+fn review_requires_projection(task: &crate::Task) -> bool {
+    task.independent_review.as_deref().is_some_and(|review| review.state != "passed")
+}
+
+/// Match the actual current attempt/producer for a non-passed opinion. A
+/// matched row is not yet current evidence; the observed producer checks it.
+fn matching_review(task:&crate::Task,agent:&Agent)->bool {
+    task.independent_review.as_deref().is_some_and(|review| super::mission_status_review::applies(true,task.attempts.as_ref().and_then(|v|v.last()).map(|a|a.id.as_str()),&agent.id,&agent.attempt_id,review))
+}
+
+/// Bound the newly wired review branch to nonmanaged planning and a completed
+/// current producer on submitted/blocked task. Earlier reviews/recovery are
+/// still refused separately; this shape check never validates its artifacts.
+fn review_shape(work:&crate::Work,task:&crate::Task,agents:&[Agent])->bool {
+    !review_requires_projection(task) || (work.planning.is_some() && matches!(task.status.as_str(),"submitted"|"blocked") && agents.iter().find(|a|a.task_id==task.id).is_some_and(|a|a.status=="completed" && matching_review(task,a)))
+}
+
+/// Require only branches whose result/readiness producers are implemented here.
+/// Retained profiles are accepted for stopped or completed/submitted results
+/// because Go does not consume dispatch readiness in those branches. All Agent
+/// rows must be terminal or active on an ordinary running task; earlier terminal
+/// rows remain history. Active classification must be observed separately; a
+/// saved running status alone proves no live process.
+/// Submitted results without a recent Agent use retained task/gate facts and
+/// unknown process/no Agent identity. Last retained Task attempt remains visible;
+/// no readiness is consumed or invented.
+/// Abandoned decisions without a matching Agent also bypass readiness; they
+/// remain nonvalidated, retaining the same review/recovery refusals. Accepted
+/// tasks with completed or no selected Agent consume actual gate/freshness facts;
+/// they retain unsupported/prior review and recovery refusals. No acceptance follows from status
+/// or from a terminal process alone. Abandoned
+/// tasks with an Agent and completed results outside submitted/accepted still
+/// refuse. Unstarted profiles require the separate real readiness observation;
+/// review/recovery history on those profiled tasks remains refused. This read
+/// never changes the recorded decision or grants a launch. Current non-passed
+/// review shapes use matching latest attempt/producer and the real review reader.
+/// Ready/waiting planning trees support claimed/renewed leases, empty decisions and
+/// initial todo/abandoned tasks without attempt/review/recovery history after structural
+/// organization validation. Missing review remains non-current, never acceptance. Holder/date pairing and parsed
+/// lease shape are checked, never treated as liveness or launch authority. Saved
+/// counters at their cap remain readable. Submitted nonmanaged tasks may retain
+/// completed Agents and their actual attempts, with no prior review/recovery history.
+/// Final passed opinions may fall through; accepted tasks consume the actual
+/// freshness/gate reader and never become validated from an opinion alone.
+/// Running tasks may retain queued/starting/running/stopping Agents; blocked
+/// tasks may retain failed/interrupted Agents. Actual process observation stays
+/// mandatory before a live classification, never inferred from these rows.
+/// Completed but unsubmitted without a current review, recovery/managed execution
+/// and closed scopes still refuse at this port boundary, not a quota. Full Agent history is required;
+/// callers must validate before applying display windows. Root, parent,
+/// ownership and depth invariants come from structural validation, not scope count.
+/// Original validation causes survive; configuration establishes no executed review.
+/// No Agent state, review, recovery or permission is inferred from missing data.
+pub(super) fn supported(work: &crate::Work, agents: &[Agent]) -> Result<(), E> {
+    if agents.iter().any(|a| {
+        a.is_active()
+            && !work
+                .tasks
+                .as_deref()
+                .unwrap_or(&[])
+                .iter()
+                .any(|t| t.id == a.task_id && t.status == "running")
+    }) {
+        return Err(E::Refused("mission-status-active-task-mismatch"));
+    }
+    if let Some(planning) = work.planning.as_deref() {
+        // Only the initial ready/waiting tree lifecycle is assembled. These shape
+        // checks delimit the port, never a new execution policy or saved cap.
+        let scopes = planning.scopes.as_deref().unwrap_or_default();
+        if (planning.repository.is_some() && !agents.is_empty())
+            || agents.iter().any(|agent|
+                !work.tasks.iter().flatten().any(|task| planned_pair(task,agent)))
+            || scopes.iter().any(|scope| !matches!(scope.state.as_str(), "ready" | "waiting"))
+        {
+            return Err(E::Refused("mission-status-planning-unported"));
+        }
+        if work.tasks.iter().flatten().any(|task|
+            !matches!(task.status.as_str(),"todo" | "abandoned" | "submitted" | "accepted" | "running" | "blocked")
+            || (matches!(task.status.as_str(),"submitted" | "accepted" | "running" | "blocked")
+                && !agents.iter().any(|agent| planned_pair(task,agent)))
+            || (!matches!(task.status.as_str(),"submitted" | "accepted" | "running" | "blocked")
+                && task.attempts.as_ref().is_some_and(|v| !v.is_empty()))
+            || !review_shape(work,task,agents)
+            || task.previous_reviews.as_ref().is_some_and(|v| !v.is_empty())
+            || task.corrective_recovery.is_some() || task.planning_retry
+            || task.review_coordination.is_some() || task.batch_review_resume.is_some()
+            || task.recovered_result.is_some())
+        {
+            return Err(E::Refused("mission-status-planning-initial-tasks-unported"));
+        }
+        for scope in scopes {
+            if scope.holder.is_empty() != scope.lease_until.is_empty()
+                || (!scope.holder.is_empty() && !swarm_identity_contract::name(scope.holder.as_bytes()))
+            {
+                return Err(E::Refused("mission-status-planning-lease-shape-invalid"));
+            }
+            if !scope.lease_until.is_empty() {
+                crate::mission_supervision::parse(&scope.lease_until)
+                    .map_err(|error| cause("mission-status-planning-lease-invalid", error))?;
+            }
+        }
+        crate::validate_mission_organization(work).map_err(|cause| {
+            E::Mutation(crate::WorkEngineError::Mission(Box::new(
+                crate::MissionSupervisionError::Cause {
+                    code: "mission-status-organization-invalid", cause: Box::new(cause),
+                },
+            )))
+        })?;
+    }
+    if agents.iter().any(|a| {
+        !matches!(
+            a.status.as_str(),
+            "failed" | "interrupted" | "completed" | "queued" | "starting" | "running" | "stopping"
+        )
+    }) {
+        return Err(E::Refused("mission-status-agent-classification-unported"));
+    }
+    // Older terminal rows remain retained history. The authoritative reader is
+    // latest-first; consuming task/result branches select their first matching
+    // Agent, while every row still receives ownership/shape validation upstream.
+    for task in work.tasks.as_deref().unwrap_or(&[]) {
+        let agent = agents.iter().find(|a| a.task_id == task.id);
+        if agent.is_some() || matches!(task.status.as_str(), "submitted" | "abandoned" | "accepted") {
+            let supported_state = match agent.map(|a| a.status.as_str()) {
+                Some("queued" | "starting" | "running" | "stopping") => task.status == "running",
+                Some("completed") => matches!(task.status.as_str(), "submitted" | "accepted") || (task.status=="blocked" && agent.is_some_and(|a|matching_review(task,a))),
+                Some("failed" | "interrupted") => task.status == "blocked",
+                None => matches!(task.status.as_str(), "submitted" | "abandoned" | "accepted"),
+                _ => false,
+            };
+            if !supported_state
+                || !review_shape(work,task,agents)
+                || task
+                    .previous_reviews
+                    .as_ref()
+                    .is_some_and(|v| !v.is_empty())
+                || task.corrective_recovery.is_some()
+                || task.planning_retry
+                || task.review_coordination.is_some()
+                || task.batch_review_resume.is_some()
+                || task.recovered_result.is_some()
+            {
+                return Err(E::Refused("mission-status-terminal-task-branch-unported"));
+            }
+        } else {
+            if task.status != "todo" || task.attempts.as_ref().is_some_and(|v| !v.is_empty()) {
+                return Err(E::Refused("mission-status-task-history-unported"));
+            }
+            if (task.launch_profile.is_some() || work.launch_profile.is_some())
+                && (!review_shape(work,task,agents)
+                    || task.previous_reviews.as_ref().is_some_and(|v| !v.is_empty())
+                    || task.corrective_recovery.is_some() || task.planning_retry
+                    || task.review_coordination.is_some() || task.batch_review_resume.is_some()
+                    || task.recovered_result.is_some())
+            {
+                return Err(E::Refused("mission-status-profile-task-branch-unported"));
+            }
+        }
+    }
+    Ok(())
+}
+/// Check only projection prerequisites after full-history supported() succeeds.
+/// A display window may hide completed submitted/accepted history, keeping its
+/// identity unknown. Running/blocked states require a displayed matching Agent;
+/// otherwise the existing task-history refusal prevents invented readiness.
+/// No IO, mutation, policy/default or process/launch authority is established.
+/// Full history is still required separately; this cannot replace eligibility.
+pub(super) fn supported_view(work: &crate::Work, agents: &[Agent]) -> Result<(), E> {
+    if work.tasks.iter().flatten().any(|task|
+        !matches!(task.status.as_str(),"todo" | "submitted" | "accepted" | "abandoned")
+        && !agents.iter().any(|agent| agent.task_id == task.id))
+    {
+        return Err(E::Refused("mission-status-task-history-unported"));
+    }
+    Ok(())
+}
+/// Borrow recorded Agent states and real diagnostics in identical row order.
+/// Active rows require the caller to replace observed_state using fresh activity
+/// observations before projection; stored status alone proves no liveness.
+/// Every diagnostic must correspond positionally to its original complete row.
+/// Terminal-limit/provider cooldown precedence follows recoveryCategoryFor.
+pub(super) fn agent_observations<'a>(
+    agents: &'a [Agent],
+    diagnostics: &'a [AttemptDiagnostic],
+) -> Result<Vec<crate::mission_status_tasks::AgentObservation<'a>>, E> {
+    if agents.len() != diagnostics.len() {
+        return Err(E::Refused(
+            "mission-status-diagnostic-observations-mismatch",
+        ));
+    }
+    Ok(agents
+        .iter()
+        .zip(diagnostics)
+        .map(
+            |(agent, diagnostic)| crate::mission_status_tasks::AgentObservation {
+                agent,
+                observed_state: &agent.status,
+                fallback_diagnostic: diagnostic,
+                environment_recovery: environment_recovery(agent, diagnostic),
+            },
+        )
+        .collect())
+}
+/// Observe the real current review before building result facts. Complete Work,
+/// settings and full-history/view eligibility must already be checked by Root.
+/// Semantic causes stay in the supplied sidecar; facts causes are also retained.
+/// No new authority, defaults, launch or mutation follows. Unknown read/close
+/// errors refuse, and caller still verifies its enclosing material snapshot.
+pub(super) fn observed_result_inputs(root:&Path,work:&crate::Work,task:&crate::Task,agent:Option<&Agent>,settings:&crate::EngineSettingsDocument,causes:&mut Vec<E>,mut facts:super::TaskFreshnessEvidence)->Result<crate::mission_status_tasks::ResultObservation,E> {
+    causes.append(&mut facts.causes);
+    let review=match agent {
+        Some(agent) if task.status!="accepted"=>Some(super::mission_status_review::observe(root,work,task,agent,settings,causes)?),
+        Some(_)=>Some(crate::mission_status_tasks::ReviewObservation::NotApplicable),
+        None=>None,
+    };
+    result_inputs_with_review(root,task,agent,facts.freshness,facts.gate,review)
+}
+
+/// Test-only constructor adapter: unsupported non-passed opinions still refuse
+/// without a real producer. Supplied facts establish no actual Root evidence.
+#[cfg(test)]
+pub(super) fn result_inputs(root:&Path,task:&crate::Task,agent:Option<&Agent>,freshness:crate::mission_status_tasks::FreshnessObservation,gate:crate::mission_status_tasks::GateObservation)->Result<crate::mission_status_tasks::ResultObservation,E> {
+    result_inputs_with_review(root,task,agent,freshness,gate,None)
+}
+
+/// Observe only facts consumed by the applicable ordinary terminal result branch.
+/// Accepted results consume the supplied current gate/freshness before any
+/// report/review/readiness projection. This producer never accepts a task.
+/// Active and failed/interrupted results use the real docs walk; early reports
+/// remain unverified. Completed/submitted results
+/// consume the retained submitted report path and do not scan docs or attribute a
+/// fresh report; reports/attribution/incomplete remain explicitly NotObserved.
+/// Callers must run supported() on full history: ordinary Work or the bounded
+/// nonmanaged planned active, failed/interrupted or submitted branches admitted
+/// there. Display-window absence of an Agent cannot establish eligibility;
+/// supported_view() must also establish the selected branch's required facts.
+/// Current review is absent or passed before NotApplicable is supplied, matching
+/// Go’s passed-opinion fallthrough. Previous opinions still refuse; non-passed
+/// opinions require the actual supplied projection.
+/// This is no verdict check. Accepted freshness separately checks native originals;
+/// no IO or permission is inferred from skipping the review presentation.
+fn result_inputs_with_review(
+    root: &Path,
+    task: &crate::Task,
+    agent: Option<&Agent>,
+    freshness: crate::mission_status_tasks::FreshnessObservation,
+    gate: crate::mission_status_tasks::GateObservation,
+    observed_review: Option<crate::mission_status_tasks::ReviewObservation>,
+) -> Result<crate::mission_status_tasks::ResultObservation, E> {
+    use crate::mission_status_tasks::*;
+    if let Some(agent) = agent {
+        if (review_requires_projection(task) && observed_review.is_none())
+            || task
+                .previous_reviews
+                .as_ref()
+                .is_some_and(|rows| !rows.is_empty())
+        {
+            return Err(E::Refused("mission-status-terminal-review-unported"));
+        }
+        if agent.status == "completed" && !matches!(task.status.as_str(), "submitted" | "accepted")
+            && !(task.status=="blocked" && matches!(&observed_review,Some(ReviewObservation::Presented(_)))) {
+            return Err(E::Refused("mission-status-completed-unsubmitted-unported"));
+        }
+    }
+    Ok(ResultObservation {
+        freshness,
+        gate,
+        reports: if agent.is_some_and(|agent| {
+            agent.is_active() || matches!(agent.status.as_str(), "failed" | "interrupted")
+        }) {
+            ReportListing::Observed(task_reports(root, &task.id)?)
+        } else {
+            ReportListing::NotObserved
+        },
+        attribution: ReportAttribution::NotObserved,
+        incomplete_report: IncompleteReport::NotObserved,
+        review: observed_review.unwrap_or_else(|| if agent.is_some() {
+            ReviewObservation::NotApplicable
+        } else {
+            ReviewObservation::NotObserved
+        }),
+    })
+}
+/// Observe selected-provider active cooldowns at the caller's observation time.
+/// Uses the same strict descriptor reader as admission, with provider names sorted
+/// and deduplicated as Go missionProviderCooldowns. Expiry and clearance exclude
+/// a record; absence is an empty observation, never permission to launch. Invalid
+/// records/read/close failures keep their typed launch cause. No writes/provider
+/// execution occur. Repeated reads detect observed changes, not an atomic snapshot.
+pub(super) fn active_cooldowns(
+    root: &Path,
+    work: &crate::Work,
+    at: i64,
+) -> Result<Vec<crate::ProviderCooldown>, E> {
+    let mut names = std::collections::BTreeSet::new();
+    if let Some(planning) = work.planning.as_deref() {
+        if !planning.provider.is_empty() {
+            names.insert(planning.provider.as_str());
+        }
+        if let Some(reviewer) = planning.reviewer.as_deref() {
+            if !reviewer.provider.is_empty() {
+                names.insert(reviewer.provider.as_str());
+            }
+        }
+    }
+    if let Some(profile) = work.launch_profile.as_deref() {
+        if !profile.provider.is_empty() {
+            names.insert(profile.provider.as_str());
+        }
+    }
+    for task in work.tasks.as_deref().unwrap_or(&[]) {
+        if !matches!(task.status.as_str(), "accepted" | "abandoned" | "waived") {
+            if let Some(profile) = task.launch_profile.as_deref() {
+                if !profile.provider.is_empty() {
+                    names.insert(profile.provider.as_str());
+                }
+            }
+        }
+    }
+    let mut active = Vec::new();
+    for name in names {
+        let observed = crate::agent_launch::with_provider_cooldown(root, name, Ok)
+            .map_err(|e| E::Launch(Box::new(e)))?;
+        if let Some(value) = observed {
+            if value.cleared_at.is_empty() && (value.resets_at == 0 || at < value.resets_at) {
+                active.push(value);
+            }
+        }
+    }
+    Ok(active)
+}
+
+#[cfg(all(test, target_os = "linux"))]
+mod tests {
+    /// Accepted observations consume real freshness, never launch readiness.
+    /// Review/recovery history stays refused; terminal process alone grants none.
+    #[test]
+    fn mission_status_accepted_guard_keeps_review_and_recovery_refusals() {
+        let mut work = crate::Work { tasks: Some(vec![crate::Task { id:"task".into(),status:"submitted".into(),..Default::default() }]),..Default::default() };
+        let agent = Agent { task_id:"task".into(),status:"completed".into(),..Default::default() };
+        supported(&work,std::slice::from_ref(&agent)).unwrap();
+        work.tasks.as_mut().unwrap()[0].status = "accepted".into();
+        supported(&work,std::slice::from_ref(&agent)).unwrap();
+        supported(&work,&[]).unwrap();
+        // Pure observation probes do not forge a persisted accepted Work.
+        use crate::mission_status_tasks::*;
+        let task = &work.tasks.as_ref().unwrap()[0];
+        let facts = result_inputs(Path::new("/unused-read-free-fixture"),task,None,
+            FreshnessObservation::NotCurrent { blockers: vec!["Gate manquante".into()] },GateObservation::Absent).unwrap();
+        assert_eq!(result_presentation(task,None,&facts).unwrap().state,"validation_stale");
+        let contradictory = ResultObservation { freshness:FreshnessObservation::Current,..facts };
+        assert!(result_presentation(task,None,&contradictory).is_err());
+        work.tasks.as_mut().unwrap()[0].planning_retry = true;
+        assert!(supported(&work,std::slice::from_ref(&agent)).is_err());
+        work.tasks.as_mut().unwrap()[0].planning_retry = false;
+        work.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());
+        assert!(supported(&work,std::slice::from_ref(&agent)).is_err());
+    }
+    /// An admitted ordinary queued launch must remain observable, never validated.
+    /// Existing unsupported review/recovery and terminal guards stay in force.
+    #[test]
+    fn mission_status_active_guard_requires_running_task_and_real_reports() {
+        let mut work = crate::Work {
+            id: "work".into(),
+            tasks: Some(vec![crate::Task {
+                id: "task".into(),
+                status: "running".into(),
+                ..Default::default()
+            }]),
+            ..Default::default()
+        };
+        let agent = Agent {
+            task_id: "task".into(),
+            work_id: "work".into(),
+            status: "queued".into(),
+            ..Default::default()
+        };
+        supported(&work, std::slice::from_ref(&agent)).unwrap();
+        work.tasks.as_mut().unwrap()[0].planning_retry = true;
+        assert!(supported(&work, std::slice::from_ref(&agent)).is_err());
+        work.tasks.as_mut().unwrap()[0].planning_retry = false;
+        work.tasks.as_mut().unwrap()[0].status = "submitted".into();
+        assert!(supported(&work, std::slice::from_ref(&agent)).is_err());
+    }
+    use super::*;
+    use std::{
+        fs as disk,
+        os::unix::fs::{symlink, PermissionsExt},
+        path::PathBuf,
+    };
+    /// Valid absent read precedes active-record observation: status must present
+    /// the selected provider refusal without clearing it or starting a process.
+    #[test]
+    fn mission_status_selected_active_cooldown_is_observable() {
+        let fixture = Fixture::new();
+        let work = crate::Work {
+            launch_profile: Some(Box::new(crate::LaunchProfile {
+            provider: "fixture".into(),
+            ..Default::default()
+        })),
+            ..crate::Work::default()
+        };
+        assert!(active_cooldowns(&fixture.0, &work, 0).unwrap().is_empty());
+        let dir = fixture.0.join(".swarm/provider-cooldowns");
+        disk::create_dir_all(&dir).unwrap();
+        disk::set_permissions(&dir, disk::Permissions::from_mode(0o700)).unwrap();
+        let path = dir.join("fixture.json");
+        let value = crate::ProviderCooldown {
+            provider: "fixture".into(),
+            observed_at: "2026-10-23T00:00:00Z".into(),
+            source: "fixture".into(),
+            signal: "backoff".into(),
+            ..Default::default()
+        };
+        let bytes = crate::encode_model(&value).unwrap();
+        disk::write(&path, &bytes).unwrap();
+        disk::set_permissions(&path, disk::Permissions::from_mode(0o600)).unwrap();
+        assert_eq!(
+            active_cooldowns(&fixture.0, &work, 0).unwrap(),
+            vec![value.clone()]
+        );
+        assert_eq!(
+            crate::agent_launch::cooldown(&fixture.0, "fixture")
+                .unwrap_err()
+                .code(),
+            "provider_cooldown"
+        );
+        assert_eq!(disk::read(&path).unwrap(), bytes);
+        let mut expired = value.clone();
+        expired.resets_at = 10;
+        disk::write(&path, crate::encode_model(&expired).unwrap()).unwrap();
+        assert_eq!(
+            active_cooldowns(&fixture.0, &work, 9).unwrap(),
+            vec![expired]
+        );
+        assert!(active_cooldowns(&fixture.0, &work, 10).unwrap().is_empty());
+        let mut cleared = value;
+        cleared.cleared_at = "2026-10-23T00:01:00Z".into();
+        disk::write(&path, crate::encode_model(&cleared).unwrap()).unwrap();
+        assert!(active_cooldowns(&fixture.0, &work, 0).unwrap().is_empty());
+        crate::agent_launch::cooldown(&fixture.0, "fixture").unwrap();
+        cleared.cleared_at = "PRIVATE-MALFORMED".into();
+        disk::write(&path, crate::encode_model(&cleared).unwrap()).unwrap();
+        let error = active_cooldowns(&fixture.0, &work, 0).unwrap_err();
+        assert!(matches!(error, E::Launch(_)));
+        assert!(!format!("{error:?}").contains("PRIVATE-MALFORMED"));
+        disk::write(&path, bytes).unwrap();
+        assert_eq!(active_cooldowns(&fixture.0, &work, 0).unwrap().len(), 1);
+    }
+    /// ASCII valid control precedes the three-em dash counterexample: Unicode
+    /// U+2E3B occupies four cells but only three UTF8 bytes in Go uniseg15.
+    #[test]
+    fn mission_status_trace_clips_terminal_cells_not_utf8_bytes() {
+        assert_eq!(trace(&"x".repeat(600)).unwrap(), "x".repeat(600));
+        assert_eq!(
+            trace(&"\u{2e3b}".repeat(200)).unwrap(),
+            format!("{}…", "\u{2e3b}".repeat(149))
+        );
+        assert_eq!(trace(&"é".repeat(600)).unwrap(), "é".repeat(600));
+    }
+    /// Fresh owned filesystem fixture, retained on failure for diagnosis.
+    struct Fixture(PathBuf);
+    impl Fixture {
+        /// Create only this test's attributed root; no Work/Agent authority seed.
+        fn new() -> Self {
+            let path =
+                std::env::temp_dir().join(crate::generate_identifier("status-reports-").unwrap());
+            disk::create_dir(&path).unwrap();
+            disk::set_permissions(&path, disk::Permissions::from_mode(0o700)).unwrap();
+            Self(path)
+        }
+    }
+    impl Drop for Fixture {
+        /// Remove only owned successful data; retain failed fixture originals.
+        fn drop(&mut self) {
+            if std::thread::panicking() {
+                eprintln!("reports fixture retained: {}", self.0.display());
+            } else {
+                disk::remove_dir_all(&self.0).unwrap();
+            }
+        }
+    }
+    /// Actual missing directory, ordinary nested files and ordering form a valid
+    /// witness before true outside-Root symlink refusal and restored recovery.
+    #[test]
+    fn mission_status_reports_contained_scan_symlinks_refusal_recovery() {
+        let fixture = Fixture::new();
+        assert!(task_reports(&fixture.0, "task").unwrap().is_empty());
+        disk::create_dir(fixture.0.join("docs")).unwrap();
+        disk::create_dir(fixture.0.join("docs/nested")).unwrap();
+        disk::write(fixture.0.join("docs/task.md"), "A real partial report").unwrap();
+        disk::write(
+            fixture.0.join("docs/nested/task-handoff.md"),
+            "Another partial report",
+        )
+        .unwrap();
+        disk::write(fixture.0.join("docs/other.md"), "Unrelated").unwrap();
+        let oldest = std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1);
+        let newest = std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(2);
+        File::open(fixture.0.join("docs/task.md"))
+            .unwrap()
+            .set_times(std::fs::FileTimes::new().set_modified(oldest))
+            .unwrap();
+        File::open(fixture.0.join("docs/nested/task-handoff.md"))
+            .unwrap()
+            .set_times(std::fs::FileTimes::new().set_modified(newest))
+            .unwrap();
+        let expected = vec![
+            "docs/nested/task-handoff.md".to_owned(),
+            "docs/task.md".to_owned(),
+        ];
+        assert_eq!(task_reports(&fixture.0, "task").unwrap(), expected);
+        // Go discovery uses Stat rather than reading report contents. A valid
+        // listing must remain valid when the selected file denies content reads.
+        disk::set_permissions(
+            fixture.0.join("docs/task.md"),
+            disk::Permissions::from_mode(0o000),
+        )
+        .unwrap();
+        if !nix::unistd::geteuid().is_root() {
+            assert_eq!(
+                File::open(fixture.0.join("docs/task.md"))
+                    .unwrap_err()
+                    .kind(),
+                std::io::ErrorKind::PermissionDenied
+            );
+        }
+        assert_eq!(task_reports(&fixture.0, "task").unwrap(), expected);
+        disk::set_permissions(
+            fixture.0.join("docs/task.md"),
+            disk::Permissions::from_mode(0o600),
+        )
+        .unwrap();
+        disk::write(fixture.0.join("inside.md"), "Contained target is a report").unwrap();
+        File::open(fixture.0.join("inside.md"))
+            .unwrap()
+            .set_times(std::fs::FileTimes::new().set_modified(std::time::SystemTime::UNIX_EPOCH))
+            .unwrap();
+        disk::set_permissions(
+            fixture.0.join("inside.md"),
+            disk::Permissions::from_mode(0o000),
+        )
+        .unwrap();
+        symlink("../inside.md", fixture.0.join("docs/task-handoff-link.md")).unwrap();
+        // The newly created link sorts ahead of 1970-dated regular entries,
+        // despite its target having an older mtime and no content read permission.
+        let linked = vec![
+            "docs/task-handoff-link.md".to_owned(),
+            "docs/nested/task-handoff.md".to_owned(),
+            "docs/task.md".to_owned(),
+        ];
+        assert_eq!(task_reports(&fixture.0, "task").unwrap(), linked);
+        // A symlinked directory is not traversed, even when its target is inside.
+        symlink("nested", fixture.0.join("docs/linked-dir")).unwrap();
+        assert_eq!(task_reports(&fixture.0, "task").unwrap(), linked);
+        let outside = Fixture::new();
+        disk::write(outside.0.join("report.md"), "Outside project").unwrap();
+        disk::remove_file(fixture.0.join("docs/task-handoff-link.md")).unwrap();
+        symlink(
+            outside.0.join("report.md"),
+            fixture.0.join("docs/task-handoff-link.md"),
+        )
+        .unwrap();
+        let error = task_reports(&fixture.0, "task")
+            .expect_err("outside project must refuse");
+        let E::Gate(crate::GateContractError::Evaluation(error)) = error else {
+            panic!("outside path must preserve Gate cause")
+        };
+        assert_eq!(error.reason(), "artifact-path");
+        assert!(matches!(
+            error
+                .source()
+                .and_then(|cause| cause.downcast_ref::<crate::LocalPathError>()),
+            Some(crate::LocalPathError::Refused(
+                crate::PathRefusal::OutsideProject
+            ))
+        ));
+        disk::remove_file(fixture.0.join("docs/task-handoff-link.md")).unwrap();
+        symlink("../inside.md", fixture.0.join("docs/task-handoff-link.md")).unwrap();
+        assert_eq!(task_reports(&fixture.0, "task").unwrap(), linked);
+        disk::remove_file(fixture.0.join("docs/task-handoff-link.md")).unwrap();
+        assert_eq!(task_reports(&fixture.0, "task").unwrap(), expected);
+        disk::remove_file(fixture.0.join("docs/task.md")).unwrap();
+        disk::create_dir(fixture.0.join("docs/task.md")).unwrap();
+        // A directory matching the filename is traversed, never a report.
+        assert_eq!(
+            task_reports(&fixture.0, "task").unwrap(),
+            vec!["docs/nested/task-handoff.md"]
+        );
+        assert!(matches!(
+            task_reports(&fixture.0, "../task"),
+            Err(E::Refused("mission-status-report-task-invalid"))
+        ));
+    }
+    /// A valid scan precedes an OS permission failure; only ENOENT may become
+    /// empty. Root's bypass privilege cannot establish the permission assertion.
+    #[test]
+    fn mission_status_reports_permission_refusal_preserves_cause_and_recovery() {
+        if nix::unistd::geteuid().is_root() {
+            return;
+        }
+        let fixture = Fixture::new();
+        disk::create_dir(fixture.0.join("docs")).unwrap();
+        disk::write(fixture.0.join("docs/task.md"), "partial").unwrap();
+        assert_eq!(
+            task_reports(&fixture.0, "task").unwrap(),
+            vec!["docs/task.md"]
+        );
+        disk::set_permissions(fixture.0.join("docs"), disk::Permissions::from_mode(0o000)).unwrap();
+        let failed = task_reports(&fixture.0, "task");
+        disk::set_permissions(fixture.0.join("docs"), disk::Permissions::from_mode(0o700)).unwrap();
+        let error = failed
+            .expect_err("permission denied must not become empty");
+        assert!(std::error::Error::source(&error).is_some());
+        assert_eq!(
+            task_reports(&fixture.0, "task").unwrap(),
+            vec!["docs/task.md"]
+        );
+    }
+    /// Go terminal fallback preserves structured observations, explicit operator
+    /// interruption emptiness, environment/check/limit categories and redaction.
+    /// These supplied protocol fixtures prove no real process or public admission.
+    #[test]
+    fn mission_status_reports_terminal_diagnostic_real_fallback_and_refusals() {
+        let mut agent = Agent {
+            id: "agent".into(),
+            attempt_id: "attempt".into(),
+            status: "interrupted".into(),
+            stop_kind: "operateur".into(),
+            ..Default::default()
+        };
+        assert_eq!(
+            terminal_diagnostics(&[agent.clone()]).unwrap()[0],
+            AttemptDiagnostic::default()
+        );
+        agent.stop_kind = String::new();
+        agent.status = "failed".into();
+        agent.activity = "permission denied".into();
+        let diagnostic = terminal_diagnostics(&[agent.clone()]).unwrap().remove(0);
+        assert_eq!(
+            diagnostic.items.as_ref().unwrap()[0].category,
+            "environment"
+        );
+        assert!(environment_recovery(&agent, &diagnostic));
+        assert_eq!(diagnostic.observed_errors, 0);
+        agent.activity = "go test failed".into();
+        assert_eq!(
+            terminal_diagnostics(&[agent.clone()]).unwrap()[0]
+                .items
+                .as_ref()
+                .unwrap()[0]
+                .category,
+            "check"
+        );
+        agent.activity = "limite erreurs d'outils consécutives".into();
+        agent.limits.max_consecutive_errors = 4;
+        let diagnostic = terminal_diagnostics(&[agent.clone()]).unwrap().remove(0);
+        assert!(diagnostic.limit_reached && diagnostic.consecutive_error_limit_reached);
+        assert_eq!(diagnostic.consecutive_error_limit, 4);
+        agent.activity = "secret value".into();
+        assert_eq!(
+            terminal_diagnostics(&[agent.clone()]).unwrap()[0]
+                .items
+                .as_ref()
+                .unwrap()[0]
+                .traces
+                .as_ref()
+                .unwrap()[0],
+            "[détail masqué : donnée potentiellement sensible]"
+        );
+        agent.diagnostic = diagnostic.clone();
+        assert_eq!(
+            terminal_diagnostics(&[agent.clone()]).unwrap()[0],
+            diagnostic
+        );
+        agent.diagnostic = AttemptDiagnostic::default();
+        agent.activity = "x".repeat(601);
+        let clipped = terminal_diagnostics(&[agent.clone()]).unwrap();
+        assert_eq!(
+            clipped[0].items.as_ref().unwrap()[0]
+                .traces
+                .as_ref()
+                .unwrap()[0],
+            format!("{}…", "x".repeat(599))
+        );
+        agent.activity = "short valid reason".into();
+        assert!(terminal_diagnostics(&[agent.clone()]).is_ok());
+        agent.status = "running".into();
+        assert!(terminal_diagnostics(&[agent]).is_err());
+    }
+    /// Supplied protocol observations exercise the completed/submitted branch,
+    /// retaining older failed/completed history and proving that unused docs/attribution/
+    /// readiness inputs are not consumed. This pure fixture grants no Agent
+    /// identity, report authenticity or acceptance; the public CLI recipe supplies
+    /// the real prepare/run/submit witness without a paid provider or SQL seed.
+    #[test]
+    fn mission_status_reports_completed_submitted_uses_retained_report_without_scan() {
+        use crate::mission_status_tasks::*;
+        let fixture = Fixture::new();
+        disk::create_dir(fixture.0.join("docs")).unwrap();
+        disk::write(fixture.0.join("docs/task.md"), "actual scanner control").unwrap();
+        assert_eq!(
+            task_reports(&fixture.0, "task").unwrap(),
+            vec!["docs/task.md"]
+        );
+        let task = crate::Task {
+            id: "task".into(),
+            title: "Completed work".into(),
+            status: "submitted".into(),
+            next: "handoff : handoff.md".into(),
+            ..Default::default()
+        };
+        let mut work = crate::Work {
+            id: "work".into(),
+            tasks: Some(vec![task]),
+            ..Default::default()
+        };
+        let mut agents = vec![
+            Agent {
+                id: "current".into(),
+                work_id: "work".into(),
+                task_id: "task".into(),
+                attempt_id: "current-attempt".into(),
+                status: "completed".into(),
+                activity: "x".repeat(601),
+                ..Default::default()
+            },
+            Agent {
+                id: "previous".into(),
+                work_id: "work".into(),
+                task_id: "task".into(),
+                attempt_id: "previous-attempt".into(),
+                status: "failed".into(),
+                activity: "earlier real terminal cause".into(),
+                ..Default::default()
+            },
+        ];
+        supported(&work, &agents).unwrap();
+        let diagnostics = terminal_diagnostics(&agents).unwrap();
+        // Go does not interpret completed activity as a failure fallback.
+        assert_eq!(diagnostics[0], AttemptDiagnostic::default());
+        assert!(!diagnostics[1].items.as_ref().unwrap().is_empty());
+        let observations = agent_observations(&agents, &diagnostics).unwrap();
+        disk::set_permissions(fixture.0.join("docs"), disk::Permissions::from_mode(0o000)).unwrap();
+        if !nix::unistd::geteuid().is_root() {
+            assert!(task_reports(&fixture.0, "task").is_err());
+        }
+        let facts = result_inputs(
+            &fixture.0,
+            &work.tasks.as_ref().unwrap()[0],
+            Some(&agents[0]),
+            FreshnessObservation::NotCurrent {
+                blockers: Vec::new(),
+            },
+            GateObservation::Absent,
+        )
+        .unwrap();
+        disk::set_permissions(fixture.0.join("docs"), disk::Permissions::from_mode(0o700)).unwrap();
+        assert!(matches!(&facts.reports, ReportListing::NotObserved));
+        assert!(matches!(&facts.attribution, ReportAttribution::NotObserved));
+        assert!(matches!(
+            &facts.incomplete_report,
+            IncompleteReport::NotObserved
+        ));
+        assert!(matches!(&facts.review, ReviewObservation::NotApplicable));
+        let projected = project_tasks(
+            &work,
+            &crate::mission_status_contract::tests::status(),
+            &[TaskObservation {
+                task_id: "task".into(),
+                result: facts,
+                dependencies: Vec::new(),
+                readiness: ReadinessObservation::NotObserved,
+                prepared_launch: PreparedLaunchObservation::Absent,
+                execution: ExecutionObservation::NotObserved,
+            }],
+            &observations,
+        )
+        .unwrap();
+        assert_eq!(projected.review, 1);
+        assert_eq!(projected.validated, 0);
+        assert_eq!(projected.running, 0);
+        let task = &projected.tasks[0];
+        assert_eq!(task.state, "review");
+        assert_eq!(task.action, "report");
+        assert_eq!(task.result.state, "result_to_review");
+        assert_eq!(task.result.process_state, "completed");
+        assert_eq!(task.result.report_state, "submitted");
+        assert_eq!(task.result.validation_state, "missing_gate");
+        assert_eq!(task.result.report_id, "handoff.md");
+        assert_eq!(task.result.attempt_id, "current-attempt");
+        assert!(task.diagnostic.is_none());
+        // Existing structured observations must remain visible even on success.
+        agents[0].diagnostic = diagnostics[1].clone();
+        assert_eq!(terminal_diagnostics(&agents).unwrap()[0], diagnostics[1]);
+        agents[0].status = "running".into();
+        assert!(supported(&work, &agents).is_err());
+        agents[0].status = "completed".into();
+        supported(&work, &agents).unwrap();
+        work.tasks.as_mut().unwrap()[0].status = "blocked".into();
+        assert!(supported(&work, &agents).is_err());
+        work.tasks.as_mut().unwrap()[0].status = "submitted".into();
+        supported(&work, &agents).unwrap();
+        work.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());
+        assert!(supported(&work, &agents).is_err());
+        assert!(result_inputs(
+            &fixture.0,
+            &work.tasks.as_ref().unwrap()[0],
+            Some(&agents[0]),
+            FreshnessObservation::NotObserved,
+            GateObservation::NotObserved
+        )
+        .is_err());
+        work.tasks.as_mut().unwrap()[0].independent_review = None;
+        supported(&work, &agents).unwrap();
+        work.tasks.as_mut().unwrap()[0].previous_reviews = Some(vec![Default::default()]);
+        assert!(supported(&work, &agents).is_err());
+        work.tasks.as_mut().unwrap()[0].previous_reviews = None;
+        supported(&work, &agents).unwrap();
+        agents[1].status = "completed".into();
+        supported(&work, &agents).unwrap();
+        // Rebuild actual pure result inputs, selecting the first matching Agent;
+        // old completed activity must not replace the newest report or identity.
+        let project = |work: &crate::Work, agents: &[Agent]| {
+            let diagnostics = terminal_diagnostics(agents).unwrap();
+            let observations = agent_observations(agents, &diagnostics).unwrap();
+            let facts = result_inputs(
+                &fixture.0,
+                &work.tasks.as_ref().unwrap()[0],
+                agents.iter().find(|a| a.task_id == "task"),
+                FreshnessObservation::NotCurrent {
+                    blockers: Vec::new(),
+                },
+                GateObservation::Absent,
+            )
+            .unwrap();
+            project_tasks(
+                work,
+                &crate::mission_status_contract::tests::status(),
+                &[TaskObservation {
+                    task_id: "task".into(),
+                    result: facts,
+                    dependencies: Vec::new(),
+                    readiness: ReadinessObservation::NotObserved,
+                    prepared_launch: PreparedLaunchObservation::Absent,
+                    execution: ExecutionObservation::NotObserved,
+                }],
+                &observations,
+            )
+            .unwrap()
+        };
+        // Submitted results do not consume launch readiness. Hiding their
+        // Agent must preserve review/ledger while making process identity unknown.
+        let mut window_work = work.clone();
+        let mut recent_task = window_work.tasks.as_ref().unwrap()[0].clone();
+        recent_task.id = "recent-task".into();
+        window_work.tasks.as_mut().unwrap().push(recent_task);
+        let mut window_agents: Vec<_> = (0..200)
+            .map(|index| {
+                let mut agent = agents[0].clone();
+                agent.id = format!("recent-{index}");
+                agent.task_id = "recent-task".into();
+                agent.attempt_id = format!("recent-attempt-{index}");
+                agent
+            })
+            .collect();
+        window_agents.push(agents[0].clone());
+        supported(&window_work, &window_agents).unwrap();
+        supported(&window_work, &window_agents[..200]).unwrap();
+        supported(&window_work, &window_agents[..0]).unwrap();
+        supported(&window_work, &window_agents).unwrap();
+        supported(&work, &[]).unwrap();
+        let hidden = project(&work, &[]);
+        assert_eq!(hidden.tasks[0].state, "review");
+        assert_eq!(hidden.tasks[0].result.state, "result_to_review");
+        assert_eq!(hidden.tasks[0].result.process_state, "unknown");
+        assert!(hidden.tasks[0].attempt.agent_id.is_empty());
+        assert!(hidden.tasks[0].attempt.attempt_id.is_empty());
+        assert_eq!(hidden.validated, 0);
+        let mut refused = work.clone();
+        refused.tasks.as_mut().unwrap()[0].planning_retry = true;
+        assert!(supported(&refused, &[]).is_err());
+        refused.tasks.as_mut().unwrap()[0].planning_retry = false;
+        refused.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());
+        assert!(supported(&refused, &[]).is_err());
+        refused.tasks.as_mut().unwrap()[0].independent_review = None;
+        refused.tasks.as_mut().unwrap()[0].status = "blocked".into();
+        assert!(supported(&refused, &[]).is_err());
+        refused.tasks.as_mut().unwrap()[0].status = "submitted".into();
+        supported(&refused, &[]).unwrap();
+        let completed = project(&work, &agents);
+        assert_eq!(completed.tasks[0].attempt.agent_id, "current");
+        assert_eq!(completed.tasks[0].attempt.attempt_id, "current-attempt");
+        assert_eq!(completed.tasks[0].result.state, "result_to_review");
+        assert_eq!(completed.tasks[0].result.process_state, "completed");
+        assert_eq!(completed.validated, 0);
+        assert_eq!(agents[1].id, "previous");
+        assert_eq!(agents[1].status, "completed");
+        work.tasks.as_mut().unwrap()[0].status = "blocked".into();
+        agents[0].status = "failed".into();
+        supported(&work, &agents).unwrap();
+        let failed = project(&work, &agents);
+        assert_eq!(failed.tasks[0].attempt.agent_id, "current");
+        assert_eq!(failed.tasks[0].result.process_state, "failed");
+        assert_ne!(failed.tasks[0].result.state, "result_to_review");
+        assert_eq!(failed.validated, 0);
+        agents[1].status = "running".into();
+        assert!(supported(&work, &agents).is_err());
+        agents[1].status = "completed".into();
+        supported(&work, &agents).unwrap();
+        agents[0].status = "completed".into();
+        assert!(supported(&work, &agents).is_err());
+        work.tasks.as_mut().unwrap()[0].status = "submitted".into();
+        supported(&work, &agents).unwrap();
+        agents[1].status = "failed".into();
+        supported(&work, &agents).unwrap();
+    }
+}
+
+FILE rust/crates/swarm-engine/src/mission_status_tasks.rs SHA256 7ed613f526b159c4700f1209ff1b2aa2c54c62a147fcedf449a968a0479f7aac
+//! Pure Go mission-task/result projections (HEAD 553593a2ffa3823d16784a6fedc291eebf390837).
+//!
+//! Producers owe the actual ordered Agent history, gate/review/report evidence,
+//! dependency freshness, readiness and execution observations. Unobserved facts
+//! refuse when consumed; no missing observation means false, empty or permission.
+//! These values are snapshots, not grants. No SQL/filesystem/clock/provider IO,
+//! policy default, report search limit, delay, retry or mutation is introduced.
+//! Result completion remains separate from acceptance. Pure presentation strings
+//! and branch order follow result_presentation.go and mission_status.go.
+//! The caller retains read/cleanup causes before invoking this module and must
+//! handle Root close/publication/flush failures afterwards. No raw Debug is derived.
+//!
+//! Remaining producer contracts: ReviewObservation follows Go current/managed
+//! review (result_presentation.go:227/275): attempt and producer identity, report
+//! digest, review contract/artifacts or previous candidate must be observed before
+//! Presented/NotApplicable is supplied. Readiness follows missionDispatchState
+//! (mission_status.go:975); structural candidates are not that classification.
+//! Prepared/execution/assist/global occupancy reads remain outside this module.
+//! This increment therefore supplies pure components, not a wired full status.
+//!
+//! Review axes: literals are Go protocol codes/presentation, reduction identities
+//! and count representation, never operator policy. Existing human/empty-text
+//! branches are explicit Go outcomes, not recovery from missing observations.
+//! Public/nontrivial functions document inputs, errors, effects and limitations.
+//! All new errors are static RootStoreError::Refused for absent/incoherent input
+//! or count representation; no typed IO cause enters here to be discarded. Tests
+//! are pure controls only and do not establish real freshness or runtime parity.
+use crate::mission_status_contract::{
+    AttemptDiagnostic, MissionAttemptProjection, MissionPrimaryAction, MissionStatus, MissionTask,
+    MissionUnderstanding, MissionWait, RecoveryPreview, ResultPresentation,
+};
+use crate::mission_status_insights::{
+    mission_task_primary, task_understanding, MissionAgentInsight,
+};
+use crate::{Agent, RootStoreError as E, Task, Work};
+use std::collections::BTreeSet;
+
+/// Current evidence classification, not stored acceptance or a cached permit.
+/// NotCurrent carries the real ordered blockers, possibly empty as in Go;
+/// NotObserved must be resolved by the reader before a consuming branch succeeds.
+#[derive(Clone)]
+pub enum FreshnessObservation {
+    NotObserved,
+    Current,
+    NotCurrent { blockers: Vec<String> },
+}
+/// Gate observation from current originals, independent of the stored Gate field.
+#[derive(Clone, Copy)]
+pub enum GateObservation {
+    NotObserved,
+    Absent,
+    Current,
+    NotCurrent,
+}
+/// A completed report scan with producer order, or an explicitly missing scan.
+/// An observed empty result is distinct from no evidence of a scan.
+#[derive(Clone)]
+pub enum ReportListing {
+    NotObserved,
+    Observed(Vec<String>),
+}
+/// A report attributable to this attempt, or the actual refusal explanation.
+/// The pure consumer performs no mtime/skew check or search of its own.
+#[derive(Clone)]
+pub enum ReportAttribution {
+    NotObserved,
+    Attributed(String),
+    Unavailable { reason: String },
+}
+/// Optional incomplete delivery report, after actual observation, not a fallback.
+#[derive(Clone)]
+pub enum IncompleteReport {
+    NotObserved,
+    Observed(Option<String>),
+}
+/// Causal review-only fields from currentReviewPresentation/managed counterpart.
+/// This cannot overwrite process identity or manufacture an accepted result.
+#[derive(Clone)]
+pub struct ReviewPresentation {
+    pub state: String,
+    pub label: String,
+    pub validation_state: String,
+    pub reason: String,
+    pub next_step: String,
+    pub report_id: String,
+    pub receipt_id: String,
+    pub report_state: String,
+}
+/// Actual applicable review projection. NotApplicable requires the producer's
+/// observed branch prerequisites, including Go’s passed-opinion bypass; it never
+/// means a positive verdict. Presented requires actual contract/artifact checks
+/// with stale causes retained by the caller. No IO is performed here.
+#[derive(Clone)]
+pub enum ReviewObservation {
+    NotObserved,
+    NotApplicable,
+    /// Current controls are semantically missing/stale before first review.
+    /// Preserve the report/receipt fields already observed by the result branch.
+    ControlsStale { reason: String },
+    Presented(ReviewPresentation),
+}
+/// Mandatory result inputs. Fields may remain explicitly NotObserved only when
+/// Go's ordered result branch never consumes them (e.g. no report scan on fresh acceptance).
+#[derive(Clone)]
+pub struct ResultObservation {
+    pub freshness: FreshnessObservation,
+    pub gate: GateObservation,
+    pub reports: ReportListing,
+    pub attribution: ReportAttribution,
+    pub incomplete_report: IncompleteReport,
+    pub review: ReviewObservation,
+}
+/// One latest-first Agent plus its actual activity classification and diagnostic.
+/// Active membership is read from Agent.status; observed_state is not inferred
+/// from a PID or current defaults here. Environment classification must be real.
+pub struct AgentObservation<'a> {
+    pub agent: &'a Agent,
+    pub observed_state: &'a str,
+    pub fallback_diagnostic: &'a AttemptDiagnostic,
+    pub environment_recovery: bool,
+}
+/// A direct dependency classification in Task.depends order. Unknown evidence is
+/// separate from an observed stale/missing prerequisite and must not be defaulted.
+#[derive(Clone, Copy)]
+pub enum DependencyFreshness {
+    NotObserved,
+    Current,
+    NotCurrent,
+}
+/// Actual dependency ID and freshness; missing plan entries may be NotCurrent.
+#[derive(Clone)]
+pub struct DependencyObservation {
+    pub task_id: String,
+    pub freshness: DependencyFreshness,
+}
+/// Read-only missionDispatchState result. None of these values grants a departure.
+#[derive(Clone, Copy)]
+pub enum DispatchDisposition {
+    Ready,
+    Waiting,
+    Manual,
+    Intervention,
+}
+/// Whether the effective profile was actually resolved, independently of readiness.
+#[derive(Clone, Copy)]
+pub enum ProfileObservation {
+    NotObserved,
+    Missing,
+    Configured,
+}
+/// Current assist/start guard, not a user approval or an executable capability.
+#[derive(Clone)]
+pub enum AssistObservation {
+    NotObserved,
+    Allowed,
+    Held { reason: String },
+}
+/// Actual global workspace observation; no zero count or isolation is inferred.
+#[derive(Clone, Copy)]
+pub enum WorkspaceObservation {
+    NotObserved,
+    Free,
+    Occupied,
+}
+/// Required readiness facts from the read-only dispatcher and related guards.
+/// NotObserved is explicit so the applicable branch can refuse, not guess ready.
+#[derive(Clone)]
+pub enum ReadinessObservation {
+    NotObserved,
+    Observed {
+        disposition: DispatchDisposition,
+        reason: String,
+        profile: ProfileObservation,
+        assistance: AssistObservation,
+        workspace: WorkspaceObservation,
+    },
+}
+/// Result of managed prepared-launch inspection; not a new prepared launch.
+#[derive(Clone)]
+pub enum PreparedLaunchObservation {
+    NotObserved,
+    Absent,
+    Present { reason: String },
+}
+/// Actual executionObserved classification, not Agent membership or PID liveness.
+#[derive(Clone, Copy)]
+pub enum ExecutionObservation {
+    NotObserved,
+    Observed,
+    NotPresent,
+}
+/// All task-specific inputs. Readers must preserve causes rather than constructing
+/// absence on read error. No currentReview/dispatcher/managed read is performed here.
+#[derive(Clone)]
+pub struct TaskObservation {
+    pub task_id: String,
+    pub result: ResultObservation,
+    pub dependencies: Vec<DependencyObservation>,
+    pub readiness: ReadinessObservation,
+    pub prepared_launch: PreparedLaunchObservation,
+    pub execution: ExecutionObservation,
+}
+/// Complete local projection, committed to no storage. Counters reflect result
+/// branches before later task overrides, matching Go; task state alone is not a count.
+pub struct TaskProjection {
+    pub tasks: Vec<MissionTask>,
+    pub validated: i64,
+    pub review: i64,
+    pub running: i64,
+}
+
+/// Borrow the actual blockers; no missing freshness is treated as a passing gate.
+fn blockers(value: &FreshnessObservation) -> Result<&[String], E> {
+    match value {
+        FreshnessObservation::Current => Ok(&[]),
+        FreshnessObservation::NotCurrent { blockers } => Ok(blockers),
+        FreshnessObservation::NotObserved => Err(E::Refused("mission-status-freshness-unobserved")),
+    }
+}
+/// Read only an observed report list, retaining the producer's ordering.
+fn first_report(value: &ReportListing) -> Result<Option<&str>, E> {
+    match value {
+        ReportListing::NotObserved => Err(E::Refused("mission-status-reports-unobserved")),
+        ReportListing::Observed(paths) => {
+            if paths.iter().any(String::is_empty) {
+                return Err(E::Refused("mission-status-report-empty"));
+            }
+            Ok(paths.first().map(String::as_str))
+        }
+    }
+}
+/// Apply a supplied review's narrow causal fields. Only Go's review result family
+/// is admitted; no accepted/validated or process-state overwrite is representable.
+fn apply_review(p: &mut ResultPresentation, observation: &ReviewObservation) -> Result<bool, E> {
+    match observation {
+        ReviewObservation::NotObserved => Err(E::Refused("mission-status-review-unobserved")),
+        ReviewObservation::NotApplicable => Ok(false),
+        ReviewObservation::ControlsStale { reason } => {
+            p.state="review_blocked".into();p.label="Preuves à renouveler".into();
+            p.validation_state="failed_or_stale".into();p.reason=reason.clone();
+            p.next_step="Renouveler les preuves et rejouer les contrôles préautorisés avant de demander la revue.".into();
+            Ok(true)
+        }
+        ReviewObservation::Presented(r) => {
+            if !matches!(
+                r.state.as_str(),
+                "review_blocked" | "review_in_progress" | "review_awaiting_publication"
+            ) {
+                return Err(E::Refused("mission-status-review-result-invalid"));
+            }
+            p.state = r.state.clone();
+            p.label = r.label.clone();
+            p.validation_state = r.validation_state.clone();
+            p.reason = r.reason.clone();
+            p.next_step = r.next_step.clone();
+            p.report_id = r.report_id.clone();
+            p.receipt_id = r.receipt_id.clone();
+            p.report_state = r.report_state.clone();
+            Ok(true)
+        }
+    }
+}
+/// Finish all three human labels from the actual classified facts, as Go's defer.
+fn finish_result(mut p: ResultPresentation) -> ResultPresentation {
+    p.process_label = fact_label(&p.process_state).into();
+    p.report_label = fact_label(&p.report_state).into();
+    p.validation_label = fact_label(&p.validation_state).into();
+    p
+}
+/// Go resultFactLabel vocabulary, including explicit unknown state presentation.
+/// This string fallback is protocol presentation, not a success or policy fallback.
+fn fact_label(state: &str) -> &'static str {
+    match state {
+        "pending_review" => "Revue indépendante en cours",
+        "pending_publication" => "Publication non confirmée",
+        "review_unvalidated" => "Avis indépendant non obtenu",
+        "review_changes_requested" => "Avis indépendant défavorable ou incomplet",
+        "not_started" => "Pas encore commencé",
+        "absent" => "Aucun rapport soumis",
+        "unknown" => "Exécution non documentée",
+        "running" => "Agent actif",
+        "completed" => "Processus terminé",
+        "failed" => "Processus en échec",
+        "interrupted" => "Processus interrompu",
+        "queued" => "Démarrage en attente",
+        "starting" => "Démarrage en cours",
+        "stopping" => "Arrêt en cours",
+        "submitted" => "Rapport soumis, contenu à vérifier",
+        "fresh" => "Preuves actuelles",
+        "stale" => "Preuves à renouveler",
+        "waived" => "Dérogation, contrôles non validés",
+        "abandoned" => "Abandonné",
+        "early_unverified" => "Rapport détecté, peut-être incomplet",
+        "pending_process" => "En attente de la fin du processus",
+        "not_validated" => "Non validé",
+        "partial_possible" => "Rapport présent, peut-être partiel",
+        "missing_gate" => "Contrôles de validation non enregistrés",
+        "failed_or_stale" => "Contrôles en échec ou preuves périmées",
+        "ready_for_decision" => "Contrôles actuels, décision à enregistrer",
+        "attributable_unsubmitted" => "Rapport détecté, à soumettre et vérifier",
+        "absent_or_unattributed" => "Rapport absent ou non attribuable",
+        _ => "État non confirmé",
+    }
+}
+
+/// Port resultPresentation's ordered branches without IO. The Agent must be the
+/// latest applicable row selected from the supplied history. Freshness, review,
+/// reports and gate state are actual observations, never authoritative by being
+/// supplied here. Missing consumed evidence refuses; serialization grants nothing.
+pub fn result_presentation(
+    task: &Task,
+    agent: Option<&AgentObservation<'_>>,
+    facts: &ResultObservation,
+) -> Result<ResultPresentation, E> {
+    if agent.is_some_and(|a| a.agent.task_id != task.id || a.observed_state.is_empty()) {
+        return Err(E::Refused("mission-status-agent-observation-mismatch"));
+    }
+    let mut p = ResultPresentation {
+        process_label: String::new(),
+        report_label: String::new(),
+        validation_label: String::new(),
+        state: "not_started".into(),
+        label: "Pas encore commencé".into(),
+        process_state: "not_started".into(),
+        report_state: "absent".into(),
+        validation_state: "not_started".into(),
+        reason: "Aucune tentative terminée ni validation actuelle n’est établie.".into(),
+        next_step: "Lancer la tâche lorsque ses conditions sont réunies.".into(),
+        attempt_id: String::new(),
+        report_id: String::new(),
+        gate_id: String::new(),
+        receipt_id: String::new(),
+    };
+    if let Some(a) = agent {
+        p.attempt_id = if a.agent.attempt_id.is_empty() {
+            a.agent.id.clone()
+        } else {
+            a.agent.attempt_id.clone()
+        };
+        p.process_state = a.observed_state.into();
+    }
+    if let Some(r) = task
+        .revalidation
+        .as_deref()
+        .map(|r| crate::text::trim_space(&r.report))
+        .filter(|r| !r.is_empty())
+    {
+        p.report_id = r.into();
+    } else if let Some(at) = task.next.rfind("handoff : ") {
+        p.report_id = crate::text::trim_space(&task.next[at + "handoff : ".len()..]).into();
+    }
+    if !p.report_id.is_empty() || matches!(task.status.as_str(), "submitted" | "accepted") {
+        p.report_state = "submitted".into();
+    }
+    if let Some(g) = &task.gate {
+        p.gate_id = if crate::text::trim_space(&g.name).is_empty() {
+            g.evaluation.scope_id.clone()
+        } else {
+            crate::text::trim_space(&g.name).into()
+        };
+    }
+    if let Some(v) = &task.automatic_validation {
+        p.receipt_id = v.receipt.clone();
+    }
+    if task.status == "accepted" {
+        match &facts.freshness {
+            FreshnessObservation::NotObserved => {
+                return Err(E::Refused("mission-status-freshness-unobserved"))
+            }
+            FreshnessObservation::Current => {
+                if !matches!(facts.gate, GateObservation::Current) {
+                    return Err(E::Refused("mission-status-current-gate-unobserved"));
+                }
+                p.state = "validated".into();
+                p.label = "Validé".into();
+                p.validation_state = "fresh".into();
+                p.reason = "Gate delivery et preuves actuelles ; la tâche est acceptée.".into();
+                p.next_step = "Consulter le résultat ; revalider si une preuve change.".into();
+            }
+            FreshnessObservation::NotCurrent { blockers } => {
+                p.state = "validation_stale".into();
+                p.label = "Validation à refaire".into();
+                p.validation_state = "stale".into();
+                p.reason = blockers.first().cloned().unwrap_or_else(|| {
+                    "L’acceptation historique n’est plus fondée sur des preuves actuelles.".into()
+                });
+                p.next_step="Rouvrir la tâche, renouveler les preuves et enregistrer une nouvelle revue de validation.".into();
+            }
+        }
+        return Ok(finish_result(p));
+    }
+    if task.status == "waived" {
+        p.state = "waived".into();
+        p.label = "Dérogation — non validé".into();
+        p.validation_state = "waived".into();
+        p.reason =
+            "Une décision explicite permet la suite sans transformer les contrôles en PASS.".into();
+        p.next_step = "Consulter le motif et la portée de la dérogation.".into();
+        return Ok(finish_result(p));
+    }
+    if task.status == "abandoned" {
+        p.state = "abandoned".into();
+        p.label = "Abandonné — non validé".into();
+        p.validation_state = "abandoned".into();
+        p.reason = "La tâche est abandonnée ; aucun résultat validé n’est revendiqué.".into();
+        p.next_step = "Consulter la décision d’abandon.".into();
+        return Ok(finish_result(p));
+    }
+    if let Some(a) = agent {
+        if a.agent.is_active() {
+            if p.process_state == "running" {
+                p.state = "in_progress".into();
+                p.label = "En cours".into();
+                p.reason =
+                    "Le processus est actif ; aucun résultat final n’est encore affirmé.".into();
+                p.next_step = "Voir la session ou attendre la fin de la tentative.".into();
+            } else {
+                p.state = "execution_unconfirmed".into();
+                p.label = "État à vérifier".into();
+                p.reason =
+                    "La tentative est enregistrée, mais son exécution n’est pas confirmée.".into();
+                p.next_step = "Réconcilier la tentative avant toute relance.".into();
+            }
+            if let Some(report) = first_report(&facts.reports)? {
+                p.report_state = "early_unverified".into();
+                p.report_id = report.into();
+                p.reason
+                    .push_str(" Un rapport existe déjà, mais il peut être précoce ou incomplet.");
+            }
+            p.validation_state = "pending_process".into();
+            return Ok(finish_result(p));
+        }
+        if matches!(a.agent.status.as_str(), "failed" | "interrupted") {
+            if apply_review(&mut p, &facts.review)? {
+                return Ok(finish_result(p));
+            }
+            p.state = "stopped_early".into();
+            p.label = "Arrêté avant la fin".into();
+            p.validation_state = "not_validated".into();
+            p.reason = crate::text::trim_space(&a.agent.activity).into();
+            if p.reason.is_empty() {
+                p.reason = if a.agent.status == "failed" {
+                    "Le processus s’est terminé en échec."
+                } else {
+                    "Le processus a été interrompu."
+                }
+                .into();
+            }
+            if let Some(report) = first_report(&facts.reports)? {
+                if p.report_state == "absent" {
+                    p.report_state = "partial_possible".into();
+                    p.report_id = report.into();
+                    p.reason.push_str(" Un rapport existe, mais l’arrêt ne permet pas d’en affirmer la complétude.");
+                }
+            }
+            p.next_step="Examiner le motif, les traces et le rapport éventuel avant de décider d’une reprise.".into();
+            return Ok(finish_result(p));
+        }
+        if a.agent.status == "completed"
+            && task.status == "blocked"
+            && task.blocker.starts_with("Livraison incomplète :")
+        {
+            p.state = "delivery_incomplete".into();
+            p.label = "Résultat à compléter".into();
+            p.validation_state = "not_validated".into();
+            p.reason = task.blocker.clone();
+            p.next_step="Le responsable doit examiner les critères manquants et préparer une correction dans les limites autorisées.".into();
+            match &facts.incomplete_report {
+                IncompleteReport::NotObserved => {
+                    return Err(E::Refused("mission-status-incomplete-report-unobserved"))
+                }
+                IncompleteReport::Observed(Some(report)) if !report.is_empty() => {
+                    p.report_id = report.clone();
+                    p.report_state = "partial_possible".into();
+                }
+                IncompleteReport::Observed(_) => {}
+            }
+            return Ok(finish_result(p));
+        }
+        if a.agent.status == "completed" && apply_review(&mut p, &facts.review)? {
+            return Ok(finish_result(p));
+        }
+    }
+    if task.status == "submitted" {
+        if agent.is_none() {
+            p.process_state = "unknown".into();
+        }
+        p.validation_state = "missing_gate".into();
+        p.state = "result_to_review".into();
+        p.label = "Résultat à vérifier".into();
+        p.reason="Un rapport est soumis ; sa complétude et les critères restent à examiner. Aucune revue de validation n’est enregistrée.".into();
+        p.next_step =
+            "Lire le rapport, vérifier les critères et enregistrer la revue de validation.".into();
+        if task.gate.is_some() {
+            let valid = match facts.gate {
+                GateObservation::Current => true,
+                GateObservation::NotCurrent => false,
+                _ => return Err(E::Refused("mission-status-gate-unobserved")),
+            };
+            let blockers = blockers(&facts.freshness)?;
+            if !valid || !blockers.is_empty() {
+                p.state = "validation_withheld".into();
+                p.label = "Validation retenue".into();
+                p.validation_state = "failed_or_stale".into();
+                p.reason = blockers.first().cloned().unwrap_or_else(|| {
+                    "La revue de validation n’autorise pas une validation actuelle.".into()
+                });
+                p.next_step="Corriger ou renouveler les preuves, puis enregistrer une revue de validation actuelle.".into();
+            } else {
+                p.validation_state = "ready_for_decision".into();
+                p.reason="La revue de validation et ses preuves sont actuelles ; la décision d’acceptation reste à enregistrer.".into();
+                p.next_step =
+                    "Examiner le rapport puis enregistrer la décision de validation.".into();
+            }
+        }
+        return Ok(finish_result(p));
+    }
+    if agent.is_some_and(|a| a.agent.status == "completed") {
+        p.process_state = "completed".into();
+        p.validation_state = "not_started".into();
+        match &facts.attribution {
+            ReportAttribution::NotObserved => {
+                return Err(E::Refused("mission-status-report-attribution-unobserved"))
+            }
+            ReportAttribution::Attributed(report) => {
+                if report.is_empty() {
+                    return Err(E::Refused("mission-status-report-empty"));
+                }
+                p.state = "result_to_review".into();
+                p.label = "Résultat à vérifier".into();
+                p.report_state = "attributable_unsubmitted".into();
+                p.report_id = report.clone();
+                p.reason="Le processus est terminé et un rapport lui est attribuable ; sa complétude n’est pas démontrée.".into();
+                p.next_step="Soumettre le rapport, vérifier les critères et enregistrer la revue de validation.".into();
+            }
+            ReportAttribution::Unavailable { reason } => {
+                p.state = "completed_unproven".into();
+                p.label = "Terminé, résultat non démontré".into();
+                p.report_state = "absent_or_unattributed".into();
+                p.reason = format!("Le processus est terminé normalement, mais {reason}.");
+                if let Some(a) = agent {
+                    if !crate::text::trim_space(&a.agent.relay).is_empty() {
+                        p.reason = a.agent.relay.clone();
+                    }
+                }
+                p.next_step =
+                    "Désigner ou compléter un rapport avant toute validation ou relance.".into();
+            }
+        }
+        return Ok(finish_result(p));
+    }
+    if task.gate.is_some() {
+        match facts.gate {
+            GateObservation::Current => {}
+            GateObservation::NotCurrent => p.validation_state = "failed_or_stale".into(),
+            _ => return Err(E::Refused("mission-status-gate-unobserved")),
+        }
+    }
+    Ok(finish_result(p))
+}
+
+/// Project the latest applicable attempt and model/cost attribution exactly from
+/// retained rows. Absence uses Task.attempts history, never current model settings.
+fn attempt(task: &Task, agents: &[AgentObservation<'_>]) -> MissionAttemptProjection {
+    let mut p = MissionAttemptProjection {
+        agent_id: String::new(),
+        attempt_id: String::new(),
+        role: String::new(),
+        process_state: String::new(),
+        activity: String::new(),
+        validation: task.status.clone(),
+        requested_model: String::new(),
+        observed_model: String::new(),
+        cost_state: "unknown".into(),
+    };
+    if let Some(a) = agents.iter().find(|a| a.agent.task_id == task.id) {
+        p.agent_id = a.agent.id.clone();
+        p.attempt_id = a.agent.attempt_id.clone();
+        p.role = a.agent.role.clone();
+        p.process_state = a.agent.status.clone();
+        p.activity = a.agent.activity.clone();
+        if let Some(model) = &a.agent.model_route {
+            p.requested_model = model.model.clone();
+        }
+        if let Some(model) = &a.agent.reported_model {
+            p.observed_model = model.model.clone();
+        }
+        if a.agent
+            .usage
+            .as_ref()
+            .is_some_and(|u| u.provider_reported_cost_usd.is_some())
+        {
+            p.cost_state = "reported".into();
+        }
+    } else if let Some(last) = task.attempts.as_ref().and_then(|a| a.last()) {
+        p.attempt_id = last.id.clone();
+    }
+    p
+}
+/// Count transitive dependants with a visited set as Go descendantCount does.
+/// This is a display impact, not graph validation, ordering or scheduling.
+fn impact(work: &Work, id: &str) -> Result<i64, E> {
+    let mut seen = BTreeSet::from([id]);
+    loop {
+        let old = seen.len();
+        for task in work.tasks.iter().flatten() {
+            if task
+                .depends
+                .iter()
+                .flatten()
+                .any(|d| seen.contains(d.as_str()))
+            {
+                seen.insert(task.id.as_str());
+            }
+        }
+        if old == seen.len() {
+            break;
+        }
+    }
+    i64::try_from(seen.len() - 1).map_err(|_| E::Refused("mission-status-count-representation"))
+}
+/// Validate exact dependency coordinates before reading freshness; every real
+/// dependency is observed even for accepted tasks because taskWaits consumes it.
+fn dependencies<'a>(
+    task: &Task,
+    facts: &'a [DependencyObservation],
+) -> Result<&'a [DependencyObservation], E> {
+    let ids = task.depends.as_deref().unwrap_or(&[]);
+    if ids.len() != facts.len() || ids.iter().zip(facts).any(|(id, f)| id != &f.task_id) {
+        return Err(E::Refused("mission-status-dependencies-mismatch"));
+    }
+    if facts
+        .iter()
+        .any(|f| matches!(f.freshness, DependencyFreshness::NotObserved))
+    {
+        return Err(E::Refused("mission-status-dependency-unobserved"));
+    }
+    Ok(facts)
+}
+/// Read-only dependency explanations in stored order. Missing/stale facts were
+/// classified by the reader; no acceptance or filesystem checks occur here.
+fn waits(work: &Work, facts: &[DependencyObservation]) -> Vec<MissionWait> {
+    facts.iter().filter(|f|matches!(f.freshness,DependencyFreshness::NotCurrent)).map(|f|{
+        match work.tasks.iter().flatten().find(|t|t.id==f.task_id){
+            None=>MissionWait {task:f.task_id.clone(),title:f.task_id.clone(),state:"missing".into(),reason:"Prérequis absent du plan.".into()},
+            Some(parent)=>MissionWait {task:f.task_id.clone(),title:parent.title.clone(),state:if parent.status=="accepted"{"stale".into()}else{parent.status.clone()},reason:if parent.status=="accepted"{"Validation ancienne : les preuves actuelles doivent être vérifiées à nouveau."}else{"Ce résultat n’est pas encore validé."}.into()}
+        }
+    }).collect()
+}
+/// Pure recoveryPreviewFor text only. No dialogue/receipt inspection or recovery
+/// consent is implied; optional advanced preview fields remain nil as Go does.
+fn recovery(work: &Work, task: &Task, agent: Option<&AgentObservation<'_>>) -> RecoveryPreview {
+    let mut p=RecoveryPreview {dialogue:None,work:work.id.clone(),task:task.id.clone(),revision:work.revision,agent:String::new(),kept:Some(vec!["Historique des tentatives, rapports et avis précédents.".into(),"Critères et dépendances du plan.".into()]),redone:Some(vec!["Vérification des conditions de lancement et du candidat courant.".into(),"Contrôles et revue requis pour la nouvelle tentative.".into()]),correction:task.next.clone(),criteria:Some(task.criteria.as_deref().unwrap_or(&[]).to_vec()),limits:"Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.".into(),since_refusal:None,evidence:None,remaining:None,refusal_note:String::new(),evidence_note:String::new()};
+    if let Some(a) = agent {
+        p.agent = a.agent.id.clone();
+        if let Some(kept) = &mut p.kept {
+            kept.push("Fournisseur et espace de la tentative sélectionnée, sous réserve des règles du lancement.".into());
+        }
+        if let Some(redone) = &mut p.redone {
+            redone.push(
+                "Une nouvelle tentative d’agent ; l’ancienne reste dans l’historique.".into(),
+            );
+        }
+    }
+    if let Some(r) = &task.corrective_recovery {
+        if !r.instruction.is_empty() {
+            p.correction = r.instruction.clone();
+        }
+    }
+    if work
+        .planning
+        .as_ref()
+        .is_some_and(|p| p.repository.is_some())
+    {
+        if let Some(kept) = &mut p.kept {
+            kept.push("Résultat précédent réutilisable seulement après contrôle du dossier de reprise ; ancienne copie conservée.".into());
+        }
+    }
+    p
+}
+/// Apply only a producer-observed dispatch disposition. Structural eligibility,
+/// slot/pause checks and recovery classification are not reimplemented or guessed.
+fn disposition(observed: &ReadinessObservation) -> Result<(&'static str, &str), E> {
+    match observed {
+        ReadinessObservation::NotObserved => Err(E::Refused("mission-status-readiness-unobserved")),
+        ReadinessObservation::Observed {
+            disposition,
+            reason,
+            ..
+        } => Ok((
+            match disposition {
+                DispatchDisposition::Ready => "ready",
+                DispatchDisposition::Waiting => "waiting",
+                DispatchDisposition::Manual => "manual",
+                DispatchDisposition::Intervention => "intervention",
+            },
+            reason,
+        )),
+    }
+}
+/// Configure default task-state branches from exact dependency/readiness inputs.
+/// The repeated dispatch observation used for corrective retries grants nothing.
+fn initial_task_state(
+    x: &mut MissionTask,
+    work: &Work,
+    task: &Task,
+    context: &MissionStatus,
+    facts: &TaskObservation,
+) -> Result<(), E> {
+    x.action = "inspect".into();
+    x.label = "Comprendre et résoudre".into();
+    x.reason = task.blocker.clone();
+    for dependency in &facts.dependencies {
+        if matches!(dependency.freshness, DependencyFreshness::NotCurrent) {
+            x.state = "waiting".into();
+            x.target = dependency.task_id.clone();
+            x.reason = work
+                .tasks
+                .iter()
+                .flatten()
+                .find(|t| t.id == dependency.task_id)
+                .map(|p| format!("Attend {}", p.title))
+                .unwrap_or_else(|| format!("Attend la validation de {}", dependency.task_id));
+            x.label = "Examiner le prérequis".into();
+            break;
+        }
+    }
+    if x.state == "waiting" {
+        return Ok(());
+    }
+    let (state, reason) = disposition(&facts.readiness)?;
+    x.state = state.into();
+    x.reason = reason.into();
+    let ReadinessObservation::Observed {
+        profile,
+        assistance,
+        workspace,
+        ..
+    } = &facts.readiness
+    else {
+        return Err(E::Refused("mission-status-readiness-unobserved"));
+    };
+    if matches!(profile, ProfileObservation::NotObserved) {
+        return Err(E::Refused("mission-status-profile-unobserved"));
+    }
+    if x.state == "ready" {
+        match assistance {
+            AssistObservation::NotObserved => {
+                return Err(E::Refused("mission-status-assist-unobserved"))
+            }
+            AssistObservation::Held { reason } => {
+                x.state = "intervention".into();
+                x.reason = reason.clone();
+            }
+            AssistObservation::Allowed => {
+                if matches!(profile, ProfileObservation::Missing) {
+                    return Err(E::Refused("mission-status-ready-profile-missing"));
+                }
+                match workspace {
+                    WorkspaceObservation::NotObserved => {
+                        return Err(E::Refused("mission-status-workspace-unobserved"))
+                    }
+                    WorkspaceObservation::Occupied => {
+                        x.state = "waiting".into();
+                        x.reason =
+                            "Espace occupé par une tentative ; reprise après sa libération".into();
+                    }
+                    WorkspaceObservation::Free => {}
+                }
+                if x.state == "ready" {
+                    x.action = "start".into();
+                    x.label = "Lancer cette tâche".into();
+                    if !context.authorized {
+                        x.state = "manual".into();
+                        x.reason =
+                            "Lancement manuel possible ; mission continue non autorisée".into();
+                    } else if !context.enabled {
+                        x.state = "waiting".into();
+                        x.action = "supervise".into();
+                        x.label = "Voir comment reprendre".into();
+                        x.reason = if context.supervision.state == "error" {
+                            "Conducteur présent, mais sa dernière vérification est en erreur"
+                        } else {
+                            "Autorisation enregistrée ; aucun conducteur actif observé"
+                        }
+                        .into();
+                    }
+                }
+            }
+        }
+    }
+    if matches!(profile, ProfileObservation::Missing) && x.state == "intervention" {
+        x.state = "configure".into();
+        x.reason = "Configuration initiale à préparer avant le premier départ".into();
+        x.action = "configure".into();
+        x.label = "Préparer le lancement".into();
+    }
+    if task.launch_held {
+        x.state = "intervention".into();
+        x.action = "prepare".into();
+        x.label = "Autoriser le plan dans Préparer".into();
+    }
+    Ok(())
+}
+
+/// Project all tasks in Work order, returning a complete new value or an error.
+/// Inputs must cover every task exactly once and every dependency in stored order;
+/// Agent facts retain the producer's latest-first history window. No partial
+/// projection is returned on missing proof, coordinate mismatch or numeric error.
+/// Counts follow Go's result branches before prepared/recovery task overrides.
+/// Existing insight functions produce explanations/actions; no fresh grant follows.
+/// Current/managed review and readiness classifiers remain mandatory external
+/// producers: this function does not implement or silently approximate them.
+pub fn project_tasks(
+    work: &Work,
+    context: &MissionStatus,
+    observations: &[TaskObservation],
+    agents: &[AgentObservation<'_>],
+) -> Result<TaskProjection, E> {
+    let tasks = work.tasks.as_deref().unwrap_or(&[]);
+    if tasks.len() != observations.len()
+        || tasks
+            .iter()
+            .zip(observations)
+            .any(|(t, o)| t.id != o.task_id)
+    {
+        return Err(E::Refused("mission-status-task-observations-mismatch"));
+    }
+    let mut context = context.clone();
+    context.validated = 0;
+    context.review = 0;
+    context.running = 0;
+    context.total = i64::try_from(tasks.len())
+        .map_err(|_| E::Refused("mission-status-count-representation"))?;
+    let insight_agents: Vec<_> = agents
+        .iter()
+        .map(|a| MissionAgentInsight {
+            task_id: &a.agent.task_id,
+            status: &a.agent.status,
+            active: a.agent.is_active(),
+            observed_state: a.observed_state,
+            fallback_diagnostic_limit_reached: a.fallback_diagnostic.limit_reached,
+            environment_recovery: a.environment_recovery,
+        })
+        .collect();
+    let mut result = TaskProjection {
+        tasks: Vec::with_capacity(tasks.len()),
+        validated: 0,
+        review: 0,
+        running: 0,
+    };
+    for (task, facts) in tasks.iter().zip(observations) {
+        let deps = dependencies(task, &facts.dependencies)?;
+        let agent = agents.iter().find(|a| a.agent.task_id == task.id);
+        let result_facts = result_presentation(task, agent, &facts.result)?;
+        let mut x = MissionTask {
+            waits: Some(waits(work, deps)),
+            recovery_preview: recovery(work, task, agent),
+            primary: MissionPrimaryAction {
+                kind: String::new(),
+                label: String::new(),
+                effect: String::new(),
+                task: String::new(),
+                tone: String::new(),
+            },
+            attempts_used: i64::try_from(task.attempts.as_ref().map_or(0, Vec::len))
+                .map_err(|_| E::Refused("mission-status-count-representation"))?,
+            attempts_allowed: task.plan_max_attempts,
+            attempt_limit_reached: false,
+            id: task.id.clone(),
+            title: task.title.clone(),
+            state: task.status.clone(),
+            reason: String::new(),
+            action: String::new(),
+            label: String::new(),
+            target: task.id.clone(),
+            impact: impact(work, &task.id)?,
+            deliverable: task.deliverable.clone(),
+            validation_mode: task
+                .validation_policy
+                .as_ref()
+                .map_or_else(|| "human".into(), |v| v.mode.clone()),
+            validation_receipt: task
+                .automatic_validation
+                .as_ref()
+                .map_or_else(String::new, |v| v.receipt.clone()),
+            result: result_facts,
+            understanding: MissionUnderstanding {
+                what: String::new(),
+                next_step: String::new(),
+                actor: String::new(),
+                actor_kind: String::new(),
+                situation: String::new(),
+            },
+            diagnostic: None,
+            attempt: attempt(task, agents),
+        };
+        let count = |field: &mut i64| -> Result<(), E> {
+            *field = field
+                .checked_add(1)
+                .ok_or(E::Refused("mission-status-count-representation"))?;
+            Ok(())
+        };
+        match x.result.state.as_str() {
+            "validated" => {
+                count(&mut result.validated)?;
+                x.state = "validated".into();
+                x.reason = x.result.reason.clone();
+                x.action = "report".into();
+                x.label = "Voir le résultat".into();
+            }
+            "validation_stale" => {
+                x.state = "intervention".into();
+                x.reason = x.result.reason.clone();
+                x.action = "reopen".into();
+                x.label = "Revalider les preuves".into();
+            }
+            "waived" | "abandoned" => {
+                x.state = x.result.state.clone();
+                x.reason = x.result.reason.clone();
+                x.action = "inspect".into();
+                x.label = if x.state == "waived" {
+                    "Voir la dérogation"
+                } else {
+                    "Voir la décision"
+                }
+                .into();
+            }
+            "review_blocked" | "delivery_incomplete" => {
+                x.state = "intervention".into();
+                x.reason = x.result.reason.clone();
+                x.action = "inspect".into();
+                x.label = "Examiner le résultat".into();
+            }
+            "review_in_progress" | "review_awaiting_publication" => {
+                count(&mut result.review)?;
+                x.state = "review".into();
+                x.reason = x.result.reason.clone();
+                x.action = "report".into();
+                x.label = "Examiner le résultat".into();
+            }
+            "result_to_review" | "validation_withheld" => {
+                count(&mut result.review)?;
+                x.state = "review".into();
+                x.reason = x.result.reason.clone();
+                x.action = "report".into();
+                x.label = "Examiner le résultat".into();
+                if x.validation_mode == "automatic" && x.result.validation_state == "missing_gate" {
+                    x.reason="Contrôles automatiques préautorisés retenus ; vérifier pause, autorisation et preuves".into();
+                }
+                if x.result.validation_state == "ready_for_decision" {
+                    x.action = "accepted".into();
+                    x.label = "Valider après revue".into();
+                }
+            }
+            "in_progress" | "execution_unconfirmed" => {
+                count(&mut result.running)?;
+                x.state = "running".into();
+                x.reason = x.result.reason.clone();
+                x.action = "inspect".into();
+                x.label = "Suivre l’agent".into();
+            }
+            "stopped_early" | "completed_unproven" => {
+                x.state = "intervention".into();
+                x.reason = x.result.reason.clone();
+                x.action = "inspect".into();
+                x.label = "Examiner avant reprise".into();
+            }
+            _ => initial_task_state(&mut x, work, task, &context, facts)?,
+        }
+        match &facts.prepared_launch {
+            PreparedLaunchObservation::NotObserved => {
+                return Err(E::Refused("mission-status-prepared-launch-unobserved"))
+            }
+            PreparedLaunchObservation::Absent => {}
+            PreparedLaunchObservation::Present { reason } => {
+                x.state = "intervention".into();
+                x.action = "inspect".into();
+                x.label = "Reprendre le lancement préparé".into();
+                x.reason = if reason.is_empty() {
+                    "La copie et les réglages sont conservés. Confirmez la reprise du lancement depuis cette tâche.".into()
+                } else {
+                    reason.clone()
+                };
+            }
+        }
+        if task.status == "blocked"
+            && task.plan_max_attempts > 0
+            && x.attempts_used >= task.plan_max_attempts
+            && x.state != "review"
+        {
+            x.attempt_limit_reached = match facts.execution {
+                ExecutionObservation::NotObserved => {
+                    return Err(E::Refused("mission-status-execution-unobserved"))
+                }
+                ExecutionObservation::Observed => false,
+                ExecutionObservation::NotPresent => true,
+            };
+        }
+        if task
+            .independent_review
+            .as_ref()
+            .is_some_and(|r| r.state == "running")
+            || agents
+                .iter()
+                .any(|a| a.agent.task_id == task.id && a.agent.is_active())
+        {
+            x.attempt_limit_reached = false;
+        }
+        if x.attempt_limit_reached {
+            x.state = "intervention".into();
+            x.action = "recovery".into();
+            x.label = "Examiner les tentatives et les refus".into();
+            if let Some(r) = &task.independent_review {
+                if r.state == "changes_requested" {
+                    x.reason = r.reason.clone();
+                }
+            }
+        }
+        if task.corrective_recovery.is_some()
+            && task.planning_retry
+            && task.status == "blocked"
+            && x.attempts_used < task.plan_max_attempts
+        {
+            let (state, reason) = disposition(&facts.readiness)?;
+            x.state = state.into();
+            x.reason = format!("Essai correctif autorisé. {reason}");
+            x.action = "supervise".into();
+            x.label = "Suivre la reprise".into();
+        }
+        context.validated = result.validated;
+        context.review = result.review;
+        context.running = result.running;
+        x.understanding = task_understanding(&x, &context, &insight_agents);
+        if let Some(a) = agent {
+            if a.fallback_diagnostic
+                .items
+                .as_ref()
+                .is_some_and(|v| !v.is_empty())
+            {
+                x.diagnostic = Some(Box::new(a.fallback_diagnostic.clone()));
+            }
+        }
+        x.primary = mission_task_primary(&x);
+        result.tasks.push(x);
+    }
+    Ok(result)
+}
+
+#[cfg(test)]
+mod tests;
+
+FILE rust/crates/swarm-engine/src/root_store/mission_status_review.rs SHA256 0a41768ae2f91c503366342a965634f415b36c69632b7595755fe13ed5fe5d3c
+//! Nonmanaged current review observations for the historical aggregate.
+//! Go result_presentation.go currentReviewPresentation ordering. Recorded review
+//! phase is not reviewer process liveness, identity authentication or acceptance.
+use super::{
+    mission_status_evidence::{semantic_artifact, semantic_gate},
+    RootStoreError as E,
+};
+use crate::gate_evaluation::artifact_hash;
+use crate::mission_status_tasks::{ReviewObservation, ReviewPresentation};
+use crate::{Agent, EngineSettingsDocument, IndependentReview, Task, Work};
+use std::path::Path;
+
+/// Require the actual latest attempt and producer, without normalization or a
+/// chronological guess from opaque identifiers. Passed deliberately falls
+/// through as Go; this pure predicate verifies no evidence or authority.
+pub(super) fn applies(
+    planning: bool,
+    latest_attempt: Option<&str>,
+    agent_id: &str,
+    agent_attempt: &str,
+    review: &IndependentReview,
+) -> bool {
+    planning
+        && review.state != "passed"
+        && latest_attempt == Some(review.attempt.as_str())
+        && review.attempt == agent_attempt
+        && review.producer == agent_id
+}
+
+/// Match the historical presentation vocabulary; unknown is not a passed opinion.
+fn state_label(state: &str) -> &'static str {
+    match state {
+        "running" => "Examen en cours",
+        "passed" => "Avis favorable",
+        "changes_requested" => "Corrections ou preuves demandées",
+        "error" => "Vérification interrompue",
+        "stale" => "Avis périmé",
+        _ => "Avis indisponible",
+    }
+}
+
+/// Construct only review causal fields, before checking report and contract.
+/// Caller must not publish the base alone; no accepted/process field is set.
+fn base(review: &IndependentReview) -> ReviewPresentation {
+    ReviewPresentation {state:"review_blocked".into(),label:state_label(&review.state).into(),validation_state:"review_unvalidated".into(),reason:format!("Revue indépendante : {}",review.reason),next_step:"Examiner le rapport et le motif de la revue avant de choisir une correction ou une reprise autorisée.".into(),report_id:review.report.clone(),receipt_id:review.receipt.clone(),report_state:"submitted".into()}
+}
+
+/// Mark an observed missing/changed report. This changes presentation only;
+/// caller separately retains a typed original semantic failure where one exists.
+fn stale_report(p: &mut ReviewPresentation) {
+    p.report_state = "stale".into();
+    p.validation_state = "failed_or_stale".into();
+    p.label = "Preuves à renouveler".into();
+    p.reason="Le rapport transmis au vérificateur est indisponible ou modifié ; ses preuves doivent être réexaminées.".into();
+}
+
+/// Check the contained report bytes against their recorded digest. Known stale
+/// errors are retained in the sidecar and return false; unknown IO/cleanup errors
+/// refuse the whole read. No unreadable file becomes absence or an empty success.
+fn report_current(
+    root: &Path,
+    review: &IndependentReview,
+    p: &mut ReviewPresentation,
+    causes: &mut Vec<E>,
+) -> Result<bool, E> {
+    match artifact_hash(root, &review.report) {
+        Ok((_, hash)) if hash == review.sha256 => Ok(true),
+        Ok(_) => {
+            causes.push(E::Refused("mission-status-review-report-stale"));
+            stale_report(p);
+            Ok(false)
+        }
+        Err(error) if semantic_artifact(&error) => {
+            causes.push(E::Gate(crate::GateContractError::Evaluation(error)));
+            stale_report(p);
+            Ok(false)
+        }
+        Err(error) => Err(E::Gate(crate::GateContractError::Evaluation(error))),
+    }
+}
+
+/// Check every declared review artifact. A digest mismatch or known semantic
+/// failure returns false with its typed sidecar; unknown IO/close errors refuse.
+/// Missing map is exactly the stored absence, not a fabricated evidence list.
+fn artifacts_current(
+    root: &Path,
+    review: &IndependentReview,
+    causes: &mut Vec<E>,
+) -> Result<bool, E> {
+    for (name, expected) in review.report_artifacts.iter().flatten() {
+        match artifact_hash(root, name) {
+            Ok((_, actual)) if &actual == expected => {}
+            Ok(_) => {
+                causes.push(E::Refused("mission-status-review-artifact-stale"));
+                return Ok(false);
+            }
+            Err(error) if semantic_artifact(&error) => {
+                causes.push(E::Gate(crate::GateContractError::Evaluation(error)));
+                return Ok(false);
+            }
+            Err(error) => return Err(E::Gate(crate::GateContractError::Evaluation(error))),
+        }
+    }
+    Ok(true)
+}
+
+/// Finalize only after report/contract/artifact checks. The stored running phase
+/// describes review workflow, never an observed live reviewer process. No state
+/// can turn this opinion into accepted/validated or grant another call.
+fn apply_state(p: &mut ReviewPresentation, state: &str) {
+    match state {
+        "changes_requested" => p.validation_state = "review_changes_requested".into(),
+        "stale" => p.validation_state = "failed_or_stale".into(),
+        "running" => {
+            p.state = "review_in_progress".into();
+            p.validation_state = "pending_review".into();
+            p.reason =
+                "Le rapport est conservé ; le vérificateur indépendant examine le candidat testé."
+                    .into();
+            p.next_step =
+                "Attendre l’avis indépendant ; le résultat n’est pas encore accepté.".into()
+        }
+        _ => {}
+    }
+}
+
+/// Distinguish stale control evidence from unknown IO/configuration/codec errors.
+/// Quality policy absence is a missing precondition, never an unfavorable verdict.
+fn semantic_validation(error: &crate::ValidationEvidenceError) -> bool {
+    match error {
+        crate::ValidationEvidenceError::Refused(code) => matches!(
+            *code,
+            "current-validation-required"
+                | "successful-controls-required"
+                | "complete-receipt-required"
+                | "control-not-demonstrated"
+                | "control-output-not-authorized"
+                | "control-output-incoherent"
+                | "validation-artifact-stale"
+        ),
+        crate::ValidationEvidenceError::Gate(error) => semantic_gate(error),
+        crate::ValidationEvidenceError::Artifact(error) => semantic_artifact(error),
+        crate::ValidationEvidenceError::Encode(_) => false,
+    }
+}
+
+/// Match the known Go control-refusal vocabulary for the static receipt cases.
+/// Other typed causes retain their safe Rust diagnostic; this formatting neither
+/// suppresses the original cause nor establishes verbatim parity for all errors.
+fn validation_reason(error:&crate::ValidationEvidenceError)->String {
+    match error {
+        crate::ValidationEvidenceError::Refused("current-validation-required")=>"contrôles moteur courants requis avant la revue".into(),
+        crate::ValidationEvidenceError::Refused("successful-controls-required")=>"contrôles non réussis".into(),
+        crate::ValidationEvidenceError::Refused("complete-receipt-required")=>"reçu moteur incomplet".into(),
+        _=>error.to_string(),
+    }
+}
+
+/// Observe the applicable ordinary review using current contained artifacts and
+/// contract, with Go's passed/no-planning/stale-attempt fallthrough. Managed
+/// presentation remains refused. Before first required review, current controls
+/// use saved validation-output/quality settings; semantic failures are explicit
+/// ControlsStale with original causes, unknown failures remain Err. Caller
+/// supplies a real canonical Work/settings snapshot under material association,
+/// preserves the sidecar even on later errors, and rechecks its outer snapshot.
+/// No launch, SQL mutation, retry, new policy, authentication or acceptance occurs.
+pub(super) fn observe(
+    root: &Path,
+    work: &Work,
+    task: &Task,
+    agent: &Agent,
+    settings: &EngineSettingsDocument,
+    causes: &mut Vec<E>,
+) -> Result<ReviewObservation, E> {
+    let Some(planning) = work.planning.as_deref() else {
+        return Ok(ReviewObservation::NotApplicable);
+    };
+    if planning.repository.is_some() {
+        return Err(E::Refused("mission-status-managed-review-unported"));
+    }
+    let latest = task
+        .attempts
+        .as_ref()
+        .and_then(|v| v.last())
+        .map(|a| a.id.as_str());
+    if task.independent_review.is_none()
+        && planning.reviewer_required
+        && task.status == "submitted"
+        && agent.status == "completed"
+        && latest == Some(agent.attempt_id.as_str())
+    {
+        let output = settings
+            .values
+            .validation_output_limit()
+            .map_err(E::Settings)?;
+        let quality = if task.validation_policy.as_deref().is_some_and(|p| {
+            p.mode == "automatic" && p.controls.as_ref().is_some_and(|v| !v.is_empty())
+        }) {
+            Some(settings.quality_policy_snapshot().map_err(E::Settings)?)
+        } else {
+            None
+        };
+        match crate::check_validation_evidence(root, task, quality.as_ref(), output) {
+            Ok(_) => {}
+            Err(error) if semantic_validation(&error) => {
+                let reason = validation_reason(&error);
+                causes.push(E::ValidationEvidence(error));
+                return Ok(ReviewObservation::ControlsStale { reason });
+            }
+            Err(error) => return Err(E::ValidationEvidence(error)),
+        }
+    }
+    let Some(review) = task.independent_review.as_deref() else {
+        return Ok(ReviewObservation::NotApplicable);
+    };
+    if !applies(true, latest, &agent.id, &agent.attempt_id, review) {
+        return Ok(ReviewObservation::NotApplicable);
+    }
+    let mut presentation = base(review);
+    if !report_current(root, review, &mut presentation, causes)? {
+        return Ok(ReviewObservation::Presented(presentation));
+    }
+    let contract = crate::review_contract(task).map_err(E::Encode)?;
+    if review.contract != contract || !artifacts_current(root, review, causes)? {
+        if review.contract != contract {
+            causes.push(E::Refused("mission-status-review-contract-stale"))
+        }
+        presentation.validation_state = "failed_or_stale".into();
+        presentation.label = "Avis périmé".into();
+        presentation.reason =
+            "Le contrat ou la révision de base a changé depuis cette revue.".into();
+        return Ok(ReviewObservation::Presented(presentation));
+    }
+    apply_state(&mut presentation, &review.state);
+    Ok(ReviewObservation::Presented(presentation))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    /// Pure identity matching is not liveness, artifact or acceptance evidence.
+    #[test]
+    fn current_review_matches_latest_attempt_and_producer_only() {
+        let mut review = IndependentReview {
+            attempt: "a3".into(),
+            producer: "agent".into(),
+            state: "changes_requested".into(),
+            ..Default::default()
+        };
+        assert!(applies(true, Some("a3"), "agent", "a3", &review));
+        for (planning, latest, id, attempt) in [
+            (false, Some("a3"), "agent", "a3"),
+            (true, None, "agent", "a3"),
+            (true, Some("a4"), "agent", "a3"),
+            (true, Some("a3"), "other", "a3"),
+            (true, Some("a3"), "agent", "a4"),
+        ] {
+            assert!(!applies(planning, latest, id, attempt, &review))
+        }
+        review.state = "passed".into();
+        assert!(!applies(true, Some("a3"), "agent", "a3", &review));
+    }
+    /// Final/current metadata never manufactures validation, including unknown
+    /// phases; exact historical labels remain distinct from process liveness.
+    #[test]
+    fn current_review_states_are_not_acceptance() {
+        for (state, label, validation, result) in [
+            (
+                "changes_requested",
+                "Corrections ou preuves demandées",
+                "review_changes_requested",
+                "review_blocked",
+            ),
+            (
+                "error",
+                "Vérification interrompue",
+                "review_unvalidated",
+                "review_blocked",
+            ),
+            ("stale", "Avis périmé", "failed_or_stale", "review_blocked"),
+            (
+                "running",
+                "Examen en cours",
+                "pending_review",
+                "review_in_progress",
+            ),
+            (
+                "other",
+                "Avis indisponible",
+                "review_unvalidated",
+                "review_blocked",
+            ),
+        ] {
+            let review = IndependentReview {
+                state: state.into(),
+                ..Default::default()
+            };
+            let mut p = base(&review);
+            apply_state(&mut p, state);
+            assert_eq!(p.label, label);
+            assert_eq!(p.validation_state, validation);
+            assert_eq!(p.state, result);
+        }
+    }
+    /// Before first required review, a missing real control receipt blocks the
+    /// result without inventing a reviewer call. Pure supplied Work/settings,
+    /// no filesystem/SQL writes or current native acceptance proof.
+    #[test]
+    fn current_review_missing_controls_are_observed_not_ignored() {
+        let settings = EngineSettingsDocument::initial(
+            crate::EngineSettingsValues::installation_defaults().unwrap(),
+            "fixture".into(),
+            "2026-10-23T12:00:00Z".into(),
+        )
+        .unwrap();
+        let task:Task=serde_json::from_value(serde_json::json!({"id":"t","status":"submitted","attempts":[{"id":"a3"}],"validation_policy":{"mode":"human","controls":[{"id":"fixture-control","command":["python3","-c","pass"]}]}})).unwrap();
+        let mut work = Work {
+            planning: Some(Box::new(crate::PlanningState {
+                reviewer_required: false,
+                ..Default::default()
+            })),
+            ..Default::default()
+        };
+        let agent = Agent {
+            id: "agent".into(),
+            task_id: "t".into(),
+            attempt_id: "a3".into(),
+            status: "completed".into(),
+            ..Default::default()
+        };
+        let mut causes = vec![];
+        assert!(matches!(
+            observe(
+                Path::new("/unused-read-free-fixture"),
+                &work,
+                &task,
+                &agent,
+                &settings,
+                &mut causes
+            )
+            .unwrap(),
+            ReviewObservation::NotApplicable
+        ));
+        assert!(causes.is_empty());
+        work.planning.as_mut().unwrap().reviewer_required = true;
+        assert!(matches!(
+            observe(
+                Path::new("/unused-read-free-fixture"),
+                &work,
+                &task,
+                &agent,
+                &settings,
+                &mut causes
+            )
+            .unwrap(),
+            ReviewObservation::ControlsStale { reason } if reason=="contrôles moteur courants requis avant la revue"
+        ));
+        assert_eq!(causes.len(), 1);
+        assert!(matches!(&causes[0], E::ValidationEvidence(_)));
+        assert!(!semantic_validation(
+            &crate::ValidationEvidenceError::Refused("unknown-future-error")
+        ));
+    }
+    /// A real current report then changed/missing bytes and restoration exercise
+    /// semantic sidecars. The unique owned fixture is retained for diagnostics.
+    #[test]
+    fn current_review_report_and_artifact_staleness_recover() {
+        let root = std::env::temp_dir().join(format!(
+            "swarm-status-review-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        eprintln!("OWNED_REVIEW_FIXTURE {}", root.display());
+        std::fs::write(root.join("report.md"), b"original").unwrap();
+        let hash = artifact_hash(&root, "report.md").unwrap().1;
+        let review = IndependentReview {
+            report: "report.md".into(),
+            sha256: hash.clone(),
+            report_artifacts: Some(std::collections::BTreeMap::from([(
+                "report.md".into(),
+                hash,
+            )])),
+            ..Default::default()
+        };
+        let mut causes = vec![];
+        let mut p = base(&review);
+        assert!(report_current(&root, &review, &mut p, &mut causes).unwrap());
+        assert!(artifacts_current(&root, &review, &mut causes).unwrap());
+        assert!(causes.is_empty());
+        std::fs::write(root.join("report.md"), b"changed").unwrap();
+        assert!(!report_current(&root, &review, &mut p, &mut causes).unwrap());
+        assert_eq!(p.report_state, "stale");
+        assert!(!artifacts_current(&root, &review, &mut causes).unwrap());
+        assert_eq!(causes.len(), 2);
+        std::fs::write(root.join("report.md"), b"original").unwrap();
+        assert!(report_current(&root, &review, &mut base(&review), &mut vec![]).unwrap());
+        std::fs::remove_file(root.join("report.md")).unwrap();
+        let mut missing = vec![];
+        assert!(!report_current(&root, &review, &mut p, &mut missing).unwrap());
+        assert_eq!(missing.len(), 1);
+        assert!(matches!(&missing[0], E::Gate(_)));
+    }
+}
+
+FILE rust/crates/swarm-engine/src/root_store/mission_report_relay.rs SHA256 9d67ddfb07dc0d22d51d357a37c89a9a4bef34ceb46e573ac578ffb0600dffee
+//! Lease-fenced automatic handoff submission. Report bytes and timestamps are
+//! observations, never authenticated authorship, quality or task acceptance.
+use super::{finished, LocalDirectory, RootStore, RootStoreError as E};
+use crate::work_engine::{MutationFence, MutationFenceReceipt};
+use crate::{Agent, EngineSettingsDocument, MissionLease, Work, WorkEngineError};
+use rusqlite::Connection;
+use std::{error::Error, path::Path};
+
+/// Result of inspecting one retained worker, including workers from older watch
+/// generations. Waiting observes no submission; Submitted is known recorded
+/// Work state, not validation/acceptance. No process is started or signalled.
+pub enum MissionReportRelayOutcome {
+    NotApplicable,
+    Waiting { reason: &'static str },
+    Submitted { work: String, revision: i64, agent_id: String, report: String },
+}
+/// One contained, nonempty report observed after applying the saved clock margin.
+#[derive(Debug, PartialEq, Eq)]
+struct Report { path: String, sha256: String }
+/// Keep original file/clock/codec errors, including nested cleanup failures.
+fn caused(code: &'static str, error: impl Error + Send + Sync + 'static) -> E {
+    E::Mutation(WorkEngineError::Mission(Box::new(crate::MissionSupervisionError::Cause {
+        code, cause: Box::new(error),
+    })))
+}
+/// Select an inclusive freshness window without date subtraction overflow. Inputs
+/// are observed nanoseconds and an explicitly validated nonnegative i64 setting;
+/// constants only convert seconds to nanoseconds. Empty/stale/ambiguous remain
+/// distinct; this pure helper establishes no filesystem containment or identity.
+fn select(times: &[(String, u64, i128)], started: i128, skew: i64) -> Result<Result<&str, &'static str>, E> {
+    if skew < 0 { return Err(E::Refused("mission-report-clock-skew-invalid")); }
+    let since = started - i128::from(skew) * 1_000_000_000;
+    let mut found = None;
+    let mut stale = false;
+    for (path, size, modified) in times {
+        if *size == 0 { continue; }
+        if *modified < since { stale = true; continue; }
+        if found.is_some() { return Ok(Err("mission-report-ambiguous")); }
+        found = Some(path.as_str());
+    }
+    Ok(found.ok_or(if stale { "mission-report-stale" } else { "mission-report-missing" }))
+}
+/// Discover only in the actual attempt workspace, translate to the canonical
+/// project and hash bytes. Shared listing/metadata/hash readers retain unknown
+/// IO/path/close causes. Sequential observations are not an atomic file snapshot;
+/// the mutation fence repeats selection and task.submit rechecks actual bytes.
+fn report(root: &Path, agent: &Agent, skew: i64) -> Result<Result<Report, &'static str>, E> {
+    let started = swarm_wire_json::go_rfc3339::parse(&agent.started)
+        .map_err(|e| caused("mission-report-start-invalid", e))?.unix_timestamp_nanos();
+    let workspace = if agent.workspace.is_empty() { root.to_path_buf() } else {
+        crate::canonical_project_root(Path::new(&agent.workspace)).map_err(E::Path)?
+    };
+    if !workspace.starts_with(root) || !workspace.is_dir() {
+        return Err(E::Refused("mission-report-workspace-outside-root"));
+    }
+    let mut times = Vec::new();
+    for name in super::mission_status_reports::task_reports(&workspace, &agent.task_id)? {
+        let (_, metadata) = crate::gate_evaluation::artifact_metadata(&workspace, &name)
+            .map_err(|e| caused("mission-report-metadata", e))?;
+        use std::os::unix::fs::MetadataExt;
+        let modified = i128::from(metadata.mtime()) * 1_000_000_000 + i128::from(metadata.mtime_nsec());
+        times.push((name, metadata.len(), modified));
+    }
+    let name = match select(&times, started, skew)? { Ok(name) => name, Err(reason) => return Ok(Err(reason)) };
+    let relative = workspace.join(name).strip_prefix(root)
+        .map_err(|e| caused("mission-report-relative", e))?.to_path_buf();
+    let relative = relative.to_str().ok_or(E::Refused("mission-report-path-not-utf8"))?;
+    let (_, sha256) = crate::gate_evaluation::artifact_hash(root, relative)
+        .map_err(|e| caused("mission-report-hash", e))?;
+    Ok(Ok(Report { path: relative.into(), sha256 }))
+}
+/// Recheck actual completed worker, original automatic claim and durable terminal
+/// receipt against the connected datastore. Require live mission consent/mode,
+/// pause/archive guards; no historical label alone authorizes the new mutation.
+pub(super) fn producer(db: &Connection, directory: &LocalDirectory, work: &Work, agent_id: &str, settings: &EngineSettingsDocument) -> Result<Agent, E> {
+    super::mission_producer::completed(db,directory,work,agent_id,settings,super::mission_producer::OriginRequirement::AutomaticWorker)
+}
+/// Engine-owned fence: current lease plus original worker proof and exact current
+/// selection. Settings are reread under the command's existing reservation; a
+/// revision change refuses, never silently adopts a new margin mid-submission.
+/// The post-stage check recognizes only its exact own intent (event/revision/
+/// report), without treating an older delivered result as a fresh submission.
+struct RelayFence<'a> { lease: &'a MissionLease, directory: LocalDirectory, root: &'a Path, agent: &'a str, settings_revision: crate::SettingCount, event_id: &'a str, expected_revision: i64, report: &'a Report }
+impl MutationFence for RelayFence<'_> {
+    fn stage_receipt(&self, db: &Connection, receipt: MutationFenceReceipt<'_>) -> Result<(), WorkEngineError> { self.lease.stage_receipt(db, receipt) }
+    fn check(&self, db: &Connection, work: &str, now: &str) -> Result<(), WorkEngineError> {
+        self.lease.check(db, work, now)?;
+        let result = (|| {
+            let settings = RootStore::read_settings_from(&self.directory)?;
+            if settings.revision != self.settings_revision { return Err(E::Refused("mission-report-settings-changed")); }
+            let saved = crate::read_recorded_work(db, work).map_err(E::Work)?;
+            let row = producer(db, &self.directory, &saved, self.agent, &settings)?;
+            if let Some(prior)=super::task_validation::latest_submission(db,&saved,&row.task_id).map_err(|e|E::Launch(Box::new(e)))?.filter(|r|r.agent_id==self.agent){
+                // WorkEngine repeats the fence after staging this very intent,
+                // before commit. Only that exact canonical own submission is
+                // allowed here; preflight already excluded historical delivery.
+                if prior.event_id!=self.event_id || prior.expected_revision!=self.expected_revision || prior.report_path!=self.report.path || prior.report_sha256!=self.report.sha256 {
+                    return Err(E::Refused("mission-report-already-submitted"));
+                }
+            }
+            let observed = report(self.root, &row, settings.values.report_clock_skew_seconds().map_err(E::Settings)?)?
+                .map_err(E::Refused)?;
+            if &observed != self.report { return Err(E::Refused("mission-report-selection-changed")); }
+            Ok(())
+        })();
+        result.map_err(|e| WorkEngineError::Mission(Box::new(crate::MissionSupervisionError::Root(Box::new(e)))))
+    }
+}
+impl RootStore {
+    /// Submit one real current worker report under the owning mission lease.
+    /// The caller supplies only the retained Agent ID; the engine discovers the
+    /// report and rechecks lease/consent/original producer/receipt/settings/bytes
+    /// inside the canonical task.submit writer, including before commit. Old
+    /// watch generations may finish; manual/active/nonblocked/dialogue work is
+    /// not relayed. An existing canonical submission by this producer is not
+    /// repeated after quality blocks the task, even across watch generations.
+    /// Missing/stale/ambiguous first reports wait without mutation.
+    /// Typed errors retain causes and known recorded Work after late cleanup;
+    /// no retry, provider, validation, acceptance or author authentication occurs.
+    pub fn relay_mission_report(&mut self, lease: &MissionLease, agent_id: &str) -> Result<MissionReportRelayOutcome, E> {
+        let work_id = super::mission_supervision_store::bound_mission_work(self, lease)
+            .map_err(|e| caused("mission-report-binding", e))?.to_owned();
+        let row = self.read_agent(agent_id)?;
+        if row.work_id != work_id { return Err(E::Refused("mission-report-work-mismatch")); }
+        if row.status != "completed" || row.role != "worker" || (row.native_mission.is_none() && row.origin != "conducteur") { return Ok(MissionReportRelayOutcome::NotApplicable); }
+        let work = self.read_work(&work_id)?;
+        let task = work.tasks.iter().flatten().find(|t| t.id == row.task_id).ok_or(E::Refused("mission-report-task-missing"))?;
+        if task.status != "blocked" || task.brainstorm { return Ok(MissionReportRelayOutcome::NotApplicable); }
+        let settings = self.settings()?;
+        let chosen = super::material_path::with_material_read(self, || {
+            // Original FIFO and durable terminal receipt readers require an
+            // actual coherent SQL snapshot even during non-mutating discovery.
+            super::mission_supervision_store::read_transaction(&self.db, || {
+                let observation = (|| {
+                    let current = crate::read_recorded_work(&self.db, &work_id).map_err(E::Work)?;
+                    let row = producer(&self.db, &self.directory, &current, agent_id, &settings)?;
+                    // A quality-blocked task still owns its canonical handoff.
+                    // New watch generations cannot resubmit the same producer,
+                    // even if its old report bytes later change.
+                    if super::task_validation::latest_submission(&self.db,&current,&row.task_id).map_err(|e|E::Launch(Box::new(e)))?.is_some_and(|r|r.agent_id==agent_id){return Ok(None);}
+                    report(&self.root, &row, settings.values.report_clock_skew_seconds().map_err(E::Settings)?).map(Some)
+                })();
+                observation.map_err(|e| crate::MissionSupervisionError::Root(Box::new(e)))
+            }).map_err(|e| caused("mission-report-observation", e))
+        })?;
+        let chosen = match chosen { None=>return Ok(MissionReportRelayOutcome::NotApplicable),Some(Ok(v))=>v,Some(Err(reason))=>return Ok(MissionReportRelayOutcome::Waiting { reason }) };
+        let event = format!("relay-{}", crate::provider_configuration::configuration_digest(format!("{agent_id}/{}/{}",row.attempt_id,chosen.sha256).as_bytes()));
+        let request = crate::TaskReportRequest { schema_version: 1, event_id: event, expected_revision: work.revision, id: task.id.clone(), agent_id: agent_id.into(), report_path: chosen.path.clone(), report_sha256: chosen.sha256.clone(), status: "submitted".into() };
+        let raw = serde_json::to_vec(&request).map_err(|e| caused("mission-report-request", e))?;
+        let root = self.root.clone();
+        let fence = RelayFence { lease, directory: self.directory.duplicate().map_err(E::Storage)?, root: &root, agent: agent_id, settings_revision: settings.revision, event_id: &request.event_id, expected_revision: request.expected_revision, report: &chosen };
+        let result = self.execute_with_fence(&work_id, "task.submit", &raw, &mut crate::SystemEnvironment, Some(&fence));
+        let recorded = result.as_ref().ok().map(|v| (v.result.work.id.clone(),v.result.work.revision));
+        let result = finished(result, fence.directory.close().map_err(E::Storage));
+        let outcome = match (result, recorded) {
+            (Err(primary), Some((work, revision))) => return Err(E::WorkRecorded { primary: Box::new(primary), work, revision }),
+            (Err(error), _) => return Err(error),
+            (Ok(outcome), _) => outcome,
+        };
+        Ok(MissionReportRelayOutcome::Submitted { work: outcome.result.work.id, revision: outcome.result.work.revision, agent_id: agent_id.into(), report: chosen.path })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn candidate(name: &str, size: u64, nanos: i128) -> (String, u64, i128) { (name.into(), size, nanos) }
+    #[test]
+    fn mission_report_selection_inclusive_margin_and_strict_zero() {
+        let t = 10_000_000_000;
+        let rows = vec![candidate("docs/t.md", 1, t - 2_000_000_000)];
+        assert_eq!(select(&rows, t, 2).unwrap(), Ok("docs/t.md"));
+        assert_eq!(select(&rows, t, 0).unwrap(), Err("mission-report-stale"));
+        let exact = vec![candidate("docs/t.md", 1, t)];
+        assert_eq!(select(&exact, t, 0).unwrap(), Ok("docs/t.md"));
+        let newer = vec![candidate("docs/t.md", 1, t + 1)];
+        assert_eq!(select(&newer, t, 0).unwrap(), Ok("docs/t.md"));
+    }
+    #[test]
+    fn mission_report_selection_empty_stale_ambiguity_and_recovery() {
+        let valid = vec![candidate("docs/t.md", 1, 10)];
+        assert_eq!(select(&valid, 10, 0).unwrap(), Ok("docs/t.md"));
+        let empty = vec![candidate("docs/t.md", 0, 10)];
+        assert_eq!(select(&empty, 10, 0).unwrap(), Err("mission-report-missing"));
+        let mut ambiguous = valid.clone(); ambiguous.push(candidate("docs/t-handoff.md", 1, 10));
+        assert_eq!(select(&ambiguous, 10, 0).unwrap(), Err("mission-report-ambiguous"));
+        ambiguous[1].2 = 9;
+        assert_eq!(select(&ambiguous, 10, 0).unwrap(), Ok("docs/t.md"));
+    }
+    #[test]
+    fn mission_report_selection_full_setting_range_and_invalid_input() {
+        let rows = vec![candidate("docs/t.md", 1, -1)];
+        assert_eq!(select(&rows, 10, i64::MAX).unwrap(), Ok("docs/t.md"));
+        assert!(select(&rows, 10, -1).is_err());
+    }
+    #[test]
+    fn mission_report_settings_absence_is_not_default_adoption() {
+        let mut values = crate::EngineSettingsValues::installation_defaults().unwrap();
+        assert_eq!(values.schema_version(), 40);
+        assert_eq!(values.report_clock_skew_seconds().unwrap(), 2);
+        values.agent_report_clock_skew_seconds = None;
+        values.validate().unwrap(); assert_eq!(values.schema_version(), 39);
+        assert!(values.report_clock_skew_seconds().is_err());
+        let raw = serde_json::to_vec(&values).unwrap();
+        let again: crate::EngineSettingsValues = serde_json::from_slice(&raw).unwrap();
+        assert!(again.agent_report_clock_skew_seconds.is_none());
+    }
+    #[test]
+    fn mission_report_settings_zero_and_independent_display_policy() {
+        let mut values = crate::EngineSettingsValues::installation_defaults().unwrap();
+        values.agent_report_clock_skew_seconds = Some(crate::SettingCount(0));
+        values.validate().unwrap(); assert_eq!(values.report_clock_skew_seconds().unwrap(), 0);
+        values.work_view_status_recent_agents = None;
+        // A supplied partial display group still refuses its own invalid shape.
+        assert!(values.validate().is_err());
+        values.work_view_status_change_events = None;
+        // Historical display absence is independent of explicit report policy.
+        values.validate().unwrap();
+        assert_eq!(values.report_clock_skew_seconds().unwrap(), 0);
+        assert!(values.mission_status_view_limits().is_err());
+    }
+    #[test]
+    fn mission_report_settings_reject_noncanonical_and_null() {
+        let initial = serde_json::to_value(crate::EngineSettingsValues::installation_defaults().unwrap()).unwrap();
+        for invalid in [serde_json::json!("-1"),serde_json::json!("02"),serde_json::json!("+2"),serde_json::Value::Null] {
+            let mut value = initial.clone(); value["agent_report_clock_skew_seconds"] = invalid;
+            assert!(serde_json::from_value::<crate::EngineSettingsValues>(value).is_err());
+        }
+    }
+}
+
+FILE rust/crates/swarm-engine/src/mission_status_tasks/tests.rs SHA256 4bd34bc8d8cbac33db77492d76e5ea1efeae6b9e4ed0636204cb6c7f711dfe02
+//! Pure branch controls only. Explicit supplied observations are test data, not
+//! a real gate/review/report/Root verification or permission to execute anything.
+use super::*;
+
+/// Supplied inert baseline. No observation is loaded, inferred or authenticated.
+fn result_facts() -> ResultObservation {
+    ResultObservation {
+        freshness: FreshnessObservation::NotCurrent { blockers: vec![] },
+        gate: GateObservation::Absent,
+        reports: ReportListing::Observed(vec![]),
+        attribution: ReportAttribution::Unavailable {
+            reason: "aucun rapport attribuable".into(),
+        },
+        incomplete_report: IncompleteReport::Observed(None),
+        review: ReviewObservation::NotApplicable,
+    }
+}
+/// Complete test-only observation with a known missing profile; no grant follows.
+fn facts(id: &str) -> TaskObservation {
+    TaskObservation {
+        task_id: id.into(),
+        result: result_facts(),
+        dependencies: vec![],
+        readiness: ReadinessObservation::Observed {
+            disposition: DispatchDisposition::Intervention,
+            reason: "fixture-profile-missing".into(),
+            profile: ProfileObservation::Missing,
+            assistance: AssistObservation::NotObserved,
+            workspace: WorkspaceObservation::NotObserved,
+        },
+        prepared_launch: PreparedLaunchObservation::Absent,
+        execution: ExecutionObservation::NotPresent,
+    }
+}
+/// Stored model fixture only. Default fields are intentional test data, never a
+/// production observation fallback or proof that an actual artifact was checked.
+fn task(id: &str, status: &str) -> Task {
+    Task {
+        id: id.into(),
+        title: id.into(),
+        status: status.into(),
+        plan_max_attempts: 3,
+        ..Default::default()
+    }
+}
+/// Fully supplied empty diagnostic, not an implicit fallback for read failure.
+fn diagnostic() -> AttemptDiagnostic {
+    AttemptDiagnostic {
+        agent_id: "fixture-agent".into(),
+        attempt_id: "fixture-attempt".into(),
+        observed_errors: 0,
+        consecutive_error_limit: 3,
+        limit_reached: false,
+        consecutive_error_limit_reached: false,
+        limit_reason: String::new(),
+        summary: String::new(),
+        items: Some(vec![]),
+    }
+}
+
+/// A normal process completion cannot become task acceptance. An attributable
+/// report advances only to review; only accepted+current evidence validates.
+#[test]
+fn mission_status_task_completion_report_and_acceptance_are_separate() {
+    let mut task = task("t", "todo");
+    let agent = Agent {
+        id: "fixture-agent".into(),
+        task_id: "t".into(),
+        attempt_id: "fixture-attempt".into(),
+        status: "completed".into(),
+        ..Default::default()
+    };
+    let diagnostic = diagnostic();
+    let observed = AgentObservation {
+        agent: &agent,
+        observed_state: "completed",
+        fallback_diagnostic: &diagnostic,
+        environment_recovery: false,
+    };
+    let mut facts = result_facts();
+    let completed = result_presentation(&task, Some(&observed), &facts).unwrap();
+    assert_eq!(completed.process_state, "completed");
+    assert_eq!(completed.state, "completed_unproven");
+    assert_eq!(completed.validation_state, "not_started");
+    facts.attribution = ReportAttribution::Attributed("fixture-report.md".into());
+    let report = result_presentation(&task, Some(&observed), &facts).unwrap();
+    assert_eq!(report.state, "result_to_review");
+    assert_eq!(report.report_state, "attributable_unsubmitted");
+    task.status = "accepted".into();
+    task.gate = Some(Default::default());
+    facts.freshness = FreshnessObservation::Current;
+    facts.gate = GateObservation::Current;
+    let accepted = result_presentation(&task, Some(&observed), &facts).unwrap();
+    assert_eq!(accepted.state, "validated");
+    assert_eq!(accepted.validation_state, "fresh");
+    assert_eq!(accepted.process_state, "completed");
+}
+
+/// Valid current evidence precedes stale and missing variants; stored acceptance
+/// survives as history while stale evidence never counts as currently validated.
+#[test]
+fn mission_status_task_stale_and_unobserved_evidence_do_not_validate() {
+    let mut task = task("t", "accepted");
+    task.gate = Some(Default::default());
+    let mut facts = result_facts();
+    facts.freshness = FreshnessObservation::Current;
+    facts.gate = GateObservation::Current;
+    assert_eq!(
+        result_presentation(&task, None, &facts).unwrap().state,
+        "validated"
+    );
+    facts.freshness = FreshnessObservation::NotCurrent {
+        blockers: vec!["fixture-preuve-modifiée".into()],
+    };
+    facts.gate = GateObservation::NotCurrent;
+    let stale = result_presentation(&task, None, &facts).unwrap();
+    assert_eq!(stale.state, "validation_stale");
+    assert_eq!(stale.reason, "fixture-preuve-modifiée");
+    facts.freshness = FreshnessObservation::Current;
+    facts.gate = GateObservation::Current;
+    assert_eq!(
+        result_presentation(&task, None, &facts).unwrap().state,
+        "validated"
+    );
+    facts.freshness = FreshnessObservation::NotObserved;
+    assert!(matches!(
+        result_presentation(&task, None, &facts),
+        Err(E::Refused("mission-status-freshness-unobserved"))
+    ));
+}
+
+/// The valid completed witness precedes absent attribution/review. Missing input
+/// refuses instead of inventing empty reports, no applicable review or success.
+#[test]
+fn mission_status_task_missing_causal_observations_refuse() {
+    let task = task("t", "todo");
+    let agent = Agent {
+        id: "fixture-agent".into(),
+        task_id: "t".into(),
+        status: "completed".into(),
+        ..Default::default()
+    };
+    let diagnostic = diagnostic();
+    let observed = AgentObservation {
+        agent: &agent,
+        observed_state: "completed",
+        fallback_diagnostic: &diagnostic,
+        environment_recovery: false,
+    };
+    let mut facts = result_facts();
+    assert_eq!(
+        result_presentation(&task, Some(&observed), &facts)
+            .unwrap()
+            .state,
+        "completed_unproven"
+    );
+    facts.attribution = ReportAttribution::NotObserved;
+    assert!(matches!(
+        result_presentation(&task, Some(&observed), &facts),
+        Err(E::Refused("mission-status-report-attribution-unobserved"))
+    ));
+    facts.attribution = ReportAttribution::Unavailable {
+        reason: "fixture".into(),
+    };
+    assert_eq!(
+        result_presentation(&task, Some(&observed), &facts)
+            .unwrap()
+            .state,
+        "completed_unproven"
+    );
+    facts.review = ReviewObservation::NotObserved;
+    assert!(matches!(
+        result_presentation(&task, Some(&observed), &facts),
+        Err(E::Refused("mission-status-review-unobserved"))
+    ));
+}
+
+/// Applicable review preserves failed process identity; an injected validated
+/// result is rejected rather than letting review bypass the acceptance branch.
+#[test]
+fn mission_status_task_review_cannot_rewrite_process_or_acceptance() {
+    let task = task("t", "blocked");
+    let agent = Agent {
+        id: "a".into(),
+        task_id: "t".into(),
+        status: "failed".into(),
+        ..Default::default()
+    };
+    let diagnostic = diagnostic();
+    let observed = AgentObservation {
+        agent: &agent,
+        observed_state: "failed",
+        fallback_diagnostic: &diagnostic,
+        environment_recovery: false,
+    };
+    let mut facts = result_facts();
+    facts.review = ReviewObservation::Presented(ReviewPresentation {
+        state: "review_blocked".into(),
+        label: "fixture".into(),
+        validation_state: "review_unvalidated".into(),
+        reason: "fixture-refus".into(),
+        next_step: "fixture".into(),
+        report_id: "r".into(),
+        receipt_id: "receipt".into(),
+        report_state: "submitted".into(),
+    });
+    let review = result_presentation(&task, Some(&observed), &facts).unwrap();
+    assert_eq!(review.state, "review_blocked");
+    assert_eq!(review.process_state, "failed");
+    assert_eq!(review.reason, "fixture-refus");
+    if let ReviewObservation::Presented(review) = &mut facts.review {
+        review.state = "validated".into();
+    }
+    assert!(matches!(
+        result_presentation(&task, Some(&observed), &facts),
+        Err(E::Refused("mission-status-review-result-invalid"))
+    ));
+}
+
+/// All task observations are supplied before counting. Completion remains an
+/// intervention; submitted result contributes to review, never validated/running.
+#[test]
+fn mission_status_task_projection_counts_results_and_requires_complete_inputs() {
+    let work = Work {
+        id: "w".into(),
+        tasks: Some(vec![task("t", "submitted")]),
+        ..Default::default()
+    };
+    let context = crate::mission_status_contract::tests::status();
+    let facts = facts("t");
+    let projected = project_tasks(&work, &context, std::slice::from_ref(&facts), &[]).unwrap();
+    assert_eq!(
+        (projected.validated, projected.review, projected.running),
+        (0, 1, 0)
+    );
+    assert_eq!(projected.tasks[0].state, "review");
+    assert_eq!(projected.tasks[0].result.validation_state, "missing_gate");
+    assert!(matches!(
+        project_tasks(&work, &context, &[], &[]),
+        Err(E::Refused("mission-status-task-observations-mismatch"))
+    ));
+    let mut changed = facts;
+    changed.prepared_launch = PreparedLaunchObservation::NotObserved;
+    assert!(matches!(
+        project_tasks(&work, &context, &[changed], &[]),
+        Err(E::Refused("mission-status-prepared-launch-unobserved"))
+    ));
+}
+
+/// A direct prerequisite uses its observed freshness and original ID. Unknown
+/// dependency/readiness inputs are not converted into waiting, ready or zero.
+#[test]
+fn mission_status_task_dependency_and_readiness_observations_are_mandatory() {
+    let mut child = task("t", "todo");
+    child.depends = Some(vec!["p".into()]);
+    let work = Work {
+        id: "w".into(),
+        tasks: Some(vec![task("p", "waived"), child]),
+        ..Default::default()
+    };
+    let context = crate::mission_status_contract::tests::status();
+    let parent = facts("p");
+    let mut child = facts("t");
+    child.dependencies = vec![DependencyObservation {
+        task_id: "p".into(),
+        freshness: DependencyFreshness::NotCurrent,
+    }];
+    let projected = project_tasks(&work, &context, &[parent.clone(), child.clone()], &[]).unwrap();
+    assert_eq!(projected.tasks[1].state, "waiting");
+    assert_eq!(projected.tasks[1].target, "p");
+    child.dependencies[0].freshness = DependencyFreshness::NotObserved;
+    assert!(matches!(
+        project_tasks(&work, &context, &[parent.clone(), child.clone()], &[]),
+        Err(E::Refused("mission-status-dependency-unobserved"))
+    ));
+    child.dependencies[0].freshness = DependencyFreshness::Current;
+    let valid = project_tasks(&work, &context, &[parent.clone(), child.clone()], &[]).unwrap();
+    assert_eq!(valid.tasks[1].state, "configure");
+    child.readiness = ReadinessObservation::NotObserved;
+    assert!(matches!(
+        project_tasks(&work, &context, &[parent, child], &[]),
+        Err(E::Refused("mission-status-readiness-unobserved"))
+    ));
+}
+
+/// A controls-stale observation changes review causality only; the previously
+/// attributed report and receipt survive and no task becomes accepted.
+#[test]
+fn mission_status_controls_stale_keeps_report_and_receipt() {
+    let mut task = task("t", "submitted");
+    task.next = "handoff : report.md".into();
+    task.automatic_validation = Some(Box::new(crate::AutomaticValidation {
+        receipt: "receipt.json".into(),
+        ..Default::default()
+    }));
+    let agent = Agent {
+        id: "fixture-agent".into(),
+        task_id: "t".into(),
+        attempt_id: "fixture-attempt".into(),
+        status: "completed".into(),
+        ..Default::default()
+    };
+    let diagnostic = diagnostic();
+    let observed = AgentObservation {
+        agent: &agent,
+        observed_state: "completed",
+        fallback_diagnostic: &diagnostic,
+        environment_recovery: false,
+    };
+    let mut facts = result_facts();
+    facts.review = ReviewObservation::ControlsStale {
+        reason: "current-validation-required".into(),
+    };
+    let result = result_presentation(&task, Some(&observed), &facts).unwrap();
+    assert_eq!(result.state, "review_blocked");
+    assert_eq!(result.report_id, "report.md");
+    assert_eq!(result.receipt_id, "receipt.json");
+    assert_eq!(result.validation_state, "failed_or_stale");
+}
+
+GO HISTORICAL 553593a2ffa3823d16784a6fedc291eebf390837:internal/engine/result_presentation.go LINES 1-225
+package engine
+
+import (
+	"fmt"
+	"strings"
+)
+
+// ResultPresentation is the single read-time projection used by the CLI and
+// the web UI. It deliberately keeps process exit, report presence and delivery
+// validation separate: none of these facts is a substitute for another one.
+type ResultPresentation struct {
+	ProcessLabel    string `json:"process_label"`
+	ReportLabel     string `json:"report_label"`
+	ValidationLabel string `json:"validation_label"`
+	State           string `json:"state"`
+	Label           string `json:"label"`
+	ProcessState    string `json:"process_state"`
+	ReportState     string `json:"report_state"`
+	ValidationState string `json:"validation_state"`
+	Reason          string `json:"reason"`
+	NextStep        string `json:"next_step"`
+	AttemptID       string `json:"attempt_id,omitempty"`
+	ReportID        string `json:"report_id,omitempty"`
+	GateID          string `json:"gate_id,omitempty"`
+	ReceiptID       string `json:"receipt_id,omitempty"`
+}
+
+func submittedReport(t *Task) string {
+	if t.Revalidation != nil && strings.TrimSpace(t.Revalidation.Report) != "" {
+		return strings.TrimSpace(t.Revalidation.Report)
+	}
+	const marker = "handoff : "
+	if at := strings.LastIndex(t.Next, marker); at >= 0 {
+		return strings.TrimSpace(t.Next[at+len(marker):])
+	}
+	return ""
+}
+
+func latestTaskAgent(agents []Agent, task string) *Agent {
+	for i := range agents { // Store.agents returns newest first.
+		if agents[i].TaskID == task {
+			return &agents[i]
+		}
+	}
+	return nil
+}
+
+func (s *Store) resultPresentation(w *Work, t *Task, agents []Agent, validation TaskValidation) (p ResultPresentation) {
+	defer func() {
+		p.ProcessLabel = resultFactLabel(p.ProcessState)
+		p.ReportLabel = resultFactLabel(p.ReportState)
+		p.ValidationLabel = resultFactLabel(p.ValidationState)
+	}()
+	p = ResultPresentation{
+		State: "not_started", Label: "Pas encore commencé", ProcessState: "not_started",
+		ReportState: "absent", ValidationState: "not_started",
+		Reason:   "Aucune tentative terminée ni validation actuelle n’est établie.",
+		NextStep: "Lancer la tâche lorsque ses conditions sont réunies.",
+	}
+	a := latestTaskAgent(agents, t.ID)
+	if a != nil {
+		p.AttemptID = a.Attempt
+		if p.AttemptID == "" {
+			p.AttemptID = a.ID
+		}
+		p.ProcessState = observedAgent(*a)
+	}
+	p.ReportID = submittedReport(t)
+	if p.ReportID != "" || t.Status == "submitted" || t.Status == "accepted" {
+		p.ReportState = "submitted"
+	}
+	if t.Gate != nil {
+		p.GateID = strings.TrimSpace(t.Gate.Name)
+		if p.GateID == "" {
+			p.GateID = t.Gate.Evaluation.Scope
+		}
+	}
+	if t.AutoValidation != nil {
+		p.ReceiptID = t.AutoValidation.Receipt
+	}
+
+	// A current acceptance is the only positive delivery verdict.
+	if t.Status == "accepted" && validation.Fresh {
+		p.State, p.Label = "validated", "Validé"
+		p.ValidationState = "fresh"
+		p.Reason = "Gate delivery et preuves actuelles ; la tâche est acceptée."
+		p.NextStep = "Consulter le résultat ; revalider si une preuve change."
+		return p
+	}
+	if t.Status == "accepted" && !validation.Fresh {
+		p.State, p.Label = "validation_stale", "Validation à refaire"
+		p.ValidationState = "stale"
+		p.Reason = "L’acceptation historique n’est plus fondée sur des preuves actuelles."
+		if len(validation.Blockers) > 0 {
+			p.Reason = validation.Blockers[0]
+		}
+		p.NextStep = "Rouvrir la tâche, renouveler les preuves et enregistrer une nouvelle revue de validation."
+		return p
+	}
+	if t.Status == "waived" {
+		p.State, p.Label = "waived", "Dérogation — non validé"
+		p.ValidationState = "waived"
+		p.Reason = "Une décision explicite permet la suite sans transformer les contrôles en PASS."
+		p.NextStep = "Consulter le motif et la portée de la dérogation."
+		return p
+	}
+	if t.Status == "abandoned" {
+		p.State, p.Label = "abandoned", "Abandonné — non validé"
+		p.ValidationState = "abandoned"
+		p.Reason = "La tâche est abandonnée ; aucun résultat validé n’est revendiqué."
+		p.NextStep = "Consulter la décision d’abandon."
+		return p
+	}
+
+	if a != nil && activeAgent(*a) {
+		switch p.ProcessState {
+		case "running":
+			p.State, p.Label = "in_progress", "En cours"
+			p.Reason = "Le processus est actif ; aucun résultat final n’est encore affirmé."
+			p.NextStep = "Voir la session ou attendre la fin de la tentative."
+		default:
+			p.State, p.Label = "execution_unconfirmed", "État à vérifier"
+			p.Reason = "La tentative est enregistrée, mais son exécution n’est pas confirmée."
+			p.NextStep = "Réconcilier la tentative avant toute relance."
+		}
+		if reports := s.taskReports(t.ID); len(reports) > 0 {
+			p.ReportState = "early_unverified"
+			p.ReportID = reports[0]
+			p.Reason += " Un rapport existe déjà, mais il peut être précoce ou incomplet."
+		}
+		p.ValidationState = "pending_process"
+		return p
+	}
+
+	// A recovered result can be reviewed without rewriting its producer exit.
+	// The review projection checks the current attempt and producer identities.
+	if a != nil && (a.Status == "failed" || a.Status == "interrupted") && s.currentReviewPresentation(w, t, a, &p) {
+		return p
+	}
+
+	if a != nil && (a.Status == "failed" || a.Status == "interrupted") {
+		p.State, p.Label = "stopped_early", "Arrêté avant la fin"
+		p.ValidationState = "not_validated"
+		p.Reason = strings.TrimSpace(a.Activity)
+		if p.Reason == "" {
+			if a.Status == "failed" {
+				p.Reason = "Le processus s’est terminé en échec."
+			} else {
+				p.Reason = "Le processus a été interrompu."
+			}
+		}
+		if reports := s.taskReports(t.ID); len(reports) > 0 && p.ReportState == "absent" {
+			p.ReportState, p.ReportID = "partial_possible", reports[0]
+			p.Reason += " Un rapport existe, mais l’arrêt ne permet pas d’en affirmer la complétude."
+		}
+		p.NextStep = "Examiner le motif, les traces et le rapport éventuel avant de décider d’une reprise."
+		return p
+	}
+	if a != nil && a.Status == "completed" && t.Status == "blocked" && strings.HasPrefix(t.Blocker, "Livraison incomplète :") {
+		p.State, p.Label, p.ValidationState = "delivery_incomplete", "Résultat à compléter", "not_validated"
+		p.Reason = t.Blocker
+		p.NextStep = "Le responsable doit examiner les critères manquants et préparer une correction dans les limites autorisées."
+		if report := s.incompleteDeliveryReport(w, t, a); report != "" {
+			p.ReportID, p.ReportState = report, "partial_possible"
+		}
+		return p
+	}
+	if a != nil && a.Status == "completed" && s.currentReviewPresentation(w, t, a, &p) {
+		return p
+	}
+
+	if t.Status == "submitted" {
+		if a == nil {
+			p.ProcessState = "unknown"
+		}
+		p.ValidationState = "missing_gate"
+		p.State, p.Label = "result_to_review", "Résultat à vérifier"
+		p.Reason = "Un rapport est soumis ; sa complétude et les critères restent à examiner. Aucune revue de validation n’est enregistrée."
+		p.NextStep = "Lire le rapport, vérifier les critères et enregistrer la revue de validation."
+		if t.Gate != nil {
+			if !s.validGate(t) || len(validation.Blockers) > 0 {
+				p.State, p.Label = "validation_withheld", "Validation retenue"
+				p.ValidationState = "failed_or_stale"
+				p.Reason = "La revue de validation n’autorise pas une validation actuelle."
+				if len(validation.Blockers) > 0 {
+					p.Reason = validation.Blockers[0]
+				}
+				p.NextStep = "Corriger ou renouveler les preuves, puis enregistrer une revue de validation actuelle."
+			} else {
+				p.ValidationState = "ready_for_decision"
+				p.Reason = "La revue de validation et ses preuves sont actuelles ; la décision d’acceptation reste à enregistrer."
+				p.NextStep = "Examiner le rapport puis enregistrer la décision de validation."
+			}
+		}
+		return p
+	}
+
+	if a != nil && a.Status == "completed" {
+		p.ProcessState = "completed"
+		p.ValidationState = "not_started"
+		report, reportReason := s.provenReport(t.ID, a.Started)
+		if report != "" {
+			p.State, p.Label = "result_to_review", "Résultat à vérifier"
+			p.ReportState, p.ReportID = "attributable_unsubmitted", report
+			p.Reason = "Le processus est terminé et un rapport lui est attribuable ; sa complétude n’est pas démontrée."
+			p.NextStep = "Soumettre le rapport, vérifier les critères et enregistrer la revue de validation."
+			return p
+		}
+		p.State, p.Label = "completed_unproven", "Terminé, résultat non démontré"
+		p.ReportState = "absent_or_unattributed"
+		p.Reason = "Le processus est terminé normalement, mais " + reportReason + "."
+		if strings.TrimSpace(a.Relay) != "" {
+			p.Reason = a.Relay
+		}
+		p.NextStep = "Désigner ou compléter un rapport avant toute validation ou relance."
+		return p
+	}
+
+	if t.Gate != nil && !s.validGate(t) {
+		p.ValidationState = "failed_or_stale"
+	}
+	return p
+}
+
+// Ordinary reviews must remain visible after they block a completed producer.
+
+GO HISTORICAL 553593a2ffa3823d16784a6fedc291eebf390837:internal/engine/conductor.go LINES 155-220
+// provenReport retient le rapport produit par cette tentative : lisible, non
+// vide et modifié après son départ. Aucun contenu n'est interprété — la
+// lecture du fond reste humaine. Plusieurs candidats restent ambigus : choisir
+// à la place de l'opérateur reviendrait à soumettre une preuve non désignée.
+func (s *Store) provenReport(task, started string) (string, string) {
+	since, e := time.Parse(time.RFC3339Nano, started)
+	if e != nil {
+		return "", "date de départ de la tentative illisible"
+	}
+	// Tolérance de dérive : l'horloge murale et la date de modification d'un
+	// fichier ne viennent pas de la même source et peuvent se croiser de
+	// quelques instants. Une tentative réelle dure bien plus que cette marge,
+	// donc elle n'affaiblit pas le refus d'un rapport d'une tentative passée.
+	since = since.Add(-reportClockSkew)
+	fresh := []string{}
+	stale := 0
+	for _, rel := range s.taskReports(task) {
+		p, e := safeReport(s.root, rel)
+		if e != nil {
+			continue
+		}
+		info, e := os.Stat(p)
+		if e != nil || info.Size() == 0 {
+			continue
+		}
+		if info.ModTime().Before(since) {
+			stale++
+			continue
+		}
+		fresh = append(fresh, rel)
+	}
+	switch {
+	case len(fresh) == 1:
+		return fresh[0], ""
+	case len(fresh) > 1:
+		return "", "plusieurs rapports candidats pour cette tentative (" + strings.Join(fresh, ", ") + ")"
+	case stale > 0:
+		return "", fmt.Sprintf("aucun rapport produit par cette tentative ; %d rapport(s) antérieur(s) ignoré(s)", stale)
+	}
+	return "", "aucun rapport lisible et non vide sous docs/ pour cette tâche"
+}
+
+// Search only the attempt's workspace. Translate back to the canonical root for evidence.
+func (s *Store) provenAttemptReport(a Agent) (string, string) {
+	cwd := a.CWD
+	if cwd == "" {
+		cwd = s.root
+	}
+	resolved, e := resolveWorkspace(s.root, cwd)
+	if e != nil {
+		return "", "espace de tentative invalide : " + e.Error()
+	}
+	scoped := *s
+	scoped.root = resolved
+	report, reason := scoped.provenReport(a.TaskID, a.Started)
+	if report == "" {
+		return "", reason
+	}
+	relative, e := filepath.Rel(s.root, filepath.Join(resolved, report))
+	if e != nil {
+		return "", e.Error()
+	}
+	if _, e = safeReport(s.root, relative); e != nil {
+		return "", e.Error()
+	}
+	return filepath.ToSlash(relative), ""
+
+GO HISTORICAL 553593a2ffa3823d16784a6fedc291eebf390837:internal/engine/review_dialog.go LINES 130-180
+		if attributed, err := safeReport(s.root, report); err == nil && attributed == path {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Store) incompleteDeliveryReport(w *Work, t *Task, a *Agent) string {
+	if a == nil || a.Status != "completed" || !currentTaskAttempt(t, a.Attempt) || t.Status != "blocked" || !strings.HasPrefix(t.Blocker, "Livraison incomplète :") || w.Planning == nil || w.Planning.Repository == nil {
+		return ""
+	}
+	rel, e := filepath.Rel(s.root, filepath.Join(w.Planning.Repository.Storage, "proofs", a.ID, "report.md"))
+	if e != nil {
+		return ""
+	}
+	if _, e = safeReport(s.root, rel); e != nil {
+		return ""
+	}
+	return filepath.ToSlash(rel)
+}
+
+func safeReport(root, path string) (string, error) {
+	p, e := localFile(root, path)
+	if e != nil {
+		return "", e
+	}
+	info, e := os.Stat(p)
+	if e != nil {
+		return "", e
+	}
+	if !info.Mode().IsRegular() {
+		return "", fmt.Errorf("Le rapport doit être un fichier ordinaire")
+	}
+	return p, nil
+}
+func (s *Store) reviewText(work string, d *taskDialog) string {
+	w, e := s.get(work)
+	if e != nil {
+		return e.Error()
+	}
+	t, e := w.task(d.task.ID)
+	if e != nil {
+		return e.Error()
+	}
+	text := s.gateSummary(work, d.task.ID) + "\n\nTâche : " + t.Title + "\nÉtat : " + uiStatus(t.Status) + "\nLivrable : " + t.Deliverable + "\nCritères : " + strings.Join(t.Criteria, " ; ") + "\nProchaine action : " + t.Next
+	text += "\n\n" + evidenceText(s.validationState(&w).Tasks[t.ID].Evidence)
+	if t.Override != nil {
+		text += "\n\nDÉROGATION MANUELLE : " + t.Override.Reason + "\nOpérateur local : " + t.Override.Actor + " · " + t.Override.At + "\nLes contrôles ne sont pas transformés en PASS."
+	}
+	if t.Gate == nil {
+		return text + "\n\nACCEPTATION INDISPONIBLE : aucune gate de validation enregistrée.\nLe conducteur doit examiner le rapport et enregistrer son évaluation."

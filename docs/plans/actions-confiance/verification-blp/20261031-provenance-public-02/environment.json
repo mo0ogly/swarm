@@ -1,0 +1,9 @@
+{
+  "overrides": {
+    "CARGO_TARGET_DIR": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0",
+    "SWARM_PROJECT_MEMORY_SEEDER": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/blp-verification-target/debug/examples/memory_source_fixture",
+    "TMPDIR": "/home/fpizzi/.local/state/swarm-fixtures/runner-tmp"
+  },
+  "scope": "Inherited environment not logged; compiler graph/profile needs separate qualification; TMPDIR pinned under the configured fixture area (Admin setting runtime_temporary_directory) per the 2026-10-31 operator interdiction, with fallback to the operator private state area when checkout ancestors are group-writable (private-directory contracts)"
+}

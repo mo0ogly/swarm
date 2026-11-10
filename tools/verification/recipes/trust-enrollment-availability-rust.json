@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "trust-enrollment-availability-rust",
+  "inputs": [
+    "web/trust-native.*",
+    "web/i18n*.js",
+    "locales/en.json",
+    "tests/trust_enrolled_*test.cjs",
+    "tests/rust_trust_availability.py",
+    "tests/rust_trust_governance*",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/BIBA-GOUVERNANCE-RUST.md",
+    "docs/en/BIBA-GOVERNANCE-RUST.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "availability-and-native-governance",
+      "command": [
+        "python3",
+        "tests/rust_trust_availability.py",
+        "--binary",
+        "bin/swarm",
+        "--output-parent",
+        "test-results"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "AVAILABILITY_PUBLIC_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+=== RUN   TestCorrectiveCandidateRetainsClosedFragmentMethodEvidence
+    managed_review_context_policy_test.go:286: sizes 164551 168226 22003 parts 1
+    managed_review_context_policy_test.go:313: closed method evidence blocks a changed corrective candidate
+--- FAIL: TestCorrectiveCandidateRetainsClosedFragmentMethodEvidence (3.08s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	3.100s
+FAIL

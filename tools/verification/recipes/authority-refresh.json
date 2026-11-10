@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "authority-refresh",
+  "inputs": [
+    "tools/swarm_local.py",
+    "tools/swarm_version.py",
+    "deploy/authority/install.sh",
+    "tests/test_authority_refresh.py",
+    "tests/fixture_area.py",
+    "docs/architecture/NATIVE-LOCAL-LAUNCHER.md",
+    "docs/en/NATIVE-LOCAL-LAUNCHER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "initialized-refresh-refusal-recovery-public-state",
+      "command": [
+        "python3",
+        "-c",
+        "import os,sys,subprocess,tempfile;from pathlib import Path;sys.path.insert(0,'tests');from fixture_area import fixture_area;os.environ['TMPDIR']=str(fixture_area());p=Path(tempfile.mkdtemp(prefix='authority-refresh-proof-',dir='.cache')).resolve();os.environ['SWARM_TEST_EVIDENCE_DIR']=str(p);subprocess.run(['python3','-m','unittest','discover','-s','tests','-p','test_authority_refresh.py','-v'],check=True);print('AUTHORITY_REFRESH_EVIDENCE '+str(p));subprocess.run(['bash','-n','deploy/authority/install.sh'],check=True);print('AUTHORITY_INSTALLER_SHELL_SYNTAX_PASS');print('AUTHORITY_REFRESH_PASS')"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "AUTHORITY_REFRESH_PASS",
+        "AUTHORITY_INSTALLER_SHELL_SYNTAX_PASS"
+      ],
+      "required_stderr": [
+        "test_existing_install_refresh_never_prepares_or_initializes_accounts (test_authority_refresh.AuthorityRefresh.test_existing_install_refresh_never_prepares_or_initializes_accounts) ... ok",
+        "test_missing_markers_refuse_before_install_effects (test_authority_refresh.AuthorityRefresh.test_missing_markers_refuse_before_install_effects) ... ok",
+        "test_fresh_install_requires_explicit_admin (test_authority_refresh.AuthorityRefresh.test_fresh_install_requires_explicit_admin) ... ok",
+        "test_cli_existing_refresh_passes_no_invented_identity (test_authority_refresh.AuthorityRefresh.test_cli_existing_refresh_passes_no_invented_identity) ... ok",
+        "test_settings_read_failure_is_not_reported_as_success (test_authority_refresh.AuthorityRefresh.test_settings_read_failure_is_not_reported_as_success) ... ok",
+        "test_invalid_settings_preserve_installed_effect_and_refuse_restart (test_authority_refresh.AuthorityRefresh.test_invalid_settings_preserve_installed_effect_and_refuse_restart) ... ok",
+        "test_public_cli_preserves_installed_effect_without_private_output (test_authority_refresh.AuthorityRefresh.test_public_cli_preserves_installed_effect_without_private_output) ... ok",
+        "test_cli_missing_identity_on_fresh_install_refuses_before_build (test_authority_refresh.AuthorityRefresh.test_cli_missing_identity_on_fresh_install_refuses_before_build) ... ok",
+        "Ran 8 tests",
+        "OK"
+      ]
+    }
+  ]
+}

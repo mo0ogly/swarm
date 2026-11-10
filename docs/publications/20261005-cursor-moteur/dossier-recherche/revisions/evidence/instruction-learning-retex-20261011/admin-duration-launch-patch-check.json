@@ -1,0 +1,21 @@
+{
+  "before": "d961e8e96215b93f37c5185d896c587ee010c26b",
+  "after": "8a803972e519bf6374c3ccb2a79c1dd4cafcc286",
+  "applied_tree": "8a803972e519bf6374c3ccb2a79c1dd4cafcc286",
+  "sha256": "06429887df1f013f9acea161357b7348760a251df7995fc36231a093e07d34e3",
+  "extensions": [
+    {
+      "path": "internal/engine/run_limits_admin.go",
+      "blob": "a97584d709522ca36c315ce24b0c724c89787961",
+      "sha256": "0acc01a56a4b9334fc22bf96dbf8cb7b184e9d6e3ec117d8c1967c11bf03d0ce",
+      "origin": "HEAD"
+    }
+  ],
+  "paths": [
+    "internal/engine/agents_store.go",
+    "internal/engine/run_limits_admin.go",
+    "internal/engine/run_limits_duration_launch_test.go",
+    "docs/architecture/RUN-SUPERVISION.md",
+    "docs/en/RUN-SUPERVISION.md"
+  ]
+}

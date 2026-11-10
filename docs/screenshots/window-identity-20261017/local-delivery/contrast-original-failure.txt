@@ -1,0 +1,3 @@
+AssertionError [ERR_ASSERTION]: GitHub link contrast below 4.5:1
+    at verifySurface (/home/fpizzi/Documents/ChatGPT/swarm/tests/version_ui.cjs:29:425)
+    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/version_ui.cjs:47:112

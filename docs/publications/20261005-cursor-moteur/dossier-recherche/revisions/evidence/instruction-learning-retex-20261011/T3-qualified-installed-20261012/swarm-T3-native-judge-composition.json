@@ -1,0 +1,70 @@
+{
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-exploration-concurrent-7vb9ub5q",
+  "original_native": {
+    "accepted_base": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+    "native_T2_head": "7d48c5e28514828a3fc979fb7d514e4713ddf23d",
+    "paths": [
+      "internal/engine/graph_delivery_qualification_test.go",
+      "internal/engine/planning.go",
+      "internal/engine/planning_api.go",
+      "internal/engine/planning_context.go",
+      "internal/engine/planning_judge.go",
+      "internal/engine/planning_judge_test.go"
+    ],
+    "patch_sha256": "decf2de0daf66075c1f9e7236c6063ba648bb7c4b8c2052b9ba2d4303f6fa608",
+    "limits": "Read-only original native candidate capture; not acceptance. Native workspace untouched."
+  },
+  "paths": [
+    {
+      "path": "internal/engine/graph_delivery_qualification_test.go",
+      "local_before_sha256": "a11f3373197c20bef984ffab9957a07d245773e7bd783bbf395d33bd9c9435f6",
+      "native_sha256": "a11f3373197c20bef984ffab9957a07d245773e7bd783bbf395d33bd9c9435f6",
+      "merged_sha256": "a11f3373197c20bef984ffab9957a07d245773e7bd783bbf395d33bd9c9435f6",
+      "method": "three-way against accepted T1; new files exact",
+      "resolution": null
+    },
+    {
+      "path": "internal/engine/planning.go",
+      "local_before_sha256": "142a6f08f0ec7e6ab915aeff8470c4f15aeefef817b4b6d33dbf1a46a2406ce6",
+      "native_sha256": "c3d8ac967e7b800ca5c8124da586f33afee83d967d4370e608a8b27ffab97fa6",
+      "merged_sha256": "05d9e8de7d64057177e35ee8c8805731558c21fecdc65c433ff5963c3aa99e78",
+      "method": "three-way against accepted T1; new files exact",
+      "resolution": null
+    },
+    {
+      "path": "internal/engine/planning_api.go",
+      "local_before_sha256": "b6fe380444f8d456a0084076a1f8658c9a2bec5eb51b371f1cd7cf0dad0d7a4c",
+      "native_sha256": "9004ed00bfb31b5209972516dddf53c85cea6ebcfcb9385a45c0cd49e29b9d94",
+      "merged_sha256": "6680491c81a1b0d6b73f84d33128281a1352217ddf687fc49e435c80846e1027",
+      "method": "three-way against accepted T1; new files exact",
+      "resolution": "CLI usage union retains reject-instructions and adds judge/renew; full conflict original preserved"
+    },
+    {
+      "path": "internal/engine/planning_context.go",
+      "local_before_sha256": "f9a1d94cb8acce5b30df488a110312bd9c317276ca651f4adc4c15cd9c463527",
+      "native_sha256": "66176ec869f60bded108597cd81b18549a370b7c4dd11cc9903881ac8c605cc9",
+      "merged_sha256": "81e66799412c188e71a46a6a180d4101a946351a0d5d4d9421393fc0c68a1eb9",
+      "method": "three-way against accepted T1; new files exact",
+      "resolution": "Context union adds global_cycle while preserving current history, source, retry and exploration fields; original conflict preserved"
+    },
+    {
+      "path": "internal/engine/planning_judge.go",
+      "local_before_sha256": null,
+      "native_sha256": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b",
+      "merged_sha256": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b",
+      "method": "three-way against accepted T1; new files exact",
+      "resolution": null
+    },
+    {
+      "path": "internal/engine/planning_judge_test.go",
+      "local_before_sha256": null,
+      "native_sha256": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd",
+      "merged_sha256": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd",
+      "method": "three-way against accepted T1; new files exact",
+      "resolution": null
+    }
+  ],
+  "preimage_backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-judge-compose-final-p1f2ubpm",
+  "result": "PASS six files composed; two same-line unions retain both local recovery context and native Judge additions",
+  "limits": "Developed unaccepted T2 code retained, not acceptance. Deferred27 excluded; native workspace untouched."
+}

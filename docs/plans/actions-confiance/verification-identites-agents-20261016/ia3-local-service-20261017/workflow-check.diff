@@ -1,0 +1,49 @@
+--- before/tools/agent-workflows/check.py
++++ after/tools/agent-workflows/check.py
+@@ -2,6 +2,7 @@
+ """Check the repository-local Claude/Codex method pack without calling a model."""
+ 
+ from pathlib import Path
++import json
+ import re
+ import subprocess
+ import sys
+@@ -66,11 +67,35 @@
+     # Exercise the engine's actual embedded assembly, without a provider call or
+     # a second implementation of its capacities/framing in this Python checker.
+     result = subprocess.run(
+-        ["go", "test", "./internal/engine", "-run",
+-         "^TestAgentWorkflowRolesAreBounded$", "-count=1", "-timeout", "30s"],
++        ["go", "test", "-json", "./internal/engine", "-run",
++         "^TestAgentWorkflowRolesAreBounded$", "-count=1", "-timeout", "0"],
+         cwd=ROOT, capture_output=True, text=True,
+     )
+     if result.returncode:
+         print(result.stdout + result.stderr, file=sys.stderr, end="")
+         sys.exit(result.returncode)
+-    print(f"OK: {len(SKILLS)} shared Claude/Codex skills, preparation commands, contract and engine-built role contexts")
++    # A zero exit code also occurs for an empty selector. Require the named
++    # test's execution/completion and package completion, not just Go's exit.
++    try:
++        events = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
++    except (ValueError, TypeError):
++        events = []
++    expected = "TestAgentWorkflowRolesAreBounded"
++    package = "swarm.local/companion/internal/engine"
++    valid = bool(events) and all(isinstance(event, dict) for event in events)
++    if valid:
++        valid = (
++            not any(event.get("Action") in ("fail", "skip") for event in events)
++            and all(any(event.get("Package") == package and event.get("Action") == action
++                        and event.get("Test") == expected for event in events)
++                    for action in ("run", "pass"))
++            and any(event.get("Package") == package and event.get("Action") == "pass"
++                    and not event.get("Test") for event in events)
++        )
++    if not valid:
++        print("ERROR: missing, incomplete or invalid named role-context test evidence", file=sys.stderr)
++        print(result.stdout + result.stderr, file=sys.stderr, end="")
++        sys.exit(1)
++    completed = {event["Test"] for event in events if event.get("Package") == package
++                 and event.get("Action") == "pass" and event.get("Test")}
++    print(f"OK: {len(SKILLS)} shared Claude/Codex skills, preparation commands, contract and engine-built role contexts ({len(completed)} tests/subtests)")

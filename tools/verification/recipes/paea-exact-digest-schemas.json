@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "paea-exact-digest-schemas",
+  "inputs": [
+    "tests/paea_digest_schema_test.py",
+    "schemas/paea/operator-package-cli-v1.schema.json",
+    "schemas/paea/personal-service-response-v1.schema.json",
+    "schemas/paea/service-installation-cli-v1.schema.json",
+    "schemas/paea/provisioning-request-cli-v1.schema.json",
+    "tools/verification/recipes/paea-exact-digest-schemas.json",
+    "tests/paea_operator_package_schema_test.py",
+    "tests/paea_service_response_schema_test.py",
+    "tests/paea_provisioning_request_schema_test.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "five-exact-digest-fields-and-final-newline-refusals",
+      "command": [
+        "python3",
+        "tests/paea_digest_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "EXACT_DIGEST_SCHEMA_PASS fields=5"
+      ],
+      "required_stderr": [
+        "Ran 1 test",
+        "OK"
+      ]
+    },
+    {
+      "id": "paea_operator_package_schema_test",
+      "command": [
+        "python3",
+        "tests/paea_operator_package_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "paea_service_response_schema_test",
+      "command": [
+        "python3",
+        "tests/paea_service_response_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "paea_provisioning_request_schema_test",
+      "command": [
+        "python3",
+        "tests/paea_provisioning_request_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    }
+  ]
+}

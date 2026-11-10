@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-11T08:09:04.037003+00:00",
+  "source_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "sources_modified": true,
+  "patch": {
+    "schema_version": 1,
+    "observed_at": "2026-10-11T08:04:50.438737+00:00",
+    "patch": "docs/plans/engine-cursor-contract/recovery/agent-engine-protocol-resumption-20261011.patch",
+    "sha256": "a2c6d3dff49ce66001db40acd2e80c15309cbba46a53e4e5ec9e98b49bf3a3ef",
+    "bytes": 28431,
+    "parent_patch": "agent-engine-protocol-20261011.patch",
+    "parent_sha256": "a9eb1ca8961e446e4d777c3202759c51e02c1c555e8929303853bb1f51f4cb84",
+    "includes_local_untransmitted_patch": "recovery-repaired-handoff-20261011.patch",
+    "scope": "Repair-ref handoff, externally attributed repair provenance, explicit prepared skill refresh preserving original manifest and frozen launch settings; CLI route and strict refusal tests.",
+    "candidate_integration": "Preserve native T1..T4 and regenerate source snapshot in integrated candidate. Merge provider-wait-20261010.patch separately.",
+    "checks": {
+      "targeted_skill_refresh": "13 PASS events, exit 0",
+      "repaired_handoff": "66 PASS events, exit 0",
+      "repaired_handoff_race": "23 PASS events, exit 0",
+      "expanded_recovery_skill_race": "51 PASS events, exit 0; includes concurrent prepared launch resumption",
+      "go_vet": "exit 0",
+      "final_full_default_suite": "1114 discovered tests/examples/fuzz targets; four disjoint groups all exit 0",
+      "patch_reverse_check": "git apply --reverse --check, exit 0"
+    },
+    "runtime": "Installed server build 2026-10-11T08:04:05Z verified via runtime-health; T2 resumed with explicit current APEX selection, second allowed production attempt, original preparation unchanged."
+  },
+  "checks": [
+    {
+      "artifact": "swarm-repaired-handoff-red.jsonl",
+      "started_at": "2026-10-11T09:56:28.841560231+02:00",
+      "last_event_at": "2026-10-11T09:56:29.994372337+02:00",
+      "counts": {
+        "start": 1,
+        "run": 1,
+        "output": 5,
+        "fail": 2
+      },
+      "observed_exit_code": 1
+    },
+    {
+      "artifact": "swarm-repaired-handoff-final.jsonl",
+      "started_at": "2026-10-11T09:56:43.112459006+02:00",
+      "last_event_at": "2026-10-11T09:57:33.152377384+02:00",
+      "counts": {
+        "start": 1,
+        "run": 65,
+        "output": 132,
+        "pass": 66
+      },
+      "observed_exit_code": 0
+    },
+    {
+      "artifact": "swarm-repaired-handoff-final-race.jsonl",
+      "started_at": "2026-10-11T09:57:07.04582813+02:00",
+      "last_event_at": "2026-10-11T09:57:42.693379614+02:00",
+      "counts": {
+        "start": 1,
+        "run": 22,
+        "output": 46,
+        "pass": 23
+      },
+      "observed_exit_code": 0
+    },
+    {
+      "artifact": "swarm-prepared-skill-refresh-tests.jsonl",
+      "started_at": "2026-10-11T10:03:18.295908574+02:00",
+      "last_event_at": "2026-10-11T10:03:22.671773515+02:00",
+      "counts": {
+        "start": 1,
+        "run": 12,
+        "output": 26,
+        "pass": 13
+      },
+      "observed_exit_code": 0
+    },
+    {
+      "artifact": "swarm-prepared-skill-refresh-race.jsonl",
+      "started_at": "2026-10-11T10:04:31.574358364+02:00",
+      "last_event_at": "2026-10-11T10:05:26.423369428+02:00",
+      "counts": {
+        "start": 1,
+        "run": 50,
+        "output": 102,
+        "pass": 51
+      },
+      "observed_exit_code": 0
+    }
+  ],
+  "command_limit": "Go JSONL preserves names and dates; selectors retained for key targeted and race commands in this revision. Full-suite command is python3 tools/verification/go_suite.py.",
+  "method_failures_preserved": "first fixture enabled refusal too late; historical .go evidence created a package; source snapshot was generated before that fixture correction and failed once. All corrected without changing acceptance manifests.",
+  "native_acceptance": false,
+  "latest_full_suite": {
+    "command": [
+      "python3",
+      "tools/verification/go_suite.py"
+    ],
+    "exit_code": 0,
+    "targets": 1114,
+    "group_targets": [
+      273,
+      270,
+      272,
+      299
+    ],
+    "group_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "scope": "full default Go suite; includes both repaired handoff and prepared-skill refresh changes; local source snapshot regenerated before execution"
+  },
+  "artifacts": [
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/incident-observation.json",
+      "bytes": 5418,
+      "sha256": "efa6379e12bac6ded101b6d4a6d1a6fbb4fcbb68c23e29cd81f8474d816a782c"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/native-semantic-review.md",
+      "bytes": 7735,
+      "sha256": "be8b7b8186d64e4796caa77026b5b89cd244b51f7783e41ca2431f3131ed60f6"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/public-resumption-observation.json",
+      "bytes": 5202,
+      "sha256": "394ff1519cdecf363d2d4a41256906208c808f68341e3beda016c293fb414d98"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-prepared-skill-refresh-live-request.json",
+      "bytes": 604,
+      "sha256": "aec7a40da1ec2fb37c27cf887654417af6af45856d3bab3ad52232214b14596a"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-prepared-skill-refresh-race.jsonl",
+      "bytes": 45622,
+      "sha256": "65a5bc3264a77535bcf816b14a52f603407f5dff4f6e9967d1f6ca17071d3298"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-prepared-skill-refresh-race.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-prepared-skill-refresh-suite.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-prepared-skill-refresh-suite.stdout",
+      "bytes": 759,
+      "sha256": "0e5d23b4cbfb53c0cc5b7975d128ffcdbb0d2a21fe2eb27bca4069a1836d9f1d"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-prepared-skill-refresh-tests.jsonl",
+      "bytes": 11745,
+      "sha256": "1f73a3bc30c8745343909f75aad8ac2dad98239c7521c5578c546ceed59c5b82"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-prepared-skill-refresh-tests.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-prepared-skill-refresh-vet.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-prepared-skill-refresh-vet.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-after.jsonl",
+      "bytes": 63543,
+      "sha256": "4973c4fe2c9dae50fe2b4793437cd4c3a733fe0af9cab2898ee758748e86bab0"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-before.jsonl",
+      "bytes": 1690,
+      "sha256": "9ff9cc7908c7e9132fa5a148aaf70478fae7b5faf6195f6625a462ca34d6f527"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-final-manifest-test.jsonl",
+      "bytes": 1366,
+      "sha256": "459858e0363cb8f34c486c73cf2d57edfac524bb36853052725131d6b57818e0"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-final-race.jsonl",
+      "bytes": 19945,
+      "sha256": "a31be46aaee21939c0bfa98f3566de12860ece67b562b2e3968f9ea077a1b75f"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-final-race.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-final-suite.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-final-suite.stdout",
+      "bytes": 1049,
+      "sha256": "08ae625d738214c4b1ea316dfce93bfd98d5026427cbb4d875de6a71afd369ef"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-final-vet.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-final-vet.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-final.jsonl",
+      "bytes": 60499,
+      "sha256": "8e1aa94d6c39c79582277ff1d0387e3977eb8378aff2d0ee2fc9ef045a4a5bc6"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-final.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-original.go.txt",
+      "bytes": 7778,
+      "sha256": "2ad07c99d35efd76468fd11f688cf2b0dab5acebc471394bd5498b65cbc7bce1"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-overlay.json",
+      "bytes": 133,
+      "sha256": "758fcd89366b19e83d3b26a63c90fb5ce21e295292d0982825e8498aae6a2dab"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-red.jsonl",
+      "bytes": 1718,
+      "sha256": "ea044ce57297b0d0da5894684bc15cb4a51c13d20f5f98213cfdd9ec24ae25ab"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-red.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/20261011-repaired-handoff/swarm-repaired-handoff-vet.stderr",
+      "bytes": 317,
+      "sha256": "bc4f50a5e31d8a54bb950244ec42373c7393f5d3ffbf4c5e452ea5f5118cc0aa"
+    }
+  ],
+  "additional_checks": {
+    "go_vet_exit_code": 0,
+    "git_diff_check_exit_code": 0,
+    "patch_reverse_check_exit_code": 0
+  }
+}

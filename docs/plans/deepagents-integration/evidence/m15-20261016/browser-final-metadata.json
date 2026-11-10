@@ -1,0 +1,9 @@
+{
+  "binary": "/tmp/swarm-m15-bin-qw68mbss/swarm",
+  "binary_sha256": "4978215b5f938e4680b81901e0644fc43f72e6df08a854e7d6bb40cb6b255272",
+  "built_source_manifest": "build-inputs.json",
+  "script_sha256": "b2070c386318a45148975946680c5b952059c9f327a023ff33096d35e9939c5b",
+  "bundle": "/tmp/swarm-memory-m3-jdee3kwu/source.zip",
+  "bundle_sha256": "584dc34ca387930f7a4296edfcb97fe09133a7b39a71f6d06cdb5aae4b1a4dce",
+  "origin": "Owned source fixture retained from M3; source evidence rechecked in the new root before admission"
+}

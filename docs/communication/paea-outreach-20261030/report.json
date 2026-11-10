@@ -1,0 +1,173 @@
+{
+  "date": "2026-10-30",
+  "owner": "Fabrice Pizzi",
+  "scope": "Five individually tailored expert outreach emails and GitHub repository description/topics. No license change, code commit, push or runtime change.",
+  "repository": "https://github.com/mo0ogly/swarm",
+  "license_finding": {
+    "observed": "PolyForm Noncommercial 1.0.0",
+    "decision": "Describe as public source under a noncommercial license; do not market as OSI open source.",
+    "license_unchanged": true,
+    "reason": "Commercial-use restriction. Relicensing would require a separate explicit decision and rights review.",
+    "observable_result": "All five sent messages and GitHub description name the existing license."
+  },
+  "github": {
+    "before": {
+      "description": "",
+      "topics": []
+    },
+    "after": {
+      "description": "Local cockpit and CLI for agentic workflows, with a deterministic Rust engine and traceable execution. Work in progress. PolyForm Noncommercial.",
+      "topics": [
+        "agent-security",
+        "ai-agents",
+        "ai-safety",
+        "local-first",
+        "multi-agent",
+        "rust",
+        "workflow-orchestration",
+        "paea"
+      ]
+    },
+    "verified_by": "gh repo view after gh repo edit; repository remains PUBLIC"
+  },
+  "contact_sources": {
+    "inria_fr": "https://evalia.inria.fr/poles/pole-2-cybersecurite/",
+    "owasp_en": "https://genai-security-project.github.io/agent-control-standard/",
+    "buck_en": "https://www.greaterwrong.com/users/buck?from=post_header&show=posts",
+    "edoardo_en": "https://www.isg.inf.ethz.ch/bin/view/Main/EdoardoDebenedetti",
+    "ifaci_fr": "https://www.ifaci.com/contact-presse/"
+  },
+  "messages": [
+    {
+      "key": "inria_fr",
+      "id": "1a18e22837a226f5",
+      "recipient": "evalia@inria.fr",
+      "subject": "Swarm et PAEA — proposition d’évaluation de l’exécution agentique",
+      "attachments": [
+        {
+          "filename": "PAEA_v0.3_F12_Guide_DAF_Audit_FR.pdf",
+          "size": 788448
+        }
+      ],
+      "verified_sent_content": true,
+      "body": "Madame, Monsieur,\n\nJe développe Swarm, un cockpit local et une CLI pour organiser et superviser des workflows d’agents IA, avec un moteur déterministe en Rust et des interfaces FR/EN. Le dépôt est public : https://github.com/mo0ogly/swarm (licence PolyForm Noncommercial 1.0.0). La migration Rust est en cours ; des parcours locaux ont été vérifiés, mais la qualification globale reste ouverte.\n\nEn parallèle, je propose PAEA (Agentic Execution Assurance Profile), une méthode expérimentale pour relier l’action proposée, l’autorité qui la permet et la preuve de son effet réel. L’idée est d’apporter un contrôle observable des conséquences, y compris lorsque le raisonnement interne du modèle devient moins lisible. Ce cadre est une proposition d’ingénierie, sans certification ni validation indépendante globale ; il ne décrit pas une protection déjà intégralement déployée dans Swarm.\n\nLe guide DAF joint rend la démarche concrète : un paiement fournisseur fictif de 4 200 €, avec substitution après approbation, course entre révocation et exécution, et résultat inconnu après une réponse perdue. Il s’agit de scénarios d’évaluation proposés, pas d’essais bancaires réalisés en production.\n\nLes travaux du programme Évaluation IA sur la sécurité des agents me semblent un point de rencontre pertinent. Pourriez-vous m’orienter vers l’équipe qui pourrait examiner les hypothèses de confiance du cadre et définir un premier test reproductible ? Je serais heureux de présenter le cas en vingt minutes.\n\nCordialement,\nFabrice Pizzi"
+    },
+    {
+      "key": "owasp_en",
+      "id": "1a18e228fe2d212f",
+      "recipient": "rock.lambros@owasp.org",
+      "subject": "Swarm / PAEA — comparing action authorization and effect evidence with OWASP ACS",
+      "attachments": [
+        {
+          "filename": "PAEA_v0.3_English.docx",
+          "size": 1078948
+        },
+        {
+          "filename": "PAEA_v0.3_F12_CFO_Audit_Guide_EN.pdf",
+          "size": 770981
+        }
+      ],
+      "verified_sent_content": true,
+      "body": "Dear Mr. Lambros,\n\nI develop Swarm, a local cockpit and CLI for organizing and supervising AI agent workflows, with a deterministic Rust engine and French/English interfaces. The public repository is https://github.com/mo0ogly/swarm, under PolyForm Noncommercial 1.0.0. The Rust migration is ongoing: selected local flows have been verified, while overall qualification remains open.\n\nAlongside Swarm, I propose PAEA (Agentic Execution Assurance Profile), an experimental engineering method connecting a proposed action, its exact authorization and evidence of its actual effect. The aim is to make consequential actions assessable even when a model’s internal reasoning becomes less readable. It is not a certification or an independently validated solution; the full proposed assurance chain is not claimed to be implemented in Swarm.\n\nGiven your work on the Agent Control Standard, I would welcome feedback on how this proposal maps to ACS: particularly exact action authorization, the enforcement boundary at the service performing the action, and independent evidence of completion. I am looking for gaps and a practical evaluation path, without claiming ACS conformance.\n\nI have attached the condensed English PAEA handbook and a CFO audit guide built around a fictional EUR 4,200 supplier payment. The case covers substitution after approval, revocation versus execution, and an unknown outcome after a lost response. These are proposed evaluation scenarios, not results from a production bank deployment.\n\nWould this be suitable for a brief discussion or a technical review by the relevant project group?\n\nBest regards,\nFabrice Pizzi"
+    },
+    {
+      "key": "buck_en",
+      "id": "1a18e22a9ca50e27",
+      "recipient": "bshlegeris@gmail.com",
+      "subject": "Swarm / PAEA — a concrete execution-assurance proposal for critical feedback",
+      "attachments": [
+        {
+          "filename": "PAEA_v0.3_English.docx",
+          "size": 1078948
+        },
+        {
+          "filename": "PAEA_v0.3_F12_CFO_Audit_Guide_EN.pdf",
+          "size": 770981
+        }
+      ],
+      "verified_sent_content": true,
+      "body": "Dear Mr. Shlegeris,\n\nI develop Swarm, a local cockpit and CLI for organizing and supervising AI agent workflows, with a deterministic Rust engine and French/English interfaces. The public repository is https://github.com/mo0ogly/swarm, under PolyForm Noncommercial 1.0.0. The Rust migration is ongoing: selected local flows have been verified, while overall qualification remains open.\n\nAlongside Swarm, I propose PAEA (Agentic Execution Assurance Profile), an experimental engineering method connecting a proposed action, its exact authorization and evidence of its actual effect. The aim is to make consequential actions assessable even when a model’s internal reasoning becomes less readable. It is not a certification or an independently validated solution; the full proposed assurance chain is not claimed to be implemented in Swarm.\n\nYour work on AI control makes your perspective particularly relevant. I would value a critical view of the weakest trust assumption: what could a malicious agent exploit even if the proposed action/authorization/effect checks were enforced? This is a bounded engineering proposal, without a claim to solve alignment or contain arbitrarily capable adversaries.\n\nI have attached the condensed English PAEA handbook and a CFO audit guide built around a fictional EUR 4,200 supplier payment. The case covers substitution after approval, revocation versus execution, and an unknown outcome after a lost response. These are proposed evaluation scenarios, not results from a production bank deployment.\n\nWould you be open to brief written feedback, or to pointing me toward a suitable evaluation setup?\n\nBest regards,\nFabrice Pizzi"
+    },
+    {
+      "key": "edoardo_en",
+      "id": "1a18e22b531fbcc6",
+      "recipient": "edoardo.debenedetti@inf.ethz.ch",
+      "subject": "Swarm / PAEA — evaluating action boundaries with CaMeL and AgentDojo in mind",
+      "attachments": [
+        {
+          "filename": "PAEA_v0.3_English.docx",
+          "size": 1078948
+        },
+        {
+          "filename": "PAEA_v0.3_F12_CFO_Audit_Guide_EN.pdf",
+          "size": 770981
+        }
+      ],
+      "verified_sent_content": true,
+      "body": "Dear Mr. Debenedetti,\n\nI develop Swarm, a local cockpit and CLI for organizing and supervising AI agent workflows, with a deterministic Rust engine and French/English interfaces. The public repository is https://github.com/mo0ogly/swarm, under PolyForm Noncommercial 1.0.0. The Rust migration is ongoing: selected local flows have been verified, while overall qualification remains open.\n\nAlongside Swarm, I propose PAEA (Agentic Execution Assurance Profile), an experimental engineering method connecting a proposed action, its exact authorization and evidence of its actual effect. The aim is to make consequential actions assessable even when a model’s internal reasoning becomes less readable. It is not a certification or an independently validated solution; the full proposed assurance chain is not claimed to be implemented in Swarm.\n\nYour work on CaMeL and AgentDojo seems especially relevant to evaluating this proposal. I would welcome your view on separating untrusted data from authority across memory and agent-to-agent exchanges, and on whether an AgentDojo task could expose a failure of the proposed action boundary. I am not claiming an implementation equivalent to CaMeL.\n\nI have attached the condensed English PAEA handbook and a CFO audit guide built around a fictional EUR 4,200 supplier payment. The case covers substitution after approval, revocation versus execution, and an unknown outcome after a lost response. These are proposed evaluation scenarios, not results from a production bank deployment.\n\nWould you be willing to suggest one useful counterexample or a suitable benchmark starting point?\n\nBest regards,\nFabrice Pizzi"
+    },
+    {
+      "key": "ifaci_fr",
+      "id": "1a18e22be406f327",
+      "recipient": "pmocquard@ifaci.com",
+      "subject": "Swarm et PAEA — un cas concret pour l’audit des agents IA et le contrôle interne",
+      "attachments": [
+        {
+          "filename": "PAEA_v0.3_F12_Guide_DAF_Audit_FR.pdf",
+          "size": 788448
+        }
+      ],
+      "verified_sent_content": true,
+      "body": "Bonjour Monsieur Mocquard,\n\nJe développe Swarm, un cockpit local et une CLI pour organiser et superviser des workflows d’agents IA, avec un moteur déterministe en Rust et des interfaces FR/EN. Le dépôt est public : https://github.com/mo0ogly/swarm (licence PolyForm Noncommercial 1.0.0). La migration Rust est en cours ; des parcours locaux ont été vérifiés, mais la qualification globale reste ouverte.\n\nEn parallèle, je propose PAEA (Agentic Execution Assurance Profile), une méthode expérimentale pour relier l’action proposée, l’autorité qui la permet et la preuve de son effet réel. L’idée est d’apporter un contrôle observable des conséquences, y compris lorsque le raisonnement interne du modèle devient moins lisible. Ce cadre est une proposition d’ingénierie, sans certification ni validation indépendante globale ; il ne décrit pas une protection déjà intégralement déployée dans Swarm.\n\nLe guide DAF joint rend la démarche concrète : un paiement fournisseur fictif de 4 200 €, avec substitution après approbation, course entre révocation et exécution, et résultat inconnu après une réponse perdue. Il s’agit de scénarios d’évaluation proposés, pas d’essais bancaires réalisés en production.\n\nJe souhaiterais proposer ce cas à une lecture critique sous l’angle de l’audit interne : quelles pièces un auditeur devrait-il exiger pour établir qu’une action a été autorisée et exécutée conformément à la décision ? Le cas pourrait aussi servir de support à un atelier ou à un article si vous le jugez pertinent.\n\nPourriez-vous m’orienter vers le groupe de travail approprié à l’IFACI ? Le manuel PAEA condensé en anglais est également disponible sur demande.\n\nCordialement,\nFabrice Pizzi"
+    }
+  ],
+  "verification_limits": [
+    "SENT and sender-side MIME content verified. Recipient delivery, reading, feedback and independent acceptance are not established.",
+    "Attachment names and byte counts checked against local files; attachments were reused without editing.",
+    "GitHub description and topics published. No separate announcement post, release or source-code push."
+  ],
+  "recovery": {
+    "observed": "Personal site email link was unreadable and direct fetch returned HTTP 403.",
+    "action": "Used the public ETH directory and corresponding-author publication to verify Edoardo Debenedetti's professional email. Did not retry the refused fetch."
+  },
+  "review": {
+    "hardcoded_policies": "No product policy changed; contact list and attachment names are campaign inputs.",
+    "functions": "No public or nontrivial product function changed.",
+    "errors": "Five successful send responses were each followed by a SENT/content/attachment check; no resend attempted.",
+    "documentation": "README-F12 updated in both languages; no runtime build needed for mail, metadata and documentation only."
+  },
+  "delivery_incidents": [
+    {
+      "date": "2026-10-30",
+      "target": "Inria Évaluation IA",
+      "original_sent_id": "1a18e22837a226f5",
+      "bounce_message_id": "1a18e229758cf997",
+      "original_recipient": "evalia@inria.fr",
+      "original_delivery_status": "failed",
+      "smtp_diagnostic": "550 #5.1.0 Address rejected.",
+      "dsn_status": "5.7.0",
+      "cause": "Inria SMTP rejected recipient. Exact mailbox configuration unknown.",
+      "recovery": {
+        "recipient": "jean-michel.a.loubes@inria.fr",
+        "contact_source": "https://appliweb.dgri.education.fr/rnsr/PresenteStruct.jsp?PUBLIC=OK&numNatStruct=202524760J",
+        "role_source": "https://evalia.inria.fr/",
+        "sent_id": "1a18e8575254f8c3",
+        "sender_copy_verified": true,
+        "body": "Bonjour Monsieur Loubes,\n\nJe vous contacte en tant que directeur du programme Évaluation de l’IA. Mon message à l’adresse générique evalia@inria.fr publiée sur le site a été rejeté par le serveur ; je me permets donc de vous adresser cette proposition, pour orientation vers l’équipe pertinente si nécessaire.\n\nJe développe Swarm, un cockpit local et une CLI pour organiser et superviser des workflows d’agents IA, avec un moteur déterministe en Rust et des interfaces FR/EN. Le dépôt est public : https://github.com/mo0ogly/swarm (licence PolyForm Noncommercial 1.0.0). La migration Rust est en cours ; des parcours locaux ont été vérifiés, mais la qualification globale reste ouverte.\n\nEn parallèle, je propose PAEA (Agentic Execution Assurance Profile), une méthode expérimentale pour relier l’action proposée, l’autorité qui la permet et la preuve de son effet réel. L’idée est d’apporter un contrôle observable des conséquences, y compris lorsque le raisonnement interne du modèle devient moins lisible. Ce cadre est une proposition d’ingénierie, sans certification ni validation indépendante globale ; il ne décrit pas une protection déjà intégralement déployée dans Swarm.\n\nLe guide DAF joint rend la démarche concrète : un paiement fournisseur fictif de 4 200 €, avec substitution après approbation, course entre révocation et exécution, et résultat inconnu après une réponse perdue. Il s’agit de scénarios d’évaluation proposés, pas d’essais bancaires réalisés en production.\n\nLes travaux du programme Évaluation IA sur la sécurité des agents me semblent un point de rencontre pertinent. Pourriez-vous m’orienter vers l’équipe qui pourrait examiner les hypothèses de confiance du cadre et définir un premier test reproductible ? Je serais heureux de présenter le cas en vingt minutes.\n\nCordialement,\nFabrice Pizzi",
+        "attachment": {
+          "filename": "PAEA_v0.3_F12_Guide_DAF_Audit_FR.pdf",
+          "size": 788448
+        },
+        "status": "SENT; immediate bounce search empty; recipient delivery/read not established."
+      },
+      "lesson": "Published address and SENT prove source/submission only, never recipient acceptance. Preserve DSN failures; use another officially sourced contact rather than retry rejected address.",
+      "owner": "Fabrice Pizzi",
+      "documentation_recovery": "First generated patch was rejected because added multiline JSON lacked patch prefixes; no mutation. Corrected with all inserted lines prefixed."
+    }
+  ],
+  "followup": {
+    "owner": "Fabrice Pizzi",
+    "state": "Awaiting optional expert replies; no monitoring or automatic follow-up scheduled.",
+    "condition": "Any received reply or explicit request can initiate the next exchange."
+  }
+}

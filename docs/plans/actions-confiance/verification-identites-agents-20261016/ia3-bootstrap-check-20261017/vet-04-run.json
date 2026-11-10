@@ -1,0 +1,25 @@
+{
+  "command": [
+    "go",
+    "vet",
+    "./internal/enrollmentbootstrap",
+    "./internal/enrollmentconfig",
+    "./internal/engine"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T16:31:03.003901+00:00",
+  "end": "2026-10-17T16:31:08.012441+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 848,
+  "overlay": null
+}

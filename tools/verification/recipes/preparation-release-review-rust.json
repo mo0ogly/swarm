@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "preparation-release-review-rust",
+  "inputs": [
+    "tests/rust_preparation_conversion.py",
+    "tests/rust_preparation_conversion_ui.cjs",
+    "tests/rust_preparation_reads.py",
+    "tests/rust_preparation_plan.py",
+    "tests/rust_native_http_cli.py",
+    "web/preparation-native.js",
+    "web/prepare.html",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "rust/crates/swarm-engine/src/root_store/preparation_conversion.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+    "rust/crates/swarm-engine/src/preparation_command.rs",
+    "rust/crates/swarm-engine/src/mutation_guard.rs",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "tests/rust_preparation_release.py",
+    "tests/rust_preparation_release_ui.cjs",
+    "rust/crates/swarm-engine/src/root_store/preparation_release.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "tests/rust_preparation_release_review.py",
+    "rust/crates/swarm-engine/src/root_store/preparation_release_review.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_read.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/Cargo.toml"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "readonly-review",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-release-review-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_release_review.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_RELEASE_REVIEW_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "RELEASE_REVIEW_PASS 17",
+        "PASS release-review-method-cause-retained-on-refusal",
+        "PASS release-review-current-http-cli-equal"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "explicit-release-journey",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-release-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_release.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_RELEASE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_RELEASE_PASS",
+        "PASS release-replay-no-write",
+        "PASS release-refuse-work-cas",
+        "PASS release-keeps-new-draft",
+        "PASS release-lock-recovery-locks-event-no-dispatch",
+        "PASS release-unknown-retains-event",
+        "PASS en-sombre-no-overflow-390"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

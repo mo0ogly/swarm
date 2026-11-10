@@ -1,0 +1,324 @@
+//! Descriptor-bound trust transactions; no provider, process launch or hidden retry.
+use super::{absent, finished, RootStore, RootStoreError as R};
+use crate::{
+    trust::{self, state::State, TrustError as E},
+    TrustReply,
+};
+use time::OffsetDateTime;
+use crate::trust::authentication::Source;
+pub(super) const STATE: &str = "trust-actions.json";
+const KEY: &str = "trust-actions-proof.key";
+pub(super) const MAX_STATE: usize = 8 * 1024 * 1024;
+fn failure(e: E) -> R {
+    R::Trust(Box::new(e))
+}
+fn retained(e: R, publication: Option<&'static str>) -> R {
+    match publication {
+        Some(publication) => R::TrustPublished {
+            primary: Box::new(e),
+            publication,
+        },
+        None => e,
+    }
+}
+impl RootStore {
+    /// Read-only observation of the current persisted Trust revision, without
+    /// executing any trust operation or reserving the trust lock: a shared
+    /// reader is deliberately NOT taken because this is presentation-only
+    /// observation beside an already running protocol, not a transaction.
+    /// The bounded state file is decoded and validated like every other trust
+    /// read; `Ok(None)` distinguishes an absent journal (never initialized)
+    /// from a readable revision. Decode/validate failures refuse typed and
+    /// are never converted to a fabricated revision or empty success. The
+    /// observed value proves no current grant, authority or acceptance.
+    pub fn trust_revision(&self) -> Result<Option<i64>, R> {
+        match self.directory.read_bounded(STATE, MAX_STATE) {
+            Ok(raw) => {
+                let state = State::decode(&raw).map_err(failure)?;
+                state.validate().map_err(failure)?;
+                state
+                    .require_supported()
+                    .map_err(failure)?;
+                Ok(Some(state.revision))
+            }
+            // Absent journal: explicitly uninitialized trust state, a real
+            // observed prerequisite state for preview consumers, not an error.
+            Err(e) if absent(&e) => Ok(None),
+            Err(e) => Err(R::Storage(e)),
+        }
+    }
+    /// Execute the trust protocol against this opened root under its historical
+    /// flock. Local configuration requires operator ownership; business actions
+    /// authenticate their own stored token. Late errors retain publication state.
+    /// Unsupported active policies refuse, never fall back to local identities.
+    pub fn trust(&self, operation: &str, raw: &[u8], token: &str) -> Result<TrustReply, R> {
+        self.trust_scoped(operation, raw, Source::Local(token), false)
+    }
+    /// Run a native-session business request. Configuration bootstrap is allowed
+    /// only on an unconfigured root; afterwards preview/apply and their replays
+    /// require a current local I3 administrator under the same state reservation.
+    /// A session cookie alone grants no configuration authority after bootstrap.
+    /// Local operator recovery remains the separate `trust` entry point.
+    pub fn trust_as_principal(&self, operation: &str, raw: &[u8], token: &str) -> Result<TrustReply, R> {
+        self.trust_scoped(operation, raw, Source::Local(token), true)
+    }
+    /// Serialize one request; the fixed caller context selects authentication,
+    /// never an input field or operator policy. Preserve publication on errors.
+    pub(super) fn trust_scoped(&self, operation: &str, raw: &[u8], token: Source<'_>, principal: bool) -> Result<TrustReply, R> {
+        #[cfg(target_os="linux")]
+        if matches!(operation,"blp-preparation-admit"|"blp-preparation-admission-show"|"blp-preparation-transport") {
+            if operation=="blp-preparation-transport" {
+                return super::preparation_transport::execute(self,operation,raw,token);
+            }
+            return super::preparation_admission::execute(self,operation,raw,token);
+        }
+        self.with_preparation_control(operation,token,principal,||self.trust_scoped_reserved(operation,raw,token,principal))
+    }
+    /// Acquire the egress writer before any SQL/Trust reservation for an identity
+    /// or BLP-policy mutation. Other business operations run unchanged. Preflight
+    /// rejects unauthorized waiters but grants no authority; callback must repeat
+    /// current admission. Preserve recorded publication on late release failure.
+    pub(super) fn with_preparation_control(&self, operation: &str, token: Source<'_>, principal: bool,
+        apply: impl FnOnce()->Result<TrustReply,R>) -> Result<TrustReply,R> {
+        if !matches!(operation,"config-apply"|"blp-policy-apply") { return apply(); }
+        if !self.writable { return Err(R::Refused("read-only-root")); }
+        // Reject unauthorized control before waiting behind provider IO. This
+        // snapshot grants nothing: the authoritative path authenticates again.
+        self.preparation_control_preflight(operation,token,principal)?;
+        let egress=self.directory.reserve_preparation_egress(true).map_err(R::Storage)?;
+        let result=apply();
+        let publication=result.as_ref().ok().and_then(|reply|reply.publication);
+        finished(result,egress.close().map_err(R::Storage)).map_err(|error|retained(error,publication))
+    }
+    /// Observe control authority under a short Trust read before acquiring the
+    /// egress writer. Current I3/admin is required exactly where the existing
+    /// operation requires it; unconfigured session bootstrap/local recovery
+    /// retain their prior contract. Final authorization is always repeated.
+    fn preparation_control_preflight(&self, operation: &str, token: Source<'_>, principal: bool) -> Result<(),R> {
+        let reservation=self.directory.reserve_trust(false).map_err(R::Storage)?;
+        let result=(||{
+            let state=match self.directory.read_bounded(STATE,MAX_STATE) {
+                Ok(raw)=>State::decode(&raw).map_err(failure)?,
+                Err(error) if absent(&error)=>State::initial(),
+                Err(error)=>return Err(R::Storage(error)),
+            };
+            state.validate().map_err(failure)?;
+            if operation=="blp-policy-apply" || (principal && state.revision!=0) {
+                let actor=trust::authentication::authenticated(&state,token).map_err(failure)?;
+                trust::authentication::require_administrator(&actor).map_err(failure)?;
+            }
+            Ok(())
+        })();
+        finished(result,reservation.close().map_err(R::Storage))
+    }
+    /// Apply the existing Trust protocol after any required egress writer is
+    /// held. Short business reservations and publication/cleanup semantics stay
+    /// unchanged; configuration/BLP mutations repeat current authentication here.
+    pub(super) fn trust_scoped_reserved(&self, operation: &str, raw: &[u8], token: Source<'_>, principal: bool) -> Result<TrustReply,R> {
+        let readonly = matches!(
+            operation,
+            "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
+                | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check"
+                | "blp-preparation-transport" | "security-show"
+        );
+        if !readonly && !self.writable {
+            return Err(R::Refused("read-only-root"));
+        }
+        let initial = self.instance()?;
+        let reservation = self
+            .directory
+            .reserve_trust(!readonly)
+            .map_err(R::Storage)?;
+        let mut publication = None;
+        let result = (|| {
+            if self.instance()? != initial {
+                return Err(R::Refused("root-instance-changed"));
+            }
+            let mut st = match self.directory.read_bounded(STATE, MAX_STATE) {
+                Ok(bytes) => State::decode(&bytes).map_err(failure)?,
+                Err(e) if absent(&e) => State::initial(),
+                Err(e) => return Err(R::Storage(e)),
+            };
+            st.validate().map_err(failure)?;
+            if !readonly {
+                match self
+                    .directory
+                    .read_bounded("trust-actions.json.initializing", MAX_STATE)
+                {
+                    Err(e) if absent(&e) => {}
+                    Ok(_) => return Err(failure(E::Conflict("trust-initialization-pending"))),
+                    Err(e) => return Err(R::Storage(e)),
+                }
+            }
+            let now = OffsetDateTime::now_utc();
+            let operator = if principal && (operation=="audit-transaction" || matches!(operation, "config-preview" | "config-apply") && st.revision != 0) {
+                st.require_supported().map_err(failure)?;
+                let actor = trust::operations::authenticated(&st, token).map_err(failure)?;
+                trust::authentication::require_administrator(&actor).map_err(failure)?;
+                actor.subject.clone()
+            } else { "local-operator".to_owned() };
+            let mut planned = None;
+            let bytes = match operation {
+                "security-show" => trust::security::observe(&st,raw,token)?,
+                #[cfg(target_os="linux")]
+                "blp-preparation-input-attribute" => {
+                    let (bytes,state)=super::preparation_admission::attribute(self,&mut st,raw,token,now)?;
+                    planned=state;bytes
+                }
+                #[cfg(target_os="linux")]
+                "blp-preparation-destination-attribute" => {
+                    let (bytes,state)=super::preparation_transport::destination_attribute(self,&mut st,raw,token,now)?;
+                    planned=state;bytes
+                }
+
+                #[cfg(target_os="linux")]
+                "blp-preparation-attribute" => {
+                    let (bytes, publication) = super::preparation_attribution::execute(self, &mut st, raw, token, now)?;
+                    planned = publication;
+                    bytes
+                }
+                #[cfg(not(target_os="linux"))]
+                "blp-preparation-attribute" => return Err(R::Refused("blp-preparation-platform-unsupported")),
+                #[cfg(target_os="linux")]
+                "blp-preparation-check" => super::preparation_call::confidentiality_check(self, &st, raw, token)?,
+                #[cfg(not(target_os="linux"))]
+                "blp-preparation-check" => return Err(R::Refused("blp-preparation-platform-unsupported")),
+                "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
+                | "blp-object-attribute" => {
+                    let (bytes, state)=trust::confidentiality::execute(&mut st,operation,raw,token,now).map_err(failure)?;
+                    planned=state; bytes
+                }
+                #[cfg(target_os="linux")]
+                "public-anchor"=>super::trust_evidence_runtime::anchor(self,&st,raw,token,now)?,
+                #[cfg(target_os="linux")]
+                "evidence-key-prepare"|"evidence-key-activate"|"evidence-key-revoke"=>{
+                    let document:serde_json::Value=serde_json::from_slice(raw).map_err(|e|failure(e.into()))?;
+                    let replayed=document["event_id"].as_str().is_some_and(|id|st.event_digests.contains_key(id));
+                    let bytes=super::trust_evidence_runtime::change(self,&mut st,operation,raw,token,now)?;
+                    if !replayed{publication=Some("signing-capability-changed");}
+                    planned=Some(if replayed{"replayed"}else{"recorded"});bytes
+                }
+                "audit-transaction"=>{
+                    st.require_supported().map_err(failure)?;
+                    let actor=trust::operations::authenticated(&st,token).map_err(failure)?;
+                    trust::authentication::require_administrator(&actor).map_err(failure)?;
+                    let report=trust::audit::transaction(&st,raw).map_err(failure)?;
+                    let mut value:serde_json::Value=serde_json::from_slice(&report).map_err(|e|failure(e.into()))?;
+                    let id=value["action_id"].as_str().ok_or_else(||failure(E::Integrity("trust-audit-action-missing")))?.to_owned();
+                    let mut command:trust::command::Command=swarm_wire_json::decode(b"{}").map_err(|e|failure(e.into()))?;
+                    command.action_id=id.clone();
+                    trust::operations::append(&mut st,"audit-access",&command,&actor,&id,&trust::hash(&report),"read","consultation de transaction autorisée",raw,now,None).map_err(failure)?;
+                    let access=st.evidence.last().ok_or_else(||failure(E::Integrity("trust-audit-event-missing")))?;
+                    value["audit_access"]=serde_json::json!({"sequence":access.sequence.to_string(),"hash":access.hash,"actor":access.actor,"report_digest":access.content_digest});
+                    value["access_recorded"]=true.into();planned=Some("recorded");
+                    use base64::Engine;
+                    value["report_base64"]=base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&report).into();
+                    trust::encoded(&value).map_err(failure)?
+                }
+                "show" => {
+                    let mut view=st.public().map_err(failure)?;
+                    #[cfg(target_os="linux")]
+                    {view["public_evidence_runtime"]=super::trust_evidence_runtime::view(self,&st)?;}
+                    trust::encoded(&view).map_err(failure)?
+                }
+                "export" => {
+                    trust::encoded(&trust::proof::export(&st).map_err(failure)?).map_err(failure)?
+                }
+                "anchor" => {
+                    let key = self.trust_key()?;
+                    trust::encoded(
+                        &trust::proof::anchor(&trust::proof::export(&st).map_err(failure)?, &key)
+                            .map_err(failure)?,
+                    )
+                    .map_err(failure)?
+                }
+                "config-preview" => {
+                    trust::config::change(&mut st, raw, true, now, &operator)
+                        .map_err(failure)?
+                }
+                "config-apply" => {
+                    planned = Some(
+                        if st.event_replies.contains_key(
+                            &serde_json::from_slice::<serde_json::Value>(raw)
+                                .map_err(|e| failure(e.into()))?["event_id"]
+                                .as_str()
+                                .unwrap_or("")
+                                .to_owned(),
+                        ) {
+                            "replayed"
+                        } else {
+                            "recorded"
+                        },
+                    );
+                    trust::config::change(&mut st, raw, false, now, &operator)
+                        .map_err(failure)?
+                }
+                _ => {
+                    let outcome = trust::operations::execute(&mut st, operation, raw, token, now)
+                        .map_err(failure)?;
+                    planned = outcome.publication;
+                    outcome.bytes
+                }
+            };
+            if !readonly && planned == Some("recorded") {
+                st.validate().map_err(failure)?;
+                trust::proof::verify_chain(&trust::proof::export(&st).map_err(failure)?)
+                    .map_err(failure)?;
+                if self.instance()? != initial {
+                    return Err(R::Refused("root-instance-changed"));
+                }
+                match self.trust_key() {
+                    Ok(_) => {}
+                    Err(e)
+                        if operation == "config-apply"
+                            && st.revision == 1
+                            && matches!(&e,R::Storage(s) if absent(s)) =>
+                    {
+                        let mut key = [0u8; 32];
+                        getrandom::getrandom(&mut key)
+                            .map_err(|_| R::Refused("trust-entropy-unavailable"))?;
+                        let mut bytes = key
+                            .iter()
+                            .map(|b| format!("{b:02x}"))
+                            .collect::<String>()
+                            .into_bytes();
+                        bytes.push(b'\n');
+                        if let Err(e)=self.directory.publish_new_with_fault(KEY,&bytes,crate::local_storage::AtomicStorageFault::None){
+                            if e.publication==crate::PublicationState::RenamedDurabilityUnknown{publication=Some("key-durability-unknown");}
+                            return Err(R::Storage(e));
+                        }
+                        publication = Some("key-created");
+                    }
+                    Err(e) => return Err(e),
+                }
+                let mut saved = serde_json::to_vec_pretty(&st).map_err(|e| failure(e.into()))?;
+                saved.push(b'\n');
+                if saved.len() > MAX_STATE {
+                    return Err(failure(E::Invalid("trust-state-format-bound")));
+                }
+                if let Err(e) = self.directory.publish(STATE, &saved) {
+                    if e.publication == crate::PublicationState::RenamedDurabilityUnknown {
+                        publication = Some("durability-unknown");
+                    }
+                    return Err(R::Storage(e));
+                }
+                publication = Some("recorded");
+            } else {
+                publication = planned;
+            }
+            Ok(TrustReply { bytes, publication })
+        })();
+        // Transition errors before publication cannot claim a committed mutation.
+        // A replay describes an older retained result, never a new effect.
+        let cleanup = reservation.close().map_err(R::Storage);
+        finished(result, cleanup).map_err(|e| retained(e, publication))
+    }
+    /// Read the separately retained symmetric proof key. Loss/malformed material
+    /// refuses; it is never regenerated for an existing configured history.
+    fn trust_key(&self) -> Result<Vec<u8>, R> {
+        let bytes = self.directory.read_bounded(KEY, 65).map_err(R::Storage)?;
+        let raw =
+            std::str::from_utf8(&bytes).map_err(|_| failure(E::Integrity("trust-key-encoding")))?;
+        trust::proof::decode_key(raw).map_err(failure)
+    }
+}

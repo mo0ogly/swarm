@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "id": "paea-provisioning-request-check",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/**/*",
+    "web/*",
+    "web/lib/**/*",
+    "web/paea-examples/v1/*.json",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "version_history.json",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-cli/tests/identity_control.rs",
+    "tools/verification/recipes/paea-identity-options.json",
+    "tests/fixtures/paea_personal_tty.py",
+    "tests/fixtures/paea_personal_report_schema.py",
+    "schemas/paea/personal-lifecycle-cli-v1.schema.json",
+    "tools/verification/recipes/paea-personal-cli.json",
+    "tests/paea_personal_native_driver.py",
+    "tools/verification/recipes/paea-personal-cli-native.json",
+    "rust/crates/swarm-cli/tests/identity_provisioning.rs",
+    "schemas/paea/provisioning-request-cli-v1.schema.json",
+    "tests/paea_provisioning_request_schema_test.py",
+    "tools/verification/recipes/paea-provisioning-request-check.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "public-private-request-preflight-and-refusal-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "identity_provisioning",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "provisioning_check_private_canonical_request_fr_en_without_material_or_target",
+        "provisioning_check_pin_canonical_reserved_roles_and_recovery",
+        "provisioning_check_output_and_flush_keep_validation_without_material"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-read-release-close-and-custom-io-cause-matrix",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--features",
+        "test-fixtures",
+        "--lib",
+        "identity_provisioning::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "provisioning_input_release_and_close_withhold_request_keep_all_causes_then_recover",
+        "provisioning_pin_refusal_keeps_independent_release_close_causes",
+        "provisioning_custom_io_wrapper_keeps_complete_cause_matrix_without_private_text"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "closed-preflight-result-schema",
+      "command": [
+        "python3",
+        "tests/paea_provisioning_request_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "private-cli-preflight-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Documenting swarm-cli",
+        "Finished"
+      ]
+    }
+  ]
+}

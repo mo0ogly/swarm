@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "planning-numeric-budgets",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "*.go",
+    "go.mod",
+    "go.sum",
+    "internal/**/*.go",
+    "tools/agent-workflows/templates/*.md",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "tools/agent-workflows/CONTRACT.md"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r25",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "native-numeric-budgets",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "planning_budget",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "planning_budget_ancestry_and_counts_are_complete_and_readonly ... ok",
+        "planning_activation_budget_checks_global_decisions_and_every_ancestor ... ok",
+        "planning_task_budget_counts_history_and_ancestor_capacity_without_reset ... ok",
+        "planning_budget_invalid_state_unknown_scope_and_absence_refuse_safely ... ok",
+        "planning_budget_deep_tree_counts_iteratively_without_hidden_cutoff ... ok",
+        "5 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "go-negative-budget-regression",
+      "command": [
+        "go",
+        "test",
+        "./internal/engine",
+        "-run",
+        "^TestPlanningScopeBudgetRejectsNegativeFields$",
+        "-v",
+        "-count=1",
+        "-timeout=0"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "--- PASS: TestPlanningScopeBudgetRejectsNegativeFields",
+        "PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "source": "docs/architecture/INSTRUCTION-LEARNING.md",
+    "input": "/tmp/swarm-learning-retex-diagrams/instructions-fr-0.mmd",
+    "output": "/tmp/swarm-learning-retex-diagrams/instructions-fr-0.png",
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "/tmp/swarm-learning-retex-diagrams/instructions-fr-0.mmd",
+      "-o",
+      "/tmp/swarm-learning-retex-diagrams/instructions-fr-0.png",
+      "-p",
+      "/tmp/swarm-mermaid-puppeteer.json"
+    ],
+    "exit_code": 0,
+    "sha256": "1150af3dc557e361e58368a869d487c1c3e8707ed2e3199e86b7c1c9e0e93b78"
+  },
+  {
+    "source": "docs/PRODUCT-WORKFLOW.md",
+    "input": "/tmp/swarm-learning-retex-diagrams/retex-fr-0.mmd",
+    "output": "/tmp/swarm-learning-retex-diagrams/retex-fr-0.png",
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "/tmp/swarm-learning-retex-diagrams/retex-fr-0.mmd",
+      "-o",
+      "/tmp/swarm-learning-retex-diagrams/retex-fr-0.png",
+      "-p",
+      "/tmp/swarm-mermaid-puppeteer.json"
+    ],
+    "exit_code": 0,
+    "sha256": "c84e401a788e36df60639a4befb278c97f96d9e525e4fe85ba971e852384eb84"
+  },
+  {
+    "source": "docs/en/INSTRUCTION-LEARNING.md",
+    "input": "/tmp/swarm-learning-retex-diagrams/instructions-en-0.mmd",
+    "output": "/tmp/swarm-learning-retex-diagrams/instructions-en-0.png",
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "/tmp/swarm-learning-retex-diagrams/instructions-en-0.mmd",
+      "-o",
+      "/tmp/swarm-learning-retex-diagrams/instructions-en-0.png",
+      "-p",
+      "/tmp/swarm-mermaid-puppeteer.json"
+    ],
+    "exit_code": 0,
+    "sha256": "a4b127b89f891bab08f15383d8e7becdbc017aba49c517feb183d1b1c2dedb38"
+  },
+  {
+    "source": "docs/en/PRODUCT-WORKFLOW.md",
+    "input": "/tmp/swarm-learning-retex-diagrams/retex-en-0.mmd",
+    "output": "/tmp/swarm-learning-retex-diagrams/retex-en-0.png",
+    "command": [
+      "/home/fpizzi/.npm-global/bin/mmdc",
+      "-i",
+      "/tmp/swarm-learning-retex-diagrams/retex-en-0.mmd",
+      "-o",
+      "/tmp/swarm-learning-retex-diagrams/retex-en-0.png",
+      "-p",
+      "/tmp/swarm-mermaid-puppeteer.json"
+    ],
+    "exit_code": 0,
+    "sha256": "61858bbab055c7527a9b56b455496f96b919e408bc3f3713b01c8867f8163308"
+  }
+]

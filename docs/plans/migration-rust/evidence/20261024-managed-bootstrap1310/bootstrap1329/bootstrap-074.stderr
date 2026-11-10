@@ -1,0 +1,16 @@
+{
+  "error": "agent-provider-catalogue-invalid",
+  "failure": {
+    "causes": [
+      "agent-provider-catalogue-invalid",
+      "agent-provider-catalogue-invalid",
+      "agent-provider-catalogue-invalid",
+      "format",
+      "json-category:Syntax"
+    ],
+    "code": "agent-provider-catalogue-invalid",
+    "message": "agent-provider-catalogue-invalid",
+    "retryable": false
+  },
+  "schema_version": 1
+}

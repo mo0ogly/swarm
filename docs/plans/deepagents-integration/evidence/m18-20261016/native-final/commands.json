@@ -1,0 +1,110 @@
+[
+  {
+    "argv": [
+      "init"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "create"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "task",
+      "add",
+      "w-053485aeb661ac7d66624516"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "start",
+      "w-053485aeb661ac7d66624516"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "57df27eb-9f0c-4555-84d6-8fd598afaf53"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-053485aeb661ac7d66624516"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "57df27eb-9f0c-4555-84d6-8fd598afaf53"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-053485aeb661ac7d66624516"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "start",
+      "w-053485aeb661ac7d66624516"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "6a432b93-90f5-4c57-a740-d6b289cba202"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-053485aeb661ac7d66624516"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "agent",
+      "show",
+      "6a432b93-90f5-4c57-a740-d6b289cba202"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "work",
+      "show",
+      "w-053485aeb661ac7d66624516"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "memory",
+      "summary-source"
+    ],
+    "exit_code": 0
+  }
+]

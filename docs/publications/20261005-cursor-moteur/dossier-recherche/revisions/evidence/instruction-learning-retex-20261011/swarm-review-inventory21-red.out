@@ -1,0 +1,21 @@
+--- FAIL: TestReviewEvidenceInventoryReadsWholeAdmittedContext (0.20s)
+    --- FAIL: TestReviewEvidenceInventoryReadsWholeAdmittedContext/root (0.11s)
+        managed_review_evidence_inventory_test.go:108: full admitted originals hidden or source text leaked {current-review bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb 201a72b54858a03524a934138c3259c138de23ad1b0d4b45bfb32155ab492384 [] Contexte de revue absent ou empreinte différente ; aucune source attestée.}
+    --- FAIL: TestReviewEvidenceInventoryReadsWholeAdmittedContext/child (0.09s)
+        managed_review_evidence_inventory_test.go:108: full admitted originals hidden or source text leaked {current-review bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb 201a72b54858a03524a934138c3259c138de23ad1b0d4b45bfb32155ab492384 [] Contexte de revue absent ou empreinte différente ; aucune source attestée.}
+--- FAIL: TestReviewEvidenceInventoryRetainsAcknowledgedCurrentVerdictAsReadOnly (1.42s)
+    --- FAIL: TestReviewEvidenceInventoryRetainsAcknowledgedCurrentVerdictAsReadOnly/root/unknown (0.10s)
+        managed_review_evidence_inventory_test.go:172: acknowledged current evidence hidden or foreign originals reused unknown {map[] []}
+    --- FAIL: TestReviewEvidenceInventoryRetainsAcknowledgedCurrentVerdictAsReadOnly/root/changes_requested (0.09s)
+        managed_review_evidence_inventory_test.go:172: acknowledged current evidence hidden or foreign originals reused changes_requested {map[] []}
+    --- FAIL: TestReviewEvidenceInventoryRetainsAcknowledgedCurrentVerdictAsReadOnly/root/error (0.08s)
+        managed_review_evidence_inventory_test.go:172: acknowledged current evidence hidden or foreign originals reused error {map[] []}
+    --- FAIL: TestReviewEvidenceInventoryRetainsAcknowledgedCurrentVerdictAsReadOnly/child/unknown (0.08s)
+        managed_review_evidence_inventory_test.go:172: acknowledged current evidence hidden or foreign originals reused unknown {map[] []}
+    --- FAIL: TestReviewEvidenceInventoryRetainsAcknowledgedCurrentVerdictAsReadOnly/child/changes_requested (0.07s)
+        managed_review_evidence_inventory_test.go:172: acknowledged current evidence hidden or foreign originals reused changes_requested {map[] []}
+    --- FAIL: TestReviewEvidenceInventoryRetainsAcknowledgedCurrentVerdictAsReadOnly/child/error (0.08s)
+        managed_review_evidence_inventory_test.go:172: acknowledged current evidence hidden or foreign originals reused error {map[] []}
+FAIL
+FAIL	swarm.local/companion/internal/engine	2.474s
+FAIL

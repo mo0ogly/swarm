@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "action": "create",
+  "event_id": "create-preparation",
+  "expected_revision": 0,
+  "title": "Owned AI preparation",
+  "text": "Need fixture"
+}

@@ -1,0 +1,21 @@
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/inspection
+    managed_review_orphan_reservation_test.go:21: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/final
+    managed_review_orphan_reservation_test.go:31: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall (1.74s)
+    --- PASS: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/inspection (0.69s)
+    --- PASS: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/final (1.05s)
+=== RUN   TestManagedReviewInterruptionDirectiveReachesReviewer
+    managed_review_orphan_reservation_test.go:108: runtime owner decision cannot reach reviewer consigne de reprise non attribuée ou hors limites
+--- FAIL: TestManagedReviewInterruptionDirectiveReachesReviewer (0.00s)
+=== RUN   TestPlanningReviewRetryRestrictionTracksWholeReducedBatch
+    planning_historical_delivery_test.go:236: sizes 164551 168167 21899 parts 1
+    planning_historical_delivery_test.go:257: reduced-context difference pending_events_total 1 2
+    planning_historical_delivery_test.go:257: reduced-context difference closure_prerequisites {"eligible":false,"reason":"preuve descendante non valide : first"} {"eligible":false,"reason":"retour non traité : fragment-test-review-result-910953be182b3db1"}
+    planning_historical_delivery_test.go:260: single versus reduced bytes 7189 7217
+    planning_historical_delivery_test.go:264: omitted current result still authorizes review retry {false 0 false false 0 0 false false false map[] false false false  [] []  map[]} contexte et rapport trop volumineux pour une activation ; préciser le périmètre ou fournir une remise plus concise, aucun contenu tronqué ni appel lancé
+--- FAIL: TestPlanningReviewRetryRestrictionTracksWholeReducedBatch (0.61s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	2.386s
+FAIL

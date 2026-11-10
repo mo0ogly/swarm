@@ -1,0 +1,12 @@
+{
+  "command": [
+    "go",
+    "run",
+    "/tmp/swarm-identity-lockscan-v3-yajlrgy7/main.go",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/lock-platform-files.json"
+  ],
+  "start": "2026-10-17T07:18:52.772177+00:00",
+  "end": "2026-10-17T07:18:53.763208+00:00",
+  "exit_code": 0,
+  "stderr": ""
+}

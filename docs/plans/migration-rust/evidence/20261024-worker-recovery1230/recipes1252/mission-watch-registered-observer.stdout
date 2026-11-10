@@ -1,0 +1,9 @@
+{"state": "RUN", "step": "running-barrier-guards"}
+{"state": "PASS", "step": "running-barrier-guards"}
+{"state": "RUN", "step": "metadata-read-close-guards"}
+{"state": "PASS", "step": "metadata-read-close-guards"}
+{"state": "RUN", "step": "observer-partial-resource-refusal"}
+{"state": "PASS", "step": "observer-partial-resource-refusal"}
+{"state": "RUN", "step": "registered-observer-public-journey"}
+{"state": "PASS", "step": "registered-observer-public-journey"}
+{"status": "PASS", "evidence": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/recipes1252/mission-watch-registered-observer", "steps": 4}

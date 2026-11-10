@@ -1,0 +1,26 @@
+{
+  "status": "REFUSED_UNQUALIFIED",
+  "version": "v0.1.1-dev.296",
+  "reason": "concurrent effective source edit",
+  "changed_effective_inputs": {
+    "rust/crates/swarm-web/src/service.rs": {
+      "before": "f4fd4a678a395d08a52fcc5d57577e64e7e845d1086d13fd613f6aea99f36140",
+      "after": "63339bcbc1ea9f98ce5e8f31e7ebf11955e4b6e098d24dddd0997f0f10cc2de4"
+    }
+  },
+  "current_changed_file_sha256": "63339bcbc1ea9f98ce5e8f31e7ebf11955e4b6e098d24dddd0997f0f10cc2de4",
+  "original_evidence": ".cache/local-delivery/rust-_yj5mb7v/build",
+  "installed": false,
+  "owner": "parallel web authority session; BLP delivery owner Codex",
+  "recovery": "new prebind after completed service edit; qualify new image, never reuse refused image",
+  "original_artifact_hashes": {
+    "build.stderr": "c1a605b99162b49c4be995f92793497d94368f6f671085649629bbf6c2a4d42f",
+    "build.stdout": "dc881442425ffd52afb46c23622f8b7e604644263538a854119c006380c8504f",
+    "build-metadata.json": "fc2f82a4bbe946adbeb60b59f027d471b54d99fb1fab988fdb7b5de92245b1d5",
+    "collector.stderr": "c2fc6d3553ac198c589fc9200c345976e3d488e72dce4bd2ae7da46264870345",
+    "profile-failure.json": "a06ed47b35fc48287accf888ce314839e376d08674641c043cbc844d28ace7cb",
+    "invocation.json": "635579e3f1df530833ed48dfc48145d8d709f989018967e5504f2bebf4d9ab76",
+    "cargo.stderr": "517e955821cf86101d1f27d04eacb88d182524582254797f683f73dd4e53f74d",
+    "failure.json": "b2b93cbe40813ad283b39a60ebefc3c7aa67b5e4b381625fff10ae82c9a75550"
+  }
+}

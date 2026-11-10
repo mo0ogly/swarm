@@ -1,0 +1,224 @@
+{
+  "at": "2026-10-11T14:28:19.645481+00:00",
+  "before_pid": 3947819,
+  "before_sha256": "604418755b085a863c270b3c6c8db14ad7d21048023cb73df56e87371d3cb98c",
+  "installed_sha256": "0f619612409b93915cee22614e1fbee3c00c6fdea62c94459d0766ba9d48f0c4",
+  "build_date": "2026-10-11T14:19:40Z",
+  "full": {
+    "command": [
+      "go",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T14:19:40.629411+00:00",
+    "end": "2026-10-11T14:27:31.584566+00:00",
+    "seconds": 470.9551053739997,
+    "exit": 0,
+    "output": "/tmp/swarm-admin-duration-launch-full.out",
+    "output_sha256": "e5f5f62f1fecd2dfd632843fcae6ab22734c064299245d535c354f21ebc9d49c",
+    "source_manifest_sha256": "6eb1733df97b130969b0566de690a1e73df8d6327abef7c25831c7f3a29399d0",
+    "candidate_digest": "bbbd3c8dde73dd1db325719a67542f3188d1da26516c65a19c4cc28805ac27e6",
+    "paths": 1171,
+    "source_drift": [],
+    "manifest_changed": false
+  },
+  "checks": [
+    {
+      "label": "race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "./internal/engine",
+        "-run",
+        "TestAdminDurationThreshold|TestRunLimits|TestObservation|TestInstructionRevision",
+        "-count=1",
+        "-timeout=120s"
+      ],
+      "start": "2026-10-11T14:19:40.629903+00:00",
+      "seconds": 44.63229731600222,
+      "exit": 0,
+      "output": "/tmp/swarm-admin-duration-launch-race.out",
+      "sha256": "cdf44a83af74aac51d9871bf66fb1495c300ab37ec388a4d8bca78becf1e7ddf"
+    },
+    {
+      "label": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "start": "2026-10-11T14:20:25.262659+00:00",
+      "seconds": 2.3088951389981958,
+      "exit": 0,
+      "output": "/tmp/swarm-admin-duration-launch-vet.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "workflows",
+      "command": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "start": "2026-10-11T14:20:27.571894+00:00",
+      "seconds": 12.485926834000566,
+      "exit": 0,
+      "output": "/tmp/swarm-admin-duration-launch-workflows.out",
+      "sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+    },
+    {
+      "label": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-11T14:20:40.058151+00:00",
+      "seconds": 0.051596572000562446,
+      "exit": 0,
+      "output": "/tmp/swarm-admin-duration-launch-diff.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_digest": "bbbd3c8dde73dd1db325719a67542f3188d1da26516c65a19c4cc28805ac27e6",
+  "source_paths": 1171,
+  "backup": "/tmp/swarm-before-admin-duration-launch-install",
+  "idle": {
+    "at": "2026-10-11T14:28:19.248876+00:00",
+    "works": [
+      {
+        "work": "w-ca937edf4e0abd85f8d3d67b",
+        "revision": 307,
+        "active_agents": [],
+        "active_reviews": [],
+        "holders": []
+      },
+      {
+        "work": "w-fff7368010d114f6e2578985",
+        "revision": 31,
+        "active_agents": [],
+        "active_reviews": [],
+        "holders": []
+      },
+      {
+        "work": "w-5757437164b50815bee50a0c",
+        "revision": 55,
+        "active_agents": [],
+        "active_reviews": [],
+        "holders": []
+      }
+    ],
+    "provider_processes": [
+      {
+        "pid": 16038,
+        "executable": "codex"
+      },
+      {
+        "pid": 17572,
+        "executable": "codex"
+      },
+      {
+        "pid": 3635999,
+        "executable": "codex"
+      }
+    ]
+  },
+  "native_provider_processes": [],
+  "effect": "Qualified10/11 source installed; exact runtime identity and authenticated health verified. No native task acceptance claimed.",
+  "started_at": "2026-10-11T14:28:40.146061+00:00",
+  "pid": 269871,
+  "actual_executable_sha256": "0f619612409b93915cee22614e1fbee3c00c6fdea62c94459d0766ba9d48f0c4",
+  "runtime_health": {
+    "state": "ready",
+    "launch_allowed": true,
+    "observed_at": "2026-10-11T14:28:40.113284643Z",
+    "message": "Le stockage est disponible.",
+    "next_step": "Les autres conditions de lancement restent contr\u00f4l\u00e9es par le moteur.",
+    "volumes": [
+      {
+        "kind": "store",
+        "path": "/home/fpizzi/workspace/swarm/.swarm",
+        "available_bytes": 35285135360,
+        "available_inodes": 26342641,
+        "state": "ready"
+      },
+      {
+        "kind": "temporary",
+        "path": "/tmp",
+        "available_bytes": 1812492288,
+        "available_inodes": 1016690,
+        "state": "ready"
+      }
+    ],
+    "version": {
+      "binary": {
+        "version": "devel",
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "build_date": "2026-10-11T14:19:40Z",
+        "provenance": "injected"
+      },
+      "source": {
+        "available": true,
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "compared": true,
+        "matches_binary": true
+      },
+      "history": {
+        "schema_version": 1,
+        "available": true,
+        "releases": [
+          {
+            "version": "v0.1.0",
+            "date": "2026-10-06",
+            "summary": {
+              "fr": "Premi\u00e8re release exp\u00e9rimentale : \u00e9dition du graphe avec pr\u00e9visualisation, automatisation durable, administration des param\u00e8tres, validation ind\u00e9pendante et reprise trac\u00e9e des contrats bloqu\u00e9s.",
+              "en": "First experimental release: graph editing with previews, durable automation, configurable administration, independent validation and audited recovery of blocked contracts."
+            },
+            "commits": [
+              {
+                "sha": "191616999c5f4b30e901042b51898cfbb21a3e06",
+                "url": "https://github.com/mo0ogly/swarm/commit/191616999c5f4b30e901042b51898cfbb21a3e06"
+              },
+              {
+                "sha": "2d08f0510d7f6da36d7f03cb9481dde7de249fe8",
+                "url": "https://github.com/mo0ogly/swarm/commit/2d08f0510d7f6da36d7f03cb9481dde7de249fe8"
+              }
+            ],
+            "release_url": "https://github.com/mo0ogly/swarm/releases/tag/v0.1.0"
+          }
+        ]
+      }
+    },
+    "version_diagnostic": {
+      "installed_cli": {
+        "available": false,
+        "version": null,
+        "commit": null,
+        "modified": null,
+        "provenance": "browser",
+        "hint": "Le navigateur ne peut pas inspecter le CLI local. Lancez swarm version --server URL_DE_SESSION."
+      },
+      "active_server": {
+        "available": true,
+        "version": "devel",
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "provenance": "injected"
+      },
+      "candidate": {
+        "available": true,
+        "version": null,
+        "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+        "modified": true,
+        "provenance": "git"
+      },
+      "state": "unknown",
+      "differences": [],
+      "next_step": "Rendez accessibles les identit\u00e9s manquantes (installed_cli) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+    }
+  }
+}

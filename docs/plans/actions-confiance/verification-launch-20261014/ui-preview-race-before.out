@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: stale preview became applicable after form input changed
+    at /tmp/swarm-actions-confiance-launch/ui-preview-race-reproducer.cjs:15:1037 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

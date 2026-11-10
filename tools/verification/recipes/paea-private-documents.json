@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "id": "paea-private-documents",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "private-document-contract",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-config",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "private_documents",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed",
+        "private_documents_postrename_and_secondary_cleanup_failures_keep_publication_state"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "physical-rename-refusal",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-config",
+        "--lib",
+        "store::file_io::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "real_noreplace_refusal_keeps_original_and_reports_attempted_publication"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "configuration-store-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-config",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "store",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "15 passed; 0 failed",
+        "store_replaced_lock_refuses_old_descriptor_until_exact_inode_is_restored"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "independent-config-witness-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-config",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "coordinator",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed",
+        "coordinator_each_interrupted_phase_recovers_once_with_original_time"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "personal-control-consumer-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "control::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "16 passed; 0 failed",
+        "both_authority_and_storage_failures_survive_pending_exact_event_recovery"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

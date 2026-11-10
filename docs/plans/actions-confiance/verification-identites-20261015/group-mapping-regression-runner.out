@@ -1,0 +1,2 @@
+{"stage": "group-mapping-pilot-regression", "exit_code": 0, "passed_cases": 126}
+{"stage": "group-mapping-identities-regression", "exit_code": 0, "passed_cases": 246}

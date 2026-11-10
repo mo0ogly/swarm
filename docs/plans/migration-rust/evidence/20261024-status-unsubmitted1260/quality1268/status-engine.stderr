@@ -1,0 +1,12 @@
+   Compiling swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+    Finished `test` profile [unoptimized] target(s) in 35.85s
+     Running unittests src/lib.rs (.cache/rust-native-version846-target/debug/deps/swarm_engine-b6aa09cf62374457)
+
+thread 'root_store::mission_status_historical::tests::mission_status_planned_submitted_requires_full_completed_history' (3401150) panicked at crates/swarm-engine/src/root_store/mission_status_historical.rs:950:13:
+blocked
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'root_store::mission_status_historical::tests::mission_status_planned_terminal_pairs_preserve_view_and_review_refusals' (3401151) panicked at crates/swarm-engine/src/root_store/mission_status_historical.rs:1065:40:
+assertion failed: supported(&work, std::slice::from_ref(&agent)).is_err()
+OWNED_REVIEW_FIXTURE /tmp/swarm-status-review-3401085-1792836672952031314
+error: test failed, to rerun pass `-p swarm-engine --lib`

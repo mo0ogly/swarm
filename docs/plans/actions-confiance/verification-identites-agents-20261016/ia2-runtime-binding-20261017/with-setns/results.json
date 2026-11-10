@@ -1,0 +1,80 @@
+{
+  "result": "PASS_ISOLATED_CHANNEL_EXPERIMENT",
+  "model_calls": 0,
+  "script_sha256": "9253af47218b7fe8edddd4ca954b49f4856904c7a054a222e6193efc16c1f065",
+  "checks": [
+    {
+      "name": "legitimate-A",
+      "result": "PASS"
+    },
+    {
+      "name": "legitimate-B",
+      "result": "PASS"
+    },
+    {
+      "name": "distinct-pinned-namespaces",
+      "result": "PASS"
+    },
+    {
+      "name": "forged-instance-label-denied",
+      "result": "PASS"
+    },
+    {
+      "name": "authorized-tool-child-attributed",
+      "result": "PASS"
+    },
+    {
+      "name": "tool-child-completed",
+      "result": "PASS"
+    },
+    {
+      "name": "endpoint-copy-fixture",
+      "result": "PASS"
+    },
+    {
+      "name": "copied-endpoint-host-denied",
+      "result": "PASS"
+    },
+    {
+      "name": "copied-endpoint-sibling-denied",
+      "result": "PASS"
+    },
+    {
+      "name": "sibling-copy-completed",
+      "result": "PASS"
+    },
+    {
+      "name": "kernel-pid-forgery-denied",
+      "result": "PASS"
+    },
+    {
+      "name": "copied-namespace-descriptors-cannot-join-sibling",
+      "result": "PASS"
+    },
+    {
+      "name": "revoked-instance-channel-denied",
+      "result": "PASS"
+    }
+  ],
+  "cleanup": [
+    {
+      "id": "A",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "id": "B",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "limits": [
+    "Standalone Linux experiment, not an engine launcher or protected authority producer",
+    "Only PID and mount namespaces pinned; user namespace changes during bwrap startup",
+    "No real provider, egress, persistent revocation, human approval, restart or effect reconciliation",
+    "No guarantee against a host administrator or an unconfined compromise of the controller account",
+    "SO_PASSCRED message attribution is distinct from connection SO_PEERCRED; descriptors are intentionally transferred by the fixture"
+  ]
+}

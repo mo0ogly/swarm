@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "action_digest": "03d2161d185dac1fb92df8e240bb0e274294ec19bd3499f6c0497785224159a1",
+  "intent_id": "1656fbe1e2fbbecfb0d1295e41412ede114fa3510e6a76f8bbeba938dfb414ef",
+  "sink_id": "sink-paea-example",
+  "outcome": "COMMITTED",
+  "observation_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+}

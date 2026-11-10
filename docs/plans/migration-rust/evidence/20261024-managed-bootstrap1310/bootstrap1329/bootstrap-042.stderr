@@ -1,0 +1,13 @@
+{
+  "error": "invalid_review_budget: planning-review-budget-not-applicable",
+  "failure": {
+    "causes": [
+      "invalid_review_budget",
+      "invalid_review_budget"
+    ],
+    "code": "invalid_review_budget",
+    "message": "invalid_review_budget: planning-review-budget-not-applicable",
+    "retryable": false
+  },
+  "schema_version": 1
+}

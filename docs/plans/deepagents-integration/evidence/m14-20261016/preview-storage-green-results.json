@@ -1,0 +1,79 @@
+{
+  "at": "2026-10-16T18:01:35.132838+00:00",
+  "cases": [
+    {
+      "argv": [
+        "/tmp/swarm-m14-release-bin-uqzy339n/swarm",
+        "--root",
+        "/tmp/swarm-m14-storage-preview-bcqly9xk",
+        "--json",
+        "agent",
+        "resume-dialogue-preview",
+        "absent"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "{\n  \"error\": \"Stockage version 34, CLI version 35 : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.\",\n  \"failure\": {\n    \"code\": \"storage_upgrade_required\",\n    \"message\": \"Stockage version 34, CLI version 35 : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+      "version_before": 34,
+      "version_after": 34,
+      "backup_count": 0,
+      "result": "PASS"
+    },
+    {
+      "argv": [
+        "/tmp/swarm-m14-release-bin-uqzy339n/swarm",
+        "--root",
+        "/tmp/swarm-m14-storage-preview-wkvy3nwg",
+        "--json",
+        "mission",
+        "recovery",
+        "w-f5583ad447ff1263bf0bd574",
+        "absent"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "{\n  \"error\": \"Stockage version 34, CLI version 35 : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.\",\n  \"failure\": {\n    \"code\": \"storage_upgrade_required\",\n    \"message\": \"Stockage version 34, CLI version 35 : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+      "version_before": 34,
+      "version_after": 34,
+      "backup_count": 0,
+      "result": "PASS"
+    },
+    {
+      "argv": [
+        "/tmp/swarm-m14-release-bin-uqzy339n/swarm",
+        "--root",
+        "/tmp/swarm-m14-storage-preview-cqilyivq",
+        "--json",
+        "mission",
+        "changes",
+        "w-23e05b9132440d1e1b042ada"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "{\n  \"error\": \"Stockage version 34, CLI version 35 : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.\",\n  \"failure\": {\n    \"code\": \"storage_upgrade_required\",\n    \"message\": \"Stockage version 34, CLI version 35 : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+      "version_before": 34,
+      "version_after": 34,
+      "backup_count": 0,
+      "result": "PASS"
+    },
+    {
+      "argv": [
+        "/tmp/swarm-m14-release-bin-uqzy339n/swarm",
+        "--root",
+        "/tmp/swarm-m14-storage-preview-0rhtk5ge",
+        "--json",
+        "mission",
+        "spending",
+        "w-06f560d2585682a9551467d3"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "{\n  \"error\": \"Stockage version 34, CLI version 35 : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.\",\n  \"failure\": {\n    \"code\": \"storage_upgrade_required\",\n    \"message\": \"Stockage version 34, CLI version 35 : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+      "version_before": 34,
+      "version_after": 34,
+      "backup_count": 0,
+      "result": "PASS"
+    }
+  ],
+  "model_calls": 0
+}

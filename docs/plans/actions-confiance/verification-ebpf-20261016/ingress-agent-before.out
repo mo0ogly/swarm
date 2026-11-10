@@ -1,0 +1,6 @@
+=== RUN   TestKernelObservationAgentLifecycle
+    kernel_observation_linux_test.go:297: active producer rejected: observation source is not an active owned attempt
+--- FAIL: TestKernelObservationAgentLifecycle (0.16s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.242s
+FAIL

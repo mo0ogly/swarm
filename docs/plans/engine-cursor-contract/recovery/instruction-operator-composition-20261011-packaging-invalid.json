@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T14:11:32.912765+00:00",
+  "parent": "review-status-owner-context-20261011.patch",
+  "parent_sha256": "9d70e9fd8eab43bfd73c365c082f87187937aa8b01577ef46899ca55b8118b72",
+  "preimage_tree": "e762659d424074805badd16241344377f3828660",
+  "result_tree": "339d20a7b2d47c229ce1febea2285b02b46565b4",
+  "patch": "docs/plans/engine-cursor-contract/recovery/instruction-operator-composition-20261011.patch",
+  "sha256": "0955da5fa217dbd50e02bf7f3f752d4b70d0b2b15e8fb8f4bed607435bd5b050",
+  "bytes": 38498,
+  "paths": [
+    "internal/engine/model.go",
+    "internal/engine/store.go",
+    "internal/engine/instruction_revision.go",
+    "internal/engine/instruction_revision_operator_test.go",
+    "docs/architecture/INSTRUCTION-LEARNING.md",
+    "docs/en/INSTRUCTION-LEARNING.md"
+  ],
+  "purpose": "Preserve immutable original and attributed learning when operator inputs change future-task Next; separable current operator base permits rejecting only the selected unused learning. Recognizable legacy prefixes recover; ambiguous edits and frozen attempts remain refused. Public events and historical hashes retained.",
+  "tests": "Three public-path regression cases failed before correction; all instruction tests now pass including replacement and atomic ambiguous-edit refusal. Full Go/race/vet/workflows qualification receipt separate.",
+  "limits": "Local correction, not native task acceptance or real UX verification; apply in worker-owned copy. No budgets, attempts, criteria or account limits changed.",
+  "packaging_failure": "Store.go was absent from sparse patch index; added as a new file although it exists in producer. Never transmitted or applied. Corrected artifact records its original HEAD blob as an expanded preimage."
+}

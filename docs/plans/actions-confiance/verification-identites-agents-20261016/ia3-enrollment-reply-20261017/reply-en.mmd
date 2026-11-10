@@ -1,0 +1,9 @@
+flowchart TD
+  J["Journal under local reservation<br/>current head and record"] --> S["SignActive<br/>ActiveReply schema_version = 1"]
+  S --> V["Signature and challenge<br/>enrollmentproof.Verify"]
+  V --> D["Shared DecodeActiveReply<br/>version and strict canonical JSON"]
+  D --> R["Recognized format<br/>consistent Head and Record, owned bytes"]
+  D --> F["Missing or unknown version<br/>no data and no fallback"]
+  R --> A["DecodeActive then CheckActive<br/>expected context, document and dates"]
+  A --> O["Validated data<br/>no execution permit"]
+  O -.-> E["Protected source and final-use freshness<br/>integration still required"]

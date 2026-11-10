@@ -1,0 +1,5 @@
+{
+  "Replace": {
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/memory_external_delivery_audit_test.go": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m1-20261015/swarm_memory_delivery_test.go"
+  }
+}

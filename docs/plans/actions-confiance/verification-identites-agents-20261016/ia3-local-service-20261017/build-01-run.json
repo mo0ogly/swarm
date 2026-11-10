@@ -1,0 +1,25 @@
+{
+  "packages": {},
+  "command": [
+    "go",
+    "build",
+    "-o",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/swarm-fixture-binary",
+    "./cmd/swarm"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T13:18:30.098531+00:00",
+  "end": "2026-10-17T13:18:41.197509+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 816
+}

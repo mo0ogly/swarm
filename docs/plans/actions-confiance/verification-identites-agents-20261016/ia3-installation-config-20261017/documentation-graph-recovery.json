@@ -1,0 +1,16 @@
+{
+  "cause": "Unscoped replacement of R --> V affected three previous diagrams per language",
+  "original": "documentation-before-graph-recovery.diff",
+  "action": "Restore the exact previous operational-contract prefix from before-docs; retain only new scoped suffix",
+  "verified": {
+    "docs/architecture/AGENT-IDENTITY-CONTRACT.md": {
+      "previous_sections_identical": true,
+      "previous_sha256": "e2e105e08f62d72870d94693785fb5a389f5464b28f0bc711792d186fdcb7c76"
+    },
+    "docs/en/AGENT-IDENTITY-CONTRACT.md": {
+      "previous_sections_identical": true,
+      "previous_sha256": "1445d7b4874899bb58e2fb8a1b49ef76f92f139c50bf040a5987b704083564db"
+    }
+  },
+  "source_code_affected": false
+}

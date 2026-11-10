@@ -1,0 +1,73 @@
+=== RUN   TestManagedBatchRuntimeInterruptedPersistence
+=== RUN   TestManagedBatchRuntimeInterruptedPersistence/all-passed
+=== RUN   TestManagedBatchRuntimeInterruptedPersistence/reply-not-durable
+--- PASS: TestManagedBatchRuntimeInterruptedPersistence (12.00s)
+    --- PASS: TestManagedBatchRuntimeInterruptedPersistence/all-passed (6.00s)
+    --- PASS: TestManagedBatchRuntimeInterruptedPersistence/reply-not-durable (6.00s)
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/selection-digest
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/resolution-citation
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/final-citation
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/managed-json
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/immutable-proof-is-not-a-response-error
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/business-refusal-stays-independent
+--- PASS: TestManagedFinalReviewFailuresRemainRoutable (1.43s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/selection-digest (0.50s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/resolution-citation (0.00s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/final-citation (0.00s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/managed-json (0.00s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/immutable-proof-is-not-a-response-error (0.08s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/business-refusal-stays-independent (0.00s)
+=== RUN   TestManagedFragmentFinalOrphanReservationResume
+=== RUN   TestManagedFragmentFinalOrphanReservationResume/available
+    managed_review_fragment_resume_test.go:19: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentFinalOrphanReservationResume/exhausted
+    managed_review_fragment_resume_test.go:19: sizes 164551 168165 21899 parts 1
+--- PASS: TestManagedFragmentFinalOrphanReservationResume (8.83s)
+    --- PASS: TestManagedFragmentFinalOrphanReservationResume/available (4.30s)
+    --- PASS: TestManagedFragmentFinalOrphanReservationResume/exhausted (4.52s)
+=== RUN   TestManagedFragmentDurableVerdictResumesWithoutBudget
+    managed_review_fragment_resume_test.go:67: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentDurableVerdictResumesWithoutBudget (23.63s)
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/inspection
+    managed_review_orphan_reservation_test.go:21: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/final
+    managed_review_orphan_reservation_test.go:31: sizes 164551 168167 21899 parts 1
+    managed_review_orphan_reservation_test.go:71: orphan settlement spent, accepted or changed history running
+--- FAIL: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall (6.41s)
+    --- PASS: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/inspection (2.56s)
+    --- FAIL: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/final (3.85s)
+=== RUN   TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult
+=== RUN   TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/current
+    planning_historical_delivery_test.go:198: sizes 164551 168165 21899 parts 1
+=== RUN   TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/absent
+    planning_historical_delivery_test.go:198: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/old-id
+    planning_historical_delivery_test.go:198: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/old-attempt
+    planning_historical_delivery_test.go:198: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/wrong-kind
+    planning_historical_delivery_test.go:198: sizes 164551 168165 21899 parts 1
+=== RUN   TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/foreign
+    planning_historical_delivery_test.go:198: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/semantic
+    planning_historical_delivery_test.go:198: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/launch-held
+    planning_historical_delivery_test.go:198: sizes 164551 168165 21899 parts 1
+--- PASS: TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult (13.81s)
+    --- PASS: TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/current (1.55s)
+    --- PASS: TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/absent (1.56s)
+    --- PASS: TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/old-id (1.70s)
+    --- PASS: TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/old-attempt (1.90s)
+    --- PASS: TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/wrong-kind (1.92s)
+    --- PASS: TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/foreign (1.81s)
+    --- PASS: TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/semantic (1.75s)
+    --- PASS: TestPlanningDeliveryReviewRetryRequiresReceivedOwnedCurrentResult/launch-held (1.61s)
+=== RUN   TestPlanningReviewRetryRestrictionTracksWholeReducedBatch
+    planning_historical_delivery_test.go:236: sizes 164551 168167 21899 parts 1
+    planning_historical_delivery_test.go:252: omitted current result still authorizes review retry {false 0 false false 0 0 false false false map[] false false false  [] []  map[]} contexte et rapport trop volumineux pour une activation ; préciser le périmètre ou fournir une remise plus concise, aucun contenu tronqué ni appel lancé
+--- FAIL: TestPlanningReviewRetryRestrictionTracksWholeReducedBatch (1.74s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	68.017s
+FAIL

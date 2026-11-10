@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "status": "applied",
+  "accepted": false,
+  "selected_scope": "root",
+  "input_event": "public-flow-enable",
+  "settings_revision": "1",
+  "lease_seconds": 120,
+  "claim_id": "planning-claim-669bb024c045d6fac7069208",
+  "run": {
+    "schema_version": 1,
+    "claim_id": "planning-claim-669bb024c045d6fac7069208",
+    "decision_event": "planning-decision-b19174945af78d0f15e74db3",
+    "decision_applied": true,
+    "accepted": false,
+    "replayed": false,
+    "work": {
+      "planning": {
+        "reviewer_required": true,
+        "reviewer": {
+          "max_context_files": 24,
+          "max_source_bytes": 98304,
+          "max_context_bytes": 131072,
+          "max_files": 100,
+          "provider": "fixture",
+          "provider_digest": "d9002c1ad102505663d20be0a9da53e642450c22a0b9d022a9294757e73ffc9b",
+          "model_route": {
+            "level": "standard",
+            "model": "fixture-standard",
+            "effort": "fixture-medium",
+            "billing": "external",
+            "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+            "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+          },
+          "max_calls": 2,
+          "calls": 0,
+          "authorized": "2026-10-24T09:51:11.232255211Z"
+        },
+        "model_route": {
+          "level": "standard",
+          "model": "fixture-standard",
+          "effort": "fixture-medium",
+          "billing": "external",
+          "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+          "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+        },
+        "checks": {
+          "req-1": [
+            {
+              "inputs": [
+                "handoff.md"
+              ],
+              "id": "actual-handoff",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Check actual owned fixture handoff input digest",
+              "timeout_seconds": 60
+            }
+          ]
+        },
+        "provider": "fixture",
+        "provider_digest": "d9002c1ad102505663d20be0a9da53e642450c22a0b9d022a9294757e73ffc9b",
+        "activations": 1,
+        "max_activations": 6,
+        "version": 1,
+        "paused": false,
+        "max_tasks": 10,
+        "max_decisions": 10,
+        "decisions": 1,
+        "scopes": [
+          {
+            "last_model": {
+              "provider": "fixture",
+              "provider_digest": "d9002c1ad102505663d20be0a9da53e642450c22a0b9d022a9294757e73ffc9b",
+              "route": {
+                "level": "standard",
+                "model": "fixture-standard",
+                "effort": "fixture-medium",
+                "billing": "external",
+                "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+                "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+              },
+              "actor": "",
+              "at": "2026-10-24T09:51:11.356691825Z"
+            },
+            "delivery": {
+              "judge_available": true,
+              "judge_cycle": 1,
+              "task_budget": 10,
+              "activation_budget": 6,
+              "closure_unavailable": true,
+              "review_retry_unavailable": true,
+              "production_retry_unavailable": true,
+              "context_sha256": "186bdc1b28e4072335e36d1c12159d9af24bf1d6b070fc630a7268396eadf5b1",
+              "events": [
+                "public-flow-enable"
+              ],
+              "decision": "planning-decision-b19174945af78d0f15e74db3"
+            },
+            "workflow": {
+              "version": 1,
+              "role": "planner",
+              "methods": [
+                "apex",
+                "audit-pdca",
+                "spec-builder",
+                "spec-audit",
+                "replan",
+                "debug",
+                "product-planning"
+              ],
+              "sha256": "97edc37b630828c58fd907ec7cf8597fdef78f5344bcf6cabcafc82eae80dccb"
+            },
+            "activations": 1,
+            "id": "root",
+            "objective": "ROOT-PRIVATE-OBJECTIVE",
+            "requirements": [],
+            "revision": 2,
+            "generation": 2,
+            "state": "waiting"
+          },
+          {
+            "max_tasks": 1,
+            "max_activations": 3,
+            "activations": 0,
+            "id": "child",
+            "parent": "root",
+            "objective": "OWN-SCOPE\nProduce only the owned requirement",
+            "requirements": [
+              "req-1"
+            ],
+            "revision": 1,
+            "generation": 0,
+            "state": "ready"
+          }
+        ],
+        "inbox": [
+          {
+            "id": "public-flow-enable",
+            "scope": "root",
+            "kind": "brief",
+            "message": "ROOT-PRIVATE-OBJECTIVE",
+            "decision": "planning-decision-b19174945af78d0f15e74db3",
+            "at": "2026-10-24T09:51:11.232255211Z"
+          },
+          {
+            "id": "plan-48f5486caa46aee5769a59082e33b0235c9463973195725ef8df5402fb4f0080",
+            "scope": "child",
+            "kind": "delegation",
+            "message": "OWN-SCOPE",
+            "at": "2026-10-24T09:51:11.647915152Z"
+          }
+        ],
+        "judge": {
+          "cycle": 1,
+          "max_cycles": 0,
+          "closed": false
+        }
+      },
+      "schema_version": 1,
+      "id": "w-d723dd1c3d0738a9a18edc70",
+      "revision": 4,
+      "title": "ROOT-PRIVATE-TITLE",
+      "objective": "ROOT-PRIVATE-OBJECTIVE",
+      "scope": "ROOT-PRIVATE-BRIEF",
+      "criteria": [
+        "OWN-REQUIREMENT"
+      ],
+      "next": "",
+      "summary": "",
+      "memory": null,
+      "created": "2026-10-24T09:51:11.078841896Z",
+      "updated": "2026-10-24T09:51:11.650957157Z",
+      "git": {
+        "head": "",
+        "branch": "",
+        "changes": ""
+      },
+      "tasks": []
+    }
+  }
+}

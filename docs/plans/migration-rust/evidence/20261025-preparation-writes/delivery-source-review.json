@@ -1,0 +1,94 @@
+{
+  "kind": "delivery-scoped-source-review-not-global-acceptance",
+  "reviewer": "Codex principal",
+  "version": "v0.1.1-dev.78",
+  "binary_sha256": "bef3310cab879016fdc84973d0a11aa47ab27a9bd0a2d34b0948ec9473c43f1c",
+  "profile_inputs": 439,
+  "reused_production_review": "scoped-source-review.json + independent-review-assessment.json; listed product bytes exactly match earlier profile8, with current named SDK/public tests on candidate78",
+  "reused_byte_identical_files": {
+    "rust/crates/swarm-engine/src/preparation_command.rs": "52e247e68f74adc420bd4e7aca7502be5f1075c4f95b61ad1dd51f89b0faced6",
+    "rust/crates/swarm-engine/src/root_store/preparation_write.rs": "4550c9284d72a79fdcdec9753b58655c994d659da477e7b5c9fdc50bd0fb3975",
+    "rust/crates/swarm-engine/src/root_store/preparation_read.rs": "8e4b0e99cf2f10dea2f6bfd6d5e226e1a0376426b33474ece312f70f635a130d",
+    "rust/crates/swarm-engine/src/root_store/preparation_methods.rs": "da14249c69884e8b0f0f54d02a65fcb517b3dd3ed32d46d02c70438886fc81c1",
+    "rust/crates/swarm-cli/src/preparation.rs": "ba35f6256bcba54c407ee83bb19e69e3f5fedfe331756445d2ee8516daddc1dd",
+    "rust/crates/swarm-web/src/service/preparations.rs": "1744b604820085222376056fd2608a43ce61394bd308af9b77012d785213ebaa",
+    "frontend/engine-settings/admin.js": "a5a050a81d1296940f7e78189b0bcc0ba0749fadd2a9898703aa1bf343ab2f0c",
+    "web/i18n-en.js": "6835d3c95fec2eefbe918bbc162ff1fdd4951314dcf82fa6e76461376db30f5f",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json": "a3718aeb4075c0bfe3dae0e968560fc87de3e002f50bd63dbd9704cc2de1a712",
+    "rust/crates/swarm-engine/config/engine-settings.json": "23c612c9bc4528a6d22f01623b09fe0fc3a9306cf196335d05f0a94be2226feb"
+  },
+  "entries": [
+    {
+      "path": "version_history.json",
+      "sha256": "5f7293d15408ec36f4147c41b927c4410d1b441af86aef6cab928ed50eec6b68",
+      "scope": "Preparation/delivery delta only; unrelated concurrent/historical notes retained",
+      "policies": "No new operator limit/default/timeout. Test IDs, expected counts, dev74/77/78 and forged title are fixture or observed identity, not product exceptions. Saved policy unchanged on live Root.",
+      "functions": "No runtime functions changed this increment; Python main/module docstrings now describe owned receipt corruption. Version/news data and operational documents match delivered behavior.",
+      "errors": "Valid replay precedes corruption; exact refusal code, no persisted mutation, repair and same-event recovery. Build-input refusal and wrong baseline retained; new preconditions recorded. Actual process used after stale artifact mistake.",
+      "documentation": "Current FR/EN replay guidance49 and paired release notes; Mermaid/RETEX original preserved, delivery/report links and limits explicit."
+    },
+    {
+      "path": "tests/rust_preparation_writes.py",
+      "sha256": "87b49ab5df880d12c8b1bd0325f612ef6cd4082ba8d0e524a54635a50ee22374",
+      "scope": "Preparation/delivery delta only; unrelated concurrent/historical notes retained",
+      "policies": "No new operator limit/default/timeout. Test IDs, expected counts, dev74/77/78 and forged title are fixture or observed identity, not product exceptions. Saved policy unchanged on live Root.",
+      "functions": "No runtime functions changed this increment; Python main/module docstrings now describe owned receipt corruption. Version/news data and operational documents match delivered behavior.",
+      "errors": "Valid replay precedes corruption; exact refusal code, no persisted mutation, repair and same-event recovery. Build-input refusal and wrong baseline retained; new preconditions recorded. Actual process used after stale artifact mistake.",
+      "documentation": "Current FR/EN replay guidance49 and paired release notes; Mermaid/RETEX original preserved, delivery/report links and limits explicit."
+    },
+    {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "sha256": "4e26a47c7cb51276f6eb27cdb7a41df7a9e80b1d593300be8922044c426516f1",
+      "scope": "Preparation/delivery delta only; unrelated concurrent/historical notes retained",
+      "policies": "No new operator limit/default/timeout. Test IDs, expected counts, dev74/77/78 and forged title are fixture or observed identity, not product exceptions. Saved policy unchanged on live Root.",
+      "functions": "No runtime functions changed this increment; Python main/module docstrings now describe owned receipt corruption. Version/news data and operational documents match delivered behavior.",
+      "errors": "Valid replay precedes corruption; exact refusal code, no persisted mutation, repair and same-event recovery. Build-input refusal and wrong baseline retained; new preconditions recorded. Actual process used after stale artifact mistake.",
+      "documentation": "Current FR/EN replay guidance49 and paired release notes; Mermaid/RETEX original preserved, delivery/report links and limits explicit."
+    },
+    {
+      "path": "docs/plans/migration-rust/PREPARATION-WRITES-20261025.md",
+      "sha256": "f3e031493e9126681971abb95680f972fd022f4ae7b3ad12e4845c48f85f0ac1",
+      "scope": "Preparation/delivery delta only; unrelated concurrent/historical notes retained",
+      "policies": "No new operator limit/default/timeout. Test IDs, expected counts, dev74/77/78 and forged title are fixture or observed identity, not product exceptions. Saved policy unchanged on live Root.",
+      "functions": "No runtime functions changed this increment; Python main/module docstrings now describe owned receipt corruption. Version/news data and operational documents match delivered behavior.",
+      "errors": "Valid replay precedes corruption; exact refusal code, no persisted mutation, repair and same-event recovery. Build-input refusal and wrong baseline retained; new preconditions recorded. Actual process used after stale artifact mistake.",
+      "documentation": "Current FR/EN replay guidance49 and paired release notes; Mermaid/RETEX original preserved, delivery/report links and limits explicit."
+    },
+    {
+      "path": "docs/plans/migration-rust/DELIVERY-PREPARATIONS-20261025.md",
+      "sha256": "76a1649266a5b81e4b9301f2c5f718a3758d24f6980c104d0f5a0f30691958da",
+      "scope": "Preparation/delivery delta only; unrelated concurrent/historical notes retained",
+      "policies": "No new operator limit/default/timeout. Test IDs, expected counts, dev74/77/78 and forged title are fixture or observed identity, not product exceptions. Saved policy unchanged on live Root.",
+      "functions": "No runtime functions changed this increment; Python main/module docstrings now describe owned receipt corruption. Version/news data and operational documents match delivered behavior.",
+      "errors": "Valid replay precedes corruption; exact refusal code, no persisted mutation, repair and same-event recovery. Build-input refusal and wrong baseline retained; new preconditions recorded. Actual process used after stale artifact mistake.",
+      "documentation": "Current FR/EN replay guidance49 and paired release notes; Mermaid/RETEX original preserved, delivery/report links and limits explicit."
+    },
+    {
+      "path": "docs/plans/migration-rust/REPLAYS.md",
+      "sha256": "b509a2f8585d530d1a7f9dbca0d2118ae5af08fae489e7000d8a4991b06fe88e",
+      "scope": "Preparation/delivery delta only; unrelated concurrent/historical notes retained",
+      "policies": "No new operator limit/default/timeout. Test IDs, expected counts, dev74/77/78 and forged title are fixture or observed identity, not product exceptions. Saved policy unchanged on live Root.",
+      "functions": "No runtime functions changed this increment; Python main/module docstrings now describe owned receipt corruption. Version/news data and operational documents match delivered behavior.",
+      "errors": "Valid replay precedes corruption; exact refusal code, no persisted mutation, repair and same-event recovery. Build-input refusal and wrong baseline retained; new preconditions recorded. Actual process used after stale artifact mistake.",
+      "documentation": "Current FR/EN replay guidance49 and paired release notes; Mermaid/RETEX original preserved, delivery/report links and limits explicit."
+    },
+    {
+      "path": "docs/en/RUST-MIGRATION-REPLAYS.md",
+      "sha256": "f87b671bce5db82103a4d4a602a64fb0728bbe1c6d8dcc9dc9c91a643de0baa5",
+      "scope": "Preparation/delivery delta only; unrelated concurrent/historical notes retained",
+      "policies": "No new operator limit/default/timeout. Test IDs, expected counts, dev74/77/78 and forged title are fixture or observed identity, not product exceptions. Saved policy unchanged on live Root.",
+      "functions": "No runtime functions changed this increment; Python main/module docstrings now describe owned receipt corruption. Version/news data and operational documents match delivered behavior.",
+      "errors": "Valid replay precedes corruption; exact refusal code, no persisted mutation, repair and same-event recovery. Build-input refusal and wrong baseline retained; new preconditions recorded. Actual process used after stale artifact mistake.",
+      "documentation": "Current FR/EN replay guidance49 and paired release notes; Mermaid/RETEX original preserved, delivery/report links and limits explicit."
+    }
+  ],
+  "shared_other_owner_hunks": "SCALING/Biba/protection/shared exports not accepted by this scoped review",
+  "evidence": [
+    "delivery-result.json",
+    "private/delivery-5xptu6ez/candidate78-writes",
+    "private/delivery-5xptu6ez/candidate78-upgrade2",
+    "private/delivery-5xptu6ez/installed-ui.json",
+    "private/delivery-5xptu6ez/installed-resources.json"
+  ],
+  "limits": "Installed flow verified; no global migration acceptance or implicit settings/mission authorization."
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "role": "setup",
+    "exit": 0,
+    "seconds": 6.177
+  },
+  {
+    "role": "provider",
+    "exit": 0,
+    "seconds": 6.213
+  },
+  {
+    "role": "http-driver",
+    "exit": 0,
+    "seconds": 9.872
+  },
+  {
+    "role": "resources",
+    "exit": 0,
+    "seconds": 7.892
+  },
+  {
+    "role": "cleanup",
+    "exit": 0,
+    "seconds": 6.135
+  },
+  {
+    "role": "admission",
+    "exit": 0,
+    "seconds": 6.132
+  },
+  {
+    "role": "recipe",
+    "exit": 0,
+    "seconds": 9.253
+  },
+  {
+    "role": "review",
+    "exit": 0,
+    "seconds": 5.773
+  }
+]

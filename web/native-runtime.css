@@ -1,0 +1,67 @@
+/* Native development host only; all colours and controls use shared tokens. */
+.native-runtime-header>div{display:flex;gap:1rem;align-items:center;min-width:0}
+.native-runtime-header h1{font-size:1.65rem;margin:0;overflow-wrap:anywhere}
+.native-runtime-header nav{display:flex;gap:.5rem;flex-wrap:wrap}
+.native-runtime-header .language-picker{margin-inline-start:auto}
+#native-startup-retry{margin-block:.5rem}
+@media(max-width:40rem){.native-runtime-header>div{align-items:flex-start}.native-runtime-header h1{font-size:1.3rem}.native-runtime-header .language-picker{margin-inline-start:0}}
+
+.native-quotas-dialog .modal-body>label{display:grid;gap:.5rem;margin-block:1rem}
+.native-quotas-dialog :is(select,textarea){width:100%;min-width:0;box-sizing:border-box;font:inherit}
+.native-quotas-dialog textarea{min-height:5rem}
+.native-quotas-dialog .engine-settings-field{display:grid;gap:.5rem}
+.native-quotas-dialog .modal-header button{margin-inline-start:auto}
+
+/* Native cockpit composition reuses the shared palette and control contracts. */
+.native-workspace [hidden]{display:none!important}
+.native-skip{position:fixed;inset-block-start:.5rem;inset-inline-start:.5rem;transform:translateY(-200%);z-index:10;padding:.75rem;background:var(--wattson-carte);color:var(--wattson-texte)}
+.native-skip:focus{transform:none}
+.native-workspace .native-runtime-header{max-width:none;padding:1rem 1.5rem;border-block-end:1px solid var(--wattson-ligne)}
+.native-runtime-header .eyebrow{margin:0 0 .25rem}
+.native-workspace-layout{display:grid;grid-template-columns:13rem minmax(0,1fr);min-height:calc(100dvh - 7rem)}
+.native-workspace #native-content{max-width:none;margin:0;padding:1.5rem;min-width:0}
+.native-navigation{padding:1.25rem;border-inline-end:1px solid var(--wattson-ligne);background:var(--wattson-carte-creuse)}
+.native-navigation details{margin-block-end:1rem}
+.native-navigation summary{font-weight:700;min-height:44px;cursor:pointer}
+.native-navigation :is(button,a){display:flex;align-items:center;min-height:44px;width:100%;box-sizing:border-box;text-align:start;padding:.65rem;margin-block:.4rem;text-decoration:none;color:var(--wattson-texte);border:1px solid transparent;background:transparent;border-radius:var(--wattson-rayon-controle)}
+.native-navigation [aria-current=page]{border-color:var(--swarm-control-border);background:var(--wattson-carte-appuyee);font-weight:700}
+.native-navigation a:hover{background:var(--wattson-carte-appuyee)}
+.native-navigation-note,.native-reading-time{font-size:.85rem;color:var(--wattson-texte-discret);line-height:1.6}
+.native-workspace h2{font:normal clamp(1.6rem,3vw,2.25rem)/1.2 Georgia,serif;margin-block:.4rem}
+.native-mission-layout{display:grid;grid-template-columns:minmax(14rem,19rem) minmax(0,1fr);gap:1.5rem;margin-block-start:1.25rem}
+.native-mission-browser{min-width:0}
+.native-mission-browser>label{margin-block-start:0}
+.native-mission-browser>button{width:100%}
+.native-mission-list{list-style:none;padding:0;margin-block:1rem}
+.native-mission-list li+li{margin-block-start:.5rem}
+.native-mission-list button{width:100%;text-align:start;display:grid;gap:.5rem;background:var(--wattson-carte);border:1px solid var(--wattson-ligne);padding:1rem}
+.native-mission-list button[aria-current=true]{border-inline-start:.25rem solid var(--wattson-accent);background:var(--wattson-carte-appuyee)}
+.native-mission-list small{color:var(--wattson-texte-discret);font-family:monospace}
+.native-mission-list :is(strong,small),.native-mission-detail{overflow-wrap:anywhere;min-width:0}
+.native-mission-detail{padding:1.25rem;background:var(--wattson-carte);border:1px solid var(--wattson-ligne);border-radius:var(--wattson-rayon-carte);align-self:start}
+.native-mission-detail h3{font:normal 1.5rem/1.35 Georgia,serif;margin-block:0 .5rem;min-width:0;flex:1 1 14rem}
+.native-objective{white-space:pre-wrap;line-height:1.7}
+.native-facts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:.4rem 1rem;border-block:1px solid var(--wattson-ligne);padding-block:1rem}
+.native-facts dt{font-size:.9rem;color:var(--wattson-texte-discret);font-weight:normal}
+.native-facts dd{margin:0;min-width:0}
+.native-task{border-block-start:1px solid var(--wattson-ligne);padding-block:.5rem}
+.native-task summary{cursor:pointer;min-height:44px;padding-block:.6rem;overflow-wrap:anywhere}
+.native-task summary strong{margin-inline-end:1rem}
+.native-state{font-size:.85rem;color:var(--wattson-texte-discret)}
+.native-task>div{padding-inline:.5rem}
+.native-task p{line-height:1.65;white-space:pre-wrap}
+@media(max-width:68rem){.native-mission-layout{grid-template-columns:minmax(12rem,16rem) minmax(0,1fr)}.native-workspace-layout{grid-template-columns:11rem minmax(0,1fr)}.native-workspace #native-content{padding:1rem}}
+@media(max-width:48rem){.native-workspace-layout,.native-mission-layout{grid-template-columns:minmax(0,1fr)}.native-navigation{border-inline-end:0;border-block-end:1px solid var(--wattson-ligne);padding:.75rem 1rem}.native-navigation nav{display:flex;flex-wrap:wrap;gap:.75rem 1.5rem}.native-navigation details{flex:1 1 10rem;margin:0}.native-navigation-note{margin-block:.25rem}.native-workspace .native-runtime-header{padding:1rem}.native-mission-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:.5rem}.native-mission-list li+li{margin:0}.native-mission-detail{padding:1rem}.native-facts{grid-template-columns:minmax(0,1fr)}}
+
+@media(max-width:48rem){.native-mission-detail h3{flex:none}}
+
+/* Same fixed-footer dialog structure; policy values never drive CSS bounds. */
+dialog[data-web-requests] .modal-body{overflow:auto;min-height:0}
+dialog[data-web-requests] .modal-footer{flex-shrink:0}
+
+/* Graph objectives use the shared scroll-body/fixed-footer contract. */
+dialog[data-graph-performance] .modal-body{overflow:auto;min-height:0}
+dialog[data-graph-performance] .modal-footer{flex-shrink:0}
+
+/* Retained exchange text may contain unbroken IDs/paths; never force page overflow. */
+[data-exchanges] :is(p,dd,h4){overflow-wrap:anywhere}

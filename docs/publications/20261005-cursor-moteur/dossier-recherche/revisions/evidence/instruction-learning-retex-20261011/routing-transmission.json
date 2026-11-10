@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T11:04:03.698961+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "patch_sha256": "8b957486beef8e95e02061e79c678a145f11a4d620086d853a26527c2ee291cc",
+  "public_transmissions": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "event_id": "instruction-learning-retex-routing-T3-20261011",
+      "before_revision": 157,
+      "after_revision": 158,
+      "next_sha256": "9ef104f17971f4322aa7013d7def138f89fa9d5d42c48258dc48ae60a1d9a17f",
+      "state": "todo",
+      "contract_attempts_dependencies_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "event_id": "instruction-learning-retex-routing-T4-20261011",
+      "before_revision": 158,
+      "after_revision": 159,
+      "next_sha256": "d7d9229e21be29dde65cb25099778958ac8f1c8423ba7d93bdf6e37be5646405",
+      "state": "todo",
+      "contract_attempts_dependencies_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "event_id": "instruction-learning-retex-routing-T5-20261011",
+      "before_revision": 159,
+      "after_revision": 160,
+      "next_sha256": "577314fbbc82cbd843e7517f5732d4e80fd0ee2281a3ce0de8451b7da2452bd0",
+      "state": "todo",
+      "contract_attempts_dependencies_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "event_id": "instruction-learning-retex-routing-T7-20261011",
+      "before_revision": 160,
+      "after_revision": 161,
+      "next_sha256": "40b4f9468c36051912b131338874ebb0af37c0758105697015395ba5d3a4c579",
+      "state": "todo",
+      "contract_attempts_dependencies_preserved": true
+    }
+  ]
+}

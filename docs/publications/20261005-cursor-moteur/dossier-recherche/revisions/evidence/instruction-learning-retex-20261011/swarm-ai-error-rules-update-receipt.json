@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-11T16:21:14.926635+00:00",
+  "common_rules": "/home/fpizzi/.codex/AGENTS.md",
+  "common_rules_sha256": "74a482df5c22edbabcf24ce1d6f0b1c9e8de54ca3998d88a81486cea3f2f017e",
+  "claude_entrypoint": "/home/fpizzi/.claude/CLAUDE.md",
+  "claude_imports_common_rules": true,
+  "scope": "Persistent personal Codex and Claude rules; preserves original continuity and permissions. File verified, no claim that already-running native roles reload it."
+}

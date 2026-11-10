@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "native-receipt-binding",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/*.rs",
+    "rust/crates/swarm-engine/src/validation_policy.rs",
+    "tests/rust_native_task_validation*.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/NATIVE-REVIEWER.md",
+    "docs/en/NATIVE-REVIEWER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "receipt-policy-slot-result-mapping",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "native_validation_receipt_",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "native_validation_receipt_binds_policy_slot_and_result_before_success ... ok",
+        "native_validation_receipt_keeps_failed_and_unattempted_results_blocked ... ok",
+        "test result: ok. 8 passed; 0 failed;"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "normal-native-execution-recovery-and-output",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='native-receipt-binding-',dir='.cache')).resolve()\nfor label,script in [('normal','tests/rust_native_task_validation.py'),('recovery','tests/rust_native_task_validation_failures.py'),('output','tests/rust_native_task_validation_output.py')]:\n out=p/label; subprocess.run(['python3',script,'--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(out)],check=True); assert json.loads((out/'result.json').read_text())['status']=='PASS'\nprint('NATIVE_RECEIPT_BINDING_PUBLIC_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_RECEIPT_BINDING_PUBLIC_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

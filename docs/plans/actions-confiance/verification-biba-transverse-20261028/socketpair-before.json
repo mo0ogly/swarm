@@ -1,0 +1,9 @@
+{
+  "root": "/tmp/swarm-biba-socketpair-wqe6i_de",
+  "valid_control": true,
+  "driver": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/biba-boundary-dbe946el/proof/boundary-driver",
+  "driver_sha256": "ffecfef222802119dd907f0676ec75932d9ff4b73a8be3f5837fa20c8573c5d4",
+  "exit": 0,
+  "packet_received": true,
+  "stderr": ""
+}

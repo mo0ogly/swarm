@@ -1,0 +1,16 @@
+{
+  "originals": [
+    "red1242/fault/baseline-recovery/watch.stdout",
+    "recipe1244/step-0001.stderr"
+  ],
+  "observations": [
+    "Old watch synchronized while original remained pending; recipe lacked synchronized-observation barrier; stopped only authenticated owned process.",
+    "Current recovery and four refusal variants passed; later historical HTTP status refused a closed planning scope."
+  ],
+  "changes": [
+    "Bound old-code discrimination to first synchronized cycle, no duration threshold.",
+    "Keep HTTP historical status 500 as explicit OPEN limitation; test show and native CLI status for canonical recovered identity."
+  ],
+  "owner": "Codex G3/status",
+  "resume_when": "Port validated closed-scope status projection with retained failure fixture; independent of native settlement"
+}

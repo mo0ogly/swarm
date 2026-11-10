@@ -1,0 +1,31 @@
+{
+  "candidate_examined": "6c2da25ea0c750dc4c2e2df5198fa61eab58c4a7",
+  "base_tree": "201b3a8e2e0f724a7cc88fef7107bf2d41569316",
+  "result_tree": "9b03d914eadbc6711dd3804b5178e78e7c30f063",
+  "paths": [
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json",
+    "docs/plan-ca937edf4e-T2.md",
+    "docs/plan-ca937edf4e-T2.delivery.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/path-binding-replan.json"
+  ],
+  "preimages": {
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json": "4f355ad577ad2148cc9816d31585a62c67ba1f958306a75ccc4ac30799f57bfe",
+    "docs/plan-ca937edf4e-T2.md": "916e32f5e0121dc61c20d06cec0dc3e99ed8cc61be0fffd2dec547c64c342d42",
+    "docs/plan-ca937edf4e-T2.delivery.json": "a5ef60c3e7b85d8219a4d1ff7c480e7be0d17bef1a3ea08a2f8c007e2a0cea63",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json": "834a5897d26c92b2e86477edd0517d96d3a3bb1d446a3ae42322d9bcea7eb54f",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/path-binding-replan.json": null
+  },
+  "postimages": {
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/judge-coverage-fix-20261011/metadata.json": "904e89a5169245630ba57d3790239b6fcd6f36fb3ac1d3b200e9133a36c0fdc7",
+    "docs/plan-ca937edf4e-T2.md": "f4bff6d95bc2cdf52c5fc38bc1c453bf48d403ca6aac0219ee44daaa23e4a6f2",
+    "docs/plan-ca937edf4e-T2.delivery.json": "a894aed2e4dfd5042cad37c13b409366910305d82ae73f892a60cca0d98304b9",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json": "9d51a3af66b1d93e2926f8b59887470c3cf6704824a55fb96dc5deb55cf29cea",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/path-binding-replan.json": "079adfabd341c2cde7fefe780549059abc72cef3b7ee5f65a5009572ef9caa04"
+  },
+  "patch_sha256": "f6b680e16cf45d6c455254da3dad6e05de638c8e1d39b0c961ce19d8bdf4bdb9",
+  "sources": 17,
+  "source_bytes": 130889,
+  "native_original_unchanged": "69e7ad880d6551d4f08e77c1981896b148951c279855cb9c19445b5f2c114113",
+  "no_Go_changed": true
+}

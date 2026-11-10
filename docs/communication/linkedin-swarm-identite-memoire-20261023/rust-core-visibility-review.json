@@ -1,0 +1,477 @@
+{
+  "date": "2026-10-23",
+  "objective": "Restore the deterministic Rust engine as the visible architectural core in both README diagram families and both languages.",
+  "origin": "User correction: the deterministic Rust engine is the heart of the project and had become unclear in both diagrams.",
+  "replan": {
+    "observed": "Generic engine labels omitted Rust and swarm-engine; the memory diagram enclosed the workflow under a historical Go label.",
+    "cause": "Documentation emphasis conflated incomplete Rust journey qualification with the engine architectural identity. Prior checks covered rendering and links but omitted this essential semantic invariant.",
+    "owner": "Root Codex, documentation/presentation.",
+    "decision": "Keep the actual Rust core explicit and visually prominent; scope Go to historical memory; mark remaining native memory/identity/confinement integrations separately.",
+    "outcome": "Four diagrams regenerated, README/architecture text aligned; no runtime change or qualification invented."
+  },
+  "head": "553593a2ffa3823d16784a6fedc291eebf390837",
+  "before": {
+    "README.md": {
+      "sha256": "9ecf771546098b156d6b45677e63e8568b77d397e451d128aa95601029ee5a35",
+      "bytes": 17884
+    },
+    "README.en.md": {
+      "sha256": "3896daa67df651735bbd77eb8a66dd9889daf5ec31f951df2feeb5beabe83699",
+      "bytes": 16565
+    },
+    "docs/architecture/OVERVIEW.md": {
+      "sha256": "41a64dc8fc116ce32620f6ece74f34e13dd589fededd39b482071d40584eab38",
+      "bytes": 11514
+    },
+    "docs/en/ARCHITECTURE.md": {
+      "sha256": "2d247236444bba243d2a52f62231d4797a8cc6343449c11f820a11fe4e367176",
+      "bytes": 10440
+    },
+    "docs/diagrams/README.md": {
+      "sha256": "dfe129fba789d7e7489b858ada899b8f76115678bf2ddcb6533cef8994fa873d",
+      "bytes": 5143
+    },
+    "docs/diagrams/architecture-overview-fr.mmd": {
+      "sha256": "fbe260490924e495478bfedff2dd4be28efb2b10dd1062c531a2430ff7752461",
+      "bytes": 1809
+    },
+    "docs/diagrams/architecture-overview-fr.svg": {
+      "sha256": "8680e403e7fe4df314a1c269aba3cf632ffa7d1f68cfeba096fdd8ba963e6500",
+      "bytes": 37632
+    },
+    "docs/diagrams/architecture-overview-fr.png": {
+      "sha256": "6a5d2a8f43140614041ea4a7c8a1da2eeb42ef1ee5f4036e59b761a2c64b5043",
+      "bytes": 97110
+    },
+    "docs/diagrams/architecture-overview-en.mmd": {
+      "sha256": "eb414c51096307751e24cf9f63ca707e851a6a7b07c5f26c2001fc448dc6bc0d",
+      "bytes": 1733
+    },
+    "docs/diagrams/architecture-overview-en.svg": {
+      "sha256": "3ed77a29b4327907316354b42431b97a4955a113d8149017c833c99347c1d5ea",
+      "bytes": 37569
+    },
+    "docs/diagrams/architecture-overview-en.png": {
+      "sha256": "9ad7c0e0ed4ac12c86c7504e6c7cfc42820b212255ea64e90cb3c9b0f7733ba4",
+      "bytes": 99968
+    },
+    "docs/diagrams/memory-identity-fr.mmd": {
+      "sha256": "270e8521ba035709e8564e16bb13c53c790df5e41c992586213c2464eff5d8df",
+      "bytes": 2307
+    },
+    "docs/diagrams/memory-identity-fr.svg": {
+      "sha256": "99bf7002bfbc7e8d2f7b87c6c9620c1163d23b4b065b838edaa8e219151b4ef6",
+      "bytes": 36941
+    },
+    "docs/diagrams/memory-identity-fr.png": {
+      "sha256": "f27d42ba19a3815281e5c0fec9ddfd5a028ede961b081b4a83054ce2f4dc8fc2",
+      "bytes": 113282
+    },
+    "docs/diagrams/memory-identity-en.mmd": {
+      "sha256": "f069334ab9ad969e00d4d0ed6005b390b5e5cff82af7314aece9345f2bf3e810",
+      "bytes": 2262
+    },
+    "docs/diagrams/memory-identity-en.svg": {
+      "sha256": "a2ab98d11e4f33b0dc6067f36eb0f9bc7b19154d3fa86fe4f7fe368f82876b17",
+      "bytes": 37213
+    },
+    "docs/diagrams/memory-identity-en.png": {
+      "sha256": "6aae9a04c418f157cba54dc429d847f630a16708669884176898e75e4dc0669f",
+      "bytes": 117470
+    }
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "b1301b214ddabedd6587528740652376b8c836df0dd6e91f7bbca9ad98a98f41",
+      "bytes": 18334
+    },
+    {
+      "path": "README.en.md",
+      "sha256": "377c44bbd29128b670ccd381799a09c5ec1ee4aaa15aa9f0e6026079277b7c02",
+      "bytes": 16971
+    },
+    {
+      "path": "docs/architecture/OVERVIEW.md",
+      "sha256": "238cca9c0c2516c33ad741275f801f18d45589653b0acd9b8c10fdb574bd6441",
+      "bytes": 11833
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "sha256": "c08047d2aab4f06bc63728a24749c274b027de617986973f3ef6a63c42c3a4fd",
+      "bytes": 10692
+    },
+    {
+      "path": "docs/diagrams/README.md",
+      "sha256": "64e0a2477e6b60498435d87166b781eecdee36ef0fd308a541fc93dc5284dff7",
+      "bytes": 5541
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.mmd",
+      "sha256": "11c3bcd111cc191d810bdef717c29be18e76abff81a4b453e177a9b04fc85094",
+      "bytes": 1881
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.svg",
+      "sha256": "dda148cd02ab650a3d06bcd89bc8ec68686c33c9eecefec7978175a5123055d2",
+      "bytes": 38382
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.png",
+      "sha256": "6c8e7a6e318583fba4561af7c3be025b36a38cd9d0d8adbfeefdb38c688a2935",
+      "bytes": 102081
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.mmd",
+      "sha256": "25f95a21ef990f12b7fe8cf92f591b5c1102e4f6f210c1f446025d82fd0baf8b",
+      "bytes": 1799
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.svg",
+      "sha256": "94563d9b606d28735aa35906f606467f0bff301a61f808afb3a48861ea4f2c66",
+      "bytes": 38107
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.png",
+      "sha256": "4617e7f7ee9ec75ec5a5f740a42a1781f9617e7dedeabef77a0fa7b62231d2eb",
+      "bytes": 102452
+    },
+    {
+      "path": "docs/diagrams/memory-identity-fr.mmd",
+      "sha256": "018a49ddc73c1ce1a0958c02d4709503c852f1aa7e2759ed195d539a586932d2",
+      "bytes": 2456
+    },
+    {
+      "path": "docs/diagrams/memory-identity-fr.svg",
+      "sha256": "4c733b83191804cf89b2b6da726715ee5e267bf3af5843d7075462188cc55779",
+      "bytes": 40768
+    },
+    {
+      "path": "docs/diagrams/memory-identity-fr.png",
+      "sha256": "e9c40bc59a0128afe643486892de2c1139fb53d908e27e9cc2bddd7240e4a989",
+      "bytes": 133833
+    },
+    {
+      "path": "docs/diagrams/memory-identity-en.mmd",
+      "sha256": "b853ca2174c74f865e552a6862d26a9bac9f9cfc718e33e8b90739147a3ebca9",
+      "bytes": 2408
+    },
+    {
+      "path": "docs/diagrams/memory-identity-en.svg",
+      "sha256": "39129c384fba14c77dce1820d40bb6e846dd5678813d5bb969d0f9926cbe8f2d",
+      "bytes": 40639
+    },
+    {
+      "path": "docs/diagrams/memory-identity-en.png",
+      "sha256": "22b2421a1391653abcf24893f35c33c91907251855aabb7298757efd97d78f64",
+      "bytes": 139686
+    }
+  ],
+  "owned_text_patch": {
+    "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/rust-core-visibility.patch",
+    "sha256": "81a3791b077f0feb1ddba7b42be1428026616a90cbc53fa5f563c1746dbb79f7",
+    "bytes": 30226
+  },
+  "sources": [
+    {
+      "path": "rust/crates/swarm-engine/src/lib.rs",
+      "sha256": "c50ff9f25e9acec81be37b17910f4f7b070641d921555046d8a11f1265e9c064",
+      "bytes": 24012
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store.rs",
+      "sha256": "b4923f65f5eb05cccc11e4d6247551e8ac90450f3ca36c8137d23b644aa238a7",
+      "bytes": 151108
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/work_engine.rs",
+      "sha256": "ea0b2f1bcf77e830c520c60e3de80c0de218d3f7b73d195a4deb455ef953a0ad",
+      "bytes": 50704
+    },
+    {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "sha256": "24752076006cfd1dc3bdf17b561ab7e99545319589cf08b80864f175c2566739",
+      "bytes": 53778
+    },
+    {
+      "path": "docs/PROJECT-MEMORY.md",
+      "sha256": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13",
+      "bytes": 45994
+    }
+  ],
+  "verification": {
+    "engine_labels": [
+      {
+        "file": "docs/diagrams/architecture-overview-fr.mmd",
+        "before_engine_label": "Moteur déterministe\nDroits · dépendances · budgets · preuves",
+        "after_engine_label": "MOTEUR DÉTERMINISTE RUST\nswarm-engine · cœur de Swarm\nÉtat · transitions · droits · preuves",
+        "before_required_label": "FAIL",
+        "after_required_label": "PASS"
+      },
+      {
+        "file": "docs/diagrams/architecture-overview-en.mmd",
+        "before_engine_label": "Deterministic engine\nPermissions · dependencies · budgets · evidence",
+        "after_engine_label": "DETERMINISTIC RUST ENGINE\nswarm-engine · Swarm core\nState · transitions · permissions · evidence",
+        "before_required_label": "FAIL",
+        "after_required_label": "PASS"
+      },
+      {
+        "file": "docs/diagrams/memory-identity-fr.mmd",
+        "before_engine_label": "MOTEUR DÉTERMINISTE<br/>Règles · dépendances · limites",
+        "after_engine_label": "MOTEUR DÉTERMINISTE RUST<br/>swarm-engine · RootStore<br/>État · transitions · droits · preuves",
+        "before_required_label": "FAIL",
+        "after_required_label": "PASS"
+      },
+      {
+        "file": "docs/diagrams/memory-identity-en.mmd",
+        "before_engine_label": "DETERMINISTIC ENGINE<br/>Rules · dependencies · limits",
+        "after_engine_label": "DETERMINISTIC RUST ENGINE<br/>swarm-engine · RootStore<br/>State · transitions · permissions · evidence",
+        "before_required_label": "FAIL",
+        "after_required_label": "PASS"
+      }
+    ],
+    "rendered_diagrams": {
+      "mermaid": "11.12.0",
+      "results": [
+        {
+          "name": "architecture-overview-fr",
+          "title": "Swarm : moteur déterministe Rust au cœur de l’architecture",
+          "description": "Le cockpit et la CLI utilisent les opérations publiques. Le superviseur décide, le moteur déterministe Rust swarm-engine vérifie et applique, les agents produisent, la revue examine. Le moteur persiste l’état. Le portage Rust est partiel ; identité publique et confinement AC-02 restent à raccorder.",
+          "viewBox": "0 15 1298.36962890625 691.7535400390625",
+          "nodes": 9,
+          "edges": 12
+        },
+        {
+          "name": "architecture-overview-en",
+          "title": "Swarm: deterministic Rust engine at the architecture core",
+          "description": "The cockpit and CLI use public operations. The supervisor decides, the deterministic Rust engine swarm-engine checks and applies, agents produce, and review examines. The engine persists state. Rust porting is partial; public identity integration and AC-02 confinement remain pending.",
+          "viewBox": "0 15 1262.3515625 729.7205810546875",
+          "nodes": 9,
+          "edges": 12
+        },
+        {
+          "name": "memory-identity-fr",
+          "title": "Swarm : moteur déterministe Rust, mémoire et identité",
+          "description": "Le moteur déterministe Rust swarm-engine est le cœur de Swarm. Un parcours worker natif ciblé relie proposition, départ et observations. La mémoire versionnée est un socle historique Go ; ses raccords Rust et l’autorité publique sont encore en pointillés.",
+          "viewBox": "0 -15 1496.3447265625 894.3961181640625",
+          "nodes": 9,
+          "edges": 11
+        },
+        {
+          "name": "memory-identity-en",
+          "title": "Swarm: deterministic Rust engine, memory and identity",
+          "description": "The deterministic Rust engine swarm-engine is Swarm’s core. A scoped native worker flow connects proposal, launch and observations. Versioned memory is a historical Go foundation; its Rust integration and public authority remain dashed.",
+          "viewBox": "0 -15 1471.201171875 914.533203125",
+          "nodes": 9,
+          "edges": 11
+        }
+      ]
+    },
+    "readme_previews": {
+      "scope": "Local Markdown preview, not GitHub remote rendering or application runtime",
+      "reports": [
+        {
+          "lang": "fr",
+          "theme": "light",
+          "layout": "desktop",
+          "links": 102,
+          "localLinks": 98,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "fr",
+          "theme": "light",
+          "layout": "mobile",
+          "links": 102,
+          "localLinks": 98,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "desktop",
+          "links": 102,
+          "localLinks": 98,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "mobile",
+          "links": 102,
+          "localLinks": 98,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "en",
+          "theme": "light",
+          "layout": "desktop",
+          "links": 102,
+          "localLinks": 98,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "en",
+          "theme": "light",
+          "layout": "mobile",
+          "links": 102,
+          "localLinks": 98,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "en",
+          "theme": "dark",
+          "layout": "desktop",
+          "links": 102,
+          "localLinks": 98,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        },
+        {
+          "lang": "en",
+          "theme": "dark",
+          "layout": "mobile",
+          "links": 102,
+          "localLinks": 98,
+          "images": 8,
+          "horizontalOverflow": false,
+          "architectureAnchor": true
+        }
+      ]
+    },
+    "architecture_previews": {
+      "scope": "Local documentation links and GitHub-like rendering only; no application execution.",
+      "checks": [
+        {
+          "file": "README.md",
+          "links": 102,
+          "localLinks": 98,
+          "localLinksPass": true
+        },
+        {
+          "file": "README.en.md",
+          "links": 102,
+          "localLinks": 98,
+          "localLinksPass": true
+        },
+        {
+          "file": "docs/PRODUCT-ARCHITECTURE.md",
+          "links": 4,
+          "localLinks": 4,
+          "localLinksPass": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "links": 35,
+          "localLinks": 35,
+          "localLinksPass": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "links": 35,
+          "localLinks": 35,
+          "localLinksPass": true
+        }
+      ],
+      "previews": [
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "theme": "light",
+          "layout": "desktop",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "theme": "light",
+          "layout": "mobile",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "theme": "dark",
+          "layout": "desktop",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "theme": "dark",
+          "layout": "mobile",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "theme": "light",
+          "layout": "desktop",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "theme": "light",
+          "layout": "mobile",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "theme": "dark",
+          "layout": "desktop",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "theme": "dark",
+          "layout": "mobile",
+          "diagrams": 2,
+          "overflow": false,
+          "images": true
+        }
+      ],
+      "mermaid": "11.12.0"
+    },
+    "visual_review": "All four final SVG-derived PNGs inspected; memory titles shortened after an observed overlap in the first render, then both final memory images re-inspected. Original first-render observation is retained in the chat tool image output.",
+    "scope": "Local Markdown previews, links, semantic labels and diagram assets. Not GitHub hosted rendering or application execution.",
+    "diff_check_exit": 0
+  },
+  "review_axes": {
+    "policies": "No execution policy changed. The gold border uses the existing shared palette; media/render dimensions are presentation inputs.",
+    "functions": "No maintained function changed. Documentation explains Rust core ownership and remaining integrations in FR/EN.",
+    "errors": "No product error branch changed; original documentation visibility defect and first-render title overlap diagnosed and corrected.",
+    "build_inputs": "No executable build or runtime test. Source existence/types establish the named engine; prior journey proofs are not rerun or expanded."
+  },
+  "learning": "Architectural identity is separate from integration maturity. Before delivering presentation edits, inspect the primary engine node in each language, and constrain historical Go labels to the subsystem actually being described. A successful render alone does not establish fidelity to the project architecture.",
+  "transmission": "Persisted in the bilingual diagram documentation, both README introductions/architecture captions and both technical architecture pages. Old review records retain their original hashes and scope.",
+  "limits": [
+    "Native memory global integration remains open; dashed links do not claim it is delivered.",
+    "The scoped worker flow is not whole-team acceptance.",
+    "AC-02 stays saved and not started.",
+    "No application code, installed version, version_history.json, service or embedded agent context changed.",
+    "Existing Word/video artifacts are historical and were not re-encoded or republished by this README/architecture correction.",
+    "No independent acceptance, commit, push or publication."
+  ]
+}

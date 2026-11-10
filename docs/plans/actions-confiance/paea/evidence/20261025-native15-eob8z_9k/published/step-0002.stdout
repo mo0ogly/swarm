@@ -1,0 +1,22 @@
+
+running 17 tests
+test allowed_lifecycle_and_both_reconciliation_observations ... ok
+test direct_struct_construction_cannot_skip_validation ... ok
+test receipt_shape_does_not_accept_approval_as_an_effect ... ok
+test duplicate_keys_are_refused_at_top_level_and_nested_depths ... ok
+test terminal_states_have_no_mutating_transition ... ok
+test unknown_never_becomes_denial_retry_or_unobserved_success ... ok
+test duplicate_source_keys_labels_and_invalid_claim_shapes_refuse ... ok
+test unknown_authority_claims_nulls_missing_and_trailing_data_refuse ... ok
+test source_labels_are_sets_but_context_source_order_is_preserved ... ok
+test raw_numbers_unicode_and_json_encodings_do_not_alias_silently ... ok
+test both_domains_match_precomputed_python_bytes_and_digests ... ok
+test git_ref_revision_expressions_aliases_mixed_oids_and_noops_refuse ... ok
+test different_project_or_git_base_defines_distinct_intent ... ok
+test money_is_exact_and_ambiguous_or_out_of_range_amounts_refuse ... ok
+test exact_approval_rejects_changed_content_and_policy ... ok
+test new_transport_keys_never_change_action_or_business_identity ... ok
+test changed_content_changes_action_but_retains_business_intent ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

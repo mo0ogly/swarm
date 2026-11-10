@@ -1,0 +1,10 @@
+{
+  "pid": 2374002,
+  "proc_start_ticks": "4199931",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-evidence-revoke-fixed.py",
+    "run"
+  ],
+  "at": "2026-10-15T23:39:35.167404+00:00"
+}

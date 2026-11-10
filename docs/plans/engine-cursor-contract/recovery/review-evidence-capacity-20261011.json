@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T19:13:28.240594+00:00",
+  "parent": "log-console-20261011.patch",
+  "parent_tree": "e2ec243ccd1da1b9d818a86e0d5a27c304d2d6f7",
+  "preimage_tree": "234ffb836b6dc5cf98c74f9dfa295e25d0b169a6",
+  "preimage_extensions": [
+    {
+      "path": "internal/engine/managed_review_fragment_final_journal_test.go",
+      "sha256": "fa43aacd975124f6e6babd5c3d601e17fc5e89ef86b5f4e3f1795476397c4321",
+      "blob": "7071eff9730330b8629b53e95ec6ef971327527b"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_final_store_test.go",
+      "sha256": "22e9e49e745e79601233dbe6db949f0de91782aa65da45553219b9f8aa0d23e3",
+      "blob": "04f1fbde0c3b07585a0570c6b4ffed0a41189d49"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_request_prompt.go",
+      "sha256": "695ef21be4d4d5e6be6b2a869010deeb8944f43011d58e32b10f162703da95b9",
+      "blob": "4456c1c008615e64812c2b9b0e2aa46ea269f495"
+    },
+    {
+      "path": "internal/engine/managed_review_fragment_request_prompt_test.go",
+      "sha256": "702048dbc677d206343d61a355011a2fe978bae80a75533c3c2b050e49e37428",
+      "blob": "64caebb79d2d1f834aadd4482f377e5101e476e2"
+    }
+  ],
+  "preimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "de198c974fd936693d6acb940bea32478fa1a92a6a1a6ee6cdbb5b34c5b6505f",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "accbb321e5dcaecb3fd9a52a4707fbfb82782df9e704fcab744249226e695e37",
+    "internal/engine/managed_review_evidence_inventory.go": "6e940da7ad8961de1155dc5e6ac80354ee08e97031144141c23cd682a313d769",
+    "internal/engine/managed_review_evidence_inventory_test.go": "e8c45a3c1e41ec56692f76a03eae37c9e0ad53ab8100d9eaae3170a84283b128",
+    "internal/engine/managed_review_fragment_final_journal.go": "4249b2b37e6f54d0a8602d5300adc930da2ae33dfab86bdbaaef2379cff8777d",
+    "internal/engine/managed_review_fragment_final_journal_test.go": "fa43aacd975124f6e6babd5c3d601e17fc5e89ef86b5f4e3f1795476397c4321",
+    "internal/engine/managed_review_fragment_final_store.go": "05c6f0c665f9a6a3d2f33d39d537ec92960f358bd20ddba2a0709fedde48db6a",
+    "internal/engine/managed_review_fragment_final_store_test.go": "22e9e49e745e79601233dbe6db949f0de91782aa65da45553219b9f8aa0d23e3",
+    "internal/engine/managed_review_fragment_request_prompt.go": "695ef21be4d4d5e6be6b2a869010deeb8944f43011d58e32b10f162703da95b9",
+    "internal/engine/managed_review_fragment_request_prompt_test.go": "702048dbc677d206343d61a355011a2fe978bae80a75533c3c2b050e49e37428",
+    "internal/engine/managed_review_fragment_runtime.go": "aca77e340822192d09f9f6bbaee19154db7657767e1b3d9965494945bb29a937",
+    "internal/engine/planning_delivery.go": "886ba17aef455a021cc2fbcd81efbe511cef756972be67b8ba94541b171bea62"
+  },
+  "postimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "961565fcab28152c2e4514325af94062ec6dbda70158f7cb8cb4434618b54194",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "e575b00f3e661729800223373e5f195ab3652986a493aaef9bb3e9b939f850c8",
+    "internal/engine/managed_review_evidence_inventory.go": "63e20c9f7e7effd1cc5042001f00353f720ed31eece9baf50c1b9926e3296bac",
+    "internal/engine/managed_review_evidence_inventory_test.go": "5a547494de2d3693e1e759a35e8e64dc4b5d90f9066d14cc7ad44f7f9a6bd3a7",
+    "internal/engine/managed_review_fragment_final_journal.go": "f3b943887ccf506785aa574139f5af8360740848825992460e42b9c995fdae6e",
+    "internal/engine/managed_review_fragment_final_journal_test.go": "d7c89dc76ff3a506ac6b9cb753667bae2edd6b6f11dba9b5fa9dd3afb743ccb8",
+    "internal/engine/managed_review_fragment_final_store.go": "bdb210eff44812ae3fb4ec6d8e66d5d2ad2ad2b6c307526b79ca0ed6f218bd45",
+    "internal/engine/managed_review_fragment_final_store_test.go": "53da5bc5078d1d231caaf9034f14c113099c83bf465b90fa81d9125defc065e1",
+    "internal/engine/managed_review_fragment_request_prompt.go": "7d32394fb5302ecc25b013c4d995fd682444d8a22072805891d9a4ab2491b591",
+    "internal/engine/managed_review_fragment_request_prompt_test.go": "a9fca90b6687fcfc40cbf4830c101951bd6096e1ce298b6336ee090ca270a39a",
+    "internal/engine/managed_review_fragment_runtime.go": "7d6d9b5e89965c793a1da11eac41bdfde4abeb9c77d552271965ff4763f5ea44",
+    "internal/engine/planning_delivery.go": "115cda74fcd215fa12f8ebe969eb6a5079a05b1d26e1f6f2a7412695efb1af0d"
+  },
+  "result_tree": "e432f5f3ec6419831f88dc61b941eaa2618cbbbe",
+  "patch": "review-evidence-capacity-20261011.patch",
+  "patch_sha256": "623f2172f4630363ea2aedb3e5f8919f4d15c15ceb9ee4d501016f05d405d1c3",
+  "paths": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "internal/engine/managed_review_evidence_inventory.go",
+    "internal/engine/managed_review_evidence_inventory_test.go",
+    "internal/engine/managed_review_fragment_final_journal.go",
+    "internal/engine/managed_review_fragment_final_journal_test.go",
+    "internal/engine/managed_review_fragment_final_store.go",
+    "internal/engine/managed_review_fragment_final_store_test.go",
+    "internal/engine/managed_review_fragment_request_prompt.go",
+    "internal/engine/managed_review_fragment_request_prompt_test.go",
+    "internal/engine/managed_review_fragment_runtime.go",
+    "internal/engine/planning_delivery.go"
+  ],
+  "check": "PASS exact12path diff, refreshed-index apply, result tree and allpostimages",
+  "candidate_digest": "06064eea1d5decca52c2e964268886053637bb3a786346351d53b819939348ad",
+  "qualification": {
+    "red": "Whole-context/root-child acknowledged inventory and speculative capacity reproduced before correction",
+    "targeted": "PASS38.805s including versioned prompt replay, no new retry authority",
+    "copied_native_originals": "PASS11sources, legacy selection14618, actual79564, two complete Judge artifacts23334; native unknown preserved, no provider/DB mutation",
+    "vet_methods": "PASS",
+    "full21": "running; installation and native effect pending",
+    "full_exit": 0,
+    "full_seconds": 539.6626341810043,
+    "full_source_digest": "06064eea1d5decca52c2e964268886053637bb3a786346351d53b819939348ad",
+    "full_paths": 1187,
+    "source_drift": [],
+    "full_receipt": "/tmp/swarm-review-inventory21-qualified-v1-full-receipt.json",
+    "race_exit": 0,
+    "race_seconds": 121.9186936240003,
+    "race_receipt": "/tmp/swarm-review-inventory21-race-receipt.json",
+    "historical_prompt_native_original": "/tmp/swarm-review-inventory21-native-counterexample-receipt.json"
+  },
+  "purpose": "General contract correction with no mission-ID exceptions: whole admitted context attestation in two verified passes, read-only current acknowledged review origins for root/child, actual immutable reply capacity after preflight, final journal2 with exact historical journal1 prompt replay. No unknown verdict retry/acceptance authority added; no admission/budget/refund guard weakened."
+}

@@ -1,0 +1,67 @@
+{
+  "result": "PASS",
+  "ended_unix": 1792183755.7367232,
+  "checks": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/identites-agents-replan.md"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "",
+      "comparison_exit_expected": 1
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "",
+      "comparison_exit_expected": 1
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "",
+      "comparison_exit_expected": 1
+    }
+  ],
+  "python_ast": "PASS",
+  "recipe_matches_observed_hash": true,
+  "application_input_files_unchanged": 1038,
+  "owned_file_hashes": {
+    "docs/plans/actions-confiance/identites-agents-replan.md": "909d6771eb808235d2c7c48cae0d5aa28c88f61822a94e72110669703153f7bf",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md": "00fddb30567232c7f929c177323ae173bb035fba00b450c8550465cd6a9d7bea",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia1_audit.py": "a0a4bc7a282f15d8cbf87a8bbd3d04a4aa1b4df426c6a07217cce05c78813e97"
+  },
+  "limits": "Audit only; security findings remain FAIL; no independent review or deployment"
+}

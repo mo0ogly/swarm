@@ -1,0 +1,133 @@
+[
+  {
+    "reason": "compiler-artifact",
+    "package_id": "path+file:///home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-web#0.1.0",
+    "manifest_path": "/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-web/Cargo.toml",
+    "target": {
+      "kind": [
+        "lib"
+      ],
+      "crate_types": [
+        "lib"
+      ],
+      "name": "swarm_web",
+      "src_path": "/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-web/src/lib.rs",
+      "edition": "2021",
+      "doc": true,
+      "doctest": true,
+      "test": true
+    },
+    "profile": {
+      "opt_level": "0",
+      "debuginfo": 0,
+      "debug_assertions": true,
+      "overflow_checks": true,
+      "test": false
+    },
+    "features": [],
+    "filenames": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libswarm_web-a085ed2f074b586a.rlib",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libswarm_web-a085ed2f074b586a.rmeta"
+    ],
+    "executable": null,
+    "fresh": false
+  },
+  {
+    "reason": "compiler-artifact",
+    "package_id": "path+file:///home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-cli#0.1.0",
+    "manifest_path": "/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-cli/Cargo.toml",
+    "target": {
+      "kind": [
+        "lib"
+      ],
+      "crate_types": [
+        "lib"
+      ],
+      "name": "swarm_cli",
+      "src_path": "/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-cli/src/lib.rs",
+      "edition": "2021",
+      "doc": true,
+      "doctest": true,
+      "test": true
+    },
+    "profile": {
+      "opt_level": "0",
+      "debuginfo": 0,
+      "debug_assertions": true,
+      "overflow_checks": true,
+      "test": false
+    },
+    "features": [],
+    "filenames": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libswarm_cli-563fa70d72480a3c.rlib",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libswarm_cli-563fa70d72480a3c.rmeta"
+    ],
+    "executable": null,
+    "fresh": false
+  },
+  {
+    "reason": "compiler-artifact",
+    "package_id": "path+file:///home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine#0.1.0",
+    "manifest_path": "/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine/Cargo.toml",
+    "target": {
+      "kind": [
+        "lib"
+      ],
+      "crate_types": [
+        "lib"
+      ],
+      "name": "swarm_engine",
+      "src_path": "/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine/src/lib.rs",
+      "edition": "2021",
+      "doc": true,
+      "doctest": true,
+      "test": true
+    },
+    "profile": {
+      "opt_level": "0",
+      "debuginfo": 0,
+      "debug_assertions": true,
+      "overflow_checks": true,
+      "test": false
+    },
+    "features": [],
+    "filenames": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libswarm_engine-8ee5b2515d0e3fad.rlib",
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/deps/libswarm_engine-8ee5b2515d0e3fad.rmeta"
+    ],
+    "executable": null,
+    "fresh": false
+  },
+  {
+    "reason": "compiler-artifact",
+    "package_id": "path+file:///home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-cli#0.1.0",
+    "manifest_path": "/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-cli/Cargo.toml",
+    "target": {
+      "kind": [
+        "bin"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "swarm-rust",
+      "src_path": "/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-cli/src/main.rs",
+      "edition": "2021",
+      "doc": true,
+      "doctest": false,
+      "test": true
+    },
+    "profile": {
+      "opt_level": "0",
+      "debuginfo": 0,
+      "debug_assertions": true,
+      "overflow_checks": true,
+      "test": false
+    },
+    "features": [],
+    "filenames": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/swarm-rust"
+    ],
+    "executable": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-build-local/debug/swarm-rust",
+    "fresh": false
+  }
+]

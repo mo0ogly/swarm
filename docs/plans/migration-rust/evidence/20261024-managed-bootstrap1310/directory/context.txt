@@ -1,0 +1,1019 @@
+IMPLEMENTATION contract: public planning.enable repository bootstrap ONLY for committed_only=true with empty include_dirty. Existing pure apply refuses repository. Root work_engine strips repository from a local clone solely for prevalidation/provider observation, then calls crate::managed_repository::prepare(root, workid, original_repository_request, settings)->Result<ManagedRepository,AgentLaunchError>; sets resulting planning.repository, validates actual candidate, existing mutation intent/replay retains ORIGINAL request. Root's existing public replay precedes IO. No managed claim/decide/launch/settlement guards removed. No source/index/HEAD mutation, no real model. Saved git_command_timeout_seconds, no 90sec literal. Local private directories and operation lock retained, manifest JSON digest exact Go encode, candidate/base actual immutable commit. Pending manifest before bare no-replace publication, final manifest after; replay verifies commit objects and exact request/paths. Unknown/orphan/changed manifest refuses without overwrite. New helper functions private, use AgentLaunchError typed cause+finish for independent close errors. Deliver code/proposal only, not execution.
+
+FILE rust/crates/swarm-engine/src/local_storage.rs
+//! Owned local directory operations anchored to an open descriptor. This does
+//! not protect against same-UID attackers, root substitution before opening or
+//! whole-backup rollback. External identity/witness/confinement remains separate.
+#![cfg(unix)]
+use crate::{generate_identifier, RuntimeError};
+use rustix::fs::{self as fs, AtFlags, FlockOperation, Mode, OFlags};
+use std::{
+    error::Error,
+    fmt,
+    fs::File,
+    io::{self, Read, Write},
+    os::unix::fs::MetadataExt,
+    path::Path,
+};
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PublicationState {
+    NotPublished,
+    RenamedDurabilityUnknown,
+}
+/// Filesystem operation semantics chosen by the caller's create/replace API,
+/// not a persisted execution policy, retry or permission.
+#[derive(Clone, Copy)]
+enum PublicationMode {
+    Replace,
+    #[cfg(target_os = "linux")]
+    CreateNew,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AtomicStorageFault {
+    None,
+    #[cfg(feature = "test-fixtures")]
+    PartialWriteNoSpace,
+    #[cfg(feature = "test-fixtures")]
+    SyncFile,
+    #[cfg(feature = "test-fixtures")]
+    CloseFile,
+    #[cfg(feature = "test-fixtures")]
+    Rename,
+    #[cfg(feature = "test-fixtures")]
+    SyncDirectory,
+    #[cfg(feature = "test-fixtures")]
+    SyncAndCleanup,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LocalStorageOperation {
+    OpenDirectory,
+    DuplicateDirectory,
+    OpenFile,
+    Metadata,
+    #[cfg(target_os = "linux")]
+    Permissions,
+    Read,
+    CreateTemporary,
+    CreateDirectory,
+    Write,
+    SyncFile,
+    CloseFile,
+    Rename,
+    SyncDirectory,
+    Lock,
+    Unlock,
+    CloseLock,
+    RemoveTemporary,
+    Entropy,
+}
+pub struct LocalStorageError {
+    pub operation: LocalStorageOperation,
+    pub publication: PublicationState,
+    cause: Box<dyn Error + Send + Sync>,
+    pub cleanup: Option<Box<LocalStorageError>>,
+}
+impl LocalStorageError {
+    fn append_cleanup(&mut self, error: Self) {
+        let mut slot = &mut self.cleanup;
+        while let Some(existing) = slot {
+            slot = &mut existing.cleanup;
+        }
+        *slot = Some(Box::new(error));
+    }
+    fn new(operation: LocalStorageOperation, cause: impl Error + Send + Sync + 'static) -> Self {
+        Self {
+            operation,
+            publication: PublicationState::NotPublished,
+            cause: Box::new(cause),
+            cleanup: None,
+        }
+    }
+    pub fn code(&self) -> &'static str {
+        if self.publication == PublicationState::RenamedDurabilityUnknown {
+            "local-publication-uncertain"
+        } else {
+            "local-storage"
+        }
+    }
+}
+impl fmt::Display for LocalStorageError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}: {:?}", self.code(), self.operation)
+    }
+}
+impl fmt::Debug for LocalStorageError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self, f)
+    }
+}
+impl Error for LocalStorageError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        Some(self.cause.as_ref())
+    }
+}
+fn close(file: File, operation: LocalStorageOperation) -> Result<(), LocalStorageError> {
+    nix::unistd::close(file).map_err(|e| LocalStorageError::new(operation, e))
+}
+fn close_after<T>(
+    result: Result<T, LocalStorageError>,
+    file: File,
+) -> Result<T, LocalStorageError> {
+    match (result, close(file, LocalStorageOperation::CloseFile)) {
+        (Ok(value), Ok(())) => Ok(value),
+        (Err(e), Ok(())) => Err(e),
+        (Ok(_), Err(e)) => Err(e),
+        (Err(mut e), Err(cleanup)) => {
+            e.cleanup = Some(Box::new(cleanup));
+            Err(e)
+        }
+    }
+}
+fn owned(file: &File, directory: bool) -> Result<(), LocalStorageError> {
+    owned_mode(file, directory, true)
+}
+fn owned_mode(file: &File, directory: bool, private: bool) -> Result<(), LocalStorageError> {
+    let metadata = file
+        .metadata()
+        .map_err(|e| LocalStorageError::new(LocalStorageOperation::Metadata, e))?;
+    if (if directory {
+        !metadata.is_dir()
+    } else {
+        !metadata.is_file()
+    }) || metadata.uid() != nix::unistd::geteuid().as_raw()
+        || (private && metadata.mode() & 0o077 != 0)
+        || (!directory && metadata.nlink() != 1)
+    {
+        return Err(LocalStorageError::new(
+            LocalStorageOperation::Metadata,
+            io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                "owned private local object required",
+            ),
+        ));
+    }
+    Ok(())
+}
+pub(crate) struct LocalDirectory {
+    file: File,
+}
+/// Set private permissions on the inode pinned by our owned O_PATH descriptor.
+/// Trusted procfs resolves this process-local magic link even after rename; no
+/// data descriptor is opened/closed, preserving SQLite POSIX locks. This is only
+/// initialization repair of an owned regular single-link file, never a caller
+/// FD or pathname grant. Missing procfs/chmod/metadata failures refuse, with no
+/// fallback to state.db or unsupported fchmodat2/AT_EMPTY_PATH emulation.
+#[cfg(target_os = "linux")]
+fn privatize_database(file: &File) -> Result<(), LocalStorageError> {
+    use std::os::fd::AsRawFd;
+    owned_mode(file, false, false)?;
+    fs::chmodat(
+        fs::CWD,
+        format!("/proc/self/fd/{}", file.as_raw_fd()),
+        Mode::RUSR | Mode::WUSR,
+        AtFlags::empty(),
+    ).map_err(|error| LocalStorageError::new(LocalStorageOperation::Permissions, error))?;
+    owned(file, false)
+}
+
+impl LocalDirectory {
+    /// Borrow the retained directory only for the private gate transport. No
+    /// pathname reopen, duplicate ownership or execution permission is created.
+    #[cfg(all(test, target_os = "linux"))]
+    pub(crate) fn gate_descriptor(&self) -> std::os::fd::BorrowedFd<'_> {
+        use std::os::fd::AsFd;
+        self.file.as_fd()
+    }
+
+    /// Adopt a descriptor received by the private gate before any child SQLite
+    /// open. Require the real RDONLY directory mode, CLOEXEC and existing private
+    /// owner contract; never repair permissions. Rejection closes the descriptor
+    /// explicitly and retains validation plus close causes. Metadata alone does
+    /// not authenticate the sender or grant execution.
+    #[cfg(all(test, target_os = "linux"))]
+    pub(crate) fn adopt_gate_descriptor(fd: std::os::fd::OwnedFd) -> Result<Self, LocalStorageError> {
+        let file: File = fd.into();
+        let result = (|| {
+            let flags = fs::fcntl_getfl(&file)
+                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Metadata, e))?;
+            let descriptor_flags = rustix::io::fcntl_getfd(&file)
+                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Metadata, e))?;
+            if flags & OFlags::ACCMODE != OFlags::RDONLY
+                || !flags.contains(OFlags::DIRECTORY) || flags.contains(OFlags::PATH)
+                || !descriptor_flags.contains(rustix::io::FdFlags::CLOEXEC)
+            {
+                return Err(LocalStorageError::new(LocalStorageOperation::Metadata,
+                    io::Error::new(io::ErrorKind::PermissionDenied, "private gate directory descriptor mode required")));
+            }
+            owned(&file, true)
+        })();
+        match result {
+            Ok(()) => Ok(Self { file }),
+            Err(error) => close_after(Err(error), file),
+        }
+    }
+    pub(crate) fn open(path: &Path) -> Result<Self, LocalStorageError> {
+        let file: File = fs::open(
+            path,
+            OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+            Mode::empty(),
+        )
+        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenDirectory, e))?
+        .into();
+        if let Err(error) = owned(&file, true) {
+            return close_after(Err(error), file);
+        }
+        Ok(Self { file })
+    }
+    /// Open a standalone resource directory owned by this user without requiring
+    /// private directory permissions. Reserved for telemetry's existing 0755
+    /// parent contract; contained files still require private mode. Root bindings
+    /// continue to use open(), and this is not same-UID OS confinement.
+    pub(crate) fn open_owned(path: &Path) -> Result<Self, LocalStorageError> {
+        let file: File = fs::open(path,
+            OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+            Mode::empty()).map_err(|error| LocalStorageError::new(LocalStorageOperation::OpenDirectory,error))?.into();
+        if let Err(error) = owned_mode(&file, true, false) {
+            return close_after(Err(error), file);
+        }
+        Ok(Self { file })
+    }
+    /// Observe a retained user-owned directory, preserving standalone telemetry's
+    /// non-private parent compatibility. Root identity() remains strictly private.
+    /// File descriptor ownership, not this tuple, prevents inode reuse.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn owned_identity(&self) -> Result<(u64,u64),LocalStorageError> {
+        owned_mode(&self.file,true,false)?;
+        self.file.metadata().map(|metadata| (metadata.dev(),metadata.ino()))
+            .map_err(|error| LocalStorageError::new(LocalStorageOperation::Metadata,error))
+    }
+    fn name(name: &str) -> Result<(), LocalStorageError> {
+        if name.is_empty()
+            || name == "."
+            || name == ".."
+            || name.contains('/')
+            || name.contains('\0')
+        {
+            Err(LocalStorageError::new(
+                LocalStorageOperation::OpenFile,
+                io::Error::new(io::ErrorKind::InvalidInput, "simple local name required"),
+            ))
+        } else {
+            Ok(())
+        }
+    }
+    fn open_file(&self, name: &str, flags: OFlags) -> Result<File, LocalStorageError> {
+        Self::name(name)?;
+        let file: File = fs::openat(
+            &self.file,
+            name,
+            flags | OFlags::NOFOLLOW | OFlags::NONBLOCK | OFlags::CLOEXEC,
+            Mode::RUSR | Mode::WUSR,
+        )
+        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenFile, e))?
+        .into();
+        if let Err(error) = owned(&file, false) {
+            return close_after(Err(error), file);
+        }
+        Ok(file)
+    }
+    /// Read at most a caller-specified file-format bound plus one refusal byte.
+    /// Uses the same owned/private/regular/NOFOLLOW checks and checked close as
+    /// other reads. Excess bytes refuse without truncation or state mutation;
+    /// this parameter is representation/resource protection, not a budget.
+    pub(crate) fn read_bounded(
+        &self,
+        name: &str,
+        maximum: usize,
+    ) -> Result<Vec<u8>, LocalStorageError> {
+        let mut file = self.open_file(name, OFlags::RDONLY)?;
+        let result = (|| {
+            let bound = u64::try_from(maximum)
+                .ok()
+                .and_then(|n| n.checked_add(1))
+                .ok_or_else(|| {
+                    LocalStorageError::new(
+                        LocalStorageOperation::Read,
+                        io::Error::new(
+                            io::ErrorKind::InvalidInput,
+                            "file format bound cannot be represented",
+                        ),
+                    )
+                })?;
+            let mut bytes = Vec::new();
+            (&mut file)
+                .take(bound)
+                .read_to_end(&mut bytes)
+                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e))?;
+            if bytes.len() > maximum {
+                return Err(LocalStorageError::new(
+                    LocalStorageOperation::Read,
+                    io::Error::new(io::ErrorKind::InvalidData, "file format bound exceeded"),
+                ));
+            }
+            Ok(bytes)
+        })();
+        close_after(result, file)
+    }
+    /// Read an owned local configuration under an explicit optional byte cap.
+    /// None means the saved policy permits complete reading, not a hidden fallback.
+    /// Open/read/close failures retain causes; callers validate the decoded schema.
+    pub(crate) fn read_capped(
+        &self,
+        name: &str,
+        maximum: Option<usize>,
+    ) -> Result<Vec<u8>, LocalStorageError> {
+        if let Some(maximum) = maximum {
+            return self.read_bounded(name, maximum);
+        }
+        let mut file = self.open_file(name, OFlags::RDONLY)?;
+        let mut bytes = Vec::new();
+        let result = file
+            .read_to_end(&mut bytes)
+            .map(|_| bytes)
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e));
+        close_after(result, file)
+    }
+    /// Reserve the actual Go pricing lock with its blocking exclusive semantics.
+    /// No timeout, retries or alternative lock name is invented. Open/flock/close
+    /// failures preserve causes; callers must close the returned reservation.
+    pub(crate) fn reserve_pricing(&self) -> Result<LocalReservation, LocalStorageError> {
+        let file = self.open_file("model-rates.lock", OFlags::RDWR | OFlags::CREATE)?;
+        if let Err(error) = fs::flock(&file, FlockOperation::LockExclusive) {
+            return close_after(
+                Err(LocalStorageError::new(LocalStorageOperation::Lock, error)),
+                file,
+            );
+        }
+        Ok(LocalReservation { file })
+    }
+    /// Acquire the real Go providers.lock exclusively without an implicit wait,
+    /// like other Root try-lock guards. A busy/error result preserves its cause;
+    /// caller can retry only after a changed precondition. No retry/deadline policy
+    /// is invented, no other process interrupted, and close remains explicit.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn reserve_provider_configuration(
+        &self,
+    ) -> Result<LocalReservation, LocalStorageError> {
+        let file = self.open_file("providers.lock", OFlags::RDWR | OFlags::CREATE)?;
+        if let Err(e) = fs::flock(&file, FlockOperation::NonBlockingLockExclusive) {
+            return close_after(
+                Err(LocalStorageError::new(LocalStorageOperation::Lock, e)),
+                file,
+            );
+        }
+        Ok(LocalReservation { file })
+    }
+    /// Duplicate the checked directory descriptor with CLOEXEC. The retained
+    /// descriptor prevents inode reuse while a datastore binding is live; this
+    /// creates no authentication, path lock or authority. Lowest available FD0
+    /// is an OS allocation parameter, never operator policy. Caller owes close.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn duplicate(&self) -> Result<Self, LocalStorageError> {
+        let fd = rustix::io::fcntl_dupfd_cloexec(&self.file, 0)
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::DuplicateDirectory, e))?;
+        Ok(Self { file: fd.into() })
+    }
+    /// Observe the actual checked directory descriptor's device/inode for local
+    /// preview target binding. This is a host observation, not authenticated Root
+    /// identity or an enduring lease. Metadata/ownership failures retain causes.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn identity(&self) -> Result<(u64, u64), LocalStorageError> {
+        owned(&self.file, true)?;
+        let metadata = self
+            .file
+            .metadata()
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::Metadata, e))?;
+        Ok((metadata.dev(), metadata.ino()))
+    }
+    /// Prepare a private SQLite main file before connecting or mutating SQL.
+    /// Existing owned regular single-link files are repaired through an O_PATH
+    /// descriptor and trusted procfs magic link. Missing files are first written
+    /// privately under a unique temporary name, synced/closed, then published by
+    /// NOREPLACE: no data-file close occurs after publication. A concurrent target
+    /// is an explicit conflict, never overwritten or silently retried. Errors
+    /// preserve partial publication and cleanup causes; no SQL or schema is run.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn prepare_database_for_initialization(&self) -> Result<(), LocalStorageError> {
+        let open = || fs::openat(
+            &self.file, "state.db",
+            OFlags::PATH | OFlags::NOFOLLOW | OFlags::NONBLOCK | OFlags::CLOEXEC,
+            Mode::empty(),
+        );
+        match open() {
+            Ok(fd) => {
+                let file: File = fd.into();
+                close_after(privatize_database(&file), file)
+            },
+            Err(error) if error == rustix::io::Errno::NOENT => {
+                self.publish_new_with_fault("state.db", b"", AtomicStorageFault::None)?;
+                // The process umask can remove owner bits from the private temp.
+                // Set exact initialization permissions through an owned O_PATH
+                // witness after publication, without any data descriptor close.
+                let file: File = open()
+                    .map_err(|error| LocalStorageError::new(LocalStorageOperation::OpenFile, error))?.into();
+                close_after(privatize_database(&file), file)
+            },
+            Err(error) => Err(LocalStorageError::new(LocalStorageOperation::OpenFile, error)),
+        }
+    }
+    /// Observe the owned private state.db inode relative to this retained directory.
+    /// O_PATH pins the file during metadata inspection without a data-file close
+    /// that could release SQLite's process-wide POSIX locks. NOFOLLOW and the
+    /// usual ownership/regular/private/single-link checks remain mandatory.
+    /// Errors preserve metadata and explicit-close causes; no data is read or
+    /// written and the resulting tuple grants no authority by itself.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn database_identity(&self) -> Result<(u64, u64), LocalStorageError> {
+        self.regular_identity("state.db")
+    }
+    /// Observe a simple-name private regular single-link file relative to this
+    /// retained directory. O_PATH pins its inode only during inspection; callers
+    /// retaining authority need their own owned witness. No data descriptor is
+    /// opened or closed, and no pathname outside this directory is followed.
+    /// Metadata and explicit O_PATH close failures preserve both causes.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn regular_identity(&self, name: &str) -> Result<(u64, u64), LocalStorageError> {
+        let file = self.open_file(name, OFlags::PATH)?;
+        let result = file.metadata()
+            .map(|metadata| (metadata.dev(), metadata.ino()))
+            .map_err(|error| LocalStorageError::new(LocalStorageOperation::Metadata, error));
+        close_after(result, file)
+    }
+    /// Confirm an existing private regular file and this directory are synced.
+    /// Used by an explicit no-change apply after a visible/uncertain replacement;
+    /// no bytes are rewritten. Open/sync/close causes remain joined, no retry or
+    /// durability success is invented. Caller holds its content/CAS reservation.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn synchronize_existing(&self, name: &str) -> Result<(), LocalStorageError> {
+        let file = self.open_file(name, OFlags::RDONLY)?;
+        let synced = file
+            .sync_all()
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::SyncFile, e));
+        close_after(synced, file)?;
+        self.file
+            .sync_all()
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::SyncDirectory, e))
+    }
+    /// Enumerate names from a fresh descriptor anchored to this checked directory.
+    /// No path traversal, secret content reads or silent partial result. Linux
+    /// dirent64.d_reclen is u16: its representational maximum plus alignment slack
+    /// bounds one transfer buffer, not entry count, retention or operator policy.
+    /// Explicit close joins read/close failures. Results are unverified names;
+    /// consumers must check selected file ownership/type/bytes again before use.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn names(&self) -> Result<Vec<Vec<u8>>, LocalStorageError> {
+        let fd = fs::openat(
+            &self.file,
+            ".",
+            OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+            Mode::empty(),
+        )
+        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenDirectory, e))?;
+        let file: File = fd.into();
+        let result = (|| {
+            owned(&file, true)?;
+            let mut buffer = vec![
+                std::mem::MaybeUninit::<u8>::uninit();
+                usize::from(u16::MAX) + 1 + std::mem::align_of::<u64>()
+            ];
+            let mut reader = fs::RawDir::new(&file, &mut buffer);
+            let mut names = Vec::new();
+            while let Some(entry) = reader.next() {
+                let entry =
+                    entry.map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e))?;
+                names.push(entry.file_name().to_bytes().to_vec());
+            }
+            Ok(names)
+        })();
+        close_after(result, file)
+    }
+
+    /// Read a framed native receipt through the existing private anchored regular
+    /// file checks. Actual extent/header/hash are checked before allocation; this
+    /// adds no operator byte ceiling. Preserve read and close errors together.
+    /// Returned bytes are untrusted domain data, not authenticated run authority.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn read_native_receipt(&self, name: &str) -> Result<Vec<u8>, LocalStorageError> {
+        let mut file = self.open_file(name, OFlags::RDONLY)?;
+        let result = crate::native_receipt::read(&mut file)
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e));
+        close_after(result, file)
+    }
+    pub(crate) fn read(&self, name: &str) -> Result<Vec<u8>, LocalStorageError> {
+        let mut file = self.open_file(name, OFlags::RDONLY)?;
+        let mut data = vec![];
+        let result = file
+            .read_to_end(&mut data)
+            .map(|_| data)
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e));
+        match (result, close(file, LocalStorageOperation::CloseFile)) {
+            (Ok(data), Ok(())) => Ok(data),
+            (Err(e), Ok(())) => Err(e),
+            (Ok(_), Err(e)) => Err(e),
+            (Err(mut e), Err(cleanup)) => {
+                e.cleanup = Some(Box::new(cleanup));
+                Err(e)
+            }
+        }
+    }
+    /// Only the inherited Go retry file permits public read bits and 4096 bytes.
+    /// This does not weaken ownership, regular-file, hardlink or symlink checks.
+    pub(crate) fn read_legacy_retry(&self) -> Result<Vec<u8>, LocalStorageError> {
+        let mut file: File = fs::openat(
+            &self.file,
+            "storage-retry.json",
+            OFlags::RDONLY | OFlags::NOFOLLOW | OFlags::NONBLOCK | OFlags::CLOEXEC,
+            Mode::empty(),
+        )
+        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenFile, e))?
+        .into();
+        let result = (|| {
+            owned_mode(&file, false, false)?;
+            let mut data = Vec::new();
+            (&mut file)
+                .take(4097)
+                .read_to_end(&mut data)
+                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e))?;
+            if data.len() > 4096 {
+                return Err(LocalStorageError::new(
+                    LocalStorageOperation::Read,
+                    io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        "legacy retry file exceeds Go format bound",
+                    ),
+                ));
+            }
+            Ok(data)
+        })();
+        close_after(result, file)
+    }
+    pub(crate) fn initialize_layout(&self) -> Result<(), LocalStorageError> {
+        self.validate_layout()?;
+        match fs::mkdirat(&self.file, "views", Mode::RWXU) {
+            Ok(()) => {}
+            Err(e) if e == rustix::io::Errno::EXIST => {}
+            Err(e) => {
+                return Err(LocalStorageError::new(
+                    LocalStorageOperation::CreateDirectory,
+                    e,
+                ))
+            }
+        }
+        let views: File = fs::openat(
+            &self.file,
+            "views",
+            OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+            Mode::empty(),
+        )
+        .map_err(|e| LocalStorageError::new(LocalStorageOperation::OpenDirectory, e))?
+        .into();
+        close_after(owned(&views, true), views)?;
+        // Existing user-owned ignore content is preserved, never overwritten.
+        match self.open_file(".gitignore", OFlags::WRONLY | OFlags::CREATE | OFlags::EXCL) {
+            Ok(mut file) => {
+                let result = file
+                    .write_all(b"*\n")
+                    .and_then(|()| file.sync_all())
+                    .map_err(|e| LocalStorageError::new(LocalStorageOperation::Write, e));
+                close_after(result, file)?;
+            }
+            Err(e)
+                if e.source()
+                    .and_then(|s| s.downcast_ref::<rustix::io::Errno>())
+                    .is_some_and(|s| *s == rustix::io::Errno::EXIST) => {}
+            Err(e) => return Err(e),
+        }
+        self.file
+            .sync_all()
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::SyncDirectory, e))
+    }
+    pub(crate) fn validate_layout(&self) -> Result<(), LocalStorageError> {
+        for name in ["views", "imports"] {
+            match fs::openat(
+                &self.file,
+                name,
+                OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+                Mode::empty(),
+            ) {
+                Ok(fd) => {
+                    let file: File = fd.into();
+                    close_after(owned(&file, true), file)?;
+                }
+                Err(e) if e == rustix::io::Errno::NOENT => {}
+                Err(e) => {
+                    return Err(LocalStorageError::new(
+                        LocalStorageOperation::OpenDirectory,
+                        e,
+                    ))
+                }
+            }
+        }
+        Ok(())
+    }
+    pub(crate) fn reserve(
+        &self,
+        exclusive: bool,
+        create: bool,
+    ) -> Result<LocalReservation, LocalStorageError> {
+        let file = self.open_file(
+            ".engine-settings.lock",
+            OFlags::RDWR
+                | if create {
+                    OFlags::CREATE
+                } else {
+                    OFlags::empty()
+                },
+        )?;
+        if let Err(error) = fs::flock(
+            &file,
+            if exclusive {
+                FlockOperation::NonBlockingLockExclusive
+            } else {
+                FlockOperation::NonBlockingLockShared
+            },
+        ) {
+            return close_after(
+                Err(LocalStorageError::new(LocalStorageOperation::Lock, error)),
+                file,
+            );
+        }
+        Ok(LocalReservation { file })
+    }
+    pub(crate) fn publish(&self, name: &str, data: &[u8]) -> Result<(), LocalStorageError> {
+        self.publish_with_fault(name, data, AtomicStorageFault::None)
+    }
+    /// Publish replacement bytes with the existing compile-gated fault device.
+    /// Same fsync/close/rename/cleanup causes as publish_mode; never a policy.
+    pub(crate) fn publish_with_fault(
+        &self,
+        name: &str,
+        data: &[u8],
+        fault: AtomicStorageFault,
+    ) -> Result<(), LocalStorageError> {
+        self.publish_mode(name, data, fault, PublicationMode::Replace)
+    }
+    /// Publish complete bytes only when the target name does not exist. Linux
+    /// NOREPLACE is the atomic race boundary, including symlink targets. Unsupported
+    /// kernels/filesystems refuse; no fallback replaces a target. Same private
+    /// temporary/fsync/checked-close/directory-sync and cleanup contract as replace.
+    /// Fault variants are absent in normal builds; no process or retry is created.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn publish_new_with_fault(
+        &self,
+        name: &str,
+        data: &[u8],
+        fault: AtomicStorageFault,
+    ) -> Result<(), LocalStorageError> {
+        self.publish_mode(name, data, fault, PublicationMode::CreateNew)
+    }
+    /// Shared durable publication. The mode is create/replace operation semantics;
+    /// a failed pre-rename write preserves the target. A visible rename with failed
+    /// directory sync retains RenamedDurabilityUnknown; cleanup never implies rollback.
+    fn publish_mode(
+        &self,
+        name: &str,
+        data: &[u8],
+        fault: AtomicStorageFault,
+        mode: PublicationMode,
+    ) -> Result<(), LocalStorageError> {
+        #[cfg(not(feature = "test-fixtures"))]
+        let _ = fault;
+        Self::name(name)?;
+        let temp = generate_identifier(".swarm-write-")
+            .map_err(|e: RuntimeError| LocalStorageError::new(LocalStorageOperation::Entropy, e))?;
+        let mut file = self.open_file(&temp, OFlags::WRONLY | OFlags::CREATE | OFlags::EXCL)?;
+        let written = (|| {
+            #[cfg(feature = "test-fixtures")]
+            if fault == AtomicStorageFault::PartialWriteNoSpace {
+                file.write_all(data.get(..1).unwrap_or_default())
+                    .map_err(|e| LocalStorageError::new(LocalStorageOperation::Write, e))?;
+                return Err(LocalStorageError::new(
+                    LocalStorageOperation::Write,
+                    io::Error::from_raw_os_error(rustix::io::Errno::NOSPC.raw_os_error()),
+                ));
+            }
+            file.write_all(data)
+                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Write, e))?;
+            #[cfg(feature = "test-fixtures")]
+            if matches!(
+                fault,
+                AtomicStorageFault::SyncFile | AtomicStorageFault::SyncAndCleanup
+            ) {
+                return Err(LocalStorageError::new(
+                    LocalStorageOperation::SyncFile,
+                    io::Error::other("fixture sync refusal"),
+                ));
+            }
+            file.sync_all()
+                .map_err(|e| LocalStorageError::new(LocalStorageOperation::SyncFile, e))
+        })();
+        let closed = close(file, LocalStorageOperation::CloseFile);
+        #[cfg(feature = "test-fixtures")]
+        let closed = closed.and_then(|()| {
+            if fault == AtomicStorageFault::CloseFile {
+                Err(LocalStorageError::new(
+                    LocalStorageOperation::CloseFile,
+                    io::Error::other("fixture close refusal"),
+                ))
+            } else {
+                Ok(())
+            }
+        });
+        let first = match (written, closed) {
+            (Ok(()), Ok(())) => Ok(()),
+            (Err(e), Ok(())) | (Ok(()), Err(e)) => Err(e),
+            (Err(mut e), Err(cleanup)) => {
+                e.cleanup = Some(Box::new(cleanup));
+                Err(e)
+            }
+        };
+        let result = first
+            .and_then(|()| {
+                #[cfg(feature = "test-fixtures")]
+                if fault == AtomicStorageFault::Rename {
+                    return Err(LocalStorageError::new(
+                        LocalStorageOperation::Rename,
+                        io::Error::other("fixture rename refusal"),
+                    ));
+                }
+                match mode {
+                    PublicationMode::Replace => fs::renameat(&self.file, &temp, &self.file, name),
+                    #[cfg(target_os = "linux")]
+                    PublicationMode::CreateNew => fs::renameat_with(
+                        &self.file,
+                        &temp,
+                        &self.file,
+                        name,
+                        fs::RenameFlags::NOREPLACE,
+                    ),
+                }
+                .map_err(|e| LocalStorageError::new(LocalStorageOperation::Rename, e))
+            })
+            .and_then(|()| {
+                #[cfg(feature = "test-fixtures")]
+                if fault == AtomicStorageFault::SyncDirectory {
+                    let mut error = LocalStorageError::new(
+                        LocalStorageOperation::SyncDirectory,
+                        io::Error::other("fixture directory sync refusal"),
+                    );
+                    error.publication = PublicationState::RenamedDurabilityUnknown;
+                    return Err(error);
+                }
+                self.file.sync_all().map_err(|e| {
+                    let mut error = LocalStorageError::new(LocalStorageOperation::SyncDirectory, e);
+                    error.publication = PublicationState::RenamedDurabilityUnknown;
+                    error
+                })
+            });
+        if let Err(mut error) = result {
+            if error.publication == PublicationState::NotPublished {
+                #[cfg(feature = "test-fixtures")]
+                if fault == AtomicStorageFault::SyncAndCleanup {
+                    error.append_cleanup(LocalStorageError::new(
+                        LocalStorageOperation::RemoveTemporary,
+                        io::Error::other("fixture cleanup refusal"),
+                    ));
+                    return Err(error);
+                }
+                if let Err(e) = fs::unlinkat(&self.file, &temp, AtFlags::empty()) {
+                    if e != rustix::io::Errno::NOENT {
+                        error.append_cleanup(LocalStorageError::new(
+                            LocalStorageOperation::RemoveTemporary,
+                            e,
+                        ));
+                    }
+                }
+            }
+            return Err(error);
+        }
+        Ok(())
+    }
+    pub(crate) fn close(self) -> Result<(), LocalStorageError> {
+        close(self.file, LocalStorageOperation::CloseFile)
+    }
+}
+pub(crate) struct LocalReservation {
+    file: File,
+}
+impl LocalReservation {
+    pub(crate) fn close(self) -> Result<(), LocalStorageError> {
+        let unlocked = fs::flock(&self.file, FlockOperation::Unlock)
+            .map_err(|e| LocalStorageError::new(LocalStorageOperation::Unlock, e));
+        let closed = close(self.file, LocalStorageOperation::CloseLock);
+        match (unlocked, closed) {
+            (Ok(()), Ok(())) => Ok(()),
+            (Err(e), Ok(())) | (Ok(()), Err(e)) => Err(e),
+            (Err(mut e), Err(cleanup)) => {
+                e.cleanup = Some(Box::new(cleanup));
+                Err(e)
+            }
+        }
+    }
+}
+
+
+GO REFERENCE committed preparation
+func (s *Store) configureManagedRepositoryLocked(work string, r ManagedRepositoryRequest) (*ManagedRepository, error) {
+	source, err := resolveWorkspace(s.root, r.Path)
+	if err != nil {
+		return nil, err
+	}
+	top, err := managedGit(source, "rev-parse", "--show-toplevel")
+	if err != nil {
+		return nil, err
+	}
+	subdir, err := filepath.Rel(top, source)
+	if err != nil || strings.HasPrefix(subdir, "..") {
+		return nil, fmt.Errorf("projet hors dépôt Git")
+	}
+	if subdir == "." {
+		subdir = ""
+	}
+	encoded, _ := json.Marshal(r)
+	digest := hash(encoded)
+	storage := filepath.Join(s.root, ".swarm", "managed", work)
+	manifest := filepath.Join(storage, "repository.json")
+	var retained *ManagedRepository
+	var retainedRaw, canonical []byte
+	finalPresent := false
+	for i, path := range []string{manifest, manifest + ".pending"} {
+		raw, err := os.ReadFile(path)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		var prior ManagedRepository
+		if err = json.Unmarshal(raw, &prior); err != nil {
+			return nil, fmt.Errorf("manifeste préparé invalide, conservé pour diagnostic : %w", err)
+		}
+		if err = validatePreparedRepository(prior, storage, source, subdir, digest, r.Include); err != nil {
+			return nil, fmt.Errorf("preuve du dépôt préparé conservée sans réécriture : %w", err)
+		}
+		encoded, err := json.Marshal(prior)
+		if err != nil {
+			return nil, err
+		}
+		if retained != nil && string(canonical) != string(encoded) {
+			return nil, fmt.Errorf("manifestes final et préparé divergents ; conserver les originaux et réconcilier avant reprise")
+		}
+		if retained == nil {
+			retained, retainedRaw, canonical = &prior, raw, encoded
+		}
+		finalPresent = finalPresent || i == 0
+	}
+	if retained != nil {
+		if !finalPresent {
+			if err = atomicWrite(manifest, retainedRaw); err != nil {
+				return nil, err
+			}
+		}
+		return retained, nil
+	}
+	base, err := managedGit(source, "rev-parse", "HEAD")
+	if err != nil {
+		return nil, err
+	}
+	dirty, err := managedGit(source, "status", "--porcelain", "--untracked-files=normal")
+	if err != nil {
+		return nil, err
+	}
+	if dirty != "" && !r.CommittedOnly && len(r.Include) == 0 {
+		return nil, fmt.Errorf("dépôt modifié : choisir le commit enregistré ou nommer les fichiers de l’instantané")
+	}
+	if r.CommittedOnly && len(r.Include) > 0 {
+		return nil, fmt.Errorf("choisir le commit seul ou une liste de fichiers, pas les deux")
+	}
+	staging, err := os.MkdirTemp(storage, "repository-build-")
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(staging)
+	bare := filepath.Join(staging, "repository.git")
+	if _, err = managedGit(storage, "clone", "--bare", "--no-local", "--no-hardlinks", top, bare); err != nil {
+		return nil, err
+	}
+	included := map[string]string{}
+	if len(r.Include) > 0 {
+		copyDir := filepath.Join(staging, "snapshot")
+		if _, err = managedGit(storage, "clone", "--no-local", bare, copyDir); err != nil {
+			return nil, err
+		}
+		if _, err = managedGit(copyDir, "checkout", "--detach", base); err != nil {
+			return nil, err
+		}
+		total := int64(0)
+		for _, name := range r.Include {
+			if name == "" || filepath.IsAbs(name) || filepath.Clean(name) != name || name == ".." || strings.HasPrefix(name, "../") || strings.HasPrefix(name, ".git/") || strings.HasPrefix(name, ".swarm/") || name == ".git" || name == ".swarm" {
+				return nil, fmt.Errorf("chemin d’instantané interdit : %s", name)
+			}
+			if _, err = managedGit(source, "check-ignore", "--", name); err == nil {
+				return nil, fmt.Errorf("fichier ignoré exclu de l’instantané : %s", name)
+			}
+			src := filepath.Join(source, name)
+			dest := filepath.Join(copyDir, subdir, name)
+			for parent := dest; parent != copyDir; parent = filepath.Dir(parent) {
+				if st, e := os.Lstat(parent); e == nil && st.Mode()&os.ModeSymlink != 0 {
+					return nil, fmt.Errorf("lien interdit dans la destination : %s", name)
+				}
+			}
+			stat, statErr := os.Lstat(src)
+			if os.IsNotExist(statErr) {
+				if _, err = managedGit(source, "ls-files", "--error-unmatch", "--", name); err != nil {
+					return nil, err
+				}
+				if err = os.Remove(dest); err != nil && !os.IsNotExist(err) {
+					return nil, err
+				}
+				included[name] = "deleted"
+				continue
+			}
+			if statErr != nil || !stat.Mode().IsRegular() {
+				return nil, fmt.Errorf("fichier régulier requis : %s", name)
+			}
+			if _, err = localFile(source, name); err != nil {
+				return nil, err
+			}
+			total += stat.Size()
+			if total > 64<<20 {
+				return nil, fmt.Errorf("instantané supérieur à 64 Mio")
+			}
+			data, err := os.ReadFile(src)
+			if err != nil {
+				return nil, err
+			}
+			if err = os.MkdirAll(filepath.Dir(dest), 0700); err != nil {
+				return nil, err
+			}
+			if err = os.WriteFile(dest, data, stat.Mode().Perm()); err != nil {
+				return nil, err
+			}
+			included[name] = hash(data)
+		}
+		gitPaths := []string{}
+		for _, name := range r.Include {
+			gitPaths = append(gitPaths, filepath.Join(subdir, name))
+		}
+		if _, err = managedGit(copyDir, append([]string{"add", "-A", "--"}, gitPaths...)...); err != nil {
+			return nil, err
+		}
+		tree, err := managedGit(copyDir, "write-tree")
+		if err != nil {
+			return nil, err
+		}
+		base, err = managedGit(copyDir, "commit-tree", tree, "-p", base, "-m", "Instantané autorisé pour Swarm")
+		if err != nil {
+			return nil, err
+		}
+		if _, err = managedGit(bare, "fetch", "--no-tags", copyDir, base); err != nil {
+			return nil, err
+		}
+	}
+	if _, err = managedGit(bare, "update-ref", "refs/heads/swarm-result", base); err != nil {
+		return nil, err
+	}
+	if _, err = managedGit(bare, "symbolic-ref", "HEAD", "refs/heads/swarm-result"); err != nil {
+		return nil, err
+	}
+	final := filepath.Join(storage, "repository.git")
+	if _, err = os.Lstat(final); err == nil {
+		return nil, fmt.Errorf("dépôt préparé sans manifeste : examiner avant reprise")
+	}
+	snap, _ := json.Marshal(map[string]any{"base": base, "files": included})
+	repo := &ManagedRepository{Subdir: subdir, Source: source, Storage: storage, Base: base, Candidate: base, Snapshot: hash(snap), Included: r.Include, RequestDigest: digest}
+	raw, _ := json.Marshal(repo)
+	if err = atomicWrite(manifest+".pending", raw); err != nil {
+		return nil, err
+	}
+	if err = os.Rename(bare, final); err != nil {
+		return nil, err
+	}
+	if err = atomicWrite(manifest, raw); err != nil {
+		return nil, err
+	}
+	return repo, nil
+}
+func validatePreparedRepository(prior ManagedRepository, storage, source, subdir, digest string, include []string) error {
+	if prior.RequestDigest != digest || prior.Storage != storage || prior.Source != source || prior.Subdir != subdir || !slices.Equal(prior.Included, include) {
+		return fmt.Errorf("manifeste du dépôt incompatible avec la sélection et ses chemins canoniques ; réconcilier avant reprise")
+	}
+	snapshot, err := hex.DecodeString(prior.Snapshot)
+	if err != nil || len(snapshot) != 32 {
+		return fmt.Errorf("empreinte SHA-256 du dépôt préparé absente ou invalide")
+	}
+	for _, oid := range []string{prior.Base, prior.Candidate} {
+		if oid == "" {
+			return fmt.Errorf("identité Git du dépôt préparé absente")
+		}
+		resolved, err := managedGit(filepath.Join(storage, "repository.git"), "rev-parse", "--verify", oid+"^{commit}")
+		if err != nil {
+			return fmt.Errorf("objet Git préparé absent : %w", err)
+		}
+		if resolved != oid {
+			return fmt.Errorf("identité Git préparée non canonique")
+		}
+	}
+	return nil
+}
+

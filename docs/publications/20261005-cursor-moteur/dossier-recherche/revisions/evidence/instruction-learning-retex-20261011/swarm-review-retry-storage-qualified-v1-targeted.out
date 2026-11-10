@@ -1,0 +1,25 @@
+=== RUN   TestMigrationOnePreservesWork
+--- PASS: TestMigrationOnePreservesWork (0.42s)
+=== RUN   TestMigrationBackupCanRestoreAndResume
+--- PASS: TestMigrationBackupCanRestoreAndResume (0.77s)
+=== RUN   TestConcurrentWriters
+--- PASS: TestConcurrentWriters (0.04s)
+=== RUN   TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen
+    managed_review_retry_delivery_test.go:16: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen (2.87s)
+=== RUN   TestReviewRetryStorageMigrationPreservesQueuedInstruction
+    managed_review_retry_storage_test.go:13: sizes 164551 168167 21899 parts 1
+--- PASS: TestReviewRetryStorageMigrationPreservesQueuedInstruction (1.02s)
+=== RUN   TestReviewRetryConnectedWriterRejectsChangedStorageBeforeMutation
+    managed_review_retry_storage_test.go:69: sizes 164551 168167 21899 parts 1
+--- PASS: TestReviewRetryConnectedWriterRejectsChangedStorageBeforeMutation (0.78s)
+=== RUN   TestProviderCooldownStorageVersionPreservesHistoryBeforeUpgrade
+--- PASS: TestProviderCooldownStorageVersionPreservesHistoryBeforeUpgrade (0.36s)
+=== RUN   TestVersionTwoBackupRestoresContextBeforeTrackingMigration
+--- PASS: TestVersionTwoBackupRestoresContextBeforeTrackingMigration (0.77s)
+=== RUN   TestRunLimitsMigrationKeepsExistingConfiguration
+--- PASS: TestRunLimitsMigrationKeepsExistingConfiguration (0.12s)
+=== RUN   TestInspectionCLIRefusesImplicitStorageUpgrade
+--- PASS: TestInspectionCLIRefusesImplicitStorageUpgrade (0.18s)
+PASS
+ok  	swarm.local/companion/internal/engine	7.532s

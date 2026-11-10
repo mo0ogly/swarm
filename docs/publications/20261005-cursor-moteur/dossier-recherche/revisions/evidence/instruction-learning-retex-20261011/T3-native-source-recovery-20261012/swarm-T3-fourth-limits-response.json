@@ -1,0 +1,16 @@
+{
+  "scope": "task",
+  "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+  "scope_key": "plan-ca937edf4e-T3",
+  "values": {
+    "silence_seconds": 0,
+    "tool_seconds": 900,
+    "max_tool_calls": 0,
+    "max_repeated_calls": 0,
+    "max_consecutive_errors": 6
+  },
+  "revision": 2,
+  "actor": "fpizzi/uid:1001",
+  "reason": "Autorisation utilisateur antérieure de relever les droits/budgets insuffisants. Arrêt observé après trois erreurs consécutives mêlant refus attendu de préimage et commandes jq fragiles. Prochain essai : patch cumulatif direct vérifié, import temporaire compatible Git protégé et scripts Python avec statut de contrôle explicite. Porter la marge de correction à6 pour T3, persister dans Admin ; autres limites et historique inchangés. Cette mesure de reprise ne clôt pas la cause de classification des contrôles attendus.",
+  "updated": "2026-10-12T11:19:13.531455557Z"
+}

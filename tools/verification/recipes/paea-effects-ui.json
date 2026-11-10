@@ -1,0 +1,86 @@
+{
+    "schema_version": 1,
+    "id": "paea-effects-ui",
+    "inputs": [
+        "rust/Cargo.toml",
+        "rust/Cargo.lock",
+        ".cargo/config.toml",
+        "rust/crates/swarm-cli/**/*",
+        "rust/crates/swarm-engine/config/engine-settings.json",
+        "rust/crates/swarm-engine/src/**/*",
+        "rust/crates/swarm-web/src/**/*",
+        "rust/crates/swarm-web/tests/paea_effects_page.rs",
+        "web/paea-effects.html",
+        "web/paea-effects.js",
+        "web/paea.html",
+        "web/paea.css",
+        "web/i18n.js",
+        "web/i18n-en.js",
+        "web/wattson_themes.css",
+        "web/swarm-design.css",
+        "web/swarm-logo.png",
+        "locales/en.json",
+        "scripts/i18n/build.cjs",
+        "tests/fixture_area.py",
+        "tests/paea_effects_ui.cjs",
+        "tests/paea_effects_ui_recipe.py",
+        "tests/paea_effects_ui_recipe_guard_test.py",
+        "package.json",
+        "package-lock.json",
+        "tools/verification/recipe.py",
+        "tools/verification/recipes/paea-effects-ui.json",
+        "docs/architecture/PAEA-GIT-TRANSACTION.md",
+        "docs/en/PAEA-GIT-TRANSACTION.md"
+    ],
+    "environment": {},
+    "steps": [
+        {
+            "id": "i18n-generated",
+            "command": [
+                "node",
+                "scripts/i18n/build.cjs",
+                "--check"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "\"mode\":\"check\"",
+                "\"status\":\"pass\""
+            ],
+            "required_stderr": []
+        },
+        {
+            "id": "wrapper-ownership-guards",
+            "command": [
+                "python3",
+                "tests/paea_effects_ui_recipe_guard_test.py",
+                "-v"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [],
+            "required_stderr": [
+                "test_refused_existing_output_preserves_preexisting_bytes",
+                "test_refused_missing_parent_allocates_nothing",
+                "test_tmp_refused_before_allocation_for_both_options",
+                "test_success_fresh_output_dir_is_owned",
+                "Ran 4 tests",
+                "OK"
+            ]
+        },
+        {
+            "id": "managed-binary-browser-qualification",
+            "command": [
+                "python3",
+                "tests/paea_effects_ui_recipe.py",
+                "--binary",
+                "{root}/bin/swarm",
+                "--output-parent",
+                "{root}/.cache"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "PAEA_EFFECTS_UI_BROWSER_VERIFIED 19"
+            ],
+            "required_stderr": []
+        }
+    ]
+}

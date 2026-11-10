@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "closed-method-reuse-diagnostic-hold-20261015",
+  "expected_revision": 431,
+  "reason": "Précontrôle de la remise corrigée : aucune revue démarrée, dépendance de méthode historique refusée. Diagnostiquer la réutilisation sans modifier les anciens avis ni répéter la dépense."
+}

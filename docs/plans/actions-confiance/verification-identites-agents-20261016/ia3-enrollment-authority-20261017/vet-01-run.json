@@ -1,0 +1,24 @@
+{
+  "command": [
+    "go",
+    "vet",
+    "./internal/identitycontract",
+    "./internal/enrollmentauthority",
+    "./internal/enrollmentstate"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T11:30:21.731915+00:00",
+  "end": "2026-10-17T11:30:22.019764+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 12
+}

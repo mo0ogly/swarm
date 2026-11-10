@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/glm-prompt.txt",
+      "sha256": "f187d316ad0971aa0b8a1372276eadeeb66a1448b8e796f40a43aef3049b9a41"
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/glm-context.txt",
+      "sha256": "3e152c0a836627e529fa7eac16ca8faadbd59a7ac80121ccf4a551ff37dc0e9b"
+    }
+  ],
+  "endpoint": "https://chat.skynet.cossi.internet/openai/chat/completions",
+  "timeout_seconds": null,
+  "script_sha256": "3eb953b843b64b71261e232f0599948d8523df8bada07d86c46e32348a81f1dc"
+}

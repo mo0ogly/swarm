@@ -1,0 +1,147 @@
+{
+  "captured_at_utc": "2026-10-15T19:43:06.301455+00:00",
+  "inspection": "Static source and documentation only; no LangMem optimizer or real model executed",
+  "upstream": {
+    "repository": "https://github.com/langchain-ai/langmem",
+    "path": "/tmp/swarm-langmem-audit-md_bk6dp",
+    "commit": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+    "clean": true,
+    "files": [
+      {
+        "path": "src/langmem/__init__.py",
+        "bytes": 698,
+        "sha256": "7af7387c702a9cd8d9895ab37acb17fcbf5606287ce7744bc44b1820a42fc4a1"
+      },
+      {
+        "path": "src/langmem/prompts/optimization.py",
+        "bytes": 23215,
+        "sha256": "eba463458e6ab7de7d51edf4c9a48a949af2205911e6cf7685043ce92ab47862"
+      },
+      {
+        "path": "src/langmem/prompts/stateless.py",
+        "bytes": 8612,
+        "sha256": "37326ec26e650b48aa52b7d2f484d24699437e129e49b147803dfb70c1b725de"
+      },
+      {
+        "path": "src/langmem/prompts/stateful.py",
+        "bytes": 1924,
+        "sha256": "cf4595dce2c04b25be80c12621dd1084115119bdae45ceeacf98754c241ea0ff"
+      },
+      {
+        "path": "src/langmem/prompts/metaprompt.py",
+        "bytes": 9778,
+        "sha256": "7bd6964f981d8614e9e51ca0358dbe3530e36c5c31866efc051dadd23430d505"
+      },
+      {
+        "path": "src/langmem/prompts/prompt.py",
+        "bytes": 1720,
+        "sha256": "a938470af1c1777cc50c3c3a51ddc6b58f35e61ade1f7bc23941c2a5ca334d1e"
+      },
+      {
+        "path": "src/langmem/prompts/types.py",
+        "bytes": 4587,
+        "sha256": "11d73fe68243353e98299d6358fe8996828fe57d389929fbb698767fb88398cd"
+      },
+      {
+        "path": "docs/docs/concepts/conceptual_guide.md",
+        "bytes": 20660,
+        "sha256": "49c925c64937d3952ce2b0c4f761c255c485c84cac8d2c695ae0ab4427d81288"
+      },
+      {
+        "path": "docs/docs/guides/optimize_memory_prompt.md",
+        "bytes": 5450,
+        "sha256": "f0610a7052100e1746af554a1464949ed88d5d13a06279ebcdd03e076c251939"
+      },
+      {
+        "path": "docs/docs/guides/optimize_compound_system.md",
+        "bytes": 3121,
+        "sha256": "22d28d5506d2bbdbba2b679787aac3c00796c3dec290d94818c3ca6b22cc11c4"
+      },
+      {
+        "path": "examples/intro_videos/procedural_memory.ipynb",
+        "bytes": 20719,
+        "sha256": "b689c248344ad820905f26193a50bbe7d413ce6fa0aba1a07a7eaff5b7906061"
+      },
+      {
+        "path": "tests/test_docstring_examples.py",
+        "bytes": 10403,
+        "sha256": "56c37a30a128ef692bb199ba7ce93a372459c7a2918e8615b2b7441cfa1a149d"
+      }
+    ]
+  },
+  "swarm": {
+    "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+    "dirty": true,
+    "files": [
+      {
+        "path": "internal/engine/instruction_revision.go",
+        "bytes": 7974,
+        "sha256": "8fb06af1125ed0785f282e77be4607e81e4a76e32f1a1ee36a4863cb6efc8615"
+      },
+      {
+        "path": "internal/engine/instruction_revision_test.go",
+        "bytes": 7090,
+        "sha256": "e6a3c4d1869b2c8fdb235d5d111912f3b07a266e24f35df9f96cfa86b0b7bc08"
+      },
+      {
+        "path": "internal/engine/instruction_revision_operator_test.go",
+        "bytes": 5343,
+        "sha256": "595d052c1e8a425463220e98af2674f4e213eb2db6c9c2a72d9f0560c6d6c747"
+      },
+      {
+        "path": "internal/engine/planning_prompt.go",
+        "bytes": 9811,
+        "sha256": "c32dbbff1ec7279eabe91437257212b4c2238e0cbdb3fc27c6e1647e94ca1725"
+      },
+      {
+        "path": "internal/engine/agent_workflow.go",
+        "bytes": 5059,
+        "sha256": "d623574c657a9a8152df596999655d7e40206986332eedb6cedbd2f7e238efc8"
+      },
+      {
+        "path": "internal/engine/project_profile.go",
+        "bytes": 9744,
+        "sha256": "9682ba15292dd5ed91a93394e3e353a01ff9f17f01820cc26b87e2a80c9b1824"
+      },
+      {
+        "path": "internal/engine/agents_store.go",
+        "bytes": 55917,
+        "sha256": "b9bbcceccd835be1237c3b45ead0b00b2235a75bf8a6dc846853c096d04c0cc5"
+      },
+      {
+        "path": "internal/engine/retex.go",
+        "bytes": 9724,
+        "sha256": "0112c6e2b1d31de4f7d8c829f046cbe86c4cb2588123b8bfa13b6ff9f2b3f0ec"
+      }
+    ]
+  },
+  "documentation": [
+    {
+      "url": "https://docs.langchain.com/oss/python/concepts/memory.md",
+      "snapshot": "memory-overview.md",
+      "sha256": "d9628175fc859aa5a25a8fb537ace30ba7ae45055bba2f88820a25efd9218e3b"
+    },
+    {
+      "url": "https://www.langchain.com/blog/reflection-agents",
+      "read_with": "web tool; article inspected; linked notebooks opened but not audited in full"
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/langgraph/stores",
+      "read_with": "web tool; linked guide opened, not exhaustive source audit"
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/langgraph/add-memory",
+      "read_with": "web tool; linked guide opened, not exhaustive source audit"
+    },
+    {
+      "url": "https://github.com/hinthornw/trustcall",
+      "read_with": "web tool; repository overview opened; package source not audited in full"
+    }
+  ],
+  "checks": {
+    "new_runtime_tests": "NOT TESTED",
+    "real_model_quality": "NOT TESTED",
+    "application_changes": false
+  },
+  "method_recovery": "A search guessed absent tests/test_prompts.py and returned exit 2; file inventory then identified actual tests/test_docstring_examples.py. No absent test is counted as read or executed."
+}

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "resume-exact-receipt-resolution-e5292f31cadb443e",
+  "expected_revision": 224,
+  "reason": "Replan sur contre-exemple exact vérifié : la citation refusée du premier avis final est packet=2 artifact=12 need_index=1 : \"candidate_commit\":\"671336f40f5e33279a61898131abab2809990c77\". Elle figure bien dans le reçu moteur transmis ; le parseur des résolutions omettait cet original de contexte. Ce défaut du lecteur est corrigé au niveau commun, avec refus inchangé du reçu comme preuve d’implémentation, des reçus absents et des identités altérées. 6 tests principaux et 9 sous-cas avec race passent ; la même réponse originale relue sans modification ni appel fournisseur devient changes_requested sur deux tâches. Ce n’est pas un fichier web absent ni une précondition métier corrigée. Le superviseur peut reprendre seulement la décision finale indépendante du même candidat, en conservant les trois inspections valides, les réponses refusées, les 43 appels et les deux tentatives. L’avis métier doit rester libre, y compris ses refus audit/UI reproduits séparément. Ne pas relancer la production pour corriger ce transport."
+}

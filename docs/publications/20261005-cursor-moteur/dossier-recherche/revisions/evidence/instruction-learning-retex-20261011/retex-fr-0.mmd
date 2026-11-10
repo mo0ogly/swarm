@@ -1,0 +1,11 @@
+flowchart TD
+  R[Recette : contrôles et décision requis] --> F{Preuves fraîches et clôture du responsable ?}
+  F -->|Non| C[Corriger puis reprendre la recette]
+  F -->|Oui| T[RETEX et quick wins facultatifs]
+  T --> P[Constat ou hypothèse, valeur, effort, risque, critère]
+  P --> U{Choix utilisateur}
+  U -->|Écarter ou conserver| H[Historique préservé]
+  U -->|Faire évoluer| B[Préparation du nouvel incrément]
+  B --> A[Adoption du plan et autorisation de départ]
+  A --> E[Réalisation, vérification et nouvelle recette]
+  E --> T

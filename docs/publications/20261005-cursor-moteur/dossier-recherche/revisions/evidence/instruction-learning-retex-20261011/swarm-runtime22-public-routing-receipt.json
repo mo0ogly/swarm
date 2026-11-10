@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-11T19:49:43.497791+00:00",
+  "bundle": {
+    "at": "2026-10-11T19:49:11.797465+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-selection-recovery-20261011.bundle",
+    "sha256": "0ddd5aff5de569af99c44e6bf3c3e4cbb385f4214df70ed8b5dda8958039658a",
+    "commit": "853769099a41aa953e1d7b312d8ae7ed4d3149e8",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 98,
+    "manifest_sha256": "043baac34e0bcbbe95e0eafafd2b15906003006898be4ce283f4ab78f841491a",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-inputs-iqs9iscs",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/selection-recovery22-import-f4ciec55",
+    "verification": "PASS fetch and every original input byte/hash; old95 preserved",
+    "limits": "Cumulative95 unchanged qualified recovery inputs plus22 guarded selection-capacity recovery and exact preimages. Full1189 qualification receipt and source digest in canonical22metadata; targeted root/child actual-process negative chain and16invalid guards, race274.632s, vet/methods, immutable native read-only originals PASS. Common personal Codex/Claude directives and planner/worker prevention updated without changing historical reviewer method. No original ACK/unknown/inspection/cost refunded, no implicit acceptance or production. Runtime22 installation verified separately. T3 merges all patches and native Judge and qualifies its own complete candidate; T4 allincidentclasses; T7 root/twochildren native end-to-end; T8 RETEX still required."
+  },
+  "updates": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "revision": 482,
+      "operator_base_sha256": "ed9ab05489b819fd1f337d0b441165f0422a18a565c7b81538f35ba5eeaed3c7",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision": 483,
+      "operator_base_sha256": "3aa4be5ee165f789a1bdc551b32f9a3a519b3f48716e90d8f4d7f285d8adb48a",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision": 484,
+      "operator_base_sha256": "c9252e0ae69c4a1c0a9e615419ac19141c48fc2112f61947fff63bbd1931eee8",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "revision": 485,
+      "operator_base_sha256": "b0ad7e1b173d1f5c8e5c3718ff4f62631fe24cf516e8c49be32e8f7d48b07b5b",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision": 486,
+      "operator_base_sha256": "ced775bf95a1fa48a0b419308e58b80013fedc4b745147f3478b81b69bf9dcbe",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "revision": 487,
+      "operator_base_sha256": "157465568a861c0b597233f442533bcd4e8898f13ffeea2d080825e364af044a",
+      "criteria_dependencies_attempts_learning_preserved": true
+    }
+  ],
+  "public_revision": 487,
+  "paused": false,
+  "t2_original_preserved": true,
+  "scope": "Future instructions saved publicly, not yet received by workers. Qualified cumulative21+22 installed and mission unpaused; original T2 unknown preserved pending fresh supervisor choice/new independent opinion. Neither documentation nor source qualification is mission acceptance."
+}

@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-12T15:16:15.901907+00:00",
+  "revision": 804,
+  "old_result": "61693d4413607770cfff22508236f3986c20bd33",
+  "new_recovered_result": {
+    "proof_key": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1-repair-5ae5690c24c65175",
+    "replaces_result": "61693d4413607770cfff22508236f3986c20bd33",
+    "event_id": "T3-explicit-binary-scope-revision-6744ad94f455472eb2b572df3b03e837",
+    "request_sha256": "5ae5690c24c651757b9e6b45dbeffaac8161e93fcc55a1625cb48a11cef3a2d7",
+    "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+    "attempt_id": "a-cd4afa7836a7687fe0e466c5",
+    "result_commit": "d073b271d38abb097624ececace0f9e084c11ce1",
+    "tree": "e961404761454c28165194e426e3b40d9ff5a41d",
+    "actor": "fpizzi/uid:1001",
+    "at": "2026-10-12T15:16:15.50730064Z",
+    "reason": "Correction opérateur explicite du précontrôle impayé T3 : scope-preview public courant335 fichiers,63 binaires horsmoteur. Dans la copie arrêtée seulement, différer47 nouvelles captures UX et restaurer16 médias de formation à la base acceptée. Tous les originaux restent dans le candidat historique, une sauvegarde externe et l’application principale ; SHA primaire63 vérifiés inchangés. Tous574 fichiers Go restent identiques, critères moteur intacts ; seul rapport opérateur/manifest1157sources actualisés. Remise272fichiers sans delta binaire. Conserver résultat précédent61693d4413607770cfff22508236f3986c20bd33,63refus,4tentatives et82revues ; nouveau résultat/arbre/proofkey attribués, contrôles frais et revue coordonnée complète obligatoires. Pas de nouvelle production, de suppression des critères, de revuevisuelle prétendue ni acceptation deT3/T2. Budgets Admin Go480/processus600 reçus et sourcecode inchangée. Élasticité supervisée T5 reste àimplémenter ; consigne seule ne vautpasfonction.",
+    "original_process_status": "interrupted"
+  },
+  "attempts": 4,
+  "review_calls_before": 82,
+  "review_calls_after": 82,
+  "status": "blocked",
+  "acceptance_created": false,
+  "external_repair": true,
+  "historical_result_preserved": true,
+  "planning_paused": true
+}

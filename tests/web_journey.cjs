@@ -65,7 +65,7 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
 (async()=>{
  try{
  const url=await new Promise((resolve,reject)=>{let out='';const timer=setTimeout(()=>reject(new Error('Server did not start')),10000);server.stdout.on('data',d=>{out+=d;const m=out.match(/http:\/\/[^\s]+\/session\/[^\s]+/);if(m){clearTimeout(timer);resolve(m[0])}});server.on('exit',code=>reject(new Error('Server exited '+code)))});
- browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox'],userDataDir:fs.mkdtempSync(path.join(os.tmpdir(),'swarm-ui-'))});
+ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox'],userDataDir:fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-ui-'))});
  page=await browser.newPage();page.setDefaultTimeout(15000);await page.setViewport({width:1440,height:1000});page.on('pageerror',e=>errors.push(e.message));
  await page.goto(url);
  // Le cockpit ouvre en mode conduite ; ce parcours exerce l'outillage complet.

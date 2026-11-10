@@ -1,0 +1,13 @@
+error[E0624]: associated function `caused` is private
+  --> /home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/stdio-real-source/before/transport.rs:18:42
+   |
+18 |     E::Launch(Box::new(AgentLaunchError::caused(code, error)))
+   |                                          ^^^^^^ private associated function
+   |
+  --> crates/swarm-engine/src/agent_launch_error.rs:30:4
+   |
+   = note: private associated function defined here
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0624`.

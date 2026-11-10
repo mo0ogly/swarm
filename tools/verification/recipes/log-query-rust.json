@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "id": "log-query-rust",
+  "inputs": [
+    "config/activity-policy.json",
+    "config/log-read-policy.json",
+    "docs/architecture/NATIVE-ACTIVITY.md",
+    "docs/architecture/NATIVE-LOG-QUERY.md",
+    "docs/en/NATIVE-ACTIVITY.md",
+    "docs/en/NATIVE-LOG-QUERY.md",
+    "locales/en.json",
+    "rust/crates/swarm-cli/src/activity.rs",
+    "rust/crates/swarm-cli/src/activity_policy.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/log_query.rs",
+    "rust/crates/swarm-cli/src/log_read_policy.rs",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "rust/crates/swarm-engine/src/activity_entry.rs",
+    "rust/crates/swarm-engine/src/activity_page.rs",
+    "rust/crates/swarm-engine/src/activity_read_policy.rs",
+    "rust/crates/swarm-engine/src/activity_read_policy_store.rs",
+    "rust/crates/swarm-engine/src/agent_live_read.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "rust/crates/swarm-engine/src/log_read_policy.rs",
+    "rust/crates/swarm-engine/src/log_read_policy_store.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/activity_read.rs",
+    "rust/crates/swarm-engine/src/root_store/agent_log_history.rs",
+    "rust/crates/swarm-engine/src/root_store/log_query.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_read.rs",
+    "rust/crates/swarm-engine/src/text.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/activity.rs",
+    "rust/crates/swarm-web/src/service/activity_policy.rs",
+    "rust/crates/swarm-web/src/service/live.rs",
+    "rust/crates/swarm-web/src/service/log_query.rs",
+    "rust/crates/swarm-web/src/service/log_read_policy.rs",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "rust/crates/swarm-wire-json/src/lib.rs",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tests/helpers/verification_cleanup.cjs",
+    "tests/recorded_cursor_test.cjs",
+    "tests/rust_activity.py",
+    "tests/rust_activity_browser.py",
+    "tests/rust_activity_ui.cjs",
+    "tests/rust_activity_window.py",
+    "tests/rust_agent_exchanges.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_http_head_regressions.py",
+    "tests/rust_installed_activity.py",
+    "tests/rust_installed_version_read.cjs",
+    "tests/rust_log_query.py",
+    "tests/rust_log_query_browser.py",
+    "tests/rust_log_query_ui.cjs",
+    "tests/rust_log_read_legacy.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_readonly_agent_fixture.py",
+    "tests/test_http_head_wire.py",
+    "web/i18n-en.js",
+    "web/live-session.html",
+    "web/live-session.js",
+    "web/native-activity-policy.js",
+    "web/native-cockpit.js",
+    "web/native-log-query.js",
+    "web/native-log-read-policy.js",
+    "web/native-runtime.css",
+    "web/native-runtime.html",
+    "web/native-runtime.js",
+    "web/recorded-cursor.js"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-go",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='log-final-',dir='.cache')).resolve()/'public-go'\nprint('RETAINED_FLOW',p,flush=True)\na=['python3','tests/rust_log_query.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\na+=['--go-binary',os.environ['SWARM_GO_REFERENCE_BINARY']]\nsubprocess.run(a,check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "LOG_QUERY_PUBLIC_VERIFIED 8"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "legacy",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='log-final-',dir='.cache')).resolve()/'legacy'\nprint('RETAINED_FLOW',p,flush=True)\na=['python3','tests/rust_log_read_legacy.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\na+=['--settings-constructor',os.environ['SWARM_LOG_SETTINGS_CONSTRUCTOR']]\nsubprocess.run(a,check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "LOG_READ_LEGACY_VERIFIED 3"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "browser",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='log-final-',dir='.cache')).resolve()/'browser'\nprint('RETAINED_FLOW',p,flush=True)\na=['python3','tests/rust_log_query_browser.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nsubprocess.run(a,check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "LOG_QUERY_BROWSER_VERIFIED 4"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "exact-cursors",
+      "command": [
+        "node",
+        "tests/recorded_cursor_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "RECORDED_CURSOR_VERIFIED 16"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

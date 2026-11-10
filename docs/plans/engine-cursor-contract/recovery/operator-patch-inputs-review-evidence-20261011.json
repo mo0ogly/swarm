@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T19:22:41.007151+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-review-evidence-20261011.bundle",
+  "sha256": "eed2eb7e0c34a3882345654fdd0ed272bd4c51826796d2842c2115fb20446659",
+  "commit": "346db7afce139f37560ccc933d55caee6821c6d5",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 95,
+  "manifest_sha256": "67a8c942831362896f1d6a6e1eabadef8162d7625c3805fc4cfebf682e27452c",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-inputs-e67ugj8i",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-import-inxfmc_3",
+  "verification": "PASS fetch and every original input byte/hash; old89 preserved",
+  "limits": "Cumulative89 unchanged qualified recovery inputs plus21 whole-context/acknowledged current inventory/actual selection capacity patch and exact preimages. Full1187 PASS539.663s without source drift; targeted38.805s, raceGo child94.252s (wall121.919s), vet/methods and original native copied-proof counterexample PASS. Original unknown remains unknown; no provider/DB mutation in qualification. Console20 is installed, generic21 qualified sources transferred but deployment awaits complete supervised selection-recovery22. T3 must merge all patches and native Judge, qualify own complete candidate; T4..T8/RETEX still required."
+}

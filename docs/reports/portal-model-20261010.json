@@ -1,0 +1,82 @@
+{
+  "status": "PASS",
+  "root": "/tmp/swarm-portal-model-1tEcnE",
+  "preparation": "prep-3bf13edef91606d7951f5274",
+  "work": "w-b752fc29ee7ee6a0190c8357",
+  "checks": [
+    "FR/EN two themes",
+    "all increments and task criteria",
+    "keyboard and escape",
+    "responsive",
+    "answers preserved",
+    "CLI/HTTP parity",
+    "error recovery",
+    "export matches API",
+    "plan inserted and saved",
+    "plan save failure recovers without duplicate",
+    "open decisions rejected",
+    "public conversion preserves plan/dependencies",
+    "launch held/no agents"
+  ],
+  "candidate": {
+    "commit": "d4539e0041000a38acb162a17f053e318fb3db5d",
+    "modified": true,
+    "binary": "/tmp/swarm-portal-model-20261010-v2",
+    "sha256": "e471776ebb7f3b2ff0dd7d3726f70b4daf6d88d3f3d472ccc8bac2fc5a48f272"
+  },
+  "date": "2026-10-10",
+  "limits": [
+    "Scripted isolated fixture; no LLM or live portal implementation",
+    "No automatic cross-increment scheduler",
+    "Same-session verification, no independent reviewer"
+  ],
+  "regression": "preparation_subjects_ui.cjs PASS",
+  "repository_checks": {
+    "go_test_all": {
+      "command": "go test -json ./...",
+      "exit_code": 0,
+      "passed_cases": 1789,
+      "skipped_cases": [
+        "TestOperatorPreview",
+        "TestCorrectiveRecoveryBrowserRecipe",
+        "TestEngineContractTruthBrowser",
+        "TestHistoricalRequalificationBrowser",
+        "TestManagedRecoveryBrowserRecipe",
+        "TestMissingReportRecoveryBrowserRecipe",
+        "TestRecoveryHealthBrowserRecipe",
+        "TestLiveProviderStreamReplay"
+      ],
+      "packages": [
+        {
+          "package": "swarm.local/companion/internal/engine",
+          "result": "pass",
+          "elapsed_seconds": 533.168
+        }
+      ],
+      "log": "/tmp/swarm-portal-go-final.jsonl"
+    },
+    "first_go_test_attempt": "Interrupted by SIGTERM (143); no verdict claimed. Final detailed run succeeded.",
+    "go_vet_exit_code": 0,
+    "npm_test_exit_code": 0,
+    "method_pack": "PASS",
+    "diff_check": "PASS",
+    "work_model_targeted_tests": "PASS",
+    "qualification_manifest": "PASS"
+  },
+  "runtime": {
+    "origin": "http://127.0.0.1:35977",
+    "model_url": "http://127.0.0.1:35977/prepare.html?start=template&template=client-portal&lang=fr",
+    "root": "/tmp/swarm-portal-product-wgfgquk9",
+    "pid": 1065021
+  },
+  "source_sha256": {
+    "internal/engine/preparation_work_model.go": "f41f190f91ac9d88cd744ad2d9cb4e428c7a1c13758570a01018f20edf35c1d1",
+    "internal/engine/preparation_templates.go": "ad99c355a0ece0480f9d0cc12072d23e7a2b39a38250a2e6ebfa64a208eae02f",
+    "tools/agent-workflows/templates/preparations.json": "ce6add5a3b3ff46e82cf2e977e5c95d35e5ce088ca05b75462a96eef25480557",
+    "web/preparation-work-graph.js": "1031d4a2f0f6037b13765c9559e859c894443af6dd6a7aab6d3bcb2af8cffc50",
+    "web/prephase-templates.js": "5b32152c97f5f35d248cc33b5913bacc014389cdaf7ec7d6d61c4ce386e025d2",
+    "web/prephase.js": "0cfd6e567f70ccfad815aef1fc2366c749551d0815c1e21ca7ddb9ac3575cc1a",
+    "web/prepare.html": "b802b889aa15815a514ae9512939455452512529c01fe24c62ae660897e2248d",
+    "locales/en.json": "1e0a465baad415000bfd7b5011090a1f578ac80916ab0abbcda0c1597d750e3d"
+  }
+}

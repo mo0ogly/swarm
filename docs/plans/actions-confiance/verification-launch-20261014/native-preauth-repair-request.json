@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-preauth-publication-repair-20261015-1100",
+  "expected_revision": 461,
+  "task_id": "plan-68b50cc82e-T2",
+  "agent_id": "auto-c8053557575a81bb6164",
+  "attempt_id": "a-b4669e24bbfb91f7a9686499",
+  "review_id": "review-4c9934b4e3e64645f7c49c12",
+  "result_tree": "08ede6843a08ffec564a4c009da7161478f60f0b",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "reason": "Replan R21 : publication préauthentification reproduite puis interdite pour les commandes métier, aperçus et lectures. Seul le rejeu opérateur de la configuration initiale exacte reprend les originaux. 126 cas Go race et sept recettes publiques passent, dont refus sans publication et reprise CLI exacte ; contrôles natifs et avis indépendant frais requis. 90 appels et deux tentatives conservés, aucun avis réutilisé."
+}

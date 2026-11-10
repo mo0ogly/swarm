@@ -1,0 +1,64 @@
+{
+  "cache": null,
+  "fixture_inference_delay_seconds": 0.08,
+  "iterations_per_level": 3,
+  "limits": "Publication path only, warm host caches uncontrolled. No real model, independent assessment of this code, native acceptance or global speedup claim.",
+  "production": "results prepared before measurement; production time not measured",
+  "provider": "deterministic local subprocess",
+  "provider_cost": null,
+  "samples": [
+    {
+      "concurrency": 1,
+      "iteration": 1,
+      "publication_seconds": 1.0868933219999999,
+      "accepted": 2,
+      "review_fixture_calls": 2,
+      "retained_during_sibling_review": false
+    },
+    {
+      "concurrency": 1,
+      "iteration": 2,
+      "publication_seconds": 0.996426001,
+      "accepted": 2,
+      "review_fixture_calls": 2,
+      "retained_during_sibling_review": false
+    },
+    {
+      "concurrency": 1,
+      "iteration": 3,
+      "publication_seconds": 0.859807335,
+      "accepted": 2,
+      "review_fixture_calls": 2,
+      "retained_during_sibling_review": false
+    },
+    {
+      "concurrency": 2,
+      "iteration": 1,
+      "publication_seconds": 0.881248661,
+      "sibling_staging_seconds": 0.061435541,
+      "accepted": 2,
+      "review_fixture_calls": 2,
+      "retained_during_sibling_review": true
+    },
+    {
+      "concurrency": 2,
+      "iteration": 2,
+      "publication_seconds": 1.023528733,
+      "sibling_staging_seconds": 0.085074358,
+      "accepted": 2,
+      "review_fixture_calls": 2,
+      "retained_during_sibling_review": true
+    },
+    {
+      "concurrency": 2,
+      "iteration": 3,
+      "publication_seconds": 0.833959283,
+      "sibling_staging_seconds": 0.049493711,
+      "accepted": 2,
+      "review_fixture_calls": 2,
+      "retained_during_sibling_review": true
+    }
+  ],
+  "status": "PASS",
+  "tokens": null
+}

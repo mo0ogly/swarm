@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "repair-exact-approval-1792036910671827950",
+  "expected_revision": 287,
+  "task_id": "plan-68b50cc82e-T2",
+  "agent_id": "auto-c8053557575a81bb6164",
+  "attempt_id": "a-b4669e24bbfb91f7a9686499",
+  "review_id": "review-4b43f0d3a78a3c830eac85ce",
+  "confirm_recovery": true,
+  "result_tree": "93f2fdbb0e4d702ec0d9dce548dc0ed94ec65918",
+  "reason": "Trois défauts R13 reproduits avant correction par CLI isolé et trois gardes Go FAIL. Empreinte complète exigée à l’accord ; conflit de clé refusé dès request, y compris concurrence et états connus ; champs non fiables ignorés pour le rejeu avec lecture prouvée des anciens originaux sans réécriture. 24 tests principaux et 34 sous-cas race, validation publique 58 noms Go, livraison navigateur et trois tests 32 bits PASS. Le moteur distingue désormais le diff canonique de son champ vidé dans les messages fragmentés, base2 reçue par sélecteur et décideur, versions0/1 intactes. Qualification de chaîne, réouverture, refus des bases altérées et compatibilité vérifiés ; avis précédent non modifié. Nouveau candidat exige contrôles et revue frais, aucune acceptation présumée."
+}

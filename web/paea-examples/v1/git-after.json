@@ -1,0 +1,35 @@
+{
+  "proposal": {
+    "schema_version": 1,
+    "request_id": "request-1",
+    "action": {
+      "kind": "repository.promote",
+      "repository_id": "repository-1",
+      "target_ref": "refs/heads/candidate",
+      "expected_old_oid": "1111111111111111111111111111111111111111",
+      "candidate_oid": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  },
+  "context": {
+    "project_id": "project-1",
+    "principal_id": "requester-1",
+    "instance_id": "instance-1",
+    "mandate_id": "mandate-1",
+    "mandate_revision": 1,
+    "policy_revision": 1,
+    "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "tool_manifest_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "sources": [
+      {
+        "source_id": "document-1",
+        "version": "v1",
+        "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "integrity": 0,
+        "confidentiality_labels": [
+          "restricted",
+          "internal"
+        ]
+      }
+    ]
+  }
+}

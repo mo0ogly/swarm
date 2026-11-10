@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "expected_revision": 637,
+  "event_id": "operator-replan-planning-resume-3b5dc9abc9bc490ba4f6ed3f3a1e0c65",
+  "reason": "Replan opérateur : la mission a été dépausée à635 mais Planning.Paused restait vrai depuis626. Reprendre aussi la planification par son opération publique ; préserver57 activations,73 appels et le résultat T2 déjà réarmé à637. Vérifier reprise réelle de la préparation puis décision indépendante. Aucun nouvel avis ni acceptation prescrit, aucune nouvelle production.",
+  "scope": "root"
+}

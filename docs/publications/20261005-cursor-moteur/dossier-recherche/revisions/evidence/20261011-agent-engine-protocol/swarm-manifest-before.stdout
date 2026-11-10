@@ -1,0 +1,5 @@
+--- FAIL: TestGraphDeliveryD03QualificationManifest (0.01s)
+    graph_delivery_qualification_test.go:256: stale input: PREPARATION-UX.md
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.031s
+FAIL

@@ -1,0 +1,7 @@
+{
+  "tools/memory-evaluation/compare.py": "d6eb74f0c45dde6793c80fff793d57ac76b3035790e8e415d01b7aeebbea6af9",
+  "tests/test_memory_comparison.py": "b011c7eea02a13fda9f26fb6b237904169359e1cb0eabd8909509c7e9fffeb20",
+  "docs/plans/deepagents-integration/evidence/m6-20261016/pack/manifest.json": "9301038101558075a8e46e5e4aa86257be7f77193eaa28c805de850a06ad339d",
+  "docs/plans/deepagents-integration/evidence/m6-20261016/fixture-answers-correct.json": "545336db73add9fab32e65214cb4113dd83c8740acf1ebeec543f7c74c89c677",
+  "docs/plans/deepagents-integration/evidence/m6-20261016/fixture-answers-negative.json": "16fae05ccf5e79878358810c836ee0250e9747700ea9e53f16c45f549a438b48"
+}

@@ -1,0 +1,14 @@
+flowchart TD
+  T["Trust : caller vérifié<br/>empreinte de session conservée"] --> P["Projection privée moteur<br/>principal, session, portée et candidat complet"]
+  C["Contrôle : autorité et checkpoint<br/>actualité protégée : prérequis"] -.-> P
+  P --> D["Publication canonique version 1<br/>instantané entier et racines exactes"]
+  D --> H["Prepared immuable<br/>SHA-256 avec domaine et version"]
+  H --> N["NewChallenge<br/>projet exact et digest de demande"]
+  D -.-> S["Service : recevoir le cadre complet<br/>Bind puis vérifier la source : cible"]
+  N -.-> S
+  S -.-> R["Réponse authentifiée<br/>source et transport protégés : cible"]
+  R --> V["enrollmentproof.Verify"]
+  H --> A["CheckActive<br/>attendus, dates et empreinte du document"]
+  V --> A
+  A --> O["Donnée d’autorité validée<br/>aucun permis d’exécuter"]
+  O -.-> E["Réauthentification et état courant<br/>linéarisation à l’usage : à réaliser"]

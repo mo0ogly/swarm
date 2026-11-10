@@ -1,0 +1,74 @@
+{
+  "status": "EXISTING_BUILD_PROVENANCE_VERIFIED",
+  "scope": "Read-only verification of retained build evidence; no new compilation",
+  "effective_archive_sha256": "6cc7b1a0e8fb46d36a902dfafa4f5c487d924581148cf16a3129f753e13b5678",
+  "effective_archive_members_verified": 432,
+  "relevant_paea_source_matches": {
+    "rust/crates/swarm-cli/src/protection.rs": "1cf422d57f08f1e58c8b44c3f503e1dc9373d04dd8c8e0adf07934b5b520aa8c",
+    "rust/crates/swarm-protection-contract/src/canonical.rs": "5e9bad76b65a7fdbbd2a3966fdebbba59480d80c2e2337498ac5d0bd2a9092f0",
+    "rust/crates/swarm-protection-contract/src/comparison.rs": "e5c7bab96729ad9c14c6670f240d8370072a0aa12dcdc6ecb6a4c45d3d565538",
+    "rust/crates/swarm-protection-contract/src/lib.rs": "d2ec9462574d1f3c324498dd26c989bd2db9aba5ad7426d0f48f8cbef3f6f3bc",
+    "rust/crates/swarm-protection-contract/src/receipt.rs": "863100afee29a52a95e922c92cf2226b0e44a1515d8739f296a3190453d87383",
+    "rust/crates/swarm-protection-contract/src/strict_json.rs": "9edc35078e857e321efa432d2839c35a554ac2632165058688798d87cece87bd",
+    "rust/crates/swarm-protection-contract/src/types.rs": "4cf2a9869422eff1d9aaf8bc9d019600b8ef179ac9132e6fbbba3101cbf76c42",
+    "rust/crates/swarm-protection-contract/Cargo.toml": "cc2f4aa17b70f5f3827fdb90bad6c5c8866ffa5d473223c8db79e69668aea192"
+  },
+  "dependencies": [
+    {
+      "package": "path+file:///home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-identity-contract#0.1.0",
+      "features": [
+        "serde"
+      ],
+      "test_profile": false
+    },
+    {
+      "package": "path+file:///home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-protection-contract#0.1.0",
+      "features": [],
+      "test_profile": false
+    }
+  ],
+  "feature_producers": [
+    "rust/crates/swarm-enrollment-authority/Cargo.toml",
+    "rust/crates/swarm-enrollment-config/Cargo.toml",
+    "rust/crates/swarm-identity-contract/Cargo.toml"
+  ],
+  "normal_core_profile": {
+    "native_build_metadata": {
+      "present": true,
+      "sha256": "2129a59692673f8c7af107d7ebc72f0e6c174e4a60c3937aef0510ee4b89fcec"
+    },
+    "status": "VERIFIED_DEFAULT_NATIVE_PROFILE",
+    "binary": ".cache/rust-migration-binaries/swarm-rust-aa98dced42eaeedf8e88d42a63b15ef161d0abe27cedf5bac446a63fa1eba042",
+    "sha256": "aa98dced42eaeedf8e88d42a63b15ef161d0abe27cedf5bac446a63fa1eba042",
+    "artifacts_observed": 111,
+    "selected_core_artifacts": 4,
+    "all_core_features_empty": true,
+    "all_core_test_false": true,
+    "no_fixture_feature": true,
+    "ambient_override_presence": {
+      "RUSTFLAGS": false,
+      "CARGO_ENCODED_RUSTFLAGS": false,
+      "RUSTC_WRAPPER": false,
+      "RUSTC_WORKSPACE_WRAPPER": false,
+      "CARGO_BUILD_TARGET": false,
+      "RUSTUP_TOOLCHAIN": false,
+      "CARGO_HOME": false
+    },
+    "actual_dependencies_stable": true,
+    "cargo_config_inputs": {
+      ".cargo/config.toml": "ced712ed94313257a11d93f311445bad70e7c1e6b60c57d4486113af2c481691"
+    },
+    "configuration_scope": "Checkout config bytes and declared pre-Cargo environment; not observed C flags or runtime capability",
+    "effective_sources_archived": {
+      "inputs": 432,
+      "sha256": "6cc7b1a0e8fb46d36a902dfafa4f5c487d924581148cf16a3129f753e13b5678",
+      "all_members_verified": true,
+      "source_stable_after_archive": true
+    },
+    "installed": false,
+    "global_watchdog": null
+  },
+  "binary_sha256": "aa98dced42eaeedf8e88d42a63b15ef161d0abe27cedf5bac446a63fa1eba042",
+  "installation": "NOT ESTABLISHED BY THIS CHAT",
+  "independent_acceptance": "NOT ESTABLISHED"
+}

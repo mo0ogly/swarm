@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-a7984af18130910ae413837756aece88157296ca30f41b96ef4e97cc180b2e1d",
+    "task",
+    "validate",
+    "w-6f8a90ab5cc11d94d6eb2d0e",
+    "--root",
+    "/tmp/swarm-model83-xcm8zswe",
+    "--json",
+    "--input",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/legacy-control-refusal/valid/validate.input.json"
+  ],
+  "global_watchdog": null,
+  "explicit_fixture_cache": {
+    "CODEX_HOME": "/tmp/swarm-model83-xcm8zswe/codex-home"
+  }
+}

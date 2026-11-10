@@ -2,13 +2,14 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import tempfile
+from fixture_area import fixture_area
 import unittest
 from controlled_business_fault import GOOD, check_feature, inject_once
 
 
 class ControlledFaultTests(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
+        self.tmp = tempfile.TemporaryDirectory(dir=fixture_area())
         self.addCleanup(self.tmp.cleanup)
         self.base = Path(self.tmp.name)
         self.copies = self.base / 'copies'

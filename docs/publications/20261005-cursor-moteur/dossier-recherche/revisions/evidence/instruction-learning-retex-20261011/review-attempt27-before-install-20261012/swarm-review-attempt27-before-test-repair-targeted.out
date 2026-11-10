@@ -1,0 +1,6 @@
+--- FAIL: TestLegacyPriorReviewCoordinationArchivesOnlyAfterValidDecision (0.99s)
+    review_attempt_lifecycle_test.go:153: sizes 164551 168167 21899 parts 1
+    review_attempt_lifecycle_test.go:185: invalid plan archived history or mutated work
+FAIL
+FAIL	swarm.local/companion/internal/engine	21.559s
+FAIL

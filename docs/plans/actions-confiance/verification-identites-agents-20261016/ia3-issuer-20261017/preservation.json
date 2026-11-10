@@ -1,0 +1,22 @@
+{
+  "comparison": "IA3a final -> IA3b frozen compiler view",
+  "changed_existing_nonweb": [
+    "internal/engine/agent_identity_registry_publish.go",
+    "internal/engine/agent_identity_registry_types.go",
+    "tools/agent-workflows/CONTRACT.md"
+  ],
+  "new_inputs": [
+    "internal/engine/agent_identity_issuer_linux.go",
+    "internal/engine/agent_identity_issuer_linux_test.go",
+    "web/signals.css",
+    "web/signals.js"
+  ],
+  "changed_web_preserved": [
+    "web/project-memory.css",
+    "web/project-memory.html",
+    "web/project-memory.js"
+  ],
+  "resource_go": "compiler-only equivalent explicit embed list; original checkout untouched",
+  "other_previous_inputs_unchanged": 1049,
+  "unrelated_review_fixtures_unchanged": true
+}

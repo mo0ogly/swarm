@@ -1,0 +1,3 @@
+{"stage": "introspection-final-race", "exit_code": 0, "passed_cases": 41}
+{"stage": "introspection-final-regression-t2t4", "exit_code": 0, "passed_cases": 252}
+{"stage": "introspection-final-regression-t3", "exit_code": 1, "passed_cases": 316}

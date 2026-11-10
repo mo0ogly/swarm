@@ -1,0 +1,165 @@
+{
+  "at_utc": "2026-10-14T23:05:59.803073+00:00",
+  "proof_directory": "/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-abb4d7ee142de86e",
+  "candidate": "dbad69c23570f775eda94c86a9ee253452bec9c7",
+  "receipt_sha256": "5763ce0d94b1b7cea9337b211e04f974a90df75d9f7bec298cfab53779843583",
+  "review_plan_sha256": "7079575ebe623485e2d4de60adc080db53f0c1f930795d2e31cd79b00993d283",
+  "input_budget": {
+    "client_executable_stamp": "c1c4d2b651f5d27532ba7865ad9bd0a2e7652051f3e76b1febf7c4ce6dcf6f98",
+    "provider_sha256": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+    "client_version": "codex-cli 0.159.2",
+    "capability_sha256": "8120b9c85b8d94b98f5f51eaebebb6895d59340ee21c20ea4890424bf43e92cb",
+    "version": 1,
+    "model": "gpt-5.6-sol",
+    "tokenizer": "o200k_base/tiktoken-go-v0.6.2",
+    "context_tokens": 272000,
+    "effective_percent": 95,
+    "client_reserve_tokens": 32768,
+    "output_reserve_tokens": 65536,
+    "max_utf8_bytes": 1048576
+  },
+  "packets": 2,
+  "controls": [
+    {
+      "task": "plan-68b50cc82e-T1",
+      "id": "plan-entry",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 107,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 107
+    },
+    {
+      "task": "plan-68b50cc82e-T1",
+      "id": "plan-validation",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 177,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 177
+    },
+    {
+      "task": "plan-68b50cc82e-T1",
+      "id": "plan-delivery",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 175,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 175
+    },
+    {
+      "task": "plan-68b50cc82e-T1",
+      "id": "plan-criterion-1",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 169,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 169
+    },
+    {
+      "task": "plan-68b50cc82e-T1",
+      "id": "plan-criterion-2",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 169,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 169
+    },
+    {
+      "task": "plan-68b50cc82e-T1",
+      "id": "plan-criterion-3",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 169,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 169
+    },
+    {
+      "task": "plan-68b50cc82e-T1",
+      "id": "plan-criterion-4",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 169,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 169
+    },
+    {
+      "task": "plan-68b50cc82e-T2",
+      "id": "plan-entry",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 107,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 107
+    },
+    {
+      "task": "plan-68b50cc82e-T2",
+      "id": "plan-validation",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 18805,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 18805
+    },
+    {
+      "task": "plan-68b50cc82e-T2",
+      "id": "plan-delivery",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 2687,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 2687
+    },
+    {
+      "task": "plan-68b50cc82e-T2",
+      "id": "plan-criterion-1",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 493,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 493
+    },
+    {
+      "task": "plan-68b50cc82e-T2",
+      "id": "plan-criterion-2",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 583,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 583
+    },
+    {
+      "task": "plan-68b50cc82e-T2",
+      "id": "plan-criterion-3",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 455,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 455
+    },
+    {
+      "task": "plan-68b50cc82e-T2",
+      "id": "plan-criterion-4",
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_bytes": 1495,
+      "review_output_truncated": null,
+      "review_output_received_bytes": 1495
+    }
+  ],
+  "reading_note": "controls is keyed by task and uses executed/passed/output_bytes; earlier unrecognized fields were null and did not establish a result."
+}

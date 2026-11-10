@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/check-fd/run-check.py", line 18, in <module>
+    before=snapshot();(out/'check-inputs-before.json').write_text(json.dumps(before,indent=2)+'\n')
+  File "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/check-fd/run-check.py", line 17, in snapshot
+    return {str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(library_files())}
+                                                                                                ~~~~~~~~~~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-biba-transverse-20261028/check-fd/run-check.py", line 14, in library_files
+    return sources | manifests | {root/"rust/Cargo.lock",root/".cargo/config.toml"} | rust_assets(root,sources)
+                                                                                      ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/rust-migration/qualification_inputs.py", line 47, in rust_assets
+    else:raise RuntimeError('Rust include expression requires effective-input collection: '+str(source))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Rust include expression requires effective-input collection: /home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine/src/root_store/cockpit_post_delivery.rs

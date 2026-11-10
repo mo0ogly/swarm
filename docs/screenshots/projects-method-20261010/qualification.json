@@ -1,0 +1,15 @@
+{
+  "head": "d4539e0041000a38acb162a17f053e318fb3db5d",
+  "dirty": true,
+  "binary_sha256": "78c2decd902396e3d935e0e5b001111a1290ed3c697e8014c84a17450a288cab",
+  "method_recipe": "PASS",
+  "home_recipe": "PASS",
+  "npm_test": "PASS",
+  "configuration": "PASS",
+  "visual_inspection": "16 screenshots inspected by AI",
+  "limitations": [
+    "method preview only, no stage tracking",
+    "subject templates are scoping templates, not predefined operational graphs",
+    "skill structure validated, no independent behavioral execution"
+  ]
+}

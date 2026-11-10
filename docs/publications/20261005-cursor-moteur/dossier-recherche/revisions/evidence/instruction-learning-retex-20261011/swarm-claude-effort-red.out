@@ -1,0 +1,7 @@
+--- FAIL: TestPolicyPreviewAtomicSaveConflictAndExport (0.03s)
+    provider_models_test.go:96: claude : Effort medium non annoncé pour sonnet.
+--- FAIL: TestClaudeConfiguredEffortOverridesCLIChoice (0.00s)
+    provider_models_test.go:137: Effort low non annoncé pour sonnet.
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.085s
+FAIL

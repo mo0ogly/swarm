@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "node",
+    "tests/dialogue_recovery_ui.cjs",
+    "/tmp/swarm-m14-release-bin-uqzy339n/swarm",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m14-20261016/browser-current",
+    "--integrity",
+    "--restore"
+  ],
+  "started_at_utc": "2026-10-16T18:01:29.265115+00:00",
+  "duration_seconds": 79.447,
+  "exit_code": 1,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "589af5c6b7a37ab3eb021113d9d386011a0b40c094b389a8ea6d68bf87af77ce",
+  "real_model_calls": 0
+}

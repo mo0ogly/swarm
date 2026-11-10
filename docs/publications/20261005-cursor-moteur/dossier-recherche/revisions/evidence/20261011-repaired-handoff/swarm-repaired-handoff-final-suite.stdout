@@ -1,0 +1,26 @@
+Full default-suite coverage: 1112 named tests/examples/fuzz targets; [273, 269, 272, 298] per group
+Group 4 exit 1 
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+2026/10/11 09:56:53 http: TLS handshake error from 127.0.0.1:59294: remote error: tls: bad certificate
+--- FAIL: TestGraphDeliveryD03QualificationManifest (0.17s)
+    graph_delivery_qualification_test.go:265: stale input: internal/engine/managed_recovery_repaired_handoff_test.go
+FAIL
+FAIL	swarm.local/companion/internal/engine	87.268s
+FAIL
+
+Group 1 exit 0 
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+ok  	swarm.local/companion/internal/engine	110.824s
+
+Group 3 exit 0 
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+ok  	swarm.local/companion/internal/engine	117.820s
+
+Group 2 exit 0 
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+ok  	swarm.local/companion/internal/engine	242.222s
+

@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueIncompleteTurnCannotBeAnswered|TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions|TestDialogueCompletionRejectsContradictoryAndPrivateFailures|TestDialogueConfirmationStorageFailureBlocksContinuation|TestDialogueProtocolRejectsReplayAndUnconfirmedEOF|TestDialogueUsageSnapshotDoesNotMutate)$",
+    "-count=1",
+    "-v",
+    "-timeout=180s"
+  ],
+  "started_at_utc": "2026-10-16T10:28:16.826220+00:00",
+  "ended_at_utc": "2026-10-16T10:29:46.834315+00:00",
+  "elapsed_seconds": 90.0080671869946,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueUsageSnapshotDoesNotMutate",
+    "TestDialogueIncompleteTurnCannotBeAnswered",
+    "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+    "TestDialogueCompletionRejectsContradictoryAndPrivateFailures",
+    "TestDialogueConfirmationStorageFailureBlocksContinuation",
+    "TestDialogueProtocolRejectsReplayAndUnconfirmedEOF"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "cb1bc24fb30941097cb42b342fe8575abc6eacd8275dd50da66c09b13da4f18b",
+  "real_model_calls": 0
+}

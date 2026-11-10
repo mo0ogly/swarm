@@ -1,0 +1,44 @@
+{
+  "host": {
+    "document": {
+      "schema_version": 1,
+      "pins": {
+        "installation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "authority_public_key": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc",
+        "bootstrap_principal": {
+          "principal_id": "operator",
+          "principal_kind": "human",
+          "issuer": "https://issuer.example",
+          "subject": "fixture-human"
+        }
+      },
+      "service_uid": 1001,
+      "controller_uid": 4294966294,
+      "configuration_directory": "/tmp/swarm-bootstrap-cli-5gvf2o_b/config",
+      "witness_directory": "/tmp/swarm-bootstrap-cli-5gvf2o_b/witness"
+    },
+    "digest": "20c9faf86fa26e4c93b7f8db96b3ca0581e08f84c1298361fca1cf5b3f617bb6",
+    "path": "/tmp/swarm-bootstrap-cli-5gvf2o_b/bootstrap/host.json"
+  },
+  "namespace": {
+    "document": {
+      "schema_version": 1,
+      "pins": {
+        "installation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "authority_public_key": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc",
+        "bootstrap_principal": {
+          "principal_id": "operator",
+          "principal_kind": "human",
+          "issuer": "https://issuer.example",
+          "subject": "fixture-human"
+        }
+      },
+      "service_uid": 0,
+      "controller_uid": 4294967295,
+      "configuration_directory": "/tmp/fixture/config",
+      "witness_directory": "/tmp/fixture/witness"
+    },
+    "digest": "e6cc0379b9b61ab99f5fbe2d8ca0368fe7ff21983a8a7fed020408fa45d14731",
+    "path": "/tmp/swarm-bootstrap-cli-5gvf2o_b/bootstrap/namespace.json"
+  }
+}

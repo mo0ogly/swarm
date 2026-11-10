@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto'),assert=require('node:assert/strict');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-recovery-'));
+const root=fs.mkdtempSync(path.join(__dirname,'..','.swarm-fixtures','swarm-recovery-'));
 const cli=(args,input)=>JSON.parse(execFileSync(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined}));
 cli(['init']);const work=cli(['work','create'],{schema_version:1,event_id:crypto.randomUUID(),expected_revision:0,title:'Parcours de résolution',objective:'Annuler une attente puis préparer sa reprise',scope:'Recette isolée',criteria:['Résultat visible'],next:'Vérifier'}).work.id;cli(['autonomy',work,'autonome']);
 fs.writeFileSync(path.join(root,'.swarm/providers.json'),JSON.stringify({schema_version:1,providers:{fixture:{command:'/bin/false',args:[],env_allow:[]}}}));

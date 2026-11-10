@@ -1,0 +1,9 @@
+{
+  "type": "deterministic producer double",
+  "agent": "63f69a2552004043a6b682ef4c2f8a4d",
+  "attempt": "a-95de4baab71f0d8f98a41f03",
+  "no_model_call": true,
+  "observed_after_setup_metadata_error": true,
+  "original_positive_claim": "deliberately untrusted negative input, never engine acceptance",
+  "observed_at": "2026-10-13T19:24:33.310427+00:00"
+}

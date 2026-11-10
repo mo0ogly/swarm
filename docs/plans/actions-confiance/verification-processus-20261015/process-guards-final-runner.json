@@ -1,0 +1,10 @@
+{
+  "pid": 2166292,
+  "proc_start_ticks": "3948029",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-process-guards-final.py",
+    "run"
+  ],
+  "at": "2026-10-15T22:57:36.148200+00:00"
+}

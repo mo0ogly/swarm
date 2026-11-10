@@ -1,0 +1,6 @@
+=== RUN   TestManagedIndependentReviewPreservesRepetitiveOriginalWithoutTruncation
+    managed_review_test.go:472: large repetitive original differs: expected_bytes=330000 expected_sha256=8ca87ca6f4378bcf5ea453e9cd118b6eb2a20718a303960d33b36b7328592f33 observed_tasks=1 observed_report_bytes=329999 observed_report_sha256=f96c5548dd0554f46814cbb5304abf895355d961cb2774add30fd6ddd67f6089 suffix="omplete evidence record.\nA long complete evidence record.\nA long complete evidence record."
+--- FAIL: TestManagedIndependentReviewPreservesRepetitiveOriginalWithoutTruncation (0.53s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.554s
+FAIL

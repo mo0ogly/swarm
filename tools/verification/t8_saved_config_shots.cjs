@@ -2,7 +2,7 @@
 // T8: real browser capture of a SAVED run-limits configuration (FR/EN, 2 themes)
 // in an isolated temporary root. Usage: node t8_saved_config_shots.cjs BINARY OUTDIR
 const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert/strict'),{spawn}=require('child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-t8-'));fs.mkdirSync(out,{recursive:true});
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(__dirname,'../..','.swarm-fixtures','swarm-t8-'));fs.mkdirSync(out,{recursive:true});
 function cli(args,input){return new Promise((resolve,reject)=>{const p=spawn(binary,['--root',root,'--json',...args,...(input?['--input','-']:[])]);let t='',e='';p.stdout.on('data',x=>t+=x);p.stderr.on('data',x=>e+=x);p.on('exit',c=>c?reject(Error(e||t)):resolve(t?JSON.parse(t):null));p.stdin.end(input?JSON.stringify(input):undefined)})}
 (async()=>{
  await cli(['init']);

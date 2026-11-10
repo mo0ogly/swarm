@@ -1,5 +1,13 @@
 # Résultat — diagnostic des connexions IA
 
+## Repère de lecture APEX — 24 octobre 2026
+
+La [file APEX FR](../FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) conserve les vérifications et l’activation
+locale historiques de ce diagnostic. Elles ne prouvent ni santé du fournisseur
+utilisateur, ni serveur actuellement installé, ni qualification Rust actuelle.
+Codex racine rattache le contrat aux parcours configuration/fournisseur concernés ;
+aucune connexion réelle, reconstruction ou relance n’est exécutée par ce renvoi.
+
 Console implémentée dans la fenêtre IA ; les erreurs de transport affichent une
 cause exploitable. Activation locale effectuée après autorisation « ok next » : serveur reconstruit
 et relancé via ./swarm.sh restart --no-open, sortie 0. Le fournisseur utilisateur n’a pas été testé par ce correctif.

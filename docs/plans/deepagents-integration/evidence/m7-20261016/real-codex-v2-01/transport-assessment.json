@@ -1,0 +1,42 @@
+{
+  "at_utc": "2026-10-16T07:58:30.948600+00:00",
+  "kind": "local_exact_input_transport_check",
+  "real_model_calls": 0,
+  "request_count": 4,
+  "pack_sha256": "f5fa8d5ad55fddd25116ffe634733c685a4ffcf94e52c7c3d60e38a5c48441b6",
+  "normalized_fields": [
+    "exact experimental prompt -> placeholder",
+    "isolated current working directory -> placeholder"
+  ],
+  "remaining_request_differences": [
+    "/client_metadata/root_turn_id",
+    "/client_metadata/session_id",
+    "/client_metadata/thread_id",
+    "/client_metadata/turn_id",
+    "/client_metadata/x-codex-installation-id",
+    "/client_metadata/x-codex-turn-metadata",
+    "/client_metadata/x-codex-window-id",
+    "/input/0/id",
+    "/input/1/id",
+    "/input/2/id",
+    "/input/3/id",
+    "/input/4/id",
+    "/input/5/id",
+    "/input/6/id",
+    "/prompt_cache_key"
+  ],
+  "request_keys": [
+    "client_metadata",
+    "include",
+    "input",
+    "model",
+    "parallel_tool_calls",
+    "prompt_cache_key",
+    "reasoning",
+    "store",
+    "stream",
+    "text",
+    "tool_choice"
+  ],
+  "note": "Local endpoint and isolated unauthenticated home; remote authenticated request bodies are not captured."
+}

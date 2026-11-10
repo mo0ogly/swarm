@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "version": "v0.1.1-dev.295",
+  "binary_sha256": "e1adea56e4cf53e0787d362f55e14bbd53d40c82a38b3815a081b0a33e203c73",
+  "service_restarted_by_increment": true,
+  "service_restarted_by_readonly_probe": false,
+  "scope_clarification": "The inherited service_restarted:false field in immutable result.json describes only the read-only probe. The increment DID restart the managed service using the prepared SHA; see retained restart channels. No functional test result is changed.",
+  "browser_assertions": 56,
+  "help_language_checks": 2,
+  "source_hash_matches": 9,
+  "artifacts": {
+    "help-fr.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "browser.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "restart.stdout": "038aa02be0514e0570d6eff537b04f12b0a5b32a04689fae2b93ef7260446b62",
+    "status.json": "476ab120ca5c566d16c6015a72bdee67f682b48f89c1a64f0d3f4c3286e9cc40",
+    "version.json": "13881e173a6402c2a4709e14bfd1f78d157ce0a04c832d73f886e68c2a57fcdb",
+    "help-en.stdout": "db1946673eaf8800314c2dcf4e55f6e569c27b2ea6590b373b4dde1ebef4cb82",
+    "qualified-profile.json": "d64683d2c4301d7f7cec095d9f11edb4e60f27c1354598763c7eb8cf0b365108",
+    "restart.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compiled-version-history.json": "e6e70567efbba7257183942d486316a9b10f150cc57063ffe88deab883dc0fe3",
+    "browser.stdout": "010672f44acfb1058a0123a13a891805a8fe17b0dbbe4cd5a5183f47e593c226",
+    "profile-inputs.json": "beadd43d02b875d26bf4e2d6d256c915a6483658a61afdc2f9b3e568056720b7",
+    "result.json": "38a966b72927ba81a2dfff92201d8ea7e93efaaaccbef529326e56de86e66689",
+    "probe.py": "ab7d8b4cba4f4e4464b7f869a951d911d3a00ca7de18a8a99f7aa759181bcf18",
+    "help-en.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "help-fr.stdout": "e34e991166f74dcc9ff0774eba7312e219c1a2c8b63774db9d8817fd04e250a6"
+  }
+}

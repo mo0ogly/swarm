@@ -1,0 +1,32 @@
+{
+  "scope": "New maintained two-task test, recipe and FR/EN documentation only",
+  "files": {
+    "tests/rust_native_two_task.py": "06330ae10417b9fa8df13722d2af24d1caf199d051c259541d6064f847d2f3f8",
+    "tools/verification/recipes/native-two-task-mission.json": "a9c1c8e9ffdb2f632f4187bb6caf96ff459829fc29d76c057260fbfa64fb37c6",
+    "docs/architecture/NATIVE-WORKER-RECOVERY.md": "8643efd126738100270c1e5d5718b09d6dfddebdee369e740890c89170ffe25d",
+    "docs/en/NATIVE-WORKER-RECOVERY.md": "225d84af36c24d9d98fb518c2665ddb10e585d086a89b83f54c48baa37a3f0d4"
+  },
+  "policies": {
+    "status": "reviewed",
+    "classification": "Task count2, child budget2, mission slots1, local provider amount1 and socket backlog1 are explicit fixture inputs/transport, not product ceilings; no timeout/retry introduced; saved parent profile consumed by public resume."
+  },
+  "functions": {
+    "status": "reviewed",
+    "names": [
+      "archive_markers",
+      "assert_resources",
+      "run",
+      "main"
+    ],
+    "contract": "Purpose, inputs/preconditions, effects, errors and material limits documented; generated fixture code reused unchanged."
+  },
+  "errors": {
+    "status": "reviewed",
+    "contract": "Primary traceback and independent cleanup errors retained; live process attested before adopted-child reap; read-only SQL errors propagate; copied marker bytes verified before owned unlink; no successful-empty refusal."
+  },
+  "documentation": {
+    "status": "reviewed",
+    "contract": "FR/EN behavior and Mermaid synchronized; reports explicitly fixture-only, no acceptance or managed settlement; local version notes unchanged because no application delivered or build input modified."
+  },
+  "independent_acceptance": false
+}

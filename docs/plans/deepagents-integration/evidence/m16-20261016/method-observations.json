@@ -1,0 +1,33 @@
+{
+  "owner": "Codex",
+  "incidents": [
+    {
+      "cause": "Initial searches guessed nonexistent filenames and requested overly broad output.",
+      "evidence": "Tool transcript; these search failures are not application failures.",
+      "correction": "Discover paths with rg --files or rg -l first; use bounded source sections and concise process filters.",
+      "verification": "Subsequent path discovery identified cmd/swarm/main.go, resources.go and actual stream/CLI producers."
+    },
+    {
+      "cause": "go build . compiled resources into a non-executable ar archive.",
+      "evidence": [
+        "build.json",
+        "build-non-executable.json",
+        "native.json",
+        "native/failure.json"
+      ],
+      "correction": "Build ./cmd/swarm; keep original archive at /tmp/swarm-m16-bin-xz0f58zo/swarm.resources.a. Recipe now requires executable mode and calls version before initializing a fixture.",
+      "verification": [
+        "build-cli.json",
+        "native-cli.json",
+        "native-cli/built-version.json"
+      ]
+    },
+    {
+      "cause": "Inherited input collector did not cover cmd/swarm/main.go, root resources.go, modules or the new native recipe.",
+      "evidence": "projection-contract-inputs.json and preserved run-check-v1.py.txt",
+      "correction": "Capture these inputs and the runner in subsequent receipts; bind native binary/script digests to final build and source manifests. Existing engine test inputs remain unchanged.",
+      "verification_condition": "build-final receipt, current hash comparison and final audit"
+    }
+  ],
+  "model_calls": 0
+}

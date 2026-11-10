@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "native-delivery-input-boundary",
+  "inputs": [
+    "tools/swarm_version.py",
+    "tools/rust-migration/build_native.py",
+    "tools/verification/verify_native_profile.py",
+    "tests/test_swarm_version.py",
+    "tests/test_swarm_version_candidate_race.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/NATIVE-LOCAL-LAUNCHER.md",
+    "docs/en/NATIVE-LOCAL-LAUNCHER.md"
+  ],
+  "environment": {
+    "PYTHONPATH": "tests"
+  },
+  "steps": [
+    {
+      "id": "candidate-versus-qualified-input-and-delivery-control-regressions",
+      "expected_exit": 0,
+      "required_stdout": [
+        "Livraison Rust locale préparée"
+      ],
+      "required_stderr": [
+        "test_unused_candidate_change_does_not_refuse_qualified_inputs",
+        "test_compiled_source_changed_after_profile_still_refuses",
+        "Ran 10 tests",
+        "OK"
+      ],
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "-v",
+        "test_swarm_version_candidate_race",
+        "test_swarm_version"
+      ]
+    }
+  ]
+}

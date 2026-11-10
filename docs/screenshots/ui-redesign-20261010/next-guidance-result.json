@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "root": "/tmp/swarm-guidance-nqAhPk",
+  "work": "w-00f2a1c52e046e4e5e43c201",
+  "languages": [
+    "fr",
+    "en"
+  ],
+  "themes": [
+    "etat",
+    "sombre"
+  ],
+  "web_cli_summary_equal": true,
+  "primary_opens_actual_task": true,
+  "opening_preserves_state": true,
+  "agents": 1,
+  "paid_model_calls": 0,
+  "retry_form_preview": true,
+  "changes": true,
+  "prerequisite_navigation": true,
+  "spending": true,
+  "recovery_preview": true,
+  "errors": [],
+  "failures": []
+}

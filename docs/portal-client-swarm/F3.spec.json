@@ -1,0 +1,253 @@
+{
+  "version": 1,
+  "foundation": "F3",
+  "title": "Verifier la couverture : matrice story-ecran-API-preuve",
+  "depends_on": "F2",
+  "coverage": [
+    {
+      "story": "decouverte",
+      "journey": "J-prospect",
+      "screens": ["Page publique accueil", "Section graphe/preuves exemple"],
+      "api": [
+        {"method": "GET", "path": "/api/public/landing-content", "auth": "aucune", "purpose": "Textes enonce moteur vs agents, liens cinq fondations/six etapes."},
+        {"method": "GET", "path": "/api/public/example-graph", "auth": "aucune", "purpose": "Graphe/preuves exemple lecture seule, aucune donnee privee."}
+      ],
+      "evidence": [
+        "Chargement OK -> succes affiche texte + graphe (etat success F2).",
+        "Graphe exemple absent -> etat empty avec lien catalogue (pas d'erreur).",
+        "Panne backend exemple -> etat error + reessai, verifier aucune fuite de stacktrace.",
+        "FR/EN + mobile/bureau + navigation clavier sur la page."
+      ],
+      "error_states_covered": []
+    },
+    {
+      "story": "catalogue",
+      "journey": "J-prospect",
+      "screens": ["Liste des modeles", "Fiche modele detaillee", "Comparateur deux modeles"],
+      "api": [
+        {"method": "GET", "path": "/api/public/models", "auth": "aucune", "purpose": "Liste modeles avec resume cinq fondations/six etapes."},
+        {"method": "GET", "path": "/api/public/models/{modelId}", "auth": "aucune", "purpose": "Fiche detaillee d'un modele."}
+      ],
+      "evidence": [
+        "Liste rendue -> au moins deux fiches comparables sur un ecran (F2 S-criterion).",
+        "Catalogue vide -> message explicatif, pas d'erreur HTTP affichee comme echec.",
+        "Catalogue indisponible -> etat error + reessai.",
+        "Action choisir modele -> redirection sessions, aucun appel moteur reel declenche avant connexion (verifier absence de POST vers moteur a ce stade)."
+      ],
+      "error_states_covered": []
+    },
+    {
+      "story": "sessions",
+      "journey": "J-client",
+      "screens": ["Formulaire connexion", "Formulaire creation compte (si D1 confirme mot de passe local)"],
+      "api": [
+        {"method": "POST", "path": "/api/auth/login", "auth": "aucune (etablit la session)", "purpose": "Verifie identifiants, cree session server-side si valides."},
+        {"method": "POST", "path": "/api/auth/logout", "auth": "session requise", "purpose": "Invalide la session cote serveur immediatement."},
+        {"method": "GET", "path": "/api/auth/session", "auth": "session requise", "purpose": "Verification etat session courante (expiration, identite)."}
+      ],
+      "evidence": [
+        "Identifiants valides -> session creee, cookie/jeton opaque non enumerable, redirection espace personnel.",
+        "E8 : identifiants invalides -> message generique identique (compte inexistant vs mot de passe faux), aucune session creee.",
+        "Deconnexion explicite -> appel suivant avec meme jeton refuse immediatement (E5 partiel).",
+        "Session expiree (politique D4 ci-dessous) -> refus 401 sur premier appel suivant l'expiration."
+      ],
+      "error_states_covered": ["E8"]
+    },
+    {
+      "story": "ressources",
+      "journey": "J-client",
+      "screens": ["Liste ressources autorisees", "Detail ressource"],
+      "api": [
+        {"method": "GET", "path": "/api/me/resources", "auth": "session requise", "purpose": "Liste filtree cote serveur selon compte connecte uniquement."},
+        {"method": "GET", "path": "/api/me/resources/{resourceId}", "auth": "session requise", "purpose": "Acces direct re-verifie serveur (jamais confiance a l'UI)."}
+      ],
+      "evidence": [
+        "Compte A demande ressource de B via URL directe -> 403/404 generique (E1, E2).",
+        "Identifiant de ressource devine/sequentiel -> meme refus generique, aucune distinction existe/inexiste (E3).",
+        "Requete anonyme sans session -> 401 explicite, aucune donnee partielle (E4).",
+        "Rejouer appel valide apres revocation/logout -> 401/403 immediat (E5).",
+        "Liste vide pour nouveau compte -> etat empty + lien demarrage.",
+        "Panne chargement -> etat error + reessai, jamais le contenu demande en cas d'echec d'autorisation."
+      ],
+      "error_states_covered": ["E1", "E2", "E3", "E4", "E5"]
+    },
+    {
+      "story": "demarrage",
+      "journey": "J-client",
+      "screens": ["Guide sequentiel (installation -> fournisseur -> configuration)", "Ecran recapitulatif preparation"],
+      "api": [
+        {"method": "GET", "path": "/api/me/onboarding/state", "auth": "session requise", "purpose": "Etape atteinte, reprise a la bonne etape au retour."},
+        {"method": "POST", "path": "/api/me/onboarding/steps/{stepId}/validate", "auth": "session requise", "purpose": "Valide une etape avant d'autoriser la suivante."},
+        {"method": "POST", "path": "/api/me/onboarding/complete", "auth": "session requise", "purpose": "Declenche la preparation reelle cote Swarm local (jamais une simulation portail)."}
+      ],
+      "evidence": [
+        "Abandon puis retour -> reprise exacte a l'etape atteinte (pas de perte de progression).",
+        "E7 : fournisseur injoignable pendant une etape -> message specifique + action corrective, etat preserve.",
+        "Aucune configuration encore -> etat empty, ecran initial.",
+        "Requete anonyme sur ces endpoints -> 401 (E4 partage avec ressources).",
+        "Completion reelle -> verifier qu'un effet observable cote Swarm local est produit, pas seulement un flag portail."
+      ],
+      "error_states_covered": ["E7", "E4"]
+    },
+    {
+      "story": "administration",
+      "journey": "J-admin",
+      "screens": ["Recherche compte", "Fiche compte + droits", "Journal d'audit global"],
+      "api": [
+        {"method": "GET", "path": "/api/admin/accounts?q={query}", "auth": "session + role administrateur", "purpose": "Recherche par identifiant/email/nom."},
+        {"method": "GET", "path": "/api/admin/accounts/{accountId}", "auth": "session + role administrateur", "purpose": "Droits actuels et journal du compte."},
+        {"method": "PATCH", "path": "/api/admin/accounts/{accountId}/rights", "auth": "session + role administrateur", "purpose": "Attribution/retrait de droit, horodate et trace."},
+        {"method": "GET", "path": "/api/admin/audit-log", "auth": "session + role administrateur", "purpose": "Journal global horodate de toutes actions administrateur."}
+      ],
+      "evidence": [
+        "Recherche sans resultat -> etat empty explicatif.",
+        "Changement de droit applique -> entree journal visible immediatement, confirmation ecran.",
+        "Echec application -> etat error, aucune modification partielle silencieuse (verifier via relecture apres echec simule).",
+        "E6 : compte role client appelle ces endpoints -> 403, role insuffisant trace si pertinent."
+      ],
+      "error_states_covered": ["E6"]
+    },
+    {
+      "story": "revocation",
+      "journey": "J-admin",
+      "screens": ["Action revoquer depuis fiche compte", "Confirmation visible dans journal"],
+      "api": [
+        {"method": "POST", "path": "/api/admin/accounts/{accountId}/sessions/revoke", "auth": "session + role administrateur", "purpose": "Revoque toutes sessions actives du compte cible."},
+        {"method": "POST", "path": "/api/admin/accounts/{accountId}/rights/revoke", "auth": "session + role administrateur", "purpose": "Retire un droit specifique, horodate."}
+      ],
+      "evidence": [
+        "E5 : rejouer un appel precedemment valide (jeton deja emis) apres revocation -> refus serveur immediat, pas de succes degrade.",
+        "Entree journal avec horodatage exact creee au moment de la revocation, pas apres coup.",
+        "Echec technique de revocation -> message erreur explicite, jamais 'revoque' affiche sans confirmation serveur.",
+        "Verification immediate post-revocation : rejouer /api/me/resources avec l'ancien jeton -> 401/403."
+      ],
+      "error_states_covered": ["E5"]
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G1",
+      "description": "D1 (F1) non tranchee : mecanisme d'authentification (mot de passe local avec reinitialisation vs OAuth externe) conditionne le schema exact de POST /api/auth/login et l'existence d'un flux de reinitialisation. La matrice ci-dessus suppose un mot de passe local par defaut (coherent avec le perimetre 'aucune connexion reelle a un service distant'), a confirmer explicitement avant implementation.",
+      "stories": ["sessions"],
+      "severity": "bloquant pour implementation, non bloquant pour cette fondation de couverture"
+    },
+    {
+      "id": "G2",
+      "description": "D2 (F1) non tranchee : granularite des droits administrateur (binaire actif/revoque vs droits fins par ressource/modele) change le schema de PATCH /api/admin/accounts/{id}/rights (valeur booleenne vs liste de scopes). La matrice reste valide dans les deux cas au niveau du contrat d'URL, mais le corps de requete differe.",
+      "stories": ["administration", "revocation"],
+      "severity": "a trancher avant conception detaillee API en F4"
+    },
+    {
+      "id": "G3",
+      "description": "D5 (F1) non tranchee : si le journal d'audit devient visible au client concerne, un endpoint GET /api/me/audit-log devra etre ajoute a la story ressources/demarrage. Non inclus dans la matrice actuelle qui suppose le journal reserve a l'administrateur (position par defaut de F2).",
+      "stories": ["ressources", "administration"],
+      "severity": "extension possible, pas un defaut de couverture actuelle"
+    },
+    {
+      "id": "G4",
+      "description": "Aucun endpoint de creation de compte (inscription) n'est explicitement liste : la story sessions suppose un compte deja existant pour la connexion. Si l'auto-inscription est dans le perimetre produit, un POST /api/auth/register manque a la matrice.",
+      "stories": ["sessions"],
+      "severity": "a confirmer avec le parcours prospect avant F4/F5"
+    },
+    {
+      "id": "G5",
+      "description": "Le format exact des identifiants de ressource (E3, anti-enumeration) n'est pas fixe ici : la decision D-F3-3 ci-dessous recommande un identifiant opaque mais le schema de generation (UUID v4, longueur, espace de noms) reste a definir en F4.",
+      "stories": ["ressources"],
+      "severity": "detail d'implementation, direction fixee"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D-F3-1",
+      "question": "Politique d'expiration de session (D4 heritee de F1), necessaire pour concevoir /api/auth/session et le comportement E5.",
+      "decision": "Expiration fixe a duree courte (ex. 24h) cote serveur, stockage de session server-side (pas un JWT auto-suffisant sans etat), controle de validite a chaque appel protege. La revocation manuelle (logout, action admin) invalide immediatement l'entree server-side independamment de l'expiration programmee.",
+      "rationale": "Un JWT stateless sans liste de revocation ne peut pas satisfaire E5 (refus immediat apres revocation) sans verification d'une liste noire a chaque appel, ce qui revient a un etat server-side. Autant assumer directement une session server-side pour simplifier la preuve de revocation effective exigee par F2/story revocation.",
+      "status": "decision d'echafaudage pour permettre la matrice API ci-dessus ; reste soumise a confirmation explicite de l'utilisateur en F4 (choix technologique final)."
+    },
+    {
+      "id": "D-F3-2",
+      "question": "Message d'erreur d'authentification (E8) et de refus de ressource (E1-E3) : faut-il un seul message generique partage ou des messages distincts par cas ?",
+      "decision": "Un seul message generique par categorie (echec connexion, echec acces ressource), identique quelle que soit la cause reelle (compte inexistant, mot de passe faux, ressource inexistante, ressource interdite). Le code HTTP peut varier (401 vs 403) mais jamais le contenu du message ne doit permettre de distinguer les cas.",
+      "rationale": "Exigence anti-enumeration explicite dans F2 (E3, E8) ; un detail de message differencie reintroduirait une fuite d'information meme avec un bon code HTTP.",
+      "status": "applicable directement, pas de decision utilisateur supplementaire requise."
+    },
+    {
+      "id": "D-F3-3",
+      "question": "Schema d'identifiant pour les ressources et comptes exposes par l'API (E3, anti-enumeration par devinette).",
+      "decision": "Identifiants opaques non sequentiels (type UUID ou equivalent) pour toute ressource/compte reference dans une URL publique a l'API ; aucun identifiant auto-incremente expose.",
+      "rationale": "Un identifiant sequentiel rend l'enumeration triviale (E3) independamment des controles d'autorisation ; l'opacite de l'identifiant est une defense complementaire, pas un remplacement du controle serveur.",
+      "status": "applicable directement ; schema de generation precis renvoye a F4 (voir gap G5)."
+    }
+  ],
+  "evidence_plan": [
+    {
+      "story": "decouverte",
+      "planned_checks": [
+        "Test rendu page publique sans session : verifier presence texte + graphe exemple + liens.",
+        "Test etat empty (mock absence graphe exemple).",
+        "Test etat error (mock panne backend exemple) : verifier absence de trace technique affichee."
+      ],
+      "status": "planifie, non execute (aucun code moteur dans ce perimetre)"
+    },
+    {
+      "story": "catalogue",
+      "planned_checks": [
+        "Test liste modeles >= 2 entrees affichees simultanement pour comparaison.",
+        "Test action choisir modele : verifier absence de requete POST vers un endpoint moteur avant connexion."
+      ],
+      "status": "planifie, non execute"
+    },
+    {
+      "story": "sessions",
+      "planned_checks": [
+        "Test E8 : deux requetes login (mauvais mot de passe, compte inexistant) -> comparer corps de reponse octet pour egalite stricte.",
+        "Test creation session puis logout puis rejouer un appel protege -> attendre 401.",
+        "Test expiration simulee (horloge avancee ou session factice expiree) -> attendre 401."
+      ],
+      "status": "planifie, non execute ; depend de D1 tranchee pour le schema exact des champs du formulaire"
+    },
+    {
+      "story": "ressources",
+      "planned_checks": [
+        "Test E1 : compte A authentifie demande une ressource appartenant a B -> 403/404 generique.",
+        "Test E2 : URL directe vers ressource privee sans passer par la liste -> meme refus que E1.",
+        "Test E3 : identifiant sequentiel/devine -> meme refus, sans distinction existant/inexistant.",
+        "Test E4 : requete anonyme -> 401, corps de reponse sans donnee partielle.",
+        "Test E5 : rejouer jeton apres revocation -> 401/403 immediat."
+      ],
+      "status": "planifie, non execute ; suite de tests prioritaire car couvre 5 cas d'erreur F2"
+    },
+    {
+      "story": "demarrage",
+      "planned_checks": [
+        "Test reprise d'etape apres abandon simule (fermeture puis retour).",
+        "Test E7 : fournisseur injoignable simule -> message specifique, etat du guide inchange apres l'echec.",
+        "Test completion -> verifier effet observable cote Swarm local (pas seulement flag portail)."
+      ],
+      "status": "planifie, non execute"
+    },
+    {
+      "story": "administration",
+      "planned_checks": [
+        "Test recherche compte (resultat et absence de resultat).",
+        "Test attribution de droit -> verifier entree journal horodatee creee au meme moment.",
+        "Test E6 : compte role client appelle /api/admin/* -> 403."
+      ],
+      "status": "planifie, non execute"
+    },
+    {
+      "story": "revocation",
+      "planned_checks": [
+        "Test E5 cible : emettre jeton valide, revoquer, rejouer le meme jeton sur /api/me/resources -> 401/403 immediat, sans delai de propagation observable.",
+        "Test horodatage journal : verifier que l'entree de revocation precede ou egale le refus serveur observe, jamais posterieure a une confirmation UI 'revoque'."
+      ],
+      "status": "planifie, non execute ; cas le plus critique car anti-pattern 'succes degrade' explicitement exclu par F2"
+    }
+  ],
+  "limits": [
+    "Cette fondation fixe des contrats API candidats pour permettre la matrice de couverture ; elle ne constitue pas une architecture backend definitive (renvoyee a F4) ni une implementation (aucun code moteur produit ici).",
+    "D-F3-1, D-F3-2, D-F3-3 sont des decisions d'echafaudage necessaires a la matrice ; D-F3-1 reste soumise a confirmation utilisateur explicite en F4, les deux autres sont directement applicables.",
+    "Les sept stories sont couvertes integralement (coverage[7]) et les huit cas d'erreur E1-E8 de F2 sont references au moins une fois (verifie par controle structurel ci-dessous) ; la pertinence semantique de cette couverture reste a confirmer par revue independante.",
+    "Aucun test ci-dessus n'a ete execute dans cette tache : evidence_plan decrit des controles a construire en phase de realisation (six etapes par fonctionnalite), pas des resultats observes."
+  ]
+}

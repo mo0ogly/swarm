@@ -1,0 +1,26 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-o",
+    "/tmp/swarm-identity-issuer-build-0mxzoehv/swarm",
+    "./cmd/swarm"
+  ],
+  "executor": "Codex alone; isolated fixture stores; local OIDC signed-token fixture, no real provider",
+  "start": "2026-10-17T08:22:28.233204+00:00",
+  "end": "2026-10-17T08:23:37.729507+00:00",
+  "elapsed_seconds": 69.49623492499813,
+  "exit": 0,
+  "input_count": 1058,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  }
+}

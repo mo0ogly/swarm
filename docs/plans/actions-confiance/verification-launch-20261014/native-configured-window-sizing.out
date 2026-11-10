@@ -1,0 +1,195 @@
+=== RUN   TestNativeReferenceSelectionSizingProbe
+{
+  "actual_error": "capacité en tokens dépassée après réserves",
+  "actual_measure": {
+    "prompt_tokens": 169498,
+    "schema_tokens": 2221,
+    "utf8_bytes": 537524,
+    "remaining_text_tokens": -11623
+  },
+  "already_supplied": [
+    {
+      "packet": 1,
+      "artifact": 0,
+      "sha256": "d68056784895e7114c6d245a6868a606ab47e43fdbbc4ce2a392eac3e882ec4e"
+    }
+  ],
+  "call": "fragment-final-e3e1d429c041dd6b3ed1809f",
+  "candidate": "3d66a1fdd7d6a16f848f1f3f79890c6fcb0fcd43",
+  "configured_budget": {
+    "default_context_tokens": 272000,
+    "max_context_tokens": 872000,
+    "client_executable_stamp": "c1c4d2b651f5d27532ba7865ad9bd0a2e7652051f3e76b1febf7c4ce6dcf6f98",
+    "provider_sha256": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+    "client_version": "codex-cli 0.159.2",
+    "capability_sha256": "3bcf3e8970291c8cd7bc3b0022d9f90cce83f507e04c8dd23864eb0b075a803c",
+    "version": 2,
+    "model": "gpt-5.6-sol",
+    "tokenizer": "o200k_base/tiktoken-go-v0.6.2",
+    "context_tokens": 400000,
+    "effective_percent": 95,
+    "client_reserve_tokens": 32768,
+    "output_reserve_tokens": 65536,
+    "max_utf8_bytes": 1048576
+  },
+  "configured_error": "\u003cnil\u003e",
+  "configured_measure": {
+    "prompt_tokens": 169498,
+    "schema_tokens": 2221,
+    "utf8_bytes": 537524,
+    "remaining_text_tokens": 109977
+  },
+  "declared_selected_tokens": 108187,
+  "declared_token_limit": 92641,
+  "originals": [
+    {
+      "artifact": 6,
+      "bytes": 1372,
+      "kind": "diff",
+      "name": "diff --git a/internal/engine/review_timeout_test.go b/internal/engine/review_timeout_test.go",
+      "packet": 0
+    },
+    {
+      "artifact": 10,
+      "bytes": 44702,
+      "kind": "diff",
+      "name": "diff --git a/internal/engine/trust_actions_operator_regression_test.go b/internal/engine/trust_actions_operator_regression_test.go",
+      "packet": 0
+    },
+    {
+      "artifact": 6,
+      "bytes": 1766,
+      "kind": "source",
+      "name": "internal/engine/web_session.go",
+      "packet": 1
+    },
+    {
+      "artifact": 12,
+      "bytes": 44992,
+      "kind": "source",
+      "name": "internal/engine/trust_actions.go",
+      "packet": 1
+    },
+    {
+      "artifact": 13,
+      "bytes": 1939,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_cli.go",
+      "packet": 1
+    },
+    {
+      "artifact": 14,
+      "bytes": 2689,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_http.go",
+      "packet": 1
+    },
+    {
+      "artifact": 0,
+      "bytes": 26709,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_test.go",
+      "packet": 2
+    },
+    {
+      "artifact": 1,
+      "bytes": 14368,
+      "kind": "source",
+      "name": "tests/actions_confiance_t2.py",
+      "packet": 2
+    },
+    {
+      "artifact": 2,
+      "bytes": 18254,
+      "kind": "source",
+      "name": "tests/actions_confiance_t2_ui.cjs",
+      "packet": 2
+    },
+    {
+      "artifact": 3,
+      "bytes": 6146,
+      "kind": "source",
+      "name": "web/trust-actions.html",
+      "packet": 2
+    },
+    {
+      "artifact": 4,
+      "bytes": 2955,
+      "kind": "source",
+      "name": "web/trust-actions.css",
+      "packet": 2
+    },
+    {
+      "artifact": 5,
+      "bytes": 7664,
+      "kind": "source",
+      "name": "web/trust-actions.js",
+      "packet": 2
+    },
+    {
+      "artifact": 12,
+      "bytes": 48127,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_operator_regression_test.go",
+      "packet": 2
+    },
+    {
+      "artifact": 13,
+      "bytes": 3573,
+      "kind": "source",
+      "name": "package.json",
+      "packet": 2
+    },
+    {
+      "artifact": 14,
+      "bytes": 21363,
+      "kind": "source",
+      "name": "internal/engine/main.go",
+      "packet": 2
+    },
+    {
+      "artifact": 15,
+      "bytes": 35854,
+      "kind": "source",
+      "name": "internal/engine/web_server.go",
+      "packet": 2
+    },
+    {
+      "artifact": 17,
+      "bytes": 1831,
+      "kind": "source",
+      "name": "internal/engine/trust_actions_originals.go",
+      "packet": 2
+    },
+    {
+      "artifact": 18,
+      "bytes": 4409,
+      "kind": "source",
+      "name": "tests/i18n_test.cjs",
+      "packet": 2
+    },
+    {
+      "artifact": 23,
+      "bytes": 8116,
+      "kind": "source",
+      "name": "internal/engine/web_requests_config_test.go",
+      "packet": 2
+    },
+    {
+      "artifact": 24,
+      "bytes": 2995,
+      "kind": "source",
+      "name": "tools/actions-confiance/qualify.py",
+      "packet": 2
+    }
+  ],
+  "questions": 32,
+  "reply_sha256": "9d61f2b1aea1fb3b72aa382cd171171d8e9ccb36a20f583644b8742f6951fa45",
+  "review": "review-648b1d25ee01e0532390cff9",
+  "scope": "Read-only sizing and source attribution. No provider call, database or changed review is produced.",
+  "selected": 20,
+  "selected_without_cost_row": []
+}
+--- PASS: TestNativeReferenceSelectionSizingProbe (15.74s)
+PASS
+ok  	swarm.local/companion/internal/engine	15.767s

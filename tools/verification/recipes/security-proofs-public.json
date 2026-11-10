@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "security-proofs-public",
+  "inputs": [
+    "tools/verification/recipe.py", "tests/security_proofs_public.py", "tests/security_proofs_ui.cjs",
+    "tests/fixture_area.py", "tests/rust_agent_model_route.py", "tests/rust_native_http_cli.py",
+    "tests/helpers/browser_verification_runtime.cjs", "tools/verification/verify_npm_archive.py",
+    "rust/crates/swarm-cli/src/trust.rs", "rust/crates/swarm-web/src/service/trust.rs",
+    "rust/crates/swarm-web/src/service/native_admin.rs", "rust/crates/swarm-engine/src/trust/security.rs",
+    "rust/crates/swarm-engine/config/security-catalogue.json", "docs/architecture/blp-flow-inventory.json",
+    "web/security-proofs.*", "web/trust-native.html", "web/trust-native.css", "web/swarm-design.css",
+    "web/wattson_themes.css", "web/i18n.js", "web/i18n-en.js", "locales/en.json", "package.json", "package-lock.json"
+  ],
+  "environment": {},
+  "steps": [{
+    "id": "actual-cli-http-browser-and-embedded-bytes",
+    "command": ["python3", "-c", "import os,subprocess,sys; sys.path.insert(0,'tests'); from fixture_area import fixture_root; from pathlib import Path; out=Path(os.environ['SWARM_SECURITY_PROOF_OUTPUT']) if 'SWARM_SECURITY_PROOF_OUTPUT' in os.environ else fixture_root('security-public-')/'journey'; subprocess.run(['python3','tests/security_proofs_public.py','--binary',os.environ['SWARM_SECURITY_BINARY'],'--output',str(out)],check=True); print('SECURITY_PROOFS_EVIDENCE '+str(out))"],
+    "expected_exit": 0,
+    "required_stdout": ["SECURITY_PROOFS_PUBLIC_PASS", "SECURITY_PROOFS_EVIDENCE"],
+    "required_stderr": []
+  }]
+}

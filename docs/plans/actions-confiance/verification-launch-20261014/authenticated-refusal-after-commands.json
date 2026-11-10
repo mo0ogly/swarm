@@ -1,0 +1,44 @@
+[
+  {
+    "operation": "show",
+    "exit_code": 0,
+    "stdout": "{\n  \"actions\": {},\n  \"amount_minor_text\": {},\n  \"evidence_count\": 0,\n  \"identities\": [\n    {\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"alice\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"bob\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect-service\"\n    }\n  ],\n  \"ledger\": [],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandates\": {},\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"simulation\": true\n}\n",
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "operation": "mandate-create",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "{\n  \"error\": \"mandat invalide\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"mandat invalide\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+    "input_sha256": "5c3c3d5d35f94fb9450c2ad6569c9ede019f8083e4bc459a8e2c6bcb6d8dd02a"
+  },
+  {
+    "operation": "show",
+    "exit_code": 0,
+    "stdout": "{\n  \"actions\": {},\n  \"amount_minor_text\": {},\n  \"evidence_count\": 1,\n  \"identities\": [\n    {\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"alice\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"bob\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect-service\"\n    }\n  ],\n  \"ledger\": [],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandates\": {},\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"simulation\": true\n}\n",
+    "stderr": "",
+    "input_sha256": null
+  },
+  {
+    "operation": "mandate-create",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "{\n  \"error\": \"mandat invalide\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"mandat invalide\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+    "input_sha256": "5c3c3d5d35f94fb9450c2ad6569c9ede019f8083e4bc459a8e2c6bcb6d8dd02a"
+  },
+  {
+    "operation": "mandate-create",
+    "exit_code": 4,
+    "stdout": "",
+    "stderr": "{\n  \"error\": \"autorisation du rejeu absente ou différente ; événement historique conservé\",\n  \"failure\": {\n    \"code\": \"authorization_required\",\n    \"message\": \"autorisation du rejeu absente ou différente ; événement historique conservé\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+    "input_sha256": "5c3c3d5d35f94fb9450c2ad6569c9ede019f8083e4bc459a8e2c6bcb6d8dd02a"
+  },
+  {
+    "operation": "export",
+    "exit_code": 0,
+    "stdout": "{\n  \"originals\": {\n    \"5c3c3d5d35f94fb9450c2ad6569c9ede019f8083e4bc459a8e2c6bcb6d8dd02a\": \"ewogICJzY2hlbWFfdmVyc2lvbiI6IDEsCiAgImV2ZW50X2lkIjogImEyYzVlZDUxZGJjMzRlZWE5OTJkZTIyNWExYzdlYjg1IiwKICAibWFuZGF0ZV9pZCI6ICJpbnZhbGlkLWF1ZGl0ZWQtcmVzb3VyY2UiLAogICJzdWJqZWN0IjogImFsaWNlIiwKICAiYWN0aW9ucyI6IFsKICAgICJzZXR0bGUiCiAgXSwKICAicmVzb3VyY2UiOiAiLi4vb3V0c2lkZSIsCiAgIm1heF9hbW91bnRfbWlub3IiOiA1MDAsCiAgImN1cnJlbmN5IjogIkVVUiIsCiAgImJlbmVmaWNpYXJ5IjogIkFDTUUiCn0K\"\n  },\n  \"schema_version\": 2,\n  \"simulation\": true,\n  \"evidence\": [\n    {\n      \"sequence\": 1,\n      \"previous_hash\": \"\",\n      \"hash\": \"7482c0906e5f46c36798ccf3bfb59b1e738e5668b3f7ff3b56d5888171787932\",\n      \"kind\": \"mandate-create\",\n      \"actor\": \"admin\",\n      \"integrity\": 3,\n      \"object_id\": \"invalid-audited-resource\",\n      \"content_digest\": \"\",\n      \"original_digest\": \"5c3c3d5d35f94fb9450c2ad6569c9ede019f8083e4bc459a8e2c6bcb6d8dd02a\",\n      \"result\": \"denied\",\n      \"reason\": \"mandat invalide\",\n      \"at\": \"2026-10-15T02:27:41.348526472Z\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "input_sha256": null
+  }
+]

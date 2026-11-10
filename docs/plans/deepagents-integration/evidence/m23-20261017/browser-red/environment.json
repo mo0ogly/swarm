@@ -1,0 +1,20 @@
+{
+  "root": "/tmp/swarm-memory-ui-bPvsJN",
+  "binary": "/tmp/swarm-m19-bin-o0uuhvjr/swarm",
+  "bundle": "/tmp/swarm-memory-m3-jdee3kwu/source.zip",
+  "url": "http://127.0.0.1:36991/session/session-d7076b60584bc602d60b5564",
+  "mode": "candidate frontend over retained real API",
+  "assets": "/tmp/swarm-m23-candidate-ac67k2fp",
+  "inputs": {
+    "binary": "026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2",
+    "bundle": "584dc34ca387930f7a4296edfcb97fe09133a7b39a71f6d06cdb5aae4b1a4dce",
+    "recipe": "9638834e3a33d1f5192b9207ad710a54552249a7bc37f9a1cfb90fc8bcc4d927",
+    "assets": {
+      "project-memory.html": "09e406478444c68c09fcc2e19ccfccb5e76f79bb1da33f9570f8a1acb96b6c15",
+      "project-memory.js": "021dcc9253a1215cd211bf052b92ad3b0cfd12c9985dd299ae4f1f0e59a0ab65",
+      "project-memory.css": "000f19a70e8c9dd294b5ded2f72c72e18fa2cff2a64994b6da93b99852a766cb",
+      "signals.js": "38fa9e333b2b874d165f33436823ce6bb6dc4fe37e04a80637239d961c39cb99",
+      "signals.css": "69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a"
+    }
+  }
+}

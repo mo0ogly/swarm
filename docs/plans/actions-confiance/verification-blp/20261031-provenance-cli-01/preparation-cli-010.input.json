@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "action": "budget",
+  "preparation_id": "prep-688350fb6dec4e0d4b1bb93f",
+  "event_id": "budget-cli",
+  "expected_revision": 1,
+  "budget": {
+    "limit_usd": 10,
+    "reserve_per_launch_usd": 0.5,
+    "estimate_source": "Synthetic fixture",
+    "reference_date": "2026-10-27"
+  }
+}

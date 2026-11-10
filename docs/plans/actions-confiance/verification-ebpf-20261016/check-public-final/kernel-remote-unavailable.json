@@ -1,0 +1,22 @@
+{
+  "effective_policy": {
+    "enabled": true,
+    "timeout_seconds": 17,
+    "ring_bytes": 131072
+  },
+  "schema_version": 1,
+  "available": false,
+  "source": "ebpf",
+  "scope": "owned_fixture_only",
+  "reason": "permission_denied",
+  "diagnostic": "kernel backend ring: creating map: map create: operation not permitted (MEMLOCK may be too low, consider rlimit.RemoveMemlock)",
+  "events": [],
+  "owned_pids": [
+    3522348
+  ],
+  "fixture_verified": false,
+  "global_qualification": false,
+  "lost": 0,
+  "cleanup_verified": true,
+  "revision": 2
+}

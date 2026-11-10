@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "resume-finding-contract2-3a47d859a81440a4",
+  "expected_revision": 194,
+  "reason": "Replan sur preuve nouvelle : le refus de protocole R9 a de nouveau lié deux défauts à la pièce14 marquée inspected. Le moteur installé utilise maintenant finding_contract_version2 : défauts imbriqués uniquement dans un constat fail, unknown conserve les preuves manquantes. Contrats0/1 et originaux historiques conservés ; qualification race ciblée15tests/25sous-cas PASS et précontrôle public method_restart_ready : 3 inspections neuves et 2 appels finaux, 28 appels disponibles. Même candidat671336f40f5e33279a61898131abab2809990c77, aucun changement métier ni nouveau producteur, ancien avis archivé et dépense conservée. Le superviseur doit décider la reprise autorisée de méthode via review-retry, garder tout refus métier et contrôler son effet. Pas de réutilisation des anciennes inspections sous le nouveau contrat ni acceptation implicite."
+}

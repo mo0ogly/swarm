@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "root-bootstrap-busy",
+  "inputs": [
+    "tests/rust_root_bootstrap_busy.py",
+    "tests/test_rust_root_bootstrap_busy_guards.py",
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/bootstrap-busy-contract.md",
+    ".cargo/config.toml",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/connected_database_identity.rs",
+    "rust/crates/swarm-engine/src/native_diagnostics.rs",
+    "rust/crates/swarm-engine/src/telemetry_store.rs",
+    "tools/verification/recipe.py",
+    "tools/verification/verify_native_profile.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "owned-bootstrap-busy-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_root_bootstrap_busy_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_typed_codes_reject_messages_wrappers_and_malformed",
+        "test_identity_and_later_storage_are_distinct_not_success_claims",
+        "test_snapshot_preserves_database_and_settings_bytes",
+        "test_lock_child_eof_rolls_back_and_closes_without_dml",
+        "test_ready_publication_failure_still_releases_waits_and_closes",
+        "test_primary_and_release_failures_are_both_retained",
+        "test_preexisting_output_is_not_owned_or_overwritten",
+        "test_profiles_bind_normal_bytes_without_boolean_coercion",
+        "Ran 12 tests",
+        "OK",
+        "test_publication_keeps_primary_and_directory_close_failure",
+        "test_publication_keeps_primary_and_temporary_unlink_failure",
+        "test_typed_identity_operation_tracks_prepare_query_without_timing_claim",
+        "test_exercise_records_typed_capture_phase_in_actual_result"
+      ]
+    },
+    {
+      "id": "public-bootstrap-exclusive-lock-observation-and-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess\nkeys=['initializer-binary','initializer-profile','binary','profile','role','output']\nargv=['python3','tests/rust_root_bootstrap_busy.py']\nfor key in keys: argv.extend(['--'+key,os.environ['SWARM_BOOTSTRAP_BUSY_'+key.upper().replace('-','_')]])\nsubprocess.run(argv,check=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public bootstrap lock observation retained; unchanged Root and settings reopen"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

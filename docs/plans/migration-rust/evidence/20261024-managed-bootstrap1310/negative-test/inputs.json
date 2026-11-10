@@ -1,0 +1,7 @@
+{
+  "files": {
+    "tests/rust_planning_bootstrap.py": "616030118522e7ecc039eecb38d93f86a964256bb6c5a72e13ceae550741f555",
+    "rust/crates/swarm-engine/src/planning_request.rs": "427a366bcb71d4c7c9fec040d7a9108e81d98c55265abf205af3f435657a628c"
+  },
+  "context_sha256": "1c3e83fac26123ebd30d3d251eebfbc22e8ec5737e381a182786094d1877084b"
+}

@@ -1,0 +1,14 @@
+'use strict';
+// Exercise the verdict actually emitted by the configurable adapter, with
+// controlled observations. No browser/model and no native configuration access.
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const adapter=fs.readFileSync(process.argv[2]||path.join(__dirname,'graph_performance_ui.cjs'),'utf8');
+function verdict(values,observations){let generated,metadata;const fakeFS={mkdirSync(){},readFileSync:fs.readFileSync,writeFileSync(filename,contents){if(filename.endsWith('.cjs'))generated=contents;else if(filename.endsWith('performance-policy.json'))metadata=JSON.parse(contents)}};const ctx={require:name=>name==='node:fs'?fakeFS:name==='node:child_process'?{execFileSync:()=>JSON.stringify({revision:7,values}),spawnSync:()=>({status:0})}:require(name),__dirname,__filename:process.argv[2]||path.join(__dirname,'graph_performance_ui.cjs'),process:{argv:['node','adapter','/fixture/binary','/fixture/output','/fixture/config'],env:{PUPPETEER_MODULE:'/fixture/browser'},execPath:process.execPath}};vm.runInNewContext(adapter,ctx);
+assert.ok(generated);const sha=source=>require('node:crypto').createHash('sha256').update(source).digest('hex');assert.equal(metadata.generated_recipe_sha256,sha(generated),'generated source fingerprint missing');assert.equal(metadata.adapter_sha256,sha(adapter),'adapter fingerprint missing');const match=generated.match(/const failures=(.+?);assert.deepEqual\(failures,\[\],'performance budgets; all measurements retained'\);/s);assert.ok(match,'generated recipe has no final verdict');return()=>vm.runInNewContext('const failures='+match[1]+";assert.deepEqual(failures,[],'configured performance targets');",{assert:{deepEqual:(a,b,message)=>assert.deepEqual(JSON.parse(JSON.stringify(a)),JSON.parse(JSON.stringify(b)),message)},SWARM_POLICY:{values},load_measurements:observations})}
+const policy={samples:3,keyboard_p95_ms:11,loads:[{cards:73,render_p95_ms:111}]};
+assert.doesNotThrow(verdict(policy,[{cards:73,initial_p95_ms:110,keyboard_p95_ms:10}]));
+assert.throws(verdict(policy,[{cards:73,initial_p95_ms:112,keyboard_p95_ms:10}]),/configured performance targets/,'strict configured render target ignored');
+assert.throws(verdict(policy,[{cards:73,initial_p95_ms:110,keyboard_p95_ms:12}]),/configured performance targets/,'strict configured keyboard target ignored');
+assert.doesNotThrow(verdict({samples:1,keyboard_p95_ms:500,loads:[{cards:73,render_p95_ms:5000}]},[{cards:73,initial_p95_ms:2000,keyboard_p95_ms:200}]),'historical ceiling overrides relaxed Admin targets');
+assert.doesNotThrow(verdict(policy,[{cards:73,initial_p95_ms:111,keyboard_p95_ms:11}]));
+console.log('PASS configurable graph adapter: actual generated verdict uses strict/relaxed/equal Admin targets and custom card count');

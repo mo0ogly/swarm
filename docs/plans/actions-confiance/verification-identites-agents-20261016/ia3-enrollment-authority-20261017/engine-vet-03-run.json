@@ -1,0 +1,22 @@
+{
+  "command": [
+    "go",
+    "vet",
+    "./internal/engine"
+  ],
+  "start": "2026-10-17T11:35:32.936779+00:00",
+  "end": "2026-10-17T11:35:37.055055+00:00",
+  "exit": 0,
+  "input_count": 1069,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  }
+}

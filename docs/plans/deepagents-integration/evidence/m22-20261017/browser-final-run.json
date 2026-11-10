@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "node",
+    "tests/semantic_signals_ui.cjs",
+    "docs/plans/deepagents-integration/evidence/m22-20261017/browser-final"
+  ],
+  "started_at": "2026-10-17T08:18:34.840916+00:00",
+  "finished_at": "2026-10-17T08:18:57.460769+00:00",
+  "exit_code": 0,
+  "reason": "final harness now refuses evidence replacement and adds the focused wax-seal preview",
+  "CHROME_BIN": null,
+  "executable": "/usr/bin/google-chrome",
+  "replacement_exit_code": 1,
+  "original_receipt_preserved": true
+}

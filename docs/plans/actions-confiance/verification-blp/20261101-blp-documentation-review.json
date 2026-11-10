@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "scope": "documentation of existing BLP; no implementation or enforcement change",
+  "status": "VERIFIED_DOCUMENTATION",
+  "date_utc": "2026-11-01T13:44:23.670325+00:00",
+  "head_observed": "d4e219eeafcae5f90307a105ddaa93ba9874dc4f",
+  "files": {
+    "README.md": "2e1c4170a17980c1b395b00fc5838a26295ac801de7f05773cc2dea6ca7fb907",
+    "docs/SECURITY-POSITIONING.md": "929178d39f213c85a9569ff8294741b9c3346c175053a036300ca2c2511aa91c",
+    "docs/en/SECURITY-POSITIONING.md": "7db6b4e51acf26be25cc992738f9de524e602d41147cc7cd942994263f1ff829",
+    "docs/architecture/BIBA-RUST.md": "73c1d8befabf97c845e620716070786f7d30953166f23fc5746f5c1288680ab9",
+    "docs/en/BIBA-RUST.md": "24e937be08723ec5369113461848eec1b9d982b517977ff7327bcbfcfa41f3fc",
+    "docs/architecture/BLP-FLOWS.md": "e3d9ae44ed04cafe1bc13a1d077003503f4aed6ae94e395f7f9599a6f53bd39c",
+    "docs/en/BLP-FLOWS.md": "c567aa7232a5af6a5676770ff7bd1c17487197040b5b9915ef35a1c252c4df2e",
+    "docs/plans/actions-confiance/BLP-APEX.md": "20c70b0da519337d250cc7de28912606e0dc10d43bb8450ccb2c352600357266",
+    "docs/en/plans/actions-confiance/BLP-APEX.md": "a23063697da47f75ed49acda53093bf786b0789074ecd110f820952c87076a19",
+    "docs/architecture/BELL-LAPADULA.md": "ff1c30d709b4e9f308614e7b85783ef0e08a0abaa693c16a7df2c35d44289729",
+    "docs/en/BELL-LAPADULA.md": "6899cbf255df0359dec0e3174bfc10a3ad1d856243b1dcab127db19c7682a89a"
+  },
+  "source_contracts_read": {
+    "rust/crates/swarm-confidentiality/src/lib.rs": "992572d41810c57c2b9ae3edc9cc8a1471bb7bf8c5cc655be8f0f3b7956fd879",
+    "rust/crates/swarm-engine/src/trust/confidentiality.rs": "4bad3731bf2089d97ef7000befd15b366e809e68aa29bc3e175fb22bf3dbe691",
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs": "dc1a21530466bd7842816b4105f1ba7cb01bf615d09e6e95aa83f4ad56d704a8",
+    "rust/crates/swarm-engine/src/root_store/reader_guard.rs": "237af07cab099cf7f320b3fd574fbe7d33205b2d33f1736fdd5fe7892d4b2975",
+    "web/trust-confidentiality.js": "c42b8e5aa27f463286c798cb143898bbe244a9ea185b43682fe5cac33cf6233e"
+  },
+  "evidence_reused": {
+    "docs/plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/journey/result.json": "9d5e8d828fb2ce014a8132576c993fe9a63deba4227e6918f9e1e698629d6b99",
+    "docs/plans/actions-confiance/verification-blp/20261101-preparation-check-installed-01/result.json": "ae9f505e87ab9a4fa4b123d7de599a3112d1988486dab7d2cdf043f92f4dc851",
+    "docs/plans/actions-confiance/verification-blp/20261101-preparation-flow-inventory-01/result.json": "fab2d973c7542046a37524f1cedde5bad556321e02961bb53a619d5432551e59"
+  },
+  "checks": {
+    "new_page_local_links_and_anchors": 30,
+    "existing_entry_points_link_to_reference": 9,
+    "evidence_counts": "26 public assertions,13 runtime sources,56 browser checks,25 flows/50 anchors/46 files; checked from retained results",
+    "fr_en": "matching capabilities,authorities,interfaces,limitations,unfinished packages and evidence; native296 reread during task",
+    "compiler_inputs": "none of these11Markdown files occurs in qualified296 effective input inventory; no rebuild or version_history modification by this session"
+  },
+  "policies": "only documents existing protocol schema/status fields and authority; introduces no defaults,limits or operator policy",
+  "functions": "none created/modified; no docstring or Rustdoc change needed",
+  "errors": "no error handling changed; existing refusals/storage/provenance/cleanup distinctions documented",
+  "limits": [
+    "documentation proves neither execution nor acceptance; linked original evidence retains its scope",
+    "local owner-key fixtures do not qualify Authority/enrollment or real provider/human declassification",
+    "no end-to-end BLP claim; runtime_enforced remainsfalse",
+    "persistent repository links do not rebuild embedded contexts or update already-running sessions"
+  ]
+}

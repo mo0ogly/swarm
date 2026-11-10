@@ -1,0 +1,14 @@
+[
+  {
+    "source": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "render": "/tmp/swarm-quote-citation25-fr.png",
+    "sha256": "5e6b150d4747d85a931a247436851cd29e3aa01b00a53b09c2f4ca126b9b2150",
+    "exit": 0
+  },
+  {
+    "source": "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "render": "/tmp/swarm-quote-citation25-en.png",
+    "sha256": "7afa225461e135b6c1f89a3940387dd22b0801283901951f502975399a8500e1",
+    "exit": 0
+  }
+]

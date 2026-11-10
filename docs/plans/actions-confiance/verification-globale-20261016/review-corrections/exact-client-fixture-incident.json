@@ -1,0 +1,7 @@
+{
+  "observed": "new test double omitted JSON.stringify used by corrected parser",
+  "failure": "TypeError JSON.stringify is not a function",
+  "owner": "Codex root",
+  "correction": "include real stringify in unsupported-rawJSON fixture; product unchanged",
+  "original": "exact-client-lexical-first.cjs"
+}

@@ -1,0 +1,14 @@
+=== RUN   TestPreparedRepositoryRetainsIncompletePendingEvidence
+=== RUN   TestPreparedRepositoryRetainsIncompletePendingEvidence/pending-only
+    prephase_organization_test.go:665: incomplete retained state overwritten
+=== RUN   TestPreparedRepositoryRetainsIncompletePendingEvidence/different-request
+    prephase_organization_test.go:665: incomplete retained state overwritten
+=== RUN   TestPreparedRepositoryRetainsIncompletePendingEvidence/malformed
+    prephase_organization_test.go:665: incomplete retained state overwritten
+--- FAIL: TestPreparedRepositoryRetainsIncompletePendingEvidence (0.44s)
+    --- FAIL: TestPreparedRepositoryRetainsIncompletePendingEvidence/pending-only (0.13s)
+    --- FAIL: TestPreparedRepositoryRetainsIncompletePendingEvidence/different-request (0.18s)
+    --- FAIL: TestPreparedRepositoryRetainsIncompletePendingEvidence/malformed (0.13s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.467s
+FAIL

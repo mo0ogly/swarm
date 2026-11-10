@@ -1,0 +1,36 @@
+{
+  "at_utc": "2026-10-16T21:06:47.479731+00:00",
+  "status": "M21 PASS LOCAL; M20 DEPENDENCY OPEN",
+  "requirements": {
+    "M21.1": "PASS reproducer fails before correction",
+    "M21.2": "PASS shared source binding and duplicate rejection",
+    "M21.3": "PASS 57 Python cases, 4 Go encoding vectors, M19/M18 public flow on frozen binary",
+    "M21.4": "PASS documentation FR/EN, inventory, RETEX and scoped final checks",
+    "M20": "OPEN: IA2/IA3 authenticated identity and usage authority required"
+  },
+  "python_methods": 57,
+  "new_python_methods": 8,
+  "go_serialization_vectors": 4,
+  "new_go_engine_tests": 0,
+  "public_checks_m19": 5,
+  "public_checks_m18": 5,
+  "scripted_work_processes": 3,
+  "model_calls": 0,
+  "shared_source_hashes_unchanged": 13,
+  "relative_links_resolved": 19,
+  "owned_changed_files": 12,
+  "runtime_observed": {
+    "pid": 2186583,
+    "ready": true,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "observation": "swarm.sh status, read-only tool result"
+  },
+  "deployment": false,
+  "independent_review": false,
+  "next_owner": {
+    "identity_contract": "dedicated identity conversation, IA2/IA3",
+    "memory_consumers": "this conversation, M20"
+  },
+  "condition": "current authenticated principal/recipient plus usage decision and protected control boundary, verified through public operations"
+}

@@ -1,0 +1,25 @@
+{
+  "observed_at": "2026-11-08T22:44:12.793416+00:00",
+  "delivery": {
+    "version": "v0.1.1-dev.364",
+    "sha256": "aed1422210080ceae550cdc7133f242134bfa4eb0b7088a44c40b37d3c9414f8",
+    "pid": 2171843,
+    "checked_at": "2026-11-08T22:44:12.793416+00:00",
+    "source": "/proc/2171843/exe + active-process-final + rapport qualification + recipe-sdk-03/result.json",
+    "scope": "Image active comparée, preuve SDK PASS/stable lue ; pas nouveau replay ni acceptation indépendante",
+    "git": "d084c1487726 main local, pas nouveau commit GQ"
+  },
+  "N3": {
+    "id": "N3",
+    "state": "analysis_reviewed_no_new_implementation",
+    "thread_id": "01a1bbb6-ef86-7471-9025-fba8d1edd81d",
+    "need": "Mark/Brandon : examiner couverture mandats/effets déjà qualifiée, proposer/réaliser plus petit complément isolé manquant, sans refaire R1/R2 ni lancer vrai modèle.",
+    "implementation": "not_assigned",
+    "output": "01-mandats-effets/ANALYSE-N3-NUIT.md",
+    "report_sha256": "f66e1370dd4644105d929446deddd0e94290e384762b39d6d62528d6358568d2",
+    "result": "Preuves R1/Trust et enfant natif déterministe déjà disponibles ; vrai modèle reste bloqué chez propriétaire. MCP/humain inconnus, pas absents."
+  },
+  "new_mutating_workers": 0,
+  "publication": "refus PR/checks/install inchangé, pas nouvelle tentative",
+  "handoff_limit": "HANDOFF historique361 non utilisé pour déduire portée finale364 ; N4 doit fournir inventaire actuel et ressources."
+}

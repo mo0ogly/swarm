@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-10-16T06:33:06.279914+00:00",
+  "reviewer": "/root/review_actions_candidate",
+  "verdict": "request_changes",
+  "candidate_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "packet_sha256": "ba442a030208b5b69ed2329339493d60c2a22d6d31f2dd2631d68cd9bbfed3d1",
+  "received_source_hashes": 1056,
+  "received_proof_hashes": 42,
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "P1",
+      "status": "CONFIRMED",
+      "title": "commit succeeds after evidence-chain tampering detected by verify",
+      "locations": [
+        "internal/engine/trust_actions.go:894",
+        "internal/engine/trust_actions_originals.go:27",
+        "internal/engine/trust_connector.go:176"
+      ]
+    },
+    {
+      "id": "F2",
+      "severity": "P2",
+      "status": "CONFIRMED",
+      "title": "export does not bind native connector intent/result and effective policy",
+      "locations": [
+        "internal/engine/trust_actions.go:1122",
+        "internal/engine/trust_actions.go:1202",
+        "internal/engine/trust_connector.go:193"
+      ]
+    }
+  ],
+  "original_receipt_sha256": "27883184de2f008c91d70fedc9cb917166525181f1dd17d64d9ef2dbe10c43d5",
+  "r20": "DEFERRED_BY_USER",
+  "global_acceptance": false
+}

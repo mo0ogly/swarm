@@ -1,0 +1,853 @@
+{
+  "date": "2026-10-23",
+  "objective": "Word, README FR/EN, complete diagrams and a refined motion-design film",
+  "owner": "Codex alone",
+  "scope": "Editorial and local media only",
+  "outputs": [
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4",
+      "sha256": "bb5f6a0f6355991618e380f4a231b657d74c180862e462cf2d48b8f2513eebf9",
+      "bytes": 8376442
+    },
+    {
+      "path": "/home/fpizzi/Downloads/swarm/Swarm_Architecture_Film_v2.mp4",
+      "sha256": "bb5f6a0f6355991618e380f4a231b657d74c180862e462cf2d48b8f2513eebf9",
+      "bytes": 8376442
+    },
+    {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v5.docx",
+      "sha256": "7221c298384ffa611eade4877340856f3e44957e8af58bc2c740f8ca91b49135",
+      "bytes": 3502564
+    },
+    {
+      "path": "/home/fpizzi/Downloads/swarm/Swarm_Article2_Identite_Memoire_v5.docx",
+      "sha256": "7221c298384ffa611eade4877340856f3e44957e8af58bc2c740f8ca91b49135",
+      "bytes": 3502564
+    }
+  ],
+  "word": {
+    "source_sha256": "42e6a0a983ca1ec60a6b3ba6f097f45ef22203bf5da2c3a9d9dfab8e3d6d4883",
+    "output_sha256": "7221c298384ffa611eade4877340856f3e44957e8af58bc2c740f8ca91b49135",
+    "output": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v5/Swarm_Article2_Identite_Memoire_v5.docx",
+    "figures": [
+      {
+        "key": "architecture-overview",
+        "part": "word/media/image3.png",
+        "png_sha256": "a4ca7f9cc7677f5b668ccf33762d667e34bd689a1ffc560568519bf41441ca72",
+        "svg_sha256": "16c1a4112f5a9441b02922ac4414836edc37b980e1b1e8e67da83ec8cb26f3fb",
+        "mermaid_sha256": "1221c5e3651f826ffd88c41ac200f83eae426ae7273aa8a6734859c753be3142"
+      },
+      {
+        "key": "identity-authority",
+        "part": "word/media/image4.png",
+        "png_sha256": "0fafd13356e7202a91d9f8db266f04e20dbcdd27fcd8004c244c86cc2b13a010",
+        "svg_sha256": "866e3717e5c4672586819fddb27c2487529b6e986f1cc5a4bb1998d165f23f3e",
+        "mermaid_sha256": "f86b8c7016f38c4e3c78a43b66b7b1d5d42016c117af44351b03d62ecc7359fd"
+      },
+      {
+        "key": "memory-context",
+        "part": "word/media/image5.png",
+        "png_sha256": "6b5042737f424bd526bf5fe352b245b6a68aa609295bb2fb8591ba5033952983",
+        "svg_sha256": "fcac7bca26dcba5ef84e793be7c5515fc79a1b80bad30a5902e5acb8d055ad55",
+        "mermaid_sha256": "68fff8632f6288a9733742cf874d98fc589219e3396959a93f442645f4bea7af"
+      },
+      {
+        "key": "run-supervision",
+        "part": "word/media/image6.png",
+        "png_sha256": "ead3b172e32230af1729cd86c32a9c5411a4669b391a4f4f2d7fc41243eb9108",
+        "svg_sha256": "99a12a8a5355fd0489490e549b471b75b40abc6ac68bd16454807f0f3cf8e86a",
+        "mermaid_sha256": "d20f0d8a70ed29295be7a2b63523c3d37a9a571e281f36eada1bc7528a5f9228"
+      },
+      {
+        "key": "logs-observability",
+        "part": "word/media/image7.png",
+        "png_sha256": "b01bd2bc7e9d9b9899d8225b368a200198e4c6b18bad103be361bb0d0e683044",
+        "svg_sha256": "4f015bc06e98ce912de799f7e0ccb419903d609d44cb39aac023a604572dc890",
+        "mermaid_sha256": "fa9fa996c65fae22c04f1839c38641b9149174f30f1b8a47fd7fb03fb2923855"
+      }
+    ],
+    "poster_sha256": "3936074be7b416eef98ca947926829b3d03fb0b85fd26f673613b8b874566d3f",
+    "preserved_parts": {
+      "_rels/.rels": "a9ae57efe9186f07d48303bcac5d54c7e359bf3f503939c03ad2954e5c59a5c4",
+      "docProps/core.xml": "d14be8284e406d14dc2a576b19f15e7f637b955f9e27a3d9ed871ec99606f7ba",
+      "docProps/app.xml": "be664981c3141cddfc59362beb287ebf20d0773660e2dd6faac5968a5930a081",
+      "word/styles.xml": "b67623bcbe235da5f2075d004a14740d37c7c4f1d8be4548fe7ed42da2681cbe",
+      "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf18d6c3029f6707c81bf590f6d6dd8757a5e93f15",
+      "word/settings.xml": "86c73de844b13fc27c417004b8fc5a7fdf76224ea4f5bdd0fb3996abedf5c6bb",
+      "word/webSettings.xml": "349d36de7434d09f86987ff671d8814964a0588c1e630c06e562cda7e75e9f95",
+      "word/fontTable.xml": "79385fb7f60247507ecaffc292e9ebd52ea0657b8634f629ba6fccc54011d6bb",
+      "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f2820a56e8b660016c647773555b060b0a02ac76941",
+      "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a55d1d2efaa31b137977f5f3a752366e1023612144",
+      "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a54403611b322d96da33371779e742d2d3f7ed7a6c",
+      "customXml/itemProps1.xml": "c542307b13ec29a8b546217bb37936ab4822e044b265d2952985ec3d6afed24e",
+      "word/numbering.xml": "70976f19cbcd896e51890859fe6ecb3467a5a7ad0c040160fedc5a1993cb09ce",
+      "word/footer1.xml": "b43cf378f96a3128c4d18c21b739781dd27fb58b272601dd6c8a6f385d042b3c",
+      "word/media/image1.png": "3ec3cbfe231c485cebc94908527c9dc862c47a5fbd58b3dececbeda3db4d2db1",
+      "word/media/image2.png": "a58c8b5257a47304f8806a3aeadcd45e22346bb093c8a224972189fe79f2b09e",
+      "word/comments.xml": "1c52081dd44b808d4b68384f78be72f6d7d8cae0a0f510193fdc038882f97d36",
+      "docProps/thumbnail.jpeg": "96367138dc44ce09bf2c8f0f8e49348a1478d2c5c0af69bbc2bbc38b63cdcead"
+    },
+    "article_v4_text_preserved": true,
+    "references": 18,
+    "technical_figures": 5,
+    "poster_figures": 1,
+    "comments": 6,
+    "video_relative_link": "Swarm_Architecture_Film_v2.mp4",
+    "pages": 14,
+    "all_final_pages_visually_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "render": "Packaged documents compiler and bundled LibreOffice, 110dpi",
+    "render_evidence": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v5/render-01",
+    "native_word_refresh": "Not exercised"
+  },
+  "film": {
+    "film": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/media-refresh/Swarm_Architecture_Film_v2.candidate.mp4",
+    "sha256": "bb5f6a0f6355991618e380f4a231b657d74c180862e462cf2d48b8f2513eebf9",
+    "bytes": 8376442,
+    "seconds": 100.0,
+    "frames": 3000,
+    "full_decode": "PASS",
+    "geometry": "1920x1080 30fps H264 yuv420p",
+    "audio": {
+      "codec": "AAC",
+      "channels": 2,
+      "sample_rate": 48000,
+      "decoded_peak_dbfs": -5.524585454537375,
+      "decoded_rms_dbfs": -19.09200244884773,
+      "clipping": false,
+      "manual_audition": "Not established by these automated checks"
+    },
+    "subtitles": [
+      "fra",
+      "eng"
+    ],
+    "chapters": 9,
+    "samples": [
+      {
+        "scene": "hook",
+        "phase": 0,
+        "frame": 66,
+        "path": "frame-01.png",
+        "sha256": "0084cc9efd72df048b74b4b2def52f1449d59a09440c790f3782c8730a317d0b"
+      },
+      {
+        "scene": "hook",
+        "phase": 1,
+        "frame": 168,
+        "path": "frame-02.png",
+        "sha256": "3f86bc5dd62eaf811eeb1302887a34b75a5f27f865458a92caf44e02a10ce834"
+      },
+      {
+        "scene": "hook",
+        "phase": 2,
+        "frame": 258,
+        "path": "frame-03.png",
+        "sha256": "928ecf8930ceb62f5da71339630cb111b83b2dce8736fbc1a8b3f0a19b38d3cf"
+      },
+      {
+        "scene": "memory",
+        "phase": 0,
+        "frame": 379,
+        "path": "frame-04.png",
+        "sha256": "7f4b6f2eccb3374da796b20259bdb8425bababb1ac4803475ffda79207b5fd5f"
+      },
+      {
+        "scene": "memory",
+        "phase": 1,
+        "frame": 502,
+        "path": "frame-05.png",
+        "sha256": "b9c1463879c731dc6240ae00674cd716eb479611a07cefd81fdcd709f0677b7e"
+      },
+      {
+        "scene": "memory",
+        "phase": 2,
+        "frame": 610,
+        "path": "frame-06.png",
+        "sha256": "3db96692ceafebe1f80ce2d8cc5d515f96fcc76d09e104cd7ece47e914c9ad40"
+      },
+      {
+        "scene": "identity",
+        "phase": 0,
+        "frame": 739,
+        "path": "frame-07.png",
+        "sha256": "e456f7aed5274347875f812119b78f604a6c990bc39d80b28d67b04068647d0c"
+      },
+      {
+        "scene": "identity",
+        "phase": 1,
+        "frame": 862,
+        "path": "frame-08.png",
+        "sha256": "6a0b07b4974d5b10df13a03b09af336f5a18fbf5df0aa656e753b0fde9b4fd87"
+      },
+      {
+        "scene": "identity",
+        "phase": 2,
+        "frame": 970,
+        "path": "frame-09.png",
+        "sha256": "92ff7fbea5033300d0d5d9c243007560aae67078c6a5e0e8f30f9bedd617b011"
+      },
+      {
+        "scene": "rust",
+        "phase": 0,
+        "frame": 1099,
+        "path": "frame-10.png",
+        "sha256": "86ae58b03ecea78c9c3d4acfcfb22bd4d5881faef3fc72e7b533e4b85dcb8fcb"
+      },
+      {
+        "scene": "rust",
+        "phase": 1,
+        "frame": 1222,
+        "path": "frame-11.png",
+        "sha256": "76a996540303a2609070283a814b27697bed21c8814cb0a5ef948bd863693770"
+      },
+      {
+        "scene": "rust",
+        "phase": 2,
+        "frame": 1330,
+        "path": "frame-12.png",
+        "sha256": "cd10b1e44513562af3bf46246c47e7782f65954870e351078e9044c2bf580216"
+      },
+      {
+        "scene": "human",
+        "phase": 0,
+        "frame": 1459,
+        "path": "frame-13.png",
+        "sha256": "cf8a023322442f56fb7c83760f14a4008fbe8d1722eb76bb6c70e46d210f1eed"
+      },
+      {
+        "scene": "human",
+        "phase": 1,
+        "frame": 1582,
+        "path": "frame-14.png",
+        "sha256": "8176266c4c631801878414c1df4066984b0267d87f846999c94a95002c0a0473"
+      },
+      {
+        "scene": "human",
+        "phase": 2,
+        "frame": 1690,
+        "path": "frame-15.png",
+        "sha256": "e7d8e3ddb933711820af47c7220e52f104c48000333af4579eeaaafc4e150c80"
+      },
+      {
+        "scene": "supervision",
+        "phase": 0,
+        "frame": 1819,
+        "path": "frame-16.png",
+        "sha256": "61603097484fab67ab5af2a74a9daaa5a99f168892e4a576406b62a6c1480925"
+      },
+      {
+        "scene": "supervision",
+        "phase": 1,
+        "frame": 1942,
+        "path": "frame-17.png",
+        "sha256": "71966c6a4cec7da5dae5e7e6768d73290153c05e6e9404767395740ac7007879"
+      },
+      {
+        "scene": "supervision",
+        "phase": 2,
+        "frame": 2050,
+        "path": "frame-18.png",
+        "sha256": "3c90c116661036f876139f20619b23fdfda22ecab25a72d83bc790849c064870"
+      },
+      {
+        "scene": "logs",
+        "phase": 0,
+        "frame": 2166,
+        "path": "frame-19.png",
+        "sha256": "140bbaf807540e45bcf6d9df94e68366087771f84088745a86304ed1f6765a92"
+      },
+      {
+        "scene": "logs",
+        "phase": 1,
+        "frame": 2268,
+        "path": "frame-20.png",
+        "sha256": "862fedc91677addb7b12e7b09cf6f60383e5e699addfa61bc3f63046790b2eb3"
+      },
+      {
+        "scene": "logs",
+        "phase": 2,
+        "frame": 2358,
+        "path": "frame-21.png",
+        "sha256": "708dbffa1a7309649e4dac66ac67119f37050cbad3e0d2bd96848a6f38d6c9cc"
+      },
+      {
+        "scene": "future",
+        "phase": 0,
+        "frame": 2466,
+        "path": "frame-22.png",
+        "sha256": "b818e3ae17364bf400205228c15645aad8313d847e31d412da9cf30510076651"
+      },
+      {
+        "scene": "future",
+        "phase": 1,
+        "frame": 2568,
+        "path": "frame-23.png",
+        "sha256": "b86f8c01f91574f7890ecc1ae029f6f55f171b091f4b0be0df85136210dbddad"
+      },
+      {
+        "scene": "future",
+        "phase": 2,
+        "frame": 2658,
+        "path": "frame-24.png",
+        "sha256": "72832c8edadab41847e889a617f320114634f46f0e1fc504208af4fc687e4881"
+      },
+      {
+        "scene": "closing",
+        "phase": 0,
+        "frame": 2766,
+        "path": "frame-25.png",
+        "sha256": "6a03a5221f8f1f263438821f745707941399b0c6b8875b89ba57ab3d9975828b"
+      },
+      {
+        "scene": "closing",
+        "phase": 1,
+        "frame": 2868,
+        "path": "frame-26.png",
+        "sha256": "291c02a94bfde010201bdf77050048973768ffeead65cc1ab377dfcf85410930"
+      },
+      {
+        "scene": "closing",
+        "phase": 2,
+        "frame": 2958,
+        "path": "frame-27.png",
+        "sha256": "9d23fd46671635905de3969ab50dfbdbb4521d6c26aa7b687bfd6af9cbdbc0d9"
+      }
+    ],
+    "boxes": [
+      {
+        "kind": "ftyp",
+        "offset": 0,
+        "bytes": 32
+      },
+      {
+        "kind": "moov",
+        "offset": 32,
+        "bytes": 113555
+      },
+      {
+        "kind": "free",
+        "offset": 113587,
+        "bytes": 8
+      },
+      {
+        "kind": "mdat",
+        "offset": 113595,
+        "bytes": 8262847
+      }
+    ],
+    "visual_review": {
+      "encoded_samples": 27,
+      "method": "Three contact sheets of all encoded phases, full-size identity/human samples, and full-size source frames for all nine scenes",
+      "result": "No clipped captions or misplaced content observed; measured wrap and decorative label geometry corrected before final encoding"
+    },
+    "scope": "Media validity only; no Swarm runtime qualification"
+  },
+  "diagram_review": {
+    "families": 5,
+    "nodes_per_language": 96,
+    "edges_per_language": 111,
+    "all_previous_objects_and_relationships_preserved": true,
+    "modified_labels": [
+      "I_JOURNAL",
+      "M_VERSION"
+    ],
+    "changed_export_families": [
+      "identity-authority",
+      "memory-context"
+    ],
+    "geometry": "All 10 SVGs: no clipped labels or cluster/node overlaps",
+    "evidence": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/media-refresh/diagram-geometry.json",
+    "scope": "Semantic limits clarified; original runtime source observations are historical, not freshly qualified"
+  },
+  "source_decisions": "sources-v4-review.json, reused within their retained scope; no new external technical claim added",
+  "authority": "No commit, publication, process restart, provider call, mission operation or AC02 execution",
+  "increment_review": {
+    "policies": "Numeric timings, BPM, dimensions, fonts and encoder settings are media presentation/transport choices. No Swarm operator policy introduced. human validation and AC02 status retained.",
+    "functions": "render.mjs, soundtrack.py and verify.py retain purposes, inputs, side effects, failure behavior and scope. They author/verify local media only. No Rust/Go product function changed.",
+    "errors": "Measured node-title overflow fixed by generic wrapping. Decoder failure and initial invalid select filter retained; parser grammar corrected and fresh verification passed. No media delivery based on the failed extraction. Encoder nonzero/spawn failures reject; no successful empty output fallback.",
+    "build_inputs": "Bundled Node/Python and canvas, local fonts, canonical logo and local FFmpeg. Product build not run. version_history local runtime delivery rule not applicable; Word v5 and film v2 have SHA256 identities.",
+    "languages": "Five diagram families remain FR/EN. README and architecture wording updated in both languages. Word/film French; FR/EN subtitle tracks and files."
+  },
+  "learning": [
+    {
+      "origin": "Text overflow during media authoring",
+      "action": "Measure and wrap node titles before encoding; keep a refusal for missing height.",
+      "observed_effect": "All 3000 frames passed text-width checks."
+    },
+    {
+      "origin": "FFmpeg select filter and dependent contact sheet failure",
+      "action": "Quote filter expressions for FFmpeg grammar, retain failures and wait for successful prerequisites.",
+      "observed_effect": "Fresh decode and 27 extracted samples passed."
+    }
+  ],
+  "limitations": [
+    "No manual human audition is established by numeric audio verification",
+    "The film is explanatory animation, not a real application demo",
+    "No native Word playback or LinkedIn platform publication tested",
+    "No independent reviewer or runtime qualification invoked"
+  ],
+  "task_owned_files": {
+    "README.md": "7de7131d056977ba201f02dc8e35204447b870621f0f0508bc141a433bf69da1",
+    "README.en.md": "d90ab4b1c27a2baebc9d43d0ec2663be285fef65872a83b8ae18fb43574017e2",
+    "docs/architecture/OVERVIEW.md": "bddc20a32af817c46de4bf1f6cd53a01e2251aafdb4fae58177899712273ae66",
+    "docs/en/ARCHITECTURE.md": "2d0f21e0d116d12adda013a7f386b5930ce87b91b0083efe42acb756addd8b42",
+    "docs/diagrams/README.md": "9e31ef7ea92a035d56432e58d069f89bc7658b6420faa58992da572a1d617050",
+    "docs/diagrams/CONTRACT-MAP.md": "86c52dc6d19f08e87dbe8ef14ebda3d64a670615d9b9b895a6fdedaa8bd0e152",
+    "docs/diagrams/architecture-contracts.json": "fcb53aacd63cc5b7a87c258c0c8cb33ebb2882e1d84d648da8c6d288b9f00774",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md": "cf7e21230ff530a7aabed05e7978bdf186ae1ee8b5e126283999a388b9efcc10",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/article-v5-fr.md": "b0d9cee4fcbdbdfccc86ab495361084f99aa3daff0cf77ecf45bc72367ae6bb4",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/media-refresh.patch": "9e28a7801243d09faf79e1a59de7cb189ddcebd64eb5ee6bea10177fe2addc86",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4": "bb5f6a0f6355991618e380f4a231b657d74c180862e462cf2d48b8f2513eebf9",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v5.docx": "7221c298384ffa611eade4877340856f3e44957e8af58bc2c740f8ca91b49135",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/verify.py": "e55102126990242f57dca7cf2c0037b94700917c1bd0130814348d804a35f22f",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.fr.srt": "b075fb125a81ce10ac3c8ff7046bac47915f4014ede12379ff3c25a6ff2c6384",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/scenes.json": "5e73370109e6d597a6d6ed05544281cf41d89cbd30676fae7bc4d7ce26f5d5c2",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/chapters.ffmetadata": "039fae606554f80f4743d6826ec8170b6fb194aaae8ccae8af8f3c69ca602b67",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/render.mjs": "6cb8faeaf5e73ba3c3324c5c7a9701482cb7682ca4b26e4016fc5c6bb08a68c4",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md": "a6561979e98d9f19e7e89f917af796c64d59ecfc9908807732a61c064e36aa3b",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/apercu.png": "3936074be7b416eef98ca947926829b3d03fb0b85fd26f673613b8b874566d3f",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/soundtrack.py": "fd015ba6e6cf118d9e14b476a9f6062543c959a74ccaaaaa699c2cc377fd83c2",
+    "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.en.srt": "8abf2663caa22f724a7ec615a2be2c4a24213c5172566ce271c7533a902a3c03",
+    "docs/diagrams/identity-authority-fr.mmd": "f86b8c7016f38c4e3c78a43b66b7b1d5d42016c117af44351b03d62ecc7359fd",
+    "docs/diagrams/identity-authority-fr.svg": "866e3717e5c4672586819fddb27c2487529b6e986f1cc5a4bb1998d165f23f3e",
+    "docs/diagrams/identity-authority-fr.png": "02a80f301449ddccc5a17bdf897f6d3c3cd50a449944cd3a067f27edd11a7652",
+    "docs/diagrams/identity-authority-en.mmd": "7b37aefc3ec83eccdca8529594520c9df41e8c24e8e85e56ec8e9a9cebca8ccc",
+    "docs/diagrams/identity-authority-en.svg": "f24014c90c041ec5dc58e78baaaa9cf62d9c4fa00d11e18c4015063a1944cdf6",
+    "docs/diagrams/identity-authority-en.png": "57c0aff7c6ba60a9ff979bc1b79c9bdf61f60b68ab9e5e888b95abbcea650cfe",
+    "docs/diagrams/memory-context-fr.mmd": "68fff8632f6288a9733742cf874d98fc589219e3396959a93f442645f4bea7af",
+    "docs/diagrams/memory-context-fr.svg": "fcac7bca26dcba5ef84e793be7c5515fc79a1b80bad30a5902e5acb8d055ad55",
+    "docs/diagrams/memory-context-fr.png": "9d302c65e0332d88146b71b18527e0e330efb12c45940d181d9b659fd141d373",
+    "docs/diagrams/memory-context-en.mmd": "4ffdcfd2704abf0f3dfd0080befa612a6fe3ac5cf5c119039ece606f636a4424",
+    "docs/diagrams/memory-context-en.svg": "44bf17e3a9a5e278cccf3eb317a18d518d043c75db88a1da702aa67c2db0b054",
+    "docs/diagrams/memory-context-en.png": "6684da9b2ecc4198160f1bd3b32d97744ab6a3b9ccd5da20cac554d5714e9956"
+  },
+  "verification_status": "Verified local editorial delivery: document, diagrams, media, playback and links; not published",
+  "final_checks": {
+    "links": {
+      "documents": 9,
+      "links": 577,
+      "broken": 0,
+      "result": [
+        {
+          "file": "README.md",
+          "localLinks": 131
+        },
+        {
+          "file": "README.en.md",
+          "localLinks": 131
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "localLinks": 66
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "localLinks": 66
+        },
+        {
+          "file": "docs/diagrams/README.md",
+          "localLinks": 40
+        },
+        {
+          "file": "docs/diagrams/CONTRACT-MAP.md",
+          "localLinks": 81
+        },
+        {
+          "file": "docs/communication/linkedin-swarm-identite-memoire-20261023/README.md",
+          "localLinks": 47
+        },
+        {
+          "file": "docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md",
+          "localLinks": 14
+        },
+        {
+          "file": "docs/communication/linkedin-swarm-identite-memoire-20261023/article-v5-fr.md",
+          "localLinks": 1
+        }
+      ]
+    },
+    "documentation_preview": {
+      "scope": "Documentation only; local GitHub-like rendering, no application execution",
+      "checks": [
+        {
+          "file": "README.md",
+          "links": 135,
+          "localLinks": 131,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "README.en.md",
+          "links": 135,
+          "localLinks": 131,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "links": 66,
+          "localLinks": 66,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "links": 66,
+          "localLinks": 66,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "docs/diagrams/README.md",
+          "links": 40,
+          "localLinks": 40,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "docs/diagrams/CONTRACT-MAP.md",
+          "links": 81,
+          "localLinks": 81,
+          "allLocalTargetsAndMarkdownFragments": true
+        }
+      ],
+      "previews": [
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        }
+      ]
+    },
+    "video_section_preview": {
+      "scope": "Documentation only; local GitHub-like rendering, no application execution",
+      "checks": [
+        {
+          "file": "README.md",
+          "links": 135,
+          "localLinks": 131,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "README.en.md",
+          "links": 135,
+          "localLinks": 131,
+          "allLocalTargetsAndMarkdownFragments": true
+        }
+      ],
+      "previews": [
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        }
+      ]
+    },
+    "browser_playback": {
+      "initial": {
+        "time": 1.220494,
+        "paused": false,
+        "decodedFrames": 40,
+        "duration": 100,
+        "width": 1920,
+        "height": 1080,
+        "error": null,
+        "muted": true
+      },
+      "seek": {
+        "time": 53,
+        "readyState": 4,
+        "error": null
+      },
+      "errors": [],
+      "scope": "Actual Chrome decode/play/seek with local bytes; muted, no human audio audition or LinkedIn upload"
+    },
+    "git_diff_check": "PASS",
+    "task_owned_file_hashes_stable": 33,
+    "earlier_video_sha256": "1355a1a627c756ec13c2b7e38a0d6ec5556d36abddfaf592afc079ddd46ae0ba",
+    "frozen_v4_unchanged": true,
+    "public_sources": "Reused from retained source review; no stronger or new external claim introduced",
+    "review_limit": "Self-review, not independent acceptance"
+  },
+  "replan_history": [
+    {
+      "observed": "Ancien film silencieux et documentaire ; Word et schémas détaillés actuels déjà vérifiés.",
+      "alternatives": [
+        "Remonter les anciennes planches fixes",
+        "Créer des séquences animées explicatives, garder les cinq schémas complets dans le Word et les sources"
+      ],
+      "decision": "Seconde voie pour améliorer le film sans simplifier la documentation technique."
+    },
+    {
+      "observed": "Inventaire trop large de /tmp a rencontré des répertoires système inaccessibles.",
+      "cause": "Recherche étendue inutile pour retrouver nos propres helpers.",
+      "action": "Reprise sur chemins connus et glob de premier niveau ; aucune permission ni répertoire système modifié.",
+      "result": "Helpers locaux retrouvés."
+    },
+    {
+      "observed": "Measured still render rejected INSTANCE SUIVANTE: 278px for a 266px text slot.",
+      "cause": "Single-line node title layout did not account for label width.",
+      "action": "Generic measured wrapping within node title width, maximum two lines with explicit refusal beyond available height.",
+      "evidence": "First still-render failure retained in task output; rerender after layout precondition changed.",
+      "owner": "Codex media renderer"
+    },
+    {
+      "observed": "Video verifier completed probe/decode but extraction rejected select=eq(n,66)+... because filter commas were not quoted for FFmpeg grammar. A dependent contact-sheet step was wrongly attempted after the returned failure.",
+      "cause": "Verification filter quoting and orchestration did not stop at failed prerequisite.",
+      "decision": "Quote the entire FFmpeg select expression within its single argv value. Guard follow-up extraction on observed success, preserve the original failed evidence directory and use a fresh one.",
+      "owner": "Codex verification method",
+      "condition": "Successful extraction plus explicit inspection of final encoded frames, not only a green probe."
+    },
+    {
+      "observed": "Final reference check misclassified A_AC02 as a path because the identifier regex excluded digits. The catalogue contains this ID.",
+      "cause": "Verifier inferred identifier grammar instead of consulting its authoritative ID set.",
+      "action": "Resolve every reference by direct catalogue membership, then as a real file path. Retained output copies were already hash-verified; no unknown output overwritten.",
+      "condition": "All scene references resolve against current catalogue or existing sources."
+    }
+  ],
+  "retrospective": {
+    "result": "All requested editorial artifacts saved, five complete bilingual views preserved, full motion-design MP4 delivered with original score and two subtitle languages.",
+    "corrections": "Measured title overflow, decorative label sizing, FFmpeg filter syntax and catalogue ID classification diagnosed before final delivery. Original failures retained.",
+    "lesson": "Measure text before encoding, resolve references from authoritative catalogues and stop dependent QA after a failed prerequisite. Never treat scenario files or stills as the completed video.",
+    "remaining": "Subjective music/pace approval belongs to the user; no human audition, native Word playback or LinkedIn publication is claimed."
+  }
+}

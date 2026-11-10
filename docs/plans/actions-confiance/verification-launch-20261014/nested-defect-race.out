@@ -1,0 +1,547 @@
+=== RUN   TestDefectCitationNativeLegacyOriginalsRemainRejected
+=== RUN   TestDefectCitationNativeLegacyOriginalsRemainRejected/first
+=== RUN   TestDefectCitationNativeLegacyOriginalsRemainRejected/second
+--- PASS: TestDefectCitationNativeLegacyOriginalsRemainRejected (0.06s)
+    --- PASS: TestDefectCitationNativeLegacyOriginalsRemainRejected/first (0.03s)
+    --- PASS: TestDefectCitationNativeLegacyOriginalsRemainRejected/second (0.03s)
+=== RUN   TestDefectCitationNativeUniqueBytesComputePhysicalLine
+--- PASS: TestDefectCitationNativeUniqueBytesComputePhysicalLine (0.10s)
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/short_entire_patch_line
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/invented_trailing_newline
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/inline_Unicode
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/multiline_original
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/space_normalization
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/line_separator_normalization
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/ambiguous
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/overlapping_ambiguous
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/blank
+=== RUN   TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/separator_start
+--- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/short_entire_patch_line (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/invented_trailing_newline (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/inline_Unicode (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/multiline_original (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/space_normalization (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/line_separator_normalization (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/ambiguous (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/overlapping_ambiguous (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/blank (0.00s)
+    --- PASS: TestDefectCitationUniqueBytesAreLiteralAndUnambiguous/separator_start (0.00s)
+=== RUN   TestDefectCitationQuoteOnlyRejectsUnrequestedLocationAndUnknownVersion
+--- PASS: TestDefectCitationQuoteOnlyRejectsUnrequestedLocationAndUnknownVersion (0.05s)
+=== RUN   TestDefectCitationMissingArtifactCannotDefaultToZero
+--- PASS: TestDefectCitationMissingArtifactCannotDefaultToZero (0.00s)
+=== RUN   TestDefectCitationNewSchemasKeepHistoricalShape
+--- PASS: TestDefectCitationNewSchemasKeepHistoricalShape (0.05s)
+=== RUN   TestDefectCitationProtocolRestartKeepsMethodAndOldEvidence
+    managed_review_fragment_defect_citation_test.go:214: sizes 164551 168167 21899 parts 1
+--- PASS: TestDefectCitationProtocolRestartKeepsMethodAndOldEvidence (3.83s)
+=== RUN   TestFragmentNestedDefectRestartKeepsMethodAndOldEvidence
+    managed_review_fragment_defect_citation_test.go:218: sizes 164551 168167 21899 parts 1
+--- PASS: TestFragmentNestedDefectRestartKeepsMethodAndOldEvidence (3.52s)
+=== RUN   TestFragmentRetryFeedbackIsDiagnosticOnly
+--- PASS: TestFragmentRetryFeedbackIsDiagnosticOnly (0.20s)
+=== RUN   TestFragmentRetryFeedbackRejectsInventedOperatorInCompactReply
+--- PASS: TestFragmentRetryFeedbackRejectsInventedOperatorInCompactReply (0.20s)
+=== RUN   TestFragmentRetryFeedbackKeepsValidMidlineAndDiagnosesEscapedTab
+--- PASS: TestFragmentRetryFeedbackKeepsValidMidlineAndDiagnosesEscapedTab (0.20s)
+=== RUN   TestFragmentRetryAssociationFeedbackMatchesCitationContract
+=== RUN   TestFragmentRetryAssociationFeedbackMatchesCitationContract/0
+=== RUN   TestFragmentRetryAssociationFeedbackMatchesCitationContract/1
+--- PASS: TestFragmentRetryAssociationFeedbackMatchesCitationContract (0.39s)
+    --- PASS: TestFragmentRetryAssociationFeedbackMatchesCitationContract/0 (0.21s)
+    --- PASS: TestFragmentRetryAssociationFeedbackMatchesCitationContract/1 (0.19s)
+=== RUN   TestFragmentRetryFeedbackDiagnosesRejectedQuoteOnlyCitation
+--- PASS: TestFragmentRetryFeedbackDiagnosesRejectedQuoteOnlyCitation (0.20s)
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/1
+    managed_review_fragment_final_journal_test.go:50: inspection de fragment : réponse structurée invalide
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/2
+    managed_review_fragment_final_journal_test.go:50: inspection de fragment : réponse structurée invalide
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/3
+    managed_review_fragment_final_journal_test.go:50: inspection de fragment : réponse structurée invalide
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/4
+    managed_review_fragment_final_journal_test.go:50: inspection de fragment : réponse structurée invalide
+=== RUN   TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/5
+    managed_review_fragment_final_journal_test.go:50: inspection de fragment : réponse structurée invalide
+--- FAIL: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts (5.58s)
+    --- FAIL: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/1 (1.12s)
+    --- FAIL: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/2 (1.00s)
+    --- FAIL: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/3 (1.10s)
+    --- FAIL: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/4 (1.25s)
+    --- FAIL: TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts/5 (1.11s)
+=== RUN   TestFragmentFindingContractNativeInspectedNeeds
+--- PASS: TestFragmentFindingContractNativeInspectedNeeds (0.04s)
+=== RUN   TestFragmentFindingContractSchemaOracle
+--- PASS: TestFragmentFindingContractSchemaOracle (0.03s)
+=== RUN   TestFragmentNestedDefectBinding
+--- PASS: TestFragmentNestedDefectBinding (0.00s)
+=== RUN   TestFragmentNestedDefectInvalidBoundaries
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/inspected_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/unknown_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/fail_without_defect
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/fail_with_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/inspected_with_empty_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/unknown_without_needs
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/global_defects
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/global_null
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/foreign_artifact
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/line_supplied
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/string_anchor
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/missing_anchor
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/altered_quote
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/duplicate_claim
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/too_many_claims
+=== RUN   TestFragmentNestedDefectInvalidBoundaries/array_findings
+--- PASS: TestFragmentNestedDefectInvalidBoundaries (0.01s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/inspected_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/unknown_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/fail_without_defect (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/fail_with_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/inspected_with_empty_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/unknown_without_needs (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/global_defects (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/global_null (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/foreign_artifact (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/line_supplied (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/string_anchor (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/missing_anchor (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/altered_quote (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/duplicate_claim (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/too_many_claims (0.00s)
+    --- PASS: TestFragmentNestedDefectInvalidBoundaries/array_findings (0.00s)
+=== RUN   TestFragmentNestedDefectSchemaOracle
+--- PASS: TestFragmentNestedDefectSchemaOracle (0.00s)
+=== RUN   TestFragmentNestedDefectLegacyFormatsStayReadable
+--- PASS: TestFragmentNestedDefectLegacyFormatsStayReadable (0.00s)
+=== RUN   TestFragmentNestedDefectRejectedCitationRemainsDiagnostic
+--- PASS: TestFragmentNestedDefectRejectedCitationRemainsDiagnostic (0.00s)
+=== RUN   TestFragmentPartialNegativeRequiresWholeCandidateDecision
+    managed_review_fragment_partial_scope_test.go:15: sizes 164551 168167 21899 parts 1
+--- PASS: TestFragmentPartialNegativeRequiresWholeCandidateDecision (15.43s)
+=== RUN   TestFragmentLocalNegativeCannotReplaceLaterTransportError
+    managed_review_fragment_partial_scope_test.go:71: sizes 164551 168167 21899 parts 1
+--- PASS: TestFragmentLocalNegativeCannotReplaceLaterTransportError (4.61s)
+=== RUN   TestFragmentFinalReviewerCanRefuteLocalFindingWithOriginalEvidence
+    managed_review_fragment_partial_scope_test.go:109: sizes 164551 168167 21899 parts 1
+--- PASS: TestFragmentFinalReviewerCanRefuteLocalFindingWithOriginalEvidence (17.41s)
+=== RUN   TestManagedFragmentCompleteEvidence
+--- PASS: TestManagedFragmentCompleteEvidence (1.73s)
+=== RUN   TestManagedFragmentRejectsTampering
+=== RUN   TestManagedFragmentRejectsTampering/missing
+=== RUN   TestManagedFragmentRejectsTampering/duplicate
+=== RUN   TestManagedFragmentRejectsTampering/content
+=== RUN   TestManagedFragmentRejectsTampering/candidate
+=== RUN   TestManagedFragmentRejectsTampering/report
+=== RUN   TestManagedFragmentRejectsTampering/source
+=== RUN   TestManagedFragmentRejectsTampering/receipt
+=== RUN   TestManagedFragmentRejectsTampering/order
+=== RUN   TestManagedFragmentRejectsTampering/executable
+=== RUN   TestManagedFragmentRejectsTampering/budget
+--- PASS: TestManagedFragmentRejectsTampering (8.82s)
+    --- PASS: TestManagedFragmentRejectsTampering/missing (0.98s)
+    --- PASS: TestManagedFragmentRejectsTampering/duplicate (0.85s)
+    --- PASS: TestManagedFragmentRejectsTampering/content (0.93s)
+    --- PASS: TestManagedFragmentRejectsTampering/candidate (0.94s)
+    --- PASS: TestManagedFragmentRejectsTampering/report (0.85s)
+    --- PASS: TestManagedFragmentRejectsTampering/source (0.81s)
+    --- PASS: TestManagedFragmentRejectsTampering/receipt (0.84s)
+    --- PASS: TestManagedFragmentRejectsTampering/order (0.98s)
+    --- PASS: TestManagedFragmentRejectsTampering/executable (0.86s)
+    --- PASS: TestManagedFragmentRejectsTampering/budget (0.78s)
+=== RUN   TestManagedFragmentRejectsUnboundedEvidence
+--- PASS: TestManagedFragmentRejectsUnboundedEvidence (1.59s)
+=== RUN   TestManagedFragmentManySmallFilesReplyCapacity
+--- PASS: TestManagedFragmentManySmallFilesReplyCapacity (0.40s)
+=== RUN   TestManagedFragmentPromptBoundAndIdentity
+--- PASS: TestManagedFragmentPromptBoundAndIdentity (0.00s)
+=== RUN   TestManagedFragmentRuntimeProviderProtocol
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/pass
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/fail
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/unknown
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/exit
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/selection-unknown
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/decision-fail
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-resolved
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-open
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedFragmentRuntimeProviderProtocol/questions-omitted
+    managed_review_fragment_runtime_test.go:74: sizes 164551 168167 21899 parts 1
+SIGQUIT: quit
+PC=0x4bf721 m=0 sigcode=0
+
+goroutine 0 gp=0x5ef1940 m=0 mp=0x5ef3020 [idle]:
+runtime.futex(0x5ef3160, 0x80, 0x0, 0x0, 0x0, 0x0)
+	/usr/local/go/src/runtime/sys_linux_amd64.s:557 +0x21 fp=0x7ffe2a3a70d8 sp=0x7ffe2a3a70d0 pc=0x4bf721
+runtime.futexsleep(0x7ffe2a3a7150?, 0x450cf1?, 0x19bcfa3ec?)
+	/usr/local/go/src/runtime/os_linux.go:75 +0x30 fp=0x7ffe2a3a7128 sp=0x7ffe2a3a70d8 pc=0x476e50
+runtime.notesleep(0x5ef3160)
+	/usr/local/go/src/runtime/lock_futex.go:47 +0x87 fp=0x7ffe2a3a7160 sp=0x7ffe2a3a7128 pc=0x450407
+runtime.mPark(...)
+	/usr/local/go/src/runtime/proc.go:1887
+runtime.stopm()
+	/usr/local/go/src/runtime/proc.go:2910 +0x8c fp=0x7ffe2a3a7190 sp=0x7ffe2a3a7160 pc=0x48268c
+runtime.findRunnable()
+	/usr/local/go/src/runtime/proc.go:3647 +0xd9c fp=0x7ffe2a3a7308 sp=0x7ffe2a3a7190 pc=0x48415c
+runtime.schedule()
+	/usr/local/go/src/runtime/proc.go:4020 +0xb1 fp=0x7ffe2a3a7340 sp=0x7ffe2a3a7308 pc=0x485251
+runtime.park_m(0xc0003201c0)
+	/usr/local/go/src/runtime/proc.go:4144 +0x285 fp=0x7ffe2a3a73a0 sp=0x7ffe2a3a7340 pc=0x485705
+runtime.mcall()
+	/usr/local/go/src/runtime/asm_amd64.s:459 +0x4e fp=0x7ffe2a3a73b8 sp=0x7ffe2a3a73a0 pc=0x4bb08e
+
+goroutine 1 gp=0xc000002380 m=nil [chan receive, 2 minutes]:
+runtime.gopark(0x18?, 0xc00006f008?, 0x18?, 0xa3?, 0xc00042d718?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc00042d6b0 sp=0xc00042d690 pc=0x4b4d2e
+runtime.chanrecv(0xc000233420, 0xc00042d796, 0x1)
+	/usr/local/go/src/runtime/chan.go:664 +0x3e5 fp=0xc00042d728 sp=0xc00042d6b0 pc=0x44aa85
+runtime.chanrecv1(0x5ef0a60?, 0x1e24e40?)
+	/usr/local/go/src/runtime/chan.go:506 +0x12 fp=0xc00042d750 sp=0xc00042d728 pc=0x44a672
+testing.(*T).Run(0xc000185a40, {0x211235a, 0x2a}, 0x4d6ef98)
+	/usr/local/go/src/testing/testing.go:1859 +0x91e fp=0xc00042d888 sp=0xc00042d750 pc=0x61e31e
+testing.runTests.func1(0xc000185a40)
+	/usr/local/go/src/testing/testing.go:2279 +0x86 fp=0xc00042d8d8 sp=0xc00042d888 pc=0x622826
+testing.tRunner(0xc000185a40, 0xc0005c5ae0)
+	/usr/local/go/src/testing/testing.go:1792 +0x226 fp=0xc00042d9a8 sp=0xc00042d8d8 pc=0x61c866
+testing.runTests(0xc0000100a8, {0x5ee6ea0, 0x54e, 0x54e}, {0x3?, 0x0?, 0x5ef1360?})
+	/usr/local/go/src/testing/testing.go:2277 +0x96d fp=0xc00042db10 sp=0xc00042d9a8 pc=0x62268d
+testing.(*M).Run(0xc0006101e0)
+	/usr/local/go/src/testing/testing.go:2142 +0xeeb fp=0xc00042de88 sp=0xc00042db10 pc=0x61fc6b
+main.main()
+	_testmain.go:2763 +0x165 fp=0xc00042df50 sp=0xc00042de88 pc=0x1d00e65
+runtime.main()
+	/usr/local/go/src/runtime/proc.go:283 +0x28b fp=0xc00042dfe0 sp=0xc00042df50 pc=0x47d7ab
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc00042dfe8 sp=0xc00042dfe0 pc=0x4bd0c1
+
+goroutine 2 gp=0xc000002e00 m=nil [force gc (idle), 3 minutes]:
+runtime.gopark(0x5e12ab0?, 0x5ef3020?, 0x0?, 0x0?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc0000687a8 sp=0xc000068788 pc=0x4b4d2e
+runtime.goparkunlock(...)
+	/usr/local/go/src/runtime/proc.go:441
+runtime.forcegchelper()
+	/usr/local/go/src/runtime/proc.go:348 +0xb3 fp=0xc0000687e0 sp=0xc0000687a8 pc=0x47daf3
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0000687e8 sp=0xc0000687e0 pc=0x4bd0c1
+created by runtime.init.7 in goroutine 1
+	/usr/local/go/src/runtime/proc.go:336 +0x1a
+
+goroutine 3 gp=0xc000003340 m=nil [GC sweep wait]:
+runtime.gopark(0x5ef0601?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc00007ef80 sp=0xc00007ef60 pc=0x4b4d2e
+runtime.goparkunlock(...)
+	/usr/local/go/src/runtime/proc.go:441
+runtime.bgsweep(0xc000094000)
+	/usr/local/go/src/runtime/mgcsweep.go:316 +0xdf fp=0xc00007efc8 sp=0xc00007ef80 pc=0x4658ff
+runtime.gcenable.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:204 +0x25 fp=0xc00007efe0 sp=0xc00007efc8 pc=0x459d85
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc00007efe8 sp=0xc00007efe0 pc=0x4bd0c1
+created by runtime.gcenable in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:204 +0x66
+
+goroutine 4 gp=0xc000003500 m=nil [GC scavenge wait]:
+runtime.gopark(0x6cb44b?, 0x6c0bf7?, 0x0?, 0x0?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc000078f78 sp=0xc000078f58 pc=0x4b4d2e
+runtime.goparkunlock(...)
+	/usr/local/go/src/runtime/proc.go:441
+runtime.(*scavengerState).park(0x5ef13e0)
+	/usr/local/go/src/runtime/mgcscavenge.go:425 +0x49 fp=0xc000078fa8 sp=0xc000078f78 pc=0x463369
+runtime.bgscavenge(0xc000094000)
+	/usr/local/go/src/runtime/mgcscavenge.go:658 +0x59 fp=0xc000078fc8 sp=0xc000078fa8 pc=0x4638f9
+runtime.gcenable.gowrap2()
+	/usr/local/go/src/runtime/mgc.go:205 +0x25 fp=0xc000078fe0 sp=0xc000078fc8 pc=0x459d25
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc000078fe8 sp=0xc000078fe0 pc=0x4bd0c1
+created by runtime.gcenable in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:205 +0xa5
+
+goroutine 5 gp=0xc000003dc0 m=nil [finalizer wait]:
+runtime.gopark(0x0?, 0x4d706c8?, 0x20?, 0xa0?, 0x2000000020?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc000079e30 sp=0xc000079e10 pc=0x4b4d2e
+runtime.runfinq()
+	/usr/local/go/src/runtime/mfinal.go:196 +0x145 fp=0xc000079fe0 sp=0xc000079e30 pc=0x458d45
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc000079fe8 sp=0xc000079fe0 pc=0x4bd0c1
+created by runtime.createfing in goroutine 1
+	/usr/local/go/src/runtime/mfinal.go:166 +0x3d
+
+goroutine 6 gp=0xc000184000 m=nil [chan receive]:
+runtime.gopark(0x5f13720?, 0xffffffff?, 0x29?, 0x4?, 0xc000204f50?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc000204f18 sp=0xc000204ef8 pc=0x4b4d2e
+runtime.chanrecv(0xc000038230, 0x0, 0x1)
+	/usr/local/go/src/runtime/chan.go:664 +0x3e5 fp=0xc000204f90 sp=0xc000204f18 pc=0x44aa85
+runtime.chanrecv1(0x0?, 0x0?)
+	/usr/local/go/src/runtime/chan.go:506 +0x12 fp=0xc000204fb8 sp=0xc000204f90 pc=0x44a672
+runtime.unique_runtime_registerUniqueMapCleanup.func2(...)
+	/usr/local/go/src/runtime/mgc.go:1796
+runtime.unique_runtime_registerUniqueMapCleanup.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1799 +0x2f fp=0xc000204fe0 sp=0xc000204fb8 pc=0x45cecf
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc000204fe8 sp=0xc000204fe0 pc=0x4bd0c1
+created by unique.runtime_registerUniqueMapCleanup in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1794 +0x79
+
+goroutine 18 gp=0xc000102380 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a74acb5312a?, 0x3?, 0x91?, 0xfe?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc000203f38 sp=0xc000203f18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc000203fc8 sp=0xc000203f38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc000203fe0 sp=0xc000203fc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc000203fe8 sp=0xc000203fe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 19 gp=0xc000102540 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a7278b78d6b?, 0x3?, 0x63?, 0xc6?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc000202f38 sp=0xc000202f18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc000202fc8 sp=0xc000202f38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc000202fe0 sp=0xc000202fc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc000202fe8 sp=0xc000202fe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 7 gp=0xc0001841c0 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a74b387fe88?, 0x1?, 0xd3?, 0x2e?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc000201f38 sp=0xc000201f18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc000201fc8 sp=0xc000201f38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc000201fe0 sp=0xc000201fc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc000201fe8 sp=0xc000201fe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 34 gp=0xc000320000 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a74b394510f?, 0x1?, 0x2?, 0x49?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc000200f38 sp=0xc000200f18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc000200fc8 sp=0xc000200f38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc000200fe0 sp=0xc000200fc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc000200fe8 sp=0xc000200fe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 35 gp=0xc0003201c0 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a749bcf9e17?, 0x1?, 0xdd?, 0xcb?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc0004f1f38 sp=0xc0004f1f18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc0004f1fc8 sp=0xc0004f1f38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc0004f1fe0 sp=0xc0004f1fc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0004f1fe8 sp=0xc0004f1fe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 20 gp=0xc000102700 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a7494b7904b?, 0x1?, 0x7c?, 0x27?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc0004f0f38 sp=0xc0004f0f18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc0004f0fc8 sp=0xc0004f0f38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc0004f0fe0 sp=0xc0004f0fc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0004f0fe8 sp=0xc0004f0fe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 8 gp=0xc000184380 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a74b3937777?, 0x1?, 0xb6?, 0x7b?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc0004eff38 sp=0xc0004eff18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc0004effc8 sp=0xc0004eff38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc0004effe0 sp=0xc0004effc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0004effe8 sp=0xc0004effe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 21 gp=0xc0001028c0 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a74b387e7ad?, 0x3?, 0x45?, 0x3c?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc0004eef38 sp=0xc0004eef18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc0004eefc8 sp=0xc0004eef38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc0004eefe0 sp=0xc0004eefc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0004eefe8 sp=0xc0004eefe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 36 gp=0xc000320380 m=nil [GC worker (idle)]:
+runtime.gopark(0x5f15de0?, 0x1?, 0xd5?, 0x3f?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc0004edf38 sp=0xc0004edf18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc0004edfc8 sp=0xc0004edf38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc0004edfe0 sp=0xc0004edfc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0004edfe8 sp=0xc0004edfe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 37 gp=0xc000320540 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a74b3941940?, 0x3?, 0x8a?, 0x3c?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc0004ecf38 sp=0xc0004ecf18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc0004ecfc8 sp=0xc0004ecf38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc0004ecfe0 sp=0xc0004ecfc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0004ecfe8 sp=0xc0004ecfe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 9 gp=0xc000184540 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a749d91b149?, 0x3?, 0xe1?, 0x60?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc0004ebf38 sp=0xc0004ebf18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc0004ebfc8 sp=0xc0004ebf38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc0004ebfe0 sp=0xc0004ebfc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0004ebfe8 sp=0xc0004ebfe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 22 gp=0xc000102a80 m=nil [GC worker (idle)]:
+runtime.gopark(0x1a749d91a9a7?, 0x1?, 0x74?, 0xc4?, 0x0?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc0004eaf38 sp=0xc0004eaf18 pc=0x4b4d2e
+runtime.gcBgMarkWorker(0xc00039bce0)
+	/usr/local/go/src/runtime/mgc.go:1423 +0xe9 fp=0xc0004eafc8 sp=0xc0004eaf38 pc=0x45c1e9
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/usr/local/go/src/runtime/mgc.go:1339 +0x25 fp=0xc0004eafe0 sp=0xc0004eafc8 pc=0x45c0c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0004eafe8 sp=0xc0004eafe0 pc=0x4bd0c1
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/usr/local/go/src/runtime/mgc.go:1339 +0x105
+
+goroutine 1643 gp=0xc00019ddc0 m=nil [chan receive]:
+runtime.gopark(0x18?, 0xc000100008?, 0xe8?, 0x5?, 0xc00042fc88?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc00042fc20 sp=0xc00042fc00 pc=0x4b4d2e
+runtime.chanrecv(0xc0000383f0, 0xc00042fd06, 0x1)
+	/usr/local/go/src/runtime/chan.go:664 +0x3e5 fp=0xc00042fc98 sp=0xc00042fc20 pc=0x44aa85
+runtime.chanrecv1(0x5ef0a60?, 0x1e24e40?)
+	/usr/local/go/src/runtime/chan.go:506 +0x12 fp=0xc00042fcc0 sp=0xc00042fc98 pc=0x44a672
+testing.(*T).Run(0xc000783a40, {0x20bb64a, 0x11}, 0xc0000105b8)
+	/usr/local/go/src/testing/testing.go:1859 +0x91e fp=0xc00042fdf8 sp=0xc00042fcc0 pc=0x61e31e
+swarm.local/companion/internal/engine.TestManagedFragmentRuntimeProviderProtocol(0xc000783a40)
+	/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_runtime_test.go:73 +0x1ab fp=0xc00042fee0 sp=0xc00042fdf8 pc=0x19a35ab
+testing.tRunner(0xc000783a40, 0x4d6ef98)
+	/usr/local/go/src/testing/testing.go:1792 +0x226 fp=0xc00042ffb0 sp=0xc00042fee0 pc=0x61c866
+testing.(*T).Run.gowrap1()
+	/usr/local/go/src/testing/testing.go:1851 +0x45 fp=0xc00042ffe0 sp=0xc00042ffb0 pc=0x61e5c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc00042ffe8 sp=0xc00042ffe0 pc=0x4bd0c1
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go/src/testing/testing.go:1851 +0x8f3
+
+goroutine 4230 gp=0xc000782540 m=nil [runnable]:
+runtime.slicecopy(0xc000a1ca5c?, 0x1a?, 0xc000947fa9?, 0x1a?, 0x1?)
+	/usr/local/go/src/runtime/slice.go:355 +0xe5 fp=0xc0006cce10 sp=0xc0006cce08 pc=0x496445
+encoding/json.appendString[...]({0xc0009f7d1f?, 0x0, 0x2e1}, {0xc000936000, 0x12801}, 0x1)
+	/usr/local/go/src/encoding/json/encode.go:988 +0x67c fp=0xc0006cce98 sp=0xc0006cce10 pc=0x6a755c
+encoding/json.stringEncoder(0xc0005b8100, {0x1e24e40?, 0xc0003222b0?, 0x3?}, {0x0?, 0x0?})
+	/usr/local/go/src/encoding/json/encode.go:601 +0x652 fp=0xc0006ccfd8 sp=0xc0006cce98 pc=0x68ea12
+encoding/json.structEncoder.encode({{{0xc000198788, 0x4, 0x4}, 0xc0003835c0, 0xc0003835f0}}, 0xc0005b8100, {0x1ede020?, 0xc000322280?, 0x1ede020?}, {0x0, ...})
+	/usr/local/go/src/encoding/json/encode.go:727 +0x3c8 fp=0xc0006cd090 sp=0xc0006ccfd8 pc=0x68f288
+encoding/json.structEncoder.encode-fm(0xc0005b8100, {0x1ede020?, 0xc000322280?, 0x2?}, {0xc0?, 0x4e?})
+	<autogenerated>:1 +0xe5 fp=0xc0006cd140 sp=0xc0006cd090 pc=0x6b0205
+encoding/json.arrayEncoder.encode({0x0?}, 0xc0005b8100, {0x1e14020?, 0xc00043a1e8?, 0xc00043a1ef?}, {0x80?, 0xa1?})
+	/usr/local/go/src/encoding/json/encode.go:870 +0x103 fp=0xc0006cd1b0 sp=0xc0006cd140 pc=0x691403
+encoding/json.arrayEncoder.encode-fm(0xc0005b8100, {0x1e14020?, 0xc00043a1e8?, 0x496411?}, {0x9e?, 0x51?})
+	<autogenerated>:1 +0x85 fp=0xc0006cd218 sp=0xc0006cd1b0 pc=0x6afea5
+encoding/json.sliceEncoder.encode({0x4c0429?}, 0xc0005b8100, {0x1e14020?, 0xc00043a1e8?, 0x5e7d65?}, {0x14?, 0x3?})
+	/usr/local/go/src/encoding/json/encode.go:843 +0x528 fp=0xc0006cd3a8 sp=0xc0006cd218 pc=0x690d68
+encoding/json.sliceEncoder.encode-fm(0xc0005b8100, {0x1e14020?, 0xc00043a1e8?, 0xa?}, {0x40?, 0x10?})
+	<autogenerated>:1 +0x85 fp=0xc0006cd410 sp=0xc0006cd3a8 pc=0x6affa5
+encoding/json.structEncoder.encode({{{0xc000196008, 0xb, 0x11}, 0xc000383710, 0xc000383740}}, 0xc0005b8100, {0x1f25200?, 0xc00043a180?, 0x4c03f1?}, {0x0, ...})
+	/usr/local/go/src/encoding/json/encode.go:727 +0x3c8 fp=0xc0006cd4c8 sp=0xc0006cd410 pc=0x68f288
+encoding/json.structEncoder.encode-fm(0xc0005b8100, {0x1f25200?, 0xc00043a180?, 0x5f17560?}, {0x0?, 0x0?})
+	<autogenerated>:1 +0xe5 fp=0xc0006cd578 sp=0xc0006cd4c8 pc=0x6b0205
+encoding/json.(*encodeState).reflectValue(0xc0005b8100, {0x1f25200?, 0xc00043a180?, 0xc0005b8100?}, {0x0?, 0x39?})
+	/usr/local/go/src/encoding/json/encode.go:333 +0x84 fp=0xc0006cd5d0 sp=0xc0006cd578 pc=0x68ae24
+encoding/json.(*encodeState).marshal(0xc0005b8100, {0x1f25200, 0xc00043a180}, {0x34?, 0x25?})
+	/usr/local/go/src/encoding/json/encode.go:309 +0xeb fp=0xc0006cd670 sp=0xc0006cd5d0 pc=0x68aaab
+encoding/json.Marshal({0x1f25200, 0xc00043a180})
+	/usr/local/go/src/encoding/json/encode.go:175 +0x12c fp=0xc0006cd778 sp=0xc0006cd670 pc=0x689ecc
+swarm.local/companion/internal/engine.parseManagedFragmentInspection({0xc00031a5a0, 0x1d3}, {0x1, 0x2, 0x0, 0x0, {0x0, 0x0}, 0x0, 0x2, ...})
+	/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_reply.go:65 +0x5d7 fp=0xc0006cdcc8 sp=0xc0006cd778 pc=0x146aaf7
+swarm.local/companion/internal/engine.parsePlannedFragment({_, _}, {0x0, {0x0, 0x0, 0x0}, 0x0, 0x2, {0xc000830bc0, 0x40}, ...}, ...)
+	/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_reuse.go:52 +0x248 fp=0xc0006cdeb8 sp=0xc0006cdcc8 pc=0x147aaa8
+swarm.local/companion/internal/engine.managedFragmentFinalBundle({0x0, 0x0, {0xc0000d05a0, 0x1, 0x1}, {0xc00002bc50, 0x28}, {0xc00002bc80, 0x28}, {0xc000c84000, ...}, ...}, ...)
+	/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_final.go:56 +0x4c5 fp=0xc0006cebb8 sp=0xc0006cdeb8 pc=0x1450765
+swarm.local/companion/internal/engine.parseManagedFragmentFinalRequest({_, _}, {_, _}, {0x0, 0x0, {0xc0000d05a0, 0x1, 0x1}, {0xc00002bc50, ...}, ...}, ...)
+	/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_request.go:29 +0x210 fp=0xc0006cf038 sp=0xc0006cebb8 pc=0x146eab0
+swarm.local/companion/internal/engine.validateManagedFragmentFinalJournal({{_, _, _}, _, {_, _}, {_, _, _}}, {0x1, ...}, ...)
+	/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_final_journal.go:110 +0x147b fp=0xc0006cf7e8 sp=0xc0006cf038 pc=0x1452dbb
+swarm.local/companion/internal/engine.(*Store).commitManagedFragmentFinal(_, {_, _}, {0x0, 0x0, 0x0, 0x0, {0x0, 0x0}, {0x0, ...}, ...}, ...)
+	/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_final_store.go:107 +0xe0e fp=0xc0006d0408 sp=0xc0006cf7e8 pc=0x1456b2e
+swarm.local/companion/internal/engine.(*Store).runManagedFragmentReview(_, {0x0, 0xc000996000, 0x0, {0x0, 0x0, 0x0}, {0x0, 0x0, 0x0}, ...}, ...)
+	/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_runtime.go:264 +0x381d fp=0xc0006d16e8 sp=0xc0006d0408 pc=0x148507d
+swarm.local/companion/internal/engine.TestManagedFragmentRuntimeProviderProtocol.func1(0xc0000f36c0)
+	/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_fragment_runtime_test.go:88 +0xba7 fp=0xc0006d3ee0 sp=0xc0006d16e8 pc=0x19a4267
+testing.tRunner(0xc0000f36c0, 0xc0000105b8)
+	/usr/local/go/src/testing/testing.go:1792 +0x226 fp=0xc0006d3fb0 sp=0xc0006d3ee0 pc=0x61c866
+testing.(*T).Run.gowrap1()
+	/usr/local/go/src/testing/testing.go:1851 +0x45 fp=0xc0006d3fe0 sp=0xc0006d3fb0 pc=0x61e5c5
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc0006d3fe8 sp=0xc0006d3fe0 pc=0x4bd0c1
+created by testing.(*T).Run in goroutine 1643
+	/usr/local/go/src/testing/testing.go:1851 +0x8f3
+
+goroutine 4231 gp=0xc0000f4fc0 m=nil [select]:
+runtime.gopark(0xc000707f60?, 0x2?, 0xe8?, 0x7d?, 0xc000707f4c?)
+	/usr/local/go/src/runtime/proc.go:435 +0xce fp=0xc000707da8 sp=0xc000707d88 pc=0x4b4d2e
+runtime.selectgo(0xc000707f60, 0xc000707f48, 0xc000707f90?, 0x0, 0x4c0429?, 0x1)
+	/usr/local/go/src/runtime/select.go:351 +0x985 fp=0xc000707f18 sp=0xc000707da8 pc=0x491385
+database/sql.(*DB).connectionOpener(0xc00050f930, {0x520ce60, 0xc00035e8c0})
+	/usr/local/go/src/database/sql/sql.go:1261 +0xeb fp=0xc000707fa0 sp=0xc000707f18 pc=0x762d8b
+database/sql.OpenDB.gowrap1()
+	/usr/local/go/src/database/sql/sql.go:841 +0x50 fp=0xc000707fe0 sp=0xc000707fa0 pc=0x75ff10
+runtime.goexit({})
+	/usr/local/go/src/runtime/asm_amd64.s:1700 +0x1 fp=0xc000707fe8 sp=0xc000707fe0 pc=0x4bd0c1
+created by database/sql.OpenDB in goroutine 4230
+	/usr/local/go/src/database/sql/sql.go:841 +0x287
+
+rax    0xca
+rbx    0x0
+rcx    0x4bf723
+rdx    0x0
+rdi    0x5ef3160
+rsi    0x80
+rbp    0x7ffe2a3a7118
+rsp    0x7ffe2a3a70d0
+r8     0x0
+r9     0x0
+r10    0x0
+r11    0x286
+r12    0xd
+r13    0x1
+r14    0x5ef1940
+r15    0x5
+rip    0x4bf721
+rflags 0x286
+cs     0x33
+fs     0x0
+gs     0x0
+FAIL	swarm.local/companion/internal/engine	197.742s
+FAIL

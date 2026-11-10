@@ -1,0 +1,17 @@
+{
+  "fixture": "/tmp/swarm-assist-recipe-vcptg_d2",
+  "checks": [
+    "Administration accessible depuis la navigation ; catalogue local affiché",
+    "Aperçu, annulation Échap et restitution du focus ; aucune mutation avant confirmation",
+    "Effort medium choisi dans le formulaire, preview puis sauvegarde durable ; choix hérité disponible",
+    "Réouverture directe de la page admin : effort medium conservé",
+    "Export téléchargé et import versionné confirmé par les boutons",
+    "Import de commande rejeté dans la modale",
+    "Test IA depuis la carte fournisseur : niveau choisi, aperçu exact, réponse et modèle conservés",
+    "Modèle de la réponse conservé après rechargement",
+    "Changer de lancement vers lecture du rapport ne reste pas bloqué par une résolution de modèle en cours",
+    "FR/EN, thèmes clair/sombre, desktop et mobile320 : medium relu, héritage explicite, aucun débordement, Échap/focus"
+  ],
+  "errors": [],
+  "at": "2026-10-11T16:06:50.794Z"
+}

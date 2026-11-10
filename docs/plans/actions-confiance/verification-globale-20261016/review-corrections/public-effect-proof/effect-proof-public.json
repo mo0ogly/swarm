@@ -1,0 +1,692 @@
+{
+  "schema_version": 1,
+  "checks": [
+    "ledger: exact policy/intent/result/native digest exported",
+    "ledger: reconciliation preserves committed snapshot",
+    "ledger: HMAC verifies the reopened new export",
+    "ledger: rejects changed result",
+    "ledger: rejects changed native",
+    "ledger: rejects changed policy",
+    "ledger: corrupt chain refused before mutation",
+    "access: exact policy/intent/result/native digest exported",
+    "access: reconciliation preserves committed snapshot",
+    "access: HMAC verifies the reopened new export",
+    "access: rejects changed result",
+    "access: rejects changed native",
+    "access: rejects changed policy",
+    "access: corrupt chain refused before mutation",
+    "historical unchanged export and HMAC anchor verified by corrected binary"
+  ],
+  "binary_sha256": "c0030271a0c2108a6d872b954b0be7556f69642463e28e3070f6bde1edfd8ec8",
+  "roots": [
+    "/tmp/swarm-effect-proof-ruo2ph4f",
+    "/tmp/swarm-effect-proof-5gkm60zx",
+    "/tmp/swarm-effect-proof-oyillgtr",
+    "/tmp/swarm-effect-proof-_2wk7bvc"
+  ],
+  "runs": [
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "init"
+      ],
+      "started_unix": 1792134934.7495167,
+      "ended_unix": 1792134935.1327865,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "config-apply",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134935.1329648,
+      "ended_unix": 1792134935.2736998,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "mandate-create",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134935.2741735,
+      "ended_unix": 1792134935.3918972,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "request",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134935.3920264,
+      "ended_unix": 1792134935.5389016,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "approve",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134935.5390353,
+      "ended_unix": 1792134935.6859794,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "commit",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134935.6861088,
+      "ended_unix": 1792134935.8503397,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "export"
+      ],
+      "started_unix": 1792134935.8504348,
+      "ended_unix": 1792134935.9762776,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "reconcile",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134935.9778457,
+      "ended_unix": 1792134936.0967104,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "export"
+      ],
+      "started_unix": 1792134936.0967846,
+      "ended_unix": 1792134936.194675,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "anchor"
+      ],
+      "started_unix": 1792134936.195785,
+      "ended_unix": 1792134936.3456995,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134936.3461878,
+      "ended_unix": 1792134936.480494,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134936.4817421,
+      "ended_unix": 1792134936.717231,
+      "exit_code": 2,
+      "expected": 2
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134936.7184951,
+      "ended_unix": 1792134936.8483238,
+      "exit_code": 2,
+      "expected": 2
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134936.8497343,
+      "ended_unix": 1792134936.9733102,
+      "exit_code": 2,
+      "expected": 2
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-5gkm60zx",
+        "--json",
+        "init"
+      ],
+      "started_unix": 1792134936.9736345,
+      "ended_unix": 1792134937.1711972,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-5gkm60zx",
+        "--json",
+        "trust",
+        "config-apply",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134937.1713235,
+      "ended_unix": 1792134937.318164,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-5gkm60zx",
+        "--json",
+        "trust",
+        "mandate-create",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134937.3185928,
+      "ended_unix": 1792134937.4271913,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-5gkm60zx",
+        "--json",
+        "trust",
+        "request",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134937.4282112,
+      "ended_unix": 1792134937.5629857,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-5gkm60zx",
+        "--json",
+        "trust",
+        "approve",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134937.5631483,
+      "ended_unix": 1792134937.7080624,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-5gkm60zx",
+        "--json",
+        "trust",
+        "commit",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134937.7125165,
+      "ended_unix": 1792134937.8353283,
+      "exit_code": 2,
+      "expected": 2
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-5gkm60zx",
+        "--json",
+        "trust",
+        "show"
+      ],
+      "started_unix": 1792134937.835627,
+      "ended_unix": 1792134937.9673936,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "init"
+      ],
+      "started_unix": 1792134937.9680922,
+      "ended_unix": 1792134938.2098064,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "config-apply",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134938.2099302,
+      "ended_unix": 1792134938.4044092,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "mandate-create",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134938.4048474,
+      "ended_unix": 1792134938.510822,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "request",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134938.5109472,
+      "ended_unix": 1792134938.6417298,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "approve",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134938.641913,
+      "ended_unix": 1792134938.8727193,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "commit",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134938.8733134,
+      "ended_unix": 1792134939.0996685,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "export"
+      ],
+      "started_unix": 1792134939.10077,
+      "ended_unix": 1792134939.2578945,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "reconcile",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134939.259003,
+      "ended_unix": 1792134939.3947043,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "export"
+      ],
+      "started_unix": 1792134939.3948183,
+      "ended_unix": 1792134939.5397985,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "anchor"
+      ],
+      "started_unix": 1792134939.540802,
+      "ended_unix": 1792134939.6424549,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134939.6429565,
+      "ended_unix": 1792134939.7501767,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134939.7517526,
+      "ended_unix": 1792134939.8991969,
+      "exit_code": 2,
+      "expected": 2
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134939.904376,
+      "ended_unix": 1792134940.0181766,
+      "exit_code": 2,
+      "expected": 2
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-oyillgtr",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134940.0194995,
+      "ended_unix": 1792134940.1888766,
+      "exit_code": 2,
+      "expected": 2
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-_2wk7bvc",
+        "--json",
+        "init"
+      ],
+      "started_unix": 1792134940.1892304,
+      "ended_unix": 1792134940.3544521,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-_2wk7bvc",
+        "--json",
+        "trust",
+        "config-apply",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134940.3546507,
+      "ended_unix": 1792134940.425459,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-_2wk7bvc",
+        "--json",
+        "trust",
+        "mandate-create",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134940.4259057,
+      "ended_unix": 1792134940.5072849,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-_2wk7bvc",
+        "--json",
+        "trust",
+        "request",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134940.5074208,
+      "ended_unix": 1792134941.8600771,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-_2wk7bvc",
+        "--json",
+        "trust",
+        "approve",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134941.8602357,
+      "ended_unix": 1792134941.9235706,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-_2wk7bvc",
+        "--json",
+        "trust",
+        "commit",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134941.9248037,
+      "ended_unix": 1792134941.994638,
+      "exit_code": 2,
+      "expected": 2
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-_2wk7bvc",
+        "--json",
+        "trust",
+        "show"
+      ],
+      "started_unix": 1792134941.9948864,
+      "ended_unix": 1792134942.0476944,
+      "exit_code": 0,
+      "expected": 0
+    },
+    {
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-effect-proof-ruo2ph4f",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792134942.0763533,
+      "ended_unix": 1792134942.1221452,
+      "exit_code": 0,
+      "expected": 0
+    }
+  ],
+  "legacy_receipt_sha256": "27883184de2f008c91d70fedc9cb917166525181f1dd17d64d9ef2dbe10c43d5",
+  "live_state_modified": false,
+  "global_acceptance": false
+}

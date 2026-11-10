@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "swap_observed": true,
+  "private_original_unchanged": true,
+  "provider_not_executed": true,
+  "driver_sha256": "ffecfef222802119dd907f0676ec75932d9ff4b73a8be3f5837fa20c8573c5d4",
+  "product_qualified": false,
+  "installed": false
+}

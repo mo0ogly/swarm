@@ -45,11 +45,11 @@ faute de l'agent déclenche une régénération du livrable (défaut D3) au lieu
 
 ## B.2 Taxonomie
 
-Cinq classes, dérivées de MAST (Cemri et al., 2025), qui classe les défaillances des agents mais
-n'a aucune catégorie pour l'orchestrateur lui-même :
+Cinq classes proposées pour l’attribution opérationnelle, en regard de MAST (Cemri et al.,
+2025), qui inclut déjà les défauts de conception du système. Elles ne remplacent pas MAST :
 
 | Classe | Définition |
-|||
+|---|---|
 | Agent | L'agent a produit un livrable ou un comportement fautif (candidat modifié, rapport ancien relayé, sortie invalide). |
 | Environnement | Une cause extérieure à l'agent et au moteur : service indisponible, processus tué, réponse perdue, écriture concurrente d'un tiers. |
 | Règle | Une règle juste mais mal calibrée a arrêté un travail correct (budget trop bas, délai trop court). |
@@ -80,13 +80,15 @@ injectée correctement arrêtée » de la version initiale du protocole, qui mê
 
 ## B.4 Vérité de référence
 
-Contrairement à MAST, la cause est connue par construction : chaque faute est injectée. La
-vérité de référence de chaque unité est fixée **avant** l'annotation, par la table suivante,
-puis corrigée unité par unité si les traces montrent une cause différente (ces corrections
-sont publiées).
+*Précision méthodologique du 8 octobre 2026, avant constitution du corpus :* l’injection
+identifie une perturbation contrôlée, pas nécessairement la cause effective de chaque unité.
+La table suivante donne des hypothèses d’attribution, à vérifier sur les traces avant annotation.
+Une faute injectée par le harnais ne prouve pas qu’un agent réel l’aurait produite. Les causes
+initiales, aggravantes et indémontrables doivent être distinguées ; les corrections de référence
+sont publiées, sans réécrire les résultats historiques.
 
 | Faute injectée | Classe principale attendue | Remarque |
-||||
+|---|---|---|
 | F1 réponse perdue | Environnement | |
 | F2 lanceurs concurrents | Environnement | écriture concurrente d'un tiers |
 | F3 arrêt brutal (137) | Environnement | |
@@ -104,14 +106,14 @@ Le moteur classe chaque échec de reprise dans une catégorie (`recovery.go`) : 
 `environment`, `conflict`, `business`, `unknown`. Correspondance fixée d'avance :
 
 | Catégorie du moteur | Classe |
-|||
+|---|---|
 | `transient`, `environment`, `conflict` | Environnement |
 | `business` | Agent |
 | `unknown` | Inconnu |
 
 Le moteur n'a pas de catégorie pour la règle ni pour lui-même. Son rappel sur ces deux classes
 est donc nul par construction ; nous le rapportons comme un constat, au même titre que
-l'absence de catégorie orchestrateur dans MAST.
+la nécessité de confronter cette attribution aux défauts de conception décrits par MAST.
 
 ## B.6 Annotation
 

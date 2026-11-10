@@ -1,0 +1,10 @@
+=== RUN   TestActionsConfianceT5PublicNamespace
+--- PASS: TestActionsConfianceT5PublicNamespace (1.28s)
+=== RUN   TestActionsConfianceT5VersionPinningAndApproval
+--- PASS: TestActionsConfianceT5VersionPinningAndApproval (1.43s)
+=== RUN   TestActionsConfianceT5ReplayRechecksDataAdmission
+    trust_process_test.go:104: historical create replay returned case data after policy withdrawal
+--- FAIL: TestActionsConfianceT5ReplayRechecksDataAdmission (1.07s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	4.282s
+FAIL

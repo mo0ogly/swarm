@@ -1,0 +1,48 @@
+[
+  {
+    "language": "fr",
+    "command": [
+      "mmdc",
+      "-i",
+      "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/contract-fr.mmd",
+      "-o",
+      "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/contract-fr.svg",
+      "-c",
+      "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1400",
+      "-H",
+      "1200"
+    ],
+    "start": "2026-10-17T05:56:53.279673+00:00",
+    "end": "2026-10-17T05:56:58.154603+00:00",
+    "exit_code": 0,
+    "stdout": "Generating single mermaid chart\n",
+    "stderr": ""
+  },
+  {
+    "language": "en",
+    "command": [
+      "mmdc",
+      "-i",
+      "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/contract-en.mmd",
+      "-o",
+      "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/contract-en.svg",
+      "-c",
+      "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-mermaid.json",
+      "-p",
+      "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/diagram-browser.json",
+      "-w",
+      "1400",
+      "-H",
+      "1200"
+    ],
+    "start": "2026-10-17T05:56:58.156604+00:00",
+    "end": "2026-10-17T05:57:01.843052+00:00",
+    "exit_code": 0,
+    "stdout": "Generating single mermaid chart\n",
+    "stderr": ""
+  }
+]

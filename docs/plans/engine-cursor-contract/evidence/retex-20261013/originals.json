@@ -1,0 +1,115 @@
+{
+  "scope": "Originals retained outside source; no provider configuration or session secret published. Repository exports are exact copies or explicitly selected public projections.",
+  "receipts": [
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw1-preflight/cli.jsonl",
+      "sha256": "338851662a79ae1f3e89d89aabb9b9d5118c44b33a2e1db7064ace01121b53be",
+      "bytes": 19866751
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw1-preflight/final-public-work.json",
+      "sha256": "362ecfedbe21359ce94bead3e9c5e581d21f6d89be714527c3b3bf836f451da2",
+      "bytes": 70044
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw1-preflight/delivery.bundle",
+      "sha256": "e785c39b808cb5fde2cffcc478e41ad87a5ca59d61051a6a544ee1ce32abd552",
+      "bytes": 3969
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw1-spending-recheck.json",
+      "sha256": "9b8227c39e7d3b61c93924ad748818dbc3b158028fd7545e97ee95a5c63ea10f",
+      "bytes": 8099
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-retex-final-candidate",
+      "sha256": "eeead1e1624ee11b6667a17fa03455c260fd99df907d7be0c0f16cc07625bfa5",
+      "bytes": 78670659
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw2-browser-final/calls-fr-etat.png",
+      "sha256": "c00cb89b07252c7d4b0e04f061b90ed6193db64003d991e4505e566f00e1f7e3",
+      "bytes": 148884
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw2-browser-final/calls-en-sombre.png",
+      "sha256": "9f26b2b32cabfef5bb3351941d0ec408f956ce93df95119f5c427825beaca0b4",
+      "bytes": 139129
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-serial/frozen.json",
+      "sha256": "6e7b72858e1318cb395b50bae1b7d24cd76104654415b2cc3d38cd00078c2af5",
+      "bytes": 2079
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-serial/execution-inputs.json",
+      "sha256": "a202606a0f75201099f600a3e8d7b6fb80c69f23b013dff767b590aa45358fa1",
+      "bytes": 863
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-serial/cli.jsonl",
+      "sha256": "7291bbf40a5a0f419eca3ab0db8da8bc091c8a55969cf0ab6558f9f6653f1576",
+      "bytes": 46031058
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-serial/final-public-work.json",
+      "sha256": "9bd42734bb70718363b383e417f6b25ac4523c4fde77d817a3407875e727ffc7",
+      "bytes": 164950
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-serial/spending.json",
+      "sha256": "87ace9b63e1a64b7ed6d86b129b48276887477d3680d7763d43e3456882eab92",
+      "bytes": 16403
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-serial/delivery.bundle",
+      "sha256": "871792002d12c2b53b5f369b169ff3a7bc0c0a11d1f914f746d8dde970efb85c",
+      "bytes": 10299
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-parallel/frozen.json",
+      "sha256": "d7b9519d5fe1df1e8a9b77c8deb5497aaf06b68c3b71fcd7911321161ce70ab9",
+      "bytes": 2085
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-parallel/execution-inputs.json",
+      "sha256": "5d0be78c429dbedef39da0eb534203afe3271d12d811bd32369901483348e244",
+      "bytes": 865
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-parallel/cli.jsonl",
+      "sha256": "8646f1741f49e21053f312c3e66c78aaf93a3ea6d8c8015c89776216a67b850f",
+      "bytes": 23454592
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-parallel/final-public-work.json",
+      "sha256": "7efe1eb69c62923c1b68012140cf47dbe7773791600e717e9124d0f67bf5751d",
+      "bytes": 163569
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-parallel/spending.json",
+      "sha256": "4980cdaeffa41420a03cd655e122d16b8f9b9474a0906539f7d6b8d0c626091c",
+      "bytes": 15132
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw3-parallel/delivery.bundle",
+      "sha256": "efdc15ffde278d434e9a425958c6cf40f5c0ae85ea447ef8381f5585786059bd",
+      "bytes": 10653
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw2-browser-console/result.json",
+      "sha256": "32bc2a7deb3c08ec4f878cbe5a841063e85883c36d0bea6ea47ad045778556bb",
+      "bytes": 4934
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw2-browser-console/calls-fr-etat.png",
+      "sha256": "c00cb89b07252c7d4b0e04f061b90ed6193db64003d991e4505e566f00e1f7e3",
+      "bytes": 148884
+    },
+    {
+      "original": "/home/fpizzi/.cache/swarm-operator-replan-20261011/retex-qw2-browser-console/calls-mobile-en-sombre.png",
+      "sha256": "5aeb623be30a4b66340b31630d88fb688753f4d414afe74fdb2b98e43b6de639",
+      "bytes": 61188
+    }
+  ]
+}

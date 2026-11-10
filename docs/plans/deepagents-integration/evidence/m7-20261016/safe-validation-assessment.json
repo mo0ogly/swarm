@@ -1,0 +1,53 @@
+{
+  "at_utc": "2026-10-16T07:51:47.479991+00:00",
+  "checks": [
+    {
+      "label": "safe-knowledge-tests",
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "label": "safe-legacy-tests",
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "label": "safe-collector-tests",
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "label": "safe-grade-correct",
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "label": "safe-grade-stale",
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "label": "safe-v1-replay",
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "label": "safe-package-discovery",
+      "actual": 0,
+      "expected": 0
+    }
+  ],
+  "historical_model_results_exactly_preserved": true,
+  "new_evidence_packages": [],
+  "existing_package_discovery_preserved": [
+    "swarm.local/companion",
+    "swarm.local/companion/cmd/swarm",
+    "swarm.local/companion/docs/plans/actions-confiance/verification-launch-20261014/canonical-pilot-integration-20261015/preimages/internal/engine",
+    "swarm.local/companion/docs/plans/deepagents-integration/evidence/m1-20261015",
+    "swarm.local/companion/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/contract-resolution23-counterexamples-20261011/candidate/internal/engine",
+    "swarm.local/companion/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/contract-resolution23-counterexamples-20261011/primary-preimages/internal/engine",
+    "swarm.local/companion/internal/engine"
+  ],
+  "prior_outer_assertion_issue": "Initial wrapper asserted no packages anywhere under deepagents-integration, but M1 already contains a pre-existing fixture package. The correction is scoped to new M7 snapshots; no existing package was removed.",
+  "new_real_model_calls": 0
+}

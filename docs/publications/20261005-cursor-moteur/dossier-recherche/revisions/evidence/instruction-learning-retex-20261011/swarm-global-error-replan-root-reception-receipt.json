@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-11T16:36:27.160215+00:00",
+  "revision": 392,
+  "root_generation": 75,
+  "root_state": "waiting",
+  "root_delivery": {
+    "review_retry_unavailable": true,
+    "production_retry_unavailable": true,
+    "context_sha256": "de428c37c4d752903ab8f47b30673b1aed7a1ee79dd626a5349ac6edf7998ffc",
+    "events": [
+      "root-global-errors-replan-medium-and-current-review-20261011",
+      "review-754dbd4d247114000994bbc6-result-940a941913ea1d9f",
+      "plan-c393d63138f032a6bb4c4a10ac43c1b82f7156589e8ec8eaece8ec061da7dc98"
+    ],
+    "decision": "planning-claim-21b6d8b46646d0600d282af7-decision"
+  },
+  "new_global_instruction_received": true,
+  "limitations": "Received context and decision attribution, not global error behavior implementation. Root tool-free cannot alter an ended producer; public recovery delegated to operator."
+}

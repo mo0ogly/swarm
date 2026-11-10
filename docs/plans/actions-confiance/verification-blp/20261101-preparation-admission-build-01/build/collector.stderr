@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/verification/verify_native_profile.py", line 245, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/verification/verify_native_profile.py", line 242, in main
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path.cwd());parser.add_argument('--target-dir',type=Path);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args();root=args.root.resolve();target=(args.target_dir or root/'rust/target/r97').resolve();require(target.is_relative_to(root),'profile-target-outside-checkout');print(json.dumps(run(root,args.output.resolve(),target)),flush=True)
+                                                                                                                                                                                                                                                                                                                                                                                                                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/verification/verify_native_profile.py", line 226, in run
+    actual=dependencies(root,depfile);publish(out/'after.json',json.dumps(actual,indent=2)+'\n');effective_unchanged(root,before,actual)
+                                                                                                 ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/verification/verify_native_profile.py", line 149, in effective_unchanged
+    require(not changed,'profile-effective-input-changed:'+','.join(changed))
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tools/verification/verify_native_profile.py", line 19, in require
+    if not condition:raise ValueError(reason)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: profile-effective-input-changed:rust/crates/swarm-authority/src/audit.rs,rust/crates/swarm-authority/src/server.rs

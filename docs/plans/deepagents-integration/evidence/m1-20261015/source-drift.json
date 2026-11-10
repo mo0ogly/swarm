@@ -1,0 +1,7 @@
+{
+  "observation": "A test from another workstream changed during the audit. Memory sources remain unchanged. Run one final targeted group against a fresh baseline rather than treating the old full compilation inputs as unchanged.",
+  "changed_since_first_overlay_baseline": [
+    "internal/engine/trust_identity_context_test.go"
+  ],
+  "action": "Preserve unrelated work; capture current complete Go package source baseline; rerun selected checks once."
+}

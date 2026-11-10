@@ -1,0 +1,267 @@
+{
+  "version": 1,
+  "foundation": "F5",
+  "title": "Definir le systeme design",
+  "depends_on": "F4",
+  "visual_direction": {
+    "principle": "Lisibilite et confiance d'abord : le produit vend un moteur deterministe, pas un decor. Palette neutre sombre/claire, peu de couleur d'accent reservee aux actions et aux etats, typographie monospace reservee au technique (identifiants, JSON, logs) pour marquer la frontiere preuve/texte.",
+    "tone": "Serieux, technique, sans jargon marketing ; aucune animation decorative non fonctionnelle (seulement transitions d'etat chargement/apparition <=200ms).",
+    "light_dark": "Deux themes complets (clair/sombre) bascule manuelle, persistee par compte si connecte sinon localStorage ; jamais de flash non theme au chargement (valeur par defaut injectee server-side selon prefers-color-scheme).",
+    "non_goals": "Pas de theme unique copie d'un autre produit ; pas de mascotte, pas d'illustration generique stock ; pas de dark pattern (ex. bouton revocation jamais minimise visuellement)."
+  },
+  "tokens": {
+    "color": {
+      "bg_base": {"light": "#FFFFFF", "dark": "#0B0E12"},
+      "bg_surface": {"light": "#F4F5F7", "dark": "#141821"},
+      "bg_surface_raised": {"light": "#FFFFFF", "dark": "#1B2029"},
+      "border_default": {"light": "#D8DBE0", "dark": "#2A303B"},
+      "text_primary": {"light": "#12151A", "dark": "#EDEFF2"},
+      "text_secondary": {"light": "#4B5563", "dark": "#9AA3AF"},
+      "accent_action": {"light": "#1D4ED8", "dark": "#5B8DEF"},
+      "accent_action_hover": {"light": "#1639AD", "dark": "#7AA3F5"},
+      "success": {"light": "#157F3C", "dark": "#3FCB7A"},
+      "warning": {"light": "#9A6400", "dark": "#E0A838"},
+      "danger": {"light": "#B3261E", "dark": "#F2746B"},
+      "danger_surface": {"light": "#FDECEA", "dark": "#2B1515"},
+      "focus_ring": {"light": "#1D4ED8", "dark": "#7AA3F5"},
+      "contrast_rule": "Toute paire texte/fond respecte au minimum WCAG AA (4.5:1 texte normal, 3:1 grand texte/icone) ; verifie par controle manuel liste en limits, pas par outil automatique dans ce perimetre."
+    },
+    "typography": {
+      "font_ui": "Systeme (ui-sans-serif stack : -apple-system, Segoe UI, Roboto, Arial) pour eviter un chargement web font externe (perimetre sans connexion reseau distante additionnelle).",
+      "font_mono": "Systeme monospace (ui-monospace, SFMono, Consolas) reserve aux identifiants (uuid), extraits JSON/API, journal d'audit.",
+      "scale": {"xs": "12px/16px", "sm": "14px/20px", "base": "16px/24px", "lg": "20px/28px", "xl": "24px/32px", "2xl": "30px/38px"},
+      "weight": {"regular": 400, "medium": 500, "semibold": 600},
+      "usage_rule": "Un seul niveau de titre par ecran (xl ou 2xl) ; base pour corps de texte ; sm/xs reserves aux metadonnees (horodatage, statut)."
+    },
+    "spacing": {"scale_px": [4, 8, 12, 16, 24, 32, 48, 64], "rule": "Multiples de 4px uniquement ; 16px marge interne par defaut des cartes, 24px entre sections d'ecran."},
+    "radius": {"sm": "4px (champs, badges)", "md": "8px (cartes, boutons)", "lg": "12px (panneaux modaux)"},
+    "elevation": {
+      "level0": "aucune ombre (bg_base)",
+      "level1": "ombre legere sur bg_surface_raised (cartes)",
+      "level2": "ombre marquee sur modale/menu deroulant uniquement"
+    },
+    "motion": {"duration_fast": "120ms", "duration_base": "200ms", "easing": "ease-out", "rule": "Jamais d'animation sur les messages d'erreur/refus (apparition immediate, pas de fade qui retarde la lecture d'un refus serveur)."}
+  },
+  "components": [
+    {
+      "id": "AppShell",
+      "purpose": "Structure commune : en-tete (logo, langue, theme, compte/connexion), navigation contextuelle par role, zone de contenu, pied de page minimal.",
+      "variants": ["public (prospect, non connecte)", "client (connecte, role client)", "admin (connecte, role administrateur)"],
+      "states": ["loading (squelette en-tete)", "error (bandeau si session invalide detectee mid-navigation)", "success"],
+      "notes": "Variant admin ajoute une entree de navigation 'Administration' visible seulement si role=administrateur confirme serveur (jamais seulement cache cote client sans re-verification API)."
+    },
+    {
+      "id": "GraphProofViewer",
+      "purpose": "Affichage lecture seule d'un graphe et de ses preuves (exemple public ou reel si etendu plus tard).",
+      "variants": ["exemple public (aucune donnee privee)"],
+      "states": ["loading (squelette graphe)", "empty (aucun graphe exemple -> message + lien catalogue)", "error (panne backend -> message generique + reessai, jamais de stacktrace)", "success (graphe + liste de preuves associees)"],
+      "notes": "Correspond a GET /api/public/example-graph (F4). Composant purement presentatif, aucune mutation."
+    },
+    {
+      "id": "ModelCard",
+      "purpose": "Carte resume d'un modele du catalogue (cinq fondations + six etapes resumees).",
+      "variants": ["liste (compacte)", "comparateur (deux cartes cote a cote)", "fiche detaillee (etendue)"],
+      "states": ["loading (squelette carte)", "success"],
+      "notes": "Action principale 'Choisir ce modele' redirige vers connexion/creation de compte ; aucun appel POST moteur avant authentification (critere F3)."
+    },
+    {
+      "id": "AuthForm",
+      "purpose": "Formulaire connexion et creation de compte (D1 F4 : mot de passe local).",
+      "variants": ["login", "register"],
+      "states": ["loading (soumission en cours, bouton desactive)", "error (message generique identique compte inexistant/mot de passe faux, cf D-F3-2 ; jamais de distinction par champ)", "success (redirection espace personnel)"],
+      "notes": "Champ mot de passe avec bascule visibilite ; validation client (longueur) n'est jamais la seule barriere, le serveur revalide (politique min 12 caracteres, F4)."
+    },
+    {
+      "id": "ResourceList",
+      "purpose": "Liste des ressources autorisees pour le compte connecte (GET /api/me/resources).",
+      "variants": ["liste simple"],
+      "states": ["loading (squelette liste)", "empty (aucune ressource -> message + lien demarrage)", "error (panne -> message + reessai)", "success (liste avec acces detail)"],
+      "notes": "Un clic sur un element relance toujours une verification serveur (GET /api/me/resources/{id}) ; le composant n'affiche jamais un contenu mis en cache sans confirmation d'autorisation au chargement de la page detail."
+    },
+    {
+      "id": "OnboardingStepper",
+      "purpose": "Guide sequentiel installation -> fournisseur -> configuration -> complete (OnboardingState F4).",
+      "variants": ["etape active", "etape validee", "etape bloquee"],
+      "states": ["loading (verification etape)", "empty (aucune progression -> etape initiale)", "error (etape en echec, specifique : ex. fournisseur injoignable E7 -> etat du guide preserve, pas de retour a zero)", "success (etape validee ou guide complete)"],
+      "notes": "Reprend exactement current_step au retour (critere F2/F4) ; ne jamais permettre de sauter une etape non validee cote serveur."
+    },
+    {
+      "id": "AdminAccountSearch",
+      "purpose": "Recherche de compte par identifiant/email/nom (GET /api/admin/accounts?q=).",
+      "variants": ["defaut"],
+      "states": ["loading", "empty (aucun resultat -> message explicatif)", "error", "success (liste de resultats cliquables)"],
+      "notes": "Visible uniquement si role administrateur confirme ; sinon redirection/refus (E6)."
+    },
+    {
+      "id": "AdminAccountDetail",
+      "purpose": "Fiche compte : droits actuels, etat, actions (attribuer/retirer droit, revoquer session/droit).",
+      "variants": ["defaut"],
+      "states": ["loading", "error (echec application -> aucune modification partielle affichee, F4 transaction)", "success (etat applique + entree journal visible immediatement)"],
+      "notes": "Le bouton 'Revoquer' ne doit jamais afficher 'revoque' avant confirmation serveur explicite (cf story revocation, anti succes-degrade)."
+    },
+    {
+      "id": "AuditLogTable",
+      "purpose": "Journal d'audit global tri decroissant (GET /api/admin/audit-log).",
+      "variants": ["defaut"],
+      "states": ["loading", "empty (aucune entree encore)", "error", "success"],
+      "notes": "Colonnes horodatage exact (font_mono), acteur, cible, action. Reserve a l'administrateur pour cet increment (D5=A1, F4)."
+    },
+    {
+      "id": "ConfirmDangerDialog",
+      "purpose": "Confirmation explicite avant toute action irreversible visible (revocation session/droit).",
+      "variants": ["revoquer session", "revoquer droit"],
+      "states": ["loading (action en cours)", "error (echec -> dialogue reste ouvert avec message, pas de fermeture silencieuse)", "success (fermeture + confirmation uniquement apres reponse serveur 200)"],
+      "notes": "Jamais ferme ni marque succes avant reponse serveur ; correspond directement a l'exigence 'pas de succes degrade' (F2/F3/F4 E5)."
+    },
+    {
+      "id": "StatusBanner",
+      "purpose": "Bandeau global reutilisable pour erreur/avertissement/succes transverse (ex. session expiree detectee).",
+      "variants": ["info", "success", "warning", "danger"],
+      "states": ["visible", "dismissible (sauf danger bloquant comme session expiree qui force reconnexion)"],
+      "notes": "Utilise par AppShell quand une verification de session echoue en arriere-plan pendant la navigation."
+    }
+  ],
+  "screens": [
+    {
+      "id": "SCR-public-landing",
+      "story": "decouverte",
+      "components": ["AppShell(public)", "GraphProofViewer"],
+      "fr_en": "FR/EN via selecteur en-tete, memorise ; textes cles : enonce moteur deterministe vs agents, lien catalogue, lien explication cinq fondations/six etapes.",
+      "mobile_desktop": "Desktop : graphe + texte cote a cote (2 colonnes >=1024px). Mobile (<768px) : texte puis graphe empiles, graphe scrollable horizontalement si besoin."
+    },
+    {
+      "id": "SCR-public-catalog",
+      "story": "catalogue",
+      "components": ["AppShell(public)", "ModelCard(liste)", "ModelCard(comparateur)"],
+      "fr_en": "Fiches modele traduites (resume cinq fondations/six etapes) FR/EN depuis contenu publie.",
+      "mobile_desktop": "Desktop : grille 2-3 colonnes de ModelCard, comparateur en side-by-side. Mobile : liste 1 colonne, comparateur bascule en vue empilee avec ancre de synchronisation scroll."
+    },
+    {
+      "id": "SCR-model-detail",
+      "story": "catalogue",
+      "components": ["AppShell(public)", "ModelCard(fiche detaillee)"],
+      "fr_en": "Contenu detaille traduit ; action 'Choisir ce modele' en FR/EN identique au reste du parcours.",
+      "mobile_desktop": "Desktop : colonne contenu large + barre lateral sommaire. Mobile : contenu seul, sommaire en accordeon haut de page."
+    },
+    {
+      "id": "SCR-login",
+      "story": "sessions",
+      "components": ["AppShell(public)", "AuthForm(login)"],
+      "fr_en": "Libelles de champs et message d'erreur generique traduits ; message identique dans les deux langues pour les deux cas d'echec (anti enumeration D-F3-2).",
+      "mobile_desktop": "Formulaire centre, largeur max 400px desktop ; pleine largeur avec marge 16px mobile."
+    },
+    {
+      "id": "SCR-register",
+      "story": "sessions",
+      "components": ["AppShell(public)", "AuthForm(register)"],
+      "fr_en": "Politique mot de passe (min 12 caracteres) affichee en FR/EN sous le champ.",
+      "mobile_desktop": "Identique SCR-login."
+    },
+    {
+      "id": "SCR-client-home",
+      "story": "sessions",
+      "components": ["AppShell(client)", "StatusBanner"],
+      "fr_en": "Recapitulatif compte, modele choisi, etat d'avancement traduits.",
+      "mobile_desktop": "Desktop : tableau de bord 2 colonnes (recap + raccourcis). Mobile : empile, raccourcis en boutons pleine largeur."
+    },
+    {
+      "id": "SCR-resources",
+      "story": "ressources",
+      "components": ["AppShell(client)", "ResourceList"],
+      "fr_en": "Libelles ressource et messages empty/error traduits ; aucun contenu sensible traduit automatiquement sans revue (hors perimetre).",
+      "mobile_desktop": "Desktop : liste avec colonne detail a droite (vue maitre-detail). Mobile : liste pleine largeur, detail en page separee avec retour."
+    },
+    {
+      "id": "SCR-resource-detail",
+      "story": "ressources",
+      "components": ["AppShell(client)"],
+      "fr_en": "Titre et metadonnees ressource traduits si fournis par le catalogue, contenu brut inchange.",
+      "mobile_desktop": "Pleine largeur dans les deux cas, pas de contrainte specifique au-dela de AppShell."
+    },
+    {
+      "id": "SCR-onboarding-guide",
+      "story": "demarrage",
+      "components": ["AppShell(client)", "OnboardingStepper"],
+      "fr_en": "Instructions d'installation/fournisseur/configuration traduites integralement ; erreurs d'etape (E7) traduites sans exposer de details techniques bruts du fournisseur.",
+      "mobile_desktop": "Desktop : stepper lateral + contenu etape principal. Mobile : stepper horizontal compact en haut, contenu etape en dessous."
+    },
+    {
+      "id": "SCR-admin-search",
+      "story": "administration",
+      "components": ["AppShell(admin)", "AdminAccountSearch"],
+      "fr_en": "Interface admin traduite FR/EN comme le reste (pas de langue reservee a l'admin).",
+      "mobile_desktop": "Desktop : champ recherche + tableau resultats. Mobile : champ recherche + liste de cartes compactes (tableau illisible <768px remplace par cartes)."
+    },
+    {
+      "id": "SCR-admin-account-detail",
+      "story": "administration",
+      "components": ["AppShell(admin)", "AdminAccountDetail", "ConfirmDangerDialog"],
+      "fr_en": "Libelles droits/etat traduits ; action destructive toujours confirmee avec texte explicite (pas seulement une icone).",
+      "mobile_desktop": "Desktop : panneau droits + historique recent cote a cote. Mobile : empile, historique recent replie par defaut (voir accessibilite : etat replie annonce)."
+    },
+    {
+      "id": "SCR-admin-audit-log",
+      "story": "revocation",
+      "components": ["AppShell(admin)", "AuditLogTable"],
+      "fr_en": "En-tetes de colonnes traduits ; valeurs d'action (enum) traduites via dictionnaire fixe, jamais de texte libre non traduit.",
+      "mobile_desktop": "Desktop : tableau complet. Mobile : tableau transforme en liste de cartes empilees (une entree = une carte horodatage/acteur/cible/action)."
+    }
+  ],
+  "responsive": {
+    "breakpoints": {"mobile": "<768px", "tablet": "768-1023px", "desktop": ">=1024px"},
+    "rules": [
+      "Tout tableau de donnees (AuditLogTable, resultats admin) a un equivalent carte empilee sous 768px ; jamais de scroll horizontal force pour lire une donnee critique.",
+      "Toute zone maitre-detail (ResourceList) devient navigation a deux pages sous 768px, jamais deux colonnes compressees illisibles.",
+      "Cibles tactiles >=44x44px sur mobile pour toute action (bouton, lien de navigation, case de confirmation).",
+      "Aucune information disponible uniquement au survol (hover) : tout etat hover a un equivalent focus/tap explicite."
+    ]
+  },
+  "accessibility": {
+    "standard": "WCAG 2.1 AA vise sur l'ensemble des ecrans listes.",
+    "keyboard": "Navigation complete au clavier (Tab/Shift+Tab, Entree/Espace pour activer, Echap pour fermer ConfirmDangerDialog) ; ordre de tabulation suit l'ordre visuel ; aucun piege de focus hors modale ouverte intentionnellement.",
+    "focus_visible": "focus_ring token applique sur tout element interactif, jamais supprime par outline:none sans remplacement visible.",
+    "aria": "ConfirmDangerDialog = role=alertdialog avec focus initial sur l'action la moins destructive (Annuler) ; StatusBanner danger = role=alert pour annonce immediate par lecteur d'ecran ; OnboardingStepper expose aria-current sur l'etape active.",
+    "contrast": "Respect des paires de tokens color listees (AA minimum) ; verifie manuellement a la livraison de chaque ecran, pas d'outil automatique execute dans ce perimetre (limite declaree).",
+    "forms": "Chaque champ AuthForm a un label visible associe (pas de placeholder seul comme label) ; messages d'erreur lies au champ via aria-describedby en plus du message generique global."
+  },
+  "i18n": {
+    "languages": ["fr", "en"],
+    "mechanism": "Dictionnaire de cles statiques par ecran/composant, charge au build ou au premier rendu ; pas de traduction automatique a la volee du contenu genere par l'utilisateur.",
+    "coverage_rule": "Toute chaine visible (y compris messages d'erreur generiques, libelles d'etat enum, en-tetes de colonnes) possede une cle fr et en ; aucune chaine codee en dur dans un composant.",
+    "date_time": "Horodatages affiches en ISO 8601 ou format localise explicite selon la langue active (ex. journal d'audit) ; jamais de format ambigu jour/mois inverse.",
+    "switch": "Selecteur de langue dans AppShell, persistant par compte si connecte (champ a ajouter si retenu) sinon preference navigateur/localStorage ; changement de langue ne recharge pas une session ni ne perd une progression OnboardingStepper."
+  },
+  "states": {
+    "loading": "Squelette (skeleton) correspondant a la forme du contenu final, jamais un spinner plein ecran qui masque la structure ; duree-limite avant basculement vers error si timeout (seuil a definir en realisation).",
+    "empty": "Message explicatif + action suivante utile (ex. lien catalogue/demarrage) ; jamais traite comme une erreur ni masque silencieusement.",
+    "error": "Message generique sans detail technique interne (pas de stacktrace, pas de code SQL) ; action de reessai explicite quand pertinent ; les refus d'autorisation (401/403) ne sont jamais presentes comme une simple erreur reseau mais comme un etat distinct ('acces refuse' / 'session expiree').",
+    "success": "Confirmation explicite uniquement apres reponse serveur effective (jamais optimiste pour une action destructive comme revocation, cf ConfirmDangerDialog)."
+  },
+  "decisions": [
+    {
+      "id": "D-F5-1",
+      "question": "Theme clair/sombre : obligatoire au premier increment ou extension differee ?",
+      "decision": "Obligatoire au premier increment (les deux themes consideres criteres de livraison, pas une extension).",
+      "rationale": "Le cadre d'execution de cette tache liste explicitement les deux themes dans les controles attendus (cf CADRE D'EXECUTION) ; differer romprait la coherence avec les criteres de verification deja fixes pour le produit."
+    },
+    {
+      "id": "D-F5-2",
+      "question": "Police web externe pour une identite visuelle plus marquee, ou police systeme uniquement ?",
+      "decision": "Police systeme uniquement pour cet increment.",
+      "rationale": "Le perimetre agents exclut toute connexion reseau distante additionnelle non deja couverte par le moteur ; charger une police externe introduirait une dependance CDN/tiers hors decision utilisateur explicite. Reste une option future si l'utilisateur autorise explicitement un fournisseur de polices nomme."
+    },
+    {
+      "id": "D-F5-3",
+      "question": "Maquette HTML/SVG statique locale : produite dans ce perimetre ou renvoyee a la realisation ?",
+      "decision": "Non produite dans ce depot pour cet increment ; ce rapport fixe la specification structuree (tokens/composants/ecrans) suffisante pour deriver une maquette en phase de realisation.",
+      "rationale": "Le contrat de tache rend les maquettes HTML/SVG facultatives ('si utile') ; avec budget borne a 30 appels et exploration deja approfondie des fondations F2-F4 necessaires a la coherence, produire des fichiers HTML/SVG supplementaires n'apporterait pas de preuve de pertinence design superieure a la specification structuree ci-dessus et risquerait de deborder le budget reserve aux verifications/rapport. Limite explicitement declaree ci-dessous."
+    }
+  ],
+  "limits": [
+    "F5 fixe un systeme design candidat (tokens, composants, ecrans, regles responsive/accessibilite/i18n/etats) ; aucune maquette HTML/SVG executable n'est produite dans ce perimetre (D-F5-3), aucun code applicatif moteur.",
+    "Les valeurs de contraste des tokens sont choisies pour viser AA mais non verifiees par un outil automatique dans cette tache ; verification manuelle/outillee renvoyee a la phase de realisation ou a la revue independante.",
+    "Les sept stories sont couvertes par au moins un ecran et les composants associes (coverage verifiee par controle structurel ci-dessous) ; la pertinence semantique exacte (ex. adequation reelle du GraphProofViewer a un graphe de preuves Swarm) reste a confirmer par revue independante.",
+    "Les traductions FR/EN sont decrites comme regle de couverture (cle par chaine), pas comme un dictionnaire de traduction complet livre ici ; le contenu textuel precis sort du perimetre design system.",
+    "Theme clair/sombre et persistance par compte dependent d'un champ de preference non encore ajoute au data_model F4 (Account) ; a ajouter en realisation si confirme (limite ouverte liee a D-F5-1)."
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "assertions": [
+    "managed-auto-waiting-FIFO-does-not-create-second-copy",
+    "managed-auto-original-proof-refusal-preserves-terminal-state",
+    "managed-auto-cycle-1-settles-once-with-durable-original",
+    "managed-auto-paused-reopen-retains-first-completion",
+    "managed-auto-cycle-2-settles-once-with-durable-original",
+    "managed-auto-final-reopen-has-no-third-agent-or-fake-acceptance"
+  ],
+  "agent_ids": [
+    "watch-12e525926625c1504db9d47d",
+    "watch-6f47cbfd98339c6053cca6d1"
+  ],
+  "task_ids": [
+    "task",
+    "task-2"
+  ],
+  "binary_sha256": "9d3346aebb56f76fdb1d58415475aef500e7f569d01258081afcb00f8e7fb272",
+  "accepted": false,
+  "installed": false,
+  "global_watchdog": null,
+  "paid_provider": false
+}

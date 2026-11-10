@@ -1,0 +1,139 @@
+{
+  "planning": {
+    "reviewer_required": true,
+    "reviewer": {
+      "max_context_files": 24,
+      "max_source_bytes": 98304,
+      "max_context_bytes": 131072,
+      "max_files": 100,
+      "provider": "fixture",
+      "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+      "model_route": {
+        "level": "standard",
+        "model": "fixture-standard",
+        "effort": "fixture-medium",
+        "billing": "external",
+        "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+        "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+      },
+      "max_calls": 2,
+      "calls": 0,
+      "authorized": "2026-10-28T17:52:34.497792927Z"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "fixture-standard",
+      "effort": "fixture-medium",
+      "billing": "external",
+      "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+      "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+    },
+    "repository": {
+      "source": "/tmp/swarm-model83-74_5nz19/source",
+      "storage": "/tmp/swarm-model83-74_5nz19/.swarm/managed/w-ef9376091b28b6a5610fbd8a",
+      "base_commit": "70f9efba95ff9bafc4a303054ea9980735628fa2",
+      "candidate_commit": "70f9efba95ff9bafc4a303054ea9980735628fa2",
+      "snapshot_digest": "9a80f3fd1639c9cdee5aded2890a8abd5ec43aad80d1c572b38ef1001e09c2a0",
+      "request_digest": "44857e71ce04d382e59eda18dbe1bc3b7cbcace02e4cf93cc2118244ab49ad01"
+    },
+    "provider": "fixture",
+    "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+    "activations": 1,
+    "max_activations": 3,
+    "version": 1,
+    "paused": false,
+    "max_tasks": 10,
+    "max_decisions": 10,
+    "decisions": 1,
+    "scopes": [
+      {
+        "last_model": {
+          "provider": "fixture",
+          "provider_digest": "9354aa3883900f6e505b8fc0272b52334058800bb0b30ab558a4fdcd6c949727",
+          "route": {
+            "level": "standard",
+            "model": "fixture-standard",
+            "effort": "fixture-medium",
+            "billing": "external",
+            "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+            "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+          },
+          "actor": "",
+          "at": "2026-10-28T17:52:34.672203673Z"
+        },
+        "delivery": {
+          "judge_available": true,
+          "judge_cycle": 1,
+          "task_budget": 10,
+          "activation_budget": 3,
+          "closure_unavailable": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "9be6726c8959a5692aa8fd043dbe0d70c788ec8f4d85576ab80aadac13a2709e",
+          "events": [
+            "managed-preview-enable"
+          ],
+          "decision": "managed-ack"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "0ee8956b70ffdc7971b868f62666fa89f4cd40edeb68fb9211755de537572e55"
+        },
+        "activations": 1,
+        "id": "root",
+        "objective": "Scoped fixture planning",
+        "requirements": [
+          "req-1"
+        ],
+        "revision": 2,
+        "generation": 2,
+        "state": "waiting"
+      }
+    ],
+    "inbox": [
+      {
+        "id": "managed-preview-enable",
+        "scope": "root",
+        "kind": "brief",
+        "message": "Scoped fixture planning",
+        "decision": "managed-ack",
+        "at": "2026-10-28T17:52:34.497792927Z"
+      }
+    ],
+    "judge": {
+      "cycle": 1,
+      "max_cycles": 0,
+      "closed": false
+    }
+  },
+  "schema_version": 1,
+  "id": "w-ef9376091b28b6a5610fbd8a",
+  "revision": 4,
+  "title": "Public planning bootstrap",
+  "objective": "Scoped fixture planning",
+  "scope": "Owned local bootstrap",
+  "criteria": [
+    "Configuration is persisted without model execution"
+  ],
+  "next": "",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-28T17:52:34.315657822Z",
+  "updated": "2026-10-28T17:52:36.046528001Z",
+  "git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "tasks": []
+}

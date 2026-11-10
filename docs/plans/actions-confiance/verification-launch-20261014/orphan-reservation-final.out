@@ -1,0 +1,93 @@
+=== RUN   TestManagedBatchRuntimeInterruptedPersistence
+=== RUN   TestManagedBatchRuntimeInterruptedPersistence/all-passed
+=== RUN   TestManagedBatchRuntimeInterruptedPersistence/reply-not-durable
+--- PASS: TestManagedBatchRuntimeInterruptedPersistence (11.87s)
+    --- PASS: TestManagedBatchRuntimeInterruptedPersistence/all-passed (5.89s)
+    --- PASS: TestManagedBatchRuntimeInterruptedPersistence/reply-not-durable (5.97s)
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/managed-json
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/selection-digest
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/resolution-citation
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/final-citation
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/immutable-proof-is-not-a-response-error
+=== RUN   TestManagedFinalReviewFailuresRemainRoutable/business-refusal-stays-independent
+--- PASS: TestManagedFinalReviewFailuresRemainRoutable (1.55s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/managed-json (0.00s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/selection-digest (0.56s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/resolution-citation (0.00s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/final-citation (0.00s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/immutable-proof-is-not-a-response-error (0.10s)
+    --- PASS: TestManagedFinalReviewFailuresRemainRoutable/business-refusal-stays-independent (0.00s)
+=== RUN   TestManagedFragmentFinalOrphanReservationResume
+=== RUN   TestManagedFragmentFinalOrphanReservationResume/available
+    managed_review_fragment_resume_test.go:19: sizes 164551 168165 21899 parts 1
+=== RUN   TestManagedFragmentFinalOrphanReservationResume/exhausted
+    managed_review_fragment_resume_test.go:19: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentFinalOrphanReservationResume (8.80s)
+    --- PASS: TestManagedFragmentFinalOrphanReservationResume/available (4.64s)
+    --- PASS: TestManagedFragmentFinalOrphanReservationResume/exhausted (4.16s)
+=== RUN   TestManagedFragmentDurableVerdictResumesWithoutBudget
+    managed_review_fragment_resume_test.go:67: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentDurableVerdictResumesWithoutBudget (22.82s)
+=== RUN   TestPlanningReviewRetryCanRestartChangedMethod
+    managed_review_method_restart_test.go:66: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryCanRestartChangedMethod (2.00s)
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/inspection
+    managed_review_orphan_reservation_test.go:21: sizes 164551 168167 21899 parts 1
+=== RUN   TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/final
+    managed_review_orphan_reservation_test.go:31: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall (8.78s)
+    --- PASS: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/inspection (2.86s)
+    --- PASS: TestManagedReviewOrphanReservationSettlesWithoutAnotherCall/final (5.91s)
+=== RUN   TestManagedReviewInterruptionDirectiveReachesReviewer
+--- PASS: TestManagedReviewInterruptionDirectiveReachesReviewer (0.00s)
+=== RUN   TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen
+    managed_review_retry_delivery_test.go:16: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen (14.40s)
+=== RUN   TestReviewRetryDirectiveForeignCandidateCannotReserve
+    managed_review_retry_delivery_test.go:98: sizes 164551 168165 21899 parts 1
+--- PASS: TestReviewRetryDirectiveForeignCandidateCannotReserve (2.47s)
+=== RUN   TestPlanningReviewRetryRestrictionTracksWholeReducedBatch
+    planning_historical_delivery_test.go:236: sizes 164551 168165 21899 parts 1
+--- PASS: TestPlanningReviewRetryRestrictionTracksWholeReducedBatch (1.95s)
+=== RUN   TestReviewProtocolFailureRoutingIsCurrentAndScoped
+=== RUN   TestReviewProtocolFailureRoutingIsCurrentAndScoped/root
+=== RUN   TestReviewProtocolFailureRoutingIsCurrentAndScoped/child
+--- PASS: TestReviewProtocolFailureRoutingIsCurrentAndScoped (0.65s)
+    --- PASS: TestReviewProtocolFailureRoutingIsCurrentAndScoped/root (0.36s)
+    --- PASS: TestReviewProtocolFailureRoutingIsCurrentAndScoped/child (0.29s)
+=== RUN   TestPlanningProtocolFailureRejectsProducerRetry
+    review_failure_routing_test.go:91: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningProtocolFailureRejectsProducerRetry (1.56s)
+=== RUN   TestPlanningReviewRetryQueuesSameCandidateWithoutProductionOrSpend
+    review_failure_routing_test.go:113: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryQueuesSameCandidateWithoutProductionOrSpend (2.37s)
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/wrong_scope
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/semantic_refusal
+    review_failure_routing_test.go:146: sizes 164551 168165 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_candidate
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_contract
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/no_budget
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/implicit_edit
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/unchanged_correction
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+=== RUN   TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/active_producer
+    review_failure_routing_test.go:146: sizes 164551 168167 21899 parts 1
+--- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically (13.63s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/wrong_scope (1.61s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/semantic_refusal (1.64s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_candidate (1.48s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/changed_contract (1.55s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/no_budget (1.98s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/implicit_edit (1.49s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/unchanged_correction (1.82s)
+    --- PASS: TestPlanningReviewRetryRejectsInvalidRecoveryAtomically/active_producer (2.07s)
+PASS
+ok  	swarm.local/companion/internal/engine	94.003s

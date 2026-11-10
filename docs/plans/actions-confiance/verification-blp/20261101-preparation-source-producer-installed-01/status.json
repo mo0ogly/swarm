@@ -1,0 +1,15 @@
+{
+  "running": true,
+  "ready": true,
+  "pid": 2446693,
+  "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "url": "http://127.0.0.1:38433/",
+  "binary": {
+    "build_date": "2026-11-01T16:40:20Z",
+    "commit": "821dbb340ceb99b323fd4bb9a7f2bbdc106b0e9c",
+    "modified": true,
+    "provenance": "injected",
+    "version": "v0.1.1-dev.304"
+  },
+  "binary_sha256": "341e71bb2e67d47d0c468c04f8c7ecd38f313fb0686b60af88ba675d50cbade6"
+}

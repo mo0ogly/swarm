@@ -1,0 +1,16 @@
+=== RUN   TestFragmentDiagnosticNeverAcceptsOrRepeatsCall
+    managed_review_diagnostic_test.go:14: sizes 164551 168167 21899 parts 1
+--- PASS: TestFragmentDiagnosticNeverAcceptsOrRepeatsCall (2.72s)
+=== RUN   TestManagedFragmentHistoricalPublicRecovery
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/fail
+    managed_review_fragment_reuse_test.go:308: wrong cumulative budget
+--- FAIL: TestManagedFragmentHistoricalPublicRecovery (21.36s)
+    --- FAIL: TestManagedFragmentHistoricalPublicRecovery/fail (21.36s)
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift
+=== RUN   TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fail
+    managed_review_fragment_tokens_store_test.go:23: sizes 164551 168167 21899 parts 1
+--- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift (3.22s)
+    --- PASS: TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fail (3.22s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	27.373s
+FAIL

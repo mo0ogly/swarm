@@ -1,0 +1,175 @@
+{
+  "status": "PASS",
+  "at": "2026-10-17T11:43:57.191403+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "scope": "M25 private pure memory verdict only; public M20 enforcement and identity activation remain open",
+  "tests": {
+    "named_passes": 72,
+    "parents": 12,
+    "subcases": 60,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": "final-run.json",
+    "original_events_rechecked": true
+  },
+  "inputs": {
+    "count": 1069,
+    "final_before_equals_after": true,
+    "current_matches_final_tested": true,
+    "candidate_to_final_delta": [
+      "internal/engine/memory_usage_decision_test.go"
+    ]
+  },
+  "build": {
+    "status": "PASS reused",
+    "reason": "Only test code changed after the successful candidate build; production dependency inputs are identical",
+    "binary": "/tmp/swarm-m25-bin-fv1b0st3/swarm",
+    "sha256": "b141e9ff35891e867154796bf330e2b870572436c4a4c84d810ac35a823a1136",
+    "evidence": "candidate-run.json"
+  },
+  "vet": {
+    "status": "PASS",
+    "evidence": "final-vet-run.json"
+  },
+  "reproducer": {
+    "status": "FAIL before correction, PASS after correction",
+    "evidence": "red-run.json and final-run.json"
+  },
+  "read_only_ownership": {
+    "internal/engine/memory_summary_source.go": {
+      "baseline_sha256": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+      "tested_sha256": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+      "current_sha256": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+      "current_matches_tested": true,
+      "changed_since_baseline": false
+    },
+    "internal/engine/memory_summary_selection.go": {
+      "baseline_sha256": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+      "tested_sha256": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+      "current_sha256": "97a7c589e1196ad5335778bb6e438e1e58571bdde0b0c69bb56369595970fe38",
+      "current_matches_tested": true,
+      "changed_since_baseline": false
+    },
+    "internal/engine/agent_identity_contract.go": {
+      "baseline_sha256": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+      "tested_sha256": "009643397dfb11afda7edb764d780758c207ce6047b917ad401efa7fc045840c",
+      "current_sha256": "009643397dfb11afda7edb764d780758c207ce6047b917ad401efa7fc045840c",
+      "current_matches_tested": true,
+      "changed_since_baseline": true
+    },
+    "internal/engine/agent_identity_authority.go": {
+      "baseline_sha256": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+      "tested_sha256": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+      "current_sha256": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+      "current_matches_tested": true,
+      "changed_since_baseline": false
+    }
+  },
+  "pre_test_identity_drift_revalidation": "read-only-contract-revalidation.json",
+  "original_audit_failure": "audit-first-failure.json",
+  "owned_files": {
+    "docs/PROJECT-MEMORY.md": "2aa687136a4ca732cc4701f552ffa15832db9c0274d1d99289fdafbf0528475b",
+    "docs/en/PROJECT-MEMORY.md": "f84752e97a82862e02cea4dc3defac39f7a7263b8775b9855c350d5c1ef34f4a",
+    "docs/plans/deepagents-integration/PLAN.md": "724ad1edf17aac60bc09beeea215e5214041ac59cdbea9d8459851e57d9beb10",
+    "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md": "eabc56d9d3b874b67f01b11904da306608c24c02a859fa0a772b05cb4b5bf7bd",
+    "internal/engine/memory_usage_binding.go": "f4a4b59697fefb69749687c461e93fa9400e376970932e064e3909b8e95cd9fb",
+    "internal/engine/memory_usage_binding_test.go": "fc052a05d0e9646dab765f8d17c5a0f2fe50c45d21287e0b657913e6907d420c",
+    "internal/engine/memory_usage_decision.go": "df2832128f653aa22c4134fa42fddf12de489382b692f06f0367573cff29d2b0",
+    "internal/engine/memory_usage_decision_test.go": "62246fd7a723746a2a1565c7c29e0a8e242b88a4111c38400629d800de1b6c21",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-21.md": "929490afba89d8ea9a8a6945e44bfe53da892cded39aebf35d53e07e5ac2dbaa",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-21.md": "600e193b6292bc0198de8f1f54adbad90c507a3a919b1b9b753e1a9caa11a171"
+  },
+  "owned_diff": "owned.diff",
+  "gofmt": "PASS (four Go files)",
+  "git_diff_check": "PASS (working tree)",
+  "local_markdown_links": {
+    "status": "PASS",
+    "count": 20,
+    "links": [
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "plans/deepagents-integration/RESULTATS-MEMOIRE-20.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "plans/deepagents-integration/RESULTATS-MEMOIRE-21.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "SEMANTIC-SIGNALS.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "plans/deepagents-integration/RESULTATS-MEMOIRE-19.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../plans/deepagents-integration/RESULTATS-MEMOIRE-20.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../plans/deepagents-integration/RESULTATS-MEMOIRE-21.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "SEMANTIC-SIGNALS.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../plans/deepagents-integration/RESULTATS-MEMOIRE-19.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/PLAN.md",
+        "target": "CONTRAT-USAGES-MEMOIRE.md"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/PLAN.md",
+        "target": "RESULTATS-MEMOIRE-01.md"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+        "target": "../../architecture/AGENT-IDENTITY-CONTRACT.md"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+        "target": "evidence/m20-20261017/preplan-observation.json"
+      }
+    ]
+  },
+  "diagrams": "FR/EN source updated; rendered output NOT TESTED",
+  "review": "same author; no independent acceptance claimed",
+  "global_watchdog": "disabled: go test -timeout=0 and subprocess without timeout",
+  "runtime": "No server restart/deployment, model/provider call, native mission, delegation or inter-chat message"
+}

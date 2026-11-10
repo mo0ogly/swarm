@@ -1,0 +1,76 @@
+{
+  "data_policy": {
+    "resources": [],
+    "enabled": false,
+    "classifications": [],
+    "destinations": [],
+    "providers": [],
+    "tools": []
+  },
+  "delegation": {
+    "max_depth": 0
+  },
+  "step_up": {
+    "enabled": false,
+    "operations": [
+      "approve"
+    ],
+    "acr_values": [],
+    "max_age_seconds": 0,
+    "proof_ttl_seconds": 300
+  },
+  "group_mapping": {
+    "enabled": false,
+    "claim": "groups",
+    "rules": []
+  },
+  "workload_introspection": {
+    "enabled": false,
+    "endpoint": "",
+    "client_id": "",
+    "timeout_seconds": 15,
+    "validation_window_seconds": 5,
+    "max_sessions": 64,
+    "max_token_bytes": 16384
+  },
+  "process_policy": {
+    "enabled": false
+  },
+  "secret_broker": {
+    "enabled": false,
+    "material_ttl_seconds": 300,
+    "grant_ttl_seconds": 60,
+    "max_material_bytes": 4096,
+    "max_entries": 16
+  },
+  "sealed_execution": {
+    "enabled": false,
+    "timeout_seconds": 15
+  },
+  "evidence_signing": {
+    "enabled": false,
+    "key_ttl_seconds": 86400
+  },
+  "laboratory": {
+    "enabled": false,
+    "timeout_seconds": 30,
+    "max_concurrent_runs": 1
+  },
+  "kernel_check": {
+    "enabled": false,
+    "timeout_seconds": 15,
+    "ring_bytes": 65536
+  },
+  "kernel_observation": {
+    "enabled": false,
+    "window_seconds": 5,
+    "timeout_seconds": 15,
+    "ring_bytes": 65536,
+    "max_events": 128
+  },
+  "oidc_logout": {
+    "enabled": false,
+    "max_age_seconds": 300,
+    "replay_retention_seconds": 600
+  }
+}

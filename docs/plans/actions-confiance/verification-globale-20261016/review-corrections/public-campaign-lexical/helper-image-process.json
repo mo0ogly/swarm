@@ -1,0 +1,26 @@
+{
+  "stage": "helper-image",
+  "argv": [
+    "python3",
+    "tests/actions_confiance_secret_image.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-proof-exact",
+    "--timeout-seconds",
+    "180",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign-lexical/helper-image",
+    "--secret-broker"
+  ],
+  "pid": 475296,
+  "start_ticks": "6974688",
+  "started_unix": 1792135322.7405074,
+  "status": "passed",
+  "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6",
+  "exit_code": 0,
+  "ended_unix": 1792135325.7632425,
+  "stdout_sha256": "97f7d2cdb58ae28f3e91fb6d92feecfef10701e3cffe02f590b21317d9ff7cde",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observed_results": 4,
+  "result_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign-lexical/helper-image/image-replacement.json",
+  "result_sha256": "2df180c4aa83224aa90a3b6876343bd540bffab1020a878d4a2d6d9a7a539baf"
+}

@@ -1,5 +1,14 @@
 # RETEX — suivi de supervision
 
+## Repère de lecture APEX — 24 octobre 2026
+
+Ce suivi est chronologique. Le [diagnostic final T5](T5-diagnostic-superviseur.md#clôture-publique-vérifiée)
+conserve la clôture ultérieure 5/5 avec responsabilité racine close ; les attentes
+R3/R4 ci-dessous ne sont plus des consignes de suivi actives. La [file APEX FR](../FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026)
+et [EN](../../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) distingue cette clôture de l’ancienne mission budgets 5/6.
+Codex racine possède le rapprochement ; aucune preuve du Rust actuel ni nouvelle
+organisation de sous-agents n’est déduite de ces campagnes historiques.
+
 ## T1 : preuve et reprise
 
 Le premier dossier envoyé à la revue ne joignait pas les journaux cités. Le superviseur a ajouté une recette publique bornée, exécutée par le moteur sur stockage isolé : tests ciblés Go, navigateur FR/EN dans les deux thèmes, serveur réel et fixture distingués. Code 0, sortie non tronquée. Une nouvelle revue a été refusée pour citation exacte : le texte décodé de review_output ne figurait que sous sa forme JSON échappée dans les sources comparées. Contournement traçable : sortie moteur ajoutée telle quelle au rapport, aucune preuve inventée. Correction durable à inclure dans T2 : citations exactes des sorties décodées, sans accepter paraphrases ni contenu absent ; test négatif requis. Les deux tentatives producteur sont conservées ; aucun troisième départ ni hausse de limite.

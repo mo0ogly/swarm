@@ -1,0 +1,14 @@
+{
+  "baseline_entries": 38,
+  "modified_existing": [
+    "internal/engine/agent_identity_config_service_linux.go",
+    "internal/engine/agent_identity_config_service_linux_test.go",
+    "internal/enrollmentconfig/config.go",
+    "internal/enrollmentconfig/config_test.go"
+  ],
+  "new": [
+    "internal/engine/agent_identity_config_client_linux.go",
+    "internal/engine/agent_identity_config_client_linux_test.go"
+  ],
+  "unchanged_existing": 34
+}

@@ -1,0 +1,33 @@
+{
+  "result": "PASS",
+  "root": "/tmp/swarm-ia2-isolation-3rhzi5mk",
+  "model_calls": 0,
+  "binary_sha256": "026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2",
+  "script_sha256": "ba0bcec55e2bfdc4d2a56acde2b85c0621ccb9060139a7e958b3647acb92cc8b",
+  "control_hashes_unchanged": {
+    "trust-actions.json": "0241678b9082f15d5ac2eee648638c8b1452870cde8fd303a5af9a0dd9ac3793",
+    "trust-actions-proof.key": "44f6c42089be2aedb630ffc9b4bf7e44c828970b82d4a1f94c56991e1643730d",
+    "state.db": "baf14e9e5a9fec141155b51454324a32d12c118f25687eb3212906ab137feb82"
+  },
+  "workspace_effect_observed": true,
+  "blocked_variants": [
+    "key read",
+    "key write-open",
+    "registry read",
+    "workspace control",
+    "symlink",
+    "child process",
+    "ancestor proc root",
+    "host loopback",
+    "private inherited environment",
+    "original control CLI"
+  ],
+  "limits": [
+    "Standalone host experiment, not integrated into engine launchers",
+    "No real provider or model",
+    "Network disabled: native remote providers need a separately designed authenticated egress path",
+    "No broker/channel authentication, revocation race, approval or resource-control qualification",
+    "Read-only runtime directory mounts are an experiment, not a portable audited allowlist",
+    "Host administrator compromise is outside this experiment"
+  ]
+}

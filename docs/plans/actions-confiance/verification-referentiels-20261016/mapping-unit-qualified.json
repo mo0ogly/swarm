@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "tools/actions-confiance/test_controls.py"
+  ],
+  "started_at": "2026-10-16T02:00:55.599687+00:00",
+  "exit_code": 0,
+  "named_passed_tests": [
+    "__main__.MappingClaims.test_false_claims_explicit.test_false_claims_explicit",
+    "__main__.MappingClaims.test_unsupported_claims.test_unsupported_claims",
+    "__main__.MappingValidation.test_duplicate_json.test_duplicate_json",
+    "__main__.MappingValidation.test_evidence_and_source_integrity.test_evidence_and_source_integrity",
+    "__main__.MappingValidation.test_invalid_matrix_contracts.test_invalid_matrix_contracts",
+    "__main__.MappingValidation.test_non_regular_file.test_non_regular_file",
+    "__main__.MappingValidation.test_reference_bool_schema.test_reference_bool_schema",
+    "__main__.MappingValidation.test_symlink_and_escape.test_symlink_and_escape",
+    "__main__.MappingValidation.test_unbound_source.test_unbound_source",
+    "__main__.MappingValidation.test_valid_is_not_compliance.test_valid_is_not_compliance"
+  ],
+  "input_sha256": {
+    "tools/actions-confiance/controls.py": "299c31ee5419cc904d3527ca4a3aeb1939bfa14cf3420d1e3a686b82dd89d459",
+    "tools/actions-confiance/test_controls.py": "0720bb6e85158508cd54dff5bbc2c056cbd998f6d0cfa9aa9e99e857425b0e1e"
+  },
+  "sources_unchanged": true,
+  "output_sha256": "8b392ad9f2c5b478769a47392d27f71332c394d565dd5146761443af1e116f8c"
+}

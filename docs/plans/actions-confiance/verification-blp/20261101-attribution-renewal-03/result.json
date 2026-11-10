@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "recipe": "blp-attribution-renewal",
+  "status": "FAIL",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": false,
+  "steps": [
+    {
+      "id": "policy-revision-is-not-declassification",
+      "command": [
+        "/home/fpizzi/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "confidentiality",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 365.3427474869968,
+      "executable": "/home/fpizzi/.cargo/bin/rustup",
+      "launcher_sha256": "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+    }
+  ],
+  "failure": {
+    "type": "ValueError",
+    "cause": "recipe-declared-inputs-changed",
+    "errno": null
+  },
+  "artifacts": {
+    "recipe.original.json": "4129926d1d0098f351fdf58df3f0e9e2345fcefebb551beaf58130b569c7cccb",
+    "runner.py": "348c9154cf1db9c2c2d6e187d5cb90d86b5125c8290159a6453193b037dbf74b",
+    "inputs.before.json": "3bb4efaf155d41c277876af6209c56418d5554640cee386b8a0092c420303e09",
+    "declared-inputs.tar.gz": "4c39f27a01a4c77986533e414e45b32c3e95e85d9a0f360d69bbe778f9862dfd",
+    "environment.json": "3e8fa0f79406ea53103c26fe13edbe05e64764bc5acb094ffb9c7a21e361e8bc",
+    "step-0001.stdout": "c1bb7cd9117640e9b82f6c4f05b6d6efb4b14f44f1782eb2b4f89cc2d9fe4549",
+    "step-0001.stderr": "ff102c7cf53401ac84308d32538ff8879efc7270f0ab0ff2627b9a6b9480aa41",
+    "step-0001.json": "c203d25558c3d9cff00cf3009784b9d2329d2e6f76ddb37a74c3056267ea6566",
+    "inputs.after.json": "31dd42690eacaec8a7b003e6ba99a082f05c14d99e7ea73dcb15f38e1511635c"
+  }
+}

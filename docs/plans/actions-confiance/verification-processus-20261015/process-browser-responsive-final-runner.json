@@ -1,0 +1,10 @@
+{
+  "pid": 2229253,
+  "proc_start_ticks": "4021769",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-process-browser-responsive-final.py",
+    "run"
+  ],
+  "at": "2026-10-15T23:09:53.546494+00:00"
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "argv": [
+      "go",
+      "test",
+      "-overlay",
+      "/tmp/swarm-actions-confiance-launch/t2-current-mutant-resource.json",
+      "./internal/engine",
+      "-run",
+      "^TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource$",
+      "-count=1",
+      "-v"
+    ],
+    "exit_code": 1,
+    "output": "/tmp/swarm-actions-confiance-launch/t2-current-mutant-resource.out",
+    "guard": "resource"
+  },
+  {
+    "argv": [
+      "go",
+      "test",
+      "-overlay",
+      "/tmp/swarm-actions-confiance-launch/t2-current-mutant-state.json",
+      "./internal/engine",
+      "-run",
+      "^TestActionsConfianceT2ApprovalCannotRegressEffectState$",
+      "-count=1",
+      "-v"
+    ],
+    "exit_code": 1,
+    "output": "/tmp/swarm-actions-confiance-launch/t2-current-mutant-state.out",
+    "guard": "state"
+  },
+  {
+    "argv": [
+      "go",
+      "test",
+      "-overlay",
+      "/tmp/swarm-actions-confiance-launch/t2-current-mutant-amount.json",
+      "./internal/engine",
+      "-run",
+      "^TestActionsConfianceT2IdentityMandateApprovalAndBiba$",
+      "-count=1",
+      "-v"
+    ],
+    "exit_code": 1,
+    "output": "/tmp/swarm-actions-confiance-launch/t2-current-mutant-amount.out",
+    "guard": "amount"
+  }
+]

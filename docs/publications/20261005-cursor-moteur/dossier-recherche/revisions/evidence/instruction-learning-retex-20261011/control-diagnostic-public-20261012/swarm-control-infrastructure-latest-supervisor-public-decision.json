@@ -1,0 +1,7 @@
+{
+  "id": "planning-claim-b2341350010d1e1424844993-decision",
+  "at": "2026-10-12T13:10:34.512439823Z",
+  "scope": "root",
+  "reason": "La précondition opérateur a permis la reprise réservée du même résultat T3 et de la même tentative, mais l’événement frais montre que cette reprise a échoué à la première frontière de contrôle : plan-validation appliqué à T1, code 1, empreinte 7881cd6eb1bdb74020bbe3c99cf7802968a869f6338b7536a9671f961696cad0. Ce nouvel échec remplace la précondition de reprise précédente : il ne faut ni répéter l’intégration à l’identique, ni présumer un défaut du candidat T3, ni inventer le contenu du diagnostic seulement référencé. T3 a épuisé ses 4 tentatives, production_retry_unavailable est vrai, T2 reste bloquée et T4–T8 dépendent de leur résolution ; aucune action indépendante utile ni modification légitime du graphe n’est démontrée. Le propriétaire du contrôle moteur doit fournir le diagnostic original référencé, établir pourquoi la validation d’une dépendance T1 déjà acceptée échoue dans l’intégration T3, corriger ce contrat général ou ses entrées, puis rendre disponible une reprise publique conservant résultat, tentative, preuves et dépenses. Après effet observé de cette correction, reprendre T3, organiser scope-preview/review-plan seulement avec candidat, empreinte et identités task#N effectivement retournés, puis traiter T2 et poursuivre T4–T8 jusqu’au RETEX.",
+  "operations": null
+}

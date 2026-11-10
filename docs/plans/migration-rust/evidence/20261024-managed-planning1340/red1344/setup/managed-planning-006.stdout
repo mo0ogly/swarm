@@ -1,0 +1,116 @@
+{
+  "planning": {
+    "reviewer_required": true,
+    "reviewer": {
+      "max_context_files": 24,
+      "max_source_bytes": 98304,
+      "max_context_bytes": 131072,
+      "max_files": 100,
+      "provider": "fixture",
+      "provider_digest": "c8beb76fb677c7e9b86f6836143d69e2e5a46e50625e1ec9ae3b9252cedbef11",
+      "model_route": {
+        "level": "standard",
+        "model": "fixture-standard",
+        "effort": "fixture-medium",
+        "billing": "external",
+        "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+        "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+      },
+      "max_calls": 2,
+      "calls": 0,
+      "authorized": "2026-10-24T11:26:56.447690307Z"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "fixture-standard",
+      "effort": "fixture-medium",
+      "billing": "external",
+      "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+      "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+    },
+    "checks": {
+      "req-1": [
+        {
+          "inputs": [
+            "handoff.md"
+          ],
+          "id": "actual-handoff",
+          "command": [
+            "python3",
+            "-c",
+            "from pathlib import Path; assert Path('handoff.md').read_text().strip()"
+          ],
+          "criteria": [
+            1
+          ],
+          "justification": "Check owned handoff content",
+          "timeout_seconds": 60
+        }
+      ]
+    },
+    "repository": {
+      "source": "/tmp/swarm-model83-j9poubhr/source",
+      "storage": "/tmp/swarm-model83-j9poubhr/.swarm/managed/w-33d1ecf3e674b5f9e91cea83",
+      "base_commit": "cb7f3934751649d79ea5ac3edc35222875409116",
+      "candidate_commit": "cb7f3934751649d79ea5ac3edc35222875409116",
+      "snapshot_digest": "13f414978b047c2569f440f089f1550945543114f268876bb8c2180b545c3ee1",
+      "request_digest": "44857e71ce04d382e59eda18dbe1bc3b7cbcace02e4cf93cc2118244ab49ad01"
+    },
+    "provider": "fixture",
+    "provider_digest": "c8beb76fb677c7e9b86f6836143d69e2e5a46e50625e1ec9ae3b9252cedbef11",
+    "activations": 0,
+    "max_activations": 6,
+    "version": 1,
+    "paused": false,
+    "max_tasks": 2,
+    "max_decisions": 10,
+    "decisions": 0,
+    "scopes": [
+      {
+        "activations": 0,
+        "id": "root",
+        "objective": "Scoped fixture planning",
+        "requirements": [
+          "req-1"
+        ],
+        "revision": 1,
+        "generation": 0,
+        "state": "ready"
+      }
+    ],
+    "inbox": [
+      {
+        "id": "managed-planning-enable",
+        "scope": "root",
+        "kind": "brief",
+        "message": "Scoped fixture planning",
+        "at": "2026-10-24T11:26:56.447690307Z"
+      }
+    ],
+    "judge": {
+      "cycle": 1,
+      "max_cycles": 0,
+      "closed": false
+    }
+  },
+  "schema_version": 1,
+  "id": "w-33d1ecf3e674b5f9e91cea83",
+  "revision": 2,
+  "title": "Public planning bootstrap",
+  "objective": "Scoped fixture planning",
+  "scope": "Owned local bootstrap",
+  "criteria": [
+    "Configuration is persisted without model execution"
+  ],
+  "next": "",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-24T11:26:56.360842606Z",
+  "updated": "2026-10-24T11:26:56.507327332Z",
+  "git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "tasks": []
+}

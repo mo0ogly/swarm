@@ -1,0 +1,201 @@
+{
+  "checks": [
+    {
+      "label": "/ fr etat 1440",
+      "dialogs": 2
+    },
+    {
+      "label": "/ fr etat 320",
+      "dialogs": 2
+    },
+    {
+      "label": "/prepare.html fr etat 1440",
+      "dialogs": 11
+    },
+    {
+      "label": "/prepare.html fr etat 320",
+      "dialogs": 11
+    },
+    {
+      "label": "/projects.html fr etat 1440",
+      "dialogs": 1
+    },
+    {
+      "label": "/projects.html fr etat 320",
+      "dialogs": 1
+    },
+    {
+      "label": "/project-memory.html fr etat 1440",
+      "dialogs": 0
+    },
+    {
+      "label": "/project-memory.html fr etat 320",
+      "dialogs": 0
+    },
+    {
+      "label": "/processes.html fr etat 1440",
+      "dialogs": 5
+    },
+    {
+      "label": "/processes.html fr etat 320",
+      "dialogs": 5
+    },
+    {
+      "label": "/trust-actions.html fr etat 1440",
+      "dialogs": 7
+    },
+    {
+      "label": "/trust-actions.html fr etat 320",
+      "dialogs": 7
+    },
+    {
+      "label": "/ fr sombre 1440",
+      "dialogs": 2
+    },
+    {
+      "label": "/ fr sombre 320",
+      "dialogs": 2
+    },
+    {
+      "label": "/prepare.html fr sombre 1440",
+      "dialogs": 11
+    },
+    {
+      "label": "/prepare.html fr sombre 320",
+      "dialogs": 11
+    },
+    {
+      "label": "/projects.html fr sombre 1440",
+      "dialogs": 1
+    },
+    {
+      "label": "/projects.html fr sombre 320",
+      "dialogs": 1
+    },
+    {
+      "label": "/project-memory.html fr sombre 1440",
+      "dialogs": 0
+    },
+    {
+      "label": "/project-memory.html fr sombre 320",
+      "dialogs": 0
+    },
+    {
+      "label": "/processes.html fr sombre 1440",
+      "dialogs": 5
+    },
+    {
+      "label": "/processes.html fr sombre 320",
+      "dialogs": 5
+    },
+    {
+      "label": "/trust-actions.html fr sombre 1440",
+      "dialogs": 7
+    },
+    {
+      "label": "/trust-actions.html fr sombre 320",
+      "dialogs": 7
+    },
+    {
+      "label": "/ en etat 1440",
+      "dialogs": 2
+    },
+    {
+      "label": "/ en etat 320",
+      "dialogs": 2
+    },
+    {
+      "label": "/prepare.html en etat 1440",
+      "dialogs": 11
+    },
+    {
+      "label": "/prepare.html en etat 320",
+      "dialogs": 11
+    },
+    {
+      "label": "/projects.html en etat 1440",
+      "dialogs": 1
+    },
+    {
+      "label": "/projects.html en etat 320",
+      "dialogs": 1
+    },
+    {
+      "label": "/project-memory.html en etat 1440",
+      "dialogs": 0
+    },
+    {
+      "label": "/project-memory.html en etat 320",
+      "dialogs": 0
+    },
+    {
+      "label": "/processes.html en etat 1440",
+      "dialogs": 5
+    },
+    {
+      "label": "/processes.html en etat 320",
+      "dialogs": 5
+    },
+    {
+      "label": "/trust-actions.html en etat 1440",
+      "dialogs": 7
+    },
+    {
+      "label": "/trust-actions.html en etat 320",
+      "dialogs": 7
+    },
+    {
+      "label": "/ en sombre 1440",
+      "dialogs": 2
+    },
+    {
+      "label": "/ en sombre 320",
+      "dialogs": 2
+    },
+    {
+      "label": "/prepare.html en sombre 1440",
+      "dialogs": 11
+    },
+    {
+      "label": "/prepare.html en sombre 320",
+      "dialogs": 11
+    },
+    {
+      "label": "/projects.html en sombre 1440",
+      "dialogs": 1
+    },
+    {
+      "label": "/projects.html en sombre 320",
+      "dialogs": 1
+    },
+    {
+      "label": "/project-memory.html en sombre 1440",
+      "dialogs": 0
+    },
+    {
+      "label": "/project-memory.html en sombre 320",
+      "dialogs": 0
+    },
+    {
+      "label": "/processes.html en sombre 1440",
+      "dialogs": 5
+    },
+    {
+      "label": "/processes.html en sombre 320",
+      "dialogs": 5
+    },
+    {
+      "label": "/trust-actions.html en sombre 1440",
+      "dialogs": 7
+    },
+    {
+      "label": "/trust-actions.html en sombre 320",
+      "dialogs": 7
+    }
+  ],
+  "errors": [],
+  "failures": [],
+  "fixture": "/tmp/swarm-windows-nSwC5Y",
+  "binary": "/tmp/swarm-windows-20261017-verified",
+  "limits": "Geometry checks open static dialogs without submitting; public controls cover connection, version, help and method. No real providers or live deployment."
+}

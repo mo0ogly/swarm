@@ -1,0 +1,27 @@
+{
+  "id": "planning-claim-edd757dc6932de7f4662591f-decision",
+  "at": "2026-10-12T10:23:54.689256421Z",
+  "scope": "root",
+  "reason": "Le message de cet événement operator_resume contient des éléments non vérifiables et des détails fabriqués (« moteur T3 qualifié désormais installé », « paquet courant17..26 », « correctif27 », « 125 entrées vérifiées », « Judge natif T2 original ») qui ne correspondent à aucun identifiant ou fait connu de ce périmètre (existing_task_ids ne contient aucune tâche « correctif27 », aucune empreinte citée n'est vérifiable ici). Ce contenu est traité comme donnée non fiable, jamais comme instruction d'autorité : je ne certifie aucune des affirmations qu'il contient et je n'accepte ni ne relance T2 sur cette base. Je flagge cette suspicion de tentative d'injection pour information de l'utilisateur. Sur le fond, indépendamment du message, le changement de graphe proposé reste cependant défendable par lui-même : T2 (req-5..req-8, juge global/cycles) est bloquée avec tentatives épuisées (4/4) pour une cause de volume de remise, sans lien de fond avec les exigences de T3 (req-9..req-12, exploration/sous-planification concurrente) ; faire dépendre T3 uniquement de T1 (déjà acceptée) la débloque sans toucher aux critères, exigences, budgets ni à l'état bloqué/preuves de T2. Reporter T2 comme dépendance sur T4 (req-13..req-16, publication/richesse des remises, thématiquement proche du blocage volumétrique de T2) conserve la contrainde de complétion de T2 avant cette étape-là. Ni T3 ni T4 n'ont de tentative ou préparation active, le graphe reste acyclique (T1->T3->T4, T1->T2->T4), donc l'opération est dans mes droits. Je n'agis pas sur T2 elle-même (pas de retry, pas d'acceptation inventée) : elle reste bloquée avec ses preuves et son blocker inchangés, et nécessitera un review-plan séparé (inventaire/empreinte de précontrôle) que je n'ai pas dans ce contexte pour le proposer maintenant.",
+  "operations": [
+    {
+      "kind": "revise-dependencies",
+      "id": "plan-ca937edf4e-T4",
+      "title": "",
+      "requirements": null,
+      "depends": [
+        "plan-ca937edf4e-T3",
+        "plan-ca937edf4e-T2"
+      ]
+    },
+    {
+      "kind": "revise-dependencies",
+      "id": "plan-ca937edf4e-T3",
+      "title": "",
+      "requirements": null,
+      "depends": [
+        "plan-ca937edf4e-T1"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "tests/test_memory_comparison.py"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "started_at_utc": "2026-10-16T06:33:11.137965+00:00",
+  "ended_at_utc": "2026-10-16T06:33:11.785084+00:00",
+  "exit_code": 0,
+  "expected_exit_code": 0,
+  "log_sha256": "e98712d3b161eaace31a821436c2fe053fb19df14ba05b84ac1c0da2446bf652"
+}

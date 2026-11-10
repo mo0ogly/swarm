@@ -1,0 +1,303 @@
+{
+  "status": "PASS",
+  "at": "2026-10-17T12:50:40.151035+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "scope": "M26 existing extractive pre-start consistency; no identity admission or atomic effect authority",
+  "verified": {
+    "parents": 21,
+    "subcases": 60,
+    "named_passes": 81,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": "verified-run.json"
+  },
+  "verified_race": {
+    "parents": 7,
+    "subcases": 26,
+    "named_passes": 33,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": "verified-race-run.json"
+  },
+  "retained_checks": {
+    "evidence": "final-run.json",
+    "named_passes": 92,
+    "tests": [
+      "TestMemorySummarySourceCLIAPIParityAndSessionProtection",
+      "TestMemorySummarySourceCLIExportsExactSelectedSourcesWithoutMutation",
+      "TestMemorySummarySourceInspectionNeverMigratesOldStore",
+      "TestMemorySummarySourceInvalidUTF8ReadBoundary",
+      "TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork",
+      "TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork/changed-answer",
+      "TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork/empty-answer",
+      "TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork/identity",
+      "TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork/invalid-utf8",
+      "TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork/revision-column",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/brainstorm-target",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/changed-ref",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/duplicate",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/empty",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/foreign-work",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/revision",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/schema",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/stale",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/task",
+      "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection/unknown-field",
+      "TestMemorySummarySourceWrongMethodDoesNotReturnCatalog",
+      "TestMemoryUsageBindingChangesWhenPlanProjectionDoesNot",
+      "TestMemoryUsageBindingExactSourcesAndNoOperatorTransmission",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/duplicate-source",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/foreign-work",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/invalid-utf8",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/invalid-work",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/missing-anchor",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/no-instance",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/no-recipient",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/no-scope",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/no-summary",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/relative-root",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/stale-packet",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/wrong-task",
+      "TestMemoryUsageBindingRejectsInvalidWithoutPartialResult/zero-revision",
+      "TestMemoryUsageBindingTracksDestinationAndSelection",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/annotation",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/plan-digest",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/plan-version",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/project-root",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/recipient-instance",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/recipient-principal",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/revision",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/target-task",
+      "TestMemoryUsageBindingTracksDestinationAndSelection/task-definition",
+      "TestMemoryUsageDecisionChecksBothActorsBeforeReturning",
+      "TestMemoryUsageDecisionRebuildsAndRechecksBeforeReuse",
+      "TestMemoryUsageDecisionRebuildsAndRechecksBeforeReuse/changed-selection",
+      "TestMemoryUsageDecisionRebuildsAndRechecksBeforeReuse/new-authority",
+      "TestMemoryUsageDecisionRebuildsAndRechecksBeforeReuse/new-grant",
+      "TestMemoryUsageDecisionRebuildsAndRechecksBeforeReuse/other-task-snapshot",
+      "TestMemoryUsageDecisionRebuildsAndRechecksBeforeReuse/reauthenticate-then-expire",
+      "TestMemoryUsageDecisionRebuildsAndRechecksBeforeReuse/stale-answer",
+      "TestMemoryUsageDecisionRejectsEditedOrPartialPrevious",
+      "TestMemoryUsageDecisionRejectsEditedOrPartialPrevious/edited-actor",
+      "TestMemoryUsageDecisionRejectsEditedOrPartialPrevious/edited-binding",
+      "TestMemoryUsageDecisionRejectsEditedOrPartialPrevious/edited-expiration",
+      "TestMemoryUsageDecisionRejectsEditedOrPartialPrevious/empty",
+      "TestMemoryUsageDecisionRejectsEditedOrPartialPrevious/missing-recipient",
+      "TestMemoryUsageDecisionRejectsEditedOrPartialPrevious/missing-requester",
+      "TestMemoryUsageDecisionRejectsEditedOrPartialPrevious/reordered-recipient",
+      "TestMemoryUsageDecisionRejectsEditedOrPartialPrevious/roles-swapped",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/expired-recipient-caller",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/expired-recipient-grant",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/foreign-control-project",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/invalid-event",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/last-recipient-right",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/last-requester-right",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/missing-clock",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/missing-recipient-caller",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/missing-recipient-channel",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/missing-recipient-grant",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/other-recipient-instance",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/other-recipient-subject",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/revoked-recipient-grant",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/revoked-recipient-instance",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/revoked-requester-grant",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/stale-recipient",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/stale-requester",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/unanchored-snapshot",
+      "TestMemoryUsageDecisionRejectsEveryIncompleteAuthority/unregistered-recipient",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/expired",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/memory.read",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/memory.summarize",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/memory.transmit",
+      "TestMemoryUsageRequestsUseIndependentKernelRightsAndFreshness/revoked",
+      "TestMemoryUsageResourceSnapshotTaskBoundary"
+    ],
+    "changed_inputs_since_this_run": [
+      "internal/engine/memory_summary_receipt.go",
+      "internal/engine/memory_summary_receipt_test.go"
+    ],
+    "reason": "Only the pre-start receipt checker and its test changed; source and pure M24/M25 tests do not call this checker. Shared extract builder and their producers/callers unchanged; no init added.",
+    "distinct_normal_names_with_verified": 173
+  },
+  "inputs": {
+    "count": 1085,
+    "current_matches_verified": true,
+    "race_go_inputs_match_verified": true
+  },
+  "read_only": {
+    "internal/engine/agents_store.go": {
+      "baseline_sha256": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+      "current_sha256": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+      "matches_baseline": true,
+      "matches_tested": true
+    },
+    "internal/engine/agents_process.go": {
+      "baseline_sha256": "00d74a35555c8c4fb2f2ac56d5482bc3b8a8ca0bbb97755a14f5cb02dfec256f",
+      "current_sha256": "00d74a35555c8c4fb2f2ac56d5482bc3b8a8ca0bbb97755a14f5cb02dfec256f",
+      "matches_baseline": true,
+      "matches_tested": true
+    },
+    "internal/engine/agent_context.go": {
+      "baseline_sha256": "772ab3e440c07fbeef89dd9a9792af2226a5d74998bd8417e7c4ffce65f94e1c",
+      "current_sha256": "772ab3e440c07fbeef89dd9a9792af2226a5d74998bd8417e7c4ffce65f94e1c",
+      "matches_baseline": true,
+      "matches_tested": true
+    },
+    "internal/engine/memory_summary_source.go": {
+      "baseline_sha256": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+      "current_sha256": "d0a5552fe9a5a93d68e9f4e8eb62d096ac7e1503d842e93bb77744aff8cdadfa",
+      "matches_baseline": true,
+      "matches_tested": true
+    },
+    "internal/engine/memory_usage_binding.go": {
+      "baseline_sha256": "f4a4b59697fefb69749687c461e93fa9400e376970932e064e3909b8e95cd9fb",
+      "current_sha256": "f4a4b59697fefb69749687c461e93fa9400e376970932e064e3909b8e95cd9fb",
+      "matches_baseline": true,
+      "matches_tested": true
+    },
+    "internal/engine/memory_usage_decision.go": {
+      "baseline_sha256": "df2832128f653aa22c4134fa42fddf12de489382b692f06f0367573cff29d2b0",
+      "current_sha256": "df2832128f653aa22c4134fa42fddf12de489382b692f06f0367573cff29d2b0",
+      "matches_baseline": true,
+      "matches_tested": true
+    }
+  },
+  "build": {
+    "status": "PASS",
+    "binary": "/tmp/swarm-m26-bin-1mapgkl8/swarm",
+    "sha256": "9da7d61d086c8dcf77af1ae62298a3e115b0b91960ad87a1f825a823d3cf4d60",
+    "evidence": "verified-run.json"
+  },
+  "vet": "PASS (verified-vet.log)",
+  "gofmt": "PASS (five Go files)",
+  "git_diff_check": "PASS",
+  "markdown_links": {
+    "count": 24,
+    "links": [
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "plans/deepagents-integration/RESULTATS-MEMOIRE-20.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "plans/deepagents-integration/RESULTATS-MEMOIRE-21.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "SEMANTIC-SIGNALS.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "plans/deepagents-integration/RESULTATS-MEMOIRE-19.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "plans/deepagents-integration/RESULTATS-MEMOIRE-22.md"
+      },
+      {
+        "from": "docs/PROJECT-MEMORY.md",
+        "target": "../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../plans/deepagents-integration/RESULTATS-MEMOIRE-20.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../plans/deepagents-integration/RESULTATS-MEMOIRE-21.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "SEMANTIC-SIGNALS.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../plans/deepagents-integration/RESULTATS-MEMOIRE-19.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../plans/deepagents-integration/RESULTATS-MEMOIRE-22.md"
+      },
+      {
+        "from": "docs/en/PROJECT-MEMORY.md",
+        "target": "../../tools/memory-evaluation/README.md"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/PLAN.md",
+        "target": "CONTRAT-USAGES-MEMOIRE.md"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/PLAN.md",
+        "target": "RESULTATS-MEMOIRE-01.md"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+        "target": "../../architecture/AGENT-IDENTITY-CONTRACT.md"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+        "target": "evidence/m20-20261017/preplan-observation.json"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md",
+        "target": "RESULTATS-MEMOIRE-22.md"
+      },
+      {
+        "from": "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-22.md",
+        "target": "RESULTATS-MEMOIRE-22.md"
+      }
+    ]
+  },
+  "owned_files": {
+    "internal/engine/memory_summary_selection.go": "09151f72964711349efd2038f9aef0ea137851c967638ceadc38e9fea5f12c52",
+    "docs/PROJECT-MEMORY.md": "b8c315395165e598679ef56949dad61a1700dfe20f4e6943fbfd39ab156feb2a",
+    "docs/en/PROJECT-MEMORY.md": "f948a33beaa0dca385d0abf728fdc55115e26977577a49a43463306ceb958eb5",
+    "docs/plans/deepagents-integration/PLAN.md": "8c889dce8d8726a5af6097f7d0ef6509009cf0b7747cbb324320c87ab55c5394",
+    "docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md": "7ed09574f1d965c353a169d2cd6ab5c4be79c2156900127a6a9d8d27d1d71ad1",
+    "internal/engine/memory_summary_selection_test.go": "b60648cf61b5a66cd4c52bed96abb6c06b9547d0889bd6919b8252442d8c879d",
+    "internal/engine/memory_summary_source_test.go": "57bdc99f26705198a554dd0e9e3079c1081c76de1b48a1a122c73a30b77852d3",
+    "internal/engine/memory_summary_receipt.go": "66259dcdb7b6904e3f8998adafc7f092492b6f1e07ea12956c8eb976c3baceef",
+    "internal/engine/memory_summary_receipt_test.go": "db1e0984e589e5734cafa945e11a611925ba9bfb63ceddb1fa102bd89dd59dc5",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-22.md": "882cc0f13ef8be77135ab72e6adeb312b895499de387329c0f95e112d93b4adc",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-22.md": "538e8b6ff9fc7079a2e262ecd80af20611fa7cd29282abfa6c6e1bbf1a741cc8"
+  },
+  "owned_diff": "owned.diff",
+  "original_failures": [
+    "red-run.json",
+    "candidate-run.json",
+    "review-red-run.json"
+  ],
+  "review": "same author; introduced prepared-history defect reproduced and fixed; no independent acceptance",
+  "public_flow": "Go-compiled Store/in-process CLI/HTTP API and real scripted subprocess input/reopen, not installed-server/browser execution",
+  "diagram_render": "NOT TESTED; existing FR/EN sequence labels updated",
+  "global_watchdog": "disabled: go test -timeout=0; subprocess without timeout",
+  "runtime": "No live mission fixture, identity file change, provider/model call, native mission, delegation, inter-chat message, restart, commit or deployment"
+}

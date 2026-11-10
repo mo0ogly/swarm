@@ -1,0 +1,14 @@
+{
+  "name": "methods",
+  "argv": [
+    "python3",
+    "tools/agent-workflows/check.py"
+  ],
+  "started": "2026-10-12T15:05:18.935033+00:00",
+  "finished": "2026-10-12T15:05:31.545491+00:00",
+  "exit": 0,
+  "wall_seconds": 12.610459767005523,
+  "output": "/tmp/swarm-binary-preflight-inspection-methods.out",
+  "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+  "drift": []
+}

@@ -1,0 +1,9 @@
+{
+  "result": "FAIL bounded preflight refusal",
+  "exit": 1,
+  "active_seconds": 40.44,
+  "cause": "No remaining capacity for final original evidence; inspection fits but final synthesis budget remains guarded.",
+  "source_revision": "isolated v2",
+  "output_sha256": "257a960861dfe84f9aca97d49daaff79fdd49d6f61d13a9e30d767ecb098b313",
+  "native_effect": "none; no installation, provider spending or acceptance"
+}

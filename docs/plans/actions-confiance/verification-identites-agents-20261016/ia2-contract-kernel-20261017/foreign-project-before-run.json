@@ -1,0 +1,22 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityInternalConsumerRejectsForeignProject$",
+    "-count=1",
+    "-timeout",
+    "30s"
+  ],
+  "start": "2026-10-17T05:49:35.768898+00:00",
+  "end": "2026-10-17T05:49:59.959510+00:00",
+  "exit_code": 1,
+  "source_sha256": {
+    "internal/engine/agent_identity_authority.go": "4cf14e20bf340adca602c967439ace733a60c0f00a62d23f81f6e3639dad7f53",
+    "internal/engine/agent_identity_authority_test.go": "e9a11c9f53f7db208edcbac4e353eea154546a9d6efc887e5ba911e07db475b2",
+    "internal/engine/agent_identity_contract_test.go": "3143b34c6308c4bb60f268532f4ad494ff8fd2083e2c560b9c1b6bf0970b70f0",
+    "internal/engine/agent_identity_contract.go": "6f00b2f93c45cc2319ce3f4fca76301ac68dc5897613df56326ed2541cbff121"
+  }
+}

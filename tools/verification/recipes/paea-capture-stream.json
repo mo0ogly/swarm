@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "paea-capture-stream-primitive",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/Cargo.toml",
+    "rust/crates/**/src/**/*.rs",
+    "rust/crates/swarm-cli/tests/paea_approval_web.rs",
+    "rust/crates/swarm-cli/tests/common/*.rs",
+    "rust/crates/swarm-enrollment-authority/tests/common/*.rs",
+    "web/**/*",
+    "frontend/**/*",
+    ".cargo/config.toml",
+    "tests/fixture_area.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_NET_OFFLINE": "true"
+  },
+  "steps": [
+    {
+      "id": "exact-bytes-refusal-prefix-and-fresh-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "paea_approval_web",
+        "paea_capture_stream::",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test paea_capture_stream::capture_stream_preserves_prefix_and_cause_on_reader_failure_then_recovers_fresh ... ok",
+        "test paea_capture_stream::capture_stream_refuses_existing_file_and_dangling_symlink_without_alteration ... ok",
+        "test paea_capture_stream::capture_stream_writes_exact_bytes_to_a_new_file ... ok",
+        "3 passed; 0 failed; 0 ignored;"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "id": "paea-control-startup",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/**/*",
+    "web/*",
+    "web/lib/**/*",
+    "web/paea-examples/v1/*.json",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "version_history.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "bootstrap-v2",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--test",
+        "control",
+        "--features",
+        "test-fixtures",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "control_journal_permissions_links_types_and_overlapping_roots_refuse_without_mutation"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "bootstrap-v1-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--test",
+        "bootstrap",
+        "--features",
+        "test-fixtures",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "bootstrap_readonly_roundtrip_binds_external_digest_without_creating_locks"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "control-core-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "control::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "16 passed; 0 failed",
+        "both_authority_and_storage_failures_survive_pending_exact_event_recovery"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-control-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "identity_control",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "current_control_cli_observes_real_signed_enrollment_fr_en_without_authorizing_or_creating_project",
+        "control_cli_revocation_and_real_sqlite_contention_refuse_and_explicit_recovery_works",
+        "control_cli_bad_pin_unsafe_file_and_private_invalid_json_refuse_before_journal_access"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "secondary-error-traversal",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "identity_control::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "startup_primary_secondary_and_custom_io_reach_safe_cli_diagnostics"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "existing-cli-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "cli",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "17 passed; 0 failed",
+        "native_bootstrap_cli_rejects_incomplete_identity_without_creating_a_project"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

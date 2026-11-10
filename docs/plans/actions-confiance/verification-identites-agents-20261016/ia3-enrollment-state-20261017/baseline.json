@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-17T11:07:55.379340+00:00",
+  "existing_sources": {
+    "internal/enrollmentproof/proof.go": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+    "internal/enrollmentproof/proof_test.go": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b"
+  },
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "boundary_choice": "not answered; no activation",
+  "new_package": "internal/enrollmentstate",
+  "global_test_watchdog": 0
+}

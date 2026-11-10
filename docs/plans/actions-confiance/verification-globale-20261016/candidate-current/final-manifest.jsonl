@@ -1,0 +1,8 @@
+{"Time":"2026-10-16T07:32:33.041991815+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-16T07:32:33.561031961+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest"}
+{"Time":"2026-10-16T07:32:33.562090153+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Output":"=== RUN   TestGraphDeliveryD03QualificationManifest\n"}
+{"Time":"2026-10-16T07:32:38.358668228+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Output":"--- PASS: TestGraphDeliveryD03QualificationManifest (4.80s)\n"}
+{"Time":"2026-10-16T07:32:38.358806879+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestGraphDeliveryD03QualificationManifest","Elapsed":4.8}
+{"Time":"2026-10-16T07:32:38.367346373+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-16T07:32:39.396579022+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t6.354s\n"}
+{"Time":"2026-10-16T07:32:39.396667709+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":6.355}

@@ -1,0 +1,19 @@
+sequenceDiagram
+  participant L as Lanceur privé de confiance
+  participant H as Helper de l'image courante
+  participant A as Autorité métier indépendante
+  participant W as Configuration et témoin
+  L->>H: Exec image épinglée, canaux privés et pidfd parent
+  Note over L,H: Parent détient le pidfd enfant créé par clone
+  L->>H: Démarrage V1 hello, nonce et digest de pins
+  H->>H: Vérifier processus parent, UID, format et pins propres
+  H-->>L: Démarrage V1 ready lié au hello
+  L->>L: Vérifier processus enfant, UID et ready exact
+  L->>H: Démarrage V1 release exact
+  H->>H: Vérifier release puis admettre le canal métier
+  L->>H: Demande métier V2, challenge distinct et Change exact
+  H->>A: Autoriser cette demande attribuée
+  A->>W: Effet seulement sous autorité maintenue
+  W-->>L: Réponse V2 liée à la demande via le helper
+  L->>L: Valider réponse et recueillir fin de l'enfant
+  Note over L,W: Ready et release ne donnent aucun droit métier

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "citation-compact-pause-b5c6c2cfcaf6",
+  "expected_revision": 373,
+  "reason": "Exact next-message preflight exposed a real token shortage before spending. Read-only sizing preserves all originals and compares duplicate/single diagnostics. Correct redundant diagnostic transport and report the first rejected citation before retry; no transport increase or verdict change."
+}

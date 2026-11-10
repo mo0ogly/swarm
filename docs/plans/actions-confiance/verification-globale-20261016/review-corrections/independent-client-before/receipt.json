@@ -1,0 +1,68 @@
+{
+  "binary_sha256": "c0030271a0c2108a6d872b954b0be7556f69642463e28e3070f6bde1edfd8ec8",
+  "parser_source_sha256": "aa95d96af4f6f3a0bd04916e70bedbe22bc82fcfa0d903f6738f6a166320560d",
+  "api_source_sha256": "5e09ff21549302a98a7d0e4c93d1c7ad015a1118d609983dc0cd8d682aac265d",
+  "legacy_receipt_sha256": "27883184de2f008c91d70fedc9cb917166525181f1dd17d64d9ef2dbe10c43d5",
+  "tamper": "first export.evidence[].sequence: 1 -> 1.00000000000000001",
+  "source_classification": "untrusted pasted proof; Go rejects decimal into integer directly",
+  "ui_reencoded_to_original": true,
+  "runs": [
+    {
+      "kind": "original",
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-actions-review-client-20261016-wnjUHLcT/fixture",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792135096.233213,
+      "ended_unix": 1792135096.3028965,
+      "exit_code": 0,
+      "stdout": "{\n  \"sequence\": 4,\n  \"simulation\": true,\n  \"verified\": true\n}\n",
+      "stderr": "",
+      "payload_sha256": "6cc1e0910bf272d1bf55ff1e8906db1688af8c19c65c597b92f189e7bbf0034f"
+    },
+    {
+      "kind": "tampered-direct",
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-actions-review-client-20261016-wnjUHLcT/fixture",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792135096.303005,
+      "ended_unix": 1792135096.3935056,
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "{\n  \"error\": \"json: cannot unmarshal number 1.00000000000000001 into Go struct field TrustEvidence.export.evidence.sequence of type int\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"json: cannot unmarshal number 1.00000000000000001 into Go struct field TrustEvidence.export.evidence.sequence of type int\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n",
+      "payload_sha256": "9527c631ae1b0a07057d8da649ab3f6863ac017eb75dd16d85742f693e17230c"
+    },
+    {
+      "kind": "tampered-via-current-ui-decoder",
+      "argv": [
+        "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+        "--root",
+        "/tmp/swarm-actions-review-client-20261016-wnjUHLcT/fixture",
+        "--json",
+        "trust",
+        "verify",
+        "--input",
+        "-"
+      ],
+      "started_unix": 1792135096.3935838,
+      "ended_unix": 1792135096.4559457,
+      "exit_code": 0,
+      "stdout": "{\n  \"sequence\": 4,\n  \"simulation\": true,\n  \"verified\": true\n}\n",
+      "stderr": "",
+      "payload_sha256": "73dca6f3c063b2337c5449bccddac97e3a6228805ed7453e0d68c45f0f6f894b"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "source": "docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/20261011-instruction-learning-retex.md",
+  "input": "/tmp/swarm-planning-rejection-recovery.mmd",
+  "output": "/tmp/swarm-planning-rejection-recovery.png",
+  "exit_code": 0,
+  "sha256": "6cf8e1bc7302d3b06a6b93ad7b3b07731e3fd47534ed97c47b6de91ba4a82b80",
+  "command": [
+    "/home/fpizzi/.npm-global/bin/mmdc",
+    "-i",
+    "/tmp/swarm-planning-rejection-recovery.mmd",
+    "-o",
+    "/tmp/swarm-planning-rejection-recovery.png",
+    "-p",
+    "/tmp/swarm-mermaid-puppeteer.json"
+  ]
+}

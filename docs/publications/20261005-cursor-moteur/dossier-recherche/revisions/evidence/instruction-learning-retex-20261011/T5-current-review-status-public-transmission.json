@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-11T11:53:14.275778+00:00",
+  "task": "plan-ca937edf4e-T5",
+  "before_revision": 194,
+  "after_revision": 195,
+  "event": "T5-current-review-status-20261011",
+  "observation": "static code path displays old task blocker despite current independent review; implementation and browser qualification assigned to T5",
+  "next_sha256": "49cc01e2c16d9ae922b77fdfe2c39c641e7b4196ba7f5b09c910c81066caf5c7"
+}

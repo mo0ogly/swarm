@@ -1,0 +1,23 @@
+{
+  "status": "VERIFIED_LOCAL_DELIVERY_EXTERNAL_REVIEW_OPEN",
+  "version": "v0.1.1-dev.95",
+  "binary_sha256": "ba404609f9f5ddd3060b3b6baa2060922b62ab740c6d02e33ab2775e5c01476c",
+  "effective_inputs": 449,
+  "checks": {
+    "answers": 35,
+    "previous_plan": 98,
+    "previous_writes": 50,
+    "installed": 13,
+    "version_ui_fr_en": 14
+  },
+  "recipe_integrity": "VERIFIED",
+  "external_review": "NOT_OBTAINED",
+  "glm_calls": 3,
+  "glm_usable_responses": 0,
+  "global_diff_check": "FAIL_OUTSIDE_LOT_TWO_TRAILING_BLANKS",
+  "live_settings_schema": 41,
+  "missions_preserved": true,
+  "provider_calls": 0,
+  "commit": false,
+  "push": false
+}

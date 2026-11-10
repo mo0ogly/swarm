@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-11T16:19:31.787517+00:00",
+  "pid": 1303507,
+  "parent_pid": 1291751,
+  "cwd": "/tmp/swarm-planner-3304471088",
+  "requested_arguments": {
+    "--model": "sonnet",
+    "--effort": "medium"
+  },
+  "revision": 376,
+  "review": "review-754dbd4d247114000994bbc6",
+  "candidate": null,
+  "review_calls": 30,
+  "limit": "Owned actual reviewer argv proves explicit requested medium; effective provider reasoning effort and actual model still unknown until provider receipt. No private prompt/environment/output included."
+}

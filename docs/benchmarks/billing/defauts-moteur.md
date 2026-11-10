@@ -111,3 +111,14 @@ l'empêche (E3 : il ne paie que la remise acceptée de `prepare`).
 **Piste.** Permettre de déclarer, au niveau du travail et non du responsable, qu'une exigence
 doit être acceptée avant le départ de toute tâche portant une exigence donnée (par exemple
 `req-1` avant `req-2`), vérifié par le répartiteur.
+
+
+## Complément du 8 octobre — attribution des 32 exclusions historiques
+
+L’analyse complète [des 32 cas](analyse-32-exclusions-20261008.md) précise les observations
+intermédiaires de D5 : 27 ERREUR SQLite sont explicites (14 décisions, 13 revues), dont 26
+sous F4e et une sous F7. Les cinq DÉLAI sous F4e n’ont aucun événement SQLite dans leur
+historique public ; ils conservent un claim de 120 secondes sans décision suivante.
+Leur cause initiale demeure inconnue. Le banc considère le holder comme une activité
+jusqu’au délai global, lui aussi de 120 secondes. Les attributuer toutes à D5 n’est pas justifié.
+Les archives et critères historiques sont conservés ; aucune nouvelle campagne n’a été lancée.

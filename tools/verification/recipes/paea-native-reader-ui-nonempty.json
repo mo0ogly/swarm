@@ -1,0 +1,69 @@
+{
+    "schema_version": 1,
+    "id": "paea-native-reader-ui-nonempty",
+    "inputs": [
+        "rust/Cargo.toml",
+        "rust/Cargo.lock",
+        "rust/crates/swarm-web/src/**/*",
+        "rust/crates/swarm-web/tests/paea_reconcile.rs",
+        "web/paea-effects.html",
+        "web/paea-effects.js",
+        "web/paea.html",
+        "web/paea.css",
+        "web/i18n.js",
+        "web/i18n-en.js",
+        "web/wattson_themes.css",
+        "web/swarm-design.css",
+        "web/swarm-logo.png",
+        "scripts/i18n/build.cjs",
+        "tests/fixture_area.py",
+        "tests/paea_reconcile_native_reader_ui.cjs",
+        "tests/paea_reconcile_native_reader_ui_recipe.py",
+        "package.json",
+        "package-lock.json",
+        "tools/verification/recipe.py",
+        "tools/verification/recipes/paea-native-reader-ui-nonempty.json",
+        "docs/actions-confiance-rust.md",
+        "docs/en/actions-confiance-rust.md"
+    ],
+    "environment": {
+        "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+        "CARGO_PROFILE_DEV_DEBUG": "0",
+        "CARGO_PROFILE_TEST_DEBUG": "0",
+        "CARGO_INCREMENTAL": "0"
+    },
+    "steps": [
+        {
+            "id": "i18n-generated",
+            "command": [
+                "node",
+                "scripts/i18n/build.cjs",
+                "--check"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "\"mode\":\"check\"",
+                "\"status\":\"pass\""
+            ],
+            "required_stderr": []
+        },
+        {
+            "id": "native-browser-witness-qualification-nonempty",
+            "command": [
+                "python3",
+                "tests/paea_reconcile_native_reader_ui_recipe.py",
+                "--binary",
+                "{root}/bin/swarm",
+                "--report-scope",
+                "nonempty",
+                "--output-parent",
+                "{root}/.cache"
+            ],
+            "expected_exit": 0,
+            "required_stdout": [
+                "PAEA_NATIVE_READER_UI_NONEMPTY_VERIFIED 14"
+            ],
+            "required_stderr": []
+        }
+    ]
+}

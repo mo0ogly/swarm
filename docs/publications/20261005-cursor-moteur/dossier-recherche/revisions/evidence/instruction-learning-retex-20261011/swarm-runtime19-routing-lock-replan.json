@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-11T18:26:15.177236+00:00",
+  "cause_observed": "Public mission resume exited2 database is locked (SQLITE_BUSY), before any verified resume.",
+  "owner": "Native runtime/store writer boundary; operator must inspect live holder/review and public mission state before next mutation.",
+  "original_error": "command_failed, retryable false, database is locked (5) (SQLITE_BUSY)",
+  "condition": "Active transaction completed and public mission status confirms still paused; use supported authenticated server operation rather than overlapping separate writers.",
+  "work_read_exit": 0
+}

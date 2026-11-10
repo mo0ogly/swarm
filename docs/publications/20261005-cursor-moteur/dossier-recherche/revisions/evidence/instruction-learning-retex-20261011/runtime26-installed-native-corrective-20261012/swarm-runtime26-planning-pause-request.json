@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "paused-settlement26-owned-planning-pause-f98d77671af74f139ca51bbd88c70f63",
+  "expected_revision": 679,
+  "scope": "root",
+  "reason": "Maintenance du moteur26 qualifié après revue terminée et sans processus actif. Conserver identité, résultat, revues, compteurs et entrées120. Les deux pauses seront reprises publiquement après vérification du service."
+}

@@ -1,0 +1,12 @@
+{
+  "kernel": "6.17.0-41-generic",
+  "machine": "x86_64",
+  "uid": 1001,
+  "operation": "landlock_create_ruleset(NULL,0,LANDLOCK_CREATE_RULESET_VERSION)",
+  "abi": 7,
+  "errno": 0,
+  "read_only_capability_query": true,
+  "extra_privilege_requested": false,
+  "source": "https://docs.kernel.org/6.17/userspace-api/landlock.html",
+  "at": "2026-10-15T20:30:39.136000+00:00"
+}

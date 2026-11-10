@@ -1,0 +1,202 @@
+{
+  "status": "STATIC_ONLY_UNQUALIFIED",
+  "reviewer": "Codex root in implementation context; not independent",
+  "owned_inputs": {
+    "rust/crates/swarm-protection-contract/src/receipt.rs": "aea163242fc5242619e8018cd821bda972ccdd03b7009279f7453836e292e248",
+    "rust/crates/swarm-protection-contract/src/lib.rs": "28558f2fc0e489333ffac80a60560347d0a728928caeca373d4ae23e2e169399",
+    "rust/crates/swarm-protection-contract/tests/receipt_report.rs": "648dcbe83c8c882e50cb59456a39583054f2242fd5020dbceaa744ef53e4be9c",
+    "rust/crates/swarm-cli/src/protection.rs": "48ba2ddc77e17bd7562846af7dd20a16b0e091b3b55033100a093535cb674b9b",
+    "rust/crates/swarm-cli/src/lib.rs": "f3632bafd6a7bf2f44b74b7ff766a25cc11ece39eee187c70993f2aded01cec3",
+    "rust/crates/swarm-cli/tests/protection_receipt_report.rs": "3c2bc39e40aa3e55de2671b19ed45b7331f804ffd1932a43f537cb2d7b82756f",
+    "schemas/paea/receipt-report-v2.schema.json": "f15b890236016d08ed78d5fcf07e419aef04fb0a409ed29c7e0c3f29b313694e",
+    "tools/verification/recipes/paea-contract.json": "7254e3ac21bcf6fafacc53845c87e7e4ac1a338cacd7d0c89bccf9d0ddd69278",
+    "docs/architecture/PAEA-CONTRACT.md": "1ea494a66ebc548e2d4ff45ae7763b66348bc9b1a66cc6518b43b265f8a55359",
+    "docs/en/PAEA-CONTRACT.md": "ca93545ad229d1fd2f21a40a55398c07d2e989289c6479fc5656013ca4b4d604",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "360be75a4d9669b247859d0e558dac0dba797598a7cb601136273621af4913f4",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "7fb999b280c9da8923744fd7f5eda91a8b4869afc7ec620e000970da1151deca",
+    "docs/plans/FILE-APEX.md": "229215309c76ede870dcea8388e8804ce9705a187cc50d105e083f5adce6c0ee",
+    "docs/en/APEX-QUEUE.md": "b607312a15afcf5403adf057f9d39702d9781763a2bbc080244a15acfb86d48e",
+    "version_history.json": "f367b2c21907a006318e815fbbf77b5090aaffdfbfd3a67ae49ab6fb2321a8fc",
+    "docs/plans/actions-confiance/paea/INCREMENT-10.md": "4da224cc2778614a81e3a98e9dcdcb2914e3eec536fb48f06998f226b9c68100",
+    "docs/en/plans/actions-confiance/paea/INCREMENT-10.md": "590d41c647415344ae169a74c8d510647d50b4ff83f8dc710deef97179e419c1"
+  },
+  "owned_scopes": {
+    "rust/crates/swarm-cli/src/lib.rs": "PAEA receipt-report FR/EN help only; generic USAGE drift belongs to other workstream",
+    "version_history.json": "one source-only PAEA FR/EN local note; concurrent candidate-validation note preserved, not product-verified here"
+  },
+  "function_inventory": [
+    {
+      "file": "rust/crates/swarm-protection-contract/src/receipt.rs",
+      "line": 40,
+      "function": "check_receipt_documents",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-protection-contract/tests/receipt_report.rs",
+      "line": 7,
+      "function": "inputs",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-protection-contract/tests/receipt_report.rs",
+      "line": 25,
+      "function": "changed",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-protection-contract/tests/receipt_report.rs",
+      "line": 34,
+      "function": "receipt_report_binds_observation_and_raw_bytes_without_authorizing",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-protection-contract/tests/receipt_report.rs",
+      "line": 74,
+      "function": "receipt_report_transport_and_whitespace_do_not_change_business_identity",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-protection-contract/tests/receipt_report.rs",
+      "line": 106,
+      "function": "receipt_report_rejects_bad_documents_and_receipts_then_recovers",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-protection-contract/tests/receipt_report.rs",
+      "line": 157,
+      "function": "receipt_report_keeps_binding_and_lifecycle_refusals",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/src/protection.rs",
+      "line": 18,
+      "function": "execute",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/src/protection.rs",
+      "line": 90,
+      "function": "check_receipt",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/src/lib.rs",
+      "line": 496,
+      "function": "execute",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+      "line": 11,
+      "function": "fixture",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+      "line": 33,
+      "function": "call",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+      "line": 54,
+      "function": "accepted",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+      "line": 61,
+      "function": "refused",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+      "line": 73,
+      "function": "protection_receipt_report_exact_files_and_legacy_shape_in_both_languages",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+      "line": 120,
+      "function": "protection_receipt_report_refuses_invalid_inputs_and_runtime_then_recovers",
+      "Rustdoc": "source reviewed, compilation deferred"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+      "line": 199,
+      "function": "protection_receipt_report_writer_failure_then_recovery",
+      "Rustdoc": "source reviewed, compilation deferred"
+    }
+  ],
+  "policy_review": {
+    "operator_policy_added": false,
+    "protocol": "output schema2 belongs only to separate receipt-report; v1 document/receipt inputs and check-receipt output unchanged. Six positional tokens/file markers are framing invariants. Fixed not-established values are non-authority declarations. SHA-256 format reuses existing protocol.",
+    "technical": "existing per-file 16MiB regular-file reader, strict serde parser and writer; no new aggregate cap, deadline, retry, clock, concurrency or budget.",
+    "fixtures": "test indices/case arrays/digests/counts4and3 and EOF stdin are test inputs/safety, not operator policy.",
+    "admin_api_cli": "no new effective policy or saved operator setting; no Admin configuration or validation path required for this output protocol"
+  },
+  "function_review": {
+    "ReceiptReport": "Rustdoc separates v2 output from v1 inputs, exact-byte identities from canonical/intent identity; no signature, authority, freshness, atomic snapshot, uniqueness or effect. Public fields never authenticate an untrusted external report.",
+    "check_receipt_documents": "strict document decode -> canonicalize -> strict receipt decode -> existing binding/lifecycle -> raw hashes/report. No IO, mutation, policy/clock/authority lookup or publication. Only hashes/static markers/states emitted.",
+    "CLI_execute_check_receipt": "guard arity/runtime flags then shared state/file framing. V2 branch uses typed report and shared output handling. V1 JSON source block byte-identical; runtime compatibility is still NOT TESTED on new code.",
+    "root_execute": "only help additions owned; current generic usage drift semantically inspected and syntax parsed separately; parser and dispatch bytes unchanged by that drift.",
+    "tests": "13 documented helper/test functions, 4 changed/new production functions; source syntax only. Four library plus three Linux CLI tests selected exactly, none executed.",
+    "rustdoc_types": "NOT EXECUTED under explicit user compilation ban"
+  },
+  "error_review": {
+    "decode_binding": "existing safe Error codes/typed JSON causes preserved before report; no empty-success fallback. UNKNOWN only accepts explicit reconciliation and terminal replay refuses.",
+    "read_close": "shared read_command_file handles open/metadata/framing/read/close, retaining primary/secondary causes, with no Root opened.",
+    "serialize_write_flush": "serialize complete report before write_output; write_all/flush failure keeps original IO cause and may follow partial or complete visible bytes, without a protected-effect claim.",
+    "consumer": "Protection/CommandInput/Output -> report() -> safe failure.code with nonzero exit and private retained causes; no new error wrapper or ignored result.",
+    "prepared_checks": "malformed/unknown/duplicate raw input, binding/lifecycle, changed observation/format/transport identity, v1/v2 shape, runtime/stdin and /dev/full recovery; not executable evidence until compilation allowed"
+  },
+  "documentation_review": {
+    "updated": "FR/EN architecture, plan/queue, increment10, CLI help, schema/recipe and qualified source-only local note. No UI/generated resources or Cargo dependency changed.",
+    "versioning": "separate v2 command chosen over in-place v1 break; schema1 inputs retained. Current new Rust sources are ahead of dev75; old14-test proof is not new-code PASS.",
+    "transmission": "canonical plan and INCREMENT-10 carry no-compilation and exact new targets; no embedded agent context or existing process changed.",
+    "schema": "metaschema/output-field/state checks on synthetic data only; runtime binding/lifecycle/provenance remain separate"
+  },
+  "observed_dependencies": {
+    "rust/crates/swarm-protection-contract/src/canonical.rs": "5e9bad76b65a7fdbbd2a3966fdebbba59480d80c2e2337498ac5d0bd2a9092f0",
+    "rust/crates/swarm-protection-contract/src/comparison.rs": "e5c7bab96729ad9c14c6670f240d8370072a0aa12dcdc6ecb6a4c45d3d565538",
+    "rust/crates/swarm-protection-contract/src/types.rs": "4cf2a9869422eff1d9aaf8bc9d019600b8ef179ac9132e6fbbba3101cbf76c42",
+    "rust/crates/swarm-protection-contract/src/strict_json.rs": "9edc35078e857e321efa432d2839c35a554ac2632165058688798d87cece87bd",
+    "rust/crates/swarm-protection-contract/Cargo.toml": "cc2f4aa17b70f5f3827fdb90bad6c5c8866ffa5d473223c8db79e69668aea192",
+    "rust/crates/swarm-identity-contract/src/lib.rs": "e1257094aac54c52738dcfd1c0471139c196d5571de2662aaa32a751e4c0a1af",
+    "rust/crates/swarm-engine/src/command_input.rs": "891a00b25f0e7f0ae126466286c4328bedc136aa5423fa233e42e075615a82b8",
+    "rust/crates/swarm-cli/Cargo.toml": "b52a7826314b7b4bb5b8b5ee1fc19e6a4a9598ab7731a6168ade7a3c6dcbf816",
+    "tests/fixtures/paea/contract-v1.json": "cd02fa4b14bdef9b4542c8e547c417c2bb52ad0829d779bbb7ed0d7830a3d16b",
+    "schemas/paea/receipt-check-v1.schema.json": "1fb0eac36336a8fd466b3b8ddeaf1cb4f1f2e1cb54130c56478b34c9fbee5a95",
+    "rust/Cargo.lock": "aa38912569baadb99c168ecb4dbdc6be878482e9c98908955f295294cc9df346",
+    ".cargo/config.toml": "ced712ed94313257a11d93f311445bad70e7c1e6b60c57d4486113af2c481691"
+  },
+  "prechange": "prechange-public-boundary.json retained; full inputs in prechange-public-boundary-02.json after initial evidence omission diagnosed",
+  "reused_static_checks": "unchanged Rust/schema/test-selection proof in static-checks.json; changed generic CLI help parsed again; current docs/version metadata reviewed separately",
+  "concurrent_replan": "original integrity refusal, reconstructed SHA-verified source and exact diff retained. USAGE only and one external FR/EN note; no PAEA parser or handler drift. No concurrent product acceptance claimed.",
+  "open": [
+    {
+      "id": "PAEA-OBS-01",
+      "state": "IMPLEMENTED_NOT_TESTED",
+      "owner": "Codex after compilation ban lifted",
+      "criterion": "new raw identities distinguish bytes, legacy outputs retained and all affected targets/recipe pass on same build"
+    },
+    {
+      "id": "TYPE-RUSTDOC-PROFILE-INSTALL",
+      "state": "NOT_TESTED",
+      "owner": "Codex local integration",
+      "criterion": "new compile/types/Rustdoc, exact effective profile and supported delivery once authorized"
+    },
+    {
+      "id": "PAEA-PROTECTED-EFFECTS",
+      "state": "OPEN",
+      "owner": "PA-02/03 and AC-02",
+      "criterion": "current authenticated authority at protected effect point and independent observation"
+    },
+    {
+      "id": "PAEA-E3-RETEX",
+      "state": "OPEN",
+      "owner": "sponsor/evaluator/Codex",
+      "criterion": "required independent means, campaigns and final corrections/RETEX"
+    }
+  ]
+}

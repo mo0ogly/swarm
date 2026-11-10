@@ -1,0 +1,5 @@
+--- FAIL: TestManagedFragmentSelectionUsesReceivedEvidenceCapacity (0.33s)
+    managed_review_fragment_request_prompt_test.go:97: selector falsely declares available complete proof too large 63805 93718 63805
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.361s
+FAIL

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://swarm.local/schemas/paea/provisioning-request-cli-v1.schema.json",
+  "title": "Protected provisioning request preflight; never approval or material generation",
+  "description": "UID numeric bounds are Linux representation, not operator policy. Producer enforces distinct roles. Durable read is local FS acknowledgement, not freshness/human/authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "protocol",
+    "operation_result",
+    "request_digest",
+    "service_uid",
+    "controller_uid",
+    "request_validated",
+    "input_durability",
+    "provisioning_started",
+    "human_authentication_verified",
+    "current_authority_verified",
+    "service_started",
+    "confinement_verified"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "protocol": {
+      "const": "swarm-provisioning-request-cli-v1"
+    },
+    "operation_result": {
+      "const": "completed"
+    },
+    "request_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "service_uid": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967294
+    },
+    "controller_uid": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967294
+    },
+    "request_validated": {
+      "const": true
+    },
+    "input_durability": {
+      "const": "directory_acknowledged"
+    },
+    "provisioning_started": {
+      "const": false
+    },
+    "human_authentication_verified": {
+      "const": false
+    },
+    "current_authority_verified": {
+      "const": false
+    },
+    "service_started": {
+      "const": false
+    },
+    "confinement_verified": {
+      "const": false
+    }
+  }
+}

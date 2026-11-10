@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "fixture"
+  },
+  "answers": [
+    {
+      "case_id": "contract-current-without",
+      "prompt_sha256": "34993bb6123e4fd3577669a16b59a9f444d9b15ff5e0e4f6c75da82732873877",
+      "response": {
+        "current_state": "blocked",
+        "supported_version": null,
+        "source_sha256": null,
+        "current_actions": [
+          "inspect_current_source"
+        ],
+        "future_condition": "fresh_source_and_compatibility_check",
+        "reason": "Contrôle manuel, sans appel de modèle."
+      },
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "contract-current-with",
+      "prompt_sha256": "89b0049fc015056d9224adacaf552a56216d3b546ce3fee5e19530a1aaf81caa",
+      "response": {
+        "current_state": "blocked",
+        "supported_version": 33,
+        "source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "current_actions": [
+          "request_operator_decision",
+          "prepare_supported_migration"
+        ],
+        "future_condition": "supported_migration_and_fresh_compatibility_check",
+        "reason": "Contrôle manuel, sans appel de modèle."
+      },
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "contract-changed-without",
+      "prompt_sha256": "82ec910152f0fe6dbdeba17d7458373fdf997974fcf6b53ede27ffbbd24a9abc",
+      "response": {
+        "current_state": "blocked",
+        "supported_version": null,
+        "source_sha256": null,
+        "current_actions": [
+          "inspect_current_source"
+        ],
+        "future_condition": "fresh_source_and_compatibility_check",
+        "reason": "Contrôle manuel, sans appel de modèle."
+      },
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "contract-changed-with",
+      "prompt_sha256": "0177b4e4869643bc94912479f233cfef4a7b9a325014863af26bb8f4f5319ced",
+      "response": {
+        "current_state": "blocked",
+        "supported_version": 33,
+        "source_sha256": "ac9dd0587806253b28082fe87c05e3fb7f75ff4201fe3469553e8c3ecd3da8fa",
+        "current_actions": [
+          "request_operator_decision",
+          "prepare_supported_migration"
+        ],
+        "future_condition": "supported_migration_and_fresh_compatibility_check",
+        "reason": "Contrôle manuel, sans appel de modèle."
+      },
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    }
+  ]
+}

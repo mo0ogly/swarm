@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "swarm-workbench-design",
+  "inputs": [
+    "web/swarm-workbench.js",
+    "web/trust-workbench.js",
+    "web/swarm-workbench.css",
+    "web/swarm-design.css",
+    "web/cockpit-native-read.js",
+    "web/cockpit-native.js",
+    "web/prepare.html",
+    "web/native-runtime.html",
+    "web/trust-native.html",
+    "web/native-run-limits.js",
+    "web/i18n-en.js",
+    "locales/en.json",
+    "version_history.json",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "rust/crates/swarm-web/src/service/native_preparation.rs",
+    "tests/swarm_workbench_ui.cjs",
+    "tests/rust_native_cockpit_browser.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_resume_http_contract.py",
+    "tests/rust_pricing_http_contract.py",
+    "docs/WORKBENCH-DESIGN.md",
+    "docs/en/WORKBENCH-DESIGN.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "real-native-workbench-browser",
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_EXISTING_COCKPIT_PASS"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\nbase=Path(os.environ.get('SWARM_DESIGN_EVIDENCE_BASE','.cache'))\np=Path(tempfile.mkdtemp(prefix='workbench-design-',dir=base)).resolve()/'browser'\nprint('RETAINED_FLOW',p,flush=True)\nsubprocess.run(['python3','tests/rust_native_cockpit_browser.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--design','--output',str(p)],check=True)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "captured_at": "2026-10-17T17:37:35.960603+00:00",
+  "executor": "Codex, direct local execution",
+  "base_commit": "06481f15e677285b789cfb81ba8e02e351bfdc27",
+  "binary_version": "v0.1.1-dev.5",
+  "binary_sha256": "d6cd99bfb87b154b5d59459f3b26e64659ef84e5105c6d6d740afe818ddd70b2",
+  "recipe": "node tests/pilot_readability_ui.cjs PREPARED_BINARY OUTPUT",
+  "result": "result.json",
+  "sources": {
+    "web/pilot-inspector.js": "0b199678919fd3563a64c5d68b50bd023625c16746f5f05e4be2621671e19733",
+    "web/swarm-design.css": "d16f095be28059d4cb9ec55073c41a57d15bf9ea612d1b556e66196757d188f7",
+    "web/i18n-en.js": "76a31d6c6f4a2c62bf76b523593d99ba851f79754c86a200325e31240e42d497",
+    "locales/en.json": "abafab69a65a42595fb53a08e49d6f32293488af7b991c78cf93e6815316a531",
+    "tests/pilot_readability_ui.cjs": "9f34abfbcc356693dc2c9ca5eb41aa1dfc388557ed89dff627f34a4a9753c858",
+    "version_history.json": "829cc5295789cf57d943ab9c006d13e930dd1f294cf163cb327a9d40edc52f63"
+  },
+  "limits": "Isolated historical-agent fixture; navigation visits recorded separately; no provider launch, live task change or Git repair."
+}

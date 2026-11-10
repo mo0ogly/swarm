@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-provenance-public",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "tools/verification/recipe.py",
+    "tests/rust_preparation_cli_calls.py",
+    "tests/rust_preparation_calls.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_project_memory_source.py",
+    "tests/rust_preparation_plan.py",
+    "tests/fixture_area.py",
+    "rust/crates/swarm-engine/examples/memory_source_fixture.rs"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0",
+    "SWARM_PROJECT_MEMORY_SEEDER": "{root}/.cache/blp-verification-target/debug/examples/memory_source_fixture"
+  },
+  "steps": [
+    {
+      "id": "fixture-placement-guard",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--example",
+        "memory_source_fixture",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "explicit_fixture_area_guard_retains_refusals",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "fixture-memory-sidecar",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--example",
+        "memory_source_fixture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "public-cli",
+      "command": [
+        "python3",
+        "-c",
+        "import os,sys,subprocess; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=fixture_root('blp-provenance-cli-')/'journey'; binary=Path(os.environ['SWARM_PREPARATION_UI_BINARY']).resolve(strict=True); subprocess.run(['python3','tests/rust_preparation_cli_calls.py','--binary',str(binary),'--output',str(out)],check=True); print('BLP_PROVENANCE_PUBLIC_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CLI_PASS",
+        "PASS auto-private-v3-provenance",
+        "PASS explicit-level-private-v3-provenance",
+        "PASS producer-provenance-matches-provider-stdin",
+        "PASS explicit-preexec-recovery"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-http",
+      "command": [
+        "python3",
+        "-c",
+        "import os,sys,subprocess; from pathlib import Path; sys.path.insert(0,'tests'); from fixture_area import fixture_root; out=fixture_root('blp-provenance-http-')/'journey'; binary=Path(os.environ['SWARM_PREPARATION_UI_BINARY']).resolve(strict=True); subprocess.run(['python3','tests/rust_preparation_calls.py','--binary',str(binary),'--output',str(out)],check=True); print('BLP_PROVENANCE_PUBLIC_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CALLS_PASS",
+        "PASS api-explicit-level-refuses-without-contact",
+        "PASS memory-guard-safe-no-contact",
+        "PASS project-context-public-recovery"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+{"mode":"build","source":"locales/en.json","source_sha256":"e2816040006091201c1fe83908a3ee3bfcdac524390e50bc722c7e3a92eaef6c","output":"web/i18n-en.js","output_sha256":"0db5c2b08e5826e4c6753dab32f38b401a71e877f81d255756a6604b123aa430","status":"pass"}
+{"mode":"build","source":"locales/trust-actions-en.json","source_sha256":"ebb16538511c39fbf26fc21a3a9a3344efe6f25492a7cd962fc8ccac30f43d7d","output":"web/trust-actions-en.js","output_sha256":"61d2de97e7e2f55375eebb23539867fb72ec07bd6d9e312e871ffdf35610dfd4","status":"pass"}

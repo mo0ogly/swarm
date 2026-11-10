@@ -1,0 +1,11 @@
+=== RUN   TestReviewRetryStorageMigrationPreservesQueuedInstruction
+    managed_review_retry_storage_test.go:13: sizes 164551 168163 21899 parts 1
+    managed_review_retry_storage_test.go:33: v27 writer-compatible storage still allows losing the newly saved review instruction
+--- FAIL: TestReviewRetryStorageMigrationPreservesQueuedInstruction (0.76s)
+=== RUN   TestReviewRetryConnectedWriterRejectsChangedStorageBeforeMutation
+    managed_review_retry_storage_test.go:69: sizes 164551 168167 21899 parts 1
+    managed_review_retry_storage_test.go:82: outdated open connection rewrote newer mission storage
+--- FAIL: TestReviewRetryConnectedWriterRejectsChangedStorageBeforeMutation (0.75s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.540s
+FAIL

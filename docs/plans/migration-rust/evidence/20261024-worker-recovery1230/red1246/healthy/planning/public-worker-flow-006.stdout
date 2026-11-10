@@ -1,0 +1,108 @@
+{
+  "planning": {
+    "reviewer_required": true,
+    "reviewer": {
+      "max_context_files": 24,
+      "max_source_bytes": 98304,
+      "max_context_bytes": 131072,
+      "max_files": 100,
+      "provider": "fixture",
+      "provider_digest": "d9002c1ad102505663d20be0a9da53e642450c22a0b9d022a9294757e73ffc9b",
+      "model_route": {
+        "level": "standard",
+        "model": "fixture-standard",
+        "effort": "fixture-medium",
+        "billing": "external",
+        "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+        "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+      },
+      "max_calls": 2,
+      "calls": 0,
+      "authorized": "2026-10-24T09:51:11.232255211Z"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "fixture-standard",
+      "effort": "fixture-medium",
+      "billing": "external",
+      "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+      "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+    },
+    "checks": {
+      "req-1": [
+        {
+          "inputs": [
+            "handoff.md"
+          ],
+          "id": "actual-handoff",
+          "command": [
+            "python3",
+            "-c",
+            "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+          ],
+          "criteria": [
+            1
+          ],
+          "justification": "Check actual owned fixture handoff input digest",
+          "timeout_seconds": 60
+        }
+      ]
+    },
+    "provider": "fixture",
+    "provider_digest": "d9002c1ad102505663d20be0a9da53e642450c22a0b9d022a9294757e73ffc9b",
+    "activations": 0,
+    "max_activations": 6,
+    "version": 1,
+    "paused": false,
+    "max_tasks": 10,
+    "max_decisions": 10,
+    "decisions": 0,
+    "scopes": [
+      {
+        "activations": 0,
+        "id": "root",
+        "objective": "ROOT-PRIVATE-OBJECTIVE",
+        "requirements": [
+          "req-1"
+        ],
+        "revision": 1,
+        "generation": 0,
+        "state": "ready"
+      }
+    ],
+    "inbox": [
+      {
+        "id": "public-flow-enable",
+        "scope": "root",
+        "kind": "brief",
+        "message": "ROOT-PRIVATE-OBJECTIVE",
+        "at": "2026-10-24T09:51:11.232255211Z"
+      }
+    ],
+    "judge": {
+      "cycle": 1,
+      "max_cycles": 0,
+      "closed": false
+    }
+  },
+  "schema_version": 1,
+  "id": "w-d723dd1c3d0738a9a18edc70",
+  "revision": 2,
+  "title": "ROOT-PRIVATE-TITLE",
+  "objective": "ROOT-PRIVATE-OBJECTIVE",
+  "scope": "ROOT-PRIVATE-BRIEF",
+  "criteria": [
+    "OWN-REQUIREMENT"
+  ],
+  "next": "",
+  "summary": "",
+  "memory": null,
+  "created": "2026-10-24T09:51:11.078841896Z",
+  "updated": "2026-10-24T09:51:11.237656195Z",
+  "git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "tasks": []
+}

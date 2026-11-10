@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "native-production-retry",
+  "inputs": [
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_reviewer_claim_candidate.py",
+    "tools/agent-workflows/check.py",
+    "tools/agent-workflows/test_check.py",
+    "tests/rust_native_reviewer.py",
+    "tools/verification/verify_native_profile.py",
+    "tools/verification/recipe.py",
+    "tools/verification/native_no_go.py",
+    "tests/rust_review_streaming_capture.py",
+    "tests/rust_review_raw_capture.py",
+    "tests/rust_review_required_receipt_guard.py",
+    "tests/rust_review_retained_evidence_test.py",
+    "tests/rust_review_publication.py",
+    "tests/rust_review_public_context.py",
+    "tests/rust_review_context_units.py",
+    "tests/normal_profile_archive_test.py",
+    "tests/rust_review_failure_reconciliation.py",
+    "tests/rust_review_departed_owner.py",
+    "tests/rust_review_departed_owner_cases.py",
+    "tests/rust_review_public_certificate.py",
+    "tests/fixtures/native-review-public-v1.json",
+    "tests/fixtures/native-review-public-v1.provenance.json",
+    "tests/rust_review_stale_original_cases.py",
+    "tests/rust_review_budget_result_cases.py",
+    "tests/rust_review_financial_start_guards.py",
+    "rust/crates/swarm-engine/tests/financial_budget.rs",
+    "tests/rust_native_reviewer_cases.py",
+    "tests/rust_native_review_acceptance.py",
+    "rust/crates/swarm-engine/tests/task_lifecycle.rs",
+    "rust/crates/swarm-engine/tests/review_evidence.rs",
+    "tests/rust_native_review_acceptance_http.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_native_review_decision.py",
+    "tests/rust_native_scope_closure.py",
+    "tests/rust_scoped_retry_admission.py",
+    "tests/rust_native_production_retry.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r97",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "native-production-retry-control-and-fault-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import json,tempfile,subprocess,sys; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-production-retry-',dir='.cache')).resolve(); subprocess.run([sys.executable,'tools/verification/verify_native_profile.py','--output',str(base/'profile')],check=True); p=json.loads((base/'profile/result.json').read_bytes()); binary=str(Path(p['binary']).resolve()); common=[sys.executable,'tests/rust_native_production_retry.py','--binary',binary,'--profile',str(base/'profile/result.json')]; subprocess.run(common+['--output',str(base/'control')],check=True); subprocess.run(common+['--output',str(base/'faults'),'--faults','--control',str(base/'control/result.json')],check=True); assert all(json.loads((base/name/'result.json').read_bytes())['actual_second_worker'] for name in ['control','faults']); print('REPLAY_EVIDENCE '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native production retry with guarded second worker",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

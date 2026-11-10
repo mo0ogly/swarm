@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "state": "locally verified; not installed in the active server",
+  "patch": "docs/plans/engine-cursor-contract/recovery/recovery-source-preflight-20261010.patch",
+  "patch_sha256": "2e1b60067c37ce64e91a41b1dbe282eac17e0e86c8552e80199a83a13276a78c",
+  "patch_bytes": 5973,
+  "source_base": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "requires": "Existing delivery-source attachment fix; use current compact CONTRACT.md and existing APEX/replan resources, merge previous patches without resetting them",
+  "files": [
+    "internal/engine/recovered_result.go",
+    "internal/engine/recovered_result_evidence_test.go",
+    "tools/agent-workflows/check.py"
+  ],
+  "verification": {
+    "top_level_pass": 22,
+    "including_subtests_pass": 46,
+    "exit_code": 0,
+    "provider_calls": 0,
+    "execution": "/tmp/swarm-recovery-capacity-verification-after/execution.json"
+  }
+}

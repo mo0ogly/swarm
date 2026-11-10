@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "paea-linux-prerequisites",
+  "inputs": [
+    "tools/paea/linux_prerequisites.py",
+    "tests/paea_linux_prerequisites_test.py",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-linux-prerequisites.json"
+  ],
+  "steps": [
+    {
+      "id": "reader-range-map-publisher-and-observation-contract",
+      "command": [
+        "python3",
+        "tests/paea_linux_prerequisites_test.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 5 tests",
+        "OK",
+        "test_publish_exact_json_then_existing_directory_refuses",
+        "test_live_observation_never_claims_launch_confinement_or_human"
+      ]
+    },
+    {
+      "id": "actual-readonly-current-namespace-observation",
+      "command": [
+        "python3",
+        "tools/paea/linux_prerequisites.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"kind\": \"paea-linux-prerequisite-observation\"",
+        "\"launch_verified\": false",
+        "\"separate_host_uid_verified\": false",
+        "\"confinement_verified\": false",
+        "\"human_verified\": false"
+      ],
+      "required_stderr": []
+    }
+  ],
+  "environment": {}
+}

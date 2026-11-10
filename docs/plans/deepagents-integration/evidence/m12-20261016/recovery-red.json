@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "at_utc": "2026-10-16T14:12:28.459570+00:00",
+  "exit_code": 1,
+  "log_sha256": "56e793ff8b22ad13e4b0711ac54846b0577e3fb79acd2747eee4506024c1f298",
+  "test_source_sha256": "726be522f23f5fb0409251db0940239c63ae0593a1effc0380b2fe6238389819",
+  "real_model_calls": 0
+}

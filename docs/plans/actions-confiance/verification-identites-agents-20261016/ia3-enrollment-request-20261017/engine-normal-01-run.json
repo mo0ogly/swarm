@@ -1,0 +1,56 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentity(EnrollmentRequest.*|Caller.*|PrincipalKeepsOpaqueIssuerAndSubject|InternalConsumer.*|IssuerAuthenticatedHumanExactPermit)$",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "start": "2026-10-17T11:45:21.476498+00:00",
+  "end": "2026-10-17T11:45:40.087390+00:00",
+  "exit": 0,
+  "input_count": 1080,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 28,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [
+      "TestAgentIdentityCallerFederationAndReopen",
+      "TestAgentIdentityCallerFederationAndReopen/human",
+      "TestAgentIdentityCallerFederationAndReopen/service",
+      "TestAgentIdentityCallerSuspensionAndLegacyContext",
+      "TestAgentIdentityCallerUsesTrustWithoutRolePromotion",
+      "TestAgentIdentityCallerUsesTrustWithoutRolePromotion/admin",
+      "TestAgentIdentityCallerUsesTrustWithoutRolePromotion/approver",
+      "TestAgentIdentityCallerUsesTrustWithoutRolePromotion/requester",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/duplicate-snapshot-field",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/enrollment-digest",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/enrollment-generation",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/instance",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/invalid-record",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/missing-session",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/plan",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/project",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/roots",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/service",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/stale-caller",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/unknown-snapshot-field",
+      "TestAgentIdentityEnrollmentRequestRejectsInconsistentFramesAndSnapshots/work",
+      "TestAgentIdentityEnrollmentRequestUsesVerifiedSessionAndCompleteCandidate",
+      "TestAgentIdentityInternalConsumerLogoutInvalidatesReplay",
+      "TestAgentIdentityInternalConsumerRejectsForeignProject",
+      "TestAgentIdentityInternalConsumerResolvesEveryRequest",
+      "TestAgentIdentityIssuerAuthenticatedHumanExactPermit",
+      "TestAgentIdentityPrincipalKeepsOpaqueIssuerAndSubject"
+    ],
+    "fail": [],
+    "skip": []
+  }
+}

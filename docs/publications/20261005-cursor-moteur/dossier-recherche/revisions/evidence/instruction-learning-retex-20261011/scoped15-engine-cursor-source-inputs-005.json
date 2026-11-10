@@ -1,0 +1,57 @@
+[
+  {
+    "path": "web/retex.js",
+    "kind": "source",
+    "sha256": "2bb1a9ecbf8b70b65b765988fb4beffb1b92698ddfa8c301d0d4a1d58d631ee9"
+  },
+  {
+    "path": "web/role-models.js",
+    "kind": "source",
+    "sha256": "f99a1254dc62fcfc309e12cb68bc1fe228e095b2713b7de6569e60e1c577d2ec"
+  },
+  {
+    "path": "web/runtime-health.js",
+    "kind": "source",
+    "sha256": "93f6444cb440085a92a1aa1a0eae7c2108cbef71623480f902a63021ecd1c51e"
+  },
+  {
+    "path": "web/session-console.js",
+    "kind": "source",
+    "sha256": "645ef292c1bf7bd122febeb5dbae04d045e8d281979bab44505c09793dfdf8bc"
+  },
+  {
+    "path": "web/status-contract.js",
+    "kind": "source",
+    "sha256": "f9ba0690f8dace61990ddab69c40daf5194d539615b9cc4ccd6aa2c383a88012"
+  },
+  {
+    "path": "web/swarm-design.css",
+    "kind": "source",
+    "sha256": "0cacfa5481e475983fa95c894699c12c85adbef86a448735300eb0f9f26a997f"
+  },
+  {
+    "path": "web/swarm-logo.png",
+    "kind": "source",
+    "sha256": "d8ad9094dd879b42f213cea10c471696af378679c0634a044b7fe312de7ae9bb"
+  },
+  {
+    "path": "web/swarm-shell.js",
+    "kind": "source",
+    "sha256": "21e025f6f4b08c103da54c0a4d9013fbf0a172cbd9a7ce3cc03743c0ec4a68a1"
+  },
+  {
+    "path": "web/task-models.js",
+    "kind": "source",
+    "sha256": "7af3c5745d8b066549629d4993c0e24b948fbbb185d7153b440a272e2f7ebdca"
+  },
+  {
+    "path": "web/terminal.html",
+    "kind": "source",
+    "sha256": "d1261f1b52a0ca73c313de3ce196f9d2074b36cf32f374b4271e9ed0d72c299d"
+  },
+  {
+    "path": "web/wattson_themes.css",
+    "kind": "source",
+    "sha256": "0055edad2bcfa30d65b63eee8c522cd53d6953353f0a98f34024c364a08f0a59"
+  }
+]

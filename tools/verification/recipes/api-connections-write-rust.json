@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "api-connections-write-rust",
+  "inputs": [
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/crates/swarm-engine/src/provider_connection_change.rs",
+    "rust/crates/swarm-engine/src/provider_connection_catalogue.rs",
+    "rust/crates/swarm-engine/src/provider_connections_read.rs",
+    "rust/crates/swarm-engine/src/provider_connections_write.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/provider_connections.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/api_connections.rs",
+    "tests/rust_api_connections_write.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "docs/architecture/NATIVE-API-CONNECTIONS.md",
+    "docs/en/NATIVE-API-CONNECTIONS.md",
+    "docs/architecture/RUST-MIGRATION.md",
+    "docs/en/RUST-MIGRATION.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "source-bound-private-save-key-rules-history-and-structured-cli-effects",
+      "expected_exit": 0,
+      "required_stdout": [
+        "API_CONNECTIONS_WRITE_VERIFIED 9"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile,json\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='api-connections-write-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_api_connections_write.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)],check=True)\nr=json.loads((p/'result.json').read_bytes());assert r['status']=='PASS' and len(r['checks'])==9 and not r['provider_started']"
+      ]
+    }
+  ]
+}

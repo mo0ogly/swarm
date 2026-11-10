@@ -11,6 +11,10 @@ import pathlib
 import re
 import subprocess
 import tempfile
+import sys as _fa_sys
+from pathlib import Path as _fa_Path
+_fa_sys.path.insert(0, str(_fa_Path(__file__).resolve().parents[2] / 'tests'))
+from fixture_area import fixture_area
 
 root = pathlib.Path(__file__).resolve().parents[2]
 proof = root / 'docs/plans/version-history/combined-qualification'
@@ -34,7 +38,7 @@ for key, value in current.items():
     if key == 'provenance':
         continue
     env['SWARM_' + key.upper()] = str(value).lower() if isinstance(value, bool) else value or ''
-with tempfile.TemporaryDirectory(prefix='swarm-version-delivery-') as temp:
+with tempfile.TemporaryDirectory(prefix='swarm-version-delivery-', dir=fixture_area()) as temp:
     path = pathlib.Path(temp)
     absent = path / 'must-not-create-storage'
     no_storage = json.loads(run(['bin/swarm', '--root', str(absent), '--json', 'version']))

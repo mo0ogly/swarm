@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-25T19:09:38.837524+00:00",
+  "scope": "PA-01 offline public recipe on existing binary; self-review plus tool-free GLM decoder contribution; no compilation, migration qualification, full effective compiler graph, installation or E2/E3",
+  "authority": "User go next avec glm; no-compilation instruction retained",
+  "modified_sources": [
+    "tests/paea_public_contract_test.py",
+    "tools/verification/recipes/paea-public-existing-binary.json",
+    "docs/architecture/PAEA-CONTRACT.md",
+    "docs/en/PAEA-CONTRACT.md",
+    "docs/plans/actions-confiance/paea/INCREMENT-02.md",
+    "docs/en/plans/actions-confiance/paea/INCREMENT-02.md",
+    "docs/plans/actions-confiance/PAEA-APEX.md",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md",
+    "docs/plans/FILE-APEX.md",
+    "docs/en/APEX-QUEUE.md"
+  ],
+  "observed_unmodified_producers": [
+    "rust/crates/swarm-protection-contract/src/strict_json.rs",
+    "rust/crates/swarm-cli/src/lib.rs"
+  ],
+  "inputs": {
+    "tests/paea_public_contract_test.py": "be658a26626446356d2ba320290457d3c07db961e1c510d1af92f0f67eebb1b3",
+    "tools/verification/recipes/paea-public-existing-binary.json": "1aa2b015811f00f3af38fe185abda05bcd9527b0f340ea2429d15ce1cb6d80f7",
+    "docs/architecture/PAEA-CONTRACT.md": "3c06d9478b715fe0525256b50d04546e671f336c105007ddd83c6cbca1fd41de",
+    "docs/en/PAEA-CONTRACT.md": "4afb3f5dc3eadf8c6501cb2b550240dfcf019cd72ec0abe7429f49a2aa618bce",
+    "docs/plans/actions-confiance/paea/INCREMENT-02.md": "94a7f106e95cb6d9610e8426033707cb6c76eee6cecc8e6610942950b57b02fe",
+    "docs/en/plans/actions-confiance/paea/INCREMENT-02.md": "f90f71d9d385a840b6e9663cc0c5a5a178d296dca962c59db1aab66b2fa4e714",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "d5ba0a7c2169be2af112a359b570ea068f5c8fdd0f2d030d35e8e4eb790f9063",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "10108e2e11bd55dda22a584534020768d82d936c68122e0f087329372143fc37",
+    "docs/plans/FILE-APEX.md": "0f2a4f9a4a8ae3a01943cf32b96cc33996ad65ba34ee021bbb9ae2c75c33cde1",
+    "docs/en/APEX-QUEUE.md": "eeabeb66cdfac5dace0931acbe0f9ad90c27dfc44969aad50f49d4e6c0e7c3a4",
+    "rust/crates/swarm-protection-contract/src/strict_json.rs": "9edc35078e857e321efa432d2839c35a554ac2632165058688798d87cece87bd",
+    "rust/crates/swarm-cli/src/lib.rs": "efda8fd632fcb072999c568894a9332083cf738f428d88ddf6031a588ec57486"
+  },
+  "source_archive_sha256": "348f959032658438565b1df1ee5af338d42ca726a9e4fa7260e625a7ba9a8287",
+  "function_inventory": [
+    {
+      "name": "encode",
+      "line": 27,
+      "docstring": true
+    },
+    {
+      "name": "replace_once",
+      "line": 32,
+      "docstring": true
+    },
+    {
+      "name": "main",
+      "line": 167,
+      "docstring": true
+    },
+    {
+      "name": "setUpClass",
+      "line": 44,
+      "docstring": true
+    },
+    {
+      "name": "setUp",
+      "line": 50,
+      "docstring": true
+    },
+    {
+      "name": "document",
+      "line": 56,
+      "docstring": true
+    },
+    {
+      "name": "invoke",
+      "line": 61,
+      "docstring": true
+    },
+    {
+      "name": "accepted",
+      "line": 87,
+      "docstring": true
+    },
+    {
+      "name": "test_all_frozen_vectors_match_public_bytes_in_both_languages",
+      "line": 101,
+      "docstring": true
+    },
+    {
+      "name": "test_raw_ambiguities_refuse_between_valid_control_and_recovery",
+      "line": 109,
+      "docstring": true
+    },
+    {
+      "name": "test_equivalent_input_encodings_preserve_exact_content",
+      "line": 143,
+      "docstring": true
+    },
+    {
+      "name": "test_output_failure_is_nonzero_after_valid_control_then_recovers",
+      "line": 156,
+      "docstring": true
+    }
+  ],
+  "review_axes": {
+    "policies": {
+      "status": "reviewed",
+      "record": "INCREMENT-02: fixture/test counts, existing CLI codes/envelope, SHA256 representation and explicit test artifact environment; no operator policy/deadline/retry/budget"
+    },
+    "functions": {
+      "status": "reviewed",
+      "record": "INCREMENT-02: encoding/substitution/control/fault/recovery/invocation/prerequisite/publication contracts; docstrings inspected"
+    },
+    "errors": {
+      "status": "reviewed",
+      "record": "INCREMENT-02: original bytes preserved, read/launch/output/publication failures, refusal/recovery, atomic exclusive publisher and real failure.code consumer"
+    },
+    "documentation": {
+      "status": "reviewed FR/EN",
+      "record": "Contract, reports, plans/queue. No runtime assets/embedded contexts changed. No release note change: tests/docs only; no build/install authorized."
+    }
+  },
+  "recipe_verification": [
+    {
+      "evidence": "public-recipe-01",
+      "stdout": "{\"integrity\": \"VERIFIED\", \"recorded_status\": \"FAIL\", \"recipe\": \"paea-public-existing-binary\"}\n",
+      "exit": 1
+    },
+    {
+      "evidence": "public-recipe-02",
+      "stdout": "{\"integrity\": \"VERIFIED\", \"recorded_status\": \"PASS\", \"recipe\": \"paea-public-existing-binary\"}\n",
+      "exit": 0
+    }
+  ],
+  "recipe_declared_inputs_unchanged": true,
+  "binary": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/paea-contract-target/debug/swarm-rust",
+  "binary_sha256": "addcc5eb6b32dd7d2ed963a01a80062155ccd9613985fb518c079f5a461f794f",
+  "binary_stable": true,
+  "public_results": {
+    "named_tests": 4,
+    "invocations": 88,
+    "expected_refusals": 17,
+    "successes": 71,
+    "document_faults": 16,
+    "output_faults": 1
+  },
+  "glm": {
+    "full_review": "unusable: length/no final text, preserved",
+    "focused_review": "usable: raw decoder only, no demonstrated defect, three regression suggestions adapted and executed by principal",
+    "requested_model": "glm-5.2",
+    "reported_model": "glm-5.2",
+    "backend_version": "not established",
+    "calls": 2,
+    "reported_total_tokens": 19544,
+    "monetary_cost": "not established",
+    "no_e3_independence": true
+  },
+  "original_artifacts_sha256": {
+    "binary-observation.json": "6dd945dd8dcd12f5cb5d170b2be60fab90f8093259ba2822ed78c447bf6d3ceb",
+    "prompt-focused.txt": "dea1b39dd86273f32e7600589e2f44453411d405513b41f56d51b71ba70494f9",
+    "final-collector-replan.json": "2ed047b0d804fbc4281422b8bc94c0c6a1e464771db15e4c1c17fbb857337fef",
+    "context-focused.txt": "e76c2bef2cc25a75fa760629c7b3638c1e0ab374e6c0a13ab1d0d2a4449a0542",
+    "delegation.json": "f2a7c9bb9bc7d246429dca4d4761973898d8e21f28b419494acf33b452cf032c",
+    "prompt.txt": "87e800b3e1f16867e79bb2f2eb8c844e90434f905d5ede910e615107025c69bc",
+    "replan.json": "7d89f5a2a005bb57a5dcedf5e9bd640f9983f8443a63611cd36027ae6a27512d",
+    "public-transcript.json": "f6e1a5d65cb6e2825cc2da41af3b4b0cae3265bb3fcc081c51f46c350ad12b84",
+    "context.txt": "e762cf3266cbdd4f591ea65ad32199c9ad13feb20e93659958aaa5173cd8023c",
+    "public-transcript-02.json": "8f903036e4ddecce1546fd871ed75c1b8dc460301232d10e8cdb64b94f9d3793",
+    "public-recipe-replan.json": "8f2022f4cd02041c3cf412dfd4f101028a395c57ccd09aea218d653780220934",
+    "public-recipe-02/runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "public-recipe-02/step-0001.stdout": "af5a5c0319ab75a7742b7282a36f83d97ecb6cc41c3fc8273a0eed7d2e00c498",
+    "public-recipe-02/step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public-recipe-02/declared-inputs.tar.gz": "7a63cb0e54e56ce954a9b9fc60167d0408dea2e90a563ddadc3262e64b774f02",
+    "public-recipe-02/environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "public-recipe-02/step-0001.json": "c70132c670f60f35db347a2bcddcd4709afd4ab5a623987402127f97d9747d81",
+    "public-recipe-02/inputs.before.json": "0871a4829be0029584a7c23882a7fad36b9ed53acd796fb5dd58417620c0bd17",
+    "public-recipe-02/result.json": "365cbde0b1351fd0df9244146cc18151b023bd624cda9df3f44f9469f7aa9ca5",
+    "public-recipe-02/inputs.after.json": "0871a4829be0029584a7c23882a7fad36b9ed53acd796fb5dd58417620c0bd17",
+    "public-recipe-02/recipe.original.json": "1aa2b015811f00f3af38fe185abda05bcd9527b0f340ea2429d15ce1cb6d80f7",
+    "public-recipe-01/runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "public-recipe-01/step-0001.stdout": "0e27ec20480554b29c9ffefd68045d0b4e4c2524061d5e177d72f653bf31024c",
+    "public-recipe-01/step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public-recipe-01/declared-inputs.tar.gz": "6f96054819f9e24d0490ae734d7af4f14da9a374ef5ba7d939c439d6484c4744",
+    "public-recipe-01/environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "public-recipe-01/step-0001.json": "0cf8e86325f5af70f02ffc8a581f627d83a4b19295914a8dcb9a9bfafb06ec17",
+    "public-recipe-01/inputs.before.json": "0c5d02170476adadb268db8d1b6d3d4ff134e0d4a705ad595ff4339c24d6ff57",
+    "public-recipe-01/result.json": "78b69b46c26c9acf778a4ff0c30ece652e25bdadd18558d9b73a0e70c6ed6d5d",
+    "public-recipe-01/inputs.after.json": "0c5d02170476adadb268db8d1b6d3d4ff134e0d4a705ad595ff4339c24d6ff57",
+    "public-recipe-01/recipe.original.json": "1aa2b015811f00f3af38fe185abda05bcd9527b0f340ea2429d15ce1cb6d80f7",
+    "glm-focused/inputs.json": "74a3ee696365741bc3a1dfa7ce8c0d06b38c7d5ab80f4c8b9ed8896ea24f946e",
+    "glm-focused/response.json": "45d071c9f942733ce2c1b1f289340736c6fbeb1649dba1546ea464578171ee1d",
+    "glm-focused/request.json": "ffad0923992355ed10c60f0f676ea188461aba4db58ff09baf1f2ca88b2c3c24",
+    "glm-focused/result.json": "8ba280325a068b4d9a04d35b443f4be175bcf46caf15a7482cea8c061a253102",
+    "glm-focused/answer.txt": "df998a127f6115d9e96a9262d9cc1ff4424b6959b2ac4bdde934ee90d162a235",
+    "glm-review/inputs.json": "8f61abb26f9dd7ab852d582318dfd7698cb44c8b1346d27e7dfdc33479f20cff",
+    "glm-review/response.json": "92032c75135c2306b0bbabb95c1557cc48fa464409d11abbb1d2b94de8bae433",
+    "glm-review/request.json": "db4f8d5df0c49efa000a3d4f5f1d4ead46e60b302f8116d18bd59acaeea60b48",
+    "glm-review/result.json": "39bb9c181a5f8f2a698c3299072736b673141a7666de62280b898468ad90ec0e",
+    "glm-review/answer.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "limits": [
+    "No Rust rebuild or active authority/effect service",
+    "No OS confinement or T01-T22/E3 campaign proved",
+    "Binary hashes establish observed artifact identity, not full graph qualification",
+    "PA-00/01 incomplete; Rust/IA3/AC-02 and external evaluator/team prerequisites retained"
+  ],
+  "owners_and_resumption": {
+    "Root integration": "Complete PA-01 with authoritative producers; new Rust build/install needs no-compilation instruction lifted and shared candidate available",
+    "Identity/AC-02 owners": "Protected authority and execution handoffs before activation",
+    "Sponsor": "Independent evaluator/third-party team before E3 preregistration and campaigns"
+  }
+}

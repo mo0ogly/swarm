@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:inspection:v1",
+  "title": "PAEA exact offline inspection report v1",
+  "description": "Data only. Canonical JSON is exact UTF-8 text; semantic validation, input binding and authenticity are separate. No approval or effect.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "document",
+    "canonicalization",
+    "canonical",
+    "authority",
+    "effect",
+    "approval_validity"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "scope": {
+      "const": "offline-data-only"
+    },
+    "document": {
+      "$ref": "#/$defs/identity"
+    },
+    "canonicalization": {
+      "const": "paea-json-v1"
+    },
+    "canonical": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority": {
+      "const": "not-established"
+    },
+    "effect": {
+      "const": "not-established"
+    },
+    "approval_validity": {
+      "const": "not-established"
+    }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document_sha256",
+        "action_digest",
+        "intent_id"
+      ],
+      "properties": {
+        "document_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "action_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "intent_id": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "digest": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "not": {
+        "pattern": "[^a-f0-9]"
+      }
+    }
+  }
+}

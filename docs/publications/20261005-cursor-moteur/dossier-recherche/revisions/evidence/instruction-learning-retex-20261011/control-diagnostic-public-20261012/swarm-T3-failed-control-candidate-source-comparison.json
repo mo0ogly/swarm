@@ -1,0 +1,30 @@
+{
+  "failed_candidate": "f68bef4d093f89dc8aa07ee40743f45841c25c73",
+  "source_inputs": 1157,
+  "differences": [
+    {
+      "path": ".agents/skills/product-delivery/SKILL.md",
+      "missing": true
+    },
+    {
+      "path": ".agents/skills/product-delivery/agents/openai.yaml",
+      "missing": true
+    },
+    {
+      "path": ".agents/skills/product-planning/SKILL.md",
+      "missing": true
+    },
+    {
+      "path": ".agents/skills/product-planning/agents/openai.yaml",
+      "missing": true
+    },
+    {
+      "path": ".agents/skills/product-review/SKILL.md",
+      "missing": true
+    },
+    {
+      "path": ".agents/skills/product-review/agents/openai.yaml",
+      "missing": true
+    }
+  ]
+}

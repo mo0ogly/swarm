@@ -1,0 +1,51 @@
+{
+  "at": "2026-10-15T19:58:00.503351+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "files": [
+    {
+      "path": "internal/engine/model.go",
+      "sha256": "5c619dc7757aa314a268887d28c1204efb742994b4ae86392d1a0adea00b5021"
+    },
+    {
+      "path": "internal/engine/store.go",
+      "sha256": "31fea4b7f69f932b28354a9605cfe05e11b4335e918e504f4dad361435317502"
+    },
+    {
+      "path": "internal/engine/agents_store.go",
+      "sha256": "b9bbcceccd835be1237c3b45ead0b00b2235a75bf8a6dc846853c096d04c0cc5"
+    },
+    {
+      "path": "internal/engine/agents_process.go",
+      "sha256": "2f93e0e653d24304912807830b4b80bf98fcc4148df2855a529f59a832accda8"
+    },
+    {
+      "path": "internal/engine/web_server.go",
+      "sha256": "b0e51b7a4482146805854673bbc1c7a7bbf366921dc57bcc6107869831f6b941"
+    },
+    {
+      "path": "internal/engine/main.go",
+      "sha256": "5c0ddf56d870eaa6a66e1639e2e82189a567904c5828f70afa6192256703e772"
+    },
+    {
+      "path": "internal/engine/retex.go",
+      "sha256": "0112c6e2b1d31de4f7d8c829f046cbe86c4cb2588123b8bfa13b6ff9f2b3f0ec"
+    },
+    {
+      "path": "internal/engine/dialogue_context.go",
+      "sha256": "b8885e9d6e6f7681307cf42b10dc76cca7774df43319974a8fbb521a2970e2ab"
+    },
+    {
+      "path": "web/retex.js",
+      "sha256": "2bb1a9ecbf8b70b65b765988fb4beffb1b92698ddfa8c301d0d4a1d58d631ee9"
+    },
+    {
+      "path": "locales/en.json",
+      "sha256": "e2816040006091201c1fe83908a3ee3bfcdac524390e50bc722c7e3a92eaef6c"
+    },
+    {
+      "path": "web/i18n-en.js",
+      "sha256": "0db5c2b08e5826e4c6753dab32f38b401a71e877f81d255756a6604b123aa430"
+    }
+  ]
+}

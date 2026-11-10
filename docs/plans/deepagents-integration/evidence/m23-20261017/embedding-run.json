@@ -1,0 +1,12 @@
+{
+  "command": [
+    "go",
+    "run",
+    "-mod=readonly",
+    "docs/plans/deepagents-integration/evidence/m23-20261017/check-embedded.go",
+    "docs/plans/deepagents-integration/evidence/m23-20261017/embedded-expected.json"
+  ],
+  "start": "2026-10-17T08:30:43.936835+00:00",
+  "end": "2026-10-17T08:30:47.426493+00:00",
+  "exit_code": 0
+}

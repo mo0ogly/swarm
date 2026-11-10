@@ -1,0 +1,34 @@
+=== RUN   TestActionsConfianceT3IntrospectionPolicyContract
+--- PASS: TestActionsConfianceT3IntrospectionPolicyContract (0.99s)
+=== RUN   TestActionsConfianceT3IntrospectionActiveRevokedAndRestart
+--- PASS: TestActionsConfianceT3IntrospectionActiveRevokedAndRestart (1.56s)
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/string-active
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/issuer
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/subject
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/audience
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/multiple-audiences
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/expired
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/missing-exp
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-iat
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/inactive
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/null-active
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/client
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/extended
+=== RUN   TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-nbf
+--- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity (0.01s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/string-active (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/issuer (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/subject (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/audience (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/multiple-audiences (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/expired (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/missing-exp (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-iat (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/inactive (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/null-active (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/client (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/extended (0.00s)
+    --- PASS: TestActionsConfianceT3IntrospectionResponseRejectsAmbiguity/future-nbf (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	4.100s

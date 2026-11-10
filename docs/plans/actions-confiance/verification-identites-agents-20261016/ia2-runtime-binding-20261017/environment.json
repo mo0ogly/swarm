@@ -1,0 +1,16 @@
+{
+  "observed_at": "2026-10-17T06:09:54.877419+00:00",
+  "observed_after_run": true,
+  "kernel": {
+    "system": "Linux",
+    "release": "6.17.0-41-generic",
+    "machine": "x86_64"
+  },
+  "controller_uid": 1001,
+  "bwrap": {
+    "path": "/usr/bin/bwrap",
+    "version": "bubblewrap 0.11.0",
+    "sha256": "7bbffeb19f312d5503232e1502f0f97f2ac4ffcb51dec47d9a58bffbad1f12d5",
+    "mode": "0o755"
+  }
+}

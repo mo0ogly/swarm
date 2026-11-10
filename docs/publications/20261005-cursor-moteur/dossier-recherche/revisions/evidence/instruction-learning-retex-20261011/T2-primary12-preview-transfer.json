@@ -1,0 +1,24 @@
+{
+  "preview": "/tmp/swarm-T2-complement9-runtime-preview-20261011-graijm4m",
+  "checks": [
+    {
+      "patch": "instruction-operator-composition-20261011",
+      "sha256": "48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd",
+      "check_exit": 0,
+      "check_output": ""
+    },
+    {
+      "patch": "admin-duration-launch-20261011",
+      "sha256": "06429887df1f013f9acea161357b7348760a251df7995fc36231a093e07d34e3",
+      "check_exit": 0,
+      "check_output": ""
+    },
+    {
+      "patch": "source-capacity-recovery-20261011",
+      "sha256": "1d9552c7fd4571c7d9e47170cfa27918f333e8cd163a7f1ae7420cb30d039b84",
+      "check_exit": 0,
+      "check_output": ""
+    }
+  ],
+  "effect": "Isolated unaccepted Judge integration preview only; no primary source/runtime mutation"
+}

@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-12T13:08:53.021779+00:00",
+  "before_revision": 765,
+  "after_revision": 766,
+  "task": "plan-ca937edf4e-T3",
+  "result": "61693d4413607770cfff22508236f3986c20bd33",
+  "attempt": "a-cd4afa7836a7687fe0e466c5",
+  "worker_attempts": 4,
+  "review_calls_before": 82,
+  "review_calls_after": 82,
+  "status": "blocked",
+  "acceptance_created": false,
+  "original_recovered_result_preserved": true,
+  "budget": {
+    "scope": "role",
+    "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+    "scope_key": "validation",
+    "values": {
+      "silence_seconds": 0,
+      "tool_seconds": 180,
+      "max_tool_calls": 0,
+      "max_repeated_calls": 0,
+      "max_consecutive_errors": 0
+    },
+    "revision": 1,
+    "actor": "fpizzi/uid:1001",
+    "reason": "Budget explicite autorisé pour ce projet : contrôle historique30s expiré avant sortie en compilation. Durée externe180s pour les contrôles déterministes du même candidat ; commandes, options internes, critères, preuves historiques, tentatives et revues conservés. Ce réglage ne valide aucun critère.",
+    "updated": "2026-10-12T13:06:40.715017505Z"
+  },
+  "retry": {
+    "control_runtime_budget_sha256": "f4f3abd7ee740aacfcf539cfc843c181be16777b04cfcf6d1324cb3821d7f85e",
+    "event_id": "retained-control-runtime-gate-retry-8344e5c37549470db6d4fc9a8c3bbd3d",
+    "request_sha256": "6c706a8e3a1994e82ff919b33d2a244ce8262ae1770b89d02e0f210c85f2277a",
+    "agent_id": "T3-fourth-public-environment-verified-b555f91f9e1349cb800c96431a8b58f1",
+    "attempt_id": "a-cd4afa7836a7687fe0e466c5",
+    "result_commit": "61693d4413607770cfff22508236f3986c20bd33",
+    "failed_base": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+    "expected_candidate": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+    "contract_sha256": "c344704126bf9759b51ef266074f4bb6665564d37679b2b40174567df30c52b2",
+    "original_failure": "Contrôle plan-validation de plan-ca937edf4e-T1 en échec : délai de 30s dépassé (empreinte e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855) ; diagnostic : .swarm/managed/w-ca937edf4e0abd85f8d3d67b/diagnostics/control-failure-e697a3fdd190ff9024f3f243.json",
+    "failure_evidence": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/diagnostics/control-failure-e697a3fdd190ff9024f3f243.json",
+    "evidence_sha256": "24c2469d71b5e3897f47a455c731217f98264200a37e8aa428b561ea020206de",
+    "legacy_missing_output": false,
+    "reason": "Replan : résultat T3 récupéré et qualifié conservé, refus de contrôle T1 à30s avant sortie. Précondition corrigée par budget Admin validation explicite révision1/180s plus récent que le refus, reçu dans chaque contrôle ; même commande et options, même base, même tentative et résultat. Reprendre contrôles cumulés puis coordination et revue indépendante, sans cinquième worker ni verdict fabriqué.",
+    "at": "2026-10-12T13:08:52.956266326Z"
+  },
+  "mission_paused": false,
+  "planning_paused": true,
+  "original_gate_refusal_preserved": true
+}

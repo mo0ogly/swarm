@@ -1,0 +1,102 @@
+[
+  {
+    "name": "qualified-image-init",
+    "passed": true
+  },
+  {
+    "name": "trust-policy-produced",
+    "passed": true
+  },
+  {
+    "name": "blp-revision-1-produced",
+    "passed": true
+  },
+  {
+    "name": "session-cannot-attribute",
+    "passed": true
+  },
+  {
+    "name": "worker-cannot-attribute",
+    "passed": true
+  },
+  {
+    "name": "public-attribution-1-produced",
+    "passed": true
+  },
+  {
+    "name": "attribution-1-exact-replay",
+    "passed": true
+  },
+  {
+    "name": "attribution-1-duplicate-refuses",
+    "passed": true
+  },
+  {
+    "name": "blp-revision-2-produced",
+    "passed": true
+  },
+  {
+    "name": "stale-attribution-refuses",
+    "passed": true
+  },
+  {
+    "name": "producer-downgrade-refuses",
+    "passed": true
+  },
+  {
+    "name": "public-attribution-2-produced",
+    "passed": true
+  },
+  {
+    "name": "attribution-2-exact-replay",
+    "passed": true
+  },
+  {
+    "name": "attribution-2-duplicate-refuses",
+    "passed": true
+  },
+  {
+    "name": "equal-label-history-positive-control",
+    "passed": true
+  },
+  {
+    "name": "positive-read-is-readonly",
+    "passed": true
+  },
+  {
+    "name": "public-downgrade-refuses",
+    "passed": true
+  },
+  {
+    "name": "public-refusal-preserves-journal",
+    "passed": true
+  },
+  {
+    "name": "public-refusal-redacts-material",
+    "passed": true
+  },
+  {
+    "name": "public-exact-fixture-recovery",
+    "passed": true
+  },
+  {
+    "name": "confidential-downgrade-refuses",
+    "passed": true
+  },
+  {
+    "name": "confidential-refusal-preserves-journal",
+    "passed": true
+  },
+  {
+    "name": "confidential-refusal-redacts-material",
+    "passed": true
+  },
+  {
+    "name": "confidential-exact-fixture-recovery",
+    "passed": true
+  },
+  {
+    "name": "image-stayed-identical",
+    "passed": true
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "event_id": "T3-Codex-explicit-provider-relay-74780312e17d42da8bcc00c8c23429e6",
+  "expected_revision": 742,
+  "expected_view_digest": "1134a5e22c9562ca70e489afec1900fbf4bc1f5f8285750f735977399bfb27cc",
+  "action": "relay",
+  "provider": "codex"
+}

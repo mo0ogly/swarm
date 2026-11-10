@@ -1,0 +1,46 @@
+{
+  "raw_original": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-73db283052c72b94/fragment-final-fd6c9371bbefed723cd3c260-raw-a1335bb052e392467b1459bc5782e34a6c89c424d92667ad281c2ee8872cf674.json",
+  "quote_length": 524,
+  "exact_match_in_raw_control_outputs": [
+    {
+      "control": "plan-entry",
+      "length": 107,
+      "contains": false
+    },
+    {
+      "control": "plan-validation",
+      "length": 27128,
+      "contains": false
+    },
+    {
+      "control": "plan-delivery",
+      "length": 2686,
+      "contains": false
+    },
+    {
+      "control": "plan-criterion-1",
+      "length": 493,
+      "contains": false
+    },
+    {
+      "control": "plan-criterion-2",
+      "length": 583,
+      "contains": true
+    },
+    {
+      "control": "plan-criterion-3",
+      "length": 455,
+      "contains": false
+    },
+    {
+      "control": "plan-criterion-4",
+      "length": 1494,
+      "contains": false
+    }
+  ],
+  "quoted_criterion": {
+    "index": 2,
+    "verdict": "pass",
+    "evidence": "{\"version\": 1, \"task\": \"T2\", \"criterion\": 2, \"cases\": [{\"id\": \"lost-response-restart-reconcile\", \"status\": \"pass\", \"assertions\": 6, \"observed\": {\"unknown\": \"unknown\", \"reconciled\": \"reconciled\", \"ledger_entries\": 1, \"commit_process\": {\"operation\": \"commit\", \"pid\": 1540307, \"exited\": true}, \"reconcile_process\": {\"operation\": \"reconcile\", \"pid\": 1540317, \"exited\": true}}}, {\"id\": \"content-bound-idempotency\", \"status\": \"pass\", \"assertions\": 3, \"observed\": {\"same_action\": \"act-37ae7c78775cabe196bb\", \"conflict_exit\": 3}}]}\n"
+  }
+}

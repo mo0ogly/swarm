@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:http-receipt-check:v1",
+  "title": "PAEA HTTP data-only receipt correspondence request",
+  "description": "Original UTF-8 documents encoded as strings, never as parsed JSON numbers. No file path, Root, authority or effect operation is accepted. Structural checking returns receipt-report v2; schema shape alone does not establish binding or lifecycle.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "document", "receipt", "expected_sink", "previous_state"],
+  "properties": {
+    "schema_version": {"const": 1, "type": "integer"},
+    "document": {"type": "string"},
+    "receipt": {"type": "string"},
+    "expected_sink": {"type": "string"},
+    "previous_state": {"enum": ["PROPOSED", "ADMITTED", "APPROVAL_PENDING", "AUTHORIZED", "COMMIT_REQUESTED", "COMMITTED", "DENIED", "UNKNOWN", "RECONCILED_COMMITTED", "RECONCILED_NOT_COMMITTED"]}
+  }
+}

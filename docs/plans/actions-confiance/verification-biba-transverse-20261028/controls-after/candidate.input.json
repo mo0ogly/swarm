@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "biba-control-candidate",
+  "expected_revision": 24,
+  "task_id": "task"
+}

@@ -1,0 +1,8 @@
+{
+  "case_id": "missing-recoverable-with",
+  "model": "gpt-5.6-sol",
+  "effort": "medium",
+  "pack_sha256": "9301038101558075a8e46e5e4aa86257be7f77193eaa28c805de850a06ad339d",
+  "at": "2026-10-16T06:49:53.192636+00:00",
+  "automatic_retries": 0
+}

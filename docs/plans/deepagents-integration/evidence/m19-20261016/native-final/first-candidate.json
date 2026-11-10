@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "source_sha256": "1bceff8a6f7179be16cfde73c3b1aaa0b98a508c73d0060184435bac08fdde6a",
+  "cutoff": 4,
+  "parent_sha256": null,
+  "status": "ok",
+  "entries": [
+    {
+      "id": "snapshot",
+      "message": "current-task-snapshot",
+      "kind": "evidence",
+      "state": "historical",
+      "source_sha256": "b4a2568454701b8367f939860ffbe8e08432e71d5f785f30869b36f5fbdf83c1",
+      "text": "{\"project_sha256\":\"7b0eb38d25ff00a4488b6acccbb98e4b82b619db7025e792573a98164f2e31a0\",\"work_title\":\"Summary source fixture\",\"work_objective\":\"Keep attributed history\",\"work_scope\":\"Owned fixture\",\"work_criteria\":[\"Sources remain available\"],\"task\":{\"plan_checks\":{\"plan-criterion-1\":\"validation\",\"plan-delivery\":\"delivery\",\"plan-entry\":\"entry\",\"plan-validation\":\"validation\"},\"id\":\"t1\",\"title\":\"Future worker\",\"owner\":\"\",\"deliverable\":\"report.txt\",\"criteria\":[\"Current contract changed; recheck before reuse\"],\"depends\":null,\"status\":\"todo\",\"blocker\":\"\",\"next\":\"Inspect sources\",\"attempts\":[]}}"
+    },
+    {
+      "id": "future",
+      "message": "dialogue-3324dcfb7b8ea3ab5f55819e4e149e6d54ea5db71ee9476765c250d11236fb50-question",
+      "kind": "intention",
+      "state": "future",
+      "source_sha256": "cd86fdbd5d3ef9f8ac1b249bf7106dd48c37bc41da0c2d91b09fa2a86e091352",
+      "text": "Intention future : vérifier avant de déployer."
+    },
+    {
+      "id": "incident",
+      "message": "dialogue-fc298a9ad5b76380f2e0ac1ac53c13eba716b408b30e111599ff32553348dc07-question",
+      "kind": "incident",
+      "state": "open",
+      "source_sha256": "7b5513f1db7aa5078a7da6f33bdc6671093ce1b2fe4a3ccf00209050b1858daf",
+      "text": "Incident ouvert : effet incertain à examiner avant reprise."
+    }
+  ]
+}

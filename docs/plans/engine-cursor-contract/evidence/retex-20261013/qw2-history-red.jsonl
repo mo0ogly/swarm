@@ -1,0 +1,9 @@
+{"Time":"2026-10-13T21:58:28.03954741+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-13T21:58:28.08834468+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries"}
+{"Time":"2026-10-13T21:58:28.08843532+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries","Output":"=== RUN   TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries\n"}
+{"Time":"2026-10-13T21:58:28.437808073+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries","Output":"    spending_calls_test.go:139: silent worker history truncation: 200 instead of 201\n"}
+{"Time":"2026-10-13T21:58:28.439872637+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries","Output":"--- FAIL: TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries (0.35s)\n"}
+{"Time":"2026-10-13T21:58:28.439934874+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingPreservesCompleteWorkerHistoryAndRetries","Elapsed":0.35}
+{"Time":"2026-10-13T21:58:28.440384755+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-13T21:58:28.448027468+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.406s\n"}
+{"Time":"2026-10-13T21:58:28.448181366+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.409}

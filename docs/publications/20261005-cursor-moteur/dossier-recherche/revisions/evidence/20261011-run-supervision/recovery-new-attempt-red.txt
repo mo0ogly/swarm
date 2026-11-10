@@ -1,0 +1,5 @@
+--- FAIL: TestRecoveredResultNewAttemptPreservesPreviousRepair (0.85s)
+    recovered_result_new_attempt_test.go:51: a retained repair of a previous attempt must not block the current stopped attempt un résultat réparé est déjà enregistré ; aucune nouvelle soumission implicite
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.869s
+FAIL

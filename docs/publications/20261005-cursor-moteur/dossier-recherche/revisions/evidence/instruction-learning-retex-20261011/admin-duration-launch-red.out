@@ -1,0 +1,7 @@
+--- FAIL: TestAdminDurationThresholdFrozenIntoLaunch (0.05s)
+    run_limits_duration_launch_test.go:23: admin duration not frozen into actual launch: {ObservationMode:0 SilenceSeconds:180 ToolSeconds:300 MaxToolCalls:40 MaxRepeatedCalls:4 MaxConsecutiveErrors:3}
+--- FAIL: TestAdminDurationThresholdRetryOverridesHistoricalDurationOnly (0.08s)
+    run_limits_duration_launch_test.go:67: retry duration or historical call ceiling incorrect: old={ObservationMode:0 SilenceSeconds:180 ToolSeconds:300 MaxToolCalls:30 MaxRepeatedCalls:4 MaxConsecutiveErrors:3} next={ObservationMode:0 SilenceSeconds:180 ToolSeconds:300 MaxToolCalls:30 MaxRepeatedCalls:4 MaxConsecutiveErrors:3}
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.196s
+FAIL

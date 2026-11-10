@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "checks": [
+    "fr/etat: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, common/prepared projections, log navigation, pause, find, responsive and empty",
+    "fr/sombre: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, common/prepared projections, log navigation, pause, find, responsive and empty",
+    "en/etat: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, common/prepared projections, log navigation, pause, find, responsive and empty",
+    "en/sombre: reader structure, source fidelity, security, clipboard refusal, outline, refresh focus, preview, common/prepared projections, log navigation, pause, find, responsive and empty"
+  ],
+  "errors": [],
+  "httpErrors": [],
+  "outside": [],
+  "failed": [],
+  "navigationAborts": [
+    {
+      "path": "/log-console.html",
+      "error": "net::ERR_ABORTED",
+      "resource": "document",
+      "duringNavigation": true
+    },
+    {
+      "path": "/api/v1/snapshot",
+      "error": "net::ERR_ABORTED",
+      "resource": "fetch",
+      "duringNavigation": true
+    },
+    {
+      "path": "/api/v1/assist/turns",
+      "error": "net::ERR_ABORTED",
+      "resource": "fetch",
+      "duringNavigation": true
+    }
+  ],
+  "root": "/tmp/swarm-dense-reading-xDe1iB",
+  "limits": "Local author checks. Projected log API and retained/prepared rendering fixtures; no provider, native launch or live mission. Clipboard success/refusal doubles."
+}

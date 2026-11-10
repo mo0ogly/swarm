@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "blp-preparation-quarantine-core",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/**/*",
+    "rust/crates/swarm-engine/tests/confidentiality.rs",
+    "tools/verification/recipe.py",
+    "web/trust-confidentiality.js",
+    "web/trust-native.html",
+    "locales/en.json",
+    "web/i18n-en.js"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/blp-verification-target",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_BUILD_JOBS": "1"
+  },
+  "steps": [
+    {
+      "id": "policy-compatibility-and-lattice",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-confidentiality",
+        "--lib",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "preparation_quarantine_is_explicit_and_preserves_legacy_encoding",
+        "11 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "release-preserves-observed-effect",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::preparation_confidentiality::tests",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "release_failure_preserves_completed_operation_and_primary_error",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "policy-public-storage-and-actual-lock-order",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "confidentiality",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "preparation_quarantine_preview_reopen_refusal_and_recovery",
+        "preparation_quarantine_corruption_never_falls_back_to_disabled",
+        "preparation_quarantine_activation_serializes_with_engaged_operation",
+        "15 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

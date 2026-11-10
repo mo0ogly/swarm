@@ -1,0 +1,13 @@
+{
+  "observed_at": "2026-10-16T07:10:58.961200+00:00",
+  "wrapper_session": 25120,
+  "wrapper_exit_code": 143,
+  "effects_data_exit_code": 0,
+  "remaining_process": 361560,
+  "remaining_start_ticks": "6836753",
+  "remaining_observed_alive": true,
+  "cause": "wrapper termination signal; origin not established",
+  "owner": "Codex root",
+  "decision": "follow same live Go process; no duplicate launch",
+  "completion_condition": "terminal structured package event and source hashes; process exit only if actually observed"
+}

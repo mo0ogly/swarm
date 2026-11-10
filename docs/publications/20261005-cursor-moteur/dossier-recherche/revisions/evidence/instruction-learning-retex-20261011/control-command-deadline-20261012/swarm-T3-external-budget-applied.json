@@ -1,0 +1,16 @@
+{
+  "scope": "role",
+  "mission_id": "w-ca937edf4e0abd85f8d3d67b",
+  "scope_key": "validation",
+  "values": {
+    "silence_seconds": 0,
+    "tool_seconds": 600,
+    "max_tool_calls": 0,
+    "max_repeated_calls": 0,
+    "max_consecutive_errors": 0
+  },
+  "revision": 2,
+  "actor": "fpizzi/uid:1001",
+  "reason": "Replan après original public0a9f24be99a3e3b4e26cb34a15388b69807cccf4ca954bcc32df434b93f29683 : arguments Go120s et deux budgets réellement reçus, processus extérieur180040ms sans sortie (CPU94465ms). Poste observé saturé : 12 CPU, charge48, RAM et swap presque entièrement utilisés. Augmentation autorisée du seul budget extérieur180→600s pour laisser compilation et test ciblé terminer ; Go120s inchangé. Source, critères, commande métier, résultat, 4 tentatives, 82 revues et les deux refus conservés ; aucune acceptation ni arrêt de processus tiers.",
+  "updated": "2026-10-12T14:29:29.037041782Z"
+}

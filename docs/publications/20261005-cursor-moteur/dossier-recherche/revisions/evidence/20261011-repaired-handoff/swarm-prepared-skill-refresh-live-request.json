@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "prepared_id": "auto-f2abbcfe6bed66fd1a5e",
+  "expected_revision": 105,
+  "confirm_action_skill_refresh": true,
+  "reason": "Adoption explicite de la méthode APEX/replan actualisée dans les mêmes droits. Corriger les défauts de preuve relevés par la revue fraîche, sans modifier la copie préparée, le candidat accepté, le fournisseur ou les budgets. Manifeste original et anciennes empreintes conservés.",
+  "skills": [
+    {
+      "path": ".claude/skills/apex/SKILL.md",
+      "sha256": "5910f2c12111109d67824a5b44a4ad762808b935e4b22447d6177759d00a4dde"
+    }
+  ]
+}

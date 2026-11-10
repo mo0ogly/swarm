@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "scope": "declared-recipe-locators-only; no execution or result authority",
+  "recipes": [
+    {"id":"blp-flow-inventory","path":"tools/verification/recipes/blp-flow-inventory.json"},
+    {"id":"blp-preparation-admission-engine","path":"tools/verification/recipes/blp-preparation-admission-engine.json"},
+    {"id":"blp-preparation-admission-public","path":"tools/verification/recipes/blp-preparation-admission-public.json"},
+    {"id":"blp-preparation-transport-public","path":"tools/verification/recipes/blp-preparation-transport-public.json"},
+    {"id":"blp-preparation-worker-gate","path":"tools/verification/recipes/blp-preparation-worker-gate.json"},
+    {"id":"blp-dialogue-reader-public","path":"tools/verification/recipes/blp-dialogue-reader-public.json"}
+  ]
+}

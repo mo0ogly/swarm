@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-12T13:16:12.587592+00:00",
+  "source_commit": "f68bef4d093f89dc8aa07ee40743f45841c25c73",
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-failed-control-candidate-source-59g8zpnv",
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff",
+    "-count=1",
+    "-timeout",
+    "25s"
+  ],
+  "exit": 0,
+  "wall_seconds": 34.84858775998873,
+  "output_sha256": "d08c626406e51eb160efa03a0f219deac02fecee3c059836e296a75eae953a52",
+  "output": "/tmp/swarm-T3-exact-failed-candidate-control-reproduction.out",
+  "native_database_or_private_diagnostic_read": false
+}
