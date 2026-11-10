@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Actions de confiance, Audit et Sécurité : le rail suit le thème choisi comme celui du cockpit, et un sélecteur Sombre/Clair remplace le bouton « Changer de thème » en haut à droite ; le choix reste dans l’URL. Aucun changement moteur.",
+        "en": "Trust actions, Audit and Security: the rail follows the selected theme like the cockpit rail, and a Dark/Light switch replaces the “Change theme” button at the top right; the choice stays in the URL. No engine change."
+      },
+      {
         "fr": "Cockpit : le rail de navigation suit désormais le thème choisi (marine en sombre, clair en thème clair) au lieu de rester marine ; couleurs regroupées en jetons --rail-*. En-tête mobile, préparation et accès inchangés. Aucun changement moteur.",
         "en": "Cockpit: the navigation rail now follows the selected theme (marine in dark, light in the light theme) instead of staying marine; colours grouped as --rail-* tokens. Mobile header, preparation and access pages unchanged. No engine change."
       },
