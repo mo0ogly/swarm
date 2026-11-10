@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Audit et preuves : mise en page de la maquette (compteurs depuis les états enregistrés, liste des transactions avec badges, chaîne de preuve en étapes depuis le rapport d’audit, vérificateur public à droite) ; Actualiser recharge aussi la liste d’audit. Archives protégées de la maquette non affichées (fonction absente). Aucun changement moteur.",
+        "en": "Audit and evidence: board layout (counters from recorded states, transaction list with badges, step-by-step proof chain from the audit report, public verifier on the right); Refresh also refills the audit list. The board's protected archives are not shown (no such function). No engine change."
+      },
+      {
         "fr": "Actions de confiance, Audit et Sécurité : le rail suit le thème choisi comme celui du cockpit, et un sélecteur Sombre/Clair remplace le bouton « Changer de thème » en haut à droite ; le choix reste dans l’URL. Aucun changement moteur.",
         "en": "Trust actions, Audit and Security: the rail follows the selected theme like the cockpit rail, and a Dark/Light switch replaces the “Change theme” button at the top right; the choice stays in the URL. No engine change."
       },
