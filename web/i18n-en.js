@@ -5596,6 +5596,7 @@ globalThis.SwarmEnglish = {
   "Texte minimal des avis": "Minimum review text",
   "Texte source": "Source text",
   "Texte source copié.": "Source text copied.",
+  "Thème": "Theme",
   "Thème clair": "Light theme",
   "Thème et session": "Theme and session",
   "Thème sombre": "Dark theme",

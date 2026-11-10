@@ -1,8 +1,9 @@
 'use strict';
 /** Static check of web/swarm-design.css: the cockpit rail takes every colour
  * from local --rail-* tokens, and the light "etat" theme redefines them, so the
- * rail follows the selected theme (user decision 10 Nov 2026).
- * Reads one file; no browser, network or write. Does not replace the visual
+ * rail follows the selected theme (user decision 10 Nov 2026). Also checks the
+ * Trust/audit shell rail (web/swarm-workbench.css) and its header theme switch.
+ * Reads three files; no browser, network or write. Does not replace the visual
  * check of the served page. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -41,4 +42,16 @@ check('rail-rules-carry-no-literal-marine-colours', () => {
   }
   assert.deepEqual(literals, []);
 });
-console.log(`${count}/3 rail theme checks passed`);
+const wb = fs.readFileSync(__dirname + '/../web/swarm-workbench.css', 'utf8');
+check('workbench-rail-follows-theme', () => {
+  assert.match(wb, /\.workbench-rail\{--rail-fond:var\(--swarm-marine\)[^}]*background:var\(--rail-fond\)/);
+  assert.match(wb, /:root\[data-theme="etat"\] \.workbench-rail\{--rail-fond:#eceae1/);
+  assert.doesNotMatch(wb, /\.workbench-rail\{background:var\(--swarm-marine\)/);
+});
+check('workbench-header-has-theme-switch', () => {
+  const js = fs.readFileSync(__dirname + '/../web/trust-workbench.js', 'utf8');
+  assert.match(js, /main\.prepend\(header\);themeSwitch\(header\)/);
+  assert.match(js, /\['sombre','Sombre'\],\['etat','Clair'\]/);
+  assert.match(wb, /\.workbench-theme-switch button\[aria-pressed=true\]/);
+});
+console.log(`${count}/5 rail theme checks passed`);

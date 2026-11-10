@@ -95,6 +95,10 @@ marine en sombre, fond `#eceae1` et texte `#355565` en clair, sélection sur car
 `#fffefa` et repère ocre `#785200`. Toutes ses couleurs passent par les jetons
 locaux `--rail-*` de `.cockpit-page .rail` dans `web/swarm-design.css`. L’en-tête
 mobile, l’en-tête de préparation et la page d’accès restent marine.
+Le rail des pages Actions de confiance, Audit et Sécurité (`.workbench-rail`,
+`web/swarm-workbench.css`) suit aussi le thème ; leur en-tête porte en haut à
+droite un sélecteur Sombre/Clair (`web/trust-workbench.js`) qui garde le choix
+dans le paramètre `theme` de l’URL.
 Le doré signale la sélection et les moments clés. Le cyan accompagne les connexions.
 Les états utilisent les paires succès, attention, alerte et information ; ne pas
 remplacer le rouge d’erreur par la couleur de marque. Toujours doubler la couleur
