@@ -233,3 +233,393 @@ Consigne utilisateur relue dans le chat de coordination : séquencer sur main sa
 nouvelle branche. Protection GitHub relue : PR obligatoire, checks/install exigés,
 enforce_admins actif. Aucun contournement ; le push peut être refusé, auquel cas
 ce commit reste local et une décision sur le parcours PR sera nécessaire.
+
+
+## JS-UI-372-01/02 — reprise bornée du 9 novembre
+
+Attribution du coordinateur : Swarm07 est le seul mutateur UI ; root consolide
+les index partagés, Gi conserve la session humaine. Aucun Git, provider, mission,
+branche, worktree ou sous-agent dans ce lot. Service courant372/PID1880842,
+SHA4977c71b2f5da940cec84fcb45cd438d34b10034b5f2f4c08f6f08e7d05a0e99.
+Les preuves356/368 ne sont pas réutilisées pour qualifier372.
+
+01 : reçu Gi ui-003, Version contenu556/604 EN,556/601 FR à viewport624.
+02 : observation EN sombre vers FR relisant état ; défaut encore à reproduire.
+Sources examinées : swarm-design.css ligne114 et293–304 (retours de lignes,
+listes) ; cockpit-native.js bouton thème (DOM/liens sans URL) ; i18n.js sélecteur
+(recharge URL+lang) ; native_admin.rs (thème cockpit consommé depuis URL, défaut
+état) ; runtime-health.js (notes en LI textContent). Contrats et état propriétaire :
+CSS commune, langue/thème de présentation, renderer non modifié ; les autres dirty
+moteur sont hors correction. Pas de build/redémarrage en parallèle autorisé ici.
+
+Plan : témoin372 isolé, mêmes notes et transitions,4combinaisons ×624/390 ; corriger
+seulement une cause reproduite, rejouer avec overlays explicitement marqués des
+sources ciblées, puis recette permanente/profile et remise exacte au coordinateur
+avant compilation/livraison mêlant d’autres dirty. Vérifier contenu intégral,
+focus/Échap/réouverture, reload/langue/thème et entrée de thème invalide.
+Preuves neuves locales `.cache/ui-version-20261109` ; Lexar480KiB libre, aucun
+nettoyage ni écriture de nouvelles preuves sur ce support.
+
+Premier banc interrompu : recette copiée du serveur historique Go attendait une
+URLsession que Rust ne produit pas. Replan : lecture du vrai contrat Server dans
+rust_native_http_cli.py ; banc corrigé sur web-bound JSON + session du seul Root
+fixture. Aucun secret humain lu/transmis. L’essai initial reste incomplet, jamais
+PASS. Le serveur372 actif n’a pas été arrêté.
+
+
+### Diagnostic et correction source vérifiés — image non livrée
+
+Témoin `.cache/ui-version-20261109/baseline372-protocol/result.json` : les huit
+contextes (FR/EN × thèmes ×624/390) débordent dans Version, sans débordement du
+document. BF16b LI long sans overflow-wrap. La transition EN sombre→FR et le
+rechargement échouent aussi ; bouton sombre témoin passant. Cause02 : le bouton
+modifiait le DOM, mais pas l’URL ; i18n recharge l’URL ; native_admin consomme son
+thème et retombe sur état si absent. Le défaut est maintenant reproduit, pas inféré.
+
+Correction01 : même règle partagée des paragraphes/listes/descriptions de dialogue,
+`overflow-wrap:anywhere`, aucun texte coupé ou caché, aucune largeur augmentée.
+Correction02 : toggleTheme documenté, enum existant vers DOM+URL replaceState,
+conservation des autres paramètres et des liens Admin. Aucun localStorage de thème
+ni règle moteur ajouté. Shell/i18n/renderer natif restent inchangés.
+
+Replay final source, overlays explicitement marqués des seuls deux fichiers :
+`source-final/result.json`,56/56 PASS. Comparaison intégrale des LI avec tous les
+items FR/EN du producteur Version, non simplement recherche d’un token ; focus
+au titre, Échap/opener, réouverture, reload, transition inverse et thème invalide.
+Recette compilée maintenue : version-dialog-preferences.json (sans overlay).
+Ces résultats sources ne prouvent pas l’image installée. Les fixtures sont privées,
+aucun fournisseur/mission/POST ; processus de ces essais remis après fermeture.
+
+Blocage de livraison explicite :8entrées effectives différentes de372, dont cinq
+hors correction. pending-build-inputs.json et foreign-inputs.patch remis. Quatre
+sources de l’inspecteur/placeholder sont dans3eeeaef8e ; message annonce14checks,
+reçu original non établi par cette session. i18n test échoue : la clé générée
+« Agent natif — exécution et mandat courants requis » est absente du catalogue
+source. i18n-mismatch.json conserve le discriminant. Aucun retrait/reset de ce
+travail ; root coordonne gel/qualification et génération avant décision de build.
+Ne pas répéter le test inchangé ni installer un composite sur la base des overlays.
+
+Revue politiques/fonctions/erreurs/doc liée aux SHA : HANDOFF.json. Source stable,
+aucun build/redémarrage/Git ;372 reste active. Conditions de reprise : décision
+root sur les cinq entrées étrangères et le catalogue, gel des sources, build
+pris en charge/profil qualifié, recette sur l’image exacte, puis remise Gi pour
+contrôle humain protégé et rapprochement des octets. Aucun login38434 demandé.
+RETEX intermédiaire : suivre le producteur ET le consommateur des préférences ;
+mesurer le contenu interne en plus du document ; préférer une vraie condition DOM
+aux frames hors écran ; les doublons source n’établissent jamais une livraison.
+
+
+### Prérequis complémentaires autorisés par root
+
+Le coordinateur autorise explicitement le contrôle existant de l’inspecteur et
+le rétablissement canonique de la traduction d’Oryh, sans changer son consommateur.
+`workbench-summary.stdout` :14/14 PASS nommés. Revue follow/mount, placeholder et
+stageCSS de3eeea : id connu dans modèle validé requis, sélection de présentation
+seule ; HTML textuel conservé, erreur DOM propagée ; dimensions/breakpoint1024 sont
+un choix de géométrie UI, pas une politique d’exécution. Cette revue/test double
+reste distincte d’une preuve de l’image composite ou d’une revue indépendante.
+
+Catalogue : phrase utilisée trust-native.js:51, traduction anglaise déjà existante
+dans i18n-en.js rétablie exactement dans locales/en.json, autres entrées dont
+placeholder conservées. Générateur existant repassé ; i18n-after.stdout PASS.
+Aucune nouvelle capacité native ni droit n’est déduite de cette phrase UI.
+
+Root a relevé un cas d’erreur dans toggleTheme : le DOM pouvait changer avant un
+refus de replaceState. Tests marqués d’injection locale dans history-refusal-before
+et history-refusal-observed montrent cinq échecs (ancien DOM/URL, visibilité,
+cause et reprise). Ces essais ne sont pas PASS. Nouvelle correction générale :
+enregistrer URL d’abord ; en refus conserver ancien DOM/URL, afficher une phrase
+FR/EN sûre, propager web-native-theme-update-refused avec cause originale. Le test
+restaure sa méthode historique originale puis vérifie une nouvelle action +reload.
+Un catalogue source neuf est nécessaire à ce diagnostic traduit ; overlays finaux
+explicitement trois assets (CSS, cockpit-native.js, i18n-en.js), toujours non livrés.
+
+HANDOFF.json initial complet est conservé ; sa duplication des notes a tronqué
+une lecture du coordinateur. Replan de la transmission : un reçu compact séparé
+avec chemins, SHA, comptes et noms de défauts, sans corps de notes. Ne pas recycler
+le test source pour fabriquer une preuve runtime ; prochaine image unique après
+inventaire final/gel coordonné et recette compilée, puis contrôle Gi.
+
+
+### Gel source remis avant compilation
+
+`READY.json` est le reçu compact (chemins/SHA/comptes, pas les corps des notes).
+source-ready-load/result.json :63/63 PASS, overlays marqués trois assets seulement.
+14/14 workbench-summary et i18n-after PASS ; cinq tests shell Échap conservés.
+Les63 incluent cause/refus/reprise, console et requêtes échouées. Aucun échec
+silencieusement filtré : source-refusal-fixed conserve4GETnative-version annulés
+par navigation prématurée ; source-network-settled garde ReferenceError (lang
+observé avant scripts chargés). Correction du banc : événement load de navigation
+attendu avant composants, puis promesse réelle Version attendue avant départ.
+Les diagnostics antérieurs ne prouvent pas une panne moteur. Le premier témoin de
+refus avait effectivement terminé en FAIL ; ne pas qualifier sa simple progression
+lente de blocage produit ou affirmer qu’une interruption l’a produit.
+
+Les fichiers de production et tests du reçu sont maintenant stables ; aucun
+processus des fixtures restantes (processes-final.json). Root décide gel et
+créneau avant build unique ; pas de nouveau build, restart ou demande de login.
+La phase installation/réexamen runtime/RETEX final reste ouverte.
+
+
+### Candidat373 qualifié — redémarrage non exécuté
+
+Créneau unique build attribué explicitement par root après revalidation de READY
+sans écart et absence de cargo/rustc concurrents. Préflight : huit écarts connus
+et aucun nouveau depuis372, inventaire complet dans build-preflight.json.
+`./swarm.sh build` a produit une seule image373, sans redémarrage du serveur372.
+Sources gelées durant compilation et tests ; aucun Git, fournisseur ou mission.
+
+Image : v0.1.1-dev.373, SHA256
+`9ba81aa1ca94baa743c063957a1e0cfe90ed744588385922b7589bde977330d4`.
+Profil `.cache/local-delivery/rust-cpvqgcfk/build/profile/result.json` :
+VERIFIED_DEFAULT_NATIVE_PROFILE, core features vides, core non-test, aucune feature
+fixture, dépendances effectives stables. Archive effective SHA256
+`5f716959f9f4112533b026ae31d7e1b4d2fc042aac3cbb4188546e848410780a`.
+Le record candidat et tous les effective_inputs ont été rapprochés des sources
+après les vérifications : zéro écart. Pas de nouvelle compilation des14 contrôles
+inspecteur inchangés ; preuves exactes réutilisées dans leur portée source.
+
+Recette permanente version-dialog-preferences sur cette image, SANS OVERLAY :
+63/63 PASS, recipe.py verify VERIFIED, originaux dans compiled-recipe373.
+Une exception JS est intentionnellement injectée/typée/cause vérifiée pour le
+refus historique ; aucune autre erreur JS, aucun warn/error console ni requête
+échouée, aucun POST dans la fixture. Le résultat ne prouve pas une session humaine.
+Six assets protégés servis par un autre Root privé du même binaire comparés aux
+membres de l’archive : CSS partagé, cockpit-native.js, catalogueEN, workbenchJS/CSS
+et graphJS. Tous identiques ; empreinte /proc de l’enfant égale à celle du candidat
+avant/après lectures. Version/commit/modified et l’intégralité des notes FR/EN
+servis correspondent au record et au JSON compilé. served373/result.json conserve
+les chemins, statuts et empreintes ; pas de cookie humain exporté.
+
+Remise compacte : `.cache/ui-version-20261109/READY-CANDIDATE373.json`.
+372/PID1880842 et son SHA4977… sont encore actifs après le build. Redémarrage non
+exécuté : root coordonne la suite et la recette Gi dans sa session normale.
+Commande préparée (pas lancée) : swarm.sh restart --prepared-build SHA373 --no-open.
+RETEX final après activation et observation humaine reste ouvert ; ne pas annoncer
+« installé/corrigé sur instance » à partir de la recette de fixture.
+
+
+### Activation373 — remise à root avant navigateur Gi
+
+Créneau unique restart attribué explicitement après rapprochement par root des
+hashes du candidat, profil, archive, recette et octets servis. Préflight renouvelé :
+record373 identique, image candidate exacte, source sans entrée compilée nouvelle,
+instance372/PID1880842 identifiée. Cinq Work lus via CLI publique avant arrêt,
+corps non conservés ; seulement compte et empreintes. La commande préparée avec
+le SHA complet a sélectionné373 sans nouvelle compilation et annoncé zéro entrée
+plus récente non installée. Aucun autre service interrompu, aucune mission lancée.
+
+Image active vérifiée par /proc de l’exécutable et API native-version :
+v0.1.1-dev.373, PID2336522, SHA256
+9ba81aa1ca94baa743c063957a1e0cfe90ed744588385922b7589bde977330d4,
+commit3eeeaef8ea62e2165613d75b2c7714708885db80, modified=true,
+builddate2026-11-09T21:57:09Z. Status running/ready true. Cinq Work après activation,
+même SHA de leur liste publique et de engine-settings show ; aucun corps privé
+écrit dans les preuves. ACTIVATION373.json est le reçu compact de cette remise ;
+activation-before373 et activation-after373 gardent les snapshots originaux.
+
+Défaut du collecteur de reçu conservé dans activation-receipt-contract-failure :
+comparaison erronée de l’objet binary API à l’enveloppe build incluant schema_version.
+Les champs communs étaient déjà exacts ; reprise par comparaison explicite des
+quatre champs et de provenance injected. Aucun redémarrage/test répété pour cela.
+Une namespace de métadonnées différente n’est pas une divergence d’exécutable.
+
+RETEX local : UI01 venait d’une règle de prose qui oubliait les LI contenant des
+identifiants longs ; UI02 du producteur de préférence DOM sans mise à jour de
+l’URL que consommaient langue/reload. Correction aux contrats communs et preuve
+avant/après conservée. En erreur, commettre l’URL avant affichage et conserver
+l’ancien état/diagnostic/cause ; le test de refus/reprise est permanent. Attendre
+les lectures Version avant navigation évite d’attribuer les annulations du banc
+au produit. Le partage d’un workspace exige un gel explicite et le rapprochement
+des octets étrangers, pas leur retrait ni une requalification implicite par un
+commit. Reçus compacts et liens SHA transmettent les preuves sans tronquer les
+notes ; les originaux restent intacts et locaux car Lexar presque pleine.
+
+La vérification authentifiée n’est PAS close par cette activation. Prochaine remise
+root→Gi : recharger373 dans sa session normale38433, vérifier Version FR/EN × thèmes,
+624 et largeur mobile pertinente, contenu interne sans coupure/défilement injustifié,
+Échap/focus/réouverture ; EN sombre→FR puis reload garde sombre ; restaurer les
+préférences initiales, aucune mission. Rapprocher les ressources protégées observées
+avec l’archive373 si demandé. Ce chat ne redemande pas de connexion/API et n’accède
+pas à la session distincte de Gi. Les preuves fixture63/profil/exe/API/CLI sont
+établies ; observation humaine, acceptation globale et conformité WCAG restent
+hors de leur portée. Root coordonne ce dernier témoin avant clôture des deux constats.
+
+
+## Clôture bornée JS-UI-372-01/02 — observation authentifiée373
+
+**Les deux constats sont clos dans le périmètre ci-dessous.** Reçu final de Gi
+relu le9novembre : `.cache/ui-version-20261109/gi-final373/result.json`, statut
+PASS_BOUNDED_AUTHENTICATED_373. SHA256
+6dba6b0d0db97bdadb880ceb76a49452b46ec718ce256c0f9a8e51c3e48500a5.
+Reçu de comparaison lié : comparison.json, SHA256
+377a12e4024dd4248290c09e4e734978f539029efb8df982702f9a847fbdb52c.
+Liaison image373/SHA9ba81aa1… vers activation, profil/archive et ressources conservée.
+
+Gi est l’exécutant navigateur ; root compare les corps téléchargés et les octets
+de l’archive ; Swarm07 finalise ici documentation/RETEX, sans nouvelle exécution.
+Huit cas uniques FR/EN × état/sombre ×624/390 : version373, commit/date et disclosure,
+modal/titre et huit fermetures Échap avec retour au déclencheur visible. À624,
+contenu556/556 ; à390,322/322. Le LI long BF16b est intégral,434/434 puis200/200,
+hauteur client égale à scrollHeight, overflow-wrap:anywhere et aucun line-clamp.
+Égalité du texte complet par rapport au DOM initial de chaque langue conservée ;
+ce n’est pas une nouvelle revue sémantique de tout le catalogue historique.
+
+**UI01 : corrigé et vérifié sur l’instance.** Le débordement interne mesuré372
+556/604 EN et556/601 FR ne se reproduit plus dans ces huit cas, sans masquer ni
+couper le texte ni élargir artificiellement le dialogue. **UI02 : corrigé et vérifié
+sur l’instance.** Deux transitions EN sombre→FR avec vrai reload restent sombres
+(624 et390) ; les transitions claires et reload gardent état. Préférences initiales
+FR/état/624×684 restaurées et overrideviewport réinitialisé ; aucune mission choisie.
+
+Six ressources authentifiées ciblées comparées par root à l’archive373 : six
+concordances exactes, hash de comparaison revérifié ici. L’API d’export ne fournit
+ni statutHTTP ni en-têtes : aucun200 n’est déduit de cette remise. Ce contrôle
+n’est pas un rejeu des22assets de372 ni une requalification368/372. Console warn/error
+avant/après vide dans la collecte limitée100 ; univers réseau non exhaustivement
+mesuré. Captures dans le transcript Gi, aucun fichierimage nouveau annoncé.
+
+RETEX final du lot : deux causes différentes (retour à la ligne des LI ; préférence
+DOM non reportée dans l’URL consommée par langue/reload) ont eu chacune un témoin
+négatif puis la même vérification après correction. Le cas d’erreur replaceState
+conserve ancien état et cause, avec diagnostic FR/EN et reprise ; il reste une
+injection de fixture, jamais présentée comme incident de la session humaine.
+63assertions compilées sansoverlay,14du composant inspecteur et catalogue cohérent,
+un seul build373 et une activation du prepared-build exact précèdent la remise
+humaine. Les cinq Work et réglages publics sont conservés selon leurs empreintes.
+Les originaux des échecs du banc, du catalogue et du collecteur restent distincts
+des preuves produit. Les règles/contrats FR/EN et la recette permanente transmettent
+le retour d’expérience ; cela ne garantit pas l’absence d’un autre défaut futur.
+
+Observation séparée à conserver : à390, le libellé français de fermeture apparaît
+« Ferme/r » sur deux lignes ; texte accessible et bouton fonctionnel. **Cause et
+régression non établies**, aucun nouveau correctif ni test lancé ici. Propriétaire
+Swarm00/UI ; condition future : triage explicitement attribué, comparaison à une
+baseline390 pertinente et lecture des règles de bouton. Cette observation ne
+rouvre pas implicitement les deux contrats vérifiés et ne vaut pas acceptation
+globale ni conformité WCAG/BLP. Root maintient le suivi commun.
+
+Reçu compact de clôture : `.cache/ui-version-20261109/CLOSURE373.json`. Cette
+finalisation modifie seulement ce plan et produit le reçu ; aucun test/build/
+restart/Git supplémentaire, aucune action métier, aucun transfert de secret.
+
+
+### Publication isolée des corrections UI01/02
+
+La demande de commit/push porte sur ce seul lot. Commit préparé sur la base publique
+origin/main, sans les commits Conduite locaux ultérieurs ni les dirty des autres
+agents. Aucun checkout, reset ou réécriture de main. Le rétablissement du libellé
+natif d’Oryh est conservé localement avec son consommateur non publié : le commit
+retient uniquement le nouveau diagnostic de refus de thème dans les catalogues.
+Les preuves373 incluent le contexte local qualifié de cette date ; elles ne
+requalifient pas implicitement une future image du commit isolé. GitHub exige PR
+et checks/install ; la publication reste conditionnée au parcours autorisé,
+sans contourner la protection ni créer une branche sans autorité applicable.
+
+
+## Livraison locale intégrée après PR24 — demande utilisateur
+
+Fabrice demande maintenant d’installer la version fusionnée en intégrant les
+travaux des autres agents. HEADa28bade23 contient origin/main2829ec90e et les six
+commits Conduite locaux, sans réécriture. Service encore373/PID2336522. Depuis son
+archive qualifiée, onze entrées effectives différentes, toutes UI (liste conservée
+au gel) ; les nombreuses sources moteur dirty correspondent déjà aux entrées373.
+Aucun cargo/rustc observé au préflight.32Gio libres localement ; Lexar480KiB,
+repli de preuve `.cache/integration-merged-20261109`, aucun nettoyage.
+
+Contrats du commit427 lus : thème sombre par défaut (`?theme=etat` explicite),
+contrôles de graphe repliés avec choix local conservé, inspecteur/mission partagés,
+sections secondaires groupées, compteurs indisponibles explicités sans production
+inventée, nom de connexion dédupliqué uniquement à l’affichage. Aucun nouveau
+budget, politique d’exécution, droit ou transport. Les ajouts du commit427 ne sont pas
+présumés installés par leur commit : qualifier cette image intégrée neuve.
+
+Recette Version adaptée au contrat nouveau : défaut sombre vérifié explicitement,
+paramètre invalide comparé au même défaut observé, sans conserver l’ancienne
+attente claire de373. Les autres assertions/refus/reprises restent en place.
+La docstring de setNotice déplacée par l’insertion de setMetricHint est rattachée
+à son véritable consommateur, sans changement de comportement. Documentation FR/EN
+du cockpit intégrée ; notes version_history des lots fusionnés déjà présentes en
+FR/EN, pas de nouvelle capacité à leur ajouter.
+
+Plan borné :16contrôles summary et cohérencei18n sur les sources, lecture du contrat
+rapide Conduite, gel inventaire, build pris en charge sans arrêter373, recette
+Version64 et cockpit natif existant sur l’image exacte (nouvelles dépendances
+reader/graphe/accordéons justifient ce parcours). Diagnostiquer tout échec plutôt
+que masquer les erreurs. Puis restart prepared-build exact, conservation des cinq
+Work/réglages, identité réelle et vérification authentifiée dans ce chat si session
+valide. La session normale38433 vient d’être ouverte avec identitéFabrice visible ;
+aucun mot de passe, clé ou cookie extrait. Maquette file:// conservée.
+
+
+### Livraison intégrée374 effectuée et vérifiée
+
+Demande utilisateur exécutée : version fusionnée et travaux Conduite des autres
+agents intégrés dans l’image locale, sans stash/reset/rebase ni nouveau Git/push.
+Une seule construction puis restart prepared-build exact, zéro entrée plus récente
+non installée au moment de l’activation. Image v0.1.1-dev.374, PID2516827,
+SHA256d4caa771eefebe0d404b3767b7c413a2207cfd034071008475ec83982a354822,
+baseGita28bade231bd41f48a4ba264aa1f8b24f241f399, modified=true.
+Profilproductionnormal VERIFIED_DEFAULT_NATIVE_PROFILE, core features vides,
+non-test, sans fixture et dépendances observées stables. Sources moteur dirty
+identiques à celles déjà qualifiées373 ; cela ne constitue pas leur nouvelle
+acceptation métier globale. Tous les inputs compilés restent égaux à l’inventaire
+après le contrôle final.
+
+Résultats conservés dans `.cache/integration-merged-20261109/RESULT.json` :
+16assertions DOM du composant,64Version sur l’image sans overlay,416cockpit natif
+existant : PASS ; intégrité de recette Version VERIFIED, i18n cohérent. La sélection
+des416 est motivée par les changements graphe/reader/sections/identité, pas un rejeu
+global arbitraire. Aucun test workspace/moteur inchangé répété sans raison.
+
+Session humaine normale38433 réutilisée ici, sans nouvelle connexion ni clé :
+Version374 FR/EN × thèmes ×624/390 (huit cas), texte long complet et hash stable par
+langue, aucune largeur interne excessive ni line-clamp, huit Échap avec focus
+opener. Transition EN sombre→FR suivie d’un vrai reload conserve sombre ; défaut
+sombre confirmé sans paramètre. Métadonnées et disclosure local/noncommité visibles.
+Le lien de baseGit est le hash réel locala28b ; aucun statutHTTPGitHub n’est inféré
+pour ce commit local non publié par cette opération.
+
+Lecture réelle d’une mission existante : sept tâches, carte de mission du rail,
+validation/activité courantes explicitement inconnues, absence de compteur de
+décisions expliquée. Inspecteur R5 avec dépendances R4/R6 puis retour Graphe ;
+outils fermés initialement, ouverture volontaire conservée après reload et choix
+restauré fermé. Un seul groupe Détails de mission, fermé par défaut ; identité
+Fabrice sans login redondant. Aucun départ d’agent, modèle/fournisseur ou action
+métier déclenché dans l’instance ; les écritures des recettes cockpit restent dans
+leurs Roots privés isolés, jamais le datastore actif.
+
+42ressources authentifiées du cockpit (22JS,19CSS,logo) rapprochées octet par octet
+avec l’archive effective374 : toutes exactes ; copies relues dans assets374 et
+reçu live-assets.json. API d’export sans statuts/en-têtes, aucun200 inventé.
+Console capturée warn/error limitée100 : vide. Les diagnostics réseau exhaustifs
+sont ceux des fixtures ; ne pas les attribuer implicitement à toute la session.
+Cinq Work et engine-settings publics ont exactement les mêmes empreintes avant
+activation et après les interactions ; /proc/exe et APIversion attestent374 prête.
+
+RETEX : l’ancienne recette attendait encore le défaut clair ; elle vérifie désormais
+le défaut natif sombre explicite et le repli invalide vers ce même défaut observé,
+sans changer une politique produit pour satisfaire un test. Rattachement de la
+docstring setNotice réparé, pas de changement de comportement. La première boucle
+visuelle a essayé un bouton dans le volet refermé par la navigation de langue :
+incident original conservé dans live-method-incident.json, aucun cas alors validé.
+Reprise par précondition réelle du nouveau document (langue cible ET sélecteur de
+Work peuplé/activé), puis huit cas passants ; aucun sleep arbitraire, code produit
+inchangé pour cet incident. Les fichiers/commits d’autrui ont été conservés et
+leurs entrées ont été qualifiées dans le périmètre compilé, pas assimilées à une
+acceptation indépendante. Les preuves restent localement, Lexar presque pleine.
+
+Onglet livré en FR/sombre, sans mission sélectionnée, taille navigateur normale
+restaurée (1280), même préférence Couloirs et outils de mission refermés. Maquette
+file:// originale non modifiée. Capture installed374.jpg montre le dialogue réel.
+Documentation FR/EN du cockpit mise à jour avant build ; les notes bilingues des
+lots sont effectivement embarquées. Aucun nouveau comportement produit hors de
+ces lots n’a été introduit par l’adaptation de recette/docstring.
+
+Portée de clôture : installation et parcours ci-dessus vérifiés ; aucune conformité
+WCAG/BLP globale ni acceptation de tous les scénarios moteur/fournisseur. Les notes
+historiques « à vérifier » d’autres lots ne sont pas utilisées comme état courant.
+Suite documentaire conservée : leur rapprochement avec les reçus actuels relève
+du suivi transversal/root, sans effacer les preuves historiques ni réécrire les
+notes d’autrui dans cette livraison. L’observation cosmétique Ferme/r390 reste
+séparée/non qualifiée, aucun nouveau correctif implicite.

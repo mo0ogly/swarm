@@ -23,6 +23,21 @@
   }
 
   /**
+   * Show or remove the small explanation line under one metric counter.
+   * @param {string} id counter element id inside a `.metric` card
+   * @param {string|null} text translated hint, or null to remove it
+   * @returns {void} DOM-only; missing elements are ignored, nothing is written
+   */
+  function setMetricHint(id, text) {
+    const card = document.getElementById(id)?.closest('.metric');
+    if (!card) return;
+    let hint = card.querySelector('.metric-hint');
+    if (!text) { hint?.remove(); return; }
+    if (!hint) { hint = document.createElement('small'); hint.className = 'metric-hint'; card.appendChild(hint); }
+    hint.textContent = text;
+  }
+
+  /**
    * Toggle a notice element with explanation text.
    * @param {string} id @param {boolean} show @param {string} text @returns {void}
    */
@@ -63,6 +78,9 @@
    * Fill conduite plan and state sections.
    * Current mode preserves calculation failures. History mode renders public
    * recorded task objects verbatim as safe text; it infers no validity or activity.
+   * Each history summary shows the exact status through the shared workbench
+   * badge (translated label + shape + tone), falling back to engine text when
+   * the workbench module is absent.
    * @param {object|null} mission @param {string|null} missionError
    * @param {object} work @param {string} readMode @returns {void}
    */
@@ -80,7 +98,11 @@
           const details = document.createElement('details');
           details.className = 'history-task';
           const summary = document.createElement('summary');
-          summary.textContent = `${task.title || task.id} — ${engine(task.status || '')}`;
+          // Same recorded-state badge as lanes/inspector: translated label,
+          // shape and tone from the exact status code; unknown codes stay neutral.
+          const badge = globalThis.SwarmWorkbench?.statusBadge;
+          if (badge) summary.append(document.createTextNode(task.title || task.id), badge(task.status || '', task.status || ''));
+          else summary.textContent = `${task.title || task.id} — ${engine(task.status || '')}`;
           const original = document.createElement('pre');
           original.className = 'history-original';
           original.textContent = JSON.stringify(task, null, 2);
@@ -138,6 +160,12 @@
     setText('accepted-count', mission && isSafeCount(mission.validated) ? String(mission.validated) : '—');
     setText('active-count', mission && isSafeCount(mission.active_agents) ? String(mission.active_agents) : '—');
     setText('decision-count', '—'); // no decisions producer available
+    // Say why the counters stay empty instead of showing a bare dash: the native
+    // engine has no decision producer, and history reads do not evaluate current
+    // validation. No count is inferred from recorded task states.
+    document.getElementById('decision-count')?.closest('.metric')?.setAttribute('data-unavailable', 'true');
+    setMetricHint('decision-count', t('Non fourni par le moteur natif.'));
+    setMetricHint('accepted-count', mission && isSafeCount(mission.validated) ? null : t('Validation courante non évaluée dans cette lecture.'));
 
     setNotice('validation-status', true,
       t('Les états enregistrés ne prouvent ni une activité en cours ni une validation indépendante.'));

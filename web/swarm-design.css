@@ -126,7 +126,23 @@ button:disabled { opacity: .6; }
 .skip-link:focus { top: 12px; }
 .mobile-header { display: none; }
 .cockpit-page .rail {
-  /* The brand rail stays marine in both themes; local tokens keep every control legible. */
+  /* Rail palette: marine in the dark theme, light in the "etat" theme (user
+     decision 10 Nov 2026). Every rail colour goes through these local tokens;
+     the light values are set in the :root[data-theme="etat"] block below. */
+  --rail-fond: #062338;
+  --rail-ligne: #375568;
+  --rail-ligne-groupe: #29485b;
+  --rail-texte: #c5d8df;
+  --rail-index: #92b1c1;
+  --rail-survol: #12384c;
+  --rail-survol-encre: #ffffff;
+  --rail-courant: #183e4f;
+  --rail-courant-encre: #f8d779;
+  --rail-accent: #f8c650;
+  --rail-discret: #adc3ce;
+  --rail-champ-bordure: #628695;
+  --swarm-rail-selected: #0f3d61;
+  --swarm-rail-text: #e5edf0;
   --wattson-carte: #062338;
   --wattson-carte-appuyee: #12384c;
   --wattson-champ: #102f43;
@@ -139,33 +155,62 @@ button:disabled { opacity: .6; }
   --wattson-info-encre: #b8e5ed;
   --wattson-lien: #93d4df;
   color-scheme: dark;
-  width: 248px; padding: 24px 18px 16px; gap: 10px; background: #062338; color: #e5edf0;
+  width: 248px; padding: 24px 18px 16px; gap: 10px; background: var(--rail-fond); color: var(--wattson-texte);
   border-right: 0; overflow-y: auto; z-index: 30;
+}
+:root[data-theme="etat"] .cockpit-page .rail {
+  --rail-fond: #eceae1;
+  --rail-ligne: #c5cfcd;
+  --rail-ligne-groupe: #d7ddda;
+  --rail-texte: #355565;
+  --rail-index: #506975;
+  --rail-survol: #e2f0f1;
+  --rail-survol-encre: #062b49;
+  --rail-courant: #fffefa;
+  --rail-courant-encre: #062b49;
+  --rail-accent: #785200;
+  --rail-discret: #506975;
+  --rail-champ-bordure: #708991;
+  --swarm-rail-selected: #fffefa;
+  --swarm-rail-text: #243d4a;
+  --wattson-carte: #fffefa;
+  --wattson-carte-appuyee: #eeeee7;
+  --wattson-champ: #fffefa;
+  --wattson-ligne: #c5cfcd;
+  --wattson-texte: #243d4a;
+  --wattson-titre: #062b49;
+  --wattson-libelle: #355565;
+  --wattson-texte-discret: #506975;
+  --wattson-info-fond: #e2f0f1;
+  --wattson-info-encre: #205967;
+  --wattson-lien: #205e70;
+  color-scheme: light;
+  border-right: 1px solid var(--rail-ligne);
 }
 .cockpit-page .rail .brand { display: grid; grid-template-columns: 50px 1fr; align-items: center; column-gap: 10px; font-size: 23px; letter-spacing: .14em; }
 .cockpit-page .rail .brand-logo { grid-row: 1/3; width: 50px; height: 50px; object-fit: contain; margin: 0; }
 .cockpit-page .rail .brand span { font-size: 10px; letter-spacing: .06em; }
-.rail-label { border-top: 1px solid #375568; padding-top: 22px; margin-top: 18px; }
+.rail-label { border-top: 1px solid var(--rail-ligne); padding-top: 22px; margin-top: 18px; }
 .rail>label { font-size: 11px; font-weight: 500; }
 .rail #work { font-size: 13px; min-height: 42px; }
 .rail #tabs { display: block; margin-top: 20px; }
-.nav-group { border: 0; border-top: 1px solid #29485b; border-radius: 0; background: transparent; }
-.nav-group>summary { list-style: none; display: grid; grid-template-columns: 24px 1fr 12px; gap: 10px; align-items: center; min-height: 48px; padding: 10px 4px; color: #c5d8df; font-size: 13px; font-weight: 600; }
+.nav-group { border: 0; border-top: 1px solid var(--rail-ligne-groupe); border-radius: 0; background: transparent; }
+.nav-group>summary { list-style: none; display: grid; grid-template-columns: 24px 1fr 12px; gap: 10px; align-items: center; min-height: 48px; padding: 10px 4px; color: var(--rail-texte); font-size: 13px; font-weight: 600; }
 .nav-group>summary::-webkit-details-marker { display: none; }
-.nav-index { font: 10px ui-monospace,monospace; color: #92b1c1; }
+.nav-index { font: 10px ui-monospace,monospace; color: var(--rail-index); }
 .nav-group>summary::after { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform .16s ease; }
 .nav-group[open]>summary::after { transform: rotate(45deg); }
-.nav-group:has([aria-current=page])>summary { color: #f8c650; }
-.nav-items { display: grid; gap: 2px; margin: 0 0 12px 15px; padding-left: 12px; border-left: 1px solid #375568; }
-.rail .nav-items button,.rail .nav-items a { display: block; position: relative; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 3px; padding: 9px 10px; color: #c5d8df; font-size: 12px; font-weight: 500; text-decoration: none; min-height: 38px; }
-.rail .nav-items button:hover,.rail .nav-items a:hover { background: #12384c; color: #ffffff; }
-.rail .nav-items [aria-current=page] { background: #183e4f; color: #f8d779; font-weight: 700; }
-.rail .nav-items [aria-current=page]::before { content: ""; position: absolute; left: -16px; top: 16px; width: 6px; height: 6px; background: #f8c650; border-radius: 50%; }
+.nav-group:has([aria-current=page])>summary { color: var(--rail-accent); }
+.nav-items { display: grid; gap: 2px; margin: 0 0 12px 15px; padding-left: 12px; border-left: 1px solid var(--rail-ligne); }
+.rail .nav-items button,.rail .nav-items a { display: block; position: relative; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 3px; padding: 9px 10px; color: var(--rail-texte); font-size: 12px; font-weight: 500; text-decoration: none; min-height: 38px; }
+.rail .nav-items button:hover,.rail .nav-items a:hover { background: var(--rail-survol); color: var(--rail-survol-encre); }
+.rail .nav-items [aria-current=page] { background: var(--rail-courant); color: var(--rail-courant-encre); font-weight: 700; }
+.rail .nav-items [aria-current=page]::before { content: ""; position: absolute; left: -16px; top: 16px; width: 6px; height: 6px; background: var(--rail-accent); border-radius: 50%; }
 .rail .nav-interventions { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: #f8d779; background: #f8c65012; border: 1px solid #a58742; font-size: 12px; }
 .nav-interventions strong { font: 14px ui-monospace,monospace; }
-.rail .rail-connection { margin-top: auto; color: #adc3ce; font: 11px ui-monospace,monospace; padding-top: 20px; }
+.rail .rail-connection { margin-top: auto; color: var(--rail-discret); font: 11px ui-monospace,monospace; padding-top: 20px; }
 .rail-bottom { margin-top: 0; display: block; }
-.rail-settings>summary { color: #c5d8df; padding: 12px 0; font-size: 12px; border-top: 1px solid #375568; }
+.rail-settings>summary { color: var(--rail-texte); padding: 12px 0; font-size: 12px; border-top: 1px solid var(--rail-ligne); }
 .rail-settings-body { display: grid; gap: 6px; padding-top: 4px; }
 .rail-settings-body button { text-align: left; font-size: 12px; }
 .rail .language-picker { padding-top: 8px; font-size: 11px; }
@@ -291,7 +336,8 @@ dialog > header h2::before,dialog > form > header h2::before {
   background: url('/swarm-logo.png') center / contain no-repeat;
 }
 dialog :is(.modal-body,section) { line-height: 1.65; }
-dialog :is(.modal-body,section) :is(p,li,dd) { line-height: 1.7; }
+/* Preserve full prose and technical identifiers in narrow dialog lists. */
+dialog :is(.modal-body,section) :is(p,li,dd) { line-height: 1.7; overflow-wrap: anywhere; }
 dialog :is(.modal-body,section) :is(h3,h4) { color: var(--wattson-lien); line-height: 1.4; }
 dialog :is(.modal-body,section) h3 { font-size: 17px; margin-block: 1.25em .55em; }
 dialog :is(.modal-body,section) strong { font-weight: 750; }
@@ -426,7 +472,7 @@ button,a,summary { transition: background-color .14s ease,color .14s ease; }
 :root { --swarm-control-border: #628695; }
 :root[data-theme="etat"] { --swarm-control-border: #708991; }
 input,select,textarea { border-color: var(--swarm-control-border); }
-.cockpit-page .rail input,.cockpit-page .rail select { border-color: #628695; }
+.cockpit-page .rail input,.cockpit-page .rail select { border-color: var(--rail-champ-bordure); }
 .cockpit-page .rail .brand,.prep-header .brand { border: 0; padding: 0; }
 .cockpit-page .rail .brand-logo,.prep-header .brand-logo { background: transparent; padding: 0; filter: none; border-radius: 0; }
 .graph-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
@@ -529,3 +575,31 @@ body.graph-studio-open .pilot-inspector { z-index:91; }
 .graph-studio .graph-minimap { pointer-events:none; }
 
 .graph-studio.is-fullscreen #pilot-list { overflow:auto; }
+
+/* Conduite alignment with docs/design/swarm/Main.dc.html (9 Nov 2026).
+ * Counters use solid semantic badges: a saturated tone token as fill and a
+ * contrasting ink per theme, so a number reads as a badge, not a pale tint.
+ * Text labels stay next to every badge; colour is never the only signal. */
+:root { --swarm-badge-encre: #062b49; --swarm-badge-info: var(--swarm-cyan); }
+:root[data-theme="etat"] { --swarm-badge-encre: #ffffff; --swarm-badge-info: #287888; }
+.metric::after { content: none; }
+.metric strong,.mission-kpi strong { font-weight: 700; background: var(--wattson-texte-discret); color: var(--swarm-badge-encre); }
+.metric.info strong,.mission-kpi[data-tone="info"] strong { background: var(--swarm-badge-info); color: var(--swarm-badge-encre); }
+.metric.success strong,.mission-kpi[data-tone="success"] strong { background: var(--wattson-succes); color: var(--swarm-badge-encre); }
+.metric.attention strong,.mission-kpi[data-tone="attention"] strong { background: var(--wattson-attention); color: var(--swarm-badge-encre); }
+.metric.alert strong,.mission-kpi[data-tone="alert"] strong { background: var(--wattson-alerte); color: var(--swarm-badge-encre); }
+.rail .nav-interventions { min-height: 44px; padding: 0 12px; border: 0; border-radius: 5px; background: var(--swarm-gold); color: var(--swarm-marine); font-size: 14px; font-weight: 600; }
+.rail .nav-interventions:hover { background: #ffd56e; }
+.nav-interventions strong { padding: 0 8px; border-radius: 999px; background: var(--swarm-marine); color: var(--swarm-gold); }
+/* An empty status paragraph has nothing to announce: never paint an empty bar. */
+.notice:empty { display: none; }
+/* Header actions never split a word; they wrap as whole controls instead. */
+.cockpit-page .page-header { flex-wrap: wrap; align-items: center; gap: 10px 12px; }
+.cockpit-page .page-header>div:first-child { flex: 1 1 420px; min-width: 0; }
+.cockpit-page .page-header>:not(div:first-child) { flex: none; white-space: nowrap; }
+.history-task>summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+/* Section titles in Conduite use sentence case, as on the board. */
+#conduite h3{text-transform:none;letter-spacing:0}
+/* A counter without a producer reads as unavailable, not as a pending gold item. */
+.metric[data-unavailable=true] strong{background:var(--wattson-carte-appuyee);color:var(--wattson-texte-discret)}
+.metric-hint{display:block;margin-top:4px;font-size:11px;line-height:1.4;color:var(--wattson-texte-discret)}

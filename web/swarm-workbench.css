@@ -12,7 +12,7 @@
 .workbench-cockpit .page-header{border-bottom:1px solid var(--wattson-ligne);padding-bottom:22px}.workbench-cockpit .graph-heading{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.workbench-cockpit .pilot-canvas{background-image:radial-gradient(var(--swarm-grid) 1px,transparent 1px);background-size:20px 20px}.workbench-cockpit #conduite-plan .notice{border-inline-start-width:3px}.workbench-cockpit .nav-items a{display:block;padding:10px 12px;border-radius:5px;color:inherit;text-decoration:none;min-height:44px}.workbench-cockpit .nav-items a:hover{background:var(--wattson-info-fond);color:var(--wattson-info-encre)}
 .preparation-page .prep-layout:has(#chat:not([hidden])){grid-template-columns:minmax(0,62fr) minmax(300px,38fr)}.preparation-page .prep-chat{border-top:3px solid var(--wattson-lien)}.preparation-page .prep-workspace{border-top:3px solid var(--wattson-accent)}.preparation-page .document-heading h2,.preparation-page #chat-title{font-family:Georgia,serif;font-size:26px;font-weight:400}.preparation-page .steps{flex-wrap:wrap}.preparation-page .prep-heading{border-bottom:1px solid var(--wattson-ligne);padding-bottom:18px}
 .engine-settings-dialog{width:min(1080px,calc(100vw - 32px))}.engine-settings-dialog .modal-header{border-bottom:1px solid var(--wattson-ligne)}.engine-settings-dialog .engine-settings-group{border:1px solid var(--wattson-ligne);border-radius:8px;background:var(--wattson-carte);margin-bottom:12px}.engine-settings-dialog .engine-settings-group summary{min-height:44px;padding:12px;font-weight:600}.engine-settings-dialog .modal-footer{border-top:1px solid var(--wattson-ligne);background:var(--wattson-carte)}
-.trust-workbench{display:grid;grid-template-columns:240px minmax(0,1fr);margin:0;background:var(--wattson-page-fond);color:var(--wattson-texte);font-family:var(--wattson-police);min-height:100vh}.trust-workbench>main{margin:0;max-width:none;min-width:0;padding:28px clamp(16px,3vw,40px)}.workbench-rail{background:var(--swarm-marine);color:var(--swarm-rail-text);padding:24px 16px}.workbench-brand{display:flex;gap:12px;align-items:center;font-family:Georgia,serif;font-size:24px;margin-bottom:32px;color:inherit;text-decoration:none}.workbench-rail nav{display:flex;flex-direction:column;gap:8px}.workbench-rail nav a{color:inherit;text-decoration:none;padding:12px;min-height:44px;border-radius:5px}.workbench-rail nav a[aria-current]{background:var(--swarm-rail-selected);color:var(--swarm-gold);font-weight:600}.trust-workbench .workbench-page-header{padding:0 0 20px;margin:0 0 16px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;background:transparent;color:var(--wattson-texte);border-bottom:1px solid var(--wattson-ligne)}.trust-workbench h1{font-family:Georgia,serif;font-size:clamp(28px,3vw,38px);font-weight:400}.trust-workbench h2{font-family:Georgia,serif;font-weight:400}.trust-workbench main>section,.trust-workbench main>details,.workbench-security-overview{background:var(--wattson-carte);border:1px solid var(--wattson-ligne);border-radius:8px;padding:18px;margin-bottom:16px}.workbench-security-tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--wattson-ligne);margin:18px 0}.workbench-security-tabs button{min-height:44px;background:var(--wattson-carte);color:var(--wattson-texte);border-radius:0;border:0;border-bottom:3px solid transparent}.workbench-security-tabs button[aria-selected=true]{border-bottom-color:var(--wattson-accent);font-weight:600}.workbench-security-panel{min-width:0}.workbench-security-panel fieldset{min-width:0}.workbench-security-panel table{display:block;overflow:auto;max-width:100%}.workbench-credentials{display:flex;flex-wrap:wrap;gap:16px;align-items:end}.workbench-credentials h2{flex-basis:100%}
+.trust-workbench{display:grid;grid-template-columns:240px minmax(0,1fr);margin:0;background:var(--wattson-page-fond);color:var(--wattson-texte);font-family:var(--wattson-police);min-height:100vh}.trust-workbench>main{margin:0;max-width:none;min-width:0;padding:28px clamp(16px,3vw,40px)}.workbench-rail{--rail-fond:var(--swarm-marine);--rail-texte:var(--swarm-rail-text);--rail-courant:var(--swarm-rail-selected);--rail-courant-encre:var(--swarm-gold);--rail-survol:#12384c;background:var(--rail-fond);color:var(--rail-texte);padding:24px 16px}.workbench-brand{display:flex;gap:12px;align-items:center;font-family:Georgia,serif;font-size:24px;margin-bottom:32px;color:inherit;text-decoration:none}.workbench-rail nav{display:flex;flex-direction:column;gap:8px}.workbench-rail nav a{color:inherit;text-decoration:none;padding:12px;min-height:44px;border-radius:5px}.workbench-rail nav a:hover{background:var(--rail-survol)}.workbench-rail nav a[aria-current]{background:var(--rail-courant);color:var(--rail-courant-encre);font-weight:600}.trust-workbench .workbench-page-header{padding:0 0 20px;margin:0 0 16px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;background:transparent;color:var(--wattson-texte);border-bottom:1px solid var(--wattson-ligne)}.trust-workbench h1{font-family:Georgia,serif;font-size:clamp(28px,3vw,38px);font-weight:400}.trust-workbench h2{font-family:Georgia,serif;font-weight:400}.trust-workbench main>section,.trust-workbench main>details,.workbench-security-overview{background:var(--wattson-carte);border:1px solid var(--wattson-ligne);border-radius:8px;padding:18px;margin-bottom:16px}.workbench-security-tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--wattson-ligne);margin:18px 0}.workbench-security-tabs button{min-height:44px;background:var(--wattson-carte);color:var(--wattson-texte);border-radius:0;border:0;border-bottom:3px solid transparent}.workbench-security-tabs button[aria-selected=true]{border-bottom-color:var(--wattson-accent);font-weight:600}.workbench-security-panel{min-width:0}.workbench-security-panel fieldset{min-width:0}.workbench-security-panel table{display:block;overflow:auto;max-width:100%}.workbench-credentials{display:flex;flex-wrap:wrap;gap:16px;align-items:end}.workbench-credentials h2{flex-basis:100%}
 @media(max-width:1024px){.workbench-lanes-content{grid-template-columns:1fr}.preparation-page .prep-layout:has(#chat:not([hidden])){grid-template-columns:1fr}.trust-workbench{grid-template-columns:200px minmax(0,1fr)}}
 @media(max-width:760px){.trust-workbench{grid-template-columns:minmax(0,1fr)}.workbench-rail{padding:16px}.workbench-rail nav{flex-direction:row;flex-wrap:wrap}.workbench-brand{margin-bottom:12px}.workbench-security-tabs{flex-direction:column}.workbench-view-switch{margin-inline-start:0}.workbench-inspector{position:static}.trust-workbench dialog{max-width:calc(100vw - 20px);padding:16px}.workbench-credentials label{min-width:0;max-width:100%}}
 
@@ -20,3 +20,54 @@
 
 /* Public recorded task objects stay readable without changing semantic colors. */
 .history-task .history-original { white-space:pre-wrap; overflow-wrap:anywhere; max-inline-size:100%; }
+/* Summary cards (docs/design/swarm/Main.dc.html): to-check, blocked, progress.
+ * Counts are solid badges; text labels carry the meaning, colour only reinforces it. */
+.workbench-summary{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:12px;margin:0 0 18px}
+.workbench-summary-card{display:flex;align-items:center;gap:14px;min-width:0;padding:14px 16px;border:1px solid var(--wattson-ligne);border-radius:8px;background:var(--wattson-carte)}
+.workbench-summary-card.warn{background:var(--wattson-attention-fond);border-color:var(--wattson-attention);color:var(--wattson-attention-encre)}
+.workbench-summary-card.alert{background:var(--wattson-alerte-fond);border-color:var(--wattson-alerte);color:var(--wattson-alerte-encre)}
+.workbench-summary-card>div{flex:1;min-width:0}
+.workbench-summary-card h3{margin:0 0 2px;font-size:14px;color:inherit}
+.workbench-summary-card p{margin:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workbench-summary-card button{flex:none}
+.workbench-count{display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:2.4ch;padding:2px 12px;border-radius:999px;font:700 22px/1.4 ui-monospace,monospace;background:var(--wattson-texte-discret);color:var(--swarm-badge-encre,#062b49)}
+.workbench-count.warn{background:var(--wattson-attention)}
+.workbench-count.alert{background:var(--wattson-alerte)}
+.workbench-ratio strong{font:600 20px/1.4 ui-monospace,monospace;color:var(--wattson-titre)}
+.workbench-ratio span{color:var(--wattson-texte-discret)}
+.workbench-summary progress{width:100%;height:6px;margin-top:6px;accent-color:var(--wattson-succes)}
+@media(max-width:760px){.workbench-summary{grid-template-columns:1fr}}
+.history-task>summary::before{content:'▸';color:var(--wattson-lien)}
+.history-task[open]>summary::before{content:'▾'}
+/* State filter chips: pressed chip uses the gold action fill of the board. */
+.workbench-filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.workbench-chip{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:4px 12px;border:1px solid var(--wattson-ligne);border-radius:999px;background:var(--wattson-carte);color:var(--wattson-texte);font-size:13px;font-weight:600}
+.workbench-chip[aria-pressed=true]{background:var(--swarm-gold);border-color:var(--swarm-gold);color:var(--swarm-marine)}
+.workbench-chip-count{padding:0 8px;border-radius:999px;background:var(--wattson-carte-appuyee);font:700 12px/1.6 ui-monospace,monospace}
+.workbench-chip[aria-pressed=true] .workbench-chip-count{background:var(--swarm-marine);color:var(--swarm-gold)}
+#graph .graph-state-dim{opacity:.3}
+.workbench-summary-card h3{text-transform:none;letter-spacing:0;font-size:15px}
+@media(max-width:760px){.workbench-chip{min-height:44px}}
+/* Shared stage (board layout): graph or lanes on the left, one task inspector
+ * on the right for both views; stacked below 1024px. */
+.workbench-stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,300px);gap:16px;align-items:start}
+.workbench-stage-main{min-width:0}
+.workbench-stage>.workbench-inspector{position:sticky;top:16px;max-height:calc(100dvh - 32px);overflow:auto}
+.workbench-lanes-content{grid-template-columns:minmax(0,1fr)}
+@media(max-width:1024px){.workbench-stage{grid-template-columns:1fr}.workbench-stage>.workbench-inspector{position:static;max-height:none}}
+/* Quick wins (9 Nov 2026): rail mission card, grouped details, legend badges. */
+.rail-mission-card{display:grid;gap:2px;margin-top:8px;padding:10px 12px;border:1px solid var(--wattson-ligne);border-radius:6px;background:var(--swarm-rail-selected,var(--wattson-carte-appuyee));color:var(--swarm-rail-text,var(--wattson-texte));min-width:0}
+.rail-mission-card strong{font:500 15px/1.3 Georgia,"Times New Roman",serif;overflow-wrap:anywhere}
+.rail-mission-card code{font-size:11px;color:var(--wattson-lien);overflow-wrap:anywhere}
+.rail-mission-label{font-size:11px;opacity:.8}
+.workbench-more{margin-top:18px;border-top:1px solid var(--wattson-ligne)}
+.workbench-more>summary{font-weight:600}
+.native-graph-color-key{display:flex;flex-wrap:wrap;gap:8px}
+/* Trust/audit shell (10 Nov 2026): the rail follows the selected theme, as the
+   cockpit rail does, and the header carries a visible Dark/Light switch. */
+:root[data-theme="etat"] .workbench-rail{--rail-fond:#eceae1;--rail-texte:#355565;--rail-courant:#fffefa;--rail-courant-encre:#062b49;--rail-survol:#e2f0f1;border-right:1px solid #c5cfcd}
+:root[data-theme="etat"] .workbench-rail nav a[aria-current]{box-shadow:inset 3px 0 #785200}
+.workbench-theme-switch{display:inline-flex;margin-inline-start:auto;border:1px solid var(--wattson-ligne);border-radius:6px;overflow:hidden}
+.workbench-theme-switch button{border:0;border-radius:0;min-height:36px;padding:6px 14px;background:var(--wattson-carte);color:var(--wattson-texte)}
+.workbench-theme-switch button[aria-pressed=true]{background:var(--wattson-action-fond);color:var(--wattson-action-encre);font-weight:600}
+@media(max-width:760px){.workbench-theme-switch button{min-height:44px}}

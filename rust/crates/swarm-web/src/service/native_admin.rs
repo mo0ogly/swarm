@@ -182,6 +182,7 @@ fn page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
 /// authenticated Trust UI; their query selects presentation, not authority.
 /// Only trusted source tags are parsed. Missing/unterminated tags refuse the
 /// entire page; no filesystem lookup, user HTML or command is involved.
+/// Theme defaults to dark (`sombre`); `?theme=etat` selects light.
 fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
     let mut source = include_str!("../../../../../web/index.html").to_owned();
     while let Some(start) = source.find("<script") {
@@ -213,7 +214,9 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
     }
     let query: Vec<_> = form_urlencoded::parse(r.uri().query().unwrap_or("").as_bytes()).collect();
     let language = if query.iter().any(|(k,v)| k=="lang" && v=="en") { "en" } else { "fr" };
-    let theme = if query.iter().any(|(k,v)| k=="theme" && v=="sombre") { "sombre" } else { "etat" };
+    // Dark is the default, like /prepare.html and /native-runtime.html; only an
+    // explicit `theme=etat` selects the light theme.
+    let theme = if query.iter().any(|(k,v)| k=="theme" && v=="etat") { "etat" } else { "sombre" };
     Ok(source.replacen(tag, &format!("<html lang=\"{language}\" data-theme=\"{theme}\">"), 1).into_bytes())
 }
 

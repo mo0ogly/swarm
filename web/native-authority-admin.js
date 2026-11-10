@@ -200,7 +200,8 @@
   }
   host.hidden=false;
   // Header: who is signed in + own password change.
-  const who=node('span',undefined,'native-session-user');who.textContent=me.account.display_name+' ('+me.account.subject+')';
+  const who=node('span',undefined,'native-session-user');// Show the login only when it adds information beyond the display name.
+  const shown=String(me.account.display_name||''),login=String(me.account.subject||'');who.textContent=!shown?login:shown.toLocaleLowerCase()===login.toLocaleLowerCase()?shown:shown+' ('+login+')';
   const own=button('Mon mot de passe');own.dataset.authorityOwnPassword='';
   const logout=nav?.querySelector('[data-action="logout"]');if(nav){nav.insertBefore(who,logout||null);nav.insertBefore(own,logout||null)}
   /** Generic modal: fields built by `build(body)`; `submit` returns a

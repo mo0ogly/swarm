@@ -90,7 +90,15 @@ Palette UI dérivée du logo (valeurs de travail, pas prétention à une extract
 | Action principale | Doré `#f8c650`, encre marine | Marine `#062b49`, encre blanche |
 | Accent lisible | Doré `#f8c650` | Ocre `#926300` |
 
-Le rail reste marine dans les deux thèmes, avec ses propres paires de texte/fond.
+Le rail du cockpit suit le thème (décision utilisateur du 10 novembre 2026) :
+marine en sombre, fond `#eceae1` et texte `#355565` en clair, sélection sur carte
+`#fffefa` et repère ocre `#785200`. Toutes ses couleurs passent par les jetons
+locaux `--rail-*` de `.cockpit-page .rail` dans `web/swarm-design.css`. L’en-tête
+mobile, l’en-tête de préparation et la page d’accès restent marine.
+Le rail des pages Actions de confiance, Audit et Sécurité (`.workbench-rail`,
+`web/swarm-workbench.css`) suit aussi le thème ; leur en-tête porte en haut à
+droite un sélecteur Sombre/Clair (`web/trust-workbench.js`) qui garde le choix
+dans le paramètre `theme` de l’URL.
 Le doré signale la sélection et les moments clés. Le cyan accompagne les connexions.
 Les états utilisent les paires succès, attention, alerte et information ; ne pas
 remplacer le rouge d’erreur par la couleur de marque. Toujours doubler la couleur
@@ -325,3 +333,23 @@ acceptation de tâche. Garder « État enregistré », les identifiants et les a
 d’autonomie existants. Paires de couleurs adaptées aux deux thèmes ; textes FR/EN.
 Recette agent-status-badges.json, puis fixture navigateur dédiée pour toutes les
 variantes sans lancer d’agent ; vérifier séparément la page installée.
+
+
+### Version : listes longues et préférences de présentation
+
+Les paragraphes, listes et descriptions des dialogues utilisent `overflow-wrap:
+anywhere` : les identifiants techniques restent intégraux et peuvent se répartir
+sur plusieurs lignes sans imposer une barre horizontale au contenu. Ne pas
+masquer/couper le texte ni agrandir artificiellement le dialogue. Le bouton de
+thème du cockpit met à jour le seul paramètre `theme` de l’URL, source consommée
+au rechargement et au changement de langue ; les autres paramètres et l’historique
+de navigation sont conservés. Aucun réglage moteur ni stockage de mission.
+Régression permanente : `version-dialog-preferences.json`, binaire Rust fourni via
+`SWARM_STATUS_CONTRACT_BINARY`, fixture privée, FR/EN × clair/sombre,624/390px,
+textes complets, titre/Échap/réouverture, langue/reload et thème invalide. Les
+overlays de sources sont réservés au diagnostic et ne prouvent pas la livraison.
+
+Si replaceState refuse la mise à jour du thème, le cockpit conserve le DOM et
+l’URL précédents, affiche un diagnostic sûr et propage un code typé avec sa cause.
+Une nouvelle action après rétablissement peut enregistrer la préférence ; aucun
+succès de persistance n’est inféré du seul changement de couleur.

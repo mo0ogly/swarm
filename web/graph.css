@@ -209,3 +209,20 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
   .native-graph-studio .native-graph-tools,.native-graph-studio .native-graph-analysis { padding:0; }
   .native-graph-studio .native-graph-tools>summary,.native-graph-studio .native-graph-analysis>summary { min-height:44px; box-sizing:border-box; padding:10px; }
 }
+
+/* Conduite alignment (docs/design/swarm/Main.dc.html): one compact bar.
+ * Search leads the bar; zoom, full screen and match navigation become icon
+ * buttons on every width (their text stays as accessible name and title).
+ * A search dims non-matching cards without hiding or disabling them. */
+.native-graph-studio .pilot-actions { align-items:center; gap:6px; }
+.native-graph-studio .native-graph-search { order:-1; flex:1 1 100%; }
+.native-graph-studio .native-graph-search label { position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.native-graph-studio .native-graph-search output:empty { display:none; }
+.native-graph-studio #pilot-zoom-in,.native-graph-studio #pilot-zoom-out,
+.native-graph-studio #pilot-fullscreen,.native-graph-studio #pilot-search-previous,
+.native-graph-studio #pilot-search-next,.native-graph-studio #pilot-search-clear { width:36px; min-width:36px; min-height:36px; padding:6px; position:relative; justify-content:center; }
+.native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-action-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-tool-icon { margin:0; }
+.native-graph-studio .graph-search-dim { opacity:.32; transition:opacity .15s; }
+@media(prefers-reduced-motion:reduce) { .native-graph-studio .graph-search-dim { transition:none; } }
+@media(max-width:760px) { .native-graph-studio #pilot-zoom-in,.native-graph-studio #pilot-zoom-out,.native-graph-studio #pilot-fullscreen,.native-graph-studio #pilot-search-previous,.native-graph-studio #pilot-search-next,.native-graph-studio #pilot-search-clear { width:44px; min-width:44px; min-height:44px; } }

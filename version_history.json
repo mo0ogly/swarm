@@ -7,6 +7,18 @@
     },
     "items": [
       {
+        "fr": "Actions de confiance, Audit et Sécurité : le rail suit le thème choisi comme celui du cockpit, et un sélecteur Sombre/Clair remplace le bouton « Changer de thème » en haut à droite ; le choix reste dans l’URL. Aucun changement moteur.",
+        "en": "Trust actions, Audit and Security: the rail follows the selected theme like the cockpit rail, and a Dark/Light switch replaces the “Change theme” button at the top right; the choice stays in the URL. No engine change."
+      },
+      {
+        "fr": "Cockpit : le rail de navigation suit désormais le thème choisi (marine en sombre, clair en thème clair) au lieu de rester marine ; couleurs regroupées en jetons --rail-*. En-tête mobile, préparation et accès inchangés. Aucun changement moteur.",
+        "en": "Cockpit: the navigation rail now follows the selected theme (marine in dark, light in the light theme) instead of staying marine; colours grouped as --rail-* tokens. Mobile header, preparation and access pages unchanged. No engine change."
+      },
+      {
+        "fr": "Dialogue Version : les identifiants longs des notes restent lisibles sans défilement horizontal interne ; le thème choisi au bouton du cockpit est conservé dans l’URL lors du changement de langue et du rechargement. Aucun réglage moteur modifié.",
+        "en": "Version dialog: long identifiers in notes wrap without internal horizontal scrolling; the cockpit theme button preserves its choice in the URL across language changes and reload. No engine setting changed."
+      },
+      {
         "fr": "Catalogue historique anglais : cinq traductions réconciliées dans la source et son artefact généré ; installation de ce complément à vérifier.",
         "en": "Historical English catalogue: five translations reconciled in source and generated artifact; installation of this increment remains to be verified."
       },
@@ -1621,6 +1633,26 @@
       {
         "fr": "Garde de source mémoire versionnée : l'ancienne bascule HTTP 501 « garde non porté » est retirée — le garde est porté (project_memory_source.rs), ses refus typés remplacent le code mort : une source mémoire gérée visée comme consigne refuse 400 `project-source-memory-managed`, une entrée d'appelant invalide refuse 400 via caller_invalid, une défaillance d'inventaire racine/SQL reste une erreur serveur ; les attentes de test obsolètes sont mises à jour vers les codes réels (assertions conservées) et la clé UX morte est remplacée par les motifs français réels. Conformité /tmp : les trois producteurs de fixtures Rust qui écrivaient sous /tmp (project_context.rs:593, mission_status_review.rs:369, tests/project_context.rs Fixture) sont déplacés vers la zone de fixtures du dépôt `.swarm-fixtures/` (0700, base canonisée) ; la fixture diagnostique de la vague reste sous /tmp, préservée pour son propriétaire.",
         "en": "Versioned memory source guard: the legacy HTTP 501 \"guard not ported\" switch is retired — the guard is ported (project_memory_source.rs) and its typed refusals replace the dead code: a managed memory source targeted as a directive refuses 400 `project-source-memory-managed`, invalid caller input refuses 400 through caller_invalid, and a root/SQL inventory failure stays a server error; stale test expectations are updated to the real codes (assertions kept) and the dead UX key is replaced by the real French reasons. /tmp conformance: the three Rust fixture producers that wrote under /tmp (project_context.rs:593, mission_status_review.rs:369, tests/project_context.rs Fixture) are moved to the repository fixture area `.swarm-fixtures/` (0700, canonicalized base); the wave's diagnostic fixture remains under /tmp, preserved for its owner."
+      },
+      {
+        "fr": "Conduite alignée sur la maquette (lot 1) : compteurs en pastilles pleines colorées avec chiffre contrasté selon le thème, bouton « Décisions à traiter » or/marine, cercles décoratifs retirés, message d’état vide masqué, actions d’en-tête sans mot coupé, états de l’historique du plan affichés en badges traduits (Acceptée, Bloquée, À faire) au lieu des codes moteur.",
+        "en": "Conduite aligned with the design board (batch 1): counters shown as solid coloured badges with theme-contrasted numbers, gold/navy “Decisions to handle” button, decorative circles removed, empty status notice hidden, header actions no longer split words, plan history states shown as translated badges (Accepted, Blocked, To do) instead of engine codes."
+      },
+      {
+        "fr": "Conduite alignée sur la maquette (lot 2) : cartes de synthèse « À vérifier », « Bloquées » et « Avancement » calculées uniquement à partir des états enregistrés (projection puis statut du travail), avec pastille pleine, première tâche concernée et bouton « Voir » qui ouvre les Couloirs sur cette tâche sans action moteur ; « — » sans mission. Le triangle de dépliage de l’historique du plan est rétabli. Aucun producteur de décisions n’existe côté moteur natif : aucune carte de décision n’est inventée.",
+        "en": "Conduite aligned with the design board (batch 2): “Needs review”, “Blocked” and “Progress” summary cards computed only from recorded states (projection, then Work status), with a solid badge, the first matching task and a “View” button opening Lanes on that task without any engine action; “—” without a mission. The plan history disclosure triangle is restored. The native engine has no decisions producer, so no decision card is invented."
+      },
+      {
+        "fr": "Conduite alignée sur la maquette (lot 3) : pastilles de filtre « Toutes », « À traiter », « En cours », « Acceptées » avec compteur, calculées sur les états enregistrés ; elles filtrent les Couloirs et estompent dans le graphe les cartes hors filtre, sans les masquer ni rien enregistrer. La recherche du graphe passe en tête de barre et estompe les tâches non trouvées. Zoom, plein écran et navigation de recherche deviennent des boutons icônes (libellé conservé comme nom accessible et infobulle). Titres des cartes de synthèse en casse normale.",
+        "en": "Conduite aligned with the design board (batch 3): “All”, “Needs attention”, “In progress”, “Accepted” filter chips with counts computed from recorded states; they filter Lanes and dim out-of-filter graph cards without hiding them or saving anything. Graph search now leads the bar and dims non-matching tasks. Zoom, full screen and search navigation become icon buttons (label kept as accessible name and tooltip). Summary card titles use normal case."
+      },
+      {
+        "fr": "Conduite alignée sur la maquette (lot 4) : le détail de tâche est un panneau latéral partagé par le Graphe et les Couloirs (rôle, état, dépendances, tâches débloquées), qui suit la carte du graphe ayant le focus, au clavier comme à la souris, sans changer l’ouverture de la carte ni rien enregistrer ; empilé sous 1024 px. Le champ de recherche du graphe affiche l’indice « Rechercher une tâche ou un identifiant ».",
+        "en": "Conduite aligned with the design board (batch 4): the task detail is a side panel shared by Graph and Lanes (role, state, dependencies, unblocked tasks) that follows the focused graph card, by keyboard or pointer, without changing how the card opens or saving anything; stacked below 1024px. The graph search field shows the hint “Search a task or an identifier”."
+      },
+      {
+        "fr": "Conduite, gains rapides UX : le compteur « Décisions à traiter » est grisé avec « Non fourni par le moteur natif » ; « Validées actuellement » indique quand la validation courante n’est pas évaluée ; le bandeau sur les états enregistrés passe en information ; la légende du graphe utilise les badges d’état ; le nom de session n’est plus doublé par l’identifiant identique ; titres de section en casse normale ; « Outils du graphe » replié par défaut (choix enregistré respecté) ; assistant, état du travail, à traiter et fil d’activité regroupés sous « Détails de la mission » ; carte « Mission sélectionnée » dans la barre latérale ; cockpit en thème sombre par défaut comme la Préparation (?theme=etat pour le clair).",
+        "en": "Conduite UX quick wins: the “Decisions to address” counter is greyed with “Not provided by the native engine”; “Currently validated” says when current validation is not evaluated; the recorded-states banner becomes informational; the graph legend uses the state badges; the session name is no longer repeated by an identical login; sentence-case section titles; “Graph tools” collapsed by default (a saved choice is kept); assistant, work state, inbox and activity feed grouped under “Mission details”; “Selected mission” card in the rail; cockpit uses the dark theme by default like Preparation (?theme=etat for light)."
       }
     ]
   },
