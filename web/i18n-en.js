@@ -7012,5 +7012,16 @@ globalThis.SwarmEnglish = {
   "Vérifier le statut actuel": "Check current status",
   "Lire l’historique enregistré": "Read recorded history",
   "Historique reçu — statut opérationnel non évalué.": "History received — operational status not evaluated.",
+  "Synthèse des états enregistrés": "Recorded state summary",
+  "Bloquées": "Blocked",
+  "Avancement": "Progress",
+  "Aucune tâche dans cet état.": "No task in this state.",
+  "Toutes": "All",
+  "Acceptées": "Accepted",
+  "Filtrer par état enregistré": "Filter by recorded state",
+  "Rechercher une tâche ou un identifiant": "Search a task or an identifier",
+  "Non fourni par le moteur natif.": "Not provided by the native engine.",
+  "Validation courante non évaluée dans cette lecture.": "Current validation not evaluated in this read.",
+  "Détails de la mission": "Mission details",
   "Préférence de thème non enregistrée. Le thème précédent est conservé.": "Theme preference was not saved. The previous theme is preserved."
 };

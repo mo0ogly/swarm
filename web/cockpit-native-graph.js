@@ -416,7 +416,7 @@
     const status=document.createElement('p');status.className='graph-studio-hint';status.setAttribute('role','status');
     const key='swarm-native-graph:v1:'+work.id+':'+orientation,viewKey=VIEW_PREFIX+work.id;
     const preferenceStatus=document.createElement('p');preferenceStatus.id='pilot-view-status';preferenceStatus.className='native-graph-preference-status';preferenceStatus.setAttribute('role','status');preferenceStatus.textContent=viewError||initial?.preferenceError||'';if(viewErrorCode||initial?.preferenceErrorCode)preferenceStatus.dataset.viewError=viewErrorCode||initial.preferenceErrorCode;
-    const media=matchMedia('(min-width:761px)'),tools=document.createElement('details');tools.id='pilot-tools';tools.className='native-graph-tools';tools.open=initial?.toolsOpen??media.matches;
+    const media=matchMedia('(min-width:761px)'),tools=document.createElement('details');tools.id='pilot-tools';tools.className='native-graph-tools';tools.open=initial?.toolsOpen??false;
     const toolsToggle=document.createElement('summary');toolsToggle.id='pilot-tools-toggle';toolsToggle.textContent=t('Outils du graphe');const toolsBody=document.createElement('div');toolsBody.className='pilot-actions';tools.append(toolsToggle,toolsBody);
     let lastViewAttempt=null,resetting=false;
     let visibleIds=null,selectionMode=false;
@@ -622,17 +622,18 @@
     direction.addEventListener('change',()=>{host.dataset.orientation=direction.value;render(work)});toolbar.append(direction);
     const search=document.createElement('div');search.className='native-graph-search';search.setAttribute('role','search');search.setAttribute('aria-label',t('Rechercher une tâche'));
     const searchLabel=document.createElement('label');searchLabel.htmlFor='pilot-search';searchLabel.textContent=t('Rechercher une tâche');
-    const searchInput=document.createElement('input');searchInput.id='pilot-search';searchInput.type='search';searchInput.autocomplete='off';searchInput.setAttribute('aria-controls','pilot-canvas');
+    const searchInput=document.createElement('input');searchInput.id='pilot-search';searchInput.type='search';searchInput.autocomplete='off';searchInput.setAttribute('aria-controls','pilot-canvas');searchInput.placeholder=t('Rechercher une tâche ou un identifiant');
     const searchStatus=document.createElement('output');searchStatus.id='pilot-search-status';searchStatus.setAttribute('role','status');searchStatus.setAttribute('aria-live','polite');
     let matches=[],matchIndex=-1;
     /** Refresh local matches without hiding nodes/edges or changing layout.
+     * A non-empty query dims non-matching cards (visual only, still focusable).
      * Empty queries clear highlights; no match disables navigation and reports
      * it visibly. Query/matches are not persisted and reset with this renderer.
      * @returns {void} updates classes, output and navigation control only
      */
     function findMatches(){
       const query=searchKey(searchInput.value.trim());matches=query?work.tasks.filter(task=>isVisible(task.id)&&(searchKey(task.id).includes(query)||searchKey(task.title).includes(query))):[];matchIndex=-1;
-      const ids=new Set(matches.map(task=>task.id));for(const [id,u]of units)u.group.classList.toggle('graph-search-match',ids.has(id));
+      const ids=new Set(matches.map(task=>task.id));for(const [id,u]of units){u.group.classList.toggle('graph-search-match',ids.has(id));u.group.classList.toggle('graph-search-dim',!!query&&!ids.has(id))}
       nextMatch.disabled=matches.length===0;previousMatch.disabled=matches.length===0;clearSearch.disabled=!searchInput.value;
       searchStatus.textContent=!query?'':matches.length===0?t('Aucune tâche correspondante.'):matches.length===1?t('Une tâche trouvée.'):matches.length+' '+t('tâches trouvées.');
     }
@@ -762,10 +763,14 @@
     /** Reapply the responsive default only when crossing the existing layout
      * breakpoint; retain focus if the focused secondary control becomes hidden.
      */
-    function resizeTools(e){if(!e.matches&&tools.contains(document.activeElement))toolsToggle.focus();tools.open=e.matches;persistView()}
+    /** Close the tools panel when the viewport becomes narrow; widening never
+     * reopens it (closed by default unless the viewer saved it open). */
+    function resizeTools(e){if(e.matches)return;if(tools.contains(document.activeElement))toolsToggle.focus();tools.open=false;persistView()}
     media.addEventListener('change',resizeTools);
     decorate(toolsToggle,'tools');decorate(analysisToggle,'tools');
-    const legend=document.createElement('div');legend.id='pilot-graph-colors';legend.className='native-graph-color-key';legend.setAttribute('aria-label',t('Couleurs des états'));for(const [tone,label]of [['attente','à faire'],['active','en cours'],['attention','à vérifier'],['alerte','bloquée'],['validee','acceptée']]){const item=document.createElement('span');item.className='graph-teinte';item.dataset.etat=tone;item.textContent=t(label);legend.append(item)}
+    const legend=document.createElement('div');legend.id='pilot-graph-colors';legend.className='native-graph-color-key';legend.setAttribute('aria-label',t('Couleurs des états'));// Legend reuses the shared state badges (label + shape + tone) so it no longer
+    // reads as checkboxes; the plain swatches remain only if the workbench is absent.
+    const keyBadge=globalThis.SwarmWorkbench?.statusBadge;for(const [tone,label,state]of [['attente','à faire','todo'],['active','en cours','running'],['attention','à vérifier','submitted'],['alerte','bloquée','blocked'],['validee','acceptée','accepted']]){if(keyBadge){legend.append(keyBadge(state,state));continue}const item=document.createElement('span');item.className='graph-teinte';item.dataset.etat=tone;item.textContent=t(label);legend.append(item)}
     const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez un cadre pour le déplacer. Cliquez pour ouvrir la tâche ; cliquez sur une flèche pour modifier le lien.');
     studio.append(toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,canvas);host.replaceChildren(studio,modal,help);
     /** Capture completed same-Work presentation, including deferred modal/scroll.

@@ -88,6 +88,10 @@ fn native_admin_landing_and_assets_are_protected_without_secret_or_path_fallback
             assert!(!html.contains("/native-runtime/app.js"));
             assert!(!html.contains(&f.key));
         }
+        // Without a theme parameter the cockpit uses the dark theme, like /prepare.html.
+        let r = f.get("GET", &format!("/?lang={lang}"), true);
+        let html = std::str::from_utf8(r.response.body()).unwrap();
+        assert!(html.contains("data-theme=\"sombre\""));
     }
     for (path, kind) in [
         ("/native-runtime/base.css", "text/css"),
