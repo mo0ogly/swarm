@@ -352,7 +352,8 @@ dialog :is(.modal-body,section) code:not(pre code) {
 dialog mark { background: var(--wattson-attention-fond); color: var(--wattson-attention-encre); padding: .08em .25em; border-radius: 3px; }
 dialog blockquote { margin-inline: 0; padding: 12px 16px; border-inline-start: 3px solid var(--wattson-info-encre); background: var(--wattson-info-fond); color: var(--wattson-info-encre); }
 .modal-header { border-top: 0; }
-.modal-header > button { flex-shrink: 0; white-space: nowrap; }
+/* Keep window controls whole while the adjacent title wraps on narrow screens. */
+.modal-header > button,dialog > header > button,dialog > form > header > button { flex-shrink: 0; white-space: nowrap; }
 .modal-header,.modal-footer,dialog>header,dialog>footer { background: var(--wattson-carte); }
 :is(#modal-fields,#pricing-modal-fields)>label { border: 0; border-left: 2px solid var(--wattson-ligne); border-radius: 0; background: transparent; }
 pre { border-radius: 4px; font-size: 12px; }
