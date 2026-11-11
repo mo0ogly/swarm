@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "version-dialog-close-label",
+  "inputs": [
+    "web/swarm-design.css",
+    "web/cockpit.css",
+    "web/cockpit-native-version.js",
+    "web/swarm-shell.js",
+    "tests/version_dialog_preferences_ui.cjs",
+    "docs/UI-DESIGN.md",
+    "docs/en/WINDOW-IDENTITY.md",
+    "version_history.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "compiled-close-labels-and-closures",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='version-close-',dir='.cache')).resolve()\nprint('RETAINED_VERSION_CLOSE',p,flush=True)\nsubprocess.run(['node','tests/version_dialog_preferences_ui.cjs',os.environ['SWARM_STATUS_CONTRACT_BINARY'],str(p),'--close-label-only'],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS fr-etat-624-close-labels-whole",
+        "PASS fr-etat-624-close-controls-fit",
+        "PASS fr-etat-624-header-close-focus",
+        "PASS fr-etat-624-footer-close-focus",
+        "PASS fr-etat-624-escape-close-focus",
+        "PASS fr-etat-390-close-labels-whole",
+        "PASS fr-etat-390-close-controls-fit",
+        "PASS fr-etat-390-header-close-focus",
+        "PASS fr-etat-390-footer-close-focus",
+        "PASS fr-etat-390-escape-close-focus",
+        "PASS fr-sombre-624-close-labels-whole",
+        "PASS fr-sombre-624-close-controls-fit",
+        "PASS fr-sombre-624-header-close-focus",
+        "PASS fr-sombre-624-footer-close-focus",
+        "PASS fr-sombre-624-escape-close-focus",
+        "PASS fr-sombre-390-close-labels-whole",
+        "PASS fr-sombre-390-close-controls-fit",
+        "PASS fr-sombre-390-header-close-focus",
+        "PASS fr-sombre-390-footer-close-focus",
+        "PASS fr-sombre-390-escape-close-focus",
+        "PASS en-etat-624-close-labels-whole",
+        "PASS en-etat-624-close-controls-fit",
+        "PASS en-etat-624-header-close-focus",
+        "PASS en-etat-624-footer-close-focus",
+        "PASS en-etat-624-escape-close-focus",
+        "PASS en-etat-390-close-labels-whole",
+        "PASS en-etat-390-close-controls-fit",
+        "PASS en-etat-390-header-close-focus",
+        "PASS en-etat-390-footer-close-focus",
+        "PASS en-etat-390-escape-close-focus",
+        "PASS en-sombre-624-close-labels-whole",
+        "PASS en-sombre-624-close-controls-fit",
+        "PASS en-sombre-624-header-close-focus",
+        "PASS en-sombre-624-footer-close-focus",
+        "PASS en-sombre-624-escape-close-focus",
+        "PASS en-sombre-390-close-labels-whole",
+        "PASS en-sombre-390-close-controls-fit",
+        "PASS en-sombre-390-header-close-focus",
+        "PASS en-sombre-390-footer-close-focus",
+        "PASS en-sombre-390-escape-close-focus",
+        "PASS no-JS-errors",
+        "PASS no-console-warnings-errors",
+        "PASS no-failed-requests",
+        "PASS no-POST"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

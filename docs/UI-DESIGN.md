@@ -353,3 +353,16 @@ Si replaceState refuse la mise à jour du thème, le cockpit conserve le DOM et
 l’URL précédents, affiche un diagnostic sûr et propage un code typé avec sa cause.
 Une nouvelle action après rétablissement peut enregistrer la préférence ; aucun
 succès de persistance n’est inféré du seul changement de couleur.
+
+
+### Boutons de fermeture des en-têtes
+
+Les boutons des en-têtes de dialogue, avec ou sans formulaire, partagent la
+règle des `.modal-header` : leur libellé ne rétrécit pas et reste sur une ligne ;
+le titre voisin peut se répartir sur plusieurs lignes. Ne pas couper Fermer/Close,
+masquer son texte ni fixer une largeur par langue. La recette ciblée
+`version-dialog-close-label.json` utilise `--close-label-only` dans le driver
+existant : FR/EN, clair/sombre,390px et témoin624px, libellés complets et une ligne,
+absence de collision/débordement, clic des deux fermetures et Échap avec retour
+au déclencheur. Elle ne rejoue pas notes/persistance/thèmes déjà couverts.
+La preuve avec seule CSS source en overlay reste distincte de l’image livrée.

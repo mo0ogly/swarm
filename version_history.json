@@ -1657,6 +1657,10 @@
       {
         "fr": "Conduite, gains rapides UX : le compteur « Décisions à traiter » est grisé avec « Non fourni par le moteur natif » ; « Validées actuellement » indique quand la validation courante n’est pas évaluée ; le bandeau sur les états enregistrés passe en information ; la légende du graphe utilise les badges d’état ; le nom de session n’est plus doublé par l’identifiant identique ; titres de section en casse normale ; « Outils du graphe » replié par défaut (choix enregistré respecté) ; assistant, état du travail, à traiter et fil d’activité regroupés sous « Détails de la mission » ; carte « Mission sélectionnée » dans la barre latérale ; cockpit en thème sombre par défaut comme la Préparation (?theme=etat pour le clair).",
         "en": "Conduite UX quick wins: the “Decisions to address” counter is greyed with “Not provided by the native engine”; “Currently validated” says when current validation is not evaluated; the recorded-states banner becomes informational; the graph legend uses the state badges; the session name is no longer repeated by an identical login; sentence-case section titles; “Graph tools” collapsed by default (a saved choice is kept); assistant, work state, inbox and activity feed grouped under “Mission details”; “Selected mission” card in the rail; cockpit uses the dark theme by default like Preparation (?theme=etat for light)."
+      },
+      {
+        "fr": "Fenêtres : le libellé Fermer reste entier sur une ligne, y compris sur mobile ; le titre peut revenir à la ligne. Fermeture au clic et par Échap conservée.",
+        "en": "Dialogs: the Close label stays whole on one line, including on mobile; the title may wrap. Click and Escape closure retained."
       }
     ]
   },
