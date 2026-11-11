@@ -40,7 +40,9 @@ fn promote_outcome_label(outcome:&crate::PaeaGitPromoteOutcome)->&'static str{
 /// std IO inner errors are visited even when source() skips their wrapper. This
 /// is a projection of listed families, not a proof about custom Error types.
 /// Organization, review-evidence and task-lifecycle refusals retain code and
-/// static reason; no private Display is projected. The private recorded
+/// static reason; mutation guards retain their static reason and independent
+/// statement-finalization causes through the same registered box/IO wrappers.
+/// No private Display is projected. The private recorded
 /// reviewer failure is never rendered. Recorded transaction/event/work families
 /// expose static codes and preserve independent primary/cleanup branches, including
 /// recovery without a cleanup error. Context/workflow/control reasons use only
@@ -362,6 +364,15 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
                 explicit = true;
             }
             _ => {}
+        }
+    }
+    if let Some(e) = native_ref::<crate::MutationGuardError>(e, &mut result, &mut explicit) {
+        result.labels.push(e.code().into());
+        result.labels.push(e.reason().into());
+        if let crate::MutationGuardError::Finalize { primary, cleanup } = e {
+            result.children.push(("primary", primary.as_ref()));
+            result.children.push(("cleanup", cleanup));
+            explicit = true;
         }
     }
     if let Some(e) = native_ref::<crate::WorkEngineError>(e, &mut result, &mut explicit) {
@@ -1308,6 +1319,71 @@ mod migration_review_error_tests {
             let nodes=project(error.as_ref());assert!(nodes.iter().any(|n|n.labels.iter().any(|s|s=="review-reply-quote-absent")),"static reply reason disappeared");
             assert!(nodes.iter().all(NativeGateCause::valid));assert!(!serde_json::to_string(&nodes).unwrap().contains("PRIVATE"));
             if wrapper==3{assert!(nodes.iter().any(|n|n.io_errno==Some(28) && n.path.iter().any(|p|p=="cleanup")));}
+        }
+    }
+}
+
+#[cfg(test)]
+mod held_method_guard_diagnostic_tests {
+    use super::*;
+    use crate::{ContractRevisionRefusal as R, MutationGuardError as G};
+
+    /// Static refusals are projected without changing legacy public error codes.
+    /// This exercises the full guard family, not only the triggering pause case.
+    #[test]
+    fn held_method_guard_diagnostic_static_refusals() {
+        let mut cases = vec![G::Hierarchical, G::WorkActive, G::PauseRequired,
+            G::LaunchLocked, G::ActiveAgent, G::Revision { expected: 1, observed: None },
+            G::Revision { expected: 1, observed: Some(2) }];
+        for refusal in [R::ExplicitUpdateRequired, R::ConfirmationRequired, R::ReasonInvalid,
+            R::ManagedRepository, R::TaskMissing, R::TaskBlockedRequired,
+            R::SeparateStatusRequired, R::TaskScopeRequired, R::StaleContract,
+            R::CriteriaCount, R::FieldsUnchanged, R::ScopeMissing, R::ScopeClosed, R::ReviewRunning] {
+            cases.push(G::ContractRevision(refusal));
+        }
+        for error in cases {
+            let nodes = project(&error);
+            assert!(nodes.iter().all(NativeGateCause::valid));
+            for label in [error.code(), error.reason()] {
+                assert!(nodes.iter().any(|n| n.labels.iter().any(|s| s == label)), "lost {label}");
+            }
+        }
+        assert_eq!(G::PauseRequired.code(), "format");
+    }
+
+    /// A valid SQL witness precedes each finalization fault. Direct, concrete
+    /// boxed, custom IO, Work and compound Root wrappers retain both independent
+    /// branches and only numeric/static diagnostics, never private SQL messages.
+    #[test]
+    fn held_method_guard_diagnostic_finalize_wrapper_matrix() {
+        for wrapper in 0..5 {
+            let db = rusqlite::Connection::open_in_memory().unwrap();
+            assert_eq!(db.query_row("SELECT 1", [], |r| r.get::<_, i64>(0)).unwrap(), 1);
+            let error = G::Finalize {
+                primary: Box::new(G::Sql(rusqlite::Error::SqliteFailure(
+                    rusqlite::ffi::Error::new(5), Some("PRIVATE primary SQL".into())))),
+                cleanup: rusqlite::Error::SqliteFailure(
+                    rusqlite::ffi::Error::new(14), Some("PRIVATE cleanup SQL".into())),
+            };
+            let error: Box<dyn Error + Send + Sync> = match wrapper {
+                0 => Box::new(error),
+                1 => Box::new(Box::new(error)),
+                2 => Box::new(io::Error::other(Box::new(error))),
+                3 => Box::new(crate::WorkEngineError::Guard(error)),
+                _ => Box::new(crate::RootStoreError::Cleanup {
+                    primary: Some(Box::new(crate::RootStoreError::Mutation(crate::WorkEngineError::Guard(error)))),
+                    cleanup: Box::new(crate::RootStoreError::Launch(Box::new(crate::AgentLaunchError::caused(
+                        "fixture-cleanup", io::Error::from_raw_os_error(28))))),
+                }),
+            };
+            let nodes = project(error.as_ref());
+            assert!(nodes.iter().any(|n| n.sqlite_code == Some(5)));
+            assert!(nodes.iter().any(|n| n.sqlite_code == Some(14) && n.path.iter().any(|p| p == "cleanup")));
+            assert!(nodes.iter().all(NativeGateCause::valid));
+            assert!(!serde_json::to_string(&nodes).unwrap().contains("PRIVATE"));
+            if wrapper == 4 { assert!(nodes.iter().any(|n| n.io_errno == Some(28))); }
+            // Projection failure never poisons an unrelated successful statement.
+            assert_eq!(db.query_row("SELECT 1", [], |r| r.get::<_, i64>(0)).unwrap(), 1);
         }
     }
 }
