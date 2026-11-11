@@ -23,10 +23,18 @@ refusals. Mockup numeric rules and values do not become product policy/defaults.
 
 Security belongs to Configuration; Audit and evidence belongs to Follow-up.
 `/trust-actions.html?view=security` and `?view=audit` compose the existing Trust
-page. Security tabs group actual Biba, Bell-LaPadula, role conflict, identity and
-key controls. Arrow/Home/End keys select tabs; Escape retains native dialog
-behavior. Existing IDs/listeners, I3 gates and actual preview/application APIs stay
-in force. Audit follows `docs/design/swarm/Audit.dc.html` (10 November 2026):
+page. Security follows `docs/design/swarm/Securite.dc.html` (10 November 2026): the
+real configuration form leaves its dialog and is shown in the page under a heading
+(link to audit, "Read configuration again"), an I3 admin-token banner, tabs for the
+actual Biba, Bell-LaPadula, role conflict, identity and key controls (Arrow/Home/End),
+then a save bar (reason, status, Preview, Save), sticky except on mobile. The form
+is filled at load from the `show` projection. Biba lists levels I3 to I1 with the
+subjects actually declared at each level; Identities shows a table (subject,
+integrity, roles, authentication). Nothing is invented: before reading the table
+says so and an empty level shows "—". Keys show the order of the existing buttons.
+Audit reading and public verification stay in the Audit view. In the page the
+admin token stays in memory until the page is left (the dialog clears it on close).
+Existing IDs/listeners, I3 gates and actual preview/application APIs stay in force. Audit follows `docs/design/swarm/Audit.dc.html` (10 November 2026):
 heading with Export evidence and Read the HMAC anchor, a token strip, counters
 (transactions, unknown outcomes, pending approvals, denied) computed from the
 recorded states of the `show` projection, then three columns: filterable

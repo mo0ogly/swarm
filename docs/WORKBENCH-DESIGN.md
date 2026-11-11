@@ -43,10 +43,21 @@ Ce sont deux présentations de la page Trust existante :
 historiques restent disponibles. Les paramètres ne transmettent que langue/thème ;
 aucun jeton n’est ajouté à la navigation.
 
-Sécurité conserve le dialogue réel et organise ses groupes en onglets : Biba,
-Bell-LaPadula, conflits de rôles, identités et clés. Clavier : flèches, Début/Fin,
-Tab et Échap natif du dialogue. Les champs, identifiants et écouteurs restent ceux
-de `trust-native.js` ; aperçu, application et contrôles I3 restent côté moteur.
+Sécurité suit la maquette `docs/design/swarm/Securite.dc.html` (10 novembre 2026).
+Le vrai formulaire de configuration quitte son dialogue et s’affiche dans la page :
+en-tête (lien vers l’audit, bouton « Relire la configuration »), bandeau du jeton
+administrateur I3, onglets Biba, Bell-LaPadula, conflits de rôles, identités et
+clés (flèches, Début/Fin), puis barre d’enregistrement (motif, état, Prévisualiser,
+Enregistrer), collante sauf sur mobile. Le formulaire est rempli dès le chargement
+depuis la projection `show`. L’onglet Biba montre les niveaux I3 à I1 avec les sujets
+réellement déclarés à chaque niveau ; l’onglet Identités montre un tableau (sujet,
+intégrité, rôles, authentification). Rien n’est inventé : avant lecture, le tableau
+le dit ; un niveau vide affiche « — ». Les clés affichent l’ordre des boutons
+existants. La lecture d’audit et la vérification publique restent dans la vue
+Audit. En page, le jeton administrateur reste en mémoire jusqu’à ce que l’on quitte
+la page (dans le dialogue, il est effacé à la fermeture). Les champs, identifiants
+et écouteurs restent ceux de `trust-native.js` ; aperçu, application et contrôles
+I3 restent côté moteur.
 
 Audit suit la maquette `docs/design/swarm/Audit.dc.html` (10 novembre 2026) :
 en-tête avec Exporter les preuves et Lire l’ancre HMAC, bandeau des jetons,

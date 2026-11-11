@@ -61,6 +61,7 @@ function identitySettings(){
  $('trust-identity-availability').textContent=t(bound?'Source HTTP liée à une intention exacte ; le compte et le droit sont revérifiés à chaque appel':source?.root_api_available===true&&source.http_available===false?'Enrôlement : API moteur disponible ; raccord HTTP non actif. Cette page utilise les jetons locaux.':'Disponibilité de la source d’identité non vérifiée');
  const list=$('trust-identity-sources');list.replaceChildren();
  for(const id of state.identities){const item=document.createElement('li'),p=id.enrollment_principal;item.textContent=id.subject+' · '+t(p?'Principal enrôlé déclaré — autorité courante requise':'Identité locale — jeton requis')+(p?' · '+p.principal_id+' · '+p.issuer+' · '+p.subject:'');list.append(item);}
+ [...list.children].forEach((item,i)=>{const id=state.identities[i];item.dataset.subject=String(id.subject);item.dataset.integrity=String(id.integrity);item.dataset.roles=(id.roles||[]).join(' ');item.dataset.auth=id.enrollment_principal?'enrolled':'local';});list.dataset.loaded='true';
 }
 /** Render public lifecycle separately from private runtime availability. No key
  * from this display is silently promoted to the verifier's independent pin. */
@@ -108,11 +109,21 @@ async function load(){const v=await api('show');if(v.result.schema_version!==1||
 function render(){auditChoices();const box=$('actions');box.replaceChildren();for(const a of Object.values(state.actions)){const item=document.createElement('article'),text=document.createElement('p');text.textContent=a.id+' · '+t(statusLabels[a.state]||a.state)+' · '+(state.amount_minor_text[a.id]||'0')+' '+a.currency+' · '+a.resource;item.append(text);for(const op of ['approve','commit','reconcile']){const b=document.createElement('button');b.type='button';b.textContent=t(opLabels[op]||op);b.addEventListener('click',()=>{$('operation').value=op;fields('fields',shapes[op],'f-',{...a,amount_minor:state.amount_minor_text[a.id],action_id:a.id});$('token').focus();});item.append(b);}box.append(item);}}
 /** Disable duplicate gestures during one request, surface failures in the active
  * dialog, and retain the requirement for readback after uncertain responses. */
-async function guarded(action){if(busy)return;busy=true;for(const b of document.querySelectorAll('button'))b.disabled=true;try{await action();}catch(e){($('settings').open?$('admin-message'):$('message')).textContent=e.message+' — '+t('Vérifier l’état avant reprise');}finally{busy=false;for(const b of document.querySelectorAll('button'))b.disabled=false;$('save').disabled=!proposal;syncGovernance();syncEnrolledAvailability();confidentiality?.sync();}}
+async function guarded(action){if(busy)return;busy=true;for(const b of document.querySelectorAll('button'))b.disabled=true;try{await action();}catch(e){($('settings').open||inline()?$('admin-message'):$('message')).textContent=e.message+' — '+t('Vérifier l’état avant reprise');}finally{busy=false;for(const b of document.querySelectorAll('button'))b.disabled=false;$('save').disabled=!proposal;syncGovernance();syncEnrolledAvailability();confidentiality?.sync();}}
 $('operation').addEventListener('change',()=>fields('fields',shapes[$('operation').value],'f-'));
 $('command').addEventListener('submit',event=>{event.preventDefault();guarded(async()=>{const op=$('operation').value,v={schema_version:1,event_id:'web-'+crypto.randomUUID()};for(const key of shapes[op])v[key]=$('f-'+key).value;if(op==='mandate-create')v.actions=['settle'];if(op==='commit')v.lose_response=$('lose').checked;const reply=await api(op,encode(v));result(reply);$('message').textContent=reply.result.state==='denied'?t('Opération refusée')+' · '+(globalThis.SwarmI18n?.engine(reply.result.reason)||reply.result.reason):t('Résultat reçu ; état relu');await load();});});
 $('refresh').addEventListener('click',()=>guarded(load));for(const op of ['export','anchor'])$(op).addEventListener('click',()=>guarded(async()=>result(await api(op,'{}'))));
-$('admin').addEventListener('click',()=>guarded(async()=>{await load();focus=$('admin');proposal=null;$('identities').value='';$('trust-admin-token').value='';fields('policy',['mandate_ttl_seconds','unknown_reconcile_seconds','evidence_retention_days'],'p-',state.policy);$('separation').checked=state.policy.require_separation;roleSettings();$('admin-message').textContent=t('Renseigner toutes les identités pour modifier la configuration');$('settings').showModal();$('p-mandate_ttl_seconds').focus();}));
+/** True when the Security workbench has placed the configuration form in the
+ * page instead of the dialog. Reads the DOM only. */
+function inline(){return !$('settings').contains($('configuration'));}
+/** Fill the configuration form from the last `show` projection: policy fields,
+ * separation, roles, identities and signing. Drops any pending preview and
+ * the private identities JSON. In the dialog the admin token is cleared too
+ * (a new opening is a new gesture); inline, the typed token stays in page
+ * memory until navigation. No request; `state` must already be loaded.
+ * @returns {void} */
+function adminForm(){focus=$('admin');proposal=null;$('identities').value='';if(!inline())$('trust-admin-token').value='';fields('policy',['mandate_ttl_seconds','unknown_reconcile_seconds','evidence_retention_days'],'p-',state.policy);$('separation').checked=state.policy.require_separation;roleSettings();$('admin-message').textContent=t('Renseigner toutes les identités pour modifier la configuration');}
+$('admin').addEventListener('click',()=>guarded(async()=>{await load();adminForm();if(inline())return;$('settings').showModal();$('p-mandate_ttl_seconds').focus();}));
 $('configuration').addEventListener('input',()=>{proposal=null;$('save').disabled=true;});
 $('trust-role-settings').addEventListener('input',()=>{roleTouched=true;});
 $('trust-signing-enabled').addEventListener('input',()=>{signingTouched=true;});
@@ -166,5 +177,5 @@ $('language').textContent=globalThis.SwarmI18n?.language==='en'?'Français':'Eng
 $('theme').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat';});
 const confidentiality=globalThis.SwarmTrustConfidentiality?.install({api,guarded,t});
 fields('fields',shapes[$('operation').value],'f-');
-guarded(async()=>{const response=await fetch('/api/v1/native-session',{cache:'no-store'});const session=await response.json();if(!response.ok||session.schema_version!==1||!/^[a-f0-9]{64}$/.test(session.csrf_token))throw Error('web-native-session-invalid');csrf=session.csrf_token;await load();$('message').textContent=t('Prêt — configuration et identités locales requises');});
+guarded(async()=>{const response=await fetch('/api/v1/native-session',{cache:'no-store'});const session=await response.json();if(!response.ok||session.schema_version!==1||!/^[a-f0-9]{64}$/.test(session.csrf_token))throw Error('web-native-session-invalid');csrf=session.csrf_token;await load();if(inline())adminForm();$('message').textContent=t('Prêt — configuration et identités locales requises');});
 })();
