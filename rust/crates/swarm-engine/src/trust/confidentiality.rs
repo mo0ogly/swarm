@@ -280,7 +280,9 @@ pub(crate) fn capability(st: &State) -> Result<Value, E> {
 /// binds the exact proposal, actor and current Trust/BLP revisions, appends one
 /// attributed proof and preserves idempotence. Object attribution cannot lower
 /// any previously recorded classification across revisions; that requires the
-/// separate, unavailable BLP-06 contract. No input creates human identity.
+/// separate, unavailable BLP-06 contract. Object preview shares every admission
+/// check, rejects recorded event ids and returns without state/proof publication;
+/// the existing apply operation alone records or replays. No input creates human identity.
 pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, now: OffsetDateTime)
     -> Result<(Vec<u8>, Option<&'static str>), E>
 {
@@ -307,7 +309,8 @@ pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, 
         if !value.is_empty() { return Err(E::Invalid("blp-show-body-invalid")); }
         return Ok((super::encoded(&json!({"trust_revision":st.revision.to_string(),"capability":capability(st)?,"record":st.confidentiality}))?,None));
     }
-    if op=="blp-object-attribute" {
+    if matches!(op,"blp-object-attribute"|"blp-object-attribute-preview") {
+        let preview=op=="blp-object-attribute-preview";
         let c:AttributeChange=swarm_wire_json::decode(raw)?;
         if c.schema_version!=1 || !swarm_identity_contract::name(c.event_id.as_bytes())
             || c.reason.trim().is_empty() || c.reason.chars().any(char::is_control)
@@ -341,6 +344,7 @@ pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, 
         entry.policy.validate().and_then(|_|entry.policy.check_read(&actor.subject,Some(label))).map_err(|e|E::Invalid(e.code()))?;
         let fingerprint=super::digest(&json!({"operation":"blp-object-attribute","actor":actor.subject,"change":c}))?;
         if let Some(prior)=st.event_digests.get(&c.event_id) {
+            if preview { return Err(E::Conflict("blp-event-already-recorded")); }
             if prior!=&fingerprint { return Err(E::Conflict("event_conflict")); }
             let current=st.confidentiality.as_ref().ok_or(E::Integrity("blp-replay-history-missing"))?.current()?;
             // Freshness is the replayed event's OWN recorded effect: on a
@@ -362,7 +366,6 @@ pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, 
         let value=json!({"schema_version":1,"attributed":true,"canonical_digest":c.canonical_digest,
             "policy_revision":entry.revision.to_string(),"trust_revision":st.revision.to_string(),
             "classification":classification,"actor":actor.subject,"reason":c.reason,"runtime_enforced":false});
-        let bytes=super::encoded(&value)?;
         let stamp=super::operations::stamp(now)?;
         let attribution=Attribution{canonical_digest:c.canonical_digest.clone(),
             project_path:c.project_path.clone().into_bytes(),
@@ -391,6 +394,18 @@ pub(crate) fn execute(st: &mut State, op: &str, raw: &[u8], source: Source<'_>, 
                 return Err(E::Conflict("blp-declassification-required"));
             }
         }
+        // All shared admission checks precede the readonly return, including
+        // duplicate-object and cross-revision declassification refusals. Preview
+        // reserves no event id and appends neither attribution nor audit proof.
+        if preview {
+            let mut value=value;
+            value["attributed"]=json!(false);
+            value["preview"]=json!(true);
+            value["applied"]=json!(false);
+            value["would_attribute"]=json!(true);
+            return Ok((super::encoded(&value)?,None));
+        }
+        let bytes=super::encoded(&value)?;
         let current_entry=st.confidentiality.as_mut().ok_or(E::Integrity("blp-history-missing"))?
             .history.last_mut().ok_or(E::Integrity("blp-history-missing"))?;
         // The attribution binds to the CURRENT entry in place: it inherits the

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "security-initialization-ui",
+  "inputs": [
+    "tests/security_initialization_ui.cjs",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tests/fixture_area.py",
+    "tools/verification/verify_npm_archive.py",
+    "tools/verification/recipe.py",
+    "package.json",
+    "package-lock.json",
+    "web/trust-native.html",
+    "web/wattson_themes.css",
+    "web/swarm-design.css",
+    "web/trust-native.css",
+    "web/swarm-workbench.css",
+    "web/i18n-en.js",
+    "web/i18n.js",
+    "web/trust-confidentiality.js",
+    "web/trust-native.js",
+    "web/trust-workbench.js",
+    "web/swarm-logo.png",
+    "tools/verification/SECURITY-INITIALIZATION.md",
+    "tools/verification/SECURITY-INITIALIZATION.en.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "initial-hydration-race-and-draft-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess; subprocess.run(['node','tests/security_initialization_ui.cjs',os.environ['SWARM_SECURITY_INIT_CONFIG']],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "SECURITY_INITIALIZATION_PASS 7",
+        "PASS normal-initial-without-admin-click",
+        "PASS data-before-layout-initial-without-admin-click",
+        "PASS layout-before-data-initial-without-admin-click",
+        "PASS guards-initial-without-admin-click",
+        "PASS initial-refusal-initial-without-admin-click",
+        "PASS early-edit-initial-without-admin-click",
+        "PASS guards-draft-token-preview-preserved",
+        "PASS initial-refusal-explicit-recovery",
+        "PASS early-edit-draft-preserved",
+        "PASS harness-stable-security_initialization_ui.cjs",
+        "PASS post-render-failure-initial-without-admin-click",
+        "PASS post-render-failure-no-automatic-fields",
+        "PASS post-render-failure-duplicate-event-no-promotion",
+        "PASS post-render-failure-explicit-recovery",
+        "PASS post-render-failure-measured-admin-clicks"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

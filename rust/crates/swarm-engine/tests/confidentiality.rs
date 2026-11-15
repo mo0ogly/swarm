@@ -715,3 +715,56 @@ fn poisoned_stored_attribution_refuses_at_reopen() {
             "poisoned variant {name} must refuse at reopen with an integrity cause, got: {result:?}");
     }
 }
+
+/// Preview shares all attribution admission checks on a readonly Root, leaves
+/// exact journal bytes unchanged and reserves no event. A real admitted object
+/// and valid preview precede faults; explicit apply/replay and policy renewal
+/// demonstrate recovery. No provider, real identity or live state is involved.
+#[test]
+fn object_attribution_preview_is_readonly_and_shares_admission() {
+    let (f,mut policy,original)=classified_object_fixture();
+    let mut proposal=original.clone();
+    proposal["event_id"]="object-preview".into();
+    proposal["canonical_digest"]="d".repeat(64).into();
+    let before=f.state();
+    let store=RootStore::open(&f.0,false).unwrap();
+    let reply=store.trust_as_principal("blp-object-attribute-preview",
+        &serde_json::to_vec(&proposal).unwrap(),"fixture-admin-token").unwrap();
+    assert_eq!(reply.publication,None,"preview must not report publication");
+    let value:Value=serde_json::from_slice(&reply.bytes).unwrap();
+    assert_eq!(value["preview"],true);assert_eq!(value["applied"],false);
+    assert_eq!(value["attributed"],false);assert_eq!(value["would_attribute"],true);
+    assert_eq!(value["runtime_enforced"],false);
+    assert_eq!(value["policy_revision"],"1");assert_eq!(value["trust_revision"],"1");
+    assert!(store.trust_as_principal("blp-object-attribute",
+        &serde_json::to_vec(&proposal).unwrap(),"fixture-admin-token").is_err());
+    store.close().unwrap();assert_eq!(f.state(),before);
+    assert_eq!(f.call("blp-object-attribute-preview",proposal.clone(),"fixture-admin-token").unwrap(),value);
+    assert_eq!(f.state(),before,"repeated preview must reserve no event or proof");
+    for token in ["","fixture-worker-token"] {
+        assert!(f.call("blp-object-attribute-preview",proposal.clone(),token).is_err());
+        assert_eq!(f.state(),before,"authority refusal must not mutate");
+    }
+    for field in ["expected_revision","expected_trust_revision"] {
+        let mut stale=proposal.clone();stale[field]=0.into();
+        assert!(f.call("blp-object-attribute-preview",stale,"fixture-admin-token").unwrap_err().contains(
+            if field=="expected_revision" {"blp-policy-stale"} else {"blp-trust-revision-conflict"}));
+        assert_eq!(f.state(),before);
+    }
+    let mut duplicate=original.clone();duplicate["event_id"]="object-duplicate-preview".into();
+    assert!(f.call("blp-object-attribute-preview",duplicate,"fixture-admin-token").unwrap_err().contains("blp-attribution-conflict"));
+    assert!(f.call("blp-object-attribute-preview",original.clone(),"fixture-admin-token").unwrap_err().contains("blp-event-already-recorded"));
+    assert_eq!(f.state(),before);
+    let applied=f.call("blp-object-attribute",proposal.clone(),"fixture-admin-token").unwrap();
+    assert_eq!(applied["attributed"],true);let after=f.state();assert_ne!(after,before);
+    assert_eq!(f.call("blp-object-attribute",proposal,"fixture-admin-token").unwrap(),applied);
+    assert_eq!(f.state(),after,"apply retry must replay without an extra proof");
+    policy["expected_revision"]=1.into();policy["event_id"]="preview-policy-renewal".into();
+    f.call("blp-policy-apply",policy,"fixture-admin-token").unwrap();
+    let mut renewal=original;renewal["expected_revision"]=2.into();renewal["event_id"]="preview-renewed-object".into();
+    let renewed=f.state();
+    assert_eq!(f.call("blp-object-attribute-preview",renewal.clone(),"fixture-admin-token").unwrap()["would_attribute"],true);
+    renewal["classification"]["compartments"]=json!([]);
+    assert!(f.call("blp-object-attribute-preview",renewal,"fixture-admin-token").unwrap_err().contains("blp-declassification-required"));
+    assert_eq!(f.state(),renewed,"preview must share the cross-revision floor");
+}
