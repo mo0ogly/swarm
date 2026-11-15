@@ -3,6 +3,8 @@
 
 Uses an owned inert Root, public configuration/policy/producer calls through the
 qualified production binary and a real browser against its served Trust page.
+Initial Security hydration is checked without Admin clicks in both data/layout
+orders, using barriers that continue original HTTP requests without fake responses.
 One explicit gesture attributes one exact object; session-alone and weak-bearer
 refusals are typed and non-mutating. No live project, classified content,
 provider, watchdog, retry or fabricated frontend response. The object digest is
@@ -14,6 +16,7 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 from blp_attribution_history_cli import digest
@@ -38,7 +41,7 @@ def main():
     profile=json.loads(args.profile.read_bytes())
     sha=digest(binary)
     assert profile['sha256']==sha and profile['status']=='VERIFIED_DEFAULT_NATIVE_PROFILE'
-    f=Fixture(binary,out,'object-attribute');checks=[]
+    f=Fixture(binary,out,'object-attribute');checks=[];web=None
     def check(name,condition):
         checks.append(dict(name=name,passed=bool(condition)));publish(out/'checks.json',checks)
         assert condition,name
@@ -71,8 +74,11 @@ def main():
         # second (digest, project, revision) attribution under another event id
         # (`blp-attribution-conflict`), so the driver supplies one distinct
         # fixture object per combo in the test's fixed combo order.
-        combo_order=[lang+'-'+theme+'-'+str(width)
-            for lang in ['fr','en'] for theme in ['sombre','etat'] for width in [1280,390]]
+        journeys=[dict(lang='fr',theme='sombre',width=1280,view='security',initial_order='data-before-layout'),
+            dict(lang='en',theme='etat',width=390,view='security',initial_order='layout-before-data'),
+            dict(lang='fr',theme='etat',width=390,view='actions'),
+            dict(lang='en',theme='sombre',width=1280,view='actions')]
+        combo_order=['-'.join(str(j[k]) for k in ('view','lang','theme','width')) for j in journeys]
         object_digests=[]
         for index,label in enumerate(combo_order):
             object_bytes=b'PRIVATE_BLP_OBJECT_ATTRIBUTE_FIXTURE '+label.encode()+b'\n'
@@ -82,8 +88,9 @@ def main():
         web.capture_async(out/'http-observer.raw')
         (out/'evidence').mkdir(mode=0o700)
         config=dict(url='http://'+web.address,root=str(f.root),cookie=web.cookie,
+            initial_policy=dict(mandate_ttl_seconds='3600',unknown_reconcile_seconds='0',evidence_retention_days='365'),
             tokens=dict(admin='fixture-admin-token',worker='fixture-worker-token'),
-            digests=object_digests,project_path=str(f.root),
+            digests=object_digests,journeys=journeys,project_path=str(f.root),
             levels=[level['id'] for level in policy['levels']],
             compartments=policy['compartments'],
             expected_revision=str(revision),expected_trust_revision=str(trust_revision),
@@ -112,6 +119,18 @@ def main():
             error=repr(error),root=str(f.root)))
         print('OBJECT_ATTRIBUTE_PUBLIC_FAIL '+repr(error),flush=True)
         raise
+    finally:
+        # Success is published only after the owned server drains and closes.
+        # Preserve a prior browser/driver failure together with cleanup errors.
+        primary=sys.exception()
+        if web is not None:
+            try:web.cleanup()
+            except BaseException as cleanup:
+                failures=([primary] if primary is not None else [])+[cleanup]
+                try:publish(out/'cleanup-failure.json',dict(status='FAIL',type=type(cleanup).__name__,scope='Owned fixture cleanup only'))
+                except BaseException as publication:failures.append(publication)
+                if len(failures)>1:raise BaseExceptionGroup('Browser verification and fixture cleanup failed',failures)
+                raise
     publish(out/'result.json',dict(status='PASS',checks=checks,binary_sha256=sha,root=str(f.root),
         scope='owned inert Admin object-attribution fixture; no live project, no declassification, no bulk scan',
         global_watchdog=None,limits='UI form drives the existing exact-once/monotonic producer; physical lineage and BLP-06 remain open'))

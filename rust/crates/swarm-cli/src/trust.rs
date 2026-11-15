@@ -10,6 +10,8 @@ use std::{
 /// attribution, including producer-resolved preparation slices, uses the
 /// existing authenticated I3/admin engine operation and
 /// current revisions; neither CLI input nor session creates classification authority.
+/// Object-attribution preview opens Root readonly and shares producer validation;
+/// it never publishes an attribution. The separate apply operation remains a writer.
 /// `security-show` is readonly and requires a current I3/admin; compiled scope
 /// metadata never imports recipe evidence or establishes qualification.
 pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
@@ -25,7 +27,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     if !matches!(
         op,
         "show" | "security-show"
-            | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute" | "blp-preparation-check" | "blp-preparation-attribute" | "blp-preparation-input-attribute" | "blp-preparation-destination-attribute" | "blp-preparation-admit" | "blp-preparation-admission-show" | "blp-preparation-transport"
+            | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute" | "blp-object-attribute-preview" | "blp-preparation-check" | "blp-preparation-attribute" | "blp-preparation-input-attribute" | "blp-preparation-destination-attribute" | "blp-preparation-admit" | "blp-preparation-admission-show" | "blp-preparation-transport"
             | "export"
             | "anchor"
             | "verify"
@@ -69,7 +71,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         write_output(out, &bytes)?;
         return Ok(0);
     }
-    let readonly = read || matches!(op, "security-show" | "config-preview" | "read-object" | "read-original" | "public-anchor" | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check" | "blp-preparation-admission-show" | "blp-preparation-transport");
+    let readonly = read || matches!(op, "security-show" | "config-preview" | "read-object" | "read-original" | "public-anchor" | "blp-show" | "blp-policy-preview" | "blp-object-attribute-preview" | "blp-check" | "blp-preparation-check" | "blp-preparation-admission-show" | "blp-preparation-transport");
     let store = swarm_engine::RootStore::open(Path::new(&a.root), !readonly)
         .map_err(|e| CliError::Root(Box::new(e)))?;
     let token = std::env::var("SWARM_TRUST_TOKEN").unwrap_or_default();

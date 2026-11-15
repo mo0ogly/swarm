@@ -44,10 +44,10 @@ remains visible.
 | SP-L01 | — | Contracts, sources, rights, BLP scope/inventory | Authoritative sources and explicit unknowns | FRAMED — readonly contract and source inventory |
 | SP-L02 | L01 | Readonly engine/API/CLI metadata projection | Current I3 admin, strict schema, no mutation; absent/stale policy | IMPLEMENTED / LOCALLY VERIFIED (readonly scope) |
 | SP-L03 | L02 | Security and evidence: policy, coverage, checks, evidence, qualification | No fabricated PASS; FR/EN, themes, keyboard, errors, mobile, actual assets | PARTIAL — fixture UX verified; real Authority session open |
-| SP-L04 | L02–03 | Structured administration reusing existing form | No-op preview, stale revision refusal, persistence/restart, shared validation | PLANNED |
+| SP-L04 | L02–03 | Structured administration reusing existing form | No-op preview, stale revision refusal, persistence/restart, shared validation | PARTIAL — SP-L04a and initialization locally delivered as380; Authority session and main integration open |
 | SP-L05 | L02–03 | Recipe adapter, rights, progress/stop, durable evidence | No arbitrary command/path; unknown recipe refused; failure/interruption/recovery retained | PLANNED |
 | SP-L06 | L04–05 | Qualification dossier, review, decisions, protected export | Missing/failed/stale mandatory criteria block acceptance; exact candidate/reviewer | PLANNED |
-| SP-L07 | L01–06 | Public recipes, review, local installation, retrospective | Active image, FR/EN notes, served flow; independent review distinct | IN PROGRESS — image active; global review/qualification/RETEX open |
+| SP-L07 | L01–06 | Public recipes, review, local installation, retrospective | Active image, FR/EN notes, served flow; independent review distinct | IN PROGRESS — local380 delivery; integration, global qualification and retrospective open |
 
 Codex owns implementation. Authorized operators own policy decisions, independent
 reviewers own review, acceptance authorities own decisions. This document grants no
@@ -140,3 +140,50 @@ classified data. Program remains open; runtime_enforced:false is retained.
   policy. No evidence cleanup or watchdog added.
 - Changed verification inputs require fresh scoped checks; historical outcomes
   stay preserved and reused only within their exact unchanged scope.
+
+### Initialization correction and380 delivery — 15 November 2026
+
+[380 receipt](../../../plans/actions-confiance/SP-L04a-INIT-DELIVERY-20261115.json):
+default native profile without fixture features, SHA256
+`f0e92ce3749855bee14f2b6ea68037c0e5532ac58308e36988f76ad6b46678a1`,
+Git base2d06746f and dirty state disclosed. Supported prepared restart completed
+after qualification; local process3575178/executable and allowed Version probe
+agree. The new FR/EN note is observed in the active binary. This establishes
+neither Git integration nor global acceptance. The379 receipt remains historical.
+
+CI found the initial show/layout race. One-shot hydration now requires the complete
+read and render plus the inline form. State assigned before a failed render is not
+ready; an explicit healthy reread recovers. Later edits/previews are preserved.
+Existing button gates and explicit Admin reread remain unchanged: this is no blanket
+control-disable guarantee. No delay, retry or extra fetch is introduced.
+
+Independent bounded source/synthetic review passed with retained RED/GREEN controls.
+The maintained test/recipe covers seven cases,61 synthetic assertions and actual
+initial0/recovery1 click counts. Historical constant adminClicks:0 fields are NOT
+MEASURED; originals and errata remain. The INIT recipe received metadata/21-input
+archive/readback/stability/assertion-string admission only, not a full step replay.
+
+Actual native380/API checks pass59 assertions: two orders controlled by continuing
+real GETs, six initial assertions without Admin, four FR/EN/theme/mobile journeys
+and800×600 refusals. Six protected fixture assets match the compiled profile; four
+explicit attributions persist exactly. Recipe PASS, integrity VERIFIED. Changed
+load/adminForm justified this affected flow; unchanged Rust/CLI and historical152
+campaigns were not replayed, nor61 solely for a docstring wording change.
+
+The actual fixture380 Version dialog passes nine FR/EN/note/commit/dirty/Escape/
+focus/error assertions. Its inherited inner “installed” label is explicitly limited
+by the wrapper/erratum to fixture scope. Live human Authority session/dialog/assets
+remain UNVERIFIED; no owner-key retry, fabricated assertion or relaxed protection.
+Allowed launcher probes do not establish a human session.
+
+Bounded lesson: join complete successes, instrument gestures and retain original
+failures; a test label is not delivery provenance. A released archive transfer
+restored space before build without weakening20GiB reserve. Post-delivery tracking
+docs are absent from effective compiler inputs, so no reflex rebuild for state
+wording. Swarm00/CI owns final runtime review/main integration. L05/L06 and global
+retrospective remain open; runtime_enforced:false is unchanged.
+
+The Version proof producer now emits versiondialogue-owned-endpoint, with separate
+installation/process and human-session provenance required. Exact old driver and
+erratum remain; only comments/report wording changed, with bounded source and
+consumer/schema checks, no replay of nine gestures or380 rebuild (not compiled).

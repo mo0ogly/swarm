@@ -46,10 +46,10 @@ parle de qualification interne. `runtime_enforced:false` reste affiché.
 | SP-L01 | — | Contrats, sources, droits, périmètre BLP et inventaire | Chaque observation a une source ; inconnus visibles | CADRÉ — contrat lecture et inventaire de sources |
 | SP-L02 | L01 | Projection moteur/API/CLI en lecture, métadonnées sans contenu classifié | Refus sans identité/admin, schéma strict, zéro mutation, politique absente/périmée distinguée | RÉALISÉ / VÉRIFIÉ LOCAL (périmètre lecture) |
 | SP-L03 | L02 | Vue Sécurité et preuves : politique, couverture, vérifications, preuves, qualification | Pas de réussite inventée ; FR/EN, thèmes, clavier, erreurs, mobile et vrais assets | PARTIEL — UX fixture vérifiée ; session Authority réelle ouverte |
-| SP-L04 | L02–03 | Administration structurée raccordée au formulaire existant | Preview sans mutation, révision concurrente, reprise/redémarrage, même validation API/CLI | À FAIRE |
+| SP-L04 | L02–03 | Administration structurée raccordée au formulaire existant | Preview sans mutation, révision concurrente, reprise/redémarrage, même validation API/CLI | PARTIEL — SP-L04a et initialisation livrés localement en380 ; session Authority et intégration main ouvertes |
 | SP-L05 | L02–03 | Adaptateur de recettes, droits, progression/arrêt et preuves durables | Recette inconnue refusée ; pas de chemin/commande arbitraire ; refus/interruption/reprise conservés | À FAIRE |
 | SP-L06 | L04–05 | Dossier de qualification, revue, décisions, export protégé | Aucun critère obligatoire manquant/FAIL/périmé accepté ; candidat et réviseur liés | À FAIRE |
-| SP-L07 | L01–06 | Recettes publiques, revue, installation locale et RETEX | Image active, notes FR/EN et parcours servis ; revue indépendante distincte | EN COURS — image active ; revue/qualification/RETEX globaux ouverts |
+| SP-L07 | L01–06 | Recettes publiques, revue, installation locale et RETEX | Image active, notes FR/EN et parcours servis ; revue indépendante distincte | EN COURS — livraison locale380 ; intégration, qualification et RETEX globaux ouverts |
 
 Codex possède les lots d'implémentation. L'opérateur habilité possède les décisions
 de politique ; le réviseur indépendant possède sa revue et l'autorité d'acceptation
@@ -153,3 +153,57 @@ Le programme reste ouvert ; runtime_enforced:false est conservé.
   ni une nouvelle politique de délai. Aucun nettoyage de preuves ou watchdog.
 - Toute reprise des contrôles après changement d'entrées garde les anciens résultats ;
   contrôle partagé inchangé réutilisé seulement dans sa portée déclarée.
+
+### Correction d’initialisation et livraison380 — 15 novembre 2026
+
+[Reçu380](SP-L04a-INIT-DELIVERY-20261115.json) : image native par défaut sans
+feature fixture, SHA256 `f0e92ce3749855bee14f2b6ea68037c0e5532ac58308e36988f76ad6b46678a1`,
+base Git2d06746f et modifications non commitées déclarées. Redémarrage géré
+réalisé après qualification ; processus3575178/exécutable local/sonde Version
+autorisée concordent. La nouvelle note FR/EN est observée dans le binaire actif.
+Ce constat ne vaut ni fusion Git ni acceptation globale. Le reçu379 reste historique.
+
+La revue CI a trouvé une course d’initialisation : show pouvait finir avant le
+montage Sécurité ; le formulaire restait vide sans clic Admin. La jointure à usage
+unique attend maintenant lecture et rendu complets ainsi que le formulaire inline.
+Un échec de rendu après affectation de state ne rend pas l’état prêt ; une relecture
+explicite saine reprend. Les saisies et previews ultérieures ne sont pas rechargées
+automatiquement. Cela ne désactive pas tous les contrôles : leurs gates existants
+et la relecture Admin restent inchangés. Aucun délai, retry ou nouveau fetch.
+
+Revue indépendante source/synthétique favorable, avec témoins RED et GREEN.
+La garde permanente maintenue dans tests/security_initialization_ui.cjs et sa
+recette couvrent sept cas ;61 assertions synthétiques réussies, compteurs réels
+initial0/reprise1. Les anciens champs constants adminClicks:0 sont NON MESURÉS,
+leurs originaux conservés et bornés par erratum. La recette INIT a reçu un contrôle
+discriminant de métadonnées/21inputs/archive relue/stabilité/chaînes attendues ;
+aucune étape de cette recette complète n’a été relancée pour son emballage.
+
+Le parcours natif sur380 passe59 assertions : vraies réponses API, deux ordres
+contrôlés par continuation de GET, six assertions initiales sans clic Admin,
+quatre parcours FR/EN/deux thèmes/mobile et refus800×600. Six assets réellement
+servis en fixture protégée concordent avec le profil compilé ; quatre attributions
+explicites sont persistées exactement. Recette PASS, intégrité VERIFIED. Le
+changement de load/adminForm justifie ce parcours affecté ; ni Rust/CLI inchangés,
+ni campagnes152, ni garde61 pour le seul commentaire n’ont été rejoués.
+
+Le dialogue Version en fixture380 passe neuf assertions FR/EN, note/commit/dirty,
+Escape/focus et absence d’erreurs. Le rapport interne porte un ancien libellé
+installed : son erratum et le wrapper limitent explicitement la preuve à la fixture.
+La session humaine Authority réelle et ses ressources protégées restent NON
+VÉRIFIÉES ; aucune nouvelle tentative avec clé propriétaire, aucune assertion
+fabriquée. Les sondes de version permises ne prouvent pas cette session.
+
+RETEX borné : joindre les réussites complètes, instrumenter les gestes réellement,
+conserver les échecs et ne pas déduire une livraison d’un libellé de test. La marge
+disque a été rétablie par transfert d’une archive libérée, avant build, réserve
+20GiB maintenue. Les pages de suivi modifiées après livraison ne font pas partie
+des inputs compilés ; aucun rebuild réflexe pour ces états documentaires.
+Swarm00/CI garde la revue runtime finale et l’intégration main ; L05/L06 et le
+RETEX global restent ouverts. runtime_enforced:false inchangé.
+
+Le producteur de preuve Version a ensuite été corrigé : scope générique
+versiondialogue-owned-endpoint, installation/processus et session humaine à
+établir séparément. Ancien driver exact et erratum conservés ; commentaire et
+libellés de rapport seuls changés, comparaison bornée/consommateurs/schema contrôlés,
+sans rejeu des neuf gestes ni rebuild380 (outil hors inputs compilés).

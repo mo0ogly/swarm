@@ -7,8 +7,20 @@
     },
     "items": [
       {
+        "fr": "Administration Sécurité : les champs initiaux attendent à la fois les données et le montage de la page, sans clic Relire. Les saisies et prévisualisations ultérieures restent conservées ; la relecture explicite recharge les champs. Une garde navigateur ciblée couvre les deux ordres et les refus/reprises avec réponses synthétiques. Un rendu de lecture en échec ne rend pas les champs prêts ; seule une relecture explicite réussie permet la reprise.",
+        "en": "Security administration: initial fields wait for both data and page mounting without a Read click. Later edits and previews remain preserved; explicit reread reloads fields. A focused browser guard covers both orders and refusal/recovery with synthetic responses. A failed read render cannot mark fields ready; an explicit successful reread allows recovery."
+      },
+      {
+        "fr": "Administration Sécurité : la barre de sauvegarde reste dans le flux pour ne pas couvrir les contrôles BLP en fenêtre courte. Les recettes conservent aussi les issues de processus et les erreurs de contrôle/publication sans perdre leurs causes.",
+        "en": "Security administration: the save bar stays in document flow so it does not cover BLP controls in short windows. Verification tooling also retains process outcomes and admission/publication errors without losing their causes."
+      },
+      {
         "fr": "Compilations locales : cache temporaire externe admis seulement après enregistrement explicite du montage/UUID, contrôles de descripteurs et réserve disque inchangée. Dépôt, données, service et binaire installé restent locaux.",
         "en": "Local builds: external temporary cache admitted only after explicit mount/UUID registration, held-descriptor checks and the unchanged disk reserve. Repository, data, service and installed binary remain local."
+      },
+      {
+        "fr": "Attribution Bell-LaPadula : prévisualisation séparée en lecture seule, application explicite des mêmes octets, révisions décimales exactes et invalidation des propositions après modification des champs ou du jeton. La protection transversale reste incomplète.",
+        "en": "Bell-LaPadula attribution: separate readonly preview, explicit application of identical bytes, exact decimal revisions and proposal invalidation after field or token edits. Transversal protection remains incomplete."
       },
       {
         "fr": "Audit et preuves : mise en page de la maquette (compteurs depuis les états enregistrés, liste des transactions avec badges, chaîne de preuve en étapes depuis le rapport d’audit, vérificateur public à droite) ; Actualiser recharge aussi la liste d’audit. Archives protégées de la maquette non affichées (fonction absente). Aucun changement moteur.",

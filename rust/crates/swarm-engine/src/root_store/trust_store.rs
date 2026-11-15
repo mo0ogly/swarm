@@ -114,11 +114,13 @@ impl RootStore {
     /// Apply the existing Trust protocol after any required egress writer is
     /// held. Short business reservations and publication/cleanup semantics stay
     /// unchanged; configuration/BLP mutations repeat current authentication here.
+    /// Object-attribution preview uses a shared reservation and may open a
+    /// readonly Root; producer refusal/close errors propagate without publication.
     pub(super) fn trust_scoped_reserved(&self, operation: &str, raw: &[u8], token: Source<'_>, principal: bool) -> Result<TrustReply,R> {
         let readonly = matches!(
             operation,
             "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
-                | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check"
+                | "blp-show" | "blp-policy-preview" | "blp-object-attribute-preview" | "blp-check" | "blp-preparation-check"
                 | "blp-preparation-transport" | "security-show"
         );
         if !readonly && !self.writable {
@@ -184,7 +186,7 @@ impl RootStore {
                 #[cfg(not(target_os="linux"))]
                 "blp-preparation-check" => return Err(R::Refused("blp-preparation-platform-unsupported")),
                 "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check"
-                | "blp-object-attribute" => {
+                | "blp-object-attribute" | "blp-object-attribute-preview" => {
                     let (bytes, state)=trust::confidentiality::execute(&mut st,operation,raw,token,now).map_err(failure)?;
                     planned=state; bytes
                 }
