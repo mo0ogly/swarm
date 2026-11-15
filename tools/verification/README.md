@@ -1,6 +1,73 @@
 # Recettes permanentes / Permanent verification recipes
 
+Recette capture PAEA : `recipes/paea-capture-reader.json` vérifie les gardes
+`paea_capture_*` du témoin approval-web (27 noms attendus dans la recette ;
+ce compte est une attente, pas une preuve d'exécution). Le refus d'attente du
+parent est transféré PUR : aucune jointure, écriture de reçu, E/S ni rendu
+stderr ne précède `panic_any` ; le reçu réel n'est écrit que par le récepteur
+explicite APRÈS la résolution (premier `wait` réel selon la politique du
+récepteur pour la couture FnOnce connue), en retenant le texte d'étape `Err`
+de l'écrivain OU sa panique opaque comme données, l'état de publication étant
+observé sur le système de fichiers, jamais supposé ; UNKNOWN n'est jamais
+présenté comme Finished.
+
+PAEA capture recipe: `recipes/paea-capture-reader.json` checks the
+`paea_capture_*` guards of the approval-web witness (27 expected names in the
+recipe; this count is an expectation, not a proof of execution). The parent
+wait refusal is transferred PURELY: no join, receipt write, IO or stderr
+rendering precedes `panic_any`; the real receipt is written only by the
+explicit receiver AFTER resolution (the first real `wait` under the
+receiver's own policy for the known FnOnce seam), retaining the writer's
+`Err` stage text OR its opaque panic as data, with the publication state
+observed on the filesystem, never assumed; UNKNOWN is never presented as
+Finished.
+
+### PAEA C3b — réception explicite / explicit receiver
+
+Contrat cible du code et des deux gardes affectées :
+`paea_capture_parent_wait_refusal_retains_owned_handoff` (garde22 modifiée)
+et `paea_capture_parent_wait_refusal_transfers_before_receipt_or_rendering`
+(nouvelle garde27). La conservation ne joint ni ne réattend l’enfant et n’écrit
+ni reçu ni diagnostic. La porte ne fait que `panic_any` du carrier entier.
+Le récepteur de fixture autorise un premier vrai wait uniquement après une
+couture déterministe qui n’a jamais appelé le wait OS ; ce n’est pas une reprise
+automatique d’un vrai refus OS. Après reap et deux jointures, le reçu reprend
+les faits Finished réels. Les observations faillibles gardent leurs faits
+possédés hors du catch et conservent toute panique secondaire avec eux.
+
+La garde27 attend un contrôle sain réel, zéro rendu/reçu avant réception,
+le payload contrôleur Some/None conservé, puis un vrai refus rename EISDIR.
+Le temporaire refusé est gardé ; seul le répertoire vide de collision détenu,
+observé et identifié est retiré, avant un nouveau reçu sous précondition corrigée.
+Une panique locale injectée dans l’annonce après fsync/rename reste un échec
+portant le payload opaque original ; la publication réelle est relue, jamais
+déduite d’un Err/panic. Le writer standard conserve son annonce et son contrat
+existant ; le nouveau paramètre FnOnce est un seam de test, sans état global.
+Aucun nouveau budget, délai, retry ou politique opérateur. Les invariants de
+join et le cleanup global restent hors de cette preuve. Le compteur27 du
+manifeste n’établit pas une exécution27 ; les deux contrôles ciblés doivent être
+reçus séparément. Les récits des lots capture antérieurs ci-dessous conservent
+leurs attentes et limites historiques ; la présente section et le manifeste
+courant décrivent le contrat C3b, sans réécrire leurs preuves.
+
+Target contract: guard22 changes and guard27 is new. The pending carrier moves
+whole before joins, wait, receipts or diagnostic rendering. Only an explicit
+fixture receiver may perform the first real wait after a known seam that never
+called OS wait. Actual Finished receipts follow reap and both joins. Fallible
+observations borrow complete owned facts inside a catch; any secondary panic
+travels with the original owner. Guard27 expects a healthy real control, zero
+pre-reception rendering/receipt, preserved None/Some payload, real EISDIR,
+identity-checked removal of only its empty collision directory, preserved failed
+temporary and one changed-precondition recovery. A local post-publication
+announcement panic retains its opaque payload and the actual published receipt
+is read back. Standard writer behavior remains unchanged; no global stderr/hook
+mutation or new policy. Join invariants/global cleanup are not qualified.
+The permanent27 count is an expectation, not a27-test PASS claim. Historical
+capture-lot narratives below keep their original scope; this section and the
+current manifest describe C3b without rewriting their proof history.
+
 Précontrôles archive/Git en lecture seule : [contrats et commandes](PREFLIGHTS.md).
+
 Read-only archive/Git preflights: [contracts and commands](PREFLIGHTS.en.md).
 
 Pour les paramètres des prochaines compilations Cargo et le garde d'admission

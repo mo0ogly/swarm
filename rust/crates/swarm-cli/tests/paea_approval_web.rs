@@ -190,6 +190,50 @@ fn write_process_receipt(
     selection: &Value,
     process_outcome: &Value,
 ) -> Result<(PathBuf, PathBuf), String> {
+    write_process_receipt_with_announcer(
+        leaf,
+        witness,
+        manifest,
+        selection,
+        process_outcome,
+        |receipt_path| {
+            eprintln!(
+                "{}",
+                json!({
+                    "manifest": manifest,
+                    "receipt": receipt_path.display().to_string(),
+                })
+            );
+        },
+    )
+}
+
+/// The SAME receipt writer with the final announcement exposed as an
+/// EXPLICIT seam: `announce` receives the published receipt path at the
+/// writer's ONE announcement point — immediately AFTER the atomic rename,
+/// the file fsync and the parent-directory fsync, and before `Ok` — so a
+/// caller can observe or fault the final diagnostic without any global
+/// stderr mutation and without fabricating an OS error. The existing
+/// `write_process_receipt` delegates here with the STANDARD single stderr
+/// manifest JSON line, so every existing call site keeps its exact
+/// observable behavior (same IO sequence, same stage-tagged `Err` texts,
+/// same announcement timing and shape). A panic inside `announce` — or
+/// anywhere in the writer — propagates as a real panic to the caller and
+/// proves NOTHING about rollback or non-publication: the rename may
+/// already have completed, so a caller that must survive a writer panic
+/// retains the opaque payload and inspects the filesystem itself (the
+/// parent WaitRefused receiver step does exactly that). Inputs, atomicity
+/// contract, receipt content, failure shape (`Err(String)` stage-tagged
+/// text) and the `Ok` return are EXACTLY the existing writer's;
+/// witness-local to this test; the shared capture types are untouched.
+fn write_process_receipt_with_announcer(
+    leaf: &Path,
+    witness: &str,
+    manifest: &str,
+    selection: &Value,
+    process_outcome: &Value,
+    announce: impl FnOnce(&Path),
+) -> Result<(PathBuf, PathBuf), String> {
     // Relative paths (never absolute paths that would leak the runner's
     // private area spelling) + real byte hashes of the conserved files.
     let stdout_name = "stdout.raw";
@@ -252,15 +296,16 @@ fn write_process_receipt(
     dir.sync_all()
         .map_err(|e| format!("leaf dir fsync refused: {e}"))?;
     drop(dir);
-    eprintln!(
-        "{}",
-        json!({
-            "manifest": manifest,
-            "receipt": receipt_path.display().to_string(),
-        })
-    );
+    // The ONE final announcement seam: the caller-provided announcer runs
+    // here — immediately AFTER the atomic rename, the file fsync and the
+    // parent-directory fsync, before `Ok` — replacing the previously
+    // inline stderr print. A panic inside it propagates to the caller and
+    // proves nothing about rollback or non-publication (the rename may
+    // already have completed).
+    announce(&receipt_path);
     Ok((receipt_path, leaf.to_path_buf()))
 }
+
 
 /// Builds the witness-local `process` receipt object for a REAL Finished
 /// collect, strictly from the actual finished facts: the real `ExitStatus`
@@ -313,24 +358,13 @@ fn finished_process_outcome(
     })
 }
 
-/// Builds the witness-local `process` receipt object for the typed refusal
-/// route that still records an unresolved outcome (wait refused): the process
-/// outcome is EXPLICITLY UNKNOWN / NOT FINISHED — `finished` is `false` and
-/// every fact the route does not actually carry (exit code, Unix signal,
-/// success, terminal variants, `Completed` byte counts) stays `null` with
-/// NO invented status, count or settled state. The controller-panic
-/// presence is recorded ONLY where the caller passes a fact the route
-/// actually knows (routes without that fact record `null`; the
-/// preparation-refused AND signal-refused consumers NO LONGER CALL this
-/// helper at all — each transfers the WHOLE typed refusal BY VALUE through
-/// its pure helper (`fail_signal_stop_preparation_refused` /
-/// `fail_signal_stop_signal_refused`), and only AFTER the explicit
-/// receiver's real finish returns `Finished` does that receiver write the
-/// FINISHED receipt via `finished_process_outcome` — never a not-finished
-/// envelope for a known-finished capture, and never implying UNKNOWN ==
-/// Finished), while a genuine OS `pidfd_send_signal` refusal exercise and
-/// the WaitRefused helper's pre-payload receipt I/O stay separately OPEN.
-/// Witness-local to this test.
+/// Build the explicit unknown/no-process envelope for the startup receipt
+/// fault probe, which supplies no child process facts. Status, signal, success,
+/// terminal variants and byte counts remain null; controller presence is only
+/// the caller-supplied fact (None for that probe). Pure JSON construction.
+/// This helper is not called by the pending parent wait/preparation/signal
+/// transfer paths. A receiver with actual Finished facts must use
+/// finished_process_outcome; unknown is never equivalent to Finished.
 fn not_finished_process_outcome(controller_panic_presence: Option<bool>) -> Value {
     json!({
         "finished": false,
@@ -345,87 +379,118 @@ fn not_finished_process_outcome(controller_panic_presence: Option<bool>) -> Valu
     })
 }
 
+/// Owned receipt context conserved alongside a WaitRefused refusal BY
+/// VALUE (fixture metadata only, finite): the private leaf, the witness
+/// and manifest labels, and a CLONE of the selection JSON. The clone is
+/// deliberate and bounded — the transfer must not borrow caller data, and
+/// the fixture selection object is a small fixed JSON document; if its
+/// allocation failure may abort while the owned handback is in scope.
+/// Memory-abort recovery is not claimed by this transport.
+/// No receipt is built or written from this context before the typed
+/// transfer; the explicit receiver that recovers the carrier decides
+/// every receipt only AFTER the child and both streams are resolved.
+struct ParentWaitRefusedReceiptContext {
+    leaf: PathBuf,
+    witness: &'static str,
+    manifest: &'static str,
+    selection: Value,
+}
+
 /// Witness-local typed carrier of the ONE fixed parent WaitRefused route
 /// (the SIGINT-stopped route whose finish came back as
-/// `ChildCaptureOutcome::WaitRefused`). EVERY conserved fact is carried BY
-/// VALUE: the original non-Clone wait-refusal cause (moved verbatim —
-/// `io::Error` is not Clone, never copied or re-created), the SAME child
-/// (stdin already closed; NEVER re-waited by the conservation — the exit
-/// status stays UNKNOWN, zero automatic wait after a real refusal), BOTH
-/// captures as their REAL joined terminal states (their `Failed` /
-/// `Panicked` issues and causes are retained verbatim, never masked),
-/// both evidence paths, the ORIGINAL controller panic payload when one
-/// was retained (only its presence ever reaches the receipt; the payload
-/// text never does), and the process-receipt outcome as DATA —
-/// `Ok(receipt path)` on the receipt success path or `Err(stage-tagged
-/// receipt text)` on the secondary receipt-write failure (never
-/// swallowed, never disguised as a success). A `catch_unwind` receiver
-/// can recover the carrier from the panic payload BY VALUE
-/// (`downcast::<ParentWaitRefusedCarrier>()` on the boxed payload — a
-/// bare `downcast_ref` borrow would NOT pass ownership) and then decide
-/// the actual cleanup explicitly (including the FIRST real `Child::wait`
-/// when no real wait has run). Witness-local to this test (bounded
-/// helper, never a product or shared-module API).
+/// `ChildCaptureOutcome::WaitRefused`), transferred PURELY and UNRESOLVED.
+/// EVERY conserved fact is carried BY VALUE: the original non-Clone
+/// wait-refusal cause (moved verbatim — `io::Error` is not Clone, never
+/// copied or re-created), the SAME child (stdin already closed by the
+/// finish contract; NEVER re-waited by the conservation or the boundary —
+/// the exit status stays UNKNOWN, zero automatic wait after a real
+/// refusal), BOTH captures as their STILL-OWNED, UNJOINED
+/// `LiveRecordedStream` owners (NO join runs before the typed transfer:
+/// no terminal state is claimed, `Failed`/`Panicked` issues stay with the
+/// workers, and no join can panic before the payload is secured), both
+/// evidence paths, the ORIGINAL controller panic payload when one was
+/// retained (never rendered, never serialized), and the owned receipt
+/// CONTEXT (leaf, labels, finite selection clone) from which an explicit
+/// receiver may LATER write a receipt — only AFTER it has resolved the
+/// child and both streams. NO file I/O, no rendering, no stderr write, no
+/// join and no receipt happen on the conservation or the pure failure
+/// boundary, so an arbitrary custom `Display`/`Debug` of the primary
+/// cause can never panic before `panic_any` and never lose the ownership
+/// transfer. A `catch_unwind` receiver recovers the carrier from the
+/// panic payload BY VALUE (`downcast::<ParentWaitRefusedCarrier>()` on
+/// the boxed payload — a bare `downcast_ref` borrow would NOT pass
+/// ownership) and then decides everything explicitly (including the FIRST
+/// real `Child::wait` ONLY under its own receiver policy for the known
+/// FnOnce pre-OS-wait seam — a REAL OS-wait refusal must NOT be
+/// automatically re-waited). With no higher receiver the payload is
+/// dropped UNRESOLVED at the libtest top level: dropping
+/// `LiveRecordedStream` DETACHES its worker (no terminal state, no
+/// receipt) and no global cleanup exists — this carrier claims none.
+/// Witness-local to this test (bounded helper, never a product or
+/// shared-module API).
 struct ParentWaitRefusedCarrier {
     context: &'static str,
     error: std::io::Error,
     child: std::process::Child,
-    stdout_state: paea_capture_live::LiveStreamState,
-    stderr_state: paea_capture_live::LiveStreamState,
+    stdout_stream: paea_capture_live::LiveRecordedStream,
+    stderr_stream: paea_capture_live::LiveRecordedStream,
     stdout_path: PathBuf,
     stderr_path: PathBuf,
     controller_panic: Option<Box<dyn std::any::Any + Send>>,
-    receipt: Result<PathBuf, String>,
+    receipt_context: ParentWaitRefusedReceiptContext,
 }
 
 /// Manual Debug: the child is identified by its pid (diagnostic only —
 /// `Child` itself is not `Debug` and a pid may be recycled after exit),
-/// the controller panic only by its presence.
+/// the controller panic only by its presence, the still-unjoined streams
+/// only by a static description (their real terminal states do not exist
+/// before an explicit receiver join), and the receipt context by its leaf
+/// path. This impl is never invoked on the pure boundary itself.
 impl std::fmt::Debug for ParentWaitRefusedCarrier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ParentWaitRefusedCarrier")
             .field("context", &self.context)
             .field("error", &self.error)
             .field("child_pid", &self.child.id())
-            .field("stdout_state", &self.stdout_state)
-            .field("stderr_state", &self.stderr_state)
+            .field("stdout_stream", &"LiveRecordedStream(..) unjoined")
+            .field("stderr_stream", &"LiveRecordedStream(..) unjoined")
             .field("stdout_path", &self.stdout_path)
             .field("stderr_path", &self.stderr_path)
             .field(
                 "controller_panic_present",
                 &self.controller_panic.is_some(),
             )
-            .field("receipt", &self.receipt)
+            .field("receipt_leaf", &self.receipt_context.leaf)
             .finish()
     }
 }
 
-/// Conservation of a WaitRefused handback on the parent's SIGINT-stopped
-/// route into the complete typed [`ParentWaitRefusedCarrier`] — the ONE
-/// WaitRefused route fixed in this slice, shared VERBATIM by the
-/// production witness arm and the dedicated regression guard below. EVERY
-/// handback field is moved in BY VALUE (nothing dropped, no silent
-/// abandonment); BOTH captures join to their REAL terminal states BEFORE
-/// the receipt is written (on this route the SIGINT stop was accepted and
-/// the stdin-EOF permission was already given, but an accepted stop
-/// request is NOT termination proof — the joins keep the same documented
-/// blocking limit as the finish contract and end only at the producer's
-/// real causal EOF: no timer, no kill, no retry; `Failed`/`Panicked`
-/// states and their causes are retained verbatim); the receipt is the
-/// EXPLICIT
-/// UNKNOWN / not-finished envelope — the exit status stays UNKNOWN — and
-/// now records the controller-panic PRESENCE the route actually knows
-/// (never the payload text). The child is NOT re-waited here and no
-/// signal, kill, timer, retry or second conservation reader exists: the
-/// receipt reuses the ONE existing `write_process_receipt` and the real
-/// producer contracts. Resolving the handback (an explicit FIRST real
-/// `Child::wait` when no real wait has run, or any other decision) is the
-/// `catch_unwind` receiver's explicit job after recovering the carrier BY
-/// VALUE; this helper itself resolves nothing.
+
+/// PURE conservation of a WaitRefused handback on the parent's
+/// SIGINT-stopped route into the complete typed
+/// [`ParentWaitRefusedCarrier`] — the ONE WaitRefused route fixed in this
+/// slice, shared VERBATIM by the production witness arm and the dedicated
+/// regression guards below. EVERY handback field is moved in BY VALUE
+/// (nothing dropped, no silent abandonment); NOTHING ELSE HAPPENS: no
+/// join runs here (the captures stay UNJOINED, still owned by their
+/// workers — no terminal state is claimed and no join can panic before
+/// the typed transfer), the child is NOT re-waited (the exit status stays
+/// UNKNOWN; a REAL OS-wait refusal is never automatically re-waited), and
+/// NO receipt is built or written here — the caller's owned receipt
+/// context (leaf, witness/manifest labels, finite selection clone) is
+/// conserved AS DATA for an explicit receiver to use only AFTER it has
+/// resolved the child and both streams. There is no I/O, no rendering, no
+/// stderr write, no timer, no kill, no retry and no second conservation
+/// reader: an arbitrary custom `Display`/`Debug` of the primary cause
+/// cannot run on this route at all. Resolving the handback (an explicit
+/// FIRST real `Child::wait` under the receiver's own policy for the known
+/// FnOnce pre-OS-wait seam, the joins, any receipt) is the
+/// `catch_unwind` receiver's explicit job after recovering the carrier
+/// BY VALUE; this helper itself resolves nothing.
 fn conserve_parent_wait_refused_carrier(
     context: &'static str,
-    witness: &str,
-    manifest: &str,
+    witness: &'static str,
+    manifest: &'static str,
     leaf: &Path,
     selection: &Value,
     handback: paea_capture_child::WaitRefusalHandback,
@@ -439,64 +504,296 @@ fn conserve_parent_wait_refused_carrier(
         stdout_path,
         stderr_path,
     } = handback;
-    let stdout_state = stdout_stream.join();
-    let stderr_state = stderr_stream.join();
-    let receipt = write_process_receipt(
-        leaf,
-        witness,
-        manifest,
-        selection,
-        &not_finished_process_outcome(Some(controller_panic.is_some())),
-    )
-    .map(|(receipt_path, _)| receipt_path);
     ParentWaitRefusedCarrier {
         context,
         error,
         child,
+        stdout_stream,
+        stderr_stream,
+        stdout_path,
+        stderr_path,
+        controller_panic,
+        receipt_context: ParentWaitRefusedReceiptContext {
+            leaf: leaf.to_path_buf(),
+            witness,
+            manifest,
+            selection: selection.clone(),
+        },
+    }
+}
+
+
+/// PURE typed failure for the parent witness's WaitRefused route: the
+/// COMPLETE carrier is transferred REALLY to this typed boundary and
+/// panicked WITH the test as a TYPED RECOVERABLE payload —
+/// `std::panic::panic_any(carrier)` — so a `catch_unwind` receiver can
+/// recover it BY VALUE (`downcast::<ParentWaitRefusedCarrier>()` on the
+/// boxed payload; a bare `downcast_ref` borrow would NOT pass ownership)
+/// and decide everything explicitly. NOTHING runs before the transfer: no
+/// `eprintln!`, no rendering of the primary `io::Error` or of any capture
+/// state (an arbitrary custom `Display`/`Debug` may panic — rendering it
+/// here could destroy the transfer and lose the child, the streams, the
+/// cause and the payload), no join, no wait, no receipt I/O, no stderr
+/// write. The child is NEVER re-waited here and the exit status stays
+/// UNKNOWN through this boundary. Limits: this typed carrier only
+/// transfers ownership to a recovering `catch_unwind` receiver — with no
+/// higher consumer, the libtest top-level drop does NOT establish any
+/// external cleanup (dropping a `LiveRecordedStream` DETACHES its worker:
+/// no terminal state, no receipt), the unexpected handback stays VISIBLE
+/// as this witness's failure, and NO claim is made that all refusal
+/// routes are resolved: genuine pidfd and SignalRefused handling remain
+/// OPEN; guard24 separately exercises the PreparationRefused parent's
+/// pure by-value helper. Post-recovery diagnostics and receipts belong to
+/// the receiver alone, only while it owns the recovered facts.
+fn fail_parent_wait_refused(carrier: ParentWaitRefusedCarrier) -> ! {
+    std::panic::panic_any(carrier)
+}
+
+/// Finished receiver facts for a recovered parent WaitRefused carrier,
+/// built ONLY by [`resolve_parent_wait_refused_carrier_after_known_seam`]
+/// AFTER the receiver's explicit resolution: the REAL `ExitStatus` of the
+/// FIRST real wait, BOTH joined REAL terminal `LiveStreamState`s, both
+/// evidence paths, the original non-Clone wait-refusal cause (moved
+/// verbatim), the ORIGINAL controller panic payload (still opaque, never
+/// rendered), the conserved context label and the owned receipt context.
+/// Nothing is invented: no status, count or settled state beyond the real
+/// wait and joins; the payload text never reaches any receipt.
+struct ParentWaitRefusedResolvedFacts {
+    context: &'static str,
+    wait_refusal_error: std::io::Error,
+    exit: std::process::ExitStatus,
+    stdout_state: paea_capture_live::LiveStreamState,
+    stderr_state: paea_capture_live::LiveStreamState,
+    stdout_path: PathBuf,
+    stderr_path: PathBuf,
+    controller_panic: Option<Box<dyn std::any::Any + Send>>,
+    receipt_context: ParentWaitRefusedReceiptContext,
+}
+
+/// Typed carrier for the UNEXPECTED case where the receiver's FIRST REAL
+/// wait of a recovered parent WaitRefused handback ALSO refuses (a
+/// fixture anomaly, never a claimed normal route): the conserved context,
+/// the recovered seam wait cause, the NEW real wait cause, the
+/// STILL-unreaped child plus BOTH still-UNJOINED capture owners with
+/// their evidence paths, the ORIGINAL controller panic payload and the
+/// receipt context — all moved BY VALUE into ONE payload through the PURE
+/// door; never `.expect`-dropped, never stringified, no automatic retry,
+/// no second wait attempt. Recovered BY VALUE with
+/// `downcast::<ParentWaitRefusedRealWaitAlsoRefused>()`. This route is
+/// NOT exercised by the guards of this slice (their children are
+/// cooperative and their seam refusals precede any real wait); it exists
+/// so a real refusal observed at the receiver can never be silently
+/// dropped or auto-retried.
+struct ParentWaitRefusedRealWaitAlsoRefused {
+    context: &'static str,
+    seam_wait_error: std::io::Error,
+    real_wait_error: std::io::Error,
+    child: std::process::Child,
+    stdout_stream: paea_capture_live::LiveRecordedStream,
+    stderr_stream: paea_capture_live::LiveRecordedStream,
+    stdout_path: PathBuf,
+    stderr_path: PathBuf,
+    controller_panic: Option<Box<dyn std::any::Any + Send>>,
+    receipt_context: ParentWaitRefusedReceiptContext,
+}
+
+/// PURE transfer door for [`ParentWaitRefusedRealWaitAlsoRefused`]:
+/// `std::panic::panic_any` of the WHOLE typed payload — no formatting, no
+/// logging, no receipt I/O, no retry, no second wait — so the complete
+/// unresolved ownership travels BY VALUE to a `catch_unwind` receiver
+/// (`Box::downcast` on the boxed payload; never a bare borrow).
+fn fail_parent_wait_refused_real_wait_refused(
+    refusal: ParentWaitRefusedRealWaitAlsoRefused,
+) -> ! {
+    std::panic::panic_any(refusal)
+}
+
+/// Receiver-side EXPLICIT resolution of a recovered parent WaitRefused
+/// carrier, shared by the rewritten guard22 and the new transfer-boundary
+/// guard.
+///
+/// Preconditions: the carrier was recovered BY VALUE from the typed
+/// boundary, and the receiver's OWN policy authorizes the FIRST real
+/// `Child::wait` — legitimate ONLY for the KNOWN FnOnce pre-OS-wait seam
+/// (a synthetic injected handler that refused BEFORE any real wait). A
+/// REAL OS-wait refusal must NOT be automatically re-waited: a receiver
+/// observing a real refusal here must transfer the unresolved ownership
+/// (see [`ParentWaitRefusedRealWaitAlsoRefused`]) instead of retrying.
+///
+/// Steps, in order, ALL before any verdict: (1) the FIRST real
+/// `Child::wait` through the owned handle — the stdin-EOF permission was
+/// already given by the finish contract BEFORE the original refusal, so a
+/// cooperative child terminates on its own; on a REAL wait refusal the
+/// complete [`ParentWaitRefusedRealWaitAlsoRefused`] is built (everything
+/// moved in, both captures still UNJOINED) and transferred through the
+/// PURE door — no retry, no second attempt; (2) BOTH capture joins — the
+/// REAL terminal states; a documented `LiveRecordedStream::join`
+/// invariant panic (double join — impossible here because the carrier
+/// held unjoined streams — or a clean worker exit without a terminal
+/// publication) is NOT recovered or masked: it propagates AFTER the child
+/// was already reaped by step (1), so it cannot orphan the child; (3) the
+/// complete [`ParentWaitRefusedResolvedFacts`] come back BY VALUE.
+///
+/// Errors: step (1)'s real-refusal divergence (typed carrier); join
+/// invariant panics propagate (documented `join` contract, no generic
+/// cleanup claimed). A child that ignores stdin EOF would block the wait
+/// forever (documented `finish` limit — no timer exists); the known-seam
+/// policy presupposes the cooperative fixture script.
+///
+/// Effects: one child wait and both stream joins, with their documented
+/// blocking/error behavior; no receipt or diagnostic rendering. Verdicts
+/// and receipt IO stay with the caller after this resolution.
+fn resolve_parent_wait_refused_carrier_after_known_seam(
+    carrier: ParentWaitRefusedCarrier,
+) -> ParentWaitRefusedResolvedFacts {
+    let ParentWaitRefusedCarrier {
+        context,
+        error,
+        mut child,
+        stdout_stream,
+        stderr_stream,
+        stdout_path,
+        stderr_path,
+        controller_panic,
+        receipt_context,
+    } = carrier;
+    let exit = match child.wait() {
+        Ok(exit) => exit,
+        Err(real_wait_error) => fail_parent_wait_refused_real_wait_refused(
+            ParentWaitRefusedRealWaitAlsoRefused {
+                context,
+                seam_wait_error: error,
+                real_wait_error,
+                child,
+                stdout_stream,
+                stderr_stream,
+                stdout_path,
+                stderr_path,
+                controller_panic,
+                receipt_context,
+            },
+        ),
+    };
+    let stdout_state = stdout_stream.join();
+    let stderr_state = stderr_stream.join();
+    ParentWaitRefusedResolvedFacts {
+        context,
+        wait_refusal_error: error,
+        exit,
         stdout_state,
         stderr_state,
         stdout_path,
         stderr_path,
         controller_panic,
-        receipt,
+        receipt_context,
     }
 }
 
-/// Explicit typed failure for the parent witness's WaitRefused route: the
-/// COMPLETE carrier is transferred REALLY to this typed boundary and
-/// panicked WITH the test as a TYPED RECOVERABLE payload — a
-/// `catch_unwind` receiver can recover it BY VALUE
-/// (`downcast::<ParentWaitRefusedCarrier>()` on the boxed payload) and
-/// decide the actual cleanup explicitly (including the FIRST real
-/// `Child::wait` when no real wait has run). The conserved facts are
-/// printed first (the payload itself is not a message string); the child
-/// is NEVER re-waited here and the exit status stays UNKNOWN through this
-/// boundary. Limits: this typed carrier only transfers ownership to a
-/// recovering `catch_unwind` receiver — with no higher consumer, the
-/// libtest top-level drop does NOT establish any external cleanup, the
-/// unexpected handback stays VISIBLE as this witness's failure, and NO
-/// claim is made that all refusal routes are resolved: genuine pidfd and
-/// SignalRefused handling remain OPEN; guard24 separately exercises the
-/// PreparationRefused parent's pure by-value helper.
-fn fail_parent_wait_refused(carrier: ParentWaitRefusedCarrier) -> ! {
-    eprintln!(
-        "parent witness unexpected wait refusal — {context}: cause {error}; \
-         child pid {pid} NEVER re-waited here (exit status UNKNOWN); \
-         stdout {stdout:?}, stderr {stderr:?}; stdout path {stdout_path:?}, \
-         stderr path {stderr_path:?}; original controller panic retained: \
-         {panic_present}; receipt outcome: {receipt:?}",
-        context = carrier.context,
-        error = carrier.error,
-        pid = carrier.child.id(),
-        stdout = carrier.stdout_state,
-        stderr = carrier.stderr_state,
-        stdout_path = carrier.stdout_path,
-        stderr_path = carrier.stderr_path,
-        panic_present = carrier.controller_panic.is_some(),
-        receipt = carrier.receipt,
-    );
-    std::panic::panic_any(carrier);
+/// The EXACT fault of a refused or panicking finished-path receipt write
+/// for the parent WaitRefused receiver: the writer RETURNED `Err` (its
+/// verbatim stage-tagged text, e.g. `receipt atomic rename refused: …`)
+/// or the writer PANICKED (its ORIGINAL opaque panic payload retained
+/// verbatim — e.g. a fault at the writer's final announcement AFTER the
+/// atomic rename). Publication uncertainty is preserved in BOTH cases: an
+/// `Err` at or after the atomic rename and a panic after it prove NEITHER
+/// rollback NOR non-publication — whether any receipt bytes were left
+/// published is a filesystem fact the receiver must OBSERVE, never
+/// something invented here.
+enum ParentWaitRefusedReceiptFault {
+    Refused(String),
+    WriterPanicked(Box<dyn std::any::Any + Send>),
 }
+
+/// Complete terminal facts + receipt fault of the parent WaitRefused
+/// receiver: the WHOLE [`ParentWaitRefusedResolvedFacts`] (real exit,
+/// both joined terminals, original causes/payload, paths, receipt
+/// context) plus the retained [`ParentWaitRefusedReceiptFault`] and the
+/// receipt target path (the leaf travels inside the context). No empty
+/// success: the caller never receives a fabricated `Ok`.
+struct ParentWaitRefusedReceiptFailure {
+    facts: ParentWaitRefusedResolvedFacts,
+    fault: ParentWaitRefusedReceiptFault,
+    receipt_target: PathBuf,
+}
+
+/// The writer's STANDARD announcement as an explicit announcer closure —
+/// the same single stderr manifest JSON line the existing
+/// `write_process_receipt` emits (Codex's manual identification; stderr,
+/// never stdout). Used by the guard phases that exercise the writer's
+/// default behavior; never a global stderr mutation — an explicit
+/// announcer at the writer's own seam.
+fn announce_guard_receipt_standard(manifest: &'static str) -> impl FnOnce(&Path) {
+    move |receipt_path: &Path| {
+        eprintln!(
+            "{}",
+            json!({
+                "manifest": manifest,
+                "receipt": receipt_path.display().to_string(),
+            })
+        );
+    }
+}
+
+/// Owned finished-path receipt step for the parent WaitRefused receiver,
+/// called ONLY AFTER the explicit resolution above (the child is reaped,
+/// both captures hold REAL joined terminal states — collection is
+/// stable). Inputs: the owned [`ParentWaitRefusedResolvedFacts`] and an
+/// explicit announcer at the writer's own final announcement seam (the
+/// standard stderr line via [`announce_guard_receipt_standard`], or a
+/// guard-injected FnOnce fault — never a global stderr closure, never a
+/// fabricated OS error).
+///
+/// Behavior: builds the receipt STRICTLY from the REAL Finished facts via
+/// the existing `finished_process_outcome` (the KNOWN controller-panic
+/// PRESENCE of the recovered carrier — presence only, never the payload
+/// text) and runs the EXISTING writer
+/// (`write_process_receipt_with_announcer`) ONCE, wrapped in ONE
+/// `catch_unwind`: a writer `Err` AND a writer PANIC (e.g. a fault at the
+/// writer's final announcement AFTER the atomic rename) are both retained
+/// as data in [`ParentWaitRefusedReceiptFailure`] together with ALL owned
+/// facts and the receipt target — an `Err`/panic must not imply no
+/// publication or rollback, and this helper claims neither.
+///
+/// Outcomes: `Ok((facts, receipt_path))` on the writer's `Ok` (the facts
+/// come back UNCHANGED, moved through); `Err(failure)` otherwise — never
+/// a `.expect`, never a string-only panic, nothing dropped, no retry, no
+/// rollback, no publication claim; every recovery decision stays with the
+/// caller.
+fn write_parent_wait_refused_finished_receipt(
+    facts: ParentWaitRefusedResolvedFacts,
+    announce: impl FnOnce(&Path),
+) -> Result<(ParentWaitRefusedResolvedFacts, PathBuf), ParentWaitRefusedReceiptFailure> {
+    let receipt_target = facts.receipt_context.leaf.join("process-receipt.json");
+    let attempted = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        write_process_receipt_with_announcer(
+            &facts.receipt_context.leaf,
+            facts.receipt_context.witness,
+            facts.receipt_context.manifest,
+            &facts.receipt_context.selection,
+            &finished_process_outcome(
+                &facts.exit,
+                &facts.stdout_state,
+                &facts.stderr_state,
+                facts.controller_panic.is_some(),
+            ),
+            announce,
+        )
+    }));
+    match attempted {
+        Ok(Ok((receipt_path, _))) => Ok((facts, receipt_path)),
+        Ok(Err(receipt_stage_text)) => Err(ParentWaitRefusedReceiptFailure {
+            fault: ParentWaitRefusedReceiptFault::Refused(receipt_stage_text),
+            facts,
+            receipt_target,
+        }),
+        Err(writer_panic) => Err(ParentWaitRefusedReceiptFailure {
+            fault: ParentWaitRefusedReceiptFault::WriterPanicked(writer_panic),
+            facts,
+            receipt_target,
+        }),
+    }
+}
+
 
 /// Constant cooperative script for the parent wait-refusal guard's real
 /// local children (`/usr/bin/python3 -c`, stdin + both raw streams
@@ -726,8 +1023,10 @@ fn assert_parent_guard_completed(
 
 /// PARENT REGRESSION (the ONE named guard of this slice):
 /// `paea_capture_parent_wait_refusal_retains_owned_handoff` — the typed
-/// receipt / ownership boundary of the parent witness's WaitRefused
-/// route.
+/// PURE-transfer ownership boundary of the parent witness's WaitRefused
+/// route: no join, no file I/O, no rendering and no stderr write precede
+/// the typed transfer, and every receipt is written only afterwards by
+/// the explicit receiver.
 ///
 /// Phase 1 — HEALTHY CONTROL: an actual valid child under the SAME
 /// preconditions as the parent's stopped route (stdin + both raw streams
@@ -741,35 +1040,42 @@ fn assert_parent_guard_completed(
 /// a SYNTHETIC refusal injected BEFORE any real wait (a test seam ONLY —
 /// this is NOT a real OS wait failure). The handback is conserved with
 /// the SAME helper the production WaitRefused arm uses
-/// (`conserve_parent_wait_refused_carrier`): BOTH captures join to their
-/// real terminal states BEFORE the receipt, the UNKNOWN / not-finished
-/// receipt envelope records the controller-panic PRESENCE (never the
-/// payload text), the receipt path travels as data, and a DISTINCTIVE
-/// original controller-panic payload marker travels INSIDE the carrier.
-/// The typed boundary is failed with the SAME `fail_parent_wait_refused`
-/// the production arm uses, inside a test `catch_unwind`; the boxed
-/// payload is recovered BY VALUE (a borrow downcast would not pass
-/// ownership), every field is destructured by move, and the facts are
-/// asserted as data: single seam invocation, same child pid, verbatim
-/// non-Clone cause, completed terminal states, exact raw bytes, UNKNOWN
-/// receipt envelope with `controller_panic: true` and no raw payload
-/// text, and the exact payload marker. The RECEIVER then decides the
-/// actual cleanup explicitly: the injected handler never reached the real
-/// `Child::wait`, so the direct `child.wait()` is the FIRST real wait of
-/// this child — the real exit code is retained, no orphan.
+/// (`conserve_parent_wait_refused_carrier`) PURELY: the captures stay
+/// UNJOINED, the child stays unreaped and NO receipt is built before the
+/// typed boundary `fail_parent_wait_refused` (the production function)
+/// panics the carrier with NO rendering at all. The test `catch_unwind`
+/// recovers the boxed payload BY VALUE (a borrow downcast would not pass
+/// ownership); the RECEIVER then decides the resolution explicitly — the
+/// FIRST real `Child::wait` (authorized ONLY by the receiver policy for
+/// the known FnOnce pre-OS-wait seam), BOTH joins, and ONLY THEN the
+/// receipt, written by the shared receiver step over the REAL Finished
+/// facts (real exit code 7, both REAL `Completed` terminals,
+/// controller-panic PRESENCE true, never the payload text). The
+/// historical UNKNOWN / not-finished envelope expectations are gone: no
+/// UNKNOWN receipt is produced on this route anymore, the Finished
+/// receipt exists only AFTER the explicit known-seam receiver wait, and
+/// UNKNOWN is never presented as Finished (the historical proofs stay
+/// historical). The facts are asserted as data: single seam invocation,
+/// same child pid, verbatim non-Clone cause, completed terminal states,
+/// exact raw bytes, Finished receipt facts, and the exact payload marker
+/// — no orphan.
 ///
 /// Phase 3 — SECONDARY RECEIPT FAILURE as data: a third real child on a
 /// fresh leaf whose receipt target path is pre-created as a real
-/// DIRECTORY, so the receipt's atomic rename REALLY refuses (actual
-/// directory rename collision, feasible inside the same bounded guard).
-/// The same helper conserved the handback and the SAME typed boundary
-/// fails; the recovered carrier carries
-/// `Err("receipt atomic rename refused: …")` as data (never swallowed,
-/// never a fake success), the joined terminal states stay conserved, and
-/// the receiver again runs the explicit FIRST real wait — the real exit
-/// code is retained, no orphan. The refused temp receipt file and the
-/// collision directory stay in the private failure leaf as retained
-/// evidence.
+/// DIRECTORY, so the RECEIVER-side receipt write REALLY refuses at its
+/// atomic rename (actual directory rename collision, feasible inside the
+/// same bounded guard). The same pure boundary fails; the recovered
+/// carrier is resolved exactly as in Phase 2 and the shared receiver step
+/// returns the writer's stage-tagged `Err` text AS DATA with ALL owned
+/// facts (never swallowed, never a fake success), claiming nothing about
+/// publication — the ACTUAL filesystem state is inspected: no receipt
+/// file is published, the refused temp receipt file and the collision
+/// directory stay in the private failure leaf as retained evidence, and
+/// the receiver's explicit changed-precondition recovery keeps the real
+/// exit code (no orphan) and the verbatim cause. The dedicated
+/// transfer-boundary guard below adds the render-counter, filesystem
+/// inspection and announcer-panic observables on the same pure boundary.
+
 ///
 /// Limits (visible, never hidden): the injected refusal is a TEST SEAM,
 /// not a real OS wait failure; the typed carrier transfers ownership ONLY
@@ -932,10 +1238,11 @@ fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
              must NOT report a Finished outcome: {exit:?}"
         ),
     };
-    // Conservation with the SAME helper the production WaitRefused arm
-    // uses — joins BEFORE the receipt, UNKNOWN envelope, presence-only
-    // panic record, receipt success path as data, and the DISTINCTIVE
-    // original controller-panic payload marker INSIDE the carrier.
+    // PURE conservation with the SAME helper the production WaitRefused
+    // arm uses — NOTHING joins, writes, renders or prints here: the
+    // captures stay UNJOINED, the child stays unreaped, NO receipt is
+    // built, and the DISTINCTIVE original controller-panic payload marker
+    // travels INSIDE the carrier.
     let conserved = conserve_parent_wait_refused_carrier(
         PARENT_GUARD_INJECTED_CONTEXT,
         PARENT_GUARD_WITNESS,
@@ -948,8 +1255,9 @@ fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
     );
     // THE REAL TYPED BOUNDARY — failed with the SAME function the
     // production WaitRefused arm uses, inside a test catch_unwind; the
-    // boxed payload is recovered BY VALUE (the default panic hook may
-    // print during the catch — no global hook mutation is allowed).
+    // boxed payload is recovered BY VALUE and NOTHING is rendered before
+    // the transfer (the default panic hook may print during the catch —
+    // no global hook mutation is allowed).
     let caught = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         fail_parent_wait_refused(conserved);
     }));
@@ -959,49 +1267,48 @@ fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
     );
     let carrier = boxed_payload
         .downcast::<ParentWaitRefusedCarrier>()
-        .expect(
-            "the typed panic payload must downcast BY VALUE into the \
-             complete ParentWaitRefusedCarrier",
-        );
-    // Every field destructured BY MOVE out of the recovered box — nothing
-    // cloned, no cause re-creation, no borrow replacing the ownership
-    // transfer. Facts are snapshotted as data BEFORE any verdict.
-    let ParentWaitRefusedCarrier {
+        .unwrap_or_else(|unexpected| std::panic::resume_unwind(unexpected));
+    // Data snapshots BEFORE any verdict: the child pid for the seam
+    // equality, then the receiver's EXPLICIT RESOLUTION — the FIRST real
+    // wait of this child (authorized ONLY by the receiver policy for the
+    // KNOWN FnOnce pre-OS-wait seam: the injected handler never reached
+    // the real `Child::wait` — no automatic wait, retry, signal or kill
+    // exists anywhere in this guard) and BOTH joins. The REAL exit is
+    // snapshotted by the resolution, so even a failing later verdict
+    // cannot drop the unreaped child and its real runtime issue stays
+    // retained.
+    let recovered_child_pid = carrier.child.id();
+    let resolved = resolve_parent_wait_refused_carrier_after_known_seam(*carrier);
+    let (facts, receipt_path) = match write_parent_wait_refused_finished_receipt(
+        resolved,
+        announce_guard_receipt_standard(PARENT_GUARD_MANIFEST),
+    ) {
+        Ok(ok) => ok,
+        Err(failure) => std::panic::panic_any(failure),
+    };
+    let (facts, recovered_cause_text) = observe_parent_wait_refused_owned(facts, |facts| {
+        let rendered = facts.wait_refusal_error.to_string();
+        let marker = facts.controller_panic.as_ref()
+            .and_then(|payload| payload.downcast_ref::<String>());
+        assert_eq!(marker.map(String::as_str), Some(PARENT_WAIT_REFUSAL_PANIC_MARKER));
+        rendered
+    });
+    let ParentWaitRefusedResolvedFacts {
         context: carrier_context,
-        error: recovered_error,
-        mut child,
+        wait_refusal_error: recovered_error,
+        exit: recovered_exit,
         stdout_state,
         stderr_state,
         stdout_path: recovered_stdout_path,
         stderr_path: recovered_stderr_path,
         controller_panic: recovered_panic,
-        receipt: recovered_receipt,
-    } = *carrier;
-    let recovered_child_pid = child.id();
-    // EXPLICIT RECEIVER RESOLUTION FIRST — immediately after the BY-VALUE
-    // destructure and BEFORE every verdict and evidence read: the injected
-    // seam handler never reached the real `Child::wait`, so this is the
-    // FIRST real wait of this child (a deliberate receiver decision for
-    // the synthetic refusal-before-actual-wait case — no automatic wait,
-    // retry, signal or kill exists anywhere in this guard). The REAL exit
-    // code is snapshotted now, so even a failing later verdict cannot
-    // drop the unreaped child and its real runtime issue stays retained.
-    let recovered_exit_code = child
-        .wait()
-        .expect("the FIRST real wait of the injected child must succeed")
-        .code();
-    let recovered_cause_text = recovered_error.to_string();
+        receipt_context: _,
+    } = facts;
+    let recovered_exit_code = recovered_exit.code();
     let recovered_cause_kind = recovered_error.kind();
     let seam_invocation_count = seam_invocations.get();
     let seam_seen_pid = seam_child_pid.get();
     let recovered_panic_present = recovered_panic.is_some();
-    let receipt_path = match &recovered_receipt {
-        Ok(path) => path.clone(),
-        Err(text) => panic!(
-            "the injected guard's receipt write must succeed on the clean \
-             leaf; unexpected secondary receipt failure conserved as data: {text}"
-        ),
-    };
     let marker_text = match recovered_panic {
         Some(payload) => match payload.downcast::<String>() {
             Ok(text) => *text,
@@ -1015,7 +1322,8 @@ fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
              carrier, not be dropped"
         ),
     };
-    // FACT VERDICTS — all data-level, nothing invented:
+    // FACT VERDICTS — all data-level, nothing invented, ALL after the
+    // child and both streams are resolved:
     assert_eq!(
         carrier_context, PARENT_GUARD_INJECTED_CONTEXT,
         "the failing-site context label must travel with the carrier"
@@ -1051,7 +1359,8 @@ fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
     );
     assert!(
         receipt_path.starts_with(&injected_leaf),
-        "the receipt must be written inside the guard's private leaf"
+        "the receiver's Finished receipt must be written inside the \
+         guard's private leaf"
     );
     assert_parent_guard_completed(
         &stdout_state,
@@ -1073,42 +1382,47 @@ fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
         expected_stderr,
         "the REAL raw stderr bytes must be retained through the typed boundary"
     );
-    // UNKNOWN exit receipt: the envelope is explicitly not-finished with
-    // no invented code/signal/success/terminal state, records the
-    // controller-panic PRESENCE the route actually knows, and NEVER
-    // carries the raw payload text.
+    // FINISHED receipt — produced ONLY by the receiver, ONLY AFTER the
+    // explicit known-seam receiver wait and BOTH joins, strictly from the
+    // REAL Finished facts. The historical UNKNOWN / not-finished envelope
+    // expectations are deliberately gone: no UNKNOWN receipt is produced
+    // on this route anymore and UNKNOWN is never presented as Finished
+    // (the historical proofs stay historical).
     let receipt_raw =
         fs::read(&receipt_path).expect("the retained process receipt must be readable");
     let receipt_json: Value = serde_json::from_slice(&receipt_raw)
         .expect("the retained process receipt must be valid JSON");
     assert_eq!(
-        receipt_json["process"]["finished"], json!(false),
-        "the receipt must record the UNKNOWN / not-finished envelope"
+        receipt_json["process"]["finished"], json!(true),
+        "the receiver's receipt must record the REAL Finished facts of the \
+         post-wait collection"
     );
     assert_eq!(
-        receipt_json["process"]["exit_code"], Value::Null,
-        "the exit status stays UNKNOWN: no invented code"
+        receipt_json["process"]["exit_code"], json!(PARENT_WAIT_REFUSAL_EXIT_CODE),
+        "the receipt must record the real constant exit code"
     );
     assert_eq!(
         receipt_json["process"]["signal"], Value::Null,
-        "the exit status stays UNKNOWN: no invented signal"
+        "the child terminated by its constant code, so the signal field is \
+         genuinely Null"
     );
     assert_eq!(
-        receipt_json["process"]["success"], Value::Null,
-        "the exit status stays UNKNOWN: no invented success flag"
+        receipt_json["process"]["success"], json!(false),
+        "the receipt must record the real success flag (exit code 7 is NOT \
+         a success)"
     );
     assert_eq!(
-        receipt_json["process"]["stdout_terminal"], Value::Null,
-        "the UNKNOWN envelope invents no terminal state"
+        receipt_json["process"]["stdout_terminal"], json!("Completed"),
+        "the joined stdout terminal must be the REAL Completed variant"
     );
     assert_eq!(
-        receipt_json["process"]["stderr_terminal"], Value::Null,
-        "the UNKNOWN envelope invents no terminal state"
+        receipt_json["process"]["stderr_terminal"], json!("Completed"),
+        "the joined stderr terminal must be the REAL Completed variant"
     );
     assert_eq!(
         receipt_json["process"]["controller_panic"], json!(true),
-        "the UNKNOWN envelope must record the controller-panic PRESENCE \
-         the route actually knows"
+        "the receipt must record the controller-panic PRESENCE the \
+         recovered carrier actually knows"
     );
     assert_eq!(
         receipt_json["artifacts"]["stdout"]["bytes"], json!(expected_stdout.len()),
@@ -1124,13 +1438,14 @@ fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
         "the receipt must NEVER contain the raw controller-panic payload text"
     );
     // RECEIVER VERDICT on the snapshotted REAL exit — the child was
-    // already reaped immediately after the BY-VALUE destructure, so no
-    // failing assertion above can orphan it.
+    // already reaped by the resolution, so no failing assertion above can
+    // orphan it.
     assert_eq!(
         recovered_exit_code,
         Some(PARENT_WAIT_REFUSAL_EXIT_CODE),
         "the real exit code must be retained after the explicit first wait — no orphan"
     );
+
 
     // PHASE 3 — SECONDARY RECEIPT FAILURE AS DATA: a fresh leaf where the
     // receipt target path is pre-created as a real DIRECTORY, so the
@@ -1183,70 +1498,432 @@ fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
              conserved carrier as its payload",
         )
         .downcast::<ParentWaitRefusedCarrier>()
-        .expect(
-            "the collision typed panic payload must downcast BY VALUE into \
-             the complete ParentWaitRefusedCarrier",
-        );
-    let ParentWaitRefusedCarrier {
-        error: collision_error,
-        child: mut collision_child,
-        stdout_state: collision_stdout_state,
-        stderr_state: collision_stderr_state,
-        receipt: collision_receipt,
-        ..
-    } = *collision_carrier;
-    // EXPLICIT RECEIVER RESOLUTION FIRST — immediately after the BY-VALUE
-    // destructure and BEFORE every verdict and evidence read: the FIRST
-    // real wait of this child (a deliberate receiver decision, never an
-    // automatic reattempt — no automatic wait, retry, signal or kill
-    // exists anywhere in this guard). The REAL exit code is snapshotted
-    // now, so even a failing later verdict cannot drop the unreaped child
-    // and its real runtime issue stays retained.
-    let collision_exit_code = collision_child
-        .wait()
-        .expect("the FIRST real wait of the collision child must succeed")
-        .code();
-    let collision_receipt_text = match &collision_receipt {
-        Ok(path) => panic!(
-            "the receipt rename collision must FAIL the receipt write; \
-             unexpected success: {}",
-            path.display()
-        ),
-        Err(text) => text.clone(),
+        .unwrap_or_else(|unexpected| std::panic::resume_unwind(unexpected));
+    // EXPLICIT RECEIVER RESOLUTION FIRST — the FIRST real wait of this
+    // child (the same known-seam receiver policy, never an automatic
+    // reattempt — no automatic wait, retry, signal or kill exists anywhere
+    // in this guard) and BOTH joins — and only then the receipt attempt
+    // against the collision leaf.
+    let collision_resolved =
+        resolve_parent_wait_refused_carrier_after_known_seam(*collision_carrier);
+    let collision_failure = match write_parent_wait_refused_finished_receipt(
+        collision_resolved,
+        announce_guard_receipt_standard(PARENT_GUARD_MANIFEST),
+    ) {
+        Ok(ok) => std::panic::panic_any(ok),
+        Err(failure) => failure,
     };
-    assert!(
-        collision_receipt_text.starts_with("receipt atomic rename refused:"),
-        "the secondary receipt failure must be the REAL stage-tagged rename \
-         refusal conserved as data: {collision_receipt_text}"
-    );
-    assert_eq!(
-        collision_error.to_string(),
-        collision_cause_text,
-        "the non-Clone refusal cause must also survive the collision branch verbatim"
-    );
-    assert_parent_guard_completed(
-        &collision_stdout_state,
-        expected_stdout.len(),
-        "collision stdout capture",
-    );
-    assert_parent_guard_completed(
-        &collision_stderr_state,
-        expected_stderr.len(),
-        "collision stderr capture",
-    );
-    assert_eq!(
-        collision_seam_invocations.get(), 1,
-        "ONE wait attempt per finish on the collision branch too"
-    );
-    // RECEIVER VERDICT on the snapshotted REAL exit — the child was
-    // already reaped immediately after the BY-VALUE destructure, so no
-    // failing assertion above can orphan it.
-    assert_eq!(
-        collision_exit_code,
-        Some(PARENT_WAIT_REFUSAL_EXIT_CODE),
-        "the collision child's real exit code must be retained — no orphan"
-    );
+    if !matches!(&collision_failure.fault, ParentWaitRefusedReceiptFault::Refused(_)) {
+        std::panic::panic_any(collision_failure);
+    }
+    let (_retained_collision_failure, ()) = observe_parent_wait_refused_owned(collision_failure, |failure| {
+        let collision_receipt_text = match &failure.fault {
+            ParentWaitRefusedReceiptFault::Refused(text) => text,
+            _ => panic!("returned stage-tagged rename refusal expected"),
+        };
+        assert!(collision_receipt_text.starts_with("receipt atomic rename refused:"));
+        assert!(collision_receipt_text.contains("os error 21"));
+        assert_eq!(failure.facts.receipt_context.leaf, collision_leaf);
+        assert_eq!(failure.facts.wait_refusal_error.to_string(), collision_cause_text);
+        assert_parent_guard_completed(&failure.facts.stdout_state, expected_stdout.len(), "collision stdout capture");
+        assert_parent_guard_completed(&failure.facts.stderr_state, expected_stderr.len(), "collision stderr capture");
+        assert_eq!(collision_seam_invocations.get(), 1);
+        assert!(failure.receipt_target.is_dir());
+        let mut temporary = Vec::new();
+        for entry in fs::read_dir(&collision_leaf).expect("collision leaf must remain readable") {
+            let entry = entry.expect("collision directory entry must remain readable");
+            if entry.file_name().to_string_lossy().starts_with("process-receipt.json.tmp-") { temporary.push(entry.path()); }
+        }
+        assert_eq!(temporary.len(), 1);
+        assert_eq!(failure.facts.exit.code(), Some(PARENT_WAIT_REFUSAL_EXIT_CODE));
+        // This guard retains the failed state. Changed-precondition recovery
+        // is exercised separately by guard27, never inferred from this Err.
+    });
 }
+
+/// Fixture data, not operator policy: the transfer-boundary guard's
+/// receipt labels and failing-site context strings (witness-local to this
+/// test; a SEPARATE new guard sharing guard22's pure boundary with NEW
+/// observables).
+const PARENT_TRANSFER_GUARD_WITNESS: &str =
+    "paea_capture_parent_wait_refusal_transfers_before_receipt_or_rendering";
+const PARENT_TRANSFER_GUARD_MANIFEST: &str =
+    "paea-capture-parent-transfer-boundary-guard-receipt";
+const PARENT_TRANSFER_GUARD_HEALTHY_CONTEXT: &str =
+    "parent transfer-boundary guard healthy witness wait refused";
+const PARENT_TRANSFER_GUARD_INJECTED_CONTEXT: &str =
+    "parent transfer-boundary guard injected wait refusal conserved purely";
+const PARENT_TRANSFER_GUARD_COLLISION_CONTEXT: &str =
+    "parent transfer-boundary guard injected wait refusal with the receipt rename collision";
+const PARENT_TRANSFER_GUARD_ANNOUNCER_CONTEXT: &str =
+    "parent transfer-boundary guard injected wait refusal with the announcement panic";
+/// Distinctive marker carried INSIDE the typed boundary as the original
+/// controller panic payload (transfer guard, `Some` arm); verified by
+/// EXACT value equality after the BY-VALUE recovery.
+const PARENT_TRANSFER_GUARD_PANIC_MARKER: &str =
+    "parent transfer-boundary original controller panic payload marker";
+/// Distinctive marker INSIDE the counting `Display` of the transfer
+/// guard's custom primary cause: the exact text a render produces (the
+/// pure boundary must produce ZERO renders before the transfer).
+const PARENT_TRANSFER_GUARD_SEAM_DISPLAY_MARKER: &str =
+    "synthetic transfer-boundary counting wait refusal";
+/// Distinctive marker the guard-injected announcer panics with AFTER the
+/// writer completed its atomic rename and directory fsync. The panic is a
+/// test seam at the writer's own announcement seam — never a global
+/// stderr closure and never a fabricated OS error.
+const PARENT_TRANSFER_GUARD_ANNOUNCER_PANIC_MARKER: &str =
+    "TRANSFER-BOUNDARY-ANNOUNCER-PANIC-AFTER-RENAME";
+
+/// Custom primary-cause error for the transfer guard's
+/// formatting-observation counter: its `Display` increments a shared
+/// atomic counter on EVERY render and then writes its marker — a
+/// NONPANICKING observation mode, so even a restored pre-transfer
+/// `eprintln!` (which would render this Display before `panic_any`)
+/// could not lose an unreaped child during the RED demonstration.
+/// `Send + Sync + 'static` so it can travel inside an `io::Error` through
+/// the handback and the typed boundary. Witness-local fixture type only.
+struct RenderCountingWaitRefusalError {
+    marker: &'static str,
+    renders: std::sync::Arc<std::sync::atomic::AtomicUsize>,
+}
+
+/// Count Debug as well as Display, without triggering a nested render.
+impl std::fmt::Debug for RenderCountingWaitRefusalError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.renders.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        f.write_str(self.marker)
+    }
+}
+
+impl std::fmt::Display for RenderCountingWaitRefusalError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.renders
+            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        write!(f, "{}", self.marker)
+    }
+}
+
+impl std::error::Error for RenderCountingWaitRefusalError {}
+
+/// Execute a fallible observation while keeping its entire owned input outside
+/// the catch. On a diagnostic panic, transfer BOTH the original owned facts or
+/// refusal and the opaque secondary payload through panic_any, without rendering.
+/// Callers use this only after child/stream collection is stable. It performs
+/// exactly the supplied observation; no retry, cleanup or publication inference.
+fn observe_parent_wait_refused_owned<T: std::any::Any + Send, R>(
+    owned: T,
+    observe: impl FnOnce(&T) -> R,
+) -> (T, R) {
+    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| observe(&owned))) {
+        Ok(value) => (owned, value),
+        Err(secondary) => std::panic::panic_any((owned, secondary)),
+    }
+}
+
+/// Guard27: a healthy real child/writer control precedes fault injection.
+/// The same pure pending-carrier door transfers a custom render-counting error
+/// and an optional opaque controller payload before any join/receipt/rendering.
+/// Only this fixture's known pre-OS-wait seam permits the receiver's first real
+/// wait. Every behavioral assertion follows reap and both joins.
+///
+/// Real directory-rename refusal retains all facts and its real stage/cause;
+/// only the exact newly-created empty directory is removed after identity checks,
+/// then one fresh receipt is written with the same facts. Its failed temporary
+/// remains unchanged. A second local fault panics at the writer announcement
+/// after publication; the opaque original panic and actual published JSON are
+/// inspected together. Neither Err nor panic implies rollback/non-publication.
+///
+/// All leaves/raws/receipts remain for principal reception (0700/0600). No timer,
+/// sleep, kill, retry, global stderr/hook mutation, live Authority or real OS-wait
+/// refusal. Unexpected observation/cleanup/recovery failures retain the original
+/// owned facts/refusal plus the secondary issue. Join-invariant/global-cleanup
+/// recovery remains outside this guard. These are expectations, not a PASS claim.
+#[test]
+fn paea_capture_parent_wait_refusal_transfers_before_receipt_or_rendering() {
+    use std::os::unix::fs::{DirBuilderExt, MetadataExt};
+    use std::sync::{Arc, atomic::{AtomicUsize, Ordering}};
+
+    /// Exact fixture bytes, not a product volume/count policy.
+    fn expected_raw() -> (Vec<u8>, Vec<u8>) {
+        let mut out = PARENT_WAIT_REFUSAL_STDOUT_PREFIX.to_vec();
+        out.extend_from_slice(PARENT_WAIT_REFUSAL_STDOUT_FINAL);
+        let mut err = PARENT_WAIT_REFUSAL_STDERR_PREFIX.to_vec();
+        err.extend_from_slice(PARENT_WAIT_REFUSAL_STDERR_FINAL);
+        (out, err)
+    }
+    /// Read terminal/raw/permission facts after collection, without formatting
+    /// the primary cause. Panics remain caught with the caller's owned facts.
+    fn check_facts(facts: &ParentWaitRefusedResolvedFacts) {
+        let (out, err) = expected_raw();
+        assert_eq!(facts.exit.code(), Some(PARENT_WAIT_REFUSAL_EXIT_CODE));
+        assert_parent_guard_completed(&facts.stdout_state, out.len(), "guard27 stdout");
+        assert_parent_guard_completed(&facts.stderr_state, err.len(), "guard27 stderr");
+        assert_eq!(fs::read(&facts.stdout_path).unwrap(), out);
+        assert_eq!(fs::read(&facts.stderr_path).unwrap(), err);
+        assert_eq!(fs::metadata(&facts.receipt_context.leaf).unwrap().permissions().mode() & 0o777, 0o700);
+        for path in [&facts.stdout_path, &facts.stderr_path] {
+            assert_eq!(fs::metadata(path).unwrap().permissions().mode() & 0o777, 0o600);
+        }
+    }
+    /// Read the complete published/temporary receipt and compare it with actual
+    /// collected facts, relative paths, counts and raw-byte SHA-256 values.
+    fn check_receipt(facts: &ParentWaitRefusedResolvedFacts, path: &Path) -> Vec<u8> {
+        check_facts(facts);
+        let bytes = fs::read(path).unwrap();
+        let receipt: Value = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(receipt["schema_version"], json!(1));
+        assert_eq!(receipt["witness"], json!(facts.receipt_context.witness));
+        assert_eq!(receipt["selection"], facts.receipt_context.selection);
+        assert_eq!(receipt["process"], finished_process_outcome(
+            &facts.exit, &facts.stdout_state, &facts.stderr_state, facts.controller_panic.is_some()));
+        for (kind, raw_path) in [("stdout", &facts.stdout_path), ("stderr", &facts.stderr_path)] {
+            let raw = fs::read(raw_path).unwrap();
+            assert_eq!(receipt["artifacts"][kind]["path"], json!(format!("{kind}.raw")));
+            assert_eq!(receipt["artifacts"][kind]["bytes"], json!(raw.len()));
+            assert_eq!(receipt["artifacts"][kind]["sha256"], json!(format!("{:x}", Sha256::digest(&raw))));
+        }
+        assert_eq!(fs::metadata(path).unwrap().permissions().mode() & 0o777, 0o600);
+        let text = std::str::from_utf8(&bytes).unwrap();
+        for marker in [PARENT_TRANSFER_GUARD_PANIC_MARKER, PARENT_TRANSFER_GUARD_ANNOUNCER_PANIC_MARKER, PARENT_TRANSFER_GUARD_SEAM_DISPLAY_MARKER] {
+            assert!(!text.contains(marker), "opaque payload text must not enter receipt JSON");
+        }
+        bytes
+    }
+    /// Start one cooperative real child, synthesize a pre-OS-wait refusal,
+    /// transfer the whole carrier by value, snapshot observations as data,
+    /// then perform the fixture receiver's first real wait and both joins.
+    /// Any unexpected payload is resumed intact; real-wait refusal is handled
+    /// by the complete typed unresolved carrier, never retried.
+    fn transfer(
+        leaf: &Path,
+        selection: &Value,
+        error: std::io::Error,
+        controller_panic: Option<Box<dyn std::any::Any + Send>>,
+        renders: &Arc<AtomicUsize>,
+    ) -> ParentWaitRefusedResolvedFacts {
+        let capture = start_parent_guard_capture(spawn_parent_wait_refusal_child(),
+            &leaf.join("stdout.raw"), &leaf.join("stderr.raw"));
+        let pid = capture.id();
+        let called = std::cell::Cell::new(0u32);
+        let outcome = capture.finish_with_wait(|child| {
+            called.set(called.get() + 1);
+            let _observed_pid = child.id();
+            Err(error)
+        });
+        let handback = match outcome {
+            paea_capture_child::ChildCaptureOutcome::WaitRefused(handback) => handback,
+            finished => std::panic::panic_any(finished),
+        };
+        let pending = conserve_parent_wait_refused_carrier(
+            PARENT_TRANSFER_GUARD_INJECTED_CONTEXT, PARENT_TRANSFER_GUARD_WITNESS,
+            PARENT_TRANSFER_GUARD_MANIFEST, leaf, selection, handback, controller_panic);
+        let caught = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| fail_parent_wait_refused(pending)));
+        let payload = match caught { Err(payload) => payload, Ok(()) => panic!("pure failure door returned") };
+        let pending = payload.downcast::<ParentWaitRefusedCarrier>()
+            .unwrap_or_else(|unexpected| std::panic::resume_unwind(unexpected));
+        let received_pid = pending.child.id();
+        let rendered_before_receiver = renders.load(Ordering::Relaxed);
+        let receipt_existed = leaf.join("process-receipt.json").try_exists();
+        let facts = resolve_parent_wait_refused_carrier_after_known_seam(*pending);
+        let receipt_existed = match receipt_existed {
+            Ok(existed) => existed,
+            Err(error) => std::panic::panic_any((facts, error)),
+        };
+        let (facts, ()) = observe_parent_wait_refused_owned(facts, |facts| {
+            check_facts(facts);
+            assert_eq!(pid, received_pid);
+            assert_eq!(called.get(), 1);
+            assert_eq!(rendered_before_receiver, 0, "C3b_RENDER_BEFORE_TYPED_TRANSFER");
+            assert!(!receipt_existed, "C3b_RECEIPT_BEFORE_EXPLICIT_RECEIVER");
+            eprintln!("{}", json!({"manifest":"paea-C3b-transfer-observation", "observation_not_verdict":true,
+                "phase":"pure-transfer-received-and-collected", "renders_at_recovery":rendered_before_receiver,
+                "receipt_existed_at_recovery":receipt_existed, "seam_invocations":called.get(),
+                "leaf":leaf, "process":finished_process_outcome(&facts.exit,&facts.stdout_state,&facts.stderr_state,facts.controller_panic.is_some())}));
+        });
+        facts
+    }
+    /// One receipt attempt; unexpected refusal is re-emitted whole, without
+    /// flattening its original facts and secondary stage/payload into a string.
+    fn write_ok(facts: ParentWaitRefusedResolvedFacts) -> (ParentWaitRefusedResolvedFacts, PathBuf) {
+        match write_parent_wait_refused_finished_receipt(facts,
+            announce_guard_receipt_standard(PARENT_TRANSFER_GUARD_MANIFEST)) {
+            Ok(ok) => ok,
+            Err(failure) => std::panic::panic_any(failure),
+        }
+    }
+
+    let selection = json!({"guard": PARENT_TRANSFER_GUARD_WITNESS, "child": "constant cooperative local python child; known pre-OS-wait seam only"});
+    let healthy_leaf = private_fixture_leaf("transfer-healthy");
+    let healthy = start_parent_guard_capture(spawn_parent_wait_refusal_child(),
+        &healthy_leaf.join("stdout.raw"), &healthy_leaf.join("stderr.raw"));
+    let (exit, out, err) = match healthy.finish() {
+        paea_capture_child::ChildCaptureOutcome::Finished {exit, stdout_capture, stderr_capture,..} => (exit,stdout_capture,stderr_capture),
+        paea_capture_child::ChildCaptureOutcome::WaitRefused(handback) => fail_parent_wait_refused(conserve_parent_wait_refused_carrier(
+            PARENT_TRANSFER_GUARD_HEALTHY_CONTEXT, PARENT_TRANSFER_GUARD_WITNESS,
+            PARENT_TRANSFER_GUARD_MANIFEST, &healthy_leaf, &selection, handback, None)),
+    };
+    let (expected_out, expected_err) = expected_raw();
+    assert_eq!(exit.code(), Some(PARENT_WAIT_REFUSAL_EXIT_CODE));
+    assert_parent_guard_completed(&out, expected_out.len(), "healthy stdout");
+    assert_parent_guard_completed(&err, expected_err.len(), "healthy stderr");
+    assert_eq!(fs::read(healthy_leaf.join("stdout.raw")).unwrap(), expected_out);
+    assert_eq!(fs::read(healthy_leaf.join("stderr.raw")).unwrap(), expected_err);
+    let process = finished_process_outcome(&exit, &out, &err, false);
+    let (healthy_receipt, _) = write_process_receipt(&healthy_leaf, PARENT_TRANSFER_GUARD_WITNESS,
+        PARENT_TRANSFER_GUARD_MANIFEST, &selection, &process).unwrap();
+    let healthy_json: Value = serde_json::from_slice(&fs::read(&healthy_receipt).unwrap()).unwrap();
+    assert_eq!(healthy_json["process"], process);
+    assert_eq!(healthy_json["selection"], selection);
+    assert_eq!(healthy_json["schema_version"], json!(1));
+    assert_eq!(healthy_json["witness"], json!(PARENT_TRANSFER_GUARD_WITNESS));
+    for kind in ["stdout", "stderr"] {
+        let raw = fs::read(healthy_leaf.join(format!("{kind}.raw"))).unwrap();
+        assert_eq!(healthy_json["artifacts"][kind]["path"], json!(format!("{kind}.raw")));
+        assert_eq!(healthy_json["artifacts"][kind]["bytes"], json!(raw.len()));
+        assert_eq!(healthy_json["artifacts"][kind]["sha256"], json!(format!("{:x}", Sha256::digest(&raw))));
+    }
+    for name in ["stdout.raw", "stderr.raw", "process-receipt.json"] {
+        assert_eq!(fs::metadata(healthy_leaf.join(name)).unwrap().permissions().mode() & 0o777, 0o600);
+    }
+    assert_eq!(fs::metadata(&healthy_leaf).unwrap().permissions().mode() & 0o777, 0o700);
+
+    // Pure transfer + one later safe render, with original Some payload owned.
+    let renders = Arc::new(AtomicUsize::new(0));
+    let injected_leaf = private_fixture_leaf("transfer-injected");
+    // A real child-free fixture panic supplies the opaque Some payload.
+    // It does not claim a live controller or Authority action.
+    let original_controller_payload = match std::panic::catch_unwind(|| {
+        std::panic::panic_any(PARENT_TRANSFER_GUARD_PANIC_MARKER.to_string());
+    }) {
+        Err(payload) => payload,
+        Ok(()) => panic!("fixture panic did not produce an opaque payload"),
+    };
+    let facts = transfer(&injected_leaf, &selection,
+        std::io::Error::new(std::io::ErrorKind::Other, RenderCountingWaitRefusalError {
+            marker: PARENT_TRANSFER_GUARD_SEAM_DISPLAY_MARKER, renders: renders.clone()}),
+        Some(original_controller_payload), &renders);
+    let (facts, path) = write_ok(facts);
+    let (mut facts, ()) = observe_parent_wait_refused_owned(facts, |facts| {
+        check_receipt(facts, &path);
+        assert_eq!(facts.wait_refusal_error.to_string(), PARENT_TRANSFER_GUARD_SEAM_DISPLAY_MARKER);
+        assert_eq!(renders.load(Ordering::Relaxed), 1);
+    });
+    let payload = match facts.controller_panic.take() {
+        Some(payload) => payload,
+        None => std::panic::panic_any(facts),
+    };
+    let original = match payload.downcast::<String>() {
+        Ok(original) => original,
+        Err(unexpected) => std::panic::panic_any((facts, unexpected)),
+    };
+    let (_held_original, ()) = observe_parent_wait_refused_owned((facts, original), |(_, original)| {
+        assert_eq!(original.as_str(), PARENT_TRANSFER_GUARD_PANIC_MARKER);
+    });
+
+    // Real rename refusal; facts, stage and private raw evidence stay owned.
+    let collision_leaf = private_fixture_leaf("transfer-collision");
+    let zero = Arc::new(AtomicUsize::new(0));
+    let facts = transfer(&collision_leaf, &selection,
+        std::io::Error::new(std::io::ErrorKind::Other, "synthetic collision wait cause"), None, &zero);
+    // Prove the writer accepts the SAME collected facts before injecting fault.
+    let (facts, baseline_path) = write_ok(facts);
+    let (facts, ()) = observe_parent_wait_refused_owned(facts, |facts| { check_receipt(facts, &baseline_path); });
+    let target = collision_leaf.join("process-receipt.json");
+    let (facts, (baseline_bytes, identity)) = observe_parent_wait_refused_owned(facts, |_| {
+        let baseline_bytes = fs::read(&baseline_path).unwrap();
+        fs::rename(&baseline_path, collision_leaf.join("healthy-before-collision.json")).unwrap();
+        std::fs::DirBuilder::new().mode(0o700).create(&target).unwrap();
+        let metadata = fs::metadata(&target).unwrap();
+        (baseline_bytes, (metadata.dev(),metadata.ino(),metadata.permissions().mode()))
+    });
+    let failure = match write_parent_wait_refused_finished_receipt(facts,
+        announce_guard_receipt_standard(PARENT_TRANSFER_GUARD_MANIFEST)) {
+        Err(failure) => failure,
+        Ok(ok) => std::panic::panic_any(ok),
+    };
+    let (failure, (temp, temp_bytes)) = observe_parent_wait_refused_owned(failure, |failure| {
+        match &failure.fault {
+            ParentWaitRefusedReceiptFault::Refused(stage) => {
+                assert!(stage.starts_with("receipt atomic rename refused:"));
+                assert!(stage.contains("os error 21"));
+            },
+            _ => panic!("actual EISDIR refusal expected"),
+        }
+        check_facts(&failure.facts);
+        assert_eq!(failure.receipt_target, target);
+        let metadata = fs::metadata(&target).unwrap();
+        assert!(metadata.is_dir());
+        assert_eq!((metadata.dev(),metadata.ino(),metadata.permissions().mode()), identity);
+        let mut temps = Vec::new();
+        for entry in fs::read_dir(&collision_leaf).unwrap() {
+            let entry = entry.unwrap();
+            if entry.file_name().to_string_lossy().starts_with("process-receipt.json.tmp-") { temps.push(entry.path()); }
+        }
+        assert_eq!(temps.len(), 1);
+        let body = check_receipt(&failure.facts, &temps[0]);
+        assert_eq!(body, baseline_bytes);
+        eprintln!("{}", json!({"manifest":"paea-C3b-transfer-observation", "observation_not_verdict":true,
+            "phase":"actual-receipt-rename-refusal", "target":target, "temporary":temps[0],
+            "stage":match &failure.fault {ParentWaitRefusedReceiptFault::Refused(text)=>text.as_str(),_=>"unexpected"},
+            "process":finished_process_outcome(&failure.facts.exit,&failure.facts.stdout_state,&failure.facts.stderr_state,failure.facts.controller_panic.is_some())}));
+        assert_eq!(fs::read_dir(&target).unwrap().collect::<Result<Vec<_>,_>>().unwrap().len(), 0);
+        (temps.remove(0), body)
+    });
+    if let Err(cleanup) = fs::remove_dir(&target) { std::panic::panic_any((failure, cleanup)); }
+    let ParentWaitRefusedReceiptFailure { facts, fault, .. } = failure;
+    let (facts, recovered_path) = match write_parent_wait_refused_finished_receipt(facts,
+        announce_guard_receipt_standard(PARENT_TRANSFER_GUARD_MANIFEST)) {
+        Ok(ok) => ok,
+        Err(next) => std::panic::panic_any((fault, next)),
+    };
+    let (_kept_failure_and_facts, ()) = observe_parent_wait_refused_owned((facts, fault), |(facts, _)| {
+        check_receipt(facts, &recovered_path);
+        assert_eq!(fs::read(&temp).unwrap(), temp_bytes);
+        assert_eq!(fs::read(&recovered_path).unwrap(), baseline_bytes);
+        assert!(!target.is_dir());
+        eprintln!("{}", json!({"manifest":"paea-C3b-transfer-observation", "observation_not_verdict":true,
+            "phase":"changed-precondition-recovery", "receipt":recovered_path, "failed_temporary_retained":temp,
+            "process":finished_process_outcome(&facts.exit,&facts.stdout_state,&facts.stderr_state,facts.controller_panic.is_some())}));
+    });
+
+    // A callback panic AFTER publication is retained with all finished facts.
+    let announcer_leaf = private_fixture_leaf("transfer-announcer");
+    let facts = transfer(&announcer_leaf, &selection,
+        std::io::Error::new(std::io::ErrorKind::Other, "synthetic announcer wait cause"), None, &zero);
+    let (facts, control_path) = write_ok(facts);
+    let (facts, control_bytes) = observe_parent_wait_refused_owned(facts, |facts| check_receipt(facts, &control_path));
+    let announcements = std::cell::Cell::new(0u32);
+    let failure = match write_parent_wait_refused_finished_receipt(facts, |_| {
+        announcements.set(announcements.get() + 1);
+        std::panic::panic_any(PARENT_TRANSFER_GUARD_ANNOUNCER_PANIC_MARKER.to_string());
+    }) {
+        Err(failure) => failure,
+        Ok(ok) => std::panic::panic_any(ok),
+    };
+    let (failure, ()) = observe_parent_wait_refused_owned(failure, |failure| {
+        assert_eq!(announcements.get(), 1);
+        assert!(matches!(&failure.fault, ParentWaitRefusedReceiptFault::WriterPanicked(_)));
+        assert_eq!(check_receipt(&failure.facts, &failure.receipt_target), control_bytes);
+        assert!(!failure.facts.controller_panic.is_some());
+        eprintln!("{}", json!({"manifest":"paea-C3b-transfer-observation", "observation_not_verdict":true,
+            "phase":"announcement-panic-after-publication", "announcements":announcements.get(),
+            "writer_panic_owned":true, "published_receipt":failure.receipt_target,
+            "process":finished_process_outcome(&failure.facts.exit,&failure.facts.stdout_state,&failure.facts.stderr_state,failure.facts.controller_panic.is_some())}));
+    });
+    let ParentWaitRefusedReceiptFailure {facts, fault,..} = failure;
+    let payload = match fault {
+        ParentWaitRefusedReceiptFault::WriterPanicked(payload) => payload,
+        unexpected => std::panic::panic_any((facts, unexpected)),
+    };
+    let original = match payload.downcast::<String>() {
+        Ok(original) => original,
+        Err(unexpected) => std::panic::panic_any((facts, unexpected)),
+    };
+    let (_kept_writer_panic_and_facts, ()) = observe_parent_wait_refused_owned((facts, original), |(_, original)| {
+        assert_eq!(original.as_str(), PARENT_TRANSFER_GUARD_ANNOUNCER_PANIC_MARKER);
+    });
+}
+
 
 /// Fixture data, not operator policy: the new guard's receipt labels and
 /// failing-site context strings (witness-local to this test).
@@ -5623,33 +6300,35 @@ fn approval_web_cli_binds_and_consumes_exact_preparation_once() {
         paea_capture_child::ChildCaptureOutcome::WaitRefused(handback) => {
             // THE ONE WaitRefused route fixed in this slice: the COMPLETE
             // handback is conserved into the witness-local typed
-            // [`ParentWaitRefusedCarrier`] — BOTH captures join to their
-            // real terminal states BEFORE the receipt (the SIGINT stop was
-            // accepted on this route and the stdin-EOF permission was
-            // already given, but an accepted stop request is NOT
-            // termination proof — the joins keep the same documented
-            // blocking limit as the finish contract and end only at the
-            // producer's real causal EOF; `Failed`/`Panicked` states and
-            // their causes are retained verbatim, never masked), the
-            // receipt is the
-            // EXPLICIT UNKNOWN / not-finished envelope that now records
-            // the controller-panic PRESENCE this route actually knows
-            // (never the payload text), and the receipt success path OR
-            // the secondary receipt-write error travels as DATA inside the
-            // carrier. The original non-Clone cause, the SAME child (never
-            // re-waited here — the exit status stays UNKNOWN; no signal,
-            // kill, timer or retry exists) and the original controller
-            // panic payload move BY VALUE through the typed recoverable
-            // boundary — no formatted panic pretends to conserve the
-            // ownership. A higher `catch_unwind` receiver can recover the
-            // carrier BY VALUE and decide the actual cleanup explicitly
-            // (including the FIRST real `Child::wait` when no real wait
-            // has run); with no higher consumer this unexpected handback
-            // stays VISIBLE as the witness failure (the libtest top-level
+            // [`ParentWaitRefusedCarrier`] and transferred PURELY — the
+            // captures stay UNJOINED (an accepted stop request is NOT
+            // termination proof; no join, terminal state or join-panic can
+            // precede the transfer), the child stays unreaped (the exit
+            // status stays UNKNOWN — a real OS-wait refusal is never
+            // automatically re-waited), NO receipt is built or written
+            // before the payload is secured, and NOTHING is rendered or
+            // printed: the original non-Clone cause, the SAME child, both
+            // still-owned stream owners, both evidence paths, the original
+            // controller panic payload (never rendered, never serialized)
+            // and the owned receipt context move BY VALUE through the
+            // typed recoverable boundary — an arbitrary custom
+            // `Display`/`Debug` of the primary cause can no longer destroy
+            // the transfer, and no pre-transfer I/O can imply publication.
+            // A higher `catch_unwind` receiver can recover the carrier BY
+            // VALUE and decide everything explicitly — resolution (the
+            // FIRST real `Child::wait` ONLY under its own receiver policy
+            // for the known FnOnce pre-OS-wait seam), both joins, and only
+            // then any receipt over the REAL finished facts, retaining the
+            // writer's stage-tagged `Err` text OR its opaque panic with
+            // the actual facts and target context (publication state is
+            // observed, never assumed); with no higher consumer this
+            // unexpected handback stays VISIBLE as the witness failure and
+            // the pure carrier stays UNRESOLVED (the libtest top-level
             // drop establishes no external cleanup) — no claim is made
             // that all refusal routes are resolved: genuine pidfd and
             // SignalRefused routes remain OPEN; guard24 separately covers
             // the PreparationRefused pure transfer helper.
+
             fail_parent_wait_refused(conserve_parent_wait_refused_carrier(
                 "approval-web positive witness wait refused after the accepted SIGINT",
                 "approval_web_cli_binds_and_consumes_exact_preparation_once",
