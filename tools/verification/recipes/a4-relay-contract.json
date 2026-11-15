@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "a4-relay-reference-contract",
+  "inputs": [
+    "tests/a4_relay_contract.py",
+    "docs/plans/actions-confiance/A4-RELAY-CONTRACT.md",
+    "docs/en/plans/actions-confiance/A4-RELAY-CONTRACT.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "fictional-witness-relays-refusals-and-recovery",
+      "command": ["python3", "tests/a4_relay_contract.py", "-v"],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_healthy_ab_receipt_then_application",
+        "test_altered_scope_sense_and_authority_at_each_relay",
+        "test_missing_reversed_and_broken_chain",
+        "test_duplicate_does_not_reapply_or_duplicate_history",
+        "test_engaged_unknown_effects_survive_stop_and_resume",
+        "test_resume_requires_distinct_registered_linked_decision",
+        "test_lab_guard_omission_has_observable_consequence",
+        "Ran 7 tests",
+        "OK"
+      ]
+    }
+  ]
+}
