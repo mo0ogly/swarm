@@ -74,6 +74,17 @@ entrée de preuve vide ou refusée n’affiche pas un verdict favorable. Aucune 
 identité ou transaction d’exemple n’est introduite. Les limites BLP et la portée
 simulée des effets Trust restent celles indiquées par l’interface existante.
 
+Vérifications PAEA (`/paea.html`) et Sécurité et preuves (`/security-proofs.html`)
+n’ont pas de planche dans la maquette. Elles reçoivent le même habillage par
+`web/workbench-shell.js` (16 novembre 2026), activé par les attributs
+`data-workbench-*` du `<body>` : rail commun avec l’entrée courante, en-tête dans la
+page avec numéro de section et phrase d’introduction, sélecteur Sombre/Clair (le
+bouton d’origine reste dans le DOM, masqué, car le script de la page l’écoute),
+liens PAEA regroupés en grille de cartes et sections en cartes. Les nœuds sont
+déplacés, jamais copiés : identifiants, liens et appels restent ceux de la page.
+Les liens du rail ne portent que langue, thème et vue. Test :
+`node tests/workbench_shell_pages_test.cjs SORTIE`.
+
 ## Sources et vérification
 
 - `web/swarm-workbench.js` : projection de lecture et préférence d’affichage.

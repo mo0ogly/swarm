@@ -7077,5 +7077,7 @@
   "1 · Préparer une clé": "1 · Prepare a key",
   "2 · Activer avec un autre administrateur": "2 · Activate with another administrator",
   "3 · Signer l’ancre publique": "3 · Sign the public anchor",
-  "Après la première initialisation, la session seule ne permet pas de modifier les identités. Le jeton Admin reste en mémoire de cette page et disparaît quand vous la quittez.": "After the first initialization, the session alone cannot change identities. The Admin token stays in this page’s memory and is gone when you leave it."
+  "Après la première initialisation, la session seule ne permet pas de modifier les identités. Le jeton Admin reste en mémoire de cette page et disparaît quand vous la quittez.": "After the first initialization, the session alone cannot change identities. The Admin token stays in this page’s memory and is gone when you leave it.",
+  "05 · Configuration · Sécurité": "05 · Configuration · Security",
+  "Vues PAEA": "PAEA views"
 }
