@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "blp-installed-version-ui",
+  "inputs": [
+    "tests/blp_delivery_version_ui.cjs",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tools/verification/verify_npm_archive.py",
+    "web/runtime-health.js",
+    "web/cockpit-native-version.js",
+    "package.json",
+    "package-lock.json",
+    "tests/helpers/version_provenance_assertions.cjs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "owned-endpoint-version-dialog",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess; subprocess.run(['node','tests/blp_delivery_version_ui.cjs',os.environ['SWARM_BLP_LIVE_VERSION_CONFIG']],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS fr-running-metadata",
+        "PASS en-running-metadata",
+        "PASS fr-embedded-notes-and-blp-note",
+        "PASS en-embedded-notes-and-blp-note",
+        "PASS fr-git-link-and-dirty-disclosure",
+        "PASS en-git-link-and-dirty-disclosure",
+        "PASS no-browser-errors"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

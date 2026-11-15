@@ -27,7 +27,7 @@ page. Security follows `docs/design/swarm/Securite.dc.html` (10 November 2026): 
 real configuration form leaves its dialog and is shown in the page under a heading
 (link to audit, "Read configuration again"), an I3 admin-token banner, tabs for the
 actual Biba, Bell-LaPadula, role conflict, identity and key controls (Arrow/Home/End),
-then a save bar (reason, status, Preview, Save), sticky except on mobile. The form
+then a save bar (reason, status, Preview, Save) in document flow so controls stay reachable. The form
 is filled at load from the `show` projection. Biba lists levels I3 to I1 with the
 subjects actually declared at each level; Identities shows a table (subject,
 integrity, roles, authentication). Nothing is invented: before reading the table

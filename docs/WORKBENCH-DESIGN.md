@@ -48,7 +48,7 @@ Le vrai formulaire de configuration quitte son dialogue et s’affiche dans la p
 en-tête (lien vers l’audit, bouton « Relire la configuration »), bandeau du jeton
 administrateur I3, onglets Biba, Bell-LaPadula, conflits de rôles, identités et
 clés (flèches, Début/Fin), puis barre d’enregistrement (motif, état, Prévisualiser,
-Enregistrer), collante sauf sur mobile. Le formulaire est rempli dès le chargement
+Enregistrer), dans le flux pour ne pas recouvrir les contrôles. Le formulaire est rempli dès le chargement
 depuis la projection `show`. L’onglet Biba montre les niveaux I3 à I1 avec les sujets
 réellement déclarés à chaque niveau ; l’onglet Identités montre un tableau (sujet,
 intégrité, rôles, authentification). Rien n’est inventé : avant lecture, le tableau

@@ -8,6 +8,8 @@ impl NativeHttpService {
     /// preserve the exact known trust publication, never a successful empty body.
     /// Object attribution is an explicit mutating I3/admin control intent whose
     /// bearer, revisions and label are checked by the existing engine producer.
+    /// Its separate preview uses the same validation with a readonly Root and
+    /// no publication; it never turns a refusal into an empty successful result.
     /// Session admission alone grants no classification or declassification rights.
     /// `security-show` uses the same I3/admin admission, shared read reservation
     /// and close path; its metadata includes no evidence-import or execution grant.
@@ -45,7 +47,7 @@ impl NativeHttpService {
                 | "read-object"
                 | "read-original"
                 | "audit-transaction"
-                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute" | "blp-preparation-check" | "blp-preparation-attribute" | "blp-preparation-input-attribute" | "blp-preparation-destination-attribute" | "blp-preparation-admit" | "blp-preparation-admission-show" | "blp-preparation-transport"
+                | "blp-show" | "blp-policy-preview" | "blp-policy-apply" | "blp-check" | "blp-object-attribute" | "blp-object-attribute-preview" | "blp-preparation-check" | "blp-preparation-attribute" | "blp-preparation-input-attribute" | "blp-preparation-destination-attribute" | "blp-preparation-admit" | "blp-preparation-admission-show" | "blp-preparation-transport"
                 | "public-anchor" | "public-verify" | "evidence-key-prepare" | "evidence-key-activate" | "evidence-key-revoke"
         ) {
             return Err(HttpServiceError::Refused("trust-action-unknown"));
@@ -77,7 +79,7 @@ impl NativeHttpService {
         let readonly = matches!(
             op,
             "show" | "export" | "anchor" | "config-preview" | "read-object" | "read-original" | "public-anchor"
-                | "blp-show" | "blp-policy-preview" | "blp-check" | "blp-preparation-check" | "blp-preparation-admission-show"
+                | "blp-show" | "blp-policy-preview" | "blp-object-attribute-preview" | "blp-check" | "blp-preparation-check" | "blp-preparation-admission-show"
                 | "blp-preparation-transport" | "security-show"
         );
         let store = RootStore::open(&self.root, !readonly).map_err(|e| root("trust-open", e))?;

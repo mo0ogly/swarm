@@ -134,6 +134,9 @@
    body.replaceChildren();if(!items.length){const tr0=el('tr'),td=el('td',loaded?'Aucune identité déclarée.':'Identités non lues : Relire la configuration.','audit-empty');td.colSpan=4;tr0.append(td);body.append(tr0);return}
    for(const d of items){const row=el('tr'),pill=el('span','I'+d.integrity,'audit-badge');pill.dataset.tone=levelTone[d.integrity]||'run';const cells=[el('td'),el('td'),el('td'),el('td')];cells[0].textContent=d.subject;cells[1].append(pill);cells[2].textContent=d.roles||'—';cells[3].textContent=tr(d.auth==='enrolled'?'Compte enrôlé (enrollment_principal)':'Jeton local');row.append(...cells);body.append(row)}}
   draw();if(sources)new MutationObserver(draw).observe(sources,{childList:true,attributes:true,attributeFilter:['data-loaded']});
+  // Announce the completed inline DOM only. The native controller joins this
+  // with loaded data once; no synthetic click, request or credential is sent.
+  document.dispatchEvent(new Event('swarm-trust-layout-ready'));
  }
  /** Replace the single "change theme" button by a visible Dark/Light switch at
   * the right end of the page header. The original #theme button stays in the

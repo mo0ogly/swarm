@@ -156,7 +156,8 @@
 .security-table th,.security-table td{padding:8px 10px;border-bottom:1px solid var(--wattson-ligne);overflow-wrap:anywhere}
 .security-steps{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:8px 0;padding:0}
 .security-steps li{padding:6px 12px;border:1px solid var(--wattson-ligne);border-radius:999px;font-size:13px}
-.security-savebar{position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end;margin-top:16px;padding:14px 16px;background:var(--wattson-carte);border:1px solid var(--wattson-ligne);border-radius:8px;box-shadow:0 -6px 16px rgb(0 0 0 / .12)}
+/* Keep domain controls reachable at short desktop heights: the save bar stays in normal flow. */
+.security-savebar{position:static;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end;margin-top:16px;padding:14px 16px;background:var(--wattson-carte);border:1px solid var(--wattson-ligne);border-radius:8px;box-shadow:0 -6px 16px rgb(0 0 0 / .12)}
 .security-savebar label{flex:2 1 260px;margin:0}
 .security-savebar #admin-message{flex:1 1 200px;margin:0;font-size:13px}
 .security-savebar button{min-height:44px;margin:0}
