@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "external-build-storage",
+  "inputs": [
+    "tools/verification/build_storage.py",
+    "tools/verification/verify_native_profile.py",
+    "tools/rust-migration/build_native.py",
+    "tests/test_external_build_storage.py",
+    "tests/native_build_metadata_test.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "simulated-admission-refusal-recovery",
+      "command": [
+        "python3",
+        "tests/test_external_build_storage.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 14 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "native-metadata-consumer-regressions",
+      "command": [
+        "python3",
+        "tests/native_build_metadata_test.py",
+        "MetadataBinding.test_collector_signal_is_retained_before_refusal",
+        "MetadataBinding.test_status_path_change_preserves_accurate_build_metadata",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 2 tests",
+        "OK"
+      ]
+    }
+  ]
+}
