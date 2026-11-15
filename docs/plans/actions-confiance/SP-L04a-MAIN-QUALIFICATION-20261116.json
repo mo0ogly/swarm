@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-16",
+  "status": "EXACT_MAIN_CANDIDATE_QUALIFIED_NOT_INSTALLED",
+  "source_commit": "8f348911abe1f8664bd7cfeb94d10258023363f5",
+  "stock_parent": "75b6b64ce2bdf5f17281d13853426db55c2a5d0c",
+  "main_base": "7213cbea4bbe12a07e3bd54dede2c1cb56e0ee37",
+  "binary_sha256": "f03f75ab730fcd091f292bc1888c6aa34b8b05d1272e7a01c852d1d0a05c5403",
+  "metadata": {
+    "schema_version": 1,
+    "version": "devel",
+    "commit": "8f348911abe1f8664bd7cfeb94d10258023363f5",
+    "modified": false,
+    "build_date": "2026-11-15T23:01:07Z"
+  },
+  "profile": "default native,785effective sources, corefeatures[], testfalse, nofixture feature",
+  "qualification": {
+    "native_browser": "59namedassertions+4driverchecks,4exactpersisted attributions,readonlypreview/refusals/explicitapply/twoinitialorders noAdmin/sixprotectedassetshashes matchmainprofile",
+    "native_preview": "ConsumerJSandnativeCLI preview/control/stale/refusal/exactapply/replay PASS",
+    "rust_readonly_consumer": "OneexactnewintegrationtestPASS; RootStoremain49ba vsworking8c70; testELF11c843 retained separatefeatures[]testtrue, not productionprofile",
+    "version_clean": "9actualVersionassertions FR/EN on cleanmainownedendpoint; expectedmodifiedfalse/no dirtynotice; journal unchanged/privatecfgremoved/cleanupcompleted",
+    "version_oracle_pure": "3namedPASS andlegacydirtycontrolPASS→cleanFAIL retained; independent09APPROVE040c...",
+    "stock_reuse": "14+5+2 reused onlypurehelper/testscope;7sourcesbyteidentical,fixtureobservernoncalledsamevalidallocation; newrealadmissionmainbuilder+publicpaths covernewroot, no fullStockmanifestmainPASS claimed"
+  },
+  "reception": {
+    "path": "/run/media/fpizzi/SWARM/ci-main-qualification-o7nbfxyf/qualification-reception.json",
+    "sha256": "ffabb4f5d6d9f972f12bdb2551866040e4a278de69db97c21ace54590de802af"
+  },
+  "proofs": {
+    "native-build-01/result.json": "1db6f934af24557b115f1054ce5aa4d0f63b2eb4d31c4e1c1232857bbccfc523",
+    "native-build-01/profile/result.json": "a51b9e869fd5253004948ff8569b63f6f931348e8f901845698073efe1831dea",
+    "native-browser-01/result.json": "910ad08f7c7d9a9f0bdd4dc1870d3c11c14efc7635d242a50fdab2b8c3ea09cf",
+    "native-browser-01/ui-result.json": "2cc7fca109e6068d3927e5a5254f5398f1ab654aa840f9b0981ea4c934231a18",
+    "native-preview-01/result.json": "8010c370224c79337462f4e0218b0bbaf7f8c9e21f7ede6d8ed710c50edf80fc",
+    "rust-preview-01/retention.json": "8d71335b112b8ba87a11f66eb2d448ddb07c7213511566bc554b834ee4bbc60b",
+    "version-clean-01/result.json": "b864abf4225fed8c36d1047ac384df004421eae4e88befe72df70859af984ca4",
+    "version-clean-01/ui/result.json": "38c2315ffb80b9e7611afb358bf61be8a70ba05ad0803adda3ba7b3916d5a425",
+    "version-provenance-green-01/result.json": "6c30be1f5dc5f7b72375dc6319104d6e475610c651c300fc5a0cfb329ec74a91",
+    "verify-observations.json": "9a2898954d210300d4775ef7a6c4272f12d6d2a67d99a2fa97a3a0ab74747c70",
+    "version-provenance-verify-observation.json": "257a1afabf3d86b7628dcfebcee812d97516605adfa4a59f76b7861a3078b61b"
+  },
+  "review09": {
+    "path": "/run/media/fpizzi/SWARM/swarm-evidence/review09-version-cd01-20261116/version/REPORT.json",
+    "sha256": "040c130b7a0d3684abfe13e4456dd8e29ef7a9e28b5729763dbf416224f93d3b"
+  },
+  "packaging": "This receipt, FR/EN status/retrospective and focused Rust manifest are absent from785effective compilerinputs; preserve exact8f348911 source proof, no rebuild for packaging. Final Git integration refs are recorded separately by coordinator.",
+  "limits": [
+    "devel qualification image local, no managedinstallation orrestart byCI; working380stillactualservice.",
+    "Actual humanAuthority liveVersion/assets gate remainsopen; ownedfixturecredentialsnotAuthority.",
+    "All checksboundto785mainimagef03, notworking790f0e92; testELFnotproduct.",
+    "Private61synthetic reused underoriginalsources+mapping, wholeINITrecipe notclaimedrun.",
+    "RequiredGitHubchecks/currenthead/independentrootreview andnormalmerges remain gates; no globalBLP/L05/L06/RETEX acceptance."
+  ],
+  "restore": "Read exact external evidence paths from reception index, verify listed SHA256. Preserve original failures/profiles; do not copy browser profiles/cookies. Frozen devel candidate remains local in worktree cache; it is not the active service."
+}

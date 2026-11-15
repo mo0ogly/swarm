@@ -44,10 +44,10 @@ remains visible.
 | SP-L01 | — | Contracts, sources, rights, BLP scope/inventory | Authoritative sources and explicit unknowns | FRAMED — readonly contract and source inventory |
 | SP-L02 | L01 | Readonly engine/API/CLI metadata projection | Current I3 admin, strict schema, no mutation; absent/stale policy | IMPLEMENTED / LOCALLY VERIFIED (readonly scope) |
 | SP-L03 | L02 | Security and evidence: policy, coverage, checks, evidence, qualification | No fabricated PASS; FR/EN, themes, keyboard, errors, mobile, actual assets | PARTIAL — fixture UX verified; real Authority session open |
-| SP-L04 | L02–03 | Structured administration reusing existing form | No-op preview, stale revision refusal, persistence/restart, shared validation | PARTIAL — SP-L04a and initialization locally delivered as380; Authority session and main integration open |
+| SP-L04 | L02–03 | Structured administration reusing existing form | No-op preview, stale revision refusal, persistence/restart, shared validation | PARTIAL — SP-L04a and initialization locally delivered as380; main candidate separately qualified, human Authority and global acceptance open |
 | SP-L05 | L02–03 | Recipe adapter, rights, progress/stop, durable evidence | No arbitrary command/path; unknown recipe refused; failure/interruption/recovery retained | PLANNED |
 | SP-L06 | L04–05 | Qualification dossier, review, decisions, protected export | Missing/failed/stale mandatory criteria block acceptance; exact candidate/reviewer | PLANNED |
-| SP-L07 | L01–06 | Public recipes, review, local installation, retrospective | Active image, FR/EN notes, served flow; independent review distinct | IN PROGRESS — local380 delivery; integration, global qualification and retrospective open |
+| SP-L07 | L01–06 | Public recipes, review, local installation, retrospective | Active image, FR/EN notes, served flow; independent review distinct | IN PROGRESS — local380 delivery; separate Git receipts, global qualification and retrospective open |
 
 Codex owns implementation. Authorized operators own policy decisions, independent
 reviewers own review, acceptance authorities own decisions. This document grants no

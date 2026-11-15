@@ -46,10 +46,10 @@ parle de qualification interne. `runtime_enforced:false` reste affiché.
 | SP-L01 | — | Contrats, sources, droits, périmètre BLP et inventaire | Chaque observation a une source ; inconnus visibles | CADRÉ — contrat lecture et inventaire de sources |
 | SP-L02 | L01 | Projection moteur/API/CLI en lecture, métadonnées sans contenu classifié | Refus sans identité/admin, schéma strict, zéro mutation, politique absente/périmée distinguée | RÉALISÉ / VÉRIFIÉ LOCAL (périmètre lecture) |
 | SP-L03 | L02 | Vue Sécurité et preuves : politique, couverture, vérifications, preuves, qualification | Pas de réussite inventée ; FR/EN, thèmes, clavier, erreurs, mobile et vrais assets | PARTIEL — UX fixture vérifiée ; session Authority réelle ouverte |
-| SP-L04 | L02–03 | Administration structurée raccordée au formulaire existant | Preview sans mutation, révision concurrente, reprise/redémarrage, même validation API/CLI | PARTIEL — SP-L04a et initialisation livrés localement en380 ; session Authority et intégration main ouvertes |
+| SP-L04 | L02–03 | Administration structurée raccordée au formulaire existant | Preview sans mutation, révision concurrente, reprise/redémarrage, même validation API/CLI | PARTIEL — SP-L04a et initialisation livrés localement en380 ; candidat main qualifié séparément, Authority humaine et acceptation globale ouvertes |
 | SP-L05 | L02–03 | Adaptateur de recettes, droits, progression/arrêt et preuves durables | Recette inconnue refusée ; pas de chemin/commande arbitraire ; refus/interruption/reprise conservés | À FAIRE |
 | SP-L06 | L04–05 | Dossier de qualification, revue, décisions, export protégé | Aucun critère obligatoire manquant/FAIL/périmé accepté ; candidat et réviseur liés | À FAIRE |
-| SP-L07 | L01–06 | Recettes publiques, revue, installation locale et RETEX | Image active, notes FR/EN et parcours servis ; revue indépendante distincte | EN COURS — livraison locale380 ; intégration, qualification et RETEX globaux ouverts |
+| SP-L07 | L01–06 | Recettes publiques, revue, installation locale et RETEX | Image active, notes FR/EN et parcours servis ; revue indépendante distincte | EN COURS — livraison locale380 ; reçus Git distincts, qualification et RETEX globaux ouverts |
 
 Codex possède les lots d'implémentation. L'opérateur habilité possède les décisions
 de politique ; le réviseur indépendant possède sa revue et l'autorité d'acceptation

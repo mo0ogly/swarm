@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "blp-attribution-preview-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/src/**/*",
+    "rust/crates/swarm-engine/tests/confidentiality.rs",
+    ".cargo/config.toml",
+    ".cargo/storage-policy.json",
+    ".cargo/external-targets.json",
+    "tools/verification/cargo_space_guard.py",
+    "tools/verification/build_storage.py",
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/verify_native_profile.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "one-readonly-preview-admission-regression",
+      "command": [
+        "python3",
+        "-c",
+        "import os,sys\nfrom pathlib import Path\nsys.path.insert(0,'tools/verification')\nimport verify_native_profile as p\nroot=Path.cwd(); target=Path(os.environ['SWARM_RUST_TARGET_DIR']); out=Path(os.environ['SWARM_BLP_UNIT_OUTPUT']); out.mkdir(mode=0o700)\nargv=['cargo','test','--manifest-path','rust/Cargo.toml','--locked','-p','swarm-engine','--test','confidentiality','object_attribution_preview_is_readonly_and_shares_admission','--message-format=json','--','--exact','--nocapture']\ntry:\n with p.storage.admitted(root,target) as admission:\n  p.publish(out/'invocation.json',__import__('json').dumps(dict(argv=argv,target=admission.check(),scope='One integration fixture test, not production profile or installation',global_watchdog=None),indent=2)+'\\n')\n  p.outcomes.execute(argv,out=out,name='cargo',admission=admission,publish=p.publish,digest=p.digest,failure_code='blp-preview-unit-failed',cwd=root,env={**os.environ,'CARGO_TARGET_DIR':str(target)})\nexcept BaseException as error:\n p.publish(out/'failure.json',__import__('json').dumps(p.outcomes.failure_document(error),indent=2)+'\\n');raise\nprint((out/'cargo.stdout').read_text(),end='')\nprint((out/'cargo.stderr').read_text(),file=sys.stderr,end='')\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 1 test",
+        "test object_attribution_preview_is_readonly_and_shares_admission ... ok",
+        "1 passed; 0 failed; 0 ignored"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

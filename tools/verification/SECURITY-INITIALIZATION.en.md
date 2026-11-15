@@ -69,3 +69,32 @@ no new execution or current-image qualification is inferred from this wording.
 The separate native BLP check covers both orders by continuing real GETs, without synthetic API responses, then the existing four journeys. Executed on380:59 assertions PASS and recipe integrity VERIFIED.
 
 The maintained Version check accepts clean or modified builds according to explicit expected boolean facts. It checks absence or presence of the local-change notice itself; non-boolean provenance is refused. The `version-provenance-oracle` recipe retains clean/modified controls, inconsistent notices, refusal without mutation and recovery. It establishes neither installation nor an Authority session.
+
+The focused `blp-attribution-preview-rust` recipe exercises only the new preview integration test. `SWARM_RUST_TARGET_DIR` selects an already registered target; `SWARM_BLP_UNIT_OUTPUT` names fresh evidence. Admission holds descriptors through Cargo and retains exit/signal before postchecks. Runner TMPDIR hosts fixtures only; this test profile does not qualify the delivered binary. Historical full campaigns are not replayed.
+
+## Main-derived candidate qualification — 16 November 2026
+
+[Bounded receipt](../../docs/plans/actions-confiance/SP-L04a-MAIN-QUALIFICATION-20261116.json):
+commit8f348911, imagef03f75ab730fcd091f292bc1888c6aa34b8b05d1272e7a01c852d1d0a05c5403,
+explicit `devel` verification label and clean metadata. The default native profile
+binds785 archived/read-back effective inputs, empty corefeatures, non-test/no-fixture.
+The new native journey passes59 assertions and four exact attributions; CLI preview
+and JS consumer pass; one new Rust test covers readonly RootStore. Version passes
+nine checks on that clean native endpoint; its provenance helper passes three
+focused checks. The four image-related recipes and the separate helper recipe have VERIFIED integrity. Storage
+14+5+2 results are reused only for unchanged producer scope, not claimed as whole
+manifests executed on main. The full synthetic INIT recipe is not claimed replayed.
+This verification binary is not installed; local380 delivery and human Authority
+session evidence remain separate.
+
+Bounded retrospective: the old oracle required modified=true and rejected a clean
+build regardless of rendering. A valid modified control precedes the retained
+erroneous clean rejection. The oracle now compares explicit booleans and the local
+DOM notice itself; invalid facts, inconsistent notices and recovery are checked.
+The original nine dirty observations retain their exact source. A sparse checkout
+must materialize recipe inputs and local imports, including tracked parent files,
+before execution; retain an explicit inventory without cloning everything or
+replacing shared work. Diagnose clean index stat-cache errors by byte comparison
+before refreshing the isolated index. Git checks/merges and global acceptance are
+separate outcomes; tracking changes outside the effective graph require no reflex
+rebuild.

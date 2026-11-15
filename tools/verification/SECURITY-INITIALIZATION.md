@@ -80,3 +80,34 @@ exécution ni image courante n'est déduite de cette correction documentaire.
 Le contrôle natif BLP couvre séparément les deux ordres par continuation des vrais GET, sans réponse API synthétique, puis les quatre parcours existants. Exécuté sur380 :59 assertions PASS et intégrité de recette VERIFIED.
 
 Le contrôle Version maintenu accepte un build propre ou modifié selon le booléen explicitement attendu. Il vérifie l’absence ou la présence du seul avis de modifications locales ; une provenance non booléenne est refusée. La recette `version-provenance-oracle` conserve les témoins propre/modifié, les avis incohérents, le refus sans mutation et la reprise. Elle ne prouve ni installation ni session Authority.
+
+La recette ciblée `blp-attribution-preview-rust` exerce le seul nouveau test d’intégration de prévisualisation. `SWARM_RUST_TARGET_DIR` sélectionne une cible déjà enregistrée ; `SWARM_BLP_UNIT_OUTPUT` désigne une preuve fraîche. L’admission maintient ses descripteurs pendant Cargo et conserve sortie/signal avant contrôle final. Le TMPDIR du lanceur héberge uniquement des fixtures ; ce profil de test ne qualifie pas le binaire livré. Les campagnes historiques complètes ne sont pas rejouées.
+
+## Qualification du candidat issu de main — 16 novembre 2026
+
+[Reçu borné](../../docs/plans/actions-confiance/SP-L04a-MAIN-QUALIFICATION-20261116.json) :
+commit8f348911, imagef03f75ab730fcd091f292bc1888c6aa34b8b05d1272e7a01c852d1d0a05c5403,
+libellé de contrôle `devel`, métadonnées propres. Le profil natif par défaut lie785
+entrées effectives archivées et relues, features cœur vides, hors tests/fixture.
+Le nouveau parcours natif passe59 assertions et quatre attributions exactes ;
+la prévisualisation CLI et le consommateur JS passent ; un seul nouveau test Rust
+couvre le RootStore en lecture seule. Version passe neuf contrôles sur cet endpoint
+natif propre ; le helper de provenance passe trois contrôles ciblés. Les quatre recettes liées à la nouvelle image, ainsi que la recette du helper,
+ont une intégrité VERIFIED. Les tests de stockage
+14+5+2 restent des preuves réutilisées dans leur portée de producteurs inchangés,
+pas une exécution intégrale des manifests sur main. La garde INIT synthétique
+complète n'est pas annoncée rejouée. Le binaire de contrôle n'est pas installé ;
+la livraison locale380 reste distincte, ainsi que la session humaine Authority.
+
+RETEX borné : l'ancien oracle imposait modified=true, ce qui rejetait un build
+propre indépendamment de son rendu. Le témoin modifié valide précède le refus
+erroné propre conservé. L'oracle compare désormais les booléens explicites et le
+seul avis local du DOM ; valeurs invalides, avis incohérents et reprise sont
+vérifiés. Les neuf anciennes observations dirty conservent leur source exacte.
+Un checkout partiel doit matérialiser ses entrées de recettes et imports locaux,
+y compris les fichiers suivis du parent, avant lancement ; l'inventaire reste
+explicite, sans copier tout le checkout ni écraser le travail partagé. Une erreur
+de cache stat d'index propre se diagnostique par comparaison des octets avant
+rafraîchissement de l'index isolé. Fusions/contrôles Git et acceptation globale
+restent des résultats séparés ; ces changements de suivi hors graphe effectif
+ne déclenchent pas une reconstruction réflexe.
