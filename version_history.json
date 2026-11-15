@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Sécurité suit la maquette : formulaire de configuration posé dans la page, bandeau du jeton I3, onglets, niveaux d’intégrité et tableau des identités tirés des identités déclarées, barre Prévisualiser/Enregistrer.",
+        "en": "Security follows the design board: configuration form in the page, I3 token banner, tabs, integrity levels and identity table from declared identities, Preview/Save bar."
+      },
+      {
         "fr": "Administration Sécurité : les champs initiaux attendent à la fois les données et le montage de la page, sans clic Relire. Les saisies et prévisualisations ultérieures restent conservées ; la relecture explicite recharge les champs. Une garde navigateur ciblée couvre les deux ordres et les refus/reprises avec réponses synthétiques. Un rendu de lecture en échec ne rend pas les champs prêts ; seule une relecture explicite réussie permet la reprise.",
         "en": "Security administration: initial fields wait for both data and page mounting without a Read click. Later edits and previews remain preserved; explicit reread reloads fields. A focused browser guard covers both orders and refusal/recovery with synthetic responses. A failed read render cannot mark fields ready; an explicit successful reread allows recovery."
       },
