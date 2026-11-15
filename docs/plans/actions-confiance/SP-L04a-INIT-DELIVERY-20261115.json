@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "scope": "SP-L04a parent initialization correction, bounded delivery/retrospective; not L05 execution or global BLP qualification",
+  "status": "INSTALLED_LOCAL_380_NATIVE_FIXTURE_VERIFIED_HUMAN_AUTHORITY_GATE_OPEN",
+  "version": "v0.1.1-dev.380",
+  "binary_sha256": "f0e92ce3749855bee14f2b6ea68037c0e5532ac58308e36988f76ad6b46678a1",
+  "commit": "2d06746f751703d455668a113cdc8061391cb59e",
+  "modified": true,
+  "pid": 3575178,
+  "proofs": {
+    "qualified_image": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proposals/ci-design-init-01-5661eff36e/revision-03/integration/qualified380.json",
+      "sha256": "e450a9091973bbb1b5646b1523757ce279f1c77bfa0dc9e5a01214cb8e339bbf"
+    },
+    "live_identity": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proposals/ci-design-init-01-5661eff36e/revision-03/integration/live380-identity.json",
+      "sha256": "9d698516d20d48f96e3f67723b74cc8e0c55bbae7f7f02e19f8360ad982c1343"
+    },
+    "source_ci_review": {
+      "path": "/run/media/fpizzi/SWARM/ci-review-stock-ui-20261115-mbwz4era/init-revision03-review.json",
+      "sha256": "38964bef6fb548b99d24705be660dc5d9ef33232c26f97220e1ffa65f61cd002"
+    },
+    "native_ui": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proofs/sp-l04a-native380-01/ui-result.json",
+      "sha256": "2cc7fca109e6068d3927e5a5254f5398f1ab654aa840f9b0981ea4c934231a18"
+    },
+    "native_result": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proofs/sp-l04a-native380-01/result.json",
+      "sha256": "5aa2ceed96296242e1e096c247dd897cad6a5e5357475b01eaf71caf735bd7db"
+    },
+    "native_recipe": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proofs/sp-l04a-native380-recipe-01/result.json",
+      "sha256": "7ea3e334be76e35b2aa8aefbe3d519ee177ddd2b8a33a3a5b40457e221cf5d11"
+    },
+    "fixture_version": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proofs/sp-l04a-version380-fixture-01/result.json",
+      "sha256": "d3e3e2e072780b1887fa4fc3157291da35bdd71f48204d9fb4722b50ce2b4de0"
+    },
+    "fixture_version_ui": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proofs/sp-l04a-version380-fixture-01/ui/result.json",
+      "sha256": "87617e8b976602c1929df932b43444b0d97e0e50f7b513012568cf797c3c39d1"
+    },
+    "fixture_scope_erratum": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proofs/sp-l04a-version380-fixture-01/SCOPE-ERRATUM.json",
+      "sha256": "71cace7fad76374f0f83fdc45fa0a3458eb5c2868afa712f49cb47faf850bf98"
+    },
+    "runner_metadata_only": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proposals/ci-design-init-01-5661eff36e/revision-03/integration/manifest-admission/result.json",
+      "sha256": "c38d480ab625af775e4156f689c3a5c753f558e7feac695dd6b01c40082b0861"
+    },
+    "synthetic_61": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proposals/ci-design-init-01-5661eff36e/revision-02/green-02/result.json",
+      "sha256": "4e35b52a8e6629bbc26375d3012f732e1b6660126e210101ab966819e77add09"
+    },
+    "synthetic_render_red": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proposals/ci-design-init-01-5661eff36e/revision-02/red-03/result.json",
+      "sha256": "478d7f2d2c9ad867c255d12f8e8e59c8c4c84cb6ed080bcbed5435e41f571646"
+    },
+    "oracle_erratum": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proposals/ci-design-init-01-5661eff36e/ORACLE-02-ERRATUM.json",
+      "sha256": "4f5f89f01882272aa70ad3122190c863d763f52cafca9155960a32da5fba220f"
+    },
+    "storage_transfer": {
+      "path": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/reprises-veille-x-20261108/STORAGE-TRANSFER-SELECTED-LIBRARIES-20261115.json",
+      "sha256": "2fb6cbc11fec332ca74dce6e6557dcc0f32f518ffe372aa02dd5a18912ad1050"
+    },
+    "version_scope_producer_correction": {
+      "path": "/run/media/fpizzi/SWARM/swarm-storage-20261115/proposals/ci-design-init-01-5661eff36e/revision-03/integration/version-scope-correction.json",
+      "sha256": "e22b562d452ee574268bcf3cd8fd889768e7625fee34d03a0b57355780841990"
+    }
+  },
+  "results": {
+    "independent_source_review": "APPROVE bounded source/synthetic evidence; independent runtime/main acceptance remains coordinator/CI responsibility",
+    "synthetic": "PASS seven cases61 assertions on revision02, revision03 sole load docstring change mapped without replay",
+    "native_browser": "PASS59 assertions on real qualified380 fixture/API, initial noAdmin hydration bothorders, four FR/EN/theme/mobile journeys plus800x600 refusals, exact4 persisted attributions",
+    "native_recipe_integrity": "VERIFIED/PASS via recipe.py verify --evidence, no rerun",
+    "version_fixture": "PASS9 assertions FR/EN, notes/commit/dirty/Escape/focus; private config removed; Trust journal unchanged",
+    "runner_recipe": "PASS metadata/21 declared inputs/archive/readback/assertion mapping only; permanent initialization recipe steps NOT RUN, no full manifestPASS",
+    "installation": "PASS supported prepared restart, actual PID/exe/bin SHA/localFS and allowed version probe+FR/EN notes equality",
+    "live_authority_dialog_assets": "NOT VERIFIED: legitimate human frontend session required; no repeated403, forged assertion or protection relaxation",
+    "git": "No worker commit/push/merge; coordinator/CI integration pending"
+  },
+  "residual": [
+    "runtime_enforced:false unchanged; no end-to-end Bell-LaPadula guarantee or external certification",
+    "L05a private candidate frozen, uncompiled/untested/unintegrated; L05execution/L06/globalRETEX remain open",
+    "Do not copy profiles/cookies/private config into handoff archives",
+    "Historical379 proofs retain their archived registry;380 profile binds current two registered targets"
+  ],
+  "method_corrections": [
+    "Historical constant adminClicks fields NOT MEASURED; current counter installed before navigation, initial0 and explicit recovery1 measured",
+    "Readiness requires full read+render success; synthetic render failure is not attributed to real backend",
+    "Existing Version script inherited installed label is limited by fixture wrapper and explicit scope erratum",
+    "Future Version reports use versiondialogue-owned-endpoint plus explicit separate managed-installation/human-session provenance; old driver hash retained, wording-only consumer/schema comparison, no nine-gesture replay or rebuild"
+  ],
+  "documentation_only_after_build": {
+    "paths": [
+      "docs/plans/actions-confiance/SECURITY-PROOFS-APEX.md",
+      "docs/en/plans/actions-confiance/SECURITY-PROOFS-APEX.md",
+      "tools/verification/SECURITY-INITIALIZATION.md",
+      "tools/verification/SECURITY-INITIALIZATION.en.md"
+    ],
+    "all_absent_from_effective_compiler_inputs": true,
+    "reason": "State/evidence wording only, no function/config/runtime policy change; no rebuild/retest needed"
+  },
+  "restore": "Read individual indexed evidence files from their absolute external paths into a private directory and verify SHA256; preserve originals and never archive Chrome profiles or credentials."
+}

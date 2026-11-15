@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "id": "version-provenance-oracle",
+  "inputs": [
+    "tests/helpers/version_provenance_assertions.cjs",
+    "tests/version_provenance_assertions.test.cjs"
+  ],
+  "environment": {},
+  "steps": [{
+    "id": "clean-modified-refusal-and-recovery",
+    "command": ["node", "--test", "tests/version_provenance_assertions.test.cjs"],
+    "expected_exit": 0,
+    "required_stdout": [
+      "modified control and clean control both match explicit build facts",
+      "opposite metadata and missing or spurious dirty notices are refused",
+      "invalid facts preserve inputs and a subsequent valid observation recovers"
+    ],
+    "required_stderr": []
+  }]
+}

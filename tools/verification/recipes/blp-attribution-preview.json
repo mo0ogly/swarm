@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "blp-attribution-preview",
+  "inputs": [
+    "tests/blp_attribution_preview_unit.cjs",
+    "tests/blp_attribution_preview_cli.py",
+    "tests/fixture_area.py",
+    "web/trust-confidentiality.js",
+    "rust/crates/swarm-engine/src/trust/confidentiality.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-cli/src/trust.rs",
+    "rust/crates/swarm-web/src/service/trust.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "consumer-exact-wire-and-invalidation",
+      "command": [
+        "node",
+        "tests/blp_attribution_preview_unit.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS BLP consumer routing, exact revisions, field/token/inflight invalidation and exact apply"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-preview-and-apply",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess; subprocess.run(['python3','tests/blp_attribution_preview_cli.py','--binary',os.environ['SWARM_BLP_BINARY'],'--profile',os.environ['SWARM_BLP_PROFILE'],'--output',os.environ['SWARM_BLP_PROOF_OUTPUT']],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS valid mutating producer control",
+        "PASS readonly preview exact journal unchanged",
+        "PASS stale/refusal, explicit apply, replay"
+      ],
+      "required_stderr": []
+    }
+  ]
+}
