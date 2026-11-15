@@ -151,7 +151,7 @@ impl WitnessPanic {
 /// `Finished` destructure (real `ExitStatus` code, Unix signal and success,
 /// each raw stream's REAL terminal variant with its EXACT `Completed` byte
 /// count, controller-panic PRESENCE only), or `not_finished_process_outcome`
-/// on the typed refusal routes (explicit UNKNOWN / not-finished envelope —
+/// for the remaining unresolved refusal callers (explicit UNKNOWN / not-finished envelope —
 /// no invented status, count or settled state). The private controller-panic
 /// payload is NEVER serialized into the receipt. Content: receipt schema
 /// version, witness label, relative paths inside the retained leaf + their
@@ -168,8 +168,11 @@ impl WitnessPanic {
 /// `CompoundPanic` carrier unwinds BOTH the ORIGINAL payload (verbatim,
 /// downcastable inside) and this text as the secondary receipt cause
 /// (never swallowed, never disguised; the top-level unwound type is
-/// truthfully the carrier, not the original panic type). Refusal routes
-/// raise their real cause with the receipt text in their panic message. The path is printed ONCE per call as
+/// truthfully the carrier, not the original panic type). Refusal callers
+/// decide their distinct error transport; this builder does not preserve
+/// child ownership. PreparationRefused transfers without calling it; only
+/// an explicit receiver with stable finished facts can write its final
+/// receipt. The path is printed ONCE per call as
 /// a single manifest JSON line on STDERR (never a log tail, no session
 /// secret) for Codex's manual identification — stderr, NOT stdout: under
 /// `--nocapture` a `println!` interleaves with the harness's own stdout
@@ -311,16 +314,24 @@ fn finished_process_outcome(
 }
 
 /// Builds the witness-local `process` receipt object for the typed refusal
-/// routes (preparation refused, signal refused, wait refused): the process
+/// routes that still record unresolved outcomes (signal refused, wait refused): the process
 /// outcome is EXPLICITLY UNKNOWN / NOT FINISHED — `finished` is `false` and
 /// every fact the route does not actually carry (exit code, Unix signal,
 /// success, terminal variants, `Completed` byte counts) stays `null` with
 /// NO invented status, count or settled state. The controller-panic
-/// presence is recorded ONLY where the route actually carries it (the
-/// signal-refused refusal exposes the real flag; routes without that fact
-/// record `null`): the typed ownership of these routes and their
-/// original-panic preservation remain a separate, still-OPEN task and are
-/// NOT claimed resolved or exercised here. Witness-local to this test.
+/// presence is recorded ONLY where the caller passes a fact the route
+/// actually knows (the signal-refused refusal exposes its real flag;
+/// routes without that fact record `null`; the preparation-refused
+/// consumer NO LONGER CALLS this helper at all — it transfers the WHOLE
+/// typed refusal BY VALUE through the pure
+/// `fail_signal_stop_preparation_refused` helper, and only AFTER the
+/// explicit receiver's real finish returns `Finished` does that receiver
+/// write the FINISHED receipt via `finished_process_outcome` — never a
+/// not-finished envelope for a known-finished capture, and never
+/// implying UNKNOWN == Finished), while `SignalRefused` and a genuine pidfd
+/// failure keep their typed ownership and original-panic preservation
+/// explicitly OPEN, and the WaitRefused helper's pre-payload receipt I/O
+/// stays separately open. Witness-local to this test.
 fn not_finished_process_outcome(controller_panic_presence: Option<bool>) -> Value {
     json!({
         "finished": false,
@@ -465,8 +476,9 @@ fn conserve_parent_wait_refused_carrier(
 /// recovering `catch_unwind` receiver — with no higher consumer, the
 /// libtest top-level drop does NOT establish any external cleanup, the
 /// unexpected handback stays VISIBLE as this witness's failure, and NO
-/// claim is made that all refusal routes are resolved (PreparationRefused
-/// and SignalRefused remain explicitly OPEN and untouched).
+/// claim is made that all refusal routes are resolved: genuine pidfd and
+/// SignalRefused handling remain OPEN; guard24 separately exercises the
+/// PreparationRefused parent's pure by-value helper.
 fn fail_parent_wait_refused(carrier: ParentWaitRefusedCarrier) -> ! {
     eprintln!(
         "parent witness unexpected wait refusal — {context}: cause {error}; \
@@ -766,8 +778,8 @@ fn assert_parent_guard_completed(
 /// top-level drop establishes no external cleanup, and if no higher
 /// consumer recovers the production witness's unexpected handback, that
 /// handback stays VISIBLE as the witness failure; NO claim is made that
-/// all refusal routes are resolved (PreparationRefused and SignalRefused
-/// remain explicitly OPEN and untouched); there is no automatic re-wait,
+/// all refusal routes are resolved (genuine pidfd and SignalRefused routes
+/// remain OPEN; guard24 separately exercises the PreparationRefused helper); there is no automatic re-wait,
 /// no signal, no kill, no timeout and no retry anywhere in this guard.
 #[test]
 fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
@@ -1234,6 +1246,574 @@ fn paea_capture_parent_wait_refusal_retains_owned_handoff() {
         collision_exit_code,
         Some(PARENT_WAIT_REFUSAL_EXIT_CODE),
         "the collision child's real exit code must be retained — no orphan"
+    );
+}
+
+/// Fixture data, not operator policy: the new guard's receipt labels and
+/// failing-site context strings (witness-local to this test).
+const PARENT_PREPARATION_GUARD_WITNESS: &str =
+    "paea_capture_parent_preparation_refusal_keeps_owned_capture";
+const PARENT_PREPARATION_GUARD_MANIFEST: &str =
+    "paea-capture-parent-preparation-refusal-guard-receipt";
+const PARENT_PREPARATION_GUARD_HEALTHY_CONTEXT: &str =
+    "parent preparation guard healthy witness wait refused";
+const PARENT_PREPARATION_GUARD_INJECTED_CONTEXT: &str =
+    "parent preparation guard injected capture wait refused";
+/// Distinctive marker inside the SYNTHETIC preparation-refusal cause (the
+/// injected error is a test seam, never a real `pidfd_open` failure).
+const PARENT_PREPARATION_SEAM_MARKER: &str = "synthetic parent-guard preparation refusal";
+
+/// PURE transfer door for the parent witness's `PreparationRefused` route
+/// and for the dedicated regression guard below: the COMPLETE typed
+/// [`paea_capture_child::SignalStopPreparationRefusal`] — the intact
+/// capture (unreaped child with its stdin NOT closed, BOTH still-running
+/// captures, both evidence paths) plus the real non-Clone cause — is
+/// panicked AS the typed recoverable payload with
+/// `std::panic::panic_any(refusal)`, with NO formatting, NO logging and
+/// NO receipt I/O before the transfer.
+///
+/// Purpose: preserve the whole owned refusal for an explicit receiver — a
+/// `catch_unwind` site recovers the boxed payload BY VALUE
+/// (`downcast::<paea_capture_child::SignalStopPreparationRefusal>()` on
+/// the boxed payload; a bare `downcast_ref` borrow would NOT pass
+/// ownership) and then decides everything explicitly.
+///
+/// Preconditions: called only at the typed `PreparationRefused` boundary,
+/// where the pidfd preparation refused BEFORE any controller ran (so the
+/// receiver can record `controller_panic: false` as a KNOWN fact — this
+/// refusal struct carries no payload field) and the capture is still
+/// fully intact (nothing waited, joined, closed or written).
+///
+/// Outputs: never returns (`!`) — one unwind carrying the whole refusal.
+/// Effects: nothing is printed, written, waited, joined or closed here.
+///
+/// Errors: none raised by this helper itself; the payload type must
+/// satisfy `Any + Send` for `panic_any`.
+///
+/// Limits (visible, never hidden): if no higher consumer recovers the
+/// payload, the libtest top-level drop of the unrecovered payload closes
+/// the capture's OWNED descriptors — the child's stdin write end (a
+/// stdin-blocking script then exits on its own stdin EOF) and each
+/// stream's evidence READER descriptor — while each `LiveRecordedStream`
+/// has NO `Drop`: dropping it DETACHES its worker (the `JoinHandle`
+/// drop), and that worker still owns the child's actual stdout/stderr
+/// pipe read ends and the conservation file, so those pipe ends are NOT
+/// closed by this drop and keep draining until real pipe EOF. The drop
+/// does NOT stop, reap or finish the capture: no wait, no reap, no join,
+/// no terminal-completion establishment, no worker resolution and no
+/// receipt are established by that drop, and NO global cleanup exists. NO real OS `pidfd_open` refusal is established
+/// anywhere — the exercised guard below injects a clearly labeled
+/// synthetic seam error. The default panic hook may print for the
+/// non-string payload (no global hook mutation is allowed);
+/// `SignalRefused` and a genuine pidfd failure stay separate, still-OPEN
+/// routes.
+fn fail_signal_stop_preparation_refused(
+    refusal: paea_capture_child::SignalStopPreparationRefusal,
+) -> ! {
+    std::panic::panic_any(refusal)
+}
+
+/// PARENT REGRESSION (the ONE named guard of this slice):
+/// `paea_capture_parent_preparation_refusal_keeps_owned_capture` — the
+/// typed `PreparationRefused` boundary of the parent witness's
+/// `signal_stop` route, exercised at the PARENT-HELPER level through the
+/// SAME pure helper the production arm now uses — a synthetic
+/// helper-level exercise: NOT the real HTTP parent route end-to-end, NOT
+/// a real pidfd refusal, NOT global cleanup, NOT installation or
+/// acceptance. Implemented proposal, pending the principal's targeted
+/// verification of this guard.
+///
+/// Purpose: prove the positive HTTP parent's `PreparationRefused` route
+/// no longer writes a premature UNKNOWN receipt over the still-growing
+/// stream files and never stringifies or drops the owned capture — the
+/// COMPLETE typed refusal (intact capture + real cause) survives the pure
+/// `panic_any` transfer and reaches an explicit receiver BY VALUE.
+///
+/// Preconditions: Linux test crate; `/usr/bin/python3` available; the
+/// constants above are FIXTURE DATA, not operator policy; the existing
+/// parent helpers (`spawn_parent_wait_refusal_child`,
+/// `start_parent_guard_capture`) supply the SAME real cooperative child
+/// shape as the parent's stopped route (stdin + both raw streams piped,
+/// private fixture paths, constant script blocking on one stdin byte).
+///
+/// Phase 1 — HEALTHY REAL CONTROL before any fault injection: one real
+/// child from the existing helper is finished through the owner; the real
+/// Finished outcome (true exit code 7 — never a success — and BOTH
+/// captures `Completed` with the exact 57-byte counts) and the exact
+/// prefix+final raw bytes are asserted, and a VALID Finished receipt (the
+/// typed builder over the real facts) is written and read back field by
+/// field BEFORE any fault is injected.
+///
+/// Phase 2 — SYNTHETIC `SignalStopPreparationRefusal`: a second real
+/// child is started through the SAME helpers and its INTACT capture
+/// (child unreaped, stdin NOT closed, BOTH captures still running) is
+/// wrapped with a clearly labeled SEAM error into the typed refusal — NO
+/// `signal_stop` call, NO controller invoked and NO real `pidfd_open`
+/// syscall failure claimed or performed. The intact facts (child id, both
+/// evidence paths, stdin presence) are snapshotted as DATA before
+/// wrapping, with NO assertion while the child is unresolved. The refusal
+/// passes through the SAME pure helper inside a test `catch_unwind`; the
+/// boxed payload is downcast BY VALUE into the ENTIRE
+/// `SignalStopPreparationRefusal` and destructured by move; the recovered
+/// facts are again snapshotted as data — infallible accessors ONLY (pid,
+/// both paths, stdin presence and the cause's error KIND; the owned
+/// `io::Error` stays WHOLE and its text is rendered only after the
+/// finish); only then does the receiver explicitly finish the capture —
+/// the child script exits only on stdin EOF, so `finish` itself owns the
+/// stdin closing and the whole collection; deliberately NO `take_stdin`
+/// (the receiver would hold the pipe end and deadlock the stdin-blocking
+/// child), no wait before this point, no signal, no kill, no retry. The
+/// stable FINISHED receipt is written only AFTER that explicit finish:
+/// the finish REALLY returns `Finished`, so the receipt is the typed
+/// `finished_process_outcome` over those real terminal facts — never a
+/// manufactured UNKNOWN envelope after a known finish, and never
+/// implying UNKNOWN == Finished — recording the route's KNOWN controller
+/// fact `controller_panic: false` (no controller ever ran) with no
+/// payload field on this refusal to record; a hypothetically UNRESOLVED
+/// receiver would have no stable final receipt here and none is claimed.
+///
+/// Verdicts (all AFTER the receiver's finish, all data-level, nothing
+/// invented): the recovered cause keeps its real kind and verbatim text;
+/// the SAME child id and BOTH evidence paths travel unchanged; stdin
+/// stays present (NOT closed) through the whole transfer; the finish is
+/// the real `Finished` with exit code 7 and BOTH `Completed` 57-byte
+/// captures; the raw prefix+final bytes are exact; the Finished receipt
+/// readback validates the EXACT process object against a fresh
+/// `finished_process_outcome` over the same real terminal facts (real
+/// `finished: true`, exit code 7, null signal, `success: false`, KNOWN
+/// `controller_panic: false`, both `Completed` terminal states with the
+/// exact 57-byte counts) plus both artifact paths, their byte counts and
+/// the SHA256 of the already-asserted raw bytes, and the seam text NEVER
+/// appears in the receipt. An unexpected finish
+/// `WaitRefused` is conserved by the EXISTING
+/// `conserve_parent_wait_refused_carrier` and failed with the EXISTING
+/// `fail_parent_wait_refused`, preserving the WHOLE ownership.
+///
+/// Errors: any failed precondition, receipt write or unexpected refusal
+/// panics with its real cause — nothing is retried, masked or swallowed;
+/// the default panic hook may print during the `catch_unwind` (no global
+/// hook mutation is allowed).
+///
+/// Effects: two real children run to their real exits; both private
+/// leaves, all four 0600 evidence files and both receipts stay on disk
+/// even on PASS for Codex; nothing is removed here.
+///
+/// Limits: the injected refusal is a TEST SEAM proving the typed
+/// transfer, NOT a real OS pidfd refusal; this guard exercises the parent
+/// HELPER only — not the real HTTP parent route, not global cleanup,
+/// installation or acceptance; if the payload were never recovered, the
+/// libtest top-level drop would close the capture's owned stdin and
+/// evidence-READER descriptors while DETACHING the workers (each
+/// `LiveRecordedStream` has NO `Drop`; the detached workers keep owning
+/// the child's actual stream pipe read ends and the conservation files)
+/// without stopping, reaping or finishing the capture (no global cleanup
+/// exists); no sleeps, timeouts, retries, hooks or kill
+/// anywhere; `SignalRefused`, a genuine pidfd failure, global cleanup and
+/// live Authority acceptance remain OPEN.
+#[test]
+fn paea_capture_parent_preparation_refusal_keeps_owned_capture() {
+    // Local SHA-256 readback helper (lowercase hex): recomputes the
+    // artifact digests over the ALREADY asserted raw bytes for the
+    // receipt validation below. If the receipt's digest schema or the
+    // crate's hashing dependency differs from this form, this fails
+    // LOUDLY here — never a fake pass.
+    fn sha256_hex(bytes: &[u8]) -> String {
+        use sha2::Digest;
+        let digest = sha2::Sha256::digest(bytes);
+        let mut hex = String::with_capacity(digest.len() * 2);
+        for byte in digest {
+            hex.push_str(&format!("{byte:02x}"));
+        }
+        hex
+    }
+    let healthy_leaf = private_fixture_leaf("parent-preparation-refusal-healthy");
+    let injected_leaf = private_fixture_leaf("parent-preparation-refusal-injected");
+    let selection = json!({
+        "guard": "paea_capture_parent_preparation_refusal_keeps_owned_capture",
+        "child": "constant local /usr/bin/python3 -c script; stdin and both raw streams piped; cooperative stdin-EOF stop",
+    });
+    let mut expected_stdout = PARENT_WAIT_REFUSAL_STDOUT_PREFIX.to_vec();
+    expected_stdout.extend_from_slice(PARENT_WAIT_REFUSAL_STDOUT_FINAL);
+    let mut expected_stderr = PARENT_WAIT_REFUSAL_STDERR_PREFIX.to_vec();
+    expected_stderr.extend_from_slice(PARENT_WAIT_REFUSAL_STDERR_FINAL);
+
+    // PHASE 1 — HEALTHY REAL CONTROL under the same preconditions, REAL
+    // finish, valid Finished receipt FIRST (before any fault injection).
+    let healthy_stdout_path = healthy_leaf.join("stdout.raw");
+    let healthy_stderr_path = healthy_leaf.join("stderr.raw");
+    let healthy = start_parent_guard_capture(
+        spawn_parent_wait_refusal_child(),
+        &healthy_stdout_path,
+        &healthy_stderr_path,
+    );
+    let (healthy_exit, healthy_stdout_state, healthy_stderr_state) = match healthy.finish() {
+        paea_capture_child::ChildCaptureOutcome::Finished {
+            exit,
+            stdout_capture,
+            stderr_capture,
+            ..
+        } => (exit, stdout_capture, stderr_capture),
+        paea_capture_child::ChildCaptureOutcome::WaitRefused(handback) => {
+            fail_parent_wait_refused(conserve_parent_wait_refused_carrier(
+                PARENT_PREPARATION_GUARD_HEALTHY_CONTEXT,
+                PARENT_PREPARATION_GUARD_WITNESS,
+                PARENT_PREPARATION_GUARD_MANIFEST,
+                &healthy_leaf,
+                &selection,
+                handback,
+                None,
+            ));
+        }
+    };
+    assert_eq!(
+        healthy_exit.code(),
+        Some(PARENT_WAIT_REFUSAL_EXIT_CODE),
+        "the healthy control child must terminate with its constant real exit code"
+    );
+    assert_parent_guard_completed(
+        &healthy_stdout_state,
+        expected_stdout.len(),
+        "healthy stdout capture",
+    );
+    assert_parent_guard_completed(
+        &healthy_stderr_state,
+        expected_stderr.len(),
+        "healthy stderr capture",
+    );
+    assert_eq!(
+        fs::read(&healthy_stdout_path).expect("healthy stdout evidence must be readable"),
+        expected_stdout,
+        "the healthy control must retain the EXACT raw stdout bytes"
+    );
+    assert_eq!(
+        fs::read(&healthy_stderr_path).expect("healthy stderr evidence must be readable"),
+        expected_stderr,
+        "the healthy control must retain the EXACT raw stderr bytes"
+    );
+    // A VALID Finished receipt from the typed builder over the REAL facts
+    // is written and read back BEFORE any fault injection.
+    let (healthy_receipt_path, _) = write_process_receipt(
+        &healthy_leaf,
+        PARENT_PREPARATION_GUARD_WITNESS,
+        PARENT_PREPARATION_GUARD_MANIFEST,
+        &selection,
+        &finished_process_outcome(
+            &healthy_exit,
+            &healthy_stdout_state,
+            &healthy_stderr_state,
+            false,
+        ),
+    )
+    .expect(
+        "the healthy control's Finished receipt write must succeed \
+         before any fault is injected",
+    );
+    let healthy_receipt: Value = serde_json::from_slice(
+        &fs::read(&healthy_receipt_path)
+            .expect("the healthy control's receipt must be readable"),
+    )
+    .expect("the healthy control's receipt must be valid JSON");
+    assert_eq!(
+        healthy_receipt["process"]["finished"], json!(true),
+        "the healthy control's receipt must record its real Finished facts"
+    );
+    assert_eq!(
+        healthy_receipt["process"]["exit_code"], json!(PARENT_WAIT_REFUSAL_EXIT_CODE),
+        "the healthy control's receipt must record the real constant exit code"
+    );
+    assert_eq!(
+        healthy_receipt["process"]["controller_panic"], json!(false),
+        "the healthy control's receipt must record the real absence of a \
+         controller panic"
+    );
+    assert_eq!(
+        healthy_receipt["artifacts"]["stdout"]["bytes"], json!(expected_stdout.len()),
+        "the healthy control's receipt must account for the real retained \
+         stdout bytes"
+    );
+    assert_eq!(
+        healthy_receipt["artifacts"]["stderr"]["bytes"], json!(expected_stderr.len()),
+        "the healthy control's receipt must account for the real retained \
+         stderr bytes"
+    );
+    // The EXACT process object must equal the typed builder over the same
+    // real terminal facts (finished: true, exit 7, null signal, success:
+    // false, controller_panic: false, both Completed with exact counts).
+    assert_eq!(
+        healthy_receipt["process"],
+        serde_json::to_value(&finished_process_outcome(
+            &healthy_exit,
+            &healthy_stdout_state,
+            &healthy_stderr_state,
+            false,
+        ))
+        .expect("the healthy real Finished outcome must serialize to JSON"),
+        "the healthy receipt's process object must EQUAL the typed \
+         finished_process_outcome over the same real Finished facts"
+    );
+    // Both artifact paths, counts and the SHA256 of the already asserted
+    // raw bytes, validated straight from the receipt.
+    assert_eq!(
+        healthy_receipt["artifacts"]["stdout"]["path"],
+        json!("stdout.raw"),
+        "the healthy receipt must name the real stdout evidence path"
+    );
+    assert_eq!(
+        healthy_receipt["artifacts"]["stderr"]["path"],
+        json!("stderr.raw"),
+        "the healthy receipt must name the real stderr evidence path"
+    );
+    assert_eq!(
+        healthy_receipt["artifacts"]["stdout"]["sha256"],
+        json!(sha256_hex(&expected_stdout)),
+        "the healthy receipt's stdout SHA256 must match the already asserted \
+         raw stdout bytes"
+    );
+    assert_eq!(
+        healthy_receipt["artifacts"]["stderr"]["sha256"],
+        json!(sha256_hex(&expected_stderr)),
+        "the healthy receipt's stderr SHA256 must match the already asserted \
+         raw stderr bytes"
+    );
+
+    // PHASE 2 — SYNTHETIC PreparationRefused around a REAL intact capture:
+    // no `signal_stop` call, NO controller invoked and NO real pidfd_open
+    // syscall failure — the injected error is a clearly labeled test seam.
+    let injected_stdout_path = injected_leaf.join("stdout.raw");
+    let injected_stderr_path = injected_leaf.join("stderr.raw");
+    let mut injected = start_parent_guard_capture(
+        spawn_parent_wait_refusal_child(),
+        &injected_stdout_path,
+        &injected_stderr_path,
+    );
+    // The INTACT facts are snapshotted as DATA before wrapping; NOTHING is
+    // asserted while the child is unresolved.
+    let pre_child_pid = injected.id();
+    let pre_stdout_path = injected.stdout_path().to_path_buf();
+    let pre_stderr_path = injected.stderr_path().to_path_buf();
+    let pre_stdin_present = injected.stdin().is_some();
+    let injected_cause =
+        format!("{PARENT_PREPARATION_SEAM_MARKER} injected before any controller ran");
+    let injected_cause_text = injected_cause.clone();
+    let refusal = paea_capture_child::SignalStopPreparationRefusal {
+        error: std::io::Error::new(std::io::ErrorKind::Other, injected_cause),
+        capture: injected,
+    };
+    // THE SAME PURE PARENT HELPER the production PreparationRefused arm
+    // uses, inside a test catch_unwind; the default panic hook may print
+    // during the catch (no global hook mutation is allowed).
+    let caught = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        fail_signal_stop_preparation_refused(refusal);
+    }));
+    let boxed_payload = caught.expect_err(
+        "the pure preparation-refusal transfer must really panic with the \
+         COMPLETE typed refusal as its payload",
+    );
+    let recovered = boxed_payload
+        .downcast::<paea_capture_child::SignalStopPreparationRefusal>()
+        .expect(
+            "the typed panic payload must downcast BY VALUE into the \
+             ENTIRE SignalStopPreparationRefusal",
+        );
+    // Destructure the ENTIRE typed payload BY MOVE — nothing cloned, no
+    // cause re-creation, no borrow replacing the ownership transfer.
+    let paea_capture_child::SignalStopPreparationRefusal {
+        error,
+        capture: mut intact,
+    } = *recovered;
+    let recovered_child_pid = intact.id();
+    let recovered_stdout_path = intact.stdout_path().to_path_buf();
+    let recovered_stderr_path = intact.stderr_path().to_path_buf();
+    let recovered_stdin_present = intact.stdin().is_some();
+    let recovered_cause_kind = error.kind();
+    // The owned io::Error stays WHOLE, unformatted and un-rendered until
+    // AFTER the explicit finish below: no to_string/display/formatting of
+    // the cause happens while the child and both streams are unresolved
+    // (pre-finish snapshots are infallible accessor values only).
+    // EXPLICIT RECEIVER FINISH — before ANY verdict or evidence readback.
+    // The child script exits only on stdin EOF, so `finish` itself owns
+    // the stdin closing (the EOF permission) and the whole collection;
+    // deliberately NO `take_stdin` here (the receiver would hold the pipe
+    // end and deadlock the stdin-blocking child), no wait, signal, kill
+    // or retry anywhere.
+    let (exit, stdout_state, stderr_state) = match intact.finish() {
+        paea_capture_child::ChildCaptureOutcome::Finished {
+            exit,
+            stdout_capture,
+            stderr_capture,
+            ..
+        } => (exit, stdout_capture, stderr_capture),
+        paea_capture_child::ChildCaptureOutcome::WaitRefused(handback) => {
+            fail_parent_wait_refused(conserve_parent_wait_refused_carrier(
+                PARENT_PREPARATION_GUARD_INJECTED_CONTEXT,
+                PARENT_PREPARATION_GUARD_WITNESS,
+                PARENT_PREPARATION_GUARD_MANIFEST,
+                &injected_leaf,
+                &selection,
+                handback,
+                None,
+            ));
+        }
+    };
+    // NOW — with the child and both streams resolved — the owned cause is
+    // first rendered to text (no to_string/display/formatting of the
+    // io::Error happened before the explicit finish); then the stable
+    // FINISHED receipt is written: the finish REALLY returned `Finished`,
+    // so the receipt is the typed `finished_process_outcome` over those
+    // real terminal facts — never a manufactured UNKNOWN envelope after a
+    // known finish, never implying UNKNOWN == Finished — recording the
+    // route's KNOWN controller fact (no controller ever ran, so
+    // `controller_panic` is `false`, not null) with no payload field on
+    // this refusal to record.
+    let recovered_cause_text = error.to_string();
+    let (receipt_path, _) = write_process_receipt(
+        &injected_leaf,
+        PARENT_PREPARATION_GUARD_WITNESS,
+        PARENT_PREPARATION_GUARD_MANIFEST,
+        &selection,
+        &finished_process_outcome(&exit, &stdout_state, &stderr_state, false),
+    )
+    .expect(
+        "the Finished receipt write must succeed on the receiver's joined \
+         evidence",
+    );
+    // FACT VERDICTS — all data-level, all AFTER the explicit finish.
+    assert_eq!(
+        recovered_cause_kind,
+        std::io::ErrorKind::Other,
+        "the recovered cause must keep its real error kind"
+    );
+    assert_eq!(
+        recovered_cause_text, injected_cause_text,
+        "the original refusal cause must reach the receiver verbatim \
+         (moved through the pure transfer, never copied or re-created)"
+    );
+    assert_eq!(
+        recovered_child_pid, pre_child_pid,
+        "the SAME child (same pid) must travel through the typed refusal"
+    );
+    assert_eq!(
+        recovered_stdout_path, pre_stdout_path,
+        "the stdout evidence path must be conserved unchanged through the \
+         typed refusal"
+    );
+    assert_eq!(
+        recovered_stderr_path, pre_stderr_path,
+        "the stderr evidence path must be conserved unchanged through the \
+         typed refusal"
+    );
+    assert!(
+        pre_stdin_present && recovered_stdin_present,
+        "the intact capture's stdin must stay present (NOT closed) through \
+         the whole typed transfer"
+    );
+    assert_eq!(
+        exit.code(),
+        Some(PARENT_WAIT_REFUSAL_EXIT_CODE),
+        "the receiver's explicit finish must collect the real constant \
+         exit code"
+    );
+    assert_parent_guard_completed(
+        &stdout_state,
+        expected_stdout.len(),
+        "injected stdout capture",
+    );
+    assert_parent_guard_completed(
+        &stderr_state,
+        expected_stderr.len(),
+        "injected stderr capture",
+    );
+    assert_eq!(
+        fs::read(&recovered_stdout_path).expect("injected stdout evidence must be readable"),
+        expected_stdout,
+        "the raw stdout bytes must be retained through the typed transfer"
+    );
+    assert_eq!(
+        fs::read(&recovered_stderr_path).expect("injected stderr evidence must be readable"),
+        expected_stderr,
+        "the raw stderr bytes must be retained through the typed transfer"
+    );
+    let receipt_raw =
+        fs::read(&receipt_path).expect("the Finished process receipt must be readable");
+    let receipt_json: Value = serde_json::from_slice(&receipt_raw)
+        .expect("the Finished process receipt must be valid JSON");
+    // The finish REALLY returned Finished, so the receipt must carry the
+    // REAL finished facts: the EXACT process object of the typed builder
+    // over those same facts — never a manufactured UNKNOWN envelope after
+    // a known finish.
+    assert_eq!(
+        receipt_json["process"],
+        serde_json::to_value(&finished_process_outcome(
+            &exit,
+            &stdout_state,
+            &stderr_state,
+            false,
+        ))
+        .expect("the receiver's real Finished outcome must serialize to JSON"),
+        "the receipt's process object must EQUAL the typed \
+         finished_process_outcome over the receiver's real Finished facts"
+    );
+    assert_eq!(
+        receipt_json["process"]["finished"], json!(true),
+        "the receipt must record the REAL finished state, never an UNKNOWN \
+         envelope after a known finish"
+    );
+    assert_eq!(
+        receipt_json["process"]["exit_code"], json!(PARENT_WAIT_REFUSAL_EXIT_CODE),
+        "the receipt must record the real constant exit code 7"
+    );
+    assert_eq!(
+        receipt_json["process"]["signal"], Value::Null,
+        "the real termination was by exit, not by signal — the receipt must \
+         record null, not an invented signal"
+    );
+    assert_eq!(
+        receipt_json["process"]["success"], json!(false),
+        "exit code 7 is a real failure — the receipt must never normalize it \
+         to success"
+    );
+    assert_eq!(
+        receipt_json["process"]["controller_panic"], json!(false),
+        "the receipt must record the KNOWN controller fact of this route: \
+         no controller ever ran, so no controller panic — false, not null"
+    );
+    // Both artifact paths, counts and the SHA256 of the already asserted
+    // raw bytes, validated straight from the receipt.
+    assert_eq!(
+        receipt_json["artifacts"]["stdout"]["path"],
+        json!("stdout.raw"),
+        "the receipt must name the real stdout evidence path"
+    );
+    assert_eq!(
+        receipt_json["artifacts"]["stderr"]["path"],
+        json!("stderr.raw"),
+        "the receipt must name the real stderr evidence path"
+    );
+    assert_eq!(
+        receipt_json["artifacts"]["stdout"]["bytes"], json!(expected_stdout.len()),
+        "the Finished receipt must account for the REAL retained stdout bytes"
+    );
+    assert_eq!(
+        receipt_json["artifacts"]["stderr"]["bytes"], json!(expected_stderr.len()),
+        "the Finished receipt must account for the REAL retained stderr bytes"
+    );
+    assert_eq!(
+        receipt_json["artifacts"]["stdout"]["sha256"],
+        json!(sha256_hex(&expected_stdout)),
+        "the receipt's stdout SHA256 must match the already asserted raw \
+         stdout bytes"
+    );
+    assert_eq!(
+        receipt_json["artifacts"]["stderr"]["sha256"],
+        json!(sha256_hex(&expected_stderr)),
+        "the receipt's stderr SHA256 must match the already asserted raw \
+         stderr bytes"
+    );
+    let receipt_text = String::from_utf8(receipt_raw).expect("the Finished receipt must be UTF-8");
+    assert!(
+        !receipt_text.contains(PARENT_PREPARATION_SEAM_MARKER),
+        "the Finished receipt must NEVER contain the synthetic refusal \
+         cause text (the typed cause travels by value, never into JSON)"
     );
 }
 
@@ -2740,33 +3320,21 @@ fn approval_web_cli_binds_and_consumes_exact_preparation_once() {
     let stopped = match route {
         SignalStopResult::Stopped(result) => result,
         SignalStopResult::PreparationRefused(refusal) => {
-            // Typed refusal route, NOT claimed exercised: the receipt
-            // carries the explicit UNKNOWN / not-finished outcome envelope
-            // (no invented status, count or settled state); its typed
-            // ownership and original-panic preservation stay OPEN. A
-            // receipt failure stays a failure and conserves the real
-            // refusal cause as the primary information.
-            let (receipt, _) = write_process_receipt(
-                &leaf,
-                "approval_web_cli_binds_and_consumes_exact_preparation_once",
-                "paea-approval-web-positive-process-receipt",
-                &selection,
-                &not_finished_process_outcome(None),
-            )
-            .unwrap_or_else(|e| {
-                panic!(
-                    "SIGINT preparation refused before the controller ran (pidfd_open; \
-                     cause: {}) AND its process receipt write was also refused: {e}",
-                    refusal.error
-                )
-            });
-            panic!(
-                "SIGINT preparation refused before the controller ran (pidfd_open) — \
-                 receipt: {}; intact capture conserved: {:?}; cause: {}",
-                receipt.display(),
-                refusal.capture,
-                refusal.error
-            );
+            // Typed refusal route conserved WHOLE by value: the previous
+            // arm wrote a premature UNKNOWN receipt here — reading the
+            // WHOLE still-growing stream files — then stringified and
+            // DROPPED the owned capture. This replacement performs NO
+            // formatting, NO logging and NO receipt I/O before the
+            // transfer: the SAME pure helper the dedicated regression
+            // guard uses panics with the COMPLETE typed refusal as a
+            // recoverable BY-VALUE payload. No controller exists on this
+            // route, so the absence of a controller panic is KNOWN (the
+            // receiver records `false`, never null) and the refusal
+            // struct carries no payload field; the stable FINISHED receipt
+            // is written only by the explicit receiver, AFTER its real
+            // finish returns `Finished` (never an UNKNOWN envelope after
+            // a known finish, and never implying UNKNOWN == Finished).
+            fail_signal_stop_preparation_refused(refusal);
         }
         SignalStopResult::SignalRefused(refusal) => {
             // Typed refusal route, NOT claimed exercised: the receipt
@@ -2842,8 +3410,9 @@ fn approval_web_cli_binds_and_consumes_exact_preparation_once() {
             // has run); with no higher consumer this unexpected handback
             // stays VISIBLE as the witness failure (the libtest top-level
             // drop establishes no external cleanup) — no claim is made
-            // that all refusal routes are resolved: PreparationRefused
-            // and SignalRefused remain explicitly OPEN and untouched.
+            // that all refusal routes are resolved: genuine pidfd and
+            // SignalRefused routes remain OPEN; guard24 separately covers
+            // the PreparationRefused pure transfer helper.
             fail_parent_wait_refused(conserve_parent_wait_refused_carrier(
                 "approval-web positive witness wait refused after the accepted SIGINT",
                 "approval_web_cli_binds_and_consumes_exact_preparation_once",
