@@ -234,6 +234,28 @@ why. Use the configured Git identity, never invent attribution or add
 `Co-Authored-By` lines, including inherited messages. Do not rewrite published
 history or force-push without explicit authority.
 
+### Commit and main integration — Fabrice, 15 November 2026
+
+For the authorized Swarm plans, Fabrice explicitly requests commits and merges
+into `main` to avoid losing work across branches. This supersedes the earlier
+session instruction “no commit/merge” for those plans. Do not ask again for that
+same authority. Save attributable work in bounded commits on the appropriate
+branch; label an unfinished checkpoint honestly and never merge it as verified.
+Integrate reviewed and verified lots into `main`, using the configured remote,
+PR path and required checks where applicable. A saved commit, a merge, a push,
+a local installation and functional acceptance are separate outcomes to verify.
+
+Before any Git mutation, identify the actual branch/HEAD, index, worktrees,
+remote/base and owners of dirty hunks. Preserve all unrelated work and staging;
+do not switch a dirty shared checkout, bulk-stage foreign hunks, reset, stash,
+clean, rewrite history or force-push to obtain a merge. Reuse qualified checks
+while their effective inputs remain unchanged; inspect the merge result and
+run only checks justified by a changed contract or new failure. Keep each lot's
+commit/merge SHA, evidence, owner and remaining limits in its plan. If a branch
+conflict occurs, recover and resolve the real contract without dropping code.
+This Git authority does not authorize unrelated releases, social/site publishing,
+account actions or reactivation of X. The coordinator sequences integration.
+
 ## Local delivery version and release notes
 
 Every delivered change must have an identifiable running version and current
@@ -363,6 +385,27 @@ or unsuitable, report the local fallback and proceed only with adequate space.
 This preference changes no configured fixture directory, running execution,
 publication right or embedded agent context. See the bilingual storage guidance
 in `tools/verification/README.md`.
+
+## External disk scope — Fabrice, 15 November 2026
+
+The external disk, like Lexar, is for **evidence and temporary files only**:
+archives, isolated fixtures and compiler caches/temporary outputs. Keep Swarm's
+canonical repository, `.git`, live mission data, configuration, service/runtime
+and installed executable on the local disk. Do not migrate the application or
+run the installed service from removable storage. A compiler target on the disk
+is temporary; the supported delivery path must still qualify and install the
+local executable. Do not move the outputs of an already running command.
+
+Observe the actual mount/device, permissions, filesystem and free space before
+writing. On 15 November, SWARM was observed at `/run/media/fpizzi/SWARM` as ext4;
+this dated observation is not a future mount guarantee. Admit an external build
+target only through the qualified path, refuse a missing/changed mount before
+writing and preserve the host/output reserve. A `rw` mount alone does not close
+Lexar's earlier incident. No formatting, uncertain cache deletion or lowering
+the disk guard is authorized. Copy, synchronize and reread evidence hashes before
+any authorized relocation; retain the old reference or a restoration index and
+command, original failure status, metadata and active work. These rules do not
+change fixture selection, running jobs or publication rights by themselves.
 
 ## Permanent verification recipes — Claude and Codex
 
