@@ -1,12 +1,15 @@
 'use strict';
 /** Targeted real Rust HTTP fixture for Version wrapping and presentation URL
  * persistence. CLI init creates only an isolated Root; no provider/mission runs.
- * Optional --source-assets overlays exactly the three declared candidate assets,
+ * Optional --source-assets overlays the three declared candidate assets (only
+ * the shared CSS with --close-label-only),
  * explicitly separating source regression from a compiled/installed proof.
- * No global, navigation or protocol watchdog; named failures are retained. */
+ * --close-label-only selects the close-control contract and skips previously
+ * covered note/theme/persistence scenarios. No global, navigation or protocol
+ * watchdog; named failures and original fixture output are retained. */
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
-const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),overlay=process.argv.includes('--source-assets');fs.mkdirSync(out,{recursive:true});
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),overlay=process.argv.includes('--source-assets'),closeOnly=process.argv.includes('--close-label-only');fs.mkdirSync(out,{recursive:true});
 const root=fs.mkdtempSync(path.resolve('.swarm-fixtures/version-ui-'));
 execFileSync(binary,['--root',root,'init'],{stdio:'pipe'});
 const app=spawn(binary,['web','--root',root,'--json','--lang','en'],{stdio:['ignore','pipe','pipe']});app.stderr.pipe(fs.createWriteStream(path.join(out,'server.stderr'),{flags:'wx'}));
@@ -24,16 +27,32 @@ async function tools(page){if(await page.$eval('#nav-toggle',e=>e.getClientRects
  const base='http://'+address,digest=crypto.createHash('sha256').update(address).digest('hex'),key=fs.readFileSync(path.join(root,'.swarm','web-session-'+digest.slice(0,16)),'utf8');
  browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',timeout:0,protocolTimeout:0,userDataDir:path.join(root,'chrome'),args:['--no-sandbox']});
  const context=await browser.createBrowserContext(),page=await context.newPage();page.setDefaultTimeout(0);page.setDefaultNavigationTimeout(0);page.on('pageerror',e=>(injectingHistoryRefusal?faultErrors:errors).push(e.message));page.on('console',m=>{if(['warn','error'].includes(m.type()))consoleErrors.push(m.text())});page.on('requestfailed',r=>requestFailures.push({path:new URL(r.url()).pathname,error:r.failure()?.errorText}));page.on('request',r=>{if(r.method()==='POST')posts.push(new URL(r.url()).pathname)});
- if(overlay){await page.setRequestInterception(true);page.on('request',r=>{const pathname=new URL(r.url()).pathname;const file={'/swarm-design.css':'web/swarm-design.css','/cockpit-native.js':'web/cockpit-native.js','/i18n-en.js':'web/i18n-en.js'}[pathname];if(file)r.respond({status:200,contentType:file.endsWith('.css')?'text/css':'application/javascript',body:fs.readFileSync(file)}).catch(e=>errors.push(e.message));else r.continue().catch(e=>errors.push(e.message))})}
+ if(overlay){await page.setRequestInterception(true);page.on('request',r=>{const pathname=new URL(r.url()).pathname;const file=(closeOnly?{'/swarm-design.css':'web/swarm-design.css'}:{'/swarm-design.css':'web/swarm-design.css','/cockpit-native.js':'web/cockpit-native.js','/i18n-en.js':'web/i18n-en.js'})[pathname];if(file)r.respond({status:200,contentType:file.endsWith('.css')?'text/css':'application/javascript',body:fs.readFileSync(file)}).catch(e=>errors.push(e.message));else r.continue().catch(e=>errors.push(e.message))})}
  await context.setCookie({name:'swarm_session_'+digest.slice(0,12),value:key,url:base,httpOnly:true,sameSite:'Strict'});
  for(const lang of ['fr','en'])for(const theme of ['etat','sombre'])for(const width of [624,390]){
   const label=lang+'-'+theme+'-'+width;await page.setViewport({width,height:900});await page.goto(base+'/?'+new URLSearchParams({view:'conduite',lang,theme}),{waitUntil:'load'});await ready(page);await tools(page);await page.click('#version-open');await page.waitForFunction(()=>document.querySelector('#version-dialog')?.open&&document.querySelector('.version-local-changes li'),{polling:'mutation'});
+  if(closeOnly){
+   // Named finite viewports are test inputs: reported mobile390 and witness624.
+   // Read both close controls before interaction; complete labels, actual text
+   // line fragments, containment and title separation are the observable contract.
+   const close=await page.evaluate(()=>{const d=document.querySelector('#version-dialog'),h=d.querySelector('header'),title=h.querySelector('h2'),content=document.querySelector('#version-dialog-content');return {buttons:[...d.querySelectorAll(':scope > header button,:scope > footer button')].map(b=>{const range=document.createRange();range.selectNodeContents(b);const box=b.getBoundingClientRect(),parent=b.parentElement.getBoundingClientRect();return {text:b.textContent.trim(),lines:new Set([...range.getClientRects()].filter(r=>r.width>0).map(r=>r.top)).size,client:b.clientWidth,scroll:b.scrollWidth,left:box.left,right:box.right,parentLeft:parent.left,parentRight:parent.right,whiteSpace:getComputedStyle(b).whiteSpace}}),titleRight:title.getBoundingClientRect().right,contentClient:content.clientWidth,contentScroll:content.scrollWidth,document:document.documentElement.scrollWidth,viewport:innerWidth}});
+   check(label+'-close-labels-whole',close.buttons.length===2&&close.buttons.every(b=>b.text===(lang==='fr'?'Fermer':'Close')&&b.lines===1&&b.scroll<=b.client+1),close);
+   check(label+'-close-controls-fit',close.buttons.every(b=>b.left>=b.parentLeft-1&&b.right<=b.parentRight+1)&&close.titleRight<=close.buttons[0].left+1&&close.contentScroll<=close.contentClient+1&&close.document<=close.viewport+1,close);
+   await (await page.$('#version-dialog')).screenshot({path:path.join(out,label+'-close.png')});
+   await page.click('#version-dialog > header button');check(label+'-header-close-focus',await page.evaluate(()=>!document.querySelector('#version-dialog').open&&document.activeElement.id==='version-open'));
+   await page.click('#version-open');await page.waitForFunction(()=>document.querySelector('#version-dialog')?.open&&document.querySelector('.version-local-changes li'),{polling:'mutation'});
+   await page.click('#version-dialog > footer button');check(label+'-footer-close-focus',await page.evaluate(()=>!document.querySelector('#version-dialog').open&&document.activeElement.id==='version-open'));
+   await page.click('#version-open');await page.waitForFunction(()=>document.querySelector('#version-dialog')?.open&&document.querySelector('.version-local-changes li'),{polling:'mutation'});
+   await page.keyboard.press('Escape');check(label+'-escape-close-focus',await page.evaluate(()=>!document.querySelector('#version-dialog').open&&document.activeElement.id==='version-open'));
+   continue;
+  }
   const measure=await page.evaluate(()=>{const content=document.querySelector('#version-dialog-content');return {client:content.clientWidth,scroll:content.scrollWidth,document:document.documentElement.scrollWidth,viewport:innerWidth,titleFocused:document.activeElement.id==='version-dialog-title',notes:[...content.querySelectorAll('li')].map(e=>e.textContent),overflow:[...content.querySelectorAll('li')].filter(e=>e.scrollWidth>e.clientWidth+1).map(e=>({text:e.textContent,client:e.clientWidth,scroll:e.scrollWidth,wrap:getComputedStyle(e).overflowWrap}))}});
   check(label+'-internal-content-fits',measure.scroll<=measure.client+1,measure);check(label+'-document-fits',measure.document<=measure.viewport+1);check(label+'-title-focus',measure.titleFocused);check(label+'-all-local-notes-retained',measure.notes.length>0&&JSON.stringify(measure.notes)===JSON.stringify(await page.evaluate(()=>VersionHistoryPanel.value.history.local_changes.items.map(item=>item[document.documentElement.lang]))));
   if(width===624)await (await page.$('#version-dialog')).screenshot({path:path.join(out,label+'.png')});
   await page.keyboard.press('Escape');check(label+'-escape-restores-opener',await page.evaluate(()=>!document.querySelector('#version-dialog').open&&document.activeElement.id==='version-open'));
   await page.click('#version-open');await page.evaluate(async()=>{await VersionHistoryPanel.pending});check(label+'-reopens',await page.$eval('#version-dialog',e=>e.open));await page.keyboard.press('Escape');
  }
+ if(!closeOnly){
  // Exact reported precondition: URL has no theme; theme changed by its button.
  await page.goto(base+'/?view=conduite&lang=en',{waitUntil:'load'});await ready(page);await tools(page);if(await page.$eval('html',e=>e.dataset.theme!=='etat'))await page.click('#theme');await page.click('#theme');check('button-selects-dark',await page.$eval('html',e=>e.dataset.theme==='sombre'));await Promise.all([page.waitForNavigation({waitUntil:'load'}),page.select('#swarm-language','fr')]);await ready(page);check('EN-dark-to-FR-retains-dark',await page.$eval('html',e=>e.lang==='fr'&&e.dataset.theme==='sombre'),page.url());await page.reload({waitUntil:'load'});await ready(page);check('reload-retains-language-and-dark',await page.$eval('html',e=>e.lang==='fr'&&e.dataset.theme==='sombre'));
  await tools(page);if(await page.$eval('html',e=>e.dataset.theme!=='etat'))await page.click('#theme');check('button-selects-light',await page.$eval('html',e=>e.dataset.theme==='etat'));await Promise.all([page.waitForNavigation({waitUntil:'load'}),page.select('#swarm-language','en')]);await ready(page);check('FR-light-to-EN-retains-light',await page.$eval('html',e=>e.lang==='en'&&e.dataset.theme==='etat'));
@@ -51,7 +70,8 @@ async function tools(page){if(await page.$eval('#nav-toggle',e=>e.getClientRects
  await page.evaluate(()=>{history.replaceState=window.fixtureHistory.original;removeEventListener('error',window.fixtureHistory.listener);delete window.fixtureHistory});injectingHistoryRefusal=false;
  check('only-marked-history-error',faultErrors.length===1&&faultErrors[0].includes('web-native-theme-update-refused'),faultErrors);
  await page.click('#theme');await page.reload({waitUntil:'load'});await ready(page);check('history-refusal-recovery-persists',await page.$eval('html',(e,oldTheme)=>e.dataset.theme!==oldTheme,oldPresentation.theme),null);
+ }
  check('no-JS-errors',errors.length===0,errors);check('no-console-warnings-errors',consoleErrors.length===0,consoleErrors);check('no-failed-requests',requestFailures.length===0,requestFailures);check('no-POST',posts.length===0,posts);await context.close();
- }catch(error){errors.push(error.stack);throw error}finally{if(browser)await browser.close();if(app.exitCode===null&&app.signalCode===null){const stopped=new Promise(resolve=>app.once('exit',resolve));if(!app.kill('SIGTERM'))throw Error('fixture-server-stop-refused');await stopped}const result={status:checks.length>0&&errors.length===0&&checks.every(c=>c.ok)?'PASS':'FAIL',checks,errors,marked_fault_errors:faultErrors,consoleErrors,requestFailures,posts,overlay,inputs,binary_sha256:crypto.createHash('sha256').update(fs.readFileSync(binary)).digest('hex'),root,global_watchdog:null};fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(result,null,2));}
+ }catch(error){errors.push(error.stack);throw error}finally{if(browser)await browser.close();if(app.exitCode===null&&app.signalCode===null){const stopped=new Promise(resolve=>app.once('exit',resolve));if(!app.kill('SIGTERM'))throw Error('fixture-server-stop-refused');await stopped}const result={status:checks.length>0&&errors.length===0&&checks.every(c=>c.ok)?'PASS':'FAIL',checks,errors,marked_fault_errors:faultErrors,consoleErrors,requestFailures,posts,overlay,close_only:closeOnly,inputs,binary_sha256:crypto.createHash('sha256').update(fs.readFileSync(binary)).digest('hex'),root,global_watchdog:null};fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(result,null,2));}
  if(checks.some(c=>!c.ok))process.exitCode=1;
 })().catch(e=>{console.error(e.stack);process.exitCode=1});

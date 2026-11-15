@@ -111,3 +111,16 @@ If replaceState refuses the theme update, the cockpit keeps the previous DOM and
 URL, displays a safe diagnostic and propagates a typed error retaining its cause.
 A new action after recovery may save the preference; color alone never proves
 persistence.
+
+
+### Dialog header close controls
+
+Header buttons in dialogs, including form dialogs, share the existing
+`.modal-header` contract: controls do not shrink and their labels stay on one
+line while the adjacent title can wrap. Do not split/hide Close/Fermer or set
+a language-specific width. The targeted `version-dialog-close-label.json`
+recipe selects `--close-label-only` in the maintained driver: FR/EN, light/dark,
+390px plus624px witness, complete single-line labels, containment/no title
+collision, both close-button clicks and Escape returning focus to the trigger.
+It skips previously covered notes/theme/persistence scenarios. CSS-only source
+overlay evidence is distinct from the delivered compiled image.

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "native-build-outcomes",
+  "inputs": [
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/verify_native_profile.py",
+    "tools/rust-migration/build_native.py",
+    "tools/verification/build_storage.py",
+    "tests/test_native_build_outcomes.py",
+    "tests/native_build_metadata_test.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "process-admission-publication-causes",
+      "command": [
+        "python3",
+        "tests/test_native_build_outcomes.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 5 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "metadata-consumer-compatibility",
+      "command": [
+        "python3",
+        "tests/native_build_metadata_test.py",
+        "MetadataBinding.test_collector_signal_is_retained_before_refusal",
+        "MetadataBinding.test_status_path_change_preserves_accurate_build_metadata",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 2 tests",
+        "OK"
+      ]
+    }
+  ]
+}

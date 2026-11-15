@@ -255,3 +255,7 @@ go.work.sum
 /docs/plans/actions-confiance/verification-biba-transverse-20261028/boundary-linked-current
 /docs/plans/actions-confiance/verification-biba-transverse-20261028/workspace-swap-fd-after/workspace-swap.so
 /docs/plans/actions-confiance/verification-biba-transverse-20261028/workspace-swap.so
+
+# Workstation-only explicit external compiler cache registration and its writer lock
+/.cargo/external-targets.json
+/.cargo/external-targets.lock

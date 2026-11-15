@@ -58,6 +58,18 @@ def observe(root,out,prefix):
 
 
 def build(root,out,target,version):
+    """Build under a held registered temporary-output volume, defaulting local.
+
+    External targets require exact persisted mount/UUID admission before Cargo;
+    no source, mission, service or installed binary moves to that target. All
+    descriptors close on success/refusal; original and cleanup causes survive.
+    """
+    profile.require(release(version),'native-build-version-invalid')
+    with profile.storage.admitted(root,target) as admission:
+        return _build_admitted(root,out,target,version,admission)
+
+
+def _build_admitted(root,out,target,version,admission):
     """Freeze a qualified default-profile candidate and verify consumed metadata.
 
     Explicit version is only a label. Actual Git/date facts cannot be overridden
@@ -69,27 +81,19 @@ def build(root,out,target,version):
     exercised. Runtime env forgery is a fixture, not an injected build declaration.
     """
     profile.require(release(version),'native-build-version-invalid')
-    profile.require(target.is_relative_to(root),'native-build-target-outside-root')
     out.mkdir(parents=False,exist_ok=False,mode=0o700)
     profile.publish(out/'method.py',Path(__file__).read_bytes())
     try:
+        target_proof=admission.check()
+        profile.publish(out/'storage-admission.json',json.dumps(target_proof,indent=2)+'\n')
         before=observe(root,out,'before')
         metadata=dict(schema_version=1,version=version,commit=before['commit'],modified=before['modified'],build_date=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds').replace('+00:00','Z'))
         raw=json.dumps(metadata,sort_keys=True,separators=(',',':'))
         profile.publish(out/'build-metadata.json',raw+'\n')
         env={**os.environ,'SWARM_NATIVE_BUILD_METADATA':raw}
         args=[sys.executable,str(Path(profile.__file__)), '--root',str(root),'--target-dir',str(target),'--output',str(out/'profile')]
-        profile.publish(out/'invocation.json',json.dumps(dict(argv=args,root=str(root),metadata_sha256=hashlib.sha256(raw.encode()).hexdigest(),global_watchdog=None),indent=2)+'\n')
-        with (out/'collector.stdout').open('xb') as stdout,(out/'collector.stderr').open('xb') as stderr:
-            result=subprocess.run(args,env=env,stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr)
-        # A killed collector can leave empty stderr and no final profile. Keep
-        # its actual exit/signal before refusing; missing output is not success.
-        profile.publish(out/'collector-result.json',json.dumps(dict(
-            returncode=result.returncode,
-            signal=-result.returncode if result.returncode<0 else None,
-            stdout_sha256=profile.digest(out/'collector.stdout'),
-            stderr_sha256=profile.digest(out/'collector.stderr'),
-        ),indent=2)+'\n')
+        profile.publish(out/'invocation.json',json.dumps(dict(argv=args,root=str(root),storage_admission=target_proof,metadata_sha256=hashlib.sha256(raw.encode()).hexdigest(),global_watchdog=None),indent=2)+'\n')
+        result=profile.outcomes.execute(args,out=out,name='collector',admission=admission,publish=profile.publish,digest=profile.digest,failure_code='native-build-profile-failed',env=env)
         profile.require(result.returncode==0,'native-build-profile-failed')
         qualified=json.loads((out/'profile/result.json').read_bytes())
         profile.require(qualified['native_build_metadata']==dict(present=True,sha256=hashlib.sha256(raw.encode()).hexdigest()),'native-build-metadata-binding')
@@ -108,10 +112,10 @@ def build(root,out,target,version):
         # evidence; unrelated docs/test paths do not invalidate their accuracy.
         # The collector independently refuses changed effective compiler inputs.
         profile.require(all(before[key]==after[key] for key in ('commit','modified')),'native-build-git-observation-changed')
-        proof=dict(status='VERIFIED_NATIVE_CANDIDATE',binary=str(binary),sha256=qualified['sha256'],metadata=metadata,metadata_sha256=hashlib.sha256(raw.encode()).hexdigest(),git_observations_stable=before==after,git_metadata_stable=True,profile=str(out/'profile/result.json'),runtime_forgery_ignored=True,cold_root_not_created=True,installed=False,published=False,global_watchdog=None)
+        proof=dict(storage_admission=admission.check(),status='VERIFIED_NATIVE_CANDIDATE',binary=str(binary),sha256=qualified['sha256'],metadata=metadata,metadata_sha256=hashlib.sha256(raw.encode()).hexdigest(),git_observations_stable=before==after,git_metadata_stable=True,profile=str(out/'profile/result.json'),runtime_forgery_ignored=True,cold_root_not_created=True,installed=False,published=False,global_watchdog=None)
         profile.publish(out/'result.json',json.dumps(proof,indent=2)+'\n');return proof
     except BaseException as error:
-        try:profile.publish(out/'failure.json',json.dumps(dict(status='FAIL',type=type(error).__name__,candidate_unqualified=True,installed=False))+'\n')
+        try:profile.publish(out/'failure.json',json.dumps(dict(status='FAIL',**profile.outcomes.failure_document(error),candidate_unqualified=True,installed=False))+'\n')
         except BaseException as secondary:raise BaseExceptionGroup('Native build and evidence publication failed',[error,secondary])
         raise
 
