@@ -10,8 +10,13 @@ its bytes and declared environment do not prove actual C flags or capabilities.
 No process graph sandbox,
 independent review, installation, paid provider, retry or global watchdog.
 """
-import argparse,hashlib,json,os,re,shlex,subprocess,tempfile,tarfile
+import argparse,hashlib,importlib.util,json,os,re,shlex,subprocess,tempfile,tarfile
 from pathlib import Path
+
+_storage_spec=importlib.util.spec_from_file_location('native_build_storage',Path(__file__).with_name('build_storage.py'))
+storage=importlib.util.module_from_spec(_storage_spec);_storage_spec.loader.exec_module(storage)
+_outcome_spec=importlib.util.spec_from_file_location('native_build_outcome',Path(__file__).with_name('native_build_outcome.py'))
+outcomes=importlib.util.module_from_spec(_outcome_spec);_outcome_spec.loader.exec_module(outcomes)
 
 
 def require(condition,reason):
@@ -55,7 +60,7 @@ def manifest(root,paths):
 
 
 CARGO_CONFIG_NAMES=('.cargo/config','.cargo/config.toml')
-CARGO_SUPPORT_NAMES=('.cargo/storage-policy.json','tools/verification/cargo_space_guard.py')
+CARGO_SUPPORT_NAMES=('.cargo/storage-policy.json','tools/verification/cargo_space_guard.py','.cargo/external-targets.json','tools/verification/build_storage.py','tools/verification/native_build_outcome.py')
 
 
 def cargo_config_inputs(root):
@@ -195,6 +200,17 @@ def build_metadata_binding(environment):
 
 
 def run(root,out,target):
+    """Admit/hold default-local or explicitly registered external temporary output.
+
+    External identity/configuration refusals precede Cargo and cannot fall back.
+    The installed/frozen executable and source/evidence ownership stay local;
+    build outputs on the external volume remain temporary compilation caches.
+    """
+    with storage.admitted(root,target) as admission:
+        return _run_admitted(root,out,target,admission)
+
+
+def _run_admitted(root,out,target,admission):
     """Build offline/locked without fixture features, retain exact observations.
 
     This command does not install or restart. Cargo/manifest/IO/qualification
@@ -204,6 +220,8 @@ def run(root,out,target):
     out.mkdir(parents=False,exist_ok=False)
     publish(out/'method.py',Path(__file__).read_bytes())
     try:
+        target_proof=admission.check()
+        publish(out/'storage-admission.json',json.dumps(target_proof,indent=2)+'\n')
         depfile=target/'debug/swarm-rust.d';before=candidates(root)
         publish(out/'before.json',json.dumps(before,indent=2)+'\n')
         env={**os.environ,'CARGO_TARGET_DIR':str(target),'CARGO_PROFILE_DEV_DEBUG':'0','CARGO_PROFILE_TEST_DEBUG':'0','CARGO_INCREMENTAL':'0'}
@@ -211,9 +229,8 @@ def run(root,out,target):
         metadata=build_metadata_binding(env)
         presence={key:bool(env.get(key)) for key in names};require(not any(presence.values()),'profile-ambient-compiler-override')
         args=['cargo','build','--manifest-path','rust/Cargo.toml','--offline','--locked','-p','swarm-cli','--bin','swarm-rust','--message-format=json']
-        publish(out/'invocation.json',json.dumps(dict(argv=args,cwd=str(root),target_dir=str(target),native_build_metadata=metadata,ambient_override_presence=presence,cargo_config_inputs=config_manifest(before),cargo_environment_before_config={'LIBSQLITE3_FLAGS':env.get('LIBSQLITE3_FLAGS')},profile_environment={key:env[key] for key in ['CARGO_PROFILE_DEV_DEBUG','CARGO_PROFILE_TEST_DEBUG','CARGO_INCREMENTAL']},global_watchdog=None),indent=2)+'\n')
-        with (out/'cargo.stdout').open('xb') as stdout,(out/'cargo.stderr').open('xb') as stderr:
-            result=subprocess.run(args,cwd=root,env=env,stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr)
+        publish(out/'invocation.json',json.dumps(dict(argv=args,cwd=str(root),target_dir=str(target),storage_admission=target_proof,native_build_metadata=metadata,ambient_override_presence=presence,cargo_config_inputs=config_manifest(before),cargo_environment_before_config={'LIBSQLITE3_FLAGS':env.get('LIBSQLITE3_FLAGS')},profile_environment={key:env[key] for key in ['CARGO_PROFILE_DEV_DEBUG','CARGO_PROFILE_TEST_DEBUG','CARGO_INCREMENTAL']},global_watchdog=None),indent=2)+'\n')
+        result=outcomes.execute(args,out=out,name='cargo',admission=admission,publish=publish,digest=digest,failure_code='profile-cargo-failed',cwd=root,env=env)
         require(result.returncode==0,'profile-cargo-failed')
         events=[json.loads(line) for line in (out/'cargo.stdout').read_text().splitlines()]
         require(any(e.get('reason')=='build-finished' and e.get('success') is True for e in events),'profile-build-finished-missing')
@@ -226,24 +243,24 @@ def run(root,out,target):
             if artifact['target']['name']=='swarm-rust':continue
             filename=next(p for p in artifact['filenames'] if p.endswith('.rlib'));match=re.fullmatch(r'lib(.+)-([0-9a-f]+)\.rlib',Path(filename).name);require(match is not None,'profile-library-name')
             package=artifact['target']['name'].replace('_','-');path=target/'debug/.fingerprint'/(package+'-'+match[2])/('lib-'+artifact['target']['name']+'.json');value=json.loads(path.read_bytes());require(value['rustflags']==[],'profile-compiler-flags')
-            fingerprints[str(path.relative_to(root))]=dict(sha256=digest(path),features=value['features'],rustflags=value['rustflags'],compile_kind=value['compile_kind'])
+            fingerprints[str(path.relative_to(root)) if path.is_relative_to(root) else str(path)]=dict(sha256=digest(path),features=value['features'],rustflags=value['rustflags'],compile_kind=value['compile_kind'])
         actual=dependencies(root,depfile);publish(out/'after.json',json.dumps(actual,indent=2)+'\n');effective_unchanged(root,before,actual)
         source_archive=archive_effective_sources(root,out,actual)
         binary=Path(next(e for e in selected if e['target']['name']=='swarm-rust')['executable']);raw=binary.read_bytes();sha=hashlib.sha256(raw).hexdigest();frozen=root/'.cache/rust-migration-binaries'/('swarm-rust-'+sha);frozen.parent.mkdir(parents=True,exist_ok=True)
         if frozen.exists():require(digest(frozen)==sha,'profile-frozen-binary-mismatch')
         else:publish(frozen,raw);frozen.chmod(0o700)
         require(digest(frozen)==sha,'profile-frozen-readback')
-        proof=dict(native_build_metadata=metadata,status='VERIFIED_DEFAULT_NATIVE_PROFILE',binary=str(frozen.relative_to(root)),sha256=sha,artifacts_observed=len(artifacts),selected_core_artifacts=4,all_core_features_empty=True,all_core_test_false=True,no_fixture_feature=True,ambient_override_presence=presence,actual_dependencies_stable=True,cargo_config_inputs=config_manifest(actual),configuration_scope='Checkout config bytes and declared pre-Cargo environment; not observed C flags or runtime capability',effective_sources_archived=source_archive,installed=False,global_watchdog=None)
+        proof=dict(storage_admission=admission.check(),native_build_metadata=metadata,status='VERIFIED_DEFAULT_NATIVE_PROFILE',binary=str(frozen.relative_to(root)),sha256=sha,artifacts_observed=len(artifacts),selected_core_artifacts=4,all_core_features_empty=True,all_core_test_false=True,no_fixture_feature=True,ambient_override_presence=presence,actual_dependencies_stable=True,cargo_config_inputs=config_manifest(actual),configuration_scope='Checkout config bytes and declared pre-Cargo environment; not observed C flags or runtime capability',effective_sources_archived=source_archive,installed=False,global_watchdog=None)
         publish(out/'artifacts.json',json.dumps(selected,indent=2)+'\n');publish(out/'fingerprints.json',json.dumps(fingerprints,indent=2)+'\n');publish(out/'result.json',json.dumps(proof,indent=2)+'\n');return proof
     except BaseException as error:
-        try:publish(out/'failure.json',json.dumps(dict(status='FAIL',type=type(error).__name__,reason=str(error),scope='Build unqualified; inspect original Cargo channels',global_watchdog=None),indent=2)+'\n')
+        try:publish(out/'failure.json',json.dumps(dict(status='FAIL',**outcomes.failure_document(error),scope='Build unqualified; inspect original Cargo channels',global_watchdog=None),indent=2)+'\n')
         except BaseException as secondary:raise BaseExceptionGroup('Qualification and evidence publication failed',[error,secondary])
         raise
 
 
 def main():
     """Qualify the explicit checkout/cache/output, without hidden execution caps."""
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path.cwd());parser.add_argument('--target-dir',type=Path);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args();root=args.root.resolve();target=(args.target_dir or root/'rust/target/r97').resolve();require(target.is_relative_to(root),'profile-target-outside-checkout');print(json.dumps(run(root,args.output.resolve(),target)),flush=True)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path.cwd());parser.add_argument('--target-dir',type=Path);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args();root=args.root.resolve();target=(args.target_dir or root/'rust/target/r97').resolve();print(json.dumps(run(root,args.output.resolve(),target)),flush=True)
 
 
 if __name__=='__main__':main()

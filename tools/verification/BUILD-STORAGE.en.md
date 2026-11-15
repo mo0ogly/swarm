@@ -83,3 +83,69 @@ Use a fresh evidence directory on a Unix filesystem, then archive verified proof
 on USB with a local index. Recipe publication uses Unix hard links, so direct
 FAT32 evidence directories are unsupported. See the [verification guide](README.md)
 and [Cargo profiles](https://doc.rust-lang.org/cargo/reference/profiles.html).
+
+## Registered external temporary targets (STOCK-EXT-01)
+
+The external disk holds evidence, fixtures and temporary compiler caches/outputs
+only. Checkout, `.git`, configuration, mission data, service and installed image
+remain local. `verify_native_profile.py` still freezes/verifies the executable in
+the local `.cache/rust-migration-binaries`; the builder/launcher qualify this
+local copy. No service is installed from the external cache.
+
+The default target remains inside the checkout. An exact external target requires
+a local `.cargo/external-targets.json` registration (unversioned operator file,
+no secret). Existing selection remains `deploy/local-web.json` `rust_target_dir`,
+the historical `SWARM_RUST_TARGET_DIR` override, or an explicit builder argument.
+Selecting a path grants no admission. Register it using:
+
+```sh
+python3 tools/verification/build_storage.py --root /CHECKOUT register --target /MOUNT/cache/target --mountpoint /MOUNT --uuid OBSERVED_UUID --fstype ext4
+```
+
+Schema: `schema_version:1`, `targets`, each with `path`, `mountpoint`, `uuid`,
+`fstype`. Canonical absolute paths, unknown/duplicate keys, file owner/mode, aliases,
+actual mount and identity are validated. A nonblocking cooperative writer lock
+refuses concurrent registration without deleting the lock. Adjacent candidate
+bytes are reread/fsynced then atomically replaced. Pre-replacement failure keeps
+the old policy and retains the temporary for diagnosis; post-replacement failure
+is no rollback claim. Existing directory modes are preserved; availability
+against an actor able to modify the checkout namespace is not guaranteed.
+
+`build_storage.admitted()` is the sole public lifetime entrypoint. Builder and
+collector retain descriptors across the subprocess: exact findmnt UUID/fstype,
+rw/without noexec, major/minor, anchor/target dev/inode, path and policy/helper
+bytes are checked before Cargo and after execution. Directory-FD traversal with
+O_NOFOLLOW refuses a different-device component before Cargo. There is no missing
+mount fallback. The FD blocks ordinary unmount; this is no same-UID sandbox or
+protection against privileged forced/lazy detach. Post-execution refusal retains
+unqualified output and cannot establish that nothing was written.
+
+Python 3.11+ is required for grouped causes. ext4 is the technically qualified
+Unix-witness scope; another filesystem needs its own qualification, not an
+operator policy ceiling. Host/output reserve is unchanged. Registry/helper hashes
+are bound to effective inputs/archives; invocation/results retain admission facts.
+This mechanism does not archive the complete `deploy/local-web.json`.
+
+Permanent recipe: `recipes/external-build-storage.json`. Its simulations do not
+prove a real mount or Cargo build; actual mounted-device witnesses and the
+exercised native profile remain separate. Historical local targets without an
+external registry remain compatible; an absent registry grants no external target.
+
+### Completed subprocess and postcheck failures
+
+`native_build_outcome.execute` is shared by builder/collector. It closes/reads
+channels without hiding exit/signal, attempts immutable `collector-result.json`
+or `cargo-result.json` **before** the postcheck, then writes a distinct
+`*-admission-after.json` with process outcome, admission and first-publication
+status. The final `failure.json` includes structured `native_outcome` and nested
+causes even if either receipt publication fails. A failed spawn keeps unknown
+returncode as null; zero is never invented. Any failure blocks successful
+qualification. Channel/close/hash errors are not empty successes.
+
+The outcome recipe is `recipes/native-build-outcomes.json`. It exercises five
+simulated failure/recovery cases and two targeted metadata consumers, with no
+Cargo process. Original refusal evidence and earlier successful production
+profiles remain distinct; changed collector methods require fresh qualification.
+The external-admission unit recipe does not require a live workstation registry:
+its mount/registration data is isolated. Actual builds still bind the real
+optional registry and control-method hashes.
