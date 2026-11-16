@@ -25,3 +25,8 @@ One offline/locked engine `--lib --no-run` build returned0; no test body execute
 ## Source checkpoint after storage recovery
 
 Managed preparer SHA-256 6a357d1f4f31fb5dd70629c54eea31cfb53425e731cc59dcbdc9b0ddb29fd7ad: two GLM proposals and bounded principal corrections,09 APPROVE_SOURCE_ONLY (receipt 9be1ec21b08420aeab808b9bf8bc7750c6d0f8a7e4b7a68afd59a6e2304de29f). WIP source checkpoint only, no runtime/W/SDK/F or installation claim. Reserve recovered by verified archival of64historical proofs; CLI5f restored locally, full hash reread and787effective inputs unchanged. Separate managed trial allocation follows capacity/provenance admission; no historical campaign replay. Original failures preserved. Erratum: LF[10] correct in both proposals; no delimiter defect.
+
+
+## Preparatory flow observation —16November2026
+
+After verified local CLI5f restoration and comparison of787effective inputs plus7reviewed dependencies, source6a357d1f saved in91d08318adbeba3be8ddc888343082e4dbf80a95 executed one new managed preparatory flow. Root receipt `MANAGED-PREPARATION-VERIFIED-01.json` SHA-256 f8da5f816643a0a516c1bc022f503df3891708c139f2ce124a384351b828d644 in `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy`:10assertions,123retained files, READY_MANAGED_CONTROLS_NOT_REVIEWED. One inert worker/report handoff, passing native control, read-only inspection without reviewer invocation, calls0. Actual sigint stop with children0/lease released/Root closed and owner reaped. No W/SDK/F, fault, acceptance, merge or installation established. Historical campaigns not replayed. Next W reuses this Work; GLM adapter being prepared, not executed. SDK source86c29 remains compile-only and is not relabelled by this documentation commit.
