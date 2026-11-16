@@ -110,7 +110,11 @@ fn launch(error: A) -> E {
 /// Completed opinion observation is not admission: native job consumers still
 /// require their exact running record and publication verifies original custody.
 /// Fresh/public controls retain their absent-review check; no DTO grants a mode.
-fn review_source(review:Option<&crate::IndependentReview>)->ReviewSource<'_>{
+/// This is the single legacy mapping: the retained holder copies its owned
+/// purpose from it, so an error record stays Claimed here. ReviewerRetry is
+/// never derived from state and reaches observe_submission only through the
+/// explicit *_using_source entry points below.
+pub(super) fn review_source(review:Option<&crate::IndependentReview>)->ReviewSource<'_>{
     match review {
         Some(r) if matches!(r.state.as_str(),"passed"|"changes_requested")=>ReviewSource::RecordedOpinion(r),
         Some(r)=>ReviewSource::Claimed(r),
@@ -134,7 +138,22 @@ fn inputs(
 /// Internal reviewer observation names the exact current running record or a
 /// completed opinion for readonly source inspection;
 /// the shared submission guard compares it in full. This is no exec allowance.
+/// The optional record maps through review_source exactly as before; explicit
+/// ReviewSource purposes use inputs_using_source and are never reclassified.
 fn inputs_using(store:&RootStore,work:&str,request:&Request,job:Option<&store::Job>,review:Option<&crate::IndependentReview>)->Result<Option<Inputs>,E>{
+    inputs_using_source(store,work,request,job,review_source(review))
+}
+/// Read actual managed submission and owner/phase under a short reservation and
+/// SQL snapshot with an explicit ReviewSource purpose. None means genuinely
+/// ordinary Work only, never a failed read. Fresh requires idle task; existing
+/// jobs require exact current scalar equality. The caller-selected variant
+/// reaches observe_submission unchanged, so an explicit ReviewerRetry is never
+/// reclassified from the record state during acquisition or refresh, and
+/// ordinary controls stay Fresh. Accepted-baseline verification reads immutable
+/// Git reports under saved policy; no candidate creation or control/provider
+/// execution occurs while locks are held, and missing/stale original authority
+/// refuses before preparing/claiming a new job.
+fn inputs_using_source(store:&RootStore,work:&str,request:&Request,job:Option<&store::Job>,source:ReviewSource<'_>)->Result<Option<Inputs>,E>{
     let reservation = store.directory.reserve(false, false).map_err(E::Storage)?;
     let result = (|| {
         let settings = store.read_settings()?;
@@ -177,7 +196,7 @@ fn inputs_using(store:&RootStore,work:&str,request:&Request,job:Option<&store::J
                 &settings,
                 work,
                 &request,
-                review_source(review),
+                source,
                 RepositoryPurpose::Candidate,
             )
             .map_err(launch)?;
@@ -374,9 +393,21 @@ pub(super) fn acquire_job(
 /// Pin an existing completed control job for an internally selected current
 /// running reviewer or readonly completed opinion. Full submission equality and immutable checkpoint guards
 /// remain; fresh public controls still use None and cannot name this allowance.
+/// The optional record maps through review_source exactly as before; explicit
+/// ReviewSource purposes use acquire_using_source and are never reclassified.
 pub(super) fn acquire_for_review(store:&RootStore,job:&store::Job,candidate:&ManagedCandidate,review:Option<&crate::IndependentReview>)->Result<Session,E>{
+    acquire_using_source(store,job,candidate,review_source(review))
+}
+/// Pin an existing completed control job under an explicit ReviewSource purpose.
+/// The purpose reaches observe_submission unchanged, so an explicit ReviewerRetry
+/// is never reclassified from the record state during acquisition or refresh;
+/// full submission equality and immutable checkpoint guards remain. This is
+/// readonly custody only: no authority, SQL claim, post-claim refresh or
+/// directive lifecycle follows. Existing ordinary-control callers select Fresh;
+/// the caller still owes Root-verified original/decision checks for explicit retry.
+pub(super) fn acquire_using_source(store:&RootStore,job:&store::Job,candidate:&ManagedCandidate,source:ReviewSource<'_>)->Result<Session,E>{
     let request=Request{schema_version:1,event_id:job.event_id.clone(),expected_revision:job.work_revision,task_id:job.task_id.clone()};
-    let input=inputs_using(store,&job.work_id,&request,Some(job),review)?
+    let input=inputs_using_source(store,&job.work_id,&request,Some(job),source)?
         .ok_or(E::Refused("task-validation-managed-repository-required"))?;
     let initial=initial_artifacts(store,job,candidate)?;
     acquire(store,input,false,Some(candidate),Some(&initial))
@@ -451,7 +482,18 @@ pub(super) fn prepare(
 }
 /// Borrow a checked reviewer record while recomputing the same complete source.
 /// No descriptor, Git operation, mutation or process grant is created.
+/// The optional record maps through review_source exactly as before; explicit
+/// ReviewSource purposes use prepare_using_source and are never reclassified.
 pub(super) fn prepare_for_review(db:&rusqlite::Connection,directory:&crate::root_store::LocalDirectory,root:&Path,settings:&crate::EngineSettingsDocument,work:&str,request:&Request,data:&Captured,review:Option<&crate::IndependentReview>)->Result<Prepared,A>{
+    prepare_using_source(db,directory,root,settings,work,request,data,review_source(review))
+}
+/// Recompute the same complete managed source under an explicit ReviewSource
+/// purpose. The purpose reaches observe_submission unchanged, so an explicit
+/// ReviewerRetry is never reclassified from the record state; every digest,
+/// binding, plan and artifact equality is identical to prepare_for_review and
+/// the source tuple is unchanged. Borrowed observations grant no permission;
+/// no Git, descriptor, mutation or process grant is created here.
+pub(super) fn prepare_using_source(db:&rusqlite::Connection,directory:&crate::root_store::LocalDirectory,root:&Path,settings:&crate::EngineSettingsDocument,work:&str,request:&Request,data:&Captured,source:ReviewSource<'_>)->Result<Prepared,A>{
     let actual_instance = crate::root_store::observe_instance(db, directory)
         .map_err(|e| A::caused("task-validation-managed-root-instance", e))?;
     if actual_instance != data.root_instance {
@@ -463,7 +505,7 @@ pub(super) fn prepare_for_review(db:&rusqlite::Connection,directory:&crate::root
         settings,
         work,
         request,
-        review_source(review),
+        source,
         RepositoryPurpose::Candidate,
     )?;
     let limits = settings
