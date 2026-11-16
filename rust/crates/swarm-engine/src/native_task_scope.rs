@@ -39,6 +39,9 @@ impl NativeTaskScope {
 mod tests {
     use super::*;
 
+    /// Exercise valid closed-scope JSON and its round trip, then reject empty
+    /// coordinates, an unknown field and a missing attempt. Assertions panic on
+    /// mismatch; representation checks alone authenticate no execution or role.
     #[test]
     fn native_scope_closed_shape_and_identity_contract() {
         let good = serde_json::json!({"root_digest":"a".repeat(64),"work_id":"work",

@@ -1340,6 +1340,9 @@ mod tests {
     use super::*;
     use serde_json::json;
 
+    /// Check legacy unscoped hashing, native coordinates and ancestry binding
+    /// on in-memory mandate terms, then reject a malformed null scope. Assertion
+    /// failure panics; no identity, persisted mandate or native effect is proved.
     #[test]
     fn native_mandate_hash_binds_scope_and_ancestry_without_changing_legacy() {
         let original=json!({"actions":["settle"]});
@@ -1362,6 +1365,9 @@ mod tests {
         assert!(mandate_hash(&bound).is_err());
     }
 
+    /// Exercise unbound and same-scope controls, then reject removal or task
+    /// scope switching under a bound parent. Only in-memory terms are compared;
+    /// a mismatch panics, and no delegation is issued or authenticated.
     #[test]
     fn native_delegation_cannot_remove_or_switch_scope() {
         let mut parent=json!({"actions":["settle"],"resource":"invoice/a","currency":"EUR",

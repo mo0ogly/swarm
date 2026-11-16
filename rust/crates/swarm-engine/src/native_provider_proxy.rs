@@ -120,6 +120,9 @@ fn final_reply(reply: &serde_json::Value, nonce: &str) -> io::Result<bool> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// Start with a valid synthetic acknowledgment, then check stale/missing
+    /// nonce errors, explicit refusal and missing-result errors. Assertions panic
+    /// on mismatch; this proves no real peer identity, delivery or native effect.
     #[test]
     fn native_proxy_final_reply_rejects_stale_acknowledgment() {
         let mut reply = serde_json::json!({"type":"swarm.trust.reply","schema_version":1,

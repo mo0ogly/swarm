@@ -710,6 +710,9 @@ pub(crate) fn run(
 }
 #[cfg(test)]
 mod tests {
+    /// Check synthetic errors retain the primary cause, cleanup cause and known
+    /// publication marker together. Assertions panic on loss; no actual channel
+    /// failure, durable effect, delivery or rollback is established by this test.
     #[test]
     fn native_delivery_failure_keeps_primary_cleanup_and_publication() {
         use super::*;

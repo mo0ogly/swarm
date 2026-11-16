@@ -322,6 +322,9 @@ pub fn execute_agent_gate(root: &Path, id: &str) -> Result<Infallible, RootStore
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// Check exact prompt/suffix bytes at the supplied context cap, refusal one
+    /// byte below, uncapped input and unchanged unmapped transport. This uses
+    /// in-memory values; assertions panic, with no Admin persistence or exec.
     #[test]
     fn native_prompt_suffix_obeys_saved_context_limit() {
         let original="prepared";
