@@ -52,10 +52,13 @@ def read_at(root, components):
     return raw, identity
 
 
-def retain_review(root, work, task_id, result, owner, output):
+def retain_review(root, work, task_id, result, owner, output, *, managed_protocol=None):
     """Hold Root and private directory through all original reads and close them.
 
-    No pathname stat substitutes for the Job directory identity. Primary/read
+    managed_protocol optionally binds the actual managed preview, its frozen
+    snapshot/context/cohort and the managed I0 marker. None requires an ordinary
+    original; it never converts one protocol to another. No pathname stat
+    substitutes for the Job directory identity. Primary/read
     and both descriptor-close failures remain owned until the final consumer.
     """
     held, errors, value = [], [], None
@@ -64,7 +67,7 @@ def retain_review(root, work, task_id, result, owner, output):
         held.append(rootfd)
         privatefd=os.open('.swarm',os.O_RDONLY|os.O_DIRECTORY|os.O_CLOEXEC|os.O_NOFOLLOW,dir_fd=rootfd)
         held.append(privatefd)
-        value=_retain_review(root,work,task_id,result,owner,output,rootfd,privatefd)
+        value=_retain_review(root,work,task_id,result,owner,output,rootfd,privatefd,managed_protocol)
     except BaseException as error:
         errors.append(error)
     finally:
@@ -75,12 +78,14 @@ def retain_review(root, work, task_id, result, owner, output):
     return value
 
 
-def _retain_review(root, work, task_id, result, owner, output, rootfd, privatefd):
+def _retain_review(root, work, task_id, result, owner, output, rootfd, privatefd, managed_protocol):
     """Copy genuine SR1, content-v2 certificate and event-addressed I0 marker.
 
     Requires already successful normal task review and Work readback. Checks full
     schema/bindings, actual waited/granted child, raw capture and marker before
-    declaring a witness. No fabricated Root-relative reply/marker or journal.
+    declaring a witness. The optional managed protocol additionally requires its
+    exact original snapshot, content-addressed context and whole-cohort result;
+    ordinary callers reject a managed original. No fabricated reply/marker or journal.
     Public reconciliation by the caller remains an independent engine check.
     """
     root, output = Path(root).resolve(), Path(output)
@@ -126,10 +131,33 @@ def _retain_review(root, work, task_id, result, owner, output, rootfd, privatefd
     event = job['event_id']
     check(isinstance(event,str) and event and event.isascii()
           and all(c.isalnum() or c in '-_' for c in event), 'retention-event-component')
-    marker, _ = read_at(privatefd, ['biba-i0','reviewer',event,'reviewer-invoked.json'])
+    snapshot=receipt.get('managed_review')
+    if managed_protocol is None:
+        check(snapshot is None,'retention-ordinary-protocol-required')
+    else:
+        check(snapshot is not None and snapshot['protocol']==managed_protocol
+              and snapshot['prompt_sha256']==job['prompt_sha256'],'retention-managed-snapshot-binding')
+        context_name='native-review-context-v1-'+managed_protocol['context_sha256']+'.json'
+        context, _ = read_at(privatefd,[context_name])
+        check(review['context']=='.swarm/'+context_name
+              and fixture.digest(context)==review['context_sha256']==managed_protocol['context_sha256']
+              and json.loads(context)==managed_protocol['context']
+              and review['candidate_commit']==managed_protocol['context']['candidate_commit'],
+              'retention-managed-context-binding')
+        tasks=[t['task'] for t in review['managed_tasks']]
+        expected_tasks=[t['task'] for t in managed_protocol['context']['tasks']]
+        check(len(tasks)==len(set(tasks))==len(expected_tasks) and set(tasks)==set(expected_tasks),
+              'retention-managed-whole-cohort')
+        fixture.publish(output/'managed-context.json',context)
+    marker_name='managed-reviewer-invoked.json' if managed_protocol is not None else 'reviewer-invoked.json'
+    marker, _ = read_at(privatefd, ['biba-i0','reviewer',event,marker_name])
     invoked = json.loads(marker)
     check(invoked['pid'] == job['child_pid'] and invoked['ppid'] == job['parent_pid']
           and invoked['stdin_sha256'] == job['prompt_sha256'], 'retention-I0-invocation-binding')
+    if managed_protocol is not None:
+        check(invoked['context_sha256']==managed_protocol['context_sha256']
+              and invoked['catalog_sha256']==managed_protocol['catalog_sha256'],
+              'retention-managed-I0-protocol-binding')
     certname = 'native-review-public-v2-'+review['receipt_sha256']+'.json'
     check(review['receipt'] == '.swarm/'+certname, 'retention-certificate-reference')
     certificate, _ = read_at(privatefd, [certname])
