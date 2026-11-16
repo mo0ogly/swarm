@@ -20,3 +20,8 @@ Restent requis : vrai témoin managed valide avant mauvais/nonrunning review et 
 ## Observation de compilation seule —16novembre2026
 
 Un build engine offline/locked `--lib --no-run` terminé avec code0 ; aucun corps de test exécuté. Artefact engine réel test=true/features=[],558entrées workspace effectives conformes aux947candidats archivés avant Cargo et relus. ELF temporaire figé9b1d5baae0f4f20a305527dcbce611681a243632f367db41cf603a4df2e43f1c, commit source86c29e91f28dc3df016b8bdcf4d7a4ef01be6b8a. Reçu racine82046168701a3ca30654254617955bc5ad2b9cdcd77f9e8335dfede4aba73dae dans `/run/media/fpizzi/SWARM/swarm-evidence/root00-sdk5c-build-3l38zm8u`. Portée compilation/emprunts et profil test workspace, pas authentification complète par unité/compilateur/registry/générés, témoin managed, W/F, production ou version installée. La documentation ne reconstruit ni ne rebaptise le SDK source.
+
+
+## Sauvegarde source après reprise stockage
+
+Préparateur managed SHA-256 6a357d1f4f31fb5dd70629c54eea31cfb53425e731cc59dcbdc9b0ddb29fd7ad : deux propositions GLM et corrections bornées du principal, revue09 APPROVE_SOURCE_ONLY (reçu 9be1ec21b08420aeab808b9bf8bc7750c6d0f8a7e4b7a68afd59a6e2304de29f). Point WIP source seulement, sans résultat runtime/W/SDK/F ni installation. Réserve restaurée par archivage vérifié de64preuves historiques ; CLI5f restauré localement, SHA complet relu et787entrées effectives inchangées. Essai géré séparément alloué après capacité et provenance, sans campagne historique. Les anciens échecs restent conservés. Erratum : LF[10] correct dans les deux propositions, aucun défaut de séparateur.

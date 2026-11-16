@@ -20,3 +20,8 @@ Still required: actual healthy managed witness before wrong/nonrunning review an
 ## Compile-only observation —16November2026
 
 One offline/locked engine `--lib --no-run` build returned0; no test body executed. Actual engine test=true/features=[],558effective workspace inputs matched947declared candidate bytes archived before Cargo and reread. Frozen temporary ELF9b1d5baae0f4f20a305527dcbce611681a243632f367db41cf603a4df2e43f1c, source commit86c29e91f28dc3df016b8bdcf4d7a4ef01be6b8a. Root receipt82046168701a3ca30654254617955bc5ad2b9cdcd77f9e8335dfede4aba73dae in `/run/media/fpizzi/SWARM/swarm-evidence/root00-sdk5c-build-3l38zm8u`. Scope is compile/borrow checking and workspace test-profile observations, not complete per-unit/compiler/registry/generated authentication, managed witness, W/F, production or installed version. Documentation does not rebuild or rename SDK source.
+
+
+## Source checkpoint after storage recovery
+
+Managed preparer SHA-256 6a357d1f4f31fb5dd70629c54eea31cfb53425e731cc59dcbdc9b0ddb29fd7ad: two GLM proposals and bounded principal corrections,09 APPROVE_SOURCE_ONLY (receipt 9be1ec21b08420aeab808b9bf8bc7750c6d0f8a7e4b7a68afd59a6e2304de29f). WIP source checkpoint only, no runtime/W/SDK/F or installation claim. Reserve recovered by verified archival of64historical proofs; CLI5f restored locally, full hash reread and787effective inputs unchanged. Separate managed trial allocation follows capacity/provenance admission; no historical campaign replay. Original failures preserved. Erratum: LF[10] correct in both proposals; no delimiter defect.
