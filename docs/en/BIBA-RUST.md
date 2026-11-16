@@ -871,8 +871,10 @@ establishes no rollback. Later failures produce `failure.json` when storage
 permits, without erasing receipts. All three Git calls also retain argv, raw
 channels and statuses in the synthetic workspace before assertions. The producer
 is staged there from the declared source; nested observation grants no rights or
-admission. Both recipes declare this separate cohort prerequisite, absent from
-main230d. This revision has not been run, built, installed or qualified.
+admission. Both recipes declare this module, already present in main230d with SHA256
+`27b2bf5ebc57647876c00a338685cde71eaacea89d4bf1b55894fa33da5722ba`.
+The cohort must bind these exact bytes to its source pin; no missing-module
+prerequisite is established. This revision has not been run, built, installed or qualified.
 
 ### Independent JSON-error retention — unexecuted candidate
 

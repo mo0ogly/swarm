@@ -9,7 +9,8 @@ Le producteur27b2 existe déjà dans230d/8d/df1f ; il est inchangé, hors commit
 L'ancienne indication d'absence dans les paquets est corrigée explicitement.
 
 Les documents BIBA-RUST conservent intégralement les octets df1f et ajoutent
-seulement les suffixes04 extraits après leur préfixe exact8d, avec un en-tête
+les suffixes04 extraits après leur préfixe exact8d, avec la seule correction
+factuelle de présence du producteur demandée par root et un en-tête
 signalant la portée historique. Préfixes, suffixes et nouveaux hashes composés
 sont liés dans le reçu de sauvegarde. Aucun fichier Rust Biba ni hunk Biba5
 n'est remplacé. Les autres recettes/docs/test postimages sont exactes aux paquets.
@@ -39,7 +40,8 @@ pas une négation des preuves ultérieures reçues ci-dessus. Root séquence tou
 qualification restante. Restaurer061b propre et42helpers après sauvegarde.
 
 English: source-only WIP on exactdf1f, preserving every Biba5 source/doc byte.
-Append only the04 suffixes after their exact8d prefixes; record all composition
+Append the04 suffixes after their exact8d prefixes, correcting only the false
+producer-absence statement as requested by root; record all composition
 hashes and explicitly qualify historical unexecuted/producer-absence statements.
 Producer27b2 already exists and stays unchanged. Keep exact caller939,harness054e,
 handler2a6 and recipes, with bounded source approvals linked above. Reuse received
@@ -49,3 +51,19 @@ Component-fixture evidence establishes no real lowFD close, publicengine flow,
 complete production profile, installation or global acceptance. No PR/mainmerge,
 new test/build/driver/Gitfixture/provider/service execution. Restore clean061b
 and its42helpers; root owns remaining gates and source/target allocation.
+
+## Correction documentaire root — 16 novembre 2026
+
+Après le premier commit WIP, root a demandé de remplacer explicitement la phrase
+fausse d’absence dans les deux annexes composées, sans réécriture d’historique.
+La lecture réelle des blobs `tools/verification/native_build_outcome.py` aux
+commits230d,8d etdf1f donne chaque fois
+`27b2bf5ebc57647876c00a338685cde71eaacea89d4bf1b55894fa33da5722ba`.
+Le prérequis restant est la liaison exacte de cohorte/source pin. Les paquets
+originaux restent figés ; seuls trois documents changent dans ce complément.
+
+English: root requested explicit replacement of the false absence sentence after
+the initial WIP commit. Actual230d/8d/df1f producer blobs all hash to27b2 above.
+Exact cohort/source-pin binding remains required. This follow-up changes only
+the two composed appendices and this note, preserves frozen packets and does
+not rewrite history or replay code/tests.

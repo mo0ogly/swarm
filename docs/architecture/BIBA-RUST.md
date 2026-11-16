@@ -917,7 +917,10 @@ produisent `failure.json` si le stockage le permet, sans effacer les reçus.
 Les trois appels Git conservent aussi leurs argv, canaux bruts et statuts dans le
 workspace synthétique avant les assertions. Le producteur y est copié depuis
 la source déclarée ; l’observation imbriquée n’accorde aucun droit ni admission.
-Les deux recettes déclarent ce module, prérequis de cohorte absent de main230d.
+Les deux recettes déclarent ce module, déjà présent dans main230d, SHA256
+`27b2bf5ebc57647876c00a338685cde71eaacea89d4bf1b55894fa33da5722ba`.
+La cohorte doit lier ces octets exacts au source pin ; aucun prérequis d’absence
+du module n’est établi.
 Cette révision n’a pas été exécutée, compilée, installée ou qualifiée.
 
 ### Conservation indépendante de l'erreur JSON — candidat non exécuté
