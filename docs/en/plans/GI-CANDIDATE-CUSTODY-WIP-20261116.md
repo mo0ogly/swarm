@@ -1,7 +1,18 @@
-# WIP — Gi producer candidate custody
+# WIP — Gi producer candidate transition
 
-Unfinished source checkpoint, uncompiled and not mergeable.
+Source reviewed, uncompiled and not runtime verified: do not merge as accepted.
 
-Only cfg(test) producer borrows candidate through sources::request for preparation/claim/freshness. Reviewer09 REQUEST_CHANGES: preclaim holder carries review=None, postclaim guard requires Some(review), refusing review-managed-held-record-changed. This P2 remains OPEN. Never remove I0/equality checks. Next correction: explicit transition to holder of the actually recorded claim, outside SQL/settings, followed by new review and targeted checks.
+First checkpoint7088121 counterexample R09-CUSTODY-1 is resolved at source through distinct holders. sources::request acquires/refreshes the preclaim candidate outside SQL; its callback retains preparation/claim transactions and records known Work/claim before close. sources::job then acquires custody of the actually recorded running review outside SQL; its callback retains owner/freshness/clock/expiry/history checks. No equality/I0/budget/TTL protection or limit removed. Errors after claim do not imply rollback.
 
-Source report SHA57dde4f568fb90876e8fc90cd5c8b43cd0e76f95931387431159a7b58e6c237b, private evidence /run/media/fpizzi/SWARM/swarm-evidence/root00-gi-candidate-custody-cecms474. Base061be0a7ed7d4017e86677f4589e9bd4aeabd12e; sourcef9cc3d9d83a860412cb7a6fee58e558dfad7c8bd94850f8bcaa77c6d4829b016. No test, build, W/SDK/F, installation or acceptance established. Failed Work w-83e055eae3e47c27a0f5043c rev14/calls0 unchanged; no DB, budget, TTL, clock or engine guard changes.
+```mermaid
+flowchart LR
+ A[Preclaim without review] --> B[Recorded claim]
+ B --> C[Close preclaim holder]
+ C --> D[Holder of exact review]
+ D --> E[Checks and expiry]
+ E --> F[Close and reports]
+```
+
+Reviewer09 APPROVE_SOURCE_ONLY: SHA6b3d83798f27900c0c035197cf96ef41e870693c99adeef52a15b554e0fc9263. Source5c0e1ab29b4eb87673b126f2314c34d5c8ef343d5ca957894d8a8b567f1ff14a; private evidence /run/media/fpizzi/SWARM/swarm-evidence/root00-gi-custody-transition-u41ymcya. One separator blank line removed; no other function body changed.
+
+Still required: new SDK qualification, actual healthy managed witness before wrong/nonrunning review and cleanup retaining knownWork, then controlled recovery. No build/test/W/SDK/F/installation/acceptance performed for this candidate. Failed Work w-83e055eae3e47c27a0f5043c, last observed rev14/calls0, is untouched. Historical scenarios are not replayed.

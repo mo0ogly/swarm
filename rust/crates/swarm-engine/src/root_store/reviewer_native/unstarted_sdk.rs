@@ -796,11 +796,20 @@ fn unstarted_expired_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
 /// Only the libtest entry wraps this result for terminal rendering. Input/Root
 /// errors as well as the post-claim proof/close path pass through that wrapper.
 /// No helper/provider is executed; all existing freshness/budget guards apply.
-/// Managed candidate custody is borrowed once via sources::request outside
-/// every SQL/settings lock and forwarded into preparation, claim and guard;
-/// exact old-event replay selects None in that adapter. This producer adds no
-/// explicit refresh/reacquisition after claim writes; candidate close failure
-/// joins the original error through the existing known-Work projection.
+/// Managed candidate custody is an explicit two-phase transition over the
+/// existing source adapters; holder acquisition/refresh/close occurs outside
+/// SQL/settings locks, while callbacks use their original checked snapshots. Preclaim,
+/// sources::request owns acquisition/preflight/record with the review-less
+/// holder, records known Work/claim metadata inside its callback before that
+/// holder's fallible close, and yields only the owned staged claim value.
+/// Afterwards sources::job reacquires the exact running recorded review of
+/// that recorded claim from its actual current Work/review identity, and the
+/// postclaim holder is scoped through the unchanged owner/freshness/call/
+/// finance/expiry/history/proof checks before its own close. Close or
+/// reacquisition failure joins the original error while metadata already
+/// recorded inside the callbacks is retained. The adapter selects None on an
+/// existing event; the producer still requires a New claim. No same-holder or runtime equivalence
+/// across the transition is claimed or required.
 fn run_unstarted_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
     use std::os::unix::fs::DirBuilderExt;
     let input_path=std::path::PathBuf::from(std::env::var_os("SWARM_UNSTARTED_PRODUCER_INPUT").unwrap());
@@ -828,11 +837,13 @@ fn run_unstarted_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
         if before.revision!=request.expected_revision {
             return Err(E::Refused("unstarted-producer-revision-changed"));
         }
-        // Managed candidate custody is borrowed once here, outside every
-        // SQL/settings lock. The adapter selects None for exact event replay;
-        // this producer adds no explicit post-claim refresh/reacquisition.
-        // Candidate close joins the callback outcome afterwards.
-        super::sources::request(&root,work_id,&request,|source|->Result<serde_json::Value,E>{
+        // Phase 1 custody: sources::request acquires/refreshes before the
+        // callback opens its original preflight/claim snapshots. Afterwards it
+        // explicitly closes the review-less holder even on callback
+        // failure. Known Work/claim metadata is recorded inside this callback
+        // BEFORE that fallible close, and only the owned staged claim value is
+        // returned; no holder reference escapes and no holder field is mutated.
+        let staged=super::sources::request(&root,work_id,&request,|source|{
         // Healthy source/host observation precedes claim. No provider permit
         // or child is created by material preparation. Host probe IO is real.
         let tx=root.db.unchecked_transaction().map_err(E::Sql)?;
@@ -856,7 +867,17 @@ fn run_unstarted_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
         };
         known_work=Some((staged.work.id.clone(),staged.work.revision));
         known_claim=Some(staged.job.clone());
+        Ok(staged)
+        })?;
+        // Explicit phase transition: the preclaim holder is already closed
+        // above, with success or a joined close error. Phase 2 uses the
+        // existing sources::job adapter to reacquire custody for the exact
+        // running recorded review of this recorded job, outside every
+        // SQL/settings lock, from its actual current Work/review identity; the
+        // outer request and the historical claim stay untouched. Close or
+        // reacquisition failure preserves the metadata recorded in phase 1.
         let job=&staged.job;
+        super::sources::job(&root,job,|source|->Result<serde_json::Value,E>{
         let initial=store::job(&root.db,&job.id).map_err(|e|E::Launch(Box::new(e)))?
             .ok_or(E::Refused("unstarted-producer-job-required"))?;
         if &initial!=job {return Err(E::Refused("unstarted-producer-claim-changed"));}
@@ -967,7 +988,6 @@ fn run_unstarted_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
     finish_unstarted_producer(outcome,final_publication,Ok(()),&known_work)
         .map_err(|error|Box::new(error) as Box<dyn std::error::Error>)
 }
-
 /// Encode and publish one private fixture observation without flattening causes.
 /// The caller owns the fresh output path. Encode/IO failures remain typed; a
 /// visible file alone proves neither successful publication nor producer success.

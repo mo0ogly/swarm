@@ -1,7 +1,18 @@
-# WIP — producteur Gi, custodie du candidat
+# WIP — transition du candidat du producteur Gi.eth
 
-Sauvegarde source inachevée, non compilée et non fusionnable.
+Source revue, non compilée et non vérifiée en exécution : ne pas fusionner comme validée.
 
-Le seul producteur cfg(test) emprunte le candidat via sources::request et le transmet à préparation/claim/fraîcheur. Revue09 REQUEST_CHANGES : le holder préclaim porte review=None, le guard postclaim attend Some(review) et refuse review-managed-held-record-changed. Ce défaut P2 reste OUVERT. Aucune protection I0/égalité ne doit être supprimée. Suite en cours : transition explicite vers le holder de la revendication enregistrée, hors SQL/settings, puis nouvelle revue et vérifications ciblées.
+Le contre-exemple R09-CUSTODY-1 de la première sauvegarde7088121 est résolu à la source par deux détenteurs distincts. sources::request acquiert/rafraîchit le candidat préclaim hors SQL ; son callback garde les transactions de préparation/revendication et renseigne Work/claim connus avant sa fermeture. sources::job acquiert ensuite le détenteur de la review réellement enregistrée/running hors SQL ; son callback garde owner/fraîcheur/horloge/expiration/historique. Aucune égalité, protection I0, politique de budget/TTL ou limite supprimée. Les erreurs après claim ne signifient pas rollback.
 
-Rapport source SHA57dde4f568fb90876e8fc90cd5c8b43cd0e76f95931387431159a7b58e6c237b, preuves privées /run/media/fpizzi/SWARM/swarm-evidence/root00-gi-candidate-custody-cecms474. Base061be0a7ed7d4017e86677f4589e9bd4aeabd12e ; sourcef9cc3d9d83a860412cb7a6fee58e558dfad7c8bd94850f8bcaa77c6d4829b016. Aucun test, build, W/SDK/F, installation ou acceptation établi. Work refusé w-83e055eae3e47c27a0f5043c rev14/calls0 inchangé ; aucune mutation DB, budget, TTL, horloge ou garde moteur.
+```mermaid
+flowchart LR
+ A[Préclaim sans review] --> B[Revendication enregistrée]
+ B --> C[Fermeture préclaim]
+ C --> D[Holder de la review exacte]
+ D --> E[Contrôles et expiration]
+ E --> F[Fermeture et rapports]
+```
+
+Revue09 APPROVE_SOURCE_ONLY : SHA6b3d83798f27900c0c035197cf96ef41e870693c99adeef52a15b554e0fc9263. Source5c0e1ab29b4eb87673b126f2314c34d5c8ef343d5ca957894d8a8b567f1ff14a ; preuves privées /run/media/fpizzi/SWARM/swarm-evidence/root00-gi-custody-transition-u41ymcya. Une ligne blanche séparatrice supprimée, aucun autre corps de fonction changé.
+
+Restent requis : qualification du nouveau SDK, vrai témoin managed valide avant mauvais/nonrunning review et cleanup conservant knownWork, puis reprise contrôlée. Aucun build/test/W/SDK/F/installation/acceptation réalisé pour ce candidat. Le Work refusé w-83e055eae3e47c27a0f5043c, dernière lecture rev14/calls0, n’est pas modifié. Les anciens scénarios ne sont pas rejoués.
