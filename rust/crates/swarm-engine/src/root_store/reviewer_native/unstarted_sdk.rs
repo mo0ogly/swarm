@@ -796,6 +796,11 @@ fn unstarted_expired_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
 /// Only the libtest entry wraps this result for terminal rendering. Input/Root
 /// errors as well as the post-claim proof/close path pass through that wrapper.
 /// No helper/provider is executed; all existing freshness/budget guards apply.
+/// Managed candidate custody is borrowed once via sources::request outside
+/// every SQL/settings lock and forwarded into preparation, claim and guard;
+/// exact old-event replay selects None in that adapter. This producer adds no
+/// explicit refresh/reacquisition after claim writes; candidate close failure
+/// joins the original error through the existing known-Work projection.
 fn run_unstarted_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
     use std::os::unix::fs::DirBuilderExt;
     let input_path=std::path::PathBuf::from(std::env::var_os("SWARM_UNSTARTED_PRODUCER_INPUT").unwrap());
@@ -823,10 +828,15 @@ fn run_unstarted_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
         if before.revision!=request.expected_revision {
             return Err(E::Refused("unstarted-producer-revision-changed"));
         }
+        // Managed candidate custody is borrowed once here, outside every
+        // SQL/settings lock. The adapter selects None for exact event replay;
+        // this producer adds no explicit post-claim refresh/reacquisition.
+        // Candidate close joins the callback outcome afterwards.
+        super::sources::request(&root,work_id,&request,|source|->Result<serde_json::Value,E>{
         // Healthy source/host observation precedes claim. No provider permit
         // or child is created by material preparation. Host probe IO is real.
         let tx=root.db.unchecked_transaction().map_err(E::Sql)?;
-        let prepared=super::material::prepare(&root,&tx,settings.clone(),work_id,&request);
+        let prepared=super::material::prepare_for_job_using(&root,&tx,settings.clone(),work_id,&request,None,source);
         let observed=prepared.and_then(|m|guard::original_fresh(&m.host.preflight.valid_until));
         let rollback=tx.rollback().map_err(E::Sql);
         match (observed,rollback) {
@@ -836,7 +846,7 @@ fn run_unstarted_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
             (Err(primary),Err(cleanup))=>return Err(E::Cleanup{primary:Some(Box::new(primary)),cleanup:Box::new(cleanup)}),
         }
         claim_attempted=true;
-        let staged=match super::claim::record(&root,work_id,&request)? {
+        let staged=match super::claim::record_using_candidate(&root,work_id,&request,None,source)? {
             super::claim::Recorded::New(value)=>*value,
             super::claim::Recorded::Replay(job)=>{
                 replay_observed=true;
@@ -853,7 +863,7 @@ fn run_unstarted_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
         unstarted::unstarted(job)?;
         guard::owner(job)?;
         let tx=root.db.unchecked_transaction().map_err(E::Sql)?;
-        let fresh=guard::fresh(&root,&tx,settings,job).map(|_|());
+        let fresh=guard::fresh_using(&root,&tx,settings,job,source).map(|_|());
         let rollback=tx.rollback().map_err(E::Sql);
         match (fresh,rollback) {
             (Ok(()),Ok(()))=>{},
@@ -923,6 +933,7 @@ fn run_unstarted_claim_producer() -> Result<(),Box<dyn std::error::Error>> {
             "scope":"expired before helper; parent must observe process exit and departure",
             "owner_departure_verified":false,"provider_started":false,"verdict":false
         }))
+        })
     })();
     // Capture recorded metadata BEFORE safe projection, publication or close.
     // record may have committed and then failed release without returning a Job.
