@@ -56,3 +56,8 @@ Owned purpose/record project borrowed ReviewSource; explicit helpers preserve pu
 Cargo `--lib --no-run --offline --locked` exited0, default library-test profile without extra features, 558effective inputs archived/read back; sources stable before/after. Test ELF`738db0f581eb36080c77d8eccfa208c8cb0084720ebb428baedb6cd36791221e` retained as0400nonexecutable proof in `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/purpose-prerequisite-compile-01`. **Zero test bodies executed**, no functional PASS inferred. Earlier3helper tests retained/reused only for unchanged scope, not replayed. No installation/acceptance: incomplete preparatory packet and no current production image qualified for this contract. MRR-D01, behavioral MRR-D03, W/SDK/F and P2 stay open.
 
 Recipe limitation: derived runner docstring retained “missing tests” wording although argv/count/summary explicitly state --no-run/0. Prose proves no executed check. Actual runner and archived copy remain unchanged; correct a future recipe’s documentation before use, no replay to replace this evidence.
+
+
+## Root recovery core: source-only checkpoint
+
+Shared ordinary/managed Root recovery core and exact assembled artifact map:09source approved, library --no-run compilation only,0tests. Public Fresh acquisition remains unwired; no new W/SDK/F, production, installation or acceptance. WIP; do not merge as a verified fix.

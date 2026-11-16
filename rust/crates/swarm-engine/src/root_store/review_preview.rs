@@ -85,13 +85,27 @@ impl RootStore {
     }
     /// Share exact source assembly with engine-owned native invocation framing;
     /// the flag conveys a supported transport fact, never a grant or policy.
+    /// When a managed Recovery is consumed through actual held candidate
+    /// custody, its original artifact map is verified against the actually
+    /// assembled observations before any input reaches the caller, Material or
+    /// a staged claim; missing original map or mismatch refuses typed-safe.
+    /// Ordinary assembly and its errors are unchanged.
     fn assemble_review_inputs_using(
         &self, tx:&rusqlite::Transaction<'_>,prepared:PreparedReview,
         candidate:Option<&task_validation::ReviewCandidate>,invocation:bool,
     )->Result<TaskReviewInputs,E>{
             let submitted = task_validation::submission(tx, &prepared.work, &prepared.preview.task_id)
                 .map_err(|e| E::Launch(Box::new(e)))?;
-            match candidate {
+            // Borrow-then-clone only the few fields the managed recovery artifact
+            // check needs; `prepared` is consumed by the assembler below. A
+            // candidate is Some only for managed Work, whose recovery always
+            // comes from the managed-only observation entry.
+            let managed_original_artifacts = match (candidate, prepared.recovery.as_ref()) {
+                (Some(_), Some(recovery)) => Some(recovery.previous.report_artifacts.clone()),
+                _ => None,
+            };
+            let controls_artifacts = prepared.controls.artifacts.clone();
+            let inputs = match candidate {
                 Some(candidate) => {
                     let plan=candidate.candidate().control_plan.as_ref().ok_or(E::Refused("review-managed-plan-required"))?;
                     let reports=plan.policies.iter().map(|policy|task_validation::submission(tx,&prepared.work,&policy.task_id)
@@ -99,7 +113,16 @@ impl RootStore {
                     inputs::assemble_managed_using(&self.root,prepared,candidate,&reports,invocation)
                 }
                 None => inputs::assemble(&self.root, prepared, &submitted),
+            }?;
+            // Consuming obligation of every managed Recovery: the original
+            // recorded alias map (data names, never passed to Root
+            // artifact_hash here) must equal the map rebuilt from actual
+            // assembled observations. Ordinary recovery re-read real Root
+            // artifacts inside review_recovery and is never checked here.
+            if let Some(original) = managed_original_artifacts {
+                verify_managed_recovery_artifacts(original, &controls_artifacts, &inputs.materials)?;
             }
+            Ok(inputs)
     }
 
     /// Keep source admission and caller assembly inside one settings/SQL read
@@ -173,6 +196,16 @@ impl RootStore {
     /// candidate custody. Native invocation supplies the same borrowed holder;
     /// missing custody retains its refusal. This parameter is never a JSON
     /// permission or a relaxed provider admission.
+    /// Managed Work with held custody selects the managed-only recovery
+    /// observation and, for review=None with a Recovery, the explicit held
+    /// ReviewerRetry re-preview with that exact Recovery data; review=Some
+    /// keeps the existing held-record preview and fresh/no-recovery keeps the
+    /// existing preview. Recovery data are observations: the original managed
+    /// artifact freshness is a consuming obligation discharged later in
+    /// assemble_review_inputs_using against actually assembled observations.
+    /// This internal route does not wire public acquisition to acquire_for_retry
+    /// and grants no execution. Ordinary Work keeps the ordinary recovery entry
+    /// and preview selection unchanged.
     /// Caller owns snapshot/settings, final source refresh and explicit custody.
     fn prepare_review_snapshot_using(
         &self, tx:&rusqlite::Transaction<'_>,settings:crate::EngineSettingsDocument,
@@ -183,13 +216,24 @@ impl RootStore {
         let current = crate::read_recorded_work(tx, work).map_err(E::Work)?;
         // Managed review requires the external complete candidate holder. A
         // new control receipt alone never unlocks an ordinary target-only review.
-        if current.planning.as_deref().is_some_and(|p| p.repository.is_some()) && candidate.is_none() {
+        let managed = current.planning.as_deref().is_some_and(|p| p.repository.is_some());
+        if managed && candidate.is_none() {
             return Err(E::Refused("review-managed-candidate-unported"));
         }
-        let recovery = self.review_recovery(tx, &current, &request.task_id, review, &settings)?;
+        // Managed-only observation entry only for managed Work with actual held
+        // candidate custody; every other shape keeps the ordinary entry.
+        let recovery = match (managed, candidate.is_some()) {
+            (true, true) => self.managed_review_recovery(tx, &current, &request.task_id, review, &settings)?,
+            _ => self.review_recovery(tx, &current, &request.task_id, review, &settings)?,
+        };
         let source = if let Some(candidate)=candidate {
-            if recovery.is_some(){return Err(E::Refused("review-managed-recovery-unported"));}
-            candidate.preview(self,tx,&settings,work,request,review)
+            match (review, recovery.as_ref()) {
+                // Retry-only explicit purpose over the exact Root-verified Recovery.
+                (None, Some(recovery)) =>
+                    candidate.preview_for_retry(self,tx,&settings,work,request,recovery),
+                // Existing held-record preview for the exact running review or fresh.
+                (review, _) => candidate.preview(self,tx,&settings,work,request,review),
+            }
         }else{match (review, recovery.as_ref()) {
             (None, Some(recovery)) => task_validation::prepare_reviewer_retry_preview(
                 tx, &self.root, &settings, work, request, recovery),
@@ -274,6 +318,42 @@ impl RootStore {
         Ok(PreparedReview { work: current, preview, workflow, controls, settings,
             admission_source_sha256: source.source_sha256, recovery })
     }
+}
+
+/// Verify one managed Recovery's original artifact map against the actually
+/// assembled observations before any inputs reach a caller, Material or a
+/// staged claim. `original` is `previous.report_artifacts` cloned from the
+/// Root-verified failed managed review; its keys are Material-produced data
+/// aliases (cohort/..., candidate/...), never real Root paths, so they are
+/// compared only as data names and are never passed to Root artifact_hash.
+/// `controls_artifacts` is the current checked control artifact map and
+/// `materials` are the complete assembled sources. This rebuilds the exact
+/// full map Material records: current control artifacts plus every
+/// report/document material, refusing a matching name with a different hash,
+/// then requires exact equality with the original map. Freshness is never
+/// satisfied by hashes or DTOs alone: the held candidate's full Captured/
+/// bound_source preview checks and the assembler's actual source reads and
+/// SHA comparisons remain mandatory and untouched. A missing original map or
+/// any mismatch refuses typed-safe with no success-empty fallback. Pure
+/// in-memory comparison: no filesystem, SQL or provider access, no mutation,
+/// no new path or IO, and no authority, grant or acceptance is created.
+fn verify_managed_recovery_artifacts(
+    original: Option<std::collections::BTreeMap<String, String>>,
+    controls_artifacts: &std::collections::BTreeMap<String, String>,
+    materials: &[ReviewInputSource],
+) -> Result<(), E> {
+    let recorded = original.ok_or(E::Refused("review-recovery-original-artifacts-required"))?;
+    let mut actual = controls_artifacts.clone();
+    for source in materials.iter().filter(|s| matches!(s.kind.as_str(), "report" | "document")) {
+        if actual.get(&source.name).is_some_and(|hash| hash != &source.sha256) {
+            return Err(E::Refused("review-input-artifact-changed-since-controls"));
+        }
+        actual.insert(source.name.clone(), source.sha256.clone());
+    }
+    if recorded != actual {
+        return Err(E::Refused("review-recovery-managed-artifacts-changed"));
+    }
+    Ok(())
 }
 
 // The historical internal module name preserves existing replay filters. Normal
