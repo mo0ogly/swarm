@@ -66,3 +66,8 @@ Core de reprise Root ordinaire/géré et comparaison exacte des artefacts assemb
 ## Initial managed selector: WIP
 
 Sélecteur initial géré : observation Root originale/décision avant custody et revalidation consommateur, revue09 source seule. Aucune compilation ou preuve fonctionnelle de ce sélecteur. MRR-T01 recette ACK, profil normal, témoin/reprise/fermetures/débit1→2 restent ouverts. WIP non fusionnable comme correctif vérifié.
+
+
+## Actual managed witness and dispatcher failure
+
+Recette W witness/retry source revue09. Témoin réel PASS0→1 (15preuves/8CLIreaped0), refus sanscorrection PASS sansmutation. Reprise originale FAIL dispatcher planning-decision-managed-operation-unported avant secondreview; Work21/reviewer1of2/planner3of3, nativeappelterminalRefused. MRR-D04 et autorité de reprise de l’ancien Work épuisé ouverts, aucune réinterprétation/restitution. WIP, pas de merge/install/acceptation.

@@ -124,3 +124,21 @@ Recette future : témoin géré distinct valide sous préconditions comparées a
 Proposition GLM lue intégralement (200.709s, usage déclaré59723tokens) ; `review_candidate.rs` SHA256`aa7e287de65743ad49685afd5ce0e4914556634498c5605e25061f71ad581744`. L'observateur privé vérifie le Work géré actuel, sa révision et le core Root original/décision dans un snapshot court ; rollback/close terminés avant custody, Some seul choisit ReviewerRetry, aucune erreur transformée en fallback Fresh. Le consommateur revalide core et map assemblée. Revue09 APPROVE_SOURCE_ONLY tour01a1e693-2ecd-7c72-a858-aa4ddbea1e8e ; nouveaux refus de lecture/fermeture possibles, aucune équivalence runtime supposée.
 
 Aucun build/test/parcours encore sur ce sélecteur, aucun nouvel appel reviewer, Work19/calls1/2 inchangé. Prochaines étapes : sauvegarde WIP, profil normal de production qualifié et recette MRR-T01 corrigée/revue avant lancement. Ni correction globale ni installation/acceptation ; aucun merge de WIP.
+
+
+### 2026-11-16T23:03:33.384875+00:00 — candidat normal qualifié, ancien Work relu sans mutation
+
+Sélecteur sauvegardé+poussé WIP`1e4713cfbcc5db1e37ea61a93292d4281f0085d2`. Build normal sans features fixture : SHA256`30910bc926edb286d3315a850a1198a8cfa010cd1df70dce53b1cde4baddc96d`,787entrées effectives, commit et modified=false observés, sources avant archivées/relues puis stables, métadonnées version vérifiées via vrai CLI local. Preuves `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/managed-retry-normal-build-01`. Ni installation/service ni validation fonctionnelle de reprise.
+
+Notre prévol01 a refusé car le vérificateur de chemins relatifs était lancé depuis le checkout principal (56différences) plutôt que CI (0différence réelle) ; diagnostic original conservé. Précondition corrigée dans02, même build réutilisé sans rebuild ni garde contournée. Deux lectures publiques attendues/fermées0 : Work identique à l'échec original, révision19, reviewer1/2 ; planning2/3activations,2/3décisions, scopechild1/2, prêt/non pausé/sanslease. Pas de champ enabled inventé : présence de planning et parcours existant restent les sources à lire.
+
+Un seul paquet GLM sur la recette W témoin/reprise est actif (`/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/managed-w-retry-recipe-glm`), aucune nouvelle revue/planning/provider de fixture exécutée. MRR-T01, preuves de reprise/erreurs/fermetures, SDK/F et livraison restent ouverts ; aucun merge WIP.
+
+
+### 2026-11-16T23:26:28.117389+00:00 — témoin natif réussi ; reprise arrêtée par le dispatcher géré
+
+Recette W source`6e3811f4c246a590c8d2f0b70b9c5a40b388f62ccc80cf7648a9c56e0a9d6a73`, revue09 après corrections du principal et du canal stderr. Témoin distinct réellement réussi : revue`review-ae0631ee471aeddcbdaf3688`, compteur0→1, tâche submitted non acceptée,15fichiers de preuve relus et8commandes CLI reaped/fermées0. Reçu SHA256`a180991a04064687579193e80ae0c132c33dd8e48d850d0f385384227828a06e`. Nouveau normal30910bc9… ; aucun SDK/F ni installation.
+
+Sur l'ancien Work, refus avant correction native-retry-decision-required constaté sans changement Work/ledger. Le vrai planning.step a ensuite appelé l'inert provider mais `planning_decision.rs::decide` refuse encore review-retry pour repositorySome : planning-decision-managed-operation-unported. Résultat réel Work21, reviewer1/2 inchangé, planner3/3activations et2/3décisions ; appel planning-claim-9da3d9c4e37f597ec10aca8f terminal **Refused** (lecture seule du registre native). Sources/canaux/owners dans `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/managed-retry-original-failure-01` ; aucun second reviewer ni contrôle rejoué.
+
+MRR-D04 : le port du leaf retry_review n'établit pas son admission par le dispatcher. Corriger l'entrée commune en conservant originales, contrôle/copie, décision et garde de custody avant revue ; examiner le dispatcher entier et ses appelants. `apply_planning_receipt` conserve un refus métier terminal : pas de réinterprétation via reconcile après correctif. L'ancien Work épuisé reste ouvert avec son historique ; reprise exige une voie prise en charge et l'autorité budgétaire réellement manquante, sans reset/refund ni nouveau Root présenté comme récupération. Travaux correctifs indépendants restent autorisés.

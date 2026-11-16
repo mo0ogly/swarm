@@ -119,3 +119,21 @@ Future verification: distinct valid managed witness with compared preconditions 
 Complete GLM final read (200.709s, reported59723tokens); review_candidate.rs SHA256`aa7e287de65743ad49685afd5ce0e4914556634498c5605e25061f71ad581744`. Private observer checks actual managed Work/revision and original/decision core in a short snapshot; rollback/close precede custody, only Some selects ReviewerRetry, errors never become Fresh fallback. Consumer rechecks core and assembled map. Independent09 APPROVE_SOURCE_ONLY turn01a1e693-2ecd-7c72-a858-aa4ddbea1e8e; additional read/close refusals possible, no runtime equivalence inferred.
 
 No build/test/flow yet for this selector, no new reviewer call; Work19/calls1of2 unchanged. Next: save WIP, qualify current normal production profile and amend/review MRR-T01 recipe before execution. No full-fix/install/acceptance claim or WIP merge.
+
+
+### 2026-11-16T23:03:33.384875+00:00 — current normal candidate qualified; old Work read unchanged
+
+Selector saved+pushed WIP`1e4713cfbcc5db1e37ea61a93292d4281f0085d2`. Default production profile without fixture features SHA256`30910bc926edb286d3315a850a1198a8cfa010cd1df70dce53b1cde4baddc96d`,787effective inputs, actual commit/modified=false metadata and local CLI version verified, before-source archive read back and inputs stable. Evidence `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/managed-retry-normal-build-01`. No installation/service or functional retry proof.
+
+Our readonly01 preflight used relative-path qualification from the canonical rather than CI cwd (56wrong-checkout differences,0actualCI differences). Original diagnosis kept;02 changes cwd, reuses same qualified image without rebuild/bypass. Two public readonly children reaped/closed0: Work equals original failure,revision19/reviewer1of2,planning2of3activations/2of3decisions,child1of2ready/unpaused/no lease. No invented enabled field; inspect actual presence/route contracts.
+
+One GLM W witness/retry recipe packet active (`/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/managed-w-retry-recipe-glm`), no new fixture review/planning/provider invoked. MRR-T01, behavioral/error/close proof,SDK/F and delivery remain open; no WIP merge.
+
+
+### 2026-11-16T23:26:28.117389+00:00 — real native witness succeeded; managed dispatcher blocks recovery
+
+W recipe SHA`6e3811f4c246a590c8d2f0b70b9c5a40b388f62ccc80cf7648a9c56e0a9d6a73`,09source-reviewed after root/diagnostic-channel corrections. Distinct healthy managed witness actually passed: review`review-ae0631ee471aeddcbdaf3688`,calls0→1,task submitted/not accepted,15proof files read back and8CLI children reaped/closed0. Receipt SHA`a180991a04064687579193e80ae0c132c33dd8e48d850d0f385384227828a06e`. Normal30910bc9…; no SDK/F/install.
+
+Old Work first refused missing canonical correction without Work/ledger changes. Actual planning.step then invoked the inert provider, but planning_decision.rs::decide still rejects managed review-retry: planning-decision-managed-operation-unported. Actual Work21,reviewer1of2 unchanged,planner3of3activations/2of3decisions; claim planning-claim-9da3d9c4e37f597ec10aca8f is terminal **Refused** by readonly normalized record. Primary channels/owners `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/managed-retry-original-failure-01`; no second reviewer or control replay.
+
+MRR-D04: an implemented leaf does not prove dispatcher admission. Port shared entry while preserving original/control/repository/decision/custody guards, inspect whole dispatcher+callers. apply_planning_receipt preserves terminal business refusal: never reinterpret through reconcile after a code fix. Original exhausted Work stays open with history; supported resumption and actually missing budget authority required, no reset/refund or replacement Root labelled recovered. Independent corrective work remains authorized.

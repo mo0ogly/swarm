@@ -66,3 +66,8 @@ Shared ordinary/managed Root recovery core and exact assembled artifact map:09so
 ## Initial managed selector: WIP
 
 Initial managed selector observes original/decision before custody and revalidates at consumer;09source-only review. No compile or behavioral proof for this selector yet. MRR-T01 ACK recipe, normal profile, witness/retry/close/debit1to2 remain open. WIP not eligible for merge as verified fix.
+
+
+## Actual managed witness and dispatcher failure
+
+W witness/retry recipe09source-approved. Real healthy witness PASS0to1 (15proofs/8CLIreaped0); missing correction refused without mutation. Original retry FAIL managed planning dispatcher before second reviewer; Work21/reviewer1of2/planner3of3, native call terminalRefused. MRR-D04 and original exhausted Work resumption authority remain open; no reinterpretation/refund. WIP, no merge/install/acceptance.
