@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "biba-stdio-handler-branches-inert",
+  "inputs": [
+    "tests/test_biba_stdio_handler_branches.py",
+    "tests/test_biba_stdio_retention.py",
+    "tests/rust_biba_linux_boundary.py",
+    "tools/verification/native_build_outcome.py",
+    "docs/architecture/BIBA-STDIO-HANDLER-TESTS.md",
+    "docs/en/BIBA-STDIO-HANDLER-TESTS.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "additional-handler-branches-doubles",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess\nsubprocess.run(['python3','tests/test_biba_stdio_handler_branches.py','--candidate','tests/rust_biba_linux_boundary.py','--candidate-sha256',os.environ['SWARM_HANDLER_CANDIDATE_SHA256'],'--outcome-source','tools/verification/native_build_outcome.py','--outcome-sha256',os.environ['SWARM_HANDLER_OUTCOME_SHA256'],'--helpers-source','tests/test_biba_stdio_retention.py','--helpers-sha256',os.environ['SWARM_HANDLER_HELPERS_SHA256'],'--evidence-parent',os.environ['SWARM_HANDLER_EVIDENCE_PARENT']],check=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "INERT_HANDLER_BRANCHES_EVIDENCE",
+        "INERT_HANDLER_BRANCHES_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

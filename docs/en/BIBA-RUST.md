@@ -795,3 +795,104 @@ child, actual close failure or public engine projection of causes. These gates,
 the normal production profile, delivered image, Version/FR_EN notes and
 installation remain open under root allocation. No enforcement or global
 acceptance follows from these results.
+
+
+## Provenance of retained stdio appendices — 16 November 2026
+
+The following sections retain historical statements from private04 packets.
+Their unexecuted statuses describe those increments; see WIP POC06-STDIO-20261116
+for later evidence and its fixture scope. The historical claim that the producer
+was absent from main230d is incorrect: `native_build_outcome.py` already exists
+at230d,8d anddf1f with SHA27b2bf5e… and is preserved unchanged here. All Biba5
+bytes above remain intact; stdio evidence does not qualify actual close failures.
+
+
+### Git/stdio control — recipe definition pending qualification
+
+The qualification delta uses the confined process's real `/dev/null`, then
+`/usr/bin/git diff --no-index` on two synthetic I0 output files. A patch containing
+the expected data precedes a private synthetic output attempt; the expected refusal
+and original channels are retained. The outside observer then checks unchanged
+private bytes. Before recovery the I0 patch is replaced by a different sentinel:
+restoring the expected bytes with a fresh call requires a new write rather than
+an empty success. JSON correlates the three calls. This describes candidate
+assertions, not a new execution or product acceptance.
+
+The existing build-driver compiles the library with Cargo offline/locked and
+selects its actual artifact, then compiles fixture drivers. Its resolved target
+must stay under the source root and the launcher chooses `.cache`: this version
+does not directly accept an external DD target. The Cargo guard reads persisted
+root/output free-space policy but reserves no bytes and does not cover all direct
+`rustc -o` or C compiler calls. Real placement/admission still needs the allocated
+window, without relaxing guards or bypassing paths.
+
+The recipe retains its existing component entry, adding no native-agent campaign.
+The build-driver also runs existing Internet/workspace-swap controls; workspace-swap
+calls the main control again. No Git-only mode exists. Consumed source/import/default
+and configuration declarations are included. Active Python assertions
+(`sys.flags.optimize == 0`) in the relevant interpreters are a qualification
+precondition to observe, not an invariant currently enforced by these drivers.
+Inherited Internet IPv6 expectations stay separate from the Git witness. No
+component/generation result qualifies the product profile,381 or all closes;
+the `kernel::ruleset` limitation remains a separate follow-up.
+
+
+### Targeted Git/stdio entry — permanent candidate
+
+The candidate adds `--scenario git-stdio` to the existing boundary script.
+Omitting the selector preserves the full historical journey. The real null/Git
+probe is extracted into one shared function: the targeted entry creates an inert
+Root, pins driver bytes before/after and invokes only that probe, without
+Internet/workspace-swap or repeated controls. Parent and child explicitly refuse
+optimized Python; the witness remains unchanged except for this guard and its
+observed effective flag.
+
+The dedicated `biba-git-stdio.json` recipe builds nothing. It consumes a driver
+already built and qualified by its build owner through SWARM_BIBA_STDIO_DRIVER,
+SWARM_BIBA_STDIO_DRIVER_SHA256 and SWARM_BIBA_STDIO_EVIDENCE_PARENT. A supplied
+hash proves no provenance: before execution root must bind driver, rlib, sources,
+features/profile, configuration and tools to the selected build record. Reuse an
+actually qualified unchanged build; a relevant change justifies at most one
+package build and one link of the same driver, not an engine rebuild or legacy
+checks. The current aggregate build-driver provides no targeted/external build
+route. Producing a new external driver requires the qualified
+`build_storage.admitted` lifetime through build/postchecks and host/output reserve.
+This test recipe does not implement that builder integration and claims no DD
+path, symlink bypass or relaxed guard. No new run or381 qualification in this increment.
+
+
+### Private negative-evidence revision — not executed
+
+The candidate writes stdout/stderr directly to separate files using
+`native_build_outcome.py`. It retains exit/signal and hashes before attempting
+a driver-byte postcheck after every process start, including process or receipt
+publication failure. Secondary errors propagate together; a failed publication
+establishes no rollback. Later failures produce `failure.json` when storage
+permits, without erasing receipts. All three Git calls also retain argv, raw
+channels and statuses in the synthetic workspace before assertions. The producer
+is staged there from the declared source; nested observation grants no rights or
+admission. Both recipes declare this separate cohort prerequisite, absent from
+main230d. This revision has not been run, built, installed or qualified.
+
+### Independent JSON-error retention — unexecuted candidate
+
+Root's inert verification of the previous candidate observed two failing methods
+(malformed JSON plus driver drift; malformed JSON plus posthash-read refusal),
+four failed subassertions among eight methods. No Biba or Git was called. Raw
+channels and postcheck failures survived, but collector failure skipped parsing.
+
+This private correction makes `stdio_probe` independently validate stdout after
+collector failure only when metadata establishes attempted execution, a known
+integer returncode and a recorded SHA256 for stdout. It rereads retained bytes,
+compares their hash, then parses JSON. Any read/hash/JSON failure is grouped with
+the original error, carrying the same `native_outcome` to the final consumer and
+`failure.json`. No original channel or receipt is rewritten. Valid JSON still
+propagates the original collector error; unknown completion/output is not parsed
+or replaced with an empty success. Business assertions do not accept output
+after a collector refusal.
+
+The producer, eight-method harness, doubles, recipes and earlier frozen sources
+remain unchanged. Source review and inert execution of both focused cases plus
+nonzero/publication/healthy regressions remain required because the caller is
+shared. This correction proves no real Biba run, confinement, installation or
+global qualification.

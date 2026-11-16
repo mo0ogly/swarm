@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "biba-stdio-retention-inert",
+  "inputs": [
+    "tests/test_biba_stdio_retention.py",
+    "tests/rust_biba_linux_boundary.py",
+    "tools/verification/native_build_outcome.py",
+    "docs/architecture/BIBA-STDIO-RETENTION-TESTS.md",
+    "docs/en/BIBA-STDIO-RETENTION-TESTS.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "healthy-first-caller-retention-doubles",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess\nsubprocess.run(['python3','tests/test_biba_stdio_retention.py','--candidate','tests/rust_biba_linux_boundary.py','--candidate-sha256',os.environ['SWARM_STDIO_RETENTION_CANDIDATE_SHA256'],'--outcome-source','tools/verification/native_build_outcome.py','--outcome-sha256',os.environ['SWARM_STDIO_RETENTION_OUTCOME_SHA256'],'--evidence-parent',os.environ['SWARM_STDIO_RETENTION_EVIDENCE_PARENT']],check=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "INERT_STDIO_RETENTION_EVIDENCE",
+        "INERT_STDIO_RETENTION_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "biba-git-stdio",
+  "inputs": [
+    "rust/crates/swarm-biba-linux/src/*.rs",
+    "rust/crates/swarm-biba-linux/Cargo.toml",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "tests/rust_biba_boundary_driver.rs",
+    "tests/rust_biba_linux_boundary.py",
+    "tests/rust_agent_model_route.py",
+    "tests/fixture_area.py",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "docs/architecture/BIBA-RUST.md",
+    "docs/en/BIBA-RUST.md",
+    "tools/verification/native_build_outcome.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "targeted-stdio-with-pinned-driver",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,uuid,json\nfrom pathlib import Path\nparent=Path(os.environ['SWARM_BIBA_STDIO_EVIDENCE_PARENT']).resolve()\nif not parent.is_dir():raise RuntimeError('Evidence parent must exist')\ndriver=Path(os.environ['SWARM_BIBA_STDIO_DRIVER']).resolve()\npin=os.environ['SWARM_BIBA_STDIO_DRIVER_SHA256']\nout=parent/('biba-git-stdio-'+uuid.uuid4().hex)\nsubprocess.run(['python3','tests/rust_biba_linux_boundary.py','--scenario','git-stdio','--driver',str(driver),'--driver-sha256',pin,'--output',str(out)],check=True)\nresult=json.loads((out/'result.json').read_bytes())\nif result.get('status')!='PASS' or result.get('scenario')!='git-stdio' or result.get('driver_sha256')!=pin or result.get('python_optimization')!=0:raise RuntimeError('Targeted stdio result is incomplete or has another driver')\nprint('BIBA_GIT_STDIO_EVIDENCE '+str(out))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native-boundary-real-null-git-and-protected-output",
+        "PASS pinned-driver-image-before-and-after",
+        "BIBA_GIT_STDIO_PASS",
+        "BIBA_GIT_STDIO_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

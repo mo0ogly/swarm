@@ -836,3 +836,111 @@ ni un vrai FD bas possédé dans un enfant isolé, ni une erreur réelle de clos
 ni la projection publique des causes par le moteur. Ces critères, le profil
 produit normal, le binaire livré, Version/notes FR/EN et l’installation restent
 ouverts sous l’attribution root. Aucun enforcement ou succès global n’en découle.
+
+
+## Provenance des appendices stdio conservés — 16 novembre 2026
+
+Les sections suivantes reprennent les déclarations historiques des paquets
+privés 04. Leurs mentions « non exécuté » décrivent ces incréments ; voir la note
+WIP POC06-STDIO-20261116 pour les preuves ultérieures et leur portée de fixture.
+La mention historique « producteur absent de main230d » est erronée : le module
+`native_build_outcome.py` existe déjà aux bases 230d, 8d et df1f, SHA27b2bf5e… ;
+il est conservé inchangé dans cette sauvegarde. Les octets Biba5 ci-dessus sont
+intégralement préservés ; aucun résultat stdio ne qualifie les closes réels.
+
+
+### Contrôle Git/stdio — définition de recette à qualifier
+
+Le delta de qualification utilise le véritable `/dev/null` du processus confiné,
+puis `/usr/bin/git diff --no-index` sur deux fichiers synthétiques de l’output I0.
+Un patch contenant le contenu attendu précède la tentative de sortie vers le
+fichier privé synthétique ; le refus attendu et ses canaux sont conservés.
+L’observateur hors confinement vérifie ensuite les octets privés inchangés.
+Avant la reprise, le patch I0 est remplacé par une sentinelle distincte : retrouver
+les octets attendus après un nouvel appel exige une nouvelle écriture, pas un
+succès vide. La sortie JSON corrèle les trois appels. Ce texte décrit les
+assertions du candidat, aucune nouvelle exécution ou acceptation produit.
+
+Le build-driver existant compile la bibliothèque via Cargo offline/locked et
+sélectionne son véritable artefact, puis compile les drivers de fixture. Sa cible
+résolue doit rester sous le root de source et le lanceur choisit `.cache` : cette
+version ne prend pas directement une cible DD externe. La garde Cargo lit la
+politique persistée d’espace sur root et output, sans réservation, et ne couvre
+pas tous les `rustc -o` directs/compilateurs C. L’admission/placement réel reste
+à vérifier dans le créneau alloué ; aucune garde baissée ou chemin contourné.
+
+La recette conserve son entrée composant existante, sans ajouter une campagne
+native/agentique : le build-driver lance aussi les anciens contrôles Internet et
+workspace-swap, ce dernier rappelant le contrôle principal. Il n’existe pas de
+mode Git-seul à annoncer. Les sources/imports/défaut et configurations consommées
+sont déclarés ; des assertions Python actives (`sys.flags.optimize == 0`) sur les
+interpréteurs concernés sont une précondition de qualification à faire observer,
+non une garantie actuellement imposée par ces drivers. Les états IPv6 particuliers
+du contrôle Internet hérité restent distincts du témoin Git. Ni ce composant ni
+un résultat de génération ne qualifie le profil produit,381 ou tous les closes ;
+la limite `kernel::ruleset` conserve sa suite séparée.
+
+
+### Entrée Git/stdio ciblée — candidat permanent
+
+Le candidat ajoute `--scenario git-stdio` au seul script de frontière existant.
+L’absence du sélecteur conserve le parcours complet historique. Le témoin réel
+null/Git est extrait dans une fonction partagée : l’entrée ciblée crée un Root
+synthétique, exige une empreinte de driver avant/après et appelle seulement ce
+témoin, pas Internet/workspace-swap ni leur témoin répété. Le programme enfant et
+le parent refusent explicitement Python optimisé ; le scénario de contrôle reste
+le même, hors ce guard et l’observation du flag effectif.
+
+La recette dédiée `biba-git-stdio.json` ne compile rien. Elle consomme un driver
+déjà construit et qualifié par le rôle de build, via SWARM_BIBA_STDIO_DRIVER,
+SWARM_BIBA_STDIO_DRIVER_SHA256 et SWARM_BIBA_STDIO_EVIDENCE_PARENT. Une empreinte
+fournie ne prouve pas la provenance : avant exécution, root doit relier driver,
+rlib, sources, features/profil, configuration et outils au record de build choisi.
+Un build inchangé réellement qualifié se réutilise ; un changement pertinent
+justifie au plus un build du package et un lien du même driver, pas le rebuild
+de l’engine ni les anciens contrôles. Le build-driver agrégateur actuel n’est
+pas une voie ciblée/externe ; la production d’un nouveau driver externe exige
+le chemin d’admission qualifié `build_storage.admitted`, tenu durant build et
+recontrôlé après, plus les réserves hôte/sorties. Cette intégration de build n’est
+pas implémentée par la recette de test ; aucun DD, symlink ou baisse de garde
+n’est prétendu. Aucune exécution nouvelle ni qualification381 dans cet incrément.
+
+
+### Révision privée des preuves négatives — non exécutée
+
+Le candidat écrit directement stdout/stderr dans deux fichiers via le collecteur
+`native_build_outcome.py`. Il conserve statut/signal et empreintes avant de tenter
+le contrôle des octets du driver après tout départ du processus, y compris après
+un échec du processus ou de publication. Les erreurs secondaires sont regroupées ;
+une publication refusée ne prouve aucun retour arrière. Les erreurs ultérieures
+produisent `failure.json` si le stockage le permet, sans effacer les reçus.
+Les trois appels Git conservent aussi leurs argv, canaux bruts et statuts dans le
+workspace synthétique avant les assertions. Le producteur y est copié depuis
+la source déclarée ; l’observation imbriquée n’accorde aucun droit ni admission.
+Les deux recettes déclarent ce module, prérequis de cohorte absent de main230d.
+Cette révision n’a pas été exécutée, compilée, installée ou qualifiée.
+
+### Conservation indépendante de l'erreur JSON — candidat non exécuté
+
+Une vérification inerte du candidat précédent a observé deux méthodes en échec
+(JSON malformé + drift du driver ; JSON malformé + lecture posthash refusée),
+soit quatre sous-assertions en échec sur huit méthodes. Elle n'a appelé ni Biba
+ni Git. Les canaux et l'échec du postcontrôle étaient conservés, mais le parsing
+JSON n'était pas atteint après l'erreur du collecteur.
+
+Dans cette correction privée, `stdio_probe` tente séparément la validation de
+stdout après un refus du collecteur, seulement si les métadonnées établissent
+une tentative d'exécution, un code de retour entier connu et une empreinte
+SHA256 de stdout. Il relit les octets conservés, vérifie leur empreinte puis
+parse le JSON. Une erreur de lecture, d'empreinte ou JSON est regroupée avec
+l'erreur initiale, avec le même `native_outcome` transmis au consommateur final
+et à `failure.json`. Aucun canal ni reçu initial n'est réécrit. Si le JSON est
+valide, l'erreur initiale est tout de même propagée ; si l'issue ou stdout est
+inconnue, aucun parsing ni résultat vide n'est inventé. Les assertions métier
+ne sont pas évaluées pour accepter une sortie après un refus du collecteur.
+
+Le producteur, le harnais à huit méthodes, les doubles, recettes et sources
+figées antérieures restent inchangés. Cette correction requiert encore revue
+et exécution inerte des deux cas puis non-régression nonzero/publication/témoin,
+car le point d'appel est partagé. Elle ne prouve aucune exécution Biba réelle,
+aucun confinement, installation ou qualification globale.

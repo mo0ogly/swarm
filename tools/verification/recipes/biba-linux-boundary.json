@@ -9,10 +9,17 @@
     "tests/rust_biba_internet_deny_driver.rs",
     "tests/rust_biba_linux_boundary*.py",
     "tests/rust_agent_model_route.py",
+    "tests/fixture_area.py",
+    "rust/crates/swarm-engine/config/engine-settings.json",
     "docs/architecture/BIBA-RUST.md",
     "docs/en/BIBA-RUST.md",
     "tests/rust_biba_workspace_swap.py",
-    "tests/fixtures/biba_workspace_swap.c"
+    "tests/fixtures/biba_workspace_swap.c",
+    "rust/Cargo.toml",
+    ".cargo/config.toml",
+    ".cargo/storage-policy.json",
+    "tools/verification/cargo_space_guard.py",
+    "tools/verification/native_build_outcome.py"
   ],
   "environment": {},
   "steps": [
@@ -21,12 +28,13 @@
       "command": [
         "python3",
         "-c",
-        "import pathlib,subprocess,tempfile; p=pathlib.Path(tempfile.mkdtemp(prefix='biba-boundary-',dir='.cache')).resolve(); subprocess.run(['python3','tests/rust_biba_linux_boundary_build.py','--target-dir',str(p/'target'),'--output',str(p/'proof')],check=True); print('BIBA_BOUNDARY_EVIDENCE '+str(p/'proof'))"
+        "import pathlib,subprocess,tempfile,json; p=pathlib.Path(tempfile.mkdtemp(prefix='biba-boundary-',dir='.cache')).resolve(); subprocess.run(['python3','tests/rust_biba_linux_boundary_build.py','--target-dir',str(p/'target'),'--output',str(p/'proof')],check=True); print('BIBA_BOUNDARY_EVIDENCE '+str(p/'proof')); stdio=json.loads((p/'proof/native/result.json').read_text()); assert stdio['null_sink_device_verified'] and stdio['git_output_witness_and_refusal'] and stdio['git_output_recovery']; print('BIBA_STDIO_NULL_GIT_VERIFIED')"
       ],
       "expected_exit": 0,
       "required_stdout": [
         "NATIVE_BIBA_BOUNDARY_PASS",
-        "BIBA_BOUNDARY_EVIDENCE"
+        "BIBA_BOUNDARY_EVIDENCE",
+        "BIBA_STDIO_NULL_GIT_VERIFIED"
       ],
       "required_stderr": []
     }
