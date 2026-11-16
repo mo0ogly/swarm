@@ -110,3 +110,17 @@ Root a conservé le diff original malformé : première reconstruction refusée 
 ### 2026-11-16T22:48:44.350543+00:00 — core Root revu, compilation ciblée seulement
 
 Revue09 APPROVE_SOURCE_ONLY tour01a1e689-669e-7651-9d0d-2d508059c20c, primaire `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/managed-recovery-core-glm/REVIEW09-CORE-PRIMARY.json`. Core ordinaire conservé ; voie gérée avec original/décision/inbox/receipt et map assemblée exacte. Cargo --lib --no-run terminé0 en1m10s ;558entrées effectives stables, ELF test `b8b23d37703f6dae761fe6cb25afbc00a60b085c801003990e099815fd866d72`, preuve0400nonexécutable `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/root-core-compile-01`. **0corps de test**, aucune reprise publique, installation ou acceptation. Acquisition Fresh encore non raccordée. Prochain paquet : observer la reprise Root dans un snapshot court, fermer ce snapshot avant custody, sélectionner le purpose explicite puis revalider transactionnellement dans le consommateur ; pas de refresh de nouvelle admission après mutation.
+
+
+### 2026-11-16T22:55:23.720079+00:00 — MRR-T01 : recette W encore bloquée
+
+Lecture ciblée du brouillon `tests/rust_managed_review_w.py` SHA256`8be2ddaefa446076b44891bf109afb05c8498853f4d37da4caa9ce4068666b4a` : la docstring annonce un acquittement, mais le corps ne fait que review-reconcile avant review-inputs/review ; aucune décision planning.step/claim/decide. Préparer sa correction avec le vrai helper de proposition/frozen_program et le parcours public du planner, pas une modification SQL ni un ACK fabriqué. Le Work d'échec19/calls1/2 n'a pas de champs managed_tasks/candidate_commit de verdict ; le refus conditionnel native-managed-current-review-unported n'est donc pas déclaré bloquant pour ce cas sans observation.
+
+Recette future : témoin géré distinct valide sous préconditions comparées avant faute ; sur l'ancien échec, refus preview avant ACK avec état inchangé, vraie décision corrective reçue/appliquée et next présent hors preuves, refus de source changée puis restauration, reprise débit1→2 sans rejouer les contrôles, rechecks running/gate/process/publication et fermetures observés, réconciliation sans nouveau débit. Admission, compteurs planner/scope et profil production à vérifier avant lancement. Aucun test, nouvelle fixture, planner/provider/review exécuté à ce stade.
+
+
+### 2026-11-16T22:57:30.874336+00:00 — sélection initiale de reprise intégrée, non exécutée
+
+Proposition GLM lue intégralement (200.709s, usage déclaré59723tokens) ; `review_candidate.rs` SHA256`aa7e287de65743ad49685afd5ce0e4914556634498c5605e25061f71ad581744`. L'observateur privé vérifie le Work géré actuel, sa révision et le core Root original/décision dans un snapshot court ; rollback/close terminés avant custody, Some seul choisit ReviewerRetry, aucune erreur transformée en fallback Fresh. Le consommateur revalide core et map assemblée. Revue09 APPROVE_SOURCE_ONLY tour01a1e693-2ecd-7c72-a858-aa4ddbea1e8e ; nouveaux refus de lecture/fermeture possibles, aucune équivalence runtime supposée.
+
+Aucun build/test/parcours encore sur ce sélecteur, aucun nouvel appel reviewer, Work19/calls1/2 inchangé. Prochaines étapes : sauvegarde WIP, profil normal de production qualifié et recette MRR-T01 corrigée/revue avant lancement. Ni correction globale ni installation/acceptation ; aucun merge de WIP.

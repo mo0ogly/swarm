@@ -52,7 +52,11 @@ impl ReviewPurpose {
 /// inputs on preview/refresh and performs no post-claim refresh, admission or
 /// directive delivery; execution sources::held already refreshes before its
 /// callback and closes after, and running gates acquire their own Claimed
-/// record separately. Explicit close errors propagate to the caller.
+/// record separately. A ReviewerRetry holder is stored only through
+/// acquire_for_retry, which public acquire selects only after a fresh private
+/// managed_review_recovery observation; the consuming snapshot still re-verifies
+/// the original and canonical decision before any claim. Explicit close errors
+/// propagate to the caller.
 pub(in crate::root_store) struct ReviewCandidate {
     session: managed_execution::Session,
     job: store::Job,
@@ -82,8 +86,11 @@ impl ReviewCandidate {
     /// the identical bound_source equality against the pinned job. Recovery data
     /// are cloneable observations granting no permission: the caller must still
     /// verify the original and canonical decision again transactionally before
-    /// any claim. Not reachable from the public preview path; no claim, directive
-    /// or acceptance follows and no post-claim lifecycle is represented here.
+    /// any claim, and the shared assembler re-checks the original artifact map
+    /// against actually assembled observations. Reachable from the shared
+    /// prepared-review snapshot only for a held ReviewerRetry purpose with a
+    /// current managed recovery observation; no claim, directive or acceptance
+    /// follows and no post-claim lifecycle is represented here.
     pub(in crate::root_store) fn preview_for_retry(&self, root: &RootStore, tx: &rusqlite::Connection,
         settings: &crate::EngineSettingsDocument, work: &str, request: &Request, recovery:&Recovery) -> Result<TaskValidationPreview, A> {
         let stored=match &self.purpose{
@@ -121,12 +128,20 @@ impl ReviewCandidate {
     pub(in crate::root_store) fn close(self)->Result<(),E>{self.session.close()}
 }
 
-/// Select actual ordinary vs managed Work under a short read snapshot. Managed
+/// Select actual ordinary vs managed Work under short read snapshots. Managed
 /// mode requires a published native v3 job and complete successful originals;
 /// only then pin its existing candidate after checked snapshot/lock release.
-/// No preparation, file/SQL write, reviewer call or capacity reservation occurs.
+/// Managed Work first obtains a fresh private managed_review_recovery
+/// observation: Some selects explicit retry custody through acquire_for_retry,
+/// None (ordinary, fresh or no qualified original) keeps the legacy
+/// acquire_using(None) mapping, and a real observer error propagates without
+/// fallback. No preparation, file/SQL write, reviewer call or capacity
+/// reservation occurs.
 pub(in crate::root_store) fn acquire(root:&RootStore,work:&str,request:&Request)->Result<Option<ReviewCandidate>,E>{
-    acquire_using(root,work,request,None)
+    match observed_managed_retry_recovery(root,work,request)?{
+        Some(recovery)=>acquire_for_retry(root,work,request,&recovery),
+        None=>acquire_using(root,work,request,None),
+    }
 }
 /// Internal retained-review variant. Native job callers still require their
 /// exact running record; publication inspection may select a completed opinion
@@ -147,15 +162,42 @@ pub(in crate::root_store) fn acquire_using(root:&RootStore,work:&str,request:&Re
 /// only through this named hook and never inferred from record state, after
 /// refusing a previous record that is not in the failed state; the shared
 /// transactional guard must also re-observe that exact failed record as the
-/// current one. Ordinary Work still yields None; no claim, directive, admission
-/// or post-claim refresh is performed here and nothing is connected to the
-/// public preview/request/claim paths.
+/// current one. acquire selects this hook only after its own fresh private
+/// managed_review_recovery observation of stored current Work; ordinary Work
+/// still yields None. No claim, directive, admission or post-claim refresh is
+/// performed here.
 pub(in crate::root_store) fn acquire_for_retry(root:&RootStore,work:&str,request:&Request,recovery:&Recovery)->Result<Option<ReviewCandidate>,E>{
     if recovery.previous.state!="error"{return Err(E::Refused("review-retry-previous-not-failed"));}
     observed_managed_original(root,work,request)?.map(|(job,candidate,metadata)|{
         let session=managed_execution::acquire_using_source(root,&job,&candidate,ReviewSource::ReviewerRetry(&recovery.previous))?;
         Ok(ReviewCandidate{session,job,metadata,purpose:ReviewPurpose::ReviewerRetry(recovery.previous.clone())})
     }).transpose()
+}
+/// Private short-read observer deciding whether public acquisition selects
+/// explicit retry custody. Preconditions: a short directory reservation and a
+/// non-autocommit read transaction over the actual stored Work in the current
+/// SQL/settings snapshot; ordinary repository absent returns Ok(None) and the
+/// request's expected revision must equal the actual revision. Calls the actual
+/// Root managed_review_recovery core with claimed=None and returns only its
+/// plain cloneable observation; None means no qualified original, never a
+/// relaxed fallback. The read creates no mutation, custody, authority, grant or
+/// admission and IO/SQL/codec causes propagate unchanged. The transaction is
+/// rolled back and the reservation closed with both causes preserved before any
+/// candidate/Git/descriptor custody is acquired.
+fn observed_managed_retry_recovery(root:&RootStore,work:&str,request:&Request)->Result<Option<Recovery>,E>{
+    let reservation=root.directory.reserve(false,false).map_err(E::Storage)?;
+    let observed=(||{
+        let tx=root.db.unchecked_transaction().map_err(E::Sql)?;
+        let result=(||{
+            let current=crate::read_recorded_work(&tx,work).map_err(E::Work)?;
+            if !current.planning.as_deref().is_some_and(|p|p.repository.is_some()){return Ok(None);}
+            if current.revision!=request.expected_revision{return Err(E::Refused("review-revision-conflict"));}
+            let settings=root.read_settings()?;
+            root.managed_review_recovery(&tx,&current,&request.task_id,None,&settings)
+        })();
+        finished(result,tx.rollback().map_err(E::Sql))
+    })();
+    finished(observed,reservation.close().map_err(E::Storage))
 }
 /// Snapshot the actual completed native managed original for one work/task
 /// request under a short reservation and read transaction, refusing before any

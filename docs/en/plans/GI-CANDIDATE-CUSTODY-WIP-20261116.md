@@ -61,3 +61,8 @@ Recipe limitation: derived runner docstring retained “missing tests” wording
 ## Root recovery core: source-only checkpoint
 
 Shared ordinary/managed Root recovery core and exact assembled artifact map:09source approved, library --no-run compilation only,0tests. Public Fresh acquisition remains unwired; no new W/SDK/F, production, installation or acceptance. WIP; do not merge as a verified fix.
+
+
+## Initial managed selector: WIP
+
+Initial managed selector observes original/decision before custody and revalidates at consumer;09source-only review. No compile or behavioral proof for this selector yet. MRR-T01 ACK recipe, normal profile, witness/retry/close/debit1to2 remain open. WIP not eligible for merge as verified fix.

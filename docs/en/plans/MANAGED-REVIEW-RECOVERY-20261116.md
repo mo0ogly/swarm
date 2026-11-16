@@ -105,3 +105,17 @@ Raw malformed proposal retained; first exact-block reconstruction refused before
 ### 2026-11-16T22:48:44.350543+00:00 — Root core source reviewed; compile-only evidence
 
 Independent09 APPROVE_SOURCE_ONLY turn01a1e689-669e-7651-9d0d-2d508059c20c; primary `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/managed-recovery-core-glm/REVIEW09-CORE-PRIMARY.json`. Ordinary core preserved; managed path retains original/decision/inbox/receipt and exact assembled artifact map checks. Cargo --lib --no-run exited0 in1m10s;558stable effective inputs, test ELF `b8b23d37703f6dae761fe6cb25afbc00a60b085c801003990e099815fd866d72`,0400non-executable proof `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/root-core-compile-01`. **0test bodies**, no public retry, installation or acceptance. Initial Fresh acquisition remains unwired. Next packet: observe Root recovery in a short snapshot, close it before custody, select explicit purpose, then transactionally reverify at consumer; no new admission refresh after mutation.
+
+
+### 2026-11-16T22:55:23.720079+00:00 — MRR-T01: W recipe remains blocked
+
+Actual draft tests/rust_managed_review_w.py SHA256`8be2ddaefa446076b44891bf109afb05c8498853f4d37da4caa9ce4068666b4a` claims acknowledgement in its docstring, but only calls review-reconcile then review-inputs/review; no planning.step/claim/decide exists. Amend using actual proposal/frozen-program helpers and the public planner route; no SQL edits or fabricated ACK. Actual failed Work19/calls1of2 lacks managed_tasks/candidate_commit verdict fields, so native-managed-current-review-unported is not asserted as its blocker without observation.
+
+Future verification: distinct valid managed witness with compared preconditions before fault; old failure preview refusal before ACK without mutation; actual delivered/applied corrective decision and next outside evidence; source drift refusal/restoration; one new debit1→2, no controls replay, running/gate/process/publication/close and reconciliation without another debit. Revalidate planner/scope budgets, admission and production profile first. No test/new fixture/planner/provider/review executed here.
+
+
+### 2026-11-16T22:57:30.874336+00:00 — initial retry selector integrated, not exercised
+
+Complete GLM final read (200.709s, reported59723tokens); review_candidate.rs SHA256`aa7e287de65743ad49685afd5ce0e4914556634498c5605e25061f71ad581744`. Private observer checks actual managed Work/revision and original/decision core in a short snapshot; rollback/close precede custody, only Some selects ReviewerRetry, errors never become Fresh fallback. Consumer rechecks core and assembled map. Independent09 APPROVE_SOURCE_ONLY turn01a1e693-2ecd-7c72-a858-aa4ddbea1e8e; additional read/close refusals possible, no runtime equivalence inferred.
+
+No build/test/flow yet for this selector, no new reviewer call; Work19/calls1of2 unchanged. Next: save WIP, qualify current normal production profile and amend/review MRR-T01 recipe before execution. No full-fix/install/acceptance claim or WIP merge.

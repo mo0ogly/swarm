@@ -61,3 +61,8 @@ Limite de recette : le runner dérivé a gardé dans sa docstring une mention «
 ## Root recovery core: source-only checkpoint
 
 Core de reprise Root ordinaire/géré et comparaison exacte des artefacts assemblés : source revue09, compilation bibliothèque --no-run seulement,0tests. Acquisition publique Fresh non raccordée ; aucun nouveau W/SDK/F, production, installation ou acceptation. WIP, ne pas fusionner comme correctif vérifié.
+
+
+## Initial managed selector: WIP
+
+Sélecteur initial géré : observation Root originale/décision avant custody et revalidation consommateur, revue09 source seule. Aucune compilation ou preuve fonctionnelle de ce sélecteur. MRR-T01 recette ACK, profil normal, témoin/reprise/fermetures/débit1→2 restent ouverts. WIP non fusionnable comme correctif vérifié.
