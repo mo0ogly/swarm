@@ -17,6 +17,8 @@ struct Material<'a> {
     disabled: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     enrollment_principal: Option<&'a swarm_identity_contract::Principal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    native_scope: Option<&'a crate::NativeTaskScope>,
 }
 fn is_false(v: &bool) -> bool {
     !*v
@@ -65,6 +67,7 @@ impl Serialize for ConfigDigest<'_> {
                 roles: &i.roles,
                 disabled: i.disabled,
                 enrollment_principal: i.enrollment_principal.as_ref(),
+                native_scope: i.native_scope.as_ref(),
             })
             .collect();
         map.serialize_entry("identities", &identities)?;

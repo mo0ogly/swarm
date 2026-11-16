@@ -4,13 +4,17 @@
 //! provider/account activation, policy timeout or global-system observation.
 #![cfg(target_os="linux")]
 mod kernel;
-use std::{fs::{self,File,OpenOptions},io,os::{fd::{AsRawFd,FromRawFd,IntoRawFd},unix::fs::{OpenOptionsExt,MetadataExt}},path::{Path,PathBuf}};
+use std::{fs::{self,File,OpenOptions},io,os::{fd::{AsRawFd,FromRawFd,IntoRawFd},unix::fs::{OpenOptionsExt,MetadataExt,FileTypeExt}},path::{Path,PathBuf}};
 /// Safe static failure family retaining the original IO cause, never raw paths.
 #[derive(Debug)] pub struct Error {pub stage:&'static str,cause:io::Error,cleanup:Vec<Error>}
 impl std::fmt::Display for Error {fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->std::fmt::Result{f.write_str(self.stage)}}
 impl std::error::Error for Error {fn source(&self)->Option<&(dyn std::error::Error+'static)>{Some(&self.cause)}}
 fn err(stage:&'static str,cause:io::Error)->Error{Error{stage,cause,cleanup:Vec::new()}}
 fn invalid(stage:&'static str)->Error{err(stage,io::Error::from_raw_os_error(libc::EINVAL))}
+/// Pin one final component without following links and keep ownership above
+/// stdio. No type/authority is inferred here. Open/dup/explicit close failures
+/// preserve their independent causes. On refusal, explicit close is attempted
+/// once for every owned FD; an error is not a proof of successful release.
 fn open(path:&Path)->Result<File,Error>{
     let file=OpenOptions::new().read(true).custom_flags(libc::O_PATH|libc::O_CLOEXEC|libc::O_NOFOLLOW).open(path).map_err(|e|err("biba-path-open",e))?;
     // The helper's caller owns fds 0-2 and may reassign them (stdin dup2) while
@@ -20,16 +24,41 @@ fn open(path:&Path)->Result<File,Error>{
     let raw=file.as_raw_fd();
     // SAFETY: raw is the owned descriptor just opened, still valid here.
     let pinned=unsafe{libc::fcntl(raw,libc::F_DUPFD_CLOEXEC,3)};
-    if pinned<0{return Err(err("biba-path-repin",io::Error::last_os_error()))}
-    // SAFETY: adopt exactly the duplicate produced above; it is owned and unheld.
-    Ok(unsafe{File::from_raw_fd(pinned)})
-    // Dropping `file` closes the original low descriptor; the duplicate is the
-    // same open-file description, so the pinned inode is preserved.
+    if pinned<0{return finish(Err(err("biba-path-repin",io::Error::last_os_error())),close(file))}
+    // SAFETY: adopt exactly the duplicate produced above, with unique ownership.
+    let pinned=unsafe{File::from_raw_fd(pinned)};
+    match close(file){
+        Ok(())=>Ok(pinned),
+        Err(error)=>finish(Err(error),close(pinned)),
+    }
 }
 /// Explicitly close an owned FD; preserve close failure rather than retrying it.
 fn close(file:impl IntoRawFd)->Result<(),Error>{let fd=file.into_raw_fd();
     // SAFETY: consume exactly the owned descriptor once, never a borrowed fd.
     if unsafe{libc::close(fd)}<0{Err(err("biba-close",io::Error::last_os_error()))}else{Ok(())}
+}
+/// Validate the actual pinned standard null sink, never a path or a regular
+/// substitute. Linux character device major1/minor3 is a technical device ABI
+/// invariant, not an operator path/permission choice. Final symlinks, other
+/// devices and descriptors below3 refuse without a grant; metadata IO retains
+/// its cause. The caller still owns the descriptor and must close it explicitly.
+fn validate_null_sink(file:&File)->Result<(),Error>{
+    let metadata=file.metadata().map_err(|e|err("biba-null-sink-metadata",e))?;
+    if file.as_raw_fd()<3 || !metadata.file_type().is_char_device()
+        || libc::major(metadata.rdev())!=1 || libc::minor(metadata.rdev())!=3 {
+        return Err(invalid("biba-null-sink-device-required"));
+    }
+    Ok(())
+}
+/// Add only read/write to the opened null-device inode for worker stdio startup
+/// (for example Git's unconditional sanitizer). O_PATH/NOFOLLOW pins the final
+/// node above stdio; no parent, execute, truncate, removal, refer or ioctl right
+/// is granted. Preparation and every independent close failure remain errors.
+fn add_null_sink(rules:&std::os::fd::OwnedFd)->Result<(),Error>{
+    let null=open(Path::new("/dev/null"))?;
+    let result=(||{validate_null_sink(&null)?;
+        kernel::add(rules,&null,kernel::NULL_SINK).map_err(|e|err("biba-null-sink-rule",e))})();
+    finish(result,close(null))
 }
 /// Prepared inode-bound ruleset. Construction does not change this process.
 pub struct Sandbox {rules:std::os::fd::OwnedFd,workspace:File,private:File}
@@ -60,7 +89,9 @@ impl Sandbox {
     /// Prepare the fixed I0 boundary around an engine-owned output directory.
     /// Root-private authority is unreadable except this exact output leaf. The
     /// output must be distinct from/not ancestor of Root and contain no hardlinks.
-    /// No enforcement/exec/identity grant occurs here; all IO failures refuse.
+    /// The pinned Linux null character device is the only fixed nonpersistent
+    /// stdio sink outside output. No enforcement/identity grant occurs here;
+    /// unavailable/invalid null devices and reported IO/explicit close failures refuse.
     pub fn prepare(root:&Path,workspace:&Path)->Result<Self,Error>{
         let observed=workspace.metadata().map_err(|e|err("biba-workspace-metadata",e))?;
         Self::prepare_bound(root,workspace,(observed.dev(),observed.ino()))
@@ -71,8 +102,12 @@ impl Sandbox {
     /// Every descriptor this crate returns is owned above 2 (`biba-path-repin`
     /// otherwise): the caller owns 0-2 and may reassign them while the Sandbox
     /// lives, which would close a low pinned FD behind its back.
-    /// A replaced/symlink/unsafe directory refuses; all owned FD close causes
-    /// survive. This does not freeze writes by an outside unconfined same-UID actor.
+    /// A replaced/symlink/unsafe directory refuses. Explicit close failures in
+    /// this module are retained; kernel::ruleset's low-FD Drop close is not observed.
+    /// This does not freeze writes by an outside unconfined same-UID actor.
+    /// Worker stdio additionally admits only the pinned Linux null character
+    /// device with read/write file rights. Invalid-device, rule and explicit
+    /// close failures refuse; no other output target or fallback is added.
     pub fn prepare_bound(root:&Path,workspace:&Path,expected:(u64,u64))->Result<Self,Error>{
         available()?;
         let root=root.canonicalize().map_err(|e|err("biba-root",e))?;
@@ -99,6 +134,7 @@ impl Sandbox {
                 let added=kernel::add(&rules,&f,access).map_err(|e|err("biba-read-rule",e));
                 finish(added,close(f))?;
             }
+            add_null_sink(&rules)?;
             kernel::add(&rules,&workspace,kernel::ALL).map_err(|e|err("biba-output-rule",e))
         })();
         if let Err(e)=result{return finish(finish(finish(Err(e),close(rules)),close(workspace)),close(private))}
@@ -153,4 +189,26 @@ fn finish<T>(value:Result<T,Error>,cleanup:Result<(),Error>)->Result<T,Error>{
 impl Error {
     /// Preserve the original IO and every close cause for the engine's wrapper matrix.
     pub fn into_parts(self)->(&'static str,io::Error,Vec<Error>){(self.stage,self.cause,self.cleanup)}
+}
+
+#[cfg(test)]
+mod null_sink_tests {
+    use super::*;
+    /// The real node is a valid witness; regular executable, final symlink alias
+    /// and another character device refuse before any ruleset grant. No fixture
+    /// paths, subprocess rights or host files are created/modified by this test.
+    #[test]
+    fn null_sink_requires_pinned_exact_character_device(){
+        let null=open(Path::new("/dev/null")).unwrap();
+        assert!(null.as_raw_fd()>=3);validate_null_sink(&null).unwrap();
+        let regular=open(&std::env::current_exe().unwrap()).unwrap();
+        assert_eq!(validate_null_sink(&regular).unwrap_err().stage,"biba-null-sink-device-required");
+        close(regular).unwrap();validate_null_sink(&null).unwrap();
+        let alias=open(&PathBuf::from(format!("/proc/self/fd/{}",null.as_raw_fd()))).unwrap();
+        assert_eq!(validate_null_sink(&alias).unwrap_err().stage,"biba-null-sink-device-required");
+        close(alias).unwrap();validate_null_sink(&null).unwrap();
+        let other=open(Path::new("/dev/zero")).unwrap();
+        assert_eq!(validate_null_sink(&other).unwrap_err().stage,"biba-null-sink-device-required");
+        close(other).unwrap();validate_null_sink(&null).unwrap();close(null).unwrap();
+    }
 }

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "native-task-mandate-web",
+  "inputs": [
+    "tests/native_task_mandate_web.py",
+    "tests/native_task_mandate.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_trust_biba.py",
+    "tests/rust_native_http_cli.py",
+    "tests/fixture_area.py",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "web/trust-native.html",
+    "web/trust-native.js",
+    "web/trust-native.css",
+    "web/i18n-en.js",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "rust/crates/swarm-engine/src/trust/state.rs",
+    "rust/crates/swarm-engine/src/root_store/native_task_scope.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-identity-http-and-archived-assets",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,uuid\nfrom pathlib import Path\np=Path(os.environ['SWARM_NATIVE_MANDATE_EVIDENCE_PARENT']).resolve()\nif not p.is_dir():raise RuntimeError('Evidence parent must exist')\np=p/('native-web-'+uuid.uuid4().hex)\nsubprocess.run(['python3','tests/native_task_mandate_web.py','--binary',os.environ['SWARM_NATIVE_MANDATE_BINARY'],'--build-record',os.environ['SWARM_NATIVE_MANDATE_BUILD_RECORD'],'--output',str(p)],check=True)\nprint('NATIVE_WEB_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS served-version-matches-qualified-image",
+        "PASS native-mapping-readback-exact",
+        "PASS public-native-identity-has-no-bearer",
+        "PASS presentation-creates-no-effect",
+        "PASS bare-session-refused",
+        "PASS wrong-host-refused",
+        "PASS served-qualified-asset-/trust-actions.html",
+        "PASS served-qualified-asset-/trust-native.js",
+        "PASS served-qualified-asset-/trust-native.css",
+        "PASS served-qualified-asset-/i18n-en.js",
+        "PASS faults-and-reads-preserve-trust-journal",
+        "PASS owned-server-drained-without-error",
+        "PASS qualified-image-unchanged",
+        "NATIVE_TASK_MANDATE_WEB_VERIFIED assertions=13",
+        "NATIVE_WEB_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

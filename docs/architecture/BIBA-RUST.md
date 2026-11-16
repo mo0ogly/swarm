@@ -747,3 +747,47 @@ sinon), la gate exige le claim, un seul tour actif par préparation. Portée
 egress. BF-16 (héritage des résultats) et le confinement OS/descendants
 restent ouverts ; non activé en production, non accepté, Bell-LaPadula non
 déclaré terminé.
+
+
+## Puits stdio fixe du worker Linux — candidat en revue
+
+Statut : contrat du candidat privé, revue indépendante et qualification à faire.
+Ni compilation, ni exécution, ni installation établies par cette annexe.
+À collationner avec les pages BIBA-RUST FR/EN sur leurs préfixes réels ; ne pas
+remplacer leurs autres sections ou y importer le profil de méthodes déclarées.
+
+Le gate natif existant vérifie les droits et prépare l’output I0. Son adaptateur
+appelle Sandbox::prepare_bound avec l’identité device/inode attendue. Le candidat
+prépare aussi un descripteur O_PATH|O_NOFOLLOW du node final /dev/null, détenu
+au-dessus de stdio, vérifie un périphérique caractère Linux major1/minor3 puis
+ajoute seulement READ_FILE|WRITE_FILE sur cet inode. Préparer n’applique pas le
+confinement ; l’appel d’enforcement ultérieur reste nécessaire avant exec.
+Le proxy et le backend descendants héritent ensuite de la frontière existante.
+Aucun rôle, mandat, niveau Biba, clairance, accès Root privé ou permission sur un
+autre output n’est ajouté. Le puits non persistant n’est pas un stockage I1.
+
+Une erreur d’ouverture, de pin, de métadonnées, de règle ou de fermeture refuse
+avec sa cause. Le correctif open/repin ferme explicitement l’original bas et,
+si nécessaire, le duplicata ; les causes primaire et indépendantes sont conservées
+via finish/into_parts et l’adaptateur existant. Une fermeture en erreur ne prouve
+pas une libération réussie ; aucun retry ou repli sans confinement. Le masque,
+le node et la borne FD sont des invariants techniques, pas une politique opérateur.
+Aucun timeout, budget, plafond ou paramètre Admin nouveau.
+
+Le candidat ajoute le témoin réel et les refus de type/node/symlink du test
+null_sink_requires_pinned_exact_character_device, conservé depuis la source380.
+Ce test n’a pas été exécuté ici et ne prouve pas l’application des règles à un
+worker. La future preuve doit distinguer ce contrôle, le Git I0 valide → refus
+sur sortie protégée sans mutation → nouvelle écriture de reprise de la recette
+existante, et le profil produit exact. Root/CI attribuent le créneau et les seuls
+contrôles justifiés. Les preuves64/13 restent sur380 ;381 n’est pas qualifiée.
+ReadOnly, prepare_declared et les17 deltas méthodes/avis sont exclus du candidat.
+
+
+Limite héritée conservée : `kernel::ruleset` garde son original bas dans
+`_original` puis le libère par `Drop` lors du repin, sans remonter une erreur
+de cette fermeture. Le correctif `lib::open` ne prouve donc pas tous les closes
+du noyau. Propriétaire : Biba/root ; reprise : contrat de fermeture bas/duplicata
+et causes primaire/cleanup revu séparément, puis témoin du vrai chemin bas et
+injections contrôlées/refus/reprise dans un processus isolé. Aucun correctif
+exécutable de ce chemin n’est inclus dans cette composition.

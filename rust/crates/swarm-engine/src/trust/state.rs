@@ -117,6 +117,13 @@ impl State {
         // A mapping never carries an alternative bearer credential. Duplicate
         // issuer/subject identities would bypass canonical-person separation.
         for (index, id) in self.identities.iter().enumerate() {
+            if let Some(scope) = &id.native_scope {
+                if scope.validate().is_err() || id.enrollment_principal.is_some()
+                    || !id.token_hash.is_empty()
+                    || self.identities[..index].iter().any(|prior| prior.native_scope.as_ref() == Some(scope)) {
+                    return Err(TrustError::Integrity("trust-native-mapping"));
+                }
+            }
             if let Some(p) = &id.enrollment_principal {
                 if !p.valid() || p.kind != "human" || !id.token_hash.is_empty()
                     || self.identities[..index].iter().filter_map(|i| i.enrollment_principal.as_ref())
@@ -133,6 +140,10 @@ impl State {
             if u64::try_from(decisions.len()).ok()!=Some(registry.revision)||decisions.last().is_some_and(|e|digest!=e.content_digest){return Err(TrustError::Integrity("trust-public-registry-proof"));}
         }else if !decisions.is_empty(){return Err(TrustError::Integrity("trust-public-registry-missing"));}
         for (id, m) in &self.mandates {
+            if let Some(value) = m.get("native_scope") {
+                let scope: crate::NativeTaskScope = serde_json::from_value(value.clone())?;
+                scope.validate().map_err(TrustError::Invalid)?;
+            }
             if m.get("id").and_then(Value::as_str) != Some(id)
                 || m.get("integrity").and_then(Value::as_i64) != Some(2)
             {
@@ -237,6 +248,7 @@ impl State {
         let identities:Vec<Value>=self.identities.iter().map(|id| {
             let mut value=serde_json::json!({"subject":id.subject,"integrity":id.integrity,"roles":id.roles,"disabled":id.disabled});
             if let Some(p)=&id.enrollment_principal {value["enrollment_principal"]=serde_json::json!({"principal_id":p.id,"principal_kind":p.kind,"issuer":p.issuer,"subject":p.subject});}
+            if let Some(scope)=&id.native_scope {value["native_scope"]=serde_json::json!(scope);}
             value
         }).collect();
         let mut view = serde_json::json!({"schema_version":1,"revision":self.revision,"policy":self.policy,"identities":identities,"mandates":self.mandates,"actions":self.actions,"ledger":self.ledger,"access_ledger":self.access_ledger,"effect_receipts":self.connector_receipts,"evidence_count":self.evidence.len(),"simulation":true,"originals_missing":self.evidence.iter().filter(|e|self.originals.get(&e.original_digest).is_none_or(|v|v.is_empty())).count(),"limits":["aucun paiement réel","identités locales authentifiées","délégation de mandat et contexte de données portés ; admission distante A2A encore refusée"],"biba":{"model":"strict-with-named-endorsement-v1","scope":"trust-actions-only","os_confinement":false},"amount_minor_text":self.actions.iter().map(|(id,a)|(id.clone(),Value::String(a.get("amount_minor").and_then(Value::as_i64).unwrap_or(0).to_string()))).collect::<BTreeMap<_,_>>()});

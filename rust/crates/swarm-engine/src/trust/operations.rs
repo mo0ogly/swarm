@@ -28,6 +28,8 @@ fn authority(actor: &Actor) -> Result<String, E> {
         Roles: Vec<String>,
         #[serde(skip_serializing_if = "Option::is_none")]
         EnrollmentPrincipal: Option<&'a swarm_identity_contract::Principal>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        NativeScope: Option<&'a crate::NativeTaskScope>,
     }
     let mut roles = actor.roles.clone();
     roles.sort();
@@ -36,6 +38,7 @@ fn authority(actor: &Actor) -> Result<String, E> {
         Integrity: actor.integrity,
         Roles: roles,
         EnrollmentPrincipal: actor.enrollment_principal.as_ref(),
+        NativeScope: actor.native_scope.as_ref(),
     })
 }
 /// Parse recorded timestamps with the already shared Go RFC3339 contract.
@@ -156,6 +159,29 @@ fn action_hash(cmd: &Command, requester: &str) -> Result<String, E> {
 }
 /// Hash all protected mandate terms, including revocation/version and selection.
 fn mandate_hash(m: &Value) -> Result<String, E> {
+    let base = unscoped_mandate_hash(m)?;
+    match mandate_scope(m)? {
+        None => Ok(base),
+        Some(scope) => digest(&json!({"base":base,"native_scope":scope,
+            "parent_mandate_id":text(m,"parent_mandate_id"),
+            "parent_content_digest":text(m,"parent_content_digest")})),
+    }
+}
+/// Decode an optional stored binding without silently dropping malformed data.
+/// This pure projection authenticates nobody and never normalizes an invalid
+/// stored scope into a legacy unbound mandate.
+fn mandate_scope(m: &Value) -> Result<Option<crate::NativeTaskScope>, E> {
+    match m.get("native_scope") {
+        None => Ok(None),
+        Some(value) => {
+            let scope: crate::NativeTaskScope = serde_json::from_value(value.clone())?;
+            scope.validate().map_err(E::Invalid)?;
+            Ok(Some(scope))
+        }
+    }
+}
+/// Preserve the exact historical hash preimage when no native scope is present.
+fn unscoped_mandate_hash(m: &Value) -> Result<String, E> {
     #[derive(Serialize)]
     #[allow(non_snake_case)]
     struct Fields<'a> {
@@ -259,6 +285,8 @@ fn delegation_max_depth(st: &State) -> Result<i64, E> {
 /// an action subset, and a lifetime fully covered by the parent's. Historical
 /// Go contract `trustDelegationNarrows`; the access connector has no amount.
 fn delegation_narrows(child: &Value, parent: &Value) -> bool {
+    let (Ok(child_scope), Ok(parent_scope)) = (mandate_scope(child), mandate_scope(parent)) else {return false;};
+    if parent_scope.is_some() && child_scope != parent_scope { return false; }
     let child_connector = child.get("connector").cloned().unwrap_or(Value::Null);
     let parent_connector = parent.get("connector").cloned().unwrap_or(Value::Null);
     let child_connector_id = child_connector.get("id").and_then(Value::as_str).unwrap_or("");
@@ -492,7 +520,16 @@ pub(crate) fn append(
         expires_at: None,
         token_digest: actor.token_hash.clone(),
         enrollment_context: actor.enrollment.clone(),
+        native_scope: actor.native_scope.clone(),
     };
+    if actor.native_scope.is_some() {
+        context.principal_kind = "native_agent".into();
+        context.issuer = Some("urn:swarm:native-owned-execution".into());
+        context.assurance.method = "native_owned_execution".into();
+        context.attributes.role_mapping_digest = super::digest(&json!({
+            "scope":actor.native_scope,"subject":actor.subject,
+            "roles":actor.roles,"integrity":actor.integrity}))?;
+    }
     if let Some(principal) = &actor.enrollment_principal {
         context.principal_id=principal.id.clone();
         context.principal_kind=principal.kind.clone();
@@ -548,6 +585,38 @@ pub(crate) struct Transition {
 }
 /// Execute the historical core path under the owner's exclusive reservation.
 /// Authentication, replay, proof and current policy precede any business edit.
+/// Enforce the native binding before both fresh transitions and replay. Local
+/// operators may prepare/approve a bound action, but cannot execute its effect
+/// with a bearer. A native actor requires the exact current mandate and scope;
+/// task authority never adds identity roles or bypasses the later Biba check.
+fn native_admission(st: &State, op: &str, cmd: &Command, actor: &Actor,
+    now: OffsetDateTime) -> Result<(), E> {
+    let mandate_id = if matches!(op, "commit" | "reconcile") {
+        st.actions.get(target(cmd)).map(|a| text(a, "mandate_id"))
+    } else { Some(cmd.mandate_id.as_str()) };
+    let mandate = mandate_id.and_then(|id| st.mandates.get(id));
+    let binding = mandate.map(mandate_scope).transpose()?.flatten();
+    if let Some(actual) = &actor.native_scope {
+        // No native reader/egress classification authority is inferred from
+        // integrity or task mapping. Until that separate contract is admitted,
+        // a configured BLP policy refuses this new transport before any effect.
+        if st.confidentiality.is_some() {
+            return Err(E::Unsupported("native-trust-confidentiality-not-admitted"));
+        }
+        if !matches!(op, "request" | "commit" | "reconcile")
+            || binding.as_ref() != Some(actual)
+            || !active(st, mandate_id.unwrap_or(""), now)?.is_empty() {
+            return Err(E::Authorization);
+        }
+    } else if binding.is_some() && matches!(op, "commit" | "reconcile") {
+        return Err(E::Authorization);
+    }
+    Ok(())
+}
+
+/// Execute one current authenticated business transition. Native scope checks
+/// precede cached replies, while legacy unbound wire preimages remain unchanged.
+/// Mutation is in-memory only; the Root owner publishes and reports late errors.
 pub(crate) fn execute<'a>(
     st: &mut State,
     op: &str,
@@ -558,6 +627,11 @@ pub(crate) fn execute<'a>(
     let mut cmd = command::decode(raw)?;
     st.require_supported()?;
     let actor = authenticated(st, token)?;
+    if let Some(scope) = &cmd.native_scope {
+        scope.validate().map_err(E::Invalid)?;
+        if op != "mandate-create" { return Err(E::Authorization); }
+    }
+    native_admission(st, op, &cmd, &actor, now)?;
     let role_conflict=super::separation::conflict(st,op,&cmd,&actor)?;
     if role_conflict && st.event_replies.contains_key(&cmd.event_id){return Err(E::Authorization)}
     if let Some(bytes) = replay(st, op, &mut cmd, &actor)? {
@@ -651,6 +725,9 @@ pub(crate) fn execute<'a>(
                         return Err(E::Invalid("expiration de mandat invalide"));
                     }
                     let mut m = json!({"id":cmd.mandate_id,"subject":cmd.subject,"delegator":actor.subject,"actions":cmd.actions,"resource":cmd.resource,"max_amount_minor":cmd.max_amount_minor,"currency":cmd.currency,"beneficiary":cmd.beneficiary,"version":1,"policy_revision":st.revision,"integrity":2,"starts_at":stamp(start.replace_nanosecond(0).map_err(|_|E::Invalid("date invalide"))?)?,"expires_at":stamp(expiry.replace_nanosecond(0).map_err(|_|E::Invalid("date invalide"))?)?,"content_digest":"","original_digest":hash(raw)});
+                    if let Some(scope) = &cmd.native_scope {
+                        m["native_scope"] = serde_json::to_value(scope)?;
+                    }
                     if let Some(parent) = parent_mandate {
                         m["parent_mandate_id"] = text(&parent, "id").into();
                         m["parent_content_digest"] = text(&parent, "content_digest").into();
@@ -1262,6 +1339,50 @@ fn effect_transition(
 mod tests {
     use super::*;
     use serde_json::json;
+
+    /// Check legacy unscoped hashing, native coordinates and ancestry binding
+    /// on in-memory mandate terms, then reject a malformed null scope. Assertion
+    /// failure panics; no identity, persisted mandate or native effect is proved.
+    #[test]
+    fn native_mandate_hash_binds_scope_and_ancestry_without_changing_legacy() {
+        let original=json!({"actions":["settle"]});
+        assert_eq!(mandate_hash(&original).unwrap(),unscoped_mandate_hash(&original).unwrap());
+        let mut bound=original.clone();
+        bound["native_scope"]=json!({"root_digest":"a".repeat(64),"work_id":"work",
+            "task_id":"task","attempt_id":"attempt","agent_id":"agent"});
+        let baseline=mandate_hash(&bound).unwrap();
+        assert_ne!(baseline,mandate_hash(&original).unwrap());
+        for key in ["root_digest","work_id","task_id","attempt_id","agent_id"] {
+            let mut changed=bound.clone();
+            changed["native_scope"][key]=if key=="root_digest" {"b".repeat(64)} else {"changed".into()}.into();
+            assert_ne!(baseline,mandate_hash(&changed).unwrap());
+        }
+        for key in ["parent_mandate_id","parent_content_digest"] {
+            let mut changed=bound.clone(); changed[key]="changed".into();
+            assert_ne!(baseline,mandate_hash(&changed).unwrap());
+        }
+        bound["native_scope"]=Value::Null;
+        assert!(mandate_hash(&bound).is_err());
+    }
+
+    /// Exercise unbound and same-scope controls, then reject removal or task
+    /// scope switching under a bound parent. Only in-memory terms are compared;
+    /// a mismatch panics, and no delegation is issued or authenticated.
+    #[test]
+    fn native_delegation_cannot_remove_or_switch_scope() {
+        let mut parent=json!({"actions":["settle"],"resource":"invoice/a","currency":"EUR",
+            "beneficiary":"supplier","max_amount_minor":10,"starts_at":"2026-01-01T00:00:00Z",
+            "expires_at":"2027-01-01T00:00:00Z"});
+        assert!(delegation_narrows(&parent,&parent));
+        let unbound=parent.clone();
+        parent["native_scope"]=json!({"root_digest":"a".repeat(64),"work_id":"work",
+            "task_id":"task","attempt_id":"attempt","agent_id":"agent"});
+        assert!(delegation_narrows(&parent,&unbound));
+        assert!(delegation_narrows(&parent,&parent));
+        assert!(!delegation_narrows(&unbound,&parent));
+        let mut switched=parent.clone(); switched["native_scope"]["task_id"]="other".into();
+        assert!(!delegation_narrows(&switched,&parent));
+    }
 
     #[test]
     fn root_mandate_digest_matches_legacy_preimage() {

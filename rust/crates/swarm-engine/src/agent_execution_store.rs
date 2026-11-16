@@ -43,6 +43,7 @@ pub(crate) fn reservation(
 enum LogFamily {
     Lifecycle,
     Incident,
+    NativeTrust,
 }
 /// Apply the frozen UTF-8 detail cap, sanitize terminal text and verify the exact
 /// inserted log after RETURNING. Zero omits detail but leaves the incident/state
@@ -86,6 +87,8 @@ fn append_log(
         (LogFamily::Lifecycle, true) => "lifecycle-truncated",
         (LogFamily::Incident, false) => "incident",
         (LogFamily::Incident, true) => "incident-truncated",
+        (LogFamily::NativeTrust, false) => "native-trust",
+        (LogFamily::NativeTrust, true) => "native-trust-truncated",
     };
     let sequence: i64 = query(
         tx,
@@ -153,6 +156,25 @@ pub(crate) fn transaction<T>(
             }
         },
     }
+}
+
+/// Retain one host-prepared broker reply against its original agent/attempt.
+/// This is an observation before delivery, not an authority grant or a claim
+/// that a business effect/delivery succeeded. Uses the existing saved log cap
+/// and immediate transaction/commit-uncertainty handling, without retries.
+/// Caller supplies safe structured fields only, never raw input or credentials.
+pub(crate) fn native_trust_log(db: &mut Connection, expected: &Agent, message: &str)
+    -> Result<(), AgentLaunchError> {
+    transaction(db, |tx| {
+        let (mut actual, _, _) = crate::agent_execution_preflight::retained(tx,&expected.id)?;
+        if actual.work_id != expected.work_id || actual.task_id != expected.task_id
+            || actual.attempt_id != expected.attempt_id {
+            return Err(AgentLaunchError::Refused("native-trust-log-context-changed"));
+        }
+        actual.heartbeat=crate::system_timestamp()
+            .map_err(|e|AgentLaunchError::caused("native-trust-log-clock",e))?;
+        append_log(tx,&actual,LogFamily::NativeTrust,message)
+    })
 }
 /// Persist complete Agent bytes by exact prior-row CAS, not a supplied identity.
 /// The final read after log insertion detects ignored/reverted writes. Work must

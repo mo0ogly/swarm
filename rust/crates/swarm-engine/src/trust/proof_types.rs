@@ -1,11 +1,11 @@
 //! Wire DTOs for trust ledger evidence, effect proofs, and identity context.
 //!
-//! These structs mirror the canonical Go source exactly (field order is load-bearing
-//! for canonical hashes). All data carried here is untrusted wire data: presence of a
+//! Legacy field order is load-bearing for canonical hashes. Optional native scope
+//! is omitted for historical evidence. All data here is untrusted wire data: presence of a
 //! value proves nothing about its provenance or authority — verification happens
 //! elsewhere. This module performs no hashing, IO, crypto, or policy evaluation.
 //!
-//! The supplied Go field list is authoritative; no fields are added or reordered.
+//! Native scope is an explicit extension, never evidence of host authentication by itself.
 
 use serde::{Deserialize, Serialize};
 
@@ -124,6 +124,9 @@ pub(crate) struct IdentityContext {
     pub token_digest: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub enrollment_context: Option<EnrollmentContext>,
+    /// Host-observed native binding; absent for legacy local/human evidence.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_scope: Option<crate::NativeTaskScope>,
 }
 
 /// Assurance claims. Untrusted; not verified here.

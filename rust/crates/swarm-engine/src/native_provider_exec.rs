@@ -38,6 +38,22 @@ pub(crate) struct PreparedExec {
     internet_denied: bool,
 }
 impl PreparedExec {
+    /// Wrap the frozen backend argv in this very Swarm executable, after all
+    /// telemetry arguments have been added. Biba still applies before exec;
+    /// the backend descendant inherits it and the ordinary stdio only. This
+    /// transport selection grants no Root access or action authority. Explicit
+    /// close preserves preparation causes; no PATH/shell fallback is introduced.
+    pub(crate) fn with_native_proxy(mut self) -> Result<Self, E> {
+        let result = (|| {
+            let image = std::env::current_exe().map_err(|e|caused("native-proxy-image",e))?;
+            let image = CString::new(image.as_os_str().as_bytes())
+                .map_err(|e|caused("native-proxy-image",e))?;
+            let mut args = vec![image.clone(), CString::new("_native_provider_proxy").expect("literal")];
+            args.extend(self.args.iter().cloned());
+            self.path = image; self.args = args; Ok(())
+        })();
+        match result { Ok(()) => Ok(self), Err(e) => finish(Err(e),self.close()) }
+    }
     /// Encode exact CLI arguments, observe only the supplied validated environment
     /// names, and seal complete prompt bytes in a CLOEXEC memfd. Requires absolute
     /// image/workspace paths; duplicate/invalid environment names and embedded NUL

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "native-task-mandate",
+  "inputs": [
+    "rust/crates/swarm-engine/src/native_task_scope.rs",
+    "rust/crates/swarm-engine/src/root_store/native_task_scope.rs",
+    "rust/crates/swarm-engine/src/trust_types.rs",
+    "rust/crates/swarm-engine/src/trust/authentication.rs",
+    "rust/crates/swarm-engine/src/trust/config.rs",
+    "rust/crates/swarm-engine/src/trust/command.rs",
+    "rust/crates/swarm-engine/src/trust/state.rs",
+    "rust/crates/swarm-engine/src/trust/operations.rs",
+    "rust/crates/swarm-engine/src/trust/proof_types.rs",
+    "rust/crates/swarm-engine/src/agent_native_stream.rs",
+    "rust/crates/swarm-engine/src/agent_supervision.rs",
+    "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/native_provider_exec.rs",
+    "rust/crates/swarm-engine/src/native_provider_proxy.rs",
+    "rust/crates/swarm-engine/src/validation_run.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-cli/src/agent.rs",
+    "rust/crates/swarm-cli/src/main.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/trust/response.rs",
+    "web/trust-native.js",
+    "web/i18n-en.js",
+    "version_history.json",
+    "tests/native_task_mandate.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_trust_biba.py",
+    "tests/rust_native_http_cli.py",
+    "tests/fixture_area.py",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "docs/architecture/POC06-TASK-MANDATE.md",
+    "docs/en/POC06-TASK-MANDATE.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-workers-and-protocol-refusals",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,uuid\nfrom pathlib import Path\nparent=Path(os.environ['SWARM_NATIVE_MANDATE_EVIDENCE_PARENT']).resolve()\nif not parent.is_dir():raise RuntimeError('Evidence parent must exist')\np=parent/('native-journey-'+uuid.uuid4().hex)\nsubprocess.run(['python3','tests/native_task_mandate.py','--binary',os.environ['SWARM_NATIVE_MANDATE_BINARY'],'--build-record',os.environ['SWARM_NATIVE_MANDATE_BUILD_RECORD'],'--output',str(p)],check=True)\nprint('NATIVE_MANDATE_EVIDENCE '+str(p))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS proxy-protocol-valid",
+        "PASS proxy-protocol-stale",
+        "PASS proxy-protocol-empty",
+        "PASS unmapped-final-intent-explicit-refusal",
+        "PASS native scenario basic",
+        "PASS native scenario biba",
+        "PASS native scenario delegation",
+        "PASS native scenario check_apply",
+        "PASS native scenario revocation",
+        "PASS native scenario final_intent",
+        "NATIVE_TASK_MANDATE_VERIFIED cases=6",
+        "NATIVE_MANDATE_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

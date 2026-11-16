@@ -28,6 +28,10 @@ fn no(v: &bool) -> bool {
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Command {
+    /// Operator-declared binding, admissible only on mandate creation. Native
+    /// action callers cannot supply their own effective execution context.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_scope: Option<crate::NativeTaskScope>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub connector: Option<ConnectorSelection>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

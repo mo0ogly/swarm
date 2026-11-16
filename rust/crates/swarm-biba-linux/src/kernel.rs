@@ -7,6 +7,10 @@ pub(crate) fn abi() -> io::Result<i32> {
     if v<0 {Err(io::Error::last_os_error())} else {Ok(v as i32)}
 }
 pub(crate) const READ:u64=(1<<0)|(1<<2)|(1<<3);
+/// Fixed Linux stdio null sink: READ_FILE and WRITE_FILE only (ABI rights).
+/// This mask adds no execute, truncate, parent removal/creation/refer or IOCTL_DEV.
+/// This technical mask is not a caller-selected or persisted operator policy.
+pub(crate) const NULL_SINK:u64=(1<<1)|(1<<2);
 pub(crate) const ALL:u64=(1<<16)-1;
 #[repr(C)] struct Ruleset {fs:u64,net:u64,scoped:u64}
 #[repr(C,packed)] struct Beneath {access:u64,fd:i32}

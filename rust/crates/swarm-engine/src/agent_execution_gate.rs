@@ -92,6 +92,7 @@ fn fresh(root: &Path, prepared: &ExecutionPreparation) -> Result<(), RootStoreEr
 fn prepare_exec(
     prepared: &ExecutionPreparation,
     internet_denied: bool,
+    native_proxy: bool,
 ) -> Result<crate::native_provider_exec::PreparedExec, RootStoreError> {
     let provider = prepared.model.provider();
     if prepared.agent.command != provider.command || prepared.agent.args != provider.args {
@@ -99,17 +100,33 @@ fn prepare_exec(
             "agent-execution-provider-arguments-conflict",
         ));
     }
+    let prompt = transport_prompt(&prepared.agent.prompt,prepared.launch_policy.context_bytes,native_proxy)?;
     crate::native_provider_exec::PreparedExec::prepare(
         provider,
         &prepared.host.environment_names,
         &prepared.host.workspace,
-        prepared.agent.prompt.as_bytes(),
+        &prompt,
     )
     .map(|command| {
         command
             .with_workspace_identity(prepared.host.directory_identity)
             .with_internet_denied(internet_denied)
     })
+}
+/// Include the fixed native protocol suffix under the SAME saved Admin context
+/// byte limit as the original prompt. No second ceiling/default is introduced.
+/// Overflow or an exceeded limit refuses before allocating/sealing/exec; this
+/// pure preparation grants no rights and does not alter the retained intention.
+fn transport_prompt(original:&str, limit:Option<usize>, native:bool)->Result<Vec<u8>,RootStoreError> {
+    let suffix=if native {crate::native_provider_proxy::INSTRUCTIONS}else{b""};
+    let length=original.len().checked_add(suffix.len())
+        .ok_or(RootStoreError::Refused("agent-execution-context-representation"))?;
+    if limit.is_some_and(|cap|length>cap) {
+        return Err(RootStoreError::Refused("agent-execution-context-exceeded"));
+    }
+    let mut prompt=Vec::with_capacity(length);
+    prompt.extend_from_slice(original.as_bytes());prompt.extend_from_slice(suffix);
+    Ok(prompt)
 }
 /// Acquire the actual Root binding before helper-side gate inspection, then
 /// close the preparing store explicitly. The current operator network policy is
@@ -121,7 +138,7 @@ fn prepare_exec(
 fn prepare_bound_gate(
     root: &Path,
     id: &str,
-) -> Result<(ExecutionPreparation, crate::RootBinding, bool), RootStoreError> {
+) -> Result<(ExecutionPreparation, crate::RootBinding, bool, bool), RootStoreError> {
     let mut store = RootStore::open(root, false)?;
     let operation = (|| {
         let binding = store.bind_root()?;
@@ -133,7 +150,11 @@ fn prepare_bound_gate(
             Ok(denied) => denied,
             Err(error) => return crate::root_store::finished(Err(error), binding.close()),
         };
-        Ok((prepared, binding, denied))
+        let native_proxy = match store.native_agent_mapping_enabled(id) {
+            Ok(enabled) => enabled,
+            Err(error) => return crate::root_store::finished(Err(error), binding.close()),
+        };
+        Ok((prepared, binding, denied, native_proxy))
     })();
     crate::root_store::finished(operation, store.close())
 }
@@ -243,10 +264,10 @@ pub fn execute_agent_gate(root: &Path, id: &str) -> Result<Infallible, RootStore
         if grant != [1] {
             return Err(RootStoreError::Refused("agent-gate-release-invalid"));
         }
-        let (prepared, binding, internet_denied) = prepare_bound_gate(root, id)?;
+        let (prepared, binding, internet_denied, native_proxy) = prepare_bound_gate(root, id)?;
         let mut token_issued = false;
         let command = (|| {
-            let command = prepare_exec(&prepared, internet_denied)?;
+            let command = prepare_exec(&prepared, internet_denied, native_proxy)?;
             if let Err(error) = fresh(root, &prepared) {
                 return crate::root_store::finished(Err(error), command.close());
             }
@@ -258,6 +279,7 @@ pub fn execute_agent_gate(root: &Path, id: &str) -> Result<Infallible, RootStore
             let command = command
                 .add_environment(telemetry.environment)?
                 .add_leading_arguments(telemetry.arguments)?;
+            let command = if native_proxy { command.with_native_proxy()? } else { command };
             // Catch a persistent Root replacement during the pathname-based
             // telemetry launcher. This cannot undo an already issued token and
             // does not prove that no telemetry side effect reached a copy.
@@ -300,6 +322,20 @@ pub fn execute_agent_gate(root: &Path, id: &str) -> Result<Infallible, RootStore
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// Check exact prompt/suffix bytes at the supplied context cap, refusal one
+    /// byte below, uncapped input and unchanged unmapped transport. This uses
+    /// in-memory values; assertions panic, with no Admin persistence or exec.
+    #[test]
+    fn native_prompt_suffix_obeys_saved_context_limit() {
+        let original="prepared";
+        let total=original.len()+crate::native_provider_proxy::INSTRUCTIONS.len();
+        let prompt=transport_prompt(original,Some(total),true).unwrap();
+        assert_eq!(&prompt[..original.len()],original.as_bytes());
+        assert_eq!(&prompt[original.len()..],crate::native_provider_proxy::INSTRUCTIONS);
+        assert!(transport_prompt(original,Some(total-1),true).is_err());
+        assert!(transport_prompt(original,None,true).is_ok());
+        assert_eq!(transport_prompt(original,Some(original.len()),false).unwrap(),original.as_bytes());
+    }
     use std::{cell::Cell, fs, os::unix::fs::PermissionsExt, path::PathBuf};
 
     /// Private fresh Roots, retained on panic; no provider, process or live DB.

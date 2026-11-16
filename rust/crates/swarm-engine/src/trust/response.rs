@@ -25,7 +25,9 @@ pub(crate) fn mediate(op: &str, actor: &TrustIdentity, value: Value) -> Result<V
         3 => Integrity::I3,
         _ => return Err(E::Authorization),
     };
-    if check_biba(subject, Integrity::I2, BibaAccess::Read).is_ok() {
+    // Native write authority does not grant a new provider data-release path.
+    // Return only the existing closed status acknowledgement even at I2.
+    if actor.native_scope.is_none() && check_biba(subject, Integrity::I2, BibaAccess::Read).is_ok() {
         return Ok(value);
     }
     let id = value

@@ -709,3 +709,44 @@ claim, one active turn per preparation. Scope: the worker's Api branch; the
 CLI path keeps its own egress control. BF-16 (result inheritance) and
 OS/descendant confinement remain open; not activated in production, not
 accepted, Bell-LaPadula not declared finished.
+
+
+## Fixed Linux worker stdio sink — candidate under review
+
+Status: private candidate contract, pending independent review and qualification.
+This appendix establishes no compilation, execution or installation. Collate it
+with the actual FR/EN BIBA-RUST prefixes without replacing foreign sections or
+importing the separate declared-method profile.
+
+The existing native gate checks authority and the owned I0 output. Its adapter
+calls Sandbox::prepare_bound with the expected device/inode. The candidate also
+pins the final /dev/null node with O_PATH|O_NOFOLLOW above stdio, requires the
+Linux character device major1/minor3 and adds only READ_FILE|WRITE_FILE for that
+inode. Preparation does not enforce confinement; later enforcement is still
+required before exec. Proxy/backend descendants inherit the existing boundary.
+No role, mandate, Biba level, clearance, private Root access or other output
+permission is granted. This nonpersistent sink is not I1 data storage.
+
+Open, repin, metadata, rule and close failures refuse with retained causes. The
+open/repin correction explicitly closes the low original and, when necessary,
+the duplicate, preserving primary and independent cleanup causes through the
+existing finish/into_parts/engine adapter. A close error does not prove successful
+release. No retry or unconfined fallback is introduced. Device, mask and descriptor
+bound are technical invariants, not new operator policy or Admin/budget/time limits.
+
+The existing380 null_sink_requires_pinned_exact_character_device guard is retained
+as source, with a valid real node and wrong-type/node/symlink refusals; it was not
+run here and does not prove worker rules enforcement. Future evidence must separate
+that guard, the maintained Git I0 witness → protected-output refusal without
+mutation → fresh-write recovery, and the exact production profile. Root/CI allocate
+only justified checks.64/13 proofs remain380;381 is not qualified. ReadOnly,
+prepare_declared and the17 held-method/opinion deltas are excluded.
+
+
+Retained inherited limit: `kernel::ruleset` keeps its low original in
+`_original` and closes it through `Drop` during repinning, without propagating
+that close error. The `lib::open` correction therefore does not prove all kernel
+closes. Owner: Biba/root. Resume after a separately reviewed low/duplicate close
+contract and primary/cleanup traversal, then a real low-FD control and controlled
+fault/refusal/recovery cases in an isolated process. No executable correction of
+that kernel path is included in this composition.
