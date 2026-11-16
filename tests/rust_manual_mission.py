@@ -9,9 +9,11 @@ import argparse, json, os, sqlite3, traceback
 from pathlib import Path
 import rust_agent_model_route as m
 
-PROGRAM=m.PROGRAM+r"""
-import tempfile
-body=('# Local native fixture handoff\n\nInput SHA256: '+observed['stdin_sha256']+'\nRequested model: '+model+'\nObserved fixture only; not authenticated model or task acceptance.\n').encode()
+# Explicit inert report format, shared by producer and source consumer oracle.
+# Fixture data only: no product policy or independent authorship proof.
+REPORT_TEMPLATE = '# Local native fixture handoff\n\nInput SHA256: {input_sha256}\nRequested model: {model}\nObserved fixture only; not authenticated model or task acceptance.\n'
+
+PROGRAM=m.PROGRAM+"\nimport tempfile\nbody="+repr(REPORT_TEMPLATE)+".format(input_sha256=observed['stdin_sha256'],model=model).encode()\n"+r"""
 fd,name=tempfile.mkstemp(dir='.',prefix='.handoff-')
 with os.fdopen(fd,'wb') as stream:stream.write(body);stream.flush();os.fsync(stream.fileno())
 os.replace(name,'handoff.md')
@@ -55,9 +57,18 @@ def fixture(binary,output,label):
     assert actual['stdin_sha256'].encode() in report and b'not authenticated model' in report
     return f
 
-def submit(f,event='submit'):
-    """Submit the real completed worker without changing attempts or budget receipt."""
-    before=f.snapshot();r=handoff(f,event);v=f.ok(['task','submit',f.work],r)
+def submit(f,event='submit',*,expected_sha256=None):
+    """Submit a real completed worker, optionally bound to retained source bytes.
+
+    expected_sha256 is supplied evidence, not an operator policy or authorizing
+    assertion. Refuse a changed public report before submitting; the public API
+    rechecks it against this same hash. Existing callers without an original
+    source binding retain their prior behavior. No attempt/budget edit or retry.
+    """
+    before=f.snapshot();r=handoff(f,event)
+    if expected_sha256 is not None and r['report_sha256'] != expected_sha256:
+        raise ValueError('manual-submit-original-report-changed')
+    v=f.ok(['task','submit',f.work],r)
     assert v['work']['tasks'][0]['status']=='submitted'
     after=f.snapshot()
     assert after[0]['tasks'][0]['attempts']==before[0]['tasks'][0]['attempts']

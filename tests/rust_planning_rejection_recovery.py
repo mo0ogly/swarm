@@ -15,6 +15,23 @@ from rust_planning_activation import apply_policy
 
 PROGRAM=native.PROGRAM.replace("open('model-received.json','x'","open('model-received-'+str(os.getpid())+'.json','x'").replace("args=sys.argv[1:]", "with open('fixture-prompt-'+str(os.getpid())+'.bin','xb') as f:\n f.write(raw);f.flush();os.fsync(f.fileno())\nargs=sys.argv[1:]")
 
+
+def program_with_proposal(value):
+    """Freeze explicit inert proposal data into executable bytes before a claim.
+
+    Preserve the ordinary wire/program contract; replace exactly the legacy
+    Root-relative proposal read with JSON literal data, as reviewer preparer06
+    already does. Invalid JSON or template drift refuses before publication.
+    No import, execution, Work mutation, identity or provider grant is performed.
+    Existing legacy PROGRAM consumers are unchanged until they adopt this call.
+    """
+    needle = "proposal=json.load(open('planning-proposal.json'))"
+    if PROGRAM.count(needle) != 1:
+        raise ValueError('inert-planner-template-boundary-changed')
+    frozen = json.dumps(value, ensure_ascii=False, sort_keys=True, allow_nan=False)
+    return PROGRAM.replace(needle, 'proposal=json.loads(' + repr(frozen) + ')')
+
+
 def pending(work):
     """Use actual unacknowledged root inputs; never invent delivery identifiers."""
     return [e['id'] for e in work['planning']['inbox'] if e['scope']=='root' and not e.get('decision')]

@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "id": "gi-source-fixture-originals",
+  "inputs": [
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "tests/fixture_area.py",
+    "tests/gi_source_import_entry.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_gieth_effective_dependency.py",
+    "tests/rust_inert_source_originals.py",
+    "tests/rust_managed_auto_worker.py",
+    "tests/rust_managed_file_provider.py",
+    "tests/rust_managed_planning.py",
+    "tests/rust_managed_repository_bootstrap.py",
+    "tests/rust_managed_result_recovery.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_manual_review.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_native_first_publication.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_native_http_mission.py",
+    "tests/rust_native_managed_candidate.py",
+    "tests/rust_native_managed_review_inputs.py",
+    "tests/rust_native_managed_reviewer.py",
+    "tests/rust_native_managed_validation.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_reviewer.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_unstarted_claim_prepare.py",
+    "tests/rust_unstarted_review_parent.py",
+    "tests/rust_unstarted_review_process.py",
+    "tests/rust_unstarted_review_retention.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "tests/test_rust_inert_source_originals.py",
+    "tools/verification/GI-SOURCE-TESTS.en.md",
+    "tools/verification/GI-SOURCE-TESTS.md",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/gi-source-fixture-originals.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "first-import-rust_unstarted_review_process",
+      "command": [
+        "python3",
+        "-I",
+        "-S",
+        "-B",
+        "-c",
+        "import os,runpy,sys; assembly=sys.argv[1]; entry=sys.argv[2]; script=assembly+'/tests/gi_source_import_entry.py'; sys.argv=[script,assembly,entry,os.path.join(os.environ['SWARM_GI_SOURCE_IMPORT_RECEIPTS'],entry+'.json')]; runpy.run_path(script,run_name='__main__')",
+        "{root}",
+        "rust_unstarted_review_process"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "IMPORT_CONTRACT_OK rust_unstarted_review_process"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "first-import-rust_unstarted_review_retention",
+      "command": [
+        "python3",
+        "-I",
+        "-S",
+        "-B",
+        "-c",
+        "import os,runpy,sys; assembly=sys.argv[1]; entry=sys.argv[2]; script=assembly+'/tests/gi_source_import_entry.py'; sys.argv=[script,assembly,entry,os.path.join(os.environ['SWARM_GI_SOURCE_IMPORT_RECEIPTS'],entry+'.json')]; runpy.run_path(script,run_name='__main__')",
+        "{root}",
+        "rust_unstarted_review_retention"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "IMPORT_CONTRACT_OK rust_unstarted_review_retention"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "first-import-rust_unstarted_review_parent",
+      "command": [
+        "python3",
+        "-I",
+        "-S",
+        "-B",
+        "-c",
+        "import os,runpy,sys; assembly=sys.argv[1]; entry=sys.argv[2]; script=assembly+'/tests/gi_source_import_entry.py'; sys.argv=[script,assembly,entry,os.path.join(os.environ['SWARM_GI_SOURCE_IMPORT_RECEIPTS'],entry+'.json')]; runpy.run_path(script,run_name='__main__')",
+        "{root}",
+        "rust_unstarted_review_parent"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "IMPORT_CONTRACT_OK rust_unstarted_review_parent"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "first-import-rust_unstarted_claim_prepare",
+      "command": [
+        "python3",
+        "-I",
+        "-S",
+        "-B",
+        "-c",
+        "import os,runpy,sys; assembly=sys.argv[1]; entry=sys.argv[2]; script=assembly+'/tests/gi_source_import_entry.py'; sys.argv=[script,assembly,entry,os.path.join(os.environ['SWARM_GI_SOURCE_IMPORT_RECEIPTS'],entry+'.json')]; runpy.run_path(script,run_name='__main__')",
+        "{root}",
+        "rust_unstarted_claim_prepare"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "IMPORT_CONTRACT_OK rust_unstarted_claim_prepare"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "first-import-rust_planning_worker_public_flow",
+      "command": [
+        "python3",
+        "-I",
+        "-S",
+        "-B",
+        "-c",
+        "import os,runpy,sys; assembly=sys.argv[1]; entry=sys.argv[2]; script=assembly+'/tests/gi_source_import_entry.py'; sys.argv=[script,assembly,entry,os.path.join(os.environ['SWARM_GI_SOURCE_IMPORT_RECEIPTS'],entry+'.json')]; runpy.run_path(script,run_name='__main__')",
+        "{root}",
+        "rust_planning_worker_public_flow"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "IMPORT_CONTRACT_OK rust_planning_worker_public_flow"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "first-import-rust_mission_manual_review",
+      "command": [
+        "python3",
+        "-I",
+        "-S",
+        "-B",
+        "-c",
+        "import os,runpy,sys; assembly=sys.argv[1]; entry=sys.argv[2]; script=assembly+'/tests/gi_source_import_entry.py'; sys.argv=[script,assembly,entry,os.path.join(os.environ['SWARM_GI_SOURCE_IMPORT_RECEIPTS'],entry+'.json')]; runpy.run_path(script,run_name='__main__')",
+        "{root}",
+        "rust_mission_manual_review"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "IMPORT_CONTRACT_OK rust_mission_manual_review"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "first-import-rust_inert_source_originals",
+      "command": [
+        "python3",
+        "-I",
+        "-S",
+        "-B",
+        "-c",
+        "import os,runpy,sys; assembly=sys.argv[1]; entry=sys.argv[2]; script=assembly+'/tests/gi_source_import_entry.py'; sys.argv=[script,assembly,entry,os.path.join(os.environ['SWARM_GI_SOURCE_IMPORT_RECEIPTS'],entry+'.json')]; runpy.run_path(script,run_name='__main__')",
+        "{root}",
+        "rust_inert_source_originals"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "IMPORT_CONTRACT_OK rust_inert_source_originals"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "eight-controlled-source-contracts",
+      "command": [
+        "python3",
+        "-I",
+        "-S",
+        "-B",
+        "-c",
+        "import runpy,sys; sys.path.insert(0,sys.argv[1]+'/tests'); runpy.run_path(sys.argv[1]+'/tests/test_rust_inert_source_originals.py',run_name='__main__')",
+        "{root}"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"scope\": \"CONTROLLED_SOURCE_CONTRACTS_ONLY\"",
+        "\"tests_run\": 8",
+        "\"failures\": 0",
+        "\"errors\": 0",
+        "\"complete\": true"
+      ],
+      "required_stderr": [
+        "Ran 8 tests",
+        "\nOK\n"
+      ]
+    }
+  ]
+}

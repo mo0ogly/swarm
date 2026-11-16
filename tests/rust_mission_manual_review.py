@@ -51,13 +51,18 @@ def prepare(binary,out,manual_controls=True):
     """Prepare actual manual worker/report/controls and explicit mission consent.
     Return an inactive owned Root before any automatic review admission; this
     preparation is not PASS or review authority. Executable bytes stay fixed.
+    Retain completed I0 worker originals and stage their exact fresh public report
+    before submit/controls; no producer input changes after claim, fabricated
+    report or widening of provider Root access.
     manual_controls retains the earlier explicit control witness; false delegates
     the first actual batch to watch, without seeding a validation receipt.
     """
     setup=out/'setup';setup.mkdir();ready,owned=flow.flow(binary,setup,before_worker=True,return_fixture=True)
     program=provider_program()
     fixture.publish(owned.root/'codex',program.encode());os.chmod(owned.root/'codex',0o700);program_sha=fixture.digest(program.encode())
-    preview=owned.prepare(preview=True);owned.request['model_policy_hash']=preview['agent']['model_route']['policy_hash'];prepared=owned.prepare();owned.run_and_assert(prepared);manual.submit(owned)
+    preview=owned.prepare(preview=True);owned.request['model_policy_hash']=preview['agent']['model_route']['policy_hash'];prepared=owned.prepare();actual=owned.run_and_assert(prepared)
+    publication=flow.originals.worker_report(owned,prepared,actual)
+    manual.submit(owned,expected_sha256=publication['sha256'])
     if manual_controls:
         current=relay.work(owned);done=owned.ok(['task','validate',owned.work],dict(schema_version=1,event_id='manual-source-controls',expected_revision=current['revision'],task_id='task'));check(done['controls_passed'],'manual source controls failed')
     agent=owned.ok(['agent','show',prepared['agent']['id']])['agent'];check(agent.get('native_mission') is None and agent['status']=='completed','source is not genuinely manual completed worker')

@@ -142,3 +142,129 @@ vérifié, sans reset/écrasement du travail d'autrui
 ni réécriture des preuves historiques. Pas de relance campaign dans ce paquet.
 Le RETEX est de distinguer identité du binaire, applicabilité de ses sources et
 conservation des propriétaires jusqu'au dernier consommateur.
+
+## Correction16 proposée après échec réel de prepare-W
+
+État16 : SOURCE PRIVÉE SEULEMENT, non importée/non exécutée/non acceptée. La
+campagne unique gi-wf-root-20261116-6azg223q a été lancée après rétablissement des
+préconditions CI061b ; le paragraphe de dérive15 ci-dessus reste une observation
+historique, pas l'état de cette campagne. Elle a échoué au premier planning step
+pendant prepare-W. Work w-786d8f2435c51d7a0e927ec5 est réellement révision4,
+activation1/6, décisions0, tâches vides, reviewer0/2, avec rejet en inbox. Le budget
+est encore0/0, coût réel inconnu : le setup10/1 ultérieur n'a pas été atteint.
+Aucun F ni revueW n'a été lancé. Le prepareur416488 est récolté/validé/fermé, sans
+pending. Ces faits ne signifient pas rollback ou absence d'autres effets.
+
+Le receipt SR1 original a un body SHAe4222126fddff2d44294140fe1f715f681a263038c10eb3836b9bb3f545b7f55,
+exit1 et stderr non tronqué : codex ligne9 lit planning-proposal.json relatif,
+FileNotFoundError errno2. Le fichier existe àRoot ; le child416703/parent416689 a
+écrit ses marqueurs dans la feuille I0 du claim f7c84e0f520c740f80ae5e3d. Le prompt
+original SHA934df05b... correspond au job. CLIstdout est vide ; le stdout brut du
+provider n'est pas archivé par ce receipt, donc non établi en tant que canal brut.
+planning history renvoie[] malgré ce receipt natif ; ne pas en inférer aucun run.
+
+Proposition16 : program_with_proposal remplace exactement la lecture Root par
+une valeur JSON littérale DANS le programme inerte, avant chaque claim. Le chemin
+legacy proposal()/PROGRAM n'est pas migré implicitement pour les anciens replays.
+Le flow source utilise planner_step pour les trois décisions : frame SR1, claim,
+Work/scope/génération native, dev/inode privé, PID/PPID, prompt et proposition exacte
+sont liés aux marqueurs de la feuille réelle. Origines copiées après retour public
+réussi, exit/grant/completion du receipt ; pas de re-wait OS indépendant annoncé.
+
+Le worker garde le workspace explicite créé par Fixture. Son programme/format
+REPORT_TEMPLATE est figé avant launch ; le template est une oracle de données de
+fixture et ne reconstitue jamais une sortie absente. Après run_and_assert synchrone
+et agent show completed/native/exit0, lecture entière du vrai report/markerI0,
+comparaison au prompt/route/format déclaré, conservation de ces octets et identité,
+puis relecture avant/après publication. Le superviseur publie uniquement ces octets
+réels vers Root/handoff.md, par temporaire adjacent vérifié et hardlink EXCLUSIF,
+fsync et relecture. Source I0 intacte ; destination existante, même égale, refuse.
+Erreur tardive peut laisser une destination visible et un temporaire conservé :
+ni rollback ni retry ne sont inférés. Task submit reste public et reçoit le SHA
+original, afin qu'un report public modifié ne soit pas accepté sous un nouveau hash.
+
+Arbitrage du coordinateur : tasksubmit accepte aussi un chemin I0 directement,
+mais les contrôles W/F préautorisés lisent Root/handoff.md. Le transfert superviseur
+minimal préserve ces contrats ; il n'accorde aucune lecture Root au provider et
+ne prouve pas une publication native autonome. La branche READY avant worker
+reste sans admission worker/transfert ; le consommateur mission_manual_review
+adopte la même rétention après son vrai worker. Les autres anciennes campagnes
+ne sont ni exécutées ni déclarées requalifiées. L'API de retour READY et le refus
+return_fixture sans before_worker sont conservés.
+
+Vérifications FUTURES à attribuer, aucune exécutée dans16 :
+
+- Témoin réel complet de source publique sur le même profil/I0 avant tout défaut ;
+  les trois décisions doivent consommer leurs vrais prompts/outputs et créer les
+  bons effets, aucun Root-relative read provider. Le contre-exemple061b réel est
+  conservé ; ni nouvel incident W/F ni succès nouveau n'est fabriqué ici.
+- Avant chaque variante, témoin natif/FD valide avec mêmes préconditions. Refuser
+  receipt/claim/PID/prompt altéré ou clôture inconnue, sans nouvelle activation ;
+  les doubles sur lecteur ne prouvent pas Authority ni OS. Refuser un report I0
+  altéré avant première lecture grâce au format déclaré, ou changé entre lectures,
+  sans le reconstruire ; destination existante, lien, ENOSPC et close refusée
+  préservent original et causes, jamais PASS vide.
+- Reprise contrôlée du consommateur seulement après décision : restaurer les
+  vrais octets du défaut dans la NOUVELLE fixture attribuée, garder l'échec initial,
+  utiliser un nouveau contexte de preuves du consommateur et destination fraîche,
+  relire l'agent natif existant, sans relancer provider/claim ni rembourser appel.
+  Ne pas écraser une destination déjà visible ; root arbitre son sort séparément.
+  Modifier ensuite le report public doit refuser sous le SHA original au submit.
+- DEFAULT W/F et READY True/True sont des chemins distincts ; vérifier le second
+  sans worker démarré, puis son consommateur réel. Les modules14 inchangés gardent
+  leur preuve de source, mais l'ancienne receipt d'import ne qualifie pas la
+  nouvelle fermeture/import cyclique : root/CI doit l'attribuer explicitement.
+
+Les sources sont retenues hors CI ; root a repris son gel pour la baseline Biba.
+Aucune écriture dans la fixture échouée, tentative/budget remis à zéro, nouveau
+claim ou relance W/F autorisée par ce texte. Revue indépendante, fermeture sources,
+import/interpréteur, source/profile/OS/I0/Authority/storage et allocation demeurent
+les gates du coordinateur. Historique377 ouvert ; aucun installé/global accepté.
+
+## Correction17 privée du premier import (proposée, non exécutée)
+
+La revue source09 a établi une initialisation anticipée possible de16 : entrée
+directe process→watch→flow→originals→from process import Failure/check, avant leurs
+définitions. Entrée directe retention ajoute la même dépendance avant read_at.
+Les entrées DEFAULT/READY ne sont pas déclarées en échec : leur ordre peut déjà
+charger ces symboles. Ce constat source est distinct du vrai FileNotFoundError061b.
+
+17 retire seulement les deux from-import globaux du helper originals et les
+résout dans chacun de ses trois consommateurs, au moment de l'appel. Classes14,
+fonctions read_at/Failure/check, Biba/TTL/caps, visibilité des modules canoniques et
+contrats des fonctions restent inchangés. Aucun alias Failure/read_at n'est
+maintenu dans originals pour accommoder un test. Aucun global/default/annotation
+consommant ces symboles n'a été déplacé aveuglément. L'import du helper ne les
+requiert plus avant définition ; leur emploi en fonction reste explicite.
+
+Gardes SOURCE séparées préparées dans fixture17-tests-source-only : même script
+sur16/17, nouveaux processus pour process, retention, parent DEFAULT, préparateur06,
+flow READY, mission_manual_review et helper direct. Canonical symbols seulement,
+pas sys.modules supprimé/stub/module remplacé ni API17 absente16 comme faux RED.
+Aucun import/AST/syntaxe/test/enfant exécuté pendant préparation. Les gardes sont
+à revoir puis attribuer par root avec fermeture43/defaultJSON physique ; union44
+si consumerREADY également présent. Les imports réels des programmes inertes sont
+une autre couche. Ni une garde ni huit tests à doubles ne qualifient vraiW.
+
+Origine16/GLMrequest restent figées ;17 est une autre candidate. Les tests lisent
+Failure canonique et injectent par seamOS partagé16/17, sans réclamer le réexport
+retiré. Revue indépendante/allocation avant import, puis nouveau témoin réel avant
+repriseW/F ; Workrévision4 et toutes preuves originales préservés.
+
+## Delta17 : diagnostic de publication (R09-16-DIAG)
+
+La relecture du temporaire, auparavant hors enveloppe, conserve maintenant la
+cause originale avec son nom aléatoire, son identité de création si observée et
+l'étape tentée. Un fstat du descripteur nouvellement créé collecte cette identité ;
+son propre refus est conservé et ferme une seule fois le descripteur. L'identité
+de création n'affirme pas l'identité actuelle du chemin. Les erreurs de lecture,
+fermeture et comparaison restent imbriquées dans Failure canonique.
+
+Le diagnostic distingue tentative de lien et retour réussi du lien ; aucun refus
+ne prouve absence ou rollback, y compris si la cible préexistait. Pas de retry,
+écrasement, suppression supplémentaire ni changement d'octets, hash ou Authority.
+L'unlink historique du temporaire après validation reste inchangé : un refus de
+fsync ultérieur peut donc laisser la cible visible et le temporaire déjà supprimé.
+Les gardes proposées dans GI-SOURCE-TESTS couvrent témoin, refus et reprise vers
+un nouveau nom en conservant le temporaire refusé lors de la relecture. Elles ne
+sont pas exécutées ici ; aucune qualification de17 ni reprise W/F n'est acquise.
