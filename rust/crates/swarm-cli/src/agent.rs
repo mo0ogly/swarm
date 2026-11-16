@@ -12,6 +12,10 @@ use std::{io::Write, path::Path};
 /// and distinguish already-recorded lifecycle changes from failed output.
 pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
     #[cfg(target_os = "linux")]
+    if a.pos.get(1).is_some_and(|v| v == "native-scope") {
+        return native_scope(a, out);
+    }
+    #[cfg(target_os = "linux")]
     if a.pos.get(1).is_some_and(|v| v == "run") {
         return run(a, out);
     }
@@ -158,6 +162,31 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
             primary
         }
     })
+}
+
+/// Project a prepared agent's retained scope for explicit operator mapping.
+/// Requires an exact ID and JSON output; never launches, authenticates or grants
+/// rights. Source/close/output causes survive; callers must not use this staleable
+/// observation as a runtime identity capability.
+#[cfg(target_os = "linux")]
+fn native_scope(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
+    if a.pos.len() != 3 || !a.json || !a.input.is_empty() || !a.output.is_empty()
+        || a.server || !a.task.is_empty() || a.phase != "delivery" {
+        return Err(CliError::Usage);
+    }
+    let root_error = |e| CliError::Root(Box::new(e));
+    let mut store = swarm_engine::RootStore::open(Path::new(&a.root), false)
+        .map_err(root_error)?;
+    let result = store.native_agent_scope(&a.pos[2]).map_err(root_error)
+        .and_then(|scope| json_bytes(&scope).map_err(CliError::Output));
+    match (result, store.close()) {
+        (Ok(bytes), Ok(())) => { write_output(out, &bytes)?; Ok(0) },
+        (Err(error), Ok(())) => Err(error),
+        (Ok(_), Err(error)) => Err(root_error(error)),
+        (Err(primary), Err(cleanup)) => Err(CliError::RootCleanup {
+            primary: Box::new(primary), cleanup: Box::new(cleanup),
+        }),
+    }
 }
 
 /// Read a strict fixture/diagnostic preview and current saved Admin values.

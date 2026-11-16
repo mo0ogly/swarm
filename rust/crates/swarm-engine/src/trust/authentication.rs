@@ -7,14 +7,17 @@ pub(crate) enum Source<'a> {
     Local(&'a str),
     #[cfg(target_os = "linux")]
     Enrolled(&'a swarm_enrollment_authority::trust_action::Identity<'a>),
+    #[cfg(target_os = "linux")]
+    Native(&'a crate::root_store::native_task_scope::NativeExecutionContext),
 }
 impl<'a> From<&'a str> for Source<'a> {
     fn from(value: &'a str) -> Self {
         Self::Local(value)
     }
 }
-/// Runtime actor owns observations, not future authority. Only Source under held
-/// enrollment guards can create its nonlocal context; persisted mappings cannot.
+/// Runtime actor owns observations, not future authority. Enrolled sources hold
+/// their authority guards; native sources require the private host context under
+/// current SQL/Trust reservations. Persisted mappings cannot create either proof.
 pub(crate) struct Actor {
     identity: TrustIdentity,
     pub enrollment: Option<EnrollmentContext>,
@@ -36,9 +39,17 @@ pub(crate) fn require_administrator(actor: &Actor) -> Result<(), E> {
     } else { Err(E::Authorization) }
 }
 /// Resolve a current stored role mapping with exactly one authentication source.
-/// Enrolled mappings reject every bearer. No source fallback or mutation occurs.
+/// Enrolled and native mappings reject every bearer. No source fallback or mutation occurs.
 pub(crate) fn authenticated<'a>(st: &State, source: impl Into<Source<'a>>) -> Result<Actor, E> {
     match source.into() {
+        #[cfg(target_os = "linux")]
+        Source::Native(context) => {
+            let identity = st.identities.iter().find(|id| !id.disabled
+                && id.native_scope.as_ref() == Some(context.scope())
+                && id.enrollment_principal.is_none() && id.token_hash.is_empty())
+                .cloned().ok_or(E::Authorization)?;
+            Ok(Actor { identity, enrollment: None, expires_at: None })
+        }
         Source::Local(token) => {
             if !credential_valid(token) {
                 return Err(E::Authorization);
@@ -49,6 +60,7 @@ pub(crate) fn authenticated<'a>(st: &State, source: impl Into<Source<'a>>) -> Re
                 .iter()
                 .find(|id| {
                     id.enrollment_principal.is_none()
+                        && id.native_scope.is_none()
                         && !id.disabled
                         && bool::from(id.token_hash.as_bytes().ct_eq(digest.as_bytes()))
                 })
@@ -71,7 +83,8 @@ pub(crate) fn authenticated<'a>(st: &State, source: impl Into<Source<'a>>) -> Re
                 .identities
                 .iter()
                 .find(|id| {
-                    !id.disabled && id.enrollment_principal.as_ref() == Some(held.principal())
+                    !id.disabled && id.native_scope.is_none()
+                        && id.enrollment_principal.as_ref() == Some(held.principal())
                 })
                 .cloned()
                 .ok_or(E::Authorization)?;

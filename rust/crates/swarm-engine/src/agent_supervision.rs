@@ -40,6 +40,19 @@ fn root_error(
 fn ioe(e: impl std::error::Error + Send + Sync + 'static) -> io::Error {
     io::Error::other(e)
 }
+/// Join a retained technical broker failure with a later log/codec/delivery
+/// failure. Both typed causes and known publication survive; no rollback claim.
+fn native_late_error(primary: &mut Option<RootStoreError>, late: RootStoreError,
+    publication: Option<&'static str>) -> RootStoreError {
+    let error = match primary.take() {
+        Some(primary) => RootStoreError::Cleanup { primary:Some(Box::new(primary)), cleanup:Box::new(late) },
+        None => late,
+    };
+    match publication {
+        Some(publication) => RootStoreError::TrustPublished { primary:Box::new(error),publication },
+        None => error,
+    }
+}
 /// Checked monotonic policy deadline. Representation failure is explicit and
 /// never becomes an immediate stop or an implicit unbounded fallback.
 fn after(at: Instant, ms: i64) -> io::Result<Instant> {
@@ -149,6 +162,7 @@ struct Control<'a> {
     settings_revision: crate::SettingCount,
     startup: Option<LocalReservation>,
     channel: Option<UnixStream>,
+    reply_channel: Option<UnixStream>,
     ack: Vec<u8>,
     ack_eof: bool,
     released: bool,
@@ -163,6 +177,87 @@ struct Control<'a> {
     stop_kind: Option<&'static str>,
 }
 impl Control<'_> {
+    /// Consume one closed native action frame. Identity comes only from this
+    /// owned channel and the broker's current kernel/Root/SQL checks, never its
+    /// payload. Trust retains durable effect/replay evidence before a reply.
+    /// Late close, codec or delivery failures retain known publication; no retry
+    /// or successful delivery is inferred from a recorded effect.
+    fn trust_request(&mut self) -> io::Result<()> {
+        let request = self.stream.try_borrow_mut().map_err(ioe)?.take_trust_request();
+        let Some(request) = request else { return Ok(()); };
+        let result = (|| {
+            if request.finish_only {
+                return Ok(crate::TrustReply { bytes: b"{\"finished\":true}".to_vec(), publication:None });
+            }
+            let original = crate::root_store::observe_instance(self.db, self.dir)?;
+            let store = crate::RootStore::open(self.root, true)?;
+            let result = serde_json::to_vec(&request.input)
+                .map_err(|e| root_error("native-trust-input", e))
+                .and_then(|raw| store.native_trust(&original, &self.agent, &request.operation, &raw));
+            let publication = result.as_ref().ok().and_then(|r|r.publication);
+            finished(result, store.close()).map_err(|e| match publication {
+                Some(publication) => RootStoreError::TrustPublished { primary: Box::new(e), publication },
+                None => e,
+            })
+        })();
+        let publication = match &result {
+            Ok(reply) => reply.publication,
+            Err(error) => error.trust_publication(),
+        };
+        let retain = |error| match publication {
+            Some(publication) => RootStoreError::TrustPublished { primary: Box::new(error), publication },
+            None => error,
+        };
+        let mut terminal = None;
+        let (reply, failed) = match result {
+            Ok(reply) => {
+                let value: serde_json::Value = serde_json::from_slice(&reply.bytes)
+                    .map_err(|e|ioe(retain(root_error("native-trust-reply", e))))?;
+                let failed = value.get("state").and_then(|s|s.as_str()) == Some("denied");
+                (serde_json::json!({"type":"swarm.trust.reply","schema_version":1,
+                    "id":request.reply_id.as_ref().unwrap_or(&request.id),"request_id":request.id,"ok":true,"result":value,"publication":publication}), failed)
+            },
+            Err(error) => {
+                let reply = serde_json::json!({"type":"swarm.trust.reply","schema_version":1,
+                    "id":request.reply_id.as_ref().unwrap_or(&request.id),"request_id":request.id,
+                    "ok":false,"error":error.code(),"reason":match &error {
+                        RootStoreError::Trust(cause)=>Some(cause.reason()),
+                        RootStoreError::Refused(reason)=>Some(*reason),_=>None},"publication":publication});
+                let business = match &error {
+                    RootStoreError::Refused(_) => true,
+                    RootStoreError::Trust(cause) => matches!(cause.as_ref(),
+                        crate::TrustError::Authorization | crate::TrustError::Data(_)
+                        | crate::TrustError::Invalid(_) | crate::TrustError::Conflict(_)
+                        | crate::TrustError::Unsupported(_)),
+                    _ => false,
+                };
+                if !business { terminal=Some(error); }
+                (reply,true)
+            },
+        };
+        if !request.finish_only {
+            self.stream.try_borrow_mut().map_err(ioe)?.trust_result(&request.id, failed)
+                .map_err(|e|ioe(native_late_error(&mut terminal,RootStoreError::Guard(e),publication)))?;
+            let message=serde_json::to_string(&serde_json::json!({
+                "event":"native_trust_reply_prepared","frame_id":request.id,
+                "operation":request.operation,"agent_id":self.agent.id,
+                "work_id":self.agent.work_id,"task_id":self.agent.task_id,
+                "attempt_id":self.agent.attempt_id,"failed":failed,
+                "error":reply.get("error"),"publication":publication,"delivered":false}))
+                .map_err(|e|ioe(native_late_error(&mut terminal,root_error("native-trust-log-encoding",e),publication)))?;
+            store::native_trust_log(self.db,&self.agent,&message)
+                .map_err(|e|ioe(native_late_error(&mut terminal,RootStoreError::Launch(Box::new(e)),publication)))?;
+        }
+        let mut bytes = serde_json::to_vec(&reply)
+            .map_err(|e|ioe(native_late_error(&mut terminal,root_error("native-trust-reply",e),publication)))?;
+        bytes.push(b'\n');
+        let delivery=self.reply_channel.as_mut().ok_or(RootStoreError::Refused("native-trust-channel-missing"))
+            .and_then(|channel|channel.write_all(&bytes).map_err(|e|root_error("native-trust-delivery",e)));
+        match delivery {
+            Err(error) => Err(ioe(native_late_error(&mut terminal,error,publication))),
+            Ok(()) => match terminal { Some(error) => Err(ioe(retain(error))), None=>Ok(()) },
+        }
+    }
     /// Drain only the private engine channel, never stdout. EOF alone leaves
     /// startup uncertainty; a validated helper failure permits a pre-exec result.
     fn read_gate(&mut self) -> io::Result<()> {
@@ -197,10 +292,19 @@ impl Control<'_> {
         let channel = self.channel.take().map_or(Ok(()), |s| {
             nix::unistd::close(s).map_err(|e| root_error("agent-gate-channel-close", e))
         });
-        finished(lock, channel)
+        let replies = self.reply_channel.take().map_or(Ok(()), |s| {
+            nix::unistd::close(s).map_err(|e| root_error("native-trust-channel-close", e))
+        });
+        finished(finished(lock, channel), replies)
     }
 }
 impl OwnedProcessControl for Control<'_> {
+    /// Retain only the parent side of the already inherited stdout socket.
+    /// No child FD whitelist or change to Biba/seccomp is introduced.
+    fn output_channel(&mut self, channel: &UnixStream) -> io::Result<()> {
+        self.reply_channel = Some(channel.try_clone()?);
+        Ok(())
+    }
     /// Register the actual held child, recheck permission, then and only then
     /// send the private protocol grant. Commit uncertainty never sends a byte.
     fn started(&mut self, pid: u32) -> io::Result<()> {
@@ -293,6 +397,7 @@ impl OwnedProcessControl for Control<'_> {
     /// Drain expiry is an error with cleanup, never a successful empty result.
     fn observe(&mut self) -> io::Result<Option<Signal>> {
         self.read_gate()?;
+        self.trust_request()?;
         let now = Instant::now();
         if self.drain_at.is_some_and(|deadline| now >= deadline) {
             self.drain_expired = true;
@@ -435,6 +540,7 @@ pub(crate) fn run(
         settings_revision,
         startup: Some(startup),
         channel: Some(channel),
+        reply_channel: None,
         ack: vec![],
         ack_eof: false,
         released: false,
@@ -519,6 +625,7 @@ pub(crate) fn run(
             owned_exit_code
         };
         let failed = waited.is_none_or(|s| !s.success())
+            || stream.proxy_failure.is_some()
             || !process_ok
             || gate_failure.is_some()
             || gate_result.is_err()
@@ -535,7 +642,7 @@ pub(crate) fn run(
             "output_bytes":stream.output_bytes,"output_sha256":stream.sha256(),"output_complete":process_ok&&finish_stream.is_ok(),
             "capture":capture,"capture_invalid_utf8":capture_invalid_utf8,"capture_truncated":stream.capture_truncated,
             "public_messages_truncated":stream.public_truncated,"first_event_error":stream.first_event_error.as_ref().map(|e|e.code()),
-            "event_source":"provider_declared_unverified","provider_facts":&provider_facts,"stop_kind":control.stop_kind,"observation":stream.observation().map_err(RootStoreError::Guard)?
+            "event_source":"provider_declared_unverified","provider_facts":&provider_facts,"proxy_failure":&stream.proxy_failure,"stop_kind":control.stop_kind,"observation":stream.observation().map_err(RootStoreError::Guard)?
         });
         // Freeze the same escaped wire bytes that exact persistence/replay will
         // read, including literal provider capture text. Never relax readback.
@@ -603,6 +710,22 @@ pub(crate) fn run(
 }
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn native_delivery_failure_keeps_primary_cleanup_and_publication() {
+        use super::*;
+        let mut primary=Some(RootStoreError::Refused("native-original"));
+        let error=native_late_error(&mut primary,RootStoreError::Refused("native-delivery"),Some("recorded"));
+        assert!(primary.is_none());
+        assert_eq!(error.trust_publication(),Some("recorded"));
+        match error {
+            RootStoreError::TrustPublished{primary,..} => match *primary {
+                RootStoreError::Cleanup{primary:Some(first),cleanup} => {
+                    assert_eq!(first.code(),"native-original");
+                    assert_eq!(cleanup.code(),"native-delivery");
+                }, _=>panic!("both causes required"),
+            }, _=>panic!("publication required"),
+        }
+    }
     use super::*;
     /// Real controller/SQLite effects: completed gate permits a valid pulse,
     /// pending gate must preserve DB bytes/logs, ownership and stop observation.
@@ -637,7 +760,7 @@ mod tests {
         let stream=Rc::new(RefCell::new(NativeStream::new(&agent,policy.clone(),Instant::now()).unwrap()));
         let (channel,peer)=UnixStream::pair().unwrap();channel.set_nonblocking(true).unwrap();
         let mut control=Control {db:&mut db,dir:&dir,root:&root,agent,reserved:None,policy,settings_revision:settings.revision,
-            startup:None,channel:Some(channel),ack:Vec::new(),ack_eof:true,released:true,stream,next:Instant::now(),
+            startup:None,channel:Some(channel),reply_channel:None,ack:Vec::new(),ack_eof:true,released:true,stream,next:Instant::now(),
             stopping:None,kill_sent:false,leader_exit:None,drain_at:None,drain_expired:false,kill_at:None,stop_kind:None};
         // Valid normal pulse control before the pending-channel assertion.
         assert!(control.observe().unwrap().is_none());

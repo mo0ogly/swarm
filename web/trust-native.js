@@ -60,7 +60,7 @@ function identitySettings(){
  if(bound&&[...$('trust-enrolled-operation').options].some(o=>o.value===source.operation))$('trust-enrolled-operation').value=source.operation;
  $('trust-identity-availability').textContent=t(bound?'Source HTTP liée à une intention exacte ; le compte et le droit sont revérifiés à chaque appel':source?.root_api_available===true&&source.http_available===false?'Enrôlement : API moteur disponible ; raccord HTTP non actif. Cette page utilise les jetons locaux.':'Disponibilité de la source d’identité non vérifiée');
  const list=$('trust-identity-sources');list.replaceChildren();
- for(const id of state.identities){const item=document.createElement('li'),p=id.enrollment_principal;item.textContent=id.subject+' · '+t(p?'Principal enrôlé déclaré — autorité courante requise':'Identité locale — jeton requis')+(p?' · '+p.principal_id+' · '+p.issuer+' · '+p.subject:'');list.append(item);}
+ for(const id of state.identities){const item=document.createElement('li'),p=id.enrollment_principal;item.textContent=id.subject+' · '+t(id.native_scope?'Agent natif — exécution et mandat courants requis':p?'Principal enrôlé déclaré — autorité courante requise':'Identité locale — jeton requis')+(p?' · '+p.principal_id+' · '+p.issuer+' · '+p.subject:'');list.append(item);}
  [...list.children].forEach((item,i)=>{const id=state.identities[i];item.dataset.subject=String(id.subject);item.dataset.integrity=String(id.integrity);item.dataset.roles=(id.roles||[]).join(' ');item.dataset.auth=id.enrollment_principal?'enrolled':'local';});list.dataset.loaded='true';
 }
 /** Render public lifecycle separately from private runtime availability. No key

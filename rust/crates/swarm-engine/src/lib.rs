@@ -9,6 +9,8 @@ pub use swarm_linux_prerequisites as linux_prerequisites;
 mod biba;
 pub use biba::{Integrity, BibaAccess, BibaDenied, check_biba};
 mod trust_types;
+mod native_task_scope;
+pub use native_task_scope::NativeTaskScope;
 #[cfg(unix)]
 mod trust;
 #[cfg(unix)]
@@ -56,6 +58,10 @@ mod agent_execution_store;
 mod agent_scope_signals;
 #[cfg(target_os = "linux")]
 mod native_provider_exec;
+#[cfg(target_os = "linux")]
+mod native_provider_proxy;
+#[cfg(target_os = "linux")]
+pub use native_provider_proxy::{execute_native_provider_proxy,native_proxy_diagnostic};
 #[cfg(target_os = "linux")]
 pub use agent_execution_gate::execute_agent_gate;
 pub use agent_execution_snapshot::{

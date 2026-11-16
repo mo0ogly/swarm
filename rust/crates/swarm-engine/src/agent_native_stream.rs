@@ -14,6 +14,11 @@ use std::{
 /// Retained facts remain distinct from truncation, malformed declarations and
 /// process execution. No raw tool input/reasoning becomes a public message.
 pub(crate) struct NativeStream {
+    pub proxy_failure: Option<NativeProxyFailure>,
+    pending_trust: Option<NativeTrustRequest>,
+    trust_ids: std::collections::BTreeSet<String>,
+    final_trust: Option<NativeTrustRequest>,
+    final_trust_invalid: bool,
     guard: AgentToolGuard,
     facts: crate::agent_provider_facts::ProviderFacts,
     policy: AgentExecutionPolicy,
@@ -32,6 +37,35 @@ pub(crate) struct NativeStream {
     pub public_truncated: bool,
     codex_items: BTreeMap<String, String>,
     pub first_event_error: Option<AgentGuardError>,
+}
+/// First declared proxy failure, not an authenticated engine/gate receipt.
+/// Vocabulary validation prevents arbitrary private diagnostics in metadata;
+/// this record never grants rights or excuses tool failures.
+#[derive(Clone,serde::Serialize,serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct NativeProxyFailure {
+    #[serde(rename="type")]
+    kind: String,
+    schema_version: i64,
+    causes_scope: String,
+    causes: Vec<crate::native_diagnostics::NativeGateCause>,
+}
+/// Closed stop-and-wait protocol. These are untrusted action terms, never a
+/// caller-selected identity, Root or execution context. The supervisor mediates
+/// before executing any protected effect and returns one correlated reply.
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct NativeTrustRequest {
+    #[serde(skip)]
+    pub finish_only: bool,
+    #[serde(skip)]
+    pub reply_id: Option<String>,
+    #[serde(rename = "type")]
+    kind: String,
+    schema_version: i64,
+    pub id: String,
+    pub operation: String,
+    pub input: serde_json::Value,
 }
 /// Preserve codec/clock/guard causes through the process sink; no raw event is
 /// included in the error's display. Stream refusal triggers owned cleanup.
@@ -63,6 +97,87 @@ fn fits(cap: crate::SettingCap, value: u128) -> bool {
     cap.0.is_none_or(|n| value <= n.0 as u128)
 }
 impl NativeStream {
+    /// Retain an explicit final action intent from supported assistant text.
+    /// It remains untrusted and inert until the native proxy's finalization;
+    /// multiple/malformed intents latch a refusal, never select a valid subset.
+    fn assistant_text(&mut self, text: String) -> Result<(), AgentGuardError> {
+        if let Some(raw) = text.strip_prefix("SWARM_TRUST_REQUEST ") {
+            if self.final_trust.is_some() || self.final_trust_invalid {
+                self.final_trust_invalid = true;
+                return Err(AgentGuardError::refused("native-trust-final-intent-conflict"));
+            }
+            match swarm_wire_json::decode::<NativeTrustRequest>(raw.as_bytes()) {
+                Ok(request) if request.kind == "swarm.trust.request"
+                    && request.schema_version == 1
+                    && swarm_identity_contract::name(request.id.as_bytes()) => {
+                    self.final_trust = Some(request); Ok(())
+                },
+                _ => { self.final_trust_invalid = true;
+                    Err(AgentGuardError::refused("native-trust-final-intent-invalid")) },
+            }
+        } else { self.public(text); Ok(()) }
+    }
+    /// Transfer one untrusted request to the foreground owner. Taking data
+    /// grants nothing; the owner must independently authenticate its execution.
+    pub(crate) fn take_trust_request(&mut self) -> Option<NativeTrustRequest> {
+        self.pending_trust.take()
+    }
+
+    /// Record the supervisor's broker result in the existing tool guard. This
+    /// observes a response, not task acceptance or successful delivery to child.
+    pub(crate) fn trust_result(&mut self, id: &str, failed: bool) -> Result<(), AgentGuardError> {
+        self.guard.result(self.at()?, id, failed)
+    }
+
+    /// Admit only a closed v1 request frame and one outstanding call at a time.
+    /// Existing frame bytes/tool-count policies still apply. Invalid/overlapping
+    /// frames fail before any broker call; no automatic retry or caller grant.
+    fn trust_request(&mut self, raw: &[u8], at: i64) -> Result<bool, AgentGuardError> {
+        let Ok(boundaries) = crate::agent_tool_guard::validated_json(raw) else { return Ok(false); };
+        let Ok(top) = fields(raw, &boundaries) else { return Ok(false); };
+        let kind = string(&top, "type").unwrap_or_default();
+        if kind == "swarm.trust.finalize" {
+            #[derive(serde::Deserialize)]
+            #[serde(deny_unknown_fields)]
+            struct Finalize { #[serde(rename="type")] kind: String, schema_version: i64, id: String }
+            let frame: Finalize = swarm_wire_json::decode(raw)
+                .map_err(|e| AgentGuardError::caused("native-trust-finalize",e))?;
+            if frame.kind != kind || frame.schema_version != 1
+                || !swarm_identity_contract::name(frame.id.as_bytes()) || self.final_trust_invalid
+                || self.pending_trust.is_some() {
+                return Err(AgentGuardError::refused("native-trust-finalize-refused"));
+            }
+            let request = self.final_trust.take().unwrap_or_else(|| NativeTrustRequest {
+                finish_only:true, reply_id:Some(frame.id.clone()),kind:"swarm.trust.request".into(),schema_version:1,
+                id:frame.id.clone(),operation:String::new(),input:serde_json::Value::Null,
+            });
+            if request.finish_only { self.pending_trust = Some(request); return Ok(true); }
+            let bytes = serde_json::to_vec(&serde_json::json!({"type":request.kind,
+                "schema_version":request.schema_version,"id":request.id,
+                "operation":request.operation,"input":request.input}))
+                .map_err(|e|AgentGuardError::caused("native-trust-finalize",e))?;
+            let queued = self.trust_request(&bytes, at)?;
+            if let Some(request) = self.pending_trust.as_mut() { request.reply_id = Some(frame.id); }
+            return Ok(queued);
+        }
+        if kind != "swarm.trust.request" { return Ok(false); }
+        let request: NativeTrustRequest = swarm_wire_json::decode(raw)
+            .map_err(|e| AgentGuardError::caused("native-trust-frame-invalid", e))?;
+        if request.kind != "swarm.trust.request" || request.schema_version != 1
+            || !swarm_identity_contract::name(request.id.as_bytes())
+            || self.pending_trust.is_some() || self.trust_ids.contains(&request.id) {
+            return Err(AgentGuardError::refused("native-trust-protocol"));
+        }
+        let terms = serde_json::to_vec(&serde_json::json!({"operation":request.operation,"input":request.input}))
+            .map_err(|e|AgentGuardError::caused("native-trust-call-terms",e))?;
+        self.guard.call(at, &request.id, "swarm.trust", &terms)?;
+        if self.guard.observation(at)?.stop_reason.is_some() {
+            return Err(AgentGuardError::refused("native-trust-guard-stopped"));
+        }
+        self.trust_ids.insert(request.id.clone());
+        self.pending_trust = Some(request);
+        Ok(true)
+    }
     /// Construct from complete frozen metadata and supplied policy/clock; absent
     /// guards or invalid caps refuse, without defaults or a provider launch.
     pub(crate) fn new(
@@ -78,6 +193,11 @@ impl NativeStream {
             .as_deref()
             .ok_or_else(|| AgentGuardError::refused("agent-guard-snapshot-missing"))?;
         Ok(Self {
+            proxy_failure: None,
+            pending_trust: None,
+            trust_ids: std::collections::BTreeSet::new(),
+            final_trust: None,
+            final_trust_invalid: false,
             guard: AgentToolGuard::new(agent.limits.clone(), snapshot)?,
             facts: crate::agent_provider_facts::ProviderFacts::default(),
             policy,
@@ -160,6 +280,16 @@ impl NativeStream {
         let b = crate::agent_tool_guard::validated_json(raw)?;
         let top = fields(raw, &b)?;
         let kind = crate::agent_provider_facts::event_kind(&top)?;
+        if kind == "swarm.native.proxy-failure" {
+            let failure:NativeProxyFailure=swarm_wire_json::decode(raw)
+                .map_err(|e|AgentGuardError::caused("native-proxy-diagnostic",e))?;
+            if failure.schema_version!=1 || failure.causes_scope!="known-native-compound-v1"
+                || !failure.causes.iter().all(crate::native_diagnostics::NativeGateCause::valid) {
+                return Err(AgentGuardError::refused("native-proxy-diagnostic-invalid"));
+            }
+            if self.proxy_failure.is_none() { self.proxy_failure=Some(failure); }
+            return Ok(());
+        }
         self.facts.observe(&top, &kind, &b, seen_at)?;
         if kind == "assistant" || kind == "user" {
             let message = fields(
@@ -199,7 +329,7 @@ impl NativeStream {
                         };
                         self.guard.result(at, &id, failed)?;
                     }
-                    "text" if kind == "assistant" => self.public(string(&block, "text")?),
+                    "text" if kind == "assistant" => self.assistant_text(string(&block, "text")?)?,
                     "text" | "thinking" | "redacted_thinking" => {}
                     _ => self.loss(at, AgentGuardVisibility::MissingEvents)?,
                 }
@@ -213,7 +343,7 @@ impl NativeStream {
             )?;
             let typ = string(&item, "type")?;
             if typ == "agent_message" && kind == "item.completed" {
-                self.public(string(&item, "text")?);
+                self.assistant_text(string(&item, "text")?)?;
                 return Ok(());
             }
             if matches!(
@@ -311,9 +441,15 @@ impl NativeStream {
     }
     /// Finish a trailing non-newline record after actual EOF. Truncated events
     /// remain degraded; no artificial newline changes output hash or byte count.
+    /// An unconsumed RPC or unfinalized/invalid native intent explicitly refuses
+    /// completion. In particular, missing native mapping never becomes a silently
+    /// ignored intent with a successful empty result. No late effect is executed.
     pub(crate) fn finish(&mut self) -> io::Result<()> {
         if !self.line.is_empty() || self.dropping {
             self.line_complete()?;
+        }
+        if self.pending_trust.is_some() || self.final_trust.is_some() || self.final_trust_invalid {
+            return Err(io_error(AgentGuardError::refused("native-trust-incomplete")));
         }
         Ok(())
     }
@@ -328,6 +464,14 @@ impl NativeStream {
             self.loss(at, AgentGuardVisibility::MissingEvents)
                 .map_err(io_error)?;
         } else if !raw.trim_ascii().is_empty() {
+            // A recognized native request is consumed as data only. It never
+            // passes through assistant text/provider-fact attribution.
+            if let Some(frame) = raw.strip_prefix(crate::native_provider_proxy::FRAME_PREFIX) {
+                if !self.trust_request(frame, at).map_err(io_error)? {
+                    return Err(io_error(AgentGuardError::refused("native-trust-frame-invalid")));
+                }
+                self.dropping = false; return Ok(());
+            }
             let seen_at = crate::system_timestamp().map_err(|e| {
                 io_error(AgentGuardError::caused(
                     "agent-provider-observation-clock",
@@ -410,6 +554,40 @@ mod tests {
     use super::*;
     use crate::{AgentGuardSnapshot, AgentGuardStop, RunLimits, SettingCap, SettingCount};
     /// Explicit fixture policies are not installation defaults or a fallback.
+    #[test]
+    fn native_protocol_is_closed_correlated_and_stop_and_wait() {
+        let frame=b"SWARM_NATIVE_TRUST_V1 {\"type\":\"swarm.trust.request\",\"schema_version\":1,\"id\":\"call\",\"operation\":\"commit\",\"input\":{}}\n";
+        let mut s=stream(); s.write_all(frame).unwrap();
+        let request=s.take_trust_request().unwrap();
+        assert_eq!(request.id,"call"); assert!(!request.finish_only);
+        assert!(s.take_trust_request().is_none());
+        s.trust_result("call",true).unwrap();
+        assert!(s.write_all(frame).is_err());
+        let mut overlapping=stream(); overlapping.write_all(frame).unwrap();
+        assert!(overlapping.write_all(frame).is_err());
+        let mut spoofed=stream();
+        assert!(spoofed.write_all(b"SWARM_NATIVE_TRUST_V1 {\"type\":\"swarm.trust.request\",\"schema_version\":1,\"id\":\"call\",\"operation\":\"commit\",\"input\":{},\"identity\":\"admin\"}\n").is_err());
+        assert!(spoofed.take_trust_request().is_none());
+        let mut malformed=stream();
+        assert!(malformed.write_all(b"SWARM_NATIVE_TRUST_V1 {not-json}\n").is_err());
+    }
+
+    #[test]
+    fn native_final_intent_is_inert_until_finalize_and_conflicts_refuse() {
+        let intent="SWARM_TRUST_REQUEST {\"type\":\"swarm.trust.request\",\"schema_version\":1,\"id\":\"final-call\",\"operation\":\"commit\",\"input\":{}}";
+        let mut s=stream(); s.assistant_text(intent.into()).unwrap();
+        assert!(s.take_trust_request().is_none());
+        let finalize=b"SWARM_NATIVE_TRUST_V1 {\"type\":\"swarm.trust.finalize\",\"schema_version\":1,\"id\":\"finalize\"}\n";
+        s.write_all(finalize).unwrap();
+        assert_eq!(s.take_trust_request().unwrap().id,"final-call");
+        let mut conflict=stream(); conflict.assistant_text(intent.into()).unwrap();
+        assert!(conflict.assistant_text(intent.into()).is_err());
+        assert!(conflict.write_all(finalize).is_err());
+        assert!(conflict.take_trust_request().is_none());
+        let mut empty=stream(); empty.write_all(finalize).unwrap();
+        assert!(empty.take_trust_request().unwrap().finish_only);
+    }
+
     fn stream() -> NativeStream {
         let a = Agent {
             capture_output: true,

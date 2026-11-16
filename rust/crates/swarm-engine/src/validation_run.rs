@@ -191,6 +191,12 @@ fn valid_text(mut bytes: &[u8]) -> String {
 /// `observe` may request TERM/KILL only. Typed IO causes trigger owned cleanup;
 /// no hidden polling interval, timeout, retry, persistence or task acceptance.
 pub(crate) trait OwnedProcessControl {
+    /// Borrow the parent side of the already owned full-duplex stdout channel
+    /// before spawn. Default consumers retain no extra handle. A native broker
+    /// may clone it for correlated replies; no child descriptor, socket creation
+    /// permission or authority is added. Failure precedes spawning and closes
+    /// all channels through the ordinary cleanup path.
+    fn output_channel(&mut self, _channel: &UnixStream) -> io::Result<()> { Ok(()) }
     /// Register the newly owned real PID, optionally releasing a caller-held
     /// input gate only after its durable checks. Failure triggers owned cleanup.
     fn started(&mut self, pid: u32) -> io::Result<()>;
@@ -459,6 +465,15 @@ pub(crate) fn run_controlled_command(
             }
         }
     };
+    if let Some(controller) = control.as_deref_mut() {
+        if let Err(error) = controller.output_channel(&channels[0].reader) {
+            let mut error = Some(ValidationRunError::new("output-control-channel", error));
+            close(writer, &mut error, "close-writer");
+            close(writer2, &mut error, "close-writer");
+            close_channels(channels, &mut error);
+            return Err(error.unwrap());
+        }
+    }
     command
         .stdin(input)
         .stdout(Stdio::from(OwnedFd::from(writer)))

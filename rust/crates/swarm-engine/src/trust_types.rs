@@ -75,6 +75,9 @@ pub(crate) struct TrustIdentityInput {
     /// Role mapping data only; an active held enrollment must authenticate it.
     #[serde(default)]
     pub enrollment_principal: Option<swarm_identity_contract::Principal>,
+    /// Inert exact native mapping; no bearer or human source may authenticate it.
+    #[serde(default)]
+    pub native_scope: Option<crate::NativeTaskScope>,
     pub integrity: i64,
     pub roles: Vec<String>,
     #[serde(default)]
@@ -89,6 +92,9 @@ pub(crate) struct TrustIdentity {
     /// Exact canonical identity mapping, never a stored authentication proof.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub enrollment_principal: Option<swarm_identity_contract::Principal>,
+    /// Data only. Current host-owned execution must authenticate separately.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_scope: Option<crate::NativeTaskScope>,
     pub integrity: i64,
     pub roles: Vec<String>,
     #[serde(default, skip_serializing_if = "is_false")]
@@ -142,6 +148,8 @@ pub(crate) fn credential_valid(token: &str) -> bool {
 /// - local token passes [`credential_valid`]; an enrollment mapping instead
 ///   requires an exact valid human Principal and an empty/omitted local token;
 /// - enrollment IDs and issuer/subject pairs are unique, rejecting aliases;
+/// - native mappings require a valid exact scope, no token or enrollment, and
+///   a unique scope; this declaration does not authenticate a native process;
 /// - roles restricted to `requester|approver|admin|effect`, then sorted
 ///   lexicographically; duplicates are kept, not deduplicated and not
 ///   rejected (Go allows them);
@@ -159,6 +167,7 @@ pub(crate) fn prepare_identities(
     let mut seen_subject: Vec<String> = Vec::new();
     let mut seen_hash: Vec<String> = Vec::new();
     let mut seen_principals: Vec<swarm_identity_contract::Principal> = Vec::new();
+    let mut seen_native: Vec<crate::NativeTaskScope> = Vec::new();
     for i in inputs {
         if !swarm_identity_contract::name(i.subject.as_bytes()) {
             return Err("subject does not match identity contract");
@@ -169,7 +178,15 @@ pub(crate) fn prepare_identities(
         if !(1..=3).contains(&i.integrity) {
             return Err("integrity out of range");
         }
-        let hash = if let Some(p) = &i.enrollment_principal {
+        let hash = if let Some(scope) = &i.native_scope {
+            scope.validate()?;
+            if i.enrollment_principal.is_some() || !i.token.is_empty() {
+                return Err("native mapping forbids enrollment and local token");
+            }
+            if seen_native.contains(scope) { return Err("duplicate native scope"); }
+            seen_native.push(scope.clone());
+            String::new()
+        } else if let Some(p) = &i.enrollment_principal {
             if !p.valid() || p.kind != "human" || !i.token.is_empty() {
                 return Err("enrollment mapping requires human principal and no local token");
             }
@@ -198,6 +215,7 @@ pub(crate) fn prepare_identities(
             subject: i.subject,
             token_hash: hash,
             enrollment_principal: i.enrollment_principal,
+            native_scope: i.native_scope,
             integrity: i.integrity,
             roles,
             disabled: i.disabled,
@@ -210,6 +228,39 @@ pub(crate) fn prepare_identities(
 mod tests {
     use super::*;
 
+    /// Data admission has three exclusive source kinds; it never authenticates
+    /// a native execution or derives its integrity from a task.
+    #[test]
+    fn native_identity_requires_exclusive_unique_scope() {
+        let scope = serde_json::json!({"root_digest":"a".repeat(64),"work_id":"work",
+            "task_id":"task","attempt_id":"attempt","agent_id":"agent"});
+        let native = serde_json::json!({"subject":"native-worker","native_scope":scope,
+            "integrity":2,"roles":["effect"]});
+        let admit = |v: serde_json::Value| prepare_identities(vec![
+            input("operator", "operator-token-abcdef", 3, &["admin"], false),
+            input("reviewer", "reviewer-token-abcdef", 2, &["approver"], false),
+            serde_json::from_value(v).unwrap(),
+        ]);
+        let good = admit(native.clone()).unwrap();
+        assert!(good[2].token_hash.is_empty());
+        assert!(good[2].enrollment_principal.is_none());
+        assert!(good[2].native_scope.as_ref().unwrap().validate().is_ok());
+        let mut mixed = native.clone(); mixed["token"] = "native-token-abcdef".into();
+        assert!(admit(mixed).is_err());
+        let mut mixed = native.clone(); mixed["enrollment_principal"] = serde_json::json!({
+            "principal_id":"human","principal_kind":"human","issuer":"issuer","subject":"person"});
+        assert!(admit(mixed).is_err());
+        let mut invalid = native.clone(); invalid["native_scope"]["task_id"] = "".into();
+        assert!(admit(invalid).is_err());
+        let mut duplicate = native.clone(); duplicate["subject"] = "native-alias".into();
+        assert!(prepare_identities(vec![
+            input("operator", "operator-token-abcdef", 3, &["admin"], false),
+            serde_json::from_value(native).unwrap(), serde_json::from_value(duplicate).unwrap(),
+        ]).is_err());
+        let legacy = serde_json::to_value(&good[0]).unwrap();
+        assert!(legacy.get("native_scope").is_none());
+    }
+
     fn input(
         subject: &str,
         token: &str,
@@ -221,6 +272,7 @@ mod tests {
             subject: subject.to_string(),
             token: token.to_string(),
             enrollment_principal: None,
+            native_scope: None,
             integrity,
             roles: roles.iter().map(|s| s.to_string()).collect(),
             disabled,

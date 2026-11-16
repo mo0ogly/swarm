@@ -7024,6 +7024,7 @@ globalThis.SwarmEnglish = {
   "Non fourni par le moteur natif.": "Not provided by the native engine.",
   "Validation courante non évaluée dans cette lecture.": "Current validation not evaluated in this read.",
   "Détails de la mission": "Mission details",
+  "Agent natif — exécution et mandat courants requis": "Native agent — current execution and mandate required",
   "Préférence de thème non enregistrée. Le thème précédent est conservé.": "Theme preference was not saved. The previous theme is preserved.",
   "04 · Suivi": "04 · Monitoring",
   "Retracer une action de confiance, vérifier ses preuves, exporter pour un tiers. Lecture seule.": "Trace a trusted action, check its evidence, export it for a third party. Read-only.",
