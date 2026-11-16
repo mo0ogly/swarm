@@ -1340,3 +1340,92 @@ Recette maintenue : `tools/verification/recipes/gieth-review-refresh.json` ; sui
 preuves et limites : [cadrage et résultats Gi.eth](../plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).
 
 La commande `task review-refresh` figure dans l’aide CLI française et anglaise. Ce renvoi décrit le renouvellement explicite des preuves ; l’aide n’accorde aucun droit de revue, publication ou acceptation.
+
+## Clôture explicite d'une revendication non démarrée
+
+`task review-retire-unstarted REVIEW_ID --root ROOT --input REQUEST.json --json`
+exige l'enveloppe `schema_version:1, event_id, expected_revision, task_id`.
+Sur Linux, le moteur exige une revendication expirée, le départ confirmé du
+propriétaire d'origine sur le même hôte, le Root physique associé au job et
+une connexion à sa base courante vérifiée. Permission, enfant ou reçu existant
+font refuser la clôture. L'expiration seule ne prouve pas le départ.
+
+La transaction archive l'avis courant comme périmé, vide son emplacement
+courant et termine le job sans verdict. L'événement `review.claim-retired`
+est distinct d'un original fournisseur. Le registre conserve son empreinte
+dans `receipt_sha256` pour ce terminal sans permission uniquement. Aucun
+fichier de reçu fournisseur n'est produit. Les appels, réserves financières,
+tentatives et contrôles sont conservés. Une revue ultérieure doit satisfaire
+à nouveau les gardes de source, budget et lancement. Le rejeu exact de la
+clôture, de l'ancienne demande ou de la réconciliation lit la décision passée
+et restitue le Work courant sans modifier une nouvelle revendication.
+
+Le SDK de qualification conserve avant assertion l'argv, les empreintes du
+binaire et du profil, les canaux bruts même partiels, le code/signal et une
+relecture du Work. Les erreurs de capture/publication sont conservées avec
+l'issue primaire. Une sortie non nulle ou une attente incertaine demande cette
+relecture sans présumer l'absence d'effet. Le SDK nécessite une fixture neuve
+dont la revendication provient du producteur réel, avant tout helper. Son
+exécution et le générateur d'une telle interruption restent à qualifier.
+
+La création des lecteurs du SDK utilise une opération faillible. Le contrôleur
+conserve chaque pipe indépendamment de la closure et garde les handles des
+lecteurs créés jusqu'à leur jonction. Un refus de lecteur déclenche la
+récupération explicite du seul enfant de fixture possédé, puis la collecte
+des canaux conservés. L'intention de commande ne décrit pas un état courant :
+le démarrage observé et le PID sont enregistrés séparément. Les erreurs de
+wait/kill/reap et les paniques de lecteur restent des issues à qualifier ;
+un payload opaque ou un préfixe mémoire perdu ne devient pas une preuve
+complète. Le protocole de refus avec enfant inerte possédé reste à exécuter.
+
+La garde de processus inerte est un second test ignoré, distinct du SDK métier.
+Elle utilise un interpréteur explicitement identifié et haché, un protocole fini
+sur stdin/stdout/stderr et quatre enfants neufs : témoin, refus lecteur 1,
+nouveau témoin, refus lecteur 2. Les préfixes réels doivent être reçus avant
+injection. Le refus de factory simule EAGAIN ; il ne constitue pas une
+reproduction d'épuisement système. Chaque cas conserve l'intention, le
+démarrage, les canaux, le wait et les jonctions avant assertion. Cette garde
+et le SDK métier attendent leur exécution réservée.
+
+Le programme Python de la garde est conservé dans une chaîne Rust brute.
+La vérification syntaxique doit porter sur les octets effectivement rendus :
+l'ancienne chaîne ordinaire décodait les quatre séquences antislash-n et
+produisait un Python invalide. La preuve privée conserve ce refus puis la
+charge corrigée et ses constantes AST de 10/10/9/9/1 octets. Cette vérification
+compile seulement la syntaxe Python ; le témoin réel et les refus restent
+à exécuter dans le créneau de qualification.
+
+Préparation06 propose un producteur cfg(test) distinct. Une nouvelle fixture
+de sources/contrôles publics précède sa revendication par claim::record.
+Le producteur vérifie la fraîcheur avant et après le commit réel, conserve
+l'échéance originale, le propriétaire, le débit et la réserve, puis attend
+uniquement cette échéance sans entrer dans le helper. Il quitte ensuite le
+processus de test. Son parent doit attendre la fin effective et la reprise
+doit vérifier le départ sur l'hôte d'origine. Le fichier du producteur ne
+prouve pas ce départ à lui seul. Le code est préparé, non exécuté ni qualifié.
+
+Préparation07 corrige uniquement la proposition06 : avant toute projection ou
+fermeture, le producteur conserve l'identité/révision portée par recorded_work(),
+y compris si claim::record échoue après commit et libération. Sans Job retourné,
+aucun Job n'est inventé. Les états « appel non tenté », « Work enregistré connu »,
+« Job existant observé » et « issue inconnue » sont séparés ; une erreur sans
+métadonnées ne prouve jamais un rollback. Les causes typées de l'opération,
+publication et fermeture restent dans les enveloppes Cleanup/WorkRecorded.
+producer-observation.json précède la fermeture contrôlée ; producer-finalization.json
+en conserve ensuite le diagnostic sûr. L'échec de publication de ce dernier reste
+une erreur, même si un fichier est visible. Le parent doit exiger la sortie réussie
+et les preuves applicables, jamais la seule présence d'un fichier. Une garde
+synthétique des enveloppes est proposée ; aucune injection SQL réelle, compilation
+ou exécution n'a qualifié07. Les versions05/06 et leurs refus restent conservés.
+
+Préparation08 corrige le dernier consommateur de la proposition07. Un propriétaire
+d'erreur local au producteur garde l'objet typé d'origine et fournit à Debug/Display
+la projection sûre complète des branches et les métadonnées Work connues. Ainsi le
+retour Result consommé par libtest peut les représenter même si la dernière preuve
+fichier manque ; les messages privés ne sont pas rendus. Tous les retours du
+producteur, y compris les erreurs d'entrée avant claim, passent par cette enveloppe.
+RootStoreError global reste inchangé. Une garde de la représentation Box<dyn Error>
+et du trait Termination est proposée, sans exécution. Le parent doit toujours
+conserver stderr et attendre le processus ; une sortie perdue ou non flushée n'est
+pas rendue durable par cette enveloppe. La qualification du compilateur/profil réel
+et la capture du parent restent ouvertes. Les versions05/06/07 sont préservées.

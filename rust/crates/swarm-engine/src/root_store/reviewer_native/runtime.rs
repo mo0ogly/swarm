@@ -79,6 +79,10 @@ fn recover(root: &RootStore, id: &str, action: Recovery) -> Result<TaskReviewOut
     let job = store::job(&root.db, id)
         .map_err(|e| E::Launch(Box::new(e)))?
         .ok_or(E::Refused("review-recovery-job-required"))?;
+    #[cfg(target_os = "linux")]
+    if job.phase == store::Phase::Refused && job.permission == 0 && job.child_pid.is_none() {
+        return super::unstarted::replay(root, &job);
+    }
     if matches!(job.phase, store::Phase::Recorded | store::Phase::Refused) {
         return publication::record(root, id).map(Into::into);
     }

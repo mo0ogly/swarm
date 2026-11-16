@@ -53,6 +53,9 @@ pub(super) struct Job {
     pub child_stamp: Option<String>,
     pub permission: i64,
     pub phase: Phase,
+    /// Hash of the provider original for executed jobs. A refused childless
+    /// permission-zero job instead binds its review.claim-retired engine event;
+    /// recovery must validate that event before trying a provider journal.
     pub receipt_sha256: Option<String>,
     pub published_revision: Option<i64>,
 }

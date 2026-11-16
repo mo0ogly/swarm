@@ -2,7 +2,8 @@
 use crate::{json_bytes, write_output, Arguments, CliError};
 use std::io::{self, Write};
 /// Route bounded review input to Root's one authoritative controller. Review
-/// takes Work/input; recovery/retirement takes an engine review ID without argv.
+/// takes Work/input; prelaunch retirement takes REVIEW_ID/input; original
+/// recovery takes REVIEW_ID without input. No action accepts provider argv.
 /// Close/encode/flush errors preserve already recorded Work and original causes;
 /// no failed command implies rollback or permission to rerun a paid process.
 pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
@@ -16,14 +17,16 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     }
     let action = a.pos[1].as_str();
     let run = action == "review";
+    let retire = action == "review-retire-unstarted";
+    let takes_input = run || retire;
     if !matches!(
         action,
-        "review" | "review-reconcile" | "review-retire-stale"
-    ) || run == a.input.is_empty()
+        "review" | "review-reconcile" | "review-retire-stale" | "review-retire-unstarted"
+    ) || takes_input == a.input.is_empty()
     {
         return Err(CliError::Usage);
     }
-    let raw = if run {
+    let raw = if takes_input {
         Some(
             if a.input == "-" {
                 swarm_engine::read_command_document(&mut io::stdin().lock())
@@ -41,7 +44,14 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     let mut known = None;
     let result = (|| {
         let outcome = if let Some(raw) = raw {
-            store.run_task_review(&a.pos[2], &raw)
+            if retire {
+                #[cfg(target_os = "linux")]
+                { store.retire_unstarted_task_review(&a.pos[2], &raw) }
+                #[cfg(not(target_os = "linux"))]
+                { Err(swarm_engine::RootStoreError::Refused("review-unstarted-platform-unported")) }
+            } else {
+                store.run_task_review(&a.pos[2], &raw)
+            }
         } else if action == "review-retire-stale" {
             store.retire_stale_task_review(&a.pos[2])
         } else {

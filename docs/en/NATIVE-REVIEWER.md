@@ -1274,3 +1274,87 @@ Maintained recipe: `tools/verification/recipes/gieth-review-refresh.json`; scope
 plan, evidence and limits: [Gi.eth report (French)](../plans/actions-confiance/GIETH-REVUE-V1-V2-CADRAGE.md).
 
 The `task review-refresh` command is listed in both French and English CLI help. This reference describes explicit proof renewal; help grants no review, publication or acceptance authority.
+
+## Explicit retirement of an unstarted claim
+
+`task review-retire-unstarted REVIEW_ID --root ROOT --input REQUEST.json --json`
+requires the strict `schema_version:1, event_id, expected_revision, task_id`
+envelope. On Linux the engine requires expiry, confirmed departure of the
+original owner on the same host, the job's physical Root and verification of
+the current connected database. Any permission, child or original journal
+refuses retirement. Expiry alone does not prove owner departure.
+
+The transaction archives the running review as stale, clears its current
+slot and ends the job without a verdict. The `review.claim-retired` event
+is distinct from a provider original. For this childless, unpermitted terminal
+only, the ledger's `receipt_sha256` binds the engine event. No provider
+journal is produced. Call counters, monetary reserves, attempts and controls
+are preserved. A new review must satisfy ordinary source, budget and launch
+guards. Exact retirement replay, original request replay and reconciliation
+read the historical decision and return current Work without touching a
+replacement claim.
+
+The qualification SDK retains argv, candidate and profile hashes, partial raw
+channels, exit code/signal and observed Work before asserting success. Capture
+and artifact-publication failures remain alongside the primary outcome.
+Nonzero exit or uncertain wait requires state observation without assuming no
+effect. The SDK requires a new fixture whose real producer committed the claim
+before any helper. Execution and the generator for this interruption remain
+qualification prerequisites.
+
+SDK reader startup is fallible. The controller owns each pipe independently
+of the startup closure and retains every started reader handle until joined.
+Reader refusal triggers explicit recovery of the owned direct fixture child,
+then collection of the retained channels. Command intent is not current status:
+observed launch and PID are recorded separately. Wait/kill/reap errors and
+reader panics remain qualification cases; an opaque payload or lost worker
+memory prefix does not establish complete evidence. The refusal protocol with
+an owned inert child still requires execution.
+
+The inert-process guard is a second ignored test, separate from the genuine
+review SDK. It uses an explicitly hashed interpreter, a finite stdin/stdout/
+stderr protocol and four new children: witness, reader1 refusal, fresh witness,
+reader2 refusal. Actual ready prefixes must arrive before injection. The factory
+returns simulated EAGAIN; this is not actual system-resource exhaustion.
+Each case retains intent, observed launch, channels, wait and joins before
+asserting its result. Both this guard and the genuine SDK await reserved execution.
+
+The guard's Python program is retained in a Rust raw string. Syntax checking
+must use the rendered bytes: the former ordinary string decoded four
+backslash-n sequences and produced invalid Python. Private evidence retains
+that refusal, the corrected payload and its AST byte constants of
+10/10/9/9/1 bytes. This check compiles Python syntax only; the actual healthy
+child and refusal cases still require their qualification slot.
+
+Preparation06 proposes a separate cfg(test) producer. A new public source/
+control fixture precedes the real claim::record writer. The producer verifies
+freshness before and after commit, retains the original expiry, owner, debit
+and reserve, then waits only for that expiry without entering the helper.
+It subsequently exits the test process. Its parent must wait for actual process
+termination and recovery must verify departure on the original host. The
+producer's output alone does not prove departure. This is prepared code,
+neither executed nor qualified.
+
+Preparation07 corrects proposal06 only: before projection or close, the producer
+retains the identity/revision exposed by recorded_work(), including record errors
+after commit and release. No Job is invented when none was returned. Claim not
+attempted, known recorded Work, observed existing Job and unknown outcome remain
+distinct; an error without metadata never proves rollback. Original operation,
+publication and close causes survive in typed Cleanup/WorkRecorded envelopes.
+producer-observation.json precedes checked close; producer-finalization.json then
+retains its safe diagnostic. Failure to publish that final report still returns
+an error, even when a file is visible. The parent must require successful exit
+and applicable evidence rather than file presence. A synthetic envelope guard
+is proposed; no real SQL injection, compilation or execution has qualified07.
+Versions05/06 and their refusals remain preserved.
+
+Preparation08 corrects proposal07's final consumer. A producer-local error owner
+retains the original typed object and exposes the full safe branch projection and
+known Work metadata through Debug/Display. The Result consumed by libtest can then
+represent those facts even if the last proof file is unavailable, without private
+messages. Every producer return, including input errors before claim, passes
+through this wrapper. Global RootStoreError is unchanged. A guard for the actual
+Box<dyn Error> representation and Termination trait is proposed, not executed. The
+parent must still capture stderr and wait for the process; the wrapper cannot make
+lost or unflushed output durable. Actual compiler/profile qualification and parent
+capture remain open. Versions05/06/07 remain preserved.

@@ -24,6 +24,10 @@ mod recovery_sdk;
 #[cfg(test)]
 mod root_identity_sdk;
 mod stale;
+#[cfg(target_os = "linux")]
+mod unstarted;
+#[cfg(all(test, target_os = "linux"))]
+mod unstarted_sdk;
 #[cfg(test)]
 mod stale_sdk;
 mod runtime;
