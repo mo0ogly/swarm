@@ -1,5 +1,96 @@
 # PAEA — plan APEX adopté et suivi d’exécution
 
+<!-- paea-current-projection-20261116 -->
+## Projection courante — 16 novembre 2026
+
+Rafraîchissement documentaire PA00/09 attribué par Swarm00. Les passages
+« courants » des 5–8 novembre ci-dessous sont des **états historiques datés** :
+ils ne désignent ni un appel GLM encore actif ni l’image actuellement installée.
+La reprise part du [repère CURRENT][pn-pointer], puis des reçus du dossier indiqué.
+Cette projection ne requalifie aucun candidat et ne clôt ni PA00–PA13 ni le RETEX
+final. L’identité du serveur actif n’a pas été recontrôlée dans ce lot documentaire.
+
+Les [sources, dates et SHA-256 complets][pn-index] distinguent :
+
+- **6 novembre, HTTP** : [un test positif normal334][pn-http], sur fixture enrôlée
+  isolée, sources stables et vérification d’intégrité à code 0. Session/CSRF, accord durable dans PROJECT,
+  SERVICE et refs Git inchangés sont reçus ; ni Authority humaine ni image active
+  actuelle ne sont établies par ce témoin.
+- **6 novembre, formulaires** : [36 contrôles FR/EN][pn-ui] sur scripts servis
+  dans Chrome avec API synthétiques, sans diagnostic inattendu. Cette preuve ne
+  vaut pas parcours d’approbation réel authentifié.
+- **15–16 novembre, capture** : [C2/C3][pn-c2] puis [C3b][pn-c3b] ont leurs
+  réceptions bornées. C3b : un RED causal puis les seules gardes 22/27, chacune
+  1 PASS / 0 FAIL, sources stables, deux vérifications d’intégrité à code 0, 18 flux bruts et 11 reçus JSON. Aucun vrai
+  refus OS wait/signal, invariant de join ou cleanup global n’est qualifié.
+- **Git à la lecture du 2026-11-16T01:23:10.810274+01:00 (Europe/Paris)** : PR38 ouverte, head `d2317ab3ca4fa22b707927e7d80acfe42adb5c1b` ; fusion non établie à cette lecture. Le nom de contrôle CI
+  `install` ne prouve pas une installation locale. Le commit de contenu
+  `d2bc1332de8fed074aa282ddd84ff81a9d5eabfa`, les merges de branche et une fusion
+  dans main restent des événements distincts ; voir le [relevé distant][pn-pr].
+- **Preuves déplacées** : [réception stockage2][pn-storage] des huit anciens
+  chemins et 80 fichiers, cinq PASS/trois FAIL historiques conservés. Ce n’est pas
+  une campagne applicative. Le gain physique de 248012800 octets est rapporté par
+  le coordinateur après son retrait, pas attribué au lecteur 02. Aucun autre
+  groupe d’archives à préparer sans besoin nouveau.
+
+### Reprise par lot — critère adopté inchangé
+
+Chaque ligne est une projection de gestion, pas une nouvelle acceptation.
+L’absence de preuve nouvelle dans C3b ne retire pas une qualification historique.
+Les responsabilités et sorties détaillées restent celles du tableau adopté plus bas.
+
+| Lot | Portée conservée et reste concret | Propriétaire / condition de reprise |
+|---|---|---|
+| PA-00 Référence | Delta C3b/Git/stockage lié aux reçus ; aucune identité runtime courante déduite. | 02 + Swarm00 : lier toute nouvelle image à son reçu effectif avant une assertion de livraison. |
+| PA-01 Contrats | Contrats des deux domaines conservés ; C3b ne requalifie pas leurs schémas/API. | Propriétaire des contrats : reprise sur entrée changée ou défaut établi. |
+| PA-02 Autorité | Autorité fixture HTTP ; [demande humaine existante][pn-pending] distincte. | Opérateur/identité : connexion et droits effectifs ; ne pas répéter la demande ni fabriquer d’enrôlement. |
+| PA-03 Deux services | Témoin PROJECT/SERVICE isolé [HTTP][pn-http] ; pas de clôture des deux services réels par ce lot. | Trust/dépôt géré : services et principal autorisés, puis engagement/effet observés dans la portée attribuée. |
+| PA-04 Confinement | Conservation du child/captures par C3b ; cela ne prouve pas une barrière OS. | AC-02/G3 + administrateur : prérequis et témoin possédé avant tout essai de contournement alloué. |
+| PA-05 Réseau/secrets | Aucun nouveau verdict egress/confidentialité issu de C3b. | AC-02/G3 : passage effectif et oracle d’octets sous périmètre autorisé. |
+| PA-06 Composition | Travaux mémoire/A2A conservés dans G2/G4 ; pas de nouvelle clôture de composition. | Identité/Mémoire : dépendances et remises de ces lots, sans droit créé par contenu ou résumé. |
+| PA-07 Outils/temps | [Delta I15/I17 du 7 novembre][pn-gap] conservé avec ses limites ; vrais refus OS non couverts par C3b. | Lancement/catalogue : réadmission sur changement pertinent ; protocole séparé avant faute OS. |
+| PA-08 UX/accords | [36 contrôles synthétiques][pn-ui] conservés ; session protégée actuelle non observée ici. | UX/opérateur : reprendre le parcours authentifié quand sa précondition réelle est disponible. |
+| PA-09 Preuves | Réceptions C2/C3/C3b, originaux FAIL et alias complets conservés ; pas de preuve indépendante globale ajoutée. | 02/revue : nouvelles entrées → nouvelle liaison de preuve ; pas de replay inchangé. |
+| PA-10 E2 local | Clôture E2 historique bornée et critères encore ouverts conservés ; aucun build/install nouveau pour ces tests/docs. | Swarm00/intégrateur : même candidat qualifié, deux domaines et livraison supportée avant extension de déclaration. |
+| PA-11 Préparer E3 | [G6/H3][pn-g6] : offre et matrice à régénérer à la remise, pas dans ce rafraîchissement. | Commanditaire/tiers : désignation et réception acceptée ; aucun évaluateur inventé. |
+| PA-12 Campagnes E3 | Aucune campagne indépendante ajoutée par C3b/stockage. | Évaluateur : PA-10 + PA-11, protocole préenregistré et moyens/participants autorisés. |
+| PA-13 Corrections/RETEX | RETEX intermédiaires conservés ; le RETEX final ne remplace pas les exigences ouvertes. | Codex + évaluateur : défauts reçus/requalifiés et critères finaux observés avant clôture globale. |
+
+### Portes et reports à préserver
+
+La [matrice détaillée du 29 octobre][pn-matrix] reste une preuve historique, à lire
+avec les deltas de [GAP-CLOSURE][pn-gap] ; elle n’est ni réécrite ni régénérée ici.
+Le report [G6/H3][pn-g6] porte sur l’offre aux tiers et sa réception. Les prérequis
+humains (Authority déjà demandée, identités/services, évaluateur, équipe tierce et
+participants) ne sont pas des lacunes de prose. Les anciens constats OS ne valent
+pas diagnostic actuel ; vrais refus wait/signal, invariants de join et cleanup
+global nécessitent un protocole propre et une allocation, pas une variante des gardes 22/27.
+Aucune acceptation indépendante nouvelle n’est établie par cette projection.
+
+Swarm00 conserve le [registre, les créneaux et Git][pn-registry]. C-D01 et Gi gardent
+leurs propriétaires. L’[erratum TMPDIR][pn-tmp] sépare parent externe, runner local
+et rebinding explicite des argv Cargo ; il ne localise pas toutes les écritures
+ni la cause d’une variation disque. Aucune configuration live, réserve, politique,
+campagne ou installation n’est modifiée par ce document.
+
+[pn-pointer]: paea/evidence/CURRENT-GLM.json
+[pn-c3b]: paea/evidence/20261028-acquisition81-mvfdts57/glm-paea-c3b-prepayload-receiver-20261115T221953Z/supervisor-C3b-direct-reception.json
+[pn-c2]: paea/evidence/20261028-acquisition81-mvfdts57/glm-paea-c2c3-secondary-receiver-20261115T211921Z/C2C3-QUALIFICATION-FINAL.json
+[pn-http]: paea/evidence/20261028-acquisition81-mvfdts57/glm-receipt-probe-evidence-hygiene-20261106T152111Z/supervisor-http-direct-reception.json
+[pn-ui]: paea/evidence/20261028-acquisition81-mvfdts57/glm-form-sibling-fixture-repair-20261106T172242Z/supervisor-browser-direct-reception.json
+[pn-pending]: paea/evidence/20261028-acquisition81-mvfdts57/glm-form-guard-owned-cleanup-20261106T184245Z/human-authority-login-pending.json
+[pn-storage]: paea/evidence/20261028-acquisition81-mvfdts57/glm-paea-c3b-prepayload-receiver-20261115T221953Z/STORAGE2-POST-RELOCATION-PERSONAL-RECEPTION.json
+[pn-tmp]: paea/evidence/20261028-acquisition81-mvfdts57/glm-paea-c3b-prepayload-receiver-20261115T221953Z/C3b-TMPDIR-ERRATUM.json
+[pn-g6]: paea/REVIEW-PACKAGE-20261109.md
+[pn-gap]: paea/GAP-CLOSURE-PLAN-20261103.md
+[pn-matrix]: paea/evidence/20261028-acquisition81-mvfdts57/glm-closure-inventory-20261029T201336Z/invariant-matrix.json
+[pn-registry]: reprises-veille-x-20261108/REPRISE-SUPERVISION-20261115.json
+[pn-pr]: paea/evidence/20261028-acquisition81-mvfdts57/glm-paea-c3b-prepayload-receiver-20261115T221953Z/DOC-NOW-PR38-raw.json
+[pn-index]: paea/evidence/20261028-acquisition81-mvfdts57/glm-paea-c3b-prepayload-receiver-20261115T221953Z/DOC-NOW-PROOF-INDEX.json
+
+## Historique conservé — états datés
+
+
 Point de preuve — 2026-11-05 11:04 UTC : trois contrôles ciblés vérifiés :
 rétention sous vrai flock et reprise1PASS (profil default), classificateur1PASS
 (feature test-fixtures), custody candidat1PASS (default). Zéro-test intermédiaire
