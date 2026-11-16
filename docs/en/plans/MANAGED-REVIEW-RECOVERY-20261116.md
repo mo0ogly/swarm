@@ -52,3 +52,17 @@ flowchart LR
 7. Resume current Work only with genuinely ported protocol and verified public decision. Commit/PR/checks/main/local installation remain separate verified stages; no WIP merge or fabricated acceptance. RETEX then next independent lot.
 
 Resume after acceptable spec audit, actual missing-source reads, reservations and fresh space admission. No additional human decision identified now; any real missing authority must be evidenced.
+
+
+### 16 November design review — MRR-D01 through D03 remain open
+
+The complete GLM design `7d9395f620c8968b054cce3ce233763f413fd8b78336ae6d4ac22577737e6b6f` was read and independently reviewed by09 (turn01a1e549-078d-7500-8e80-ed0ec154d46a). Verified data → custody outside SQL → transactional recheck is a viable route, but this proposal is not sufficient for a complete patch. MRR-D01: cover the running post-claim job, its immediate archived error and identical context reconstruction. MRR-D02: carry corrective guidance into the managed prompt outside quote evidence. MRR-D03: preserve explicit holder purpose during pre-claim refresh, then use the proper running holder for rechecks without new admission after mutation.
+
+First delegated production increment: context assembly only in `review_preview/inputs.rs`, shared with the ordinary path, with inert content/absence/refusal tests. It unlocks no admission guard and proves no managed retry. Custody and post-claim port remain open. Current Work19 and calls1/2 unchanged; no second W or historical campaign replay.
+
+
+### MRR-D02 prerequisite — source/helper verified, managed retry not ported
+
+`append_recovery_context` in `review_preview/inputs.rs` shares ordinary and managed corrective context. Guidance remains outside quote materials/catalogue and precedes encoding and the full prompt cap. Source `9a8cebf74b4c6cfdb380fd45a3148152d78e096bf9267dbe56b4baafc658d93f`; independent09 APPROVE_SOURCE_ONLY (turn01a1e550-c91b-7451-8583-e2c2adf6cc83). Three new inert tests PASS (unchanged absence; complete directive with unchanged materials; nonobject refusal after a valid witness), Cargo `--lib` filter `root_store::review_preview::inputs::tests::recovery_`. Evidence and effective source inventory: `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/prompt-prerequisite-check-01/`. Library-test profile, stable sources; no production build, installation, retry admission or complete managed-flow verification.
+
+Bounded principal supplementation addressed GLM reasoning latency without final patch, with no duplicate call or added cap. Its final answer after531.299s proposed the same shared context; fully read and compared. Its “exactly once” docstring would not establish idempotence and was not adopted. Exact declared usage67451tokens,59693completion; no price or Codex quota inferred. The reviewed/tested principal version remains unchanged after PASS. MRR-D01/D03, full-flow MRR-D02 and P2 stay open. Work19/calls1/2 unchanged. No historical replay, second W, service, provider or acceptance.

@@ -38,3 +38,10 @@ W sourceaa009304 actually invoked the reviewer: exit2, review-reply-noncanonical
 
 
 [Managed recovery plan](MANAGED-REVIEW-RECOVERY-20261116.md):09 audit ready for source curation/design, not patch. Managed admission P2 remains open; current Work unchanged, calls1of2. Full GLM plan read, no code adoption; bounded source/design work before any repair. Reserve recovered through158readback-verified historical proof copies on SWARM; active sources/data remain local.
+
+
+### MRR-D02 prerequisite — source/helper verified, managed retry not ported
+
+`append_recovery_context` in `review_preview/inputs.rs` shares ordinary and managed corrective context. Guidance remains outside quote materials/catalogue and precedes encoding and the full prompt cap. Source `9a8cebf74b4c6cfdb380fd45a3148152d78e096bf9267dbe56b4baafc658d93f`; independent09 APPROVE_SOURCE_ONLY (turn01a1e550-c91b-7451-8583-e2c2adf6cc83). Three new inert tests PASS (unchanged absence; complete directive with unchanged materials; nonobject refusal after a valid witness), Cargo `--lib` filter `root_store::review_preview::inputs::tests::recovery_`. Evidence and effective source inventory: `/run/media/fpizzi/SWARM/swarm-evidence/root00-managed-preparer-cq1joyiy/prompt-prerequisite-check-01/`. Library-test profile, stable sources; no production build, installation, retry admission or complete managed-flow verification.
+
+Bounded principal supplementation addressed GLM reasoning latency without final patch, with no duplicate call or added cap. Its final answer after531.299s proposed the same shared context; fully read and compared. Its “exactly once” docstring would not establish idempotence and was not adopted. Exact declared usage67451tokens,59693completion; no price or Codex quota inferred. The reviewed/tested principal version remains unchanged after PASS. MRR-D01/D03, full-flow MRR-D02 and P2 stay open. Work19/calls1/2 unchanged. No historical replay, second W, service, provider or acceptance.
