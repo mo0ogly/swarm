@@ -3,14 +3,19 @@
   "id": "permanent-recipe-runner-regressions",
   "inputs": [
     "tools/verification/*.py",
-    "tools/verification/README.md"
+    "tools/verification/README.md",
+    "tests/fixture_area.py",
+    "tests/test_fixture_area.py",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "tests/test_fixture_area_encoding.py"
   ],
   "environment": {},
   "steps": [
     {
-      "id": "eight-runner-regressions",
+      "id": "fourteen-runner-regressions",
       "command": [
         "python3",
+        "-B",
         "-m",
         "unittest",
         "discover",
@@ -29,10 +34,111 @@
         "test_relative_executable_is_bound_to_fixture_root",
         "test_tampering_and_missing_hash_table_refuse",
         "test_zero_tests_and_source_mutation_cannot_pass",
-        "Ran 8 tests",
+        "Ran 14 tests",
         "\nOK\n",
         "test_symlink_launcher_keeps_invocation_name_and_target_identity",
-        "test_tmpdir_pin_falls_back_when_checkout_ancestors_are_group_writable"
+        "test_tmpdir_pin_falls_back_when_checkout_ancestors_are_group_writable",
+        "test_resolution_proof_receipt_and_child_tmpdir",
+        "test_import_failure_retains_unobserved_proof_then_recovers",
+        "test_proof_publication_failure_stops_and_retains_primary",
+        "test_receipt_relation_and_missing_receipt_refuse",
+        "test_bad_fallback_retains_mkdir_effect_then_recovers",
+        "test_import_cache_is_not_explicit_resolution"
+      ]
+    },
+    {
+      "id": "thirteen-fixture-area-regressions",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_fixture_area.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 13 tests",
+        "\nOK\n",
+        "test_saved_value_then_default_then_refusals",
+        "test_observation_uses_consumed_read_and_keeps_cache",
+        "test_observation_preserves_current_default_and_refusals",
+        "test_read_and_observer_errors_preserve_primary",
+        "test_actual_read_denial_then_recovery",
+        "test_default_faults_fail_closed_after_proven_absence",
+        "test_present_directory_refused_with_saved_origin",
+        "test_symlink_and_missing_parent_classification",
+        "test_cd01_saved_shapes_types_paths_and_recovery",
+        "test_cd01_non_directory_parent_refuses_then_recovers",
+        "test_cd01_held_parent_survives_ancestor_replacement",
+        "test_cd01_fifo_refused_without_blocking_open",
+        "test_cd01_primary_read_and_secondary_close_causes"
+      ]
+    },
+    {
+      "id": "four-snapshot-regressions",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/verification",
+        "-p",
+        "test_snapshot.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 4 tests",
+        "\nOK\n"
+      ]
+    },
+    {
+      "id": "fixture-area-encoding-mode-regression",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_fixture_area_encoding.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_utf8_mode_text_reader_contract",
+        "Ran 1 test",
+        "\nOK\n"
+      ]
+    },
+    {
+      "id": "runner-fixture-secondary-causes",
+      "command": [
+        "python3",
+        "-I",
+        "-B",
+        "{root}/tools/verification/test_recipe_fixture_errors.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"effect_unchanged_on_refusal\": true"
+      ],
+      "required_stderr": [
+        "test_runner_retains_resolution_close_causes_cli",
+        "Ran 1 test",
+        "\nOK\n"
       ]
     }
   ]

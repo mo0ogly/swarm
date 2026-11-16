@@ -5092,3 +5092,179 @@ arbitraire. Cette fixture unitaire ne prouve ni fournisseur natif, ni approbatio
 E2E, ni acceptation indépendante. Garder le rouge original et un vert frais ;
 `recipe.py verify` contrôle l’intégrité, pas la livraison. Publication source
 complète et approbation protégée restent des vérifications distinctes.
+
+
+### C3-P — observation Python du résolveur et du placement / Python resolution and placement observation
+
+Le premier lot C3-P observait les décisions historiques sans les corriger.
+Le correctif C-D01 Python distingue maintenant l'absence observée d'une entrée
+sauvegardée des erreurs et d'un champ absent/null : seul le premier cas peut
+sélectionner le défaut livré. Un document présent incomplet refuse sans adoption
+ou écriture automatique. La grammaire suit le validateur Rust de référence,
+sans normalisation ; cela ne corrige pas le résolveur Rust lui-même.
+
+`fixture_area.configured_area(repo, observer=...)` conserve sa signature et le
+retour Path. Base et parent détenus par descripteurs, ouverture NONBLOCK et fstat
+précèdent la lecture du fichier régulier ; une substitution du nom du parent ne
+redirige pas cette lecture. Les octets peuvent encore changer pendant la lecture :
+aucun snapshot atomique, confinement ou authenticité n'est promis. `_AREA` reste
+un cache d'import ; un appel explicite résout à nouveau. Le buffer consommé alimente
+la décision et l'observation. Les causes secondaires de fermeture sont attachées
+à l'erreur primaire dans `fixture_close_errors`, celles d'observer dans
+`fixture_observation_errors`. Sans primaire, la panne de fermeture/observer refuse.
+Le passage des causes close vers result.json du runner est couvert par la garde
+ciblée décrite plus bas ; revue indépendante et autres consommateurs restent
+distincts.
+
+Le runner conserve `fixture-area-proof.json` et
+`fixture-area-proof.receipt.json` dans sa sortie neuve. Le premier distingue
+l'import (provenance interne non observée), l'appel explicite et le placement ;
+le second lie relecture interne, taille/empreinte et invocation. Les données
+comprennent seulement types/métadonnées pertinentes, chemin validé, modes examinés
+et événements mkdir/repli. Le TMPDIR préparé n'est pas un reçu d'enfant ; un
+contrôle avec enfant inerte vérifie séparément sa réception. Aucun historique de
+réglages ou environnement hérité complet n'est ajouté. Ce reçu n'est ni
+indépendant, ni une authentification, ni une preuve de Rust/R04/acceptation.
+
+Un échec de publication de cette preuve arrête les étapes et reste distinct de
+la cause primaire, dans `evidence_failures`. Les effets mkdir précédents ne sont
+pas annulés. Une panne des écritures finales peut encore laisser un dossier
+incomplet, jamais qualifié par l'absence d'erreur. Corriger la précondition puis
+prendre une sortie neuve ; ne pas réessayer automatiquement ni écraser l'ancien
+lot. `verify` exige les preuves/liens pour les nouveaux PASS et accepte le format
+historique sans attribuer rétroactivement une projection aux anciens dossiers.
+La recette `recipes/runner.json` déclare 14 tests runner, 13 helper et 4 snapshot.
+Seules les 13 méthodes helper de ce correctif ont été exécutées sur copies privées
+figées (13 PASS, aucun ignoré), après un D3 rouge sur préimage. Cela ne constitue
+ni un rejeu de la recette entière ni 31 contrôles qualifiés sur ce nouveau candidat.
+
+The first C3-P lot observed historical choices without correcting them. The
+Python C-D01 fix distinguishes observed missing saved entries from IO/shape/type
+errors and missing/null saved fields. Only observed absence can select the shipped
+default; a present incomplete document refuses without automatic adoption/write.
+The path grammar follows the supplied Rust validator, not a shared implementation
+or a correction of the Rust fixture resolver.
+
+`fixture_area.configured_area(repo, observer=...)` keeps its signature and Path
+return. Held base/parent descriptors, NONBLOCK open and fstat precede a regular-file
+read; replacing the parent pathname does not redirect that held read. Content can
+still change during reading: no atomic snapshot, confinement or authenticity is
+promised. `_AREA` remains import-cached; explicit calls resolve afresh. The consumed
+buffer drives choice and observation. Secondary close failures attach to the
+primary as `fixture_close_errors`, observer failures as `fixture_observation_errors`.
+Without a primary, a close/observer failure refuses return. Targeted retention of close details in runner result.json is covered by the
+guard below; independent review and other consumers remain distinct.
+
+Runner retains `fixture-area-proof.json` and `fixture-area-proof.receipt.json`.
+The first separates import (internal provenance unobserved), explicit resolution
+and placement; the second binds internal readback, size/hash and invocation.
+Only relevant types/metadata, validated path, examined modes and mkdir/fallback
+events are added, not full settings history or inherited environment. Prepared
+TMPDIR is not child reception; an inert-child check proves that separately.
+Receipt is neither independent/authenticated nor Rust/R04/engine acceptance.
+Proof-publication failure stops steps, separately retaining the primary cause
+and `evidence_failures`; previous mkdir effects remain. Final writes can still
+leave incomplete evidence. Recover the prerequisite and use new output; never
+automatically retry/overwrite a failed lot. `verify` requires coherent proof for
+new PASS while preserving historical evidence compatibility without inventing
+old projections. `recipes/runner.json` declares 14 runner, 13 helper and 4 snapshot
+tests. Only the 13 affected helper methods were run on frozen private copies
+(13 PASS, none skipped), after a D3 failure on the preimage. This is neither a
+complete recipe replay nor 31 qualified checks on this new candidate.
+
+
+C-D01 / CD01-R09-01 — correction privée après revue09 (15 novembre 2026).
+Le remplacement du lecteur texte avait ignoré le mode UTF-8 de Python : sous
+LC_ALL=C et -X utf8, le JSON UTF-8 brut « évidence » refusait, contrairement à
+Path.read_text et au JSON échappé équivalent. Contre-exemple désormais exécuté,
+témoins ASCII/ancien lecteur, faute brute, équivalent échappé et reprise conservés.
+Le codec est choisi via io.text_encoding(None), puis locale.getencoding seulement
+si Python renvoie locale : compatibilité texte par défaut, aucune politique
+UTF-8 imposée. Les chemins et la détention/fermeture des FD ne changent pas.
+
+Nouvelle garde pérenne séparée tests/test_fixture_area_encoding.py : une méthode,
+modes UTF-8 1 et 0 sous C, comparaison au vrai Path.read_text. La même garde est
+rouge sur le helper revu précédent, verte sur le correctif ; sorties/hashes stables
+retenus en fixture privée. Les 13 méthodes précédentes restent inchangées et non
+rejouées : leur PASS reste lié à l'ancien hash, aucune annonce de 14 tests relancés.
+La recette déclare cette garde séparément et conserve 13 pour le helper historique.
+Revue delta09 requise avant checkpoint/application ; sources partagées et main
+non modifiés. Diagnostic close vers runner, Rust/R04 et acceptation globale ouverts.
+
+
+C-D01 / CD01-R09-01 — private correction after review09 (15 November 2026).
+The replacement decoder ignored Python UTF-8 mode: under LC_ALL=C and -X utf8,
+raw UTF-8 JSON for “évidence” refused while Path.read_text and the escaped JSON
+equivalent accepted it. The counterexample is now executed, retaining ASCII and
+old-reader controls, raw failure, escaped equivalent and recovery. Encoding now
+uses io.text_encoding(None), resolving locale.getencoding only when Python returns
+locale. This preserves default text decoding without imposing a UTF-8 policy.
+Path validation and held-FD/open/close mechanisms are unchanged.
+
+Separate permanent guard tests/test_fixture_area_encoding.py: one named method,
+UTF-8 modes1 and0 under C, compared with actual Path.read_text. The same guard
+fails on the reviewed helper and passes on the fix; private stdout/stderr and
+stable hashes retained. The previous13 methods remain unchanged and unreplayed;
+their PASS stays bound to the old helper hash, not a claim of14 rerun tests.
+Recipe declares this guard separately and keeps13 for the existing helper suite.
+Delta review09 is required before checkpoint/application. No shared/main mutation.
+Runner close diagnostics, Rust/R04 and global acceptance remain open.
+
+
+### C-D01 — causes secondaires du helper jusqu'au runner (delta privé)
+
+Le runner conserve maintenant les causes retenues par le helper dans
+fixture_close_errors, comme celles de fixture_observation_errors : chaque élément
+est résumé par type, errno et phase (fixture-resolution-close ou
+fixture-resolution-observation), sans message secondaire. La cause primaire reste
+dans failure ; aucune perte n'est transformée en PASS, aucune action réexécutée
+pour compléter une preuve. Le résumé CLI conserve status/evidence/steps et exit1
+pour FAIL ; les causes sont consultables dans result.json de la sortie liée.
+
+Une garde nouvelle pérenne test_recipe_fixture_errors.py exerce l'entrée CLI
+réelle avec une injection de fixture explicitement étiquetée : close seul puis
+close+observer, chaque fois témoin valide, refus lecture/fermeture, reprise en
+sortie neuve. La fermeture libère réellement les FD puis lève un diagnostic
+synthétique, pas un refus noyau. Avant correctif : une méthode, deux sous-cas en
+échec car les trois causes close manquent ; après : une méthode PASS, deux
+sous-cas avec trois causes close et zéro/deux causes observer, primaire distincte,
+zéro étape/compteur d'effet inchangé au refus, reprises PASS. Les entrées de la
+version finale restent stables ; noms, argv, stdout/stderr et résultats internes
+sont conservés. Aucun rejeu helper13/codec1, runner14 ou153consommateurs.
+
+Le manifeste runner déclare une étape ciblée supplémentaire ; la recette entière
+n'est pas exécutée. Le bootstrap de qualification reste privé, avec le helper
+codec approuvé figé inchangé. L'allocateur normal de fixture est aussi exercé
+dans le contrôle final, sur réglages explicitement fictifs. Les messages
+secondaires ne sont pas repris dans result.json. Les dossiers d'échec précoces
+peuvent manquer environment.json : aucune nouvelle intégrité verify de ces
+dossiers incomplets n'est revendiquée. Des preuves écrites ne sont pas une
+réception indépendante ; Rust/R04, intégration et BF-L0 global restent ouverts.
+
+
+### C-D01 — helper secondary causes through the runner (private delta)
+
+Runner now retains fixture_close_errors alongside fixture_observation_errors,
+summarizing each by type, errno and phase (fixture-resolution-close or
+fixture-resolution-observation), without secondary messages. Primary remains in
+failure. Missing evidence never becomes PASS and actions are not retried to
+manufacture proof. Public CLI still reports status/evidence/steps and exit1 for
+FAIL; causes are read from the linked output's result.json.
+
+One new permanent test_recipe_fixture_errors.py guard invokes the real CLI with
+an explicitly fixture-only injection: close-only and close+observer, each with
+valid control, read/close refusal, then fresh-output recovery. The close double
+really releases FDs then raises synthetic diagnostics, not a kernel close refusal.
+Before: one method, two failing subcases because three close causes are absent.
+After: one method PASS, both subcases retain three close causes and zero/two
+observer causes, distinct primary, zero steps and unchanged effect counter on
+refusal, successful recoveries. Final inputs stable; names, argv, raw streams and
+inner results retained. No helper13/codec1, runner14 or153consumer replay.
+
+Permanent manifest declares a separate targeted step; the full recipe was not
+run. Qualification uses frozen private sources and the unchanged approved codec
+helper. Final guard also exercises ordinary fixture allocation with explicitly
+synthetic settings. Secondary messages stay out of result.json. Early failed
+dossiers may lack environment.json: no new verify integrity claim is made for
+those incomplete dossiers. Written evidence is not independent receipt; Rust/
+R04, shared integration and global BF-L0 acceptance remain open.
