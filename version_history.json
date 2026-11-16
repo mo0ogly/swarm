@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Vérifications PAEA et Sécurité et preuves : même habillage qu’Audit et Sécurité (rail commun, en-tête avec section, sélecteur Sombre/Clair, liens et sections en cartes). Aucun changement moteur.",
+        "en": "PAEA checks and Security and evidence: same shell as Audit and Security (shared rail, sectioned header, Dark/Light switch, links and sections as cards). No engine change."
+      },
+      {
         "fr": "Sécurité suit la maquette : formulaire de configuration posé dans la page, bandeau du jeton I3, onglets, niveaux d’intégrité et tableau des identités tirés des identités déclarées, barre Prévisualiser/Enregistrer.",
         "en": "Security follows the design board: configuration form in the page, I3 token banner, tabs, integrity levels and identity table from declared identities, Preview/Save bar."
       },
