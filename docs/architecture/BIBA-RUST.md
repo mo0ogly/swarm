@@ -947,3 +947,31 @@ figées antérieures restent inchangés. Cette correction requiert encore revue
 et exécution inerte des deux cas puis non-régression nonzero/publication/témoin,
 car le point d'appel est partagé. Elle ne prouve aucune exécution Biba réelle,
 aucun confinement, installation ou qualification globale.
+
+
+## Banc lowFD R3a — état source sauvegardé, qualification bornée
+
+Ce banc séparé consomme deux drivers Biba et un shim close précompilés via un
+descripteur explicite. Il ne compile rien et n'appelle ni enforce, moteur,
+provider, réseau ou service. Les chemins artifacts/output sont obligatoires ;
+la recette `biba-low-fd-close.json` emploie les entrées explicites du collecteur.
+Les mappings/reçus producteurs et hashes lient Biba/libc aux octets réellement
+retenus, sans authentifier toute la toolchain ni un profil produit complet.
+Le code Biba de bibliothèque est celui du parent ; aucun Rust moteur/config
+ou bootstrap étranger n'est ajouté avec les six fichiers de banc.
+
+L'état R3a conserve le collecteur9956 et ses gardes6132. Les réceptions séparées
+ont vérifié sept méthodes inertes de rétention, dix-neuf de producteurs, puis
+six de liaisons. Ce sont des doubles et contrôles de reçus, sans enfant lowFD.
+Ces réussites ne couvrent pas un refus tardif après completion réussie :
+fsync/validation/publication/nettoyage peuvent perdre le lien structuré dans
+9956 alors que process.json existe encore. Les quatre gardes post-completion
+R4 ne sont pas dans cet état source ; son défaut reste explicite, sans clôture.
+Aucune de ces étapes n'est rejouée pour la sauvegarde Git.
+
+Un futur usage exige son allocation et la cohorte exacte. Le parent WIP contient
+fixture_area4ece ; PR40/f5d contient1699 ; le bootstrap des dix enfants natifs
+observés contient25cabd. Ces hashes sont des sources différentes, pas une preuve
+d'équivalence. Le corpus25cabd demeure dans la preuve DD : il n'est pas ajouté
+au dépôt par ce lot. Ni recette/launcher sauvegardé entier, ni profil livré,
+conversion moteur ou installation ne sont qualifiés par les seuls résultats.

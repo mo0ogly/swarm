@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "libc": {
+    "package": "libc@0.2.186",
+    "features": [
+      "default",
+      "std"
+    ]
+  },
+  "baseline": {
+    "revision": "8d7ef6bbe90ac918124100e139331902098d2cb0",
+    "crate_lib_sha256": "369b47f1fe892377b56d47e4a3195b32a7930b394dc816c1b3213f33d794febd",
+    "crate_kernel_sha256": "1fe1da984607c6871186b19a692e111873446f691ab9b940e12b9836f4fc167f"
+  },
+  "candidate": {
+    "revision": "df1f38b78af8324fb7927ffef8f1ce8a4f14f30d",
+    "crate_lib_sha256": "d48ee1ede1e593c852c989ab6dcedfb228ccb46ee55cf84255ec065bdde0e498",
+    "crate_kernel_sha256": "16262e7166ab0ae06bfd66e67906e1362da2ec44b906cd0d0dc77680c256ee7b"
+  }
+}

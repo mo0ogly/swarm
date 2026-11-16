@@ -898,3 +898,29 @@ remain unchanged. Source review and inert execution of both focused cases plus
 nonzero/publication/healthy regressions remain required because the caller is
 shared. This correction proves no real Biba run, confinement, installation or
 global qualification.
+
+
+## R3a lowFD fixture — retained source state, bounded qualification
+
+This separate fixture consumes two prebuilt Biba drivers and a close shim through
+an explicit descriptor. It builds nothing and calls no enforce, engine, provider,
+network or service. Artifacts/output paths are required; the permanent
+`biba-low-fd-close.json` recipe uses the collector's explicit inputs. Producer
+receipts/mappings and hashes bind actual retained Biba/libc bytes without
+authenticating the whole toolchain or delivered profile. Core Biba library source
+comes from the parent; no engine Rust/config or foreign bootstrap is added with
+the six fixture files.
+
+R3a retains collector9956 and guard6132. Separate receipts verified seven inert
+retention methods, nineteen producer methods and then six binding methods. These
+are doubles/receipt checks, not lowFD children. They do not cover a late refusal
+after known successful completion: fsync/validation/publication/cleanup can lose
+9956's structured link even when process.json survives. The four R4 post-completion
+guards are absent from this source state; keep the defect explicit and open.
+None of those stages is replayed for the Git safeguard.
+
+Future use requires exact cohort admission and allocation. The WIP parent has
+fixture_area4ece, PR40/f5d has1699, while the observed ten-native bootstrap has25cabd.
+These are distinct source hashes, not equivalence proof. Corpus25cabd stays in its
+DD evidence, outside this commit. Neither the complete saved recipe/launcher nor
+delivered profile, engine conversion or installation is qualified by these results.

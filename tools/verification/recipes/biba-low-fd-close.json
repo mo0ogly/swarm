@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "biba-low-fd-close",
+  "inputs": [
+    "tests/rust_biba_low_fd_driver.rs",
+    "tests/fixtures/biba_ruleset_close.c",
+    "tests/rust_biba_low_fd.py",
+    "tests/fixture_area.py",
+    "tools/verification/recipe.py",
+    "docs/architecture/BIBA-RUST.md",
+    "docs/en/BIBA-RUST.md",
+    "tests/fixtures/biba_low_fd_matrix.json",
+    "tests/test_biba_low_fd_collector.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "owned-child-low-fd-red-green",
+      "command": [
+        "python3",
+        "tests/rust_biba_low_fd.py",
+        "--from-environment"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "BIBA_LOW_FD_REAL_CONTROL",
+        "BIBA_LOW_FD_EXPECTED_BASELINE_RED",
+        "BIBA_LOW_FD_CANDIDATE_GREEN",
+        "BIBA_LOW_FD_FRESH_RECOVERY"
+      ],
+      "required_stderr": []
+    }
+  ]
+}
