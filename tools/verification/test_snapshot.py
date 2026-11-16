@@ -33,7 +33,10 @@ class SnapshotTests(unittest.TestCase):
         (root / 'deps/lib.js').write_text('dependency')
         (root / 'tools/verification/recipe.py').write_bytes((Path(__file__).with_name('recipe.py')).read_bytes())
         (root / 'tests/fixture_area.py').write_text(
-            "def configured_area(root):\n    import tempfile\n    return root.parent\n")
+            "def configured_area(root, *, observer=None):\n"
+            "    if observer is not None:\n"
+            "        observer({'kind':'resolved','path':str(root.parent),'source':'synthetic'})\n"
+            "    return root.parent\n")
         recipe = dict(schema_version=1, id='fake', inputs=['src/a.txt'], environment={},
                       steps=[dict(id='cat', command=['cat', 'src/a.txt'], expected_exit=0, required_stdout=['declared'], required_stderr=[])])
         path = root / 'tools/verification/recipes/fake.json'
