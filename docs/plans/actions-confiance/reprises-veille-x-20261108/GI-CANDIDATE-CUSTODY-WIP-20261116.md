@@ -71,3 +71,8 @@ Sélecteur initial géré : observation Root originale/décision avant custody e
 ## Actual managed witness and dispatcher failure
 
 Recette W witness/retry source revue09. Témoin réel PASS0→1 (15preuves/8CLIreaped0), refus sanscorrection PASS sansmutation. Reprise originale FAIL dispatcher planning-decision-managed-operation-unported avant secondreview; Work21/reviewer1of2/planner3of3, nativeappelterminalRefused. MRR-D04 et autorité de reprise de l’ancien Work épuisé ouverts, aucune réinterprétation/restitution. WIP, pas de merge/install/acceptation.
+
+
+## MRR-D04 dispatcher: source-only checkpoint
+
+MRR-D04 : entrée managed review-retry portée en source et revue09, un littéral de capacité ajouté, gardes suivantes inchangées. Non compilé/vérifié runtime à ce checkpoint. AncienWork21/planner3of3/reviewer1of2 etRefusedterminal conservés. Previewquota3→4/child2→3 valide mais nonautorisée/nonappliquée. WIP non fusionnable comme correctif vérifié.

@@ -71,3 +71,8 @@ Initial managed selector observes original/decision before custody and revalidat
 ## Actual managed witness and dispatcher failure
 
 W witness/retry recipe09source-approved. Real healthy witness PASS0to1 (15proofs/8CLIreaped0); missing correction refused without mutation. Original retry FAIL managed planning dispatcher before second reviewer; Work21/reviewer1of2/planner3of3, native call terminalRefused. MRR-D04 and original exhausted Work resumption authority remain open; no reinterpretation/refund. WIP, no merge/install/acceptance.
+
+
+## MRR-D04 dispatcher: source-only checkpoint
+
+MRR-D04 managed review-retry entry source-ported and09reviewed,one capability literal added,downstream guards unchanged. Not compiled/runtime-verified at checkpoint. OriginalWork21/planner3of3/reviewer1of2 and terminalRefused retained. Quota3to4/child2to3 preview-valid but not authorized/applied. WIP not mergeable as verified fix.

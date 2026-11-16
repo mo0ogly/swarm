@@ -291,6 +291,12 @@ fn retry_task(root: &Path, w: &mut Work, op: &PlanningOperation, r: &PlanningReq
 /// capacity. The old acknowledgement remains intact. Only next/new canonical
 /// acknowledgement change: no worker/attempt,
 /// new review, reservation, receipt or acceptance is created by this decision.
+/// Managed Work (repository Some) reaches this leaf only through the decide
+/// dispatcher: supported managed scope is instruction plus canonical
+/// acknowledgement after the verified original typed failure — not a production
+/// retry and not a source freshness lease; while source custody is not held, no
+/// read here proves reviewer execution or source custody, which later Root
+/// claim/process/publication gates re-observe.
 fn retry_review(root: &Path, w: &mut Work, op: &PlanningOperation, r: &PlanningRequest, settings: &crate::EngineSettingsDocument, policy: &P) -> Result<(), E> {
     if !swarm_identity_contract::name(op.id.as_bytes()) || !crate::text::nonempty(&op.next)
         || !op.title.is_empty() || !op.deliverable.is_empty() || op.requirements.as_ref().is_some_and(|v| !v.is_empty())
@@ -606,9 +612,12 @@ fn current_native_review_input(
 /// acknowledgement only. Budget/revision/generation overflows, unsupported
 /// operations and any failed preparation preserve the input Work. Caller owns
 /// settings/Work reservations, replay before invocation, final fence and commit.
-/// Managed repositories admit only acknowledgement, delegation and new tasks
-/// after original copy/commit observation; future-task instruction additions also
-/// preserve that repository observation. Other managed operations still refuse.
+/// Managed repositories admit only acknowledgement, delegation, new tasks and
+/// the reviewer-only review-retry correction (instruction plus canonical
+/// acknowledgement after a verified current original typed review failure)
+/// after original copy/commit observation; future-task instruction additions
+/// also preserve that repository observation. Producer retry, judge, renew,
+/// closure and unknown kinds still refuse there.
 /// Holder equality is a concurrency fence, not authenticated agent authority.
 pub(crate) fn decide(
     root: &Path,
@@ -631,7 +640,9 @@ pub(crate) fn decide(
         .as_deref()
         .ok_or(E::Refused("planning-not-enabled"))?;
     if p.repository.is_some() {
-        if r.operations.iter().flatten().any(|op|!matches!(op.kind.as_str(),"delegate"|"task"|"revise-instructions")) {
+        // Reviewer-only correction retains the same delivered-input and typed
+        // original-failure guards; it admits no producer attempt or execution.
+        if r.operations.iter().flatten().any(|op|!matches!(op.kind.as_str(),"delegate"|"task"|"revise-instructions"|"review-retry")) {
             return Err(E::Refused("planning-decision-managed-operation-unported"));
         }
         #[cfg(target_os="linux")]
