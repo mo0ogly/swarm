@@ -430,10 +430,177 @@ class Producers(unittest.TestCase):
         self.case('candidate', lambda r: r.update(sha256='0'*64), 'cargo-frozen-bytes-mismatch')
 
 
+class PostCompletion(unittest.TestCase):
+    """Proposed success0-to-final-error guards; no child or Biba/kernel execution.
+
+    A mocked run callback writes valid synthetic TSV through owned report/event
+    FDs, then returns CompletedProcess0. TSV fd numbers describe synthetic parser
+    input, not a real ruleset. Existing invoke and safe_causes are the boundaries
+    exercised on both old/new collectors; no new helper is needed to get RED.
+    """
+    REPORT = b'stdio\tfree\t0\t1\t2\nprepare\tok\nretained\t17\ncleanup\tok\nrestored\tyes\n'
+    EVENTS = b'close\t1\t0\t0\t0\t0\t0\nclose\t2\t17\t0\t0\t0\t0\n'
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp(prefix=self._testMethodName+'-', dir=OUTPUT))
+        self.module = collector(COLLECTOR)
+
+    def case(self, fsync_fault=False, close_fault=False, publication_fault=False, diagnostic=b''):
+        """Collect one fake success followed by optional real owned-IO errors.
+
+        Always really close owned event FD once before raising injected EIO.
+        Fsync injection targets only report FD after the mock returned completion;
+        publication injection targets observations.json after parsed success.
+        Facts/assertions are separated so fresh recovery runs before RED asserts.
+        """
+        root = Path(tempfile.mkdtemp(prefix='case-', dir=self.root)); out = root/'out'
+        driver = root/'driver-never-executed'; driver.write_bytes(b'INERT_NOT_AN_ELF')
+        shim = root/'shim-never-loaded'; shim.write_bytes(b'INERT_NOT_A_SHARED_OBJECT')
+        real_close, real_sync, publish = os.close, os.fsync, self.module.publish
+        facts = {'completed': False, 'calls': 0, 'report_fd': None, 'event_fd': None, 'event_closes': 0, 'injected': {}, 'injection_counts': {}, 'observations_published': False, 'publication_attempts': []}
+        value = error = None
+        def fixture(_prefix):
+            return Path(tempfile.mkdtemp(prefix='owned-inert-root-', dir=root))
+        def completed(argv, **_kwargs):
+            facts['calls'] += 1
+            report_fd, event_fd = int(argv[3]), int(argv[4])
+            facts.update(report_fd=report_fd, event_fd=event_fd)
+            if report_fd <= 2 or event_fd <= 2 or report_fd == event_fd:
+                raise ValueError('inert-owned-channels-invalid')
+            for fd, raw in [(report_fd, self.REPORT), (event_fd, self.EVENTS)]:
+                if os.write(fd, raw) != len(raw):
+                    raise OSError(errno.EIO, 'owned-inert-report-short-write')
+            facts['completed'] = True
+            return subprocess.CompletedProcess(argv, 0, diagnostic, b'')
+        def syncing(fd):
+            if fsync_fault and facts['completed'] and fd == facts['report_fd']:
+                cause = OSError(errno.ENOSPC, 'injected-owned-report-fsync-after-completion')
+                facts['injected']['fsync'] = cause
+                facts['injection_counts']['fsync'] = facts['injection_counts'].get('fsync', 0)+1
+                raise cause
+            return real_sync(fd)
+        def closing(fd):
+            matched = facts['completed'] and fd == facts['event_fd']
+            result = real_close(fd)
+            if matched:
+                facts['event_closes'] += 1
+                if close_fault:
+                    cause = OSError(errno.EIO, 'injected-after-real-owned-event-close')
+                    facts['injected']['close'] = cause
+                    facts['injection_counts']['close'] = facts['injection_counts'].get('close', 0)+1
+                    raise cause
+            return result
+        def publication(path, payload):
+            facts['publication_attempts'].append(path.name)
+            if publication_fault and facts['completed'] and path.name == 'observations.json':
+                cause = OSError(errno.EACCES, 'injected-postcompletion-observation-publication')
+                facts['injected']['publication'] = cause
+                facts['injection_counts']['publication'] = facts['injection_counts'].get('publication', 0)+1
+                raise cause
+            result = publish(path, payload)
+            if path.name == 'observations.json':
+                facts['observations_published'] = True
+            return result
+        with mock.patch.object(self.module, 'fixture_root', fixture), mock.patch.object(self.module.subprocess, 'run', side_effect=completed), mock.patch.object(self.module.os, 'fsync', syncing), mock.patch.object(self.module.os, 'close', closing), mock.patch.object(self.module, 'publish', publication):
+            try:
+                value = self.module.invoke('owned-inert-success', 'control', driver, shim, out)
+            except BaseException as caught:
+                error = caught
+        return {'out': out, 'value': value, 'error': error, 'facts': facts}
+
+    def control(self):
+        """Require successful public invoke and valid synthetic parser witness."""
+        result = self.case(); facts = result['facts']
+        self.assertIsNone(result['error']); self.assertEqual(facts['calls'], 1)
+        self.assertTrue(facts['completed']); self.assertEqual(facts['event_closes'], 1)
+        self.assertEqual(self.module.observed_witness(result['value']), result['value']['binding'])
+        self.assertEqual(json.loads((result['out']/'process.json').read_bytes())['returncode'], 0)
+        return result['out']
+
+    def assert_observed(self, fsync_fault=False, close_fault=False, publication_fault=False, diagnostic=b''):
+        """Keep control/fault/fresh recovery; assert actual error and final consumer.
+
+        Final safe_causes output must retain known numeric0/raw-channel facts,
+        independently of surviving process.json. Files are never called globally
+        lost. No denied operation, completed fake process or close is retried.
+        """
+        witness = self.control()
+        try:
+            result = self.case(fsync_fault, close_fault, publication_fault, diagnostic)
+        finally:
+            recovery = self.control()
+            write(self.root/'recovery-observation.json', {'witness': str(witness), 'fresh_recovery': str(recovery), 'scope': 'INERT_SUCCESS0_POSTCOMPLETION_ONLY_NO_REAL_CHILD'})
+        facts, error = result['facts'], result['error']
+        self.assertEqual(facts['calls'], 1); self.assertTrue(facts['completed'])
+        self.assertEqual(facts['event_closes'], 1); self.assertIsNotNone(error)
+        real_nodes = exception_nodes(error)
+        for name, expected, enabled in [('fsync', errno.ENOSPC, fsync_fault), ('close', errno.EIO, close_fault), ('publication', errno.EACCES, publication_fault)]:
+            if enabled:
+                self.assertIn(name, facts['injected'])
+                self.assertEqual(facts['injection_counts'][name], 1)
+                cause = facts['injected'][name]
+                self.assertIsInstance(cause, OSError); self.assertEqual(cause.errno, expected)
+                self.assertTrue(any(node is cause for node in real_nodes), 'Original postcompletion cause must survive')
+        if fsync_fault and close_fault:
+            self.assertIsInstance(error, BaseExceptionGroup)
+            self.assertIs(error.exceptions[0], facts['injected']['fsync'])
+            self.assertIs(error.exceptions[1], facts['injected']['close'])
+        self.assertEqual(json.loads((result['out']/'process.json').read_bytes())['returncode'], 0)
+        if close_fault and not fsync_fault and not publication_fault:
+            self.assertTrue(facts['observations_published'], 'Cleanup-only branch must follow prepared parsed success')
+            observed = json.loads((result['out']/'observations.json').read_bytes())
+            self.assertEqual(observed['report']['prepare'], 'ok')
+            self.assertEqual(observed['report']['cleanup'], 'ok')
+        else:
+            self.assertFalse(facts['observations_published'])
+        if diagnostic:
+            self.assertTrue(any(type(node) is ValueError and node.args == ('child-incomplete-or-diagnostic',) for node in real_nodes))
+        for name, expected_raw in [('stdout', diagnostic), ('stderr', b'')]:
+            self.assertEqual((result['out']/name).read_bytes(), expected_raw)
+        for name in ['process.json', 'stdout', 'stderr']:
+            self.assertEqual(facts['publication_attempts'].count(name), 1)
+        final = self.module.safe_causes(error)  # real final failure consumer used by run
+        json.dumps(final)  # payload/cause links must remain JSON-acyclic
+        write(self.root/'final-consumer-observation.json', final)
+        pending = [final]; payloads = []
+        while pending:
+            item = pending.pop()
+            if isinstance(item, dict):
+                if 'completed_child' in item:
+                    payloads.append(item['completed_child'])
+                pending.extend(item.values())
+            elif isinstance(item, list):
+                pending.extend(item)
+        self.assertEqual(len(payloads), 1, 'Known completion0 must survive exactly once in final safe_causes consumer')
+        for outcome in payloads:
+            self.assertIs(outcome['execution_attempted'], True); self.assertIs(outcome['completed'], True)
+            self.assertIs(type(outcome['returncode']), int)
+            self.assertEqual(outcome['returncode'], 0); self.assertIsNone(outcome['signal'])
+            self.assertIs(outcome['paired_file_retention_complete'], True)
+            for name, expected_raw in [('stdout', diagnostic), ('stderr', b'')]:
+                self.assertEqual(outcome['channels'][name]['bytes'], len(expected_raw))
+                self.assertEqual(base64.b64decode(outcome['channels'][name]['raw_base64']), expected_raw)
+                self.assertEqual(outcome['channels'][name]['sha256'], hashlib.sha256(expected_raw).hexdigest())
+            for name in ['process.json', 'stdout', 'stderr']:
+                self.assertIs(outcome['publications'][name]['ok'], True)
+
+    def test_success0_report_fsync_and_event_cleanup_keep_final_outcome(self):
+        self.assert_observed(fsync_fault=True, close_fault=True)
+
+    def test_success0_prepared_return_cleanup_only_keeps_final_outcome(self):
+        self.assert_observed(close_fault=True)
+
+    def test_success0_observation_publication_keeps_final_outcome(self):
+        self.assert_observed(publication_fault=True)
+
+    def test_success0_parent_diagnostic_rejection_keeps_observed_nonempty_stdout(self):
+        self.assert_observed(diagnostic=b'OWNED_PARENT_DIAGNOSTIC\n')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--collector', type=Path, required=True)
-    parser.add_argument('--stage', choices=['retention', 'bindings', 'producers'], required=True)
+    parser.add_argument('--stage', choices=['retention', 'bindings', 'producers', 'post-completion'], required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--artifacts', type=Path)
     parser.add_argument('--components', type=Path)
@@ -446,8 +613,8 @@ if __name__ == '__main__':
     COLLECTOR = args.collector.resolve(strict=True); ARTIFACTS = args.artifacts.resolve(strict=True) if args.artifacts else None
     os.umask(0o077); OUTPUT = args.output.resolve(); OUTPUT.mkdir(mode=0o700, parents=False, exist_ok=False)
     write(OUTPUT/'invocation.json', {'collector': str(COLLECTOR), 'collector_sha256': sha(COLLECTOR), 'stage': args.stage, 'components': str(COMPONENTS) if COMPONENTS else None, 'artifacts': str(ARTIFACTS) if ARTIFACTS else None, 'simulated_completion_only': True, 'actual_children': 0, 'global_watchdog': None})
-    suite = unittest.defaultTestLoader.loadTestsFromTestCase({'retention': Retention, 'bindings': Bindings, 'producers': Producers}[args.stage])
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase({'retention': Retention, 'bindings': Bindings, 'producers': Producers, 'post-completion': PostCompletion}[args.stage])
     count = suite.countTestCases(); result = unittest.TextTestRunner(verbosity=2).run(suite)
     complete = count > 0 and result.testsRun == count and not result.failures and not result.errors and not result.skipped
-    write(OUTPUT/'result.json', {'status': 'INERT_CHECKS_PASS' if complete else 'INERT_CHECKS_FAIL_OR_INCOMPLETE', 'collected': count, 'run': result.testsRun, 'failures': len(result.failures), 'errors': len(result.errors), 'skips': len(result.skipped), 'actual_children': 0, 'scope': 'Collector retention/admission only, no compilation/kernel/provider/product proof'})
+    write(OUTPUT/'result.json', {'status': 'INERT_CHECKS_PASS' if complete else 'INERT_CHECKS_FAIL_OR_INCOMPLETE', 'collected': count, 'run': result.testsRun, 'failures': len(result.failures), 'errors': len(result.errors), 'skips': len(result.skipped), 'actual_children': 0, 'scope': 'Collector retention/admission/post-completion projection only, no compilation/kernel/provider/product proof'})
     raise SystemExit(0 if complete else 1)

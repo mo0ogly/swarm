@@ -975,3 +975,37 @@ observés contient25cabd. Ces hashes sont des sources différentes, pas une preu
 d'équivalence. Le corpus25cabd demeure dans la preuve DD : il n'est pas ajouté
 au dépôt par ce lot. Ni recette/launcher sauvegardé entier, ni profil livré,
 conversion moteur ou installation ne sont qualifiés par les seuls résultats.
+
+
+### R4 — completion retenue après refus tardif, preuves séparées
+
+Le collecteur0ad rend le même CompletedProcess porteur de l'outcome final. invoke
+lie cette completion connue à la cause primaire ultérieure, ou au groupe de
+nettoyage seul ; aucun payload n'est dupliqué si une cause le porte déjà. Une
+completion0 ne devient pas un succès de toute la fixture ; aucun refus avant
+completion ne reçoit un résultat inventé. Les publications et leurs erreurs
+restent distinctes des octets observés, sans retry ni cause supprimée.
+Les quatre gardes ajoutées dans3faef utilisent des completions simulées et des
+FD privés : fsync+cleanup, cleanup seul, publication et diagnostic stdout.
+La réception02 conserve quatre assertions RED attendues sur9956 et quatre
+méthodes PASS sur0ad. Les anciennes étapes7/19/6 n'ont pas été rejouées.
+
+La réception native02 distincte relit146 fichiers et dix enfants prepare/close :
+six témoins sains (quatre avant variante, deux reprises fraîches), deux RED
+comportementaux attendus baseline et deux GREEN candidat. Les vingt closes
+réels observés ont rc0/errno0 ; EIO/EBADF sont injectés après un close réussi.
+Aucun échec OS réel de close, fuite ou libération complète n'en est établi.
+L'égalité stdio parent est une assertion exécutée du collecteur, pas un état
+après sérialisé indépendamment. Le bootstrap25cabd et ses données de configuration
+restent liés à cette exécution précise ; ils ne qualifient pas le launcher/recette
+entier sur le bootstrap4ece de ce WIP. Pas d'authentification complète du loader,
+de la toolchain ou des namespaces, ni de projection publique moteur démontrée.
+
+Preuves bornées, conservées sans nouveau run :
+- R3a7/19 : `bec52c7f31ac458ebd5c8e6ed8a245c4b25efd0eba14a61d633dbafa671b34a5`.
+- Bindings6 : `091b25c8219e6cbfc9241acbb3c416031aa2817ba49f3039876cc4487a1ac781`.
+- R4 RED/GREEN : `5e24c260553c4492e3232475308a5aed4349cea6cbdacb66c7387c69b03f2191`.
+- Dix natifs : `b7d94ffa6da7787af6380562bed19fbdad879d0f734deaf1d1f2f51fc5d513f0`.
+Le manifeste WIP fournit leurs chemins et sources exacts. Root reste propriétaire
+de l'admission de cohorte, du profil livré, des parcours moteur et de la livraison ;
+ces critères et l'acceptation globale ne sont pas clos par cette sauvegarde.

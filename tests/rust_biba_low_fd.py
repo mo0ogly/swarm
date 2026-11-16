@@ -314,6 +314,9 @@ def completed_child(argv, env, channels, out, run_process=None, publish_file=Non
     publication status is explicit, never inferred from observing bytes. Each
     filename is attempted once. Distinct failure publication is not a retry.
     No timeout/retry/compilation; injected callbacks support proposed source guards.
+    Return the same CompletedProcess with its finalized low_fd_outcome attached;
+    failures carry that outcome on their raised group. This is process completion
+    and publication evidence, never proof that later invoke phases succeeded.
     """
     run_process = subprocess.run if run_process is None else run_process
     publish_file = publish if publish_file is None else publish_file
@@ -352,6 +355,7 @@ def completed_child(argv, env, channels, out, run_process=None, publish_file=Non
         failure = BaseExceptionGroup('Completed child or evidence retention failed', errors)
         failure.low_fd_outcome = outcome
         raise failure
+    child.low_fd_outcome = outcome
     return child
 
 
@@ -361,12 +365,15 @@ def invoke(label, mode, artifact, shim, out, permit=None):
     The runner never signals another process or closes parent stdio. No timeout,
     retries or output truncation. Failure attempts paired retention and returns no completed assertion;
     per-file status, not observed bytes, defines what was published. A faulty case requires a just-observed matching witness.
+    Known completion stays on a later primary error, or on a cleanup-only group
+    when a prepared return fails. Groups retaining a primary carrier do not add
+    a duplicate payload. Pre-completion failures gain no invented completion.
     """
     binding = dict(driver_sha256=digest(artifact), shim_sha256=digest(shim))
     require(mode == 'control' or permit == binding, 'fault-without-matching-observed-witness')
     out.mkdir(mode=0o700)
     root = fixture_root('swarm-biba-low-fd-'); (root/'.swarm').mkdir(mode=0o700); workspace = root/'out'; workspace.mkdir(mode=0o700)
-    before = parent_stdio(); files = []; primary = None
+    before = parent_stdio(); files = []; primary = None; child = None
     try:
         for name in ['report.tsv', 'events.tsv']:
             fd = os.open(out/name, os.O_RDWR | os.O_CREAT | os.O_EXCL, 0o600); files.append(fd)
@@ -385,6 +392,8 @@ def invoke(label, mode, artifact, shim, out, permit=None):
         return value
     except BaseException as error:
         primary = error
+        if child is not None and hasattr(child, 'low_fd_outcome') and not hasattr(error, 'low_fd_outcome'):
+            error.low_fd_outcome = child.low_fd_outcome
         raise
     finally:
         cleanup_errors = []
@@ -394,7 +403,10 @@ def invoke(label, mode, artifact, shim, out, permit=None):
             except BaseException as error:
                 cleanup_errors.append(error)
         if cleanup_errors:
-            raise BaseExceptionGroup('Fixture channels close failed', ([primary] if primary else []) + cleanup_errors)
+            group = BaseExceptionGroup('Fixture channels close failed', ([primary] if primary else []) + cleanup_errors)
+            if child is not None and hasattr(child, 'low_fd_outcome') and not (primary is not None and hasattr(primary, 'low_fd_outcome')):
+                group.low_fd_outcome = child.low_fd_outcome
+            raise group
 
 
 def check_injected(case, mode, baseline):

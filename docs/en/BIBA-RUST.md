@@ -924,3 +924,35 @@ fixture_area4ece, PR40/f5d has1699, while the observed ten-native bootstrap has2
 These are distinct source hashes, not equivalence proof. Corpus25cabd stays in its
 DD evidence, outside this commit. Neither the complete saved recipe/launcher nor
 delivered profile, engine conversion or installation is qualified by these results.
+
+
+### R4 — preserve completion after late refusal, separate evidence
+
+Collector0ad returns the same CompletedProcess carrying the finalized outcome.
+invoke attaches known completion to a later primary cause or cleanup-only group;
+it avoids duplicating a payload already carried by a cause. Completion0 is not
+whole-fixture success; no result is fabricated for pre-completion failure.
+Publication outcomes stay separate from observed bytes, without retry or loss
+of original causes. The four new3faef guards use simulated completions and private
+FDs: fsync+cleanup, cleanup alone, publication refusal and nonempty stdout.
+Reception02 retains four expected baseline9956 assertion REDs and four candidate0ad
+method PASS results. Earlier7/19/6 stages were not replayed.
+
+Separate native reception02 rehashes146 files and ten prepare/close children:
+six healthy controls (four preceding fault variants and two fresh recoveries),
+two expected baseline behavioral REDs and two candidate GREENs. All twenty actual
+close events had rc0/errno0; EIO/EBADF were injected after successful real close.
+No genuine OS close failure, leak or complete release is established. Parent
+stdio equality is an executed collector assertion, not independently serialized
+after-state. Bootstrap25cabd/configuration remains bound to that specific run,
+not the whole saved launcher/recipe on this WIP's4ece bootstrap. Full loader,
+toolchain/namespace authentication and public engine projection remain unproven.
+
+Bounded retained evidence, without a new run:
+- R3a7/19: `bec52c7f31ac458ebd5c8e6ed8a245c4b25efd0eba14a61d633dbafa671b34a5`.
+- Bindings6: `091b25c8219e6cbfc9241acbb3c416031aa2817ba49f3039876cc4487a1ac781`.
+- R4 RED/GREEN: `5e24c260553c4492e3232475308a5aed4349cea6cbdacb66c7387c69b03f2191`.
+- Ten native: `b7d94ffa6da7787af6380562bed19fbdad879d0f734deaf1d1f2f51fc5d513f0`.
+The WIP manifest binds exact paths and source hashes. Root still owns cohort
+admission, delivered profile, engine flows and delivery; this safeguard closes
+none of those gates or global acceptance.
