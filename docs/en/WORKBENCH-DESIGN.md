@@ -65,6 +65,15 @@ the local limits fragment. Trust applies the incoming theme only for `etat` or
 `sombre`; outgoing links reread the preference on click. These presentation
 parameters carry no token.
 
+PAEA checks (`/paea.html`) and Security and evidence (`/security-proofs.html`)
+have no board in the mockups. They get the same shell from
+`web/workbench-shell.js` (16 November 2026), enabled by `data-workbench-*`
+attributes on `<body>`: shared rail with the current entry, header moved into the
+page with section number and introduction, Dark/Light switch (the original button
+stays in the DOM, hidden, because the page script listens to it), PAEA links in a
+card grid and sections as cards. Nodes are moved, never copied: IDs, links and
+calls stay with the page. Rail links carry only language, theme and view. Test:
+`node tests/workbench_shell_pages_test.cjs OUTPUT`.
 
 ## Integrated Conduite presentation
 

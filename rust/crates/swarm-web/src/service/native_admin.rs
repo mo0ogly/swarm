@@ -79,6 +79,7 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/swarm-workbench.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/swarm-workbench.js"))),
         "/swarm-workbench.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/swarm-workbench.css"))),
         "/trust-workbench.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/trust-workbench.js"))),
+        "/workbench-shell.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/workbench-shell.js"))),
         "/cockpit-native-read.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-read.js"))),
         "/cockpit-native-instructions.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-instructions.js"))),
         "/cockpit-native-panels.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-panels.js"))),

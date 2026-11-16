@@ -18,7 +18,7 @@ const receiptRaw = JSON.stringify({schema_version: 1, action_digest: vector.acti
 const sha = raw => crypto.createHash('sha256').update(raw).digest('hex');
 const csrf = 'a'.repeat(64);
 const assets = new Map(['/paea.html', '/paea.js', '/paea.css', '/i18n-en.js', '/i18n.js',
-  '/swarm-design.css', '/wattson_themes.css', '/swarm-logo.png'].map(url => [url, 'web' + url]));
+  '/swarm-design.css', '/wattson_themes.css', '/swarm-logo.png', '/swarm-workbench.css', '/workbench-shell.js'].map(url => [url, 'web' + url]));
 let scenario = 'valid', server, browser, releaseResponse, markReceived;
 /** Record an observable assertion, allowing diagnosis while no global timer runs. */
 function check(name, value) { assert(value, name); checks.push(name); console.log('PASS ' + name); }
@@ -109,7 +109,7 @@ async function submit(page, expected) {
       check(`${lang}-${theme}-${width}-heading`, (await page.$eval('h1', element => element.textContent)) ===
         (lang === 'fr' ? 'Vérifications PAEA' : 'PAEA checks'));
       check(`${lang}-${theme}-${width}-theme`, await page.$eval('html', (element, value) => element.dataset.theme === value, theme));
-      check(`${lang}-${theme}-${width}-independent-cockpit-navigation`, await page.$eval('nav a', element =>
+      check(`${lang}-${theme}-${width}-independent-cockpit-navigation`, await page.$eval('header nav a', element =>
         element.textContent === 'Cockpit' && element.getAttribute('href') === '/'));
       await selectInputs(page, documentPath, receiptPath);
       scenario = 'valid'; await submit(page, 'success');
