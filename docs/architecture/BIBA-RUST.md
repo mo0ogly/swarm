@@ -751,8 +751,9 @@ déclaré terminé.
 
 ## Puits stdio fixe du worker Linux — candidat en revue
 
-Statut : contrat du candidat privé, revue indépendante et qualification à faire.
-Ni compilation, ni exécution, ni installation établies par cette annexe.
+Statut : contrat du candidat privé, revu en source ; qualification produit ouverte.
+La preuve unitaire datée ci-dessous établit seulement son périmètre à doubles,
+sans installation ni qualification du worker.
 À collationner avec les pages BIBA-RUST FR/EN sur leurs préfixes réels ; ne pas
 remplacer leurs autres sections ou y importer le profil de méthodes déclarées.
 
@@ -784,10 +785,54 @@ contrôles justifiés. Les preuves64/13 restent sur380 ;381 n’est pas qualifi�
 ReadOnly, prepare_declared et les17 deltas méthodes/avis sont exclus du candidat.
 
 
-Limite héritée conservée : `kernel::ruleset` garde son original bas dans
-`_original` puis le libère par `Drop` lors du repin, sans remonter une erreur
-de cette fermeture. Le correctif `lib::open` ne prouve donc pas tous les closes
-du noyau. Propriétaire : Biba/root ; reprise : contrat de fermeture bas/duplicata
-et causes primaire/cleanup revu séparément, puis témoin du vrai chemin bas et
-injections contrôlées/refus/reprise dans un processus isolé. Aucun correctif
-exécutable de ce chemin n’est inclus dans cette composition.
+Complément candidat de gestion des descripteurs, revu en source et vérifié
+unitairement dans le périmètre daté ci-dessous :
+le constructeur ABI `kernel::ruleset` rend un `OwnedFd` brut, éventuellement bas.
+Le wrapper privé de bibliothèque le passe au repin partagé avec `open` avant
+rétention dans `Sandbox`. Une création refusée garde `biba-ruleset` ; un dup
+refusé garde `biba-ruleset-repin` et chaque erreur indépendante de close. Si le
+close de l’original échoue après dup, le duplicata est fermé explicitement une
+fois et sa cause éventuelle reste distincte. Aucun retry de close ni succès bas
+n’est ajouté au chemin de production ; une erreur ne prouve pas une libération.
+
+La feuille de lecture englobe aussi métadonnées et ajout de règle dans une seule
+opération possédée, suivie de `finish` avec close explicite même si metadata
+refuse. `Error::into_parts` et l’adaptateur moteur inchangés conservent les
+branches primaire/cleanup ; aucun IO custom ne masque les causes. Les masques,
+permissions, droits, budgets et politiques sont inchangés.
+
+Les six gardes de `repin_tests.rs` ont été compilées et exécutées dans le
+périmètre unitaire daté ci-dessous.
+Elles utilisent des handles et errno simulés sans syscall ni vrai stdio ; elles
+ciblent témoins, refus, close exact-once, absence de Drop implicite et reprise.
+Un vrai chemin bas dans un enfant isolé, les refus/injections après témoin et la
+traversée publique moteur/diagnostics sous le profil livré restent à qualifier
+par root/CI. Aucun échec réel de close, enforcement, installation ou conformité
+globale n’est établi ici ; les limites et preuves historiques restent conservées.
+
+### Preuve unitaire conservée — 16 novembre 2026
+
+Root a exécuté une seule commande Cargo `--lib --no-run` avec succès
+(3,022 s observées), puis une seule sélection `repin_tests::` : six tests nommés
+réussis, zéro échec, zéro ignoré, un test filtré. Le garde null-sink ancien est
+filtré et ne compte pas comme PASS. Profil libtest `test=true`, `features=[]` ;
+28 entrées effectives archivées, image
+`2573511df9b7244df91018b7511ed4df33019799ed7da1f9a7d04d0bbbe1aac7`.
+Les trois sources Rust restent identiques aux postimages revues.
+
+Preuve : `/run/media/fpizzi/SWARM/swarm-evidence/biba-descriptor-unit-root-20261116-u6detosi`,
+`six-guards-01/result.json`, SHA256
+`10d4f0bb32b84dbcdb963a4fa29002487834a5e1953a4cc6e87515c3431c950e`.
+Revue indépendante 09 :
+`/run/media/fpizzi/SWARM/swarm-evidence/review09-version-cd01-20261116/biba-descriptor-unit/REPORT.json`,
+SHA256 `e72319e39d6332906924fc075f9df97238fb42ee5f3b4d316315147e76317e83`,
+approbation de cette preuve unitaire bornée. Le refus initial de qualification
+des chemins relatifs de depfile reste conservé ; la résolution a été corrigée
+sur la même image, sans seconde commande Cargo. Le paquet source et son état
+antérieur non exécuté demeurent des preuves historiques inchangées.
+
+Ces doubles ne prouvent ni un RED comportemental sur la base avant correction,
+ni un vrai FD bas possédé dans un enfant isolé, ni une erreur réelle de close,
+ni la projection publique des causes par le moteur. Ces critères, le profil
+produit normal, le binaire livré, Version/notes FR/EN et l’installation restent
+ouverts sous l’attribution root. Aucun enforcement ou succès global n’en découle.

@@ -713,8 +713,9 @@ accepted, Bell-LaPadula not declared finished.
 
 ## Fixed Linux worker stdio sink — candidate under review
 
-Status: private candidate contract, pending independent review and qualification.
-This appendix establishes no compilation, execution or installation. Collate it
+Status: source-reviewed private candidate contract; product qualification open.
+The dated unit evidence below covers mocks only, with no installation or worker
+qualification. Collate it
 with the actual FR/EN BIBA-RUST prefixes without replacing foreign sections or
 importing the separate declared-method profile.
 
@@ -743,10 +744,54 @@ only justified checks.64/13 proofs remain380;381 is not qualified. ReadOnly,
 prepare_declared and the17 held-method/opinion deltas are excluded.
 
 
-Retained inherited limit: `kernel::ruleset` keeps its low original in
-`_original` and closes it through `Drop` during repinning, without propagating
-that close error. The `lib::open` correction therefore does not prove all kernel
-closes. Owner: Biba/root. Resume after a separately reviewed low/duplicate close
-contract and primary/cleanup traversal, then a real low-FD control and controlled
-fault/refusal/recovery cases in an isolated process. No executable correction of
-that kernel path is included in this composition.
+Source-reviewed descriptor-management candidate follow-up, compiled and exercised
+within the dated unit scope below:
+the ABI constructor `kernel::ruleset` transfers a raw `OwnedFd`, possibly low.
+The private library wrapper uses the same repin transition as `open` before
+retaining it in `Sandbox`. Creation refusal keeps `biba-ruleset`; dup refusal
+keeps `biba-ruleset-repin` and every independent close cause. If original close
+fails after duplication, the duplicate gets one explicit close attempt and its
+possible cause stays separate. The production path adds no close retry or low
+successful return; a close error never proves release.
+
+The read-leaf operation also owns the descriptor through metadata and rule
+addition, followed by `finish` with explicit close even if metadata refuses.
+Unchanged `Error::into_parts` and engine conversion retain primary/cleanup
+branches without custom-IO hiding. Masks, permissions, authority, budgets and
+policies are unchanged.
+
+The six guards in `repin_tests.rs` were compiled and executed within the dated
+unit scope below.
+They use simulated owned handles/errno without syscalls or real stdio and target
+witnesses, refusals, exactly-once close attempts, no implicit Drop and recovery.
+A real low-FD path in an isolated child, controlled refusals/injections after a
+valid witness and public engine/diagnostic traversal under the delivered profile
+still need root/CI qualification. No real close failure, enforcement, installation
+or global conformance is established; historical proofs and limits are retained.
+
+### Retained unit evidence — 16 November 2026
+
+Root ran one successful Cargo `--lib --no-run` command (3.022 s observed),
+then one `repin_tests::` selection: six named tests passed, zero failed,
+zero ignored, one filtered. The old null-sink guard was filtered and is not
+counted as PASS. Libtest profile: `test=true`, `features=[]`; 28 effective
+inputs archived, image
+`2573511df9b7244df91018b7511ed4df33019799ed7da1f9a7d04d0bbbe1aac7`.
+The three Rust sources remain identical to the reviewed postimages.
+
+Evidence: `/run/media/fpizzi/SWARM/swarm-evidence/biba-descriptor-unit-root-20261116-u6detosi`,
+`six-guards-01/result.json`, SHA256
+`10d4f0bb32b84dbcdb963a4fa29002487834a5e1953a4cc6e87515c3431c950e`.
+Independent review 09:
+`/run/media/fpizzi/SWARM/swarm-evidence/review09-version-cd01-20261116/biba-descriptor-unit/REPORT.json`,
+SHA256 `e72319e39d6332906924fc075f9df97238fb42ee5f3b4d316315147e76317e83`,
+approving this bounded unit evidence. The original relative-depfile qualification
+refusal is retained; path resolution was corrected on the same image without
+a second Cargo command. The source packet and its earlier unexecuted state
+remain unchanged historical evidence.
+
+Mocks establish no baseline behavioral RED, real owned low FD in an isolated
+child, actual close failure or public engine projection of causes. These gates,
+the normal production profile, delivered image, Version/FR_EN notes and
+installation remain open under root allocation. No enforcement or global
+acceptance follows from these results.

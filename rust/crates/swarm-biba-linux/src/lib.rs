@@ -17,25 +17,62 @@ fn invalid(stage:&'static str)->Error{err(stage,io::Error::from_raw_os_error(lib
 /// once for every owned FD; an error is not a proof of successful release.
 fn open(path:&Path)->Result<File,Error>{
     let file=OpenOptions::new().read(true).custom_flags(libc::O_PATH|libc::O_CLOEXEC|libc::O_NOFOLLOW).open(path).map_err(|e|err("biba-path-open",e))?;
-    // The helper's caller owns fds 0-2 and may reassign them (stdin dup2) while
-    // a Sandbox lives. Owning a descriptor below 3 lets that reassignment close
-    // it behind this crate's back; never accept one — repin above 3 immediately.
-    if file.as_raw_fd()>=3{return Ok(file)}
-    let raw=file.as_raw_fd();
-    // SAFETY: raw is the owned descriptor just opened, still valid here.
-    let pinned=unsafe{libc::fcntl(raw,libc::F_DUPFD_CLOEXEC,3)};
-    if pinned<0{return finish(Err(err("biba-path-repin",io::Error::last_os_error())),close(file))}
-    // SAFETY: adopt exactly the duplicate produced above, with unique ownership.
-    let pinned=unsafe{File::from_raw_fd(pinned)};
-    match close(file){
+    repin(file,"biba-path-repin")
+}
+/// Apply the shared low-descriptor transition to one owned handle. `duplicate`
+/// must return a fresh owned handle above stdio, as F_DUPFD_CLOEXEC with min 3
+/// does in production. Capture its error before any close. On refusal, attempt
+/// original close once; if duplication succeeded but original close failed,
+/// attempt duplicate close once too. Preserve all returned causes via finish.
+/// Already-high handles transfer unchanged. No close retry or release proof;
+/// panic/unwinding and arbitrary nonconforming callbacks are outside this contract.
+fn repin_with<T:AsRawFd>(
+    handle:T,stage:&'static str,
+    duplicate:impl FnOnce(&T)->io::Result<T>,
+    mut close_once:impl FnMut(T)->Result<(),Error>,
+)->Result<T,Error>{
+    if handle.as_raw_fd()>=3{return Ok(handle)}
+    let pinned=match duplicate(&handle){
+        Ok(pinned)=>pinned,
+        Err(cause)=>return finish(Err(err(stage,cause)),close_once(handle)),
+    };
+    match close_once(handle){
         Ok(())=>Ok(pinned),
-        Err(error)=>finish(Err(error),close(pinned)),
+        Err(cause)=>finish(Err(cause),close_once(pinned)),
     }
+}
+/// Pin one File/OwnedFd above caller-controlled stdio without changing rights.
+/// A low original is duplicated with CLOEXEC and min 3. Adopt only the fresh
+/// successful fcntl result, and use explicit one-attempt close for each owner.
+/// A dup or close refusal retains primary/cleanup causes; it proves no release.
+fn repin<T:AsRawFd+IntoRawFd+FromRawFd>(handle:T,stage:&'static str)->Result<T,Error>{
+    repin_with(handle,stage,|owned|{
+        // SAFETY: borrowed owned FD remains live throughout fcntl; successful
+        // F_DUPFD_CLOEXEC returns a fresh descriptor >= 3, uniquely adopted here.
+        let pinned=unsafe{libc::fcntl(owned.as_raw_fd(),libc::F_DUPFD_CLOEXEC,3)};
+        if pinned<0{Err(io::Error::last_os_error())}
+        else{Ok(unsafe{T::from_raw_fd(pinned)})}
+    },close)
+}
+/// Create and retain a ruleset above stdio. Creation errors keep biba-ruleset;
+/// duplication errors keep biba-ruleset-repin and independent explicit close
+/// causes. No custom IO wrapping hides cleanup from into_parts/engine convert.
+fn ruleset()->Result<std::os::fd::OwnedFd,Error>{
+    let created=kernel::ruleset().map_err(|e|err("biba-ruleset",e))?;
+    repin(created,"biba-ruleset-repin")
 }
 /// Explicitly close an owned FD; preserve close failure rather than retrying it.
 fn close(file:impl IntoRawFd)->Result<(),Error>{let fd=file.into_raw_fd();
     // SAFETY: consume exactly the owned descriptor once, never a borrowed fd.
     if unsafe{libc::close(fd)}<0{Err(err("biba-close",io::Error::last_os_error()))}else{Ok(())}
+}
+/// Run a fallible operation while retaining ownership, then always attempt its
+/// explicit close once before returning. Primary and close errors remain distinct
+/// through finish. This covers returned errors, not panic/unwinding; a close error
+/// is not successful release. Callbacks consume/borrow only this owned handle.
+fn with_close<T>(owned:T,operation:impl FnOnce(&T)->Result<(),Error>,close_once:impl FnOnce(T)->Result<(),Error>)->Result<(),Error>{
+    let result=operation(&owned);
+    finish(result,close_once(owned))
 }
 /// Validate the actual pinned standard null sink, never a path or a regular
 /// substitute. Linux character device major1/minor3 is a technical device ABI
@@ -99,11 +136,13 @@ impl Sandbox {
     /// Prepare using the gate's recorded workspace device/inode. This observation
     /// is not an identity or grant. Pin the exact directory before inspecting it;
     /// every later rule and cwd consumes that FD, never a re-resolved pathname.
-    /// Every descriptor this crate returns is owned above 2 (`biba-path-repin`
-    /// otherwise): the caller owns 0-2 and may reassign them while the Sandbox
-    /// lives, which would close a low pinned FD behind its back.
-    /// A replaced/symlink/unsafe directory refuses. Explicit close failures in
-    /// this module are retained; kernel::ruleset's low-FD Drop close is not observed.
+    /// Every descriptor retained in the prepared Sandbox lives above 2
+    /// (`biba-path-repin`/`biba-ruleset-repin` otherwise): the caller owns 0-2
+    /// and may reassign them while the Sandbox lives, which would close a low
+    /// pinned FD behind its back.
+    /// A replaced/symlink/unsafe directory refuses. Returned repin and explicit
+    /// close failures retain their primary/cleanup causes, including the low ruleset original
+    /// and any duplicate that must be discarded. A close error proves no release.
     /// This does not freeze writes by an outside unconfined same-UID actor.
     /// Worker stdio additionally admits only the pinned Linux null character
     /// device with read/write file rights. Invalid-device, rule and explicit
@@ -125,14 +164,16 @@ impl Sandbox {
         let private=match open(&private_path){Ok(f)=>f,Err(e)=>return finish(Err(e),close(workspace))};
         let checked=private.metadata().map_err(|e|err("biba-private-root-metadata",e)).and_then(|m|if m.is_dir(){Ok(())}else{Err(invalid("biba-private-root-required"))});
         if let Err(e)=checked{return finish(finish(Err(e),close(workspace)),close(private))}
-        let rules=match kernel::ruleset(){Ok(r)=>r,Err(e)=>return finish(finish(Err(err("biba-ruleset",e)),close(workspace)),close(private))};
+        let rules=match ruleset(){Ok(r)=>r,Err(e)=>return finish(finish(Err(e),close(workspace)),close(private))};
         let result=(||{
             let mut leaves=Vec::new();read_leaves(Path::new("/"),&private_path,&mut leaves)?;
             for p in leaves {
-                let f=open(&p)?;let is_dir=f.metadata().map_err(|e|err("biba-rule-metadata",e))?.is_dir();
-                let access=if is_dir{kernel::READ}else{kernel::READ&!(1<<3)};
-                let added=kernel::add(&rules,&f,access).map_err(|e|err("biba-read-rule",e));
-                finish(added,close(f))?;
+                let f=open(&p)?;
+                with_close(f,|f|{
+                    let is_dir=f.metadata().map_err(|e|err("biba-rule-metadata",e))?.is_dir();
+                    let access=if is_dir{kernel::READ}else{kernel::READ&!(1<<3)};
+                    kernel::add(&rules,f,access).map_err(|e|err("biba-read-rule",e))
+                },close)?;
             }
             add_null_sink(&rules)?;
             kernel::add(&rules,&workspace,kernel::ALL).map_err(|e|err("biba-output-rule",e))
@@ -212,3 +253,6 @@ mod null_sink_tests {
         close(other).unwrap();validate_null_sink(&null).unwrap();close(null).unwrap();
     }
 }
+
+#[cfg(test)]
+mod repin_tests;
