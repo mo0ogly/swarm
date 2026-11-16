@@ -2054,3 +2054,25 @@ before `cfg(test)` remain identical (SHA256
 `8ad0a25c28581acc25b7c566ff59e32d708fb923cdf06a2428368ecb31291871`).
 Local proof does not replace required checks on the published head; PR #20
 retains their current outcome and the merge decision.
+
+
+### C-D01 / R1 — private Rust candidate, coordinator D5 decision (16 November 2026)
+
+**Proposed implementation in a private packet only; not compiled, tested, applied or independently accepted.** Immutable base `230d4b25441a4fa83dc2d993e20bcbc60f193ab8`; fixture_area.rs exactly matches captured R0. No current main/PR40/Gi state inferred; historical Python/C3-P/snapshot proofs preserved without replay.
+
+Adopted D5 scope: the global wrapper context is the process, retaining the first complete success **or refusal**, including provenance. New adoption requires a new context/process. No reset, implicit retry after refusal or duplicate concurrent initialization access. Proposed tests own fresh contexts and do not mutate global/live settings.
+
+Public PathBuf signatures, fallback_area, product validation and callers are preserved. An internal fallible resolver separates actual absence, IO/JSON/shape/type failures, not-configured and path validation. Only observed absence relative to a held parent permits a read/validated default. Descriptor identity and consumed-byte hashes establish neither authorship, atomic snapshots nor confinement; existing symlinks remain possible.
+
+The proposed additive FixtureAreaError export lets a real catch_unwind consumer downcast the typed wrapper payload, retaining original Arc causes and secondary close/observation branches. Default panic hooks may display an opaque payload. Fixture callbacks must return errors without panic/reentry; unexpected panic/abort remains incomplete execution, not qualified evidence. Kernel close failures retain phase/former fd/uncertainty without retry or Drop of that fd. Proposed faults after actual release are explicitly synthetic.
+
+Ten new test functions are source proposals, not executed outcomes: healthy controls, absence/missing/null, JSON/shape/types, exact grammar, directory/FIFO/dangling/regular symlinks, held-parent replacement, read/close/observer branches received at the wrapper, secondary-only failure, concurrent success/refusal, effective permissions and fresh-context recovery. Ten test sources do not mean ten PASS results. Pre-fix counterexamples and matching controls are specified separately; no red/green proof exists yet.
+
+Prerequisites: independent09 source review of the frozen packet; admission of pre-fix witnesses on the old base with the same identity and controls; effective profile/graph/tool/storage admission; then root allocation of targeted checks. Root sequences application/Git/build/tests after reception. No C-D01/full C-3/R04/R06/R08/R07/C5/BF-L0 closure, binary/service delivery or runtime version note is claimed for this private candidate.
+
+
+### C-D01 / R1a — emit comment aligned, private packet (16 November 2026)
+
+R1 review09: APPROVE_BOUNDED_SOURCE_WITH_OPEN_P3_COMMENT, report SHA256 b29b56abebfb58e865f18d927d62c0c970406ef52cffd97323a4b29d679efd18. Frozen R1 preserved. R1a only corrects emit documentation: construct event, call observer and retain returned error, then append event to trace. Callback panic does not establish that append; panic/reentry remain outside the hook contract. No executable instruction changed; no new runtime/typecheck/test evidence.
+
+The ten Context test sources and legacy adapter are unchanged and unexecuted. They do not establish RED on the absent old API. Before allocating checks, root must admit a paired harness using identical fixtures/identity/controls and the minimal root/cache-binding adaptation of the old body, separately from Context and payload-converter guards. The process-global wrapper and catch_unwind reception remain separately allocated paths. Checks are deferred in the root/CI sequence, not abandoned or PASS. No other call/shared edit/Git/build/service.

@@ -2425,3 +2425,25 @@ produit avant `cfg(test)` restent identiques (SHA256
 `8ad0a25c28581acc25b7c566ff59e32d708fb923cdf06a2428368ecb31291871`).
 Ces preuves locales ne remplacent pas les contrôles requis sur la tête publiée ;
 leur résultat courant et la décision de fusion sont consultables dans PR #20.
+
+
+### C-D01 / R1 — candidat Rust privé, décision D5 du coordinateur (16 novembre 2026)
+
+**Implémentation proposée en paquet privé uniquement, non compilée, non testée, non appliquée et sans acceptation indépendante.** Base immuable `230d4b25441a4fa83dc2d993e20bcbc60f193ab8`, `fixture_area.rs` identique au R0 capturé ; aucun état global de main/PR40/Gi déduit. Preuves Python/C3-P/snapshot historiques conservées, aucun rejeu.
+
+Décision D5 reçue : le contexte du wrapper global est le processus ; il conserve le premier résultat complet, succès **ou refus**, avec provenance. Une adoption nouvelle demande un nouveau contexte/processus ; pas de reset ni de retry implicite après refus, et pas de double accès lors des initialisations concurrentes. Les tests proposés utilisent des contextes possédés neufs, pas la configuration live ni le global.
+
+Le candidat conserve les signatures publiques `PathBuf`, `fallback_area`, le validateur produit et les appelants. Il extrait une résolution fallible interne ; les types d'absence, erreurs IO/JSON/structure/type, non-configuré et grammaire restent distincts. Seule l'absence observée relative à un parent détenu ouvre le défaut lu/validé. L'identité des descripteurs et le hash des octets consommés n'établissent ni auteur, ni snapshot atomique, ni confinement. Les symlinks existants restent possibles.
+
+`FixtureAreaError`, export additif proposé pour le vrai consommateur de `catch_unwind`, retient causes originales sous Arc, fermetures et observations secondaires. Le wrapper panique avec ce payload typé, pas son Display ; le hook panic par défaut peut afficher un payload opaque. Les callbacks de fixture doivent retourner des erreurs, sans panic/réentrée ; panic inattendue/abort reste une exécution incomplète, pas un résultat qualifié. Un échec noyau de close conserve phase, ancien fd et incertitude sans retry/Drop de ce fd. Les injections proposées après libération réelle sont explicitement synthétiques.
+
+Dix fonctions de test nouvelles sont écrites comme propositions non exécutées : témoins valides, absence réelle, champ absent/null, JSON/structures/types, grammaire exacte, dossier/FIFO/lien cassé/lien régulier, parent remplacé, causes lecture/close/observateur reçues par wrapper, erreurs secondaires seules, succès/refus concurrents, permissions effectives et reprise. Un compte de dix sources de tests ne signifie pas dix PASS. Les reproducteurs avant correction et les entrées stables sont spécifiés séparément, sans preuve de rouge/vert aujourd'hui.
+
+Préconditions : revue source indépendante09 du paquet figé, admission des contre-exemples sur la base ancienne avec mêmes témoins/identité, choix du profil/graphes/outils et stockage effectifs, puis allocation explicite root des contrôles ciblés. L'application/Git/compilation/tests sont séquencés par root après réception, pas autorisés par ce document. Ni C-D01, C-3 complet, R04/R06/R08/R07/C5, BF-L0-C ou BF-L0 global ne sont clos. Aucun binaire/service livré, aucune note de version runtime ajoutée pour ce candidat privé.
+
+
+### C-D01 / R1a — commentaire emit aligné, paquet privé (16 novembre 2026)
+
+Revue09 de R1 : APPROVE_BOUNDED_SOURCE_WITH_OPEN_P3_COMMENT, rapport SHA256 b29b56abebfb58e865f18d927d62c0c970406ef52cffd97323a4b29d679efd18. R1 figé et conservé. R1a corrige seulement la docstring d'emit : événement construit, observer invoqué et erreur retournée retenue, puis ajout de l'événement à la trace. Une panique du callback ne prouve pas cet ajout ; panic/réentrée restent hors contrat. Aucun corps d'instruction modifié, aucune nouvelle preuve runtime/typecheck/tests.
+
+Les dix sources de tests Context et l'adaptateur historique restent inchangés et non exécutés. Ils ne constituent pas un RED de l'API ancienne absente. Avant toute allocation de contrôles, root doit admettre un harness apparié sur mêmes fixtures/identité/contrôles et l'adaptation minimale de liaison root/cache de l'ancien corps, distinct des tests du Context et du convertisseur de payload. Le wrapper global par processus et la réception catch_unwind restent des parcours séparés à attribuer. Contrôles différés dans la séquence root/CI, jamais déclarés abandonnés ou PASS. Aucun autre appel, fichier partagé, Git, compilation ou service.

@@ -11,8 +11,8 @@
 //! present in `<repo>/.swarm/engine-settings.json`, must pass
 //! [`EngineSettingsValues::runtime_temporary_directory`].
 //! Outputs: a fresh 0700 directory `<prefix><random>` (or the area itself).
-//! Errors: settings refusals propagate unchanged; IO errors from directory
-//! creation propagate. Side effects: creates the area (0700) and the root on
+//! Errors: resolution refusals panic with a cloneable FixtureAreaError payload;
+//! directory-creation errors panic. No dependent allocation follows a refusal. Side effects: creates the area (0700) and the root on
 //! call, never on import. Limits: callers own retention and cleanup — this
 //! area holds fixture evidence, not a disposable cache; `std::env::temp_dir()`
 //! remains legitimate only for the categories exempted in
@@ -34,7 +34,8 @@
 //! [`fallback_area`] even inside swarm-cli. The guard also
 //! accepts `CARGO_TARGET_TMPDIR` (cargo-managed scratch) and runner-pinned
 //! `TMPDIR` reads as governed areas.
-use crate::engine_settings::EngineSettingsValues;
+mod resolution;
+pub use resolution::FixtureAreaError;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
@@ -47,65 +48,35 @@ fn repo_root() -> PathBuf {
         .expect("swarm-engine lives at rust/crates/swarm-engine")
 }
 
-/// Resolve the fixture area from the Admin setting, mirroring
-/// `tests/fixture_area.py::configured_area`: the value saved in
-/// `<repo>/.swarm/engine-settings.json` (edited through the Admin modal) wins,
-/// else the shipped installation default. Relative values resolve against the
-/// repository. All settings refusals (empty, traversal, `/tmp`) propagate.
-/// Read-only: nothing is created here.
+/// Unwrap one retained resolution without converting its typed causes to text.
+/// A catch_unwind consumer may downcast FixtureAreaError and inspect source(),
+/// close_causes() and observation_causes(). Default panic hooks can render only
+/// an opaque non-string payload; this is not a diagnostic-delivery guarantee.
+fn resolved_path(outcome: resolution::Outcome) -> PathBuf {
+    match outcome {
+        Ok(value) => value.path.clone(),
+        Err(error) => std::panic::panic_any(error),
+    }
+}
+
+/// Resolve once per process, retaining the first complete success OR refusal.
+/// Only proven saved entry absence allows the validated shipped fixture default.
+/// Present invalid/missing/null settings never adopt a default. Relative values
+/// use this checkout as base; no directory/configuration is written here.
+/// Failure panics with the exported cloneable FixtureAreaError payload, retaining
+/// original and secondary causes for a catch_unwind consumer. No textual cause
+/// delivery, atomic snapshot, confinement or automatic retry is promised. A new
+/// context/process is required to adopt changed settings after either outcome.
 pub fn configured_area() -> PathBuf {
-    static AREA: OnceLock<PathBuf> = OnceLock::new();
-    AREA
-        .get_or_init(|| {
-            let saved = repo_root().join(".swarm/engine-settings.json");
-            let raw = match std::fs::read(saved) {
-                Ok(bytes) => {
-                    let document: serde_json::Value = serde_json::from_slice(&bytes)
-                        .expect(".swarm/engine-settings.json is valid JSON");
-                    document
-                        .get("values")
-                        .and_then(|v| v.get("runtime_temporary_directory"))
-                        .and_then(serde_json::Value::as_str)
-                        .map(str::to_string)
-                }
-                Err(_) => None,
-            };
-            let raw = match raw {
-                Some(value) => value,
-                None => {
-                    let defaults = repo_root()
-                        .join("rust/crates/swarm-engine/config/engine-settings.json");
-                    let document: serde_json::Value = serde_json::from_slice(
-                        &std::fs::read(&defaults)
-                            .expect("shipped engine-settings.json is readable"),
-                    )
-                    .expect("shipped engine-settings.json is valid JSON");
-                    document
-                        .get("runtime_temporary_directory")
-                        .and_then(serde_json::Value::as_str)
-                        .expect("shipped default configures runtime_temporary_directory")
-                        .to_string()
-                }
-            };
-            // Same refusals as the Admin setting itself; a relative value is
-            // repository-relative, matching tests/fixture_area.py.
-            let values = EngineSettingsValues::installation_defaults().unwrap();
-            let mut probe = values;
-            probe.runtime_temporary_directory = Some(raw);
-            let validated = probe.runtime_temporary_directory().unwrap().to_string();
-            let path = PathBuf::from(validated);
-            if path.is_absolute() {
-                path
-            } else {
-                repo_root().join(path)
-            }
-        })
-        .clone()
+    static AREA: OnceLock<resolution::Context> = OnceLock::new();
+    let receipt = AREA.get_or_init(|| resolution::Context::new(repo_root())).resolve();
+    resolved_path(receipt.outcome)
 }
 
 /// Return the fixture area directory, creating it 0700 if absent. Mirrors
-/// `tests/fixture_area.py::fixture_area`. Errors propagate: a read-only
-/// checkout cannot host fixtures.
+/// `tests/fixture_area.py::fixture_area`. A read-only checkout cannot host
+/// fixtures. Resolution failures use FixtureAreaError
+/// panic payloads before allocation; mkdir failures retain the existing panic.
 pub fn fixture_area() -> PathBuf {
     use std::os::unix::fs::DirBuilderExt;
     let area = configured_area();
@@ -122,7 +93,9 @@ pub fn fixture_area() -> PathBuf {
 /// `std::env::temp_dir().join(...)`/`tempfile::tempdir()` fixture allocations
 /// that would place project data in `/tmp` on a bare cargo run. The root is
 /// `<prefix><random>` (12 random hex chars, like `generate_identifier`), mode
-/// 0700 by explicit creation. Callers own retention and cleanup.
+/// 0700 by explicit creation. Callers own retention and cleanup. Resolution
+/// failures panic with FixtureAreaError before allocation; creation/identifier
+/// failures retain the existing panic behavior, with no rollback promised.
 pub fn fixture_root(prefix: &str) -> PathBuf {
     use std::os::unix::fs::DirBuilderExt;
     let path = fixture_area().join(crate::generate_identifier(prefix).unwrap());
@@ -197,3 +170,7 @@ mod tests {
         assert!(a.file_name().unwrap().to_str().unwrap().starts_with("d04-area-"));
     }
 }
+
+#[cfg(test)]
+#[path = "fixture_area/resolution_tests.rs"]
+mod resolution_tests;
