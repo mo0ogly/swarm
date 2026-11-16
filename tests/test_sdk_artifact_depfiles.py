@@ -43,4 +43,72 @@ class ArtifactDepfiles(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'depfile-missing'):sdk_artifact_depfile(a)
 
 
+    def test_sdk_qualification_binds_config_and_refuses_changed_or_removed(self):
+        """Drive the actual qualifier with explicitly synthetic Cargo metadata.
+
+        Fresh retained files model one test artifact, dep-info and configuration;
+        no compiler, binary, Root, provider or genuine SDK executes. Healthy
+        controls verify archived config bytes before each mutation/removal and
+        fresh recovery. Reader refusals must preserve the actual faulted input.
+        """
+        import json,sys,tarfile,hashlib
+        repository=Path(__file__).resolve().parents[1]
+        sys.path.insert(0,str(repository/'tools/verification'))
+        try:
+            import verify_native_profile as profile
+            from rust_reviewer_claim_candidate import qualify_sdk
+            declared=os.environ.get('SWARM_SDK_CONFIG_TEST_AREA')
+            area=Path(declared) if declared else fixture_area()
+            root=Path(tempfile.mkdtemp(prefix='sdk-config-contract-',dir=area))
+            print('SDK_CONFIG_GUARD_ROOT '+str(root),flush=True)
+            checkout=root/'checkout';package=checkout/'rust/crates/swarm-engine'
+            (package/'src').mkdir(parents=True)
+            source=package/'src/lib.rs';source.write_text('// synthetic source, never compiled\n')
+            (checkout/'rust/Cargo.toml').write_text('[workspace]\nmembers=[]\n')
+            (checkout/'rust/Cargo.lock').write_text('version=4\n')
+            (package/'Cargo.toml').write_text('[package]\nname="swarm-engine"\nversion="0.0.0"\n')
+            config=checkout/'.cargo/config.toml';config.parent.mkdir()
+            config.write_text('[env]\nSYNTHETIC_CONFIG="unit fixture, never applied"\n')
+            support=checkout/'tools/verification/cargo_space_guard.py';support.parent.mkdir(parents=True)
+            support.write_text('# synthetic admission support; never executed\n')
+            inputs={str(p.relative_to(checkout)):p.read_bytes() for p in (config,support)}
+            before=profile.candidates(checkout)
+            binary=root/'artifacts/swarm_engine-1a2b';binary.parent.mkdir()
+            binary.write_bytes(b'SYNTHETIC UNIT ARTIFACT, NOT AN EXECUTABLE')
+            binary.with_suffix('.d').write_text(str(binary)+': '+str(source)+'\n')
+            event=dict(reason='compiler-artifact',features=[],profile=dict(test=True),
+                       target=dict(name='swarm_engine',kind=['lib'],src_path=str(source)),
+                       executable=str(binary),filenames=[str(binary)])
+            (root/'context.json').write_text(json.dumps(dict(kind='SYNTHETIC_UNIT_ONLY',
+                no_compiler_or_artifact_execution=True,before=before)))
+            def invoke(label):
+                """Retain one fresh qualifier output using fixed synthetic events."""
+                out=root/label;out.mkdir()
+                (out/'sdk.stdout').write_text(json.dumps(event)+'\n'+json.dumps(dict(reason='build-finished',success=True))+'\n')
+                qualify_sdk(checkout,out,before)
+                actual=json.loads((out/'sdk.sources.actual.json').read_text())
+                for name,raw in inputs.items():
+                    self.assertEqual(actual[name],hashlib.sha256(raw).hexdigest())
+                with tarfile.open(out/'sdk.sources.tar.gz') as archive:
+                    for name,raw in inputs.items():self.assertEqual(archive.extractfile(name).read(),raw)
+                return out
+            for name,raw in inputs.items():
+                path=checkout/name
+                for fault in ('changed','removed'):
+                    label=str(path.name)+'-'+fault
+                    invoke(label+'-control')
+                    if fault=='changed':path.write_bytes(raw+b'# faulted configuration\n')
+                    else:path.unlink()
+                    observed=path.read_bytes() if path.exists() else None
+                    with self.assertRaisesRegex(ValueError,'profile-cargo-config-changed-or-removed'):
+                        invoke(label+'-refused')
+                    self.assertEqual(path.read_bytes() if path.exists() else None,observed)
+                    path.write_bytes(raw)
+                    invoke(label+'-recovered')
+                    print('SDK_CONFIG_CASE '+label+' control/refusal/recovery PASS',flush=True)
+        finally:
+            sys.path.pop(0)
+
+
+
 if __name__=='__main__':unittest.main()

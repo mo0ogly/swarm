@@ -5268,3 +5268,44 @@ synthetic settings. Secondary messages stay out of result.json. Early failed
 dossiers may lack environment.json: no new verify integrity claim is made for
 those incomplete dossiers. Written evidence is not independent receipt; Rust/
 R04, shared integration and global BF-L0 acceptance remain open.
+
+
+### Contrat commun — inventaire SDK et sélection réelle du libtest
+
+Le [collecteur SDK](../../tests/rust_reviewer_claim_candidate.py) emploie
+`cargo_config_inputs(checkout)` pour les configurations Cargo locales et supports
+d’admission, même absents des depfiles. Les octets avant/effectifs/courants et
+archivés doivent concorder ; modification, suppression ou apparition refuse.
+Cela n’authentifie pas Cargo HOME, les configurations parentes ou les flags C.
+Le [guard synthétique](../../tests/test_sdk_artifact_depfiles.py) contrôle ce
+contrat avec témoins, refus et reprises ; il n’exécute aucun faux artefact et
+ne qualifie pas un vrai compilateur ou binaire à lui seul.
+
+Les noms déduits des dossiers Rust restent des propositions : les déclarations
+`#[path]`/`mod` peuvent conserver un autre espace de noms. Après qualification de
+l’image libtest, lire son `--list` et raccorder chaque fonction prévue à un nom
+collecté unique avant `--exact`. Une collecte n’est pas une exécution. Vérifier
+le nom et le compte réellement exécutés : code 0 avec zéro test reste un refus.
+Conserver la commande et le zéro initial ; corriger le seul filtre sur la preuve
+réelle n’est pas le rejeu d’un PASS. Ne pas modifier fonction/features pour faire
+apparaître artificiellement le cas attendu. Une revue source ne prouve pas le
+contrôle de types. La documentation persistée ne prouve pas sa réception par
+les contextes déjà démarrés.
+
+### Shared contract — SDK inventory and actual libtest selection
+
+The SDK collector uses the authoritative `cargo_config_inputs(checkout)` for local
+Cargo configuration/admission support omitted by depfiles. Prebound, effective,
+current and archived bytes must agree; changed, removed or appearing inputs
+refuse. Local binding does not authenticate Cargo HOME/ancestor configuration or
+observed C flags. The synthetic guard exercises controls, refusal and recovery;
+its dummy artifact is never executed and is not real compiler/binary qualification.
+
+Rust folder-derived names remain proposals: `#[path]`/`mod` may preserve another
+namespace. Read `--list` from the qualified libtest image and map each intended
+function to exactly one collected full name before `--exact`. Listing is not
+execution. Require the actual name and executed count: exit 0 with zero tests is
+a refusal. Preserve the original command/zero result; correcting its filter from
+actual evidence does not replay a passed case. Never change a function/feature
+to manufacture collection. Source review is not Rust type checking. Persisted
+guidance alone does not prove reception by already running contexts.

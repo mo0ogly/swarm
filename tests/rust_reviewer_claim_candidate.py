@@ -55,6 +55,12 @@ def qualify_sdk(checkout,out,before,test_target="swarm_engine"):
     """Bind actual workspace SDK depfiles and features to precompiled bytes.
 
     Uses the shared candidate/effective-source contract, including literal embeds.
+    Checkout-local Cargo configuration and admission support come from the same
+    authoritative cargo_config_inputs contract even when rustc depfiles omit
+    them. Their effective bytes must match the prebuild inventory and are
+    archived; changed, removed or newly appearing configuration refuses. This
+    binding does not authenticate Cargo HOME/ancestor configuration or prove
+    observed C flags or runtime capabilities.
     Unused new files do not invalidate compilation; a newly effective or changed
     input does. Preserve Cargo events, binary SHA, depfiles and source archive.
     Normal companion bins require the exact same-inode hashed dep-info, not a
@@ -77,7 +83,7 @@ def qualify_sdk(checkout,out,before,test_target="swarm_engine"):
     if test_target!='swarm_engine':
         engines=[e for e in artifacts if e['target']['name']=='swarm_engine' and not e['profile']['test']]
         profile.require(len(engines)==1 and engines[0]['features']==[],'sdk-integration-normal-engine-invalid')
-    paths={checkout/'rust/Cargo.toml',checkout/'rust/Cargo.lock',*(checkout/'rust/crates').glob('*/Cargo.toml')}
+    paths={checkout/'rust/Cargo.toml',checkout/'rust/Cargo.lock',*(checkout/'rust/crates').glob('*/Cargo.toml'),*profile.cargo_config_inputs(checkout)}
     depfiles={}
     artifact_deps=[]
     for artifact in artifacts:
