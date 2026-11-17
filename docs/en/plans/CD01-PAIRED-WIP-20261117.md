@@ -211,3 +211,12 @@ Separate `tools/verification/finite_input_custody.py`, tests, FR/EN contracts an
 Reviewer09 `01a1ea8f-cb51-79d3-a4ae-51db3ae9186c`: APPROVE_SOURCE_AND_TWENTY_INERT_GUARDS_ONLY. Evidence `root00-cd01-stdin-helper17-skxvpj3w` on SWARM includes ROOT-SEMANTIC-REVIEW, before-root-fix, after-root-fix, DOCSTRING-REUSE and REVIEW-09-FINAL. Whole recipe schema/inputs validated only, not executed. Installation/version_history not applicable to this isolated verification tool without product runtime changes.
 
 Helper lot closed within this scope; C-D01 plan stays open. No wrapper/collector wiring, historical stdin reconstruction, full graph, fifteen-body admission, compilation, installation or main merge follows. Root next maps the helper to open prospective collection criteria and allocates the smallest justified integration, with no identical R3 rebuild or automatic extra harness. Other chats idle.
+
+
+### Integration18 — corrected prerequisites, no implicit wiring
+
+GLM18 returned analysis in60.037s,22036reported tokens; no retry, code or test. Partial adoption: no immediate wiring/build and no extra generic harness. Root rejects I18-01..04: a stdin producer is named and its current rustix1.1.5 source equals the pinned copy; leaving fd0 untouched after consuming it would lose input; future EOF is a caller lease precondition rather than an argv-proven fact; historical collector UNKNOWN does not prevent a newly reviewed source consumer.
+
+Next concrete condition: bounded producer/consumer delta for an explicit finite-input lease manifest, per-real-invocation linkage, returned-fd transfer and collector validation of bytes/hash/states. Declared authority and argv/cwd matching prove neither process ancestry nor confinement. Any fd0 replacement and pipe-to-file change needs explicit review; no fallback after consumption or invented coverage of nonselected invocations. No compilation allocated by this decision; other material graph classes stay open. Root corrections and reread primary retained under `root00-cd01-integration18-rsgtlsw6` on SWARM.
+
+GitHub PR40 reobserved: same headf5d1f42f, OPEN/BLOCKED, checksSUCCESS/installCANCELLED; no new verified Docker prerequisite, replay or merge. Root00 owns continuation; other chats idle.

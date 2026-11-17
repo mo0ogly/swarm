@@ -211,3 +211,12 @@ Outil séparé `tools/verification/finite_input_custody.py`, tests, contrats FR/
 Revue09 `01a1ea8f-cb51-79d3-a4ae-51db3ae9186c` : APPROVE_SOURCE_AND_TWENTY_INERT_GUARDS_ONLY. Preuves `root00-cd01-stdin-helper17-skxvpj3w` sur SWARM, dont ROOT-SEMANTIC-REVIEW, before-root-fix, after-root-fix, DOCSTRING-REUSE et REVIEW-09-FINAL. La recette complète est seulement validée pour schéma/intrants, pas exécutée. Installation/version_history non applicables à cet outil isolé sans modification du runtime produit.
 
 Lot helper clos dans cette portée ; plan C-D01 ouvert. Aucun raccord wrapper/collecteur, reconstruction stdin historique, graphe complet, admission des15corps, compilation, installation ou fusion main établi par ce lot. Prochaine décision root : rapprocher le helper des critères ouverts de collecte prospective et définir le raccord minimal explicitement alloué, sans recommencer R3 à l’identique ni ajouter automatiquement un harnais. Les autres chats sont en attente.
+
+
+### Intégration18 — préconditions corrigées, aucun raccord implicite
+
+GLM18 a remis une analyse en60,037s,22036jetons déclarés ; pas de retry, code ou test. Adoption partielle : aucun câblage/build immédiat ni nouveau harnais générique. Le principal rejette quatre inférences I18-01..04 : un producteur stdin est bien nommé et sa source actuelle est égale à la copie épinglée rustix1.1.5 ; conserver fd0 inchangé après l’avoir consommé ferait perdre l’entrée ; l’EOF futur est une précondition de bail, pas un fait prouvable par argv ; l’issue inconnue de l’ancien collecteur n’interdit pas un nouveau consommateur source vérifié.
+
+Condition concrète suivante : delta borné producteur/consommateur sur un manifeste explicite de bail fini, liaison à chaque invocation réelle, transfert du FD retourné et validation des octets/hash/états par le collecteur. L’autorisation déclarée et la correspondance argv/cwd n’établissent ni ascendance de processus ni confinement. Toute substitution fd0 et transformation tube→fichier doit être explicitement revue ; aucun repli après consommation, ni couverture inventée des invocations non sélectionnées. Pas d’allocation de compilation par cette décision ; autres classes de graphe toujours ouvertes. Détails/root-corrections et primaire relue dans `root00-cd01-integration18-rsgtlsw6` sur SWARM.
+
+PR40 relue via GitHub : même headf5d1f42f, OPEN/BLOCKED, checksSUCCESS/installCANCELLED ; aucune précondition Docker nouvelle établie, aucun rejeu ni fusion. Propriétaire root00, autres chats en attente.
