@@ -127,6 +127,12 @@ Example:
         --rustc-intent-producer-sha256 1c06c44cf57628414296c269f98667f5fa5e8a4ce33fc7e423a64d40527a3932 \
         --root-guard /checkout/tools/verification/cargo_space_guard.py \
         --root-guard-sha256 09b7d45c78c64282dee6265be2d26cea6066505963465e2a50a856f1fe8d5916
+Library-only v2 consumption additionally accepts a caller-bound reviewed
+custody validator through _parse_intent_records(..., custody_validator=...).
+The normal run/CLI still passes none and refuses v2 records; it acquires no
+input lease automatically. v2 validates current staged consistency and declared
+transfer facts, never observed compiler consumption, authenticity or full graph.
+Callback failure metadata preserves typed interruption facts without raw text.
 """
 
 import argparse
@@ -170,6 +176,7 @@ HELPER_DIGESTS = {
 }
 HEX_DIGITS = frozenset('0123456789abcdef')
 INTENT_SCHEMA = 'cd01.rustc_intent.v1'
+INTENT_SCHEMA_V2 = 'cd01.rustc_intent.v2'
 INTENT_RECORD_FIELDS = frozenset(('capture', 'compiler_arguments_hex', 'compiler_path_hex', 'cwd_hex', 'delegation', 'outcome', 'outcome_note', 'pid', 'privacy', 'record_kind', 'record_location', 'schema', 'spaceguard_path_hex'))
 INTENT_DIR_PREFIX = 'cd01-intent-'
 CAPTURE_DIR_ENV_NAME = 'CD01_CAPTURE_DIR'
@@ -596,6 +603,8 @@ def _error_tree(error, seen=None):
         return {'type': type(error).__name__, 'cycle': True}
     seen.add(id(error))
     value = {'type': type(error).__name__, 'message': str(error)}
+    if isinstance(error, CustodyValidationFailure):
+        value['custody_validation'] = error.custody_failure
     if isinstance(getattr(error, 'collector_failure', None), dict):
         value['collector_failure'] = error.collector_failure
     if isinstance(error, OSError):
@@ -1210,17 +1219,170 @@ def _observe_toolchain_paths(env, root):
                      'SHA-256 recorded; not a full toolchain proof')
 
 
+class CustodyValidationFailure(Exception):
+    """Static callback failure retaining original objects and safe diagnostic facts.
+
+    The expected callback is the caller-pinned, reviewed read-only custody
+    validator. This carrier grants no callback authority or identity proof.
+    Original objects remain in memory; only fixed metadata/type/errno and the
+    known interruption category enter terminal JSON. No rollback is inferred.
+    """
+
+    def __init__(self, error):
+        """Keep the callback error and normalized primary/cleanup causes unrendered."""
+        super().__init__('cd01-custody-validation-failed')
+        self.original_exception = error
+        primary = getattr(error, 'original_exception', None)
+        primary = primary if isinstance(primary, BaseException) else error
+        raw_cleanup = getattr(error, 'secondary_exceptions', ())
+        cleanup = tuple(x for x in raw_cleanup if isinstance(x, BaseException)) if isinstance(raw_cleanup, (tuple, list)) else ()
+        self.secondary_exceptions = cleanup
+        stages = {'validate', 'read-manifest', 'parse-manifest',
+                  'schema-manifest', 'verify-input', 'unexpected'}
+        stage = getattr(error, 'stage', None)
+        self.custody_failure = {
+            'stage': stage if isinstance(stage, str) and stage in stages else 'callback',
+            'normalized_type': type(error).__name__,
+            'primary_type': type(primary).__name__,
+            'primary_errno': getattr(primary, 'errno', None) if type(getattr(primary, 'errno', None)) is int else None,
+            'primary_metadata': _custody_cause_metadata(getattr(error, 'primary', None)),
+            'secondary_metadata': [_custody_cause_metadata(x) for x in getattr(error, 'secondary', ())] if isinstance(getattr(error, 'secondary', ()), (tuple, list)) else [],
+            'secondary': [{'type': type(x).__name__, 'errno': getattr(x, 'errno', None)}
+                          for x in cleanup],
+            'interrupted': any(not isinstance(x, Exception) for x in (primary, *cleanup)),
+            'outcome': 'UNKNOWN',
+        }
+
+
+def _custody_cause_metadata(value):
+    """Project only the reviewed validator's fixed diagnostic vocabulary.
+
+    Unsupported metadata is explicitly marked, never rendered as foreign text.
+    The original callback exception still retains its full in-memory metadata.
+    These vocabularies are technical format tokens, not operator policies.
+    """
+    if not isinstance(value, dict):
+        return {'supported': False}
+    ops = {'validate', 'lstat', 'fstat', 'write', 'fsync', 'close', 'open',
+           'read', 'link', 'lseek', 'operation', 'list', 'parse', 'schema', 'verify'}
+    names = {'input-fd', 'allocation-id', 'output-dir', 'input.partial', 'input.bin',
+             'manifest.partial', 'manifest.json', 'capture', 'validate-staged',
+             'schema', 'allocation_id', 'eof_observed', 'byte_count', 'sha256',
+             'raw_staging_file', 'raw_published_file', 'raw_publication',
+             'manifest_staging_file', 'manifest_published_file', 'manifest_publication',
+             'staged_copy_complete_of_observed_stream', 'not_claimed'}
+    reasons = {'not-an-int', 'negative-fd', 'not-nonempty-string', 'not-a-path',
+               'not-nonempty-str-path', 'not-a-directory', 'not-current-uid-owned',
+               'not-private-mode', 'target-exists', 'target-missing', 'zero-progress',
+               'not-a-regular-file', 'offset-not-zero', 'unexpected',
+               'hardlink-pair-mismatch', 'unexpected-entry', 'staged-published-mismatch',
+               'not-object', 'missing', 'unexpected-member', 'wrong-type', 'wrong-value',
+               'byte-count-mismatch', 'sha256-mismatch'}
+    code = value.get('errno')
+    op, name, reason = value.get('op'), value.get('name'), value.get('reason')
+    op_known = isinstance(op, str) and op in ops
+    name_known = isinstance(name, str) and name in names
+    reason_known = reason is None or isinstance(reason, str) and reason in reasons
+    return {'supported': op_known and name_known and reason_known
+            and set(value) <= {'op', 'name', 'errno', 'detail', 'reason'}
+            and value.get('detail') is None and (code is None or type(code) is int),
+            'op': op if op_known else 'unsupported',
+            'name': name if name_known else 'unsupported',
+            'errno': code if type(code) is int else None,
+            'reason': reason if reason_known else None}
+
+
+def _consume_stdin_transfer(directory, intent, custody_validator):
+    """Validate a v2 declared transfer and current staged bytes, read-only.
+
+    Caller must explicitly supply the reviewed, source-bound read-only custody
+    validator and retain a stable directory/volume lease. A callable alone is
+    neither authentication nor a guarantee of read-only behavior. No CLI wiring,
+    descriptor transfer, compiler execution or history is established here.
+    Strict schemas/types/linkage refuse malformed or failed records. Callback
+    failures keep original objects and safe primary/cleanup interruption facts.
+    """
+    require(callable(custody_validator), 'cd01-v2-custody-validator-required')
+    plan = intent['stdin_transfer']
+    require(isinstance(plan, dict) and set(plan) == {
+        'status', 'allocation_id', 'custody_relative_directory', 'note'},
+        'cd01-v2-plan-fields')
+    require(plan['status'] == 'PENDING' and isinstance(plan['note'], str)
+            and isinstance(plan['allocation_id'], str) and bool(plan['allocation_id'])
+            and plan['custody_relative_directory'] == 'stdin-custody',
+            'cd01-v2-plan-values')
+    receipt_path = directory / 'stdin-transfer.json'
+    info = os.lstat(receipt_path)
+    require(stat.S_ISREG(info.st_mode) and info.st_uid == os.geteuid()
+            and not stat.S_IMODE(info.st_mode) & 0o077, 'cd01-v2-receipt-type-mode')
+    raw = receipt_path.read_bytes()
+    receipt = json.loads(raw.decode('ascii'), object_pairs_hook=_unique_pairs)
+    require(isinstance(receipt, dict) and set(receipt) == {
+        'schema', 'record_kind', 'outcome', 'outcome_note', 'pid', 'allocation_id',
+        'custody_relative_directory', 'observed_custody_manifest',
+        'descriptor_replacement', 'delegation'}, 'cd01-v2-receipt-fields')
+    require(receipt['schema'] == 'cd01.stdin_transfer.v1'
+            and receipt['record_kind'] == 'stdin_transfer_receipt'
+            and receipt['outcome'] == 'UNKNOWN' and isinstance(receipt['outcome_note'], str)
+            and type(receipt['pid']) is int and receipt['pid'] == intent['pid']
+            and receipt['allocation_id'] == plan['allocation_id']
+            and receipt['custody_relative_directory'] == 'stdin-custody',
+            'cd01-v2-receipt-linkage')
+    replacement = receipt['descriptor_replacement']
+    require(isinstance(replacement, dict) and set(replacement) == {
+        'target_fd', 'inheritable', 'dup2_attempted', 'dup2_completed',
+        'spare_close_attempted', 'spare_close_completed'}, 'cd01-v2-replacement-fields')
+    require(type(replacement['target_fd']) is int and replacement['target_fd'] == 0
+            and all(replacement[k] is True for k in replacement if k != 'target_fd'),
+            'cd01-v2-replacement-values')
+    require(receipt['delegation'] == {
+        'mode': 'os.execv in the same process (same PID)', 'outcome': 'UNKNOWN'},
+        'cd01-v2-delegation-values')
+    observed = receipt['observed_custody_manifest']
+    expected_fields = {'schema', 'allocation_id', 'eof_observed', 'byte_count',
+                       'sha256', 'raw_staging_file', 'raw_published_file', 'raw_publication'}
+    require(isinstance(observed, dict) and set(observed) == expected_fields,
+            'cd01-v2-observed-fields')
+    require(observed['schema'] == 'finite-input-custody/1'
+            and observed['allocation_id'] == plan['allocation_id']
+            and observed['eof_observed'] is True
+            and type(observed['byte_count']) is int and observed['byte_count'] >= 0
+            and isinstance(observed['sha256'], str) and len(observed['sha256']) == 64
+            and set(observed['sha256']) <= HEX_DIGITS
+            and observed['raw_staging_file'] == 'input.partial'
+            and observed['raw_published_file'] == 'input.bin'
+            and observed['raw_publication'] == 'no-clobber-hardlink',
+            'cd01-v2-observed-values')
+    try:
+        manifest = custody_validator(directory / 'stdin-custody', plan['allocation_id'])
+    except BaseException as error:
+        raise CustodyValidationFailure(error) from None
+    require(isinstance(manifest, dict) and expected_fields <= set(manifest),
+            'cd01-v2-validator-result-shape')
+    # Preserve exact types as well as values: bool aliases must not pass as int.
+    require(all(type(observed[k]) is type(manifest[k]) and observed[k] == manifest[k]
+                for k in expected_fields), 'cd01-v2-staged-receipt-mismatch')
+    return {'transfer_receipt_sha256': hashlib.sha256(raw).hexdigest(),
+            'allocation_id': plan['allocation_id'], 'manifest': manifest,
+            'scope': 'Current staged bytes checked by caller-bound validator; transfer facts declared, '
+                     'not authenticated execution, compiler consumption or full graph',
+            'outcome': 'UNKNOWN'}
+
+
 def _valid_hex(value):
     """Check lowercase reversible hex, allowing the valid empty argument encoding."""
     return isinstance(value, str) and len(value) % 2 == 0 and set(value) <= HEX_DIGITS
 
 
-def _parse_intent_records(capture):
-    """Validate current producer-v1 records without interpreting them as execution.
+def _parse_intent_records(capture, *, custody_validator=None):
+    """Validate known v1/v2 intent records without interpreting them as execution.
 
-    Capture identity must remain stable. Each invocation directory must contain
-    regular hardlinked partial/final ASCII JSON with exactly the reviewed v1
-    fields; duplicate keys, failure records, invalid hex/NUL bytes, wrong schema,
+    Capture identity must remain stable. v1 keeps the exact two-file format.
+    v2 additionally requires the current producer transfer/custody format and an
+    explicit caller-bound reviewed custody validator; run/CLI still passes none.
+    v2 results describe current staged consistency and declared transfer only.
+    No callback identity, immutable lifetime or compiler execution is established.
+    Duplicate keys, failure records, invalid hex/NUL bytes, wrong schema,
     nonpositive PID or inconsistent delegation refuse. Empty arguments/lists are
     valid. Same-PID recurrence is allowed. Raw files remain untouched; return
     hashes, exact byte fields and scoped intent classification, never outcomes.
@@ -1239,7 +1401,8 @@ def _parse_intent_records(capture):
                 'cd01-capture-entry-name-invalid')
         directory = path / entry
         require(stat.S_ISDIR(os.lstat(directory).st_mode), 'cd01-capture-entry-not-directory')
-        require(set(os.listdir(directory)) == {'intent.partial', 'intent.json'},
+        members = set(os.listdir(directory))
+        require({'intent.partial', 'intent.json'} <= members and 'failure.json' not in members,
                 'cd01-intent-members-incomplete-failed-or-foreign')
         partial, final = directory / 'intent.partial', directory / 'intent.json'
         a, b = os.lstat(partial), os.lstat(final)
@@ -1248,9 +1411,15 @@ def _parse_intent_records(capture):
                 'cd01-intent-hardlink-invalid')
         raw = final.read_bytes()
         value = json.loads(raw.decode('ascii'), object_pairs_hook=_unique_pairs)
-        require(isinstance(value, dict) and set(value) == INTENT_RECORD_FIELDS,
-                'cd01-intent-record-fields')
-        require(value['schema'] == INTENT_SCHEMA and value['record_kind'] == 'pre_exec_intent'
+        require(isinstance(value, dict), 'cd01-intent-record-fields')
+        is_v2 = value.get('schema') == INTENT_SCHEMA_V2
+        expected_fields = INTENT_RECORD_FIELDS | {'stdin_transfer'} if is_v2 else INTENT_RECORD_FIELDS
+        require(set(value) == expected_fields, 'cd01-intent-record-fields')
+        expected_members = ({'intent.partial', 'intent.json', 'stdin-custody', 'stdin-transfer.json'}
+                            if is_v2 else {'intent.partial', 'intent.json'})
+        require(members == expected_members, 'cd01-intent-members-incomplete-failed-or-foreign')
+        require(value['schema'] in (INTENT_SCHEMA, INTENT_SCHEMA_V2)
+                and value['record_kind'] == 'pre_exec_intent'
                 and value['outcome'] == 'UNKNOWN', 'cd01-intent-record-schema')
         pid = value['pid']
         require(type(pid) is int and pid > 0 and str(pid) == pid_text, 'cd01-intent-record-pid')
@@ -1288,6 +1457,8 @@ def _parse_intent_records(capture):
                             cwd_hex=value['cwd_hex'], compiler_arguments_hex=arguments,
                             argument_count=len(arguments), intent_class=kind, crate_name=crate,
                             has_test_flag='--test' in decoded, outcome='UNKNOWN', counted_as_test=False))
+        if is_v2:
+            records[-1]['stdin_custody'] = _consume_stdin_transfer(directory, value, custody_validator)
     return dict(capture_dir=str(path), records=records, failure_records=[],
                 counts=dict(total=len(records), metadata_probes=sum(x['intent_class']=='metadata-probe' for x in records),
                             compile_candidates=sum(x['intent_class']=='compile-candidate' for x in records),

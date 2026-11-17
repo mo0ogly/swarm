@@ -244,3 +244,20 @@ La première demande de clôture a reçu un ancien bilan TW-01 après un éléme
 RETEX réutilisable : lorsqu’un helper normalise une erreur, conserver l’objet primaire ne suffit pas si le consommateur perd sa catégorie dans le reçu, le diagnostic ou le statut. Suivre les causes typées jusqu’à ces sorties et vérifier témoin/faute/reprise. Vérifier aussi ID de critère et pins à la remise après changement de contexte ; une ancienne clôture ne clôt pas le lot courant. Application observée ici, sans garantie sur les prochains contextes.
 
 Preuves `root00-cd01-wrapper-transfer20-6o0cqpx8` sur SWARM : ROOT-CORRECTION, before/after-root-fix, before/after-interrupt-fix, INTERRUPT-ROOT-REVIEW, REVIEW-CONTEXT-INCIDENT et REVIEW-09-INTERRUPT-FINAL. Hook vérifié dans cette portée seulement ; manifeste/sélection CLI et consommateur v2/transfer dans le collecteur restent à réaliser. Ni compilateur,15corps, installation/version_history produit ni mainmerge ; root00 propriétaire, autres chats en attente.
+
+
+## T21 — lecteur v2 de bibliothèque, suppléance bornée (17 novembre 2026)
+
+L’appel GLM21 a été interrompu sans réponse exploitable : lanceur terminé143, client absent, contenu assistant0, aucun DONE ni résultat terminal. Cause, état final du backend et consommation inconnus ; aucun retry ni proposition partielle intégrée. Preuve : `CLIENT-INTERRUPTION.json` dans le dossier T21 ci-dessous. Le principal a suppléé sur les seuls lecteur, gardes et documentation de ce paquet ; aucune délégation parallèle.
+
+Le lecteur accepte maintenant le format v2 uniquement avec un validateur de custody fourni explicitement par un appelant responsable de son identité/source et de sa lecture seule. Schéma, types, liaison du reçu et cohérence actuelle des octets sont contrôlés ; les causes primaires et de nettoyage sont conservées sans texte privé dans la projection terminale. La CLI reste sans validateur et refuse v2. Aucun sélecteur de lease, transfert réel fd, exec, Cargo, compilation ou parcours produit installé par ce lot.
+
+Six méthodes nouvelles : cinq PASS initiaux et une ERROR (métadonnées secondaires manquantes), puis cette seule méthode corrigée PASS avec variantes IO/interruption/nettoyage. Pas de run final global6/21 ni rejeu des anciennes gardes. Fixtures structurelles synthétiques utilisant les vrais renderers/capture/validator : elles ne prouvent pas le transfert ou la consommation compilateur. Réutilisation après docstrings liée à l’AST exécutable identique. Recette21 maintenue, seulement schéma/entrées validés. Revue indépendante encore attendue au moment de cette entrée.
+
+Preuves : `/run/media/fpizzi/SWARM/swarm-evidence/root00-cd01-v2-consumer21-bizw_0sc` (`ROOT-SEMANTIC-REVIEW.json`, `DOCSTRING-REUSE.json`, `principal-initial-guards`, `principal-cause-fixed`). RETEX : une normalisation doit transmettre les métadonnées de nettoyage jusqu’au consommateur terminal ; un objet original conservé seul ne prouve pas cette transmission. Pas de notes de version produit : outils de vérification seuls, aucune livraison runtime. Fullgraph/profil/15 corps Rust restent non admis. Suite : revue indépendante, checkpoint WIP attribué, puis raccordement CLI explicite borné ; aucun merge main avant qualification du lot global.
+
+
+T21-MODE-01 — La revue09 a refusé la perte du droit exécutable du collecteur (temp atomique0600, index100755). Mode0755 rétabli, octets inchangés, aucun rejeu fonctionnel ; revue de métadonnées demandée. Prévention : conserver le mode existant lors du remplacement atomique de sources attribuées et examiner le diff de modes avant remise. Preuve MODE-RECOVERY.json ; ce correctif de méthode ne garantit pas les remplacements futurs.
+
+
+Revue09 finale T21 : APPROVE_SOURCE_AND_TARGETED_GUARDS_ONLY, T21-MODE-01 clos après contrôle indépendant0755/index100755 et SHA inchangé. Contenu et preuves ciblées réutilisés sans nouvelle exécution. Source/guardes approuvés seulement, pas CLI/runtime/main. Remise finale REVIEW-09-FINAL.json ; reviewer09 revenu en attente.

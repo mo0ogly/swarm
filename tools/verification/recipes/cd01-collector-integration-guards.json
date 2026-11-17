@@ -10,12 +10,13 @@
     "tools/verification/native_build_outcome.py",
     "tools/verification/CD01-COMPILE-COLLECTOR.md",
     "tools/verification/CD01-COMPILE-COLLECTOR.en.md",
-    "tools/verification/recipe.py"
+    "tools/verification/recipe.py",
+    "tools/verification/finite_input_custody.py"
   ],
   "environment": {},
   "steps": [
     {
-      "id": "fifteen-new-collector-contract-guards",
+      "id": "twenty-one-maintained-collector-guards",
       "command": [
         "python3",
         "-B",
@@ -40,7 +41,13 @@
         "test_failed_instrument_archive_keeps_owned_candidate",
         "test_evidence_mount_comes_from_validated_registration",
         "test_query_intent_never_becomes_execution_or_libtest_proof",
-        "Ran 15 tests",
+        "test_v1_and_v2_consistency_stay_unknown",
+        "test_missing_validator_failed_and_foreign_records_refuse",
+        "test_staged_tamper_and_typed_linkage_refuse",
+        "test_bad_receipt_json_and_member_sets_refuse",
+        "test_callback_causes_reach_safe_terminal_projection",
+        "test_identity_hardlink_and_bad_validator_result_refuse",
+        "Ran 21 tests",
         "OK"
       ]
     }

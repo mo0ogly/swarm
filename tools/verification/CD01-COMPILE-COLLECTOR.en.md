@@ -29,3 +29,14 @@ Reserve, FDs and executed inputs must remain stable. Lease pre/post hashes are n
 Fifteen distinct maintained guards use no compiler/provider/service: caller binding, actual receipts, configs/refusal, fresh target, archives, registry namespace, relative PATH, lock buffer, causes/cached values and intent scope. They ran separately for changed contracts; unchanged PASS evidence is reused. `recipes/cd01-collector-integration-guards.json` received schema/input validation only, no combined replay. Original counterexamples/corrections and exact hashes are retained under `root00-cd01-collector14-waja855_` on SWARM.
 
 No Cargo or C-D01 body ran in this increment. Independent review, exact allocation and fresh prerequisites remain required before actual collection. Fixture guards do not accept the global plan. Verification-only tools change no product runtime, so no application installation/version_history update is warranted here.
+
+
+## Library v2 consumer — packet21
+
+`_parse_intent_records(capture, custody_validator=...)` accepts v2 only with the caller's explicitly supplied reviewed custody validator. Its identity/source and read-only behavior are caller lease preconditions; a callable is neither authentication nor confinement. Existing `run`/CLI passes none and still refuses v2. No CLI selector/manifest or compilation added.
+
+V1 retains its two files and existing fields/results. V2 requires exactly the hardlinked intent, `stdin-custody` and `stdin-transfer.json`, never a failure.json or foreign member. Reader verifies exact schemas/fields/types, PENDING, PID/allocation/relative directory, replacement/close booleans, then compares digest/count/EOF/names to the current staged bytes checked by the callback. Bool and int are never interchangeable. Result stays UNKNOWN, never a test or compiler-consumption proof. Current links/bytes are observations under stable lease, not history or immutability proof; atime may change.
+
+`CustodyValidationFailure` retains original error objects in memory and supplies `_error_tree` bounded categories/errno/known-vocabulary metadata and primary/cleanup interruption facts. Private text is not rendered; unsupported metadata is explicitly marked, never successful emptiness. Existing CLI failure status1 is unchanged; no native outcome fabricated.
+
+Six new methods use synthetic structural fixtures built by actual renderers and the real helper, never dup2/guard/compiler/Cargo/provider/service. Each mutation starts from its own valid record, with fresh recovery and retained content/name snapshots. Initial5PASS/1ERROR (secondary metadata omitted by principal), then only failed guard1PASS after correction. Not six final reruns or replay of old15guards.21method recipe maintained, not globally executed.

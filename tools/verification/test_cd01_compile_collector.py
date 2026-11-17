@@ -302,4 +302,164 @@ class CollectorPolicyAndIntentGuards(unittest.TestCase):
             parsed=collector._parse_intent_records(maker.capture(root/'recovery',record))
             self.assertIn('UNKNOWN',collector._match_libtest_intent(parsed,{'facts':{},'progress':[]},event)['binding_status'])
 
+
+class StdinV2ConsumerTests(unittest.TestCase):
+    """Synthetic protocol/real custody fixtures; never compiler or FD-transfer evidence."""
+
+    def setUp(self):
+        """Retain a private fixture root and bind the actual reviewed validator."""
+        import finite_input_custody
+        self.custody = finite_input_custody
+        self.root = Path(tempfile.mkdtemp(prefix='v2-consumer-tests-'))
+        self.serial = 0
+        (self.root/'SYNTHETIC-SCOPE.json').write_text(json.dumps({
+            'kind':'synthetic structural protocol fixtures',
+            'actual':'producer formatters and custody.capture only',
+            'not_executed':['dup2','guard','compiler','Cargo','provider']}))
+
+    def make(self, v2=True):
+        """Build a new synthetic record, then validate it before any injection."""
+        self.serial += 1
+        capture = self.root / ('capture-'+str(self.serial)); capture.mkdir(mode=0o700)
+        pid = os.getpid(); leaf = capture/('cd01-intent-'+str(pid)+'-'+'0'*32);leaf.mkdir(mode=0o700)
+        allocation = 'allocated-'+str(self.serial)
+        plan = {'allocation_id':allocation,'custody_relative_directory':'stdin-custody'} if v2 else None
+        raw = producer._render_intent_record(b'/owned/compiler',[b'--crate-name',b'probe'],b'/owned/guard',plan)
+        (leaf/'intent.partial').write_bytes(raw);(leaf/'intent.partial').chmod(0o600)
+        os.link(leaf/'intent.partial',leaf/'intent.json')
+        if v2:
+            custody_dir=leaf/'stdin-custody';custody_dir.mkdir(mode=0o700)
+            source=self.root/('input-'+str(self.serial));source.write_bytes(b'x')
+            source_fd=os.open(source,os.O_RDONLY)
+            try:
+                ready, manifest=self.custody.capture(source_fd,custody_dir,allocation)
+                os.close(ready)
+            finally:
+                os.close(source_fd)
+            # Formatter declares transfer facts; this synthetic builder does not perform them.
+            (leaf/'stdin-transfer.json').write_bytes(producer._render_stdin_transfer_record(allocation,manifest))
+            (leaf/'stdin-transfer.json').chmod(0o600)
+        descriptor={'path':str(capture),'identity':collector._path_identity(capture)}
+        result=collector._parse_intent_records(descriptor,custody_validator=self.custody.validate_staged)
+        self.assertEqual(result['counts']['total'],1)
+        self.assertEqual(result['records'][0]['outcome'],'UNKNOWN')
+        self.assertFalse(result['records'][0]['counted_as_test'])
+        return descriptor,leaf
+
+    def snapshot(self, leaf):
+        """Snapshot content and names only, without claiming atime or immutable lifetime."""
+        found={}
+        for path in sorted(leaf.rglob('*')):
+            key=str(path.relative_to(leaf))
+            if path.is_symlink():found[key]=('symlink',os.readlink(path))
+            elif path.is_dir():found[key]=('directory',)
+            else:found[key]=('file',path.read_bytes())
+        return found
+
+    def deny(self, descriptor, leaf, validator=None):
+        """Assert a refusal changes no fixture content/names; then run fresh recovery."""
+        before=self.snapshot(leaf)
+        chosen=self.custody.validate_staged if validator is None else validator
+        with self.assertRaises((ValueError,collector.CustodyValidationFailure)) as caught:
+            collector._parse_intent_records(descriptor,custody_validator=chosen)
+        self.assertEqual(self.snapshot(leaf),before)
+        self.make()
+        return caught.exception
+
+    def mutate_receipt(self, leaf, mutation):
+        """Mutate owned synthetic receipt bytes, preserving its private file mode."""
+        path=leaf/'stdin-transfer.json';value=json.loads(path.read_bytes());mutation(value)
+        path.write_text(json.dumps(value,ensure_ascii=True)+'\n')
+
+    def test_v1_and_v2_consistency_stay_unknown(self):
+        """Current v1 default and explicit-v2 validation retain nonexecution scope."""
+        descriptor,leaf=self.make(False)
+        before=self.snapshot(leaf);result=collector._parse_intent_records(descriptor)
+        self.assertNotIn('stdin_custody',result['records'][0]);self.assertEqual(self.snapshot(leaf),before)
+        descriptor,leaf=self.make();before=self.snapshot(leaf)
+        result=collector._parse_intent_records(descriptor,custody_validator=self.custody.validate_staged)
+        observation=result['records'][0]['stdin_custody']
+        self.assertEqual(observation['manifest']['sha256'],hashlib.sha256(b'x').hexdigest())
+        self.assertEqual(observation['manifest']['byte_count'],1)
+        self.assertEqual(observation['outcome'],'UNKNOWN');self.assertEqual(self.snapshot(leaf),before)
+
+    def test_missing_validator_failed_and_foreign_records_refuse(self):
+        """Valid controls precede missing callback, failure file and foreign member."""
+        descriptor,leaf=self.make();before=self.snapshot(leaf)
+        with self.assertRaisesRegex(ValueError,'validator-required'):collector._parse_intent_records(descriptor)
+        self.assertEqual(self.snapshot(leaf),before);self.make()
+        for filename in ['failure.json','foreign.txt']:
+            with self.subTest(filename=filename):
+                descriptor,leaf=self.make();(leaf/filename).write_text('{}')
+                self.deny(descriptor,leaf)
+
+    def test_staged_tamper_and_typed_linkage_refuse(self):
+        """Fresh validated controls precede byte, lineage, bool/int and flag mutations."""
+        mutations=[('pid',lambda v:v.update(pid=v['pid']+1)),
+                   ('allocation',lambda v:v.update(allocation_id='different')),
+                   ('relative',lambda v:v.update(custody_relative_directory='../escape')),
+                   ('count-bool',lambda v:v['observed_custody_manifest'].update(byte_count=True)),
+                   ('eof-int',lambda v:v['observed_custody_manifest'].update(eof_observed=1)),
+                   ('target-bool',lambda v:v['descriptor_replacement'].update(target_fd=False)),
+                   ('flag-int',lambda v:v['descriptor_replacement'].update(dup2_completed=1)),
+                   ('flag-false',lambda v:v['descriptor_replacement'].update(spare_close_completed=False))]
+        for label,mutation in mutations:
+            with self.subTest(label=label):
+                descriptor,leaf=self.make();self.mutate_receipt(leaf,mutation);self.deny(descriptor,leaf)
+        descriptor,leaf=self.make();(leaf/'stdin-custody/input.bin').write_bytes(b'y')
+        error=self.deny(descriptor,leaf);self.assertIsInstance(error,collector.CustodyValidationFailure)
+
+    def test_bad_receipt_json_and_member_sets_refuse(self):
+        """Malformed/duplicate JSON and wrong member sets cannot become empty success."""
+        for payload in [b'{',b'{"schema":"x","schema":"y"}']:
+            with self.subTest(payload=payload):
+                descriptor,leaf=self.make();(leaf/'stdin-transfer.json').write_bytes(payload);self.deny(descriptor,leaf)
+        for label,mutation in [('extra',lambda v:v.update(foreign='private-value')),
+                               ('missing',lambda v:v.pop('descriptor_replacement'))]:
+            with self.subTest(label=label):
+                descriptor,leaf=self.make();self.mutate_receipt(leaf,mutation);self.deny(descriptor,leaf)
+
+    def test_callback_causes_reach_safe_terminal_projection(self):
+        """Direct IO/interruption and normalized cleanup facts survive without private text."""
+        for mode in ['io','interrupt','normalized-cleanup']:
+            with self.subTest(mode=mode):
+                descriptor,leaf=self.make()
+                primary=OSError(errno.EACCES,'PRIVATE_PRIMARY')
+                cleanup=KeyboardInterrupt('PRIVATE_CLEANUP')
+                if mode=='interrupt':error=KeyboardInterrupt('PRIVATE_INTERRUPT')
+                elif mode=='normalized-cleanup':
+                    error=self.custody.FiniteInputCustodyError('verify-input',
+                        self.custody._cause('read','input.bin',primary),
+                        [self.custody._cause('close','input.bin',cleanup)])
+                else:error=primary
+                def rejected(path,allocation):
+                    """Validate the healthy record, then inject a known callback failure."""
+                    self.custody.validate_staged(path,allocation)
+                    raise error
+                caught=self.deny(descriptor,leaf,rejected)
+                self.assertIs(caught.original_exception,error)
+                terminal=collector._error_tree(caught);text=json.dumps(terminal)
+                self.assertNotIn('PRIVATE',text)
+                facts=terminal['custody_validation'];self.assertEqual(facts['outcome'],'UNKNOWN')
+                self.assertEqual(facts['interrupted'],mode!='io')
+                self.assertEqual(collector._native_outcomes(caught),[])
+                if mode=='normalized-cleanup':
+                    self.assertIs(caught.secondary_exceptions[0],cleanup)
+                    self.assertEqual(facts['secondary_metadata'][0]['name'],'input.bin')
+                    self.assertEqual(facts['primary_errno'],errno.EACCES)
+
+    def test_identity_hardlink_and_bad_validator_result_refuse(self):
+        """Current identity/linkage and callback result shape remain required."""
+        descriptor,leaf=self.make();wrong=dict(descriptor);wrong['identity']=(0,0);self.deny(wrong,leaf)
+        descriptor,leaf=self.make();path=leaf/'intent.json';raw=path.read_bytes()
+        replacement=leaf/'copy';replacement.write_bytes(raw);replacement.chmod(0o600);os.replace(replacement,path)
+        self.deny(descriptor,leaf)
+        descriptor,leaf=self.make()
+        def invalid(path,allocation):
+            """Return a deliberately unsupported mapping after a valid actual read."""
+            self.custody.validate_staged(path,allocation)
+            return {'not':'a manifest'}
+        self.deny(descriptor,leaf,invalid)
+
+
 if __name__=='__main__':unittest.main()

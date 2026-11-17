@@ -244,3 +244,20 @@ The first closure request received an old TW-01 report after a contextCompaction
 Reusable RETEX: retaining a normalized original error object is insufficient if its consumer loses the category in receipts, diagnostics or status. Trace typed causes through those outputs and verify control/fault/recovery. Also check criterion ID and pins after context changes; an old closure does not close the current lot. Observed application here does not guarantee future contexts.
 
 Evidence `root00-cd01-wrapper-transfer20-6o0cqpx8` on SWARM: ROOT-CORRECTION, before/after-root-fix, before/after-interrupt-fix, INTERRUPT-ROOT-REVIEW, REVIEW-CONTEXT-INCIDENT and REVIEW-09-INTERRUPT-FINAL. Hook verified only within that scope; CLI manifest/selection and collector-v2/transfer consumption remain. No compiler,15bodies, product installation/version_history or mainmerge. Root00 owns continuation; other chats idle.
+
+
+## T21 — library v2 reader, bounded principal supplementation (17 November 2026)
+
+GLM21 was interrupted without usable output: launcher143, client absent, assistant content0, no DONE or terminal result. Cause, backend completion and consumption remain unknown; no retry or partial proposal used. See `CLIENT-INTERRUPTION.json` in the T21 evidence directory below. The principal supplemented only this packet’s reader, guards and documentation; no parallel delegation.
+
+The library reader now accepts v2 only with an explicitly supplied custody validator whose identity/source and read-only behavior are caller preconditions. It checks schemas, exact types, receipt linkage and current staged bytes; primary/cleanup causes reach a safe terminal projection without private text. CLI still supplies no validator and refuses v2. No lease selector, actual FD transfer, exec, Cargo, compilation or installed product flow is established by this packet.
+
+Six new methods: five initial PASS and one ERROR (missing secondary metadata), then only that corrected method PASS with IO/interruption/cleanup variants. No combined final6/21 run or old guard replay. Structural synthetic fixtures use real renderers/capture/validator; they do not prove transfer or compiler consumption. Docstring-only reuse is bound to identical executable AST. The21-method recipe is maintained with schema/input validation only. Independent review was pending when this entry was written.
+
+Evidence: `/run/media/fpizzi/SWARM/swarm-evidence/root00-cd01-v2-consumer21-bizw_0sc` (`ROOT-SEMANTIC-REVIEW.json`, `DOCSTRING-REUSE.json`, `principal-initial-guards`, `principal-cause-fixed`). RETEX: normalized failures must carry cleanup metadata to the terminal consumer; retaining the original object alone does not establish delivery. No product version entry: verification tooling only, no runtime delivery. Full graph/profile/15 Rust bodies remain unadmitted. Next: independent review, attributable WIP checkpoint, then bounded explicit CLI wiring; no main merge before overall qualification.
+
+
+T21-MODE-01 — Reviewer09 rejected the collector executable-bit loss (atomic temp0600, index100755). Restored0755 with unchanged bytes and no functional replay; metadata review requested. Prevention: preserve existing modes when atomically replacing attributable sources and inspect mode diffs before handoff. See MODE-RECOVERY.json; this recorded correction does not establish future replacement behavior.
+
+
+Final reviewer09 T21 verdict: APPROVE_SOURCE_AND_TARGETED_GUARDS_ONLY; T21-MODE-01 closed after independent0755/index100755 and unchanged SHA inspection. Prior content/targeted proofs reused without execution. Source/guards only, not CLI/runtime/main. Final handoff REVIEW-09-FINAL.json; reviewer09 returned idle.
