@@ -13,8 +13,16 @@ smoke: build
 	python3 tests/rust_native_http_cli.py --binary "$(abspath $(SWARM_OUTPUT))" --output .cache/native-smoke-$$(date +%s)-$$$$
 
 # Requires a local Docker Engine and a checkout without deploy/install.env.
+# Keep the aggregate sequential even when its caller enables parallel make.
+.PHONY: test-install-native test-install-docker
 test-install:
+	$(MAKE) test-install-native
+	$(MAKE) test-install-docker
+
+test-install-native:
 	python3 tests/rust_native_install.py --output .cache/install-native-$$(date +%s)-$$$$
+
+test-install-docker:
 	python3 tests/rust_docker_install.py --output .cache/install-docker-$$(date +%s)-$$$$
 
 # Deterministic agent processes: no paid model or API calls.

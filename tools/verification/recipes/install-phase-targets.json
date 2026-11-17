@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "install-phase-targets-fake-only",
+  "inputs": [
+    "Makefile",
+    ".github/workflows/ci.yml",
+    "tests/test_install_phase_targets.py",
+    "tools/verification/recipes/install-phase-targets.json",
+    "tools/verification/recipe.py",
+    "tests/fixture_area.py",
+    "rust/crates/swarm-engine/config/engine-settings.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "parallel-make-fake-installer-contract",
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import os,pathlib,runpy,sys,tempfile; parent=pathlib.Path(tempfile.mkdtemp(prefix='install-phase-',dir=os.environ['TMPDIR'])); sys.argv=['tests/test_install_phase_targets.py','--output',str(parent/'evidence')]; runpy.run_path('tests/test_install_phase_targets.py',run_name='__main__')"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "install-phase evidence tree:"
+      ],
+      "required_stderr": [
+        "test_missing_make_is_terminal_failure",
+        "test_ambient_makefiles_cannot_change_the_fixture",
+        "test_parallel_aggregate_installs_native_then_docker",
+        "test_parallel_aggregate_recovers_after_restoring_synthetic_input",
+        "test_parallel_aggregate_refuses_docker_after_native_failure",
+        "Ran 5 tests",
+        "\nOK\n"
+      ]
+    }
+  ]
+}
