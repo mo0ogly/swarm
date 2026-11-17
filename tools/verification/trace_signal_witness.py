@@ -12,6 +12,7 @@ import signal
 import sys
 
 import trace_process_witness as base
+from trace_outcome_custody import raise_with_custody
 
 
 WORKER = """import json, os, signal, sys
@@ -31,6 +32,8 @@ def observe(out, admission, strace, python, mode):
     causes, unknown primary trace or inconsistent channels refuse with chaining.
     All raw files remain private and retained, including upon refusal. No claim
     about bytes read, exe integrity at exec time or other signals is made.
+    Resident tracer results and already-matched primary observations survive
+    later errors/interruptions, including a successful executor return0.
     """
     base.require(mode in ('control', 'signal'), 'signal-fixture-mode')
     out.mkdir(mode=0o700)
@@ -44,17 +47,27 @@ def observe(out, admission, strace, python, mode):
     expected_tracer = -expected_signal if expected_signal is not None else 0
     failure = None
     native = None
+    known_result = None
+    primary_observation = {'status': 'UNKNOWN'}
     try:
         admission.check()
         process = base.outcomes.execute(command, out=out, name='tracer', admission=admission,
                                        publish=base.publish, digest=base.sha,
                                        failure_code='signal-fixture-tracer-nonzero', cwd=out, env=env)
         tracer_rc = process.returncode
-    except Exception as error:
+        known_result = {'returncode': tracer_rc, 'signal': -tracer_rc if tracer_rc < 0 else None,
+                        'execution_attempted': True,
+                        'source': 'native-executor-return'}
+    except BaseException as error:
         failure = error
         native = getattr(error, 'native_outcome', {})
-        tracer_rc = native.get('subprocess', {}).get('returncode')
-        base.publish(out / 'tracer-error.json', json.dumps(base.outcomes.failure_document(error), indent=2) + '\n')
+        known_result = dict(native.get('subprocess', {})) or None
+        tracer_rc = (known_result or {}).get('returncode')
+        try:
+            base.publish(out / 'tracer-error.json', json.dumps(base.outcomes.failure_document(error), indent=2) + '\n')
+        except BaseException as publication:
+            raise_with_custody(publication, tracer_result=known_result, native_receipt=native,
+                               primary_observation=primary_observation, earlier_failure=failure)
     try:
         base.require(tracer_rc == expected_tracer, 'signal-fixture-tracer-numeric')
         base.require((failure is None) == (mode == 'control'), 'signal-fixture-cause-presence')
@@ -88,17 +101,19 @@ def observe(out, admission, strace, python, mode):
                          os.fsencode(f'{k}={v}') for k, v in env.items()), 'signal-fixture-exact-exec')
         terminal = '+++ killed by SIGTERM +++' if mode == 'signal' else '+++ exited with 0 +++'
         base.require(lines[-1] == terminal, 'signal-fixture-primary-terminal')
+        primary_observation = {'status': 'OBSERVED', 'pid': marker['pid'],
+                               'exit_code': 0 if mode == 'control' else None,
+                               'signal': expected_signal, 'terminal': terminal}
         base.require(all(p.stat().st_mode & 0o777 == 0o600 for p in out.iterdir() if p.is_file()),
                      'signal-fixture-private-files')
         admission.check()
-    except Exception as error:
-        if failure is not None:
-            raise error from failure
-        raise
-    return {'mode': mode, 'tracer_returncode': tracer_rc, 'primary_pid': marker['pid'],
-            'primary_exit_code': 0 if mode == 'control' else None, 'primary_signal': expected_signal,
-            'primary_terminal': terminal, 'trace_sha256': base.sha(traces[0]),
-            'native_receipt_sha256': base.sha(out / 'tracer-result.json')}
+        return {'mode': mode, 'tracer_returncode': tracer_rc, 'primary_pid': marker['pid'],
+                'primary_exit_code': 0 if mode == 'control' else None, 'primary_signal': expected_signal,
+                'primary_terminal': terminal, 'trace_sha256': base.sha(traces[0]),
+                'native_receipt_sha256': base.sha(out / 'tracer-result.json')}
+    except BaseException as error:
+        raise_with_custody(error, tracer_result=known_result, native_receipt=native,
+                           primary_observation=primary_observation, earlier_failure=failure)
 
 
 def run_signal_witness(out, admission, strace, python):

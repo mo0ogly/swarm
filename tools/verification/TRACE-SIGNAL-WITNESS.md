@@ -23,3 +23,9 @@ processus n'est signalé. Aucun Cargo, provider, Swarm installé ou test Rust n'
 appelé. Le résultat conserve complete_build_qualification=false et
 behavioral_admission=false. Autres signaux, défaut propre du traceur, capture
 corrompue, fichiers consommés et arbres arbitraires restent non qualifiés.
+
+La conservation des résultats connus pendant une erreur/interruption tardive
+utilise désormais [le contrat commun](TRACE-OUTCOME-CUSTODY.md). Le code natif
+est copié avant tout diagnostic risqué ; l'issue primaire n'est déclarée observée
+qu'après comparaison de la trace. Les nouveaux témoins sont synthétiques et ne
+rejouent pas les observations SIGTERM historiques.

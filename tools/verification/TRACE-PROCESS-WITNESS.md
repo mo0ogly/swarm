@@ -44,3 +44,10 @@ Le second contrôle synthétique de cette recette injecte ENOSPC après un octet
 leur groupe, le fichier partiel conservé, une publication fraîche réussie et
 le refus d'écraser l'original. Cela ne simule pas une saturation réelle du volume
 ni une défaillance de stockage/démontage ; aucun enfant n'est lancé.
+
+Les erreurs tardives des callers utilisent maintenant
+`trace_outcome_custody.raise_with_custody` : résultat natif mis en mémoire avant
+validation, primaire UNKNOWN tant que la trace n'est pas comparée, puis faits
+OBSERVED conservés même si un hash ou une interruption échoue ensuite. Voir
+[le contrat commun](TRACE-OUTCOME-CUSTODY.md). Les preuves réelles antérieures
+restent datées et liées à leur source ; ces nouveaux contrôles sont synthétiques.

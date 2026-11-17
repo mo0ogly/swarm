@@ -14,6 +14,7 @@ import re
 import sys
 
 import native_build_outcome as outcomes
+from trace_outcome_custody import raise_with_custody
 
 
 WORKER = """import json, os, sys
@@ -98,7 +99,9 @@ def observe_case(out, admission, strace, python, code, nonce):
     plus matching stdout establishes this fixture's primary exit. Nonzero tracer
     outcomes retain their original error receipt. Any mismatch propagates with
     the tracer result in the exception cause; missing primary evidence is never
-    interpreted as no execution. No input-read/window-stability claim is made.
+    interpreted as no execution. Resident tracer facts and matched primary
+    observations survive later errors/interruptions, even after a successful0.
+    No input-read/window-stability claim is made.
     """
     out.mkdir(mode=0o700)
     publish(out / 'worker.py', WORKER)
@@ -110,17 +113,29 @@ def observe_case(out, admission, strace, python, code, nonce):
     command = [str(strace), '-ff', '-v', '-xx', '-s', str(string_size),
                '-e', 'trace=execve,exit,exit_group', '-o', str(out / 'trace'), '--', *argv]
     failure = None
+    native_receipt = None
+    known_result = None
+    primary_observation = {'status': 'UNKNOWN'}
     try:
         admission.check()
         child = outcomes.execute(command, out=out, name='tracer', admission=admission,
                                  publish=publish, digest=sha, failure_code='fixture-tracer-nonzero',
                                  cwd=out, env=env)
         tracer_rc = child.returncode
-    except Exception as error:
+        known_result = {'returncode': tracer_rc, 'signal': -tracer_rc if tracer_rc < 0 else None,
+                        'execution_attempted': True,
+                        'source': 'native-executor-return'}
+    except BaseException as error:
         failure = error
-        primary_receipt = getattr(error, 'native_outcome', {}).get('subprocess', {})
+        native_receipt = getattr(error, 'native_outcome', None)
+        primary_receipt = (native_receipt or {}).get('subprocess', {})
+        known_result = dict(primary_receipt) if primary_receipt else None
         tracer_rc = primary_receipt.get('returncode')
-        publish(out / 'tracer-error.json', json.dumps(outcomes.failure_document(error), indent=2) + '\n')
+        try:
+            publish(out / 'tracer-error.json', json.dumps(outcomes.failure_document(error), indent=2) + '\n')
+        except BaseException as publication:
+            raise_with_custody(publication, tracer_result=known_result, native_receipt=native_receipt,
+                               primary_observation=primary_observation, earlier_failure=failure)
     try:
         require(tracer_rc == code, 'trace-fixture-tracer-outcome')
         require((failure is None) == (code == 0), 'trace-fixture-nonzero-cause')
@@ -154,18 +169,19 @@ def observe_case(out, admission, strace, python, code, nonce):
         require(sorted(hex_array(environment)) == sorted(os.fsencode(f'{k}={v}') for k, v in env.items()),
                 'trace-fixture-environment')
         require(lines[-1] == f'+++ exited with {code} +++', 'trace-fixture-primary-terminal')
+        primary_observation = {'status': 'OBSERVED', 'pid': marker['pid'], 'exit_code': code,
+                               'signal': None, 'terminal': lines[-1]}
         require(all(p.stat().st_mode & 0o777 == 0o600 for p in out.iterdir() if p.is_file()),
                 'trace-fixture-private-files')
         admission.check()
-    except Exception as error:
-        if failure is not None:
-            raise error from failure
-        raise
-    return {'case': out.name, 'assertions': ['tracer-numeric', 'primary-marker', 'one-primary-pid',
-            'exact-exec-argv-environment', 'primary-terminal'], 'expected_fixture_exit': code,
-            'tracer_returncode': tracer_rc, 'observed_primary_exit': code,
-            'trace_sha256': sha(traces[0]), 'native_receipt_sha256': sha(out / 'tracer-result.json'),
-            'expected_nonzero_error_retained': failure is not None}
+        return {'case': out.name, 'assertions': ['tracer-numeric', 'primary-marker', 'one-primary-pid',
+                'exact-exec-argv-environment', 'primary-terminal'], 'expected_fixture_exit': code,
+                'tracer_returncode': tracer_rc, 'observed_primary_exit': code,
+                'trace_sha256': sha(traces[0]), 'native_receipt_sha256': sha(out / 'tracer-result.json'),
+                'expected_nonzero_error_retained': failure is not None}
+    except BaseException as error:
+        raise_with_custody(error, tracer_result=known_result, native_receipt=native_receipt,
+                           primary_observation=primary_observation, earlier_failure=failure)
 
 
 def run_witness(out, admission, strace, python):

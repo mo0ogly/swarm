@@ -3,6 +3,7 @@
   "id": "trace-process-transport-expected-failure-guard",
   "inputs": [
     "tools/verification/trace_process_witness.py",
+    "tools/verification/trace_outcome_custody.py",
     "tools/verification/test_trace_process_witness.py",
     "tools/verification/native_build_outcome.py",
     "tools/verification/TRACE-PROCESS-WITNESS.md",

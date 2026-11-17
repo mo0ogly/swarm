@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "trace-caller-known-facts-and-interruption-custody",
+  "inputs": [
+    "tools/verification/trace_process_witness.py",
+    "tools/verification/trace_signal_witness.py",
+    "tools/verification/trace_outcome_custody.py",
+    "tools/verification/test_trace_caller_custody.py",
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/TRACE-OUTCOME-CUSTODY.md",
+    "tools/verification/TRACE-OUTCOME-CUSTODY.en.md",
+    "tools/verification/TRACE-PROCESS-WITNESS.md",
+    "tools/verification/TRACE-PROCESS-WITNESS.en.md",
+    "tools/verification/TRACE-SIGNAL-WITNESS.md",
+    "tools/verification/TRACE-SIGNAL-WITNESS.en.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "ten-synthetic-caller-and-helper-guards",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_trace_caller_custody.py",
+        "CallerCustodyGuards"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_process_known_zero_then_eio",
+        "test_signal_known_negative_then_interrupt",
+        "test_helper_unknown_same_object_does_not_invent_zero_or_self_cause",
+        "test_helper_preserves_distinct_existing_cause_and_nested_native_record",
+        "Ran 10 tests",
+        "OK"
+      ]
+    }
+  ]
+}

@@ -40,3 +40,9 @@ by EIO after releasing the descriptor. It requires both errno causes in their
 group, retained partial bytes, successful fresh publication and refusal to
 overwrite the original. This is no real volume saturation, storage/unmount fault
 or child execution.
+
+Later caller failures now use trace_outcome_custody.raise_with_custody: native
+result cached before validation, primary UNKNOWN until trace comparison, then
+OBSERVED facts retained through a later hash error/interruption. See the
+[shared contract](TRACE-OUTCOME-CUSTODY.en.md). Earlier real observations remain
+dated/source-bound; the new error guards are synthetic.

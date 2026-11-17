@@ -22,3 +22,8 @@ is signalled. No Cargo, provider, installed Swarm or Rust test body is invoked.
 Results keep complete_build_qualification=false and behavioral_admission=false.
 Other signals, tracer faults, corrupt capture, consumed files and arbitrary trees
 remain unqualified.
+
+Known-result custody during later failures/interruptions now follows the
+[shared contract](TRACE-OUTCOME-CUSTODY.en.md). Native result is cached before
+fallible diagnostics; primary facts are observed only after trace comparison.
+The new guards are synthetic and do not replay historical SIGTERM observations.

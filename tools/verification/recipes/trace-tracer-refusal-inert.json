@@ -5,6 +5,7 @@
     "tools/verification/trace_tracer_refusal_witness.py",
     "tools/verification/test_trace_tracer_refusal_witness.py",
     "tools/verification/trace_process_witness.py",
+    "tools/verification/trace_outcome_custody.py",
     "tools/verification/native_build_outcome.py",
     "tools/verification/TRACE-TRACER-REFUSAL.md",
     "tools/verification/TRACE-TRACER-REFUSAL.en.md",
