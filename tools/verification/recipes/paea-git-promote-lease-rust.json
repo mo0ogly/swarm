@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "id": "paea-git-promote-lease-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    ".cargo/storage-policy.json",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/*.json",
+    "rust/crates/*/tests/common/**/*",
+    "tests/fixtures/**/*",
+    "web/*",
+    "frontend/engine-settings/*",
+    "config/*.json",
+    "locales/*.json",
+    "tools/agent-workflows/*",
+    ".claude/skills/*/SKILL.md",
+    "tools/verification/recipe.py",
+    "tools/verification/cargo_space_guard.py",
+    "tools/verification/build_storage.py",
+    "tools/verification/recipes/paea-git-promote-lease-rust.json",
+    "docs/architecture/PAEA-EFFECT-AUTHORITY.md",
+    "docs/en/PAEA-EFFECT-AUTHORITY.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "lease-clock-and-read",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "paea_publication_lease_guards",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "operator-vs-lease",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "managed_git_deadline_guards",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "persisted-mandate-expiry",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::paea_git_agreement::tests::agreement_matches_exact_recipe_and_rejects_absence_and_other_candidate",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "timestamp-cause-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::paea_git_agreement::tests::mandate_expiry_parse_failure_keeps_original_cause_and_recovers",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "reconcile-read-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::paea_git_promote_call::reconcile_observation_tests::reconcile_real_git_reads_changes_absence_and_refuses_errors",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "consumer-library-types",
+      "command": [
+        "cargo",
+        "check",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--lib"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "engine-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "--no-deps"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    }
+  ]
+}

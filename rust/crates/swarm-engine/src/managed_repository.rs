@@ -31,8 +31,32 @@ use std::{
 /// Private raw output stays in typed GitReportError, never public formatting.
 /// Crate callers owe fixed validated arguments and any descriptor-backed cwd
 /// lifetime; this runner does not grant authority or validate arbitrary Git args.
-pub(crate) fn git(root: &Path, args: &[&str], settings: &EngineSettingsDocument) -> Result<Vec<u8>, E> {
+/// Delegates to `git_with_deadline` with no lease deadline, so every existing
+/// caller keeps exactly the old saved-per-command-deadline behavior.
+pub(crate) fn git(
+    root: &Path,
+    args: &[&str],
+    settings: &EngineSettingsDocument,
+) -> Result<Vec<u8>, E> {
+    git_with_deadline(root, args, settings, None)
+}
+
+/// Same hardened runner and output/error ownership under one caller-supplied
+/// fixed lease deadline (an authority lease): the effective deadline is the
+/// earlier of the saved per-command deadline and the provided lease deadline
+/// (an existing operator timeout may fire first). `None` keeps the saved-only
+/// deadline with unchanged semantics for old callers. No runner or error logic
+/// is duplicated and no new policy knob exists; the caller owns the lease and
+/// must reuse the SAME fixed deadline across the related transaction and
+/// reads instead of starting a fresh lease per command.
+pub(crate) fn git_with_deadline(
+    root: &Path,
+    args: &[&str],
+    settings: &EngineSettingsDocument,
+    lease_deadline: Option<Instant>,
+) -> Result<Vec<u8>, E> {
     let (command, deadline) = git_command(root, args, settings)?;
+    let deadline = combine_deadlines(deadline, lease_deadline);
     let (mut stdout, mut stderr) = (Vec::new(), Vec::new());
     let run =
         crate::validation_run::run_owned_command(command, deadline, &mut stdout, Some(&mut stderr));
@@ -55,6 +79,18 @@ pub(crate) fn git(root: &Path, args: &[&str], settings: &EngineSettingsDocument)
             },
         )),
         Ok(_) => Ok(stdout),
+    }
+}
+
+/// Pure effective-deadline mapping for one fixed Git command under a fixed
+/// authority lease: the earlier of the saved per-command deadline and the
+/// provided lease deadline; a missing side keeps the other and both missing
+/// keep the old no-deadline behavior. No clock is sampled here.
+pub(crate) fn combine_deadlines(saved: Option<Instant>, lease: Option<Instant>) -> Option<Instant> {
+    match (saved, lease) {
+        (Some(saved), Some(lease)) => Some(saved.min(lease)),
+        (saved, None) => saved,
+        (None, lease) => lease,
     }
 }
 /// Build a fixed internal Git command with the saved per-command deadline.
@@ -692,5 +728,30 @@ mod tests {
         staging.close().unwrap();
         dir.close().unwrap();
         std::fs::remove_dir_all(root).unwrap();
+    }
+}
+
+
+#[cfg(test)]
+mod managed_git_deadline_guards {
+    use super::combine_deadlines;
+    use std::time::{Duration, Instant};
+
+    /// Effective per-command deadline mapping under a fixed authority lease:
+    /// the earlier of the saved operator deadline and the lease wins in
+    /// either order; a missing side keeps the other; both missing keep the
+    /// old no-deadline behavior, so the plain `git` wrapper (which delegates
+    /// with None) preserves every existing caller's semantics unchanged.
+    #[test]
+    fn operator_vs_lease_takes_the_earlier_deadline() {
+        let saved = Instant::now();
+        let lease = saved
+            .checked_add(Duration::from_secs(60))
+            .expect("lease sample");
+        assert_eq!(combine_deadlines(Some(saved), Some(lease)), Some(saved));
+        assert_eq!(combine_deadlines(Some(lease), Some(saved)), Some(saved));
+        assert_eq!(combine_deadlines(None, Some(lease)), Some(lease));
+        assert_eq!(combine_deadlines(Some(saved), None), Some(saved));
+        assert_eq!(combine_deadlines(None, None), None);
     }
 }

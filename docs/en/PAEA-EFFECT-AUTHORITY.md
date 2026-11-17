@@ -99,7 +99,7 @@ both CLI languages without private nested messages.
 The [article v6 workstream](plans/actions-confiance/ARTICLE-V6-ADAPTATION.md)
 retains the candidate, reproducer and checks. Source changes establish neither
 installation nor universal PV2. Reference observation during Reconcile is integrated as a source candidate,
-without native validation yet; the authority lease remains unimplemented; a missing journal row still proves no
+without native validation yet; an admission lease is also integrated as a source candidate without effect-point guarantees; a missing journal row still proves no
 absence of Git effects. Oracle attribution must distinguish intention and attempt.
 
 
@@ -128,3 +128,52 @@ CLI/HTTP expose `outcome: reconciled`, optional historical effect and observed r
 Consumers of the previous negative result must adapt to this changed shape.
 No renewed publication authority or installation follows. Component checks and
 the native public recipe remain separate evidence.
+
+## Git promotion admission lease — source candidate
+
+The matched agreement now carries optional RFC3339 `expires_at` from the approved
+action's persisted active mandate, captured under the same shared reservation.
+It is never supplied by a browser/agent field. No mandate means null metadata
+and the signed identity expiry alone bounds the lease. Validated delegation
+already requires a child to expire no later than its parent.
+
+Commit retains the match and derives one fixed monotonic deadline from the
+earlier signed/mandate expiry. Monotonic time is sampled before UTC; mapping is
+relative to observed UTC, assumed trustworthy during derivation. Once derived,
+UTC rollback cannot extend this deadline. Exact/past expiry rejects admission;
+both clocks are checked before the transaction and after its prepared-lock read.
+Preflights retain their own limits; no total callback/FS/SQL bound is added.
+Slow preflight cannot mint a new lifetime.
+
+The Git helper reuses hardened process/output/cause handling with the earlier
+operator or supplied lease deadline. The synchronous nested read also respects
+the already consumed parent transaction deadline rather than restarting its
+operator budget. Post-publication reads retain the same lease boundary. Read
+errors never become absence, including zero OLD; unknown remains explicit where
+no durable outcome is established. Lease/process/cleanup causes remain typed.
+
+Existing `git_command_timeout_seconds` is persisted in `.swarm/engine-settings.json`,
+validated by `EngineSettingsValues::git_command_timeout` and consumed by the runner.
+Units are seconds: zero expires immediately; null disables this operator deadline
+only; legacy missing fields refuse. The native catalogue, generic Admin component,
+show/describe/preview/apply routes and engine-settings CLI share authoritative
+validation. This is source evidence, not a newly executed UI flow. No lease knob,
+margin, retry or default is added. Disabling the operator deadline does not disable
+authority expiry.
+
+Client deadlines bound controlled admission/waiting, not Git's physical publication
+after COMMIT: scheduling/storage may exceed expiry. This protocol carries no
+receiver-enforced authenticated lease at that point. Late outcomes remain unknown
+or historically known according to evidence, never renewed authority. No universal
+PA/H2/PV2 claim follows. Injected clocks and inert Git repositories are component
+evidence; signed native flow, concurrent withdrawal and delivered profile remain
+separate.
+
+Permanent recipe: `tools/verification/recipes/paea-git-promote-lease-rust.json`.
+It declares twelve named component checks, consumer typing and Rustdoc compilation.
+Its inventory is declarative, not a qualified native graph. An external Cargo
+target requires the existing held-mount admission context before Cargo starts;
+the recipe grants no rights and does not itself admit removable storage. Use
+fresh evidence and preserve original refusals. This whole recipe has not yet
+run in this increment; targeted commands and frozen composition are retained
+separately.

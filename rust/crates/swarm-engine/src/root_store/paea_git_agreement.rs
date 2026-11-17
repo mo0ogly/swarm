@@ -13,6 +13,7 @@
 use super::{absent, RootStore, RootStoreError as R};
 use crate::trust::state::State;
 use serde_json::Value;
+use swarm_wire_json::go_rfc3339;
 use time::OffsetDateTime;
 
 /// Newest durable approval that binds the exact supplied canonical action
@@ -21,15 +22,31 @@ use time::OffsetDateTime;
 /// Trust configuration revision the approval was captured under, which the
 /// same locked read confirms is still current: a configuration change voids
 /// the agreement until a fresh approval is captured under the new revision.
-/// Presence proves a captured exact agreement; it never substitutes authority,
-/// plan, witness or policy checks and never establishes human presence beyond
-/// what the recorded enrollment evidence itself carries.
+/// `expires_at` is optional mandate expiry metadata captured in the SAME
+/// shared-locked read: the persisted RFC3339 `expires_at` of the chosen
+/// approved action's validated active mandate, taken from the existing
+/// persisted Trust state — never from a client field and never a default. It
+/// is `None` only for the preexisting valid no-mandate branch, where the
+/// signed identity expiry alone bounds any later admission lease. The leaf
+/// mandate's own expiry is already the delegation-chain minimum because the
+/// established `delegation_narrows` invariant requires every child lifetime
+/// to stay inside its parent's; no new policy knob is introduced. The value
+/// is additive serde metadata: existing consumers of `action_id`,
+/// `revision`, `approver` and `content_digest` are unaffected, and it never
+/// substitutes authority, plan, witness or policy checks nor establishes
+/// human presence.
+///
+/// FR : `expires_at` est la métadonnée d'expiration optionnelle du mandat
+/// validé de l'action approuvée, lue et validée dans la même observation
+/// verrouillée depuis l'état persisté ; aucune approbation sans mandat n'en
+/// porte, et l'expiration signée de l'identité reste seule borne dans ce cas.
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct PaeaGitAgreementMatch {
     pub action_id: String,
     pub approver: String,
     pub content_digest: String,
     pub revision: i64,
+    pub expires_at: Option<String>,
 }
 
 /// Exact Trust terms an approver must supply so the existing `approve`
@@ -146,7 +163,10 @@ impl RootStore {
     /// connector); and its recorded policy revision equals the state revision
     /// in the same locked read, so the freshness check is atomic with the
     /// match. The newest matching evidence (highest sequence) wins;
-    /// superseded approvals never resurface. Limits: this is a root-state
+    /// superseded approvals never resurface. The match carries optional
+    /// validated mandate expiry (`expires_at`) from this same locked read;
+    /// absence of a mandate leaves the signed identity expiry as the bound.
+    /// Limits: this is a root-state
     /// observation, not an authentication of the approver's live consent —
     /// the recorded identity context of the approval remains the only
     /// enrollment evidence, and real human enrollment/approval stays required
@@ -219,17 +239,26 @@ impl RootStore {
                     .get("mandate_id")
                     .and_then(Value::as_str)
                     .unwrap_or_default();
+                // Parse a present leaf before active(), whose older Trust
+                // contract maps timestamp errors to a fixed validation reason.
+                // An absent mandate still follows its established refusal.
+                let mandate_expires_at = if mandate_id.is_empty() {
+                    None
+                } else if let Some(mandate) = state.mandates.get(mandate_id) {
+                    let raw = mandate.get("expires_at").and_then(Value::as_str)
+                        .ok_or(R::Refused("paea-git-agreement-mandate-expiry-missing"))?;
+                    go_rfc3339::parse(raw).map_err(|cause| {
+                        R::Launch(Box::new(crate::AgentLaunchError::caused(
+                            "paea-git-agreement-mandate-expiry", cause,
+                        )))
+                    })?;
+                    Some(raw.to_owned())
+                } else { None };
                 let mandate_active = mandate_id.is_empty()
                     || crate::trust::operations::active(
-                        &state,
-                        mandate_id,
-                        OffsetDateTime::now_utc(),
-                    )
-                    .map_err(failure)?
-                    .is_empty();
-                if !mandate_active {
-                    continue;
-                }
+                        &state, mandate_id, OffsetDateTime::now_utc(),
+                    ).map_err(failure)?.is_empty();
+                if !mandate_active { continue; }
                 // P1: the approval command's retained original bytes are the
                 // exact canonical action bytes.
                 let exact_command = original == action_bytes;
@@ -259,6 +288,7 @@ impl RootStore {
                             approver: approver.to_owned(),
                             content_digest: evidence.content_digest.clone(),
                             revision: state.revision,
+                            expires_at: mandate_expires_at,
                         },
                     ));
                 }
@@ -484,6 +514,10 @@ mod tests {
         assert_eq!(matched.approver, "approver");
         assert_eq!(matched.revision, f.revision());
         assert_eq!(matched.content_digest.len(), 64);
+        let persisted = State::decode(&std::fs::read(f.0.join(".swarm/trust-actions.json")).unwrap()).unwrap();
+        let expires_at = persisted.mandates.get("mandate-first").unwrap()
+            .get("expires_at").and_then(Value::as_str).unwrap();
+        assert_eq!(matched.expires_at.as_deref(), Some(expires_at));
         // A different candidate is a different action: no match, no aliasing.
         assert!(root
             .paea_git_agreement_match(&git_action_bytes(&"e".repeat(40)))
@@ -866,4 +900,39 @@ mod tests {
         assert!(root.paea_git_agreement_match(&bytes).unwrap().is_some());
         root.close().unwrap();
     }
+    /// A public approved control exposes persisted expiry; corrupt only the
+    /// owned fixture timestamp, require its typed cause, then restore bytes.
+    #[test]
+    fn mandate_expiry_parse_failure_keeps_original_cause_and_recovers() {
+        let f = Fixture::new();
+        let candidate = "f".repeat(40);
+        assert_eq!(approve_candidate(&f, "lease-cause", &candidate)["state"], "approved");
+        let root = RootStore::open(&f.0, false).unwrap();
+        let bytes = git_action_bytes(&candidate);
+        let healthy = root.paea_git_agreement_match(&bytes).unwrap().unwrap();
+        assert!(healthy.expires_at.is_some());
+        let path = f.0.join(".swarm/trust-actions.json");
+        let original = std::fs::read(&path).unwrap();
+        std::fs::write(f.0.join("before-mandate-expiry.json"), &original).unwrap();
+        let mut corrupted: Value = serde_json::from_slice(&original).unwrap();
+        corrupted["mandates"]["mandate-lease-cause"]["expires_at"] = Value::String("invalid-rfc3339".into());
+        std::fs::write(&path, serde_json::to_vec(&corrupted).unwrap()).unwrap();
+        let attempted = root.paea_git_agreement_match(&bytes);
+        // Restore and close before asserting the fault result. An unexpected
+        // outcome cannot strand corrupt state; the original is also retained
+        // on disk if restoration itself fails.
+        std::fs::write(&path, &original).unwrap();
+        let recovered = root.paea_git_agreement_match(&bytes).unwrap().unwrap();
+        root.close().unwrap();
+        let failure = attempted.unwrap_err();
+        let mut cause: Option<&(dyn std::error::Error + 'static)> = Some(&failure);
+        let mut found = false;
+        while let Some(error) = cause {
+            found |= error.downcast_ref::<swarm_wire_json::go_rfc3339::GoTimestampError>().is_some();
+            cause = error.source();
+        }
+        assert!(found, "original RFC3339 parse error remains typed");
+        assert_eq!(recovered, healthy);
+    }
+
 }

@@ -32,7 +32,7 @@ ils ne prouvent pas la transmission réseau, l’effet Git ni l’installation.
 Le [lot article v6](../plans/actions-confiance/ARTICLE-V6-ADAPTATION.md) conserve
 le candidat, la reproduction et les contrôles. Ce changement de source ne prouve
 ni installation, ni conformité globale PV2. La lecture de référence par Reconcile est intégrée comme candidat source,
-sans validation native à ce stade. Le bail reste à réaliser ; l’absence de ligne
+sans validation native à ce stade. Un bail d’admission est aussi intégré comme candidat, sans garantie du point de publication ; l’absence de ligne
 dans le journal n’établit toujours pas l’absence d’effet Git. L’identification
 d’une intention versus d’une tentative doit rester explicite lors de l’oracle.
 
@@ -143,3 +143,57 @@ sans exiger un nouvel accord Commit. Les sorties CLI et HTTP distinguent
 Leur forme change : les consommateurs de l’ancien résultat négatif doivent
 être adaptés. Aucun droit de nouvelle publication ni installation n’en découle.
 Les contrôles composants et la recette native restent des preuves distinctes.
+
+## Bail d’admission de la promotion Git — candidat source
+
+Le match d’accord expose désormais `expires_at`, optionnel, en RFC3339 : il
+provient du mandat actif persisté de l’action approuvée, lu sous la même
+réservation partagée. Il ne vient ni du navigateur ni d’un champ proposé par
+l’agent. Sans mandat, cette métadonnée vaut null et l’expiration signée de
+l’identité reste la borne. La chaîne de délégation validée impose déjà au
+fils une expiration au plus tard à celle du parent.
+
+Commit retient ce match, puis construit une échéance monotone fixe à partir
+de la plus proche expiration signée/mandat. Le monotone est échantillonné avant
+l’UTC ; la conversion reste relative à l’UTC observée, supposée digne de confiance
+pendant la dérivation. Une fois dérivée, l’échéance n’est plus renouvelée par un
+recul de l’UTC. Une expiration exacte ou passée refuse l’admission ; les deux
+horloges sont contrôlées avant la transaction et après la lecture sous verrou Git.
+Les prévols gardent leurs limites propres ; aucune borne globale FS/SQL du
+callback n’est ajoutée ni revendiquée. Un prévol lent ne recrée pas de validité.
+
+Le helper Git réutilise le runner durci et ses causes/sorties. Sa limite est
+le minimum du délai opérateur et du bail fourni. La lecture synchrone dans le
+callback respecte aussi l’échéance déjà consommée de la transaction parente :
+elle ne redémarre pas le délai opérateur de cette transaction. Le contrôle
+après publication possible garde la même échéance de bail. Une erreur de
+lecture ne devient jamais une absence, même lorsque OLD est nul ; son état
+d’effet reste unknown si aucune observation durable n’est établie. Les erreurs
+de bail, de processus et de fermeture conservent leurs causes typées.
+
+Le réglage existant `git_command_timeout_seconds` reste stocké dans
+`.swarm/engine-settings.json`, validé par `EngineSettingsValues::git_command_timeout`
+et consommé par le runner. Il s’exprime en secondes ; zéro expire immédiatement,
+null désactive ce seul délai opérateur, une ancienne configuration sans champ
+refuse. Le catalogue natif décrit ce champ ; le composant Admin générique, les
+routes show/describe/preview/apply et la CLI engine-settings utilisent la même
+validation. Ce raccordement est constaté dans le source, sans nouvelle recette
+UI exécutée dans ce lot. Le bail n’ajoute aucun réglage, marge, retry ni défaut.
+Désactiver le délai opérateur ne désactive pas l’expiration de l’autorité.
+
+La deadline côté client borne l’admission et l’attente contrôlées, pas le point
+physique où Git publie après COMMIT : ordonnancement et stockage peuvent dépasser
+l’expiration. Le protocole actuel ne transmet pas de bail authentifié imposé au
+récepteur à ce point. Le résultat tardif reste inconnu ou historiquement connu
+selon les preuves, sans nouvelle autorité. Aucun PA/H2/PV2 global ne découle de
+ces gardes. Les horloges injectées et dépôts Git isolés testent des composants ;
+le parcours signé natif, le retrait concurrent et le profil livré restent distincts.
+
+Recette permanente : `tools/verification/recipes/paea-git-promote-lease-rust.json`.
+Elle déclare douze contrôles composants nommés, le typage des consommateurs et
+la compilation Rustdoc. Son inventaire est déclaratif, pas le graphe natif qualifié.
+Pour une cible Cargo externe, utiliser le contexte d’admission/maintien de montage
+existant avant de lancer Cargo ; la recette n’accorde aucun droit et n’admet pas
+elle-même un support amovible. Choisir un dossier de preuves neuf et conserver
+les refus originaux. La recette entière n’a pas encore été exécutée dans ce lot ;
+les commandes ciblées et leur composition figée sont conservées séparément.

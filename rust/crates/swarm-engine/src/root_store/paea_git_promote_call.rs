@@ -583,7 +583,15 @@ impl RootStore {
     /// plan scope, then executes under a project writer reservation and the
     /// project Trust reservation. Commit performs one exact reference
     /// transaction with OLD fencing after reserving the durable intent; a
-    /// commit error is uncertain and requires explicit reconciliation.
+    /// commit error is uncertain and requires explicit reconciliation. The
+    /// Commit branch retains the actual matched agreement and passes its
+    /// validated mandate expiry to the effect, which derives one fixed
+    /// monotonic admission lease from the earliest absolute signed identity
+    /// and mandate expiry, rechecks both clocks before the transaction and
+    /// inside the prepared callback after the nested Git read, and bounds the
+    /// transaction, the nested read and the post-publication read with that
+    /// one fixed deadline (controlled waiting only: no physical Git
+    /// publication deadline or receiver-enforced lease is claimed).
     /// Reconcile reads the durable journal state and the actual current direct
     /// Git reference (one read-only `for-each-ref` under the existing hardened
     /// runner, with explicit `%(symref)` validation) without any new
@@ -661,13 +669,26 @@ impl RootStore {
                                 // after the captured lookup is the same typed
                                 // refusal; Reconcile observes the journal and
                                 // the current direct ref and needs no agreement.
-                                if project
-                                    .paea_git_agreement_match(prepared.canonical.bytes())?
-                                    .is_none()
-                                {
+                                // The actual matched agreement is retained and
+                                // its validated mandate expiry (persisted
+                                // RFC3339 string; None only for the preexisting
+                                // no-mandate branch, where the signed identity
+                                // expiry alone bounds the lease) is passed to
+                                // the effect; no authority check is bypassed.
+                                let agreement = project
+                                    .paea_git_agreement_match(prepared.canonical.bytes())?;
+                                if agreement.is_none() {
                                     return Err(R::Refused("paea-git-promote-agreement-stale"));
                                 }
-                                effect::commit(self, project, prepared, identity)
+                                let mandate_expires_at =
+                                    agreement.and_then(|matched| matched.expires_at);
+                                effect::commit(
+                                    self,
+                                    project,
+                                    prepared,
+                                    identity,
+                                    mandate_expires_at,
+                                )
                             }
                             Operation::Reconcile => effect::reconcile(self, project, prepared),
                         }
@@ -879,9 +900,10 @@ mod effect {
         R, RootStore,
     };
     use rusqlite::{params, Transaction, TransactionBehavior};
-    use std::{cell::Cell, error::Error};
+    use std::{cell::Cell, error::Error, time::Instant};
     use swarm_enrollment_authority::paea_action::Identity;
     use swarm_protection_contract::Action;
+    use swarm_wire_json::go_rfc3339;
     /// True only for the absent-reference marker accepted by Git's update-ref.
     fn zero_oid(oid: &str) -> bool {
         !oid.is_empty() && oid.bytes().all(|b| b == b'0')
@@ -1073,17 +1095,180 @@ mod effect {
             },
         }
     }
+    /// Fixed admission lease for one guarded publication: the earliest
+    /// absolute expiry of the signed identity and the validated current
+    /// approval's mandate, mapped ONCE to a fixed monotonic deadline. The
+    /// monotonic sample is taken BEFORE the UTC sample (conservative mapping:
+    /// relative to the observed UTC sample, assuming trustworthy UTC during
+    /// derivation; this is not a trusted-clock attestation), with a checked
+    /// positive Duration conversion and checked_add; exact expiry refuses.
+    /// Both the absolute expiry and the fixed deadline are rechecked together:
+    /// a backward UTC jump cannot renew the monotonic deadline and a forward
+    /// UTC jump is caught by the absolute check, while the absolute
+    /// signed/mandate expiry remains the source of truth. This bounds
+    /// controlled waiting only: no physical Git publication deadline,
+    /// receiver-enforced lease or total callback/filesystem/SQL bound is
+    /// claimed, and no margin, timeout, retry or new operator setting exists.
+    ///
+    /// FR : bail d'admission fixe, dérivé une seule fois de l'expiration
+    /// absolue la plus ancienne (identité signée contre mandat validé) vers
+    /// une échéance monotone conservatrice ; l'expiration absolue reste la
+    /// vérité et un recul de l'horloge UTC ne renouvelle jamais l'échéance.
+    pub(super) struct PublicationLease {
+        /// Earliest absolute expiry (signed identity vs validated mandate).
+        expires_at: time::OffsetDateTime,
+        /// Fixed monotonic deadline derived once from the absolute expiry.
+        deadline: Instant,
+    }
+
+    impl PublicationLease {
+        /// Derive from explicit clock samples (deterministic and testable):
+        /// the monotonic sample must be taken before the UTC sample. Exact
+        /// expiry (no positive remaining lifetime) and past expiry refuse
+        /// `paea-git-promote-lease-expired`; an unrepresentable monotonic
+        /// deadline refuses `paea-git-promote-lease-representation`.
+        pub(super) fn from_samples(
+            signed: time::OffsetDateTime,
+            mandate: Option<time::OffsetDateTime>,
+            mono_now: Instant,
+            utc_now: time::OffsetDateTime,
+        ) -> Result<Self, R> {
+            let earliest = match mandate {
+                Some(mandate) if mandate < signed => mandate,
+                _ => signed,
+            };
+            let remaining = std::time::Duration::try_from(earliest - utc_now)
+                .ok()
+                .filter(|remaining| !remaining.is_zero())
+                .ok_or(R::Refused("paea-git-promote-lease-expired"))?;
+            let deadline = mono_now
+                .checked_add(remaining)
+                .ok_or(R::Refused("paea-git-promote-lease-representation"))?;
+            Ok(Self {
+                expires_at: earliest,
+                deadline,
+            })
+        }
+
+        /// Production derivation with the same conservative clock ordering:
+        /// monotonic sample first, UTC sample second.
+        pub(super) fn derive(
+            signed: time::OffsetDateTime,
+            mandate: Option<time::OffsetDateTime>,
+        ) -> Result<Self, R> {
+            let mono_now = Instant::now();
+            Self::from_samples(signed, mandate, mono_now, time::OffsetDateTime::now_utc())
+        }
+
+        /// The one fixed monotonic deadline, reused unchanged for the
+        /// reference transaction, the nested prepared-callback read and the
+        /// post-publication read — never restarted per read.
+        pub(super) fn deadline(&self) -> Instant {
+            self.deadline
+        }
+
+        /// Both-clock recheck, deterministic from explicit samples: expired
+        /// when the absolute earliest expiry has passed (source of truth) OR
+        /// the fixed monotonic deadline has been reached.
+        pub(super) fn expired(&self, mono_now: Instant, utc_now: time::OffsetDateTime) -> bool {
+            utc_now >= self.expires_at || mono_now >= self.deadline
+        }
+
+        /// Production recheck of both clocks with a fixed typed refusal; no
+        /// margin, retry or renewal exists.
+        pub(super) fn check(&self) -> Result<(), R> {
+            if self.expired(Instant::now(), time::OffsetDateTime::now_utc()) {
+                return Err(R::Refused("paea-git-promote-lease-expired"));
+            }
+            Ok(())
+        }
+    }
+
+    /// Pure prepared-callback decision for one guarded publication, from one
+    /// validated exact-ref read result and the post-read lease recheck. A
+    /// failed read refuses with its original typed cause — never a
+    /// synthesized missing ref, never a silent Abort and never a Commit, so a
+    /// zero OLD never turns a deadline/process/read error into a creation. A
+    /// lease recheck refusal likewise refuses. A successful absent ref
+    /// permits creation only for the all-zero OLD marker; the observed
+    /// candidate sets the recovery flag and aborts without a new update (the
+    /// preexisting commit-recovery semantics, with no causality inferred
+    /// beyond it); the expected OLD permits Commit; any other value refuses
+    /// typed.
+    pub(super) fn decide_from_read(
+        read: Result<Option<String>, R>,
+        lease: Result<(), R>,
+        expected_old_oid: &str,
+        candidate_oid: &str,
+        already: &Cell<bool>,
+    ) -> Result<crate::GitReferenceDecision, Box<dyn Error + Send + Sync>> {
+        let observed = match read {
+            Ok(observed) => observed,
+            Err(cause) => return Err(Box::new(cause) as Box<dyn Error + Send + Sync>),
+        };
+        lease.map_err(|cause| Box::new(cause) as Box<dyn Error + Send + Sync>)?;
+        match observed {
+            None if zero_oid(expected_old_oid) => Ok(crate::GitReferenceDecision::Commit),
+            None => Err(Box::new(std::io::Error::other(
+                "paea-git-promote-old-missing",
+            )) as Box<dyn Error + Send + Sync>),
+            Some(current) => {
+                if current == candidate_oid {
+                    // Crash recovery: the reference is already at the
+                    // candidate; record the known outcome, publish nothing.
+                    already.set(true);
+                    return Ok(crate::GitReferenceDecision::Abort);
+                }
+                if current != expected_old_oid {
+                    return Err(Box::new(std::io::Error::other(
+                        "paea-git-promote-old-changed",
+                    )) as Box<dyn Error + Send + Sync>);
+                }
+                Ok(crate::GitReferenceDecision::Commit)
+            }
+        }
+    }
+
     /// One exact guarded publication. Reserves the durable intent before any
     /// Git, verifies the actual OLD under Git's prepared lock via the decision
     /// callback, runs the reference transaction once and records the observed
     /// effect. A crash between intent and effect is recovered under OLD
     /// fencing: a reference already at the candidate records the known outcome
     /// without a new publication.
+    ///
+    /// Admission is bounded by one fixed monotonic publication lease derived
+    /// once at entry from the earliest absolute expiry of the signed identity
+    /// and the validated current approval's mandate (the raw persisted
+    /// RFC3339 string supplied by the caller; `None` keeps the signed expiry
+    /// alone, the preexisting no-mandate branch). The lease deadline is
+    /// sampled monotonic-first and then UTC, so the remaining lifetime is
+    /// fixed relative to that observed UTC sample, with trustworthy UTC during
+    /// derivation assumed; later preflights cannot restart the lease;
+    /// exact expiry refuses. Preflight repository/candidate opens keep the
+    /// existing operator policy unchanged; after them BOTH the absolute
+    /// expiry and the fixed monotonic deadline are rechecked before the
+    /// transaction, and again inside the prepared callback after the nested
+    /// Git read, before any Commit decision. The same fixed lease deadline
+    /// (never a fresh lease) bounds the reference transaction, the nested
+    /// read and the post-publication read; the effective per-command deadline
+    /// stays the earlier of the saved operator timeout and the lease. A
+    /// backward UTC jump cannot renew the fixed monotonic deadline and the
+    /// absolute signed/mandate expiry remains the source of truth. This
+    /// bounds controlled waiting only: no physical Git publication deadline,
+    /// receiver-enforced lease or total callback/filesystem/SQL bound is
+    /// claimed, and a scheduler/COMMIT pass past expiry stays an explicit
+    /// unknown.
+    ///
+    /// FR : la publication est admise sous un bail monotone fixe dérivé de
+    /// l'expiration absolue la plus ancienne (identité signée, mandat validé)
+    /// ; les deux horloges sont revérifiées avant la transaction et après la
+    /// lecture imbriquée, sans marge, relance ni nouveau réglage.
     pub(super) fn commit(
         service: &RootStore,
         project: &RootStore,
         prepared: &super::PaeaGitPromoteCall,
         identity: &Identity<'_>,
+        mandate_expires_at: Option<String>,
     ) -> Result<PaeaGitPromoteOutcome, R> {
         if identity.principal().kind != "human"
             || time::OffsetDateTime::now_utc() >= identity.expires_at()
@@ -1099,6 +1284,22 @@ mod effect {
         else {
             return Err(R::Refused("paea-git-promote-git-required"));
         };
+        // One fixed lease for the whole publication. A present mandate expiry
+        // is parsed here with the existing Go RFC3339 parser; an invalid
+        // persisted value typed-refuses with the original parse cause. The
+        // earliest absolute expiry is mapped once to the fixed monotonic
+        // deadline (monotonic sample before UTC sample, checked positive
+        // conversion and checked_add, exact expiry refuses).
+        let mandate_expiry = match &mandate_expires_at {
+            Some(raw) => Some(go_rfc3339::parse(raw).map_err(|cause| {
+                R::Launch(Box::new(crate::AgentLaunchError::caused(
+                    "paea-git-promote-mandate-expiry",
+                    cause,
+                )))
+            })?),
+            None => None,
+        };
+        let lease = PublicationLease::derive(identity.expires_at(), mandate_expiry)?;
         // Durable intent reservation precedes any Git effect on the service
         // journal; Existing retains the original bytes for the business key.
         let reservation = service
@@ -1174,14 +1375,29 @@ mod effect {
                 repository.close(),
             );
         }
+        // Slow preflights (intent reservation, replay, repository open,
+        // candidate inspect) ran under the existing operator policy; recheck
+        // BOTH the absolute expiry and the fixed monotonic deadline before
+        // the transaction. No new lifetime is minted: the deadline stays the
+        // one fixed at entry.
+        if let Err(cause) = lease.check() {
+            return finished_out(Err(cause), repository.close());
+        }
         // One exact reference transaction against the actual destination. The
         // decision callback verifies the direct ref state under Git's prepared
         // lock; protocol ACKs are observations only. The hardened runner strips
         // Git environment overrides and optional locks for the child process.
-        let settings = service.read_settings()?;
+        // The transaction deadline is the earlier of the saved per-command
+        // operator timeout and the fixed lease deadline; the SAME fixed lease
+        // deadline (never a fresh lease) also bounds the nested read below and
+        // the post-publication read.
+        let settings = match service.read_settings() {
+            Ok(settings) => settings,
+            Err(cause) => return finished_out(Err(cause), repository.close()),
+        };
         let destination = repository.directory_path();
         let already = Cell::new(false);
-        let (git, deadline) =
+        let (git, saved_deadline) =
             match crate::managed_repository::git_command(&destination, &[], &settings) {
                 Ok(value) => value,
                 Err(e) => {
@@ -1191,50 +1407,32 @@ mod effect {
                     )
                 }
             };
+        let transaction_deadline = crate::managed_repository::combine_deadlines(
+            saved_deadline,
+            Some(lease.deadline()),
+        );
         let run = crate::run_git_reference_transaction(
             git,
             &prepared.proposal,
-            deadline,
+            transaction_deadline,
             None,
             || {
-                let current = crate::managed_repository::git(
-                    &destination,
-                    &["--git-dir", ".", "rev-parse", "--verify", target_ref],
-                    &settings,
+                // Only a successful read can reach a Commit decision. Do not
+                // construct and discard a second lease error after a failed
+                // read; that original typed failure already refuses the decision.
+                // Preserve the parent's earlier operator deadline during the
+                // synchronous callback; its nested command cannot extend it.
+                let read = read_current_ref_with_deadline(
+                    &destination, target_ref, &settings, transaction_deadline,
                 );
-                match current {
-                    // Absent direct ref: only the zero-OID marker may commit a
-                    // creation; Git itself fences the actual update under its
-                    // prepared lock.
-                    Err(_) if zero_oid(expected_old_oid) => {
-                        Ok(crate::GitReferenceDecision::Commit)
-                    }
-                    Err(_) => Ok(crate::GitReferenceDecision::Abort),
-                    Ok(raw) => {
-                        let current = String::from_utf8(raw)
-                            .map_err(|_| {
-                                Box::new(std::io::Error::other(
-                                    "paea-git-promote-old-encoding",
-                                ))
-                                    as Box<dyn Error + Send + Sync>
-                            })?
-                            .trim()
-                            .to_owned();
-                        if current == *candidate_oid {
-                            // Crash recovery: the reference is already at the
-                            // candidate; record the known outcome, publish nothing.
-                            already.set(true);
-                            return Ok(crate::GitReferenceDecision::Abort);
-                        }
-                        if current != *expected_old_oid {
-                            return Err(Box::new(std::io::Error::other(
-                                "paea-git-promote-old-changed",
-                            ))
-                                as Box<dyn Error + Send + Sync>);
-                        }
-                        Ok(crate::GitReferenceDecision::Commit)
-                    }
-                }
+                let admission = if read.is_ok() { lease.check() } else { Ok(()) };
+                decide_from_read(
+                    read,
+                    admission,
+                    expected_old_oid,
+                    candidate_oid,
+                    &already,
+                )
             },
         )
         .map_err(|e| {
@@ -1260,11 +1458,14 @@ mod effect {
             );
         }
         // Observe the actual new ref value after the protocol; the recorded
-        // receipt binds this observation, not a promise.
-        let observed_new = crate::managed_repository::git(
+        // receipt binds this observation, not a promise. The same fixed lease
+        // deadline (never a fresh lease) bounds this post-publication read;
+        // the saved operator timeout may still fire first.
+        let observed_new = crate::managed_repository::git_with_deadline(
             &destination,
             &["--git-dir", ".", "rev-parse", "--verify", target_ref],
             &settings,
+            Some(lease.deadline()),
         )
         .map_err(|e| {
             R::Launch(Box::new(crate::AgentLaunchError::caused(
@@ -1295,10 +1496,12 @@ mod effect {
             );
         }
         let closed = repository.close();
-        if time::OffsetDateTime::now_utc() >= identity.expires_at() {
-            // The publication already happened; late expiry stays an explicit
-            // unknown beside the typed refusal, never a pretended absence.
-            return observed_unknown(R::Refused("paea-git-promote-authority-expired"), closed);
+        if let Err(cause) = lease.check() {
+            // Preserve both the established late-expiry stage and the typed
+            // lease refusal. Publication remains unknown, never absent.
+            return observed_unknown(R::Launch(Box::new(crate::AgentLaunchError::caused(
+                "paea-git-promote-authority-expired", cause,
+            ))), closed);
         }
         let receipt = PaeaGitPromoteReceipt {
             target_ref: target_ref.clone(),
@@ -1384,28 +1587,32 @@ mod effect {
         }
         Ok(exact)
     }
-    /// Read the exact current direct reference with the existing hardened Git
-    /// runner and saved per-command policy. A quiet symbolic-ref kind query
-    /// rejects symbolic refs, including dangling refs omitted by for-each-ref.
-    /// Its documented exit 1 permits the listing, not an absence conclusion.
-    /// No update or journal IO occurs.
-    /// Success with None means a successful listing without the exact ref;
-    /// symbolic/malformed refs and process errors retain typed failures.
-    /// The caller owns and retains the descriptor-backed directory lifetime.
-    pub(super) fn read_current_ref(
+    /// Deadline-capable sibling of `read_current_ref`: the exact same
+    /// validated read sequence (quiet symbolic-ref kind probe with its
+    /// documented exit 1, then the exact for-each-ref listing and
+    /// `parse_exact_direct_ref`) under the caller's ONE fixed lease deadline
+    /// passed to every command; the effective per-command deadline stays the
+    /// earlier of the saved operator timeout and this lease deadline, so an
+    /// existing operator timeout may fire first. The lease deadline is never
+    /// restarted per command. Typed causes are preserved exactly as in
+    /// `read_current_ref`; no update or journal IO occurs. The caller owns
+    /// and retains the descriptor-backed directory lifetime.
+    pub(super) fn read_current_ref_with_deadline(
         destination: &std::path::Path,
         target_ref: &str,
         settings: &crate::EngineSettingsDocument,
+        lease_deadline: Option<Instant>,
     ) -> Result<Option<String>, R> {
         // for-each-ref may omit dangling symbolic refs. Query their kind first;
         // Git's documented quiet exit 1 means non-symbolic, not absent. Only
         // that exact completed command result permits the subsequent listing.
         // All other process/settings/deadline failures retain their causes.
         // https://git-scm.com/docs/git-symbolic-ref#_notes
-        match crate::managed_repository::git(
+        match crate::managed_repository::git_with_deadline(
             destination,
             &["--git-dir", ".", "symbolic-ref", "--quiet", "--no-recurse", target_ref],
             settings,
+            lease_deadline,
         ) {
             Ok(_) => return Err(R::Refused("paea-git-promote-ref-symbolic")),
             Err(cause) => {
@@ -1422,7 +1629,7 @@ mod effect {
                 }
             }
         }
-        crate::managed_repository::git(
+        crate::managed_repository::git_with_deadline(
             destination,
             &[
                 "--git-dir",
@@ -1433,6 +1640,7 @@ mod effect {
                 target_ref,
             ],
             settings,
+            lease_deadline,
         )
         .map_err(|e| {
             R::Launch(Box::new(crate::AgentLaunchError::caused(
@@ -1448,6 +1656,24 @@ mod effect {
                 )))
             })
         })
+    }
+
+    /// Read the exact current direct reference with the existing hardened Git
+    /// runner and saved per-command policy. A quiet symbolic-ref kind query
+    /// rejects symbolic refs, including dangling refs omitted by for-each-ref.
+    /// Its documented exit 1 permits the listing, not an absence conclusion.
+    /// No update or journal IO occurs.
+    /// Success with None means a successful listing without the exact ref;
+    /// symbolic/malformed refs and process errors retain typed failures.
+    /// The caller owns and retains the descriptor-backed directory lifetime.
+    /// Behavior is unchanged for Reconcile: this wrapper delegates to the
+    /// deadline-capable sibling with no lease deadline.
+    pub(super) fn read_current_ref(
+        destination: &std::path::Path,
+        target_ref: &str,
+        settings: &crate::EngineSettingsDocument,
+    ) -> Result<Option<String>, R> {
+        read_current_ref_with_deadline(destination, target_ref, settings, None)
     }
     /// Reconciliation: read the durable journal state and the actual current
     /// direct Git reference without any new publication, reservation or
@@ -1942,5 +2168,257 @@ mod reconcile_observation_tests {
         let observation = error.public_effect_observation();
         assert_eq!(observation["state"], "unknown");
         assert!(observation["observed_oid"].is_null());
+    }
+}
+
+
+#[cfg(test)]
+mod paea_publication_lease_guards {
+    use super::effect::{decide_from_read, PublicationLease};
+    use super::R;
+    use std::cell::Cell;
+    use std::time::{Duration, Instant};
+    use time::OffsetDateTime;
+
+    /// Fixed UTC fixture builder from actual time crate types; no clock is
+    /// sampled for the absolute fixtures below.
+    fn utc(y: i32, m: u8, d: u8, h: u8, mi: u8, s: u8) -> OffsetDateTime {
+        time::PrimitiveDateTime::new(
+            time::Date::from_calendar_date(y, time::Month::try_from(m).expect("month"), d)
+                .expect("date"),
+            time::Time::from_hms(h, mi, s).expect("time"),
+        )
+        .assume_utc()
+    }
+
+    fn lease_or_panic(lease: Result<PublicationLease, R>) -> PublicationLease {
+        match lease {
+            Ok(lease) => lease,
+            Err(_) => panic!("valid control lease must derive"),
+        }
+    }
+
+    /// The lease bounds at the EARLIEST of the signed identity expiry and the
+    /// validated mandate expiry; with no mandate the signed expiry alone
+    /// bounds (the preexisting no-mandate branch).
+    #[test]
+    fn lease_takes_earliest_of_signed_and_mandate() {
+        let mono = Instant::now();
+        let base = utc(2026, 1, 1, 0, 0, 0);
+        let signed = utc(2031, 1, 1, 0, 0, 0);
+        let mandate = utc(2029, 6, 1, 0, 0, 0);
+        // Earlier mandate is the bound: alive just before it, expired at it,
+        // even though the signed identity is still valid then.
+        let lease = lease_or_panic(PublicationLease::from_samples(
+            signed,
+            Some(mandate),
+            mono,
+            base,
+        ));
+        assert!(!lease.expired(mono, utc(2029, 5, 31, 23, 59, 59)));
+        assert!(lease.expired(mono, mandate));
+        // No mandate: the signed expiry alone bounds the lease.
+        let lease = lease_or_panic(PublicationLease::from_samples(signed, None, mono, base));
+        assert!(!lease.expired(mono, mandate));
+        assert!(lease.expired(mono, signed));
+        // Earlier signed expiry wins when the mandate is later.
+        let lease = lease_or_panic(PublicationLease::from_samples(
+            mandate,
+            Some(signed),
+            mono,
+            base,
+        ));
+        assert!(lease.expired(mono, mandate));
+        assert!(!lease.expired(mono, base));
+    }
+
+    /// Exact expiry rejects and past expiry rejects, for the signed expiry,
+    /// the mandate expiry and the mandate==UTC-sample edge.
+    #[test]
+    fn exact_and_past_expiry_refuse() {
+        let mono = Instant::now();
+        let base = utc(2026, 1, 1, 0, 0, 0);
+        lease_or_panic(PublicationLease::from_samples(
+            utc(2031, 1, 1, 0, 0, 0), None, mono, base,
+        ));
+        assert!(matches!(
+            PublicationLease::from_samples(base, None, mono, base),
+            Err(_)
+        ));
+        assert!(matches!(
+            PublicationLease::from_samples(utc(2025, 1, 1, 0, 0, 0), None, mono, base),
+            Err(_)
+        ));
+        assert!(matches!(
+            PublicationLease::from_samples(
+                utc(2031, 1, 1, 0, 0, 0),
+                Some(utc(2025, 6, 1, 0, 0, 0)),
+                mono,
+                base
+            ),
+            Err(_)
+        ));
+        assert!(matches!(
+            PublicationLease::from_samples(utc(2031, 1, 1, 0, 0, 0), Some(base), mono, base),
+            Err(_)
+        ));
+    }
+
+    /// A backward UTC jump cannot renew the fixed monotonic deadline and a
+    /// forward UTC jump is caught by the absolute check; the monotonic
+    /// deadline boundary itself is exact.
+    #[test]
+    fn backward_utc_cannot_renew_and_forward_utc_is_caught() {
+        let mono = Instant::now();
+        let base = utc(2026, 1, 1, 0, 0, 0);
+        let signed = utc(2027, 1, 1, 0, 0, 0);
+        let lease = lease_or_panic(PublicationLease::from_samples(signed, None, mono, base));
+        let deadline = lease.deadline();
+        // Forward UTC jump past the absolute expiry: caught by the absolute
+        // check even though the monotonic deadline has not been reached.
+        assert!(lease.expired(mono, signed));
+        // Backward UTC jump (before the derivation sample) cannot renew the
+        // monotonic deadline: at the fixed deadline the lease is expired
+        // despite the rolled-back clock, and just before it, it is not.
+        let just_before = deadline
+            .checked_sub(Duration::from_nanos(1))
+            .expect("earlier monotonic instant");
+        assert!(!lease.expired(just_before, utc(2025, 1, 1, 0, 0, 0)));
+        assert!(lease.expired(deadline, utc(2025, 1, 1, 0, 0, 0)));
+    }
+
+    /// A real Git control is read with the normal policy and a future fixed
+    /// deadline. An explicitly expired fixed deadline refuses with the
+    /// original typed Git failure; no sleep or new duration is used by reads.
+    #[test]
+    fn bounded_ref_read_uses_fixed_deadline_and_preserves_default_behavior() {
+        let temporary = tempfile::tempdir_in(crate::fixture_area()).unwrap();
+        let settings = crate::EngineSettingsDocument::initial(
+            crate::EngineSettingsValues::installation_defaults().unwrap(),
+            "fixture".into(), "2026-11-17T00:00:00Z".into(),
+        ).unwrap();
+        crate::managed_repository::git(temporary.path(), &["init", "--bare", "."], &settings).unwrap();
+        assert_eq!(super::effect::read_current_ref(temporary.path(), "refs/tags/fixture", &settings).unwrap(), None);
+        let base = utc(2026, 1, 1, 0, 0, 0);
+        let lease = lease_or_panic(PublicationLease::from_samples(
+            utc(2031, 1, 1, 0, 0, 0), None, Instant::now(), base,
+        ));
+        assert_eq!(super::effect::read_current_ref_with_deadline(
+            temporary.path(), "refs/tags/fixture", &settings, Some(lease.deadline()),
+        ).unwrap(), None);
+        let expired = Instant::now().checked_sub(Duration::from_secs(1)).unwrap();
+        let cause = super::effect::read_current_ref_with_deadline(
+            temporary.path(), "refs/tags/fixture", &settings, Some(expired),
+        ).unwrap_err();
+        let mut pending: Vec<&(dyn std::error::Error + 'static)> = vec![&cause];
+        let mut seen: Vec<*const dyn std::error::Error> = Vec::new();
+        let mut found_git = false;
+        while let Some(error) = pending.pop() {
+            let pointer = error as *const dyn std::error::Error;
+            if seen.iter().any(|old| std::ptr::eq(*old, pointer)) { continue; }
+            seen.push(pointer);
+            found_git |= error.downcast_ref::<crate::GitReportError>().is_some();
+            pending.extend(crate::native_error_links(error).children.into_iter().map(|(_, e)| e));
+            if let Some(source) = error.source() { pending.push(source); }
+        }
+        assert!(found_git, "original typed runner failure remains traversable");
+        assert_eq!(super::effect::read_current_ref(temporary.path(), "refs/tags/fixture", &settings).unwrap(), None);
+    }
+
+    /// Exercise the lease's own checked representation failure on Linux, not
+    /// merely Instant::checked_add. The finite binary search is over the u64
+    /// seconds representation, a technical boundary, not an execution policy.
+    #[test]
+    fn representation_refusals_never_wrap() {
+        let mono = Instant::now();
+        let base = utc(2026, 1, 1, 0, 0, 0);
+        lease_or_panic(PublicationLease::from_samples(base + time::Duration::seconds(2), None, mono, base));
+        assert!(mono.checked_add(Duration::from_secs(u64::MAX)).is_none());
+        let (mut low, mut high) = (0_u64, u64::MAX);
+        while high - low > 1 {
+            let middle = low + (high - low) / 2;
+            if mono.checked_add(Duration::from_secs(middle)).is_some() { low = middle; }
+            else { high = middle; }
+        }
+        let boundary = mono.checked_add(Duration::from_secs(low)).unwrap();
+        assert!(matches!(PublicationLease::from_samples(
+            base + time::Duration::seconds(2), None, boundary, base,
+        ), Err(R::Refused("paea-git-promote-lease-representation"))));
+    }
+
+    /// A failed nested read with a zero OLD is a typed refusal with its
+    /// original cause: never a creation, never a silent Abort. The valid
+    /// control is the successful absent ref, which commits only for zero OLD.
+    #[test]
+    fn zero_old_read_error_never_commits() {
+        let already = Cell::new(false);
+        let committed = decide_from_read(Ok(None), Ok(()), &"0".repeat(40), &"f".repeat(40), &already);
+        assert!(matches!(committed, Ok(crate::GitReferenceDecision::Commit)));
+        let outcome = decide_from_read(
+            Err(R::Refused("fixture-nested-read")), Ok(()), &"0".repeat(40), &"f".repeat(40), &already,
+        ).unwrap_err();
+        assert!(matches!(outcome.downcast_ref::<R>(), Some(R::Refused("fixture-nested-read"))));
+        assert!(!already.get());
+    }
+
+    /// A lease recheck refusal after the nested read refuses the decision:
+    /// never a Commit and never a silent Abort, for zero and nonzero OLD.
+    #[test]
+    fn lease_refusal_after_read_never_commits() {
+        for expected in ["0".repeat(40), "1".repeat(40)] {
+            let already = Cell::new(false);
+            let observed = if expected == "0".repeat(40) { None } else { Some(expected.clone()) };
+            assert!(matches!(decide_from_read(
+                Ok(observed.clone()), Ok(()), &expected, &"f".repeat(40), &already,
+            ), Ok(crate::GitReferenceDecision::Commit)));
+            let outcome = decide_from_read(
+                Ok(observed), Err(R::Refused("fixture-lease-expired")), &expected, &"f".repeat(40), &already,
+            ).unwrap_err();
+            assert!(matches!(outcome.downcast_ref::<R>(), Some(R::Refused("fixture-lease-expired"))));
+            assert!(!already.get());
+        }
+    }
+
+    /// Exact validated-observation decisions: the observed candidate sets the
+    /// recovery flag and aborts without a new update; the expected OLD
+    /// commits; any other value and any absent ref with a nonzero OLD refuse
+    /// typed.
+    #[test]
+    fn decision_matches_candidate_expected_and_refuses_others() {
+        let candidate = "f".repeat(40);
+        let expected = "1".repeat(40);
+        let already = Cell::new(false);
+        let outcome = decide_from_read(
+            Ok(Some(candidate.clone())),
+            Ok(()),
+            &expected,
+            &candidate,
+            &already,
+        );
+        assert!(matches!(outcome, Ok(crate::GitReferenceDecision::Abort)));
+        assert!(already.get());
+        let already = Cell::new(false);
+        let outcome = decide_from_read(
+            Ok(Some(expected.clone())),
+            Ok(()),
+            &expected,
+            &candidate,
+            &already,
+        );
+        assert!(matches!(outcome, Ok(crate::GitReferenceDecision::Commit)));
+        assert!(!already.get());
+        let already = Cell::new(false);
+        let outcome = decide_from_read(
+            Ok(Some("2".repeat(40))),
+            Ok(()),
+            &expected,
+            &candidate,
+            &already,
+        );
+        assert!(matches!(outcome, Err(_)));
+        assert!(!already.get());
+        let outcome = decide_from_read(Ok(None), Ok(()), &expected, &candidate, &already);
+        assert!(matches!(outcome, Err(_)));
+        assert!(!already.get());
     }
 }
