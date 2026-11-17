@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "declared-process-tree-selected-family-guards",
+  "inputs": [
+    "tools/verification/trace_process_tree.py",
+    "tools/verification/test_trace_process_tree.py",
+    "tools/verification/trace_process_witness.py",
+    "tools/verification/trace_outcome_custody.py",
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/TRACE-PROCESS-TREE.md",
+    "tools/verification/TRACE-PROCESS-TREE.en.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "eight-synthetic-selected-family-contract-guards",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_trace_process_tree.py",
+        "DeclaredProcessTreeGuards"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_declared_spoofed_argv_and_selected_tree",
+        "test_environment_name_separator_refused",
+        "test_malformed_selected_name_refused",
+        "test_wait_status_mismatch_refused",
+        "test_missing_terminal_refused",
+        "test_unsupported_process_shape_refused",
+        "test_boolean_pid_refused",
+        "test_resumed_wait_shape_refused",
+        "Ran 8 tests",
+        "OK"
+      ]
+    }
+  ]
+}

@@ -125,3 +125,16 @@ Initial reviewer09 turn01a1e959-6506-72c3-8e26-b6f3043b7242 REQUEST_CHANGES TW-0
 Reviewer09 TW-01 closure APPROVE_SOURCE_AND_TARGETED_FLUSH_GUARD_ONLY01a1e95d-1353-7f90-8b3a-e176cc6ecbaf; source2c6df3e5682302361e81535626888a0e08c5101bcd99c8b8db069b1b774bae3d. REVIEW-09-FINAL.json retained. Documentation erratum: derived cleanup/wait/flush allocations inherited two-test scope text; argv and outputs establish ONE selected guard per run. UNIT-ALLOCATION-SCOPE-ERRATA.json preserves six originals/hashes and corrects, no replay. Future scope derives from final argv/collection. Other chats idle; bounded WIP checkpoint allowed, no merge/install.
 
 Git preflight refused before staging: .strip() removed the first porcelain status space and shifted its path. Pins conform, empty index/unchanged HEAD. Consumer correction: raw-byte status --porcelain=v1 -z without strip; GIT-STATUS-PARSER-REFUSAL.json retained, no test/rebuild.
+
+
+### C-D01 — selected process-family observer, PT-01 closure pending (17 November)
+
+Read-only GETmodels200 lists glm-5.2, not generation-health/backend-version or previous cancellation proof. Distinct pure offline GLM11 packet first fragment0.458s then full response:50,975reportedtokens (3672prompt,47,303completion including41,229reasoning),320.359s, stop/client0; no retry/cap/effort override. Original proposal/stream retained in root00-cd01-process-tree-0bitlzr_.
+
+Root read all source and reproduced malformed selected clone3 name silently unexamined and env name '=' meaning collision. Initial7namedguards5PASS2FAIL; after general name-classification and NAME=VALUE correction, only2previous failures rerun/PASS with controls/recovery. Earlier5PASS remain source-bound, testASTs unchanged, no full recipe replay. FR/EN/docstrings and recipe including local import chain updated.
+
+Offline analysis of identical original worker564552 capture (no child/strace) yields3nodes2edges,13selectedlines2617explicitlyunexamined (total2630). Original declarations independent oftexts, exactargv/env/PID/terminal and clone/wait agree; source/tool/raw hashes stable. OFFLINE-ALLOCATION/OBSERVATION.json and offline-source.py retained. No universalgraph/per-syscallinode or completecompilerinput claim.
+
+Initial reviewer0901a1e96e-bebd-7712-8e13-80d6e8494a08 REQUEST_CHANGES PT-01 major: wrong needle did not recognize <... wait4 resumed>. One new selected same-byte guard1FAIL→1PASS with control/recovery, no child; continuation prefix now refuses before classification. FR/EN/eight-guard recipe synchronized, schema/inputs only checked, no fullreplay. Finalpins PT01-CORRECTION.json. Earlier13/2617 observation stays bound to prePT01parser ee8898 and rawworker564552, never reassigned. Scoped closure review requested; other chats idle. No CD01admission/12+3bodies/historicaltest/build/install/mainmerge.
+
+Reviewer09 PT-01 closed APPROVE_SOURCE_AND_TARGETED_GUARD_ONLY01a1e971-e515-77d2-8c2c-7f5c2b28d56e, source6588ac0394931b0286e328a1cc45efdfa9d4b1d7956346e2fc706cd1e468f345. REVIEW-09-FINAL.json, no replay/new qualification. Next METHOD-CD01-QUALIFICATION-SCOPE-01 maps missing proof to originalcriteria before another harness; methodexpansion remains hypothesis to examine, currentgate unchanged.
