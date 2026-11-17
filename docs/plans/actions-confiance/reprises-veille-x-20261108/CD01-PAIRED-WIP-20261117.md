@@ -261,3 +261,23 @@ T21-MODE-01 — La revue09 a refusé la perte du droit exécutable du collecteur
 
 
 Revue09 finale T21 : APPROVE_SOURCE_AND_TARGETED_GUARDS_ONLY, T21-MODE-01 clos après contrôle indépendant0755/index100755 et SHA inchangé. Contenu et preuves ciblées réutilisés sans nouvelle exécution. Source/guardes approuvés seulement, pas CLI/runtime/main. Remise finale REVIEW-09-FINAL.json ; reviewer09 revenu en attente.
+
+
+## T22 — contrat du sélecteur CLI (17 novembre 2026)
+
+Proposition GLM reçue complète (stop/DONE, code0), relue intégralement par root. Route retenue avec amendements : manifeste opérateur explicite de sélecteurs argv/cwd/compilateur exacts, répétables avec reçus distincts. Le SHA lie des octets, pas une autorité, une ascendance ou la finitude. Bail finitude/fermeture/confidentialité déclaré par l’appelant ; EOF ne devient observé qu’après capture. Aucun nouveau harvest Cargo v1 inchangé autorisé : cette exigence proposée est rejetée. Preuve native future distincte du développement inerte. Source et amendements : `/run/media/fpizzi/SWARM/swarm-evidence/root00-cd01-cli-contract22-3zq7py0o/ROOT-DECISION.json`. Usage déclaré GLM22 :58641 tokens (31685entrée,26956sortie dont23535raisonnement), pas une facture ni preuve de consommation21. Aucun code/test/build modifié ou exécuté par T22. Prochain paquet23 limité au sélecteur wrapper, gardes nouvelles et docs FR/EN ; raccordement collecteur et allocation native restent ouverts.
+
+
+## T23 — sélecteur de manifeste wrapper (17 novembre 2026)
+
+GLM a fourni le paquet wrapper/test/docs FR-EN/recette (usage déclaré113334 tokens :24128entrée,89206sortie dont71957raisonnement ; ni facture ni usage21). Réponse entière relue ; un backtick final hors JSON a été conservé dans l’original et écarté du seul objet proposé après diagnostic, sans retry. Manifeste explicite chemin+SHA, schéma strict et sélection compilateur/argv/cwd octet par octet ; aucune correspondance conserve v1 sans lire0. Les déclarations de finitude/fermeture/confidentialité restent préconditions de l’appelant, pas une preuve d’ascendance, de finitude future ou d’autorité. Répétitions permises avec reçus exclusifs distincts, aucune politique par crate/mission/date.
+
+Régression initiale : une méthode en ERROR avant le sélecteur (custody absent), puis les six nouvelles méthodes GLM PASS. Root a reproduit et corrigé trois défauts : acceptation UTF16/32 par autodétection JSON ; interruption de fermeture masquée dans le statut terminal après readIO ; risque d’attente d’ouverture FIFO avant validation fichier régulier. Trois méthodes nouvelles ont échoué avant correction puis PASS séparément. Total neuf méthodes distinctes couvertes par six PASS initiaux + trois PASS corrigés, jamais un run final9/25 ni rejeu des seize historiques. Les entrées régulières UTF8 et catégories de cause des six premiers restent dans leur portée initiale ; UTF8 strict et catégorie terminale corrigée ont leurs propres gardes, puis le FIFO réel est refusé après ouverture O_NONBLOCK technique, sans timeout. Exec est simulé ENOSYS, dup2/IO réels en fixture et0 restauré ; aucun compilateur, Cargo, garde exécutée, service ou autre provider.
+
+Preuves : `/run/media/fpizzi/SWARM/swarm-evidence/root00-cd01-cli-selector23-tfxzzl31` ; ROOT-SEMANTIC-REVIEW.json lie les octets actuels, before/after conservent les défauts. Recette25 maintenue et seulement schéma/entrées validés. Modes conservés lors des remplacements atomiques. RETEX : distinguer décodage explicite et autodétection ; éviter l’attente avant le contrôle du type de fichier ; classifier le terminal sur toutes les causes connues après nettoyage sans réécrire le failure.json antérieur. Revue indépendante demandée à09, état réel à compléter par sa remise. Livraison produit/version_history sans objet pour ce seul outillage. Suite : checkpoint WIP revu puis raccordement collecteur (copie/pins/archive/FrozenInputs/manifeste/callback/réconciliation) ; fullgraph/profil/15 corps Rust toujours non admis, aucun merge main ni installation.
+
+
+T23-DOC-01 : revue09 a refusé deux contradictions FR/EN (None sans condition manifeste ; anciens comptes6/22). Paragraphes corrigés à la source : absence de paire, neuf méthodes distinctes6+3, vingt-cinq maintenues. Octets exécutables inchangés, aucun rejeu ; contrôle documentaire indépendant demandé. Historique du refus conservé dans REVIEW-09-ORIGINAL.json et DOC-RECOVERY.json.
+
+
+Revue09 finale T23 : APPROVE_SOURCE_AND_TARGETED_GUARDS_ONLY ; T23-DOC-01 clos après contrôle des paragraphes et sixSHA. Revue source et preuves réutilisées, aucune nouvelle exécution. Reviewer09 revenu en attente ; remise originale dans REVIEW-09-FINAL.json.

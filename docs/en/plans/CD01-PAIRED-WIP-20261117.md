@@ -261,3 +261,23 @@ T21-MODE-01 — Reviewer09 rejected the collector executable-bit loss (atomic te
 
 
 Final reviewer09 T21 verdict: APPROVE_SOURCE_AND_TARGETED_GUARDS_ONLY; T21-MODE-01 closed after independent0755/index100755 and unchanged SHA inspection. Prior content/targeted proofs reused without execution. Source/guards only, not CLI/runtime/main. Final handoff REVIEW-09-FINAL.json; reviewer09 returned idle.
+
+
+## T22 — CLI selector contract (17 November 2026)
+
+Complete GLM proposal received (stop/DONE, code0), fully read by root. Route selected with amendments: explicit operator manifest of exact argv/cwd/compiler selectors, repeatable with distinct receipts. SHA binds bytes, not authority, ancestry or finiteness. Finite-input/close/privacy lease remains a caller declaration; EOF is observed only after capture. Reject the proposed unchanged fresh v1 Cargo harvest: no new build is authorized by this contract decision. Future native proof is distinct from inert implementation. Source/amendments: `/run/media/fpizzi/SWARM/swarm-evidence/root00-cd01-cli-contract22-3zq7py0o/ROOT-DECISION.json`. GLM22 declared usage58641 tokens (31685input,26956output including23535reasoning); not a bill or evidence of21usage. No code/test/build changed or run by T22. Next23 is bounded to wrapper selector, new guards and FR/EN docs; collector wiring and native allocation stay open.
+
+
+## T23 — wrapper manifest selector (17 November 2026)
+
+GLM supplied the wrapper/tests/FR-EN docs/recipe packet (declared113334 tokens:24128input,89206output including71957reasoning; neither invoice nor21usage). Entire response read; one trailing backtick outside JSON retained in the original and removed from the parsed proposal object only after diagnosis, no retry. Explicit manifest path+SHA, strict schema and byte-exact compiler/argv/cwd selection; no match preserves v1 without reading0. Finite-input/close/privacy declarations remain caller preconditions, never ancestry, futureEOF or authority proof. Repeated matches receive distinct exclusive receipts, with no crate/mission/date policy.
+
+Initial regression: one ERROR before the selector (custody absent), then all six new GLM methods PASS. Root reproduced and corrected three defects: JSONbytes autodetect acceptedUTF16/32; readIO masked a cleanup interruption in terminal status; FIFO open could wait before regular-file validation. Three new methods failed before correction and then passed separately. Nine distinct methods covered as six initialPASS plus three correctedPASS, never a combined final9/25 run or old sixteen replay. Initial six remain scoped to their regularUTF8 inputs and unchanged cause categories; strictUTF8 and corrected terminal classification have their own guards, then a realFIFO refuses after technicalO_NONBLOCK open without a timeout. Exec mockedENOSYS, real fixture dup2/IO with0 restored; no compiler, Cargo, guard executable, service or additional provider.
+
+Evidence: `/run/media/fpizzi/SWARM/swarm-evidence/root00-cd01-cli-selector23-tfxzzl31`; ROOT-SEMANTIC-REVIEW.json binds currentbytes, before/after preserve original defects. Recipe25 maintained with schema/input validation only. Existing modes retained on atomic replacements. RETEX: explicit decoding differs from autodetection; avoid waiting before file-type admission; terminal classification must include all causes known after cleanup without rewriting earlier failure.json. Independent09 review requested, actual handoff to follow. No product delivery/version_history for verification tooling only. Next: reviewed WIPcheckpoint then collector staging/pins/archive/FrozenInputs/manifest/callback/reconciliation wiring; fullgraph/profile/15Rust bodies remain unadmitted, no main merge or installation.
+
+
+T23-DOC-01: reviewer09 rejected FR/EN contradictions (unqualified None/noCLI assertion; stale6/22 counts). Corrected original paragraphs: absent manifest pair, nine distinct methods6+3, twenty-five maintained. Executable bytes unchanged, no replay; independent documentation check requested. Original refusal retained in REVIEW-09-ORIGINAL.json and DOC-RECOVERY.json.
+
+
+Final reviewer09 T23: APPROVE_SOURCE_AND_TARGETED_GUARDS_ONLY; T23-DOC-01 closed after paragraph/sixSHA inspection. Prior source and proofs reused, no new execution. Reviewer09 idle; original handoff in REVIEW-09-FINAL.json.

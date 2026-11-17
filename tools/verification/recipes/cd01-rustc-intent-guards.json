@@ -38,7 +38,16 @@
         "test_missing_sibling_refuses_cached_module",
         "test_nonexact_input_fd_refuses_before_mutation",
         "test_normalized_capture_interrupt_keeps_category",
-        "Ran 16 tests",
+        "test_absent_pair_keeps_exact_v1_without_descriptor_read",
+        "test_partial_pair_and_library_conflict_refuse_before_effects",
+        "test_manifest_hash_and_read_faults_keep_original_causes",
+        "test_malformed_manifest_and_privacy_refusals",
+        "test_entry_types_duplicates_and_selector_mismatch",
+        "test_selected_repeatable_flow_real_helper_distinct_receipts",
+        "test_manifest_encoding_is_explicit_utf8",
+        "test_manifest_cleanup_interrupt_keeps_primary_and_terminal_category",
+        "test_manifest_fifo_refuses_without_blocking_open",
+        "Ran 25 tests",
         "OK"
       ]
     }

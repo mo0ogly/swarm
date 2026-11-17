@@ -65,9 +65,11 @@ generic secrecy guarantee is made, and the caller is responsible for
 authorizing that these inputs may be persisted.
 
 Library hook (packet20): main() accepts a keyword-only stdin_lease. None
-keeps the exact v1 protocol and record bytes; the CLI entry point passes no
-lease, so command-line/Cargo use activates no input capture and never reads
-descriptor 0. An explicit lease is a trusted-caller library decision: an
+keeps the exact v1 protocol and record bytes unless the packet23 operator
+manifest environment pair below selects an entry; with neither an explicit
+lease nor the pair configured, command-line/Cargo use activates no input
+capture and never reads descriptor 0. An explicit lease is a trusted-caller
+library decision: an
 exact five-member mapping {allocation_id, input_fd, compiler_path_hex,
 compiler_arguments_hex, cwd_hex} validated in full -- including equality
 with the wrapper argv and the current working directory -- before any byte
@@ -91,12 +93,61 @@ nothing and falls back to no consumed-input path; a successful dup2 may
 already have replaced descriptor 0 and that state is retained as observed,
 with rollback never inferred.
 
+Operator manifest selection (packet23): the CLI entry point additionally
+accepts the paired optional environment variables CD01_STDIN_LEASE_MANIFEST
+(absolute byte path) and CD01_STDIN_LEASE_MANIFEST_SHA256 (exactly 64
+lowercase ASCII hexadecimal digits). Both absent keeps the exact v1
+protocol; a partial pair refuses (78); the pair combined with an explicit
+library stdin_lease argument refuses before any capture, record creation or
+descriptor-0 read. The manifest file is opened once O_NOFOLLOW|O_CLOEXEC
+readonly, must be a private effective-uid-owned regular file (fstat), is
+read fully with no size cap and no import fallback, and its descriptor is
+closed exactly once through the existing held custody before any parsing,
+so neither delegation nor a refusal leaks it and no double close occurs.
+The SHA-256 of the exact read bytes must equal the configured digest before
+any JSON parse or selection; the loader's read window is this one file
+only, while the descriptor-0 read window remains the reviewed custody
+helper's finite read-until-EOF behavior. The document must be the exact
+protocol cd01.stdin_lease_manifest/1 with top members exactly {schema,
+record_kind, leases}, record_kind operator_stdin_lease_manifest, and a
+possibly empty leases list whose entries are exactly {allocation_id,
+input_fd, selector, declarations, repeat_policy}: a nonempty unique
+allocation_id, the exact integer 0 for input_fd (never bool), the literal
+repeat_policy "repeatable" only, the three declarations
+finite_cooperative_single_writer_input, producer_will_close_input_fd and
+persistence_authorized each the boolean True (never the integer 1), and a
+selector {compiler_path_hex, compiler_arguments_hex, cwd_hex} of lowercase
+even-length NUL-free hex decoding to a nonempty path and cwd with a
+possibly empty argument list that may contain empty arguments. No operator
+name, mission or date policy exists in the protocol; duplicate JSON
+members, duplicate allocation ids and duplicate exact selector tuples
+(even with distinct ids) refuse, and every entry is validated before any
+selection. An entry whose selector bytes equal this invocation's compiler
+bytes, argument bytes and current working directory yields the existing
+five-member lease and the reviewed v2 flow; no match keeps exact v1 and
+never reads descriptor 0. Exact invocation byte equality is not source
+identity, ancestry, an enforced future EOF, confidentiality against the
+same UID or native proof, and eligibility is never inferred from '-'
+argv, crate names, rustix or source text; the finite, private, cooperative
+single-writer declarations remain caller preconditions. Selection is per
+invocation with no shared counter, lock, global state or single-use
+marker; repeated exact invocations select independently and receive their
+own exclusive receipts. Malformed schema/hash/type refuses (78), open,
+read and close errors keep their original type and errno as operational
+failure (1), interrupts stay 130, unreadable or malformed manifests never
+fall back implicitly, no raw manifest text, digest or diagnostic value is
+echoed, and recovery is a corrected re-invocation with no cleanup or
+rollback. The current collector can neither stage the helper or the
+manifest nor consume this CLI; full helper wiring and actual compiler
+consumption remain future.
+
 Source-only proposal: wiring into real Cargo builds requires separate review
 and allocation. No cleanup is ever performed: partial and complete records are
 always kept, and a reported publication error never implies a rollback.
 """
 
 import errno
+import hashlib
 import json
 import os
 import stat
@@ -124,6 +175,16 @@ STDIN_LEASE_MEMBERS = frozenset((
     "compiler_arguments_hex",
     "cwd_hex",
 ))
+
+# Operator manifest selection (packet23): paired optional environment
+# variables. Both absent keeps the exact v1 protocol; a partial pair or a
+# combination with an explicit library stdin_lease argument refuses before
+# any capture, record creation or descriptor-0 read.
+STDIN_LEASE_MANIFEST_ENV = b"CD01_STDIN_LEASE_MANIFEST"
+STDIN_LEASE_MANIFEST_SHA256_ENV = b"CD01_STDIN_LEASE_MANIFEST_SHA256"
+STDIN_LEASE_MANIFEST_SCHEMA = "cd01.stdin_lease_manifest/1"
+STDIN_LEASE_MANIFEST_KIND = "operator_stdin_lease_manifest"
+STDIN_LEASE_MANIFEST_SHA256_LENGTH = 64
 
 EXIT_REFUSED = 78       # missing/invalid configuration (EX_CONFIG value; wrapper-technical)
 EXIT_FAILED = 1         # operational failure: capture, publication or delegation
@@ -525,7 +586,9 @@ def _handle_failure(primary, stage, state, fds, causes):
     exec_attempted flag; if its own publication fails, that cause is reported
     too and success is never faked. Every held descriptor is then closed
     exactly once, with no retries. KeyboardInterrupt and other non-Exception
-    BaseExceptions are reported as interrupted, not success.
+    BaseExceptions, including cleanup causes learned after record publication,
+    are reported as interrupted in the final terminal result. The immutable
+    failure record retains only facts known at its earlier publication point.
     """
     interrupted = isinstance(primary, KeyboardInterrupt) or not isinstance(primary, Exception) or state.get("stdin_custody_interrupted", False)
     record_dir_fd = _failure_record_dir_fd(state, fds, causes)
@@ -541,6 +604,11 @@ def _handle_failure(primary, stage, state, fds, causes):
         close_error = _close_once(entry)
         if close_error is not None:
             causes.append((entry["label"] + "_close", close_error))
+    # Cleanup happens after the immutable failure record's publication point.
+    # Retain its causes and classify the final terminal result from all known
+    # primary/cleanup interruptions; do not rewrite the earlier record.
+    interrupted = interrupted or any(not isinstance(error, Exception)
+                                     for _, error in causes)
     _emit_stderr(primary, stage, causes, interrupted)
     if interrupted:
         return EXIT_INTERRUPTED
@@ -628,6 +696,252 @@ def _validate_stdin_lease(stdin_lease, compiler, arguments):
     if leased_cwd != os.getcwdb():
         raise Refusal("stdin lease cwd_hex does not match the current working directory")
     return allocation_id, input_fd
+
+
+def _require_private_regular_file(status):
+    """Refuse unless a fstat describes an effective-uid-owned private regular file.
+
+    Applied to the operator manifest before any byte is read or parsed. As
+    with the directory checks this is hygiene under the caller lease, not
+    adversarial confinement: a same-UID attacker able to replace the
+    manifest file is out of scope, and the paired SHA-256 pins the exact
+    bytes that are parsed.
+    """
+    if not stat.S_ISREG(status.st_mode):
+        raise Refusal("stdin lease manifest must be a regular file")
+    if status.st_uid != os.geteuid():
+        raise Refusal("stdin lease manifest must be owned by the effective uid")
+    if stat.S_IMODE(status.st_mode) & 0o077:
+        raise Refusal("stdin lease manifest must be private (no group/other permission bits)")
+
+
+def _decode_lowercase_hex(value, name):
+    """Decode one lowercase even-length hex string into exact NUL-free bytes.
+
+    Accepts only str values of even length whose characters are ASCII
+    lowercase hexadecimal digits; uppercase letters, whitespace, signs and
+    odd lengths refuse. Decoded bytes must not contain NUL. The value
+    itself never appears in refusal diagnostics.
+    """
+    if not isinstance(value, str):
+        raise Refusal(name + " must be a lowercase hexadecimal string")
+    if len(value) % 2 != 0 or any(character not in "0123456789abcdef" for character in value):
+        raise Refusal(name + " must be lowercase even-length hexadecimal")
+    decoded = bytes.fromhex(value)
+    if b"\x00" in decoded:
+        raise Refusal(name + " must not decode to NUL bytes")
+    return decoded
+
+
+def _validate_manifest_sha256_env(raw):
+    """Validate the manifest SHA-256 environment value; return it as text.
+
+    The value must be exactly 64 lowercase ASCII hexadecimal digits; any
+    other type, length, casing or byte refuses before the manifest file is
+    opened. The value is never echoed into diagnostics.
+    """
+    if (not isinstance(raw, bytes)
+            or len(raw) != STDIN_LEASE_MANIFEST_SHA256_LENGTH
+            or any(byte not in b"0123456789abcdef" for byte in raw)):
+        raise Refusal(
+            "CD01_STDIN_LEASE_MANIFEST_SHA256 must be exactly 64 lowercase "
+            "hexadecimal digits")
+    return raw.decode("ascii")
+
+
+def _reject_duplicate_manifest_members(pairs):
+    """Object-pairs hook that refuses duplicate JSON member names anywhere.
+
+    Applied at every object depth of the manifest document; a repeated
+    member name refuses the whole manifest with a static message before
+    any entry is interpreted.
+    """
+    members = {}
+    for key, value in pairs:
+        if key in members:
+            raise Refusal("stdin lease manifest contains duplicate JSON member names")
+        members[key] = value
+    return members
+
+
+def _parse_manifest_document(data):
+    """Parse the exact verified manifest bytes into JSON; refuse statically.
+
+    Parsing happens only after the SHA-256 of the same bytes has matched.
+    Any UTF-8 decode or JSON syntax error, and any duplicate member at any
+    object depth, refuses with a static module-local message; parsed text,
+    byte offsets and snippets never reach diagnostics.
+    """
+    try:
+        return json.loads(data.decode("utf-8"), object_pairs_hook=_reject_duplicate_manifest_members)
+    except Refusal:
+        raise
+    except ValueError:
+        raise Refusal("stdin lease manifest is not valid JSON") from None
+
+
+def _validate_manifest_entry(entry):
+    """Validate one manifest lease entry in full; return its normalized tuple.
+
+    The entry must be a dict with exactly the members allocation_id,
+    input_fd, selector, declarations and repeat_policy: a nonempty string
+    allocation_id, the exact integer 0 for input_fd (never bool), the
+    literal "repeatable" repeat_policy only, declarations with exactly the
+    three members finite_cooperative_single_writer_input,
+    producer_will_close_input_fd and persistence_authorized, each the
+    boolean True (never the integer 1), and a selector with exactly
+    compiler_path_hex, compiler_arguments_hex and cwd_hex decoding from
+    lowercase even-length hex to NUL-free bytes with a nonempty compiler
+    path and cwd; the argument list may be empty and may contain empty
+    arguments. No operator name, mission or date member exists anywhere.
+    """
+    if not isinstance(entry, dict):
+        raise Refusal("each manifest lease entry must be a JSON object")
+    if set(entry) != {"allocation_id", "input_fd", "selector", "declarations", "repeat_policy"}:
+        raise Refusal("each manifest lease entry must contain exactly the five lease-entry members")
+    allocation_id = entry["allocation_id"]
+    if not isinstance(allocation_id, str) or not allocation_id:
+        raise Refusal("manifest lease allocation_id must be a nonempty string")
+    input_fd = entry["input_fd"]
+    if type(input_fd) is not int or input_fd != 0:
+        raise Refusal("manifest lease input_fd must be the exact integer 0")
+    if not isinstance(entry["repeat_policy"], str) or entry["repeat_policy"] != "repeatable":
+        raise Refusal("manifest lease repeat_policy must be the literal repeatable")
+    declarations = entry["declarations"]
+    if not isinstance(declarations, dict) or set(declarations) != {
+            "finite_cooperative_single_writer_input",
+            "producer_will_close_input_fd",
+            "persistence_authorized",
+    }:
+        raise Refusal("manifest lease declarations must contain exactly the three declaration members")
+    for name in ("finite_cooperative_single_writer_input",
+                 "producer_will_close_input_fd",
+                 "persistence_authorized"):
+        if declarations[name] is not True:
+            raise Refusal("manifest lease declarations must each be the boolean true")
+    selector = entry["selector"]
+    if not isinstance(selector, dict) or set(selector) != {"compiler_path_hex", "compiler_arguments_hex", "cwd_hex"}:
+        raise Refusal("manifest lease selector must contain exactly the three selector members")
+    selector_compiler = _decode_lowercase_hex(selector["compiler_path_hex"],
+                                              "manifest lease compiler_path_hex")
+    if not selector_compiler:
+        raise Refusal("manifest lease compiler_path_hex must decode to a nonempty path")
+    arguments_hex = selector["compiler_arguments_hex"]
+    if not isinstance(arguments_hex, list):
+        raise Refusal("manifest lease compiler_arguments_hex must be a list of hex strings")
+    selector_arguments = []
+    for argument in arguments_hex:
+        selector_arguments.append(
+            _decode_lowercase_hex(argument, "manifest lease compiler_arguments_hex"))
+    selector_cwd = _decode_lowercase_hex(selector["cwd_hex"], "manifest lease cwd_hex")
+    if not selector_cwd:
+        raise Refusal("manifest lease cwd_hex must decode to a nonempty path")
+    return allocation_id, input_fd, (selector_compiler, tuple(selector_arguments), selector_cwd)
+
+
+def _validate_manifest_document(document):
+    """Validate the whole manifest document; return every normalized entry.
+
+    The document must be a JSON object with exactly the members schema,
+    record_kind and leases; schema must equal the exact protocol constant
+    cd01.stdin_lease_manifest/1 and record_kind the exact
+    operator_stdin_lease_manifest kind. leases must be a list and may be
+    empty. Every entry is validated before any selection is attempted;
+    duplicate allocation_id values refuse even between otherwise valid
+    entries, and duplicate exact selector tuples refuse even with distinct
+    allocation ids.
+    """
+    if not isinstance(document, dict):
+        raise Refusal("stdin lease manifest must be a JSON object")
+    if set(document) != {"schema", "record_kind", "leases"}:
+        raise Refusal("stdin lease manifest must contain exactly schema, record_kind and leases")
+    if document["schema"] != STDIN_LEASE_MANIFEST_SCHEMA:
+        raise Refusal("stdin lease manifest schema must be the exact protocol constant")
+    if document["record_kind"] != STDIN_LEASE_MANIFEST_KIND:
+        raise Refusal("stdin lease manifest record_kind must be the exact operator manifest kind")
+    if not isinstance(document["leases"], list):
+        raise Refusal("stdin lease manifest leases must be a list")
+    entries = []
+    allocation_ids = set()
+    selectors = set()
+    for entry in document["leases"]:
+        normalized = _validate_manifest_entry(entry)
+        if normalized[0] in allocation_ids:
+            raise Refusal("manifest lease allocation_id values must be unique")
+        allocation_ids.add(normalized[0])
+        if normalized[2] in selectors:
+            raise Refusal("manifest lease selector tuples must be unique")
+        selectors.add(normalized[2])
+        entries.append(normalized)
+    return entries
+
+
+def _select_manifest_lease(manifest_path, manifest_sha256, compiler, arguments, fds):
+    """Load, hash-verify, parse and select from the operator manifest; or None.
+
+    The paired environment values are validated first (absolute byte path
+    through the shared path validator; exactly 64 lowercase hexadecimal
+    digest digits), then the manifest is opened once O_NOFOLLOW|O_CLOEXEC
+    readonly and O_NONBLOCK (avoiding FIFO-open waits before type validation),
+    required to be a private effective-uid-owned regular file via
+    fstat, and read fully with no size cap. The held descriptor is closed
+    exactly once through the caller's close-once custody before any
+    parsing, so neither delegation nor any later refusal leaks it and no
+    double close can occur; open, read and close errors keep their original
+    type and errno, and interrupts stay interrupts, flowing through the
+    existing _handle_failure custody loop that closes every held descriptor
+    exactly once. The SHA-256 of the exact read bytes must equal the
+    configured digest before any JSON parse or selection; a mismatch, a
+    malformed document, entry, selector, declaration or policy type
+    refuses. No raw manifest text, digest or diagnostic value is ever
+    echoed. When one validated entry's selector bytes equal this
+    invocation's compiler bytes, argument bytes and current working
+    directory, the equivalent five-member lease mapping is revalidated by
+    the existing library validator and returned as (allocation_id,
+    input_fd); with no match None is returned and the caller keeps the
+    exact v1 protocol without ever reading descriptor 0. Selection is per
+    invocation with no shared counter, lock, global state or single-use
+    marker: repeated exact invocations select independently and receive
+    their own exclusive receipts. The manifest declares a finite, private,
+    cooperative single-writer input under caller authority; it is not
+    source identity, ancestry, an enforced future EOF, confidentiality
+    against the same UID or native proof, and eligibility is never inferred
+    from '-' argv, crate names, rustix or source text. The manifest loader
+    window is one full buffered read of this file only; the descriptor-0
+    read window remains the reviewed custody helper's finite
+    read-until-EOF behavior.
+    """
+    manifest_path = _validate_path_config(manifest_path, "CD01_STDIN_LEASE_MANIFEST")
+    expected = _validate_manifest_sha256_env(manifest_sha256)
+    manifest_fd = os.open(manifest_path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK)
+    entry = _hold(fds, manifest_fd, "stdin_manifest_fd")
+    _require_private_regular_file(os.fstat(manifest_fd))
+    chunks = []
+    while True:
+        chunk = os.read(manifest_fd, 65536)  # Transport chunk, never a manifest-size cap.
+        if not chunk:
+            break
+        chunks.append(chunk)
+    close_error = _close_once(entry)
+    if close_error is not None:
+        raise close_error
+    data = b"".join(chunks)
+    if hashlib.sha256(data).hexdigest() != expected:
+        raise Refusal("stdin lease manifest bytes do not match the configured SHA-256")
+    current_cwd = os.getcwdb()
+    for allocation_id, input_fd, (selector_compiler, selector_arguments, selector_cwd) in \
+            _validate_manifest_document(_parse_manifest_document(data)):
+        if (selector_compiler == compiler and selector_arguments == tuple(arguments)
+                and selector_cwd == current_cwd):
+            lease = {
+                "allocation_id": allocation_id,
+                "input_fd": input_fd,
+                "compiler_path_hex": selector_compiler.hex(),
+                "compiler_arguments_hex": [argument.hex() for argument in selector_arguments],
+                "cwd_hex": selector_cwd.hex(),
+            }
+            return _validate_stdin_lease(lease, compiler, arguments)
+    return None
 
 
 def _load_custody_module(fds):
@@ -753,11 +1067,11 @@ def main(argv=None, *, stdin_lease=None):
     the primary cause first. No downstream exec ever happens after a
     publication failure.
 
-    stdin_lease=None keeps the exact v1 protocol and record bytes; the CLI
-    entry point never passes a lease, so command-line/Cargo use never
-    activates input capture. An explicit lease is validated in full against
-    argv and the current working directory before anything is consumed or
-    created, and selects the v2 flow: the same exclusive invocation directory
+    stdin_lease=None with both operator manifest environment variables
+    absent keeps the exact v1 protocol and record bytes. An explicit lease
+    is validated in full against argv and the current working directory
+    before anything is consumed or created, and selects the v2 flow: the
+    same exclusive invocation directory
     and a v2 intent record with transfer status PENDING; after the intent is
     durably published, the private custody directory is created, the reviewed
     sibling finite_input_custody source is lazily loaded (a missing source
@@ -768,6 +1082,27 @@ def main(argv=None, *, stdin_lease=None):
     delegation run. Any capture, dup2, close or publication failure means no
     exec and no consumed-input fallback; a completed dup2 may already have
     replaced descriptor 0 and that state is retained, never rolled back.
+
+    The CLI can equally select through the paired operator environment
+    variables CD01_STDIN_LEASE_MANIFEST (absolute byte path) and
+    CD01_STDIN_LEASE_MANIFEST_SHA256 (exactly 64 lowercase hexadecimal
+    digits), decided in the same pre-effect window before any capture,
+    record creation or descriptor-0 read: both absent keeps v1, a partial
+    pair refuses, and either member combined with an explicit stdin_lease
+    argument refuses. The manifest is opened once O_NOFOLLOW|O_CLOEXEC
+    readonly, must be a private effective-uid-owned regular file via fstat,
+    is read fully with no size cap, and its descriptor is closed exactly
+    once through the shared close-once custody before any parsing. The
+    SHA-256 of the exact read bytes must match the configured digest before
+    the exact cd01.stdin_lease_manifest/1 protocol is parsed and every
+    entry is validated; a selector entry matching this invocation's
+    compiler, argument and working-directory bytes selects the same v2
+    flow, while no match keeps v1 and never reads descriptor 0. Malformed
+    schema/hash/type refuses (78), IO failures keep their original errno
+    (1), interrupts stay 130, and no unreadable or malformed manifest ever
+    falls back implicitly; no raw manifest text, digest or diagnostic value
+    is echoed. Selection is per invocation with no shared counter, lock,
+    global state or single-use marker.
     """
     if argv is None:
         argv = sys.argv
@@ -784,8 +1119,10 @@ def main(argv=None, *, stdin_lease=None):
         "invocation_dir_entry": None,
         "invocation_dir_name": None,
         # Selected stdin-lease flow only; every flag reports an observed
-        # attempt or completion and never infers a step had no effect.
-        "stdin_selected": stdin_lease is not None,
+        # attempt or completion and never infers a step had no effect. Set
+        # to True only after a full library or operator-manifest lease is
+        # selected; it never reflects the mere presence of an argument.
+        "stdin_selected": False,
         "stdin_capture_attempted": False,
         "stdin_capture_completed": False,
         "stdin_dup2_attempted": False,
@@ -815,9 +1152,35 @@ def main(argv=None, *, stdin_lease=None):
         stage = "stdin_lease_validate"
         # Full lease validation (shape and equality with argv/cwd) happens
         # here, before any descriptor is read and before any directory or
-        # record is created; mismatches refuse with exit 78.
-        if stdin_lease is not None:
-            allocation_id, input_fd = _validate_stdin_lease(stdin_lease, compiler, arguments)
+        # record is created; mismatches refuse with exit 78. The paired
+        # operator manifest environment is decided in the same pre-effect
+        # window: a partial pair refuses, the pair combined with an explicit
+        # library stdin_lease argument refuses, and a valid manifest selects
+        # at most one lease. No selection at all keeps the exact v1
+        # protocol and never reads descriptor 0.
+        allocation_id = None
+        input_fd = None
+        if (stdin_lease is not None
+                or STDIN_LEASE_MANIFEST_ENV in os.environb
+                or STDIN_LEASE_MANIFEST_SHA256_ENV in os.environb):
+            manifest_path = os.environb.get(STDIN_LEASE_MANIFEST_ENV)
+            manifest_sha256 = os.environb.get(STDIN_LEASE_MANIFEST_SHA256_ENV)
+            if (manifest_path is None) != (manifest_sha256 is None):
+                raise Refusal(
+                    "CD01_STDIN_LEASE_MANIFEST and CD01_STDIN_LEASE_MANIFEST_SHA256 "
+                    "must be configured together or both absent")
+            if manifest_path is not None and stdin_lease is not None:
+                raise Refusal(
+                    "an explicit stdin_lease argument cannot be combined with the "
+                    "operator manifest environment pair")
+            if stdin_lease is not None:
+                allocation_id, input_fd = _validate_stdin_lease(stdin_lease, compiler, arguments)
+            else:
+                selected = _select_manifest_lease(
+                    manifest_path, manifest_sha256, compiler, arguments, fds)
+                if selected is not None:
+                    allocation_id, input_fd = selected
+        state["stdin_selected"] = allocation_id is not None
         stage = "env_capture_dir"
         capture_dir = os.environb.get(CAPTURE_DIR_ENV)
         if capture_dir is None:
@@ -860,7 +1223,7 @@ def main(argv=None, *, stdin_lease=None):
         _require_private_dir(os.fstat(invocation_fd))
         stage = "intent_render"
         stdin_plan = None
-        if stdin_lease is not None:
+        if state["stdin_selected"]:
             stdin_plan = {"allocation_id": allocation_id, "custody_relative_directory": STDIN_CUSTODY_NAME.decode("ascii")}
         payload = _render_intent_record(compiler, arguments, guard, stdin_plan)
         # Covers exclusive create, full write, data fsync and once-close;
@@ -877,7 +1240,7 @@ def main(argv=None, *, stdin_lease=None):
         stage = "invocation_dir_fsync"
         os.fsync(invocation_fd)
         state["intent_dir_fsynced"] = True
-        if stdin_lease is not None:
+        if state["stdin_selected"]:
             # Selected stdin-lease flow. The intent above is durable and its
             # transfer status stays PENDING; nothing below rewrites it. Any
             # failure here means no exec and no consumed-input fallback; a
