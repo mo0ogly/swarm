@@ -138,3 +138,23 @@ Offline analysis of identical original worker564552 capture (no child/strace) yi
 Initial reviewer0901a1e96e-bebd-7712-8e13-80d6e8494a08 REQUEST_CHANGES PT-01 major: wrong needle did not recognize <... wait4 resumed>. One new selected same-byte guard1FAIL→1PASS with control/recovery, no child; continuation prefix now refuses before classification. FR/EN/eight-guard recipe synchronized, schema/inputs only checked, no fullreplay. Finalpins PT01-CORRECTION.json. Earlier13/2617 observation stays bound to prePT01parser ee8898 and rawworker564552, never reassigned. Scoped closure review requested; other chats idle. No CD01admission/12+3bodies/historicaltest/build/install/mainmerge.
 
 Reviewer09 PT-01 closed APPROVE_SOURCE_AND_TARGETED_GUARD_ONLY01a1e971-e515-77d2-8c2c-7f5c2b28d56e, source6588ac0394931b0286e328a1cc45efdfa9d4b1d7956346e2fc706cd1e468f345. REVIEW-09-FINAL.json, no replay/new qualification. Next METHOD-CD01-QUALIFICATION-SCOPE-01 maps missing proof to originalcriteria before another harness; methodexpansion remains hypothesis to examine, currentgate unchanged.
+
+
+### C-D01 — original criteria and prospective collection (17 November)
+
+Matrix root00-cd01-qualification-map-jj0pjrmt/ADMISSION-MATRIX.md SHA5ffec5aa4ee431543cbd1de60ec37e6e162fef0ac7cd29af2ace78a0c9c0909d. Reviewer09 scope01a1e987-6fa0-71f2-9425-0b97e0b293fc APPROVE_SCOPE_INTERPRETATION_ONLY: contracts require qualifiedgraph/binary before admission/15bodies, not a universalsyscallframework before collection. ConditionalrouteB: prepare exact prospective collect-only plan/patch/allocation, never retroqualifyR2 or accept fromCargo0. Producerprivacy/prebinding/fidelity/config/FD/reserve/errorcustody beforecollection; anymaterialunknown remainsUNQUALIFIED. Verdict alone allocates no build.
+
+CurrentsafeCargo cwd/ancestor/homeconfiginventory: two identical31bee configs, absence distinctfromerrors(0unknown), noprivatevaluescopied/credentialfileread. PublicconfigforcesLIBSQLITE3_FLAGS andrelativewrapper; source321..334forwards-D/-U tocc, notproofcompiled. Currentrustc/cargo1.96/GCC15.2 metadata nothistoricalR2identity. Serialsingleexecobserver notgeneralCargo: spaceguard149usesexecvp.
+
+One tinyisolatedC optioncompile (noSwarm/Cargo,0tests,objectneverrun) observes-MD/-save-temps=obj/-v: exit0,probe.d/.i/.s/.o,ELFRELx86_64, depfilereportssource/ownedspaceheader/stdc-predef.h/stddef.h; selectedsources/tools preboundstable,FD/reserveheld. Full native-options-witness/RESULT.json/stderr/deps retained/read. Notfunctionaltest/Cargocc/linker/fullgraph proof. cc1.8 CFLAGS/debug producerpassages read; versionedGCCprimarydocs read (unavailablegccPreprocessorOptions replacedbyactuallyreadcppInvocation). No productoptionchanged.
+
+Next oneboundedGLM concretecollectorplan reusingreviewedfoundation; solveprivacy/fidelity/native/generatedinputs beforeactualallocation. Noautomaticgenericparser orhistoricalreplay. Admission/bodies/PRchecks/localdeliveryremaindistinct/open.
+
+
+### Prospective collector: GLM12 received, allocation blocked
+
+`CD01-COLLECTOR-PLAN-12` completed in 257.23 s without retry: reported usage 49,069 tokens (17,878 input, 31,191 output). The whole answer was read and retained under `root00-cd01-collector-plan12-2ow_noux/response/answer.txt` on SWARM. Its proposed argv-capture wrappers avoid descendant-environment logging; this direction is retained for review, not yet execution.
+
+Root retained CP12-01..05 in `ROOT-RECEPTION.json`: concurrent/partial record publication, Python argument-byte fidelity, invalid Cargo0 ⇒ actual compiler-execution inference, already-material unknown inputs, and tool/chain resolution. A successful cached build need not execute fresh compilers and cannot prove capture. Reading cc1.8.0 lines3794–3955 establishes conditional bare-cc default selection, not the actual selected branch. The installed strace manual passage does not establish unlimited `-s0` semantics.
+
+Independent reviewer09 received this bounded plan review, turn `01a1e9a9-68e7-71c0-b0a3-e359ad45bc8c`; all other chats idle, no GLM call remains active. No engine build, test body, admission, installation or main merge was started by this packet. Next: corrected/reviewed producer contract, then bounded production and targeted guards; actual collection requires allocation based on these new preconditions.
