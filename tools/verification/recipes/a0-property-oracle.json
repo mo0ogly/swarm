@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "a0-property-oracle",
+  "inputs": [
+    "tools/research/a0_property_oracle.py",
+    "tests/test_a0_property_oracle.py",
+    "tools/research/A0-PROPERTY-ORACLE.md",
+    "tools/research/A0-PROPERTY-ORACLE.en.md",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/a0-property-oracle.json"
+  ],
+  "environment": {
+    "TMPDIR": "{root}/.swarm-fixtures"
+  },
+  "steps": [
+    {
+      "id": "synthetic-properties-refusal-recovery",
+      "command": [
+        "python3",
+        "tests/test_a0_property_oracle.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_actual_index_dictionary_manifest_and_absolute_journey",
+        "test_effect_receipt_terms_mismatch_does_not_falsify_pv1",
+        "test_revocation_history_survives_later_row_reset",
+        "test_two_same_grant_commitments_cannot_pass_consumption",
+        "test_publication_failure_preserves_existing_and_partial_output",
+        "test_unknown_triggers_neither_pv1_nor_pv2",
+        "test_pv2_intention_fail_and_pv2_attempt_pass",
+        "Ran 34 tests",
+        "OK",
+        "test_disappearing_effect_row_is_error_not_pass",
+        "test_single_run_control_passes_and_mixed_run_case_is_error",
+        "test_prefix_completeness_governs_pt_fail_vs_inconc",
+        "test_control_succeeds_then_injected_dir_fsync_failure_is_uncertain",
+        "test_valid_second_buffer_cannot_redirect_recorded_source",
+        "test_marker_unlink_failure_keeps_uncertainty_and_original_cause",
+        "test_numbering_gap_cannot_prove_missing_approval",
+        "test_rewrite_or_loss_between_commands_is_evidence_error",
+        "test_terminal_rewrite_or_loss_is_checked_after_explicit_after",
+        "test_uniform_other_run_cannot_replace_requested_initialization"
+      ]
+    }
+  ]
+}
