@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "cd01-paired-custody-inert-guards",
+  "inputs": [
+    "tools/verification/cd01_pair.py",
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/test_cd01_pair_custody.py",
+    "tools/verification/CD01-AREA-PAIRED.md",
+    "tools/verification/CD01-AREA-PAIRED.en.md",
+    "tools/verification/recipe.py",
+    "tests/fixture_area.py",
+    "rust/crates/swarm-engine/config/engine-settings.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "five-inert-custody-methods",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_cd01_pair_custody.py",
+        "--candidate",
+        "{root}/tools/verification/cd01_pair.py",
+        "--candidate-sha256",
+        "ce3f8fc988b0e5ad1a42a7551f800d9752ccd65de7fe2833d983bca57818f6f0",
+        "--outcome-source",
+        "{root}/tools/verification/native_build_outcome.py",
+        "--outcome-sha256",
+        "27b2bf5ebc57647876c00a338685cde71eaacea89d4bf1b55894fa33da5722ba",
+        "--evidence-parent",
+        "{root}"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "INERT_CD01_CUSTODY_PASS five-named-methods zero-real-children"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

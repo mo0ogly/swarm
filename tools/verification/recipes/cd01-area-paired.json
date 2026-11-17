@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "cd01-area-paired-behavior-and-fixed-global",
+  "inputs": [
+    "tools/verification/cd01_pair.py",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/cd01-area-paired.json",
+    "tools/verification/CD01-AREA-PAIRED.md",
+    "tools/verification/CD01-AREA-PAIRED.en.md",
+    "tests/fixture_area.py",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/fixture_area.rs",
+    "rust/crates/swarm-engine/src/fixture_area/resolution.rs",
+    "rust/crates/swarm-engine/src/fixture_area/resolution_tests.rs",
+    "rust/crates/swarm-engine/src/fixture_area/paired_harness.rs",
+    "rust/crates/swarm-engine/src/fixture_area/paired_legacy.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/engine_settings/runtime_temporary.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/test_cd01_pair_custody.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "six-adapted-pairs",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/cd01_pair.py",
+        "paired"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "CD01_PAIRED_BEHAVIOR_PASS six-pairs five-legacy-red twelve-named-probes"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "fixed-global-fresh-processes",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/cd01_pair.py",
+        "global"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "CD01_GLOBAL_WRAPPER_PASS control refusal fresh-process-adoption three-named-probes"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

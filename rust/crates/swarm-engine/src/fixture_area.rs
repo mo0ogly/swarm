@@ -174,3 +174,7 @@ mod tests {
 #[cfg(test)]
 #[path = "fixture_area/resolution_tests.rs"]
 mod resolution_tests;
+
+#[cfg(test)]
+#[path = "fixture_area/paired_harness.rs"]
+mod paired_harness;
