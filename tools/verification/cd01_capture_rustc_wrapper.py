@@ -137,9 +137,10 @@ read and close errors keep their original type and errno as operational
 failure (1), interrupts stay 130, unreadable or malformed manifests never
 fall back implicitly, no raw manifest text, digest or diagnostic value is
 echoed, and recovery is a corrected re-invocation with no cleanup or
-rollback. The current collector can neither stage the helper or the
-manifest nor consume this CLI; full helper wiring and actual compiler
-consumption remain future.
+rollback. The collector packet24 source optionally stages the helper and
+manifest, supplies the validated environment pair and reconciles receipts;
+its native Cargo wiring and actual compiler consumption remain unverified.
+Without its explicit four-argument group it retains the default v1 path.
 
 Source-only proposal: wiring into real Cargo builds requires separate review
 and allocation. No cleanup is ever performed: partial and complete records are

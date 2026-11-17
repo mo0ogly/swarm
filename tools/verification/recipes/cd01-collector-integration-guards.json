@@ -47,7 +47,16 @@
         "test_bad_receipt_json_and_member_sets_refuse",
         "test_callback_causes_reach_safe_terminal_projection",
         "test_identity_hardlink_and_bad_validator_result_refuse",
-        "Ran 21 tests",
+        "test_cli_group_all_or_none_and_namespace_compatibility",
+        "test_default_and_leased_child_environments",
+        "test_staged_copies_module_loader_and_leased_archive",
+        "test_pinned_pair_and_checker_refusals",
+        "test_loader_io_close_wrong_api_and_cause_projection",
+        "test_reconciliation_repeats_missing_foreign_mismatch_and_matching_v1",
+        "test_empty_group_values_refuse_instead_of_disabling",
+        "test_source_manifest_privacy_and_helper_readable_mode",
+        "test_pin_io_and_secondary_errno_reach_safe_terminal",
+        "Ran 30 tests",
         "OK"
       ]
     }

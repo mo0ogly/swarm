@@ -53,6 +53,18 @@ What it does (one shot; no retry, no pause, no timeout, no watchdog, no cap):
     pins the explicitly supplied root admission guard in place by exact path
     and bytes (both shebangs recorded as observed; interpreter resolution is
     never automatically qualified),
+  * optionally — only with the complete all-or-none --rustc-stdin-lease-manifest
+    argument group — stages the supplied reviewed stdin-lease manifest and
+    custody helper as private 0600 copies with readback, loads both plus the
+    staged producer through a byte-buffer-pinned private module compile (no
+    importlib/sys.modules/PYTHONPATH/name fallback/pyc; module __name__ is
+    never __main__), validates the manifest through the loaded wrapper23
+    document API, adds exactly the two wrapper23 operator-manifest environment
+    names to the child, passes the loaded staged helper as the custody
+    validator after Cargo, and reconciles declared lease selectors against
+    actual v2 receipts; without the group nothing leased is staged, the v1
+    environment, archives and results are unchanged, and the collector never
+    reads or borrows descriptor 0,
   * creates its own NEW 0700 rustc-intent capture directory under the output;
     after Cargo it parses ONLY the producer's records there (lossless ASCII
     JSON, valid hex bytes, exact cd01.rustc_intent.v1 field set, outcome
@@ -127,12 +139,22 @@ Example:
         --rustc-intent-producer-sha256 1c06c44cf57628414296c269f98667f5fa5e8a4ce33fc7e423a64d40527a3932 \
         --root-guard /checkout/tools/verification/cargo_space_guard.py \
         --root-guard-sha256 09b7d45c78c64282dee6265be2d26cea6066505963465e2a50a856f1fe8d5916
+
+Optional packet24 leased-artifact group (accepted only complete, all or none):
+    ... --rustc-stdin-lease-manifest /reviewed/operator/stdin-lease-manifest.json \
+        --rustc-stdin-lease-manifest-sha256 <64 lowercase hex digits> \
+        --rustc-custody-helper /reviewed/packet/finite_input_custody.py \
+        --rustc-custody-helper-sha256 <64 lowercase hex digits>
 Library-only v2 consumption additionally accepts a caller-bound reviewed
 custody validator through _parse_intent_records(..., custody_validator=...).
-The normal run/CLI still passes none and refuses v2 records; it acquires no
-input lease automatically. v2 validates current staged consistency and declared
-transfer facts, never observed compiler consumption, authenticity or full graph.
-Callback failure metadata preserves typed interruption facts without raw text.
+At the packet21 increment the normal run/CLI still passed none and refused v2
+records; it acquired no input lease automatically. Packet24 below adds the
+optional all-or-none leased-artifact argument group: it acquires no lease by
+itself, derives no selector, and never borrows descriptor 0; the wrapper's
+own per-invocation selector match decides selection. v2 validates current
+staged consistency and declared transfer facts, never observed compiler
+consumption, authenticity or full graph. Callback failure metadata preserves
+typed interruption facts without raw text.
 """
 
 import argparse
@@ -147,6 +169,7 @@ sys.dont_write_bytecode = True
 import tarfile
 import tempfile
 import tomllib
+import types
 from pathlib import Path, PurePosixPath
 
 if sys.version_info < (3, 11):
@@ -181,6 +204,11 @@ INTENT_RECORD_FIELDS = frozenset(('capture', 'compiler_arguments_hex', 'compiler
 INTENT_DIR_PREFIX = 'cd01-intent-'
 CAPTURE_DIR_ENV_NAME = 'CD01_CAPTURE_DIR'
 SPACEGUARD_ENV_NAME = 'CD01_SPACEGUARD_PATH'
+STDIN_LEASE_MANIFEST_ENV_NAME = 'CD01_STDIN_LEASE_MANIFEST'
+STDIN_LEASE_MANIFEST_SHA256_ENV_NAME = 'CD01_STDIN_LEASE_MANIFEST_SHA256'
+STAGED_CUSTODY_HELPER_NAME = 'finite_input_custody.py'
+STAGED_STDIN_LEASE_MANIFEST_NAME = 'stdin-lease-manifest.json'
+LEASED_FAILURE_STAGES = frozenset(('staging', 'load', 'manifest-parse', 'pin-check'))
 REGISTRY_SOURCE_URL = 'registry+https://github.com/rust-lang/crates.io-index'
 # Registry namespace is discovered from explicit child HOME; no host-specific index literal.
 PROBE_ARGUMENT_EXACT = frozenset(('-vV', '--version'))
@@ -492,7 +520,8 @@ def _archive_declared(profile, root, out, manifest):
     return proof
 
 
-def _child_environment(target, tmpdir, capture_dir, guard_path, wrapper_path):
+def _child_environment(target, tmpdir, capture_dir, guard_path, wrapper_path, *,
+                       lease_manifest_pair=None):
     """Build the explicit inherited-name allowlist and declared wrapper instrumentation.
 
     Only PATH and HOME are inherited (both required); CARGO_TARGET_DIR (admitted
@@ -501,13 +530,19 @@ def _child_environment(target, tmpdir, capture_dir, guard_path, wrapper_path):
     producer config variables CD01_CAPTURE_DIR (our owned 0700 capture directory)
     and CD01_SPACEGUARD_PATH (the pinned root guard) are added, and RUSTC_WRAPPER
     is constructed by this collector pointing at the staged reviewed producer
-    copy. Inherited Rust flags, wrappers, toolchain and target overrides are
+    copy. With a (staged manifest copy path, manifest sha256) lease_manifest_pair,
+    exactly the two wrapper23 operator-manifest names CD01_STDIN_LEASE_MANIFEST
+    and CD01_STDIN_LEASE_MANIFEST_SHA256 are added as wrapper23 expects them,
+    pointing at the staged private manifest copy; with None the returned
+    environment and declaration are byte-identical to the pre-leased protocol.
+    Inherited Rust flags, wrappers, toolchain and target overrides are
     refused FIRST; only after that refusal is RUSTC_WRAPPER set — a declared
     instrumentation override of the workspace [build] rustc-wrapper, recorded as
     such, with the cargo argv unchanged and no claim of identical rustc argv or
     codegen. No CC/CFLAGS variable and no PATH shadowing is introduced in this
-    stage. Returns (env, safe declaration record). Errors: missing PATH/HOME or
-    any present ambient override refuses. Limits: no other environment value is
+    stage. Returns (env, safe declaration record). Errors: missing PATH/HOME,
+    any present ambient override or a malformed lease pair refuses. Limits: no
+    other environment value is
     copied into the child or log; this is no generic argv/descendant secrecy guarantee;
     workspace .cargo/config discovery otherwise remains Cargo's own, untouched.
     """
@@ -524,6 +559,12 @@ def _child_environment(target, tmpdir, capture_dir, guard_path, wrapper_path):
                 CAPTURE_DIR_ENV_NAME: str(capture_dir),
                 SPACEGUARD_ENV_NAME: str(guard_path),
                 'RUSTC_WRAPPER': str(wrapper_path)}
+    if lease_manifest_pair is not None:
+        require(isinstance(lease_manifest_pair, tuple) and len(lease_manifest_pair) == 2
+                and all(isinstance(item, str) and item for item in lease_manifest_pair),
+                'cd01-lease-manifest-pair-invalid')
+        explicit[STDIN_LEASE_MANIFEST_ENV_NAME] = lease_manifest_pair[0]
+        explicit[STDIN_LEASE_MANIFEST_SHA256_ENV_NAME] = lease_manifest_pair[1]
     env = {**passthrough, **explicit}
     declaration = dict(passthrough=passthrough, explicit=explicit, allowlist_only=True,
                        inherited_names_excluded=len([n for n in os.environ if n not in env]),
@@ -535,6 +576,13 @@ def _child_environment(target, tmpdir, capture_dir, guard_path, wrapper_path):
                            cargo_argv_unchanged=True,
                            rustc_argv_or_codegen_identity_claim='none',
                            no_cc_cflags_or_path_shadow=True))
+    if lease_manifest_pair is not None:
+        declaration['operator_stdin_lease_manifest'] = dict(
+            manifest_env=STDIN_LEASE_MANIFEST_ENV_NAME,
+            sha256_env=STDIN_LEASE_MANIFEST_SHA256_ENV_NAME,
+            staged_copy=lease_manifest_pair[0], sha256=lease_manifest_pair[1],
+            selection='wrapper23 per-invocation selector byte equality; no match '
+                      'keeps exact v1 and never reads descriptor 0')
     return env, declaration
 
 
@@ -605,6 +653,8 @@ def _error_tree(error, seen=None):
     value = {'type': type(error).__name__, 'message': str(error)}
     if isinstance(error, CustodyValidationFailure):
         value['custody_validation'] = error.custody_failure
+    if isinstance(error, LeasedArtifactFailure):
+        value['leased_artifact'] = _leased_failure_facts(error)
     if isinstance(getattr(error, 'collector_failure', None), dict):
         value['collector_failure'] = error.collector_failure
     if isinstance(error, OSError):
@@ -855,6 +905,320 @@ def _stage_rustc_intent_producer(profile, out, target, producer_path, expected_s
                                  'resolution is not qualified here')
 
 
+def _leased_group_state(args):
+    """Return (leased_mode, lease_args) for the optional all-or-none argument group.
+
+    getattr(None) defaults keep namespaces built before the leased-artifact
+    group existed compatible. A partial group refuses before any output
+    mutation or child process; absence is exactly None, never a falsy supplied
+    value. Only path value types/non-emptiness and both digest strings are
+    validated before output mutation here. Absolute paths and file form/mode
+    are validated later by staging, after the output may have been created;
+    their refusal makes no no-mutation claim. Completeness is re-checked here because
+    manually supplied namespaces bypass argparse parsing. Side effects: none.
+    """
+    lease_args = (getattr(args, 'rustc_stdin_lease_manifest', None),
+                  getattr(args, 'rustc_stdin_lease_manifest_sha256', None),
+                  getattr(args, 'rustc_custody_helper', None),
+                  getattr(args, 'rustc_custody_helper_sha256', None))
+    present = tuple(value is not None for value in lease_args)
+    require(all(present) or not any(present), 'cd01-stdin-lease-group-partial')
+    if all(present):
+        require(all(isinstance(value, (str, Path)) and bool(str(value))
+                    for value in (lease_args[0], lease_args[2])),
+                'cd01-stdin-lease-group-path-invalid')
+        _require_hex64(lease_args[1], 'stdin-lease-manifest-sha256')
+        _require_hex64(lease_args[3], 'custody-helper-sha256')
+    return all(present), lease_args
+
+
+class LeasedArtifactFailure(Exception):
+    """Static leased-artifact failure retaining original causes unrendered.
+
+    str() is always the fixed constructor token; the original primary and
+    secondary exception objects remain in memory as attributes and only the
+    bounded stage/type/errno/interruption facts projected by
+    _leased_failure_facts reach terminal diagnostics. No operator path,
+    manifest or source byte, digest or foreign exception text is rendered, a
+    failure is never normalized into an empty success, and the carrier grants
+    no authority, authentication or confinement.
+    """
+
+    def __init__(self, message, stage, primary=None, secondary=()):
+        """Keep the static token and original cause objects without rendering them."""
+        super().__init__(message)
+        self.leased_failure_stage = stage
+        self.original_exception = primary
+        self.secondary_exceptions = tuple(secondary)
+
+
+@contextlib.contextmanager
+def _leased_stage(stage):
+    """Map one leased-artifact operation's failures onto the static carrier.
+
+    The original primary exception object is retained unrendered on the
+    carrier so typed IO, parse, close and interruption causes survive in
+    memory while only static tokens and bounded facts reach diagnostics;
+    existing LeasedArtifactFailure carriers pass through unchanged and a
+    failure is never converted into an empty success. Limits: an interruption
+    fact is preserved in the bounded projection, not re-raised as a signal.
+    """
+    try:
+        yield
+    except LeasedArtifactFailure:
+        raise
+    except BaseException as error:
+        raise LeasedArtifactFailure('cd01-leased-artifact-failed', stage, error) from None
+
+
+def _leased_failure_facts(error):
+    """Project bounded leased-artifact facts without paths, bytes or foreign text.
+
+    Only the fixed stage token, exception type names, integer errnos and the
+    interrupted fact are rendered; original cause objects stay unrendered in
+    memory and a failure is never shown as success. Side effects: none.
+    Limits: diagnostic projection only; no rollback, recovery or authority.
+    """
+    stage = getattr(error, 'leased_failure_stage', None)
+    primary = getattr(error, 'original_exception', None)
+    secondary = tuple(getattr(error, 'secondary_exceptions', ()) or ())
+    primary = primary if isinstance(primary, BaseException) else None
+    secondary = tuple(cause for cause in secondary if isinstance(cause, BaseException))
+    causes = ((primary,) if primary is not None else ()) + secondary
+    return {'stage': stage if stage in LEASED_FAILURE_STAGES else 'leased-artifact',
+            'primary_type': type(primary).__name__ if primary is not None else None,
+            'primary_errno': getattr(primary, 'errno', None)
+                             if type(getattr(primary, 'errno', None)) is int else None,
+            'secondary_types': [type(cause).__name__ for cause in secondary],
+            'secondary_errno': [getattr(cause, 'errno', None)
+                                if type(getattr(cause, 'errno', None)) is int else None
+                                for cause in secondary],
+            'interrupted': any(not isinstance(cause, Exception) for cause in causes),
+            'outcome': 'UNKNOWN'}
+
+
+def _read_pinned_buffer(path, expected_sha, label, *, require_private=True):
+    """Read one candidate file exactly once under O_NOFOLLOW and pin its buffer.
+
+    Opens O_RDONLY|O_NOFOLLOW|O_CLOEXEC|O_NONBLOCK so a FIFO cannot block
+    before the fstat type check, requires an effective-uid-owned private
+    regular file (or, only for a module source with require_private=False,
+    an euid-owned regular file with no group/other write permission), reads
+    one full pass with no size cap, and closes the
+    descriptor exactly once; a close failure during an in-flight failure is
+    retained as a secondary cause. The buffer's SHA-256 must equal the
+    explicit expected digest before any parse. Errors: open, shape, read and
+    close failures raise LeasedArtifactFailure with original causes retained
+    unrendered; a digest mismatch refuses with a static token; raw bytes and
+    digests are never rendered. Side effects: none beyond the read. Limits:
+    one read window over this one file only, under the caller's stable lease.
+    """
+    try:
+        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK)
+    except BaseException as error:
+        raise LeasedArtifactFailure('cd01-leased-buffer-open-failed', 'load', error) from None
+    chunks = []
+    primary = None
+    try:
+        status = os.fstat(fd)
+        if not stat.S_ISREG(status.st_mode):
+            primary = ValueError('cd01-leased-buffer-not-regular:' + label)
+        elif status.st_uid != os.geteuid() or stat.S_IMODE(status.st_mode) & (0o077 if require_private else 0o022):
+            primary = ValueError('cd01-leased-buffer-not-private:' + label)
+        else:
+            while True:
+                chunk = os.read(fd, 65536)  # Transport chunk, never a size cap.
+                if chunk == b'':
+                    break
+                chunks.append(chunk)
+    except BaseException as error:
+        primary = error
+    close_errors = []
+    try:
+        os.close(fd)
+    except BaseException as cleanup:
+        close_errors.append(cleanup)
+    if primary is not None:
+        raise LeasedArtifactFailure('cd01-leased-buffer-read-failed', 'load',
+                                    primary, close_errors) from None
+    if close_errors:
+        raise LeasedArtifactFailure('cd01-leased-buffer-close-failed', 'load',
+                                    None, close_errors) from None
+    data = b''.join(chunks)
+    require(hashlib.sha256(data).hexdigest() == expected_sha,
+            'cd01-leased-buffer-bytes-mismatch:' + label)
+    return data
+
+
+def _load_reviewed_module(source_path, expected_sha, module_name, staged_path, required, label):
+    """Compile fixed reviewed source bytes into one private module namespace.
+
+    Reads the source exactly once through _read_pinned_buffer, requires the
+    buffer SHA-256 to equal the explicit expected digest, then compiles and
+    executes those pinned bytes in a fresh types.ModuleType namespace whose
+    __name__ is the given non-__main__ name (so no wrapper main can run
+    automatically) and whose __file__ is the staged copy path. No importlib
+    machinery, sys.modules entry, PYTHONPATH or module-name fallback and no
+    bytecode cache is consulted or written: the executed bytes are exactly the
+    pinned buffer. Every required attribute must be callable. Errors: IO and
+    close failures raise LeasedArtifactFailure with original causes retained
+    unrendered; compile failures keep the original cause unrendered; digest
+    and API mismatches refuse with static tokens. Side effects: none beyond
+    the private namespace. Limits: the hash pins the caller-supplied reviewed
+    bytes only — never source authenticity, confinement or runtime behavior.
+    """
+    data = _read_pinned_buffer(source_path, expected_sha, label)
+    module = types.ModuleType(module_name)
+    module.__file__ = str(staged_path)
+    with _leased_stage('load'):
+        exec(compile(data, str(staged_path), 'exec'), module.__dict__)
+    for attribute in required:
+        require(callable(getattr(module, attribute, None)),
+                'cd01-leased-module-api-mismatch:' + label + ':' + attribute)
+    return module
+
+
+def _stage_leased_artifact(profile, out, target, source_path, expected_sha, staged_name):
+    """Validate, pin and stage one reviewed leased-artifact source as a private copy.
+
+    Requires the explicit source to be an absolute non-symlink regular file
+    outside the cargo target; the SHA-256 of the exact buffer that will be
+    copied is checked against the explicitly supplied expected digest before
+    publication. The opened descriptor is type/uid/mode checked before reading:
+    manifests require private permissions, module sources permit group/other
+    reading but never writing. An exact byte copy is published under the literal staged
+    name into the already-owned evidence output, marked 0600 (never
+    executable), required to be effective-uid-owned and private, and re-read
+    requiring digest equality. Both the original and copy pins are retained
+    for the reusable per-child pinned-pair check. Errors: IO, chmod and
+    readback failures raise LeasedArtifactFailure with original causes
+    retained unrendered; shape, mode and hash mismatches refuse with static
+    tokens. Side effects: writes one staged file into the output. Limits: the
+    pin proves the copy equals the expected reviewed bytes only — neither
+    origin, authority nor runtime behavior; the copied manifest is a
+    caller-supplied operator declaration, never collector policy, and no
+    lease or selector is derived here.
+    """
+    _require_hex64(expected_sha, staged_name)
+    require(source_path.is_absolute(),
+            'cd01-leased-source-path-not-absolute:' + staged_name)
+    require(not source_path.is_relative_to(target),
+            'cd01-leased-source-inside-target:' + staged_name)
+    with _leased_stage('staging'):
+        info = os.lstat(source_path)
+    require(stat.S_ISREG(info.st_mode),
+            'cd01-leased-source-not-regular:' + staged_name)
+    with _leased_stage('staging'):
+        raw = _read_pinned_buffer(
+            source_path, expected_sha, staged_name,
+            require_private=(staged_name == STAGED_STDIN_LEASE_MANIFEST_NAME))
+    require(hashlib.sha256(raw).hexdigest() == expected_sha,
+            'cd01-leased-source-bytes-mismatch:' + staged_name)
+    copy_path = out / staged_name
+    with _leased_stage('staging'):
+        profile.publish(copy_path, raw)
+        copy_path.chmod(0o600)
+        copy_info = copy_path.stat()
+    require(copy_info.st_uid == os.geteuid(),
+            'cd01-leased-copy-not-euid-owned:' + staged_name)
+    require(stat.S_IMODE(copy_info.st_mode) == 0o600,
+            'cd01-leased-copy-not-private:' + staged_name)
+    with _leased_stage('staging'):
+        readback = digest(copy_path)
+    require(readback == expected_sha,
+            'cd01-leased-copy-readback-mismatch:' + staged_name)
+    return dict(staged_name=staged_name, path=str(copy_path), source=str(source_path),
+                sha256=expected_sha, source_mode=stat.S_IMODE(info.st_mode),
+                copy_mode=stat.S_IMODE(copy_info.st_mode))
+
+
+def _parse_staged_lease_manifest(producer_module, manifest_bytes):
+    """Validate pinned manifest bytes through the loaded wrapper23 document API.
+
+    Calls the byte-pinned staged producer module's _parse_manifest_document
+    (strict UTF-8 JSON with duplicate-member refusal) and
+    _validate_manifest_document, so the reviewed schema lives only in the
+    reviewed wrapper and is never duplicated in this collector. Returns the
+    normalized lease entry tuples. Errors: wrapper refusals and parse/schema
+    failures raise LeasedArtifactFailure with original causes retained
+    unrendered; raw manifest text and diagnostic values are never rendered.
+    Side effects: none. Limits: validation proves the document matches the
+    reviewed wrapper23 protocol only; the declarations stay caller
+    preconditions, no lease is acquired and no selector is derived here.
+    """
+    with _leased_stage('manifest-parse'):
+        document = producer_module._parse_manifest_document(manifest_bytes)
+        return producer_module._validate_manifest_document(document)
+
+
+def _require_pinned_pair(record, label):
+    """Require one staged artifact's original and copy bytes to still match its pin.
+
+    Reused by the per-child FrozenInputs check for the staged producer pair
+    and, in leased mode, for the custody-helper and stdin-lease-manifest
+    pairs. Errors: original or copy drift refuses with the pair role in the
+    static reason; unreadable bytes retain typed IO causes in a safe
+    LeasedArtifactFailure projection without private paths. Side
+    effects: read-only hashing. Limits: a current-byte observation under the
+    held admission, never an immutable-lifetime proof.
+    """
+    with _leased_stage('pin-check'):
+        original = digest(Path(record['source']))
+        copied = digest(Path(record['path']))
+    require(original == record['sha256'],
+            'cd01-pinned-pair-original-drift:' + label)
+    require(copied == record['sha256'],
+            'cd01-pinned-pair-copy-drift:' + label)
+
+
+def _reconcile_leased_selectors(entries, intent):
+    """Reconcile declared lease selectors against the actual parsed receipts.
+
+    Consumes only current record keys: the v2 stdin_custody allocation_id plus
+    compiler_path_hex/compiler_arguments_hex/cwd_hex. Requires every declared
+    allocation to own at least one v2 receipt, every v2 receipt to be declared,
+    and exact byte equality between a receipt's compiler path, argument list
+    and cwd and its declared selector; a declared selector recorded only as v1
+    refuses so a matched repeat cannot bypass custody, and an undeclared v2
+    receipt refuses. Matching is per receipt record directory with no ordinal,
+    ancestry or unique-process claim: repeated selections of one selector are
+    distinct record directories under the same allocation, and there is no
+    condition count cap. Returns a published summary; refusals use static
+    tokens and never render selector bytes, allocation ids or private paths.
+    Side effects: none. Limits: reconciliation covers declared selectors and
+    parsed receipts only; compiler consumption, outcomes and the full graph
+    stay UNKNOWN and no crate/mission/date policy is consulted.
+    """
+    declared = {}
+    for allocation_id, _input_fd, selector in entries:
+        require(allocation_id not in declared, 'cd01-lease-allocation-duplicate')
+        declared[allocation_id] = selector
+    observed = {}
+    for record in intent['records']:
+        selector = (bytes.fromhex(record['compiler_path_hex']),
+                    tuple(bytes.fromhex(argument)
+                          for argument in record['compiler_arguments_hex']),
+                    bytes.fromhex(record['cwd_hex']))
+        custody = record.get('stdin_custody')
+        if custody is None:
+            for declared_selector in declared.values():
+                require(declared_selector != selector, 'cd01-lease-selector-recorded-v1')
+            continue
+        allocation_id = custody['allocation_id']
+        require(allocation_id in declared, 'cd01-lease-record-undeclared')
+        require(declared[allocation_id] == selector, 'cd01-lease-selector-mismatch')
+        observed.setdefault(allocation_id, []).append(record['record_dir'])
+    for allocation_id in sorted(declared):
+        require(bool(observed.get(allocation_id)), 'cd01-lease-allocation-unobserved')
+    return dict(status='reconciled', declared_allocations=sorted(declared),
+                observed_v2_records=sum(len(directories)
+                                        for directories in observed.values()),
+                record_dirs_by_allocation={allocation_id: sorted(directories)
+                                           for allocation_id, directories in observed.items()},
+                scope='declared selector/receipt reconciliation only; compiler '
+                      'consumption and outcomes stay UNKNOWN')
+
+
 def _pin_root_guard(root, guard_path, expected_sha):
     """Pin the exact root-selected admission guard in place by path and bytes.
 
@@ -885,23 +1249,33 @@ def _pin_root_guard(root, guard_path, expected_sha):
                                  'resolution is not qualified here')
 
 
-def _archive_instruments(profile, out, producer_copy, guard_path):
+def _archive_instruments(profile, out, producer_copy, guard_path, leased_copies=None):
     """Archive/re-read pinned instruments while retaining every owned candidate.
 
-    Writes a private temporary tar and the published verified copy. All partial
-    or complete temporary candidates remain on any failure, including verification
-    and publication errors. The temporary is also retained after success; no
-    cleanup/retention policy is implemented here. Errors propagate with contexts;
-    this is custody of bytes, never behavioral or interpreter qualification.
+    Writes a private temporary tar and the published verified copy. With no
+    leased-artifacts input the member set and result keys are exactly the
+    default two (rustc-intent-producer.py, root-guard.py); a leased-copies
+    mapping of literal staged names to paths adds the current custody helper
+    and stdin-lease manifest copies with exact member hashes and a full
+    published-archive reread. All partial or complete temporary candidates
+    remain on any failure, including verification and publication errors. The
+    temporary is also retained after success; no cleanup/retention policy is
+    implemented here. Errors propagate with contexts; this is custody of
+    bytes, never behavioral or interpreter qualification.
     """
     manifest = {'rustc-intent-producer.py': digest(producer_copy),
                 'root-guard.py': digest(guard_path)}
+    extras = sorted((leased_copies or {}).items())
+    for name, path in extras:
+        manifest[name] = digest(path)
     descriptor, temporary = tempfile.mkstemp(dir=out, prefix='.instruments-')
     os.close(descriptor)
     temporary = Path(temporary)
     with tarfile.open(temporary, 'w:gz') as archive:
         archive.add(producer_copy, arcname='rustc-intent-producer.py', recursive=False)
         archive.add(guard_path, arcname='root-guard.py', recursive=False)
+        for name, path in extras:
+            archive.add(path, arcname=name, recursive=False)
     with temporary.open('rb') as stream:
         os.fsync(stream.fileno())
     _verify_tar_members(temporary, manifest)
@@ -1379,8 +1753,10 @@ def _parse_intent_records(capture, *, custody_validator=None):
 
     Capture identity must remain stable. v1 keeps the exact two-file format.
     v2 additionally requires the current producer transfer/custody format and an
-    explicit caller-bound reviewed custody validator; run/CLI still passes none.
-    v2 results describe current staged consistency and declared transfer only.
+    explicit caller-bound reviewed custody validator; run/CLI passes none unless
+    the complete optional packet24 leased-artifact group supplies the loaded
+    staged helper. v2 results describe current staged consistency and declared
+    transfer only.
     No callback identity, immutable lifetime or compiler execution is established.
     Duplicate keys, failure records, invalid hex/NUL bytes, wrong schema,
     nonpositive PID or inconsistent delegation refuse. Empty arguments/lists are
@@ -1588,7 +1964,12 @@ def run(args):
 
     Side effects: creates the NEW evidence output leaf, its tmp/ directory and
     its own 0700 rustc-intent capture directory, writes evidence files, stages
-    and pins the reviewed intent producer plus the pinned root guard, prebinds
+    and pins the reviewed intent producer plus the pinned root guard (and, only
+    with the complete optional leased-artifact argument group, the private
+    staged custody-helper and stdin-lease-manifest copies whose original and
+    copy pins join the reusable per-child FrozenInputs check, the loaded staged
+    helper being passed as the custody validator and the declared selectors
+    reconciled against actual v2 receipts), prebinds
     Cargo.lock, the lock-selected registry sources/archives and the config
     discovery hierarchy, makes three primary tool/build calls (rustc -vV,
     cargo --version, one cargo test compile) under custody of the supplied
@@ -1609,6 +1990,7 @@ def run(args):
     output = Path(args.output)
     target = Path(args.target)
     inventory_path = Path(args.inventory)
+    leased_mode, lease_args = _leased_group_state(args)
     state = {'returncodes': {'rustc_vv': None, 'cargo_version': None, 'cargo_test_compile': None},
              'progress': [], 'facts': {}, 'inventory_path': str(inventory_path),
              'before_candidates': None, 'out': None}
@@ -1690,7 +2072,37 @@ def run(args):
                                                         Path(args.rustc_intent_producer),
                                                         args.rustc_intent_producer_sha256)
                 producer_copy = Path(producer['path'])
-                instruments = _archive_instruments(profile, out, producer_copy, guard_path)
+                leased = None
+                if leased_mode:
+                    helper_stage = _stage_leased_artifact(
+                        profile, out, target, Path(lease_args[2]), lease_args[3],
+                        STAGED_CUSTODY_HELPER_NAME)
+                    manifest_stage = _stage_leased_artifact(
+                        profile, out, target, Path(lease_args[0]), lease_args[1],
+                        STAGED_STDIN_LEASE_MANIFEST_NAME)
+                    producer_module = _load_reviewed_module(
+                        producer_copy, producer['sha256'], 'cd01_staged_intent_producer',
+                        producer_copy,
+                        ('_parse_manifest_document', '_validate_manifest_document'),
+                        'rustc-intent-producer')
+                    helper_module = _load_reviewed_module(
+                        Path(helper_stage['path']), helper_stage['sha256'],
+                        'cd01_staged_finite_input_custody', Path(helper_stage['path']),
+                        ('validate_staged',), 'rustc-custody-helper')
+                    manifest_bytes = _read_pinned_buffer(
+                        Path(manifest_stage['path']), manifest_stage['sha256'],
+                        'stdin-lease-manifest')
+                    leased = dict(helper=helper_stage, manifest=manifest_stage,
+                                  helper_module=helper_module,
+                                  entries=_parse_staged_lease_manifest(producer_module,
+                                                                       manifest_bytes))
+                    state['facts']['stdin_lease_declared_allocations'] = len(leased['entries'])
+                    state['progress'].append('stdin-lease-group-staged-pinned-validated')
+                instruments = _archive_instruments(
+                    profile, out, producer_copy, guard_path,
+                    leased_copies=None if leased is None else {
+                        STAGED_CUSTODY_HELPER_NAME: Path(leased['helper']['path']),
+                        STAGED_STDIN_LEASE_MANIFEST_NAME: Path(leased['manifest']['path'])})
                 state['facts']['instruments_archive_sha256'] = instruments['sha256']
                 state['facts']['producer_sha256'] = producer['sha256']
                 state['progress'].append('producer-staged-pinned-archived')
@@ -1698,7 +2110,9 @@ def run(args):
                 capture_path = Path(capture['path'])
                 state['progress'].append('intent-capture-created')
                 env, env_declaration = _child_environment(
-                    target, tmpdir, capture_path, guard_path, producer_copy)
+                    target, tmpdir, capture_path, guard_path, producer_copy,
+                    lease_manifest_pair=None if leased is None else
+                    (leased['manifest']['path'], leased['manifest']['sha256']))
                 tool_paths = _observe_toolchain_paths(env, root)
                 argv = _cargo_argv(root)
                 target_guard = admission
@@ -1710,11 +2124,14 @@ def run(args):
                     producer copy, the pinned root guard, the discovered config
                     hierarchy, the capture-directory identity and the evidence
                     paths (registry and Cargo.lock prebinds are re-observed once
-                    after Cargo, not per child). This detects drift; it does not
-                    confine a hostile concurrent writer.
+                    after Cargo, not per child); in leased mode the reusable
+                    pinned-pair check additionally re-hashes the staged custody
+                    helper and stdin-lease manifest originals and copies. This
+                    detects drift; it does not confine a hostile concurrent
+                    writer and proves no immutable lifetime.
                     """
                     def check(self):
-                        """Refuse target, evidence, source, config, producer or guard drift."""
+                        """Refuse target, evidence, source, config, producer, guard or leased-pin drift."""
                         facts = target_guard.check()
                         require(_path_identity(out) == out_identity, 'cd01-output-drift')
                         require(_path_identity(evidence_parent) == evidence_identity,
@@ -1734,8 +2151,11 @@ def run(args):
                                 'cd01-capture-dir-drift')
                         require(_observe_toolchain_paths(env, root) == tool_paths,
                                 'cd01-selected-tool-path-drift')
-                        require(digest(Path(producer['source'])) == producer['sha256'],
-                                'cd01-producer-original-drift')
+                        _require_pinned_pair(producer, 'staged-producer')
+                        if leased is not None:
+                            _require_pinned_pair(leased['helper'], 'leased-custody-helper')
+                            _require_pinned_pair(leased['manifest'],
+                                                 'leased-stdin-lease-manifest')
                         return facts
                 admission = FrozenInputs()
                 toolchain = _observe_toolchain(profile, out, admission, env, root, state)
@@ -1776,6 +2196,17 @@ def run(args):
                     additive_registration_files=_registration_additives(root),
                     no_cc_cflags_or_path_shadow=True,
                     retries=0, timeouts=None, global_watchdog=None)
+                if leased is not None:
+                    invocation['stdin_lease_group'] = dict(
+                        mode='leased-operator-manifest',
+                        schema='cd01.stdin_lease_manifest/1',
+                        helper=dict(leased['helper']),
+                        manifest=dict(leased['manifest']),
+                        declared_allocations=sorted(entry[0] for entry in leased['entries']),
+                        selector_match='wrapper23 per-invocation byte equality; no match '
+                            'keeps exact v1 and never reads descriptor 0',
+                        module_load='byte-buffer-pinned private compile of staged copies; '
+                            'no importlib/sys.modules/PYTHONPATH/name fallback/pyc')
                 profile.publish(out / 'invocation.json', json.dumps(invocation, indent=2) + '\n')
                 result = profile.outcomes.execute(
                     argv, out=out, name='cargo', admission=admission, publish=_cached_publisher(profile, state),
@@ -1795,13 +2226,21 @@ def run(args):
                 require(digest(guard_path) == guard['sha256'], 'cd01-root-guard-changed')
                 require(digest(producer_copy) == producer['sha256'],
                         'cd01-producer-copy-changed')
-                intent = _parse_intent_records(capture)
+                intent = _parse_intent_records(
+                    capture,
+                    custody_validator=None if leased is None
+                    else leased['helper_module'].validate_staged)
                 require(all(r['guard_path_hex'] == os.fsencode(guard_path).hex()
                             for r in intent['records']), 'cd01-intent-root-guard-mismatch')
                 intent_match = _match_libtest_intent(intent, state, event)
+                intent_document = dict(intent=intent, libtest_intent_candidate=intent_match)
+                lease_reconciliation = None
+                if leased is not None:
+                    lease_reconciliation = _reconcile_leased_selectors(leased['entries'], intent)
+                    intent_document['stdin_lease_reconciliation'] = lease_reconciliation
+                    state['facts']['stdin_lease_reconciled'] = True
                 profile.publish(out / 'rustc-intent-manifest.json',
-                                json.dumps(dict(intent=intent, libtest_intent_candidate=intent_match),
-                                           indent=2) + '\n')
+                                json.dumps(intent_document, indent=2) + '\n')
                 state['facts']['rustc_intent_records'] = intent['counts']['total']
                 state['progress'].append('rustc-intent-parsed-and-matched')
                 additives = _registration_additives(root)
@@ -1834,6 +2273,15 @@ def run(args):
                 profile.publish(out / 'free-space.json', json.dumps(
                     dict(guard=MIN_FREE_BYTES, pre=free_pre, pre_cargo=free_pre_cargo,
                          post=free_post), indent=2) + '\n')
+                rustc_intent_doc = dict(producer=producer, guard=guard,
+                                        capture_dir=capture['path'], manifest=intent,
+                                        libtest_intent_candidate=intent_match,
+                                        instruments_archive=instruments)
+                if leased is not None:
+                    rustc_intent_doc['stdin_lease'] = dict(
+                        helper=dict(leased['helper']), manifest=dict(leased['manifest']),
+                        declared_allocations=sorted(entry[0] for entry in leased['entries']),
+                        reconciliation=lease_reconciliation)
                 result_doc = dict(
                     status='CD01_COMPILE_ONLY_UNQUALIFIED',
                     schema='cd01-compile-only-collector/1',
@@ -1859,10 +2307,7 @@ def run(args):
                     cargo_config_inputs=config_inputs,
                     collector_sha256=collector_sha, helper_sha256=helper_digests,
                     toolchain_observations=toolchain, cargo_artifacts=artifacts_summary,
-                    rustc_intent=dict(producer=producer, guard=guard,
-                                      capture_dir=capture['path'], manifest=intent,
-                                      libtest_intent_candidate=intent_match,
-                                      instruments_archive=instruments),
+                    rustc_intent=rustc_intent_doc,
                     registry_prebind=registry_prebind, registry_postcheck=registry_post,
                     config_discovery_pins=config_pins,
                     cargo_lock_sha256=registry_prebind['cargo_lock_sha256'],
@@ -1896,6 +2341,21 @@ def run(args):
                                     'through child execution and final publication; '
                                     'ordinary-unmount hold only, no sandbox'),
                     retries=0, timeouts=None, global_watchdog=None)
+                if leased is not None:
+                    result_doc['limits']['stdin_lease'] = dict(
+                        scope='declared operator lease selections only; wrapper23 reads '
+                            'descriptor 0 only when its selector byte-equals this '
+                            'invocation; the collector never borrows descriptor 0',
+                        declarations='caller preconditions never established here: finite '
+                            'cooperative single-writer input, producer will close the '
+                            'input fd, persistence authorized',
+                        reconciliation='declared selectors vs actual v2 receipts with byte '
+                            'equality; repeats are distinct record directories; no '
+                            'ordinal, ancestry or unique-process claim',
+                        native_proof='pending; no compiler consumption or outcome observed')
+                # Re-observe all frozen source/artifact pairs immediately before
+                # result publication, still inside evidence/target custody.
+                admission.check()
                 profile.publish(out / 'result.json', json.dumps(result_doc, indent=2) + '\n')
                 state['progress'].append('result-published')
                 free_final = _checked_free_bytes(_free_observation_paths(root, target, out))
@@ -1912,15 +2372,22 @@ def run(args):
 
 
 def _parse_args(argv=None):
-    """Parse the eight required explicit CLI arguments; no silent defaults.
+    """Parse the eight required explicit CLI arguments plus the optional
+    all-or-none stdin-lease group; no silent defaults.
 
     --root snapshot checkout, --output NEW evidence leaf, --target NEW external
     Cargo target, --inventory original snapshot JSON, --rustc-intent-producer
     the reviewed producer source, --rustc-intent-producer-sha256 its expected
     SHA-256, --root-guard the exact root admission guard path and
     --root-guard-sha256 its expected SHA-256 (both pins are technical
-    allocation inputs supplied explicitly, never operator policy). Errors:
-    missing arguments refuse via argparse; path-form problems refuse later in
+    allocation inputs supplied explicitly, never operator policy). The four
+    optional leased-artifact arguments --rustc-stdin-lease-manifest,
+    --rustc-stdin-lease-manifest-sha256, --rustc-custody-helper and
+    --rustc-custody-helper-sha256 are accepted only as a complete group: a
+    partial group refuses here during parsing (argparse exit 2) before any
+    output mutation, and without the group the collector keeps the exact
+    default v1 environment, archives and results. Errors: missing arguments
+    refuse via argparse; path-form and digest problems refuse later in
     _check_paths or the staging and pinning functions. Side effects: none.
     """
     parser = argparse.ArgumentParser(
@@ -1933,7 +2400,19 @@ def _parse_args(argv=None):
     parser.add_argument('--rustc-intent-producer-sha256', required=True)
     parser.add_argument('--root-guard', type=Path, required=True)
     parser.add_argument('--root-guard-sha256', required=True)
-    return parser.parse_args(argv)
+    parser.add_argument('--rustc-stdin-lease-manifest', type=Path, default=None)
+    parser.add_argument('--rustc-stdin-lease-manifest-sha256', default=None)
+    parser.add_argument('--rustc-custody-helper', type=Path, default=None)
+    parser.add_argument('--rustc-custody-helper-sha256', default=None)
+    args = parser.parse_args(argv)
+    lease_group = (args.rustc_stdin_lease_manifest,
+                   args.rustc_stdin_lease_manifest_sha256,
+                   args.rustc_custody_helper, args.rustc_custody_helper_sha256)
+    try:
+        _leased_group_state(args)
+    except ValueError as error:
+        parser.error(str(error))
+    return args
 
 
 def main():

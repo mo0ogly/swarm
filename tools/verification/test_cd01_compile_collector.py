@@ -2,6 +2,9 @@
 import ast
 import errno
 import io
+import stat
+import subprocess
+import sys
 import tomllib
 import copy
 import hashlib
@@ -16,6 +19,7 @@ import unittest
 from unittest import mock
 import cd01_compile_collector as collector
 import cd01_capture_rustc_wrapper as producer
+import finite_input_custody
 
 class CollectorIntegrationGuards(unittest.TestCase):
     def capture(self, root, record):
@@ -461,5 +465,433 @@ class StdinV2ConsumerTests(unittest.TestCase):
             return {'not':'a manifest'}
         self.deny(descriptor,leaf,invalid)
 
+
+class StdinLeaseWiringTests(unittest.TestCase):
+    """Packet24 structural wiring: real byte staging/private module execution, no compiler.
+
+    All fixtures are structural synthetic bytes in retained private TMPDIR
+    directories, labeled synthetic: the collector never borrows descriptor 0,
+    never executes the wrapper, guard, compiler or Cargo, and no native PASS,
+    consumption or compiler outcome is invented. A healthy valid control
+    precedes every injection and fresh recovery follows it.
+    """
+
+    def setUp(self):
+        """Retain one private fixture root and bind the actual reviewed helper."""
+        import finite_input_custody
+        self.custody = finite_input_custody
+        self.root = Path(tempfile.mkdtemp(prefix='lease-wiring-tests-'))
+        (self.root / 'SYNTHETIC-SCOPE.json').write_text(json.dumps({
+            'kind': 'synthetic structural wiring fixtures',
+            'actual': 'byte staging, private module compile, document API, reconciliation',
+            'not_executed': ['dup2', 'guard', 'compiler', 'Cargo', 'provider']}))
+
+    def operator_files(self):
+        """Write fixture operator sources: a reviewed-helper copy and a manifest."""
+        helper_source = self.root / 'operator-custody-helper.py'
+        helper_source.write_bytes(Path(self.custody.__file__).read_bytes())
+        selector = {'compiler_path_hex': b'/owned/compiler'.hex(),
+                    'compiler_arguments_hex': [b'--crate-name'.hex()],
+                    'cwd_hex': b'/owned/cwd'.hex()}
+        document = {'schema': 'cd01.stdin_lease_manifest/1',
+                    'record_kind': 'operator_stdin_lease_manifest',
+                    'leases': [dict(allocation_id='allocated-1', input_fd=0,
+                                    selector=selector,
+                                    declarations={
+                                        'finite_cooperative_single_writer_input': True,
+                                        'producer_will_close_input_fd': True,
+                                        'persistence_authorized': True},
+                                    repeat_policy='repeatable')]}
+        manifest_source = self.root / 'operator-stdin-lease-manifest.json'
+        manifest_source.write_bytes(
+            (json.dumps(document, sort_keys=True) + '\n').encode('utf-8'))
+        helper_source.chmod(0o600)
+        manifest_source.chmod(0o600)
+        return helper_source, manifest_source
+
+    def profile(self):
+        """Return the shared byte-publishing fixture profile; no production claim."""
+        def publish(path, data):
+            """Write only owned fixture bytes; no production publication claim."""
+            path.write_bytes(data.encode() if isinstance(data, str) else data)
+        return types.SimpleNamespace(
+            publish=publish,
+            digest=lambda p: hashlib.sha256(p.read_bytes()).hexdigest())
+
+    def test_cli_group_all_or_none_and_namespace_compatibility(self):
+        """argparse accepts absent/complete group, refuses partial pre-filesystem."""
+        base = ['--root', '/owned-root', '--output', '/owned-out/new', '--target',
+                '/owned-target/new', '--inventory', '/owned-inventory.json',
+                '--rustc-intent-producer', '/owned-producer.py',
+                '--rustc-intent-producer-sha256', '0' * 64,
+                '--root-guard', '/owned-root/tools/verification/cargo_space_guard.py',
+                '--root-guard-sha256', '1' * 64]
+        absent = collector._parse_args(base)
+        self.assertIsNone(absent.rustc_stdin_lease_manifest)
+        self.assertIsNone(absent.rustc_custody_helper_sha256)
+        complete = collector._parse_args(base + [
+            '--rustc-stdin-lease-manifest', '/owned-manifest.json',
+            '--rustc-stdin-lease-manifest-sha256', '2' * 64,
+            '--rustc-custody-helper', '/owned-helper.py',
+            '--rustc-custody-helper-sha256', '3' * 64])
+        self.assertEqual(str(complete.rustc_custody_helper), '/owned-helper.py')
+        self.assertTrue(collector._leased_group_state(complete)[0])
+        stream = io.StringIO()
+        with mock.patch.object(sys, 'stderr', stream):
+            with self.assertRaises(SystemExit) as caught:
+                collector._parse_args(base + ['--rustc-stdin-lease-manifest',
+                                              '/owned-manifest.json'])
+        self.assertEqual(caught.exception.code, 2)
+        self.assertIn('cd01-stdin-lease-group-partial', stream.getvalue())
+        with self.assertRaises(ValueError):
+            collector._leased_group_state(types.SimpleNamespace(
+                rustc_stdin_lease_manifest='/owned-manifest.json'))
+        self.assertFalse(collector._leased_group_state(types.SimpleNamespace())[0])
+        output_probe = self.root / 'output-leaf'
+        observed = subprocess.run(
+            [sys.executable, '-B', str(Path(collector.__file__)),
+             '--root', str(self.root), '--output', str(output_probe),
+             '--target', str(self.root / 'target-leaf'),
+             '--inventory', str(self.root / 'inventory.json'),
+             '--rustc-intent-producer', str(self.root / 'producer.py'),
+             '--rustc-intent-producer-sha256', '0' * 64,
+             '--root-guard', str(self.root / 'guard.py'),
+             '--root-guard-sha256', '1' * 64,
+             '--rustc-stdin-lease-manifest', str(self.root / 'manifest.json')],
+            capture_output=True)
+        self.assertEqual(observed.returncode, 2)
+        self.assertIn(b'cd01-stdin-lease-group-partial', observed.stderr)
+        self.assertFalse(output_probe.exists(), 'partial group mutated the filesystem')
+
+    def test_default_and_leased_child_environments(self):
+        """Default env/declaration unchanged; leased adds exactly the wrapper23 pair."""
+        with mock.patch.dict(collector.os.environ,
+                             {'PATH': '/usr/bin:/bin', 'HOME': '/owned-home'}, clear=True):
+            default_env, default_declaration = collector._child_environment(
+                Path('/owned-target'), Path('/owned-tmp'), Path('/owned-capture'),
+                Path('/owned-guard'), Path('/owned-producer'))
+            leased_env, leased_declaration = collector._child_environment(
+                Path('/owned-target'), Path('/owned-tmp'), Path('/owned-capture'),
+                Path('/owned-guard'), Path('/owned-producer'),
+                lease_manifest_pair=('/owned-out/stdin-lease-manifest.json', 'a' * 64))
+        pair_names = (collector.STDIN_LEASE_MANIFEST_ENV_NAME,
+                      collector.STDIN_LEASE_MANIFEST_SHA256_ENV_NAME)
+        self.assertNotIn(pair_names[0], default_env)
+        self.assertNotIn('operator_stdin_lease_manifest', default_declaration)
+        self.assertEqual(default_env, {name: value for name, value in leased_env.items()
+                                       if name not in pair_names})
+        self.assertEqual(default_declaration['explicit'],
+                         {name: value for name, value in leased_declaration['explicit'].items()
+                          if name not in pair_names})
+        self.assertEqual(leased_env[pair_names[0]], '/owned-out/stdin-lease-manifest.json')
+        self.assertEqual(leased_env[pair_names[1]], 'a' * 64)
+        pair = leased_declaration['operator_stdin_lease_manifest']
+        self.assertEqual(pair['manifest_env'], pair_names[0])
+        self.assertEqual(pair['sha256_env'], pair_names[1])
+
+    def test_staged_copies_module_loader_and_leased_archive(self):
+        """Real bytes stage 0600, load privately, validate manifest, archive extras."""
+        helper_source, manifest_source = self.operator_files()
+        out = self.root / 'out'; out.mkdir(mode=0o700)
+        target = self.root / 'target'; target.mkdir(mode=0o700)
+        profile = self.profile()
+        helper_sha = hashlib.sha256(helper_source.read_bytes()).hexdigest()
+        manifest_sha = hashlib.sha256(manifest_source.read_bytes()).hexdigest()
+        producer_sha = hashlib.sha256(Path(producer.__file__).read_bytes()).hexdigest()
+        producer_stage = collector._stage_rustc_intent_producer(
+            profile, out, target, Path(producer.__file__), producer_sha)
+        helper_stage = collector._stage_leased_artifact(
+            profile, out, target, helper_source, helper_sha,
+            collector.STAGED_CUSTODY_HELPER_NAME)
+        manifest_stage = collector._stage_leased_artifact(
+            profile, out, target, manifest_source, manifest_sha,
+            collector.STAGED_STDIN_LEASE_MANIFEST_NAME)
+        self.assertEqual(stat.S_IMODE(os.stat(helper_stage['path']).st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(os.stat(manifest_stage['path']).st_mode), 0o600)
+        loaded_producer = collector._load_reviewed_module(
+            Path(producer_stage['path']), producer_sha, 'cd01_staged_intent_producer',
+            Path(producer_stage['path']),
+            ('_parse_manifest_document', '_validate_manifest_document'),
+            'rustc-intent-producer')
+        loaded_helper = collector._load_reviewed_module(
+            Path(helper_stage['path']), helper_sha, 'cd01_staged_finite_input_custody',
+            Path(helper_stage['path']), ('validate_staged',), 'rustc-custody-helper')
+        self.assertEqual(loaded_helper.__name__, 'cd01_staged_finite_input_custody')
+        self.assertNotEqual(loaded_helper.__name__, '__main__')
+        self.assertEqual(Path(loaded_helper.__file__), Path(helper_stage['path']))
+        self.assertTrue(callable(loaded_helper.validate_staged))
+        manifest_bytes = collector._read_pinned_buffer(
+            Path(manifest_stage['path']), manifest_sha, 'stdin-lease-manifest')
+        entries = collector._parse_staged_lease_manifest(loaded_producer, manifest_bytes)
+        self.assertEqual(entries[0][0], 'allocated-1')
+        self.assertEqual(entries[0][1], 0)
+        self.assertEqual(entries[0][2][0], b'/owned/compiler')
+        recovery_out = self.root / 'recovery-out'; recovery_out.mkdir(mode=0o700)
+        default_archive = collector._archive_instruments(
+            profile, recovery_out, manifest_source, manifest_source)
+        self.assertEqual(sorted(default_archive['members']),
+                         ['root-guard.py', 'rustc-intent-producer.py'])
+        leased_archive = collector._archive_instruments(
+            profile, out, manifest_source, manifest_source,
+            leased_copies={collector.STAGED_CUSTODY_HELPER_NAME: Path(helper_stage['path']),
+                           collector.STAGED_STDIN_LEASE_MANIFEST_NAME:
+                               Path(manifest_stage['path'])})
+        self.assertEqual(sorted(leased_archive['members']),
+                         ['finite_input_custody.py', 'root-guard.py',
+                          'rustc-intent-producer.py', 'stdin-lease-manifest.json'])
+        self.assertEqual(leased_archive['members'][collector.STAGED_CUSTODY_HELPER_NAME],
+                         helper_sha)
+        self.assertTrue(leased_archive['reread_published'])
+
+    def test_pinned_pair_and_checker_refusals(self):
+        """Reusable pair pins pass healthy, refuse copy/original drift, and recover."""
+        helper_source, _ = self.operator_files()
+        out = self.root / 'out'; out.mkdir(mode=0o700)
+        target = self.root / 'target'; target.mkdir(mode=0o700)
+        profile = self.profile()
+        helper_sha = hashlib.sha256(helper_source.read_bytes()).hexdigest()
+        stage = collector._stage_leased_artifact(profile, out, target, helper_source,
+                                                 helper_sha,
+                                                 collector.STAGED_CUSTODY_HELPER_NAME)
+        collector._require_pinned_pair(stage, 'leased-custody-helper')
+        copy_path = Path(stage['path'])
+        retained = copy_path.read_bytes()
+        copy_path.write_bytes(retained + b'\n')
+        with self.assertRaises(ValueError) as caught:
+            collector._require_pinned_pair(stage, 'leased-custody-helper')
+        self.assertIn('cd01-pinned-pair-copy-drift', str(caught.exception))
+        copy_path.write_bytes(retained)
+        collector._require_pinned_pair(stage, 'leased-custody-helper')
+        helper_source.write_bytes(helper_source.read_bytes() + b'\n')
+        with self.assertRaises(ValueError) as caught:
+            collector._require_pinned_pair(stage, 'leased-custody-helper')
+        self.assertIn('cd01-pinned-pair-original-drift', str(caught.exception))
+        helper_source.write_bytes(retained)
+        collector._require_pinned_pair(stage, 'leased-custody-helper')
+        with self.assertRaises(ValueError) as caught:
+            collector._stage_leased_artifact(profile, out, target, helper_source,
+                                             '0' * 64,
+                                             collector.STAGED_CUSTODY_HELPER_NAME)
+        self.assertIn('cd01-leased-source-bytes-mismatch', str(caught.exception))
+
+    def test_loader_io_close_wrong_api_and_cause_projection(self):
+        """Healthy load control; IO/close/interrupt carriers project without paths."""
+        helper_source, _ = self.operator_files()
+        healthy = collector._load_reviewed_module(
+            helper_source, hashlib.sha256(helper_source.read_bytes()).hexdigest(),
+            'owned_load_control', helper_source, ('validate_staged',),
+            'rustc-custody-helper')
+        self.assertTrue(callable(healthy.validate_staged))
+        wrong_api = self.root / 'wrong-api.py'
+        wrong_api.write_bytes(b'owned_constant = 1\n')
+        wrong_api.chmod(0o600)
+        with self.assertRaises(ValueError) as caught:
+            collector._load_reviewed_module(
+                wrong_api, hashlib.sha256(wrong_api.read_bytes()).hexdigest(),
+                'owned', wrong_api, ('validate_staged',), 'rustc-custody-helper')
+        self.assertIn('cd01-leased-module-api-mismatch', str(caught.exception))
+        real = self.root / 'real.py'
+        real.write_bytes(b'owned_fixture_bytes = b"x"\n')
+        real.chmod(0o600)
+        real_sha = hashlib.sha256(real.read_bytes()).hexdigest()
+        self.assertEqual(collector._read_pinned_buffer(real, real_sha, 'owned-label'),
+                         b'owned_fixture_bytes = b"x"\n')
+        with self.assertRaises(ValueError) as caught:
+            collector._read_pinned_buffer(real, '0' * 64, 'owned-label')
+        self.assertIn('cd01-leased-buffer-bytes-mismatch', str(caught.exception))
+        injected = OSError(errno.EIO, 'owned fixture read failure')
+        with mock.patch.object(collector.os, 'read', side_effect=injected):
+            with self.assertRaises(collector.LeasedArtifactFailure) as caught:
+                collector._read_pinned_buffer(real, real_sha, 'owned-label')
+        self.assertIs(caught.exception.original_exception, injected)
+        tree = collector._error_tree(caught.exception)
+        rendered = json.dumps(tree)
+        self.assertNotIn(str(self.root), rendered)
+        self.assertEqual(tree['leased_artifact']['stage'], 'load')
+        self.assertEqual(tree['leased_artifact']['primary_errno'], errno.EIO)
+        close_error = OSError(errno.EIO, 'owned fixture close failure')
+        with mock.patch.object(collector.os, 'read', side_effect=injected), \
+                mock.patch.object(collector.os, 'close', side_effect=close_error):
+            with self.assertRaises(collector.LeasedArtifactFailure) as caught:
+                collector._read_pinned_buffer(real, real_sha, 'owned-label')
+        self.assertIs(caught.exception.secondary_exceptions[0], close_error)
+        self.assertEqual(collector._error_tree(caught.exception)
+                         ['leased_artifact']['secondary_types'], ['OSError'])
+        with mock.patch.object(collector.os, 'read', side_effect=KeyboardInterrupt()):
+            with self.assertRaises(collector.LeasedArtifactFailure) as caught:
+                collector._read_pinned_buffer(real, real_sha, 'owned-label')
+        self.assertTrue(collector._error_tree(caught.exception)
+                        ['leased_artifact']['interrupted'])
+        self.assertEqual(collector._read_pinned_buffer(real, real_sha, 'owned-label'),
+                         b'owned_fixture_bytes = b"x"\n')
+
+    def test_reconciliation_repeats_missing_foreign_mismatch_and_matching_v1(self):
+        """Real v2/v1 receipts: repeat control, four refusals, fresh recovery control."""
+        def parsed_v2(tag, allocation, arguments):
+            """Build one real parsed v2 receipt through producer and custody helper."""
+            capture = self.root / tag
+            capture.mkdir(mode=0o700)
+            leaf = capture / ('cd01-intent-' + str(os.getpid()) + '-' + os.urandom(16).hex())
+            leaf.mkdir(mode=0o700)
+            custody_dir = leaf / 'stdin-custody'
+            custody_dir.mkdir(mode=0o700)
+            source = self.root / (tag + '-input')
+            source.write_bytes(b'x')
+            source_fd = os.open(source, os.O_RDONLY)
+            try:
+                ready, manifest = self.custody.capture(source_fd, custody_dir, allocation)
+                os.close(ready)
+            finally:
+                os.close(source_fd)
+            raw = producer._render_intent_record(
+                b'/owned/compiler', arguments, b'/owned/guard',
+                {'allocation_id': allocation,
+                 'custody_relative_directory': 'stdin-custody'})
+            (leaf / 'intent.partial').write_bytes(raw)
+            (leaf / 'intent.partial').chmod(0o600)
+            os.link(leaf / 'intent.partial', leaf / 'intent.json')
+            (leaf / 'stdin-transfer.json').write_bytes(
+                producer._render_stdin_transfer_record(allocation, manifest))
+            (leaf / 'stdin-transfer.json').chmod(0o600)
+            descriptor = {'path': str(capture),
+                          'identity': collector._path_identity(capture)}
+            return collector._parse_intent_records(
+                descriptor, custody_validator=self.custody.validate_staged)
+
+        def declared_entries(pairs):
+            """Normalize declared pairs through the actual wrapper23 document API."""
+            leases = [dict(allocation_id=allocation, input_fd=0, selector=selector,
+                           declarations={
+                               'finite_cooperative_single_writer_input': True,
+                               'producer_will_close_input_fd': True,
+                               'persistence_authorized': True},
+                           repeat_policy='repeatable')
+                      for allocation, selector in pairs]
+            return producer._validate_manifest_document(
+                {'schema': 'cd01.stdin_lease_manifest/1',
+                 'record_kind': 'operator_stdin_lease_manifest', 'leases': leases})
+
+        first = parsed_v2('repeat-a', 'allocated-a', [b'--crate-name', b'owned'])
+        record = first['records'][0]
+        selector = {'compiler_path_hex': record['compiler_path_hex'],
+                    'compiler_arguments_hex': record['compiler_arguments_hex'],
+                    'cwd_hex': record['cwd_hex']}
+        second = parsed_v2('repeat-b', 'allocated-a', [b'--crate-name', b'owned'])
+        merged = {'records': first['records'] + second['records']}
+        healthy = collector._reconcile_leased_selectors(
+            declared_entries([('allocated-a', selector)]), merged)
+        self.assertEqual(healthy['observed_v2_records'], 2)
+        repeated = healthy['record_dirs_by_allocation']['allocated-a']
+        self.assertEqual(len(repeated), 2)
+        self.assertNotEqual(repeated[0], repeated[1])
+        missing = declared_entries([
+            ('allocated-a', selector),
+            ('allocated-b', dict(selector,
+                                 compiler_arguments_hex=[b'--crate-name'.hex(),
+                                                         b'other'.hex()]))])
+        with self.assertRaises(ValueError) as caught:
+            collector._reconcile_leased_selectors(missing, merged)
+        self.assertIn('cd01-lease-allocation-unobserved', str(caught.exception))
+        foreign = parsed_v2('foreign', 'allocated-c', [b'--crate-name', b'owned'])
+        with self.assertRaises(ValueError) as caught:
+            collector._reconcile_leased_selectors(
+                declared_entries([('allocated-a', selector)]), foreign)
+        self.assertIn('cd01-lease-record-undeclared', str(caught.exception))
+        mismatched = dict(selector, compiler_arguments_hex=[b'--crate-name'.hex(),
+                                                            b'foreign'.hex()])
+        with self.assertRaises(ValueError) as caught:
+            collector._reconcile_leased_selectors(
+                declared_entries([('allocated-a', mismatched)]), first)
+        self.assertIn('cd01-lease-selector-mismatch', str(caught.exception))
+        v1_capture = self.root / 'v1-matched'
+        v1_capture.mkdir(mode=0o700)
+        v1_leaf = v1_capture / ('cd01-intent-' + str(os.getpid()) + '-' + os.urandom(16).hex())
+        v1_leaf.mkdir(mode=0o700)
+        v1_raw = producer._render_intent_record(b'/owned/compiler',
+                                                [b'--crate-name', b'owned'],
+                                                b'/owned/guard')
+        (v1_leaf / 'intent.partial').write_bytes(v1_raw)
+        (v1_leaf / 'intent.partial').chmod(0o600)
+        os.link(v1_leaf / 'intent.partial', v1_leaf / 'intent.json')
+        v1_parsed = collector._parse_intent_records(
+            {'path': str(v1_capture), 'identity': collector._path_identity(v1_capture)})
+        v1_record = v1_parsed['records'][0]
+        v1_selector = {'compiler_path_hex': v1_record['compiler_path_hex'],
+                       'compiler_arguments_hex': v1_record['compiler_arguments_hex'],
+                       'cwd_hex': v1_record['cwd_hex']}
+        with self.assertRaises(ValueError) as caught:
+            collector._reconcile_leased_selectors(
+                declared_entries([('allocated-a', v1_selector)]), v1_parsed)
+        self.assertIn('cd01-lease-selector-recorded-v1', str(caught.exception))
+        recovered = collector._reconcile_leased_selectors(
+            declared_entries([('allocated-a', selector)]), first)
+        self.assertEqual(recovered['observed_v2_records'], 1)
+
+
+
+    def test_empty_group_values_refuse_instead_of_disabling(self):
+        """Absent/valid control, explicitly empty declarations refuse, fresh recovery."""
+        valid = types.SimpleNamespace(rustc_stdin_lease_manifest='/owned/manifest',
+            rustc_stdin_lease_manifest_sha256='a' * 64,
+            rustc_custody_helper='/owned/helper', rustc_custody_helper_sha256='b' * 64)
+        self.assertTrue(collector._leased_group_state(valid)[0])
+        self.assertFalse(collector._leased_group_state(types.SimpleNamespace())[0])
+        for values in [dict.fromkeys(vars(valid), ''),
+                       dict(vars(valid), rustc_stdin_lease_manifest_sha256='')]:
+            with self.subTest(values=list(values)), self.assertRaises(ValueError):
+                collector._leased_group_state(types.SimpleNamespace(**values))
+        self.assertTrue(collector._leased_group_state(valid)[0])
+
+    def test_source_manifest_privacy_and_helper_readable_mode(self):
+        """Private manifest control, nonprivate refusal, readable helper and recovery."""
+        helper, manifest = self.operator_files()
+        target = self.root / 'target'; target.mkdir(mode=0o700)
+        out = self.root / 'private-control'; out.mkdir(mode=0o700)
+        profile = self.profile()
+        sha = hashlib.sha256(manifest.read_bytes()).hexdigest()
+        collector._stage_leased_artifact(profile, out, target, manifest, sha,
+                                        collector.STAGED_STDIN_LEASE_MANIFEST_NAME)
+        manifest.chmod(0o644)
+        refused = self.root / 'nonprivate'; refused.mkdir(mode=0o700)
+        with self.assertRaises(collector.LeasedArtifactFailure):
+            collector._stage_leased_artifact(profile, refused, target, manifest, sha,
+                                            collector.STAGED_STDIN_LEASE_MANIFEST_NAME)
+        self.assertEqual(list(refused.iterdir()), [])
+        manifest.chmod(0o600)
+        recovery = self.root / 'recovery'; recovery.mkdir(mode=0o700)
+        collector._stage_leased_artifact(profile, recovery, target, manifest, sha,
+                                        collector.STAGED_STDIN_LEASE_MANIFEST_NAME)
+        helper.chmod(0o644)  # Source module may be readable; staged copy is private.
+        result = collector._stage_leased_artifact(profile, recovery, target, helper,
+            hashlib.sha256(helper.read_bytes()).hexdigest(), collector.STAGED_CUSTODY_HELPER_NAME)
+        self.assertEqual(stat.S_IMODE(Path(result['path']).stat().st_mode), 0o600)
+
+    def test_pin_io_and_secondary_errno_reach_safe_terminal(self):
+        """Healthy current pins, missing-original safe diagnostic, cleanup errno, recovery."""
+        helper, _ = self.operator_files()
+        out = self.root / 'out'; out.mkdir(mode=0o700)
+        target = self.root / 'target'; target.mkdir(mode=0o700)
+        profile = self.profile()
+        record = collector._stage_leased_artifact(profile, out, target, helper,
+            hashlib.sha256(helper.read_bytes()).hexdigest(), collector.STAGED_CUSTODY_HELPER_NAME)
+        collector._require_pinned_pair(record, 'leased-custody-helper')
+        moved = helper.with_suffix('.retained')
+        helper.rename(moved)
+        try:
+            with self.assertRaises(collector.LeasedArtifactFailure) as caught:
+                collector._require_pinned_pair(record, 'leased-custody-helper')
+            tree = collector._error_tree(caught.exception)
+            self.assertNotIn(str(self.root), json.dumps(tree))
+            self.assertEqual(tree['leased_artifact']['primary_errno'], errno.ENOENT)
+        finally:
+            moved.rename(helper)
+        primary = OSError(errno.EIO, 'PRIMARY_PRIVATE_TEXT')
+        secondary = OSError(errno.ENOSPC, 'SECONDARY_PRIVATE_TEXT')
+        carrier = collector.LeasedArtifactFailure('cd01-leased-artifact-failed', 'load',
+                                                  primary, (secondary,))
+        tree = collector._error_tree(carrier)
+        self.assertEqual(tree['leased_artifact']['secondary_errno'], [errno.ENOSPC])
+        self.assertNotIn('PRIVATE', json.dumps(tree))
+        collector._require_pinned_pair(record, 'leased-custody-helper')
 
 if __name__=='__main__':unittest.main()
