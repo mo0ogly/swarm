@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "cd01-collector-new-integration-and-error-guards",
+  "inputs": [
+    "tools/verification/cd01_compile_collector.py",
+    "tools/verification/test_cd01_compile_collector.py",
+    "tools/verification/cd01_capture_rustc_wrapper.py",
+    "tools/verification/verify_native_profile.py",
+    "tools/verification/build_storage.py",
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/CD01-COMPILE-COLLECTOR.md",
+    "tools/verification/CD01-COMPILE-COLLECTOR.en.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "fifteen-new-collector-contract-guards",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_cd01_compile_collector.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_real_producer_schema_empty_bytes_and_rejection",
+        "test_run_environment_call_binds_actual_signature",
+        "test_both_config_names_are_pinned",
+        "test_config_permission_error_is_not_absence",
+        "test_relative_path_is_resolved_from_child_cwd",
+        "test_registry_namespace_is_discovered_without_ambiguity",
+        "test_fresh_target_refuses_without_deleting",
+        "test_instrument_staging_archive_and_wrong_pin_refusal",
+        "test_terminal_report_failure_retains_primary_and_numeric_result",
+        "test_postcheck_cached_result_reaches_terminal_consumer",
+        "test_failed_free_observation_keeps_label_and_errno",
+        "test_lock_hash_and_parse_share_the_same_buffer",
+        "test_failed_instrument_archive_keeps_owned_candidate",
+        "test_evidence_mount_comes_from_validated_registration",
+        "test_query_intent_never_becomes_execution_or_libtest_proof",
+        "Ran 15 tests",
+        "OK"
+      ]
+    }
+  ]
+}

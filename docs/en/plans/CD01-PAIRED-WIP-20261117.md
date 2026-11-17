@@ -169,3 +169,16 @@ Sources, docstrings, FR/EN docs and permanent recipe are under `tools/verificati
 Independent reviewer09 received only these bytes/checks. Receipt means intent, outcome UNKNOWN; generic argument privacy, actual chain, Cargo configuration and fullgraph remain unestablished. Root remains owner; other chats wait except this necessary review. Main compile/15body admission/install/main integration stay distinct and unallocated.
 
 Reviewer09 `01a1e9bb-a471-7560-a33e-03be52c8e9bc`: APPROVE_SOURCE_AND_TARGETED_GUARDS_ONLY; RP13-DOC01 fixed in validator docstring only, executable AST unchanged. Separate real inert0/7/0 producer/existingguard-query/ownedreceiver witness observed, argv/PIDs match and seven FD/reserve checks retained; observation review remains distinct. No compiler/Cargo/C-D01body.
+
+
+### Collector14: corrected source, fifteen targeted guards, review pending
+
+GLM14 completed without retry in567.412s (reported125061tokens:15592input,109469output including95985reasoning). Whole response read. Manualdiff was corrupt; drycheck/recount refused. All14oldblocks were uniquely matched to exact65a6base after correcting one documentary context indentation. No uncertain patch executed. Original evidence stays immutable; one maintained canonical collector is `tools/verification/cd01_compile_collector.py`.
+
+Initial8newguards yielded2PASS/2FAIL/4ERROR. Six corrected integration defects cover actualproducer schema/emptyarguments, caller signature, bothconfigs/access errors, relativePATH and registry namespace. Failing guards then passed. The GLM context omitted the fullrenderer; the guard now consumes realproducer output rather than a partial fieldsummary treated as exhaustive.
+
+Inherited errorconsumers were corrected with counterexamples: swallowed stderr, lost statvfscause, and knownchild result lost after nonnativepostcheck plus failed diagnostics. Numeric0/7 in these guards are fixtures, not Cargo executions. Lockhash/parse now share a buffer; archivecandidates survive failures. Mountpath comes from validated persistedstoragepolicy, preserving SWARM/ext4/20GiB constraints. Metadataquery intentions never prove compilation.
+
+Fifteen distinct maintained guards have separate sourcebound results/justifiedreuse; no combined15replay. Five exact intermediate source/test snapshots were reconstructed with hashes matching originalexecutionpins (`RECOVERED-INPUTS.json`), without rewriting history. Future runner now savesinputbytesbeforetesting; that change is staticallyreviewed, not yet observed in use.
+
+FR/ENdocs, permanentrecipe and policy/docstring/errorreview are in `CD01-COMPILE-COLLECTOR[.en].md`, correspondingrecipe and `ROOT-SEMANTIC-REVIEW.json`. Evidence: `root00-cd01-collector14-waja855_` onSWARM. Independent09review requested for exactcandidate. No compiler/Cargo/C-D01body, installation or mainmerge. Future collection remains COMPILE_ONLY_UNQUALIFIED; fullgraph/profile, native/generated/deleted inputs, descendantenv and source/outputbinding stay UNKNOWN before separateadmission.
