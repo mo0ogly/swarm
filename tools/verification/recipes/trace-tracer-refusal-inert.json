@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "tracer-refusal-diagnostic-error-carrier",
+  "inputs": [
+    "tools/verification/trace_tracer_refusal_witness.py",
+    "tools/verification/test_trace_tracer_refusal_witness.py",
+    "tools/verification/trace_process_witness.py",
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/TRACE-TRACER-REFUSAL.md",
+    "tools/verification/TRACE-TRACER-REFUSAL.en.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "later-hash-error-retains-earlier-tracer-refusal",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_trace_tracer_refusal_witness.py",
+        "RefusalDiagnosticGuard.test_later_hash_failure_retains_earlier_numeric_refusal"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_later_hash_failure_retains_earlier_numeric_refusal",
+        "Ran 1 test",
+        "OK"
+      ]
+    },
+    {
+      "id": "later-interruption-retains-earlier-tracer-refusal",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_trace_tracer_refusal_witness.py",
+        "RefusalDiagnosticGuard.test_later_interrupt_retains_earlier_numeric_refusal"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_later_interrupt_retains_earlier_numeric_refusal",
+        "Ran 1 test",
+        "OK"
+      ]
+    }
+  ]
+}
