@@ -5,6 +5,9 @@
     "rust/Cargo.toml",
     "rust/Cargo.lock",
     ".cargo/config.toml",
+    "tests/fixture_area.py",
+    "tools/verification/cargo_space_guard.py",
+    ".cargo/storage-policy.json",
     "rust/crates/swarm-enrollment-authority/**/*",
     "rust/crates/swarm-enrollment-state/**/*",
     "rust/crates/swarm-identity-contract/**/*",
@@ -12,7 +15,8 @@
     "rust/crates/swarm-engine/**/*",
     "tools/verification/recipe.py",
     "tools/verification/recipes/paea-owned-source-acquisition.json",
-    "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen/result.json",
+    "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b/result.json",
+    "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-writer78b-regen-20261031b/**/owned-root-*.json",
     "docs/plans/actions-confiance/paea/evidence/claude-tmp-fix-e2e-20261031T173021Z/source-fixture-current-pub-regen-20261031/result.json"
   ],
   "environment": {
@@ -47,7 +51,7 @@
       "required_stdout": [
         "test promote_call_current_authority_commits_once_and_records_effect ... ok",
         "test promote_call_replays_recorded_effect_and_reconciles ... ok",
-        "test promote_call_reconcile_before_commit_reports_not_committed ... ok",
+        "test promote_call_reconcile_before_commit_observes_ref_without_history ... ok",
         "test promote_call_refuses_mandate_revoked_after_agreement_then_readmits_once ... ok",
         "test promote_call_refuses_other_service_root_without_effect ... ok",
         "5 passed; 0 failed"

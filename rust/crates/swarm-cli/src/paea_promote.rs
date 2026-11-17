@@ -4,7 +4,10 @@
 //! the private stdin frame then supplies the protected declaration pin and
 //! personal password. Operation is an explicit argument: Commit performs one
 //! OLD-fenced reference transaction after a durable intent reservation
-//! (recoverable through Reconcile), Reconcile is a pure journal read. No
+//! (recoverable through Reconcile), Reconcile is a pure journal read plus one
+//! read-only current direct-ref observation that never publishes, reserves or
+//! writes the journal; a missing effect row never proves an absent past
+//! effect. No
 //! auto-grant, UID separation or independent review exists here; the prepared
 //! permission is provisioned out of band, never issued by this process.
 use super::{personal_secret_frame, Arguments, CliError};
@@ -237,8 +240,13 @@ fn run(
         Err(primary) => return Err(failed(Ok(()), Ok(()), primary, closes)),
     };
     // Recorded means a durable effect row exists for this exact canonical
-    // intent (replayed=true performed no new publication); ReconciledNotCommitted
-    // is the explicit negative reconciliation, never an empty success.
+    // intent (replayed=true performed no new publication). Reconciled is the
+    // explicit reconciliation observation: the historical journal effect (if
+    // any) plus the actual current direct Git ref; observed_oid is null only
+    // when Git successfully listed no exact direct ref. Never an absence
+    // claim, a negative result, an empty success or a grant.
+    // FR : la réconciliation retourne l'effet journalisé historique et l'oid
+    // Git direct actuel ; l'absence de ligne ne prouve jamais l'absence d'effet.
     let outcome = match &result {
         swarm_engine::PaeaGitPromoteOutcome::Recorded {
             intent_id,
@@ -256,15 +264,19 @@ fn run(
             "new_oid":new_oid,
             "replayed":replayed
         }),
-        swarm_engine::PaeaGitPromoteOutcome::ReconciledNotCommitted {
+        swarm_engine::PaeaGitPromoteOutcome::Reconciled {
             intent_id,
             target_ref,
+            observed_oid,
+            recorded_effect,
         } => serde_json::json!({
             "schema_version":1,
             "event":"paea-promote-result",
-            "outcome":"reconciled_not_committed",
+            "outcome":"reconciled",
             "intent_id":intent_id,
-            "target_ref":target_ref
+            "target_ref":target_ref,
+            "observed_oid":observed_oid,
+            "recorded_effect":recorded_effect
         }),
     };
     let written = line(out, &outcome).map_err(|cause| {

@@ -67,7 +67,8 @@ pub struct PaeaGitCallSource {
 enum Prepared {
     /// Pack import observation (one-shot transfer job, no ref effect).
     Transfer(swarm_engine::PaeaGitTransferCall),
-    /// Promotion with OLD-fenced commit or the explicit negative outcome.
+    /// Promotion with OLD-fenced commit or the explicit reconciliation
+    /// observation (historical journal effect plus current direct Git ref).
     Promote(swarm_engine::PaeaGitPromoteCall),
 }
 impl PaeaGitCallSource {
@@ -313,7 +314,8 @@ impl std::error::Error for PaeaGitCallSourceError {
 /// Join one promote reply with a root close. When the close fails after a
 /// known engine outcome, the outcome is retained in a typed observation
 /// envelope error before the generic close, so a recorded/replayed
-/// publication is never erased by an independent cleanup refusal. Every other
+/// publication or a reconciliation observation is never erased by an
+/// independent cleanup refusal. Every other
 /// shape reuses the existing generic close unchanged; no service-level state
 /// is consulted and no cause is suppressed.
 fn close_known(
@@ -476,14 +478,21 @@ impl PaeaGitCallAuthority {
         // refusal — the browser provides neither authority nor a replacement
         // action, and no fallback grants the call without a real agreement.
         // This precedes any root open and never substitutes the engine-side
-        // authority, witness, plan and policy checks that follow.
-        if self.source.agreement(raw)?.is_none() {
+        // authority, witness, plan and policy checks that follow, which are
+        // retained for both operations. The gate covers the Commit operation
+        // only: a prepared Reconcile consumes no agreement, reads the journal
+        // and the current direct ref, and never publishes, reserves or writes.
+        if self.source.request().operation()
+            == swarm_enrollment_authority::paea_action::Operation::Commit
+            && self.source.agreement(raw)?.is_none()
+        {
             return Err(E::Refused("paea-git-call-agreement"));
         }
         let service = RootStore::open(&self.source.service_path, true)
             .map_err(|cause| root("paea-git-call-open", cause))?;
         // Retain the exact engine outcome of the promote call so a later root
-        // close failure cannot erase a known recorded/replayed observation.
+        // close failure cannot erase a known recorded/replayed/reconciled
+        // observation.
         let mut promote_outcome: Option<swarm_engine::PaeaGitPromoteOutcome> = None;
         let result = (|| {
             let project = RootStore::open(&self.source.project_path, true)
@@ -553,18 +562,28 @@ impl PaeaGitCallAuthority {
                                 "new_oid":new_oid,
                                 "replayed":replayed,
                             }),
-                            // The explicit negative reconciliation is a
-                            // structured outcome, never an empty success.
-                            swarm_engine::PaeaGitPromoteOutcome::ReconciledNotCommitted {
+                            // The explicit reconciliation observation is a
+                            // structured outcome, never an empty success, a
+                            // negative result or an absence claim: it carries
+                            // the historical journal effect (if any) and the
+                            // actual current direct Git ref (null only when
+                            // Git successfully listed no exact direct ref).
+                            // FR : observation de réconciliation ; l'oid
+                            // observé n'impute jamais la cause à l'intention.
+                            swarm_engine::PaeaGitPromoteOutcome::Reconciled {
                                 intent_id,
                                 target_ref,
+                                observed_oid,
+                                recorded_effect,
                             } => serde_json::json!({
                                 "schema_version":1,
                                 "event":"paea-git-call-result",
                                 "call":"promote",
-                                "outcome":"reconciled_not_committed",
+                                "outcome":"reconciled",
                                 "intent_id":intent_id,
                                 "target_ref":target_ref,
+                                "observed_oid":observed_oid,
+                                "recorded_effect":recorded_effect,
                             }),
                         })
                     }

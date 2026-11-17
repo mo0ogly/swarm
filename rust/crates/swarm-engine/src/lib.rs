@@ -354,7 +354,7 @@ pub use root_store::{PaeaGitTransferCall, PaeaGitTransferCallError, PaeaGitTrans
 pub use root_store::{PaeaGitAgreementMatch, PaeaGitAgreementTerms};
 #[cfg(target_os = "linux")]
 pub use root_store::{
-    PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt,
+    PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt, PaeaGitPromoteReconciledEffect,
 };
 #[cfg(unix)]
 pub use root_store::ReaderVerdict;

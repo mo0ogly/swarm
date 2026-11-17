@@ -89,8 +89,8 @@ write, newline and flush under separate safe stage codes. Authority close keeps
 the original personal/business envelope beside the known result and other close
 causes. CLI and HTTP JSON failures separately expose `paea_git_effect.state` as
 `recorded` or `unknown`. A pre-effect authority refusal does not establish absence
-of historical effects for the intention; legacy empty-journal observations also
-project as unknown. CLI text includes `effect_state` beside the safe failure code.
+of historical effects for the intention; reconciliation without an effect row also
+keeps history unknown. CLI text includes `effect_state` beside the safe failure code.
 Projection guards exercise the real in-memory response producers, not network
 delivery, a Git effect or local installation. Text normalization runs in the
 renderer after traversing cleanup wrappers, keeping safe cause codes visible in
@@ -98,6 +98,33 @@ both CLI languages without private nested messages.
 
 The [article v6 workstream](plans/actions-confiance/ARTICLE-V6-ADAPTATION.md)
 retains the candidate, reproducer and checks. Source changes establish neither
-installation nor universal PV2. Reference observation during Reconcile and an
-authority lease remain separate steps; a missing journal row still proves no
+installation nor universal PV2. Reference observation during Reconcile is integrated as a source candidate,
+without native validation yet; the authority lease remains unimplemented; a missing journal row still proves no
 absence of Git effects. Oracle attribution must distinguish intention and attempt.
+
+
+## Git reconciliation: history and current reference
+
+The Rust candidate's `Reconciled` result carries `intent_id`, `target_ref`,
+`observed_oid` and optional `recorded_effect` (historical action digest, ref and
+OID). A validated journal row remains historical if the ref moves or disappears.
+A current candidate-valued ref never attributes its publication to this intention.
+Without an effect row, history stays unknown regardless of OLD/candidate values.
+
+Reconcile opens the physically bound repository, compares its identity with the
+prepared action, and reads the exact ref using the existing hardened Git runner
+(a quiet, non-recursive `symbolic-ref` kind probe, then `for-each-ref`).
+The documented exit 1 means non-symbolic and permits the listing; other errors
+retain their typed causes. Dangling symbolic refs are rejected too. The journal
+and Git observations are separate reads, not an atomic cross-store snapshot. Null means a successful listing without that ref. Symbolic refs,
+malformed output and process failures remain typed errors. A failure after the
+journal read retains any known historical effect and original causes, without a
+fabricated Git observation. Cleanup preserves independent failures and observations.
+
+The operation publishes nothing, reserves no intention and never writes the journal.
+The web captured-agreement gate applies to Commit; Reconcile retains permission,
+plan, policy and physical witness checks without requiring a new Commit agreement.
+CLI/HTTP expose `outcome: reconciled`, optional historical effect and observed ref.
+Consumers of the previous negative result must adapt to this changed shape.
+No renewed publication authority or installation follows. Component checks and
+the native public recipe remain separate evidence.

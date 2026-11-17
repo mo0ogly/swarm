@@ -111,7 +111,7 @@ pub use paea_git_agreement::{PaeaGitAgreementMatch, PaeaGitAgreementTerms};
 mod paea_git_promote_call;
 #[cfg(target_os = "linux")]
 pub use paea_git_promote_call::{
-    PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt,
+    PaeaGitPromoteCall, PaeaGitPromoteCallError, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt, PaeaGitPromoteReconciledEffect,
 };
 #[cfg(target_os = "linux")]
 mod paea_effect_reconcile;

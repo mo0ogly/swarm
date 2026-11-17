@@ -20,8 +20,8 @@ fermeture de l’autorité conserve aussi l’enveloppe personnelle/métier comp
 avec le résultat connu et les autres causes de fermeture. Les erreurs JSON CLI
 et HTTP exposent séparément `paea_git_effect.state`, avec les valeurs `recorded`
 ou `unknown`. Un refus d’autorité avant un nouvel engagement laisse l’histoire
-de l’intention inconnue ; il ne prouve pas son absence d’effet antérieur. Un
-ancien résultat de journal sans ligne d’effet est projeté comme inconnu. Les
+de l’intention inconnue ; il ne prouve pas son absence d’effet antérieur. Une
+réconciliation sans ligne d’effet conserve un historique inconnu. Les
 diagnostics texte CLI exposent aussi `effect_state`, sans masquer la cause.
 Cette normalisation intervient dans le renderer après parcours des wrappers de
 fermeture ; les codes sûrs des causes restent visibles en français et en anglais,
@@ -31,8 +31,8 @@ ils ne prouvent pas la transmission réseau, l’effet Git ni l’installation.
 
 Le [lot article v6](../plans/actions-confiance/ARTICLE-V6-ADAPTATION.md) conserve
 le candidat, la reproduction et les contrôles. Ce changement de source ne prouve
-ni installation, ni conformité globale PV2. La lecture de référence par Reconcile
-et le bail d’autorité restent des étapes distinctes de ce lot ; l’absence de ligne
+ni installation, ni conformité globale PV2. La lecture de référence par Reconcile est intégrée comme candidat source,
+sans validation native à ce stade. Le bail reste à réaliser ; l’absence de ligne
 dans le journal n’établit toujours pas l’absence d’effet Git. L’identification
 d’une intention versus d’une tentative doit rester explicite lors de l’oracle.
 
@@ -113,3 +113,33 @@ interprétation de présentation côté navigateur, sans changement producteur n
 serveur ; elle ne qualifie aucune installation ni acceptation globale.
 
 Qualification locale : recette permanente `tools/verification/recipes/paea-approval-state-fail-closed.json` — `python3 tools/verification/recipe.py run --recipe tools/verification/recipes/paea-approval-state-fail-closed.json --output FRESH`, puis `python3 tools/verification/recipe.py verify --evidence FRESH` sur ce même répertoire FRESH produit par la recette (manifeste d’exécution, entrées et sorties brutes conservés dans FRESH) ; 36 contrôles nommés FR/EN attendus, 0 diagnostic. Le navigateur crée séparément son propre TMPDIR privé, frais, imprimé dans la sortie d’étape ; `verify` ne consomme pas ce TMPDIR. Périmètre de preuve : API synthétique et scripts Chrome réels pilotés par gestes DOM ; aucune vérification du service des ressources par l’ELF normal, du pointeur physique ou de la disposition de l’interface n’est revendiquée, et cette preuve ne qualifie ni installation ni acceptation globale.
+
+## Réconciliation Git : histoire et référence observée
+
+Le candidat Rust `Reconciled` retourne `intent_id`, `target_ref`,
+`observed_oid` et `recorded_effect`. Ce dernier contient l’action, la référence
+et l’OID historiquement journalisés, lorsqu’un effet durable validé existe.
+Il reste historique si la référence a depuis changé ou disparu. Une référence
+actuellement au candidat ne permet jamais d’attribuer sa publication à cette intention.
+Sans ligne d’effet, l’histoire reste inconnue même si Git retourne OLD ou le candidat.
+
+Reconcile ouvre le dépôt lié aux témoins physiques et compare son identité à
+l’action préparée, puis lit la référence exacte par le runner Git durci existant
+(`symbolic-ref` silencieux et non récursif, puis `for-each-ref`). Le code
+de sortie 1 documenté indique une référence non symbolique et autorise la lecture ;
+les autres erreurs conservent leurs causes typées. Une référence symbolique pendante
+est également refusée. Le journal et Git sont des lectures distinctes, sans instantané
+atomique entre les deux stockages. `observed_oid: null` désigne une lecture réussie sans cette
+référence ; une référence symbolique, une sortie malformée ou une erreur de
+processus reste une erreur typée. Une erreur après lecture du journal conserve
+le résultat historique connu et les causes originales, sans observation Git fabriquée.
+La libération des ressources conserve les observations et les erreurs indépendantes.
+
+Cette opération ne lance aucune publication, ne réserve pas d’intention et
+n’écrit pas le journal. Le transport web exige l’accord capturé pour Commit ;
+Reconcile conserve les contrôles de permission, plan, politique et témoins,
+sans exiger un nouvel accord Commit. Les sorties CLI et HTTP distinguent
+`outcome: reconciled`, l’effet historique optionnel et la référence observée.
+Leur forme change : les consommateurs de l’ancien résultat négatif doivent
+être adaptés. Aucun droit de nouvelle publication ni installation n’en découle.
+Les contrôles composants et la recette native restent des preuves distinctes.

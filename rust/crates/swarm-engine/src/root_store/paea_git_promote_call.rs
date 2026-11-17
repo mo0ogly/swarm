@@ -34,9 +34,11 @@ pub enum PaeaGitPromoteCallError {
     Authority(Use<PaeaGitPromoteOutcome, R>),
     Action(R),
     /// Typed effect observation envelope: the guarded operation reached the
-    /// backend, so `outcome` retains the known recorded/replayed or reconciled
-    /// result, or is `None` when the publication may have happened without an
-    /// observable durable outcome. `None` is an explicit unknown, never an
+    /// backend, so `outcome` retains the known recorded/replayed result, the
+    /// known reconciliation observation, or is `None` when the publication
+    /// may have happened without an observable durable outcome, or when a
+    /// reconciliation failed after observing no journal record. `None` is an
+    /// explicit unknown, never an
     /// absence claim, a success or a retry authorization. `cause` is the
     /// independent typed primary failure; independent cleanup errors stay
     /// nested in the existing `RootStoreError::Cleanup` shape. Display stays
@@ -79,7 +81,7 @@ impl PaeaGitPromoteCallError {
             _ => self.action().and_then(|a| a.as_ref().err()),
         }
     }
-    /// Known recorded/replayed or negative reconciliation outcome despite a
+    /// Known recorded/replayed result or reconciliation observation despite a
     /// later failure, retained directly on the effect envelope or found
     /// through nested callback cleanup/launch/box wrappers. Availability never
     /// restores expired/revoked authority.
@@ -101,10 +103,16 @@ impl PaeaGitPromoteCallError {
     /// Business-intention observation for a failed call, independently of its
     /// authority decision. Only a retained durable record establishes recorded;
     /// a pre-effect refusal or empty journal does not establish historical absence.
+    /// A reconciliation observation counts as recorded only when it carries the
+    /// retained journal record; an observed ref value never establishes it alone.
     /// This pure projection performs no IO and grants no retry or authority.
     pub fn effect_status(&self) -> &'static str {
         match self.known_outcome() {
             Some(PaeaGitPromoteOutcome::Recorded { .. }) => "recorded",
+            Some(PaeaGitPromoteOutcome::Reconciled {
+                recorded_effect: Some(_),
+                ..
+            }) => "recorded",
             _ => "unknown",
         }
     }
@@ -123,9 +131,23 @@ impl PaeaGitPromoteCallError {
                 "action_digest":action_digest, "target_ref":target_ref,
                 "new_oid":new_oid, "replayed":replayed,
             }),
-            Some(PaeaGitPromoteOutcome::ReconciledNotCommitted { intent_id, target_ref }) =>
-                serde_json::json!({"state":"unknown", "intent_id":intent_id,
-                    "target_ref":target_ref, "journal_state":"no_effect_row"}),
+            Some(PaeaGitPromoteOutcome::Reconciled {
+                intent_id, target_ref, observed_oid, recorded_effect,
+            }) => match recorded_effect {
+                // Recorded only through the retained journal row; the observed
+                // ref value never establishes the record by itself.
+                Some(effect) => serde_json::json!({
+                    "state":"recorded", "intent_id":intent_id,
+                    "action_digest":effect.action_digest, "target_ref":target_ref,
+                    "new_oid":effect.new_oid,
+                    "observed_oid":observed_oid,
+                }),
+                // No effect row never proves no past effect: the observation
+                // stays explicitly unknown beside the successful ref reading.
+                None => serde_json::json!({"state":"unknown", "intent_id":intent_id,
+                    "target_ref":target_ref, "observed_oid":observed_oid,
+                    "journal_state":"no_effect_row"}),
+            },
             None => serde_json::json!({"state":"unknown"}),
         }
     }
@@ -223,7 +245,7 @@ impl Error for PaeaGitPromoteCallError {
         self.branches().into_iter().next()
     }
 }
-/// Known recorded/replayed or negative reconciliation state. Replayed never
+/// Known recorded/replayed or reconciliation observation state. Replayed never
 /// denotes a new reference publication by this call.
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub enum PaeaGitPromoteOutcome {
@@ -236,13 +258,44 @@ pub enum PaeaGitPromoteOutcome {
         new_oid: String,
         replayed: bool,
     },
-    /// Under the fenced journal read, no durable effect row exists for this
-    /// canonical intent. This is an explicit reconciliation result, not an
-    /// empty success, a ref observation or a grant.
-    ReconciledNotCommitted {
+    /// Explicit reconciliation observation for one canonical intent: BOTH the
+    /// historical durable journal effect and the actual current direct Git
+    /// reference value, read without any publication, reservation, journal
+    /// write or captured agreement. `observed_oid` is `Some` only when Git
+    /// successfully listed the exact direct reference (a symbolic ref refuses) and `None` only when Git successfully listed no exact
+    /// ref; a failed read never becomes `None` and stays in the typed effect
+    /// envelope beside any journal record. An `observed_oid` equal to the
+    /// candidate never proves this intent caused it, a `recorded_effect` stays
+    /// historical even if the ref later moved or was deleted, and a missing
+    /// effect row never proves that no past effect exists. Never an empty
+    /// success, a negative result, an absence claim or a grant.
+    ///
+    /// FR : la réconciliation retourne l'effet journalisé historique et l'oid
+    /// Git direct actuellement observé, sans publier, réserver ni écrire le
+    /// journal ; l'absence de ligne d'effet ne prouve jamais l'absence d'un
+    /// effet passé, et l'oid observé n'impute jamais la cause à cette
+    /// intention.
+    Reconciled {
         intent_id: String,
         target_ref: String,
+        observed_oid: Option<String>,
+        recorded_effect: Option<PaeaGitPromoteReconciledEffect>,
     },
+}
+
+/// Flat, nonrecursive projection of the historical durable effect row carried
+/// by a reconciliation observation. It never nests a full outcome, never
+/// describes the current reference state and never claims that the recorded
+/// effect caused any observed ref value.
+///
+/// FR : projection plate de l'effet historique enregistré ; elle ne décrit
+/// jamais l'état actuel de la référence et n'impute jamais la cause d'un oid
+/// observé.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct PaeaGitPromoteReconciledEffect {
+    pub action_digest: String,
+    pub target_ref: String,
+    pub new_oid: String,
 }
 /// Frozen observation of one completed reference publication. Object IDs
 /// describe the actual observed reference state at recording time; they prove
@@ -531,8 +584,13 @@ impl RootStore {
     /// project Trust reservation. Commit performs one exact reference
     /// transaction with OLD fencing after reserving the durable intent; a
     /// commit error is uncertain and requires explicit reconciliation.
-    /// Reconcile reads the durable journal state without any new publication or
-    /// Git process. Authority AfterUse, policy and backend causes remain typed
+    /// Reconcile reads the durable journal state and the actual current direct
+    /// Git reference (one read-only `for-each-ref` under the existing hardened
+    /// runner, with explicit `%(symref)` validation) without any new
+    /// publication, reservation, journal write or captured agreement. A failed
+    /// ref read keeps its original cause and any journal record in the typed
+    /// effect envelope; it never becomes a synthesized result with a fake
+    /// observed `None`. Authority AfterUse, policy and backend causes remain typed
     /// and independently traversable; no retry or fallback runs. The caller
     /// closes both opened Roots afterwards.
     pub fn call_paea_git_promote(
@@ -602,7 +660,7 @@ impl RootStore {
                                 // underlying mandate or a superseded approval
                                 // after the captured lookup is the same typed
                                 // refusal; Reconcile observes the journal and
-                                // needs no agreement.
+                                // the current direct ref and needs no agreement.
                                 if project
                                     .paea_git_agreement_match(prepared.canonical.bytes())?
                                     .is_none()
@@ -611,7 +669,7 @@ impl RootStore {
                                 }
                                 effect::commit(self, project, prepared, identity)
                             }
-                            Operation::Reconcile => effect::reconcile(self, prepared),
+                            Operation::Reconcile => effect::reconcile(self, project, prepared),
                         }
                     })();
                     match trust.close() {
@@ -816,7 +874,10 @@ mod policy {
 }
 /// Durable intent, reference transaction and recorded effect storage.
 mod effect {
-    use super::{meta, rollback, PaeaGitPromoteOutcome, PaeaGitPromoteReceipt, R, RootStore};
+    use super::{
+        meta, rollback, PaeaGitPromoteOutcome, PaeaGitPromoteReconciledEffect, PaeaGitPromoteReceipt,
+        R, RootStore,
+    };
     use rusqlite::{params, Transaction, TransactionBehavior};
     use std::{cell::Cell, error::Error};
     use swarm_enrollment_authority::paea_action::Identity;
@@ -1251,21 +1312,171 @@ mod effect {
             Err(cause) => observed_unknown(cause, closed),
         }
     }
-    /// Reconciliation: read the durable journal state without any new
-    /// publication or Git process. Missing intent or absent effect is an
-    /// explicit negative result; a stored effect replays its observation.
+    /// Join a reconcile journal observation with a later failure. Any journal
+    /// known record survives in the typed effect envelope beside the original
+    /// cause (an independent close failure is joined below it); a failed read
+    /// never becomes an observed `None` and no reconcile result is synthesized.
+    pub(super) fn reconcile_failure(
+        journal: Option<PaeaGitPromoteOutcome>,
+        cause: R,
+        cleanup: Result<(), R>,
+    ) -> Result<PaeaGitPromoteOutcome, R> {
+        let cause = match cleanup {
+            Ok(()) => cause,
+            Err(cleanup) => R::Cleanup {
+                primary: Some(Box::new(cause)),
+                cleanup: Box::new(cleanup),
+            },
+        };
+        Err(R::PaeaGitPromoteCall(Box::new(
+            super::PaeaGitPromoteCallError::Effect {
+                outcome: journal,
+                cause,
+            },
+        )))
+    }
+    /// Full lowercase-hex SHA1/SHA256 object id, mirroring the established
+    /// 40/64-hex Git object representation validated across this crate.
+    /// Shortened, uppercase or non-hex values refuse instead of being observed.
+    fn full_oid(oid: &str) -> bool {
+        matches!(oid.len(), 40 | 64)
+            && oid
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    }
+    /// Parse the fixed `for-each-ref --format=%(refname) %(objectname)
+    /// %(symref)` output into the exact direct-ref observation for
+    /// `target_ref`. Only a line whose refname equals `target_ref` exactly
+    /// counts (prefix results, such as slash-children matched by the same
+    /// pattern, are not equivalent); a non-empty `%(symref)` field marks a
+    /// symbolic ref, which is rejected rather than represented as an absent direct ref. `Ok(None)` means Git successfully listed no exact direct
+    /// ref; malformed lines, extra fields and non-full lowercase-hex object
+    /// ids refuse instead of becoming observed values or silent `None`s.
+    pub(super) fn parse_exact_direct_ref(
+        raw: &[u8],
+        target_ref: &str,
+    ) -> Result<Option<String>, R> {
+        let text = std::str::from_utf8(raw).map_err(|cause| {
+            R::Launch(Box::new(crate::AgentLaunchError::caused(
+                "paea-git-promote-ref-encoding", cause,
+            )))
+        })?;
+        let mut exact = None;
+        for line in text.lines() {
+            let mut parts = line.split_whitespace();
+            let name = parts.next().ok_or(R::Refused("paea-git-promote-ref-malformed"))?;
+            let oid = parts.next().ok_or(R::Refused("paea-git-promote-ref-malformed"))?;
+            let symref = parts.next();
+            if parts.next().is_some() || !name.starts_with("refs/") {
+                return Err(R::Refused("paea-git-promote-ref-malformed"));
+            }
+            if !full_oid(oid) {
+                return Err(R::Refused("paea-git-promote-ref-oid"));
+            }
+            if name != target_ref { continue; }
+            if exact.is_some() {
+                return Err(R::Refused("paea-git-promote-ref-duplicate"));
+            }
+            if symref.is_some() {
+                return Err(R::Refused("paea-git-promote-ref-symbolic"));
+            }
+            exact = Some(oid.to_owned());
+        }
+        Ok(exact)
+    }
+    /// Read the exact current direct reference with the existing hardened Git
+    /// runner and saved per-command policy. A quiet symbolic-ref kind query
+    /// rejects symbolic refs, including dangling refs omitted by for-each-ref.
+    /// Its documented exit 1 permits the listing, not an absence conclusion.
+    /// No update or journal IO occurs.
+    /// Success with None means a successful listing without the exact ref;
+    /// symbolic/malformed refs and process errors retain typed failures.
+    /// The caller owns and retains the descriptor-backed directory lifetime.
+    pub(super) fn read_current_ref(
+        destination: &std::path::Path,
+        target_ref: &str,
+        settings: &crate::EngineSettingsDocument,
+    ) -> Result<Option<String>, R> {
+        // for-each-ref may omit dangling symbolic refs. Query their kind first;
+        // Git's documented quiet exit 1 means non-symbolic, not absent. Only
+        // that exact completed command result permits the subsequent listing.
+        // All other process/settings/deadline failures retain their causes.
+        // https://git-scm.com/docs/git-symbolic-ref#_notes
+        match crate::managed_repository::git(
+            destination,
+            &["--git-dir", ".", "symbolic-ref", "--quiet", "--no-recurse", target_ref],
+            settings,
+        ) {
+            Ok(_) => return Err(R::Refused("paea-git-promote-ref-symbolic")),
+            Err(cause) => {
+                let non_symbolic = match &cause {
+                    crate::AgentLaunchError::Cause { code: "managed-git-command", cause } =>
+                        matches!(cause.downcast_ref::<crate::GitReportError>(),
+                            Some(crate::GitReportError::Command { exit_code: Some(1), timed_out: false, .. })),
+                    _ => false,
+                };
+                if !non_symbolic {
+                    return Err(R::Launch(Box::new(crate::AgentLaunchError::caused(
+                        "paea-git-promote-ref-kind", cause,
+                    ))));
+                }
+            }
+        }
+        crate::managed_repository::git(
+            destination,
+            &[
+                "--git-dir",
+                ".",
+                "for-each-ref",
+                "--format=%(refname) %(objectname) %(symref)",
+                "--",
+                target_ref,
+            ],
+            settings,
+        )
+        .map_err(|e| {
+            R::Launch(Box::new(crate::AgentLaunchError::caused(
+                "paea-git-promote-ref-read",
+                e,
+            )))
+        })
+        .and_then(|raw| {
+            parse_exact_direct_ref(&raw, target_ref).map_err(|e| {
+                R::Launch(Box::new(crate::AgentLaunchError::caused(
+                    "paea-git-promote-ref-parse",
+                    e,
+                )))
+            })
+        })
+    }
+    /// Reconciliation: read the durable journal state and the actual current
+    /// direct Git reference without any new publication, reservation or
+    /// journal write. A stored effect replays its historical observation and
+    /// stays historical even when the ref has since moved or been deleted; a
+    /// missing effect row never proves an absent past effect. The ref is read
+    /// with the existing hardened runner (`for-each-ref` with explicit
+    /// `%(symref)` validation, so a symbolic ref is never treated as direct);
+    /// `observed_oid` is `None` only when Git successfully lists no exact
+    /// direct ref. Any later failure keeps its original cause in the typed
+    /// effect envelope beside any journal record and never becomes a
+    /// synthesized reconcile result with a fake observed `None`.
+    ///
+    /// FR : la réconciliation lit le journal durable et la référence Git
+    /// directe actuelle sans publier, réserver ni écrire le journal ; un
+    /// échec de lecture conserve sa cause et ne devient jamais un résultat
+    /// fabriqué avec un `None` observé.
     pub(super) fn reconcile(
         service: &RootStore,
+        project: &RootStore,
         prepared: &super::PaeaGitPromoteCall,
     ) -> Result<PaeaGitPromoteOutcome, R> {
         let Action::Git { target_ref, .. } = &prepared.proposal.action else {
             return Err(R::Refused("paea-git-promote-git-required"));
         };
-        let (project, pin) = meta(&service.db)?;
+        let (_, pin) = meta(&service.db)?;
         if pin != prepared.pin {
             return Err(R::Refused("paea-git-promote-project-pin"));
         }
-        let _ = project;
         let intent = service
             .paea_read_git_intent(prepared.canonical.intent_id(), &prepared.pin)
             .map_err(|e| {
@@ -1274,44 +1485,96 @@ mod effect {
                     e,
                 )))
             })?;
-        let record = match intent {
-            Some(record) => record,
-            None => {
-                return Ok(PaeaGitPromoteOutcome::ReconciledNotCommitted {
-                    intent_id: prepared.canonical.intent_id().to_owned(),
-                    target_ref: target_ref.clone(),
-                })
-            }
-        };
-        if record.action_digest != prepared.canonical.digest() {
-            return Err(R::Refused("paea-git-promote-intent-conflict"));
-        }
-        match existing_effect(&service.db, &record.intent_id)? {
-            Some((digest, target, new, raw)) => {
-                let stored: PaeaGitPromoteReceipt = serde_json::from_str(&raw)
-                    .map_err(|_| R::Refused("paea-git-promote-effect-decode"))?;
-                let Action::Git {
-                    expected_old_oid, ..
-                } = &prepared.proposal.action
-                else {
-                    return Err(R::Refused("paea-git-promote-git-required"));
-                };
-                validate_effect(&stored, &target, &new, expected_old_oid)?;
-                if digest != record.action_digest {
+        let (intent_id, recorded_effect) = match intent {
+            None => (prepared.canonical.intent_id().to_owned(), None),
+            Some(record) => {
+                if record.action_digest != prepared.canonical.digest() {
                     return Err(R::Refused("paea-git-promote-intent-conflict"));
                 }
-                Ok(PaeaGitPromoteOutcome::Recorded {
-                    intent_id: record.intent_id,
-                    action_digest: record.action_digest,
-                    target_ref: target,
-                    new_oid: new,
-                    replayed: true,
-                })
+                let effect = match existing_effect(&service.db, &record.intent_id)? {
+                    Some((digest, target, new, raw)) => {
+                        let stored: PaeaGitPromoteReceipt = serde_json::from_str(&raw)
+                            .map_err(|cause| R::Launch(Box::new(crate::AgentLaunchError::caused(
+                                "paea-git-promote-effect-decode", cause,
+                            ))))?;
+                        let Action::Git {
+                            expected_old_oid, ..
+                        } = &prepared.proposal.action
+                        else {
+                            return Err(R::Refused("paea-git-promote-git-required"));
+                        };
+                        validate_effect(&stored, &target, &new, expected_old_oid)?;
+                        if digest != record.action_digest {
+                            return Err(R::Refused("paea-git-promote-intent-conflict"));
+                        }
+                        Some(PaeaGitPromoteReconciledEffect {
+                            action_digest: digest,
+                            target_ref: target,
+                            new_oid: new,
+                        })
+                    }
+                    None => None,
+                };
+                (record.intent_id, effect)
             }
-            None => Ok(PaeaGitPromoteOutcome::ReconciledNotCommitted {
-                intent_id: record.intent_id,
-                target_ref: target_ref.clone(),
-            }),
+        };
+        // The journal observation that must survive any later failure in the
+        // typed envelope: a recorded row stays the known historical effect and
+        // no row stays no outcome at all, never a synthesized reconcile result.
+        let journal = recorded_effect.as_ref().map(|effect| {
+            PaeaGitPromoteOutcome::Recorded {
+                intent_id: intent_id.clone(),
+                action_digest: effect.action_digest.clone(),
+                target_ref: effect.target_ref.clone(),
+                new_oid: effect.new_oid.clone(),
+                replayed: true,
+            }
+        });
+        // Read-only custody and ref observation under the existing authority
+        // and Root witnesses: no reservation, no publication, no journal write.
+        let repository = match service.paea_open_git_repository(
+            project,
+            &prepared.work,
+            &prepared.child,
+            &prepared.pin,
+        ) {
+            Ok(value) => value,
+            Err(e) => {
+                return reconcile_failure(
+                    journal,
+                    R::Launch(Box::new(crate::AgentLaunchError::caused(
+                        "paea-git-promote-open",
+                        e,
+                    ))),
+                    Ok(()),
+                );
+            }
+        };
+        let Action::Git { repository_id, .. } = &prepared.proposal.action else {
+            return reconcile_failure(journal, R::Refused("paea-git-promote-git-required"), repository.close());
+        };
+        if repository.binding().work_id() != prepared.work
+            || repository.binding().repository_id() != repository_id
+        {
+            return reconcile_failure(journal, R::Refused("paea-git-promote-repository-binding"), repository.close());
+        }
+        let settings = match service.read_settings() {
+            Ok(value) => value,
+            Err(cause) => return reconcile_failure(journal, cause, repository.close()),
+        };
+        let destination = repository.directory_path();
+        let observed = read_current_ref(&destination, target_ref, &settings);
+        match observed {
+            Ok(observed_oid) => {
+                let outcome = PaeaGitPromoteOutcome::Reconciled {
+                    intent_id,
+                    target_ref: target_ref.clone(),
+                    observed_oid,
+                    recorded_effect,
+                };
+                observed_known(outcome, repository.close())
+            }
+            Err(cause) => reconcile_failure(journal, cause, repository.close()),
         }
     }
 }
@@ -1464,5 +1727,220 @@ mod promote_observation_tests {
         let error = PaeaGitPromoteCallError::Action(joined.err().unwrap());
         assert_eq!(error.known_outcome(), Some(&expected));
         assert!(!error.effect_unknown());
+    }
+}
+
+/// Source-only regressions for the reconciliation observation contract. These
+/// tests open no Root, run no Git and touch no journal; the public native
+/// reconcile flow (real custody, real `for-each-ref`, real journal) remains
+/// separately unverified. No assertion here grants authority or proves a past
+/// or current effect.
+#[cfg(test)]
+mod reconcile_observation_tests {
+    use super::*;
+
+    fn recorded_row() -> PaeaGitPromoteOutcome {
+        PaeaGitPromoteOutcome::Recorded {
+            intent_id: "fixture-intent".into(),
+            action_digest: "fixture-digest".into(),
+            target_ref: "refs/heads/fixture".into(),
+            new_oid: "fixture-oid".into(),
+            replayed: true,
+        }
+    }
+
+    fn envelope(outcome: PaeaGitPromoteOutcome) -> PaeaGitPromoteCallError {
+        PaeaGitPromoteCallError::Effect {
+            outcome: Some(outcome),
+            cause: R::Refused("fixture-late-close"),
+        }
+    }
+
+    /// Only the exact refname is observed; slash-children listed by the same
+    /// for-each-ref pattern are never prefix-equivalent observations.
+    #[test]
+    fn reconcile_parse_exact_name_ignores_prefix_children() {
+        let raw = b"refs/heads/fixture/child 1111111111111111111111111111111111111111 \nrefs/heads/fixture 2222222222222222222222222222222222222222 \n";
+        assert_eq!(
+            effect::parse_exact_direct_ref(raw, "refs/heads/fixture").unwrap(),
+            Some("2222222222222222222222222222222222222222".to_owned())
+        );
+    }
+
+    /// Git successfully listing no exact line is the explicit None; a symbolic
+    /// ref is rejected rather than conflated with absence.
+    #[test]
+    fn reconcile_parse_absent_and_symbolic_are_not_object_observations() {
+        assert_eq!(
+            effect::parse_exact_direct_ref(b"", "refs/heads/fixture").unwrap(),
+            None
+        );
+        assert!(effect::parse_exact_direct_ref(
+            b"refs/heads/fixture 3333333333333333333333333333333333333333 refs/heads/other\n",
+            "refs/heads/fixture"
+        ).is_err());
+    }
+
+    /// Malformed lines and shortened or non-hex object ids refuse instead of
+    /// becoming observed values or silent Nones.
+    #[test]
+    fn reconcile_parse_refuses_malformed_and_non_full_oids() {
+        assert!(
+            effect::parse_exact_direct_ref(b"refs/heads/fixture\n", "refs/heads/fixture").is_err()
+        );
+        assert!(effect::parse_exact_direct_ref(
+            b"refs/heads/fixture abc def\n",
+            "refs/heads/fixture"
+        )
+        .is_err());
+        assert!(effect::parse_exact_direct_ref(
+            b"refs/heads/fixture 2222 \n",
+            "refs/heads/fixture"
+        )
+        .is_err());
+    }
+
+    /// A valid listing is the control before malformed output injections.
+    #[test]
+    fn reconcile_parser_rejects_corrupt_stream_with_utf8_cause() {
+        assert_eq!(effect::parse_exact_direct_ref(b"", "refs/heads/fixture").unwrap(), None);
+        assert!(effect::parse_exact_direct_ref(b"garbage\n", "refs/heads/fixture").is_err());
+        let error = effect::parse_exact_direct_ref(&[255], "refs/heads/fixture").unwrap_err();
+        let mut pending: Vec<&(dyn Error + 'static)> = vec![&error];
+        let mut found = false;
+        while let Some(error) = pending.pop() {
+            found |= error.downcast_ref::<std::str::Utf8Error>().is_some();
+            pending.extend(crate::native_error_links(error).children.into_iter().map(|(_, e)| e));
+            if let Some(cause) = error.source() { pending.push(cause); }
+        }
+        assert!(found, "original UTF8 cause retained");
+    }
+
+    /// Exercise the production ref reader with real Git on a new inert bare
+    /// repository. This is component IO, not signed Root/public-call evidence.
+    #[test]
+    fn reconcile_real_git_reads_changes_absence_and_refuses_errors() {
+        let temporary = tempfile::tempdir_in(crate::fixture_area()).unwrap();
+        let settings = crate::EngineSettingsDocument::initial(
+            crate::EngineSettingsValues::installation_defaults().unwrap(),
+            "fixture".into(), "2026-11-17T00:00:00Z".into(),
+        ).unwrap();
+        let git = |args: &[&str]| crate::managed_repository::git(temporary.path(), args, &settings).unwrap();
+        git(&["init", "--bare", "."]);
+        let target = "refs/tags/fixture";
+        assert_eq!(effect::read_current_ref(temporary.path(), target, &settings).unwrap(), None);
+        let tree = String::from_utf8(git(&["--git-dir", ".", "hash-object", "-w", "-t", "tree", "--stdin"])).unwrap();
+        let commit = |message: &str| String::from_utf8(git(&[
+            "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+            "--git-dir", ".", "commit-tree", tree.trim(), "-m", message,
+        ])).unwrap().trim().to_owned();
+        let first = commit("first");
+        let second = commit("second");
+        assert_ne!(first, second);
+        git(&["--git-dir", ".", "update-ref", target, &first]);
+        assert_eq!(effect::read_current_ref(temporary.path(), target, &settings).unwrap(), Some(first.clone()));
+        git(&["--git-dir", ".", "update-ref", target, &second, &first]);
+        assert_eq!(effect::read_current_ref(temporary.path(), target, &settings).unwrap(), Some(second.clone()));
+        git(&["--git-dir", ".", "update-ref", "-d", target, &second]);
+        assert_eq!(effect::read_current_ref(temporary.path(), target, &settings).unwrap(), None);
+        git(&["--git-dir", ".", "update-ref", "refs/tags/actual", &first]);
+        git(&["--git-dir", ".", "symbolic-ref", target, "refs/tags/actual"]);
+        assert!(effect::read_current_ref(temporary.path(), target, &settings).is_err());
+        git(&["--git-dir", ".", "symbolic-ref", target, "refs/tags/missing"]);
+        assert!(effect::read_current_ref(temporary.path(), target, &settings).is_err(),
+            "dangling symbolic reference must never become observed absence");
+        let not_repository = tempfile::tempdir_in(crate::fixture_area()).unwrap();
+        assert!(effect::read_current_ref(not_repository.path(), target, &settings).is_err());
+    }
+
+    /// A failed ref read preserves its original cause in the typed envelope and
+    /// retains the journal record; it never fabricates an observed None.
+    #[test]
+    fn reconcile_failure_keeps_cause_and_journal_record() {
+        let journal = recorded_row();
+        let joined = effect::reconcile_failure(
+            Some(journal.clone()),
+            R::Refused("fixture-ref-read"),
+            Err(R::Refused("fixture-close")),
+        )
+        .expect_err("failure must stay a failure");
+        let error = PaeaGitPromoteCallError::find(&joined).expect("envelope retained");
+        assert_eq!(error.known_outcome(), Some(&journal));
+        assert!(!error.effect_unknown());
+        let cause = error.backend_error().expect("cause retained");
+        let links = crate::native_error_links(cause);
+        assert!(links.children.iter().any(|(kind, _)| *kind == "primary"));
+        assert!(links.children.iter().any(|(kind, _)| *kind == "cleanup"));
+    }
+
+    /// Without a journal record the failed read stays the explicit unknown; no
+    /// reconcile result is synthesized and no absence is ever claimed.
+    #[test]
+    fn reconcile_failure_without_journal_stays_unknown() {
+        let joined = effect::reconcile_failure(None, R::Refused("fixture-ref-read"), Ok(()))
+            .expect_err("failure must stay a failure");
+        let error = PaeaGitPromoteCallError::find(&joined).expect("envelope retained");
+        assert!(error.known_outcome().is_none());
+        assert!(error.effect_unknown());
+        assert_eq!(error.code(), "paea-git-promote-unknown");
+    }
+
+    /// Unchanged history beside a moved ref: the recorded row stays the known
+    /// historical effect and the ref observation never rewrites the receipt.
+    #[test]
+    fn reconciled_moved_ref_keeps_recorded_history_and_observation() {
+        let outcome = PaeaGitPromoteOutcome::Reconciled {
+            intent_id: "fixture-intent".into(),
+            target_ref: "refs/heads/fixture".into(),
+            observed_oid: Some("moved-oid".into()),
+            recorded_effect: Some(PaeaGitPromoteReconciledEffect {
+                action_digest: "fixture-digest".into(),
+                target_ref: "refs/heads/fixture".into(),
+                new_oid: "fixture-oid".into(),
+            }),
+        };
+        let error = envelope(outcome);
+        assert_eq!(error.effect_status(), "recorded");
+        let observation = error.public_effect_observation();
+        assert_eq!(observation["state"], "recorded");
+        assert_eq!(observation["new_oid"], "fixture-oid");
+        assert_eq!(observation["observed_oid"], "moved-oid");
+    }
+
+    /// A journal missing with the candidate ref present stays unknown: the
+    /// observed candidate never proves this intent caused it and a missing
+    /// effect row never proves no past effect.
+    #[test]
+    fn reconciled_journal_missing_with_candidate_ref_stays_unknown() {
+        let outcome = PaeaGitPromoteOutcome::Reconciled {
+            intent_id: "fixture-intent".into(),
+            target_ref: "refs/heads/fixture".into(),
+            observed_oid: Some("candidate".into()),
+            recorded_effect: None,
+        };
+        let error = envelope(outcome);
+        assert_eq!(error.effect_status(), "unknown");
+        let observation = error.public_effect_observation();
+        assert_eq!(observation["state"], "unknown");
+        assert_eq!(observation["observed_oid"], "candidate");
+        assert_eq!(observation["journal_state"], "no_effect_row");
+        assert!(observation.get("new_oid").is_none());
+    }
+
+    /// Git successfully listing no exact direct ref is the explicit None,
+    /// distinct from any failed read, which never reaches a Reconciled value.
+    #[test]
+    fn reconciled_absent_ref_is_explicit_none_not_a_failed_read() {
+        let outcome = PaeaGitPromoteOutcome::Reconciled {
+            intent_id: "fixture-intent".into(),
+            target_ref: "refs/heads/fixture".into(),
+            observed_oid: None,
+            recorded_effect: None,
+        };
+        let error = envelope(outcome);
+        assert_eq!(error.effect_status(), "unknown");
+        let observation = error.public_effect_observation();
+        assert_eq!(observation["state"], "unknown");
+        assert!(observation["observed_oid"].is_null());
     }
 }

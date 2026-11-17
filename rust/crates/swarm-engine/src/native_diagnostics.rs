@@ -29,11 +29,13 @@ fn settlement_outcome_label(outcome:&crate::PaeaSettlementOutcome)->&'static str
     match outcome {crate::PaeaSettlementOutcome::Recorded{replayed:false,..}=>"paea-settlement-recorded",crate::PaeaSettlementOutcome::Recorded{replayed:true,..}=>"paea-settlement-replayed",crate::PaeaSettlementOutcome::ReconciledNotCommitted{..}=>"paea-settlement-reconciled-not-committed"}
 }
 /// Classify one retained Git promotion observation without rendering receipt or
-/// authority data. ReconciledNotCommitted is the explicit negative, never a
-/// failed publication; these labels grant no retry or current authority.
+/// authority data. Reconciled is the explicit reconciliation observation
+/// (historical journal effect plus current direct Git ref), never a negative
+/// result, an absence claim or a failed-publication claim; these labels grant
+/// no retry or current authority.
 #[cfg(target_os="linux")]
 fn promote_outcome_label(outcome:&crate::PaeaGitPromoteOutcome)->&'static str{
-    match outcome {crate::PaeaGitPromoteOutcome::Recorded{replayed:false,..}=>"paea-git-promote-recorded",crate::PaeaGitPromoteOutcome::Recorded{replayed:true,..}=>"paea-git-promote-replayed",crate::PaeaGitPromoteOutcome::ReconciledNotCommitted{..}=>"paea-git-promote-reconciled-not-committed"}
+    match outcome {crate::PaeaGitPromoteOutcome::Recorded{replayed:false,..}=>"paea-git-promote-recorded",crate::PaeaGitPromoteOutcome::Recorded{replayed:true,..}=>"paea-git-promote-replayed",crate::PaeaGitPromoteOutcome::Reconciled{..}=>"paea-git-promote-reconciled"}
 }
 /// Inspect known compound native families without rendering private messages.
 /// Root/launch/work/storage/process/mission/identity/budget cleanup branches are explicit;

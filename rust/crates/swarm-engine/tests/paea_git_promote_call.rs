@@ -648,24 +648,39 @@ fn promote_call_replays_recorded_effect_and_reconciles() {
     let replay = invoke(&owned, &owned.commit_prepared).unwrap();
     assert!(matches!(replay, PaeaGitPromoteOutcome::Recorded { replayed: true, .. }));
     let reconciled = invoke(&owned, &owned.reconcile_prepared).unwrap();
-    assert!(matches!(reconciled, PaeaGitPromoteOutcome::Recorded { replayed: true, .. }));
+    let PaeaGitPromoteOutcome::Recorded { intent_id, action_digest, target_ref, new_oid, .. } = &first else {
+        panic!("valid control must retain its recorded effect");
+    };
+    assert_eq!(reconciled, PaeaGitPromoteOutcome::Reconciled {
+        intent_id: intent_id.clone(),
+        target_ref: target_ref.clone(),
+        observed_oid: Some(new_oid.clone()),
+        recorded_effect: Some(swarm_engine::PaeaGitPromoteReconciledEffect {
+            action_digest: action_digest.clone(),
+            target_ref: target_ref.clone(),
+            new_oid: new_oid.clone(),
+        }),
+    });
     owned.commit_prepared.close().unwrap();
     owned.reconcile_prepared.close().unwrap();
     owned.service.close().unwrap();
     owned.project.close().unwrap();
 }
-/// Reconciliation before any commit observes no durable effect: an explicit
-/// negative result, never an empty success or a Git process.
+/// Reconciliation before commitment reads the actual seeded OLD reference and
+/// no journal effect. Missing history never proves that no past effect occurred;
+/// the read launches Git without publishing or reserving a new intention.
 #[test]
 #[ignore = "requires explicit retained native source fixture"]
-fn promote_call_reconcile_before_commit_reports_not_committed() {
+fn promote_call_reconcile_before_commit_observes_ref_without_history() {
     let owned = owned();
     let outcome = invoke(&owned, &owned.reconcile_prepared).unwrap();
     assert_eq!(
         outcome,
-        PaeaGitPromoteOutcome::ReconciledNotCommitted {
+        PaeaGitPromoteOutcome::Reconciled {
             intent_id: owned.reconcile_prepared.canonical().intent_id().to_owned(),
             target_ref: "refs/heads/release".into(),
+            observed_oid: Some(owned.old.clone()),
+            recorded_effect: None,
         }
     );
     owned.commit_prepared.close().unwrap();
