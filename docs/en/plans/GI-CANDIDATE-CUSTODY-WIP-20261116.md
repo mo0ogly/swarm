@@ -92,3 +92,12 @@ Earlier recovery plan corrected BEFORE mutation: do NOT planning.resume. Childge
 ### D05 — exact counter types, 17 November 2026
 
 Bool True accepted as1 reproduced FAILf51251,then exact int required for both receipt counts and final Work count. Two targetedPASS040f2f,previous7guards reused,no runtime/CLI/provider. Independent09 delta01a1e6ea-afb4-7253-a055-1332ce9f19ee APPROVE_SOURCE_ONLY; bool case reaches receipt guard,final Work bool branch lacks separate coverage. Source0dc1e8f4…,test71177b19…. Schema validation,not operator policy; existing docstrings/errors remain coherent. Driver/runtime/quota remain open and not authorized. Bounded WIP,no main merge or installation.
+
+
+### D06 — pure post-quota comparator, 17 November 2026
+
+Two new files tests/rust_managed_resume_quota.py and test_rust_managed_resume_quota.py compare supplied dictionaries only,noIO/CLI/Root/provider/quota/derived authority. GLM reported98541tokens/434.766s,971line proposal fully read then curated: models.rs omitted scalar zeros, distinct apply/preview audit metadata, Work-bound consumption, omitted timeoutzero and exact text.rs Go trim. Initial3FAIL then2FAIL counterexamples retained. +1 is finite fixture oracle,zeros/Unicode are wire/protocol contracts,not operator policy. Public/nontrivial docstrings current,stable refusals/original malformed-shape causes. Not full QuotaChange validation.
+
+One21synthetic-test PASS campaign on sourcebadc8bbc…/test7bd690f0… retained at SWARM managed-resume-postquota-pure-glm/final-source-check-01 with names/channels/stable input pins,plus SYNTHETIC AFTER dictionary built from originalJSON. No actual Work changed. Independent09 initialP2 turn01a1e6f2: false remaining100to101 accepted; reproducedFAILc5bc1f then tied max(limit-consumption,0). Two targetedPASSa87ae0(remainder+Go trim after function-boundary restoration),other cases reused without replaying21. Current source4e028ffd…/test2c8ee447… APPROVE_SOURCE_ONLY09 delta01a1e6f4-f824-76d2-bb32-e159a4f9192f.
+
+Dictionary consistency proves no human permission,quota application,identity or runtime recovery. Quota3to4/child2to3 still NOT AUTHORIZED/NOT APPLIED,original Work lastobserved21/reviewer1of2/planner3of3; terminalRefused,controls/attempts preserved. No planning.resume/reset/main merge/build/version_history/installation:evidence tooling only,not product delivery. Supervised driver/runtime/SDK/F/custody/delivery remain open.
