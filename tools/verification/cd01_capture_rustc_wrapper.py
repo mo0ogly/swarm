@@ -64,6 +64,33 @@ access to the leased directory is out of scope. argv may contain secrets: no
 generic secrecy guarantee is made, and the caller is responsible for
 authorizing that these inputs may be persisted.
 
+Library hook (packet20): main() accepts a keyword-only stdin_lease. None
+keeps the exact v1 protocol and record bytes; the CLI entry point passes no
+lease, so command-line/Cargo use activates no input capture and never reads
+descriptor 0. An explicit lease is a trusted-caller library decision: an
+exact five-member mapping {allocation_id, input_fd, compiler_path_hex,
+compiler_arguments_hex, cwd_hex} validated in full -- including equality
+with the wrapper argv and the current working directory -- before any byte
+is consumed or any directory or record is created. It is a declared finite
+cooperative single-writer input/privacy lease, not authentication, producer
+ancestry, future EOF proof or OS confinement; no argv-minus/FIFO/env-token
+inference and no hardcoded producer or mission paths exist. A selected
+invocation keeps the exclusive invocation directory and publishes a v2
+pre-exec intent linking the allocation id and the relative custody
+directory with transfer status PENDING (never rewritten retrospectively).
+Only after that intent is durably published does it create the private
+stdin-custody directory, lazily import the reviewed sibling
+finite_input_custody module (a missing module refuses the selected
+invocation; no fallback lookup or installation), capture the leased
+descriptor, register the returned read-only descriptor in close-once
+custody, dup2 it onto descriptor 0 inheritable, close the spare exactly
+once, publish an exclusive stdin-transfer receipt whose exec outcome stays
+UNKNOWN, and only then delegate. The receipt never proves compiler
+consumption. Any capture, dup2, close or publication failure delegates
+nothing and falls back to no consumed-input path; a successful dup2 may
+already have replaced descriptor 0 and that state is retained as observed,
+with rollback never inferred.
+
 Source-only proposal: wiring into real Cargo builds requires separate review
 and allocation. No cleanup is ever performed: partial and complete records are
 always kept, and a reported publication error never implies a rollback.
@@ -85,7 +112,18 @@ INTENT_JSON_NAME = b"intent.json"
 FAILURE_JSON_NAME = b"failure.json"
 
 INTENT_SCHEMA = "cd01.rustc_intent.v1"
+INTENT_SCHEMA_V2 = "cd01.rustc_intent.v2"
 FAILURE_SCHEMA = "cd01.rustc_wrapper_failure.v1"
+STDIN_TRANSFER_SCHEMA = "cd01.stdin_transfer.v1"
+STDIN_CUSTODY_NAME = b"stdin-custody"
+STDIN_TRANSFER_NAME = b"stdin-transfer.json"
+STDIN_LEASE_MEMBERS = frozenset((
+    "allocation_id",
+    "input_fd",
+    "compiler_path_hex",
+    "compiler_arguments_hex",
+    "cwd_hex",
+))
 
 EXIT_REFUSED = 78       # missing/invalid configuration (EX_CONFIG value; wrapper-technical)
 EXIT_FAILED = 1         # operational failure: capture, publication or delegation
@@ -101,7 +139,9 @@ class Refusal(Exception):
     Instances must be constructed only with literal text written in this
     module. The note is echoed to stderr and embedded in reports verbatim, so
     it must never contain argv, environment values, paths or foreign exception
-    text.
+    text. One late refusal exists in the selected stdin-lease flow only: a
+    missing sibling custody helper is refused after the intent record, still
+    before any input byte is read and with no fallback lookup or installation.
     """
 
 
@@ -207,7 +247,7 @@ def _errno_of(error):
     return code if isinstance(code, int) else None
 
 
-def _render_intent_record(compiler, arguments, guard):
+def _render_intent_record(compiler, arguments, guard, stdin_plan=None):
     """Render the pre-exec intent record as ASCII JSON bytes.
 
     Every captured value is reversible hex of exact bytes: compiler path and
@@ -219,6 +259,15 @@ def _render_intent_record(compiler, arguments, guard):
     is made; the configured guard path is recorded explicitly. Input argv and
     intended delegation are recorded as
     separate fields.
+
+    stdin_plan=None renders the unchanged v1 record. A plan mapping with
+    allocation_id and custody_relative_directory renders the v2 record: the
+    same members plus the stdin_transfer block that links the lease
+    allocation id and the custody directory that will be created only after
+    this record is durable. The transfer status is PENDING at intent time and
+    this record is never rewritten afterwards; only the separate
+    stdin-transfer receipt reports what later happened, and an old collector
+    that expects the v1 schema rejects the v2 record by design.
     """
     record = {
         "schema": INTENT_SCHEMA,
@@ -280,6 +329,20 @@ def _render_intent_record(compiler, arguments, guard):
             "environment_values": "not recorded",
         },
     }
+    if stdin_plan is not None:
+        record["schema"] = INTENT_SCHEMA_V2
+        record["stdin_transfer"] = {
+            "status": "PENDING",
+            "allocation_id": stdin_plan["allocation_id"],
+            "custody_relative_directory": stdin_plan["custody_relative_directory"],
+            "note": (
+                "at intent time no input byte has been read and no custody "
+                "directory exists; the transfer status stays PENDING and this "
+                "record is never rewritten; the separate stdin-transfer "
+                "receipt is the only completion record and it never proves "
+                "compiler consumption"
+            ),
+        }
     return (json.dumps(record, ensure_ascii=True, sort_keys=True, indent=2)
             + "\n").encode("ascii")
 
@@ -291,7 +354,11 @@ def _render_failure_record(primary, stage, state, interrupted):
     numeric errnos, boolean publication-state flags and exec_attempted.
     Missing or incomplete publication flags mean the on-disk state is unknown;
     they never prove a rollback or that nothing was written. argv contents,
-    environment values and paths are never included.
+    environment values and paths are never included. For a selected
+    stdin-lease invocation the record additionally carries the bounded
+    attempt/completion booleans and, when the sibling custody helper failed,
+    its bounded metadata capsule (fixed stage/op/name/reason tokens and
+    numeric errnos and interruption category only); the unselected v1 record is unchanged.
     """
     record = {
         "schema": FAILURE_SCHEMA,
@@ -320,6 +387,31 @@ def _render_failure_record(primary, stage, state, interrupted):
         "primary_error_type": type(primary).__name__,
         "primary_errno": _errno_of(primary),
     }
+    if state["stdin_selected"]:
+        # Selected stdin-lease flow only; the unselected v1 failure record is
+        # byte-identical to before. Every boolean below reports an observed
+        # attempt or completion and never infers that a step had no effect.
+        record["stdin_transfer"] = {
+            "selected": True,
+            "capture_attempted": state["stdin_capture_attempted"],
+            "capture_completed": state["stdin_capture_completed"],
+            "fd_dup2_attempted": state["stdin_dup2_attempted"],
+            "fd_dup2_completed": state["stdin_dup2_completed"],
+            "spare_close_attempted": state["stdin_spare_close_attempted"],
+            "spare_close_completed": state["stdin_spare_close_completed"],
+            "receipt_file_created": state["stdin_transfer_created"],
+            "receipt_data_fsynced": state["stdin_transfer_fsynced"],
+            "receipt_published": state["stdin_receipt_published"],
+            "receipt_dir_fsynced": state["stdin_receipt_dir_fsynced"],
+            "state_note": (
+                "flags report observed attempts/completions only; a completed "
+                "dup2 may already have replaced descriptor 0 even when a later "
+                "step failed, and no rollback is ever inferred"
+            ),
+        }
+        custody_error = state.get("stdin_custody_error")
+        if custody_error is not None:
+            record["stdin_transfer"]["custody_error"] = custody_error
     return (json.dumps(record, ensure_ascii=True, sort_keys=True, indent=2)
             + "\n").encode("ascii")
 
@@ -435,7 +527,7 @@ def _handle_failure(primary, stage, state, fds, causes):
     exactly once, with no retries. KeyboardInterrupt and other non-Exception
     BaseExceptions are reported as interrupted, not success.
     """
-    interrupted = isinstance(primary, KeyboardInterrupt) or not isinstance(primary, Exception)
+    interrupted = isinstance(primary, KeyboardInterrupt) or not isinstance(primary, Exception) or state.get("stdin_custody_interrupted", False)
     record_dir_fd = _failure_record_dir_fd(state, fds, causes)
     if record_dir_fd is not None:
         try:
@@ -474,7 +566,177 @@ def _delegate(guard, compiler, arguments, state):
     raise ExecReturned("os.execv returned without replacing the process")
 
 
-def main(argv=None):
+def _validate_stdin_lease(stdin_lease, compiler, arguments):
+    """Validate an explicit trusted-caller stdin lease in full; return (id, fd).
+
+    The lease must be a dict with exactly the five lease members:
+    allocation_id (nonempty str), input_fd (an exact nonnegative int, never
+    bool), compiler_path_hex and cwd_hex (hex strings that reverse to bytes)
+    and compiler_arguments_hex (a list of hex strings). The reversed compiler
+    bytes, argument bytes and current-working-directory bytes must equal the
+    wrapper's own os.fsencode(argv) values and os.getcwdb(); any other shape
+    or any mismatch is refused before any descriptor is read and before any
+    directory or record is created. Hex is only a transport form: equality is
+    decided on the decoded bytes. The lease is a caller declaration of a
+    finite cooperative single-writer input/privacy lease; it is never
+    authentication, producer ancestry, future EOF proof or OS confinement,
+    and no argv-minus/FIFO/env-token inference exists here. The validated
+    input descriptor is only borrowed later by the custody capture; without a
+    lease this wrapper never reads descriptor 0.
+    """
+    if not isinstance(stdin_lease, dict):
+        raise Refusal("stdin lease must be a dict with exactly the five lease members")
+    if set(stdin_lease) != STDIN_LEASE_MEMBERS:
+        raise Refusal("stdin lease must contain exactly the five lease members")
+    allocation_id = stdin_lease["allocation_id"]
+    if not isinstance(allocation_id, str) or not allocation_id:
+        raise Refusal("stdin lease allocation_id must be a nonempty string")
+    input_fd = stdin_lease["input_fd"]
+    if type(input_fd) is not int:
+        raise Refusal("stdin lease input_fd must be an exact integer file descriptor")
+    if input_fd < 0:
+        raise Refusal("stdin lease input_fd must be nonnegative")
+    compiler_path_hex = stdin_lease["compiler_path_hex"]
+    if not isinstance(compiler_path_hex, str):
+        raise Refusal("stdin lease compiler_path_hex must be a hex string")
+    try:
+        leased_compiler = bytes.fromhex(compiler_path_hex)
+    except ValueError:
+        raise Refusal("stdin lease compiler_path_hex must be valid hexadecimal") from None
+    if leased_compiler != compiler:
+        raise Refusal("stdin lease compiler_path_hex does not match argv[1]")
+    arguments_hex = stdin_lease["compiler_arguments_hex"]
+    if not isinstance(arguments_hex, list):
+        raise Refusal("stdin lease compiler_arguments_hex must be a list of hex strings")
+    leased_arguments = []
+    for entry in arguments_hex:
+        if not isinstance(entry, str):
+            raise Refusal("stdin lease compiler_arguments_hex must contain only hex strings")
+        try:
+            leased_arguments.append(bytes.fromhex(entry))
+        except ValueError:
+            raise Refusal("stdin lease compiler_arguments_hex must be valid hexadecimal") from None
+    if leased_arguments != arguments:
+        raise Refusal("stdin lease compiler_arguments_hex does not match argv[2:]")
+    cwd_hex = stdin_lease["cwd_hex"]
+    if not isinstance(cwd_hex, str):
+        raise Refusal("stdin lease cwd_hex must be a hex string")
+    try:
+        leased_cwd = bytes.fromhex(cwd_hex)
+    except ValueError:
+        raise Refusal("stdin lease cwd_hex must be valid hexadecimal") from None
+    if leased_cwd != os.getcwdb():
+        raise Refusal("stdin lease cwd_hex does not match the current working directory")
+    return allocation_id, input_fd
+
+
+def _load_custody_module(fds):
+    """Load only the explicit sibling source, without import-path/cache fallback.
+
+    Selected fixture calls only. Open the regular source beside this wrapper,
+    read its bytes once under the caller lease, close once via held custody,
+    then compile those bytes in a private module namespace. No bytecode cache
+    is consulted or written and no sys.modules entry is replaced. Standard
+    library dependencies remain ordinary imports and outer qualification.
+    Read/close/compile errors escape with their original causes; the caller's
+    existing failure path closes held descriptors and prevents delegation.
+    This is a trusted caller source lease, not adversarial confinement.
+    """
+    import types
+    sibling = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           'finite_input_custody.py')
+    source_fd = os.open(sibling, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    entry = _hold(fds, source_fd, 'stdin_helper_source_fd')
+    if not stat.S_ISREG(os.fstat(source_fd).st_mode):
+        raise Refusal('stdin custody sibling source must be a regular file')
+    chunks = []
+    while True:
+        chunk = os.read(source_fd, 65536)  # Transport chunk, never a source-size cap.
+        if not chunk:
+            break
+        chunks.append(chunk)
+    error = _close_once(entry)
+    if error is not None:
+        raise error
+    module = types.ModuleType('cd01_selected_finite_input_custody')
+    module.__file__ = sibling
+    exec(compile(b''.join(chunks), sibling, 'exec'), module.__dict__)
+    return module
+
+
+def _bounded_custody_capsule(error):
+    """Bound a sibling custody helper failure into JSON-safe metadata.
+
+    Keeps only the helper's fixed stage token, its bounded primary/secondary
+    cause dicts (fixed op/name tokens, numeric errnos, an always-None detail
+    and optional fixed reason tokens) and the ready-descriptor close flag;
+    Primary or cleanup non-Exception BaseExceptions preserve the existing
+    technical interrupted category and status 130. The helper's original exception objects stay in memory through the
+    caller's cause list and are never rendered. Paths, input bytes,
+    environment values and free text are excluded.
+    """
+    originals = (error.original_exception, *error.secondary_exceptions)
+    interrupted = any(isinstance(cause, BaseException) and not isinstance(cause, Exception)
+                      for cause in originals)
+    return {
+        "interrupted": interrupted,
+        "stage": error.stage,
+        "primary": dict(error.primary),
+        "secondary": [dict(item) for item in error.secondary],
+        "ready_fd_close_attempted": bool(error.ready_fd_close_attempted),
+    }
+
+
+def _render_stdin_transfer_record(allocation_id, manifest):
+    """Render the post-transfer, pre-exec stdin receipt as ASCII JSON bytes.
+
+    Records only observed facts: the input digest reported by the manifest, byte count and
+    staging/publication linkage produced by the sibling helper, the
+    descriptor-0 replacement and spare-close attempt/completion flags, and
+    an UNKNOWN delegation outcome. It never proves that the compiler
+    consumed the replaced descriptor nor that delegation ran or succeeded,
+    and no input bytes, environment values or paths are included.
+    """
+    record = {
+        "schema": STDIN_TRANSFER_SCHEMA,
+        "record_kind": "stdin_transfer_receipt",
+        "outcome": "UNKNOWN",
+        "outcome_note": (
+            "receipt of staging and descriptor replacement only; it never "
+            "proves that the compiler consumed descriptor 0 or that "
+            "delegation ran or succeeded"
+        ),
+        "pid": os.getpid(),
+        "allocation_id": allocation_id,
+        "custody_relative_directory": STDIN_CUSTODY_NAME.decode("ascii"),
+        "observed_custody_manifest": {
+            "schema": manifest["schema"],
+            "allocation_id": manifest["allocation_id"],
+            "eof_observed": manifest["eof_observed"],
+            "byte_count": manifest["byte_count"],
+            "sha256": manifest["sha256"],
+            "raw_staging_file": manifest["raw_staging_file"],
+            "raw_published_file": manifest["raw_published_file"],
+            "raw_publication": manifest["raw_publication"],
+        },
+        "descriptor_replacement": {
+            "target_fd": 0,
+            "inheritable": True,
+            "dup2_attempted": True,
+            "dup2_completed": True,
+            "spare_close_attempted": True,
+            "spare_close_completed": True,
+        },
+        "delegation": {
+            "mode": "os.execv in the same process (same PID)",
+            "outcome": "UNKNOWN",
+        },
+    }
+    return (json.dumps(record, ensure_ascii=True, sort_keys=True, indent=2)
+            + "\n").encode("ascii")
+
+
+def main(argv=None, *, stdin_lease=None):
     """Run the wrapper protocol; return a nonzero code or replace the process.
 
     If the final diagnostic channel fails, WrapperReportingError escapes with
@@ -490,6 +752,22 @@ def main(argv=None):
     descriptor exactly once, and prints a data-free summary to stderr with
     the primary cause first. No downstream exec ever happens after a
     publication failure.
+
+    stdin_lease=None keeps the exact v1 protocol and record bytes; the CLI
+    entry point never passes a lease, so command-line/Cargo use never
+    activates input capture. An explicit lease is validated in full against
+    argv and the current working directory before anything is consumed or
+    created, and selects the v2 flow: the same exclusive invocation directory
+    and a v2 intent record with transfer status PENDING; after the intent is
+    durably published, the private custody directory is created, the reviewed
+    sibling finite_input_custody source is lazily loaded (a missing source
+    refuses; no fallback) and used to stage the leased descriptor, the
+    returned read-only descriptor is registered in close-once custody, dup2d
+    onto descriptor 0 inheritable, the spare is closed exactly once, the
+    exclusive stdin-transfer receipt is published, and only then does
+    delegation run. Any capture, dup2, close or publication failure means no
+    exec and no consumed-input fallback; a completed dup2 may already have
+    replaced descriptor 0 and that state is retained, never rolled back.
     """
     if argv is None:
         argv = sys.argv
@@ -505,6 +783,19 @@ def main(argv=None):
         "parent_dir_entry": None,
         "invocation_dir_entry": None,
         "invocation_dir_name": None,
+        # Selected stdin-lease flow only; every flag reports an observed
+        # attempt or completion and never infers a step had no effect.
+        "stdin_selected": stdin_lease is not None,
+        "stdin_capture_attempted": False,
+        "stdin_capture_completed": False,
+        "stdin_dup2_attempted": False,
+        "stdin_dup2_completed": False,
+        "stdin_spare_close_attempted": False,
+        "stdin_spare_close_completed": False,
+        "stdin_transfer_created": False,
+        "stdin_transfer_fsynced": False,
+        "stdin_receipt_published": False,
+        "stdin_receipt_dir_fsynced": False,
     }
     stage = "startup"
     try:
@@ -521,6 +812,12 @@ def main(argv=None):
         for raw_value in [compiler, *arguments]:
             if b"\x00" in raw_value:
                 raise Refusal("compiler path and arguments must not contain NUL bytes")
+        stage = "stdin_lease_validate"
+        # Full lease validation (shape and equality with argv/cwd) happens
+        # here, before any descriptor is read and before any directory or
+        # record is created; mismatches refuse with exit 78.
+        if stdin_lease is not None:
+            allocation_id, input_fd = _validate_stdin_lease(stdin_lease, compiler, arguments)
         stage = "env_capture_dir"
         capture_dir = os.environb.get(CAPTURE_DIR_ENV)
         if capture_dir is None:
@@ -562,7 +859,10 @@ def main(argv=None):
         stage = "invocation_dir_verify"
         _require_private_dir(os.fstat(invocation_fd))
         stage = "intent_render"
-        payload = _render_intent_record(compiler, arguments, guard)
+        stdin_plan = None
+        if stdin_lease is not None:
+            stdin_plan = {"allocation_id": allocation_id, "custody_relative_directory": STDIN_CUSTODY_NAME.decode("ascii")}
+        payload = _render_intent_record(compiler, arguments, guard, stdin_plan)
         # Covers exclusive create, full write, data fsync and once-close;
         # the original errno/type identifies the failing sub-operation.
         stage = "intent_partial_publication"
@@ -577,6 +877,48 @@ def main(argv=None):
         stage = "invocation_dir_fsync"
         os.fsync(invocation_fd)
         state["intent_dir_fsynced"] = True
+        if stdin_lease is not None:
+            # Selected stdin-lease flow. The intent above is durable and its
+            # transfer status stays PENDING; nothing below rewrites it. Any
+            # failure here means no exec and no consumed-input fallback; a
+            # completed dup2 may already have replaced descriptor 0 and is
+            # never rolled back. The leased descriptor is borrowed by the
+            # helper, the only reader; this wrapper never auto-reads fd 0.
+            stage = "stdin_custody_dir_create"
+            os.mkdir(STDIN_CUSTODY_NAME, 0o700, dir_fd=invocation_fd)
+            stage = "stdin_custody_import"
+            finite_input_custody = _load_custody_module(fds)
+            stage = "stdin_custody_capture"
+            state["stdin_capture_attempted"] = True
+            custody_path = os.fsdecode(os.path.join(capture_dir, invocation_name, STDIN_CUSTODY_NAME))
+            try:
+                ready_fd, manifest = finite_input_custody.capture(input_fd, custody_path, allocation_id)
+            except finite_input_custody.FiniteInputCustodyError as helper_error:
+                state["stdin_custody_error"] = _bounded_custody_capsule(helper_error)
+                state["stdin_custody_interrupted"] = state["stdin_custody_error"]["interrupted"]
+                causes.append(("stdin_custody_capture", helper_error))
+                raise
+            state["stdin_capture_completed"] = True
+            stage = "stdin_fd_register"
+            spare_entry = _hold(fds, ready_fd, "stdin_ready_fd")
+            stage = "stdin_fd_dup2"
+            state["stdin_dup2_attempted"] = True
+            os.dup2(ready_fd, 0, inheritable=True)
+            state["stdin_dup2_completed"] = True
+            stage = "stdin_spare_close"
+            state["stdin_spare_close_attempted"] = True
+            spare_close_error = _close_once(spare_entry)
+            if spare_close_error is not None:
+                raise spare_close_error
+            state["stdin_spare_close_completed"] = True
+            stage = "stdin_receipt_render"
+            receipt = _render_stdin_transfer_record(allocation_id, manifest)
+            stage = "stdin_receipt_publication"
+            _exclusively_write_file(invocation_fd, STDIN_TRANSFER_NAME, receipt, fds, causes, "stdin_transfer", state)
+            state["stdin_receipt_published"] = True
+            stage = "stdin_receipt_dir_fsync"
+            os.fsync(invocation_fd)
+            state["stdin_receipt_dir_fsynced"] = True
         stage = "exec_delegation"
         _delegate(guard, compiler, arguments, state)
     except BaseException as primary:

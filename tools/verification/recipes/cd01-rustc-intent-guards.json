@@ -6,12 +6,13 @@
     "tools/verification/test_cd01_capture_rustc_wrapper.py",
     "tools/verification/CD01-RUSTC-INTENT.md",
     "tools/verification/CD01-RUSTC-INTENT.en.md",
-    "tools/verification/recipe.py"
+    "tools/verification/recipe.py",
+    "tools/verification/finite_input_custody.py"
   ],
   "environment": {},
   "steps": [
     {
-      "id": "seven-new-producer-contract-guards",
+      "id": "cd01-rustc-intent-guards-full-set",
       "command": [
         "python3",
         "-B",
@@ -28,7 +29,16 @@
         "test_write_and_close_failures_keep_both_causes",
         "test_flush_reporting_failure_retains_cause",
         "test_invocation_collision_refuses_without_overwrite",
-        "Ran 7 tests",
+        "test_unselected_lease_keeps_exact_v1_protocol",
+        "test_healthy_lease_transfers_bytes_to_fd0",
+        "test_lease_mismatch_refuses_before_mutation_or_read",
+        "test_capture_fault_keeps_capsule_and_never_delegates",
+        "test_dup2_fault_reports_attempt_and_never_delegates",
+        "test_close_or_receipt_failure_keeps_uncertain_state",
+        "test_missing_sibling_refuses_cached_module",
+        "test_nonexact_input_fd_refuses_before_mutation",
+        "test_normalized_capture_interrupt_keeps_category",
+        "Ran 16 tests",
         "OK"
       ]
     }

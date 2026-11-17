@@ -1,5 +1,7 @@
+import contextlib
 """Focused CD01 wrapper diagnostic-custody regression; no children/compiler."""
 import errno
+import hashlib
 import io
 import unittest
 from unittest import mock
@@ -178,6 +180,432 @@ class ProducerBoundaryTests(unittest.TestCase):
                 self.assertEqual(prior, {str(p.relative_to(root)): p.read_bytes() for p in root.rglob('*') if p.is_file()})
             ProducerContractTests().invoke(root)
             self.assertEqual(len(list(root.iterdir())), 2)
+
+
+class StdinLeaseTransferTests(unittest.TestCase):
+    """Targeted packet20 stdin-lease guards; exec mocked, descriptor 0 self-restored.
+
+    Every selected invocation runs inside this unittest process: os.execv is
+    always mocked, so no compiler, guard executable, service or provider ever
+    runs and no historical campaign is replayed. Each test that can reach the
+    transfer flow saves descriptor 0 first and restores it in a finally block,
+    so even a failed assertion cannot leak a replaced descriptor. All fixtures
+    live under the caller's TMPDIR via tempfile; there is no arbitrary timeout,
+    size cap or retry anywhere, and every injection is preceded by a
+    same-precondition healthy control and followed by a fresh recovery.
+    """
+
+    def setUp(self):
+        """Retain fixtures and restore the original stdin inheritable flag."""
+        flag = os.get_inheritable(0)
+        self.addCleanup(os.set_inheritable, 0, flag)
+
+    @contextlib.contextmanager
+    def _retained_dir(self):
+        """Yield a caller-owned fixture root without deleting failure evidence."""
+        yield tempfile.mkdtemp(prefix='stdin-transfer-tests-')
+
+    def _invocation(self, capture_dir):
+        """Resolve the sole actual child invocation, distinct from its parent."""
+        found = list(capture_dir.glob('cd01-intent-*'))
+        self.assertEqual(len(found), 1)
+        return found[0]
+
+    def _lease(self, root, payload, allocation_id='alloc-packet20', compiler='/owned/compiler', arguments=('ordinary',)):
+        """Create one fresh private capture directory, input fixture and valid lease."""
+        capture_dir = root / ('lease-' + os.urandom(8).hex())
+        capture_dir.mkdir(mode=0o700)
+        input_path = root / ('input-' + os.urandom(8).hex() + '.bin')
+        input_path.write_bytes(payload)
+        input_fd = os.open(str(input_path), os.O_RDONLY)
+        self.addCleanup(os.close, input_fd)
+        lease = {
+            'allocation_id': allocation_id,
+            'input_fd': input_fd,
+            'compiler_path_hex': os.fsencode(compiler).hex(),
+            'compiler_arguments_hex': [os.fsencode(argument).hex() for argument in arguments],
+            'cwd_hex': os.getcwdb().hex(),
+        }
+        return capture_dir, input_fd, lease
+
+    def _run_lease(self, capture_dir, lease, reads):
+        """Run one selected invocation with mocked exec that double-reads fd 0."""
+        def fake_exec(executable, delegation_argv):
+            """Read the transferred descriptor in-process, then simulate exec failure."""
+            reads.append(os.read(0, 65536))
+            reads.append(os.read(0, 65536))
+            raise OSError(errno.ENOEXEC, 'EXEC_PRIVATE_TEXT')
+        stderr = io.StringIO()
+        env = {b'CD01_CAPTURE_DIR': os.fsencode(str(capture_dir)), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+        with mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv', side_effect=fake_exec) as execute:
+            result = wrapper.main(['wrapper', '/owned/compiler', 'ordinary'], stdin_lease=lease)
+        self.assertNotIn('PRIVATE_TEXT', stderr.getvalue())
+        return result, stderr, execute
+
+    def _healthy(self, root, payload):
+        """One same-precondition healthy selected invocation; returns its directory."""
+        capture_dir, _, lease = self._lease(root, payload)
+        reads = []
+        result, _, execute = self._run_lease(capture_dir, lease, reads)
+        self.assertEqual(reads, [payload, b''])
+        self.assertEqual(result, 1)
+        self.assertEqual(execute.call_count, 1)
+        return self._invocation(capture_dir)
+
+    def _recovered(self, root, payload):
+        """One fresh-recovery healthy invocation; asserts the fd 0 double read."""
+        capture_dir, _, lease = self._lease(root, payload)
+        reads = []
+        result, _, execute = self._run_lease(capture_dir, lease, reads)
+        self.assertEqual(result, 1)
+        self.assertEqual(execute.call_count, 1)
+        self.assertEqual(reads, [payload, b''])
+        return self._invocation(capture_dir)
+
+    def test_unselected_lease_keeps_exact_v1_protocol(self):
+        """No lease: byte-exact current v1 intent/failure records, no custody, no fd 0 use."""
+        with self._retained_dir() as name:
+            root = Path(name)
+            stderr = io.StringIO()
+            env = {b'CD01_CAPTURE_DIR': os.fsencode(str(root)), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+            with mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv', side_effect=OSError(errno.ENOEXEC, 'EXEC_PRIVATE_TEXT')) as execute:
+                result = wrapper.main(['wrapper', '/owned/compiler', 'or-\xff'])
+            self.assertEqual(result, 1)
+            self.assertEqual(execute.call_count, 1)
+            self.assertNotIn('PRIVATE_TEXT', stderr.getvalue())
+            directories = list(root.iterdir())
+            self.assertEqual(len(directories), 1)
+            directory = directories[0]
+            self.assertEqual(sorted(p.name for p in directory.iterdir()), ['failure.json', 'intent.json', 'intent.partial'])
+            expected = wrapper._render_intent_record(os.fsencode('/owned/compiler'), [os.fsencode('or-\xff')], b'/usr/bin/true')
+            self.assertEqual((directory / 'intent.partial').read_bytes(), expected)
+            self.assertEqual((directory / 'intent.json').read_bytes(), expected)
+            record = json.loads(expected)
+            self.assertEqual(record['schema'], 'cd01.rustc_intent.v1')
+            self.assertEqual(record['outcome'], 'UNKNOWN')
+            self.assertNotIn('stdin_transfer', record)
+            failure = json.loads((directory / 'failure.json').read_bytes())
+            self.assertNotIn('stdin_transfer', failure)
+            self.assertTrue(failure['exec_attempted'])
+
+    def test_healthy_lease_transfers_bytes_to_fd0(self):
+        """Selected lease: raw/nonUTF8 bytes reach fd 0 by real dup2; mocked exec double-reads them."""
+        payload = b'\x00\xff\xfe raw \x80 nonUTF8 \xc3(\x7f bytes'
+        saved0 = os.dup(0)
+        try:
+            with self._retained_dir() as name:
+                root = Path(name)
+                capture_dir, input_fd, lease = self._lease(root, payload)
+                reads = []
+                result, stderr, execute = self._run_lease(capture_dir, lease, reads)
+                capture_dir = self._invocation(capture_dir)
+                self.assertEqual(result, 1)
+                self.assertEqual(execute.call_count, 1)
+                self.assertTrue(os.get_inheritable(0))
+                self.assertEqual(reads, [payload, b''])
+                os.fstat(input_fd)
+                self.assertEqual(sorted(p.name for p in capture_dir.iterdir()), ['failure.json', 'intent.json', 'intent.partial', 'stdin-custody', 'stdin-transfer.json'])
+                custody = capture_dir / 'stdin-custody'
+                self.assertEqual(sorted(p.name for p in custody.iterdir()), ['input.bin', 'input.partial', 'manifest.json', 'manifest.partial'])
+                self.assertEqual((custody / 'input.bin').read_bytes(), payload)
+                manifest = json.loads((custody / 'manifest.json').read_bytes())
+                self.assertTrue(manifest['eof_observed'])
+                self.assertEqual(manifest['byte_count'], len(payload))
+                self.assertEqual(manifest['sha256'], hashlib.sha256(payload).hexdigest())
+                expected_intent = wrapper._render_intent_record(os.fsencode('/owned/compiler'), [os.fsencode('ordinary')], b'/usr/bin/true', {'allocation_id': 'alloc-packet20', 'custody_relative_directory': 'stdin-custody'})
+                self.assertEqual((capture_dir / 'intent.json').read_bytes(), expected_intent)
+                self.assertEqual((capture_dir / 'intent.partial').read_bytes(), expected_intent)
+                intent = json.loads(expected_intent)
+                self.assertEqual(intent['schema'], 'cd01.rustc_intent.v2')
+                self.assertEqual(intent['stdin_transfer']['status'], 'PENDING')
+                self.assertEqual(intent['stdin_transfer']['allocation_id'], 'alloc-packet20')
+                self.assertEqual(intent['stdin_transfer']['custody_relative_directory'], 'stdin-custody')
+                receipt = json.loads((capture_dir / 'stdin-transfer.json').read_bytes())
+                self.assertEqual(receipt['schema'], 'cd01.stdin_transfer.v1')
+                self.assertEqual(receipt['outcome'], 'UNKNOWN')
+                self.assertEqual(receipt['allocation_id'], 'alloc-packet20')
+                self.assertEqual(receipt['observed_custody_manifest']['byte_count'], len(payload))
+                self.assertEqual(receipt['observed_custody_manifest']['sha256'], manifest['sha256'])
+                self.assertTrue(receipt['descriptor_replacement']['dup2_completed'])
+                self.assertTrue(receipt['descriptor_replacement']['spare_close_completed'])
+                self.assertEqual(receipt['delegation']['outcome'], 'UNKNOWN')
+                failure = json.loads((capture_dir / 'failure.json').read_bytes())
+                self.assertTrue(failure['exec_attempted'])
+                transfer = failure['stdin_transfer']
+                self.assertTrue(transfer['capture_completed'])
+                self.assertTrue(transfer['fd_dup2_completed'])
+                self.assertTrue(transfer['spare_close_completed'])
+                self.assertTrue(transfer['receipt_published'])
+        finally:
+            os.dup2(saved0, 0)
+            os.close(saved0)
+
+    def test_lease_mismatch_refuses_before_mutation_or_read(self):
+        """Control first; a mismatching lease refuses 78 with no directory, read or exec."""
+        saved0 = os.dup(0)
+        try:
+            with self._retained_dir() as name:
+                root = Path(name)
+                self._healthy(root, b'control bytes')
+                mismatch_dir, mismatch_fd, mismatch_lease = self._lease(root, b'unread bytes')
+                mismatch_lease['compiler_path_hex'] = os.fsencode('/other/compiler').hex()
+                stderr = io.StringIO()
+                env = {b'CD01_CAPTURE_DIR': os.fsencode(str(mismatch_dir)), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+                with mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv') as execute:
+                    result = wrapper.main(['wrapper', '/owned/compiler', 'ordinary'], stdin_lease=mismatch_lease)
+                self.assertEqual(result, 78)
+                execute.assert_not_called()
+                self.assertIn('does not match argv[1]', stderr.getvalue())
+                self.assertEqual(list(mismatch_dir.iterdir()), [])
+                self.assertEqual(os.lseek(mismatch_fd, 0, os.SEEK_CUR), 0)
+                self._recovered(root, b'recovery bytes')
+        finally:
+            os.dup2(saved0, 0)
+            os.close(saved0)
+
+    def test_capture_fault_keeps_capsule_and_never_delegates(self):
+        """Control, helper read fault with bounded original-cause capsule, fresh recovery."""
+        import finite_input_custody
+        saved0 = os.dup(0)
+        try:
+            with self._retained_dir() as name:
+                root = Path(name)
+                self._healthy(root, b'control bytes')
+                fault_dir, _, fault_lease = self._lease(root, b'fault bytes')
+                stderr = io.StringIO()
+                env = {b'CD01_CAPTURE_DIR': os.fsencode(str(fault_dir)), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+                with mock.patch.object(wrapper, '_load_custody_module', return_value=finite_input_custody), mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv') as execute, mock.patch.object(finite_input_custody, '_os_read', side_effect=OSError(errno.EIO, 'READ_PRIVATE_TEXT')):
+                    result = wrapper.main(['wrapper', '/owned/compiler', 'ordinary'], stdin_lease=fault_lease)
+                fault_dir = self._invocation(fault_dir)
+                self.assertEqual(result, 1)
+                execute.assert_not_called()
+                self.assertNotIn('PRIVATE_TEXT', stderr.getvalue())
+                self.assertIn('FiniteInputCustodyError', stderr.getvalue())
+                self.assertEqual(sorted(p.name for p in fault_dir.iterdir()), ['failure.json', 'intent.json', 'intent.partial', 'stdin-custody'])
+                self.assertEqual(sorted(x.name for x in (fault_dir / 'stdin-custody').iterdir()), ['input.partial'])
+                self.assertEqual((fault_dir / 'intent.json').read_bytes(), (fault_dir / 'intent.partial').read_bytes())
+                failure = json.loads((fault_dir / 'failure.json').read_bytes())
+                self.assertEqual(failure['primary_error_type'], 'FiniteInputCustodyError')
+                self.assertFalse(failure['exec_attempted'])
+                transfer = failure['stdin_transfer']
+                self.assertTrue(transfer['capture_attempted'])
+                self.assertFalse(transfer['capture_completed'])
+                self.assertFalse(transfer['fd_dup2_attempted'])
+                capsule = transfer['custody_error']
+                self.assertEqual(capsule['stage'], 'read-input')
+                self.assertEqual(capsule['primary']['op'], 'read')
+                self.assertEqual(capsule['primary']['name'], 'input-fd')
+                self.assertEqual(capsule['primary']['errno'], errno.EIO)
+                self.assertIsNone(capsule['primary']['detail'])
+                self.assertNotIn('stdin-transfer.json', [p.name for p in fault_dir.iterdir()])
+                self._recovered(root, b'recovery bytes')
+        finally:
+            os.dup2(saved0, 0)
+            os.close(saved0)
+
+    def test_dup2_fault_reports_attempt_and_never_delegates(self):
+        """Control, dup2 fault after successful capture, then fresh recovery."""
+        saved0 = os.dup(0)
+        try:
+            with self._retained_dir() as name:
+                root = Path(name)
+                self._healthy(root, b'control bytes')
+                os.dup2(saved0, 0)
+                fault_dir, _, fault_lease = self._lease(root, b'fault bytes')
+                stderr = io.StringIO()
+                env = {b'CD01_CAPTURE_DIR': os.fsencode(str(fault_dir)), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+                with mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv') as execute, mock.patch.object(wrapper.os, 'dup2', side_effect=OSError(errno.EBADF, 'DUP2_PRIVATE_TEXT')):
+                    result = wrapper.main(['wrapper', '/owned/compiler', 'ordinary'], stdin_lease=fault_lease)
+                fault_dir = self._invocation(fault_dir)
+                self.assertEqual(result, 1)
+                execute.assert_not_called()
+                self.assertNotIn('PRIVATE_TEXT', stderr.getvalue())
+                failure = json.loads((fault_dir / 'failure.json').read_bytes())
+                transfer = failure['stdin_transfer']
+                self.assertTrue(transfer['capture_attempted'])
+                self.assertTrue(transfer['capture_completed'])
+                self.assertTrue(transfer['fd_dup2_attempted'])
+                self.assertFalse(transfer['fd_dup2_completed'])
+                self.assertFalse(transfer['spare_close_attempted'])
+                self.assertFalse(transfer['receipt_published'])
+                self.assertFalse(failure['exec_attempted'])
+                self.assertNotIn('stdin-transfer.json', [p.name for p in fault_dir.iterdir()])
+                self.assertEqual(os.fstat(0).st_ino, os.fstat(saved0).st_ino)
+                self._recovered(root, b'recovery bytes')
+        finally:
+            os.dup2(saved0, 0)
+            os.close(saved0)
+
+    def test_close_or_receipt_failure_keeps_uncertain_state(self):
+        """Spare-close and receipt-fsync faults: no exec, uncertain fd 0 state retained."""
+        import finite_input_custody
+        real_close = os.close
+        real_fsync = os.fsync
+        saved0 = os.dup(0)
+        try:
+            with self._retained_dir() as name:
+                root = Path(name)
+                # Phase A: healthy control, then the spare close fails after a real dup2.
+                self._healthy(root, b'control-a bytes')
+                os.dup2(saved0, 0)
+                fault_dir, _, lease = self._lease(root, b'fault-a bytes')
+                closed_spares = []
+                def close_fail(fd):
+                    """Close the selected spare then report its uncertain outcome once."""
+                    target = Path(os.readlink('/proc/self/fd/' + str(fd)))
+                    real_close(fd)
+                    if target.name == 'input.bin' and not closed_spares:
+                        closed_spares.append(target)
+                        raise OSError(errno.EBUSY, 'CLOSE_PRIVATE_TEXT')
+                stderr = io.StringIO()
+                env = {b'CD01_CAPTURE_DIR': os.fsencode(str(fault_dir)), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+                with mock.patch.object(wrapper, '_load_custody_module', return_value=finite_input_custody), mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv') as execute, mock.patch.object(wrapper.os, 'close', close_fail):
+                    result = wrapper.main(['wrapper', '/owned/compiler', 'ordinary'], stdin_lease=lease)
+                fault_dir = self._invocation(fault_dir)
+                self.assertEqual(result, 1)
+                execute.assert_not_called()
+                self.assertNotIn('PRIVATE_TEXT', stderr.getvalue())
+                self.assertEqual(len(closed_spares), 1)
+                failure = json.loads((fault_dir / 'failure.json').read_bytes())
+                transfer = failure['stdin_transfer']
+                self.assertTrue(transfer['capture_completed'])
+                self.assertTrue(transfer['fd_dup2_completed'])
+                self.assertTrue(transfer['spare_close_attempted'])
+                self.assertFalse(transfer['spare_close_completed'])
+                self.assertFalse(transfer['receipt_published'])
+                self.assertFalse(failure['exec_attempted'])
+                self.assertNotIn('stdin-transfer.json', [p.name for p in fault_dir.iterdir()])
+                self.assertEqual(os.readlink('/proc/self/fd/0').rsplit('/', 1)[-1], 'input.bin')
+                os.dup2(saved0, 0)
+                self._recovered(root, b'recovery-a bytes')
+                os.dup2(saved0, 0)
+                # Phase B: healthy control, then the receipt directory fsync fails.
+                self._healthy(root, b'control-b bytes')
+                os.dup2(saved0, 0)
+                fault_dir, _, lease = self._lease(root, b'fault-b bytes')
+                synced = []
+                def fsync_fail(fd):
+                    """Fail the receipt directory sync after a visible publication."""
+                    path = Path(os.readlink('/proc/self/fd/' + str(fd)))
+                    if path.is_dir() and (path / 'stdin-transfer.json').exists() and not synced:
+                        synced.append(path)
+                        raise OSError(errno.EIO, 'SYNC_PRIVATE_TEXT')
+                    return real_fsync(fd)
+                stderr = io.StringIO()
+                env = {b'CD01_CAPTURE_DIR': os.fsencode(str(fault_dir)), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+                with mock.patch.object(wrapper, '_load_custody_module', return_value=finite_input_custody), mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv') as execute, mock.patch.object(wrapper.os, 'fsync', fsync_fail):
+                    result = wrapper.main(['wrapper', '/owned/compiler', 'ordinary'], stdin_lease=lease)
+                fault_dir = self._invocation(fault_dir)
+                self.assertEqual(result, 1)
+                execute.assert_not_called()
+                self.assertNotIn('PRIVATE_TEXT', stderr.getvalue())
+                self.assertEqual(len(synced), 1)
+                failure = json.loads((fault_dir / 'failure.json').read_bytes())
+                transfer = failure['stdin_transfer']
+                self.assertTrue(transfer['fd_dup2_completed'])
+                self.assertTrue(transfer['spare_close_completed'])
+                self.assertTrue(transfer['receipt_published'])
+                self.assertFalse(transfer['receipt_dir_fsynced'])
+                self.assertFalse(failure['exec_attempted'])
+                self.assertEqual(os.readlink('/proc/self/fd/0').rsplit('/', 1)[-1], 'input.bin')
+                self._recovered(root, b'recovery-b bytes')
+        finally:
+            os.dup2(saved0, 0)
+            os.close(saved0)
+
+    def test_missing_sibling_refuses_cached_module(self):
+        """Healthy transfer, missing bound sibling despite cache, fresh recovery."""
+        import finite_input_custody
+        saved0 = os.dup(0)
+        try:
+            with self._retained_dir() as name:
+                root = Path(name)
+                self._healthy(root, b'loader-control')
+                capture_dir, input_fd, lease = self._lease(root, b'must-stay-unread')
+                absent = root / 'no-sibling' / 'wrapper.py'
+                env = {b'CD01_CAPTURE_DIR': os.fsencode(capture_dir), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+                stderr = io.StringIO()
+                with mock.patch.object(wrapper, '__file__', str(absent)), mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv', side_effect=OSError(errno.ENOEXEC, 'OWNED_EXEC')) as execute:
+                    result = wrapper.main(['wrapper', '/owned/compiler', 'ordinary'], stdin_lease=lease)
+                self._recovered(root, b'loader-recovery')
+                self.assertNotEqual(result, 0)
+                execute.assert_not_called()
+                self.assertEqual(os.lseek(input_fd, 0, os.SEEK_CUR), 0)
+        finally:
+            os.dup2(saved0, 0)
+            os.close(saved0)
+
+    def test_nonexact_input_fd_refuses_before_mutation(self):
+        """Healthy transfer, nonexact integer descriptor refused, fresh recovery."""
+        class Descriptor(int):
+            """Fixture integer subclass, excluded by exact-int lease schema."""
+        saved0 = os.dup(0)
+        try:
+            with self._retained_dir() as name:
+                root = Path(name)
+                self._healthy(root, b'type-control')
+                capture_dir, input_fd, lease = self._lease(root, b'unread-type-input')
+                lease['input_fd'] = Descriptor(input_fd)
+                env = {b'CD01_CAPTURE_DIR': os.fsencode(capture_dir), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+                stderr = io.StringIO()
+                with mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv', side_effect=OSError(errno.ENOEXEC, 'OWNED_EXEC')) as execute:
+                    result = wrapper.main(['wrapper', '/owned/compiler', 'ordinary'], stdin_lease=lease)
+                self._recovered(root, b'type-recovery')
+                self.assertEqual(result, 78)
+                execute.assert_not_called()
+                self.assertEqual(list(capture_dir.iterdir()), [])
+                self.assertEqual(os.lseek(input_fd, 0, os.SEEK_CUR), 0)
+        finally:
+            os.dup2(saved0, 0)
+            os.close(saved0)
+
+
+    def test_normalized_capture_interrupt_keeps_category(self):
+        """Control, normalized primary/cleanup interruptions, fresh recovery per case."""
+        import finite_input_custody
+        saved0 = os.dup(0)
+        try:
+            with self._retained_dir() as name:
+                root = Path(name)
+                for mode in ['primary', 'cleanup']:
+                    with self.subTest(mode=mode):
+                        self._healthy(root, b'interrupt-control')
+                        capture_dir, _, lease = self._lease(root, b'interrupt-input')
+                        interrupt = KeyboardInterrupt('PRIVATE_INTERRUPT')
+                        primary = interrupt if mode == 'primary' else OSError(errno.EIO, 'PRIVATE_INPUT')
+                        observed = []
+                        closed = []
+                        real_handle = wrapper._handle_failure
+                        real_close = finite_input_custody._os_close
+                        def observe(error, *args):
+                            """Retain normalized original causes before safe wrapper reporting."""
+                            observed.append(error)
+                            return real_handle(error, *args)
+                        def close_then_interrupt(fd):
+                            """Close an owned fixture fd, then inject one cleanup interruption."""
+                            real_close(fd)
+                            if mode == 'cleanup' and not closed:
+                                closed.append(fd)
+                                raise interrupt
+                        env = {b'CD01_CAPTURE_DIR': os.fsencode(capture_dir), b'CD01_SPACEGUARD_PATH': b'/usr/bin/true'}
+                        stderr = io.StringIO()
+                        with mock.patch.object(wrapper, '_load_custody_module', return_value=finite_input_custody), mock.patch.dict(os.environb, env), mock.patch.object(wrapper.sys, 'stderr', stderr), mock.patch.object(wrapper.os, 'execv') as execute, mock.patch.object(finite_input_custody, '_os_read', side_effect=primary), mock.patch.object(finite_input_custody, '_os_close', side_effect=close_then_interrupt), mock.patch.object(wrapper, '_handle_failure', side_effect=observe):
+                            result = wrapper.main(['wrapper', '/owned/compiler', 'ordinary'], stdin_lease=lease)
+                        self._recovered(root, b'interrupt-recovery')
+                        self.assertEqual(result, 130)
+                        execute.assert_not_called()
+                        self.assertIs(observed[0].original_exception, primary)
+                        self.assertIn(interrupt, (observed[0].original_exception, *observed[0].secondary_exceptions))
+                        self.assertIn('interrupted', stderr.getvalue())
+                        self.assertNotIn('PRIVATE', stderr.getvalue())
+                        directory = self._invocation(capture_dir)
+                        failure = json.loads((directory / 'failure.json').read_bytes())
+                        self.assertTrue(failure['interrupted'])
+                        self.assertTrue(failure['stdin_transfer']['custody_error']['interrupted'])
+                        self.assertFalse(failure['exec_attempted'])
+        finally:
+            os.dup2(saved0, 0)
+            os.close(saved0)
 
 if __name__ == '__main__':
     unittest.main()
