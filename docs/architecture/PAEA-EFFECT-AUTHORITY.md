@@ -1,5 +1,41 @@
 # Autorité exacte des services d’effet PAEA
 
+## Observation des erreurs après promotion Git
+
+Le chemin Rust de promotion conserve désormais une enveloppe typée d’observation
+distincte de la cause d’erreur : résultat durable connu, ou effet possible sans
+résultat durable établi. Ce second cas expose le code sûr
+`paea-git-promote-unknown` ; il reste une erreur, sans autorisation de réessayer.
+Une expiration ou une référence différente observée après la transaction Git
+n’établit pas l’absence de publication. Les erreurs SQL originales et les causes
+indépendantes de nettoyage restent parcourables sans afficher leurs données
+privées. Un résultat enregistré ne doit pas disparaître lors d’un échec de
+libération, de fermeture ou de sortie CLI. Une ligne de résultat CLI peut déjà
+avoir été écrite avant l’échec ultérieur : le code de sortie reste alors non nul.
+
+La CLI encode le JSON avant toute écriture, puis distingue écriture, saut de
+ligne et flush par des codes sûrs, en conservant les erreurs typées originales.
+Cela évite de perdre une erreur IO à travers la sérialisation. Un défaut de
+fermeture de l’autorité conserve aussi l’enveloppe personnelle/métier complète,
+avec le résultat connu et les autres causes de fermeture. Les erreurs JSON CLI
+et HTTP exposent séparément `paea_git_effect.state`, avec les valeurs `recorded`
+ou `unknown`. Un refus d’autorité avant un nouvel engagement laisse l’histoire
+de l’intention inconnue ; il ne prouve pas son absence d’effet antérieur. Un
+ancien résultat de journal sans ligne d’effet est projeté comme inconnu. Les
+diagnostics texte CLI exposent aussi `effect_state`, sans masquer la cause.
+Cette normalisation intervient dans le renderer après parcours des wrappers de
+fermeture ; les codes sûrs des causes restent visibles en français et en anglais,
+sans afficher les messages privés des erreurs imbriquées.
+Les gardes de projection portent sur les vrais producteurs JSON en mémoire ;
+ils ne prouvent pas la transmission réseau, l’effet Git ni l’installation.
+
+Le [lot article v6](../plans/actions-confiance/ARTICLE-V6-ADAPTATION.md) conserve
+le candidat, la reproduction et les contrôles. Ce changement de source ne prouve
+ni installation, ni conformité globale PV2. La lecture de référence par Reconcile
+et le bail d’autorité restent des étapes distinctes de ce lot ; l’absence de ligne
+dans le journal n’établit toujours pas l’absence d’effet Git. L’identification
+d’une intention versus d’une tentative doit rester explicite lors de l’oracle.
+
 [English](../en/PAEA-EFFECT-AUTHORITY.md)
 
 Le module Linux `swarm_enrollment_authority::paea_action` distingue les permissions

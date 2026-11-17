@@ -125,6 +125,7 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
     if let Some(error)=native_ref::<crate::PaeaGitPromoteCallError>(e,&mut result,&mut explicit){
         result.labels.push(error.code().into());
         if let Some(known)=error.known_outcome(){result.labels.push(promote_outcome_label(known).into());}
+        else if error.effect_unknown(){result.labels.push("paea-git-promote-unknown".into());}
         result.children.extend(error.branches().into_iter().map(|cause|("source",cause)));explicit=true;
     }
     #[cfg(target_os="linux")]
@@ -345,6 +346,14 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
                 result.children.push(("primary", primary.as_ref()));
             }
             result.children.push(("cleanup", cleanup.as_ref()));
+            explicit = true;
+        }
+        // The boxed promote-call observation envelope is visited explicitly so
+        // traversal and find() never depend on a derived source() that could
+        // skip its own wrapper; no recursive self loop is possible because the
+        // box is owned data and the walkers keep a seen-pointer guard.
+        if let crate::RootStoreError::PaeaGitPromoteCall(cause) = e {
+            result.children.push(("primary", cause.as_ref()));
             explicit = true;
         }
     }

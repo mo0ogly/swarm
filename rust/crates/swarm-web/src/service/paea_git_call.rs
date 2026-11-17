@@ -15,6 +15,36 @@ use swarm_enrollment_authority::{
 };
 use swarm_enrollment_state::Head;
 
+/// Project the first attributed promotion observation through HTTP, Root and
+/// IO wrappers. Primary causes precede independent cleanup; different calls are
+/// never merged. Missing metadata is not an absence-of-effect claim. This pure
+/// projection performs no readback, mutation, authentication or retry.
+pub(super) fn error_observation(error: &E) -> Option<serde_json::Value> {
+    use std::error::Error;
+    let mut pending: Vec<&(dyn Error + 'static)> = vec![error];
+    let mut seen: Vec<*const dyn Error> = Vec::new();
+    while let Some(cause) = pending.pop() {
+        let pointer = cause as *const dyn Error;
+        if seen.iter().any(|prior| std::ptr::eq(*prior, pointer)) { continue; }
+        seen.push(pointer);
+        if let Some(promotion) = cause.downcast_ref::<swarm_engine::PaeaGitPromoteCallError>() {
+            return Some(promotion.public_effect_observation());
+        }
+        if let Some(E::Close { primary, cleanup }) = cause.downcast_ref::<E>() {
+            pending.push(cleanup.as_ref());
+            if let Some(primary) = primary { pending.push(primary.as_ref()); }
+            continue;
+        }
+        if let Some(source) = cause.downcast_ref::<PaeaGitCallSourceError>() {
+            pending.extend(source.branches().into_iter().rev());
+            continue;
+        }
+        pending.extend(swarm_engine::native_error_links(cause).children.into_iter()
+            .rev().map(|(_, child)| child));
+    }
+    None
+}
+
 /// One exact prepared PAEA Git call with the trusted startup paths of BOTH
 /// roots it binds (service and separate project), held outside HTTP between
 /// preparation and single consumption. The prepared witnesses keep both
@@ -279,6 +309,34 @@ impl std::error::Error for PaeaGitCallSourceError {
         self.branches().into_iter().next()
     }
 }
+
+/// Join one promote reply with a root close. When the close fails after a
+/// known engine outcome, the outcome is retained in a typed observation
+/// envelope error before the generic close, so a recorded/replayed
+/// publication is never erased by an independent cleanup refusal. Every other
+/// shape reuses the existing generic close unchanged; no service-level state
+/// is consulted and no cause is suppressed.
+fn close_known(
+    reply: Result<serde_json::Value, E>,
+    closed: Result<(), RootStoreError>,
+    known: Option<swarm_engine::PaeaGitPromoteOutcome>,
+) -> Result<serde_json::Value, E> {
+    if !matches!((&reply, &closed), (Ok(_), Err(_))) {
+        return close(reply, closed);
+    }
+    match (reply, closed, known) {
+        (Ok(_), Err(cleanup), Some(outcome)) => Err(root(
+            "paea-git-call-known",
+            RootStoreError::PaeaGitPromoteCall(Box::new(
+                swarm_engine::PaeaGitPromoteCallError::Effect {
+                    outcome: Some(outcome),
+                    cause: cleanup,
+                },
+            )),
+        )),
+        (reply, closed, _) => close(reply, closed),
+    }
+}
 /// One exact prepared call plus its current held authority, kept alive until
 /// the single authenticated consumption or an explicit source close. An
 /// optional prepared approval command (frozen operation + exact bytes bound to
@@ -424,6 +482,9 @@ impl PaeaGitCallAuthority {
         }
         let service = RootStore::open(&self.source.service_path, true)
             .map_err(|cause| root("paea-git-call-open", cause))?;
+        // Retain the exact engine outcome of the promote call so a later root
+        // close failure cannot erase a known recorded/replayed observation.
+        let mut promote_outcome: Option<swarm_engine::PaeaGitPromoteOutcome> = None;
         let result = (|| {
             let project = RootStore::open(&self.source.project_path, true)
                 .map_err(|cause| root("paea-git-call-open", cause))?;
@@ -473,6 +534,7 @@ impl PaeaGitCallAuthority {
                                     RootStoreError::PaeaGitPromoteCall(Box::new(e)),
                                 )
                             })?;
+                        promote_outcome = Some(outcome.clone());
                         Ok(match &outcome {
                             swarm_engine::PaeaGitPromoteOutcome::Recorded {
                                 intent_id,
@@ -509,10 +571,10 @@ impl PaeaGitCallAuthority {
                 }
             })();
             let closed = project.close();
-            close(reply, closed)
+            close_known(reply, closed, promote_outcome.clone())
         })();
         let closed = service.close();
-        close(result, closed)
+        close_known(result, closed, promote_outcome)
     }
     /// Explicitly release the held authority and the prepared witnesses after
     /// all requests drain or on any refusal; all independent causes retained.
@@ -615,5 +677,59 @@ impl NativeHttpService {
         Ok(RouteBody::plain(
             serde_json::to_vec(&reply).map_err(E::ResponseJson)?,
         ))
+    }
+}
+
+
+#[cfg(test)]
+mod public_observation_tests {
+    use super::*;
+
+    /// Construct only a typed observation fixture, with no Root or Git effect.
+    fn recorded_error() -> E {
+        root("fixture-close", RootStoreError::PaeaGitPromoteCall(Box::new(
+            swarm_engine::PaeaGitPromoteCallError::Effect {
+                outcome: Some(swarm_engine::PaeaGitPromoteOutcome::Recorded {
+                    intent_id: "intent".into(), action_digest: "digest".into(),
+                    target_ref: "refs/heads/release".into(), new_oid: "candidate".into(), replayed: false,
+                }), cause: RootStoreError::Refused("fixture-close"),
+            },
+        )))
+    }
+
+    #[test]
+    fn public_error_body_retains_recorded_effect() {
+        let reply = super::super::error_reply(recorded_error(), false).unwrap();
+        assert!(!reply.response.status().is_success());
+        let value: serde_json::Value = serde_json::from_slice(reply.response.body()).unwrap();
+        assert_eq!(value["paea_git_effect"]["state"], "recorded");
+        assert_eq!(value["paea_git_effect"]["intent_id"], "intent");
+        assert_eq!(value["paea_git_effect"]["new_oid"], "candidate");
+    }
+
+    #[test]
+    fn public_error_body_keeps_unproven_history_unknown() {
+        let error = root("fixture-pre-effect", RootStoreError::PaeaGitPromoteCall(Box::new(
+            swarm_engine::PaeaGitPromoteCallError::Action(RootStoreError::Refused("fixture-refusal")),
+        )));
+        let reply = super::super::error_reply(error, false).unwrap();
+        let value: serde_json::Value = serde_json::from_slice(reply.response.body()).unwrap();
+        assert_eq!(value["paea_git_effect"]["state"], "unknown");
+        assert!(value["paea_git_effect"].get("intent_id").is_none());
+    }
+
+    #[test]
+    fn head_retains_typed_observation_without_a_body() {
+        let reply = super::super::error_reply(recorded_error(), true).unwrap();
+        assert!(reply.response.body().is_empty());
+        let observation = error_observation(reply.failure.as_ref().unwrap()).unwrap();
+        assert_eq!(observation["state"], "recorded");
+    }
+
+    #[test]
+    fn unrelated_error_does_not_invent_paea_metadata() {
+        let reply = super::super::error_reply(E::Refused("fixture-unrelated"), false).unwrap();
+        let value: serde_json::Value = serde_json::from_slice(reply.response.body()).unwrap();
+        assert!(value.get("paea_git_effect").is_none());
     }
 }

@@ -1905,7 +1905,9 @@ fn safe_causes(error: &(dyn std::error::Error + 'static)) -> Vec<String> {
 /// error, so a failed diagnostic cannot hide a recorded state or authorize retry.
 /// Render a nonzero CLI failure with safe typed causes, known Work and typed
 /// configuration/auxiliary-preservation metadata on every platform, independently of web
-/// sessions. A true configuration_may_be_recorded requires reread before recovery;
+/// sessions. PAEA effect state and safe cause codes are projected through cleanup
+/// wrappers for JSON and text; missing metadata never establishes historical
+/// absence. A true configuration_may_be_recorded requires reread before recovery;
 /// its absence never proves rollback. Unknown effects are
 /// omitted rather than asserted rolled back; output failures retain the original
 /// diagnostic and secondary writer error in RunOutcome. This writes/flushes only
@@ -1937,8 +1939,18 @@ fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) 
     let message = if english && matches!(&error, CliError::Unsupported) {
         "Command is not yet ported in this Rust development binary.".into()
     } else { error.message() };
+    // Normalize PAEA observations at the renderer, after traversing primary
+    // and cleanup branches. A generic outer close message cannot erase either
+    // the effect state or safe original cause codes; private Display is unused.
+    #[cfg(target_os = "linux")]
+    let message = match paea_promote::error_effect_status(&error) {
+        Some(state) => format!("{message}; effect_state={state}; causes={}", safe_causes(&error).join(",")),
+        None => message,
+    };
     let bytes = if as_json {
         let mut document = serde_json::json!({"schema_version":1,"error":message,"failure":Failure{code:error.code(),message:&message,retryable:false,causes:safe_causes(&error)}});
+        #[cfg(target_os = "linux")]
+        if let Some(effect) = paea_promote::error_observation(&error) { document["paea_git_effect"] = effect; }
         if let Some(publication)=error.trust_publication(){document["trust_publication"]=serde_json::json!(publication);document["trust_state_may_be_recorded"]=serde_json::json!(true);}
         let auxiliary=error.auxiliary_effects();
         if !auxiliary.is_empty(){document["auxiliary_effects"]=serde_json::json!(auxiliary);}

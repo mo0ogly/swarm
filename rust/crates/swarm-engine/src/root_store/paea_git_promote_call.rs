@@ -33,6 +33,18 @@ pub enum PaeaGitPromoteCallError {
     Personal(UseError<Use<PaeaGitPromoteOutcome, R>, Infallible>),
     Authority(Use<PaeaGitPromoteOutcome, R>),
     Action(R),
+    /// Typed effect observation envelope: the guarded operation reached the
+    /// backend, so `outcome` retains the known recorded/replayed or reconciled
+    /// result, or is `None` when the publication may have happened without an
+    /// observable durable outcome. `None` is an explicit unknown, never an
+    /// absence claim, a success or a retry authorization. `cause` is the
+    /// independent typed primary failure; independent cleanup errors stay
+    /// nested in the existing `RootStoreError::Cleanup` shape. Display stays
+    /// the fixed safe code; formatting exposes no receipt, credential or private nested text.
+    Effect {
+        outcome: Option<PaeaGitPromoteOutcome>,
+        cause: R,
+    },
     MissingAction,
 }
 impl PaeaGitPromoteCallError {
@@ -46,17 +58,87 @@ impl PaeaGitPromoteCallError {
             _ => None,
         }
     }
+    /// Borrow the typed callback failure carried by this error, when the held
+    /// operation reached the backend. Envelope causes surface directly.
+    fn callback_error(&self) -> Option<&R> {
+        match self {
+            Self::Action(cause) => Some(cause),
+            Self::Effect { cause, .. } => Some(cause),
+            Self::Personal(UseError::AfterUse {
+                outcome: Ok(used), ..
+            })
+            | Self::Authority(used) => used.action.as_ref()?.as_ref().err(),
+            _ => None,
+        }
+    }
     /// Borrow the backend error without discarding primary/authority causes.
     pub fn backend_error(&self) -> Option<&R> {
         match self {
             Self::Action(e) => Some(e),
+            Self::Effect { cause, .. } => Some(cause),
             _ => self.action().and_then(|a| a.as_ref().err()),
         }
     }
     /// Known recorded/replayed or negative reconciliation outcome despite a
-    /// later failure. Availability never restores expired/revoked authority.
+    /// later failure, retained directly on the effect envelope or found
+    /// through nested callback cleanup/launch/box wrappers. Availability never
+    /// restores expired/revoked authority.
     pub fn known_outcome(&self) -> Option<&PaeaGitPromoteOutcome> {
-        self.action().and_then(|a| a.as_ref().ok())
+        if let Self::Effect {
+            outcome: Some(outcome),
+            ..
+        } = self
+        {
+            return Some(outcome);
+        }
+        if let Some(action) = self.action() {
+            if let Ok(outcome) = action {
+                return Some(outcome);
+            }
+        }
+        Self::find(self.callback_error()?).and_then(Self::known_outcome)
+    }
+    /// Business-intention observation for a failed call, independently of its
+    /// authority decision. Only a retained durable record establishes recorded;
+    /// a pre-effect refusal or empty journal does not establish historical absence.
+    /// This pure projection performs no IO and grants no retry or authority.
+    pub fn effect_status(&self) -> &'static str {
+        match self.known_outcome() {
+            Some(PaeaGitPromoteOutcome::Recorded { .. }) => "recorded",
+            _ => "unknown",
+        }
+    }
+
+    /// Safe public effect metadata for this failed call. Known receipt fields
+    /// come only from the retained typed outcome; missing knowledge yields an
+    /// explicit unknown, never a fabricated no-effect result. No credentials,
+    /// private nested diagnostics or canonical payload are rendered. A journal
+    /// record is not independent authenticity or permission for another effect.
+    pub fn public_effect_observation(&self) -> serde_json::Value {
+        match self.known_outcome() {
+            Some(PaeaGitPromoteOutcome::Recorded {
+                intent_id, action_digest, target_ref, new_oid, replayed,
+            }) => serde_json::json!({
+                "state":"recorded", "intent_id":intent_id,
+                "action_digest":action_digest, "target_ref":target_ref,
+                "new_oid":new_oid, "replayed":replayed,
+            }),
+            Some(PaeaGitPromoteOutcome::ReconciledNotCommitted { intent_id, target_ref }) =>
+                serde_json::json!({"state":"unknown", "intent_id":intent_id,
+                    "target_ref":target_ref, "journal_state":"no_effect_row"}),
+            None => serde_json::json!({"state":"unknown"}),
+        }
+    }
+
+    /// True when the guarded publication may have happened but no durable
+    /// outcome was observed, on this error or through nested callback
+    /// wrappers. Unknown never establishes absence of effects and never
+    /// authorizes a retry.
+    pub fn effect_unknown(&self) -> bool {
+        if matches!(self, Self::Effect { outcome: None, .. }) {
+            return true;
+        }
+        self.callback_error().and_then(|cause| Self::find(cause)).is_some_and(Self::effect_unknown)
     }
     /// Independent personal, business and backend causes. Standard source()
     /// supplies the first only; consumers must inspect all branches.
@@ -79,7 +161,7 @@ impl PaeaGitPromoteCallError {
                     out.push(cause);
                 }
             }
-            Self::Action(_) | Self::MissingAction => (),
+            Self::Effect { .. } | Self::Action(_) | Self::MissingAction => (),
         }
         if let Some(error) = self.backend_error() {
             out.push(error);
@@ -114,10 +196,14 @@ impl PaeaGitPromoteCallError {
     }
     /// Fixed safe diagnostic, never a receipt, a password or nested SQL text.
     pub fn code(&self) -> &'static str {
+        if self.effect_unknown() && self.known_outcome().is_none() {
+            return "paea-git-promote-unknown";
+        }
         match self {
             Self::Personal(_) => "paea-git-promote-personal",
             Self::Authority(_) => "paea-git-promote-authority",
             Self::Action(_) => "paea-git-promote-action",
+            Self::Effect { .. } => "paea-git-promote-effect",
             Self::MissingAction => "paea-git-promote-action-missing",
         }
     }
@@ -533,13 +619,14 @@ impl RootStore {
                         Err(cause) => {
                             let cleanup = R::Storage(cause);
                             match inner {
-                                Ok(outcome) => {
-                                    let _ = outcome;
-                                    Err(R::Cleanup {
-                                        primary: None,
-                                        cleanup: Box::new(cleanup),
-                                    })
-                                }
+                                // A known outcome survives the failed trust
+                                // unlock in the typed observation envelope.
+                                Ok(outcome) => Err(R::PaeaGitPromoteCall(Box::new(
+                                    PaeaGitPromoteCallError::Effect {
+                                        outcome: Some(outcome),
+                                        cause: cleanup,
+                                    },
+                                ))),
                                 Err(e) => Err(R::Cleanup {
                                     primary: Some(Box::new(e)),
                                     cleanup: Box::new(cleanup),
@@ -548,7 +635,18 @@ impl RootStore {
                         }
                     }
                 })();
-                finished(result, rollback(project_tx))
+                // A known outcome survives a failed project rollback in the
+                // typed observation envelope; the plain join would drop it.
+                match (result, rollback(project_tx)) {
+                    (Ok(outcome), Ok(())) => Ok(outcome),
+                    (Ok(outcome), Err(cleanup)) => Err(R::PaeaGitPromoteCall(Box::new(
+                        PaeaGitPromoteCallError::Effect {
+                            outcome: Some(outcome),
+                            cause: cleanup,
+                        },
+                    ))),
+                    (Err(e), cleanup) => finished(Err(e), cleanup),
+                }
             })
             .map_err(PaeaGitPromoteCallError::Personal)?;
         if used.authority.is_err() {
@@ -755,23 +853,88 @@ mod effect {
         )
         .map_err(|e| R::SqlTransaction(Box::new(e)))
     }
-    /// Join an outcome with an explicit custody close, preserving a known
-    /// outcome through a later close failure.
-    fn finished_out(
+    #[cfg(test)]
+    mod post_effect_regression {
+        use super::*;
+
+        /// A recorded effect is a known observation even when custody close
+        /// fails. This reproduces the historical loss without opening a Root,
+        /// publishing a ref, or injecting a failure into live project storage.
+        #[test]
+        fn recorded_effect_survives_cleanup() {
+            let outcome = PaeaGitPromoteOutcome::Recorded {
+                intent_id: "intent".into(),
+                action_digest: "digest".into(),
+                target_ref: "refs/heads/release".into(),
+                new_oid: "candidate".into(),
+                replayed: false,
+            };
+            let error = finished_out(
+                Ok(outcome.clone()),
+                Err(R::Refused("fixture-custody-close")),
+            ).expect_err("cleanup must remain a failed call");
+            let envelope = super::super::PaeaGitPromoteCallError::Action(error);
+            assert_eq!(envelope.known_outcome(), Some(&outcome),
+                "cleanup erased an already-recorded Git outcome");
+        }
+    }
+
+    /// Join an outcome with custody close, preserving an observed result in
+    /// the typed envelope when cleanup fails. No IO, retry or rollback runs.
+    pub(super) fn finished_out(
         result: Result<PaeaGitPromoteOutcome, R>,
         cleanup: Result<(), R>,
     ) -> Result<PaeaGitPromoteOutcome, R> {
         match (result, cleanup) {
             (Ok(v), Ok(())) => Ok(v),
             (Err(e), Ok(())) => Err(e),
-            (Ok(_), Err(e)) => Err(R::Cleanup {
-                primary: None,
-                cleanup: Box::new(e),
-            }),
+            (Ok(outcome), Err(cause)) => Err(R::PaeaGitPromoteCall(Box::new(
+                super::PaeaGitPromoteCallError::Effect {
+                    outcome: Some(outcome), cause,
+                },
+            ))),
             (Err(e), Err(cleanup)) => Err(R::Cleanup {
                 primary: Some(Box::new(e)),
                 cleanup: Box::new(cleanup),
             }),
+        }
+    }
+    /// Wrap a post-publication failure in the typed effect observation
+    /// envelope: the reference transaction may have published while no durable
+    /// outcome was observed, so the observation is the explicit unknown and
+    /// never an absence claim. An independent close failure is joined below
+    /// the primary cause; no error is suppressed into a success.
+    fn observed_unknown(cause: R, cleanup: Result<(), R>) -> Result<PaeaGitPromoteOutcome, R> {
+        let cause = match cleanup {
+            Ok(()) => cause,
+            Err(cleanup) => R::Cleanup {
+                primary: Some(Box::new(cause)),
+                cleanup: Box::new(cleanup),
+            },
+        };
+        Err(R::PaeaGitPromoteCall(Box::new(
+            super::PaeaGitPromoteCallError::Effect {
+                outcome: super::PaeaGitPromoteCallError::find(&cause)
+                    .and_then(super::PaeaGitPromoteCallError::known_outcome).cloned(),
+                cause,
+            },
+        )))
+    }
+    /// Return a known recorded/replayed outcome, retaining it in the typed
+    /// observation envelope when an independent close fails instead of
+    /// dropping the result beside the close cause.
+    fn observed_known(
+        outcome: PaeaGitPromoteOutcome,
+        cleanup: Result<(), R>,
+    ) -> Result<PaeaGitPromoteOutcome, R> {
+        match cleanup {
+            Ok(()) => Ok(outcome),
+            Err(cleanup) => Err(R::PaeaGitPromoteCall(Box::new(
+                super::PaeaGitPromoteCallError::Effect {
+                    outcome: Some(outcome),
+                    cause: cleanup,
+                },
+            ))),
         }
     }
     /// Record one effect row in one explicit service-journal transaction,
@@ -823,9 +986,14 @@ mod effect {
         })();
         match result {
             Ok(outcome) => match tx.execute_batch("COMMIT") {
-                Ok(()) => rollback(tx).map(|()| outcome),
-                Err(_cause) => {
-                    let mut e = R::Refused("paea-git-promote-commit-uncertain");
+                Ok(()) => observed_known(outcome, rollback(tx)),
+                // The commit outcome stays unknown and the original SQL cause
+                // is retained typed; rollback is never claimed to have run.
+                Err(cause) => {
+                    let mut e = R::Launch(Box::new(crate::AgentLaunchError::caused(
+                        "paea-git-promote-commit-uncertain",
+                        cause,
+                    )));
                     if let Err(cleanup) = rollback(tx) {
                         e = R::Cleanup {
                             primary: Some(Box::new(e)),
@@ -1016,7 +1184,10 @@ mod effect {
         });
         let run = match run {
             Ok(value) => value,
-            Err(e) => return finished_out(Err(e), repository.close()),
+            // The transaction was requested, so whether Git published the
+            // reference is unknown at this layer; the typed reference error
+            // keeps its own observation beside the explicit unknown.
+            Err(e) => return observed_unknown(e, repository.close()),
         };
         if run.observation != crate::GitReferenceObservation::CommitAcknowledged
             && !(run.observation == crate::GitReferenceObservation::AbortAcknowledged
@@ -1041,34 +1212,44 @@ mod effect {
             )))
         });
         let observed_new = match observed_new {
-            Ok(raw) => String::from_utf8(raw)
-                .map_err(|_| R::Refused("paea-git-promote-new-oid-encoding"))?
-                .trim()
-                .to_owned(),
-            Err(e) => return finished_out(Err(e), repository.close()),
+            Ok(raw) => match String::from_utf8(raw) {
+                Ok(value) => value.trim().to_owned(),
+                Err(cause) => return observed_unknown(
+                    R::Launch(Box::new(crate::AgentLaunchError::caused(
+                        "paea-git-promote-new-oid-encoding", cause,
+                    ))),
+                    repository.close(),
+                ),
+            },
+            // The transaction was acknowledged: the publication stays an
+            // explicit unknown until the effect row is durably recorded.
+            Err(e) => return observed_unknown(e, repository.close()),
         };
         if observed_new != *candidate_oid {
-            return finished_out(
-                Err(R::Refused("paea-git-promote-ref-candidate-mismatch")),
+            // Acknowledged publication with an unreadable or mismatched ref:
+            // the durable state is unknown, never an established absence.
+            return observed_unknown(
+                R::Refused("paea-git-promote-ref-candidate-mismatch"),
                 repository.close(),
             );
         }
         let closed = repository.close();
         if time::OffsetDateTime::now_utc() >= identity.expires_at() {
-            return finished_out(
-                Err(R::Refused("paea-git-promote-authority-expired")),
-                closed,
-            );
+            // The publication already happened; late expiry stays an explicit
+            // unknown beside the typed refusal, never a pretended absence.
+            return observed_unknown(R::Refused("paea-git-promote-authority-expired"), closed);
         }
         let receipt = PaeaGitPromoteReceipt {
             target_ref: target_ref.clone(),
             old_oid: expected_old_oid.clone(),
             new_oid: observed_new,
         };
-        finished_out(
-            record(service, &intent_id, &action_digest, &receipt, already.get()),
-            closed,
-        )
+        // After an acknowledged publication every record failure stays an
+        // explicit unknown, and a recorded outcome survives a failed close.
+        match record(service, &intent_id, &action_digest, &receipt, already.get()) {
+            Ok(outcome) => observed_known(outcome, closed),
+            Err(cause) => observed_unknown(cause, closed),
+        }
     }
     /// Reconciliation: read the durable journal state without any new
     /// publication or Git process. Missing intent or absent effect is an
@@ -1132,5 +1313,156 @@ mod effect {
                 target_ref: target_ref.clone(),
             }),
         }
+    }
+}
+
+/// Additional typed observation regressions using in-memory causes. The
+/// historical custody-loss defect was separately reproduced before integration
+/// by effect::post_effect_regression, using only the pre-existing API.
+#[cfg(test)]
+mod promote_observation_tests {
+    use super::*;
+
+    /// One recorded fixture outcome; arbitrary test strings that never leave
+    /// this module and are never rendered by the fixed Display.
+    fn recorded() -> PaeaGitPromoteOutcome {
+        PaeaGitPromoteOutcome::Recorded {
+            intent_id: "fixture-intent".into(),
+            action_digest: "fixture-digest".into(),
+            target_ref: "refs/heads/fixture".into(),
+            new_oid: "fixture-oid".into(),
+            replayed: false,
+        }
+    }
+
+    /// Collect SQLite extended codes through the same typed branch walker the
+    /// envelope uses; no message parsing is involved.
+    fn sqlite_codes(error: &(dyn Error + 'static)) -> Vec<i32> {
+        let mut pending = vec![error];
+        let mut seen: Vec<*const dyn Error> = Vec::new();
+        let mut codes = Vec::new();
+        while let Some(error) = pending.pop() {
+            let pointer = error as *const dyn Error;
+            if seen.iter().any(|old| std::ptr::eq(*old, pointer)) {
+                continue;
+            }
+            seen.push(pointer);
+            if let Some(sql) = error.downcast_ref::<rusqlite::Error>() {
+                if let Some(code) = sql.sqlite_error() {
+                    codes.push(code.extended_code);
+                }
+            }
+            let links = crate::native_error_links(error);
+            pending.extend(links.children.into_iter().map(|(_, cause)| cause));
+            if let Some(source) = error.source() {
+                pending.push(source);
+            }
+        }
+        codes
+    }
+
+    /// A known recorded outcome survives a late close failure on the envelope
+    /// and stays findable through the typed Root wrapper and cleanup nesting.
+    #[test]
+    fn late_cleanup_retains_known_recorded_outcome() {
+        let outcome = recorded();
+        let direct = PaeaGitPromoteCallError::Effect {
+            outcome: Some(outcome.clone()),
+            cause: R::Refused("fixture-late-close"),
+        };
+        assert_eq!(direct.known_outcome(), Some(&outcome));
+        assert!(!direct.effect_unknown());
+        let nested = PaeaGitPromoteCallError::Action(R::PaeaGitPromoteCall(Box::new(
+            PaeaGitPromoteCallError::Effect {
+                outcome: Some(outcome.clone()),
+                cause: R::Cleanup {
+                    primary: None,
+                    cleanup: Box::new(R::Refused("fixture-close")),
+                },
+            },
+        )));
+        assert_eq!(nested.known_outcome(), Some(&outcome));
+        assert!(!nested.effect_unknown());
+        assert!(matches!(
+            nested.backend_error(),
+            Some(R::PaeaGitPromoteCall(_))
+        ));
+    }
+
+    /// The explicit unknown stays unknown through generic IO wrappers and the
+    /// fixed safe diagnostics expose it without any receipt or private data.
+    #[test]
+    fn unknown_envelope_stays_unknown_through_wrappers() {
+        let envelope = PaeaGitPromoteCallError::Effect {
+            outcome: None,
+            cause: R::Refused("fixture-post-effect"),
+        };
+        let wrapped: Box<dyn Error + Send + Sync> = Box::new(std::io::Error::other(
+            R::PaeaGitPromoteCall(Box::new(envelope)),
+        ));
+        let found = PaeaGitPromoteCallError::find(wrapped.as_ref()).expect("envelope retained");
+        assert!(found.effect_unknown());
+        assert!(found.known_outcome().is_none());
+        #[cfg(target_os = "linux")]
+        {
+            let links = crate::native_error_links(found);
+            assert_eq!(found.code(), "paea-git-promote-unknown");
+            assert!(links.labels.iter().any(|l| l == "paea-git-promote-unknown"));
+        }
+    }
+
+    /// A commit-uncertain record failure keeps the original rusqlite cause and
+    /// an independent rollback refusal; the observation stays explicitly
+    /// unknown and no outcome is invented.
+    #[test]
+    fn sql_commit_cause_and_independent_cleanup_survive_envelope() {
+        let db = rusqlite::Connection::open_in_memory().unwrap();
+        let sql = db
+            .execute_batch("SELECT * FROM fixture_missing_promote_effects")
+            .unwrap_err();
+        let expected = sql.sqlite_error().unwrap().extended_code;
+        let error = PaeaGitPromoteCallError::Effect {
+            outcome: None,
+            cause: R::Cleanup {
+                primary: Some(Box::new(R::Launch(Box::new(crate::AgentLaunchError::caused(
+                    "paea-git-promote-commit-uncertain",
+                    sql,
+                ))))),
+                cleanup: Box::new(R::Refused("fixture-rollback")),
+            },
+        };
+        assert!(error.effect_unknown());
+        assert!(error.known_outcome().is_none());
+        let cause = error.backend_error().expect("envelope retains its cause");
+        let links = crate::native_error_links(cause);
+        assert!(links.children.iter().any(|(kind, _)| *kind == "primary"));
+        assert!(links.children.iter().any(|(kind, _)| *kind == "cleanup"));
+        assert!(sqlite_codes(cause).contains(&expected));
+    }
+
+    /// A pre-effect refusal invents neither a known outcome nor an unknown
+    /// publication, even under cleanup joins. Uses only the pre-existing API,
+    /// so it also compiles and passes on a baseline without the envelope.
+    #[test]
+    fn pre_effect_failure_keeps_no_known_outcome() {
+        let direct = PaeaGitPromoteCallError::Action(R::Refused(
+            "paea-git-promote-repository-binding",
+        ));
+        assert!(direct.known_outcome().is_none());
+        let joined = PaeaGitPromoteCallError::Action(R::Cleanup {
+            primary: Some(Box::new(R::Refused("paea-git-promote-current-candidate"))),
+            cleanup: Box::new(R::Refused("fixture-close")),
+        });
+        assert!(joined.known_outcome().is_none());
+    }
+
+    /// The shared custody join must preserve a result observed before cleanup.
+    #[test]
+    fn finished_out_retains_known_outcome_beside_cleanup() {
+        let expected = recorded();
+        let joined = effect::finished_out(Ok(expected.clone()), Err(R::Refused("fixture-close")));
+        let error = PaeaGitPromoteCallError::Action(joined.err().unwrap());
+        assert_eq!(error.known_outcome(), Some(&expected));
+        assert!(!error.effect_unknown());
     }
 }

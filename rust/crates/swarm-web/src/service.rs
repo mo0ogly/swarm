@@ -1530,6 +1530,8 @@ impl NativeHttpService {
 /// Err; it never manufactures empty success or rolls back a known transaction.
 fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpServiceError> {
     let mut document = serde_json::json!({"schema_version":1,"error":error.code(),"failure":{"code":error.code()}});
+    #[cfg(target_os = "linux")]
+    if let Some(effect) = paea_git_call::error_observation(&error) { document["paea_git_effect"] = effect; }
     if let Some(probe)=error.provider_probe(){document["provider_contact_may_have_occurred"]=probe.contact_may_have_occurred.into();}
     #[cfg(target_os="linux")]
     if let Some(reason)=project_profile::public_reason(&error){document["failure"]["reason"]=reason.into();}

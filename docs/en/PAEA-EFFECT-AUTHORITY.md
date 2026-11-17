@@ -72,3 +72,32 @@ presentation interpretation, with no producer or server change; it qualifies
 no installation or global acceptance.
 
 Local qualification: permanent recipe `tools/verification/recipes/paea-approval-state-fail-closed.json` — `python3 tools/verification/recipe.py run --recipe tools/verification/recipes/paea-approval-state-fail-closed.json --output FRESH`, then `python3 tools/verification/recipe.py verify --evidence FRESH` on that same FRESH directory produced by the recipe run (run manifest, inputs and raw outputs retained in FRESH); 36 named FR/EN checks expected, 0 diagnostics. The browser separately creates its own private, fresh TMPDIR, printed in the step stdout; `verify` does not consume that TMPDIR. Evidence scope: synthetic API and actual Chrome scripts driven through DOM gestures; no verification of the normal ELF's resource serving, the physical pointer or the UI layout is claimed, and this evidence qualifies neither installation nor global acceptance.
+# Git promotion failures and effect observations
+
+The Rust promotion path retains a typed effect observation independently of its
+error cause: a known durable outcome, or possible publication without an
+established durable outcome. The latter exposes the safe code
+`paea-git-promote-unknown`; it remains a failure and grants no retry authority.
+Expiry or a different ref observed after the Git transaction cannot establish
+absence of publication. Original SQL and independent cleanup causes remain
+traversable without rendering their private data. A recorded outcome must survive
+release, close and CLI output failures. A result line may already have been
+written when a later close fails; the CLI must still return a nonzero exit code.
+
+The CLI encodes JSON before writing, then retains original typed causes for
+write, newline and flush under separate safe stage codes. Authority close keeps
+the original personal/business envelope beside the known result and other close
+causes. CLI and HTTP JSON failures separately expose `paea_git_effect.state` as
+`recorded` or `unknown`. A pre-effect authority refusal does not establish absence
+of historical effects for the intention; legacy empty-journal observations also
+project as unknown. CLI text includes `effect_state` beside the safe failure code.
+Projection guards exercise the real in-memory response producers, not network
+delivery, a Git effect or local installation. Text normalization runs in the
+renderer after traversing cleanup wrappers, keeping safe cause codes visible in
+both CLI languages without private nested messages.
+
+The [article v6 workstream](plans/actions-confiance/ARTICLE-V6-ADAPTATION.md)
+retains the candidate, reproducer and checks. Source changes establish neither
+installation nor universal PV2. Reference observation during Reconcile and an
+authority lease remain separate steps; a missing journal row still proves no
+absence of Git effects. Oracle attribution must distinguish intention and attempt.
