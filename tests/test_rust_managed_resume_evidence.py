@@ -102,6 +102,20 @@ class WitnessEvidenceTests(unittest.TestCase):
         with self.assertRaisesRegex(evidence.EvidenceError, 'witness-final-call-count'):
             self.validate()
 
+    def test_boolean_cannot_replace_integer_call_count(self):
+        self.validate()
+        path = self.directory / 'work-final.json'
+        final = json.loads(path.read_bytes())
+        final['planning']['reviewer']['calls'] = True
+        raw = json.dumps(final).encode()
+        path.write_bytes(raw)
+        pin = {'path': str(path), 'sha256': evidence.digest(raw), 'bytes': len(raw)}
+        self.receipt['output_proofs']['work-final.json'] = pin
+        self.receipt['work_final'] = pin
+        self.receipt['reviewer_calls_after'] = True
+        with self.assertRaisesRegex(evidence.EvidenceError, 'integer-call-count'):
+            self.validate()
+
     def test_proof_byte_change_refuses_and_restore_recovers(self):
         self.validate()
         path = self.directory / 'original.frame'

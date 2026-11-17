@@ -136,6 +136,9 @@ def healthy_witness(receipt_path, receipt_sha256, checkout):
     """
     import rust_managed_review_w as base
     receipt = pinned_json(receipt_path, receipt_sha256)
+    require(type(receipt['reviewer_calls_before']) is int
+            and type(receipt['reviewer_calls_after']) is int,
+            'evidence-witness-integer-call-count')
     require(receipt['status'] == base.WITNESS_STATUS
             and receipt['receipt_schema'] == base.WITNESS_SCHEMA
             and receipt['reviewer_calls_before'] == 0
@@ -173,6 +176,8 @@ def healthy_witness(receipt_path, receipt_sha256, checkout):
     final = json.loads(read_regular(directory / 'work-final.json'))
     require(receipt['output_proofs']['work-final.json'] == receipt['work_final'],
             'evidence-witness-final-work-binding')
+    require(type(final['planning']['reviewer']['calls']) is int,
+            'evidence-witness-integer-call-count')
     require(final['planning']['reviewer']['calls'] == receipt['reviewer_calls_after'],
             'evidence-witness-final-call-count')
     task = next(task for task in final['tasks'] if task['id'] == receipt['task'])

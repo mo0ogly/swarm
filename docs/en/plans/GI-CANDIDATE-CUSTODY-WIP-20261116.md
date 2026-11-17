@@ -87,3 +87,8 @@ Seven healthy_witness guards initially PASS. Independent09 REQUEST_CHANGES count
 Three axes: receipt/protocol oracles rather than configurable policy; nontrivial functions documented; IO/JSON/refusal causes propagate without empty success. No concurrent-writer confinement/runtime qualification. Principal initially mistook work_final file pin for inline Work; real-evidence refusal retained, corrected from producer. Evidence on SWARM: swarm-evidence/root00-managed-preparer-cq1joyiy/managed-resume-evidence-preflight-01.
 
 Earlier recovery plan corrected BEFORE mutation: do NOT planning.resume. Childgeneration7 already supersedes native refusal6; resume would change source-authority epoch and invalidate controls. Proposed public quota3to4/child2to3 still NOT AUTHORIZED/NOT APPLIED, usage preserved. Existing human question pending; heartbeat/time is no answer. Original Work lastobserved21/reviewer1of2/planner3of3, terminalRefused preserved. Supervised continuation driver remains to prepare/review under these preconditions. No runtime,main merge,installation/global acceptance claim.
+
+
+### D05 — exact counter types, 17 November 2026
+
+Bool True accepted as1 reproduced FAILf51251,then exact int required for both receipt counts and final Work count. Two targetedPASS040f2f,previous7guards reused,no runtime/CLI/provider. Independent09 delta01a1e6ea-afb4-7253-a055-1332ce9f19ee APPROVE_SOURCE_ONLY; bool case reaches receipt guard,final Work bool branch lacks separate coverage. Source0dc1e8f4…,test71177b19…. Schema validation,not operator policy; existing docstrings/errors remain coherent. Driver/runtime/quota remain open and not authorized. Bounded WIP,no main merge or installation.
