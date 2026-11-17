@@ -182,3 +182,12 @@ Inherited errorconsumers were corrected with counterexamples: swallowed stderr, 
 Fifteen distinct maintained guards have separate sourcebound results/justifiedreuse; no combined15replay. Five exact intermediate source/test snapshots were reconstructed with hashes matching originalexecutionpins (`RECOVERED-INPUTS.json`), without rewriting history. Future runner now savesinputbytesbeforetesting; that change is staticallyreviewed, not yet observed in use.
 
 FR/ENdocs, permanentrecipe and policy/docstring/errorreview are in `CD01-COMPILE-COLLECTOR[.en].md`, correspondingrecipe and `ROOT-SEMANTIC-REVIEW.json`. Evidence: `root00-cd01-collector14-waja855_` onSWARM. Independent09review requested for exactcandidate. No compiler/Cargo/C-D01body, installation or mainmerge. Future collection remains COMPILE_ONLY_UNQUALIFIED; fullgraph/profile, native/generated/deleted inputs, descendantenv and source/outputbinding stay UNKNOWN before separateadmission.
+
+
+### Interrupted-run recovery — retained Cargo0, collector not closed
+
+The R3 primary receipt retains Cargo0, build-finished and117artifacts after6m36 compilation; no Rust test body ran. On17November resume, collector/launcher PIDs are absent, oldexecsession unavailable, terminalcollector/post-admission receipts missing. Collector outcome is UNKNOWN; disappearance cause unestablished. No compile replay.
+
+A fresh isolated supplemental allocation under `root00-cd01-prospective15-vmigucrg/recovery-observation-g0u2wlg5` verified retainedchannels/currentstate:21419inventoryentries,211packages/11887files, configs and storage match prebindings.130intents remain (7metadataqueries,120explicit-name candidates,1libtestcandidate,2unclassified). Currentfrozenimage SHA91ac8c1913e38b38aba0c287c58344ec7c37dc3bb0ec535f6d6d8ef9ca3626b1 equals retainedR2image; it is not a hash observed at Cargoexit. Supplemental observations do not recreate missing terminalcompletion or admit a binary.
+
+CD01-STDIN-PROBE-01: two unclassified intents use stdin marker `-`. Cargo event links theirOUT_DIR to rustix1.1.5; pinnedbuild.rs creates a stdinpipe, writes probe source and deletes its artifact. Historical consumedstdinbytes are absent from these receipts; sourceconstants are not retrospective stream evidence. This and other materialclasses remainopen. Next boundedinput-custody design, no identicalrecompile orfifteenbodies. OwnerSwarm00; X remains suspended, no installation/mainmerge.
