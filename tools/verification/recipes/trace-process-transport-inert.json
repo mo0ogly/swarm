@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "trace-process-transport-expected-failure-guard",
+  "inputs": [
+    "tools/verification/trace_process_witness.py",
+    "tools/verification/test_trace_process_witness.py",
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/TRACE-PROCESS-WITNESS.md",
+    "tools/verification/TRACE-PROCESS-WITNESS.en.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "expected-nonzero-does-not-absorb-cleanup",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_trace_process_witness.py",
+        "ExpectedFailureGuards.test_expected_exit_does_not_mask_extra_cleanup"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_expected_exit_does_not_mask_extra_cleanup",
+        "Ran 1 test",
+        "OK"
+      ]
+    }
+  ]
+}
