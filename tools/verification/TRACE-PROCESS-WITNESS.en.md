@@ -28,9 +28,15 @@ cleanup-fault qualification is claimed. No Cargo, provider, Swarm service or Rus
 test body is invoked. Callers retain raw traces, native receipts and source/tool
 hashes; numeric exit alone never qualifies the witness.
 
-recipes/trace-process-transport-inert.json runs only the named synthetic guard:
+The first step of recipes/trace-process-transport-inert.json runs the synthetic guard:
 healthy0, clean expected7, refused exit7+EIO, fresh recovery0. Mocks prohibit all
 child execution. Set SWARM_TRACE_TEST_PARENT explicitly to the admitted temporary
 parent beforehand; missing configuration refuses without fallback. This recipe
 proves no real strace behavior, mount admission or build result. The real three
 process witness requires a separate allocation meeting all caller preconditions.
+
+The second synthetic recipe guard injects ENOSPC after one written byte, followed
+by EIO after releasing the descriptor. It requires both errno causes in their
+group, retained partial bytes, successful fresh publication and refusal to
+overwrite the original. This is no real volume saturation, storage/unmount fault
+or child execution.

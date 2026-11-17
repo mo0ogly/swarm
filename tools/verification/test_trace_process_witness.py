@@ -89,6 +89,50 @@ class ExpectedFailureGuards(unittest.TestCase):
         self.assertIn('trace-fixture-unexpected-native-issues', str(refused))
         self.assertIsNotNone(refused.__cause__, 'Original native cause must remain chained')
 
+    def test_receipt_write_and_close_keep_both_causes(self):
+        """An ENOSPC write plus EIO close retains both and the partial file.
+
+        This exercises the actual exclusive publisher with a controlled stream,
+        no child. Healthy publication precedes injection; fresh recovery must
+        preserve the original partial bytes and refuse overwriting that file.
+        """
+        healthy = self.root / 'healthy.json'
+        witness.publish(healthy, '{"control": true}\n')
+        self.assertEqual(json.loads(healthy.read_bytes()), {'control': True})
+        fault = self.root / 'partial.json'
+
+        class BrokenStream:
+            """Own the real fd, write one byte, then model write/close failures."""
+
+            def __init__(self, descriptor):
+                self.descriptor = descriptor
+
+            def write(self, value):
+                """Leave a visible prefix then raise controlled ENOSPC."""
+                os.write(self.descriptor, value.encode()[:1])
+                raise OSError(errno.ENOSPC, 'synthetic write')
+
+            def close(self):
+                """Release the owned descriptor before reporting controlled EIO."""
+                os.close(self.descriptor)
+                raise OSError(errno.EIO, 'synthetic close after descriptor release')
+
+        with patch.object(witness.os, 'fdopen', side_effect=lambda fd, *a, **k: BrokenStream(fd)), \
+             patch.object(subprocess, 'run', side_effect=AssertionError('NO_REAL_CHILD')) as native:
+            with self.assertRaises(ExceptionGroup) as caught:
+                witness.publish(fault, '{"not_complete": true}\n')
+            self.assertEqual(native.call_count, 0)
+        self.assertEqual([error.errno for error in caught.exception.exceptions], [errno.ENOSPC, errno.EIO])
+        original = fault.read_bytes()
+        self.assertEqual(original, b'{')
+        recovery = self.root / 'fresh-recovery.json'
+        witness.publish(recovery, '{"recovered": true}\n')
+        self.assertEqual(json.loads(recovery.read_bytes()), {'recovered': True})
+        self.assertEqual(fault.read_bytes(), original)
+        with self.assertRaises(FileExistsError):
+            witness.publish(fault, '{"overwrite": true}\n')
+        self.assertEqual(fault.read_bytes(), original)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

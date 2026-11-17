@@ -26,6 +26,22 @@
         "Ran 1 test",
         "OK"
       ]
+    },
+    {
+      "id": "exclusive-publication-preserves-write-and-close",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_trace_process_witness.py",
+        "ExpectedFailureGuards.test_receipt_write_and_close_keep_both_causes"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_receipt_write_and_close_keep_both_causes",
+        "Ran 1 test",
+        "OK"
+      ]
     }
   ]
 }

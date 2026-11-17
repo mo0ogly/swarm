@@ -31,10 +31,16 @@ et cleanup. Aucun Cargo, provider, service Swarm ou corps de test Rust n'est app
 Le caller conserve les traces, reçus natifs et empreintes des sources/outils ;
 un retour numérique seul ne suffit pas à qualifier le témoin.
 
-La recette `recipes/trace-process-transport-inert.json` exécute uniquement le
+La première étape de `recipes/trace-process-transport-inert.json` exécute le
 contre-exemple synthétique nommé : contrôle0, contrôle7 propre, exit7+EIO refusé,
 reprise0. Les appels enfants sont interdits par mocks. Définir explicitement
 `SWARM_TRACE_TEST_PARENT` vers le parent temporaire admis avant cette recette ;
 son absence refuse, sans fallback. Elle ne prouve aucun comportement réel de
 strace, admission de montage ou résultat d'un build. La recette réelle de trois
 processus doit être allouée séparément avec les préconditions du caller ci-dessus.
+
+Le second contrôle synthétique de cette recette injecte ENOSPC après un octet
+écrit puis EIO après libération du descripteur. Il exige les deux errno dans
+leur groupe, le fichier partiel conservé, une publication fraîche réussie et
+le refus d'écraser l'original. Cela ne simule pas une saturation réelle du volume
+ni une défaillance de stockage/démontage ; aucun enfant n'est lancé.
