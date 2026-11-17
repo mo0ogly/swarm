@@ -76,3 +76,14 @@ Recette W witness/retry source revue09. Témoin réel PASS0→1 (15preuves/8CLIr
 ## MRR-D04 dispatcher: source-only checkpoint
 
 MRR-D04 : entrée managed review-retry portée en source et revue09, un littéral de capacité ajouté, gardes suivantes inchangées. Non compilé/vérifié runtime à ce checkpoint. AncienWork21/planner3of3/reviewer1of2 etRefusedterminal conservés. Previewquota3→4/child2→3 valide mais nonautorisée/nonappliquée. WIP non fusionnable comme correctif vérifié.
+
+
+### MRR-D05 — précontrôle de preuves fermées, 17 novembre 2026
+
+Le pilote complet GLM (121281jetons déclarés,542.911s) est refusé/non appliqué pour schémas incorrects et terminal sans conservation des owners. Suppléance bornée root00 : tests/rust_managed_resume_evidence.py, tests/test_rust_managed_resume_evidence.py. Ce module lit seulement des fichiers fermés : aucune CLI, DB Root, quota, provider, activation ou permission. Lecture positive64fichiers/15preuves/43helpers/787sources, seul dispatcher différent ; ancien témoin30910bc9 conserve sa portée historique, normalfec4 n’a pas exécuté la reprise.
+
+Sept gardes healthy_witness PASS initialement ; revue09 REQUEST_CHANGES P2 compteur Workfinal non lié au reçu. Cas ciblé FAIL avant correction puis1PASS après correction, sans rejeu des7gardes non concernées. Source6143b0ada8f21412788dd35dee3875997c7459a9adb644120397fdb78f11b912, testbf3d5649292c47ff21828d2d7f2c998d0f5228911fab17e1a2f5af6573107cac. Revue09 delta01a1e6e0-487f-74d2-9f71-c65a47f7bf19 APPROVE_SOURCE_ONLY. Les tests ne couvrent pas tous les chemins closed_failure/profile_bridge ; lecturepositive n’est pas preuve de refus exhaustive.
+
+Trois axes : oracles de reçus/protocole, pas politique configurable ; fonctions non triviales documentées ; causes IO/JSON/refus propagées sans succès vide. Pas de confinement d’écrivain concurrent ou qualification runtime. Première erreur principale work_final pris pour Work corrigée d’après son producteur (pin), original refus conservé dans registre canonique. Preuves SWARM : swarm-evidence/root00-managed-preparer-cq1joyiy/managed-resume-evidence-preflight-01.
+
+Correction du plan de reprise antérieur, AVANT toute mutation : ne PAS émettre planning.resume. La génération enfant7 est déjà postérieure au refus natif6 ; resume changerait l’époque source et invaliderait les contrôles. Quota public préparé3→4/child2→3 toujours NON AUTORISÉ/NON APPLIQUÉ, consommations conservées. Question humaine déjà en attente ; heartbeat/délai ne vaut pas réponse. Work initial dernierobservé21/reviewer1sur2/planner3sur3, Refused terminal conservé. Pilote supervisé de continuation reste à préparer/revoir après ces préconditions ; aucun runtime, merge main, installation ou acceptation globale déclaré.

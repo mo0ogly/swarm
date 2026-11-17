@@ -76,3 +76,14 @@ W witness/retry recipe09source-approved. Real healthy witness PASS0to1 (15proofs
 ## MRR-D04 dispatcher: source-only checkpoint
 
 MRR-D04 managed review-retry entry source-ported and09reviewed,one capability literal added,downstream guards unchanged. Not compiled/runtime-verified at checkpoint. OriginalWork21/planner3of3/reviewer1of2 and terminalRefused retained. Quota3to4/child2to3 preview-valid but not authorized/applied. WIP not mergeable as verified fix.
+
+
+### MRR-D05 — closed-evidence preflight, 17 November 2026
+
+Full GLM driver(reported121281tokens,542.911s) rejected/not applied for incorrect schemas and unsafe terminal ownership. Bounded root00 supplement: tests/rust_managed_resume_evidence.py and tests/test_rust_managed_resume_evidence.py. Reads closed files only, no CLI/RootDB/quota/provider/activation/authority. Positive64files/15proofs/43helpers/787sources, dispatcher-only change;30910bc9 witness remains historical, normalfec4 has not executed recovery.
+
+Seven healthy_witness guards initially PASS. Independent09 REQUEST_CHANGES count-binding P2 reproduced FAIL before correction then1PASS afterwards; previous7unaffected guards not replayed. Source6143b0ada8f21412788dd35dee3875997c7459a9adb644120397fdb78f11b912, testbf3d5649292c47ff21828d2d7f2c998d0f5228911fab17e1a2f5af6573107cac. Delta review09 turn01a1e6e0-487f-74d2-9f71-c65a47f7bf19 APPROVE_SOURCE_ONLY. No full corruption coverage claimed for closed_failure/profile_bridge.
+
+Three axes: receipt/protocol oracles rather than configurable policy; nontrivial functions documented; IO/JSON/refusal causes propagate without empty success. No concurrent-writer confinement/runtime qualification. Principal initially mistook work_final file pin for inline Work; real-evidence refusal retained, corrected from producer. Evidence on SWARM: swarm-evidence/root00-managed-preparer-cq1joyiy/managed-resume-evidence-preflight-01.
+
+Earlier recovery plan corrected BEFORE mutation: do NOT planning.resume. Childgeneration7 already supersedes native refusal6; resume would change source-authority epoch and invalidate controls. Proposed public quota3to4/child2to3 still NOT AUTHORIZED/NOT APPLIED, usage preserved. Existing human question pending; heartbeat/time is no answer. Original Work lastobserved21/reviewer1of2/planner3of3, terminalRefused preserved. Supervised continuation driver remains to prepare/review under these preconditions. No runtime,main merge,installation/global acceptance claim.
