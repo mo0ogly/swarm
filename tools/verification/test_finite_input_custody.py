@@ -13,8 +13,16 @@ here are in-process test doubles; the owned inert receiver double is
 explicitly not a production consumer, and the helper itself claims
 nothing about any receiver.  There is no historical replay of past
 captures, no watchdog or timeout harness, and no compiler or subprocess.
-These tests qualify only the helper's own contract; they do not qualify
-any build, wrapper, installation or acceptance.
+
+The ValidateStagedTests class targets the read-only validate_staged
+consumer of records this same process has just captured: every negative
+runs a healthy capture-plus-validate control first and a fresh recovery
+last, every fault injection is restored by its mocking context manager,
+and every refusal is shown to leave the record byte-for-byte and
+entry-for-entry unchanged, including after a partially consumed read.
+Fixtures are retained, never deleted.  These tests qualify only the
+helper's own contract; they do not qualify any build, wrapper,
+installation or acceptance.
 """
 
 import errno
@@ -928,6 +936,494 @@ class FiniteInputCustodyTests(unittest.TestCase):
         self.assertIs(caught.original_exception, primary)
         self.assertEqual(os.lseek(source, 0, os.SEEK_CUR), 0)
         self.assertEqual(os.listdir(out), [])
+
+
+class ValidateStagedTests(unittest.TestCase):
+    """Targeted regressions for the read-only validate_staged consumer.
+
+    Every negative here first runs a healthy capture-plus-validate
+    control, then builds a fresh record with one targeted defect, and
+    finally runs a fresh recovery control.  Each refusal is asserted to
+    be typed, to keep its original cause where one exists, and to leave
+    the record byte-for-byte and entry-for-entry unchanged, including
+    after partially consumed reads.  Fixtures are retained under the
+    caller-selected TMPDIR; fault injections are restored by their
+    mocking context managers; no compiler and no subprocess are used.
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """Create caller-owned retained fixtures and register strict descriptor cleanup."""
+        self.base_dir = tempfile.mkdtemp(prefix='validate-staged-tests-')
+        self._input_fds = []
+        self.addCleanup(self._close_borrowed_inputs)
+
+    # -- fixture helpers -------------------------------------------------
+
+    @staticmethod
+    def _close_quietly(fd):
+        """Close one caller-owned descriptor; report cleanup errors."""
+        os.close(fd)
+
+    def _close_borrowed_inputs(self):
+        """Close every input descriptor the test borrowed as its caller."""
+        for fd in self._input_fds:
+            self._close_quietly(fd)
+        self._input_fds = []
+
+    def _fresh_output_dir(self):
+        """Create one exclusive fresh private output directory (mode 0700)."""
+        path = tempfile.mkdtemp(prefix='validate-out-', dir=self.base_dir)
+        os.chmod(path, 0o700)
+        return path
+
+    def _fresh_input_fd(self, payload):
+        """Create a fresh regular-file fixture, returned open O_RDONLY.
+
+        The test plays the caller: the descriptor it hands to capture is
+        owned by the test and closed again in cleanup, never by the
+        helper.
+        """
+        path = os.path.join(
+            self.base_dir, 'validate-input-%d.bin' % len(self._input_fds))
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        view = memoryview(payload)
+        while view:
+            view = view[os.write(fd, view):]
+        os.close(fd)
+        fd = os.open(path, os.O_RDONLY)
+        self._input_fds.append(fd)
+        return fd
+
+    def _stage_record(self, payload, allocation_id):
+        """Run one healthy capture and close the returned descriptor.
+
+        The validator consumes published files, not descriptors, so the
+        caller-owned read-only descriptor is closed here immediately;
+        the staged record stays on disk for validation.  Returns
+        (output_dir, manifest).
+        """
+        input_fd = self._fresh_input_fd(payload)
+        output_dir = self._fresh_output_dir()
+        returned_fd, manifest = finite_input_custody.capture(
+            input_fd, output_dir, allocation_id)
+        os.close(returned_fd)
+        os.fstat(input_fd)  # borrowed descriptor still open and usable
+        # This exact fresh record validates before each subsequent fault.
+        self.assertEqual(finite_input_custody.validate_staged(output_dir, allocation_id), manifest)
+        return output_dir, manifest
+
+    def _record_snapshot(self, output_dir):
+        """Return (sorted listing, {name: bytes}) for before/after equality."""
+        listing = sorted(os.listdir(output_dir))
+        contents = {}
+        for name in listing:
+            with open(os.path.join(output_dir, name), 'rb') as handle:
+                contents[name] = handle.read()
+        return listing, contents
+
+    def _rewrite_manifest(self, output_dir, mutate):
+        """Rewrite the staged manifest in place through one hardlink name.
+
+        manifest.partial and manifest.json share an inode, so editing
+        through one name keeps the no-clobber pair intact while changing
+        the bytes both names expose.  mutate receives the parsed
+        manifest and may modify it in place.
+        """
+        manifest_path = os.path.join(output_dir, 'manifest.json')
+        with open(manifest_path, 'rb') as handle:
+            published = json.loads(handle.read().decode('utf-8'))
+        mutate(published)
+        payload = (
+            json.dumps(published, sort_keys=True, indent=2) + '\n'
+        ).encode('utf-8')
+        with open(manifest_path, 'r+b') as handle:
+            handle.write(payload)
+            handle.truncate()
+
+    def _run_control(self, allocation_id='alloc-validate-control'):
+        """Healthy control: one capture then one successful validation.
+
+        Asserts the validated mapping equals the capture manifest and
+        that validation changed no record byte and no directory entry.
+        """
+        output_dir, manifest = self._stage_record(
+            CONTROL_PAYLOAD, allocation_id)
+        before = self._record_snapshot(output_dir)
+        validated = finite_input_custody.validate_staged(
+            output_dir, allocation_id)
+        self.assertIsInstance(validated, dict)
+        self.assertEqual(validated, manifest)
+        self.assertEqual(self._record_snapshot(output_dir), before)
+        return output_dir
+
+    def _assert_validate_refusal(self, output_dir, allocation_id,
+                                 stage, op, name,
+                                 reason=None, errno_value=None):
+        """Assert one typed refusal over an untouched record; return it.
+
+        Snapshots the record before the call and asserts byte-for-byte
+        and entry-for-entry equality after it.  When reason is None the
+        primary cause must carry no reason token (an errno-shaped
+        cause).
+        """
+        before = self._record_snapshot(output_dir)
+        with self.assertRaises(
+                finite_input_custody.FiniteInputCustodyError) as caught:
+            finite_input_custody.validate_staged(output_dir, allocation_id)
+        error = caught.exception
+        self.assertEqual(str(error), 'finite input custody failed')
+        self.assertEqual(error.stage, stage)
+        self.assertEqual(error.primary['op'], op)
+        self.assertEqual(error.primary['name'], name)
+        if reason is None:
+            self.assertNotIn('reason', error.primary)
+        else:
+            self.assertEqual(error.primary['reason'], reason)
+        self.assertEqual(error.primary['errno'], errno_value)
+        self.assertEqual(error.secondary, [])
+        self.assertFalse(error.ready_fd_close_attempted)
+        self.assertEqual(error.output_dir, output_dir)
+        self.assertEqual(self._record_snapshot(output_dir), before)
+        return error
+
+    # -- healthy control ---------------------------------------------------
+
+    def test_control_validate_success_read_only_repeatable(self):
+        """Control: capture then validate succeeds, twice, changing nothing.
+
+        The validated mapping equals the capture manifest, a second
+        validation of the same record succeeds identically, and both
+        calls leave every record byte and directory entry unchanged.
+        """
+        output_dir, manifest = self._stage_record(
+            CONTROL_PAYLOAD, 'alloc-validate-control')
+        before = self._record_snapshot(output_dir)
+        first = finite_input_custody.validate_staged(
+            output_dir, 'alloc-validate-control')
+        second = finite_input_custody.validate_staged(
+            output_dir, 'alloc-validate-control')
+        self.assertIsInstance(first, dict)
+        self.assertIsInstance(second, dict)
+        self.assertEqual(first, manifest)
+        self.assertEqual(second, manifest)
+        self.assertEqual(self._record_snapshot(output_dir), before)
+        self.assertEqual(
+            sorted(os.listdir(output_dir)),
+            ['input.bin', 'input.partial', 'manifest.json',
+             'manifest.partial'])
+
+    # -- targeted negatives --------------------------------------------------
+
+    def test_raw_content_tamper_rejected(self):
+        """Control; tampered input.bin bytes refused; fresh recovery.
+
+        Subtests: a same-length byte flip must fail the recomputed
+        SHA-256 comparison and an appended byte must fail the recomputed
+        byte-count comparison; both refusals leave the tampered record
+        byte-for-byte unchanged.
+        """
+        self._run_control()
+        with self.subTest('same-length-flip-sha256-mismatch'):
+            output_dir, _ = self._stage_record(PAYLOAD, 'alloc-tamper-flip')
+            raw_path = os.path.join(output_dir, 'input.bin')
+            with open(raw_path, 'rb') as handle:
+                original = handle.read()
+            flipped = bytes([original[0] ^ 0xFF]) + original[1:]
+            with open(raw_path, 'r+b') as handle:
+                handle.write(flipped)
+            self._assert_validate_refusal(
+                output_dir, 'alloc-tamper-flip',
+                'verify-input', 'verify', 'input.bin', 'sha256-mismatch')
+        with self.subTest('appended-byte-count-mismatch'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-tamper-append')
+            with open(os.path.join(output_dir, 'input.bin'), 'ab') as handle:
+                handle.write(b'X')
+            self._assert_validate_refusal(
+                output_dir, 'alloc-tamper-append',
+                'verify-input', 'verify', 'input.bin',
+                'byte-count-mismatch')
+        self._run_control()
+
+    def test_wrong_allocation_id_rejected(self):
+        """Control; wrong expected allocation id refused; fresh recovery.
+
+        The record staged for one provenance string is validated
+        against a different one: the schema check must refuse the
+        allocation_id member with the fixed wrong-value token, and the
+        record stays unchanged.
+        """
+        self._run_control()
+        output_dir, _ = self._stage_record(
+            PAYLOAD, 'alloc-provenance-original')
+        self._assert_validate_refusal(
+            output_dir, 'alloc-provenance-other',
+            'schema-manifest', 'schema', 'allocation_id', 'wrong-value')
+        self._run_control()
+
+    def test_missing_and_foreign_members_rejected(self):
+        """Control; removed or extra manifest member refused; recovery.
+
+        Both mutations are written through one hardlink name so the
+        partial/final pair stays intact and both names expose identical
+        mutated bytes; the exact-member-set check must refuse a missing
+        member and a foreign member.  Records stay unchanged.
+        """
+        self._run_control()
+        with self.subTest('missing-byte-count-member'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-missing-member')
+            self._rewrite_manifest(
+                output_dir, lambda manifest: manifest.pop('byte_count'))
+            self._assert_validate_refusal(
+                output_dir, 'alloc-missing-member',
+                'schema-manifest', 'schema', 'byte_count', 'missing')
+        with self.subTest('foreign-extra-member'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-foreign-member')
+            self._rewrite_manifest(
+                output_dir,
+                lambda manifest: manifest.update({'foreign_member': 'x'}))
+            self._assert_validate_refusal(
+                output_dir, 'alloc-foreign-member',
+                'schema-manifest', 'schema', 'manifest.json',
+                'unexpected-member')
+        self._run_control()
+
+    def test_wrong_hardlink_pairs_rejected(self):
+        """Control; broken pairs or extra entries refused; fresh recovery.
+
+        Subtests: input.bin replaced by a byte-identical standalone copy
+        breaks the raw no-clobber pair; manifest.json replaced by a
+        foreign private file breaks the manifest pair; any extra entry
+        exceeds the exact four-name record set.  All three are
+        validate-stage refusals that leave the directory entries exactly
+        as found.
+        """
+        self._run_control()
+        with self.subTest('input-bin-standalone-copy'):
+            output_dir, _ = self._stage_record(PAYLOAD, 'alloc-pair-raw')
+            raw_path = os.path.join(output_dir, 'input.bin')
+            with open(raw_path, 'rb') as handle:
+                identical = handle.read()
+            replacement = os.path.join(output_dir, 'input.bin.replacement')
+            with open(replacement, 'wb') as handle:
+                handle.write(identical)
+            os.chmod(replacement, 0o600)
+            os.replace(replacement, raw_path)
+            self._assert_validate_refusal(
+                output_dir, 'alloc-pair-raw',
+                'validate', 'lstat', 'input.bin', 'hardlink-pair-mismatch')
+        with self.subTest('manifest-json-foreign-inode'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-pair-manifest')
+            foreign = os.path.join(self.base_dir, 'foreign-manifest.bin')
+            with open(foreign, 'wb') as handle:
+                handle.write(b'{"not": "the-staged-manifest"}')
+            os.chmod(foreign, 0o600)
+            os.replace(foreign, os.path.join(output_dir, 'manifest.json'))
+            self._assert_validate_refusal(
+                output_dir, 'alloc-pair-manifest',
+                'validate', 'lstat', 'manifest.json',
+                'hardlink-pair-mismatch')
+        with self.subTest('unexpected-extra-entry'):
+            output_dir, _ = self._stage_record(PAYLOAD, 'alloc-extra-entry')
+            extra = os.path.join(output_dir, 'receiver-notes.txt')
+            with open(extra, 'wb') as handle:
+                handle.write(b'receiver notes are not part of the record')
+            self._assert_validate_refusal(
+                output_dir, 'alloc-extra-entry',
+                'validate', 'list', 'output-dir', 'unexpected-entry')
+        self._run_control()
+
+    def test_malformed_and_duplicate_manifest_json_rejected(self):
+        """Control; malformed or duplicate-member JSON refused; recovery.
+
+        Both payloads are written through one hardlink name so both
+        manifest names expose identical broken bytes.  The parse stage
+        must keep the original unrendered cause (a JSONDecodeError or
+        the duplicate-member ValueError), carry no errno, and leave the
+        record unchanged.
+        """
+        self._run_control()
+        with self.subTest('malformed-json'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-malformed-json')
+            manifest_path = os.path.join(output_dir, 'manifest.json')
+            with open(manifest_path, 'r+b') as handle:
+                handle.write(b'{ "schema": ')
+                handle.truncate()
+            error = self._assert_validate_refusal(
+                output_dir, 'alloc-malformed-json',
+                'parse-manifest', 'parse', 'manifest.json')
+            self.assertIsInstance(error.original_exception,
+                                  json.JSONDecodeError)
+        with self.subTest('duplicate-json-member'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-duplicate-json')
+            manifest_path = os.path.join(output_dir, 'manifest.json')
+            with open(manifest_path, 'rb') as handle:
+                published_text = handle.read().decode('utf-8')
+            duplicated = (published_text[:-2]
+                          + ',\n  "schema": "finite-input-custody/1"}\n')
+            with open(manifest_path, 'r+b') as handle:
+                handle.write(duplicated.encode('utf-8'))
+                handle.truncate()
+            error = self._assert_validate_refusal(
+                output_dir, 'alloc-duplicate-json',
+                'parse-manifest', 'parse', 'manifest.json')
+            self.assertIsInstance(error.original_exception, ValueError)
+            self.assertNotIsInstance(error.original_exception,
+                                     json.JSONDecodeError)
+        self._run_control()
+
+    def test_type_invalid_eof_and_byte_count_rejected(self):
+        """Control; type-invalid EOF or count refused; fresh recovery.
+
+        Subtests: eof_observed as the int 1 (equal to true but not the
+        boolean), eof_observed false, byte_count as the boolean true,
+        as a negative int and as a string.  Each is a schema-stage
+        refusal with a fixed type or value token over an unchanged
+        record.
+        """
+        self._run_control()
+        with self.subTest('eof-observed-int-one-is-not-bool'):
+            output_dir, _ = self._stage_record(PAYLOAD, 'alloc-eof-int')
+            self._rewrite_manifest(
+                output_dir, lambda manifest: manifest.update(
+                    {'eof_observed': 1}))
+            self._assert_validate_refusal(
+                output_dir, 'alloc-eof-int',
+                'schema-manifest', 'schema', 'eof_observed', 'wrong-type')
+        with self.subTest('eof-observed-false'):
+            output_dir, _ = self._stage_record(PAYLOAD, 'alloc-eof-false')
+            self._rewrite_manifest(
+                output_dir, lambda manifest: manifest.update(
+                    {'eof_observed': False}))
+            self._assert_validate_refusal(
+                output_dir, 'alloc-eof-false',
+                'schema-manifest', 'schema', 'eof_observed', 'wrong-value')
+        with self.subTest('byte-count-bool-is-not-int'):
+            output_dir, _ = self._stage_record(PAYLOAD, 'alloc-count-bool')
+            self._rewrite_manifest(
+                output_dir, lambda manifest: manifest.update(
+                    {'byte_count': True}))
+            self._assert_validate_refusal(
+                output_dir, 'alloc-count-bool',
+                'schema-manifest', 'schema', 'byte_count', 'wrong-type')
+        with self.subTest('byte-count-negative'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-count-negative')
+            self._rewrite_manifest(
+                output_dir, lambda manifest: manifest.update(
+                    {'byte_count': -1}))
+            self._assert_validate_refusal(
+                output_dir, 'alloc-count-negative',
+                'schema-manifest', 'schema', 'byte_count', 'wrong-value')
+        with self.subTest('byte-count-string'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-count-string')
+            self._rewrite_manifest(
+                output_dir, lambda manifest: manifest.update(
+                    {'byte_count': '7'}))
+            self._assert_validate_refusal(
+                output_dir, 'alloc-count-string',
+                'schema-manifest', 'schema', 'byte_count', 'wrong-type')
+        self._run_control()
+
+    def test_read_faults_preserve_original_cause(self):
+        """Control; injected read faults keep their cause; fresh recovery.
+
+        Subtests: an EIO on the validator's first manifest read
+        surfaces at stage read-manifest with the original OSError
+        retained; an EIO after one partially consumed input.bin read
+        surfaces at stage verify-input, still with the original cause,
+        with ready_fd_close_attempted false and every record byte
+        unchanged.
+        """
+        self._run_control()
+        with self.subTest('manifest-read-fault'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-manifest-read-fault')
+            primary = OSError(errno.EIO, 'PRIVATE_MANIFEST_READ')
+
+            def fault_first_read(fd, size):
+                """Fail the validator's first read with the injected error."""
+                raise primary
+
+            with mock.patch.object(
+                    finite_input_custody, '_os_read', fault_first_read):
+                error = self._assert_validate_refusal(
+                    output_dir, 'alloc-manifest-read-fault',
+                    'read-manifest', 'read', 'manifest.partial',
+                    errno_value=errno.EIO)
+            self.assertIs(error.original_exception, primary)
+            self.assertNotIn('PRIVATE', str(error))
+        with self.subTest('partial-input-read-fault'):
+            output_dir, _ = self._stage_record(
+                PAYLOAD, 'alloc-input-read-fault')
+            primary = OSError(errno.EIO, 'PRIVATE_INPUT_READ')
+            real_open = os.open
+            real_read = os.read
+            state = {'raw_fd': None, 'raw_reads': 0}
+
+            def tracking_open(path, flags, mode=None):
+                """Record the descriptor the validator opens on input.bin."""
+                if mode is None:
+                    opened = real_open(path, flags)
+                else:
+                    opened = real_open(path, flags, mode)
+                if os.fspath(path).endswith('input.bin'):
+                    state['raw_fd'] = opened
+                return opened
+
+            def fault_after_partial_raw_read(fd, size):
+                """Serve one raw chunk then inject the read error."""
+                if fd == state['raw_fd']:
+                    state['raw_reads'] += 1
+                    if state['raw_reads'] > 1:
+                        raise primary
+                return real_read(fd, size)
+
+            with mock.patch.object(
+                    finite_input_custody, '_os_open', tracking_open):
+                with mock.patch.object(
+                        finite_input_custody, '_os_read',
+                        fault_after_partial_raw_read):
+                    error = self._assert_validate_refusal(
+                        output_dir, 'alloc-input-read-fault',
+                        'verify-input', 'read', 'input.bin',
+                        errno_value=errno.EIO)
+            self.assertIs(error.original_exception, primary)
+            self.assertEqual(state['raw_reads'], 2)
+            self.assertNotIn('PRIVATE', str(error))
+        self._run_control()
+
+
+    def test_missing_name_keeps_original_cause(self):
+        """Healthy record, missing-name IO cause retained, fresh recovery."""
+        self._run_control()
+        output_dir, _ = self._stage_record(PAYLOAD, 'alloc-missing-io')
+        before = self._record_snapshot(output_dir)
+        original = FileNotFoundError(errno.ENOENT, 'PRIVATE_MISSING')
+        real_stat = finite_input_custody._os_lstat
+        def missing(path):
+            """Inject the selected missing-name lookup, leaving files intact."""
+            if os.fspath(path) == os.path.join(output_dir, 'input.partial'):
+                raise original
+            return real_stat(path)
+        try:
+            with mock.patch.object(finite_input_custody, '_os_lstat', missing):
+                with self.assertRaises(finite_input_custody.FiniteInputCustodyError) as caught:
+                    finite_input_custody.validate_staged(output_dir, 'alloc-missing-io')
+            self.assertIs(caught.exception.original_exception, original)
+            self.assertEqual(caught.exception.primary['errno'], errno.ENOENT)
+            self.assertEqual(caught.exception.primary['reason'], 'target-missing')
+            self.assertEqual(self._record_snapshot(output_dir), before)
+        finally:
+            self._run_control()
 
 
 if __name__ == '__main__':

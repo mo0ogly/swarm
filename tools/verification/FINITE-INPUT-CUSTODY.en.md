@@ -65,6 +65,52 @@ SHA-256 and the byte count describe only the bytes staged in
 `input.bin`, `manifest.partial` and `manifest.json` exist; staging
 names are retained, never deleted.
 
+## Read-only validation of a staged record (validate_staged)
+
+`validate_staged(output_dir, allocation_id)` is a strict read-only
+consumer of an already published custody record, added without any
+change to `capture`. It writes nothing, creates no link, renames,
+deletes or chmods nothing, executes nothing, reads no environment
+variable, returns no descriptor, and never mutates a record, not even
+on failure. It re-checks the caller preconditions that are
+filesystem-checkable: `allocation_id` a nonempty provenance string
+(never authentication or confinement), `output_dir` an existing real
+directory (lstat, no symlink), current-uid owned, with no group/other
+permission bits. It then requires exactly the four custody names
+`input.partial`, `input.bin`, `manifest.partial` and `manifest.json`
+and nothing else in the directory; each must be a regular file (lstat,
+so symlinks are refused), current-uid owned and private-mode; and
+`input.partial`/`input.bin` and `manifest.partial`/`manifest.json`
+must have current hardlink-pair identity (same device and inode), without proving historical creation. Only
+FileNotFoundError establishes a missing name; any other error,
+including a permission error, keeps its original cause and is never
+treated as absence.
+
+The validator then reads `manifest.partial` and `manifest.json` and
+requires identical bytes, parses the JSON refusing any duplicate
+member at any depth, and validates the exact producer schema: the
+complete member set with no missing and no foreign member, the fixed
+staging and publication names and publication tokens, the expected
+`allocation_id` (equality with the caller's expected provenance
+string), `eof_observed` and `staged_copy_complete_of_observed_stream`
+exactly the boolean true, `byte_count` an exact non-negative int (a
+bool is refused), `sha256` exactly 64 lowercase hex digits, and the
+complete `not_claimed` block. Finally it recomputes the byte count and
+SHA-256 of `input.bin` by reading it exactly once, read-only, and
+fails unless both match the manifest: this recomputation, never the
+names, labels or JSON alone, is the hash evidence. On success it
+returns the validated manifest mapping.
+
+Failures raise `FiniteInputCustodyError` with the same static message
+and typed state fields, at stages `validate`, `read-manifest`,
+`parse-manifest`, `schema-manifest` or `verify-input`, with original
+causes retained unrendered; `ready_fd_close_attempted` always stays
+false for validator failures. A first close failure is primary; cleanup close errors are secondary. There is no retry, fallback,
+timeout, size cap, environment read or cleanup; and a successful
+validation is not evidence that any receiver runs, consumes bytes or
+succeeds, nor of any compiler, lineage or full-graph fact, nor of any
+historical input; upstream intent stays unknown even at observed EOF.
+
 ## What the manifest claims, and refuses to claim
 
 The manifest records `eof_observed`, `byte_count`, `sha256`, the
@@ -103,7 +149,7 @@ is no successful return after a failure.
 ## Tests and recipe
 
 `python3 -B tools/verification/test_finite_input_custody.py -v` (the
-recipe uses the `{root}` placeholder) runs 20 unittest regressions with
+recipe uses the `{root}` placeholder) runs 29 unittest regressions with
 fresh fixtures under the caller-selected TMPDIR. Every injected-fault
 test runs a normal control capture before the fault and a fresh
 recovery capture after it. Coverage: the control contract, empty and
@@ -111,11 +157,18 @@ non-UTF-8 streams, fragmented reads, short writes, zero-progress
 writes, read/fsync/close/link/reopen/manifest faults, exclusive
 collision with an untouched original, the typed static-message error
 state, and a real `os.pipe` fed by a cooperative in-process producer
-and read by the test's owned inert receiver double. Producers and
-receivers in the tests are in-process test doubles; an actual
-production receiver does not exist in this packet, and nothing here
-claims receiver consumption. No compiler and no subprocess are used,
-and there is no historical replay and no timeout harness.
+and read by the test's owned inert receiver double, plus the read-only
+`validate_staged` consumer (healthy control, tampered raw content,
+wrong provenance, missing or foreign manifest member, wrong hardlink
+pair or extra entry, malformed or duplicate JSON, type-invalid EOF and
+count, preserved IO-error cause). The `ValidateStagedTests` class can
+also be run alone (`python3 -B
+tools/verification/test_finite_input_custody.py ValidateStagedTests
+-v`) without any historical replay. Producers and receivers in the
+tests are in-process test doubles; an actual production receiver does
+not exist in this packet, and nothing here claims receiver
+consumption. No compiler and no subprocess are used, and there is no
+historical replay and no timeout harness.
 
 Executing the recipe runs only these unit regressions. It is not an
 acceptance, a PASS verdict, an installation or a merge: no historical
@@ -124,3 +177,6 @@ collector is performed or implied by this packet.
 
 
 Root supplement: original_exception and secondary_exceptions preserve original unrendered causes, including interruption; ready_fd_close_attempted means an attempt, never proven closure after failure. Name lookup treats only FileNotFoundError as absence. Fixtures are retained in TMPDIR. The 65536-byte buffer is transport chunking, not a cap.
+
+
+Consumer scope: hardlink identity and current byte equality are observations under a stable caller lease, not proof of historical no-clobber creation or absence of a concurrent same-uid writer. Read-only means no content or namespace writes; filesystem read metadata such as atime may change. A close error can be primary when it is the first failure, secondary only during cleanup. Missing-name errors retain their original exception and errno. Nine new validator methods are run separately; the20unchanged capture PASS are reused.

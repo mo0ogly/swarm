@@ -73,6 +73,59 @@ custodie dans `input.bin`. Après un succès, les quatre noms
 `input.partial`, `input.bin`, `manifest.partial` et `manifest.json`
 existent ; les noms de staging sont conservés, jamais supprimés.
 
+## Validation en lecture seule d'un enregistrement en custodie (validate_staged)
+
+`validate_staged(output_dir, allocation_id)` est un consommateur strict
+en lecture seule d'un enregistrement de custodie déjà publié, ajouté
+sans aucun changement de `capture`. Il n'écrit rien, ne crée aucun
+lien, ne renomme, ne supprime ni ne change aucune permission,
+n'exécute rien, ne lit aucune variable d'environnement, ne renvoie
+aucun descripteur et ne mute jamais un enregistrement, même en cas
+d'échec. Il revérifie les préconditions appelant vérifiables depuis le
+système de fichiers : `allocation_id` une chaîne de provenance non
+vide (jamais une authentification ni un confinement), `output_dir` un
+vrai répertoire existant (lstat, sans lien symbolique), détenu par
+l'uid courant, sans bit de permission groupe/autres. Il exige ensuite
+exactement les quatre noms de custodie `input.partial`, `input.bin`,
+`manifest.partial` et `manifest.json`, et rien d'autre dans le
+répertoire ; chacun doit être un fichier régulier (lstat, donc les
+liens symboliques sont refusés), détenu par l'uid courant et en mode
+privé ; `input.partial`/`input.bin` et
+`manifest.partial`/`manifest.json` doivent former actuellement des couples de
+hardlinks (même périphérique et même inode), sans preuve de création historique. Seul
+FileNotFoundError établit un nom absent ; toute autre erreur, y compris
+une erreur de permission, conserve sa cause originale et n'est jamais
+traitée comme une absence.
+
+Le validateur lit ensuite `manifest.partial` et `manifest.json`, exige
+des octets identiques, analyse le JSON en refusant tout membre
+dupliqué à toute profondeur, et valide le schéma exact du producteur :
+ensemble complet des membres sans membre manquant ni membre étranger,
+noms de staging et de publication et jetons de publication fixes,
+`allocation_id` attendu (égalité avec la chaîne de provenance attendue
+par l'appelant), `eof_observed` et
+`staged_copy_complete_of_observed_stream` exactement le booléen vrai,
+`byte_count` un int exact non négatif (un bool est refusé), `sha256`
+exactement 64 chiffres hexadécimaux minuscules, et le bloc
+`not_claimed` complet. Enfin il recalcule le nombre d'octets et le
+SHA-256 de `input.bin` en le lisant exactement une fois, en lecture
+seule, et échoue si l'un ou l'autre ne correspond pas au manifeste :
+c'est ce recalcul, jamais les seuls noms, étiquettes ou JSON, qui fait
+preuve du hachage. En succès il renvoie le dictionnaire de manifeste
+validé.
+
+Les échecs lèvent `FiniteInputCustodyError` avec le même message
+statique et les mêmes champs d'état typés, aux étapes `validate`,
+`read-manifest`, `parse-manifest`, `schema-manifest` ou `verify-input`,
+avec les causes originales conservées non affichées ;
+`ready_fd_close_attempted` reste toujours faux pour les échecs du
+validateur. Une première erreur de fermeture est primaire ; les erreurs de fermeture au nettoyage sont secondaires. Aucun retry, repli, délai
+imparti, plafond de taille, lecture d'environnement ni nettoyage ; et
+une validation réussie ne prouve ni qu'un récepteur court, consomme
+des octets ou réussit, ni aucun fait de compilateur, de lignée ou de
+graphe complet, ni aucune entrée historique ; l'intention amont reste
+inconnue même à EOF observé.
+
 ## Ce que le manifeste affirme, et refuse d'affirmer
 
 Le manifeste enregistre `eof_observed`, `byte_count`, `sha256`, les
@@ -117,7 +170,7 @@ garanti. Il n'y a pas de retour en succès après un échec.
 ## Tests et recette
 
 `python3 -B tools/verification/test_finite_input_custody.py -v` (la
-recette utilise le gabarit `{root}`) lance 20 régressions unittest avec
+recette utilise le gabarit `{root}`) lance 29 régressions unittest avec
 des fixtures fraîches sous le TMPDIR choisi par l'appelant. Chaque test
 à faute injectée exécute d'abord une capture témoin normale, puis une
 capture de récupération fraîche après la faute. Couverture : le
@@ -127,11 +180,18 @@ lecture/fsync/fermeture/hardlink/réouverture/manifeste, la collision
 exclusive avec original intact, l'état d'erreur typé à message
 statique, et un vrai `os.pipe` alimenté par un producteur coopératif
 en processus et lu par le double de récepteur inerte détenu par le
-test. Les producteurs et récepteurs des tests sont des doubles en
-processus ; un récepteur de production réel n'existe pas dans ce
-paquet, et rien ici n'affirme de consommation par un récepteur.
-Aucun compilateur ni sous-processus n'est utilisé, sans rejeu
-historique ni harnais de délai imparti.
+test, plus le consommateur en lecture seule `validate_staged`
+(témoin sain, contenu brut falsifié, mauvaise provenance, membre de
+manifeste manquant ou étranger, couple de hardlinks faux ou entrée
+supplémentaire, JSON malformé ou dupliqué, EOF et compte typés
+incorrects, cause d'EIO conservée). La classe `ValidateStagedTests`
+peut aussi être lancée seule (`python3 -B
+tools/verification/test_finite_input_custody.py ValidateStagedTests
+-v`) sans rejeu historique. Les producteurs et récepteurs des tests
+sont des doubles en processus ; un récepteur de production réel
+n'existe pas dans ce paquet, et rien ici n'affirme de consommation par
+un récepteur. Aucun compilateur ni sous-processus n'est utilisé, sans
+rejeu historique ni harnais de délai imparti.
 
 Exécuter la recette ne lance que ces régressions unitaires. Ce n'est
 ni une acceptation, ni un verdict PASS, ni une installation, ni une
@@ -141,3 +201,6 @@ sous-entendus par ce paquet.
 
 
 Complément du principal : original_exception et secondary_exceptions conservent les causes originales non affichées, y compris interruption ; ready_fd_close_attempted prouve une tentative, jamais une fermeture après échec. Seul FileNotFoundError établit un nom absent. Fixtures conservées sous TMPDIR. Le tampon de 65536 octets est un découpage technique, pas un plafond.
+
+
+Portée du consommateur : identité des hardlinks et égalité courante des octets observées sous bail stable, sans preuve de création historique sans écrasement ni exclusion d’un écrivain concurrent de même UID. Lecture seule signifie aucune écriture de contenu/noms ; les métadonnées de lecture telles que atime peuvent changer. Une fermeture en échec est primaire si première erreur, secondaire lors du nettoyage. Les erreurs de nom absent conservent exception et errno originaux. Neuf nouvelles méthodes du validateur exécutées séparément ;20PASS capture inchangés réutilisés.

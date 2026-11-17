@@ -11,7 +11,7 @@
   "environment": {},
   "steps": [
     {
-      "id": "twenty-new-finite-custody-contract-guards",
+      "id": "twenty-nine-finite-custody-contract-guards",
       "command": [
         "python3",
         "-B",
@@ -41,7 +41,16 @@
         "test_validation_rejects_before_consuming_input",
         "test_error_message_static_and_state_fields_bounded",
         "test_real_pipe_cooperative_producer_inert_receiver_digest",
-        "Ran 20 tests",
+        "test_control_validate_success_read_only_repeatable",
+        "test_raw_content_tamper_rejected",
+        "test_wrong_allocation_id_rejected",
+        "test_missing_and_foreign_members_rejected",
+        "test_wrong_hardlink_pairs_rejected",
+        "test_malformed_and_duplicate_manifest_json_rejected",
+        "test_type_invalid_eof_and_byte_count_rejected",
+        "test_read_faults_preserve_original_cause",
+        "test_missing_name_keeps_original_cause",
+        "Ran 29 tests",
         "OK"
       ]
     }
