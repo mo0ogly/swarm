@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "controlled-tree-fixture-receipt-guards",
+  "inputs": [
+    "tools/verification/trace_tree_fixture_worker.py",
+    "tools/verification/test_trace_tree_fixture_worker.py",
+    "tools/verification/TRACE-TREE-FIXTURE.md",
+    "tools/verification/TRACE-TREE-FIXTURE.en.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "five-synthetic-consumer-and-cleanup-guards",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_trace_tree_fixture_worker.py",
+        "TreeReceiptGuards"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_parent_print_failure_preserves_child_zero",
+        "test_child_unlink_failure_preserves_grandchild_zero",
+        "test_nested_cleanup_preserves_spawn_receipt",
+        "test_spawn_wait_error_preserves_already_known_exit",
+        "test_deferred_stdout_flush_preserves_child_receipt",
+        "Ran 5 tests",
+        "OK"
+      ]
+    }
+  ]
+}
