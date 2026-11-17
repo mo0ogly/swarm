@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "controlled-exec-fixture-protocol-guards",
+  "inputs": [
+    "tools/verification/trace_exec_fixture_worker.py",
+    "tools/verification/test_trace_exec_fixture_worker.py",
+    "tools/verification/TRACE-EXEC-FIXTURE.md",
+    "tools/verification/TRACE-EXEC-FIXTURE.en.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "seven-exec-fixture-protocol-guards",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_trace_exec_fixture_worker.py",
+        "TraceExecFixtureGuards"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_healthy_delegate_attempt_preserves_exact_bytes_and_safe_receipt",
+        "test_invalid_inputs_and_receipt_collision_refuse_before_exec",
+        "test_publication_and_close_faults_preserve_original_causes",
+        "test_strict_types_and_unexpected_exec_return_raise",
+        "test_nested_diagnostics_preserve_safe_causes_and_cycles",
+        "test_runtime_systemexit_and_linked_interruptions_never_succeed",
+        "test_terminal_diagnostic_failure_never_renders_original_messages",
+        "Ran 7 tests",
+        "OK"
+      ]
+    }
+  ]
+}
