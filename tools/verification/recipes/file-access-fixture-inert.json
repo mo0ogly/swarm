@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "file-access-fixture-metadata-drift",
+  "inputs": [
+    "tools/verification/file_access_fixture_worker.py",
+    "tools/verification/test_file_access_fixture_worker.py",
+    "tools/verification/FILE-ACCESS-FIXTURE.md",
+    "tools/verification/FILE-ACCESS-FIXTURE.en.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [{
+    "id": "one-metadata-drift-refusal-and-recovery",
+    "command": ["python3", "-B", "{root}/tools/verification/test_file_access_fixture_worker.py", "WorkerMetadataGuard"],
+    "expected_exit": 0,
+    "required_stdout": [],
+    "required_stderr": ["test_metadata_drift_refuses_even_when_size_unchanged", "Ran 1 test", "OK"]
+  }]
+}
