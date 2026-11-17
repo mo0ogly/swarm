@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "cd01-rustc-pre-exec-intent-producer-guards",
+  "inputs": [
+    "tools/verification/cd01_capture_rustc_wrapper.py",
+    "tools/verification/test_cd01_capture_rustc_wrapper.py",
+    "tools/verification/CD01-RUSTC-INTENT.md",
+    "tools/verification/CD01-RUSTC-INTENT.en.md",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "seven-new-producer-contract-guards",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_cd01_capture_rustc_wrapper.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_reporting_failure_keeps_original_and_cleanup_causes",
+        "test_argument_bytes_and_distinct_private_intents",
+        "test_short_write_control_zero_refusal_and_recovery",
+        "test_visible_link_with_sync_failure_never_delegates",
+        "test_write_and_close_failures_keep_both_causes",
+        "test_flush_reporting_failure_retains_cause",
+        "test_invocation_collision_refuses_without_overwrite",
+        "Ran 7 tests",
+        "OK"
+      ]
+    }
+  ]
+}

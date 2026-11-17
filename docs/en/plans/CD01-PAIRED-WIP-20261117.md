@@ -158,3 +158,14 @@ Next oneboundedGLM concretecollectorplan reusingreviewedfoundation; solveprivacy
 Root retained CP12-01..05 in `ROOT-RECEPTION.json`: concurrent/partial record publication, Python argument-byte fidelity, invalid Cargo0 ⇒ actual compiler-execution inference, already-material unknown inputs, and tool/chain resolution. A successful cached build need not execute fresh compilers and cannot prove capture. Reading cc1.8.0 lines3794–3955 establishes conditional bare-cc default selection, not the actual selected branch. The installed strace manual passage does not establish unlimited `-s0` semantics.
 
 Independent reviewer09 received this bounded plan review, turn `01a1e9a9-68e7-71c0-b0a3-e359ad45bc8c`; all other chats idle, no GLM call remains active. No engine build, test body, admission, installation or main merge was started by this packet. Next: corrected/reviewed producer contract, then bounded production and targeted guards; actual collection requires allocation based on these new preconditions.
+
+
+### Rustc producer13: targeted guards, independent review pending
+
+GLM13 delivered a pre-exec intent producer proposal (528.689 s; reported usage53,232 tokens, including44,997 reasoning). Root reproduced swallowed stderr diagnostic RP13-ERR01 and corrected only that consumer:1FAIL before,1PASS after, preserving primary/cleanup/reporting causes in a static-message exception when diagnostics fail. Four new producer guards and two boundary guards then passed separately. Delegation is always mocked: no compiler, real guard, Swarm build or C-D01 body executed.
+
+Sources, docstrings, FR/EN docs and permanent recipe are under `tools/verification/cd01_capture_rustc_wrapper.py`, its test and `CD01-RUSTC-INTENT[.en].md`. The seven-guard recipe received schema/input validation only. `REUSE-BINDING.json` retains non-docstring code and original-guard equivalence; historical hashes are not reassigned. Full evidence: `root00-cd01-rustc-producer13-hvkrrd47` on SWARM.
+
+Independent reviewer09 received only these bytes/checks. Receipt means intent, outcome UNKNOWN; generic argument privacy, actual chain, Cargo configuration and fullgraph remain unestablished. Root remains owner; other chats wait except this necessary review. Main compile/15body admission/install/main integration stay distinct and unallocated.
+
+Reviewer09 `01a1e9bb-a471-7560-a33e-03be52c8e9bc`: APPROVE_SOURCE_AND_TARGETED_GUARDS_ONLY; RP13-DOC01 fixed in validator docstring only, executable AST unchanged. Separate real inert0/7/0 producer/existingguard-query/ownedreceiver witness observed, argv/PIDs match and seven FD/reserve checks retained; observation review remains distinct. No compiler/Cargo/C-D01body.
