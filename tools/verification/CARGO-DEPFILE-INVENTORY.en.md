@@ -54,4 +54,4 @@ safe cause (missing/ambiguous/wrong-kind/wrong-inode/symlink/outside-target
 artifacts or depfiles, unsupported depfile syntax, missing sources, drift or
 conflicting observations) and make the run exit nonzero while preserving
 partial observations. Read depfile bytes/hash survive syntax refusal. Output is private (0600), exclusive, file and directory synced. No content-only or mtime fallback; no replay, retry,
-timeout or alternate paths.
+timeout or alternate paths. Repeated source observations can reveal conflicts.

@@ -57,4 +57,4 @@ une cause sûre (artefact ou depfile manquant/ambigu/mauvais type/mauvais
 inode/symlink/hors cible, syntaxe depfile non prise en charge, sources
 manquantes, dérive ou observations conflictuelles) et rendent la sortie non
 nulle tout en préservant les observations partielles et les octets/hash lus avant refus syntaxique. Sortie privée (0600), exclusive, fichier et répertoire synchronisés. Aucun repli par contenu
-ou mtime ; aucune relecture, relance, temporisation ni chemin alternatif.
+ou mtime ; aucun rejeu de compilation/test, aucune relance automatique, temporisation ni chemin alternatif. Les observations répétées d’une source peuvent révéler un conflit.
