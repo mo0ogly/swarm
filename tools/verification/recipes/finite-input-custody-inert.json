@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "finite-input-custody-inert",
+  "inputs": [
+    "tools/verification/finite_input_custody.py",
+    "tools/verification/test_finite_input_custody.py",
+    "tools/verification/FINITE-INPUT-CUSTODY.md",
+    "tools/verification/FINITE-INPUT-CUSTODY.en.md",
+    "tools/verification/recipes/finite-input-custody-inert.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "twenty-new-finite-custody-contract-guards",
+      "command": [
+        "python3",
+        "-B",
+        "{root}/tools/verification/test_finite_input_custody.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_interrupt_preserves_primary_and_cleanup_cause",
+        "test_lookup_error_refuses_before_consumption",
+        "test_control_success_full_contract",
+        "test_empty_stream_stages_zero_bytes_and_eof_manifest",
+        "test_non_utf8_bytes_staged_verbatim",
+        "test_fragmented_reads_stage_identical_bytes",
+        "test_short_writes_loop_to_completion",
+        "test_zero_progress_write_aborts_and_retains_partial",
+        "test_read_fault_retains_partial_and_borrowed_descriptor",
+        "test_fsync_fault_retains_staging_without_publication",
+        "test_close_fault_attempted_once_with_primary_cause",
+        "test_link_fault_eexist_keeps_collision_cause_and_partial",
+        "test_existing_input_bin_collision_rejected_before_consuming",
+        "test_manifest_write_fault_publishes_no_manifest_json",
+        "test_manifest_link_fault_closes_ready_descriptor",
+        "test_reopen_fault_reported_with_retained_staged_files",
+        "test_close_dir_fault_prevents_success_after_publication",
+        "test_validation_rejects_before_consuming_input",
+        "test_error_message_static_and_state_fields_bounded",
+        "test_real_pipe_cooperative_producer_inert_receiver_digest",
+        "Ran 20 tests",
+        "OK"
+      ]
+    }
+  ]
+}
