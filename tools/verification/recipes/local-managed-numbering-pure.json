@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "local-managed-numbering-pure",
+  "inputs": [
+    "tools/swarm_version.py",
+    "tests/test_swarm_version_numbering.py",
+    "docs/architecture/LOCAL-DELIVERY-CACHE-PROOF.md",
+    "docs/en/LOCAL-DELIVERY-CACHE-PROOF.md",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/local-managed-numbering-pure.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "pure-numbering-compatibility-refusal-recovery",
+      "command": [
+        "python3",
+        "tests/test_swarm_version_numbering.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_010_legacy_start_and_digest_rules",
+        "test_030_observed_no_prior_allocates_above_observed_counter",
+        "test_055_observed_equal_label_different_hash_allocates_above_floor",
+        "test_085_fault_malformed_prior_refused_only_in_observed_branch",
+        "test_090_inputs_are_never_mutated",
+        "Ran 20 tests",
+        "OK"
+      ]
+    }
+  ]
+}

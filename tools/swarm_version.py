@@ -66,19 +66,123 @@ def source_identity(source,effective=None):
     return hashlib.sha256(raw).hexdigest(),rows
 
 
-def select_version(published, digest, previous):
-    match = re.fullmatch(r"v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:[-+].*)?", published)
+def _parse_canonical_dev(version):
+    """Parse one canonical local dev label 'vM.m.p-dev.N' into integers.
+
+    Private pure parser shared by select_version observed branch. Accepts
+    only str; every numeric segment must lack leading zeros; returns the
+    tuple (major, minor, patch, counter) or None for any other input. No IO,
+    no subprocess, no mutation or authority. Integer conversion can propagate
+    ValueError for Python's existing integer representation limits; no new
+    limit or interpreter-setting change is introduced here.
+    """
+    if not isinstance(version, str):
+        return None
+    match = re.fullmatch(
+        r'v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-dev\.(0|[1-9][0-9]*)',
+        version,
+    )
+    if match is None:
+        return None
+    return tuple(int(part) for part in match.groups())
+
+
+def select_version(published, digest, previous, *, installed=None):
+    """Choose a local development label without IO or argument mutation.
+
+    published is a string in the existing base-label form (including optional
+    -/+ suffix); its next patch defines the target family. digest is the plain
+    effective-source digest string. previous is a source-specific prior record,
+    or None. Caller qualification of that record is not performed here.
+
+    installed=None preserves the old three-argument behavior, including relaxed
+    prior counters and historical exception types. A supplied observation must
+    be a dict with exactly version (canonical vM.m.p-dev.N, no leading zeros)
+    and binary_sha256 (64 lowercase hex characters). A present prior record in
+    this branch needs a canonical version; its image hash must be canonical
+    when a same-version/same-digest comparison consumes it.
+
+    Installed or prior families above the target refuse. A prior in a lower
+    family contributes no counter to the target. An installed lower family
+    needs no counter floor: an unchanged target-family prior can be retained,
+    even at zero; otherwise normal new allocation starts at one or advances
+    the target-family prior. With installed in the target family, new allocation
+    is above its counter and advances a changed-digest target-family prior.
+    Same-digest priors above the observed counter retain their label; at equal
+    counters retention also requires the same image hash. All other cases use
+    max(target-family prior counter + 1, observed counter + 1), ignoring a prior
+    in another family. Without a usable prior, allocate from the applicable floor.
+
+    Invalid string bases, malformed observations/prior versions/consumed hashes
+    and incompatible families raise ValueError. Wrong published types retain
+    re.fullmatch's TypeError; int conversion may propagate Python's existing
+    representation-limit ValueError. No interpreter limit is introduced or changed.
+
+    The caller owes fresh owned-image capture under lifecycle/build locks,
+    prior qualification and a post-build version check. These labels authenticate
+    no source or actor and grant no release or installation authority. The
+    function itself reads no environment, starts no process and mutates no data.
+    prepare/main/cache/override capture is not wired to installed in this increment.
+    """
+    match = re.fullmatch(
+        r"v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:[-+].*)?",
+        published,
+    )
     if not match:
         raise ValueError("A valid published base version is required")
     major, minor, patch = map(int, match.groups())
     prefix = f"v{major}.{minor}.{patch + 1}-dev."
-    previous = previous or {}
-    prior = previous.get("version", "")
-    if prior.startswith(prefix) and prior[len(prefix):].isdigit():
-        if previous.get("source_digest") == digest:
-            return prior
-        return prefix + str(int(prior[len(prefix):]) + 1)
-    return prefix + "1"
+    target = (major, minor, patch + 1)
+    if installed is None:
+        # Legacy three-argument path, preserved verbatim; do not tighten.
+        previous = previous or {}
+        prior = previous.get("version", "")
+        if prior.startswith(prefix) and prior[len(prefix):].isdigit():
+            if previous.get("source_digest") == digest:
+                return prior
+            return prefix + str(int(prior[len(prefix):]) + 1)
+        return prefix + "1"
+    if not isinstance(installed, dict):
+        raise ValueError('installed observation must be a dict carrying exactly the keys version and binary_sha256')
+    if set(installed.keys()) != {'version', 'binary_sha256'}:
+        raise ValueError('installed observation must contain exactly the keys version and binary_sha256')
+    observed = _parse_canonical_dev(installed['version'])
+    if observed is None:
+        raise ValueError('installed version must be a canonical local dev label vM.m.p-dev.N without leading-zero segments')
+    observed_hash = installed['binary_sha256']
+    if not isinstance(observed_hash, str) or not re.fullmatch(r'[0-9a-f]{64}', observed_hash):
+        raise ValueError('installed binary_sha256 must be a 64-character lowercase hex string')
+    if observed[:3] > target:
+        raise ValueError('installed image family is above the next patch of the published base; refusing to invent a new release lineage')
+    floor = observed[3] + 1 if observed[:3] == target else 1
+    if previous is not None and not isinstance(previous, dict):
+        raise ValueError('previous must be a dict or None when an installed observation is given')
+    if previous is not None:
+        if 'version' not in previous:
+            raise ValueError('previous record is present without a version; refusing to replace history with an absent-record default')
+        prior = _parse_canonical_dev(previous['version'])
+        if prior is None:
+            raise ValueError('previous version must be a canonical local dev label vM.m.p-dev.N; refusing an unsafe or unorderable prior value')
+        if prior[:3] > target:
+            raise ValueError('previous record family is above the target family; lineage resolution is required instead of a silently invented default')
+        if prior[:3] == target:
+            digest_same = previous.get('source_digest') == digest
+            if observed[:3] == target:
+                if prior[3] > observed[3] and digest_same:
+                    return previous['version']
+                if prior[3] == observed[3] and digest_same:
+                    prior_hash = previous.get('binary_sha256')
+                    if not isinstance(prior_hash, str) or not re.fullmatch(r'[0-9a-f]{64}', prior_hash):
+                        raise ValueError('previous record claims the installed version without a canonical 64-character lowercase binary_sha256; refusing an incoherent prior record')
+                    if prior_hash == observed_hash:
+                        return previous['version']
+            elif digest_same:
+                # Prior sits in the target family while the observed image is
+                # in a lower family: the prior is already ordered above the
+                # observation, so the legacy same-digest rule applies.
+                return previous['version']
+            return prefix + str(max(prior[3] + 1, floor))
+    return prefix + str(floor)
 
 
 

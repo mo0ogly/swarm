@@ -20,3 +20,20 @@ source/home reste inchangé ; ce contrôle ne qualifie pas la prise en compte du
 réglage `runtime_temporary_directory`, un build ou une installation.
 
 Pour le garde de paire Authority avant `start`/`restart`, un serveur précédemment identifié comme possédé reste associé à son record : une perte d'identité refuse, sans repli sur le chemin d'installation. Le lecteur ouvre son image via `/proc/<pid>/exe` après un premier contrôle de possession, maintient ce descripteur pendant la commande publique `engine-settings show --json`, puis revérifie identité et couple périphérique/inœud. L'enfant reçoit le descripteur par `pass_fds` et utilise `/proc/self/fd/<fd>` ; seul le mode lu ressort après fermeture. Une erreur d'acquisition, de lecture ou de fermeture refuse avant arrêt ; une erreur de fermeture secondaire conserve aussi la cause primaire. Sans serveur possédé, les appels directs gardent la lecture par le binaire courant, mais son absence sur un Root initialisé refuse désormais ; le cas jamais initialisé conserve le comportement antérieur. Cette observation Linux/procfs n'est ni un confinement, ni un bail continu, ni une garantie contre tout échange entre observations. Les politiques existantes de mode, de démon et de protocole restent inchangées. La recette `local-live-engine-reader.json` couvre les fixtures synthétiques du lecteur, le refus historique corrigé et les gardes de version du caller ; elle n'exécute ni le moteur réel, ni un service, et ne qualifie pas une livraison entre checkouts ou un binaire installé.
+
+## Décision pure de numérotation — appelant non raccordé
+
+`select_version(published, digest, previous, *, installed=None)` conserve le calcul historique à trois arguments. L'observation facultative `installed` est un dictionnaire dédié portant exactement `version` (forme canonique `vM.m.p-dev.N`, sans zéro de tête) et `binary_sha256` (64 hexadécimaux minuscules). Elle décrit une entrée du calcul, pas une preuve : l'appelant doit encore établir la possession et la fraîcheur de l'image, qualifier son propre historique sous les verrous et revérifier avant remplacement. L'appelant doit fournir l'historique propre à cette source ; le calcul n'en fabrique ni n'en copie.
+
+| Entrées du calcul avec observation | Décision |
+| --- | --- |
+| Pas d'historique, même famille et compteur observé 381 | Nouveau numéro 382 |
+| Historique de même famille sous le compteur observé | Nouvelle allocation au-dessus du compteur observé |
+| Historique au-dessus, empreinte de source inchangée | Numéro antérieur conservé |
+| Même numéro observé et même source | Conservation seulement si l'image enregistrée est la même ; une empreinte consommée invalide refuse |
+| Source changée | Nouvelle allocation qui avance l'historique de la famille cible et respecte le plancher |
+| Famille observée inférieure | Pas de plancher de compteur entre familles ; une allocation inchangée dans la famille cible peut être conservée, même au compteur zéro |
+| Famille observée ou antérieure supérieure à la cible | Refus, sans inventer une lignée de release |
+| Historique présent sans version, observation mal formée ou version non canonique | Refus explicite |
+
+Le calcul ne fait aucune E/S, aucun lancement de processus et aucune mutation de ses entrées. Les limites natives de conversion d'entiers Python restent possibles ; aucun plafond ni réglage d'interpréteur n'est ajouté. Un numéro n'authentifie ni la source ni l'acteur. **Statut : non raccordé** à `prepare`, `main`, l'admission du cache, `SWARM_VERSION` et la capture réelle. Ces contrats restent ouverts ; la recette `local-managed-numbering-pure.json` qualifie seulement la fonction et sa compatibilité historique. Aucun build, parcours de livraison ou nouveau binaire installé n'en découle.
