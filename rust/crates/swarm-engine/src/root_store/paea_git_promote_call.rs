@@ -682,6 +682,14 @@ impl RootStore {
                                 }
                                 let mandate_expires_at =
                                     agreement.and_then(|matched| matched.expires_at);
+                                // Fixture observation only, after final agreement
+                                // and while the actual Trust SH reservation lives.
+                                #[cfg(all(target_os = "linux", feature = "test-fixtures"))]
+                                if let Some(Err(cause)) = crate::paea_git_fixture::run_shared_section_hook() {
+                                    return Err(R::Launch(Box::new(crate::AgentLaunchError::caused(
+                                        "paea-git-promote-trust-section", cause,
+                                    ))));
+                                }
                                 effect::commit(
                                     self,
                                     project,

@@ -844,3 +844,746 @@ fn promote_call_refuses_other_service_root_without_effect() {
     owned.service.close().unwrap();
     owned.project.close().unwrap();
 }
+/// Fixture-only barriers observe the actual public Commit/revocation paths.
+/// No controller-owned shared lock may mask a missing production reservation.
+#[cfg(feature = "test-fixtures")]
+mod concurrent_withdrawal {
+    use super::*;
+    use std::{
+        error::Error,
+        io,
+        os::unix::fs::MetadataExt,
+        panic::{catch_unwind, AssertUnwindSafe},
+        sync::{
+            atomic::{AtomicBool, Ordering},
+            mpsc, Arc, Barrier,
+        },
+    };
+    use swarm_engine::paea_git_fixture::{with_ex_lock_hook, with_shared_section_hook, ScopeError};
+    type Cause = Box<dyn Error + Send + Sync>;
+    type Panic = Box<dyn std::any::Any + Send>;
+    /// Controller-owned original authority fixture and every independent result.
+    /// Retention is enabled before startup; both original journals close even
+    /// when startup/use fails or panics. No failure implies an absent effect.
+    struct Call {
+        fixture: fixture::Fixture,
+        result: Option<std::thread::Result<Result<PaeaGitPromoteOutcome, PaeaGitPromoteCallError>>>,
+        startup_error: Option<Cause>,
+        startup_panic: Option<Panic>,
+        cleanup: Vec<Cause>,
+    }
+    impl Call {
+        /// Borrow the call only after all startup/use/close outcomes are known;
+        /// assertions never consume the owner or replace a retained cause.
+        fn checked(&self) -> Result<&PaeaGitPromoteOutcome, &PaeaGitPromoteCallError> {
+            assert!(
+                self.startup_error.is_none() && self.startup_panic.is_none(),
+                "authority startup failed; original retained"
+            );
+            assert!(
+                self.cleanup.is_empty(),
+                "authority cleanup failed; original retained"
+            );
+            self.result
+                .as_ref()
+                .expect("authority use absent")
+                .as_ref()
+                .unwrap_or_else(|_| panic!("authority body panicked; original retained"))
+                .as_ref()
+        }
+    }
+    /// One failure payload keeps the original assertion/panic and independently
+    /// owned typed worker, authority and cleanup results until propagation.
+    struct RetainedFailure {
+        primary: Option<Panic>,
+        parts: Vec<Box<dyn std::any::Any + Send>>,
+    }
+    /// Retain safe typed diagnostic branches without private Display text.
+    /// Cyclic Error graphs are deduplicated by identity, never by a retry cap.
+    fn safe_cause(error: &(dyn Error + 'static)) -> Value {
+        let mut pending = vec![error];
+        let mut seen: Vec<*const dyn Error> = Vec::new();
+        let mut nodes = Vec::new();
+        while let Some(error) = pending.pop() {
+            let identity = error as *const dyn Error;
+            if seen.iter().any(|prior| std::ptr::eq(*prior, identity)) {
+                continue;
+            }
+            seen.push(identity);
+            let links = swarm_engine::native_error_links(error);
+            nodes.push(json!({"labels":links.labels,"io_errno":links.io_errno,"sqlite_code":links.sqlite_code}));
+            pending.extend(links.children.into_iter().map(|(_, cause)| cause));
+        }
+        Value::Array(nodes)
+    }
+    /// Project safe diagnostics while the controller still owns all typed
+    /// results. The projection never replaces the original failure bundle.
+    fn describe_call(call: &Call) {
+        let startup = call
+            .startup_error
+            .as_ref()
+            .map(|cause| safe_cause(cause.as_ref()));
+        let cleanup: Vec<_> = call
+            .cleanup
+            .iter()
+            .map(|cause| safe_cause(cause.as_ref()))
+            .collect();
+        let action = match &call.result {
+            Some(Ok(Err(cause))) => Some(safe_cause(cause)),
+            _ => None,
+        };
+        println!(
+            "P4_CALL_DIAGNOSTIC {}",
+            json!({"startup":startup,"startup_panic":call.startup_panic.is_some(),"action":action,"cleanup":cleanup,"use_panic":matches!(call.result,Some(Err(_)))})
+        );
+    }
+    /// Preserve every failure before raising one payload, never replacing an
+    /// earlier operation/panic with a later cleanup assertion.
+    fn propagate(primary: Option<Panic>, parts: Vec<Box<dyn std::any::Any + Send>>) -> ! {
+        std::panic::panic_any(RetainedFailure { primary, parts })
+    }
+
+    /// Invoke the exact signed permission and retain its authority fixture.
+    /// Outcome and authority-close failure remain independent, including after
+    /// publication; this helper never deletes a grant or infers rollback.
+    fn retained_call(owned: &Owned, prepared: &swarm_engine::PaeaGitPromoteCall) -> Call {
+        let mut f = fixture::Fixture::build_for_trust(
+            prepared.request().permission(),
+            owned.scope.clone(),
+            owned.trust_revision,
+        );
+        f.retain_directory();
+        println!("P4_AUTHORITY_FIXTURE {}", f.path.display());
+        let startup = catch_unwind(AssertUnwindSafe(|| {
+            authenticated_startup::open(&Context::new(), f.path.to_str().unwrap(), &f.pin)
+        }));
+        let mut call = Call {
+            fixture: f,
+            result: None,
+            startup_error: None,
+            startup_panic: None,
+            cleanup: Vec::new(),
+        };
+        match startup {
+            Ok(Ok((app, head))) => {
+                call.result = Some(catch_unwind(AssertUnwindSafe(|| {
+                    owned.service.call_paea_git_promote(
+                        &owned.project,
+                        prepared,
+                        &app,
+                        &UseContext::new(),
+                        &head,
+                        b"STARTUP_FIXTURE_PASSWORD",
+                    )
+                })));
+                if let Err(error) = app.close() {
+                    call.cleanup.push(Box::new(error));
+                }
+            }
+            Ok(Err(error)) => call.startup_error = Some(Box::new(error)),
+            Err(panic) => call.startup_panic = Some(panic),
+        }
+        if let Err(error) = call.fixture.business.close() {
+            call.cleanup.push(Box::new(error));
+        }
+        if let Err(error) = call.fixture.personal.close() {
+            call.cleanup.push(Box::new(error));
+        }
+        call
+    }
+
+    /// Close every prepared operation and store, retaining each independent
+    /// cleanup cause. The service directory was retained before thread entry.
+    fn close_owned(owned: Owned) -> Vec<Cause> {
+        let mut errors = Vec::new();
+        for result in [
+            owned.commit_prepared.close(),
+            owned.reconcile_prepared.close(),
+            owned.service.close(),
+            owned.project.close(),
+        ] {
+            if let Err(error) = result {
+                errors.push(Box::new(error) as Cause);
+            }
+        }
+        errors
+    }
+
+    /// Read the current real Git reference; never replace a command failure
+    /// or malformed output with absence.
+    fn current_ref(owned: &Owned) -> String {
+        let out = Command::new(git_executable())
+            .arg("--git-dir")
+            .arg(owned._service_dir.path().join(".swarm/bare"))
+            .args(["rev-parse", "--verify", "refs/heads/release"])
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "Git ref observation failed: {:?}",
+            out.status
+        );
+        String::from_utf8(out.stdout).unwrap().trim().to_owned()
+    }
+
+    /// Stable fixture diagnostic; no secrets or dynamic error text.
+    fn stopped(reason: &'static str) -> io::Error {
+        io::Error::new(io::ErrorKind::Other, reason)
+    }
+
+    /// Events are progress only. Typed operation/close outcomes return through
+    /// joined workers; their errors are not replaced by a successful signal.
+    enum Event {
+        Shared,
+        Probe { dev: u64, ino: u64, blocked: bool },
+        CommitDone,
+        RevokeDone,
+    }
+
+    /// Require the dedicated positive helper's actual successful child exit,
+    /// immutable result, originals and retained observations before any test
+    /// service is created. A visible PASS or publication observation alone is
+    /// not qualification; no old fixture loader or receipt is silently adopted.
+    fn require_qualified_source() {
+        use sha2::{Digest, Sha256};
+        let proof = PathBuf::from(
+            std::env::var_os("SWARM_PAEA_SOURCE_FIXTURE")
+                .expect("new qualified source evidence required"),
+        );
+        assert!(
+            !proof.join("failure.json").exists()
+                && !proof.join("qualification-failure.json").exists()
+        );
+        let read = |path: &Path| fs::read(path).unwrap();
+        let hash = |raw: &[u8]| format!("{:x}", Sha256::digest(raw));
+        let terminal: Value = serde_json::from_slice(&read(&proof.join("terminal.json"))).unwrap();
+        assert_eq!(terminal["status"], "QUALIFIED_P4_FRESH_SOURCE");
+        assert_eq!(terminal["exit"], 0);
+        let process = read(&proof.join("process.json"));
+        assert_eq!(terminal["process_sha256"], hash(&process));
+        let process: Value = serde_json::from_slice(&process).unwrap();
+        assert_eq!(process["exit"], 0);
+        let raw = read(&proof.join("result.json"));
+        assert_eq!(terminal["result_sha256"], hash(&raw));
+        let result: Value = serde_json::from_slice(&raw).unwrap();
+        assert_eq!(result["status"], "PASS");
+        assert_eq!(result["task_accepted"], true);
+        assert_eq!(result["paid_provider"], false);
+        assert_eq!(
+            result["inputs_sha256"],
+            hash(&read(&proof.join("inputs.json")))
+        );
+        assert_eq!(
+            result["observation_sha256"],
+            hash(&read(&proof.join("observed-publication.json")))
+        );
+        for (name, digest) in result["artifacts"].as_object().unwrap() {
+            let relative = Path::new(name);
+            assert!(relative
+                .components()
+                .all(|part| matches!(part, std::path::Component::Normal(_))));
+            let path = proof.join(relative);
+            assert_eq!(path.canonicalize().unwrap(), path);
+            assert_eq!(digest, &Value::String(hash(&read(&path))));
+        }
+        let root = PathBuf::from(result["root"].as_str().unwrap())
+            .canonicalize()
+            .unwrap();
+        for (name, digest) in result["consumed_originals"].as_object().unwrap() {
+            let path = Path::new(name).canonicalize().unwrap();
+            assert!(path.starts_with(&root));
+            assert_eq!(digest, &Value::String(hash(&read(&path))));
+        }
+        let marker = Path::new(result["review_marker"]["path"].as_str().unwrap())
+            .canonicalize()
+            .unwrap();
+        assert!(marker.starts_with(&root));
+        assert_eq!(result["review_marker"]["sha256"], hash(&read(&marker)));
+        let physical = fs::metadata(root.join(".swarm")).unwrap();
+        assert_eq!(result["physical"]["device"], physical.dev());
+        assert_eq!(result["physical"]["inode"], physical.ino());
+        assert_eq!(raw, read(&proof.join("result.json")));
+    }
+
+    /// Save the whole nested EX witness before examining any registration,
+    /// cleanup or public-operation failure. The outer slot survives assertions
+    /// and is included in RetainedFailure, including typed probe/unlock causes.
+    fn retain_ex_witness<T>(
+        slot: &mut Option<Result<T, ScopeError<T>>>,
+        run: impl FnOnce() -> Result<T, ScopeError<T>>,
+    ) -> &T {
+        *slot = Some(run());
+        match slot.as_ref().unwrap() {
+            Ok(body) => body,
+            Err(ScopeError::RegistrationRefused) => {
+                panic!("EX control registration refused; result retained")
+            }
+            Err(ScopeError::Cleanup { .. }) => {
+                panic!("EX control cleanup panicked; body and panic retained")
+            }
+        }
+    }
+
+    /// A successful signed Commit control precedes injection on the same
+    /// composition and fresh service prerequisites. Then observe real EX
+    /// contention during Commit's SH section and persistent public revocation.
+    /// No sleeps, receive deadlines or global watchdog establish ordering.
+    #[test]
+    #[ignore = "requires newly qualified native source fixture and test-fixtures profile"]
+    fn promote_call_concurrent_withdrawal_waits_for_shared_section() {
+        require_qualified_source();
+        let mut control = owned_with(effect_config_agreement);
+        control._service_dir.disable_cleanup(true);
+        println!(
+            "P4_CONTROL_SERVICE {}",
+            control._service_dir.path().display()
+        );
+        let mut control_call = None;
+        let mut control_ex = None;
+        let control_check = catch_unwind(AssertUnwindSafe(|| {
+            seed_agreement(&control, "p4-valid-control", &promotion_resource(&control));
+            control_call = Some(retained_call(&control, &control.commit_prepared));
+            describe_call(control_call.as_ref().unwrap());
+            let outcome = control_call.as_ref().unwrap().checked();
+            assert!(
+                matches!(
+                    outcome,
+                    Ok(PaeaGitPromoteOutcome::Recorded {
+                        replayed: false,
+                        ..
+                    })
+                ),
+                "valid Commit control failed; original retained"
+            );
+            assert_eq!(current_ref(&control), control.candidate);
+            // Positive probe control on the exact exclusive path outside a
+            // shared section: acquisition and explicit unlock must succeed.
+            let probed = Arc::new(AtomicBool::new(false));
+            let seen = probed.clone();
+            let withdrawn = retain_ex_witness(&mut control_ex, || {
+                with_ex_lock_hook(
+                    move |file| {
+                        rustix::fs::flock(
+                            file,
+                            rustix::fs::FlockOperation::NonBlockingLockExclusive,
+                        )
+                        .map_err(io::Error::from)?;
+                        rustix::fs::flock(file, rustix::fs::FlockOperation::Unlock)
+                            .map_err(io::Error::from)?;
+                        seen.store(true, Ordering::SeqCst);
+                        Ok(())
+                    },
+                    || {
+                        control.project.trust("mandate-revoke", &serde_json::to_vec(&json!({"schema_version":1,"event_id":format!("p4-control-revoke-{}",std::process::id()),"mandate_id":format!("mandate-{}-p4-valid-control",std::process::id())})).unwrap(), "fixture-admin-token")
+                    },
+                )
+            });
+            let withdrawn = withdrawn
+                .as_ref()
+                .unwrap_or_else(|_| panic!("EX public control refused; typed cause retained"));
+            let withdrawn: Value = serde_json::from_slice(&withdrawn.bytes).unwrap();
+            assert_eq!(withdrawn["state"], "revoked");
+            assert!(probed.load(Ordering::SeqCst));
+        }));
+        let control_close = close_owned(control);
+        if control_check.is_err() || !control_close.is_empty() {
+            propagate(
+                control_check.err(),
+                vec![
+                    Box::new(control_call),
+                    Box::new(control_ex),
+                    Box::new(control_close),
+                ],
+            );
+        }
+        println!("P4_VALID_COMMIT_CONTROL_PASS");
+
+        let mut owned = owned_with(effect_config_agreement);
+        owned._service_dir.disable_cleanup(true);
+        println!(
+            "P4_CONCURRENT_SERVICE {}",
+            owned._service_dir.path().display()
+        );
+        let prefix = "p4-concurrent";
+        seed_agreement(&owned, prefix, &promotion_resource(&owned));
+        let mandate = format!("mandate-{}-{prefix}", std::process::id());
+        let trust_path = owned.project_path.join(".swarm/trust-actions.json");
+        let before = fs::read(&trust_path).unwrap();
+        let lock_meta = fs::metadata(owned.project_path.join(".swarm/trust-actions.lock")).unwrap();
+        let expected_inode = (lock_meta.dev(), lock_meta.ino());
+        // Open before Commit's writer reservation, avoiding an unrelated
+        // SQL preflight wait in the revocation worker.
+        let revoke_root = RootStore::open(&owned.project_path, true).unwrap();
+        let release_commit = Arc::new(Barrier::new(2));
+        let release_probe = Arc::new(Barrier::new(2));
+        let abort_commit = Arc::new(AtomicBool::new(false));
+        let (tx, rx) = mpsc::channel();
+        let (start_tx, start_rx) = mpsc::channel();
+
+        let revoke_tx = tx.clone();
+        let probe_gate = release_probe.clone();
+        let revoker = std::thread::spawn(move || {
+            let result = catch_unwind(AssertUnwindSafe(|| {
+                if start_rx
+                    .recv()
+                    .map_err(|_| stopped("controller start lost"))?
+                    == false
+                {
+                    return Ok(None);
+                }
+                let probe_tx = revoke_tx.clone();
+                let hook = move |file: &std::fs::File| -> io::Result<()> {
+                    let metadata = file.metadata()?;
+                    let (dev, ino) = (metadata.dev(), metadata.ino());
+                    match rustix::fs::flock(
+                        file,
+                        rustix::fs::FlockOperation::NonBlockingLockExclusive,
+                    ) {
+                        Err(rustix::io::Errno::AGAIN) => {
+                            probe_tx
+                                .send(Event::Probe {
+                                    dev,
+                                    ino,
+                                    blocked: true,
+                                })
+                                .map_err(|_| stopped("controller probe lost"))?;
+                            probe_gate.wait();
+                            Ok(())
+                        }
+                        Ok(()) => {
+                            // Release an unexpected acquisition before reporting
+                            // the missing shared reservation; retain unlock errno.
+                            rustix::fs::flock(file, rustix::fs::FlockOperation::Unlock)
+                                .map_err(io::Error::from)?;
+                            probe_tx
+                                .send(Event::Probe {
+                                    dev,
+                                    ino,
+                                    blocked: false,
+                                })
+                                .map_err(|_| stopped("controller probe lost"))?;
+                            Err(stopped("exclusive probe unexpectedly acquired"))
+                        }
+                        Err(errno) => Err(io::Error::from(errno)),
+                    }
+                };
+                let nested = with_ex_lock_hook(hook, || {
+                    revoke_root.trust("mandate-revoke", &serde_json::to_vec(&json!({"schema_version":1,"event_id":format!("p4-revoke-{}",std::process::id()),"mandate_id":mandate})).unwrap(), "fixture-admin-token")
+                });
+                Ok::<_, Cause>(Some(nested))
+            }));
+            let closed = revoke_root.close();
+            let terminal = revoke_tx.send(Event::RevokeDone);
+            (result, closed, terminal)
+        });
+        let commit_tx = tx.clone();
+        let commit_gate = release_commit.clone();
+        let commit_abort = abort_commit.clone();
+        let commit = std::thread::spawn(move || {
+            let progress = commit_tx.clone();
+            let result = catch_unwind(AssertUnwindSafe(|| {
+                with_shared_section_hook(
+                    move || {
+                        progress
+                            .send(Event::Shared)
+                            .map_err(|_| stopped("controller shared point lost"))?;
+                        commit_gate.wait();
+                        if commit_abort.load(Ordering::SeqCst) {
+                            Err(stopped("controller aborted Commit"))
+                        } else {
+                            Ok(())
+                        }
+                    },
+                    || retained_call(&owned, &owned.commit_prepared),
+                )
+            }));
+            let terminal = commit_tx.send(Event::CommitDone);
+            (owned, result, terminal)
+        });
+        // No controller-held sender can keep a failed worker's channel alive.
+        drop(tx);
+        let first = rx.recv();
+        let held = matches!(first, Ok(Event::Shared));
+        let start = start_tx.send(held);
+        drop(start_tx);
+        let mut commit_done = matches!(first, Ok(Event::CommitDone));
+        let mut revoke_done = false;
+        let mut witness = None;
+        let mut held_bytes = None;
+        let mut channel_failure = first.is_err();
+        if held {
+            loop {
+                match rx.recv() {
+                    Ok(Event::Probe { dev, ino, blocked }) => {
+                        witness = Some((dev, ino, blocked));
+                        held_bytes = Some(fs::read(&trust_path));
+                        if blocked {
+                            release_probe.wait();
+                        }
+                        if !blocked {
+                            abort_commit.store(true, Ordering::SeqCst);
+                        }
+                        break;
+                    }
+                    Ok(Event::RevokeDone) => {
+                        revoke_done = true;
+                        abort_commit.store(true, Ordering::SeqCst);
+                        break;
+                    }
+                    Ok(Event::CommitDone) => {
+                        commit_done = true;
+                        break;
+                    }
+                    Ok(Event::Shared) => {
+                        abort_commit.store(true, Ordering::SeqCst);
+                    }
+                    Err(_) => {
+                        channel_failure = true;
+                        abort_commit.store(true, Ordering::SeqCst);
+                        break;
+                    }
+                }
+            }
+            release_commit.wait();
+        }
+        while !commit_done || !revoke_done {
+            match rx.recv() {
+                Ok(Event::CommitDone) => commit_done = true,
+                Ok(Event::RevokeDone) => revoke_done = true,
+                Ok(_) => channel_failure = true,
+                Err(_) => {
+                    channel_failure = true;
+                    break;
+                }
+            }
+        }
+        // Join both before assertions, even if a prerequisite or worker failed.
+        let commit_joined = commit.join();
+        let revoke_joined = revoker.join();
+        let (owned, commit_result, commit_terminal) = match commit_joined {
+            Ok(value) => value,
+            Err(panic) => propagate(Some(panic), vec![Box::new(revoke_joined)]),
+        };
+        let mut renewed_call = None;
+        let mut reconciled_call = None;
+        let verification = catch_unwind(AssertUnwindSafe(|| {
+            // First decode typed results, while retaining the originals in the
+            // enclosing worker structures; progression failure cannot erase them.
+            let scoped = commit_result
+                .as_ref()
+                .unwrap_or_else(|_| panic!("Commit worker body panicked; original retained"));
+            let call = match scoped {
+                Ok(call) => call,
+                Err(ScopeError::Cleanup { outcome, .. }) => {
+                    let _ = outcome;
+                    panic!("Commit hook cleanup panicked; outcome retained");
+                }
+                Err(ScopeError::RegistrationRefused) => panic!("Commit hook registration refused"),
+            };
+            describe_call(call);
+            let outcome = call
+                .checked()
+                .unwrap_or_else(|_| panic!("Commit refused; typed cause retained"));
+            let (revocation, closed, terminal) = revoke_joined
+                .as_ref()
+                .unwrap_or_else(|_| panic!("revoker outer panic; retained"));
+            assert!(
+                closed.is_ok() && terminal.is_ok(),
+                "revoker close/terminal failed; retained"
+            );
+            let reply = match revocation {
+                Ok(Ok(Some(Ok(Ok(reply))))) => reply,
+                _ => panic!("revocation startup/body/scope/operation failed; original retained"),
+            };
+            let revoked: Value = serde_json::from_slice(&reply.bytes).unwrap();
+            assert!(
+                start.is_ok() && !channel_failure && held && commit_done && revoke_done,
+                "progress protocol failed; operation outcomes retained"
+            );
+            assert!(commit_terminal.is_ok(), "Commit terminal signal lost");
+            assert_eq!(revoked["state"], "revoked");
+            assert_eq!(witness, Some((expected_inode.0, expected_inode.1, true)));
+            assert_eq!(
+                held_bytes.as_ref().unwrap().as_ref().unwrap(),
+                &before,
+                "Trust mutated during shared section"
+            );
+            let PaeaGitPromoteOutcome::Recorded {
+                intent_id,
+                action_digest,
+                target_ref,
+                new_oid,
+                replayed,
+            } = outcome
+            else {
+                panic!("Commit not recorded");
+            };
+            assert!(!replayed);
+            assert_eq!(action_digest, owned.commit_prepared.canonical().digest());
+            assert_eq!(new_oid, &owned.candidate);
+            assert_eq!(current_ref(&owned), owned.candidate);
+            let view = owned
+                .project
+                .trust("show", b"{}", "fixture-admin-token")
+                .unwrap();
+            let view: Value = serde_json::from_slice(&view.bytes).unwrap();
+            // Public show preserves the stored mandate (revoked_at), and
+            // projects effective admission separately through mandate_status.
+            // The revoke command's response state is not a stored field.
+            let mandate_id = format!("mandate-{}-p4-concurrent", std::process::id());
+            let stored = &view["mandates"][&mandate_id];
+            assert_eq!(stored["id"], mandate_id);
+            let revoked_at = stored["revoked_at"]
+                .as_str()
+                .expect("persisted revocation timestamp required");
+            time::OffsetDateTime::parse(
+                revoked_at,
+                &time::format_description::well_known::Rfc3339,
+            )
+            .expect("persisted revocation must have a valid RFC3339 timestamp");
+            assert_eq!(view["mandate_status"][&mandate_id], "mandat révoqué");
+            assert!(owned
+                .project
+                .paea_git_agreement_match(owned.commit_prepared.canonical().bytes())
+                .unwrap()
+                .is_none());
+            renewed_call = Some(retained_call(&owned, &owned.commit_prepared));
+            let renewed = renewed_call.as_ref().unwrap().checked();
+            assert!(
+                matches!(
+                    renewed,
+                    Err(PaeaGitPromoteCallError::Action(RootStoreError::Refused(
+                        "paea-git-promote-agreement-stale"
+                    )))
+                ),
+                "renewal must refuse; original retained"
+            );
+            assert_eq!(current_ref(&owned), owned.candidate);
+            reconciled_call = Some(retained_call(&owned, &owned.reconcile_prepared));
+            assert_eq!(
+                reconciled_call.as_ref().unwrap().checked().unwrap(),
+                &PaeaGitPromoteOutcome::Reconciled {
+                    intent_id: intent_id.clone(),
+                    target_ref: target_ref.clone(),
+                    observed_oid: Some(new_oid.clone()),
+                    recorded_effect: Some(swarm_engine::PaeaGitPromoteReconciledEffect {
+                        action_digest: action_digest.clone(),
+                        target_ref: target_ref.clone(),
+                        new_oid: new_oid.clone()
+                    })
+                }
+            );
+            println!(
+                "P4_CONTENTION_WITHDRAWAL_REFUSAL_RECONCILE_PASS inode={}:{}",
+                expected_inode.0, expected_inode.1
+            );
+        }));
+        let cleanup = close_owned(owned);
+        if verification.is_err() || !cleanup.is_empty() {
+            propagate(
+                verification.err(),
+                vec![
+                    Box::new(commit_result),
+                    Box::new(revoke_joined),
+                    Box::new(cleanup),
+                    Box::new(renewed_call),
+                    Box::new(reconciled_call),
+                    Box::new((
+                        start,
+                        channel_failure,
+                        held,
+                        commit_done,
+                        revoke_done,
+                        witness,
+                        held_bytes,
+                        commit_terminal,
+                    )),
+                ],
+            );
+        }
+    }
+    /// A valid payload survives propagation together with an independent
+    /// cleanup error; no cleanup assertion replaces the original panic.
+    #[test]
+    fn retained_failure_keeps_primary_and_cleanup_parts() {
+        let captured = catch_unwind(AssertUnwindSafe(|| {
+            propagate(
+                Some(Box::new("primary")),
+                vec![Box::new(io::Error::from_raw_os_error(13))],
+            )
+        }))
+        .err()
+        .unwrap();
+        let bundle = captured.downcast::<RetainedFailure>().ok().unwrap();
+        assert_eq!(
+            bundle.primary.as_ref().unwrap().downcast_ref::<&str>(),
+            Some(&"primary")
+        );
+        assert_eq!(
+            bundle.parts[0]
+                .downcast_ref::<io::Error>()
+                .unwrap()
+                .raw_os_error(),
+            Some(13)
+        );
+    }
+
+    /// Normal fixture cleanup is the control; retention then keeps directory
+    /// bytes after both original journal closes and owner Drop, without leaks.
+    #[test]
+    fn authority_fixture_retention_preserves_directory_after_closes() {
+        let ordinary = fixture::Fixture::new();
+        let ordinary_path = ordinary.path.clone();
+        let closes = [ordinary.business.close(), ordinary.personal.close()];
+        assert!(closes.iter().all(Result::is_ok));
+        drop(ordinary);
+        assert!(!ordinary_path.exists());
+        let mut retained = fixture::Fixture::new();
+        retained.retain_directory();
+        let path = retained.path.clone();
+        let before = fs::read(&path).unwrap();
+        let closes = [retained.business.close(), retained.personal.close()];
+        drop(retained);
+        assert!(closes.iter().all(Result::is_ok));
+        assert_eq!(fs::read(path).unwrap(), before);
+    }
+    /// The EX witness uses a nested Result just like the public operation.
+    /// Its original errno survives the assertion that propagates failure;
+    /// this component guard establishes retention, not kernel contention.
+    #[test]
+    fn ex_witness_error_is_retained_before_assertion() {
+        let mut valid = None;
+        assert!(retain_ex_witness(&mut valid, || with_ex_lock_hook(
+            |_| Ok(()),
+            || Ok::<_, io::Error>(())
+        ))
+        .is_ok());
+        let mut failed = None;
+        let primary = catch_unwind(AssertUnwindSafe(|| {
+            let body = retain_ex_witness(&mut failed, || {
+                with_ex_lock_hook(
+                    |_| Ok(()),
+                    || Err::<(), _>(io::Error::from_raw_os_error(13)),
+                )
+            });
+            assert!(body.is_ok(), "EX witness failed");
+        }))
+        .err()
+        .unwrap();
+        let bundle = RetainedFailure {
+            primary: Some(primary),
+            parts: vec![Box::new(failed)],
+        };
+        type Witness = Option<Result<Result<(), io::Error>, ScopeError<Result<(), io::Error>>>>;
+        let original = bundle.parts[0]
+            .downcast_ref::<Witness>()
+            .unwrap()
+            .as_ref()
+            .unwrap();
+        let Ok(Err(cause)) = original else {
+            panic!("nested EX cause lost");
+        };
+        assert_eq!(cause.raw_os_error(), Some(13));
+        assert!(bundle.primary.is_some());
+    }
+}

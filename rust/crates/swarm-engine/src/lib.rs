@@ -332,6 +332,13 @@ pub use engine_settings::{
 };
 #[cfg(all(unix, feature = "test-fixtures"))]
 pub use local_storage::AtomicStorageFault;
+/// Fixture-only observation hooks for the concurrent public mandate
+/// withdrawal recette. Compiled only on Linux with the `test-fixtures`
+/// feature; absent from every delivered profile, with no production default
+/// hook state, setting or retry. See `src/paea_git_fixture.rs` for the
+/// scoped thread-local contract.
+#[cfg(all(target_os = "linux", feature = "test-fixtures"))]
+pub mod paea_git_fixture;
 #[cfg(unix)]
 pub use local_storage::{LocalStorageError, LocalStorageOperation, PublicationState};
 #[cfg(unix)]

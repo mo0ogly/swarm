@@ -177,3 +177,20 @@ the recipe grants no rights and does not itself admit removable storage. Use
 fresh evidence and preserve original refusals. This whole recipe has not yet
 run in this increment; targeted commands and frozen composition are retained
 separately.
+
+
+## Native concurrent withdrawal observation (fixture)
+
+PAEA synchronization hooks require Linux+test-fixtures and sit inside the real
+shared section and before the revocation exclusive lock. They add no production
+operator policy or admission path. Default image f429 was independently qualified
+with empty engine/web/CLI/bin features and no fixture module among effective
+inputs; this evidence does not cover arbitrary profiles.
+
+Signed Q3B-R1 observes EAGAIN on the expected FD/inode, unchanged Trust during
+SH, then recorded Commit, effective public revocation, renewed-use refusal and
+Reconcile separating history/current ref. One named test PASS, two-step recipe
+and integrity verification exit0, source/image bindings stable before/after.
+See ARTICLE-V6-CONCURRENT-WITHDRAWAL under actions-confiance plans. This bounded
+cooperative withdrawal observation proves no global H2, physical Git lease,
+global PV2, real LLM or installation. Historical incidents remain in the plan.

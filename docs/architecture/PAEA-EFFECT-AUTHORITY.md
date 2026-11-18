@@ -197,3 +197,22 @@ existant avant de lancer Cargo ; la recette n’accorde aucun droit et n’admet
 elle-même un support amovible. Choisir un dossier de preuves neuf et conserver
 les refus originaux. La recette entière n’a pas encore été exécutée dans ce lot ;
 les commandes ciblées et leur composition figée sont conservées séparément.
+
+
+## Observation native du retrait concurrent (fixture)
+
+Les points de synchronisation PAEA sont conditionnés à Linux+test-fixtures,
+dans la section partagée réelle et avant le verrou exclusif du retrait. Ils
+n’ajoutent ni politique opérateur ni voie d’admission en production. L’image
+par défaut f429 a été qualifiée séparément avec features moteur/web/CLI/bin
+vides et absence du module fixture dans ses entrées effectives ; cette preuve
+ne s’étend pas à des profils arbitraires.
+
+Le scénario signé Q3B-R1 observe contention EAGAIN sur le FD/inode attendu,
+Trust inchangé pendant SH, puis engagement enregistré, retrait public effectif,
+nouvel usage refusé et Reconcile (histoire/ref distinctes). Un test nommé PASS,
+recette à deux étapes et vérification d’intégrité exit0 ; sources et images
+liées avant/après. Voir le protocole ARTICLE-V6-CONCURRENT-WITHDRAWAL dans les
+plans actions-confiance. Cette observation bornée du retrait coopératif ne
+démontre ni H2 globale, ni bail imposé au point physique Git, ni PV2 globale,
+ni LLM réel ou installation. Les incidents historiques restent dans le plan.

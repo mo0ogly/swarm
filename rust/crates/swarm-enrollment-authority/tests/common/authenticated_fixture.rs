@@ -294,6 +294,12 @@ impl Fixture {
         mode(&self.path, 0o600);
         self.pin = format!("{:x}", Sha256::digest(raw));
     }
+    /// Preserve this fixture directory when its TempDir owner is dropped.
+    /// Call after construction and before fallible use. This changes cleanup
+    /// only: no fsync/archive, journal close, authority or acceptance is implied.
+    pub(crate) fn retain_directory(&mut self) {
+        self._root.disable_cleanup(true);
+    }
     /// Explicitly close original fixture connections after tested owners closed.
     pub(crate) fn close(&self) {
         self.business.close().unwrap();

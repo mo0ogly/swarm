@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "paea-concurrent-withdrawal-qualified",
+  "inputs": [
+    "tools/verification/paea_withdrawal_preflight.py",
+    "tools/verification/build_storage.py",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-concurrent-withdrawal-qualified.json",
+    "tests/test_paea_withdrawal_preflight.py",
+    ".cargo/storage-policy.json",
+    ".cargo/external-targets.json",
+    "docs/plans/actions-confiance/ARTICLE-V6-CONCURRENT-WITHDRAWAL.md",
+    "docs/en/plans/actions-confiance/ARTICLE-V6-CONCURRENT-WITHDRAWAL.md",
+    "tools/verification/cargo_space_guard.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "retained-prerequisites",
+      "command": [
+        "python3",
+        "tools/verification/paea_withdrawal_preflight.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "P4_PREREQUISITES_VERIFIED"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "single-qualified-concurrent-test",
+      "command": [
+        "python3",
+        "tools/verification/paea_withdrawal_preflight.py",
+        "--execute"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "P4_VALID_COMMIT_CONTROL_PASS",
+        "P4_CONTENTION_WITHDRAWAL_REFUSAL_RECONCILE_PASS",
+        "1 passed; 0 failed",
+        "\"event\": \"P4_CHILD_EXIT\", \"exit\": 0"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

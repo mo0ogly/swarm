@@ -444,6 +444,16 @@ impl LocalDirectory {
     /// and close remain explicit and preserve their original causes.
     pub(crate) fn reserve_trust(&self, exclusive: bool) -> Result<LocalReservation, LocalStorageError> {
         let file=self.open_file("trust-actions.lock",OFlags::RDWR|OFlags::CREATE)?;
+        // Fixture-only observation point: exclusive branch only, after the
+        // actual checked file open and before the blocking flock; compiles
+        // completely out of every non-fixture profile and never touches the
+        // shared path.
+        #[cfg(all(target_os = "linux", feature = "test-fixtures"))]
+        if exclusive {
+            if let Some(Err(error)) = crate::paea_git_fixture::run_ex_lock_hook(&file) {
+                return close_after(Err(LocalStorageError::new(LocalStorageOperation::Lock,error)),file);
+            }
+        }
         if let Err(error)=fs::flock(&file,if exclusive {FlockOperation::LockExclusive}else{FlockOperation::LockShared}) {
             return close_after(Err(LocalStorageError::new(LocalStorageOperation::Lock,error)),file);
         }
