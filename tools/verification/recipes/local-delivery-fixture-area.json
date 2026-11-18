@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "local-delivery-fixture-area",
+  "inputs": [
+    "tools/swarm_version.py",
+    "tests/test_swarm_version_fixture_area.py",
+    "tests/fixture_area.py",
+    "docs/architecture/LOCAL-DELIVERY-CACHE-PROOF.md",
+    "docs/en/LOCAL-DELIVERY-CACHE-PROOF.md",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/local-delivery-fixture-area.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "chmod-refusal-caller-recovery",
+      "command": [
+        "python3",
+        "tests/test_swarm_version_fixture_area.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_installed_fallback_refuses_failed_chmod",
+        "test_repo_selection_refuses_failed_chmod",
+        "Ran 2 tests",
+        "OK"
+      ]
+    }
+  ]
+}

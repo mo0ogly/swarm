@@ -11,28 +11,24 @@ import urllib.request
 
 
 def _fixture_area():
-    """Return the temporary-work area for delivery qualification, creating it 0700.
+    """Request mode 0700 for the selected qualification work area and return it.
 
-    Purpose: honor the operator /tmp interdiction (2026-10-31) — project data
-    must never live under `/tmp`. This module is shipped inside launcher
-    checkouts (`tools/swarm_version.py` next to `swarm_local.py`), where the
-    repository's `tests/fixture_area` module does not exist, so it carries its
-    own bounded implementation instead of importing one. Inputs: none. Output:
-    a directory path — `<source>/.swarm-fixtures/` when a repository checkout
-    is detected (`tools/` sibling of a checkout root), else `~/.swarm-fixtures/`
-    for an installed launcher. Errors: OSError propagates (read-only hosts
-    refuse). Side effects: creates the area (0700) on first use, never at
-    import. Limits: scratch for one qualification run; retention/cleanup stay
-    the caller's (the run deletes its own workspace).
+    Inputs: none. Select the module base when it contains a tools directory,
+    otherwise Path.home(), then append .swarm-fixtures. This helper imports no
+    test helper and retains the existing selection policy.
+
+    mkdir and chmod OSError instances propagate unchanged, including errno and
+    cause; no cleanup, retry or alternative location follows refusal. A directory
+    may already exist or have been created before an error; no rollback is
+    established. Success is not a proof of ownership, ACLs or OS confinement.
+    The persisted runtime_temporary_directory setting is not consumed here.
+    The caller owns the lifetime of its subsequently created scratch workspace.
     """
     candidate = Path(__file__).resolve().parent.parent
     base = candidate if (candidate / 'tools').is_dir() else Path.home()
     area = base / '.swarm-fixtures'
     area.mkdir(mode=0o700, parents=True, exist_ok=True)
-    try:
-        area.chmod(0o700)
-    except OSError:
-        pass
+    area.chmod(0o700)
     return area
 
 
