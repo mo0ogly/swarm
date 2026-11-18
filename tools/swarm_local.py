@@ -123,7 +123,11 @@ def main():
     reading partial state or probing the server. Mutations retain exclusive locking.
     Browser hand-off uses native sign-in: an owner-key single-use ticket or
     Authority login, without printing credentials. Source binaries are built;
-    external binaries stay external.
+    external binaries stay external. For an active managed start/restart, both
+    freshly built and explicitly selected candidates pass the same observed
+    version/identity gate before stop. Unreadable, older or unorderable versions
+    refuse; labels order local deliveries, not source authenticity. Refusal
+    cleanup preserves the installed binary and retains primary/cleanup causes.
     """
     config_path = SOURCE / "deploy" / "local-web.json"
     settings = json.loads(config_path.read_text()) if config_path.exists() else {}
@@ -207,20 +211,22 @@ def main():
             fcntl.flock(build_lock, fcntl.LOCK_EX)
             if args.prepared_build:
                 prepared,selected = prepare_recorded(SOURCE,binary,args.prepared_build)
+            else:
+                prepared,selected = prepare_versioned_build(SOURCE, binary)
+            try:
+                if running and args.action in ('start','restart'):
+                    live,live_sha=running_version(args.address,root,state['pid'])
+                    if not owned(state):raise RuntimeError('Server identity changed during managed candidate selection')
+                    require_prepared_not_older(live['binary']['version'],selected['version'],live_sha,selected['binary_sha256'])
+                    if args.prepared_build and args.action=="start":
+                        if live_sha!=args.prepared_build:raise RuntimeError('Prepared start requires restart to replace an active server')
+                        if prepared != binary:prepared.unlink()
+                        prepared=None
+            except BaseException as primary:
                 try:
-                    if running:
-                        live,live_sha=running_version(args.address,root,state['pid'])
-                        if not owned(state):raise RuntimeError('Server identity changed during prepared selection')
-                        require_prepared_not_older(live['binary']['version'],selected['version'],live_sha,args.prepared_build)
-                        if args.action=="start":
-                            if live_sha!=args.prepared_build:raise RuntimeError('Prepared start requires restart to replace an active server')
-                            prepared.unlink();prepared=None
-                except BaseException as primary:
-                    try:
-                        if prepared is not None:prepared.unlink(missing_ok=True)
-                    except BaseException as cleanup:raise BaseExceptionGroup('Prepared refusal and candidate cleanup failed',[primary,cleanup])
-                    raise
-            else:prepared, _ = prepare_versioned_build(SOURCE, binary)
+                    if prepared is not None and prepared != binary:prepared.unlink(missing_ok=True)
+                except BaseException as cleanup:raise BaseExceptionGroup('Managed candidate refusal and cleanup failed',[primary,cleanup])
+                raise
         # Pair guard: before stopping anything, refuse an engine replacement
         # that would desynchronize the authority assertion pair (2026-10-31
         # incident prevention). The currently running binary, not the

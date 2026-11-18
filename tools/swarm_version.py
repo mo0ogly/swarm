@@ -286,11 +286,12 @@ def prepare_recorded(source,binary,expected_sha):
 
 
 def require_prepared_not_older(installed,selected,installed_sha,selected_sha):
-    """Refuse a prepared downgrade before stopping a real owned server.
+    """Refuse a fresh or preselected managed downgrade before an owned stop.
 
     Equal exact binary hashes are the same image. Otherwise both local dev labels
     must be canonical comparable numeric versions; older/unknown labels refuse.
     These labels order local deliveries, never prove source or actor identity.
+    The historical prepared-build error identifiers stay unchanged for callers.
     """
     if installed_sha==selected_sha:return
     pattern=r'v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-dev\.(0|[1-9][0-9]*)'

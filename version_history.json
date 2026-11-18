@@ -2,8 +2,8 @@
   "schema_version": 1,
   "local_changes": {
     "summary": {
-      "fr": "Références mémoire historiques et consignes attribuées, avec contrôles avant lancement et rejet humain. Provenance des prompts de préparation. Frontière de lecture Bell-LaPadula des projections PAEA, statuts de démarrage réduits au booléen et purge des projections de consentement. Promotion Git PAEA : suivi des effets, réconciliation et retrait concurrent. Préparation locale : erreurs de permissions conservées.",
-      "en": "Historical memory references and attributed instructions, with pre-launch checks and human rejection. Preparation prompt provenance. Bell-LaPadula reader frontier for the PAEA projections, startup statuses reduced to the boolean and consent projection purging. PAEA Git promotion: effect tracking, reconciliation and concurrent withdrawal. Local preparation: permission errors preserved."
+      "fr": "Références mémoire historiques et consignes attribuées, avec contrôles avant lancement et rejet humain. Provenance des prompts de préparation. Frontière de lecture Bell-LaPadula des projections PAEA, statuts de démarrage réduits au booléen et purge des projections de consentement. Promotion Git PAEA : suivi des effets, réconciliation et retrait concurrent. Préparation locale : erreurs de permissions conservées. Contrôle de version commun avant remplacement local.",
+      "en": "Historical memory references and attributed instructions, with pre-launch checks and human rejection. Preparation prompt provenance. Bell-LaPadula reader frontier for the PAEA projections, startup statuses reduced to the boolean and consent projection purging. PAEA Git promotion: effect tracking, reconciliation and concurrent withdrawal. Local preparation: permission errors preserved. Shared version check before local replacement."
     },
     "items": [
       {
@@ -1705,6 +1705,10 @@
       {
         "fr": "Préparation locale d’un candidat : une erreur lors de la demande de permissions du répertoire de qualification est transmise au lieu d’être ignorée. Le choix du répertoire reste inchangé ; aucune restauration de son état antérieur n’est garantie.",
         "en": "Local candidate preparation: an error when requesting permissions for the qualification directory is propagated instead of being ignored. Directory selection remains unchanged; restoration of its previous state is not guaranteed."
+      },
+      {
+        "fr": "Livraison locale gérée : une image différente de version plus ancienne ou non comparable est refusée avant l’arrêt du serveur actif, qu’elle vienne d’être construite ou soit présélectionnée. Une erreur de lecture ou un changement d’identité du serveur refuse aussi ce remplacement.",
+        "en": "Managed local delivery: a different image with an older or unorderable version is refused before stopping the active server, whether freshly built or preselected. A read error or changed server identity also refuses this replacement."
       }
     ]
   },
