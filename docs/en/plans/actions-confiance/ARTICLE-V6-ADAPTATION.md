@@ -674,3 +674,27 @@ P3 WIP checkpoint —09reviewed admission/controlled-wait lease: signed/mandate 
 ## P4 isolated WIP checkpoint scope
 
 The twenty-path P4 checkpoint contains only attributed insertions, new fixture/verification tools and reviewed bilingual documents; earlier isolated checkpoint passages remain above. Review09 approved the bounded native flow/source and the three subsequent documentation corrections. The native PASS belongs to its retained composite inputs, not this separately assembled branch. No new test, main integration or installation is claimed. Evidence and restoration index: /run/media/fpizzi/SWARM/swarm-evidence/root00-p4-review-z02o085q. P7 qualification and delivery remain open.
+
+## P7 — fixture profile and bounded c421 checkpoint flow
+
+The GLM verification producer was integrated after reproduced corrections and
+independent reviews. All37 canonical inert guards pass. The new c421 compile
+finishes Cargo0/118artifacts; its controller remains1 after overbroad lexical
+`..` rejection. A corrected supplemental audit, without recompiling, binds
+197depfiles,764workspace sources,2474registry inputs and3generated files with
+no missing/unmatched entries; fixture ELF f837ad04… is retained separately from
+the local standard CLI364bc…. Both proofs have independent admission.
+
+One fresh scripted public lifecycle (2planners,1worker,1reviewer,3controls) and
+one exact concurrent test were verified and independently reviewed:2recipe
+steps PASS,1test PASS/0FAIL/0ignored/8filtered. The fixture task is published;
+the mission remains unaccepted. Inode64513:17181246 identifies the project's
+`trust-actions.lock`; the incorrect former service label remains in the erratum.
+No real LLM, full C/system/proc-macro graph, globalH2/physicalexpiry, installation
+or main merge established.122copied proof files retain bytes/modes/argv and
+originals; copying is not a new execution.
+
+Evidence: `/run/media/fpizzi/SWARM/swarm-evidence/root00-p7-fixture-controller-ndtbeuz7`. Original errors/refusals/compilation are retained; no historical
+campaign replay. This five-path verification tool/test/docs lot changes neither
+the installed application nor its release notes. Later Git preservation remains
+distinct from the exercised application checkpoint c421 and open global claims.

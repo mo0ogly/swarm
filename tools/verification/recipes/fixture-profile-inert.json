@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "fixture-profile-inert",
+  "inputs": [
+    "tools/verification/qualify_fixture_profile.py",
+    "tests/test_fixture_profile_qualification.py",
+    "tools/verification/FIXTURE-PROFILE.md",
+    "tools/verification/FIXTURE-PROFILE.en.md",
+    "tools/verification/recipes/fixture-profile-inert.json",
+    "tools/verification/build_storage.py",
+    "tools/verification/cargo_space_guard.py",
+    "tools/verification/native_build_outcome.py",
+    "tools/verification/recipe.py",
+    "tests/fixture_area.py"
+  ],
+  "environment": {
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+  },
+  "steps": [
+    {
+      "id": "inert-guards",
+      "command": [
+        "python3",
+        "-m",
+        "pytest",
+        "-c",
+        "/dev/null",
+        "--noconftest",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/test_fixture_profile_qualification.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "collected 37 items",
+        "37 passed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

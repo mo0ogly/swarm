@@ -751,3 +751,28 @@ Checkpoint P3 WIP — bail d’admission/attente contrôlée relu09 : minimum ex
 ## Portée de la sauvegarde WIP P4 isolée
 
 Cette sauvegarde P4 de vingt chemins conserve seulement les insertions attribuées, outils de fixture/vérification et documents bilingues revus ; les passages des sauvegardes isolées précédentes restent conservés ci-dessus. La revue09 approuve le scénario natif/source borné puis les trois corrections documentaires. Le PASS natif appartient à ses entrées composites conservées ; cette branche assemblée séparément reste non qualifiée. Aucun nouveau test, fusion main ou installation annoncé. Index de preuves et restauration : /run/media/fpizzi/SWARM/swarm-evidence/root00-p4-review-z02o085q. Qualification et livraison P7 restent ouvertes.
+
+## P7 — profil fixture et parcours borné du checkpoint c421
+
+Le producteur de vérification GLM a été intégré après corrections reproduites
+et revues indépendantes. Les 37 gardes inertes canoniques passent. La nouvelle
+compilation c421 termine Cargo0/118artefacts ; son contrôleur reste1 après un
+refus lexical trop large des chemins `..`. L’audit supplémentaire corrigé, sans
+recompiler, lie197depfiles,764sources workspace,2474registre et3générés, sans
+entrée manquante/non liée ; ELF fixture f837ad04… retenu séparément du CLI
+standard364bc… local. Les deux preuves ont leur admission indépendante.
+
+Un cycle public neuf scripté (2planificateurs,1worker,1reviewer,3contrôles) puis
+un seul test concurrent exact ont été vérifiés et revus :2étapes recette PASS,
+1test PASS/0FAIL/0ignored/8filtered. La tâche de fixture est publiée, la mission
+reste non acceptée. L’inode64513:17181246 désigne `trust-actions.lock` du projet ;
+l’ancien libellé erroné « service » est conservé dans la preuve d’erratum.
+Aucun LLM réel, graphe C/système/proc-macro complet, globalH2/expiration physique,
+installation ou fusion main acquis. Les 122fichiers de preuve copiés conservent
+bytes/modes/argv et les originaux ; la copie n’est pas une nouvelle exécution.
+
+Preuves : `/run/media/fpizzi/SWARM/swarm-evidence/root00-p7-fixture-controller-ndtbeuz7`. Les erreurs, refus initiaux et compilations sont conservés ;
+aucune campagne historique rejouée. Ce lot de cinq outils/tests/docs de
+vérification n’altère pas l’application installée ni ses notes de version.
+Leur sauvegarde Git ultérieure reste distincte du checkpoint applicatif c421
+exercé et des acceptations globales encore ouvertes.
