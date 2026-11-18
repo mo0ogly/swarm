@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "local-live-engine-reader",
+  "inputs": [
+    "tools/swarm_local.py",
+    "tools/swarm_version.py",
+    "tests/test_local_live_engine_reader.py",
+    "tests/test_local_managed_version_gate.py",
+    "tests/test_local_pair_guard.py",
+    "tests/fixture_area.py",
+    "docs/architecture/LOCAL-DELIVERY-CACHE-PROOF.md",
+    "docs/en/LOCAL-DELIVERY-CACHE-PROOF.md",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/local-live-engine-reader.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "owned-reader-refusal-recovery",
+      "command": [
+        "python3",
+        "tests/test_local_live_engine_reader.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_lost_identity_at_pair_entry_never_falls_back_to_path",
+        "test_live_image_decides_even_when_selected_pathname_is_missing",
+        "test_failed_query_and_failed_close_keep_both_causes",
+        "Ran 21 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "existing-managed-version-caller",
+      "command": [
+        "python3",
+        "tests/test_local_managed_version_gate.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_prepared_start_remains_same_image_only",
+        "Ran 8 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "historical-missing-current-contract",
+      "command": [
+        "python3",
+        "tests/test_local_pair_guard.py",
+        "PairGuardUnit.test_absent_current_binary_refuses_fail_closed",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_absent_current_binary_refuses_fail_closed",
+        "Ran 1 test",
+        "OK"
+      ]
+    }
+  ]
+}

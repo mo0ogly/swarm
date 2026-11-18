@@ -155,10 +155,21 @@ class PairGuardUnit(unittest.TestCase):
         self.assertIn("illisibles", message)
         self.assertIn("non arrêté", message)
 
-    def test_absent_current_binary_passes_without_settings_read(self):
-        # A current binary that disappeared mid-run has nothing to protect.
-        self.daemon.write_bytes(protocol_bytes(V1_MARKER))
-        self.guard(self.area / "gone-binary", daemon=self.daemon)
+    def test_absent_current_binary_refuses_fail_closed(self):
+        """A healthy inert reader precedes missing-current refusal and recovery."""
+        self.current.write_bytes(b"INERT_CURRENT")
+        shown = subprocess.CompletedProcess([], 0,
+                    stdout=json.dumps({"values": {"web_access_mode": "owner-key"}}), stderr="")
+        with mock.patch.object(swarm_local.subprocess, "run", return_value=shown) as query:
+            self.assertIsNone(self.guard(self.current))
+            query.assert_called_once()
+            query.reset_mock()
+            self.daemon.write_bytes(protocol_bytes(V1_MARKER))
+            message = self.refusal(self.area / "gone-binary", daemon=self.daemon)
+            self.assertIn("inconnaissable", message)
+            self.assertIn("opération non engagée", message)
+            query.assert_not_called()
+            self.assertIsNone(self.guard(self.current))
 
 
 class PairGuardPublicPath(unittest.TestCase):

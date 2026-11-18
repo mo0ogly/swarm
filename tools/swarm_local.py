@@ -229,12 +229,17 @@ def main():
                 raise
         # Pair guard: before stopping anything, refuse an engine replacement
         # that would desynchronize the authority assertion pair (2026-10-31
-        # incident prevention). The currently running binary, not the
+        # incident prevention). The currently running engine image, not the
         # candidate, is the one whose settings decide — `candidate` only
-        # carries bytes the live server has not loaded yet.
+        # carries bytes the live server has not loaded yet. While the recorded
+        # server was owned, the guard revalidates and reads that process through
+        # /proc (identity and image inode rechecked around the query), never
+        # the selected pathname, which may be missing or already replaced; a
+        # foreign or vanished process is never adopted.
         if args.action in ("restart", "start"):
             pair_candidate = str(prepared) if prepared is not None else str(binary)
-            require_matching_assertion_pair(str(binary), pair_candidate, str(root))
+            require_matching_assertion_pair(str(binary), pair_candidate, str(root),
+                                            running=state if running else None)
         if args.action in ("stop", "restart"):
             stop(state, args.stop_timeout, args.address)
             state_path.unlink(missing_ok=True)
@@ -431,47 +436,187 @@ def assertion_protocol(path):
     return next((name for name, marker in ASSERTION_PROTOCOL_DOMAINS if marker in data), None)
 
 
-def require_matching_assertion_pair(current, candidate, root):
+def _engine_settings_mode(shown):
+    """Extract `web_access_mode` from a completed `engine-settings show --json`
+    run, refusing instead of guessing.
+
+    A missing run, a nonzero exit or an unparseable/malformed payload raises
+    RuntimeError ("Réglages du moteur illisibles ; ...") so an unknowable mode
+    is never silently treated as the owner-key default; a present-but-unset
+    key keeps the historical owner-key fallback, unchanged in width. Returns
+    the mode value; reads the completed-process object only, does no IO.
+    A failed child's return code is retained in the safe diagnostic; its private
+    stdout/stderr are not copied into the public error.
+    Missing-mode fallback and accepted mode values retain the existing policy;
+    this parser alone does not establish a stronger settings schema.
+    """
+    if shown is None:
+        raise RuntimeError("Réglages du moteur illisibles ; compatibilité d’assertion inconnaissable, moteur non arrêté.")
+    if shown.returncode != 0:
+        raise RuntimeError(
+            f"Réglages du moteur illisibles (code {shown.returncode}) ; "
+            "compatibilité d’assertion inconnaissable, moteur non arrêté.")
+    try:
+        return json.loads(shown.stdout)["values"].get("web_access_mode", "owner-key")
+    except (ValueError, KeyError, TypeError, AttributeError) as error:
+        raise RuntimeError("Réglages du moteur illisibles ; compatibilité d’assertion inconnaissable, moteur non arrêté.") from error
+
+def _require_owned_image(state, descriptor=None):
+    """Refuse unless `state` still names the running process and `descriptor`
+    still refers to that process's current kernel image when supplied.
+
+    descriptor=None performs only the pre-open process check. The caller must
+    retain the lifecycle lock and recheck the opened image around its query.
+
+    `owned` rechecks the full recorded identity (pid, kernel start time,
+    executable name, cmdline) against /proc; a matching pathname or file
+    owner alone is never accepted. The opened descriptor's (st_dev, st_ino)
+    must equal a fresh stat of /proc/<pid>/exe, so a differing process or image observed at either check is refused even
+    when the old path still exists. A temporary change between observations
+    can remain unseen; this is not a continuous process lease. Errors: RuntimeError naming the identity or inode
+    mismatch; OSError from the stat calls propagates unchanged for the caller
+    to wrap with its cause. Limits: Linux /proc only; narrows but does not
+    eliminate image-swap windows (no full TOCTOU claim). Read-only.
+    """
+    if not owned(state):
+        raise RuntimeError(
+            f"Identité du moteur en cours (pid {state['pid']}) changée pendant la lecture des réglages ; "
+            "réglages refusés, moteur non arrêté.")
+    if descriptor is None:
+        return
+    opened = os.fstat(descriptor)
+    current = os.stat(f"/proc/{state['pid']}/exe")
+    if (opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino):
+        raise RuntimeError(
+            f"Image du moteur en cours (pid {state['pid']}) remplacée pendant la lecture des réglages ; "
+            "réglages refusés, moteur non arrêté.")
+
+@contextlib.contextmanager
+def owned_engine_mode(state, root):
+    """Read `web_access_mode` from the exact owned running engine image.
+
+    Opens the process kernel image once through /proc/<pid>/exe, requires the
+    full recorded identity and the opened descriptor's (st_dev, st_ino) to
+    match a fresh /proc/<pid>/exe stat, runs the public read-only
+    `engine-settings show --json` query with the child inheriting the
+    descriptor via pass_fds and exec'ing /proc/self/fd/<fd> — the child thus
+    runs the exact loaded image, not a pathname another writer could have
+    replaced — revalidates identity and inode after the child exits, parses
+    the mode, and only then closes the descriptor before yielding. The
+    descriptor is not returned; only the parsed mode leaves this helper.
+    Closing it does not confine the OS or forbid other image references. Yields
+    the `web_access_mode` value. Errors: RuntimeError when the descriptor
+    cannot be opened (original OSError attached as __cause__), when the
+    process identity or the image inode changed between the bracketing
+    checks, when the settings child cannot be started (original OSError
+    attached) or its output is unusable, or when the descriptor cannot be
+    closed; a failure striking while an earlier refusal already propagates
+    raises BaseExceptionGroup with the primary cause first, never dropping
+    it. Limits: Linux /proc only (elsewhere the open fails and the guard
+    refuses closed); identity plus dev/ino narrows but does not eliminate
+    image-swap windows; a deleted-but-running image stays observable and
+    executable through the held descriptor; the child sees /proc/self/fd/<fd>
+    as its argv[0]. Reads only; mutates nothing on the Root and starts
+    nothing but the settings-query child.
+    """
+    _require_owned_image(state)
+    try:
+        descriptor = os.open(f"/proc/{state['pid']}/exe", os.O_RDONLY | os.O_CLOEXEC)
+    except OSError as error:
+        raise RuntimeError(
+            f"Descripteur de l’image du moteur en cours (pid {state['pid']}) indisponible ; "
+            "réglages inconnaissables, moteur non arrêté.") from error
+    try:
+        _require_owned_image(state, descriptor)
+        shown = subprocess.run(
+            [f"/proc/self/fd/{descriptor}", "--root", str(root),
+             "engine-settings", "show", "--json"],
+            cwd=SOURCE, capture_output=True, text=True, pass_fds=(descriptor,))
+        _require_owned_image(state, descriptor)
+        mode = _engine_settings_mode(shown)
+    except BaseException as primary:
+        try:
+            os.close(descriptor)
+        except BaseException as cleanup:
+            raise BaseExceptionGroup(
+                "Lecture des réglages du moteur en cours refusée et fermeture du descripteur échouée",
+                [primary, cleanup])
+        if isinstance(primary, OSError):
+            raise RuntimeError(
+                f"Lecture des réglages sur l’image du moteur en cours (pid {state['pid']}) impossible ; "
+                "réglages inconnaissables, moteur non arrêté.") from primary
+        raise
+    try:
+        os.close(descriptor)
+    except OSError as error:
+        raise RuntimeError(
+            f"Descripteur de l’image du moteur en cours (pid {state['pid']}) non refermé ; "
+            "moteur non arrêté.") from error
+    yield mode
+
+def require_matching_assertion_pair(current, candidate, root, *, running=None):
     """Refuse an engine replacement that would desynchronize the authority pair,
     before the launcher stops anything.
 
+    The saved access mode is read from the engine that will actually be
+    replaced. When `running` carries the launcher's owned server record (pid
+    plus identity from server.json, still matching /proc), the mode comes from
+    that exact process's kernel image through `owned_engine_mode`: a held
+    /proc/<pid>/exe descriptor, identity and image inode rechecked before and
+    after the public read-only settings query, the child exec'ing
+    /proc/self/fd/<fd> inherited via pass_fds. The selected install pathname
+    (`current`) is then irrelevant — it may be missing or already differ from
+    the loaded image. With no owned server (`running=None`), the mode is read
+    by executing the installed engine at `current`; on an initialized Root
+    (.swarm/state.db present) a missing `current` is refused, because the
+    saved mode is then unknowable and guessing would risk the 2026-10-31
+    desynchronization; restoring a current engine requires the supported
+    delivery route and its own qualification); a never-initialized Root keeps the historical
+    skip, since nothing was ever switchable there.
+
     On a Root whose saved access mode is `authority` (read through the public
-    read-only `engine-settings show` run with the binary in place), the
-    installed daemon (SWARM_AUTHORITY_INSTALLED, default
+    read-only `engine-settings show`), the installed daemon
+    (SWARM_AUTHORITY_INSTALLED, default
     /usr/local/lib/swarm-authority/swarm-authority) and the candidate engine
     binary must speak the same assertion protocol. Errors: RuntimeError naming
     both binaries, their protocols and the supported recovery (`./swarm.sh
     authority install`) on protocol mismatch or on an installed daemon file
     that carries no recognized protocol marker; a mode that cannot be read
-    from an initialized Root is also refused (never silently treated as
-    owner-key). Passes: owner-key Roots, a Root never initialized (no
-    .swarm/state.db — the saved mode is then the owner-key default, nothing
-    was ever switchable), and an absent daemon file (nothing on disk to
-    desynchronize with; refusing would lock the operator out of a Root whose
-    daemon was uninstalled, and the start path already warns about the
-    missing front). Limits: the guard observes AUTHORITY_INSTALLED only — a
-    daemon served from another path is out of its sight, and a copied
-    authority Root whose daemon is elsewhere still fails closed at runtime
-    with `assertion-format` on every relayed request; `authority install`
-    replaces the daemon before the engine restart this guard observes, so the
-    supported recovery stays a same-tree rebuild of both sides. Reads
-    settings and binary bytes; starts, stops and reconfigures nothing.
+    from an initialized Root — including through the owned running engine — is
+    also refused (never silently treated as owner-key). Passes: owner-key
+    Roots, a Root never initialized (no .swarm/state.db — the saved mode is
+    then the owner-key default, nothing was ever switchable), and an absent
+    daemon file (nothing on disk to desynchronize with; refusing would lock
+    the operator out of a Root whose daemon was uninstalled, and the start
+    path already warns about the missing front). Limits: the guard observes
+    AUTHORITY_INSTALLED only — a daemon served from another path is out of its
+    sight, and a copied authority Root whose daemon is elsewhere still fails
+    closed at runtime with `assertion-format` on every relayed request;
+    `authority install` replaces the daemon before the engine restart this
+    guard observes, so the supported recovery stays a same-tree rebuild of
+    both sides. Reads settings and binary bytes; starts, stops and
+    reconfigures nothing; the owned-process observation is read-only and the
+    descriptor never outlives the settings query. The three positional
+    arguments keep their meaning for direct callers: `current` decides only
+    when no owned server is running.
     """
     if not (Path(root) / ".swarm" / "state.db").is_file():
         return
-    if not Path(current).is_file():
-        return
-    try:
-        shown = subprocess.run([str(current), "--root", str(root), "engine-settings", "show", "--json"],
-                               cwd=SOURCE, capture_output=True, text=True)
-    except OSError:
-        shown = None
-    if shown is None or shown.returncode != 0:
-        raise RuntimeError("Réglages du moteur illisibles ; compatibilité d’assertion inconnaissable, moteur non arrêté.")
-    try:
-        mode = json.loads(shown.stdout)["values"].get("web_access_mode", "owner-key")
-    except (ValueError, KeyError, TypeError, AttributeError):
-        raise RuntimeError("Réglages du moteur illisibles ; compatibilité d’assertion inconnaissable, moteur non arrêté.") from None
+    if running is not None:
+        # The descriptor is already closed here; only the parsed mode escapes.
+        with owned_engine_mode(running, root) as mode:
+            pass
+    else:
+        if not Path(current).is_file():
+            raise RuntimeError(
+                f"Binaire courant absent ({current}) sur un Root initialisé ; "
+                "compatibilité d’assertion inconnaissable, opération non engagée.")
+        try:
+            shown = subprocess.run([str(current), "--root", str(root), "engine-settings", "show", "--json"],
+                                   cwd=SOURCE, capture_output=True, text=True)
+        except OSError as error:
+            raise RuntimeError("Réglages du moteur illisibles ; compatibilité d’assertion inconnaissable, moteur non arrêté.") from error
+        mode = _engine_settings_mode(shown)
     if mode != "authority":
         return
     installed_path = Path(AUTHORITY_INSTALLED)
