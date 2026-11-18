@@ -242,17 +242,43 @@ def verify_candidate(candidate,version,notes,metadata=None):
                     raise failure
 
 
-def prepare(source,binary):
-    """Build/freeze/probe Rust before any live stop; return a replaceable candidate.
+def prepare(source,binary,*,installed=None):
+    """Build/freeze/probe Rust before a live stop; return a staged path and record.
 
-    Caller owns build lock. Exact observed dependencies determine numbering. A
-    changed dependency graph may require one corrected-number build; failures
-    preserve prior binary/number and retained evidence. State publication is
-    atomic, but a durability error never implies rollback. Unused candidate-file
-    edits invalidate cache only; actual profile bytes, initial/final delivery tools,
-    notes, Git and toolchain facts must remain equal. These are observations, not
-    an atomic filesystem lease. Cached reuse revalidates retained qualification; missing files rebuild,
-    incoherent evidence refuses. No paid calls occur.
+    Caller owns the build lock and source/target exclusivity. The optional
+    keyword-only installed DTO carries version and binary_sha256 from a fresh
+    owned image under lifecycle/build locks; this function captures no server.
+    None preserves legacy numbering/cache/loading and error precedence. A dual
+    qualification/publication and cleanup failure now retains both original
+    causes in a BaseExceptionGroup in either branch; cleanup success rethrows
+    the original primary. No retry, provider call or fallback engine is added.
+
+    With a DTO, the pure selector validates its schema, hash, canonical dev label
+    and target family. A direct history read distinguishes missing files from
+    present null/invalid records and propagates other IO/JSON errors. Present
+    history needs schema 2/rust, a canonical image hash and nonempty source digest;
+    the existing source-contained _read_prepared checks must return that same
+    record before numbering/cache use and again for cache reuse. Missing/tampered
+    proof or changed history refuses; observed failures never use the legacy
+    missing-cache-proof rebuild fallback. Digest fields remain local record facts,
+    not signed provenance or an independently authenticated source graph.
+
+    Both predicted and actual numbering consume the DTO. Cached reuse additionally
+    requires the selector to retain the qualified prior label. SWARM_VERSION keeps
+    its existing syntax gate and must be a comparable canonical dev label above
+    the observation; equality is admitted only by a qualified same-image cache.
+    Labels grant no installation or OS-confinement authority. The actual caller
+    still owes capture freshness and a post-build version/identity recheck; its
+    current calls remain without this DTO, so that flow is not wired here.
+
+    Validation may already read manifest/history/source/toolchain facts. Exact
+    observed dependencies determine numbering; changed graphs can require the
+    existing corrected-number build. Effective inputs, delivery tools/notes, Git
+    and toolchain must remain stable; this is no atomic filesystem lease. The
+    installed image is untouched. Staging/evidence directories can already exist
+    after a failure. Before state publication the prior record remains; a state
+    publish/durability error can have changed that record and proves no rollback.
+    Retained evidence and both primary/cleanup causes describe those limits.
     """
     manifest=json.loads((source/'version_history.json').read_text());notes=manifest.get('local_changes')
     valid=isinstance(notes,dict) and isinstance(notes.get('items'),list) and bool(notes['items'])
@@ -264,21 +290,55 @@ def prepare(source,binary):
     # while unused candidates remain only a cache-invalidation inventory.
     delivery_digest,_=source_identity(source,{})
     state_path=source/'deploy/local-build.json'
-    previous=json.loads(state_path.read_text()) if state_path.exists() else None
-    numbering_previous=previous
-    if previous and (previous.get('schema_version')!=2 or previous.get('engine')!='rust'):previous=None
+    if installed is None:
+        # Preserve legacy record loading and exception precedence exactly.
+        previous=json.loads(state_path.read_text()) if state_path.exists() else None
+        numbering_previous=previous
+        if previous and (previous.get('schema_version')!=2 or previous.get('engine')!='rust'):previous=None
+    else:
+        # A successful read is a present record, even JSON null. Do not use a
+        # metadata predicate that can hide a read failure as absent history.
+        try:
+            previous=json.loads(state_path.read_text())
+        except FileNotFoundError:
+            previous=None
+            previous_present=False
+        else:
+            previous_present=True
+        numbering_previous=previous
     published=manifest['releases'][0]['version'] if manifest.get('releases') else 'v0.0.0'
     override=os.environ.get('SWARM_VERSION')
     if override is not None and not builder.release(override):raise ValueError('Invalid SWARM_VERSION')
-    if previous and previous.get('candidate_digest')==candidate_digest and (override is None or override==previous['version']):
+    if installed is not None:
+        select_version(published,candidate_digest,None,installed=installed)
+        if override is not None:
+            override_label=_parse_canonical_dev(override)
+            if override_label is None:
+                raise ValueError('SWARM_VERSION must be a canonical comparable dev label vM.m.p-dev.N when an installed observation is supplied')
+            if override_label<_parse_canonical_dev(installed['version']):
+                raise ValueError('SWARM_VERSION is older than the observed installed version; refusing to build or reuse a downgrade')
+        if previous_present:
+            if not isinstance(previous,dict) or previous.get('schema_version')!=2 or previous.get('engine')!='rust' or not isinstance(previous.get('binary_sha256'),str) or not re.fullmatch('[0-9a-f]{64}',previous['binary_sha256']):
+                raise ValueError('an installed observation requires a present schema-2 rust previous record with a canonical lowercase binary_sha256; refusing to treat an invalid, empty or legacy record as absent')
+            if not isinstance(previous.get('source_digest'),str) or not previous['source_digest']:
+                raise ValueError('an observed source history requires a nonempty source_digest; refusing an absent or invalid equality witness')
+            if _read_prepared(source,previous['binary_sha256'])[0]!=previous:
+                raise ValueError('deploy/local-build.json changed while its record was being qualified; refusing changed history instead of selecting an unrelated record')
+    if previous and previous.get('candidate_digest')==candidate_digest and (override is None or override==previous['version']) and (installed is None or select_version(published,previous['source_digest'],previous,installed=installed)==previous['version']):
         for artifact in [binary,Path(previous['artifact'])]:
             if artifact.is_file() and profile.digest(artifact)==previous['binary_sha256']:
-                try:_read_prepared(source,previous['binary_sha256'])
+                try:
+                    checked=_read_prepared(source,previous['binary_sha256'])
+                    if installed is not None and checked[0]!=previous:
+                        raise ValueError('deploy/local-build.json changed during cache qualification; refusing changed history')
                 except FileNotFoundError:
+                    if installed is not None:raise
                     print('Preuves de livraison absentes ; reconstruction qualifiée requise.',flush=True)
                     break
                 print('Version Rust locale inchangée : '+previous['version'],flush=True)
                 return artifact,previous
+    if installed is not None and override is not None and _parse_canonical_dev(override)==_parse_canonical_dev(installed['version']):
+        raise ValueError('SWARM_VERSION equal to the observed installed version is only servable by reusing a qualified cached image whose binary_sha256 equals the observation; refusing to build an equal label for an unknown or different image')
     settings_path=source/'deploy/local-web.json'
     settings=json.loads(settings_path.read_text()) if settings_path.exists() else {}
     target=Path(os.environ.get('SWARM_RUST_TARGET_DIR',settings.get('rust_target_dir',str(source/'.cache/rust-build-local')))).resolve()
@@ -286,14 +346,24 @@ def prepare(source,binary):
     evidence=Path(tempfile.mkdtemp(prefix='rust-',dir=evidence_base))
     prior_effective=previous.get('effective_inputs') if previous else None
     predicted=source_identity(source,prior_effective)[0] if prior_effective and all((source/n).is_file() for n in prior_effective) else 'new-effective-inputs'
-    version=override if override is not None else select_version(published,predicted,numbering_previous)
+    if override is not None:
+        version=override
+    elif installed is None:
+        version=select_version(published,predicted,numbering_previous)
+    else:
+        version=select_version(published,predicted,numbering_previous,installed=installed)
     print('Construction Rust : '+version,flush=True)
     built=builder.build(source,evidence/'build',target,version)
     actual=json.loads((evidence/'build/profile/after.json').read_text())
     digest,inputs=source_identity(source,actual)
     if any(inputs.get(name)!=value for name,value in actual.items()):
         raise RuntimeError('Native effective inputs changed after qualified build; previous server retained')
-    selected=override if override is not None else select_version(published,digest,numbering_previous)
+    if override is not None:
+        selected=override
+    elif installed is None:
+        selected=select_version(published,digest,numbering_previous)
+    else:
+        selected=select_version(published,digest,numbering_previous,installed=installed)
     if selected!=version:
         version=selected
         built=builder.build(source,evidence/'corrected-number',target,version)
@@ -313,8 +383,11 @@ def prepare(source,binary):
         state_path.parent.mkdir(parents=True,exist_ok=True);profile.publish(state_path,json.dumps(state,indent=2)+'\n')
         print('Livraison Rust locale préparée : '+version,flush=True)
         return candidate,state
-    except BaseException:
-        candidate.unlink(missing_ok=True)
+    except BaseException as primary:
+        try:
+            candidate.unlink(missing_ok=True)
+        except BaseException as cleanup:
+            raise BaseExceptionGroup('Native preparation and candidate cleanup failed', [primary, cleanup])
         raise
 
 
