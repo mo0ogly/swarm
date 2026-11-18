@@ -2,8 +2,8 @@
   "schema_version": 1,
   "local_changes": {
     "summary": {
-      "fr": "Références mémoire historiques et consignes attribuées, avec contrôles avant lancement et rejet humain. Provenance des prompts de préparation. Frontière de lecture Bell-LaPadula des projections PAEA, statuts de démarrage réduits au booléen et purge des projections de consentement.",
-      "en": "Historical memory references and attributed instructions, with pre-launch checks and human rejection. Preparation prompt provenance. Bell-LaPadula reader frontier for the PAEA projections, startup statuses reduced to the boolean and consent projection purging."
+      "fr": "Références mémoire historiques et consignes attribuées, avec contrôles avant lancement et rejet humain. Provenance des prompts de préparation. Frontière de lecture Bell-LaPadula des projections PAEA, statuts de démarrage réduits au booléen et purge des projections de consentement. Promotion Git PAEA : suivi des effets, réconciliation et retrait concurrent. Préparation locale : erreurs de permissions conservées.",
+      "en": "Historical memory references and attributed instructions, with pre-launch checks and human rejection. Preparation prompt provenance. Bell-LaPadula reader frontier for the PAEA projections, startup statuses reduced to the boolean and consent projection purging. PAEA Git promotion: effect tracking, reconciliation and concurrent withdrawal. Local preparation: permission errors preserved."
     },
     "items": [
       {
@@ -1685,6 +1685,26 @@
       {
         "fr": "Fenêtres : le libellé Fermer reste entier sur une ligne, y compris sur mobile ; le titre peut revenir à la ligne. Fermeture au clic et par Échap conservée.",
         "en": "Dialogs: the Close label stays whole on one line, including on mobile; the title may wrap. Click and Escape closure retained."
+      },
+      {
+        "fr": "Promotion Git PAEA : les diagnostics distinguent un effet enregistré d’un effet inconnu, indépendamment de la décision d’autorité. Une erreur seule ne prouve pas l’absence d’effet.",
+        "en": "PAEA Git promotion: diagnostics distinguish a recorded effect from an unknown effect, independently of the authority decision. An error alone does not prove that no effect occurred."
+      },
+      {
+        "fr": "La réconciliation Git PAEA lit le journal et la référence Git directe actuelle sans republier. Un journal sans effet enregistré ne prouve pas l’absence d’effet passé.",
+        "en": "PAEA Git reconciliation reads the journal and the actual current direct Git reference without publishing again. A journal with no recorded effect does not prove that no past effect occurred."
+      },
+      {
+        "fr": "Promotion Git PAEA : le bail contrôle l’admission et l’attente pilotée des commandes Git. Il ne garantit pas une échéance physique de publication Git ni une borne globale des opérations de fichiers ou de base de données.",
+        "en": "PAEA Git promotion: the lease controls admission and controlled waiting for Git commands. It does not guarantee a physical Git publication deadline or a global bound on filesystem or database operations."
+      },
+      {
+        "fr": "Dans le parcours de promotion Git PAEA, un retrait concurrent coopératif attend la libération de la section partagée avant de prendre effet. Cette coordination reste propre à ce parcours.",
+        "en": "In the PAEA Git promotion flow, a cooperative concurrent withdrawal waits for the shared section to be released before taking effect. This coordination remains specific to this flow."
+      },
+      {
+        "fr": "Préparation locale d’un candidat : une erreur lors de la demande de permissions du répertoire de qualification est transmise au lieu d’être ignorée. Le choix du répertoire reste inchangé ; aucune restauration de son état antérieur n’est garantie.",
+        "en": "Local candidate preparation: an error when requesting permissions for the qualification directory is propagated instead of being ignored. Directory selection remains unchanged; restoration of its previous state is not guaranteed."
       }
     ]
   },
