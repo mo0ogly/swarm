@@ -37,3 +37,9 @@ Pour le garde de paire Authority avant `start`/`restart`, un serveur précédemm
 | Historique présent sans version, observation mal formée ou version non canonique | Refus explicite |
 
 Le calcul ne fait aucune E/S, aucun lancement de processus et aucune mutation de ses entrées. Les limites natives de conversion d'entiers Python restent possibles ; aucun plafond ni réglage d'interpréteur n'est ajouté. Un numéro n'authentifie ni la source ni l'acteur. **Statut : non raccordé** à `prepare`, `main`, l'admission du cache, `SWARM_VERSION` et la capture réelle. Ces contrats restent ouverts ; la recette `local-managed-numbering-pure.json` qualifie seulement la fonction et sa compatibilité historique. Aucun build, parcours de livraison ou nouveau binaire installé n'en découle.
+
+## Refus de build sur une sélection externe
+
+Refus de construction d'un binaire externe : `swarm_local.py build` refuse tout binaire résolu qui n'est pas exactement `bin/swarm` ou `bin/swarm-local` du projet, qu'il soit sélectionné par --binary, SWARM_BINARY ou la configuration persistée. Le refus intervient avant toute création de Root/runtime, tout verrou, toute observation du serveur possédé ou écriture du build, conserve le contrat d'exit 2 et affiche un message clair en français invitant à sélectionner explicitement un chemin source géré, sans aucune valeur de configuration ni secret. Le démarrage, le redémarrage et la configuration d'un binaire externe restent inchangés : il reste externe, sans reconstruction, repli implicite, extension de liste ni historique source copié.
+
+Les réglages et métadonnées de chemin peuvent déjà avoir été lus ; ce contrôle de sélection ne confine pas le processus. Les preuves sont des appels inertes à main avec limites processus/réseau/producteur simulées : elles ne démontrent ni compilation native, ni remplacement réel, ni installation. La numérotation pure demeure non raccordée.

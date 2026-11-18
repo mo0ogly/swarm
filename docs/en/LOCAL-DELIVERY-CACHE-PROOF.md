@@ -37,3 +37,9 @@ Before `start`/`restart`, the Authority pair guard retains the record of a serve
 | Present history without a version, malformed observation or noncanonical version | Explicit refusal |
 
 The calculation performs no IO, process launch or input mutation. Python's native integer-conversion limits may still raise; no cap or interpreter setting is added. A number authenticates neither source nor actor. **Status: not wired** to `prepare`, `main`, cache admission, `SWARM_VERSION` or actual image capture. Those contracts remain open; recipe `local-managed-numbering-pure.json` qualifies only the function and its historical compatibility. This establishes no build, delivery flow or newly installed binary.
+
+## Build refusal for an external selection
+
+External build refusal: `swarm_local.py build` refuses any resolved binary that is not exactly the project's `bin/swarm` or `bin/swarm-local`, whether selected via --binary, SWARM_BINARY or persisted settings. The refusal happens before any Root/runtime creation, locking, owned observation or build write, keeps the exit-2 contract and prints a clear French message asking to select a managed source path explicitly, with no configuration values or secrets. External start, restart and configure are unchanged: the binary stays external, with no rebuild, implicit fallback, allowlist extension or copied source history.
+
+Settings and path metadata may already have been read; this selection check does not confine the process. Evidence uses inert calls to main with doubled process/network/producer boundaries: it establishes no native compilation, real replacement or installation. Pure numbering remains unwired.

@@ -123,9 +123,16 @@ def main():
     reading partial state or probing the server. Mutations retain exclusive locking.
     Browser hand-off uses native sign-in: an owner-key single-use ticket or
     Authority login, without printing credentials. Source binaries are built;
-    external binaries stay external. For an active managed start/restart, both
-    freshly built and explicitly selected candidates pass the same observed
-    version/identity gate before stop. Unreadable, older or unorderable versions
+    external binaries stay external. Managed means exactly SOURCE/bin/swarm or
+    SOURCE/bin/swarm-local; external means any other resolved path taken from
+    --binary, SWARM_BINARY or persisted settings, and start, restart and
+    configure keep such a binary as-is without rebuilding it. `build` with an
+    external binary is refused before any Root/runtime creation, locking,
+    owned observation, candidate/destination write or stop; this is an
+    application-level selection gate, not an OS-confinement claim, and adds
+    no timeout, retry, cap or operator knob. For an active managed
+    start/restart, freshly built and explicitly selected candidates pass the same
+    observed version/identity gate before stop. Unreadable, older or unorderable versions
     refuse; labels order local deliveries, not source authenticity. Refusal
     cleanup preserves the installed binary and retains primary/cleanup causes.
     """
@@ -152,11 +159,18 @@ def main():
         parser.error("--address : 127.0.0.1 et port fixe 1..65535 requis")
     if args.startup_timeout <= 0 or args.stop_timeout <= 0:
         parser.error("Délais strictement positifs requis")
+    # External binaries stay external: classify before any Root/runtime
+    # creation, locking or owned observation so `build` on a nonmanaged
+    # resolved path refuses before those lifecycle/build side effects. Settings
+    # and path metadata may already have been read; this is not OS confinement.
+    binary = Path(args.binary).resolve() if args.binary else SOURCE / "bin" / "swarm-local"
+    source_binary = binary in (SOURCE / "bin/swarm", SOURCE / "bin/swarm-local")
+    if args.action == "build" and not source_binary:
+        parser.error("Construction refusée : un binaire externe reste externe ; pour construire, sélectionnez explicitement un chemin source géré (bin/swarm ou bin/swarm-local) via --binary, SWARM_BINARY ou la configuration locale.")
     os.umask(0o077)
     root.mkdir(parents=True, exist_ok=True)
     runtime = root / ".swarm" / "local-web" / hashlib.sha256(args.address.encode()).hexdigest()[:16]
     runtime.mkdir(parents=True, exist_ok=True)
-    binary = Path(args.binary).resolve() if args.binary else SOURCE / "bin" / "swarm-local"
     state_path = runtime / "server.json"
     log_path = runtime / "server.log"
     with contextlib.ExitStack() as stack, (runtime / "lifecycle.lock").open("a") as lock:
@@ -202,7 +216,6 @@ def main():
             for line in log_path.read_text().splitlines()[-80:] if log_path.exists() else []:
                 print(line.split("/session/")[0] + "/session/[private]" if "/session/" in line else line)
             return 0
-        source_binary = binary in (SOURCE / "bin/swarm", SOURCE / "bin/swarm-local")
         if args.prepared_build and not source_binary:parser.error("--prepared-build exige le chemin binaire source géré")
         prepared = None
         if args.action == "build" or source_binary and (args.action == "restart" or args.action == "start" and (not running or args.prepared_build)):
