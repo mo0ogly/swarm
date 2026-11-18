@@ -2,7 +2,7 @@
 
 [Français](../../../plans/actions-confiance/ARTICLE-V6-ADAPTATION.md)
 
-## Current state — 18 November 2026, after combined P4 review
+## Current state — 18 November 2026, after bounded c421 qualification
 
 This overview supersedes earlier pending states below; those dated entries remain
 historical evidence. P2 has ten passing component guards, including a repaired
@@ -20,8 +20,19 @@ P6 r4 reads 83 historical rows with zero errors and unchanged verdicts versus r3
 PASS; 32 earlier passes retain their older scope, and the full 34-test suite was
 not run. Source/targeted-delta review is approved (WIP cf2423fe…). One PT and one
 PV2_intention FAIL remain; no global PV2 acceptance follows. No historical
-campaign replay, main merge or installation is claimed. Next: correct bilingual
-tracking and save the attributed P4 lot; P7 qualification/delivery remains open.
+campaign replay, main merge or installation is claimed.
+
+P7 now has independently reviewed standard and fixture c421 compile evidence,
+a corrected supplemental audit, one fresh public scripted lifecycle and one
+exact concurrent test PASS (two recipe stages PASS, integrity VERIFIED).
+The 37 inert verification guards and seven-path tools/docs lot are separately
+saved on WIP b0c5ea2b…. The original compile controller remains exit1; a separate
+corrected audit was admitted, with no compiler replay. Inode64513:17181246 names
+the project trust-actions.lock file, not a service identity. Full C/system/
+proc-macro graph qualification, managed version, local installation, main merge
+and RETEX remain open. Next: qualify the supported versioned delivery path,
+keeping the exercised c421 application and later verification-only commits
+separate; no unsupported acceptance or historical campaign replay.
 
 Fabrice requested implementation in this chat on 17 November 2026. Swarm00
 reserved this bounded PAEA workstream and will not launch a competing GLM packet.
