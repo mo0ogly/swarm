@@ -54,9 +54,14 @@
         "test_fresh_read_error_preserves_original_then_recovers",
         "test_cached_current_binary_survives_refusal",
         "test_cleanup_error_keeps_both_causes_then_recovers",
-        "test_build_only_does_not_probe_or_stop",
+        "test_active_build_observes_without_stop",
         "test_prepared_start_remains_same_image_only",
-        "Ran 8 tests",
+        "test_pre_capture_failure_skips_producer_and_cleanup",
+        "test_fresh_active_image_drift_refuses",
+        "test_stopped_build_keeps_legacy_no_probe",
+        "test_preselected_keeps_single_post_capture",
+        "test_active_build_passes_observation_to_producer",
+        "Ran 13 tests",
         "OK"
       ]
     }

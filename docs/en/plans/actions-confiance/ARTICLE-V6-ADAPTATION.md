@@ -709,3 +709,10 @@ Evidence: `/run/media/fpizzi/SWARM/swarm-evidence/root00-p7-fixture-controller-n
 campaign replay. This five-path verification tool/test/docs lot changes neither
 the installed application nor its release notes. Later Git preservation remains
 distinct from the exercised application checkpoint c421 and open global claims.
+
+
+### 2026-11-18T18:18:09.353702+00:00 — P7 reviewed launcher checkpoint
+
+P7 wiring reviewed by09 (turn01a1efd7-28dd-7623-a8a2-54ba1cfdca0e), verdict APPROVE_LAUNCHER_OWNED_CAPTURE_SOURCE_AND_INERT_GUARDS_ONLY delta01. Pre/post captures, producer DTO and pre-stop refusal implemented;26distinct inert methodsPASS across composed retained evidence and scopedreuse, no fullfinalrecipe replay. Canonical13pathCAS copy verified, foreignindex and old426items preserved, item427appended; sourceW retains430items. Reserve recovered through verified relocation of2697explicitlyreleased historical proof files; g377Root/ancestor inodes physicallypreserved. Onlyreleasedproof files becomealiases; localrestore required before use needing physical/contained paths. CompleteC/system/procmacrograph remainsOPEN. Qualifiedbuild, actuallyinstalledimage andFR/ENVersiondialog remainTO VERIFY. Humanreport required before any otherlot.
+
+Evidence: `/run/media/fpizzi/SWARM/swarm-evidence/root00-p7-launcher-capture-alcgb2_f/REVIEW-CANDIDATE-DELTA01.json`; canonical `/run/media/fpizzi/SWARM/swarm-evidence/root00-p7-launcher-capture-alcgb2_f/CANONICAL-CAS-INTEGRATION.json`.

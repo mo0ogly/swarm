@@ -3,6 +3,7 @@ import argparse
 import contextlib
 import fcntl
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -131,8 +132,12 @@ def main():
     owned observation, candidate/destination write or stop; this is an
     application-level selection gate, not an OS-confinement claim, and adds
     no timeout, retry, cap or operator knob. For an active managed
-    start/restart, freshly built and explicitly selected candidates pass the same
-    observed version/identity gate before stop. Unreadable, older or unorderable versions
+    build/start/restart, a fresh preparation receives the owned image/version
+    captured before the producer, then refuses a version/hash drift at the
+    second capture. Explicitly selected candidates retain one post capture.
+    Every active path passes the observed version/identity gate before any
+    stop; build never stops the service. Without a running server the producer
+    keeps its legacy call without an installed observation. Unreadable, older or unorderable versions
     refuse; labels order local deliveries, not source authenticity. Refusal
     cleanup preserves the installed binary and retains primary/cleanup causes.
     """
@@ -222,14 +227,22 @@ def main():
             (SOURCE / "deploy").mkdir(parents=True, exist_ok=True)
             build_lock = stack.enter_context((SOURCE / "deploy/.local-build.lock").open("a"))
             fcntl.flock(build_lock, fcntl.LOCK_EX)
+            pre = pre_sha = None
             if args.prepared_build:
                 prepared,selected = prepare_recorded(SOURCE,binary,args.prepared_build)
+            elif running:
+                # Active fresh build: capture the owned image before the producer
+                # so the candidate is pinned to that exact observed floor.
+                pre,pre_sha = owned_running_version(state,args.address,root)
+                prepared,selected = prepare_versioned_build(SOURCE,binary,installed={'version':pre['binary']['version'],'binary_sha256':pre_sha})
             else:
                 prepared,selected = prepare_versioned_build(SOURCE, binary)
             try:
-                if running and args.action in ('start','restart'):
-                    live,live_sha=running_version(args.address,root,state['pid'])
+                if running and args.action in ('build','start','restart'):
+                    live,live_sha=owned_running_version(state,args.address,root)
                     if not owned(state):raise RuntimeError('Server identity changed during managed candidate selection')
+                    if pre is not None and (live['binary']['version'],live_sha)!=(pre['binary']['version'],pre_sha):
+                        raise RuntimeError('Active engine image changed during the managed build: candidate refused, active server untouched.')
                     require_prepared_not_older(live['binary']['version'],selected['version'],live_sha,selected['binary_sha256'])
                     if args.prepared_build and args.action=="start":
                         if live_sha!=args.prepared_build:raise RuntimeError('Prepared start requires restart to replace an active server')
@@ -489,20 +502,97 @@ def _require_owned_image(state, descriptor=None):
     can remain unseen; this is not a continuous process lease. Errors: RuntimeError naming the identity or inode
     mismatch; OSError from the stat calls propagates unchanged for the caller
     to wrap with its cause. Limits: Linux /proc only; narrows but does not
-    eliminate image-swap windows (no full TOCTOU claim). Read-only.
+    eliminate image-swap windows (no full TOCTOU claim). Read-only generic
+    image observation shared by every owned reader; it decides nothing about
+    settings, versions or any other caller outcome by itself.
     """
     if not owned(state):
         raise RuntimeError(
-            f"Identité du moteur en cours (pid {state['pid']}) changée pendant la lecture des réglages ; "
-            "réglages refusés, moteur non arrêté.")
+            f"Identité du moteur en cours (pid {state['pid']}) changée pendant l’observation de l’image ; "
+            "observation refusée, moteur non arrêté.")
     if descriptor is None:
         return
     opened = os.fstat(descriptor)
     current = os.stat(f"/proc/{state['pid']}/exe")
     if (opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino):
         raise RuntimeError(
-            f"Image du moteur en cours (pid {state['pid']}) remplacée pendant la lecture des réglages ; "
-            "réglages refusés, moteur non arrêté.")
+            f"Image du moteur en cours (pid {state['pid']}) remplacée pendant l’observation de l’image ; "
+            "observation refusée, moteur non arrêté.")
+
+def owned_running_version(state, address, root):
+    """Read the protected native-version DTO and hash the held owned image.
+
+    Caller preconditions: loopback address, lifecycle lock held, build locks
+    held when called from the managed build block, and `state` recording the
+    owned server. Opens /proc/<recorded pid>/exe once with
+    O_RDONLY|O_CLOEXEC after the pre-open identity check, revalidates the
+    full recorded identity and the descriptor's (st_dev, st_ino) against a
+    fresh /proc/<pid>/exe stat after the open and again after the protected
+    query and hashing, then closes the descriptor and only then returns the
+    (DTO, sha256) pair, like running_version. The hash always covers the
+    bytes of the held descriptor — never the selected pathname and never an
+    independently reopened /proc/<pid>/exe — read straight to EOF through
+    os.read with the stdlib buffer only: no size cap, deadline, retry or
+    child process here. session_request plus urlopen(timeout=1) reuse the
+    existing individual-probe deadline, no new global watchdog; the body
+    must be a dict with schema_version 1, a binary object and a nonempty
+    string binary.version — canonical form and version ordering stay the
+    producer's job. This is local observation of the running image, not
+    cryptographic server authentication: a swap completing between the
+    bracketing checks can remain unseen, and no continuous process lease is
+    claimed. Errors: RuntimeError with the original OSError attached as
+    __cause__ when the descriptor cannot be opened or the protected read
+    fails on OSError; ValueError for an unusable body; RuntimeError naming
+    the identity or inode change from the guard; BaseExceptionGroup with the
+    primary original cause first when a body failure strikes while the
+    descriptor also cannot be closed; and a close failure after an
+    otherwise successful read refuses instead of returning a version,
+    never claiming the descriptor is definitely closed. No Root write,
+    settings change, provider call or native child; raw HTTP bodies and
+    private credentials are never printed.
+    """
+    _require_owned_image(state)
+    try:
+        descriptor = os.open(f"/proc/{state['pid']}/exe", os.O_RDONLY | os.O_CLOEXEC)
+    except OSError as error:
+        raise RuntimeError(
+            f"Descripteur de l’image du moteur en cours (pid {state['pid']}) indisponible ; "
+            "version courante inconnaissable, moteur non arrêté.") from error
+    try:
+        _require_owned_image(state, descriptor)
+        request = session_request(address, root, '/api/v1/native-version')
+        with urllib.request.urlopen(request, timeout=1) as response:
+            value = json.load(response)
+        if not isinstance(value,dict) or value.get('schema_version')!=1 or not isinstance(value.get('binary'),dict) or not isinstance(value['binary'].get('version'),str) or not value['binary']['version']:
+            raise ValueError('Native compiled version response invalid')
+        digest = hashlib.sha256()
+        while True:
+            chunk = os.read(descriptor, io.DEFAULT_BUFFER_SIZE)
+            if not chunk:
+                break
+            digest.update(chunk)
+        sha = digest.hexdigest()
+        _require_owned_image(state, descriptor)
+    except BaseException as primary:
+        try:
+            os.close(descriptor)
+        except BaseException as cleanup:
+            raise BaseExceptionGroup(
+                "Lecture de la version du moteur en cours refusée et fermeture du descripteur échouée",
+                [primary, cleanup])
+        if isinstance(primary, OSError):
+            raise RuntimeError(
+                f"Lecture de la version sur l’image du moteur en cours (pid {state['pid']}) impossible ; "
+                "version courante inconnaissable, moteur non arrêté.") from primary
+        raise
+    try:
+        os.close(descriptor)
+    except OSError as error:
+        raise RuntimeError(
+            f"Descripteur de l’image du moteur en cours (pid {state['pid']}) non refermé ; "
+            "moteur non arrêté.") from error
+    return value, sha
+
 
 @contextlib.contextmanager
 def owned_engine_mode(state, root):

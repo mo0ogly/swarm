@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "id": "local-owned-version-capture",
+  "inputs": [
+    "tools/swarm_local.py",
+    "tools/swarm_version.py",
+    "tests/test_local_owned_version_capture.py",
+    "tests/test_local_managed_version_gate.py",
+    "tests/test_local_live_engine_reader.py",
+    "tests/fixture_area.py",
+    "docs/architecture/LOCAL-DELIVERY-CACHE-PROOF.md",
+    "docs/en/LOCAL-DELIVERY-CACHE-PROOF.md",
+    "version_history.json",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/local-owned-version-capture.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "owned-version-reader-inert",
+      "command": [
+        "python3",
+        "tests/test_local_owned_version_capture.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_healthy_capture_returns_dto_and_held_image_hash",
+        "test_open_query_read_failures_preserve_cause",
+        "test_malformed_json_and_schema_refuse",
+        "test_identity_and_inode_drift_refuse",
+        "test_success_with_failed_close_refuses",
+        "test_body_error_with_failed_close_groups_both_causes",
+        "test_selected_pathname_different_or_absent_not_used",
+        "Ran 7 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "managed-caller-wiring-inert",
+      "command": [
+        "python3",
+        "tests/test_local_managed_version_gate.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_fresh_downgrade_and_unknown_refuse_then_recover",
+        "test_prepared_downgrade_and_unknown_still_refuse",
+        "test_fresh_changed_identity_refuses_then_recovers",
+        "test_fresh_read_error_preserves_original_then_recovers",
+        "test_cached_current_binary_survives_refusal",
+        "test_cleanup_error_keeps_both_causes_then_recovers",
+        "test_active_build_observes_without_stop",
+        "test_prepared_start_remains_same_image_only",
+        "test_pre_capture_failure_skips_producer_and_cleanup",
+        "test_fresh_active_image_drift_refuses",
+        "test_stopped_build_keeps_legacy_no_probe",
+        "test_preselected_keeps_single_post_capture",
+        "test_active_build_passes_observation_to_producer",
+        "Ran 13 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "shared-image-diagnostic-guards",
+      "command": [
+        "python3",
+        "tests/test_local_live_engine_reader.py",
+        "OwnedEngineModeReader.test_changed_identity_after_query_refuses_and_closes",
+        "OwnedEngineModeReader.test_replaced_image_inode_after_query_refuses_and_closes",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_changed_identity_after_query_refuses_and_closes",
+        "test_replaced_image_inode_after_query_refuses_and_closes",
+        "Ran 2 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "owned-image-pair-main-callers",
+      "command": [
+        "python3",
+        "tests/test_local_live_engine_reader.py",
+        "MainLiveGuardOrdering",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_owner_key_control_queries_owned_image_then_stops",
+        "test_mismatched_pair_from_live_image_refuses_before_stop",
+        "test_lost_identity_at_pair_entry_never_falls_back_to_path",
+        "test_main_never_adopts_a_foreign_running_state",
+        "Ran 4 tests",
+        "OK"
+      ]
+    }
+  ]
+}

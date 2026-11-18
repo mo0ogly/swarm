@@ -776,3 +776,10 @@ aucune campagne historique rejouée. Ce lot de cinq outils/tests/docs de
 vérification n’altère pas l’application installée ni ses notes de version.
 Leur sauvegarde Git ultérieure reste distincte du checkpoint applicatif c421
 exercé et des acceptations globales encore ouvertes.
+
+
+### 2026-11-18T18:18:09.353702+00:00 — P7 reviewed launcher checkpoint
+
+Raccordement P7 revu par09 (turn01a1efd7-28dd-7623-a8a2-54ba1cfdca0e), verdict APPROVE_LAUNCHER_OWNED_CAPTURE_SOURCE_AND_INERT_GUARDS_ONLY delta01. Captures avant/après, DTO du producteur et refus avant arrêt implémentés ;26méthodes distinctes inertes PASS, preuves composées et réutilisations bornées, pas de rejeu complet de la recette finale. Copie canonique CAS13chemins vérifiée, index étranger et anciens items426 préservés, item427 ajouté ; le manifeste sourceW conserve430items. Réserve récupérée par transfert vérifié2697fichiers historiques explicitement libérés, Root/ancêtres g377 physiquement préservés ; seuls leurs fichiers de preuve libérés sont désormais des liens, restauration locale nécessaire avant tout usage exigeant le chemin physique/confiné. Le graphe C/système/proc-macro complet reste ouvert. Build qualifié, image réellement installée et dialogue Version FR/EN restent À VÉRIFIER. Compte rendu humain requis avant tout autre lot.
+
+Evidence: `/run/media/fpizzi/SWARM/swarm-evidence/root00-p7-launcher-capture-alcgb2_f/REVIEW-CANDIDATE-DELTA01.json`; canonical `/run/media/fpizzi/SWARM/swarm-evidence/root00-p7-launcher-capture-alcgb2_f/CANONICAL-CAS-INTEGRATION.json`.

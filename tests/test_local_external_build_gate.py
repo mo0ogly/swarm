@@ -8,8 +8,8 @@ precedes every external fault and a recovery follows inside each test, so no
 check depends on unittest method ordering. The classification and refusal in
 main itself are never mocked; refused scenarios must leave an initially
 nonexistent Root, runtime and build area absent and the selected external file
-byte-, mode- and inode-identical. Results are established only by retained named runs; the eight existing
-managed version tests remain separate proofs.
+byte-, mode- and inode-identical. Results are established only by retained named runs; the maintained
+managed version caller tests remain separate proofs.
 """
 import contextlib
 import hashlib

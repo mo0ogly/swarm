@@ -268,8 +268,10 @@ def prepare(source,binary,*,installed=None):
     its existing syntax gate and must be a comparable canonical dev label above
     the observation; equality is admitted only by a qualified same-image cache.
     Labels grant no installation or OS-confinement authority. The actual caller
-    still owes capture freshness and a post-build version/identity recheck; its
-    current calls remain without this DTO, so that flow is not wired here.
+    still owes capture freshness and a post-build version/identity recheck.
+    The managed launcher supplies this DTO for a fresh preparation with an
+    active owned server and retains both bracketing observations; a stopped
+    server keeps the legacy call. This producer performs no capture itself.
 
     Validation may already read manifest/history/source/toolchain facts. Exact
     observed dependencies determine numbering; changed graphs can require the

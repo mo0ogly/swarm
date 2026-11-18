@@ -2,8 +2,8 @@
   "schema_version": 1,
   "local_changes": {
     "summary": {
-      "fr": "Références mémoire historiques et consignes attribuées, avec contrôles avant lancement et rejet humain. Provenance des prompts de préparation. Frontière de lecture Bell-LaPadula des projections PAEA, statuts de démarrage réduits au booléen et purge des projections de consentement. Promotion Git PAEA : suivi des effets, réconciliation et retrait concurrent. Préparation locale : erreurs de permissions conservées. Contrôle de version commun avant remplacement local. Lecture des réglages par le moteur courant possédé. Construction locale refusée pour un binaire externe sélectionné. Causes de qualification et de nettoyage conservées.",
-      "en": "Historical memory references and attributed instructions, with pre-launch checks and human rejection. Preparation prompt provenance. Bell-LaPadula reader frontier for the PAEA projections, startup statuses reduced to the boolean and consent projection purging. PAEA Git promotion: effect tracking, reconciliation and concurrent withdrawal. Local preparation: permission errors preserved. Shared version check before local replacement. Settings read through the owned current engine. Local build refused for a selected external binary. Qualification and cleanup causes retained."
+      "fr": "Références mémoire historiques et consignes attribuées, avec contrôles avant lancement et rejet humain. Provenance des prompts de préparation. Frontière de lecture Bell-LaPadula des projections PAEA, statuts de démarrage réduits au booléen et purge des projections de consentement. Promotion Git PAEA : suivi des effets, réconciliation et retrait concurrent. Préparation locale : erreurs de permissions conservées. Contrôle de version commun avant remplacement local. Lecture des réglages par le moteur courant possédé. Construction locale refusée pour un binaire externe sélectionné. Causes de qualification et de nettoyage conservées. Captures de l’image possédée avant et après préparation locale.",
+      "en": "Historical memory references and attributed instructions, with pre-launch checks and human rejection. Preparation prompt provenance. Bell-LaPadula reader frontier for the PAEA projections, startup statuses reduced to the boolean and consent projection purging. PAEA Git promotion: effect tracking, reconciliation and concurrent withdrawal. Local preparation: permission errors preserved. Shared version check before local replacement. Settings read through the owned current engine. Local build refused for a selected external binary. Qualification and cleanup causes retained. Owned image captures before and after local preparation."
     },
     "items": [
       {
@@ -1721,6 +1721,10 @@
       {
         "fr": "Préparation locale : si la qualification et le nettoyage échouent ensemble, les deux causes sont conservées.",
         "en": "Local preparation: if qualification and cleanup fail together, both causes are retained."
+      },
+      {
+        "fr": "Construction locale : le lanceur observe la version et l’image du serveur géré avant et après préparation, transmet le plancher au producteur et refuse une dérive. Une construction seule conserve le serveur actif.",
+        "en": "Local builds observe the managed server version and image before and after preparation, pass the floor to the producer and refuse drift. A build-only request preserves the active server."
       }
     ]
   },

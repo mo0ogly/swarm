@@ -405,9 +405,35 @@ class PairGuardLiveReader(unittest.TestCase):
 class MainLiveGuardOrdering(unittest.TestCase):
     """main() must query the owned image and only then reach the stop."""
 
-    def exercise(self, *, mode="owner-key", daemon_v1=False, foreign_state=False,
+    def exercise(self, **kwargs):
+        """Bracket every pair-guard scenario with valid main controls and recovery.
+
+        Controls require the real guard to query the synthetic owned image and
+        reach only the stop sentinel; no native image or live Root is executed.
+        Recovery runs in finally, independently of unittest method ordering.
+        """
+        def control():
+            """Require the owned settings query before the inert stop boundary."""
+            error, seen = self._exercise_once()
+            self.assertIsInstance(error, ReachedStop)
+            self.assertEqual(seen['order'], ['settings-query', 'stop'])
+            self.assertEqual(seen['state'], seen['state_before'])
+            self.assertIsNone(seen['descriptor'])
+        control()
+        try:
+            return self._exercise_once(**kwargs)
+        finally:
+            control()
+
+    def _exercise_once(self, *, mode="owner-key", daemon_v1=False, foreign_state=False,
                  late_identity_change=False):
-        """Run one inert restart through the real main and guard; return error+receipts."""
+        """Run inert main+pair guard; double the pre/post owned-version snapshots.
+
+        Records both captures and the exact installed DTO reaching the producer.
+        Ownership/settings/protocol guard still use the synthetic engine routes;
+        process, network and real stop stay forbidden. Returns error and receipts,
+        preserving the owned fixture state and releasing its descriptor.
+        """
         with tempfile.TemporaryDirectory(prefix="live-reader-main-", dir=fixture_area()) as area:
             source = Path(area)
             root = source / "project"
@@ -461,12 +487,15 @@ class MainLiveGuardOrdering(unittest.TestCase):
                 stack.enter_context(patch.object(local, "SOURCE", source))
                 stack.enter_context(patch.object(sys, "argv", argv))
                 stack.enter_context(patch.object(local.os, "umask"))
-                stack.enter_context(patch.object(local, "prepare_versioned_build",
+                producer = stack.enter_context(patch.object(local, "prepare_versioned_build",
                                                  return_value=(candidate, selected_state)))
                 stack.enter_context(patch.object(local, "prepare_recorded",
                                                  return_value=(candidate, selected_state)))
+                observed_sha = hashlib.sha256(engine.image.read_bytes()).hexdigest()
+                capture = stack.enter_context(patch.object(local, "owned_running_version",
+                                                 return_value=(observation, observed_sha)))
                 stack.enter_context(patch.object(local, "running_version",
-                                                 return_value=(observation, "live-image-sha")))
+                                                 side_effect=AssertionError("forbidden legacy running_version")))
                 stack.enter_context(patch.object(local, "AUTHORITY_INSTALLED", daemon))
                 stack.enter_context(patch.object(local, "stop", side_effect=reached_stop))
                 stack.enter_context(patch.object(local, "authority_front",
@@ -483,6 +512,17 @@ class MainLiveGuardOrdering(unittest.TestCase):
                     local.main()
                 except BaseException as caught:
                     error = caught
+                if foreign_state:
+                    capture.assert_not_called()
+                    producer.assert_called_once_with(source, source / "bin/swarm-local")
+                else:
+                    self.assertEqual(capture.call_count, 2)
+                    for call in capture.call_args_list:
+                        self.assertEqual(call.args, (engine.state, address, root))
+                        self.assertEqual(call.kwargs, {})
+                    producer.assert_called_once_with(source, source / "bin/swarm-local",
+                        installed={'version': observation['binary']['version'],
+                                   'binary_sha256': observed_sha})
             engine.release()
             receipts = {
                 "root": str(root), "source": str(source),

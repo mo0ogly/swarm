@@ -11,22 +11,36 @@
     "tools/verification/recipe.py",
     "tools/verification/recipes/local-managed-version-gate.json"
   ],
-  "environment": {"PYTHONDONTWRITEBYTECODE": "1"},
-  "steps": [{
-    "id": "managed-version-refusal-recovery",
-    "command": ["python3", "tests/test_local_managed_version_gate.py", "-v"],
-    "expected_exit": 0,
-    "required_stdout": [],
-    "required_stderr": [
-      "test_build_only_does_not_probe_or_stop",
-      "test_cached_current_binary_survives_refusal",
-      "test_cleanup_error_keeps_both_causes_then_recovers",
-      "test_fresh_changed_identity_refuses_then_recovers",
-      "test_fresh_downgrade_and_unknown_refuse_then_recover",
-      "test_fresh_read_error_preserves_original_then_recovers",
-      "test_prepared_downgrade_and_unknown_still_refuse",
-      "test_prepared_start_remains_same_image_only",
-      "Ran 8 tests", "OK"
-    ]
-  }]
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "managed-version-refusal-recovery",
+      "command": [
+        "python3",
+        "tests/test_local_managed_version_gate.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_fresh_downgrade_and_unknown_refuse_then_recover",
+        "test_prepared_downgrade_and_unknown_still_refuse",
+        "test_fresh_changed_identity_refuses_then_recovers",
+        "test_fresh_read_error_preserves_original_then_recovers",
+        "test_cached_current_binary_survives_refusal",
+        "test_cleanup_error_keeps_both_causes_then_recovers",
+        "test_active_build_observes_without_stop",
+        "test_prepared_start_remains_same_image_only",
+        "test_pre_capture_failure_skips_producer_and_cleanup",
+        "test_fresh_active_image_drift_refuses",
+        "test_stopped_build_keeps_legacy_no_probe",
+        "test_preselected_keeps_single_post_capture",
+        "test_active_build_passes_observation_to_producer",
+        "Ran 13 tests",
+        "OK"
+      ]
+    }
+  ]
 }
