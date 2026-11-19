@@ -40,4 +40,15 @@ Sur dev.380, les fixtures avec fournisseur inerte ont vérifié le nominal, l’
 
 La [recette preparation-web-stop-order](../../tools/verification/recipes/preparation-web-stop-order.json) sélectionne uniquement ces deux ordres. Préparer un binaire natif qualifié, un checkout ou une copie de sources isolée avec une zone de fixtures valide et un répertoire de sortie privé admis. Le lanceur utilise Linux, Python 3 et `ss` d’iproute2. Définir `SWARM_PREPARATION_UI_BINARY`, `SWARM_PREPARATION_STOP_ORDER_SHA256`, `SWARM_PREPARATION_STOP_ORDER_PARENT` et `SWARM_PREPARATION_STOP_ORDER_RESERVE_BYTES` avant d’appeler [le lanceur de recettes](../../tools/verification/README.md). Conserver l’identification du build, le reçu de recette et le dossier du parcours HTTP et CLI.
 
+## Repères des preuves dev 380
+
+Le binaire natif exercé porte le SHA-256 `f0e92ce3749855bee14f2b6ea68037c0e5532ac58308e36988f76ad6b46678a1`. En saturation, le harnais compte les démarrages du fournisseur. Les lectures publiques établissent l’état du dialogue, du budget et du brief adopté. Les SHA-256 ci-dessous identifient les manifestes des dossiers conservés dans le registre local de recherche.
+
+| Périmètre observé | SHA-256 du manifeste |
+| --- | --- |
+| Nominal et arrêt avec sortie retenue | `22dde8eb9423105e3f319982a3f2b62c2cf23c388478998d8fba806ac3954fec` |
+| Saturation et reprise explicite | `b434df4a8cd6fe90289bd1c508d6b46e1805f7a41b1334214862bd03b1c763c3` |
+| Déconnexion après admission | `bdab361351aa8af8660bdfc4cefba9b9c9f1d717d133980164ca0448ab46597e` |
+| Qualification du pilote et de la recette sur la base de la PR | `4998f37a68257d6b4f576a4cc4364e1efad28160a19cee251a3a039452db6c1d` |
+
 [Canaux Tokio](https://tokio.rs/tokio/tutorial/channels) · [Arrêt asynchrone](https://tokio.rs/tokio/topics/shutdown)

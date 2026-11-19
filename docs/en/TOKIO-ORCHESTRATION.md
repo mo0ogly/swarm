@@ -40,4 +40,15 @@ On dev.380, inert-provider fixtures verified nominal completion, cancellation wi
 
 The [preparation-web-stop-order recipe](../../tools/verification/recipes/preparation-web-stop-order.json) selects these two orders. Prepare a qualified native executable, an isolated checkout or source copy with a valid fixture area, and an admitted private output directory. The driver uses Linux, Python 3 and iproute2’s `ss`. Set `SWARM_PREPARATION_UI_BINARY`, `SWARM_PREPARATION_STOP_ORDER_SHA256`, `SWARM_PREPARATION_STOP_ORDER_PARENT` and `SWARM_PREPARATION_STOP_ORDER_RESERVE_BYTES` before using the [recipe runner](../../tools/verification/README.md). Retain the build identity, recipe receipt and HTTP and CLI evidence directory.
 
+## Evidence references for dev 380
+
+The exercised native binary has SHA-256 `f0e92ce3749855bee14f2b6ea68037c0e5532ac58308e36988f76ad6b46678a1`. In the saturation fixture, the harness counts provider launches. Public reads establish the dialogue, budget and adopted brief state. The SHA-256 values below identify the manifests retained in the local research register.
+
+| Observed scope | Manifest SHA-256 |
+| --- | --- |
+| Nominal completion and stop with output held | `22dde8eb9423105e3f319982a3f2b62c2cf23c388478998d8fba806ac3954fec` |
+| Saturation and explicit recovery | `b434df4a8cd6fe90289bd1c508d6b46e1805f7a41b1334214862bd03b1c763c3` |
+| Disconnection after admission | `bdab361351aa8af8660bdfc4cefba9b9c9f1d717d133980164ca0448ab46597e` |
+| Driver and recipe qualification on the PR base | `4998f37a68257d6b4f576a4cc4364e1efad28160a19cee251a3a039452db6c1d` |
+
 [Tokio channels](https://tokio.rs/tokio/tutorial/channels) · [Graceful shutdown](https://tokio.rs/tokio/topics/shutdown)
