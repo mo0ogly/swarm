@@ -1,6 +1,6 @@
 # Orchestration Tokio dans Swarm
 
-[English](../en/TOKIO-ORCHESTRATION.md) · [Suivi D11 et preuves](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md#tokio--revue-d11-de-la-préparation-web)
+[English](../en/TOKIO-ORCHESTRATION.md) · [Plan Biba](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md) · [Qualification ciblée](#rejouer-la-qualification-ciblée)
 
 ## Choisir la frontière
 
@@ -34,7 +34,7 @@ flowchart LR
 
 Dans la source moteur, l’ordre des écritures sur le tour règle la concurrence entre l’arrêt et la finalisation. Si l’arrêt a enregistré `stopping` en premier, la finalisation enregistre `interrupted` et écarte la réponse. Si la finalisation a déjà enregistré un état terminal, l’arrêt sert cet état sous le contrôle de lecture applicable. [Finalisation](../../rust/crates/swarm-engine/src/root_store/preparation_call.rs#L1137) · [Arrêt](../../rust/crates/swarm-engine/src/root_store/preparation_call.rs#L1281).
 
-Sur dev.380, les fixtures avec fournisseur inerte ont vérifié le nominal, l’arrêt avec sortie retenue, le refus de saturation avec reprise explicite et la persistance après déconnexion. La qualification ciblée a aussi observé un arrêt qui conserve un candidat déjà enregistré, puis un arrêt qui interrompt un tour après drainage des octets du fournisseur mais avant publication. Le drainage ne situe pas la fin du parsing ni le dernier contrôle avant le commit. Le périmètre général D11 dépend de preuves propres à chaque frontière. [Suivi D11](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md#20-novembre--tokio-déconnexion-après-admission-sur-dev380).
+Sur dev.380, les fixtures avec fournisseur inerte ont vérifié le nominal, l’arrêt avec sortie retenue, le refus de saturation avec reprise explicite et la persistance après déconnexion. La qualification ciblée a aussi observé un arrêt qui conserve un candidat déjà enregistré, puis un arrêt qui interrompt un tour après drainage des octets du fournisseur mais avant publication. Le drainage ne situe pas la fin du parsing ni le dernier contrôle avant le commit. Le périmètre général D11 dépend de preuves propres à chaque frontière.
 
 ## Rejouer la qualification ciblée
 

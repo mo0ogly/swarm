@@ -1,6 +1,6 @@
 # Tokio orchestration in Swarm
 
-[Français](../architecture/TOKIO-ORCHESTRATION.md) · [D11 tracking and evidence](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md#tokio--revue-d11-de-la-préparation-web)
+[Français](../architecture/TOKIO-ORCHESTRATION.md) · [Biba plan](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md) · [Focused qualification](#replay-the-focused-qualification)
 
 ## Choose the boundary
 
@@ -34,7 +34,7 @@ flowchart LR
 
 The engine source resolves a race between stop and finalization through the order of writes to the turn. If stop recorded `stopping` first, finalization records `interrupted` and discards the response. If finalization recorded a terminal state first, stop serves the terminal state under the applicable read control. [Finalization](../../rust/crates/swarm-engine/src/root_store/preparation_call.rs#L1137) · [Stop](../../rust/crates/swarm-engine/src/root_store/preparation_call.rs#L1281).
 
-On dev.380, inert-provider fixtures verified nominal completion, cancellation with provider output held, saturation refusal with explicit recovery, and persistence after disconnection. The focused qualification also observed stop preserving an already recorded candidate, and stop interrupting a turn after provider bytes had drained but before candidate publication. Queue drainage leaves parser completion and the last check before commit unobserved. General D11 coverage requires evidence specific to each boundary. [D11 tracking](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md#20-novembre--tokio-déconnexion-après-admission-sur-dev380).
+On dev.380, inert-provider fixtures verified nominal completion, cancellation with provider output held, saturation refusal with explicit recovery, and persistence after disconnection. The focused qualification also observed stop preserving an already recorded candidate, and stop interrupting a turn after provider bytes had drained but before candidate publication. Queue drainage leaves parser completion and the last check before commit unobserved. General D11 coverage requires evidence specific to each boundary.
 
 ## Replay the focused qualification
 
