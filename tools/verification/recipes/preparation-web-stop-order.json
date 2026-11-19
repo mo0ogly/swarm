@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "preparation-web-stop-order",
+  "inputs": [
+    "tests/rust_preparation_web_stop_order.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tests/fixture_area.py",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-cli/src/preparation_worker.rs",
+    "rust/crates/swarm-engine/src/native_provider_exec.rs",
+    "rust/crates/swarm-engine/src/preparation_cli_output.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_budget.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_monitor.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+    "rust/crates/swarm-engine/src/validation_run.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "rust/crates/swarm-web/src/service/transport.rs",
+    "rust/crates/swarm-biba-linux/src/kernel.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "web-stop-order",
+      "command": [
+        "python3",
+        "-c",
+        "import os,sys\nfrom pathlib import Path\nfrom tempfile import mkdtemp\nfrom subprocess import run\nparent=Path(os.environ['SWARM_PREPARATION_STOP_ORDER_PARENT']).resolve(strict=True)\nassert parent.stat().st_uid==os.geteuid() and parent.stat().st_mode&0o077==0\nout=Path(mkdtemp(prefix='stop-order-',dir=parent))/'journey'\nrun([sys.executable,'-B','tests/rust_preparation_web_stop_order.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--binary-sha256',os.environ['SWARM_PREPARATION_STOP_ORDER_SHA256'],'--output',str(out),'--minimum-free-bytes',os.environ['SWARM_PREPARATION_STOP_ORDER_RESERVE_BYTES']],check=True)\nprint('PREPARATION_WEB_STOP_ORDER_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "result-before-stop-pass",
+        "stop-after-drain-pass",
+        "PREPARATION_WEB_STOP_ORDER_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}
