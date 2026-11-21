@@ -478,7 +478,9 @@ mod tests {
             "provider":"team-fixture", "level":"standard", "max_activations":2, "max_decisions":3,
             "max_review_calls":2, "max_tasks":assignments.len(), "task_scopes":assignments,
             "checks":{"req-1":[{
-                "id":"fixture-planner-ready", "command":["/usr/bin/test", "-x", planner],
+                "id":"fixture-planner-ready",
+                "command":["python3", "-c", "import os; assert os.access('skynet_harness', os.X_OK)"],
+                "inputs":["skynet_harness"],
                 "justification":"Check executable setup of the owned fixture planner"
             }]}
         });

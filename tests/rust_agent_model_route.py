@@ -178,8 +178,8 @@ class Fixture:
             max_tasks=1, max_decisions=1, task_scopes={'task': 'worker-scope'},
             task_workspaces={'task': str(self.workspace)},
             checks={'req-1': [dict(id='fixture-provider-ready',
-                command=['/usr/bin/test', '-x', str(self.root / 'codex')],
-                justification='Check the owned test provider is executable')]},
+                command=['python3', '-c', "import os; assert os.access('codex', os.X_OK)"],
+                inputs=['codex'], justification='Check the owned test provider is executable')]},
         ))
         self.request['expected_revision'] = attached['revision']
         return attached
