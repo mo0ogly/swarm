@@ -198,8 +198,10 @@ Per-attempt copies are prepared at launch.
 A verifiable failed or interrupted native worker completion is delivered to
 the newly assigned scope. The historical attempt and task state stay intact.
 This evidence handoff grants no retry.
-The cockpit reads the earlier ordinary attempt from its native receipt. Missing
-or inconsistent historical evidence leaves operational status unavailable.
+The cockpit reads ordinary attempts that ended before attachment from their
+native receipts, including zero-exit attempts. The task retains its state and
+requires its configured validation. Missing or inconsistent historical
+evidence leaves operational status unavailable.
 Attachment records no start consent. Start and validation use their usual
 operations. If the revision changes during launch preview, the conductor rereads
 the Work on its next cycle once the engine confirms that no admission was

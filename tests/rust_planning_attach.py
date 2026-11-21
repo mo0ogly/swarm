@@ -8,7 +8,7 @@ from pathlib import Path
 from rust_agent_model_route import Fixture, PROGRAM, digest, publish
 
 
-def run(binary, output, *, managed=False, graph=False, history=False):
+def run(binary, output, *, managed=False, graph=False, history=False, successful_history=False):
     """Cover existing-work attachment with explicit or managed workspace ownership."""
     fixture = Fixture(binary, output, 'planning-attach')
     work_id = fixture.work
@@ -37,17 +37,18 @@ def run(binary, output, *, managed=False, graph=False, history=False):
     config = dict(provider='fixture', level='standard', max_activations=3,
                   max_review_calls=3, max_tasks=3, max_decisions=3)
     original_receipt = None
-    if history:
-        # Run a real inert ordinary worker to a nonzero exit before attachment.
+    if history or successful_history:
+        # Run a real inert ordinary worker before attachment.
         # Its completion is a genuine engine original and is never rewritten.
         provider = fixture.root / 'codex'
-        publish(provider, (PROGRAM + '\nsys.exit(17)\n').encode())
+        publish(provider, (PROGRAM if successful_history else PROGRAM + '\nsys.exit(17)\n').encode())
         provider.chmod(0o700)
         fixture.request['expected_revision'] = show()['revision']
         fixture.prepare()
         fixture.call(['agent', 'run', 'session'])
-        failed = show()['tasks'][0]
-        assert failed['status'] == 'blocked' and failed['attempts'][-1]['status'] == 'failed'
+        prior = show()['tasks'][0]
+        terminal_status = 'completed' if successful_history else 'failed'
+        assert prior['status'] == 'blocked' and prior['attempts'][-1]['status'] == terminal_status
         receipt = fixture.root / '.swarm' / ('native-completion-' + digest(b'session') + '.json')
         original_receipt = receipt.read_bytes()
         publish(output / 'ordinary-worker-original.json', original_receipt)
@@ -155,11 +156,14 @@ def run(binary, output, *, managed=False, graph=False, history=False):
         assert len(completion) == 1
         event = completion[0]
         assert (event['scope'], event['task'], event['attempt']) == (
-            assignments['task'], 'task', failed['attempts'][-1]['id'])
-        assert after['tasks'][0]['attempts'] == failed['attempts']
+            assignments['task'], 'task', prior['attempts'][-1]['id'])
+        assert after['tasks'][0]['attempts'] == prior['attempts']
         assert not after['tasks'][0].get('planning_retry')
         assert receipt.read_bytes() == original_receipt
         print('PASS attachment routes the genuine historical worker completion without granting retry', flush=True)
+    if history or successful_history:
+        assert after['tasks'][0]['attempts'] == prior['attempts']
+        assert not after['tasks'][0].get('planning_retry')
         status = fixture.ok(['mission', 'status', work_id])
         assert status['organization']['ready'] and status['validated'] == 0
         assert {task['id'] for task in status['tasks']} == set(assignments)
@@ -202,7 +206,7 @@ def run(binary, output, *, managed=False, graph=False, history=False):
     print('PASS attachment-retains-graph-and-no-launch-consent', flush=True)
     return {'status': 'PASS', 'work': work_id, 'revision': after['revision'],
             'task_scopes': assignments, 'provider_called': False,
-            'fixture_worker_ran': history, 'attached_worker_completion': history,
+            'fixture_worker_ran': history or successful_history, 'attached_worker_completion': history,
             'binary_sha256': digest(binary.read_bytes())}
 
 
@@ -213,10 +217,13 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--managed', action='store_true')
     parser.add_argument('--graph', action='store_true')
-    parser.add_argument('--history', action='store_true')
+    history = parser.add_mutually_exclusive_group()
+    history.add_argument('--history', action='store_true')
+    history.add_argument('--successful-history', action='store_true')
     args = parser.parse_args()
     args.output.mkdir(mode=0o700)
-    outcome = run(args.binary.resolve(strict=True), args.output, managed=args.managed, graph=args.graph, history=args.history)
+    outcome = run(args.binary.resolve(strict=True), args.output, managed=args.managed, graph=args.graph, history=args.history,
+                  successful_history=args.successful_history)
     publish(args.output / 'result.json', outcome)
 
 

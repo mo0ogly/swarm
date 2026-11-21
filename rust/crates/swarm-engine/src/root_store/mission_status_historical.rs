@@ -469,7 +469,7 @@ impl RootStore {
     /// reviewer or acceptance grant.
     fn attached_ordinary_terminal(&self, work: &crate::Work, agent: &crate::Agent) -> Result<bool, E> {
         if agent.origin != "operateur" || agent.role != "worker" || agent.native_mission.is_some()
-            || !matches!(agent.status.as_str(), "failed" | "interrupted")
+            || !matches!(agent.status.as_str(), "completed" | "failed" | "interrupted")
         {
             return Ok(false);
         }
