@@ -190,9 +190,9 @@
     renderConduite(mission, missionError, work, data.readMode);
     globalThis.SwarmWorkbench?.render(data);
 
-    // Reuse canonical graph helpers/CSS with actual stored dependencies only.
-    // The caller supplies an explicit Work; failures stay visible, no empty pass.
-    try { SwarmRustDependencyGraph.render(work); }
+    // The graph projects both recorded Work structure and the separate mission
+    // observation. A history read carries no current conductor or task reason.
+    try { SwarmRustDependencyGraph.render(work, mission, data.readMode); }
     catch (cause) { SwarmRustDependencyGraph.clear(t('Graphe indisponible : ') + String(cause.message)); }
 
   }

@@ -1,0 +1,13 @@
+[package]
+name = "swarm-wasm-validation"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+wasmtime = { version = "=36.0.23", default-features = false, features = ["std", "runtime", "cranelift", "wat"] }
+wasmparser = { version = "=0.236.1", default-features = false, features = ["std"] }
+
+wat = "=1.263.0"
+
+[workspace]

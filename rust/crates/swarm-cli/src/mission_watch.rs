@@ -910,6 +910,32 @@ fn stale_dispatch_observation(error: &swarm_engine::MissionWorkerDispatchFailure
             if matches!(cause.as_ref(), swarm_engine::MissionSupervisionError::Refused("revision_conflict")))
 }
 
+/// Recognize the exact revision race in a read-only resource preview.
+/// The standing queue synchronization remains committed. A matching preview
+/// rolls back its temporary preparation and has not attempted admission.
+/// A stale queue, mismatched intent, uncertain cleanup or admission is fatal.
+fn stale_dispatch_preview(
+    error: &swarm_engine::MissionWorkerDispatchFailure,
+    work: &str,
+    request: &swarm_engine::MissionWorkerDispatchRequest,
+) -> bool {
+    use swarm_engine::{
+        AgentLaunchError as A, MissionDispatchCause as C, MissionDispatchPreparationEffect as P,
+        MissionDispatchQueueEffect as Q,
+    };
+    let Q::Committed(queue) = &error.queue else { return false };
+    let P::PreviewAttempted { event_id, task_id } = &error.preparation else { return false };
+    error.phase == "resource-preview"
+        && queue.work == work
+        && queue.revision == request.expected_revision
+        && queue.permission_refusal.is_none()
+        && queue.ready.contains(task_id)
+        && event_id == &request.event_id
+        && matches!(&error.cause, C::Root(root)
+            if matches!(root.as_ref(), RootError::Launch(cause)
+                if matches!(cause.as_ref(), A::Refused("revision_conflict"))))
+}
+
 /// Recognize only a clean rolled-back resource preview denied by the actual
 /// mission fence after permission withdrawal. Preserve its committed queue and
 /// original causes; no admission, replay, cleanup/commit uncertainty, generic
@@ -1154,11 +1180,12 @@ fn drive(
             Err(error) if withdrawn_dispatch_for_work(&error,work).is_some() => {
                 return stop_withdrawn_dispatch(error, work, &request.event_id, out);
             }
-            Err(error) if stale_dispatch_observation(&error) => {
+            Err(error) if stale_dispatch_observation(&error) || stale_dispatch_preview(&error, work, &request) => {
+                let preview = stale_dispatch_preview(&error, work, &request);
                 let error = phase("mission-watch-dispatch", *error);
                 let observation=json!({"schema_version":1,"event":"mission-watch-blocked","work":work,
                     "reason":"work-revision-changed","event_id":request.event_id,"expected_revision":request.expected_revision,
-                    "synchronization_committed":false,"preparation_attempted":false,"causes":crate::safe_causes(&error),
+                    "synchronization_committed":preview,"preparation_attempted":preview,"admission_attempted":false,"causes":crate::safe_causes(&error),
                     "mission_complete":false,"observation_is_permission":false});
                 if let Err(publication)=emit(out,&observation) { return Err(join(Some(error),publication)); }
                 // Keep operation identity. Only a later scheduled cycle rereads the
@@ -1572,6 +1599,36 @@ mod tests {
         let mut error=clean();error.cause=C::Mission(Box::new(M::Refused("mission-lease-lost")));assert!(!super::stale_dispatch_observation(&error));
         let mut error=clean();error.resources.push(swarm_engine::MissionDispatchResourceRefusal::Occupied{task:"task".into(),cause:swarm_engine::RootStoreError::Refused("fixture-resource")});assert!(!super::stale_dispatch_observation(&error));
         assert!(super::stale_dispatch_observation(&clean()));
+    }
+    /// A planner may commit after queue synchronization and before preview.
+    /// Only the original clean preview refusal permits a fresh observation.
+    #[test]
+    fn stale_resource_preview_retains_queue_and_refuses_uncertain_admission() {
+        use swarm_engine::{
+            AgentLaunchError as A, MissionDispatchCause as C, MissionDispatchPreparationEffect as P,
+            MissionDispatchQueueEffect as Q, MissionWorkerDispatchFailure as F,
+        };
+        let request = swarm_engine::MissionWorkerDispatchRequest {
+            schema_version: 1, event_id: "event".into(), expected_revision: 7,
+        };
+        let clean = || F {
+            phase: "resource-preview",
+            queue: Q::Committed(swarm_engine::MissionQueueRegistration {
+                work: "work".into(), revision: 7, ready: vec!["task".into()],
+                refused: vec![], permission_refusal: None,
+            }),
+            preparation: P::PreviewAttempted { event_id: "event".into(), task_id: "task".into() },
+            resources: vec![],
+            cause: C::Root(Box::new(super::RootError::Launch(Box::new(A::Refused("revision_conflict"))))),
+        };
+        assert!(super::stale_dispatch_preview(&clean(), "work", &request));
+        assert!(!super::stale_dispatch_preview(&clean(), "another-work", &request));
+        let mut error = clean();
+        error.queue = Q::OutcomeUnknown;
+        assert!(!super::stale_dispatch_preview(&error, "work", &request));
+        let mut error = clean();
+        error.preparation = P::AdmissionAttempted { event_id: "event".into(), task_id: "task".into() };
+        assert!(!super::stale_dispatch_preview(&error, "work", &request));
     }
     /// A real local channel carries controller shutdown without inventing an OS
     /// signal. Valid idle/stop precedes disconnected-owner refusal and recovery.

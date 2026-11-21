@@ -174,6 +174,42 @@ After the single team authorization, open management. Only eligible missions may
 start; dependency, budget, pause and workspace checks still apply. Review the
 provider, directory, concurrency and limits before any manual start.
 
+The engine refuses an automatic start if the project lacks a valid organization
+with a root planner and an independent reviewer. It refuses before recording
+start consent.
+
+### Attach a team to existing work
+
+For ordinary work with no start consent or active execution,
+`swarm-rust planning attach ID --root ROOT --input CONFIG.json --json` attaches a
+team while retaining the existing Work. Supply the expected revision, planner and
+reviewer provider, planning budgets, and `task_scopes` mapping every existing task
+to a branch planner. Each task needs existing criteria and an authorized
+validation policy. Human and automatic policies can coexist. Each saved policy
+covers the identical criteria assigned to its child task while that task remains
+in the plan. Supply `checks` for root and other uncovered requirements. Future
+tasks may inherit these explicit controls under the planning rules. Attachment preserves dependencies, statuses, attempts and
+results. Missing assignments or active execution reject the entire change.
+
+The optional `task_workspaces` map selects existing directories within the
+project. Distinct workspaces let the conductor progress independent branches
+subject to dependencies, current authorizations and available slots.
+For a managed repository, supply `repository` with a local path and
+`committed_only: true`. Swarm pins the existing commit. It refuses custom
+workspaces or a request to include uncommitted modifications with this option.
+Per-attempt copies are prepared at launch.
+A verifiable failed or interrupted native worker completion is delivered to
+the newly assigned scope. The historical attempt and task state stay intact.
+This evidence handoff grants no retry.
+The cockpit reads ordinary attempts that ended before attachment from their
+native receipts, including zero-exit attempts. The task retains its state and
+requires its configured validation. Missing or inconsistent historical
+evidence leaves operational status unavailable.
+Attachment records no start consent. Start and validation use their usual
+operations. If the revision changes during launch preview, the conductor rereads
+the Work on its next cycle once the engine confirms that no admission was
+attempted. The previously synchronized queue is retained.
+
 Slots set an upper bound on concurrent attempts. Unvalidated dependencies or an
 occupied directory can reduce actual concurrency. **Start all** starts tasks ready
 now; use the mission with an observed driver for ongoing automatic progression.
@@ -225,6 +261,19 @@ optional; without it, not all raw provider output is retained.
 ### Read the graph and inspect a task
 
 Arrows point from the prerequisite to the dependent task. These tasks have not started; they do not demonstrate accepted results.
+
+In the native cockpit, **Orchestration** displays the observed driver and
+the configured independent reviewer. **Team and scopes** expands the root
+planner, subplanners and their assigned tasks. Sibling scopes appear as
+separate branches. Task arrows retain their prerequisite meaning. The task
+list within a scope and the card's accessible label show the current reason
+supplied by the engine. The list displays configured checks and recorded
+receipt verdicts separately. History mode shows the recorded team and leaves
+operational status unavailable. The graph reports when a team is unattached.
+
+In the CLI, `swarm-rust planning graph ID --root ROOT --json` shows the scopes
+and their parents, the reviewer, prerequisites, and check IDs. A missing
+conductor observation stays `null`. This read-only command records no launch consent.
 
 Use **Edit dependencies** to open the draft inside the product graph. Choose
 add or remove, then activate the prerequisite and dependent task with the mouse,

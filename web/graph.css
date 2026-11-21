@@ -90,6 +90,24 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-studio .graph-noeud { cursor:default; }
 .native-graph-studio output { align-self:center; min-width:4em; text-align:center; }
 .native-graph-studio .pilot-actions { flex-wrap:wrap; }
+.native-graph-orchestration {
+  border:1px solid var(--wattson-ligne);
+  border-radius:10px;
+  background:var(--wattson-carte);
+  color:var(--wattson-texte);
+  padding:10px 14px;
+  margin-block-end:10px;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.native-graph-orchestration h3,.native-graph-orchestration p { margin:0 0 6px; }
+.native-graph-orchestration summary { cursor:pointer; color:var(--wattson-lien); padding:6px 0; }
+.native-graph-orchestration summary:focus-visible { outline:2px solid var(--wattson-lien); outline-offset:2px; }
+.native-graph-orchestration ul { margin:4px 0; padding-inline-start:16px; list-style:none; }
+.native-graph-orchestration li { padding-inline-start:10px; margin-block:4px; }
+.native-graph-orchestration li[data-scope] { border-inline-start:2px solid var(--wattson-ligne); }
+.native-graph-orchestration li[data-scope] > strong { color:var(--wattson-titre); }
+.native-graph-orchestration [data-orchestration-tree] > ul { padding-inline-start:0; }
 .native-graph-search { display:flex; flex-wrap:wrap; align-items:center; gap:8px; flex-basis:100%; min-width:0; }
 .native-graph-search label,.native-graph-search output { flex-basis:100%; min-width:0; overflow-wrap:anywhere; }
 .native-graph-search input { flex:1 1 160px; width:100%; min-width:0; }

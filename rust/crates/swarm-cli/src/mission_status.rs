@@ -47,7 +47,7 @@ struct NativeStatus {
 
 /// Preserve the native state vocabulary without mapping a present lease to a
 /// live process or an active automatic mission. Unknown legacy stays unverified.
-fn supervision_state(state: MissionSupervisionState) -> &'static str {
+pub(super) fn supervision_state(state: MissionSupervisionState) -> &'static str {
     match state {
         MissionSupervisionState::LegacyUnverified => "legacy_unverified",
         MissionSupervisionState::Stopped => "stopped",

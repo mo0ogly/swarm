@@ -77,8 +77,9 @@ fn configured_reviewer(planning: &PlanningState) -> Option<&ReviewerConfig> {
 }
 /// Validate hierarchical structural prerequisites on supplied Work data without IO.
 /// Requires planning, independent-review metadata even with declared human review,
-/// valid state/root/parents, planner provider, requirement controls or declared human
-/// review, task scope ownership and explicitly authorized covered validation.
+/// valid state/root/parents, planner provider and authorized validation. Existing
+/// child tasks can cover exact assigned criteria. Other requirements need saved
+/// controls or separately declared human review. No authority passes to new tasks.
 /// Returns typed original state/coverage errors or a safe missing boundary. Does
 /// not mutate, authenticate declarations, verify external review/controls/provider
 /// digests/cooldowns, inspect budget/capacity or authorize a launch/acceptance. A
@@ -100,24 +101,13 @@ pub fn validate_mission_organization(work: &Work) -> Result<(), MissionOrganizat
     if p.provider.is_empty() {
         return Err(E::Structure("organization-planner-missing"));
     }
-    if p.human_review_authorized.is_empty() {
-        for i in 0..work.criteria.as_ref().map_or(0, Vec::len) {
-            let key = format!("req-{}", i + 1);
-            if p.checks
-                .as_ref()
-                .and_then(|m| m.get(&key))
-                .and_then(Option::as_ref)
-                .is_none_or(Vec::is_empty)
-            {
-                return Err(E::Structure("organization-requirement-controls-missing"));
-            }
-        }
-    }
     for scope in scopes {
         if scope.id != "root" && !scopes.iter().any(|s| s.id == scope.parent) {
             return Err(E::Structure("organization-parent-missing"));
         }
     }
+    let mut covered = std::collections::BTreeSet::new();
+    let criteria = work.criteria.as_deref().unwrap_or_default();
     for task in work.tasks.iter().flatten() {
         if !scopes.iter().any(|s| s.id == task.scope_id) {
             return Err(E::Structure("organization-task-scope-missing"));
@@ -130,6 +120,40 @@ pub fn validate_mission_organization(work: &Work) -> Result<(), MissionOrganizat
             })
             .ok_or(E::Structure("organization-task-validation-unauthorized"))?;
         crate::validation_policy_covers_task(policy, task).map_err(|e| E::Coverage(Box::new(e)))?;
+        let requirements = task.requirements.as_deref().unwrap_or_default();
+        let task_criteria = task.criteria.as_deref().unwrap_or_default();
+        // Only the exact criteria of an already authorized child task can
+        // satisfy its assigned requirements. Root criteria retain their own
+        // controls and this observation never authorizes a future task.
+        if task.scope_id != "root"
+            && task.status != "abandoned"
+            && requirements.len() == task_criteria.len()
+        {
+            for (requirement, text) in requirements.iter().zip(task_criteria) {
+                let criterion = requirement
+                    .strip_prefix("req-")
+                    .and_then(|n| n.parse::<usize>().ok())
+                    .and_then(|n| n.checked_sub(1))
+                    .and_then(|index| criteria.get(index));
+                if criterion == Some(text) {
+                    covered.insert(requirement.as_str());
+                }
+            }
+        }
+    }
+    if p.human_review_authorized.is_empty() {
+        for i in 0..criteria.len() {
+            let key = format!("req-{}", i + 1);
+            if !covered.contains(key.as_str())
+                && p.checks
+                    .as_ref()
+                    .and_then(|m| m.get(&key))
+                    .and_then(Option::as_ref)
+                    .is_none_or(Vec::is_empty)
+            {
+                return Err(E::Structure("organization-requirement-controls-missing"));
+            }
+        }
     }
     Ok(())
 }

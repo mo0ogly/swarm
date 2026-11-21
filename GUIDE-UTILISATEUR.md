@@ -205,6 +205,46 @@ Après **Relire et autoriser le démarrage**, ouvrez le pilotage et utilisez
 **Lancer la mission**. Relisez le fournisseur, le dossier, les créneaux et les
 limites avant confirmation. L’autorisation du plan et le lancement sont deux étapes.
 
+Le moteur refuse le départ automatique si le projet ne dispose pas d’une
+organisation valide avec un orchestrateur racine et un réviseur indépendant.
+Ce refus précède l’enregistrement du consentement au départ.
+
+### Rattacher une équipe à un projet existant
+
+Sur un travail ordinaire sans départ autorisé ni activité en cours, la commande
+`swarm-rust planning attach ID --root ROOT --input CONFIG.json --json` rattache
+l’équipe sans créer une mission. Le document indique la révision attendue, le
+fournisseur du planificateur et du réviseur, les budgets de planification et
+`task_scopes`, qui affecte chaque tâche existante à un sous-planificateur.
+Chaque tâche doit déjà avoir une politique de validation autorisée et des critères.
+Les politiques humaines et automatiques peuvent coexister. La politique
+existante couvre les critères identiques affectés à une tâche enfant qui reste
+dans le plan. Fournir dans `checks` les contrôles des exigences racines et des
+autres exigences sans couverture. Une future tâche peut hériter de ces contrôles
+explicites selon les règles de planification.
+L’opération conserve les dépendances, statuts, tentatives et résultats existants.
+Une liste incomplète ou une activité en cours refuse toute l’écriture.
+
+Le champ facultatif `task_workspaces` associe des tâches à des répertoires
+existants dans le projet. Des espaces distincts permettent au conducteur de faire
+avancer des branches indépendantes selon leurs dépendances, leurs autorisations et
+les créneaux disponibles. Le rattachement n’enregistre aucun consentement au départ.
+Pour un dépôt géré, fournissez `repository` avec un chemin local et
+`committed_only: true`. Swarm épingle le commit existant et refuse la
+combinaison avec des espaces personnalisés ou une demande d’inclure des
+modifications hors commit. Les copies par tentative sont préparées au départ.
+Une fin native échouée ou interrompue et vérifiable est remise au périmètre
+rattaché. Le superviseur reçoit l’original attribué. La tentative historique
+et le statut de la tâche sont conservés. Cette remise n’autorise aucune relance.
+Le cockpit lit les tentatives ordinaires terminées avant rattachement depuis
+leur reçu natif, y compris une sortie de code zéro. La tâche conserve son état
+et reste soumise à sa validation. Une preuve historique absente ou incohérente
+laisse l’état opérationnel indisponible.
+Le lancement et la validation utilisent ensuite les commandes habituelles.
+Si la révision change pendant un aperçu de départ, le conducteur relit le
+projet au cycle suivant lorsque le moteur confirme qu’aucune admission n’a été
+tentée. La file déjà synchronisée est conservée.
+
 Le nombre de créneaux fixe un maximum de tentatives simultanées. Des dépendances
 non validées ou un dossier déjà occupé peuvent réduire le parallélisme réel.
 **Lancer tout** démarre les tâches prêtes à cet instant ; pour un enchaînement
@@ -245,6 +285,20 @@ filtres et sélection ne changent pas la révision métier.
   Elles tiennent compte du verdict du moteur et de la fraîcheur des preuves.
 - Les liens de responsabilité relient les rôles à leurs périmètres. Ne déduisez
   pas le sens d’un lien de sa seule couleur ou de son seul style : lisez sa légende.
+- Dans le cockpit natif, **Orchestration** distingue l’observation du conducteur
+  de la configuration du validateur indépendant. **Équipe et périmètres**
+  développe l’arbre du planificateur racine, les sous-planificateurs et leurs
+  tâches rattachées. Les sous-planificateurs de même niveau restent des branches
+  distinctes. Les flèches de tâches continuent d’indiquer leurs prérequis. La
+  raison courante fournie par le moteur figure dans les tâches rattachées et le
+  libellé des cartes. Les contrôles configurés et les verdicts du reçu
+  enregistré sont affichés séparément. En lecture historique, le détail opérationnel est
+  indisponible. Si l’équipe n’est pas rattachée, le graphe l’indique.
+
+En CLI, `swarm-rust planning graph ID --root ROOT --json` expose les
+périmètres et parents, le validateur, les prérequis et les identifiants des
+contrôles. Une observation absente du conducteur est représentée par `null`.
+Cette commande de lecture ne donne aucun consentement au départ.
 - **Horizontale / Verticale** change l’orientation, **Simplifiées / Détaillées**
   change les informations visibles. Aucun de ces réglages ne réordonne le travail.
 - **+ / −** replie ou déplie une branche. Cela ne supprime aucune tâche.
