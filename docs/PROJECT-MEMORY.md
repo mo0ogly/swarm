@@ -444,8 +444,10 @@ flowchart LR
 
 ## Sélection extractive pour un lancement explicite
 
-Un premier lancement manuel automatisé d'un worker hors mission hiérarchique
-peut porter `summary_selection`. Ce choix comporte schéma 1, empreinte du paquet
+Le premier lancement manuel d’un worker dans une équipe configurée peut porter
+`summary_selection`. Chaque dialogue choisi doit appartenir à la branche de la
+tâche. Un dialogue d’une autre branche est refusé lors de la lecture des sources,
+de l’admission et du contrôle avant départ. Ce choix comporte schéma 1, empreinte du paquet
 M18, références de dialogues, frontière, annotations protégées et motif. Le
 moteur reconstruit les citations depuis les textes persistés ; il n'accepte ni
 paraphrase libre ni reçu Python comme autorité. L'instantané opérateur complet

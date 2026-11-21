@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Mémoire : le premier lancement manuel dans une équipe configurée peut inclure un résumé extractif des dialogues de sa branche.",
+        "en": "Memory: the first manual launch in a configured team can include an extractive summary of dialogues from its own scope."
+      },
+      {
         "fr": "Orchestration : canevas du travail avec orchestrateur principal dès la création, hiérarchie des sous-orchestrateurs et équipe configurée obligatoire pour tout lancement manuel.",
         "en": "Orchestration: the Work canvas opens with its principal orchestrator, shows the sub-orchestrator hierarchy, and requires a configured team for manual launches."
       },

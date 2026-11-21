@@ -74,6 +74,8 @@ jobs:
           print('SWARM_RUNNER_TMPDIR=' + str(d))
           PYEOF
       - run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked --workspace --lib
+      - name: Check configured worker admission and extractive summary scope
+        run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-engine --test agent_launch
       - run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-cli --test version_no_repository
       - run: npm test
       - run: make smoke

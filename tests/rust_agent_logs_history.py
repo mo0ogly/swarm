@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exercise historical agent logs on a qualified native binary and owned roots.
 
-Only public prepare/run writes SQLite. A local inert provider executes once. Exact lifecycle logs are the public
+Public setup attaches the team, then public prepare/run records the native history. A local inert provider executes once. Exact lifecycle logs are the public
 fixture; the SQL unit tests separately cover the 200-row boundary. Read-only SQL is an independent
 oracle. Every public read/refusal must preserve typed and physical database bytes.
 No paid provider, global watchdog, live mission, acceptance or automatic retry.
@@ -19,7 +19,7 @@ def exercise(binary,output):
     an intentional separate filesystem effect; DB purity never claims rollback
     of a partly written output. Failures propagate with original artifacts.
     """
-    owned=fixture.Fixture(binary,output,'logs')
+    owned=fixture.configured_fixture(binary,output,'logs')
     driver=shared.Driver(binary,None,output,owned.root,None,owned.environment)
     driver.work=owned.work
     prepared=owned.prepare()

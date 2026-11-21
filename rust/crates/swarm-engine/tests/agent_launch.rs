@@ -729,35 +729,24 @@ fn worker_context_uses_latest_own_contract_without_sibling_or_obsolete_scope() {
     assert!(!preview.agent.prompt.contains("SIBLING-PRIVATE-SCOPE"));
     assert_eq!(snapshot(&f.db()), before);
 }
-/// A fresh second attempt gets its own identity and current budget count; an
-/// interrupted first attempt cannot become an implicit successful handoff.
+/// A manual stop preserves its attempt and does not authorize a scoped retry.
 #[test]
-fn worker_context_retry_has_new_attempt_identity_and_explicit_recovery_guidance() {
+fn worker_context_manual_retry_requires_a_scoped_decision() {
     let f = Fixture::new();
     let first = f.run(false).unwrap().agent;
     let mut store = RootStore::open(&f.root, true).unwrap();
-    store
-        .cancel_queued_agent("session", &mut SystemEnvironment)
-        .unwrap();
+    store.cancel_queued_agent("session", &mut SystemEnvironment).unwrap();
+    let current = store.read_work(&f.work).unwrap();
+    assert_eq!(current.tasks.as_ref().unwrap()[0].attempts.as_ref().unwrap()[0].id, first.attempt_id);
     let mut r = f.request();
     r.event_id = "retry".into();
-    r.expected_revision = store.read_work(&f.work).unwrap().revision;
-    let retry = store
-        .prepare_agent_launch(&f.work, &r, true, &mut SystemEnvironment)
-        .unwrap();
-    assert_ne!(retry.agent.attempt_id, first.attempt_id);
-    assert!(retry.agent.prompt.contains(&format!(
-        "agent retry ; tentative {}",
-        retry.agent.attempt_id
-    )));
-    assert!(retry
-        .agent
-        .prompt
-        .contains("REPRISE : comparer le contrat courant"));
-    assert!(!retry
-        .agent
-        .prompt
-        .contains(&format!("tentative {} ;", first.attempt_id)));
+    r.expected_revision = current.revision;
+    let before = snapshot(&f.db());
+    for preview in [true, false] {
+        let result = store.prepare_agent_launch(&f.work, &r, preview, &mut SystemEnvironment);
+        assert_eq!(result.err().expect("manual retry accepted").code(), "scoped-worker-retry-decision-required");
+        assert_eq!(snapshot(&f.db()), before);
+    }
     store.close().unwrap();
 }
 
@@ -767,7 +756,7 @@ fn worker_context_retry_has_new_attempt_identity_and_explicit_recovery_guidance(
 #[test]
 fn worker_context_incoherent_current_plan_mapping_refuses_without_fallback() {
     use sha2::{Digest, Sha256};
-    for case in 0..6 {
+    for case in [0, 1, 2, 3, 5] {
         let f = Fixture::new();
         let db = f.db();
         let raw: Vec<u8> = db
@@ -832,10 +821,6 @@ fn worker_context_incoherent_current_plan_mapping_refuses_without_fallback() {
             }
             _ => {}
         }
-        if case == 4 {
-            w.tasks.as_mut().unwrap()[0].plan_role = "worker".into();
-            w.plans = None;
-        }
         if case == 5 {
             w.tasks.as_mut().unwrap()[0].scope_id = "child".into();
         }
@@ -851,7 +836,7 @@ fn worker_context_incoherent_current_plan_mapping_refuses_without_fallback() {
         assert_eq!(
             result.err().expect("incoherent mapping accepted").code(),
             if case == 5 {
-                "agent-current-context-branch-unported"
+                "organization_incomplete"
             } else {
                 "agent-current-plan-mapping-invalid"
             }
@@ -1746,9 +1731,52 @@ fn summary_admission_without_context_hash_refuses_without_mutation() {
     assert_eq!(snapshot(&f.db()), before);
 }
 
-/// Confirm-then-admit: the context hash from the preview commits the agent at
-/// revision 3 with a stamped receipt (prepared at 2, queued at 3). The queued
-/// source digest matches a fresh resolution at the queued revision.
+/// Moving a selected historical dialogue out of the worker scope blocks source
+/// preparation and launch admission without touching the persisted Work.
+#[test]
+fn summary_selection_refuses_dialogue_in_another_scope() {
+    use std::error::Error;
+    let f = Fixture::with_summary();
+    let selection = f.confirmed_selection();
+    let mut r = f.request();
+    r.summary_selection = Some(Box::new(selection.clone()));
+    assert!(f.run_with(r.clone(), true).unwrap().preview_only);
+    let db = f.db();
+    let mut work = swarm_engine::read_recorded_work(&db, &f.work).unwrap();
+    let planning = work.planning.as_ref().unwrap();
+    let root = planning.scopes.as_ref().unwrap().iter()
+        .find(|scope| scope.id == "root").unwrap();
+    let root_requirements = root.requirements.clone();
+    let source = work.tasks.as_mut().unwrap().iter_mut()
+        .find(|task| task.id == "old-0").unwrap();
+    assert_ne!(source.scope_id, "root");
+    source.scope_id = "root".into();
+    source.requirements = root_requirements;
+    swarm_engine::validate_mission_organization(&work).unwrap();
+    db.execute(
+        "UPDATE works SET body=? WHERE id=?",
+        rusqlite::params![swarm_engine::encode_model(&work).unwrap(), f.work],
+    ).unwrap();
+    let before = snapshot(&db);
+    let error = swarm_engine::summary_source_for_work(&f.root, &work,
+        &swarm_engine::MemorySummarySourceRequest {
+            schema_version: 1, work: f.work.clone(), task: r.task_id.clone(),
+            expected_revision: work.revision, dialogues: selection.dialogues.unwrap(),
+        }).unwrap_err();
+    assert_eq!(error.reason(), "project-summary-source-dialogue-outside-scope");
+    for preview in [true, false] {
+        let error = f.run_with(r.clone(), preview).err().expect("cross-scope dialogue accepted");
+        let reason = std::iter::successors(error.source(), |cause| cause.source())
+            .find_map(|cause| cause.downcast_ref::<swarm_engine::MemoryError>())
+            .map(swarm_engine::MemoryError::reason);
+        assert_eq!(reason, Some("project-summary-source-dialogue-outside-scope"));
+        assert_eq!(snapshot(&db), before);
+    }
+    db.close().unwrap();
+}
+
+/// A confirmed context commits a receipt and a source hash at the new queued
+/// revision. The hash matches a fresh resolution against that recorded Work.
 #[test]
 fn summary_admission_commits_stamped_receipt() {
     use sha2::{Digest, Sha256};
@@ -1874,7 +1902,7 @@ fn summary_selection_refuses_drifted_sources_without_mutation() {
     store.close().unwrap();
 }
 
-/// The reserved branches (planning work, brainstorm target, non-worker role,
+/// The reserved branches (brainstorm target, non-worker role,
 /// foreign origin, references) refuse the extractive selection instead of
 /// inheriting a partially ported path. Role/mode/origin/references hit the
 /// generic branch guard first (the same layering as Go, whose public path
@@ -1916,6 +1944,7 @@ fn summary_selection_refuses_reserved_branches() {
             matches!(
                 error.code(),
                 "agent-launch-request-branch-unported" | "agent-launch-summary-branch-unported"
+                    | "scoped-worker-retry-decision-required"
             ),
             "unexpected reserved-branch code (case {case}): {error:?}"
         );

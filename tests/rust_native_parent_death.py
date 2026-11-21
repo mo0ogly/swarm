@@ -1,28 +1,25 @@
 #!/usr/bin/env python3
 """Observe actual owned provider fate after abrupt native supervisor death.
 
-Linux subreaper/pidfd/socket credentials prove child ownership and reap it without
+Linux subreaper, pidfds and recorded process identity prove child ownership and reap it without
 arbitrary test timeouts. Only inactive fixture Roots and inert Python providers
 are used. This is leader lifetime, not descendant confinement or crash settlement.
 """
-import argparse,ctypes,json,os,selectors,signal,socket,struct,subprocess,time,traceback
+import argparse,ctypes,json,os,selectors,signal,subprocess,traceback
 from pathlib import Path
 import rust_agent_model_route as fixture
 
 PROGRAM=fixture.PROGRAM+r'''
-import ctypes,socket
+import ctypes
 libc=ctypes.CDLL(None,use_errno=True)
 def observation():
     value=ctypes.c_int()
     if libc.prctl(2,ctypes.byref(value),0,0,0)!=0:raise OSError(ctypes.get_errno(),'fixture PR_GET_PDEATHSIG')
     return dict(pid=os.getpid(),ppid=os.getppid(),parent_death_signal=value.value)
-with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as control:
-    control.connect('parent-death.sock')
-    control.sendall((json.dumps(observation())+'\n').encode())
-    while True:
-        command=control.recv(1)
-        if command==b'Q':control.sendall((json.dumps(observation())+'\n').encode())
-        else:break
+with open('parent-death.command','rb',buffering=0) as commands, open('parent-death.marker','wb',buffering=0) as markers:
+    markers.write((json.dumps(observation())+'\n').encode())
+    while commands.read(1)==b'Q':
+        markers.write((json.dumps(observation())+'\n').encode())
 '''
 
 
@@ -38,14 +35,14 @@ def subreaper(value=None):
     return old.value
 
 
-def frame(connection):
+def frame(markers):
     """Read one bounded-by-fixture complete control frame; EOF is explicit None.
 
-    No temporal watchdog or provider authority is inferred from the socket text.
+    No temporal watchdog or provider authority is inferred from the FIFO data.
     """
     data=bytearray()
     while True:
-        byte=connection.recv(1)
+        byte=markers.read(1)
         if not byte:
             if not data:return None
             raise AssertionError('Partial fixture control frame')
@@ -56,39 +53,50 @@ def frame(connection):
 def run(binary,out,label,kill_owner):
     """Run healthy/owner-loss variants under identical persisted launch policy.
 
-    Kernel peer credentials and stored child/supervisor IDs correlate before any
+    The owned workspace FIFO observation and stored child/supervisor IDs correlate before any
     owned signal. Reap/close errors join original failures. No private SQL write,
     consumption reset, acceptance, provider/model account or live Root is used.
     """
-    owned=fixture.Fixture(binary,out,label);fixture.publish(owned.root/'codex',PROGRAM.encode());os.chmod(owned.root/'codex',0o700)
-    listener=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM);connection=None;selector=selectors.DefaultSelector();owner_fd=None;child_fd=None;process=None;child=None;child_reaped=False;owner_lost=False;primary=None;result=None
+    owned=fixture.configured_fixture(binary,out,label);fixture.publish(owned.root/'codex',PROGRAM.encode());os.chmod(owned.root/'codex',0o700)
+    markers=None;commands=None;marker_keeper=None;command_keeper=None
+    selector=selectors.DefaultSelector();owner_fd=None;child_fd=None;process=None;child=None;child_reaped=False;owner_lost=False;primary=None;result=None
     stdout=(out/(label+'-run.stdout')).open('xb');stderr=(out/(label+'-run.stderr')).open('xb')
     try:
-        listener.bind(str(owned.root/'parent-death.sock'));os.chmod(owned.root/'parent-death.sock',0o600);listener.listen(1);listener.setblocking(False);prepared=owned.prepare();money=owned.reservation()
-        argv=[str(binary),'agent','run','session','--root',str(owned.root),'--json'];process=subprocess.Popen(argv,env=owned.environment,stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr);owner_fd=os.pidfd_open(process.pid);selector.register(owner_fd,selectors.EVENT_READ,'owner');selector.register(listener,selectors.EVENT_READ,'provider')
+        marker_path=owned.workspace/'parent-death.marker'
+        command_path=owned.workspace/'parent-death.command'
+        os.mkfifo(marker_path,0o600);os.mkfifo(command_path,0o600)
+        markers=os.fdopen(os.open(marker_path,os.O_RDONLY|os.O_NONBLOCK),'rb',buffering=0)
+        marker_keeper=os.fdopen(os.open(marker_path,os.O_WRONLY|os.O_NONBLOCK),'wb',buffering=0)
+        command_keeper=os.fdopen(os.open(command_path,os.O_RDWR|os.O_NONBLOCK),'wb',buffering=0)
+        commands=open(command_path,'wb',buffering=0)
+        prepared=owned.prepare();money=owned.reservation()
+        argv=[str(binary),'agent','run','session','--root',str(owned.root),'--json'];process=subprocess.Popen(argv,env=owned.environment,stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr);owner_fd=os.pidfd_open(process.pid);selector.register(owner_fd,selectors.EVENT_READ,'owner');selector.register(markers,selectors.EVENT_READ,'provider')
         fixture.publish(out/(label+'-owner.json'),dict(argv=argv,pid=process.pid,root=str(owned.root),global_watchdog=None,kill_owner=kill_owner))
-        while connection is None:
-            events=selector.select()
-            if any(key.data=='owner' for key,_ in events):raise AssertionError('Owned CLI exited before fixture handshake')
-            connection,_=listener.accept()
-        selector.unregister(listener);peer,uid,_=struct.unpack('3i',connection.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12));assert uid==os.getuid();first=frame(connection);assert first and first['pid']==peer and first['ppid']==process.pid;child=peer;child_fd=os.pidfd_open(child)
-        agent=owned.ok(['agent','show','session'])['agent'];assert agent['child_pid']==peer and agent['supervisor_pid']==process.pid;assert json.loads((owned.root/'model-received.json').read_bytes())['stdin_sha256']==fixture.digest(prepared['agent']['prompt'].encode())
+        ready=selector.select()
+        assert any(key.data=='provider' for key,_ in ready),'Owned CLI exited before fixture handshake'
+        os.set_blocking(markers.fileno(),True)
+        first=frame(markers);assert first and first['ppid']==process.pid
+        marker_keeper.close();command_keeper.close()
+        agent=owned.ok(['agent','show','session'])['agent']
+        child=first['pid'];assert agent['child_pid']==child and agent['supervisor_pid']==process.pid
+        child_fd=os.pidfd_open(child)
+        assert json.loads((owned.workspace/'model-received.json').read_bytes())['stdin_sha256']==fixture.digest(prepared['agent']['prompt'].encode())
         if not kill_owner:
-            connection.sendall(b'X');connection.close();connection=None;code=process.wait();stdout.flush();stderr.flush();assert code==0,(out/(label+'-run.stderr')).read_text();wire=json.loads((out/(label+'-run.stdout')).read_bytes());assert wire['task_accepted'] is False;result=dict(healthy_completed=True,first=first,provider_started=True)
+            commands.write(b'X');commands.close();code=process.wait();stdout.flush();stderr.flush();assert code==0,(out/(label+'-run.stderr')).read_text();wire=json.loads((out/(label+'-run.stdout')).read_bytes());assert wire['task_accepted'] is False;result=dict(healthy_completed=True,first=first,provider_started=True)
         else:
             process.kill();assert process.wait()==-signal.SIGKILL;owner_lost=True
             # The owner is confirmed reaped before the query. A live reply proves
             # continuing provider execution, not merely a stale PID observation.
             transport=[]
-            try:connection.sendall(b'Q')
+            try:commands.write(b'Q')
             except BrokenPipeError as error:transport.append(dict(operation='query-write',errno=error.errno))
-            try:reply=frame(connection)
+            try:reply=frame(markers)
             except ConnectionResetError as error:transport.append(dict(operation='query-read',errno=error.errno));reply=None
             # Transport disappearance alone is never PASS; waitpid below must
             # still prove this actual reparented child died with SIGKILL.
             survived=reply is not None
-            if survived:assert reply['pid']==peer and reply['ppid']==os.getpid();connection.sendall(b'X')
-            connection.close();connection=None
+            if survived:assert reply['pid']==child and reply['ppid']==os.getpid();commands.write(b'X')
+            commands.close()
             waited,status=os.waitpid(child,0);assert waited==child;child_reaped=True
             assert owned.reservation()==money
             after=owned.ok(['agent','show','session'])['agent'];assert after['status'] in ('running','starting') and not after.get('native_execution_result') and not after.get('ended')
@@ -96,7 +104,7 @@ def run(binary,out,label,kill_owner):
         fixture.publish(out/(label+'-observation.json'),result)
     except BaseException as error:primary=error
     cleanup=[]
-    for close in [lambda:connection.close() if connection is not None else None,listener.close,selector.close]:
+    for close in [selector.close,*[f.close for f in (commands, markers, command_keeper, marker_keeper) if f is not None]]:
         try:close()
         except BaseException as error:cleanup.append(error)
     if process is not None and process.poll() is None:
