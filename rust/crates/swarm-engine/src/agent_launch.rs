@@ -166,10 +166,10 @@ pub(crate) fn supported_branch(r:&Launch,conductor:Option<&str>)->Result<(),Agen
 /// branches remain unsupported. This
 /// grants no automatic dispatch, parent delegation or task acceptance.
 pub(crate) fn supported_work(w: &Work, index: usize) -> Result<(), AgentLaunchError> {
-    crate::validate_mission_organization(w)
-        .map_err(|error| AgentLaunchError::caused(error.reason(), error))?;
     let planning = w.planning.as_deref()
         .ok_or(AgentLaunchError::Refused("organization-planning-missing"))?;
+    crate::validate_mission_organization(w)
+        .map_err(|error| AgentLaunchError::caused(error.code(), error))?;
     crate::validate_mission_reviewer_capacity(planning)
         .map_err(|error| AgentLaunchError::caused(error.code(), error))?;
     let task = w.tasks.as_deref().and_then(|tasks| tasks.get(index))

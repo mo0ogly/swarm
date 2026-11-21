@@ -177,6 +177,9 @@ class Fixture:
             provider='fixture', level='standard', max_activations=1, max_review_calls=1,
             max_tasks=1, max_decisions=1, task_scopes={'task': 'worker-scope'},
             task_workspaces={'task': str(self.workspace)},
+            checks={'req-1': [dict(id='fixture-provider-ready',
+                command=['/usr/bin/test', '-x', str(self.root / 'codex')],
+                justification='Check the owned test provider is executable')]},
         ))
         self.request['expected_revision'] = attached['revision']
         return attached

@@ -190,7 +190,10 @@ For ordinary work with no start consent or active execution,
 team while retaining the existing Work. Supply the expected revision, planner and
 reviewer provider, planning budgets, and `task_scopes` mapping every existing task
 to a branch planner. Each task needs existing criteria and an authorized
-validation policy. Attachment preserves dependencies, statuses, attempts and
+validation policy. Human and automatic policies can coexist. Each saved policy
+covers the identical criteria assigned to its child task while that task remains
+in the plan. Supply `checks` for root and other uncovered requirements. Future
+tasks may inherit these explicit controls under the planning rules. Attachment preserves dependencies, statuses, attempts and
 results. Missing assignments or active execution reject the entire change.
 
 The optional `task_workspaces` map selects existing directories within the
@@ -203,8 +206,10 @@ Per-attempt copies are prepared at launch.
 A verifiable failed or interrupted native worker completion is delivered to
 the newly assigned scope. The historical attempt and task state stay intact.
 This evidence handoff grants no retry.
-The cockpit reads the earlier ordinary attempt from its native receipt. Missing
-or inconsistent historical evidence leaves operational status unavailable.
+The cockpit reads ordinary attempts that ended before attachment from their
+native receipts, including zero-exit attempts. The task retains its state and
+requires its configured validation. Missing or inconsistent historical
+evidence leaves operational status unavailable.
 Attachment records no start consent. Start and validation use their usual
 operations. If the revision changes during launch preview, the conductor rereads
 the Work on its next cycle once the engine confirms that no admission was

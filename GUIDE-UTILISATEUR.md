@@ -223,6 +223,11 @@ l’équipe sans créer une mission. Le document indique la révision attendue, 
 fournisseur du planificateur et du réviseur, les budgets de planification et
 `task_scopes`, qui affecte chaque tâche existante à un sous-planificateur.
 Chaque tâche doit déjà avoir une politique de validation autorisée et des critères.
+Les politiques humaines et automatiques peuvent coexister. La politique
+existante couvre les critères identiques affectés à une tâche enfant qui reste
+dans le plan. Fournir dans `checks` les contrôles des exigences racines et des
+autres exigences sans couverture. Une future tâche peut hériter de ces contrôles
+explicites selon les règles de planification.
 L’opération conserve les dépendances, statuts, tentatives et résultats existants.
 Une liste incomplète ou une activité en cours refuse toute l’écriture.
 
@@ -237,8 +242,10 @@ modifications hors commit. Les copies par tentative sont préparées au départ.
 Une fin native échouée ou interrompue et vérifiable est remise au périmètre
 rattaché. Le superviseur reçoit l’original attribué. La tentative historique
 et le statut de la tâche sont conservés. Cette remise n’autorise aucune relance.
-Le cockpit lit cette tentative ordinaire depuis son reçu natif. Une preuve
-historique absente ou incohérente laisse l’état opérationnel indisponible.
+Le cockpit lit les tentatives ordinaires terminées avant rattachement depuis
+leur reçu natif, y compris une sortie de code zéro. La tâche conserve son état
+et reste soumise à sa validation. Une preuve historique absente ou incohérente
+laisse l’état opérationnel indisponible.
 Le lancement et la validation utilisent ensuite les commandes habituelles.
 Si la révision change pendant un aperçu de départ, le conducteur relit le
 projet au cycle suivant lorsque le moteur confirme qu’aucune admission n’a été

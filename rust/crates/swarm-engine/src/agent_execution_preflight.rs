@@ -476,7 +476,11 @@ mod tests {
         let input = serde_json::json!({
             "schema_version":1, "event_id":"team", "expected_revision":revision,
             "provider":"team-fixture", "level":"standard", "max_activations":2, "max_decisions":3,
-            "max_review_calls":2, "max_tasks":assignments.len(), "task_scopes":assignments
+            "max_review_calls":2, "max_tasks":assignments.len(), "task_scopes":assignments,
+            "checks":{"req-1":[{
+                "id":"fixture-planner-ready", "command":["/usr/bin/test", "-x", planner],
+                "justification":"Check executable setup of the owned fixture planner"
+            }]}
         });
         store.execute_external(work, "planning.attach", &serde_json::to_vec(&input).unwrap(),
             &mut crate::SystemEnvironment).unwrap().result.work.revision
