@@ -178,6 +178,24 @@ The engine refuses an automatic start if the project lacks a valid organization
 with a root planner and an independent reviewer. It refuses before recording
 start consent.
 
+### Attach a team to existing work
+
+For ordinary work with no start consent or active execution,
+`swarm-rust planning attach ID --root ROOT --input CONFIG.json --json` attaches a
+team while retaining the existing Work. Supply the expected revision, planner and
+reviewer provider, planning budgets, and `task_scopes` mapping every existing task
+to a branch planner. Each task needs existing criteria and an authorized
+validation policy. Attachment preserves dependencies, statuses, attempts and
+results. Missing assignments or active execution reject the entire change.
+
+The optional `task_workspaces` map selects existing directories within the
+project. Distinct workspaces let the conductor progress independent branches
+subject to dependencies, current authorizations and available slots.
+Attachment records no start consent. Start and validation use their usual
+operations. If the revision changes during launch preview, the conductor rereads
+the Work on its next cycle once the engine confirms that no admission was
+attempted. The previously synchronized queue is retained.
+
 Slots set an upper bound on concurrent attempts. Unvalidated dependencies or an
 occupied directory can reduce actual concurrency. **Start all** starts tasks ready
 now; use the mission with an observed driver for ongoing automatic progression.

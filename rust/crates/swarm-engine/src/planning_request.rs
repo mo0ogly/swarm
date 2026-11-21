@@ -99,6 +99,12 @@ pub(crate) fn shape_planning_operation() -> Fields {
 #[derive(Clone, Default, PartialEq, Deserialize, Serialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct PlanningRequest {
+    /// Complete assignment of existing task IDs to supervisor scope IDs for attach.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub task_scopes: Option<BTreeMap<String, String>>,
+    /// Optional existing task workspaces resolved by the Root at attachment.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub task_workspaces: Option<BTreeMap<String, String>>,
     // Go InstructionRevisionID, line 98
     #[serde(skip_serializing_if = "String::is_empty")]
     pub instruction_revision_id: String,
@@ -216,6 +222,8 @@ pub struct PlanningRequest {
 }
 pub(crate) fn shape_planning_request() -> Fields {
     &[
+        ("task_scopes", Kind::Map(&Kind::String)),
+        ("task_workspaces", Kind::Map(&Kind::String)),
         ("instruction_revision_id", Kind::String),
         ("missing_report", Kind::Bool),
         ("scope_files", Kind::Array(&Kind::String)),

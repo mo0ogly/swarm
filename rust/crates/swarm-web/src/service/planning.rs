@@ -33,6 +33,7 @@ fn query(raw: Option<&str>) -> Result<Query, E> {
 fn kind(action: Option<&str>) -> Result<&'static str, E> {
     match action {
         Some("enable") => Ok("planning.enable"),
+        Some("attach") => Ok("planning.attach"),
         Some("claim") => Ok("planning.claim"),
         Some("lease-renew") => Ok("planning.lease-renew"),
         Some("decide") => Ok("planning.decide"),
@@ -49,10 +50,11 @@ fn kind(action: Option<&str>) -> Result<&'static str, E> {
 /// particular Work or platform. Root still validates policy, ownership, schema
 /// and current state; no model launch or managed preview is promised.
 /// Allocation is proportional to this fixed protocol vocabulary, with no IO.
-pub(super) fn capabilities() -> [&'static str; 10] {
+pub(super) fn capabilities() -> [&'static str; 11] {
     [
         "show",
         "enable",
+        "attach",
         "claim",
         "lease-renew",
         "decide",

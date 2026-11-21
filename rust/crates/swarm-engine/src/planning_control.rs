@@ -50,6 +50,8 @@ pub enum PlanningControlAction {
     /// Hierarchy creation; public pure calls require local-only data. Root observes
     /// provider/reviewer metadata separately; repository remains unported.
     Enable,
+    /// Attach a hierarchy to all tasks of an existing ordinary Work.
+    Attach,
     /// Root-only operator scope claim; pure controls cannot establish source IO.
     Claim,
     /// Root-only leased acknowledgement and supported planning operations.
@@ -73,13 +75,14 @@ impl PlanningControlAction {
     pub(crate) fn requires_active_mission(self) -> bool {
         match self {
             Self::Claim | Self::Decide | Self::LeaseRenew | Self::Judge | Self::CycleRenew => true,
-            Self::Enable | Self::Pause | Self::Resume | Self::RejectInstructions => false,
+            Self::Enable | Self::Attach | Self::Pause | Self::Resume | Self::RejectInstructions => false,
         }
     }
     /// Select the exact supported recorded operation; unknown kinds remain unported.
     pub fn from_kind(kind: &str) -> Option<Self> {
         match kind {
             "planning.enable" => Some(Self::Enable),
+            "planning.attach" => Some(Self::Attach),
             "planning.claim" => Some(Self::Claim),
             "planning.decide" => Some(Self::Decide),
             "planning.lease-renew" => Some(Self::LeaseRenew),
@@ -98,6 +101,7 @@ pub enum PlanningControlError {
     Settings(crate::EngineSettingsError),
     State(crate::PlanningStateError),
     Policy(crate::ValidationPolicyError),
+    Organization(crate::MissionOrganizationError),
     ClockParse(swarm_wire_json::go_rfc3339::GoTimestampError),
     ClockFormat(time::error::Format),
     Allocation(std::collections::TryReserveError),
@@ -109,6 +113,7 @@ impl PlanningControlError {
             Self::Settings(e) => e.code(),
             Self::State(e) => e.code(),
             Self::Policy(e) => e.code(),
+            Self::Organization(e) => e.code(),
             Self::Refused(
                 "planning-enable-provider-unported" | "planning-enable-repository-unported",
             ) => "command_not_ported",
@@ -127,6 +132,7 @@ impl PlanningControlError {
             Self::Settings(e) => e.reason(),
             Self::State(e) => e.reason(),
             Self::Policy(e) => e.reason(),
+            Self::Organization(e) => e.code(),
             Self::ClockParse(_) | Self::ClockFormat(_) => "planning-control-timestamp",
             Self::Allocation(_) => "planning-control-buffer",
         }
@@ -149,6 +155,7 @@ impl Error for PlanningControlError {
             Self::Settings(e) => Some(e),
             Self::State(e) => Some(e),
             Self::Policy(e) => Some(e),
+            Self::Organization(e) => Some(e),
             Self::ClockParse(e) => Some(e),
             Self::ClockFormat(e) => Some(e),
             Self::Allocation(e) => Some(e),
@@ -173,6 +180,11 @@ pub(crate) fn validate_planning_control_action(
     request: &crate::PlanningRequest,
     action: PlanningControlAction,
 ) -> Result<(), PlanningControlError> {
+    if request.task_scopes.is_some() != (action == PlanningControlAction::Attach)
+        || (request.task_workspaces.is_some() && action != PlanningControlAction::Attach)
+    {
+        return Err(PlanningControlError::Refused("planning-task-scopes-not-applicable"));
+    }
     if action == PlanningControlAction::RejectInstructions {
         let mut envelope=request.clone();
         envelope.instruction_revision_id.clear();
@@ -180,7 +192,8 @@ pub(crate) fn validate_planning_control_action(
     }
     validate_control_fields(
         request,
-        action == PlanningControlAction::Enable && !request.provider.is_empty(),
+        matches!(action, PlanningControlAction::Enable | PlanningControlAction::Attach)
+            && !request.provider.is_empty(),
     )
 }
 /// Share the original strict checks; only the explicit action selects whether
@@ -251,6 +264,9 @@ pub(crate) fn apply_planning_control_prepared(
     validate_planning_control_action(request, action)?;
     if action == PlanningControlAction::Enable {
         return apply_local_planning_enable(work, request, at, settings, provider);
+    }
+    if action == PlanningControlAction::Attach {
+        return attach_planning(work, request, at, settings, provider);
     }
     let root_reason = match action {
         PlanningControlAction::Claim => Some("planning-claim-requires-root"),
@@ -400,6 +416,158 @@ pub(crate) fn validate_planning_enable_target(
     }
     if request.repository.is_some() {
         return Err(E::Refused("planning-enable-repository-unported"));
+    }
+    Ok(())
+}
+
+/// Check a complete, explicitly assigned existing graph before provider IO.
+/// The Root writer must also prove that workers, validations and reviews are idle
+/// in the same transaction. No task, attempt, authority or launch is created here.
+pub(crate) fn validate_planning_attach_target(
+    work: &crate::Work,
+    request: &crate::PlanningRequest,
+) -> Result<(), PlanningControlError> {
+    use PlanningControlError as E;
+    let assignments = request.task_scopes.as_ref()
+        .filter(|assignments| !assignments.is_empty())
+        .ok_or(E::Refused("planning-attach-task-scopes-required"))?;
+    let tasks = work.tasks.as_deref().unwrap_or_default();
+    if work.planning.is_some() || tasks.is_empty() || request.repository.is_some() {
+        return Err(E::Refused("planning-attach-ordinary-work-required"));
+    }
+    if request.provider.is_empty() {
+        return Err(E::Refused("planning-attach-provider-required"));
+    }
+    if assignments.len() != tasks.len()
+        || !usize::try_from(request.max_tasks).is_ok_and(|limit| tasks.len() <= limit)
+    {
+        return Err(E::Refused("planning-attach-task-coverage"));
+    }
+    if request.task_workspaces.iter().flat_map(|paths| paths.iter()).any(|(task, path)| {
+        !assignments.contains_key(task) || !crate::text::nonempty(path)
+    }) {
+        return Err(E::Refused("planning-attach-task-workspace-invalid"));
+    }
+    let mut seen = std::collections::BTreeSet::new();
+    for task in tasks {
+        let scope = assignments.get(&task.id)
+            .ok_or(E::Refused("planning-attach-task-coverage"))?;
+        if !seen.insert(&task.id) {
+            return Err(E::Refused("planning-attach-task-coverage"));
+        }
+        if scope == "root" || !swarm_identity_contract::name(scope.as_bytes()) {
+            return Err(E::Refused("planning-attach-child-scope-required"));
+        }
+        if !task.scope_id.is_empty()
+            || task.status == "running"
+            || task.attempts.iter().flatten().any(|attempt| attempt.ended.is_empty())
+            || task.independent_review.as_ref().is_some_and(|review| {
+                matches!(review.state.as_str(), "queued" | "running")
+            })
+        {
+            return Err(E::Refused("planning-attach-existing-task-ownership"));
+        }
+        let policy = task.validation_policy.as_deref()
+            .filter(|policy| !policy.authorized_at.is_empty())
+            .ok_or(E::Refused("planning-attach-validation-unauthorized"))?;
+        crate::validation_policy_covers_task(policy, task).map_err(E::Policy)?;
+        if task.criteria.as_ref().is_none_or(Vec::is_empty) {
+            return Err(E::Refused("planning-attach-task-criteria-required"));
+        }
+    }
+    crate::task_definition::validate_task_dependency_graph(work, &tasks[0])
+        .map_err(|_| E::Refused("planning-attach-invalid-graph"))?;
+    Ok(())
+}
+
+/// Build the hierarchy on a copy of the current Work, retaining its graph,
+/// attempts, receipts and policies. Requirement ownership is assigned from each
+/// task's existing criteria. Start and consent remain separate operations.
+fn attach_planning(
+    work: &crate::Work,
+    request: &crate::PlanningRequest,
+    at: &str,
+    settings: &crate::EngineSettingsDocument,
+    provider: Option<&crate::reviewer_bootstrap::Prepared>,
+) -> Result<crate::Work, PlanningControlError> {
+    use PlanningControlError as E;
+    validate_planning_attach_target(work, request)?;
+    let assignments = request.task_scopes.as_ref()
+        .ok_or(E::Refused("planning-attach-task-scopes-required"))?;
+    let mut base = work.clone();
+    let mut tasks = base.tasks.take().unwrap_or_default();
+    let criteria = base.criteria.get_or_insert_default();
+    let original_criteria = criteria.len();
+    let mut scopes = std::collections::BTreeMap::new();
+    for task in &mut tasks {
+        let id = &assignments[&task.id];
+        let scope = scopes.entry(id.clone()).or_insert_with(|| crate::PlanningScope {
+            id: id.clone(),
+            parent: "root".into(),
+            objective: format!("Supervise assigned tasks in {id}"),
+            revision: 1,
+            state: "waiting".into(),
+            ..Default::default()
+        });
+        let mut owned = Vec::new();
+        for criterion in task.criteria.iter().flatten() {
+            criteria.push(criterion.clone());
+            owned.push(format!("req-{}", criteria.len()));
+        }
+        scope.requirements.get_or_insert_default().extend(owned.clone());
+        task.scope_id.clone_from(id);
+        task.plan_role = "worker".into();
+        task.requirements = Some(owned);
+    }
+    let mut next = apply_local_planning_enable(&base, request, at, settings, provider)?;
+    let planning = next.planning.as_deref_mut()
+        .ok_or(E::Refused("planning-attach-state-missing"))?;
+    let roles = planning.scopes.get_or_insert_default();
+    let root = roles.first_mut().ok_or(E::Refused("planning-attach-root-missing"))?;
+    root.requirements.get_or_insert_default().truncate(original_criteria);
+    roles.extend(scopes.into_values());
+    if tasks.iter().all(|task| task.validation_policy.as_ref().is_some_and(|p| p.mode == "human")) {
+        // The task policies already carry operator authorization. This records
+        // the configured review mode and does not record a human verdict.
+        planning.human_review_authorized = at.into();
+    }
+    next.tasks = Some(tasks);
+    crate::validate_mission_organization(&next).map_err(E::Organization)?;
+    Ok(next)
+}
+
+/// Bind explicitly selected workspaces to worker profiles in the candidate.
+/// The caller holds the Work writer; dispatch must still recheck physical
+/// ownership, resources and the current profile before every launch.
+#[cfg(target_os = "linux")]
+pub(crate) fn bind_attachment_workspaces(
+    root: &std::path::Path,
+    work: &mut crate::Work,
+    request: &crate::PlanningRequest,
+    at: &str,
+    actor: &str,
+) -> Result<(), crate::AgentLaunchError> {
+    use crate::AgentLaunchError as E;
+    let Some(paths) = &request.task_workspaces else { return Ok(()) };
+    let root = root.canonicalize().map_err(|error| E::caused("agent-root-unavailable", error))?;
+    let private = root.join(".swarm");
+    for task in work.tasks.iter_mut().flatten() {
+        let Some(path) = paths.get(&task.id) else { continue };
+        let workspace = crate::agent_launch_preflight::workspace(&root, path)?;
+        if workspace.starts_with(&private) || private.starts_with(&workspace) {
+            return Err(E::Refused("planning-attach-task-workspace-private"));
+        }
+        let profile = task.launch_profile.get_or_insert_with(|| Box::new(crate::LaunchProfile {
+            provider: request.provider.clone(),
+            role: "worker".into(),
+            level: request.level.clone(),
+            capture_output: true,
+            ..Default::default()
+        }));
+        profile.workspace = workspace.to_str()
+            .ok_or(E::Refused("planning-attach-task-workspace-utf8"))?.into();
+        profile.updated = at.into();
+        profile.actor = actor.into();
     }
     Ok(())
 }

@@ -209,6 +209,26 @@ Le moteur refuse le départ automatique si le projet ne dispose pas d’une
 organisation valide avec un orchestrateur racine et un réviseur indépendant.
 Ce refus précède l’enregistrement du consentement au départ.
 
+### Rattacher une équipe à un projet existant
+
+Sur un travail ordinaire sans départ autorisé ni activité en cours, la commande
+`swarm-rust planning attach ID --root ROOT --input CONFIG.json --json` rattache
+l’équipe sans créer une mission. Le document indique la révision attendue, le
+fournisseur du planificateur et du réviseur, les budgets de planification et
+`task_scopes`, qui affecte chaque tâche existante à un sous-planificateur.
+Chaque tâche doit déjà avoir une politique de validation autorisée et des critères.
+L’opération conserve les dépendances, statuts, tentatives et résultats existants.
+Une liste incomplète ou une activité en cours refuse toute l’écriture.
+
+Le champ facultatif `task_workspaces` associe des tâches à des répertoires
+existants dans le projet. Des espaces distincts permettent au conducteur de faire
+avancer des branches indépendantes selon leurs dépendances, leurs autorisations et
+les créneaux disponibles. Le rattachement n’enregistre aucun consentement au départ.
+Le lancement et la validation utilisent ensuite les commandes habituelles.
+Si la révision change pendant un aperçu de départ, le conducteur relit le
+projet au cycle suivant lorsque le moteur confirme qu’aucune admission n’a été
+tentée. La file déjà synchronisée est conservée.
+
 Le nombre de créneaux fixe un maximum de tentatives simultanées. Des dépendances
 non validées ou un dossier déjà occupé peuvent réduire le parallélisme réel.
 **Lancer tout** démarre les tâches prêtes à cet instant ; pour un enchaînement

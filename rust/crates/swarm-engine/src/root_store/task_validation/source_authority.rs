@@ -16,7 +16,7 @@ pub(super) struct Authority {
 /// mutator requires review of this projection; this is not all-history validation.
 /// Missing native provenance refuses, never fabricates consent or a grant.
 pub(super) fn read(db: &rusqlite::Connection, work: &Work) -> Result<Authority, E> {
-    query(db,"SELECT id,revision,kind,request FROM main.events WHERE work_id=? AND kind IN ('planning.enable','planning.pause','planning.resume') ORDER BY revision DESC LIMIT 1",[&work.id],|rows|{
+    query(db,"SELECT id,revision,kind,request FROM main.events WHERE work_id=? AND kind IN ('planning.enable','planning.attach','planning.pause','planning.resume') ORDER BY revision DESC LIMIT 1",[&work.id],|rows|{
         let r=rows.next()?.ok_or(E::Refused("task-validation-planning-control-event-required"))?;
         let id:String=r.get(0)?;let revision:i64=r.get(1)?;let kind:String=r.get(2)?;let raw:Vec<u8>=r.get(3)?;
         let request=crate::decode_planning_request(&raw).map_err(|e|E::caused("task-validation-planning-control-event-invalid",e))?;

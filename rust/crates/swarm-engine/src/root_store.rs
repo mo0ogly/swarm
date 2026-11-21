@@ -854,6 +854,8 @@ mod mission_cost_guard;
 pub use mission_agent::MissionWorkerRequest;
 #[cfg(target_os = "linux")]
 pub(crate) use mission_control_write::stage as stage_mission_control;
+#[cfg(target_os = "linux")]
+pub(crate) use mission_control_write::require_attachment_idle;
 // Shared transaction guard; global controls use the same existing boundary.
 #[cfg(target_os = "linux")]
 pub(crate) use mission_controls::require_planning_mission_active;
