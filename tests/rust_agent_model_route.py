@@ -124,12 +124,20 @@ class Fixture:
         os.mkdir(self.workspace, 0o700)
         self.request = dict(schema_version=1,event_id='session',expected_revision=3,task_id='task',provider='fixture',capture_output=True,workspace=str(self.workspace))
         self.providers = self.root / '.swarm/providers.json'
+        self.team_provider = None
         self.save_provider()
         publish(output / (label+'-fixture.json'), dict(root=str(self.root),work=self.work,binary_sha256=digest(binary.read_bytes()),scope='owned local fixture, no account/model authentication'))
 
     def save_provider(self):
         """Write fixture configuration atomically; never modify runtime SQL."""
-        publish(self.providers, dict(schema_version=1, providers={'fixture':self.provider}))
+        publish(self.providers, self.catalogue())
+
+    def catalogue(self, **additional):
+        """Return worker entries with the fixture's separately configured team, if any."""
+        providers = {'fixture': self.provider, **additional}
+        if self.team_provider is not None:
+            providers['team-fixture'] = self.team_provider
+        return dict(schema_version=1, providers=providers)
 
     def call(self, args, value=None):
         """Invoke exact argv, retain original bytes and return actual exit/result.
@@ -161,12 +169,15 @@ class Fixture:
         assert code == 0, (self.label,args,code,value)
         return value
 
-    def configure_team(self):
+    def configure_team(self, team_provider=None):
         """Attach the inert fixture's one task and retain its new revision.
 
         Use only public authorization and attachment. The provider is a local
         test command and no launch or review follows from configuration.
         """
+        if team_provider is not None:
+            self.team_provider = team_provider
+            self.save_provider()
         current = self.ok(['work', 'show', self.work])['work']
         authorized = self.ok(['task', 'update', self.work], dict(
             schema_version=1, event_id='authorize-fixture-task', expected_revision=current['revision'],
@@ -174,7 +185,8 @@ class Fixture:
         ))['work']
         attached = self.ok(['planning', 'attach', self.work], dict(
             schema_version=1, event_id='attach-fixture-team', expected_revision=authorized['revision'],
-            provider='fixture', level='standard', max_activations=1, max_review_calls=1,
+            provider='team-fixture' if self.team_provider else 'fixture',
+            level='standard', max_activations=1, max_review_calls=1,
             max_tasks=1, max_decisions=1, task_scopes={'task': 'worker-scope'},
             task_workspaces={'task': str(self.workspace)},
             checks={'req-1': [dict(id='fixture-provider-ready',
@@ -275,9 +287,28 @@ class Fixture:
         return actual
 
 
+def configured_fixture(binary, output, label, team_provider=None):
+    """Create a public team before testing provider routing or launch behavior.
+
+    The shared Fixture stays ordinary for explicit refusal and old-binary
+    history scenarios. The configured fixture makes no provider calls.
+    """
+    fixture = Fixture(binary, output, label)
+    if team_provider is None:
+        planner = fixture.root / 'skynet_harness'
+        publish(planner, b'#!/bin/sh\nexit 91\n')
+        planner.chmod(0o700)
+        choice = dict(model='fixture-review-model', effort='')
+        team_provider = dict(command=str(planner), args=['--model', choice['model']],
+            model_policy=dict(version=1, billing='external', work_level='standard',
+                page_level='simple', levels={key: choice for key in ('simple', 'standard', 'exigeant')}))
+    fixture.configure_team(team_provider)
+    return fixture
+
+
 def valid(binary, output):
     """Only requested tier is announced; absent other-tier models do not block it."""
-    f=Fixture(binary,output,'valid')
+    f=configured_fixture(binary,output,'valid')
     before=f.ok(['work','show',f.work])['work']
     preview=f.prepare(True)
     assert preview['preview_only'] is True and preview['process_started'] is False
@@ -292,7 +323,7 @@ def cache_change(binary, output):
     """A changed declared cache refuses an existing intent, preserving its lease;
     restoring the exact owned source lets the same intent run once, not replay.
     """
-    f=Fixture(binary,output,'cache-change')
+    f=configured_fixture(binary,output,'cache-change')
     f.prepare(True)
     prepared=f.prepare()
     before=f.snapshot()
@@ -313,7 +344,7 @@ def rules_change(binary, output):
     """Relevant rules refuse before launch; restored values at a new revision
     recover, while an unrelated saved presentation change does not stale a route.
     """
-    f=Fixture(binary,output,'rules-change')
+    f=configured_fixture(binary,output,'rules-change')
     f.prepare(True);prepared=f.prepare()
     f.settings_change(agent_model_automatic_levels=['simple'])
     before=f.snapshot()
@@ -329,7 +360,7 @@ def cache_refusals(binary, output):
     """Valid controls precede malformed/nonregular/oversize cache inputs. Each
     refused preview leaves Work/agent/estimate unchanged, then corrected IO recovers.
     """
-    f=Fixture(binary,output,'cache-refusals')
+    f=configured_fixture(binary,output,'cache-refusals')
     publish(output/'cache-refusals-original.json',f.cache_bytes)
     before=f.snapshot()
     f.prepare(True)
@@ -359,7 +390,7 @@ def policy_controls(binary, output):
     """Hash, unavailable effort and unsupported requirements refuse without
     mutation. An exigeant automatic default needs an explicit saved Admin change.
     """
-    f=Fixture(binary,output,'policy-controls');preview=f.prepare(True);before=f.snapshot()
+    f=configured_fixture(binary,output,'policy-controls');preview=f.prepare(True);before=f.snapshot()
     f.request['model_policy_hash']='0'*64
     f.denied(['agent','preview',f.work],f.request,'agent-model-policy-hash-changed')
     assert f.snapshot()==before
@@ -404,7 +435,7 @@ def effective_environment(binary, output):
     """An unauthorized parent CODEX_HOME cannot select/poison the child cache.
     The actual provider receives HOME only, and parent-only changes do not stale it.
     """
-    f=Fixture(binary,output,'effective-environment');f.prepare(True)
+    f=configured_fixture(binary,output,'effective-environment');f.prepare(True)
     home=f.root/'effective-home';(home/'.codex').mkdir(parents=True,mode=0o700)
     os.chmod(home,0o700);publish(home/'.codex/models_cache.json',f.cache_bytes)
     ignored=f.root/'ignored-parent';ignored.mkdir(mode=0o700);publish(ignored/'models_cache.json',f.cache_bytes)
@@ -424,7 +455,7 @@ def configured_without_cache(binary, output):
     """A configured model is only an unverified announcement; missing cache
     invents no effort and never turns a malformed cache into a successful fallback.
     """
-    f=Fixture(binary,output,'configured-without-cache');f.prepare(True)
+    f=configured_fixture(binary,output,'configured-without-cache');f.prepare(True)
     f.provider['args'][f.provider['args'].index('--model')+1]='fixture-standard'
     f.provider['model_policy']['levels']['standard']['effort']='';f.save_provider();f.prepare(True)
     f.cache.unlink();f.prepare(True);before=f.snapshot()
@@ -438,7 +469,7 @@ def generic_mode(binary,output):
     """Custom routing preserves unrelated single-dash flags instead of assuming
     Codex short-option spelling; configured announcement and actual argv agree.
     """
-    f=Fixture(binary,output,'generic-mode');f.prepare(True)
+    f=configured_fixture(binary,output,'generic-mode');f.prepare(True)
     publish(f.root/'custom-provider',PROGRAM.encode());os.chmod(f.root/'custom-provider',0o700)
     f.provider['command']=str(f.root/'custom-provider')
     f.provider['args']=['-mode','safe',*f.provider['args']]
@@ -454,7 +485,7 @@ def api_catalogue(binary,output):
     collisions/selected APIs/type/read/cap faults refuse without state mutation.
     Every fault follows a valid control; original secrets never enter diagnostics.
     """
-    f=Fixture(binary,output,'api-catalogue');f.prepare(True);before=f.snapshot()
+    f=configured_fixture(binary,output,'api-catalogue');f.prepare(True);before=f.snapshot()
     path=f.root/'.swarm/ai-connections.json'
     for raw in [b'{}',b'null',b'{"local":null}',b'{"local":{"disabled":false,"key":"PRIVATE_API_KEY","base_url":"not contacted","model":"unverified"}}']:
         publish(path,raw);f.prepare(True);assert f.snapshot()==before
@@ -469,7 +500,7 @@ def api_catalogue(binary,output):
     assert 'PRIVATE_API_KEY' not in json.dumps(wire) and f.snapshot()==before
     f.request['provider']='fixture';f.prepare(True)
     # The Go namespace checks collisions globally, even for an unrelated request.
-    providers=dict(schema_version=1,providers={'fixture':f.provider,'api-local':f.provider})
+    providers=f.catalogue(**{'api-local':f.provider})
     publish(f.providers,providers)
     f.denied(['agent','preview',f.work],f.request,'agent-provider-api-name-conflict');assert f.snapshot()==before
     publish(path,{'local':{'disabled':True,'key':'PRIVATE_API_KEY'}});f.prepare(True)
@@ -500,8 +531,8 @@ def provider_configuration(binary,output):
     Readback is explicitly file-only, never API-secret export or readiness proof;
     the final actual agent run separately establishes the local execution witness.
     """
-    f=Fixture(binary,output,'provider-configuration');f.prepare(True);before=f.snapshot()
-    request=dict(schema_version=1,providers={'fixture':f.provider})
+    f=configured_fixture(binary,output,'provider-configuration');f.prepare(True);before=f.snapshot()
+    request=f.catalogue()
     original=f.providers.read_bytes()
     shown=f.ok(['providers','config','show'])
     assert shown['digest']==digest(original) and shown['created'] is False and shown['provider_execution_started'] is False
@@ -545,13 +576,13 @@ def configuration_update_restore(binary,output):
     without spending its reservation; exact supported restoration lets it run.
     Catalogue bytes stay unchanged across the fault to isolate configuration.
     """
-    f=Fixture(binary,output,'configuration-update-restore');f.prepare(True)
+    f=configured_fixture(binary,output,'configuration-update-restore');f.prepare(True)
     catalogue=json.loads(f.cache_bytes);catalogue['models'].append(dict(slug='fixture-alternate',visibility='list',supported_reasoning_levels=[dict(effort='fixture-medium')]))
     f.cache_bytes=json.dumps(catalogue).encode();publish(f.cache,f.cache_bytes);f.prepare(True)
     original=f.providers.read_bytes();original_provider=json.loads(json.dumps(f.provider));prepared=f.prepare();before=f.snapshot()
     assert f.reservation()==('reserved',1.0)
     f.provider['model_policy']['levels']['standard']['model']='fixture-alternate'
-    request,preview=configuration_proposal(f,dict(schema_version=1,providers={'fixture':f.provider}))
+    request,preview=configuration_proposal(f,f.catalogue())
     assert f.snapshot()==before
     bad=dict(request);bad['preview_token']='0'*64
     f.denied(['providers','config','apply'],bad,'provider-configuration-preview-required');assert f.providers.read_bytes()==original and f.snapshot()==before
@@ -574,7 +605,7 @@ def configuration_repair(binary,output):
     """Explicit inspection/preview repairs malformed data without losing it or
     allowing a malformed/symlink snapshot to become current configuration.
     """
-    f=Fixture(binary,output,'configuration-repair');f.prepare(True);before=f.snapshot();original=f.providers.read_bytes();configuration=json.loads(original)
+    f=configured_fixture(binary,output,'configuration-repair');f.prepare(True);before=f.snapshot();original=f.providers.read_bytes();configuration=json.loads(original)
     publish(f.providers,b'PRIVATE corrupted provider source')
     wire=f.denied(['providers','config','show'],None,'provider-configuration-invalid');assert 'PRIVATE' not in json.dumps(wire) and f.snapshot()==before
     meta=f.ok(['providers','config','inspect']);assert meta['format_valid'] is False and meta['digest']==digest(f.providers.read_bytes()) and 'PRIVATE' not in json.dumps(meta)
@@ -596,10 +627,11 @@ def configuration_scope(binary,output):
     """Same data/revision across owned Roots cannot reuse a target preview.
     The public token is not authentication; each Root's own preview still works.
     """
-    a=Fixture(binary,output,'configuration-scope-a');b=Fixture(binary,output,'configuration-scope-b')
+    a=configured_fixture(binary,output,'configuration-scope-a')
+    b=configured_fixture(binary,output,'configuration-scope-b',a.team_provider)
     b.provider=json.loads(json.dumps(a.provider));b.save_provider();a.prepare(True);b.prepare(True)
     assert a.providers.read_bytes()==b.providers.read_bytes()
-    configuration=dict(schema_version=1,providers={'fixture':json.loads(json.dumps(a.provider))});configuration['providers']['fixture']['args'].append('--scope-witness')
+    configuration=json.loads(json.dumps(a.catalogue()));configuration['providers']['fixture']['args'].append('--scope-witness')
     ra,pa=configuration_proposal(a,configuration);rb,pb=configuration_proposal(b,configuration)
     assert pa['before_digest']==pb['before_digest'] and pa['preview_token']!=pb['preview_token']
     before=b.snapshot();raw=b.providers.read_bytes();foreign=dict(rb,preview_token=ra['preview_token'])
@@ -614,19 +646,19 @@ def task_model(binary,output):
     actual inherited argv, then clear only the choice while preserving history.
     Policy drift is injected only after a valid selection/launch preview witness.
     """
-    f=Fixture(binary,output,'task-model')
+    f=configured_fixture(binary,output,'task-model')
     route=f.prepare(True)['agent']['model_route']
     publish(f.cache,{'models':[{'slug':'fixture-simple','visibility':'list'},{'slug':'fixture-standard','visibility':'list','supported_reasoning_levels':[{'effort':'fixture-medium'}]}]})
-    r=dict(schema_version=1,event_id='select',expected_revision=3,task_id='task',provider='fixture',level='simple',model_policy_hash=route['policy_hash'],inherit=False)
+    r=dict(schema_version=1,event_id='select',expected_revision=f.request['expected_revision'],task_id='task',provider='fixture',level='simple',model_policy_hash=route['policy_hash'],inherit=False)
     before=f.snapshot();preview=f.ok(['task-model','preview',f.work],r)
     assert preview['before'] is None and preview['after']['route']['model']=='fixture-simple' and f.snapshot()==before
-    changed=f.ok(['task-model','apply',f.work],r);assert changed['revision']==4
+    changed=f.ok(['task-model','apply',f.work],r);assert changed['revision']==r['expected_revision']+1
     assert changed['tasks'][0]['model_selection']['route']['level']=='simple'
     assert f.ok(['task-model','apply',f.work],r)==changed
     shown=f.ok(['task-model','show',f.work]);assert shown==changed
     before=f.snapshot();bad=dict(r,event_id='stale')
     f.denied(['task-model','apply',f.work],bad,'revision_conflict');assert f.snapshot()==before
-    f.request['expected_revision']=4
+    f.request['expected_revision']=changed['revision']
     valid=f.prepare(True);assert valid['agent']['model_route']['model']=='fixture-simple'
     original=dict(f.request)
     for patch in [dict(provider='other'),dict(level='exigeant'),dict(model_policy_hash='a'*64)]:
@@ -672,7 +704,7 @@ def policy_import(binary,output):
     Actual local process runs only after independent admission. Large fixtures
     demonstrate no hidden32/64KiB policy, not a performance claim or paid call.
     """
-    f=Fixture(binary,output,'policy-import')
+    f=configured_fixture(binary,output,'policy-import')
     cache={'models':[{'slug':'fixture-simple','visibility':'list'},{'slug':'fixture-standard','visibility':'list','supported_reasoning_levels':[{'effort':'fixture-medium'}]},{'slug':'fixture-frontier','visibility':'list'}]}
     publish(f.cache,cache);f.prepare(True)
     policy=json.loads(json.dumps(f.provider.pop('model_policy')));f.save_provider()
@@ -707,7 +739,8 @@ def policy_import(binary,output):
     assert (f.root/'.swarm'/applied['backup_reference']).read_bytes()==raw
     stored=json.loads(f.providers.read_bytes())['providers']['fixture']
     assert {k:v for k,v in stored.items() if k!='model_policy'}==previous
-    assert f.ok(['providers','policies','export'])==portable
+    exported=f.ok(['providers','policies','export'])
+    assert exported==dict(version=1,policies={'fixture':policy,'team-fixture':f.team_provider['model_policy']})
     f.denied(['providers','policies','apply'],r,'revision_conflict')
     f.denied(['agent','prepare',f.work],f.request,'agent-provider-verified-context-required');assert f.reservation() is None and f.snapshot()==before
     f.settings_change(agent_allow_unverified_provider_context='1');f.provider=stored

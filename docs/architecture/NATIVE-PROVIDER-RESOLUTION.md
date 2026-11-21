@@ -25,3 +25,7 @@ flowchart TD
  C --> V[Route seule + empreinte politique]
  V -. admission distincte .-> G[Prévisualisation et lancement agent]
 ```
+
+## Vérification du routage et de l’admission
+
+Les essais de routage par la CLI, de niveau de lancement et de lecture HTTP protégée utilisent un travail isolé. Leurs témoins positifs de préparation déclarent une équipe par les opérations publiques. Ils conservent une entrée de catalogue distincte pour l’orchestrateur et le vérificateur afin qu’une modification du fournisseur worker ne change pas leurs préconditions. Ces essais observent les routes et la préparation sans démarrer de fournisseur. La fixture ordinaire reste disponible pour rejouer les refus et lire l’historique de binaires antérieurs.
