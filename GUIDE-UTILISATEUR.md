@@ -282,6 +282,11 @@ filtres et sélection ne changent pas la révision métier.
   libellé des cartes. Les contrôles configurés et les verdicts du reçu
   enregistré sont affichés séparément. En lecture historique, le détail opérationnel est
   indisponible. Si l’équipe n’est pas rattachée, le graphe l’indique.
+
+En CLI, `swarm-rust planning graph ID --root ROOT --json` expose les
+périmètres et parents, le validateur, les prérequis et les identifiants des
+contrôles. Une observation absente du conducteur est représentée par `null`.
+Cette commande de lecture ne donne aucun consentement au départ.
 - **Horizontale / Verticale** change l’orientation, **Simplifiées / Détaillées**
   change les informations visibles. Aucun de ces réglages ne réordonne le travail.
 - **+ / −** replie ou déplie une branche. Cela ne supprime aucune tâche.

@@ -7,7 +7,7 @@ from pathlib import Path
 from rust_agent_model_route import Fixture, digest, publish
 
 
-def run(binary, output, *, managed=False):
+def run(binary, output, *, managed=False, graph=False):
     """Cover existing-work attachment with explicit or managed workspace ownership."""
     fixture = Fixture(binary, output, 'planning-attach')
     work_id = fixture.work
@@ -36,6 +36,13 @@ def run(binary, output, *, managed=False):
     config = dict(provider='fixture', level='standard', max_activations=3,
                   max_review_calls=3, max_tasks=3, max_decisions=3)
     before = show()
+    if graph:
+        flat = fixture.ok(['planning', 'graph', work_id])
+        assert not flat['planning_configured'] and not flat['scopes']
+        assert flat['reviewer_provider'] is None
+        assert flat['conductor_observation'] is None and len(flat['tasks']) == 3
+        assert show() == before
+        print('PASS CLI graph reports absent orchestration without a write', flush=True)
     code, result = change(['planning', 'attach'], 'missing-policy',
                           task_scopes=assignments, **config)
     assert code != 0 and 'planning-attach-validation-unauthorized' in str(result), result
@@ -123,6 +130,23 @@ def run(binary, output, *, managed=False):
         print('PASS managed attachment pins committed input without worker copy', flush=True)
     controls = fixture.ok(['mission', 'show', work_id])
     assert controls['consent_enabled'] is None and controls['autonomy'] is None
+    if graph:
+        organized = fixture.ok(['planning', 'graph', work_id])
+        assert organized['planning_configured'] and organized['reviewer_provider'] == 'fixture'
+        assert organized['conductor_observation'] is None
+        assert organized['work'] == work_id and organized['revision'] == after['revision']
+        expected_scopes = {
+            'root': (None, 'root_planner'),
+            **{scope: ('root', 'subplanner') for scope in assignments.values()},
+        }
+        assert {scope['id']: (scope['parent'], scope['role'])
+                for scope in organized['scopes']} == expected_scopes
+        assert {task['id']: task['scope'] for task in organized['tasks']} == assignments
+        assert {task['id']: task['prerequisites'] for task in organized['tasks']} == {
+            'task': [], 'grpc': ['task'], 'parallel': [],
+        }
+        assert show() == after
+        print('PASS CLI graph preserves delegation, validation role and task prerequisites', flush=True)
     code, result = change(['planning', 'attach'], 'repeat-team',
                           task_scopes=assignments, **config)
     assert code != 0 and 'planning-attach-ordinary-work-required' in str(result), result
@@ -139,9 +163,10 @@ def main():
     parser.add_argument('--binary', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--managed', action='store_true')
+    parser.add_argument('--graph', action='store_true')
     args = parser.parse_args()
     args.output.mkdir(mode=0o700)
-    outcome = run(args.binary.resolve(strict=True), args.output, managed=args.managed)
+    outcome = run(args.binary.resolve(strict=True), args.output, managed=args.managed, graph=args.graph)
     publish(args.output / 'result.json', outcome)
 
 

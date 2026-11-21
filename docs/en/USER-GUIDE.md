@@ -261,6 +261,10 @@ supplied by the engine. The list displays configured checks and recorded
 receipt verdicts separately. History mode shows the recorded team and leaves
 operational status unavailable. The graph reports when a team is unattached.
 
+In the CLI, `swarm-rust planning graph ID --root ROOT --json` shows the scopes
+and their parents, the reviewer, prerequisites, and check IDs. A missing
+conductor observation stays `null`. This read-only command records no launch consent.
+
 Use **Edit dependencies** to open the draft inside the product graph. Choose
 add or remove, then activate the prerequisite and dependent task with the mouse,
 Enter, or Space. **Undo** and **Redo** change only the draft. **Preview** asks
