@@ -1159,6 +1159,16 @@ FIFO dans cet espace et la fin de la CLI par pidfd. Modifier le fournisseur
 worker conserve l’entrée de catalogue de l’équipe. Les preuves distinguent
 admission, exécution, règlement budgétaire et acceptation de la tâche.
 
+The engine integration migration is a local checkpoint. Its remaining cases
+cover scoped summary attachments, current contract mapping and retry authority.
+Keep the original failures and require an explicit contract and passing named
+cases before integrating this checkpoint.
+
+La migration du test d’intégration moteur reste un point de reprise local.
+Les cas ouverts couvrent les synthèses dans une branche, le contrat courant et
+l’autorité de relance. Conserver les échecs et vérifier ces cas nommés après
+fixation de leur contrat avant intégration.
+
 Native141 follow-up: five generator guards now use the versioned32-type wire
 contract and exact rustfmt-normalized Rust regeneration, with .go reads denied.
 Explicit legacy extraction141/legacy-schema08 remains outside the native target.

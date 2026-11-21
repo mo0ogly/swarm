@@ -1,5 +1,7 @@
 //! Manual admission through the public Root API; isolated roots, no provider child.
 #![cfg(target_os = "linux")]
+#[path = "../../test_support/manual_launch_team.rs"]
+mod manual_launch_team;
 use rusqlite::{types::Value, Connection};
 use std::{
     collections::BTreeMap,
@@ -11,6 +13,7 @@ use swarm_engine::{decode_launch, Launch, RootStore, SystemEnvironment};
 struct Fixture {
     root: PathBuf,
     work: String,
+    revision: i64,
 }
 impl Fixture {
     /// Build actual schema, Work and task through public commands. A harmless
@@ -30,6 +33,17 @@ impl Fixture {
         let created=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Scope","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();
         let work = created.result.work.id;
         store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();
+        fs::write(
+            root.join(".swarm/providers.json"),
+            br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/cat","args":[]}}}"#,
+        )
+        .unwrap();
+        fs::set_permissions(
+            root.join(".swarm/providers.json"),
+            fs::Permissions::from_mode(0o600),
+        )
+        .unwrap();
+        let revision = manual_launch_team::attach(&root, &mut store, &work);
         store.close().unwrap();
         if summary {
             let db = Connection::open(root.join(".swarm/state.db")).unwrap();
@@ -38,10 +52,14 @@ impl Fixture {
                 .query_row("SELECT body FROM works WHERE id=?", [&work], |r| r.get(0))
                 .unwrap();
             let mut w = swarm_engine::decode_work(&raw).unwrap();
+            let witness = w.tasks.as_ref().unwrap()[0].clone();
             for (index, id) in ["old-0", "old-1"].iter().enumerate() {
                 let mut brain = swarm_engine::Task::default();
                 brain.id = (*id).into();
                 brain.brainstorm = true;
+                brain.scope_id = witness.scope_id.clone();
+                brain.requirements = witness.requirements.clone();
+                brain.validation_policy = witness.validation_policy.clone();
                 brain.question = format!("Décision numéro {index}");
                 brain.answers = Some(vec![swarm_engine::BrainstormAnswer {
                     attempt: format!("a{index}"),
@@ -57,17 +75,7 @@ impl Fixture {
             .unwrap();
             db.close().unwrap();
         }
-        fs::write(
-            root.join(".swarm/providers.json"),
-            br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/cat","args":[]}}}"#,
-        )
-        .unwrap();
-        fs::set_permissions(
-            root.join(".swarm/providers.json"),
-            fs::Permissions::from_mode(0o600),
-        )
-        .unwrap();
-        let f = Self { root, work };
+        let f = Self { root, work, revision };
         // Fixture-only financial envelope, not a live mutation or launch permission.
         let db = f.db();
         db.execute("INSERT INTO budgets(work_id,body) VALUES(?,?)",rusqlite::params![f.work,br#"{"limit_usd":10,"reserve_per_launch_usd":1,"estimate_source":"fixture estimate","reference_date":"2026-10-19"}"#.as_slice()]).unwrap();
@@ -82,7 +90,11 @@ impl Fixture {
     }
     /// Canonical raw launch remains distinct from normalized saved defaults.
     fn request(&self) -> Launch {
-        decode_launch(br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#).unwrap()
+        let bytes = serde_json::to_vec(&serde_json::json!({
+            "schema_version":1,"event_id":"session","expected_revision":self.revision,
+            "task_id":"task","provider":"fixture"
+        })).unwrap();
+        decode_launch(&bytes).unwrap()
     }
     /// Operator flow on this fixture: resolve the summary packet at the current
     /// revision, then confirm a selection quoting its resolved identifiers and
@@ -632,7 +644,7 @@ fn worker_context_current_identity_candidate_revision_and_replay_hash() {
             "mission {} ; tâche task ; agent session ; tentative {}",
             f.work, preview.agent.attempt_id
         ),
-        "révision du travail 3".into(),
+        format!("révision du travail {}", f.revision + 1),
         "Les identités, limites et conclusions des rapports antérieurs sont historiques".into(),
     ] {
         assert!(
@@ -649,7 +661,7 @@ fn worker_context_current_identity_candidate_revision_and_replay_hash() {
         .unwrap();
     assert_eq!(actual.agent.prompt, preview.agent.prompt);
     assert_eq!(actual.agent.context, preview.agent.context);
-    assert_eq!(store.read_work(&f.work).unwrap().revision, 3);
+    assert_eq!(store.read_work(&f.work).unwrap().revision, f.revision + 1);
     store.close().unwrap();
 }
 /// The latest own plan contract is required, even when Next is a generic UI
@@ -859,9 +871,9 @@ fn worker_context_incoherent_current_plan_mapping_refuses_without_fallback() {
         db.close().unwrap();
     }
 }
-/// A context reviewed before an authorized Work update is stale even if the
-/// launch revision is refreshed. Rejection preserves that legitimate update;
-/// reviewing a fresh preview then committing its exact digest recovers.
+/// A context reviewed before an authorized task action update is stale even if
+/// the launch revision advances. Rejection preserves the legitimate task edit;
+/// a fresh preview with its exact digest then admits the request.
 #[test]
 fn worker_context_stale_preview_refuses_then_fresh_digest_commits() {
     let f = Fixture::new();
@@ -869,7 +881,9 @@ fn worker_context_stale_preview_refuses_then_fresh_digest_commits() {
     let mut r = f.request();
     r.context_hash = preview.agent.context.unwrap().sha256;
     let mut store = RootStore::open(&f.root, true).unwrap();
-    store.execute_external(&f.work,"work.update",br#"{"schema_version":1,"event_id":"change","expected_revision":2,"title":"Current changed title"}"#,&mut SystemEnvironment).unwrap();
+    let change = serde_json::json!({"schema_version":1,"event_id":"change",
+        "expected_revision":f.revision,"id":"task","next":"Current changed action"});
+    store.execute_external(&f.work,"task.update",&serde_json::to_vec(&change).unwrap(),&mut SystemEnvironment).unwrap();
     r.expected_revision = store.read_work(&f.work).unwrap().revision;
     let before = snapshot(&f.db());
     let result = store.prepare_agent_launch(&f.work, &r, false, &mut SystemEnvironment);
@@ -887,8 +901,8 @@ fn worker_context_stale_preview_refuses_then_fresh_digest_commits() {
         .prepare_agent_launch(&f.work, &r, false, &mut SystemEnvironment)
         .unwrap();
     assert!(committed.created);
-    assert!(committed.agent.prompt.contains("Current changed title"));
-    assert!(committed.agent.prompt.contains("révision du travail 4"));
+    assert!(committed.agent.prompt.contains("Current changed action"));
+    assert!(committed.agent.prompt.contains(&format!("révision du travail {}", f.revision + 2)));
     store.close().unwrap();
 }
 
@@ -1365,7 +1379,7 @@ fn leased_manual_launch_preview_receipt_replay_and_binding() {
     assert_eq!(receipts.len(), 1);
     assert_eq!(receipts[0].kind, "agent.start");
     assert_eq!(receipts[0].generation, lease.generation());
-    assert_eq!(receipts[0].work_revision, 3);
+    assert_eq!(receipts[0].work_revision, f.revision + 1);
     assert_eq!(
         receipts[0].claim_settings_revision,
         lease.settings_revision()
@@ -1518,9 +1532,9 @@ fn organization_launch_reason(error: &(dyn std::error::Error + 'static)) -> Opti
     }
     None
 }
-/// A configured hierarchy still refuses the unported managed branch. Omitting
-/// reviewer/capacity yields the precise prerequisite without SQL effects; restoring
-/// the original manual fixture permits admission, never a provider process.
+/// Exercise an incompatible reviewer digest, missing reviewer and exhausted
+/// capacity independently. Each refusal preserves SQL. Restoring the attached
+/// fixture permits admission without starting any provider.
 #[test]
 fn planned_launch_preserves_organization_and_reviewer_refusals() {
     let f = Fixture::new();
@@ -1528,18 +1542,8 @@ fn planned_launch_preserves_organization_and_reviewer_refusals() {
     let root = RootStore::open(&f.root, true).unwrap();
     let original = root.read_work(&f.work).unwrap();
     root.close().unwrap();
-    let template=swarm_engine::decode_work(br#"{"schema_version":1,"id":"work","revision":1,"criteria":["test"],"planning":{"version":1,"max_tasks":10,"max_decisions":10,"max_activations":10,"provider":"fixture","human_review_authorized":"declared","scopes":[{"id":"root","revision":1,"requirements":["req-1"]}],"reviewer":{"provider":"fixture","authorized":"declared","max_calls":10}}}"#).unwrap();
     let mut managed = original.clone();
-    managed.planning = template.planning;
-    for task in managed.tasks.iter_mut().flatten() {
-        task.scope_id = "root".into();
-        task.requirements = Some(vec!["req-1".into()]);
-        task.validation_policy = swarm_engine::decode_task(
-            br#"{"id":"task","validation_policy":{"mode":"human","authorized_at":"declared"}}"#,
-        )
-        .unwrap()
-        .validation_policy;
-    }
+    managed.planning.as_mut().unwrap().reviewer.as_mut().unwrap().provider_digest = "a".repeat(64);
     swarm_engine::validate_mission_organization(&managed).unwrap();
     let db = f.db();
     let body = swarm_engine::encode_model(&managed).unwrap();
@@ -1551,7 +1555,7 @@ fn planned_launch_preserves_organization_and_reviewer_refusals() {
     let before = snapshot(&db);
     let error = match f.run(true) {
         Err(error) => error,
-        Ok(_) => panic!("reviewer without provider digest accepted"),
+        Ok(_) => panic!("reviewer with incompatible provider digest accepted"),
     };
     assert!(
         matches!(&error,swarm_engine::RootStoreError::Launch(error) if error.code()=="reviewer_unavailable")
@@ -1574,15 +1578,9 @@ fn planned_launch_preserves_organization_and_reviewer_refusals() {
         Some("organization-reviewer-missing")
     );
     assert_eq!(snapshot(&db), before);
-    let mut exhausted = managed;
-    exhausted
-        .planning
-        .as_mut()
-        .unwrap()
-        .reviewer
-        .as_mut()
-        .unwrap()
-        .calls = 10;
+    let mut exhausted = original.clone();
+    let reviewer = exhausted.planning.as_mut().unwrap().reviewer.as_mut().unwrap();
+    reviewer.calls = reviewer.max_calls;
     db.execute(
         "UPDATE works SET body=? WHERE id=?",
         rusqlite::params![swarm_engine::encode_model(&exhausted).unwrap(), f.work],
@@ -1713,7 +1711,7 @@ fn summary_preview_appends_extract_without_mutation() {
     assert!(preview.agent.prompt.trim_end().ends_with('}'));
     assert_eq!(receipt.work, f.work);
     assert_eq!(receipt.task, "task");
-    assert_eq!(receipt.prepared_revision, 2);
+    assert_eq!(receipt.prepared_revision, f.revision);
     assert_eq!(receipt.queued_revision, 0);
     assert!(receipt.queued_source_sha256.is_empty());
     assert_eq!(receipt.source_message_count, 5);
@@ -1771,7 +1769,7 @@ fn summary_admission_commits_stamped_receipt() {
     // Sources at the queued revision: the work is saved at N+1 with the
     // attempt-transition task body; the summary packet re-resolves there.
     let queued = swarm_engine::read_recorded_work(&db, &f.work).unwrap();
-    assert_eq!(queued.revision, 3);
+    assert_eq!(queued.revision, f.revision + 1);
     let packet = swarm_engine::summary_source_for_work(
         &f.root,
         &queued,
@@ -1779,7 +1777,7 @@ fn summary_admission_commits_stamped_receipt() {
             schema_version: 1,
             work: f.work.clone(),
             task: "task".into(),
-            expected_revision: 3,
+            expected_revision: f.revision + 1,
             dialogues: selection.dialogues.clone().unwrap(),
         },
     )
@@ -1788,8 +1786,8 @@ fn summary_admission_commits_stamped_receipt() {
     let receipt = manifest.summary.as_ref().expect("committed receipt");
     assert_eq!(receipt.work, f.work);
     assert_eq!(receipt.task, "task");
-    assert_eq!(receipt.prepared_revision, 2);
-    assert_eq!(receipt.queued_revision, 3);
+    assert_eq!(receipt.prepared_revision, f.revision);
+    assert_eq!(receipt.queued_revision, f.revision + 1);
     assert_eq!(receipt.queued_source_sha256, packet.sha256);
     assert_eq!(
         receipt.attachment_sha256,
