@@ -433,7 +433,27 @@ mod tests {
     /// Configure the fixture's reviewer and child scope using the same public
     /// commands as operator attachment. An optional second task permits an
     /// independent departure after cancellation of the first task.
-    fn attach_fixture_team(store: &mut crate::RootStore, work: &str, second: bool) -> i64 {
+    fn attach_fixture_team(root: &Path, store: &mut crate::RootStore, work: &str, second: bool) -> i64 {
+        use std::os::unix::fs::PermissionsExt;
+        // The reviewer needs a recognized tool-free adapter and a saved route.
+        // Keep its catalogue entry separate from the worker artifact under test.
+        let planner = root.join("skynet_harness");
+        std::fs::write(&planner, b"#!/bin/cat\nfixture planner is never executed\n").unwrap();
+        std::fs::set_permissions(&planner, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let directory = LocalDirectory::open(&root.join(".swarm")).unwrap();
+        let mut catalogue: serde_json::Value = serde_json::from_slice(
+            &std::fs::read(root.join(".swarm/providers.json")).unwrap()
+        ).unwrap();
+        let model = serde_json::json!({"model":"fixture-model", "effort":""});
+        catalogue["providers"]["team-fixture"] = serde_json::json!({
+            "command":planner, "args":["--model", "fixture-model"],
+            "model_policy":{
+                "version":1, "billing":"external", "work_level":"standard", "page_level":"simple",
+                "levels":{"simple":model, "standard":model, "exigeant":model}
+            }
+        });
+        directory.publish("providers.json", &serde_json::to_vec(&catalogue).unwrap()).unwrap();
+        directory.close().unwrap();
         let mut revision = store.read_work(work).unwrap().revision;
         if second {
             let input = serde_json::json!({
@@ -455,7 +475,7 @@ mod tests {
         }
         let input = serde_json::json!({
             "schema_version":1, "event_id":"team", "expected_revision":revision,
-            "provider":"fixture", "max_activations":2, "max_decisions":3,
+            "provider":"team-fixture", "level":"standard", "max_activations":2, "max_decisions":3,
             "max_review_calls":2, "max_tasks":assignments.len(), "task_scopes":assignments
         });
         store.execute_external(work, "planning.attach", &serde_json::to_vec(&input).unwrap(),
@@ -517,7 +537,7 @@ mod tests {
         let work=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Fixture","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap().result.work.id;
         store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap();
         // Test-owned provider copy under the fixture root; never /bin/cat.
-        let provider_path = root.join("codex");
+        let provider_path = root.join("fixture-provider");
         std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
         use std::os::unix::fs::PermissionsExt;
         std::fs::set_permissions(&provider_path, std::fs::Permissions::from_mode(0o755)).unwrap();
@@ -530,7 +550,7 @@ mod tests {
             .publish("providers.json", catalogue.as_bytes())
             .unwrap();
         setup.close().unwrap();
-        let revision = attach_fixture_team(&mut store, &work, false);
+        let revision = attach_fixture_team(root.as_path(), &mut store, &work, false);
         let request = fixture_launch("session", "task", revision);
         // Valid admission precedes any mutation: the queued row exists and the
         // digest of the actual admitted artifact is frozen in its preflight scope.
@@ -691,7 +711,7 @@ mod tests {
             )
             .unwrap();
         // Test-owned provider copy under the fixture root; never /bin/cat.
-        let provider_path = root.join("codex");
+        let provider_path = root.join("fixture-provider");
         std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
         std::fs::set_permissions(
             &provider_path,
@@ -705,7 +725,7 @@ mod tests {
         );
         setup.publish("providers.json", catalogue.as_bytes()).unwrap();
         setup.close().unwrap();
-        let revision = attach_fixture_team(&mut store, &work, true);
+        let revision = attach_fixture_team(root.as_path(), &mut store, &work, true);
         let request = fixture_launch("session", "task", revision);
         let launched = store
             .prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment)
@@ -974,17 +994,15 @@ mod tests {
             crate::RootStore::initialize(root.as_path(), &mut crate::SystemEnvironment).unwrap();
         let work=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Fixture","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap().result.work.id;
         store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap();
-        use std::os::unix::fs::PermissionsExt;
-        let provider_path = root.join("codex");
-        std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
-        std::fs::set_permissions(&provider_path, std::fs::Permissions::from_mode(0o700)).unwrap();
         let setup = LocalDirectory::open(&root.join(".swarm")).unwrap();
-        let catalogue = serde_json::json!({
-            "schema_version":1, "providers":{"fixture":{"command":provider_path,"args":[]}}
-        });
-        setup.publish("providers.json", &serde_json::to_vec(&catalogue).unwrap()).unwrap();
+        setup
+            .publish(
+                "providers.json",
+                br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/cat","args":[]}}}"#,
+            )
+            .unwrap();
         setup.close().unwrap();
-        let revision = attach_fixture_team(&mut store, &work, false);
+        let revision = attach_fixture_team(root.as_path(), &mut store, &work, false);
         let request = fixture_launch("session", "task", revision);
         store
             .prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment)
