@@ -185,7 +185,10 @@ For ordinary work with no start consent or active execution,
 team while retaining the existing Work. Supply the expected revision, planner and
 reviewer provider, planning budgets, and `task_scopes` mapping every existing task
 to a branch planner. Each task needs existing criteria and an authorized
-validation policy. Attachment preserves dependencies, statuses, attempts and
+validation policy. Human and automatic policies can coexist. Each saved policy
+covers the identical criteria assigned to its child task while that task remains
+in the plan. Supply `checks` for root and other uncovered requirements. Future
+tasks may inherit these explicit controls under the planning rules. Attachment preserves dependencies, statuses, attempts and
 results. Missing assignments or active execution reject the entire change.
 
 The optional `task_workspaces` map selects existing directories within the

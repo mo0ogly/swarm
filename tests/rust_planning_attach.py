@@ -36,6 +36,9 @@ def run(binary, output, *, managed=False, graph=False, history=False, successful
         workspaces[task] = str(directory)
     config = dict(provider='fixture', level='standard', max_activations=3,
                   max_review_calls=3, max_tasks=3, max_decisions=3)
+    root_control = dict(id='root-witness', command=['python3', '-c', 'print(1)'],
+                        justification='Isolated root control fixture', inputs=['input.txt'])
+    config['checks'] = {'req-1': [root_control]}
     original_receipt = None
     if history or successful_history:
         # Run a real inert ordinary worker before attachment.
@@ -69,7 +72,9 @@ def run(binary, output, *, managed=False, graph=False, history=False, successful
 
     for task in assignments:
         code, result = change(['task', 'update'], 'authorize-' + task, id=task,
-                              validation_policy={'mode': 'human'})
+                              validation_policy=({'mode': 'automatic', 'controls': [
+                                  dict(root_control, id='task-witness', criteria=[1])]}
+                                  if task == 'task' else {'mode': 'human'}))
         assert code == 0, result
 
     before = show()
@@ -78,6 +83,12 @@ def run(binary, output, *, managed=False, graph=False, history=False, successful
     assert code != 0 and 'planning-attach-task-coverage' in str(result), result
     assert show() == before
     print('PASS attachment-refuses-partial-assignment', flush=True)
+
+    code, result = change(['planning', 'attach'], 'missing-root-control',
+                          task_scopes=assignments, **dict(config, checks={}))
+    assert code != 0 and 'organization-requirement-controls-missing' in str(result), result
+    assert show() == before
+    print('PASS mixed policies still require an explicit root control', flush=True)
 
     code, result = change(['planning', 'attach'], 'private-workspace',
                           task_scopes=assignments, task_workspaces={'task': '.swarm'}, **config)
@@ -118,6 +129,7 @@ def run(binary, output, *, managed=False, graph=False, history=False, successful
     assert after['id'] == work_id and after['revision'] == before['revision'] + 1
     plan = after['planning']
     assert plan['provider'] == 'fixture' and plan['reviewer']['provider'] == 'fixture'
+    assert not plan.get('human_review_authorized')
     assert plan['reviewer_required'] and plan['reviewer'].get('calls', 0) == 0
     scopes = {scope['id']: scope for scope in plan['scopes']}
     assert set(scopes) == {'root', 'wasmtime', 'grpc', 'parallel'}

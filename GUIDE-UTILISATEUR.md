@@ -217,6 +217,11 @@ l’équipe sans créer une mission. Le document indique la révision attendue, 
 fournisseur du planificateur et du réviseur, les budgets de planification et
 `task_scopes`, qui affecte chaque tâche existante à un sous-planificateur.
 Chaque tâche doit déjà avoir une politique de validation autorisée et des critères.
+Les politiques humaines et automatiques peuvent coexister. La politique
+existante couvre les critères identiques affectés à une tâche enfant qui reste
+dans le plan. Fournir dans `checks` les contrôles des exigences racines et des
+autres exigences sans couverture. Une future tâche peut hériter de ces contrôles
+explicites selon les règles de planification.
 L’opération conserve les dépendances, statuts, tentatives et résultats existants.
 Une liste incomplète ou une activité en cours refuse toute l’écriture.
 

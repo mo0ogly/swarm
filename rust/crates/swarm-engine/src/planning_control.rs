@@ -535,11 +535,6 @@ fn attach_planning(
     let root = roles.first_mut().ok_or(E::Refused("planning-attach-root-missing"))?;
     root.requirements.get_or_insert_default().truncate(original_criteria);
     roles.extend(scopes.into_values());
-    if tasks.iter().all(|task| task.validation_policy.as_ref().is_some_and(|p| p.mode == "human")) {
-        // The task policies already carry operator authorization. This records
-        // the configured review mode and does not record a human verdict.
-        planning.human_review_authorized = at.into();
-    }
     next.tasks = Some(tasks);
     crate::validate_mission_organization(&next).map_err(E::Organization)?;
     Ok(next)
