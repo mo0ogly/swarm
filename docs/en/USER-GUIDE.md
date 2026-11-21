@@ -174,6 +174,10 @@ After the single team authorization, open management. Only eligible missions may
 start; dependency, budget, pause and workspace checks still apply. Review the
 provider, directory, concurrency and limits before any manual start.
 
+The engine refuses an automatic start if the project lacks a valid organization
+with a root planner and an independent reviewer. It refuses before recording
+start consent.
+
 Slots set an upper bound on concurrent attempts. Unvalidated dependencies or an
 occupied directory can reduce actual concurrency. **Start all** starts tasks ready
 now; use the mission with an observed driver for ongoing automatic progression.

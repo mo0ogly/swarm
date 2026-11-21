@@ -205,6 +205,10 @@ Après **Relire et autoriser le démarrage**, ouvrez le pilotage et utilisez
 **Lancer la mission**. Relisez le fournisseur, le dossier, les créneaux et les
 limites avant confirmation. L’autorisation du plan et le lancement sont deux étapes.
 
+Le moteur refuse le départ automatique si le projet ne dispose pas d’une
+organisation valide avec un orchestrateur racine et un réviseur indépendant.
+Ce refus précède l’enregistrement du consentement au départ.
+
 Le nombre de créneaux fixe un maximum de tentatives simultanées. Des dépendances
 non validées ou un dossier déjà occupé peuvent réduire le parallélisme réel.
 **Lancer tout** démarre les tâches prêtes à cet instant ; pour un enchaînement
