@@ -1766,8 +1766,11 @@ fn summary_selection_refuses_dialogue_in_another_scope() {
     assert_eq!(error.reason(), "project-summary-source-dialogue-outside-scope");
     for preview in [true, false] {
         let error = f.run_with(r.clone(), preview).err().expect("cross-scope dialogue accepted");
-        let reason = std::iter::successors(error.source(), |cause| cause.source())
-            .find_map(|cause| cause.downcast_ref::<swarm_engine::MemoryError>())
+        let swarm_engine::RootStoreError::Launch(launch) = error else {
+            panic!("unexpected refusal: {error}");
+        };
+        let reason = launch.source()
+            .and_then(|cause| cause.downcast_ref::<swarm_engine::MemoryError>())
             .map(swarm_engine::MemoryError::reason);
         assert_eq!(reason, Some("project-summary-source-dialogue-outside-scope"));
         assert_eq!(snapshot(&db), before);
