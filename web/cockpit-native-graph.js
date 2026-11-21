@@ -405,12 +405,14 @@
    * @param {SVGElement} svg validated Dagre layout, dimensions in SVG units
    * @param {object} work recorded Work with validated tasks/dependencies
    * @param {'LR'|'TB'} orientation displayed layout direction
+   * @param {HTMLElement} orchestration read-only role hierarchy
+   * @param {Function} rerender rebuild the same Work with its original observation
    * @param {object|null} initial same-Work view from memory or validated local storage
    * @param {string} viewError safe preference diagnostic, never raw stored content
    * @param {string} viewErrorCode safe browser/validation family for inspection
    * @returns {void} installs listeners, view capture and cleanup; storage refusals stay visible
    */
-  function navigation(host, canvas, svg, work, orientation, initial=null, viewError='', viewErrorCode='') {
+  function navigation(host, canvas, svg, work, orientation, orchestration, rerender, initial=null, viewError='', viewErrorCode='') {
     const studio=document.createElement('section');studio.id='graph-studio';studio.className='graph-studio native-graph-studio';
     const toolbar=document.createElement('div');toolbar.className='pilot-actions';
     const status=document.createElement('p');status.className='graph-studio-hint';status.setAttribute('role','status');
@@ -539,7 +541,7 @@
      * view; successful reset preserves an explicitly open full screen only in
      * memory. Cleanup must not rewrite the deleted preference.
      */
-    function resetNavigation(){finish(true);try{localStorage.removeItem(viewKey)}catch(cause){const code=storageErrorFamily(cause);preferenceStatus.dataset.viewError=code;preferenceStatus.textContent=t('Réinitialisation de navigation non confirmée.')+' ('+code+')';return}resetting=true;host.dataset.orientation='LR';host.graphView=()=>({work:work.id,orientation:'LR',left:0,top:0,studioLeft:0,studioTop:0,fullscreen:modal.open,toolsOpen:media.matches});render(work)}
+    function resetNavigation(){finish(true);try{localStorage.removeItem(viewKey)}catch(cause){const code=storageErrorFamily(cause);preferenceStatus.dataset.viewError=code;preferenceStatus.textContent=t('Réinitialisation de navigation non confirmée.')+' ('+code+')';return}resetting=true;host.dataset.orientation='LR';host.graphView=()=>({work:work.id,orientation:'LR',left:0,top:0,studioLeft:0,studioTop:0,fullscreen:modal.open,toolsOpen:media.matches});rerender()}
     button('pilot-view-reset','Réinitialiser la navigation',resetNavigation);
     button('pilot-add-task','Ajouter une tâche',()=>editTask(work)).className='primary';
     button('pilot-business-draft','Brouillon multi-tâches',()=>openBusinessDraft(work));
@@ -619,7 +621,7 @@
     button('pilot-export','Exporter le SVG',exportGraph);
     const direction=document.createElement('select');direction.id='pilot-orientation';direction.setAttribute('aria-label',t('Orientation'));
     for(const [value,label]of [['LR','Gauche → droite'],['TB','Haut → bas']]){const option=document.createElement('option');option.value=value;option.textContent=t(label);direction.append(option)}direction.value=orientation;
-    direction.addEventListener('change',()=>{host.dataset.orientation=direction.value;render(work)});toolbar.append(direction);
+    direction.addEventListener('change',()=>{host.dataset.orientation=direction.value;rerender()});toolbar.append(direction);
     const search=document.createElement('div');search.className='native-graph-search';search.setAttribute('role','search');search.setAttribute('aria-label',t('Rechercher une tâche'));
     const searchLabel=document.createElement('label');searchLabel.htmlFor='pilot-search';searchLabel.textContent=t('Rechercher une tâche');
     const searchInput=document.createElement('input');searchInput.id='pilot-search';searchInput.type='search';searchInput.autocomplete='off';searchInput.setAttribute('aria-controls','pilot-canvas');searchInput.placeholder=t('Rechercher une tâche ou un identifiant');
@@ -772,7 +774,7 @@
     // reads as checkboxes; the plain swatches remain only if the workbench is absent.
     const keyBadge=globalThis.SwarmWorkbench?.statusBadge;for(const [tone,label,state]of [['attente','à faire','todo'],['active','en cours','running'],['attention','à vérifier','submitted'],['alerte','bloquée','blocked'],['validee','acceptée','accepted']]){if(keyBadge){legend.append(keyBadge(state,state));continue}const item=document.createElement('span');item.className='graph-teinte';item.dataset.etat=tone;item.textContent=t(label);legend.append(item)}
     const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez un cadre pour le déplacer. Cliquez pour ouvrir la tâche ; cliquez sur une flèche pour modifier le lien.');
-    studio.append(toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,canvas);host.replaceChildren(studio,modal,help);
+    studio.append(orchestration,toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,canvas);host.replaceChildren(studio,modal,help);
     /** Capture completed same-Work presentation, including deferred modal/scroll.
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
@@ -787,19 +789,191 @@
   }
 
   /**
+   * Describe configured controls and the separately stored validation receipt.
+   * An older receipt may refer to a different policy. Only named control IDs and
+   * recorded verdicts are shown. This does not evaluate candidate freshness.
+   */
+  function taskControlSummary(task) {
+    const summary = document.createDocumentFragment();
+    const policy = task.validation_policy?.controls;
+    if (Array.isArray(policy) && policy.length) {
+      const configured = document.createElement('p');
+      configured.textContent = t('Contrôles configurés') + ' · ' + policy.map(control => control.id).join(', ');
+      summary.append(configured);
+    }
+    const receipt = task.automatic_validation?.controls;
+    if (Array.isArray(receipt) && receipt.length) {
+      const recorded = document.createElement('p');
+      recorded.dataset.orchestrationControls = '';
+      const verdicts = receipt.map(control => {
+        let label = 'Exécution non enregistrée';
+        if (control.executed === true && typeof control.passed === 'boolean') {
+          label = control.passed ? 'Réussite enregistrée' : 'Échec enregistré';
+        }
+        return control.id + ' — ' + t(label);
+      });
+      recorded.textContent = t('Reçu des contrôles') + ' · ' + verdicts.join(' · ');
+      summary.append(recorded);
+    }
+    return summary;
+  }
+
+  /**
+   * Project the recorded orchestration beside the editable dependency graph.
+   * Scope parentage and task assignments come from Work. Conductor observation
+   * comes from current mission status when available. Disconnected scopes and
+   * unassigned tasks are reported without inventing parentage or execution.
+   * @param {object} work recorded Work with validated tasks
+   * @param {object|null} mission optional current observation
+   * @param {string} readMode "history" suppresses current observations
+   * @param {boolean|undefined} expanded same-Work disclosure state, if known
+   * @returns {{panel: HTMLElement, assignments: Set<string>, reasons: Map<string,string>}}
+   */
+  function renderOrchestration(work, mission, readMode, expanded) {
+    const panel = document.createElement('section');
+    panel.className = 'native-graph-orchestration';
+    panel.setAttribute('aria-labelledby', 'graph-orchestration-title');
+    const heading = document.createElement('h3');
+    heading.id = 'graph-orchestration-title';
+    heading.textContent = t('Orchestration');
+    const conductor = document.createElement('p');
+    conductor.dataset.orchestrationRole = 'driver';
+    const observation = readMode === 'history' ? null : mission?.supervision;
+    let driverState = 'État du conducteur indisponible.';
+    if (observation?.state === 'absent') driverState = 'Aucun conducteur Swarm actif observé.';
+    if (observation?.state === 'error') driverState = 'Conducteur Swarm observé, dernière vérification en erreur.';
+    if (observation?.state === 'active') {
+      driverState = observation.late ? 'Conducteur Swarm observé, mais vérification en retard.' : 'Conducteur Swarm observé.';
+    }
+    conductor.textContent = t(driverState);
+    panel.append(heading, conductor);
+
+    const reasons = new Map();
+    if (readMode !== 'history' && Array.isArray(mission?.tasks)) {
+      for (const task of mission.tasks) {
+        if (typeof task?.id !== 'string' || typeof task.reason !== 'string' || !task.reason) continue;
+        reasons.set(task.id, globalThis.SwarmI18n?.engine?.(task.reason) ?? task.reason);
+      }
+    }
+    const assignments = new Set();
+    const planning = work.planning;
+    if (!planning) {
+      const missing = document.createElement('p');
+      missing.textContent = t('Planificateur racine, sous-planificateurs et validateur non rattachés.');
+      panel.append(missing);
+      return { panel, assignments, reasons };
+    }
+
+    const configuredReviewer = document.createElement('p');
+    configuredReviewer.dataset.orchestrationRole = 'reviewer';
+    const reviewer = planning.reviewer;
+    configuredReviewer.textContent = t('Validateur indépendant') + ' · ' +
+      (reviewer?.provider
+        ? [reviewer.provider, reviewer.model_route?.model].filter(Boolean).join(' · ')
+        : t('Non configuré'));
+    panel.append(configuredReviewer);
+
+    const scopes = Array.isArray(planning.scopes) ? planning.scopes : [];
+    const byId = new Map();
+    const byParent = new Map();
+    for (const scope of scopes) {
+      if (!scope || typeof scope.id !== 'string' || !scope.id || byId.has(scope.id)) continue;
+      byId.set(scope.id, scope);
+      if (!byParent.has(scope.parent)) byParent.set(scope.parent, []);
+      byParent.get(scope.parent).push(scope);
+    }
+    const tasksByScope = new Map();
+    for (const task of work.tasks) {
+      if (!tasksByScope.has(task.scope_id)) tasksByScope.set(task.scope_id, []);
+      tasksByScope.get(task.scope_id).push(task);
+    }
+    const tree = document.createElement('details');
+    tree.dataset.orchestrationTree = '';
+    tree.open = expanded ?? true;
+    const treeTitle = document.createElement('summary');
+    treeTitle.textContent = t('Équipe et périmètres');
+    tree.append(treeTitle);
+    const root = byId.get('root');
+    const visited = new Set();
+    if (root && !root.parent) {
+      const hierarchy = document.createElement('ul');
+      const pending = [{ scope: root, list: hierarchy }];
+      while (pending.length) {
+        const { scope, list } = pending.pop();
+        if (visited.has(scope.id)) continue;
+        visited.add(scope.id);
+        const item = document.createElement('li');
+        item.dataset.orchestrationRole = scope === root ? 'root' : 'subplanner';
+        item.dataset.scope = scope.id;
+        const name = document.createElement('strong');
+        name.textContent = scope === root
+          ? [t('Planificateur racine'), planning.provider, planning.model_route?.model].filter(Boolean).join(' · ')
+          : [t('Sous-planificateur'), scope.id, scope.model_selection?.provider,
+              scope.model_selection?.route?.model].filter(Boolean).join(' · ');
+        item.append(name);
+        const tasks = tasksByScope.get(scope.id) || [];
+        if (tasks.length) {
+          const details = document.createElement('details');
+          const summary = document.createElement('summary');
+          summary.textContent = t('Tâches rattachées') + ' · ' + tasks.length;
+          const members = document.createElement('ul');
+          for (const task of tasks) {
+            assignments.add(task.id);
+            const entry = document.createElement('li');
+            entry.textContent = task.title;
+            if (reasons.has(task.id)) {
+              const explanation = document.createElement('span');
+              explanation.textContent = ' — ' + reasons.get(task.id);
+              entry.append(explanation);
+            }
+            entry.append(taskControlSummary(task));
+            members.append(entry);
+          }
+          details.append(summary, members);
+          item.append(details);
+        }
+        const children = byParent.get(scope.id);
+        if (children?.length) {
+          const branch = document.createElement('ul');
+          item.append(branch);
+          for (const child of children.slice().reverse()) pending.push({ scope: child, list: branch });
+        }
+        list.append(item);
+      }
+      tree.append(hierarchy);
+    }
+    if (!visited.has('root') || visited.size !== scopes.length) {
+      const warning = document.createElement('p');
+      warning.textContent = t('Hiérarchie incomplète : certains périmètres sont introuvables.');
+      tree.append(warning);
+    }
+    if (assignments.size !== work.tasks.length) {
+      const missing = document.createElement('p');
+      missing.textContent = t('Tâches sans rattachement affichable') + ' · ' + (work.tasks.length - assignments.size);
+      tree.append(missing);
+    }
+    panel.append(tree);
+    return { panel, assignments, reasons };
+  }
+
+  /**
    * Render the dependency graph of a Work into the original #graph container.
    * Recorded projection with local navigation and explicit task-editor handlers.
    * Rendering performs no engine writes; same-Work presentation survives rerender.
    * Saving an editor uses protected engine operations; another Work restores only
    * its own validated preference and never inherits full screen or undo history.
    * Side effect: replaces the container's children (scrollable canvas + svg).
-   * @param {object} work Work {id,title,tasks:[{id,title,status,depends?:string[]}]}
+   * @param {object} work Work including recorded planning and tasks
+   * @param {object|null} mission current mission observation when available
+   * @param {string} readMode distinguishes current from historical observations
    * @throws {Error} on invalid Work, duplicate ids, unknown-shaped dependencies or cycles
    */
-  function render(work) {
+  function render(work, mission=null, readMode='current') {
     const host = container();
     const { tasks, depPairs, unknown } = validateWork(work);
     const previous=host.graphView?.(),initial=previous?.work===work.id?previous:null;
+    const expanded=initial ? host.querySelector('[data-orchestration-tree]')?.open : undefined;
+    const orchestration=renderOrchestration(work,mission,readMode,expanded);
     const recovered=initial?{view:null,error:''}:readStoredView(work.id);
     host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
     const orientation=initial?(host.dataset.orientation==='TB'?'TB':'LR'):(recovered.view?.orientation||'LR');host.dataset.orientation=orientation;
@@ -864,11 +1038,15 @@
       const group = document.createElementNS(SVG_NS, 'g');
       group.setAttribute('class', 'graph-noeud');
       group.setAttribute('role', 'img');
-      group.setAttribute('aria-label', t('Tâche : ') + task.title + t(' — identifiant : ') + task.id + t(' — état : ') + stateLabel);
+      const scope = orchestration.assignments.has(task.id)
+        ? ' · ' + t('Périmètre') + ' ' + task.scope_id : '';
+      const reason = orchestration.reasons.get(task.id);
+      const engineReason = reason ? ' · ' + reason : '';
+      group.setAttribute('aria-label', t('Tâche : ') + task.title + t(' — identifiant : ') + task.id + t(' — état : ') + stateLabel + scope + engineReason);
       group.dataset.task = task.id;
       group.dataset.etat = tonalites[task.status] || 'neutre';
       group.append(document.createElementNS(SVG_NS, 'title'));
-      group.lastChild.textContent = task.title + ' (' + task.id + ') — ' + stateLabel;
+      group.lastChild.textContent = task.title + ' (' + task.id + ') — ' + stateLabel + scope + engineReason;
       const rect = document.createElementNS(SVG_NS, 'rect');
       rect.setAttribute('x', String(left));
       rect.setAttribute('y', String(top));
@@ -901,7 +1079,8 @@
         unknown.map(u => u.dep + ' → ' + u.taskId).join(', ');
       canvas.append(warning);
     }
-    navigation(host,canvas,svg,work,orientation,initial||recovered.view,recovered.error,recovered.errorCode);
+    navigation(host,canvas,svg,work,orientation,orchestration.panel,
+      () => render(work,mission,readMode),initial||recovered.view,recovered.error,recovered.errorCode);
   }
 
   /** Display at most 24 UTF-16 code units including the ellipsis to leave room

@@ -248,6 +248,15 @@ optional; without it, not all raw provider output is retained.
 
 Arrows point from the prerequisite to the dependent task. These tasks have not started; they do not demonstrate accepted results.
 
+In the native cockpit, **Orchestration** displays the observed driver and
+the configured independent reviewer. **Team and scopes** expands the root
+planner, subplanners and their assigned tasks. Sibling scopes appear as
+separate branches. Task arrows retain their prerequisite meaning. The task
+list within a scope and the card's accessible label show the current reason
+supplied by the engine. The list displays configured checks and recorded
+receipt verdicts separately. History mode shows the recorded team and leaves
+operational status unavailable. The graph reports when a team is unattached.
+
 Use **Edit dependencies** to open the draft inside the product graph. Choose
 add or remove, then activate the prerequisite and dependent task with the mouse,
 Enter, or Space. **Undo** and **Redo** change only the draft. **Preview** asks

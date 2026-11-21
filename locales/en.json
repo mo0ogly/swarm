@@ -7079,5 +7079,20 @@
   "3 · Signer l’ancre publique": "3 · Sign the public anchor",
   "Après la première initialisation, la session seule ne permet pas de modifier les identités. Le jeton Admin reste en mémoire de cette page et disparaît quand vous la quittez.": "After the first initialization, the session alone cannot change identities. The Admin token stays in this page’s memory and is gone when you leave it.",
   "05 · Configuration · Sécurité": "05 · Configuration · Security",
-  "Vues PAEA": "PAEA views"
+  "Vues PAEA": "PAEA views",
+  "Orchestration": "Orchestration",
+  "Conducteur Swarm observé.": "Swarm driver observed.",
+  "État du conducteur indisponible.": "Swarm driver status unavailable.",
+  "Planificateur racine, sous-planificateurs et validateur non rattachés.": "Root planner, subplanners and independent reviewer are not attached.",
+  "Validateur indépendant": "Independent reviewer",
+  "Équipe et périmètres": "Team and scopes",
+  "Planificateur racine": "Root planner",
+  "Tâches rattachées": "Assigned tasks",
+  "Hiérarchie incomplète : certains périmètres sont introuvables.": "Incomplete hierarchy: some scopes could not be found.",
+  "Tâches sans rattachement affichable": "Tasks without a displayed scope",
+  "Contrôles configurés": "Configured checks",
+  "Reçu des contrôles": "Check receipt",
+  "Exécution non enregistrée": "Execution not recorded",
+  "Réussite enregistrée": "Recorded pass",
+  "Échec enregistré": "Recorded failure"
 }
