@@ -1077,9 +1077,15 @@ fn apply<E: WorkEnvironment>(
                 // Keep the original request in mutation intent/replay. Only this
                 // trusted Root adapter may attach source-observed repository data.
                 let mut local_request=request.clone();
-                if action==crate::PlanningControlAction::Enable {local_request.repository=None;}
+                let configures_repository = matches!(
+                    action,
+                    crate::PlanningControlAction::Enable | crate::PlanningControlAction::Attach
+                );
+                if configures_repository {
+                    local_request.repository = None;
+                }
                 if action == crate::PlanningControlAction::Attach {
-                    crate::planning_control::validate_planning_attach_target(&candidate, request)
+                    crate::planning_control::validate_planning_attach_target(&candidate, &local_request)
                         .map_err(WorkEngineError::PlanningControl)?;
                     #[cfg(target_os = "linux")]
                     {
@@ -1129,7 +1135,7 @@ fn apply<E: WorkEnvironment>(
                         root, &mut candidate, request, &at, &actor,
                     ).map_err(|error| WorkEngineError::PlanningBootstrap(Box::new(error)))?;
                 }
-                if action==crate::PlanningControlAction::Enable {
+                if configures_repository {
                     if let Some(repository)=request.repository.as_deref(){
                         #[cfg(target_os = "linux")]
                         {

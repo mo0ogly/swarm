@@ -224,6 +224,10 @@ Le champ facultatif `task_workspaces` associe des tâches à des répertoires
 existants dans le projet. Des espaces distincts permettent au conducteur de faire
 avancer des branches indépendantes selon leurs dépendances, leurs autorisations et
 les créneaux disponibles. Le rattachement n’enregistre aucun consentement au départ.
+Pour un dépôt géré, fournissez `repository` avec un chemin local et
+`committed_only: true`. Swarm épingle le commit existant et refuse la
+combinaison avec des espaces personnalisés ou une demande d’inclure des
+modifications hors commit. Les copies par tentative sont préparées au départ.
 Le lancement et la validation utilisent ensuite les commandes habituelles.
 Si la révision change pendant un aperçu de départ, le conducteur relit le
 projet au cycle suivant lorsque le moteur confirme qu’aucune admission n’a été

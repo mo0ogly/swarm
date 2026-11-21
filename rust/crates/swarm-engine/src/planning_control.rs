@@ -185,6 +185,12 @@ pub(crate) fn validate_planning_control_action(
     {
         return Err(PlanningControlError::Refused("planning-task-scopes-not-applicable"));
     }
+    if action == PlanningControlAction::Attach
+        && request.repository.is_some()
+        && request.task_workspaces.as_ref().is_some_and(|paths| !paths.is_empty())
+    {
+        return Err(PlanningControlError::Refused("planning-attach-managed-workspaces-conflict"));
+    }
     if action == PlanningControlAction::RejectInstructions {
         let mut envelope=request.clone();
         envelope.instruction_revision_id.clear();
@@ -432,8 +438,11 @@ pub(crate) fn validate_planning_attach_target(
         .filter(|assignments| !assignments.is_empty())
         .ok_or(E::Refused("planning-attach-task-scopes-required"))?;
     let tasks = work.tasks.as_deref().unwrap_or_default();
-    if work.planning.is_some() || tasks.is_empty() || request.repository.is_some() {
+    if work.planning.is_some() || tasks.is_empty() {
         return Err(E::Refused("planning-attach-ordinary-work-required"));
+    }
+    if request.repository.is_some() {
+        return Err(E::Refused("planning-attach-repository-requires-root"));
     }
     if request.provider.is_empty() {
         return Err(E::Refused("planning-attach-provider-required"));

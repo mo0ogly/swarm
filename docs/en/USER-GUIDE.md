@@ -191,6 +191,10 @@ results. Missing assignments or active execution reject the entire change.
 The optional `task_workspaces` map selects existing directories within the
 project. Distinct workspaces let the conductor progress independent branches
 subject to dependencies, current authorizations and available slots.
+For a managed repository, supply `repository` with a local path and
+`committed_only: true`. Swarm pins the existing commit. It refuses custom
+workspaces or a request to include uncommitted modifications with this option.
+Per-attempt copies are prepared at launch.
 Attachment records no start consent. Start and validation use their usual
 operations. If the revision changes during launch preview, the conductor rereads
 the Work on its next cycle once the engine confirms that no admission was

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Verify a hierarchy attaches to a populated Work using the public Swarm CLI."""
 import argparse
+import subprocess
 from pathlib import Path
 
 from rust_agent_model_route import Fixture, digest, publish
 
 
-def run(binary, output):
-    """Preserve task history, require complete coverage and leave consent unset."""
+def run(binary, output, *, managed=False):
+    """Cover existing-work attachment with explicit or managed workspace ownership."""
     fixture = Fixture(binary, output, 'planning-attach')
     work_id = fixture.work
 
@@ -59,8 +60,34 @@ def run(binary, output):
     assert show() == before
     print('PASS attachment-refuses-private-workspace', flush=True)
 
-    code, result = change(['planning', 'attach'], 'attach-team',
-                          task_scopes=assignments, task_workspaces=workspaces, **config)
+    if managed:
+        source = fixture.root / 'repository'
+        source.mkdir()
+        subprocess.run(['git', 'init', '--quiet', str(source)], check=True)
+        tracked = source / 'input.txt'
+        tracked.write_text('Witness from the pinned commit\n')
+        subprocess.run(['git', '-C', source, 'add', 'input.txt'], check=True)
+        subprocess.run(['git', '-C', source, '-c', 'user.name=Owned fixture', '-c',
+                        'user.email=fixture@example.invalid', 'commit', '--quiet', '-m',
+                        'Managed attachment fixture'], check=True)
+        base = subprocess.check_output(['git', '-C', source, 'rev-parse', 'HEAD'], text=True).strip()
+        tracked.write_text('Dirty input outside the authority\n')
+        repo = dict(path='repository', committed_only=True)
+        inputs = dict(task_scopes=assignments, repository=repo, **config)
+        storage = fixture.root / '.swarm' / 'managed' / work_id
+        code, result = change(['planning', 'attach'], 'managed-workspace-conflict',
+                              task_workspaces=workspaces, **inputs)
+        assert code != 0 and 'planning-attach-managed-workspaces-conflict' in str(result), result
+        assert show() == before and not storage.exists()
+        code, result = change(['planning', 'attach'], 'managed-dirty-refused',
+                              **dict(inputs, repository=dict(repo, include_dirty=['input.txt'])))
+        assert code != 0 and 'managed-dirty-snapshot-unported' in str(result), result
+        assert show() == before and not storage.exists()
+        print('PASS managed attachment refuses ambiguous workspaces and dirty source', flush=True)
+    else:
+        inputs = dict(task_scopes=assignments, task_workspaces=workspaces, **config)
+
+    code, result = change(['planning', 'attach'], 'attach-team', **inputs)
     assert code == 0, result
     after = show()
     assert after['id'] == work_id and after['revision'] == before['revision'] + 1
@@ -74,11 +101,26 @@ def run(binary, output):
     for old, current in zip(before['tasks'], after['tasks'], strict=True):
         assert current['scope_id'] == assignments[old['id']] and current['plan_role'] == 'worker'
         assert current['requirements'] == scopes[current['scope_id']]['requirements']
-        profile = current['launch_profile']
-        assert profile['workspace'] == workspaces[old['id']]
-        assert profile['provider'] == 'fixture' and profile['role'] == 'worker'
+        if not managed:
+            profile = current['launch_profile']
+            assert profile['workspace'] == workspaces[old['id']]
+            assert profile['provider'] == 'fixture' and profile['role'] == 'worker'
         assert {k: v for k, v in current.items() if k not in
                 {'scope_id', 'plan_role', 'requirements', 'launch_profile'}} == old
+    if managed:
+        assert plan['repository']['base_commit'] == base
+        storage = Path(plan['repository']['storage'])
+        assert storage == fixture.root / '.swarm' / 'managed' / work_id
+        bare = storage / 'repository.git'
+        assert subprocess.check_output(['git', '--git-dir', bare, 'show', base + ':input.txt']) == b'Witness from the pinned commit\n'
+        assert tracked.read_bytes() == b'Dirty input outside the authority\n'
+        assert not (storage / 'copies').exists()
+        snapshot = (storage / 'repository.json').read_bytes()
+        code, result = fixture.call(['planning', 'attach', work_id], dict(
+            schema_version=1, event_id='attach-team', expected_revision=before['revision'], **inputs))
+        assert code == 0, result
+        assert show() == after and (storage / 'repository.json').read_bytes() == snapshot
+        print('PASS managed attachment pins committed input without worker copy', flush=True)
     controls = fixture.ok(['mission', 'show', work_id])
     assert controls['consent_enabled'] is None and controls['autonomy'] is None
     code, result = change(['planning', 'attach'], 'repeat-team',
@@ -96,9 +138,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--managed', action='store_true')
     args = parser.parse_args()
     args.output.mkdir(mode=0o700)
-    outcome = run(args.binary.resolve(strict=True), args.output)
+    outcome = run(args.binary.resolve(strict=True), args.output, managed=args.managed)
     publish(args.output / 'result.json', outcome)
 
 
