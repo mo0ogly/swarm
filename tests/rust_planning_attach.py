@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Verify a hierarchy attaches to a populated Work using the public Swarm CLI."""
 import argparse
+import json
 import subprocess
 from pathlib import Path
 
@@ -159,6 +160,24 @@ def run(binary, output, *, managed=False, graph=False, history=False):
         assert not after['tasks'][0].get('planning_retry')
         assert receipt.read_bytes() == original_receipt
         print('PASS attachment routes the genuine historical worker completion without granting retry', flush=True)
+        status = fixture.ok(['mission', 'status', work_id])
+        assert status['organization']['ready'] and status['validated'] == 0
+        assert {task['id'] for task in status['tasks']} == set(assignments)
+        assert status['active_agents'] == 0 and show() == after
+        print('PASS cockpit status preserves historical ordinary completion after managed attachment', flush=True)
+        from rust_native_production_retry import negative_frame
+        changed = json.loads(original_receipt)
+        changed['details']['kernel_reaped'] = False
+        with negative_frame(receipt, original_receipt, json.dumps(changed).encode()):
+            code, response = fixture.call(['mission', 'status', work_id])
+            assert code != 0 and 'agent-completion-wait-not-confirmed' in str(response), response
+            assert show() == after
+        assert receipt.read_bytes() == original_receipt
+        restored = fixture.ok(['mission', 'status', work_id])
+        # Runtime clocks and spending windows continue to advance during reads.
+        for field in ('organization', 'tasks', 'validated', 'active_agents', 'total'):
+            assert restored[field] == status[field], field
+        print('PASS cockpit refuses unproven history and recovers after exact restoration', flush=True)
     if graph:
         organized = fixture.ok(['planning', 'graph', work_id])
         assert organized['planning_configured'] and organized['reviewer_provider'] == 'fixture'

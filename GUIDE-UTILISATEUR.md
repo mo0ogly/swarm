@@ -231,6 +231,8 @@ modifications hors commit. Les copies par tentative sont préparées au départ.
 Une fin native échouée ou interrompue et vérifiable est remise au périmètre
 rattaché. Le superviseur reçoit l’original attribué. La tentative historique
 et le statut de la tâche sont conservés. Cette remise n’autorise aucune relance.
+Le cockpit lit cette tentative ordinaire depuis son reçu natif. Une preuve
+historique absente ou incohérente laisse l’état opérationnel indisponible.
 Le lancement et la validation utilisent ensuite les commandes habituelles.
 Si la révision change pendant un aperçu de départ, le conducteur relit le
 projet au cycle suivant lorsque le moteur confirme qu’aucune admission n’a été

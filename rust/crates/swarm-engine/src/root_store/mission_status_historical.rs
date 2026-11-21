@@ -461,6 +461,48 @@ fn legacy_unbound_terminal(agent: &crate::Agent) -> bool {
 }
 
 impl RootStore {
+    /// Recognize an ordinary terminal native worker that ran before this Work
+    /// acquired its managed repository. The canonical launch and attachment
+    /// events must order the exact stored request, and a managed attempt row
+    /// disqualifies this path. The retained terminal journal and task attempt
+    /// must agree. This is a read-only provenance check, never a launch,
+    /// reviewer or acceptance grant.
+    fn attached_ordinary_terminal(&self, work: &crate::Work, agent: &crate::Agent) -> Result<bool, E> {
+        if agent.origin != "operateur" || agent.role != "worker" || agent.native_mission.is_some()
+            || !matches!(agent.status.as_str(), "failed" | "interrupted")
+        {
+            return Ok(false);
+        }
+        let count = crate::agent_launch::query(
+            &self.db,
+            "SELECT count(*)
+             FROM main.agents AS a
+             JOIN main.events AS launched
+               ON launched.work_id=a.work_id AND launched.kind='agent.start' AND launched.request=a.request
+             JOIN main.events AS attached
+               ON attached.work_id=a.work_id AND attached.kind='planning.attach' AND attached.revision>launched.revision
+             WHERE a.id=?1 AND a.work_id=?2 AND a.task_id=?3
+               AND NOT EXISTS (SELECT 1 FROM main.managed_attempts AS m WHERE m.agent_id=a.id)",
+            rusqlite::params![agent.id, work.id, agent.task_id],
+            |rows| Ok(rows.next()?.ok_or(crate::AgentLaunchError::Refused("mission-status-attachment-event-count-missing"))?.get::<_, i64>(0)?),
+        ).map_err(|cause| E::Launch(Box::new(cause)))?;
+        if count == 0 {
+            return Ok(false);
+        }
+        let attempts = work.tasks.iter().flatten().filter(|task| task.id == agent.task_id)
+            .flat_map(|task| task.attempts.iter().flatten())
+            .filter(|attempt| attempt.id == agent.attempt_id && attempt.status == agent.status && !attempt.ended.is_empty())
+            .count();
+        if count != 1 || attempts != 1 {
+            return Err(E::Refused("mission-status-ordinary-attachment-identity"));
+        }
+        let original = crate::agent_completion_journal::observe_terminal(&self.db, &self.directory, &agent.id)?;
+        if original.agent != *agent {
+            return Err(E::Refused("mission-status-ordinary-attachment-original-changed"));
+        }
+        Ok(true)
+    }
+
     /// Recheck original first-worker attribution without requiring its mutable
     /// copy or invoking Git/provider operations. Errors retain launch causes;
     /// caller holds the material read and rechecks Work/Agents/settings. Observe
@@ -472,7 +514,9 @@ impl RootStore {
     /// recorded mission binding predates the mandatory binding; it can never
     /// be claimed, granted or relaunched (those paths keep the strict check),
     /// so it is reported as unverified historical provenance instead of
-    /// refusing the whole status. Returns how many were not verified.
+    /// refusing the whole status. A proven ordinary terminal attempt from
+    /// before attachment is read through its original journal. Returns how
+    /// many legacy workers were not verified.
     fn status_managed_workers(&self, work: &crate::Work, agents: &[crate::Agent], settings: &crate::EngineSettingsDocument) -> Result<usize, E> {
         // Original native provenance includes the FIFO journal, whose coherent
         // history reader requires an explicit read transaction. Close it before
@@ -482,6 +526,11 @@ impl RootStore {
             for agent in agents {
                 if legacy_unbound_terminal(agent) {
                     unverified += 1;
+                    continue;
+                }
+                if self.attached_ordinary_terminal(work, agent)
+                    .map_err(|e| crate::MissionSupervisionError::Root(Box::new(e)))?
+                {
                     continue;
                 }
                 crate::managed_repository::verify_worker(&self.root, &self.db, work, agent, settings,
