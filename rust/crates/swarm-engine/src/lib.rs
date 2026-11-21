@@ -95,6 +95,7 @@ mod mission_status_runtime;
 mod mission_organization;
 pub use mission_organization::{
     validate_mission_organization, validate_mission_reviewer_capacity, MissionOrganizationError,
+    ROOT_ORCHESTRATOR_SCOPE,
 };
 mod mission_control_request;
 pub use mission_control_request::{decode_mission_priority_request, decode_mission_control_request, decode_mission_start_request, MissionControlAction, MissionControlRequest, MissionControlView};

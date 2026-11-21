@@ -36,6 +36,8 @@ pub enum MemoryError {
     Refused(&'static str),
     /// Stored-row envelope/identity/revision incoherence.
     Row(crate::WorkError),
+    /// The attached scope cannot be resolved from the recorded planning state.
+    SummaryScope(crate::PlanningBudgetError),
     /// A revision mismatch that a caller must resolve by re-examining.
     RevisionConflict(&'static str),
     Sql(rusqlite::Error),
@@ -46,7 +48,7 @@ pub enum MemoryError {
 impl MemoryError {
     pub fn code(&self) -> &'static str {
         match self {
-            Self::Refused(_) => "project-memory-refused",
+            Self::Refused(_) | Self::SummaryScope(_) => "project-memory-refused",
             Self::Row(_) => "row-incoherent",
             Self::RevisionConflict(_) => "revision-conflict",
             Self::Sql(_) => "project-memory-storage",
@@ -58,6 +60,7 @@ impl MemoryError {
         match self {
             Self::Refused(reason)
             | Self::RevisionConflict(reason) => reason,
+            Self::SummaryScope(_) => "project-summary-source-task-scope-invalid",
             Self::Row(e) => e.code(),
             Self::Sql(_) => "project-memory-sql",
             Self::IdentityMismatch => "project-memory-identity-mismatch",
@@ -74,6 +77,7 @@ impl std::error::Error for MemoryError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Row(e) => Some(e),
+            Self::SummaryScope(e) => Some(e),
             Self::Sql(e) => Some(e),
             _ => None,
         }

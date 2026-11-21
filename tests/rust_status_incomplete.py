@@ -59,6 +59,30 @@ def verify(server, owned, check):
     check('incomplete-restored', restored['validated'] == 0 and restored['tasks'][0]['result']['state'] == 'completed_unproven')
 
 
+
+def verify_scoped_abandon_refused(server, owned, check):
+    """Completed scoped attempts retain their record when direct abandonment refuses.
+
+    This uses the public endpoint and command with the actual attempt from the
+    logs fixture. No review, replacement attempt or terminal decision is created.
+    """
+    before = owned.snapshot()
+    work = owned.ok(['work', 'show', owned.work])['work']
+    endpoint = '/api/v1/mission?work='+owned.work+'&action=status'
+    status = server.request(endpoint, observe=False)
+    witness = status['tasks'][0]
+    assert work['planning'] and witness['attempt']['agent_id'] == 'session'
+    code, reply = owned.call(['task', 'update', owned.work], dict(
+        schema_version=1, event_id='refuse-abandon-after-attempt',
+        expected_revision=work['revision'], id='task', status='abandoned',
+    ))
+    check('scoped-abandon-after-attempt-refused', code != 0 and
+          ('scoped-initial-decision-history-unported' in str(reply)
+           or 'hierarchical-lifecycle-not-ported' in str(reply)))
+    check('scoped-abandon-attempt-and-state-unchanged', owned.snapshot() == before and
+          server.request(endpoint, observe=False)['tasks'][0] == witness)
+
+
 def verify_abandoned(server, owned, check):
     """Observe an abandoned task status through public CLI and HTTP only.
 

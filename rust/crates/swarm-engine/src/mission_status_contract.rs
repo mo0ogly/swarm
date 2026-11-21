@@ -536,6 +536,8 @@ pub struct MissionSupervision {
 /// Wire declaration: `HEAD:internal/engine/organization.go:11`.
 #[derive(Clone, PartialEq, Serialize)]
 pub struct Organization {
+    /// Canonical root role scoped to the Work, including before configuration.
+    pub root_scope: &'static str,
     /// Go `Ready` (organization.go:12); supplied data, not inferred.
     pub ready: bool,
     /// Go `Label` (organization.go:13); supplied data, not inferred.

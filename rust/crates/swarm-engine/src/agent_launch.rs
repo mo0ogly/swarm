@@ -153,8 +153,9 @@ pub(crate) fn supported_branch(r:&Launch,conductor:Option<&str>)->Result<(),Agen
     }
     Ok(())
 }
-/// Validate persisted manual or scoped operator-worker branches before transition.
-/// Hierarchy requires structural organization/reviewer capacity. Managed manual
+/// Validate a worker against the recorded Work before reservation or execution.
+/// Every departure requires structural organization, reviewer capacity and a scoped
+/// task eligible for the requested transition. Managed manual
 /// copies require separate attribution at admission and every execution boundary;
 /// versioned memory and conversation recovery branches remain refused. Historical
 /// Work.memory paths require the separate current memory_files check. Actual provider availability and
@@ -165,29 +166,23 @@ pub(crate) fn supported_branch(r:&Launch,conductor:Option<&str>)->Result<(),Agen
 /// branches remain unsupported. This
 /// grants no automatic dispatch, parent delegation or task acceptance.
 pub(crate) fn supported_work(w: &Work, index: usize) -> Result<(), AgentLaunchError> {
-    if let Some(planning) = w.planning.as_deref() {
-        crate::validate_mission_organization(w)
-            .map_err(|error| AgentLaunchError::caused(error.code(), error))?;
-        crate::validate_mission_reviewer_capacity(planning)
-            .map_err(|error| AgentLaunchError::caused(error.code(), error))?;
-    }
-    let task = &w
-        .tasks
-        .as_deref()
-        .ok_or(AgentLaunchError::Refused("agent-launch-task-missing"))?[index];
-    if w.planning.is_some() {
-        crate::task_lifecycle::require_scoped_worker_restart(task)
-            .map_err(|e| AgentLaunchError::caused(e.reason(), e))?;
-    }
-    if (w.planning.is_none() && w.planning_brief.is_some())
-        || w.project_memory.as_ref().is_some_and(|v| !v.is_empty())
+    let planning = w.planning.as_deref()
+        .ok_or(AgentLaunchError::Refused("organization-planning-missing"))?;
+    crate::validate_mission_organization(w)
+        .map_err(|error| AgentLaunchError::caused(error.code(), error))?;
+    crate::validate_mission_reviewer_capacity(planning)
+        .map_err(|error| AgentLaunchError::caused(error.code(), error))?;
+    let task = w.tasks.as_deref().and_then(|tasks| tasks.get(index))
+        .ok_or(AgentLaunchError::Refused("agent-launch-task-missing"))?;
+    crate::task_lifecycle::require_scoped_worker_restart(task)
+        .map_err(|e| AgentLaunchError::caused(e.reason(), e))?;
+    if w.project_memory.as_ref().is_some_and(|v| !v.is_empty())
         || task
             .memory_selections
             .as_ref()
             .is_some_and(|v| !v.is_empty())
         || task.memory_decision.is_some()
-        || task.independent_review.as_deref().is_some_and(|review| !(w.planning.is_some()
-            && task.status == "blocked" && task.planning_retry && review.state == "changes_requested"
+        || task.independent_review.as_deref().is_some_and(|review| !(task.status == "blocked" && task.planning_retry && review.state == "changes_requested"
             && crate::review_evidence::native_receipt_reference(&review.receipt)))
         || task.corrective_recovery.is_some()
         || task.recovered_result.is_some()
@@ -1428,6 +1423,9 @@ pub(crate) fn prepare<E: WorkEnvironment>(
     if chosen_work.revision != r.expected_revision {
         return Err(AgentLaunchError::Refused("revision_conflict"));
     }
+    let index = chosen_work.tasks.iter().flatten().position(|task| task.id == r.task_id)
+        .ok_or(AgentLaunchError::Refused("agent-launch-task-missing"))?;
+    supported_work(&chosen_work, index)?;
     crate::task_model::bind_launch(&chosen_work, &mut r)?;
     // Go admission-side memorySummaryAttachment (agents_store.go:496): refuse a
     // stale or invalid extractive selection before interpreting the launch, so
@@ -1469,8 +1467,6 @@ pub(crate) fn prepare<E: WorkEnvironment>(
     let managed=chosen_work.planning.as_deref().is_some_and(|p|p.repository.is_some());
     if managed {
         if preview { return Err(AgentLaunchError::Refused("agent-launch-work-branch-unported")); }
-        let index=chosen_work.tasks.iter().flatten().position(|t|t.id==r.task_id).ok_or(AgentLaunchError::Refused("agent-launch-task-missing"))?;
-        supported_work(&chosen_work,index)?;
         // Revalidate the actual automatic fence before any retained copy effect.
         if fence.and_then(|f| f.mission_conductor()).is_some() {
             let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)

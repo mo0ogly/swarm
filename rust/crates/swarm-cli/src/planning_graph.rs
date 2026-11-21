@@ -2,7 +2,7 @@
 use crate::{json_bytes, write_output, Arguments, CliError};
 use serde::Serialize;
 use std::{io::Write, path::Path};
-use swarm_engine::{RootStore, RootStoreError, Work};
+use swarm_engine::{RootStore, RootStoreError, Work, ROOT_ORCHESTRATOR_SCOPE};
 
 #[derive(Serialize)]
 struct Scope<'a> {
@@ -46,30 +46,34 @@ fn present(value: &str) -> Option<&str> {
     (!value.is_empty()).then_some(value)
 }
 
-/// Project ordered scopes, task prerequisites and recorded control facts.
-/// Configuration and receipts are separate; this never evaluates freshness or
-/// publishes commands, arbitrary output, private identities or a validation.
+/// Project the default root role or the configured scope hierarchy, followed by
+/// task prerequisites and recorded control facts. An unconfigured root has no
+/// provider or assigned tasks. This projection does not evaluate freshness or
+/// publish commands, arbitrary output, private identities or a validation.
 fn project<'a>(work: &'a Work, conductor_observation: Option<&'static str>) -> Graph<'a> {
     let planning = work.planning.as_deref();
-    let scopes = planning
-        .into_iter()
-        .flat_map(|p| {
-            p.scopes.iter().flatten().map(|scope| Scope {
-                id: &scope.id,
-                parent: present(&scope.parent),
-                role: if scope.id == "root" && scope.parent.is_empty() {
-                    "root_planner"
-                } else {
-                    "subplanner"
-                },
-                provider: scope
-                    .model_selection
-                    .as_deref()
-                    .and_then(|m| present(&m.provider))
-                    .or_else(|| present(&p.provider)),
-            })
-        })
-        .collect();
+    let scopes = match planning {
+        None => vec![Scope {
+            id: ROOT_ORCHESTRATOR_SCOPE,
+            parent: None,
+            role: "root_planner",
+            provider: None,
+        }],
+        Some(planning) => planning.scopes.iter().flatten().map(|scope| Scope {
+            id: &scope.id,
+            parent: present(&scope.parent),
+            role: if scope.id == ROOT_ORCHESTRATOR_SCOPE && scope.parent.is_empty() {
+                "root_planner"
+            } else {
+                "subplanner"
+            },
+            provider: scope
+                .model_selection
+                .as_deref()
+                .and_then(|model| present(&model.provider))
+                .or_else(|| present(&planning.provider)),
+        }).collect(),
+    };
     let tasks = work
         .tasks
         .iter()

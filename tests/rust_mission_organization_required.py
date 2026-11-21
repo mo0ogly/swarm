@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Verify automatic start refuses missing organization before persisting consent."""
+"""Verify manual and automatic admission require a configured Swarm team."""
 import argparse
 from pathlib import Path
 
 from fixture_area import fixture_root
-from rust_agent_model_route import digest, publish
+from rust_agent_model_route import Fixture, digest, publish
 from rust_native_task_validation import invoke
 
 
@@ -50,8 +50,52 @@ def scenario(binary, evidence):
     return root
 
 
+
+def manual_scenario(binary, evidence):
+    """Exercise the same manual request before and after configuring its team.
+
+    Public CLI only. Retain workload and attempt observations on each refusal.
+    The positive control uses one owned inert provider, never a remote call.
+    """
+    fixture = Fixture(binary, evidence, 'manual-organization')
+    work = fixture.work
+    work_show = ['work', 'show', work]
+    initial = fixture.ok(work_show)['work']
+    assert initial['revision'] == fixture.request['expected_revision']
+    for action in ('preview', 'prepare'):
+        code, result = fixture.call(['agent', action, work], fixture.request)
+        assert code != 0 and 'organization-planning-missing' in str(result), (action, code)
+        assert fixture.ok(work_show)['work'] == initial
+        shown, _ = fixture.call(['agent', 'show', fixture.request['event_id']])
+        assert shown != 0
+        assert fixture.reservation() is None
+        assert not (fixture.workspace / 'model-received.json').exists()
+    print('PASS manual admission refuses absent organization without a reservation', flush=True)
+
+    flat = fixture.ok(['planning', 'graph', work])
+    assert not flat['planning_configured']
+    assert flat['scopes'] == [dict(id='root', parent=None, role='root_planner', provider=None)]
+    assert flat['reviewer_provider'] is None and flat['conductor_observation'] is None
+    status = fixture.ok(['mission', 'status', work])
+    assert status['organization']['root_scope'] == 'root' and not status['organization']['ready']
+    assert fixture.ok(work_show)['work'] == initial
+    print('PASS canonical unconfigured root is observable before assignment', flush=True)
+
+    attached = fixture.configure_team()
+    assert attached['id'] == work and attached['tasks'][0]['scope_id'] == 'worker-scope'
+    assert fixture.ok(['mission', 'show', work])['consent_enabled'] is None
+    prepared = fixture.prepare()
+    assert prepared['created'] and not prepared['process_started']
+    assert prepared['agent']['task_id'] == 'task'
+    completed = fixture.ok(['agent', 'run', prepared['agent']['id']])
+    assert completed['agent']['status'] == 'completed' and not completed['task_accepted']
+    assert (fixture.workspace / 'model-received.json').is_file()
+    print('PASS configured team starts the authorized manual worker without accepting its output', flush=True)
+    return fixture.root
+
+
 def main():
-    """Bind both named outcomes to the same executable and retained output."""
+    """Bind manual and automatic outcomes to the same executable and retained output."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
@@ -59,11 +103,14 @@ def main():
     binary = args.binary.resolve(strict=True)
     expected = digest(binary.read_bytes())
     args.output.mkdir(mode=0o700)
+    manual_root = manual_scenario(binary, args.output)
     root = scenario(binary, args.output)
     assert digest(binary.read_bytes()) == expected
     publish(args.output / 'result.json', dict(
-        status='PASS', root=str(root), binary_sha256=expected, provider_called=False,
-        cases=['organization-planning-missing', 'organization-reviewer-missing'],
+        status='PASS', automatic_root=str(root), manual_root=str(manual_root),
+        binary_sha256=expected, remote_provider_called=False,
+        cases=['organization-planning-missing', 'organization-reviewer-missing',
+               'manual-refusal-without-reservation', 'canonical-root', 'manual-after-attach'],
         consent_unchanged=True,
     ))
     print('PASS organization-planning-missing')

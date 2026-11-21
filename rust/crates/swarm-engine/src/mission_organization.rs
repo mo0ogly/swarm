@@ -2,6 +2,10 @@
 use crate::{PlanningState, PlanningStateError, ReviewerConfig, ValidationPolicyError, Work};
 use std::{error::Error, fmt};
 
+/// Every Work has this root role, identified within its Work id from creation.
+/// A missing PlanningState leaves the role unconfigured and grants no authority.
+pub const ROOT_ORCHESTRATOR_SCOPE: &str = "root";
+
 /// Safe refusal with original typed state/coverage causes and private reviewer
 /// failure retained. None of these variants permits an agent, provider or commit.
 pub enum MissionOrganizationError {
@@ -95,7 +99,7 @@ pub fn validate_mission_organization(work: &Work) -> Result<(), MissionOrganizat
     }
     crate::validate_planning_state(work).map_err(|e| E::State(Box::new(e)))?;
     let scopes = p.scopes.as_deref().unwrap_or_default();
-    if !scopes.iter().any(|s| s.id == "root" && s.parent.is_empty()) {
+    if !scopes.iter().any(|s| s.id == ROOT_ORCHESTRATOR_SCOPE && s.parent.is_empty()) {
         return Err(E::Structure("organization-root-invalid"));
     }
     if p.provider.is_empty() {

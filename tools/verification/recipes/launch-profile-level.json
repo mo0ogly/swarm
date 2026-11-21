@@ -5,6 +5,7 @@
     "tests/rust_launch_profile_level.py",
     "tests/rust_agent_model_route.py",
     "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/mission_organization.rs",
     "rust/crates/swarm-engine/src/task_model.rs",
     "rust/crates/swarm-engine/src/provider_model_route.rs",
     "rust/crates/swarm-engine/src/agent_store.rs",

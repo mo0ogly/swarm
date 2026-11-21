@@ -512,7 +512,7 @@ fn attach_planning(
         let id = &assignments[&task.id];
         let scope = scopes.entry(id.clone()).or_insert_with(|| crate::PlanningScope {
             id: id.clone(),
-            parent: "root".into(),
+            parent: crate::ROOT_ORCHESTRATOR_SCOPE.into(),
             objective: format!("Supervise assigned tasks in {id}"),
             revision: 1,
             state: "waiting".into(),
@@ -654,7 +654,7 @@ fn apply_local_planning_enable(
         max_decisions: request.max_decisions,
         max_activations: request.max_activations,
         scopes: Some(vec![crate::PlanningScope {
-            id: "root".into(),
+            id: crate::ROOT_ORCHESTRATOR_SCOPE.into(),
             objective: work.objective.clone(),
             requirements: Some(requirements),
             revision: 1,

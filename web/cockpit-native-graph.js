@@ -819,10 +819,10 @@
   }
 
   /**
-   * Project the recorded orchestration beside the editable dependency graph.
-   * Scope parentage and task assignments come from Work. Conductor observation
-   * comes from current mission status when available. Disconnected scopes and
-   * unassigned tasks are reported without inventing parentage or execution.
+   * Project the Work's default root role and the recorded scope hierarchy.
+   * An unconfigured root has no provider or assigned tasks. Configured scopes
+   * use stored parentage. Only current mission status describes the conductor.
+   * Rendering does not mutate Work, dispatch a provider, or grant a launch.
    * @param {object} work recorded Work with validated tasks
    * @param {object|null} mission optional current observation
    * @param {string} readMode "history" suppresses current observations
@@ -857,23 +857,17 @@
     }
     const assignments = new Set();
     const planning = work.planning;
-    if (!planning) {
-      const missing = document.createElement('p');
-      missing.textContent = t('Planificateur racine, sous-planificateurs et validateur non rattachés.');
-      panel.append(missing);
-      return { panel, assignments, reasons };
-    }
-
+    const rootId = mission?.organization?.root_scope ?? 'root';
     const configuredReviewer = document.createElement('p');
     configuredReviewer.dataset.orchestrationRole = 'reviewer';
-    const reviewer = planning.reviewer;
+    const reviewer = planning?.reviewer;
     configuredReviewer.textContent = t('Validateur indépendant') + ' · ' +
       (reviewer?.provider
         ? [reviewer.provider, reviewer.model_route?.model].filter(Boolean).join(' · ')
         : t('Non configuré'));
     panel.append(configuredReviewer);
 
-    const scopes = Array.isArray(planning.scopes) ? planning.scopes : [];
+    const scopes = planning ? (Array.isArray(planning.scopes) ? planning.scopes : []) : [{id: rootId}];
     const byId = new Map();
     const byParent = new Map();
     for (const scope of scopes) {
@@ -883,7 +877,7 @@
       byParent.get(scope.parent).push(scope);
     }
     const tasksByScope = new Map();
-    for (const task of work.tasks) {
+    for (const task of planning ? work.tasks : []) {
       if (!tasksByScope.has(task.scope_id)) tasksByScope.set(task.scope_id, []);
       tasksByScope.get(task.scope_id).push(task);
     }
@@ -893,7 +887,7 @@
     const treeTitle = document.createElement('summary');
     treeTitle.textContent = t('Équipe et périmètres');
     tree.append(treeTitle);
-    const root = byId.get('root');
+    const root = byId.get(rootId);
     const visited = new Set();
     if (root && !root.parent) {
       const hierarchy = document.createElement('ul');
@@ -907,8 +901,8 @@
         item.dataset.scope = scope.id;
         const name = document.createElement('strong');
         name.textContent = scope === root
-          ? [t('Planificateur racine'), planning.provider, planning.model_route?.model].filter(Boolean).join(' · ')
-          : [t('Sous-planificateur'), scope.id, scope.model_selection?.provider,
+          ? [t('Orchestrateur principal'), planning?.provider || t('À configurer'), planning?.model_route?.model].filter(Boolean).join(' · ')
+          : [t('Sous-orchestrateur'), scope.id, scope.model_selection?.provider,
               scope.model_selection?.route?.model].filter(Boolean).join(' · ');
         item.append(name);
         const tasks = tasksByScope.get(scope.id) || [];
@@ -942,7 +936,7 @@
       }
       tree.append(hierarchy);
     }
-    if (!visited.has('root') || visited.size !== scopes.length) {
+    if (!visited.has(rootId) || visited.size !== scopes.length) {
       const warning = document.createElement('p');
       warning.textContent = t('Hiérarchie incomplète : certains périmètres sont introuvables.');
       tree.append(warning);
@@ -1071,7 +1065,7 @@
     }
 
     canvas.append(svg);
-    if(!tasks.length){const empty=document.createElement('p');empty.textContent=t('Aucune tâche : le graphe apparaîtra dès qu’un plan existe.');canvas.append(empty)}
+    canvas.hidden = tasks.length === 0;
     if (unknown.length) {
       const warning = document.createElement('p');
       warning.setAttribute('role', 'alert');

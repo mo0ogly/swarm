@@ -291,7 +291,8 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "26 passed; 0 failed",
+        "32 passed; 0 failed",
+        "summary_selection_refuses_dialogue_in_another_scope ... ok",
         "leased_manual_launch_preview_receipt_replay_and_binding ... ok",
         "leased_manual_launch_expiry_after_staging_rolls_back_and_recovers ... ok",
         "leased_manual_launch_receipt_failure_rolls_back_and_recovers ... ok",

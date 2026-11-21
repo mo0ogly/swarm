@@ -99,6 +99,21 @@ mod tests {
         Work {
             id: "mission".into(),
             revision: 7,
+            criteria: Some(vec!["Fixture proof".into()]),
+            planning: Some(Box::new(crate::PlanningState {
+                version: 1, max_tasks: 3, max_activations: 1, max_decisions: 1,
+                provider: "parent".into(), human_review_authorized: "fixture".into(),
+                reviewer: Some(Box::new(crate::ReviewerConfig {
+                    provider: "reviewer".into(), authorized: "fixture".into(),
+                    max_calls: 1, ..Default::default()
+                })),
+                scopes: Some(vec![crate::PlanningScope {
+                    id: crate::ROOT_ORCHESTRATOR_SCOPE.into(), state: "ready".into(),
+                    revision: 1, requirements: Some(vec!["req-1".into()]),
+                    ..Default::default()
+                }]),
+                ..Default::default()
+            })),
             launch_profile: Some(Box::new(LaunchProfile {
                 role: "worker".into(),
                 provider: "parent".into(),
@@ -111,6 +126,12 @@ mod tests {
                     .map(|id| crate::Task {
                         id: id.into(),
                         status: "todo".into(),
+                        scope_id: crate::ROOT_ORCHESTRATOR_SCOPE.into(),
+                        requirements: Some(vec!["req-1".into()]),
+                        validation_policy: Some(Box::new(crate::ValidationPolicy {
+                            mode: "human".into(), authorized_at: "fixture".into(),
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     })
                     .collect(),
@@ -144,6 +165,15 @@ mod tests {
                 .collect::<Vec<_>>(),
             ["b", "a", "c"]
         );
+        let mut unconfigured = work.clone();
+        unconfigured.planning = None;
+        assert!(select(&unconfigured, &order).unwrap().into_iter().all(|candidate| {
+            candidate.profile.err().and_then(|error| {
+                std::error::Error::source(&error)
+                    .and_then(|cause| cause.downcast_ref::<crate::AgentLaunchError>())
+                    .map(crate::AgentLaunchError::code)
+            }) == Some("organization-planning-missing")
+        }));
         assert_eq!(projected[0].profile.as_ref().unwrap().provider, "override");
         assert_eq!(projected[1].profile.as_ref().unwrap().provider, "parent");
         assert_eq!(before, crate::encode_model(&work).unwrap());
@@ -190,7 +220,7 @@ mod tests {
                 .as_ref()
                 .unwrap_err()
                 .code(),
-            "mission-candidates-manual-recovery-unported"
+            "mission-candidates-work-branch-refused"
         );
         work.tasks.as_mut().unwrap()[0].status = "todo".into();
         work.tasks.as_mut().unwrap()[0].launch_held = true;

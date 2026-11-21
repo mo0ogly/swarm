@@ -1145,6 +1145,30 @@ This is PATH observation plus declared dependency checking, not a hermetic proce
 graph against absolute nested tool paths. No model, deployment or watchdog right
 is created. Historical archive tests remain a separate explicit legacy target.
 
+Manual native admission fixtures prepare the team through public Work mutations.
+When a CLI case runs a provider, it gives the provider a workspace below the
+fixture Root and observes process readiness and termination with workspace FIFOs
+and a CLI pidfd. The catalogue entry for the team stays frozen when a case
+changes the worker provider. The retained integration results distinguish
+admission, process execution, budget settlement and task acceptance.
+
+Les fixtures d’admission manuelle native déclarent l’équipe par les opérations
+publiques Work. Les essais CLI qui démarrent un fournisseur lui réservent un
+espace sous la racine de la fixture. Ils observent sa disponibilité par des
+FIFO dans cet espace et la fin de la CLI par pidfd. Modifier le fournisseur
+worker conserve l’entrée de catalogue de l’équipe. Les preuves distinguent
+admission, exécution, règlement budgétaire et acceptation de la tâche.
+
+The engine admission recipe uses the same team setup. Summary source, preview
+and admission checks include a valid selected dialogue and a cross-scope
+refusal. The parent-death witness binds the provider PID reported from its
+workspace FIFO to the saved session identity before observing actual reap.
+
+La recette moteur reprend la même déclaration d’équipe. Les contrôles des
+sources, de la prévisualisation et de l’admission couvrent le dialogue autorisé
+et le refus interbranche. La recette de mort du superviseur lie le PID annoncé
+dans la FIFO à l’identité enregistrée avant d’observer l’arrêt du processus.
+
 Native141 follow-up: five generator guards now use the versioned32-type wire
 contract and exact rustfmt-normalized Rust regeneration, with .go reads denied.
 Explicit legacy extraction141/legacy-schema08 remains outside the native target.

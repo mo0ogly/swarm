@@ -25,3 +25,7 @@ flowchart TD
  C --> V[Route only + policy hash]
  V -. separate admission .-> G[Agent preview and launch]
 ```
+
+## Routing and admission checks
+
+The CLI routing, launch tier, and protected HTTP read checks run against isolated work. Their positive preparation cases declare a team through public operations. They keep a separate catalogue entry for the planner and reviewer so that changing the worker provider leaves the team prerequisites intact. These checks observe routing and preparation without starting a provider. The ordinary fixture remains available for refusal cases and for reading historical work from earlier binaries.

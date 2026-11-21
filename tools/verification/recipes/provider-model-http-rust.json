@@ -16,6 +16,7 @@
     "docs/architecture/NATIVE-PROVIDER-RESOLUTION.md",
     "docs/en/NATIVE-PROVIDER-RESOLUTION.md",
     "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/mission_organization.rs",
     "rust/crates/swarm-engine/src/provider_connection_catalogue.rs"
   ],
   "environment": {},
