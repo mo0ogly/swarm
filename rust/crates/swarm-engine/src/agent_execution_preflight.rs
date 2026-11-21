@@ -430,6 +430,46 @@ pub(crate) fn inspect(
 mod tests {
     use super::*;
     use rusqlite::types::Value;
+    /// Configure the fixture's reviewer and child scope using the same public
+    /// commands as operator attachment. An optional second task permits an
+    /// independent departure after cancellation of the first task.
+    fn attach_fixture_team(store: &mut crate::RootStore, work: &str, second: bool) -> i64 {
+        let mut revision = store.read_work(work).unwrap().revision;
+        if second {
+            let input = serde_json::json!({
+                "schema_version":1, "event_id":"add-second-task", "expected_revision":revision,
+                "id":"second", "title":"Second witness", "deliverable":"Report", "criteria":["Proof"]
+            });
+            revision = store.execute_external(work, "task.add", &serde_json::to_vec(&input).unwrap(),
+                &mut crate::SystemEnvironment).unwrap().result.work.revision;
+        }
+        let mut assignments = std::collections::BTreeMap::new();
+        for id in ["task", "second"].into_iter().take(if second { 2 } else { 1 }) {
+            let input = serde_json::json!({
+                "schema_version":1, "event_id":format!("authorize-{id}"), "expected_revision":revision,
+                "id":id, "validation_policy":{"mode":"human"}
+            });
+            revision = store.execute_external(work, "task.update", &serde_json::to_vec(&input).unwrap(),
+                &mut crate::SystemEnvironment).unwrap().result.work.revision;
+            assignments.insert(id, "proof");
+        }
+        let input = serde_json::json!({
+            "schema_version":1, "event_id":"team", "expected_revision":revision,
+            "provider":"fixture", "max_activations":2, "max_decisions":3,
+            "max_review_calls":2, "max_tasks":assignments.len(), "task_scopes":assignments
+        });
+        store.execute_external(work, "planning.attach", &serde_json::to_vec(&input).unwrap(),
+            &mut crate::SystemEnvironment).unwrap().result.work.revision
+    }
+
+    /// Build the fixture's exact manual launch request at the observed revision.
+    fn fixture_launch(event: &str, task: &str, revision: i64) -> crate::Launch {
+        crate::decode_launch(&serde_json::to_vec(&serde_json::json!({
+            "schema_version":1, "event_id":event, "expected_revision":revision,
+            "task_id":task, "provider":"fixture"
+        })).unwrap()).unwrap()
+    }
+
     /// Snapshot the admission-touching rows: agents, reservations, events, logs,
     /// work attempts. Not a full-schema dump; the refusal must change none of it.
     fn admission_snapshot(db: &rusqlite::Connection) -> Vec<(String, Vec<Vec<Value>>)> {
@@ -477,7 +517,7 @@ mod tests {
         let work=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Fixture","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap().result.work.id;
         store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap();
         // Test-owned provider copy under the fixture root; never /bin/cat.
-        let provider_path = root.join("fixture-provider");
+        let provider_path = root.join("codex");
         std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
         use std::os::unix::fs::PermissionsExt;
         std::fs::set_permissions(&provider_path, std::fs::Permissions::from_mode(0o755)).unwrap();
@@ -490,7 +530,8 @@ mod tests {
             .publish("providers.json", catalogue.as_bytes())
             .unwrap();
         setup.close().unwrap();
-        let request=crate::decode_launch(br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#).unwrap();
+        let revision = attach_fixture_team(&mut store, &work, false);
+        let request = fixture_launch("session", "task", revision);
         // Valid admission precedes any mutation: the queued row exists and the
         // digest of the actual admitted artifact is frozen in its preflight scope.
         let launched = store.prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment).unwrap();
@@ -613,8 +654,8 @@ mod tests {
     /// while the stale row is still queued; cancelling settles the stale
     /// intention (agent interrupted/desired stop, task blocked with the
     /// interrupted outcome, attempt ended, work revision advanced, reservation
-    /// released); a fresh event id then re-observes the current bytes and
-    /// commits with a different preflight scope; restoring the original bytes
+    /// released); a fresh task can then re-observe the current bytes. The
+    /// original task requires a scoped retry decision. The new task commits with a different preflight scope; restoring the original bytes
     /// must then refuse the new agent's consumption (agent-execution-preflight-
     /// changed), proving the new admission bound the mutated digest, not the
     /// original one; the cancelled row itself can never be consumed (desired
@@ -650,7 +691,7 @@ mod tests {
             )
             .unwrap();
         // Test-owned provider copy under the fixture root; never /bin/cat.
-        let provider_path = root.join("fixture-provider");
+        let provider_path = root.join("codex");
         std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
         std::fs::set_permissions(
             &provider_path,
@@ -664,11 +705,8 @@ mod tests {
         );
         setup.publish("providers.json", catalogue.as_bytes()).unwrap();
         setup.close().unwrap();
-        // Admission "session": work.create (+1) → task.add (+1) → admission (+1).
-        let request = crate::decode_launch(
-            br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#,
-        )
-        .unwrap();
+        let revision = attach_fixture_team(&mut store, &work, true);
+        let request = fixture_launch("session", "task", revision);
         let launched = store
             .prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment)
             .unwrap();
@@ -749,10 +787,7 @@ mod tests {
         }
         // 3. A fresh admission on the same workspace is refused while the stale
         //    row is still queued: the lane is occupied, no parallel bypass.
-        let bypass = crate::decode_launch(
-            br#"{"schema_version":1,"event_id":"bypass","expected_revision":3,"task_id":"task","provider":"fixture"}"#,
-        )
-        .unwrap();
+        let bypass = fixture_launch("bypass", "second", revision + 1);
         {
             let mut db =
                 rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
@@ -810,7 +845,7 @@ mod tests {
                 Value::Integer(v) => *v,
                 other => panic!("unexpected work revision cell: {other:?}"),
             };
-            assert_eq!(work_revision, 4, "settlement must advance the work revision");
+            assert_eq!(work_revision, revision + 2, "settlement must advance the work revision");
             let body = match &after[0].1[0][5] {
                 Value::Text(t) => t.clone(),
                 Value::Blob(t) => String::from_utf8(t.clone()).unwrap(),
@@ -821,12 +856,16 @@ mod tests {
                 "cancelled agent must carry the settlement activity: {body}"
             );
         }
-        // 5. A fresh event id re-observes the current (mutated) bytes and binds
-        //    them: the new admission must commit with a different scope.
-        let readmission_request = crate::decode_launch(
-            br#"{"schema_version":1,"event_id":"readmit","expected_revision":4,"task_id":"task","provider":"fixture"}"#,
-        )
-        .unwrap();
+        // 5. The cancelled task needs a new orchestrator decision. The
+        // independent task can acquire the released workspace and freeze the
+        // mutated provider bytes at its own fresh admission.
+        let retry = fixture_launch("retry-cancelled", "task", revision + 2);
+        let mut retry_store = crate::RootStore::open(root.as_path(), true).unwrap();
+        let error = retry_store.prepare_agent_launch(&work, &retry, false, &mut crate::SystemEnvironment)
+            .err().expect("cancelled task cannot restart without authorization");
+        assert!(error.to_string().contains("scoped-worker-retry-decision-required"), "{error}");
+        retry_store.close().unwrap();
+        let readmission_request = fixture_launch("readmit", "second", revision + 2);
         let readmitted = {
             let mut store = crate::RootStore::open(root.as_path(), true).unwrap();
             let outcome = store
@@ -935,15 +974,18 @@ mod tests {
             crate::RootStore::initialize(root.as_path(), &mut crate::SystemEnvironment).unwrap();
         let work=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Fixture","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap().result.work.id;
         store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut crate::SystemEnvironment).unwrap();
+        use std::os::unix::fs::PermissionsExt;
+        let provider_path = root.join("codex");
+        std::fs::write(&provider_path, b"#!/bin/cat\nfixture provider witness\n").unwrap();
+        std::fs::set_permissions(&provider_path, std::fs::Permissions::from_mode(0o700)).unwrap();
         let setup = LocalDirectory::open(&root.join(".swarm")).unwrap();
-        setup
-            .publish(
-                "providers.json",
-                br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/cat","args":[]}}}"#,
-            )
-            .unwrap();
+        let catalogue = serde_json::json!({
+            "schema_version":1, "providers":{"fixture":{"command":provider_path,"args":[]}}
+        });
+        setup.publish("providers.json", &serde_json::to_vec(&catalogue).unwrap()).unwrap();
         setup.close().unwrap();
-        let request=crate::decode_launch(br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#).unwrap();
+        let revision = attach_fixture_team(&mut store, &work, false);
+        let request = fixture_launch("session", "task", revision);
         store
             .prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment)
             .unwrap();

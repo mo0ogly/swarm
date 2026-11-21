@@ -174,9 +174,14 @@ After the single team authorization, open management. Only eligible missions may
 start; dependency, budget, pause and workspace checks still apply. Review the
 provider, directory, concurrency and limits before any manual start.
 
-The engine refuses an automatic start if the project lacks a valid organization
-with a root planner and an independent reviewer. It refuses before recording
-start consent.
+Every Work opens on its principal orchestrator’s canvas. Its `root` scope
+exists from creation. The canvas marks roles as pending while the team is
+being configured. Creating the Work and adding tasks trigger no provider.
+
+The engine requires a configured team for every launch. An automatic start
+refuses before consent is recorded. A manual start refuses before reservation
+and the team is checked again before execution. Reviewer capacity and task
+controls are still required.
 
 ### Attach a team to existing work
 
@@ -258,9 +263,11 @@ optional; without it, not all raw provider output is retained.
 Arrows point from the prerequisite to the dependent task. These tasks have not started; they do not demonstrate accepted results.
 
 In the native cockpit, **Orchestration** displays the observed driver and
-the configured independent reviewer. **Team and scopes** expands the root
-planner, subplanners and their assigned tasks. Sibling scopes appear as
-separate branches. Task arrows retain their prerequisite meaning. The task
+the configured independent reviewer. **Team and scopes** shows the principal
+orchestrator, sub-orchestrators, and their tasks. Each sub-orchestrator has a
+parent and a scope with assigned requirements and tasks. Incidents outside
+that scope belong to the parent. Sibling scopes appear as separate
+branches. Task arrows indicate prerequisites. The task
 list within a scope and the card's accessible label show the current reason
 supplied by the engine. The list displays configured checks and recorded
 receipt verdicts separately. History mode shows the recorded team and leaves

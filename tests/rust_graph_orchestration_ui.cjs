@@ -94,7 +94,19 @@ async function run() {
           supervision: {state: 'absent'}
         }});
         snapshot.unattached = get('.native-graph-orchestration').textContent;
-        snapshot.noInventedTree = !get('[data-orchestration-tree]');
+        snapshot.ordinary = {
+          root: role('root')?.dataset.scope, subplanners: document.querySelectorAll('[data-orchestration-role="subplanner"]').length,
+          links: document.querySelectorAll('.graph-arete').length
+        };
+        SwarmRustCockpitRead.render({work: {id: 'new-work', title: 'Empty work', tasks: []}, mission: {
+          organization: {root_scope: 'root', ready: false}, supervision: {state: 'absent'}
+        }});
+        snapshot.newWork = {
+          root: role('root')?.dataset.scope, name: role('root')?.textContent,
+          reviewer: role('reviewer')?.textContent, visible: !!role('root')?.getClientRects().length,
+          scopeCount: document.querySelectorAll('[data-scope]').length,
+          taskCount: document.querySelectorAll('.graph-noeud').length
+        };
         snapshot.requests = requests;
         return snapshot;
       }, {lang, theme});
@@ -113,21 +125,30 @@ async function run() {
       assert.doesNotMatch(result.validationScope, /private argv/);
       assert.doesNotMatch(result.historyReason, /Waiting for/);
       assert(result.width <= result.viewport);
-      assert(result.retainedDisclosure && result.noInventedTree && result.orphanHidden);
+      assert(result.retainedDisclosure && result.orphanHidden);
+      assert.deepEqual(result.ordinary, {root: 'root', subplanners: 0, links: 1});
+      assert.equal(result.newWork.root, 'root');
+      assert.equal(result.newWork.scopeCount, 1);
+      assert.equal(result.newWork.taskCount, 0);
+      assert(result.newWork.visible);
       assert.equal(result.requests, 0);
       if (lang === 'en') {
-        assert.match(result.root, /^Root planner/);
+        assert.match(result.root, /^Principal orchestrator/);
         assert.match(result.reviewer, /^Independent reviewer/);
         assert.match(result.partialTree, /Incomplete hierarchy/);
-        assert.match(result.unattached, /independent reviewer are not attached/);
+        assert.match(result.unattached, /Tasks without a displayed scope.*60/);
+        assert.equal(result.newWork.name, 'Principal orchestrator · To configure');
+        assert.equal(result.newWork.reviewer, 'Independent reviewer · Not configured');
         assert.equal(result.historyDriver, 'Swarm driver status unavailable.');
         assert.equal(result.driver, 'Swarm driver observed.');
         assert.match(result.controlReceipt, /Recorded failure/);
       } else {
-        assert.match(result.root, /^Planificateur racine/);
+        assert.match(result.root, /^Orchestrateur principal/);
         assert.match(result.reviewer, /^Validateur indépendant/);
         assert.match(result.partialTree, /Hiérarchie incomplète/);
-        assert.match(result.unattached, /validateur non rattachés/);
+        assert.match(result.unattached, /Tâches sans rattachement affichable.*60/);
+        assert.equal(result.newWork.name, 'Orchestrateur principal · À configurer');
+        assert.equal(result.newWork.reviewer, 'Validateur indépendant · Non configuré');
         assert.equal(result.historyDriver, 'État du conducteur indisponible.');
         assert.equal(result.driver, 'Conducteur Swarm observé.');
         assert.match(result.controlReceipt, /Échec enregistré/);

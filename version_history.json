@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Orchestration : canevas du travail avec orchestrateur principal dès la création, hiérarchie des sous-orchestrateurs et équipe configurée obligatoire pour tout lancement manuel.",
+        "en": "Orchestration: the Work canvas opens with its principal orchestrator, shows the sub-orchestrator hierarchy, and requires a configured team for manual launches."
+      },
+      {
         "fr": "Vérifications PAEA et Sécurité et preuves : même habillage qu’Audit et Sécurité (rail commun, en-tête avec section, sélecteur Sombre/Clair, liens et sections en cartes). Aucun changement moteur.",
         "en": "PAEA checks and Security and evidence: same shell as Audit and Security (shared rail, sectioned header, Dark/Light switch, links and sections as cards). No engine change."
       },

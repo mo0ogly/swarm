@@ -8,9 +8,14 @@ from pathlib import Path
 from rust_agent_model_route import Fixture, PROGRAM, digest, publish
 
 
-def run(binary, output, *, managed=False, graph=False, history=False):
-    """Cover existing-work attachment with explicit or managed workspace ownership."""
-    fixture = Fixture(binary, output, 'planning-attach')
+def run(binary, output, *, managed=False, graph=False, history=False, legacy_binary=None):
+    """Attach an owned work, optionally producing genuine history with a legacy binary.
+
+    The old binary may create a worker for the history case. All attachment and
+    subsequent verification run on the candidate.
+    """
+    assert not history or legacy_binary is not None, 'history requires an exact legacy binary'
+    fixture = Fixture(legacy_binary if history else binary, output, 'planning-attach')
     work_id = fixture.work
 
     def show():
@@ -51,15 +56,17 @@ def run(binary, output, *, managed=False, graph=False, history=False):
         receipt = fixture.root / '.swarm' / ('native-completion-' + digest(b'session') + '.json')
         original_receipt = receipt.read_bytes()
         publish(output / 'ordinary-worker-original.json', original_receipt)
+        fixture.binary = binary
 
     before = show()
     if graph:
         flat = fixture.ok(['planning', 'graph', work_id])
-        assert not flat['planning_configured'] and not flat['scopes']
+        assert not flat['planning_configured']
+        assert flat['scopes'] == [dict(id='root', parent=None, role='root_planner', provider=None)]
         assert flat['reviewer_provider'] is None
         assert flat['conductor_observation'] is None and len(flat['tasks']) == 3
         assert show() == before
-        print('PASS CLI graph reports absent orchestration without a write', flush=True)
+        print('PASS CLI graph reports an unconfigured root without a write', flush=True)
     code, result = change(['planning', 'attach'], 'missing-policy',
                           task_scopes=assignments, **config)
     assert code != 0 and 'planning-attach-validation-unauthorized' in str(result), result
@@ -214,9 +221,14 @@ def main():
     parser.add_argument('--managed', action='store_true')
     parser.add_argument('--graph', action='store_true')
     parser.add_argument('--history', action='store_true')
+    parser.add_argument('--legacy-binary', type=Path)
     args = parser.parse_args()
+    if args.history != (args.legacy_binary is not None):
+        parser.error('--history and --legacy-binary must be supplied together')
     args.output.mkdir(mode=0o700)
-    outcome = run(args.binary.resolve(strict=True), args.output, managed=args.managed, graph=args.graph, history=args.history)
+    legacy = args.legacy_binary.resolve(strict=True) if args.legacy_binary else None
+    outcome = run(args.binary.resolve(strict=True), args.output, managed=args.managed,
+                  graph=args.graph, history=args.history, legacy_binary=legacy)
     publish(args.output / 'result.json', outcome)
 
 

@@ -205,9 +205,15 @@ Après **Relire et autoriser le démarrage**, ouvrez le pilotage et utilisez
 **Lancer la mission**. Relisez le fournisseur, le dossier, les créneaux et les
 limites avant confirmation. L’autorisation du plan et le lancement sont deux étapes.
 
-Le moteur refuse le départ automatique si le projet ne dispose pas d’une
-organisation valide avec un orchestrateur racine et un réviseur indépendant.
-Ce refus précède l’enregistrement du consentement au départ.
+Chaque travail s’ouvre sur le canevas de son orchestrateur principal. Son
+périmètre `root` existe dès la création. Tant que l’équipe reste à
+configurer, le canevas indique les rôles en attente. La création et l’ajout
+de tâches ne déclenchent aucun fournisseur.
+
+Le moteur exige une équipe configurée pour tout départ. Le départ automatique
+est refusé avant enregistrement du consentement. Le départ manuel est refusé
+avant réservation et l’équipe est revérifiée avant l’exécution. La capacité du
+vérificateur et les contrôles de la tâche restent requis.
 
 ### Rattacher une équipe à un projet existant
 
@@ -280,9 +286,11 @@ filtres et sélection ne changent pas la révision métier.
   pas le sens d’un lien de sa seule couleur ou de son seul style : lisez sa légende.
 - Dans le cockpit natif, **Orchestration** distingue l’observation du conducteur
   de la configuration du validateur indépendant. **Équipe et périmètres**
-  développe l’arbre du planificateur racine, les sous-planificateurs et leurs
-  tâches rattachées. Les sous-planificateurs de même niveau restent des branches
-  distinctes. Les flèches de tâches continuent d’indiquer leurs prérequis. La
+  présente l’orchestrateur principal, les sous-orchestrateurs et leurs tâches.
+  Chaque sous-orchestrateur a un parent et reçoit des exigences et des tâches
+  attribuées à son périmètre. Les incidents qui dépassent ce périmètre
+  relèvent du parent. Les sous-orchestrateurs de même niveau restent des branches
+  distinctes. Les flèches de tâches indiquent leurs prérequis. La
   raison courante fournie par le moteur figure dans les tâches rattachées et le
   libellé des cartes. Les contrôles configurés et les verdicts du reçu
   enregistré sont affichés séparément. En lecture historique, le détail opérationnel est

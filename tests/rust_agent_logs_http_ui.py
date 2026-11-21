@@ -22,6 +22,7 @@ def main():
     program=fixture.PROGRAM.replace("print(json.dumps({'type':'result'", "for i in range(230):\n    print(json.dumps({'type':'assistant','message':{'model':model,'content':[{'type':'text','text':'log witness '+str(i)+' <b>literal</b>'}]}}),flush=True)\nprint(json.dumps({'type':'result'")
     program=program.replace("'model':model,'content'","'model':model,'usage':{'input_tokens':3,'output_tokens':2},'content'",1)
     fixture.publish(owned.root/'codex',program.encode());os.chmod(owned.root/'codex',0o700)
+    owned.configure_team()
     prepared=owned.prepare()
     other=owned.ok(['work','create'],dict(schema_version=1,event_id='empty-work',expected_revision=0,title='Empty log mission',objective='Read only',scope='Owned fixture',criteria=['No agents']))['work']['id']
     def stored_agent():
@@ -81,7 +82,7 @@ def main():
         check('budget-unchanged',server.request('/api/v1/work-budget?work='+owned.work,observe=False)==budget)
         import rust_status_incomplete
         rust_status_incomplete.verify(server,owned,check)
-        rust_status_incomplete.verify_abandoned(server,owned,check)
+        rust_status_incomplete.verify_scoped_abandon_refused(server,owned,check)
         fixture.publish(out/'http-result.json',dict(status='PASS',checks=checks,binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),global_watchdog=None,scope='Owned CLI fixture, one inert process; no real provider'))
         print('AGENT_LOGS_HTTP_UI_PASS '+str(len(checks))+' HTTP assertions',flush=True)
     except BaseException as e:primary=e

@@ -98,7 +98,14 @@ fn apply_provider_waits(work: &crate::Work, status: &mut MissionStatus) -> Resul
 /// probe, independent review, permission or acceptance follows from this text.
 fn organization(work: &crate::Work) -> Result<Organization, E> {
     let Some(planning) = work.planning.as_deref() else {
-        return Ok(Organization {ready:false,label:"Organisation autonome non configurée".into(),issues:Some(vec!["Responsable de mission absent : planification hiérarchique non configurée.".into()]),next:"Préparer une mission hiérarchique avec un responsable et des contrôles explicites. Les tâches existantes restent consultables et exécutables manuellement.".into(),verification:"Politique incomplète ; aucune vérification de mission démontrée.".into()});
+        return Ok(Organization {
+            root_scope: crate::ROOT_ORCHESTRATOR_SCOPE,
+            ready: false,
+            label: "Organisation autonome non configurée".into(),
+            issues: Some(vec!["Orchestrateur principal à configurer.".into()]),
+            next: "Configurer l’équipe et les contrôles avant tout lancement.".into(),
+            verification: "Politique incomplète ; aucune vérification de mission démontrée.".into(),
+        });
     };
     let reviewer = planning.reviewer.as_deref()
         .ok_or(E::Refused("mission-status-reviewer-missing"))?;
@@ -108,6 +115,7 @@ fn organization(work: &crate::Work) -> Result<Organization, E> {
         "Revue humaine explicitement autorisée ; les résultats attendront votre acceptation."
     };
     Ok(Organization {
+        root_scope: crate::ROOT_ORCHESTRATOR_SCOPE,
         ready: true,
         label: "Organisation autonome configurée".into(),
         issues: Some(Vec::new()),

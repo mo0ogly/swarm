@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "default-orchestration",
+  "inputs": [
+    "locales/en.json",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-cli/src/agent.rs",
+    "rust/crates/swarm-cli/src/planning_graph.rs",
+    "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+    "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/mission_organization.rs",
+    "rust/crates/swarm-engine/src/mission_start.rs",
+    "rust/crates/swarm-engine/src/mission_status_contract.rs",
+    "rust/crates/swarm-engine/src/planning_control.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-engine/src/work_definition.rs",
+    "tests/fixture_area.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_graph_orchestration_ui.cjs",
+    "tests/rust_mission_organization_required.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_planning_attach.py",
+    "web/cockpit-native-graph.js",
+    "web/cockpit-native-read.js",
+    "web/graph.css",
+    "web/graph.js",
+    "web/i18n-en.js",
+    "web/lib/dagre.min.js",
+    "web/swarm-design.css",
+    "web/wattson_themes.css"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-cli-admission-and-attachment",
+      "command": [
+        "python3",
+        "-c",
+        "import os, subprocess, sys\nfrom pathlib import Path\nsys.path.insert(0, 'tests')\nfrom fixture_area import fixture_root\nbase=fixture_root('organization-replay-')\nbinary=str(Path(os.environ['SWARM_ORGANIZATION_BINARY']).resolve(strict=True))\nfor test,name,extra in [('rust_mission_organization_required.py','launch',[]),('rust_planning_attach.py','attachment',['--graph'])]:\n    subprocess.run([sys.executable,'tests/'+test,'--binary',binary,'--output',str(base/name),*extra],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS manual admission refuses absent organization without a reservation",
+        "PASS canonical unconfigured root is observable before assignment",
+        "PASS configured team starts the authorized manual worker without accepting its output",
+        "PASS organization-planning-missing",
+        "PASS organization-reviewer-missing",
+        "PASS CLI graph preserves delegation, validation role and task prerequisites",
+        "PASS attachment-retains-graph-and-no-launch-consent",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "default-canvas-and-nested-roles",
+      "command": [
+        "node",
+        "tests/rust_graph_orchestration_ui.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS orchestration graph fr etat 1440",
+        "PASS orchestration graph fr sombre 390",
+        "PASS orchestration graph en etat 390",
+        "PASS orchestration graph en sombre 1440"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

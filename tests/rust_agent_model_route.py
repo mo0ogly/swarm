@@ -161,6 +161,26 @@ class Fixture:
         assert code == 0, (self.label,args,code,value)
         return value
 
+    def configure_team(self):
+        """Attach the inert fixture's one task and retain its new revision.
+
+        Use only public authorization and attachment. The provider is a local
+        test command and no launch or review follows from configuration.
+        """
+        current = self.ok(['work', 'show', self.work])['work']
+        authorized = self.ok(['task', 'update', self.work], dict(
+            schema_version=1, event_id='authorize-fixture-task', expected_revision=current['revision'],
+            id='task', validation_policy={'mode': 'human'},
+        ))['work']
+        attached = self.ok(['planning', 'attach', self.work], dict(
+            schema_version=1, event_id='attach-fixture-team', expected_revision=authorized['revision'],
+            provider='fixture', level='standard', max_activations=1, max_review_calls=1,
+            max_tasks=1, max_decisions=1, task_scopes={'task': 'worker-scope'},
+            task_workspaces={'task': str(self.workspace)},
+        ))
+        self.request['expected_revision'] = attached['revision']
+        return attached
+
     def prepare(self, preview=False):
         """Exercise the public native intention path, without a process in preview."""
         return self.ok(['agent','preview' if preview else 'prepare',self.work],self.request)
