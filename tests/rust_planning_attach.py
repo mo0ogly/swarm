@@ -4,10 +4,10 @@ import argparse
 import subprocess
 from pathlib import Path
 
-from rust_agent_model_route import Fixture, digest, publish
+from rust_agent_model_route import Fixture, PROGRAM, digest, publish
 
 
-def run(binary, output, *, managed=False, graph=False):
+def run(binary, output, *, managed=False, graph=False, history=False):
     """Cover existing-work attachment with explicit or managed workspace ownership."""
     fixture = Fixture(binary, output, 'planning-attach')
     work_id = fixture.work
@@ -35,6 +35,22 @@ def run(binary, output, *, managed=False, graph=False):
         workspaces[task] = str(directory)
     config = dict(provider='fixture', level='standard', max_activations=3,
                   max_review_calls=3, max_tasks=3, max_decisions=3)
+    original_receipt = None
+    if history:
+        # Run a real inert ordinary worker to a nonzero exit before attachment.
+        # Its completion is a genuine engine original and is never rewritten.
+        provider = fixture.root / 'codex'
+        publish(provider, (PROGRAM + '\nsys.exit(17)\n').encode())
+        provider.chmod(0o700)
+        fixture.request['expected_revision'] = show()['revision']
+        fixture.prepare()
+        fixture.call(['agent', 'run', 'session'])
+        failed = show()['tasks'][0]
+        assert failed['status'] == 'blocked' and failed['attempts'][-1]['status'] == 'failed'
+        receipt = fixture.root / '.swarm' / ('native-completion-' + digest(b'session') + '.json')
+        original_receipt = receipt.read_bytes()
+        publish(output / 'ordinary-worker-original.json', original_receipt)
+
     before = show()
     if graph:
         flat = fixture.ok(['planning', 'graph', work_id])
@@ -112,8 +128,11 @@ def run(binary, output, *, managed=False, graph=False):
             profile = current['launch_profile']
             assert profile['workspace'] == workspaces[old['id']]
             assert profile['provider'] == 'fixture' and profile['role'] == 'worker'
+        else:
+            assert current.get('launch_profile') == old.get('launch_profile')
         assert {k: v for k, v in current.items() if k not in
-                {'scope_id', 'plan_role', 'requirements', 'launch_profile'}} == old
+                {'scope_id', 'plan_role', 'requirements', 'launch_profile'}} == {
+                    k: v for k, v in old.items() if k != 'launch_profile'}
     if managed:
         assert plan['repository']['base_commit'] == base
         storage = Path(plan['repository']['storage'])
@@ -130,6 +149,16 @@ def run(binary, output, *, managed=False, graph=False):
         print('PASS managed attachment pins committed input without worker copy', flush=True)
     controls = fixture.ok(['mission', 'show', work_id])
     assert controls['consent_enabled'] is None and controls['autonomy'] is None
+    if history:
+        completion = [event for event in plan['inbox'] if event['kind'] == 'attempt_ended']
+        assert len(completion) == 1
+        event = completion[0]
+        assert (event['scope'], event['task'], event['attempt']) == (
+            assignments['task'], 'task', failed['attempts'][-1]['id'])
+        assert after['tasks'][0]['attempts'] == failed['attempts']
+        assert not after['tasks'][0].get('planning_retry')
+        assert receipt.read_bytes() == original_receipt
+        print('PASS attachment routes the genuine historical worker completion without granting retry', flush=True)
     if graph:
         organized = fixture.ok(['planning', 'graph', work_id])
         assert organized['planning_configured'] and organized['reviewer_provider'] == 'fixture'
@@ -154,6 +183,7 @@ def run(binary, output, *, managed=False, graph=False):
     print('PASS attachment-retains-graph-and-no-launch-consent', flush=True)
     return {'status': 'PASS', 'work': work_id, 'revision': after['revision'],
             'task_scopes': assignments, 'provider_called': False,
+            'fixture_worker_ran': history, 'attached_worker_completion': history,
             'binary_sha256': digest(binary.read_bytes())}
 
 
@@ -164,9 +194,10 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--managed', action='store_true')
     parser.add_argument('--graph', action='store_true')
+    parser.add_argument('--history', action='store_true')
     args = parser.parse_args()
     args.output.mkdir(mode=0o700)
-    outcome = run(args.binary.resolve(strict=True), args.output, managed=args.managed, graph=args.graph)
+    outcome = run(args.binary.resolve(strict=True), args.output, managed=args.managed, graph=args.graph, history=args.history)
     publish(args.output / 'result.json', outcome)
 
 

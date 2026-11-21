@@ -228,6 +228,9 @@ Pour un dépôt géré, fournissez `repository` avec un chemin local et
 `committed_only: true`. Swarm épingle le commit existant et refuse la
 combinaison avec des espaces personnalisés ou une demande d’inclure des
 modifications hors commit. Les copies par tentative sont préparées au départ.
+Une fin native échouée ou interrompue et vérifiable est remise au périmètre
+rattaché. Le superviseur reçoit l’original attribué. La tentative historique
+et le statut de la tâche sont conservés. Cette remise n’autorise aucune relance.
 Le lancement et la validation utilisent ensuite les commandes habituelles.
 Si la révision change pendant un aperçu de départ, le conducteur relit le
 projet au cycle suivant lorsque le moteur confirme qu’aucune admission n’a été

@@ -1134,6 +1134,10 @@ fn apply<E: WorkEnvironment>(
                     crate::planning_control::bind_attachment_workspaces(
                         root, &mut candidate, request, &at, &actor,
                     ).map_err(|error| WorkEngineError::PlanningBootstrap(Box::new(error)))?;
+                    crate::RootStore::attach_worker_completions(root, tx, &mut candidate)
+                        .map_err(|error| WorkEngineError::PlanningBootstrap(Box::new(
+                            crate::AgentLaunchError::caused("planning-attach-native-completion", error),
+                        )))?;
                 }
                 if configures_repository {
                     if let Some(repository)=request.repository.as_deref(){

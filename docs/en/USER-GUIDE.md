@@ -195,6 +195,9 @@ For a managed repository, supply `repository` with a local path and
 `committed_only: true`. Swarm pins the existing commit. It refuses custom
 workspaces or a request to include uncommitted modifications with this option.
 Per-attempt copies are prepared at launch.
+A verifiable failed or interrupted native worker completion is delivered to
+the newly assigned scope. The historical attempt and task state stay intact.
+This evidence handoff grants no retry.
 Attachment records no start consent. Start and validation use their usual
 operations. If the revision changes during launch preview, the conductor rereads
 the Work on its next cycle once the engine confirms that no admission was

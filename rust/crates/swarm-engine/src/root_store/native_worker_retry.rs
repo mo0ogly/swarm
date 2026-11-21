@@ -77,6 +77,49 @@ fn observe(root: &std::path::Path, supplied: &Work, task_id: &str, purpose: Purp
     finished(result, store.close())
 }
 impl RootStore {
+    /// Attribute an ordinary Work's retained, failed worker completion to its
+    /// newly attached scope. The attachment writer supplies its transaction
+    /// and a private Work candidate. The original terminal journal and actual
+    /// matching native Agent are mandatory before the usual end signal is
+    /// appended. Legacy attempts without a native Agent remain historical.
+    /// This grants no retry and never changes an attempt, task status or budget.
+    pub(crate) fn attach_worker_completions(
+        root: &std::path::Path,
+        tx: &rusqlite::Connection,
+        work: &mut Work,
+    ) -> Result<(), E> {
+        let terminal: Vec<_> = work.tasks.iter().flatten().filter_map(|task| {
+            let last = task.attempts.as_deref()?.last()?;
+            (task.status == "blocked" && !last.ended.is_empty()
+                && matches!(last.status.as_str(), "failed" | "interrupted"))
+                .then(|| (task.id.clone(), last.id.clone(), last.status.clone()))
+        }).collect();
+        if terminal.is_empty() {
+            return Ok(());
+        }
+        let agents = crate::list_agents(tx, &work.id).map_err(E::Agent)?;
+        let directory = crate::local_storage::LocalDirectory::open(&root.join(".swarm"))
+            .map_err(E::Storage)?;
+        let result = (|| {
+            for (task, attempt, outcome) in terminal {
+                let mut matching = agents.iter().filter(|agent| agent.task_id == task
+                    && agent.attempt_id == attempt);
+                let Some(agent) = matching.next() else { continue; };
+                if matching.next().is_some() || agent.role != "worker" || agent.status != outcome {
+                    return Err(E::Refused("planning-attach-native-completion-identity"));
+                }
+                let original = crate::agent_completion_journal::observe_terminal(tx, &directory, &agent.id)?;
+                if original.agent != *agent {
+                    return Err(E::Refused("planning-attach-native-completion-changed"));
+                }
+                crate::agent_scope_signals::ended(work, &task, &attempt, &outcome, &agent.ended)
+                    .map_err(|cause| E::Launch(Box::new(cause)))?;
+            }
+            Ok(())
+        })();
+        finished(result, directory.close().map_err(E::Storage))
+    }
+
     /// Verify a selected current end event before model input; historical events
     /// are handled by their existing acknowledgement-only contract. Returns safe
     /// metadata and exact original hash, with no process/source/permission change.
