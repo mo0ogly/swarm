@@ -326,9 +326,10 @@ own contracts.
 
 Provider resolution exposes the declared route and safe notices. The local
 catalogue is a configuration source. Resolution qualifies neither account
-availability nor the route actually executed. The referenced contract explicitly
-refuses selected API connections pending implementation. Provider errors and
-waits follow [saved policies](NATIVE-PROVIDER-POLICIES.md) and the
+availability nor the route actually executed. The native mission launch path
+refuses selected API connections. Text preparation has an HTTP path using JSON
+or SSE. The manual connection probe uses a separate JSON HTTP path.
+Provider errors and waits follow [saved policies](NATIVE-PROVIDER-POLICIES.md) and the
 [provider wait contract](NATIVE-PROVIDER-WAIT.md).
 
 ### 6.1 Interface contracts
