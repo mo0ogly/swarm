@@ -60,6 +60,34 @@ Sur dev.380, les fixtures avec fournisseur inerte ont vérifié le nominal, l’
 
 La [recette preparation-web-stop-order](../../tools/verification/recipes/preparation-web-stop-order.json) sélectionne uniquement ces deux ordres. Préparer un binaire natif qualifié, un checkout ou une copie de sources isolée avec une zone de fixtures valide et un répertoire de sortie privé admis. Le lanceur utilise Linux, Python 3 et `ss` d’iproute2. Définir `SWARM_PREPARATION_UI_BINARY`, `SWARM_PREPARATION_STOP_ORDER_SHA256`, `SWARM_PREPARATION_STOP_ORDER_PARENT` et `SWARM_PREPARATION_STOP_ORDER_RESERVE_BYTES` avant d’appeler [le lanceur de recettes](../../tools/verification/README.md). Conserver l’identification du build, le reçu de recette et le dossier du parcours HTTP et CLI.
 
+## Qualification P1.1 du 22 novembre 2026
+
+Binaire normal `v0.1.1-dev.390`, SHA-256
+`99433f0f8274cf2bd45b4db43cbb7b11f1bd7b1acad4a51d318a0b5d3a042ec2`,
+commit déclaré `71e84be8b49dad2e6868aec9cdfb5293ece36c58`, `modified:true`.
+Les lignes ci-dessous concernent cette image et des programmes locaux inertes.
+Le commit déclaré porte sur l'image Swarm. Le commit du candidat produit par
+les workers est indiqué séparément dans ORCH-06.
+
+| Critère | Résultat et portée |
+| --- | --- |
+| ORCH-01 | PASS. Deux permissions de démarrage en espaces disjoints alors que l’entrée concurrente de planification racine reste en attente. |
+| ORCH-02 | Partiel. Le conducteur planifie sans worker admissible. Une observation sans nouvelle entrée reste `idle`, sans nouveau départ de planificateur. Le compteur de contrôles n’a pas été observé spécifiquement sur ce scénario. |
+| ORCH-03 | PASS sur la fixture. Pause, reprise consentie et retrait confirmés. La demande de reprise après retrait refuse avec `mission-consent-required` et le Work relu est identique. |
+| ORCH-04 | Partiel. À deux créneaux les deux processus sont actifs ensemble. À un créneau le second attend sur `mission-agent-slots-occupied`, puis démarre après achèvement du premier. La tâche dépendante ne démarre sur aucun de ces deux parcours. Ce témoin cumule dépendance et contrôle de revue. Le conflit d’espace reste à isoler sur cette image. |
+| ORCH-05 | PASS sur la fixture. Deux périmètres arbitrent. Le refus d’autorité du second remonte à la racine, puis le sous-orchestrateur reprend sous son mandat d’origine. |
+| ORCH-06 | Partiel. Les trois contrôles et la revue séparée inerte portent sur le candidat `955bc170be7bcd6b141d49e0071448de57c1ed5a`. Un changement des sources refuse la prépublication. La restauration rend la même observation. Le rejeu exact ne réexécute pas le reviewer et garde la même réservation. La nouvelle validation d’un candidat changé reste à observer. |
+
+Les reçus se trouvent sous `/run/media/fpizzi/SWARM/swarm-evidence/` dans
+`p11-multitask-20261122.9xRb0b/orchestration-external`,
+`p11-slot-comparison-20261122.6avhlZ` et
+`p11-orch06-20261122.iiLg7L`. Dans la dernière archive,
+`publication-i0/valid-current-original.stdout` lie le commit, le reçu de
+validation, l’identifiant de revue et l’empreinte du contexte.
+La fixture de prépublication relit le marqueur dans la feuille I0 de la
+revendication de revue par le lecteur commun. Le premier échec sur le
+marqueur racine historique reste dans `publication/failure.json`.
+
 ## Repères des preuves dev 380
 
 Le binaire natif exercé porte le SHA-256 `f0e92ce3749855bee14f2b6ea68037c0e5532ac58308e36988f76ad6b46678a1`. En saturation, le harnais compte les démarrages du fournisseur. Les lectures publiques établissent l’état du dialogue, du budget et du brief adopté. Les SHA-256 ci-dessous identifient les manifestes des dossiers conservés dans le registre local de recherche.

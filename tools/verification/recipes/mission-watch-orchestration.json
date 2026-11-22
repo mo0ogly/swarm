@@ -40,6 +40,21 @@
         "REPLAY_EVIDENCE"
       ],
       "required_stderr": []
+    },
+    {
+      "id": "mission-watch-inert-single-slot",
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import os, subprocess, sys, tempfile\nfrom pathlib import Path\nbase = Path(tempfile.mkdtemp(prefix='watch-single-slot-'))\nprint('REPLAY_EVIDENCE ' + str(base), flush=True)\nsubprocess.run([sys.executable, '-B', 'tests/rust_mission_watch_parallel.py',\n                '--binary', os.environ['SWARM_ORCHESTRATION_BINARY'],\n                '--profile', os.environ['SWARM_ORCHESTRATION_PROFILE'],\n                '--slots', '1', '--output', str(base / 'single-slot')], check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS one slot defers the independent worker until the first completes",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
     }
   ]
 }

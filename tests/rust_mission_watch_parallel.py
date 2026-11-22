@@ -3,8 +3,8 @@
 
 An attached plan has two independent ready workers in separate workspaces,
 another worker with an unfinished dependency, and a pending root decision.
-The two inert programs wait for local release files until both have real native
-execution permission. No model, live mission or global watchdog is used.
+At two slots, both programs hold native permission concurrently. At one slot,
+the first is held until the second is refused for capacity. No model, live mission or global watchdog is used.
 """
 import argparse
 from contextlib import ExitStack
@@ -25,8 +25,39 @@ import rust_planning_attach as attachment
 import rust_planning_worker_public_flow as planning
 
 
-def run(binary, output):
-    """Require two concurrent process grants and preserve the pending root event."""
+def watch_records(output):
+    """Read complete conductor records from the owned stream; ignore a partial last line."""
+    return [json.loads(line) for line in (output / 'watch.stdout').read_bytes().split(b'\n')[:-1]]
+
+
+def capacity_refusal(output, conductor_fd, notifications, first_agent, waiting):
+    """Read the typed refusal for the second worker while the first is held.
+
+    The caller subscribes before spawning the watch. A second helper start
+    or conductor exit before release fails the owned fixture.
+    """
+    while True:
+        records = watch_records(output)
+        starts = [record['agent_id'] for record in records
+                  if record['event'] == 'mission-worker-started']
+        assert starts in ([], [first_agent]), starts
+        for record in records:
+            for refusal in record.get('resource_refusals', []):
+                if refusal['task_id'] == waiting and refusal['kind'] == 'capacity':
+                    assert starts == [first_agent], starts
+                    assert 'mission-agent-slots-occupied' in refusal['causes'], refusal
+                    return record
+        ready, _, _ = select.select([conductor_fd, notifications], [], [])
+        assert conductor_fd not in ready, 'conductor exited before capacity refusal'
+        os.read(notifications, 65536)
+
+
+def run(binary, output, slots=2):
+    """Observe real grants at the selected capacity and retain their evidence.
+
+    At one slot, wait for the typed refusal before releasing the first worker.
+    At two slots, hold both concurrently. Stop and reap owned processes on exit.
+    """
     owned = attachment.run(binary, output / 'attachment', graph=True, return_fixture=True)
     work_id, root = owned.work, owned.root
     before = owned.ok(['work', 'show', work_id])['work']
@@ -47,11 +78,12 @@ def run(binary, output):
     (root / 'codex').chmod(0o700)
     owned.ok(['mission', 'start', work_id], dict(
         schema_version=1, event_id='parallel-watch-start',
-        expected_revision=before['revision'], reason='Owned two-slot inert witness', slots=2,
+        expected_revision=before['revision'], reason='Owned inert capacity witness', slots=slots,
         profile=dict(provider='fixture', role='worker', workspace='workspace-task',
                      level='standard', capture_output=True)))
     expected = {'task': root / 'workspace-task', 'parallel': root / 'workspace-parallel'}
     granted = {}
+    released_early = None
     try:
         with ExitStack() as stack:
             selector = stack.enter_context(selectors.DefaultSelector())
@@ -61,6 +93,9 @@ def run(binary, output):
                 selector.register(fd, selectors.EVENT_READ, task)
             stdout = stack.enter_context(worker.spool(output / 'watch.stdout'))
             stderr = stack.enter_context(worker.spool(output / 'watch.stderr'))
+            if slots == 1:
+                notifications = worker.watch_directory(output, modifications=True)
+                stack.callback(os.close, notifications)
             argv = [str(binary), 'mission', 'watch', work_id, '--root', str(root), '--json']
             fixture.publish(output / 'command.json', dict(argv=argv, global_watchdog=None))
             process = subprocess.Popen(argv, env=owned.environment, stdin=subprocess.DEVNULL,
@@ -96,14 +131,32 @@ def run(binary, output):
                         assert agent['child_pid'] == provider['pid']
                         assert Path(os.readlink(f'/proc/{provider["pid"]}/cwd')) == expected[task]
                         granted[task] = (supervisor, supervisor_fd, agent_id)
+                        if slots == 1 and len(granted) == 1:
+                            waiting = next(name for name in expected if name != task)
+                            refusal = capacity_refusal(output, watch_fd, notifications,
+                                                       agent_id, waiting)
+                            status = public.status_native(owned)
+                            assert {item['id'] for item in status['agents']} == {agent_id}
+                            assert not (expected[waiting] / 'model-received.json').exists()
+                            fixture.publish(output / 'capacity-refusal.json', dict(
+                                refusal=refusal, native_status=status, running_task=task))
+                            fixture.publish(expected[task] / 'release-worker.json', dict(
+                                nonce=nonce, release=True))
+                            select.select([supervisor_fd], [], [])
+                            released_early = task
+                            assert owned.ok(['agent', 'show', agent_id])['agent']['status'] == 'completed'
                 current = owned.ok(['work', 'show', work_id])['work']
                 assert planning.pending(current, 'root') == pending
                 assert current['planning'].get('activations', 0) == before['planning'].get('activations', 0)
                 active = public.status_native(owned)
                 running = {item['task']: item['id'] for item in active['agents']
                            if item['status'] == 'running'}
-                assert running == {task: observed[2] for task, observed in granted.items()}, active
-                fixture.publish(output / 'simultaneous-status.json', active)
+                expected_running = {name: observed[2] for name, observed in granted.items()
+                                    if name != released_early}
+                assert running == expected_running, active
+                assert {item['task'] for item in active['agents']} <= expected.keys()
+                fixture.publish(output / ('active-status.json' if slots == 1 else
+                                          'simultaneous-status.json'), active)
                 public.mission_control(owned, 'pause', 'parallel-watch-pause')
             finally:
                 if process.poll() is None:
@@ -112,11 +165,22 @@ def run(binary, output):
                 fixture.publish(output / 'exit.json', dict(exit=code))
                 for directory in expected.values():
                     fixture.publish(directory / 'release-worker.json', dict(nonce=nonce, release=True))
-                for supervisor, supervisor_fd, _ in granted.values():
+                for task, (supervisor, supervisor_fd, _) in granted.items():
+                    if task == released_early:
+                        continue
                     select.select([supervisor_fd], [], [])
                     waited, status = os.waitpid(supervisor['pid'], 0)
                     assert waited == supervisor['pid'] and os.waitstatus_to_exitcode(status) == 0
-            assert code == 0, 'conductor failed during two-worker observation'
+            assert code == 0, 'conductor failed during worker observation'
+        if slots == 1:
+            first, second = (value[2] for value in granted.values())
+            timeline = [(record['event'], record['agent_id'], record.get('exit_code'))
+                        for record in watch_records(output)
+                        if record['event'] in ('mission-worker-started', 'mission-worker-exited')]
+            assert timeline == [('mission-worker-started', first, None),
+                                ('mission-worker-exited', first, 0),
+                                ('mission-worker-started', second, None)], timeline
+            fixture.publish(output / 'single-slot-timeline.json', timeline)
         assert owned.ok(['mission', 'show', work_id])['paused'] is True
         for _, _, agent_id in granted.values():
             assert owned.ok(['agent', 'show', agent_id])['agent']['status'] == 'completed'
@@ -127,7 +191,9 @@ def run(binary, output):
         assert revoked['paused'] is True and revoked['consent_enabled'] is False
     finally:
         public.cleanup_owned_children(binary, root, output)
-    return dict(status='PASS', simultaneous_workers=sorted(granted), dependency_waited=True,
+    return dict(status='PASS', slots=slots, grant_order=list(granted),
+                simultaneous_workers=sorted(granted) if slots == 2 else [],
+                capacity_refusal_verified=slots == 1, dependent_worker_not_admitted=True,
                 root_activation_unchanged=True, paused=True, consent_revoked=True,
                 paid_provider=False)
 
@@ -137,6 +203,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('binary', 'profile', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--slots', type=int, choices=(1, 2), default=2)
     args = parser.parse_args()
     binary, output = args.binary.resolve(), args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -144,12 +211,15 @@ def main():
     assert profile['no_fixture_feature'] and profile['sha256'] == fixture.digest(binary.read_bytes())
     fixture.publish(output / 'profile.json', profile)
     result = worker.subreaper_scope(
-        lambda: run(binary, output),
+        lambda: run(binary, output, args.slots),
         lambda error: fixture.publish(output / 'failure.json', dict(
             status='FAIL', cause=''.join(traceback.format_exception(error)))),
         parent_death.subreaper)
     fixture.publish(output / 'result.json', result)
-    print('PASS two isolated inert workers run before competing root planning', flush=True)
+    if args.slots == 1:
+        print('PASS one slot defers the independent worker until the first completes', flush=True)
+    else:
+        print('PASS two isolated inert workers run before competing root planning', flush=True)
     print('PASS public mission preserves pause, resume and consent revocation', flush=True)
 
 

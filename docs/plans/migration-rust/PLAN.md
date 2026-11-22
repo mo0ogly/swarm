@@ -148,6 +148,9 @@ le processus de revue. Le témoin de reprise injecte la modification temporaire
 depuis le propriétaire de la fixture, conserve les preuves et restaure l’original.
 La revue du diff par un autre intervenant et la livraison locale restent ouvertes.
 
+[Matrice P1.1 du 22 novembre sur v0.1.1-dev.390](../../architecture/TOKIO-ORCHESTRATION.md#qualification-p11-du-22-novembre-2026).
+[État de la reprise P1.2 après COMMIT](../../architecture/SAME-ROOT-FIFO-RECOVERY.md#pendant-commit-et-avant-le-démarrage-après-commit).
+
 ### Remontée des refus d’autorité et reprise
 
 La reprise autorisée ajoute l’avis racine au même enregistrement que le refus
