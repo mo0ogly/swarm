@@ -3124,6 +3124,42 @@
           }
         }
       ]
+    },
+    "p12_commit_interruptions": {
+      "observed_image": {
+        "version": "v0.1.1-dev.389",
+        "commit": "50f1daee655fd735c913116cd6b61314ff871bdf",
+        "modified": true,
+        "sha256": "2fa03ed1ffe14d9243f681027085d0e6f61cbc018fd3c4102e85128f00a9567c"
+      },
+      "sources": {
+        "docs/architecture/SAME-ROOT-FIFO-RECOVERY.md": "98aaecbf5b6d8c41ba5f5a5f7d5a167b8dbb600805119ce7773127102535c92f",
+        "docs/en/SAME-ROOT-FIFO-RECOVERY.md": "936c64fdaa0ee8ea3e289a2b4dfcdc614266fdf1137f9dba2e6b4fb12d264eb4"
+      },
+      "original_evidence": [
+        {
+          "archive": "fifo-commit-crash-20261122.AWWUvx",
+          "receipts": {
+            "during-control/08-persisted-settlement.json": "caa075e89e806a9358b8ae0b88cbd8777e2eb7f551fe446195d3e8bc81f524a2",
+            "during-crash/failure.json": "eda1cec240313252a76f999d273fabc882fbe70bace88f74590b8aee5fe0126e"
+          }
+        },
+        {
+          "archive": "fifo-commit-crash-20261122.VHnoWq",
+          "receipts": {
+            "binary-source.json": "ea7b98351ac08fadbdae373d40de6143fd8760ae59ba2e1a1bf896564936991c",
+            "during-crash/05-transaction-interruption.json": "76310720cf7ccee24a890f20553e166a081e836ee7b1f69b94521485172e2dc2",
+            "during-crash/06-crash-durable-readback.json": "87896a0e1513ff09daddfd9984633c88d3c336568e0e1312b294e3863a07748b",
+            "during-crash/07-b-original-turn-and-c-continuity.json": "739d297b2c98e1bfcd21fc61ea39dbb658ea91424ef8140e5ecaaf8399cb714c",
+            "during-crash/08-persisted-settlement.json": "f0b302bcce3b7562439c0b14ed7680cdae9e9eab400f584c338614bfc9475a75",
+            "after-control/08-persisted-settlement.json": "0dbc86ea32e82afa2d5807d5abdeb473f0fae6a9c1b3e3f065d0f1fccbcad890",
+            "after-crash/05-transaction-interruption.json": "2f2eb612e0c59c6a54c5bb27c7ba9d5b16d6033632a67ed46913e80ce4e37655",
+            "after-crash/06-crash-durable-readback.json": "bca3fe2e2a895df466fcc7f58ed15596ef75b3e0a2e9cd59df8339abfeeadedb",
+            "after-crash/failure.json": "795a4b60853085985440529b9e0924bfe0617a2338a6559d42aa768801a40d1f",
+            "after-crash/reopened-server-stderr.bin": "51b1e68b2810fec429523b9b5b0008a44d8549a23f17bcbd32444efb63ada62c"
+          }
+        }
+      ]
     }
   }
 }

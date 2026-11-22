@@ -35,9 +35,29 @@ Agent during B’s admission. The final readback has three released turns and
 no blocker. B has exactly `enqueued → acquired → released` on turn 2, with the
 same Agent for acquisition and release, and one estimated reservation.
 
-The witness covers the window **before COMMIT** on this image. A crash during
-COMMIT or after it succeeds, a lost worker, fairness under load and cross-Root
-scheduling remain open. The final states describe fixture attempts and queue.
+This scenario qualifies the window **before COMMIT** on this image. The final
+states describe fixture attempts and queue.
+
+## During COMMIT and before worker start after COMMIT
+
+On the same image, a control run without interruption finished. For the
+interruption during COMMIT, a page write had succeeded and SQLite had a
+journal. The first read-only probe refused the hot journal. Normal restart
+found B waiting on turn 2 at the original request time, with no durable Agent
+or reservation. With a generation 2 lease, B acquired and released the same
+turn with one estimated reservation. C retained its Agent and PID. All three
+turns were released.
+
+After COMMIT returned successfully and before worker start, readback found
+B queued with its acquired turn, Agent and reservation. The control run
+finished. After the interruption, B’s worker exited with code 2 on restart
+and the conductor stopped while preserving the active intention. Full
+recovery remains open. Worker loss, fairness under load and cross-Root
+scheduling remain open.
+
+The catalogue binds the observations to records in
+`fifo-commit-crash-20261122.VHnoWq` and preserves the earlier failure in
+`fifo-commit-crash-20261122.AWWUvx`.
 
 ## Evidence originals
 
@@ -45,7 +65,7 @@ scheduling remain open. The final states describe fixture attempts and queue.
 | --- | --- |
 | `same-root-fifo-20261122.schtsm` | `06-persisted-settlement.json` and `04-sigint-worker-survival.json` |
 | `same-root-fifo-sigkill-20261122.gE9V3k` | `06-persisted-settlement.json` and `readback.json` |
-| `fifo-admission-crash-20261122.1H4Abh` | `control/08-persisted-settlement.json`, `crash/05-transaction-interruption.json`, `crash/06-crash-durable-readback.json`, `crash/07-b-original-turn-and-c-continuity.json` `crash/08-persisted-settlement.json` and `crash/debugger.log` |
+| `fifo-admission-crash-20261122.1H4Abh` | `control/08-persisted-settlement.json`, `crash/05-transaction-interruption.json`, `crash/06-crash-durable-readback.json`, `crash/07-b-original-turn-and-c-continuity.json`, `crash/08-persisted-settlement.json` and `crash/debugger.log` |
 
 [Hashes and scope](../diagrams/architecture-contracts.json) ·
 [Queue writer](../../rust/crates/swarm-engine/src/workspace_turn_write.rs) ·
