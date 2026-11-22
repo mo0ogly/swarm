@@ -98,3 +98,21 @@ utilise un binaire natif qualifié (`SWARM_LAUNCH_DIAGNOSTICS_BINARY`) et un age
 inerte dans un Root isolé. Elle vérifie l’API et le rendu dans Chromium avec le
 serveur HTTP natif seul, sans conducteur (exemple Cargo
 `cockpit_launch_http_fixture`, fourni via `SWARM_LAUNCH_DIAGNOSTICS_HTTP_FIXTURE`).
+
+### Lecture concurrente du statut après une fin de tentative
+
+La lecture courante compare ses entrées avant publication. Pendant la fin d’une
+tentative, le Work, la liste des agents ou les espaces occupés peuvent changer
+entre les deux observations. Si les contrôles signalent uniquement des entrées
+modifiées, le moteur écarte la projection et la route protégée `mission?…&action=status`
+renvoie HTTP 409 avec `mission-status-observation-changed`. Le cockpit demande
+d’actualiser. La lecture suivante recalcule depuis l’état enregistré.
+Les causes de changement et les diagnostics annexes restent disponibles au
+moteur. Une erreur indépendante de stockage, d’identité ou de fermeture
+conserve son diagnostic d’erreur. Aucune relance d’agent ni nouvelle politique
+de répétition n’est introduite.
+
+La [recette cockpit-status-completion](../../tools/verification/recipes/cockpit-status-completion.json)
+exerce le conducteur Web avec des agents inertes. Elle conserve les réponses
+HTTP et, quand une lecture recouvre la fin d’un agent, les causes CLI observées.
+Le test Rust couvre aussi le classement des causes indépendamment du calendrier.

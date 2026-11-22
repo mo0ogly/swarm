@@ -4,6 +4,13 @@
   const t = (k) => (globalThis.SwarmI18n && typeof globalThis.SwarmI18n.t === 'function' ? globalThis.SwarmI18n.t(k) : k);
   const engine = (m) => (globalThis.SwarmI18n && typeof globalThis.SwarmI18n.engine === 'function' ? globalThis.SwarmI18n.engine(m) : String(m));
 
+  /** Localize the typed status conflict and its explicit recovery action. */
+  function missionErrorText(code) {
+    return code === 'mission-status-observation-changed'
+      ? t('La mission a évolué pendant la lecture. Cliquez sur Actualiser pour afficher le statut à jour.')
+      : engine(code);
+  }
+
   /**
    * Safe nonnegative integer check.
    * @param {*} v
@@ -188,7 +195,7 @@
           plan.appendChild(details);
         }
       } else if (missionError) {
-        plan.textContent = engine(missionError);
+        plan.textContent = missionErrorText(missionError);
       } else if (mission && Array.isArray(mission.tasks)) {
         for (const p of mission.tasks) {
           const div = document.createElement('div');
@@ -210,7 +217,7 @@
       state.textContent = readMode === 'history' && !missionError
         ? t('Lecture de l’historique enregistré. Les compteurs de validation actuelle et d’activité restent inconnus.')
         : missionError
-        ? engine(missionError)
+        ? missionErrorText(missionError)
         : mission && (mission.summary != null || mission.next != null)
           ? [mission.summary != null ? engine(mission.summary) : '', mission.next != null ? engine(mission.next) : ''].filter(Boolean).join(' — ')
           : t('État non disponible.');
