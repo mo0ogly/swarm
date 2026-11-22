@@ -321,6 +321,23 @@ Project skills are in `.agents/skills/`. They link to the canonical files under
 Choose the smallest relevant method. Do not chain every method for a trivial edit.
 See `docs/AGENT-METHODS.md` (French) or `docs/en/AGENT-METHODS.md` (English).
 
+### Repository map for coding agents
+
+Start with the [shared workflow contract](tools/agent-workflows/CONTRACT.md).
+Use this map to find the producer and consumers of the change before selecting
+a method. The extended guide explains context, tooling and evidence for each
+area. [English](docs/en/AGENT-METHODS.md#repository-map-for-coding-agents) ·
+[Français](docs/AGENT-METHODS.md#repères-du-dépôt-pour-les-agents).
+
+| Change | First sources |
+| --- | --- |
+| Architecture, mission, concurrency or recovery | [Architecture](docs/en/ARCHITECTURE.md), [agent–engine protocol](docs/en/AGENT-ENGINE-PROTOCOL.md), [Tokio orchestration](docs/en/TOKIO-ORCHESTRATION.md) and affected Rust producers |
+| API, provider or settings | [Native HTTP errors](docs/en/NATIVE-HTTP-ERRORS.md), [provider resolution](docs/en/NATIVE-PROVIDER-RESOLUTION.md), shared validation and the effective consumers |
+| UI, graph or localization | [Product architecture](docs/PRODUCT-ARCHITECTURE.md), [UI design](docs/UI-DESIGN.md), [frontend scripts](package.json) and the affected served assets |
+| Authority, identity or data flow | [Identity contract](docs/en/AGENT-IDENTITY-CONTRACT.md), [Biba](docs/en/BIBA-RUST.md), [BLP flow inventory](docs/en/BLP-FLOWS.md) and enforcement at use |
+| Memory, review or proof | [Project memory](docs/PROJECT-MEMORY.md), [review evidence](docs/en/REVIEW-EVIDENCE.md), [traceability](docs/en/TRACEABILITY.md) and the actual context consumer |
+| Build, test or delivery | [Current CI entry points](.github/workflows/ci.yml), [verification recipes](tools/verification/README.md), [local launcher contract](docs/en/NATIVE-LOCAL-LAUNCHER.md) and the checks below |
+
 ## Modèles Swarm
 
 Toute création ou modification d’un modèle Swarm doit utiliser la skill
