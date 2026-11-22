@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "mission-watch-orchestration",
+  "inputs": [
+    ".cargo/config.toml",
+    ".cargo/storage-policy.json",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-cli/src/mission_watch.rs",
+    "rust/crates/swarm-cli/src/mission_watch/role_job.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/src/mission_worker_dispatch.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-engine/src/planning_decision.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_step.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/runtime.rs",
+    "docs/architecture/TOKIO-ORCHESTRATION.md",
+    "docs/en/TOKIO-ORCHESTRATION.md",
+    "tests/fixture_area.py",
+    "tests/rust_*.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "mission-watch-inert-orchestration",
+      "command": [
+        "python3", "-B", "-c",
+        "import os, subprocess, sys, tempfile\nfrom pathlib import Path\nbase = Path(tempfile.mkdtemp(prefix='watch-orchestration-'))\nprint('REPLAY_EVIDENCE ' + str(base), flush=True)\nbinary = os.environ['SWARM_ORCHESTRATION_BINARY']\nprofile = os.environ['SWARM_ORCHESTRATION_PROFILE']\nfor name in ('rust_mission_watch_parallel', 'rust_orchestration_scopes'):\n    subprocess.run([sys.executable, '-B', 'tests/' + name + '.py', '--binary', binary, '--profile', profile, '--output', str(base / name)], check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS two isolated inert workers run before competing root planning",
+        "PASS public mission preserves pause, resume and consent revocation",
+        "PASS two isolated sub-orchestrator decisions and idle without a new provider call",
+        "PASS public conductor plans when no worker can advance",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

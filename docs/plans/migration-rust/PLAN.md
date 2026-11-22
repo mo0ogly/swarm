@@ -11,6 +11,90 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Déclenchement des agents et appels de planification — 22 novembre
+
+Périmètre validé par Fabrice, base `f9d9d7fee`. Le workflow configuré
+d'[Agents-Orchestrator](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/orchestrator/core/engine.py#L293-L374)
+enchaîne les étapes sans planificateur. Il peut relancer toutes les étapes.
+Reprendre le premier principe dans le conducteur Rust, sans importer la boucle Python.
+
+Lecture du code : [mission_watch.rs](../../../rust/crates/swarm-cli/src/mission_watch.rs)
+programme le planificateur avant la tentative d'admission worker dans une même
+itération. [planning_step.rs](../../../rust/crates/swarm-engine/src/root_store/planning_step.rs)
+sélectionne déjà une entrée ouverte et retourne `idle` sans réservation d'appel
+si aucune entrée n'est ouverte. L'ordre de programmation est un point de
+concurrence à reproduire. Son rôle dans l'incident et la répétition d'appels payés
+restent non établis. L'observation locale sur Biba annonçait une pause et six
+réservations de planification sans usage renseigné. La lecture du code établit
+aussi que [role_job.rs](../../../rust/crates/swarm-cli/src/mission_watch/role_job.rs)
+distingue planification, contrôles et revue indépendante. Cette séparation et
+les admissions existantes servent de point de départ aux nouveaux critères.
+
+Le moteur Rust ordonne les tâches admissibles et applique les décisions autorisées
+à partir des dépendances, des droits, des capacités, de l'état des périmètres et
+de la révision courante. Les décisions métier reviennent à l'orchestrateur racine
+ou au sous-orchestrateur mandaté. Les contrôles exécutables et la revue indépendante
+sont rattachés au résultat effectivement présenté. Leurs preuves sont des entrées
+de la décision d'acceptation.
+
+| Critère | Preuve attendue |
+| --- | --- |
+| ORCH-01 | Sur un plan autorisé avec tâche admissible et entrée de planification concurrente, le conducteur admet le worker sans activer d'abord un planificateur concurrent. |
+| ORCH-02 | Si un nouvel arbitrage est requis et qu'aucun worker ne peut avancer, le planificateur reçoit l'entrée admissible. Une observation à état inchangé ne crée aucun nouvel appel fournisseur ni test. |
+| ORCH-03 | Pause, refus de consentement et retrait restent observables. Aucun départ sous refus, et la reprise autorisée reste vérifiée sur le parcours public. |
+| ORCH-04 | Deux tâches indépendantes dans des espaces isolés exécutent en parallèle si la capacité configurée le permet. Une dépendance inachevée, un conflit d'espace ou la capacité atteinte bloque l'admission concernée avec un motif. |
+| ORCH-05 | La racine mandate deux sous-orchestrateurs sur des périmètres isolés. Chacun arbitre dans son mandat et remonte preuves et blocages. Une décision transversale ou hors mandat revient à la racine. La reprise conserve les décisions déjà appliquées. |
+| ORCH-06 | Un résultat arrive aux contrôles autorisés et à la revue indépendante exigée. Un refus ou une preuve périmée bloque l'acceptation. Le rejeu à preuves et entrées identiques réutilise l'issue enregistrée, et une modification pertinente exige une nouvelle validation. |
+
+Le conducteur existant est retenu pour conserver l’admission, les diagnostics
+et la reprise déjà raccordés. La première passe donne la priorité à l’admission.
+Le conducteur attend le franchissement du démarrage précédent avant de muter la
+révision pour une autre admission, puis reprend à la cadence enregistrée.
+Les décisions de périmètre, contrôles et revues réutilisent les opérations
+moteur existantes. Les changements de comportement sont décrits en FR/EN.
+
+### Preuves du candidat local
+
+Binaire CLI du profil normal et sans feature de fixture,
+SHA-256 `16a41cb2ddf8ae84f5733f45ae0a6d2ad201f9a5595c2fa8d75ab253c4aaf0dd`.
+Index des commandes, empreintes, échecs et résultats :
+`/run/media/fpizzi/SWARM/swarm-evidence/rust-orchestration-20261122.KfrOAb`.
+
+- ORCH-01 et ORCH-02 : `recipe-cadence` est PASS et son intégrité est vérifiée.
+  Deux providers inertes obtiennent des permissions en parallèle avant l’appel
+  racine concurrent. Une mission sans worker admissible traite une entrée de
+  planification. Une boîte vide rend `idle` et conserve les compteurs.
+- ORCH-03 : pause, reprise consentie et retrait de consentement observés.
+  `revoked-resume.result.json` conserve le refus de reprise et l’égalité du
+  travail avant et après.
+- ORCH-04 : deux workspaces confirmés par les processus, dépendance en attente.
+  Le parcours géré exerce aussi le FIFO et la reprise sur les originaux.
+- ORCH-05 : décisions appliquées dans deux sous-périmètres et contexte attribué
+  observé. Le routage automatique d’un arbitrage transversal et la reprise de
+  cette décision restent ouverts. Le contrat d’admission refuse une dépendance
+  hors périmètre. Aucun transfert automatique de ce refus à la racine n’a été
+  démontré.
+- ORCH-06 : `managed-cadence-pass/result.json` observe les contrôles exécutés
+  et la revue du candidat avec rejeu de l’original sans nouvelle invocation.
+  `managed-parent-source-drift/result.json` observe le refus de publication
+  sur source modifiée, puis la restitution du même résultat après restauration.
+  Aucune acceptation réelle n’est enregistrée dans les fixtures.
+
+Revue locale du diff : les nouveaux ordres sont des règles de protocole.
+La capacité, la cadence, les contrôles et les budgets restent lus via les
+contrats existants. Les commentaires des fonctions modifiées décrivent la
+lecture de démarrage et ses limites. Une erreur de lecture conserve sa cause
+et arrête la phase avant admission. Aucun appel payant, changement de budget,
+relance de mission réelle ou modification de service. La réserve commune de
+10 Go déjà autorisée est appliquée à ce seul checkout pour la qualification.
+Le premier collecteur a refusé le nouveau chemin d’empreintes de Cargo 1.100.
+Le collecteur a qualifié le build avec Cargo 1.96 sélectionné par le PATH.
+Le scénario historique de dérive de source a conservé son échec
+`managed-cadence/failure.json` : la frontière I0 a empêché l’écriture depuis
+le processus de revue. Le témoin de reprise injecte la modification temporaire
+depuis le propriétaire de la fixture, conserve les preuves et restaure l’original.
+La revue du diff par un autre intervenant et la livraison locale restent ouvertes.
+
 ## Régression graphe —31 octobre, APEX demandé
 
 G1/G11 : restituer zoom, fond/cartes, orientation et plein écran ; G4 : création

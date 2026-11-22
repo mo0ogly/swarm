@@ -2,6 +2,18 @@
 
 [English](../en/TOKIO-ORCHESTRATION.md) · [Plan Biba](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md) · [Qualification ciblée](#rejouer-la-qualification-ciblée)
 
+## Ordre d’admission dans le conducteur de mission
+
+Le conducteur tente d’abord d’admettre un worker prêt. Après un départ, il
+relit l’état. Il attend que le démarrage précédent franchisse son contrôle
+lié à la révision avant de tenter l’admission suivante sous la même autorité.
+Le moteur garde l’ordre de la file, les dépendances, l’exclusion des espaces
+occupés et la capacité configurée. Une nouvelle activation du planificateur
+attend une passe sans admission, la permission de mission et la fin des
+contextes workers retenus. La reprise d’un worker déjà admis conserve son
+identité. Les contrôles et la revue restent des opérations distinctes sur les
+preuves du résultat soumis.
+
 ## Choisir la frontière
 
 Utiliser Tokio pour la coordination asynchrone entre composants Rust coopératifs qui peuvent partager les privilèges d’un processus. Un canal typé convient lorsqu’une tâche doit confier une opération à un propriétaire unique ou recevoir un résultat ponctuel. Réutiliser le transport existant si l’opération a déjà un propriétaire et une règle d’admission.

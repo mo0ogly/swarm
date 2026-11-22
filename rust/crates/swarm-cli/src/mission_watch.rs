@@ -509,13 +509,14 @@ fn reap(
 }
 /// Observe before every dispatch/adoption without grant or cancellation. Return
 /// old-generation queued candidate IDs, whether any automatic worker retains an
-/// active context, then unowned registered IDs. The actual adoption API validates
-/// ownership, receipt and current controls. All semantic sibling refusals survive.
+/// active context, unowned registered IDs and whether a previously started worker
+/// is still crossing the revision-bound startup gate. Read failures preserve
+/// their cause. These observations authorize no work and change no state.
 fn continuation(
     store: &RootStore,
     lease: &MissionLease,
     children: &[Worker],
-) -> Result<(Vec<String>, bool, Vec<String>), RootError> {
+) -> Result<(Vec<String>, bool, Vec<String>, bool), RootError> {
     let observed = store
         .observe_mission_worker_continuation(lease)
         .map_err(|error| phase("mission-watch-continuation", *error))?;
@@ -523,9 +524,19 @@ fn continuation(
     let mut candidates = Vec::new();
     let mut registered = Vec::new();
     let mut active_context = false;
+    let mut startup_pending = false;
     for entry in observed.entries {
         active_context |= planning_context_pending(&entry.state);
         let known = children.iter().any(|child| child.agent == entry.agent_id);
+        match &entry.state {
+            State::QueuedUnregisteredObserved { .. }
+            | State::StopRequestedUnregisteredObserved { .. } if known => startup_pending = true,
+            State::RegisteredObserved => match store.read_agent(&entry.agent_id) {
+                Ok(agent) => startup_pending |= agent.status == "starting",
+                Err(error) => failure = Some(join(failure, phase("mission-watch-startup-observation", error))),
+            },
+            _ => {}
+        }
         if !known && matches!(entry.state, State::RegisteredObserved) { registered.push(entry.agent_id.clone()); }
         if adoption_candidate(known, &entry.state) {
             candidates.push(entry.agent_id.clone());
@@ -538,7 +549,7 @@ fn continuation(
             failure = Some(join(failure, error));
         }
     }
-    failure.map_or(Ok((candidates, active_context, registered)), Err)
+    failure.map_or(Ok((candidates, active_context, registered, startup_pending)), Err)
 }
 
 /// Finalize only unowned registered observations after all continuation siblings
@@ -1040,7 +1051,12 @@ fn stop_withdrawn_report(error: RootError, work: &str, recorded: &Option<(String
 /// polled at saved cadence, joined and published by this sole shared-output
 /// writer in protocol role order. One in-flight call per role prevents duplicate
 /// owned calls; engine leases/admission and persisted budgets remain authoritative.
-/// Planner defers while active worker contexts remain. Every peer is interrupted
+/// Workers with admissible work take priority over a new planner peer. A successful
+/// dispatch rechecks readiness once the prior startup crosses the revision-bound
+/// gate, so running independent tasks can use remaining configured slots.
+/// Planning waits for a dispatch pass with no
+/// admission, a usable mission permission and no retained worker context.
+/// Every peer is interrupted
 /// and joined before conductor release, even after another peer/publisher fails.
 /// This does not establish global scheduling or mission acceptance parity.
 fn drive(
@@ -1093,7 +1109,7 @@ fn drive(
         ) {
             return stop_withdrawn_report(error, work, planning_recorded, out);
         }
-        let (candidates, active_context, registered) = continuation(store, lease, children)?;
+        let (candidates, active_context, registered, startup_pending) = continuation(store, lease, children)?;
         if recover_registered(store,lease,work,registered,&mut recovery_waiting,planning_recorded,out)? {
             // Verified settlement changed the observed context. Discard this old
             // snapshot before any planning/adoption/dispatch; same lease/IDs remain.
@@ -1104,13 +1120,12 @@ fn drive(
         if active_context {
             planning_once(store,work,true,out,planning_recorded)?;
         }
-        for role in role_job::Role::ALL {
+        if startup_pending {
+            if let Some(stop) = signals.wait(cadence)? { return Ok(stop); }
+            continue;
+        }
+        for role in [role_job::Role::Controls, role_job::Role::Reviewer] {
             if jobs.contains_key(&role) { continue; }
-            if role == role_job::Role::Planner {
-                let current = store.read_work(work)?;
-                if active_context || !current.planning.as_ref().is_some_and(|p|
-                    !p.paused && p.failure.is_empty() && !p.provider.is_empty()) { continue; }
-            }
             jobs.insert(role,role_job::start(scope,role,root.to_owned(),work.to_owned(),lease,signals.source.clone())?);
         }
         if !monitor.is_running() {
@@ -1119,7 +1134,7 @@ fn drive(
         if let Some(stop) = signals.ready()? {
             return Ok(stop);
         }
-        for agent_id in candidates {
+        if let Some(agent_id) = candidates.into_iter().next() {
             if !monitor.is_running() {
                 return Err(RootError::Refused("mission-watch-heartbeat-not-running"));
             }
@@ -1164,6 +1179,8 @@ fn drive(
             }
             start_worker(executable, root, &agent_id, work, children, out)?;
             last_blocked = None;
+            if let Some(stop) = signals.wait(cadence)? { return Ok(stop); }
+            continue;
         }
         let revision = store.read_work(work)?.revision;
         let request = match pending_dispatch.take() {
@@ -1235,7 +1252,19 @@ fn drive(
                     "mission-watch-unexpected-dispatch-replay",
                 ))
             }
-            Dispatch::NoAdmission { .. } => {}
+            Dispatch::NoAdmission { queue, .. } => {
+                let role = role_job::Role::Planner;
+                if !active_context && queue.permission_refusal.is_none()
+                    && !jobs.contains_key(&role)
+                {
+                    let current = store.read_work(work)?;
+                    if current.planning.as_ref().is_some_and(|p|
+                        !p.paused && p.failure.is_empty() && !p.provider.is_empty())
+                    {
+                        jobs.insert(role,role_job::start(scope,role,root.to_owned(),work.to_owned(),lease,signals.source.clone())?);
+                    }
+                }
+            }
         }
         if let Some(stop) = signals.wait(cadence)? {
             return Ok(stop);

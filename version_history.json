@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Orchestration Rust : priorité aux workers admissibles et utilisation des places disponibles avant une nouvelle activation du planificateur.",
+        "en": "Rust orchestration: eligible workers use available slots before a new planner activation."
+      },
+      {
         "fr": "Mémoire : le premier lancement manuel dans une équipe configurée peut inclure un résumé extractif des dialogues de sa branche.",
         "en": "Memory: the first manual launch in a configured team can include an extractive summary of dialogues from its own scope."
       },

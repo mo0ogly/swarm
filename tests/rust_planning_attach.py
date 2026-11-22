@@ -9,11 +9,13 @@ from rust_agent_model_route import Fixture, PROGRAM, digest, publish
 
 
 def run(binary, output, *, managed=False, graph=False, history=False, successful_history=False,
-        legacy_binary=None):
+        legacy_binary=None, return_fixture=False):
     """Attach an owned work, optionally producing genuine history with a legacy binary.
 
     Attachment and verification run on the candidate. Only the optional
     failed/successful historical worker runs with the supplied legacy executable.
+    Returning the owned fixture leaves the attached Work unstarted for a caller
+    that will exercise public mission admission.
     """
     has_history = history or successful_history
     assert not has_history or legacy_binary is not None, 'history requires an exact legacy binary'
@@ -225,6 +227,8 @@ def run(binary, output, *, managed=False, graph=False, history=False, successful
     assert code != 0 and 'planning-attach-ordinary-work-required' in str(result), result
     assert show() == after
     print('PASS attachment-retains-graph-and-no-launch-consent', flush=True)
+    if return_fixture:
+        return fixture
     return {'status': 'PASS', 'work': work_id, 'revision': after['revision'],
             'task_scopes': assignments, 'provider_called': False,
             'fixture_worker_ran': history or successful_history, 'attached_worker_completion': history,
