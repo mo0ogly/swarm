@@ -3987,6 +3987,7 @@ globalThis.SwarmEnglish = {
   "Non classé": "Unclassified",
   "Non classés : ": "Unclassified: ",
   "Non communiqué": "Not reported",
+  "Sans périmètre": "Unassigned",
   "Non configuré": "Not configured",
   "Configurer l’équipe et les contrôles avant tout lancement.": "Configure the team and controls before any launch.",
   "Sous-orchestrateur": "Sub-orchestrator",

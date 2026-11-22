@@ -1000,8 +1000,44 @@
     } else {
       globalThis.dagre.layout(g);
     }
-    const totalWidth = depPairs.length ? g.graph().width : orientation==='LR'?Math.max(nodeWidth+40,tasks.length*(nodeWidth+28)+12):nodeWidth+40;
-    const totalHeight = depPairs.length ? g.graph().height : orientation==='TB'?Math.max(nodeHeight+40,tasks.length*(nodeHeight+28)+12):nodeHeight+40;
+    let totalWidth = depPairs.length ? g.graph().width : orientation==='LR'?Math.max(nodeWidth+40,tasks.length*(nodeWidth+28)+12):nodeWidth+40;
+    let totalHeight = depPairs.length ? g.graph().height : orientation==='TB'?Math.max(nodeHeight+40,tasks.length*(nodeHeight+28)+12):nodeHeight+40;
+    // Preserve dependency ranks while packing tasks into their recorded branch.
+    const bands = new Map();
+    if (orchestration.assignments.size) {
+      for (const task of tasks) {
+        const scope = orchestration.assignments.has(task.id) ? task.scope_id : '';
+        if (!bands.has(scope)) bands.set(scope, []);
+        bands.get(scope).push(task);
+      }
+    }
+    const branchLabels = [];
+    if (bands.size > 1) {
+      const vertical = orientation === 'TB';
+      const along = vertical ? nodeHeight : nodeWidth;
+      const across = vertical ? nodeWidth : nodeHeight;
+      const rankOf = task => depPairs.length ? g.node(graphNodeKey(task.id))[vertical ? 'y' : 'x'] : 0;
+      const ranks = [...new Set(tasks.map(rankOf))].sort((a, b) => a - b);
+      const offsets = new Map(ranks.map((rank, index) => [rank, (vertical ? 36 : 20) + index * 3 * (along + 28)]));
+      let bandStart = 20, alongEnd = 0;
+      for (const [scope, members] of bands) {
+        const counts = new Map();
+        let rows = 1;
+        branchLabels.push({ scope, start: bandStart });
+        for (const task of members) {
+          const rank = rankOf(task), index = counts.get(rank) || 0;
+          counts.set(rank, index + 1);
+          const a = offsets.get(rank) + (index % 3) * (along + 28) + along / 2;
+          const b = bandStart + 30 + Math.floor(index / 3) * (across + 28) + across / 2;
+          Object.assign(g.node(graphNodeKey(task.id)), { x: vertical ? b : a, y: vertical ? a : b });
+          alongEnd = Math.max(alongEnd, a + along / 2 + 20);
+          rows = Math.max(rows, Math.floor(index / 3) + 1);
+        }
+        bandStart += 30 + rows * (across + 28);
+      }
+      totalWidth = vertical ? bandStart : alongEnd;
+      totalHeight = vertical ? alongEnd : bandStart;
+    }
 
     const svg = svgNode('svg', {});
     svg.setAttribute('width',String(totalWidth));svg.setAttribute('height',String(totalHeight));
@@ -1011,6 +1047,13 @@
     svg.setAttribute('class', 'graph-svg');
     svg.setAttribute('role', 'group');
     svg.setAttribute('aria-label', t('Dépendances : du prérequis vers la tâche'));
+
+    for (const { scope, start } of branchLabels) {
+      const label = svgNode('text', { x: orientation === 'TB' ? start : 20,
+        y: orientation === 'TB' ? 16 : start + 18, class: 'graph-titre', 'data-graph-branch': scope });
+      label.textContent = scope || t('Sans périmètre');
+      svg.append(label);
+    }
 
     for (const e of depPairs) {
       const data = g.edge(graphNodeKey(e.from), graphNodeKey(e.to));

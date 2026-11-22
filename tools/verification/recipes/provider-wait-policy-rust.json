@@ -18,7 +18,12 @@
     "tests/rust_native_http_cli.py",
     "docs/architecture/NATIVE-PROVIDER-WAIT.md",
     "docs/en/NATIVE-PROVIDER-WAIT.md",
-    "tests/rust_provider_wait_policy.py"
+    "tests/rust_provider_wait_policy.py",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/src/planning_run_material.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/guard.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/material.rs"
   ],
   "environment": {},
   "steps": [
@@ -33,6 +38,27 @@
         "python3",
         "-c",
         "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='provider-wait-policy-rust-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_provider_wait_policy.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)],check=True)"
+      ]
+    },
+    {
+      "id": "planner-and-reviewer-read-matching-legacy-wait",
+      "expected_exit": 0,
+      "required_stdout": [
+        "native_roles_read_matching_legacy_wait_without_changing_settings ... ok"
+      ],
+      "required_stderr": [],
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::review_preview::reviewer_candidate::material::tests::native_roles_read_matching_legacy_wait_without_changing_settings",
+        "--",
+        "--exact"
       ]
     }
   ]

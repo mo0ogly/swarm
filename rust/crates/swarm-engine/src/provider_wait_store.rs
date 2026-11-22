@@ -37,6 +37,32 @@ fn intrinsic(r:&Request)->Result<(),E> {
     if r.schema_version!=1 || r.expected_revision<0 || !swarm_identity_contract::name(r.event_id.as_bytes()) || crate::text::trim_space(&r.reason).is_empty() {return Err(E::Refused("api-provider-wait-change-invalid"));}
     crate::provider_wait::validate_stored_values(&r.values).map_err(|e|E::Launch(Box::new(e)))
 }
+/// Validate coexistence with a historical wait file under current native settings.
+/// A missing file needs no adoption. A present file must decode fully and match
+/// the three shared knobs. History and native-only controls are left untouched.
+pub(crate) fn verify_native_wait(
+    directory: &crate::local_storage::LocalDirectory,
+    settings: &crate::EngineSettingsDocument,
+    mismatch: &'static str,
+) -> Result<(), crate::AgentLaunchError> {
+    use crate::AgentLaunchError as A;
+    let cap = settings.values.agent_launch_policy().map_err(|e| A::caused(e.reason(), e))?.provider_bytes;
+    let bytes = match directory.read_capped("provider-wait.json", cap) {
+        Ok(bytes) => bytes,
+        Err(error) if absent(&error) => return Ok(()),
+        Err(error) => return Err(A::caused("provider-wait-source-read", error)),
+    };
+    let legacy = crate::provider_wait::decode_provider_wait_config(&bytes)
+        .map_err(|e| A::caused("provider-wait-source-invalid", e))?.values;
+    let native = settings.values.planning_wait_policy().map_err(|e| A::caused(e.reason(), e))?;
+    if (legacy.silence_seconds, legacy.max_duration_seconds, legacy.planning_lease_seconds)
+        != (native.silence_seconds.0, native.max_duration_seconds.0, native.default_lease_seconds.0)
+    {
+        return Err(A::Refused(mismatch));
+    }
+    Ok(())
+}
+
 impl RootStore {
     /// Read checked private source with current saved cap; absence uses compiled
     /// versioned defaults. Invalid stored/default data retain a source-specific

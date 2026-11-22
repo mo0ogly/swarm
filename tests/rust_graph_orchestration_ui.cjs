@@ -62,7 +62,21 @@ async function run() {
         const role = value => get('[data-orchestration-role="' + value + '"]');
         const root = role('root');
         const branches = Array.from(root.querySelectorAll(':scope > ul > li'), node => node.dataset.scope);
+        const connectsCards = (vertical) => {
+          const edge = get('.graph-arete[data-from="wasm"][data-to="rpc"]');
+          const source = get('.graph-noeud[data-task="wasm"] .graph-cadre');
+          const target = get('.graph-noeud[data-task="rpc"] .graph-cadre');
+          const start = edge.getPointAtLength(0), end = edge.getPointAtLength(edge.getTotalLength());
+          const box = node => ['x', 'y', 'width', 'height'].map(name => Number(node.getAttribute(name)));
+          const [sx, sy, sw, sh] = box(source), [tx, ty, tw, th] = box(target);
+          const expected = vertical
+            ? [sx + sw / 2, sy + sh, tx + tw / 2, ty]
+            : [sx + sw, sy + sh / 2, tx, ty + th / 2];
+          return [start.x, start.y, end.x, end.y].every((value, i) => Math.abs(value - expected[i]) < 1);
+        };
         const snapshot = {
+          bandCount: document.querySelectorAll('[data-graph-branch]').length,
+          lrConnected: connectsCards(false),
           driver: role('driver').textContent, reviewer: role('reviewer').textContent,
           root: root.firstElementChild.textContent, branches,
           nested: get('[data-scope="transport"] [data-scope="documentation"] details summary').textContent,
@@ -78,6 +92,7 @@ async function run() {
         const orientation = get('#pilot-orientation');
         orientation.value = 'TB';
         orientation.dispatchEvent(new Event('change', {bubbles: true}));
+        snapshot.tbConnected = connectsCards(true);
         snapshot.orientedDriver = role('driver').textContent;
         snapshot.orientedReason = get('.graph-task-open[data-task="rpc"]').getAttribute('aria-label');
         get('[data-orchestration-tree]').open = false;
@@ -112,6 +127,8 @@ async function run() {
       }, {lang, theme});
       assert.deepEqual(result.branches, ['transport', 'validation']);
       assert.equal(result.taskCount, 60);
+      assert.equal(result.bandCount, 3);
+      assert(result.lrConnected && result.tbConnected, 'dependency endpoints follow the grouped cards');
       assert.deepEqual(result.links, [['wasm', 'rpc']]);
       assert.match(result.root, /glm · glm-fixture/);
       assert.match(result.reviewer, /review-fixture/);
