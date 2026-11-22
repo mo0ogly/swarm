@@ -72,9 +72,9 @@ les workers est indiqué séparément dans ORCH-06.
 | Critère | Résultat et portée |
 | --- | --- |
 | ORCH-01 | PASS. Deux permissions de démarrage en espaces disjoints alors que l’entrée concurrente de planification racine reste en attente. |
-| ORCH-02 | Partiel. Le conducteur planifie sans worker admissible. Une observation sans nouvelle entrée reste `idle`, sans nouveau départ de planificateur. Le compteur de contrôles n’a pas été observé spécifiquement sur ce scénario. |
+| ORCH-02 | PASS sur la fixture. Le conducteur planifie sans worker admissible. À état inchangé, la commande de planification retourne `idle`, sans nouveau lancement ni exécution du contrôle configuré. Le témoin positif du contrôle crée le marqueur attendu. |
 | ORCH-03 | PASS sur la fixture. Pause, reprise consentie et retrait confirmés. La demande de reprise après retrait refuse avec `mission-consent-required` et le Work relu est identique. |
-| ORCH-04 | Partiel. À deux créneaux les deux processus sont actifs ensemble. À un créneau le second attend sur `mission-agent-slots-occupied`, puis démarre après achèvement du premier. La tâche dépendante ne démarre sur aucun de ces deux parcours. Ce témoin cumule dépendance et contrôle de revue. Le conflit d’espace reste à isoler sur cette image. |
+| ORCH-04 | Partiel. À deux créneaux les deux processus sont actifs ensemble. À un créneau le second attend sur `mission-agent-slots-occupied`, puis démarre après achèvement du premier. La tâche dépendante ne démarre sur aucun de ces deux parcours. Ce témoin cumule dépendance et contrôle de revue. Une variante à deux créneaux isole le recouvrement de deux espaces et retourne un blocage FIFO jusqu’à la sortie du premier worker. |
 | ORCH-05 | PASS sur la fixture. Deux périmètres arbitrent. Le refus d’autorité du second remonte à la racine, puis le sous-orchestrateur reprend sous son mandat d’origine. |
 | ORCH-06 | Partiel. Les trois contrôles et la revue séparée inerte portent sur le candidat `955bc170be7bcd6b141d49e0071448de57c1ed5a`. Un changement des sources refuse la prépublication. La restauration rend la même observation. Le rejeu exact ne réexécute pas le reviewer et garde la même réservation. La nouvelle validation d’un candidat changé reste à observer. |
 
@@ -87,6 +87,8 @@ validation, l’identifiant de revue et l’empreinte du contexte.
 La fixture de prépublication relit le marqueur dans la feuille I0 de la
 revendication de revue par le lecteur commun. Le premier échec sur le
 marqueur racine historique reste dans `publication/failure.json`.
+Les témoins ciblés sont `p11-idle-controls-20261122.kUx4T0/run/result.json`
+et `p11-overlap-20261122.FPARps/run/capacity-refusal.json`.
 
 ## Repères des preuves dev 380
 

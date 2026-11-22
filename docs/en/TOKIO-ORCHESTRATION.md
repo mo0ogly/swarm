@@ -71,9 +71,9 @@ candidate commit separately.
 | Criterion | Result and scope |
 | --- | --- |
 | ORCH-01 | PASS. Two startup grants in separate workspaces while the competing root planning input remains pending. |
-| ORCH-02 | Partial. The conductor plans without an eligible worker. Observation without fresh input stays `idle` with no new planner launch. This scenario did not specifically track the control execution count. |
+| ORCH-02 | PASS in the fixture. The conductor plans without an eligible worker. With unchanged state, the planning command returns `idle` without a new launch or execution of the configured control. The positive control witness produces the expected marker. |
 | ORCH-03 | PASS in the fixture. Pause, authorized resume and consent withdrawal were observed. A resume request after withdrawal returned `mission-consent-required` and the Work readback was identical. |
-| ORCH-04 | Partial. With two slots the processes are active together. With one slot the second is refused with `mission-agent-slots-occupied` until the first completes. The dependent task starts in neither case. This witness combines dependency and review gates. A workspace conflict remains to be isolated on this image. |
+| ORCH-04 | Partial. With two slots the processes are active together. With one slot the second is refused with `mission-agent-slots-occupied` until the first completes. The dependent task starts in neither case. This witness combines dependency and review gates. A two-slot variant isolates overlapping workspaces and returns a FIFO blocker until the first worker exits. |
 | ORCH-05 | PASS in the fixture. Two scopes make decisions. The second scope’s authority refusal reaches the root, then the child resumes under its original mandate. |
 | ORCH-06 | Partial. Three controls and a separate inert review cover candidate `955bc170be7bcd6b141d49e0071448de57c1ed5a`. Changed source blocks prepublication. Restoration returns the same observation. Exact replay leaves reviewer invocations and reservations unchanged. Fresh validation of a changed candidate remains to be observed. |
 
@@ -85,7 +85,9 @@ Receipts are under `/run/media/fpizzi/SWARM/swarm-evidence/` in
 receipt, review ID and context digest. The prepublication fixture uses the
 shared reader for the marker in the review claim’s I0 leaf.
 The first failure on the historical Root-level marker remains in
-`publication/failure.json`.
+`publication/failure.json`. The focused witnesses are
+`p11-idle-controls-20261122.kUx4T0/run/result.json` and
+`p11-overlap-20261122.FPARps/run/capacity-refusal.json`.
 
 ## Evidence references for dev 380
 
