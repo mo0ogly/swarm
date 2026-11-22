@@ -1,5 +1,8 @@
 //! Lease-owned FIFO registration before capacity/occupancy. No provider starts.
-use super::{auxiliary_schema, bound, caused, execute, write, RootStore};
+use super::{auxiliary_schema, bound, caused, execute, read_transaction, write, RootStore};
+use crate::agent_launch::CandidateHostCheck;
+use crate::root_store::{mission_agent, mission_candidates, mission_task_order, mission_workspace_queue};
+use crate::workspace_turn;
 use crate::work_engine::MutationFence;
 use crate::workspace_turn_write::{self as queue, Candidate};
 use crate::{MissionLease, MissionSupervisionError as E, Work};
@@ -56,12 +59,14 @@ pub(crate) fn schema(db: &rusqlite::Connection, create: bool) -> Result<bool, E>
 /// mutation is retained. Provider/host checks read actual configuration; no call
 /// or workspace ownership is inferred. Cost/attempt history and fresh evidence
 /// are rechecked; the factory still repeats all guards before acquisition/grant.
+/// ReadOnly is for diagnostics. VerifyWrite may create a temporary probe file.
 fn ready(
     store: &RootStore,
     work: &Work,
     task: &str,
     profile: &crate::LaunchProfile,
     settings: &crate::EngineSettingsDocument,
+    host_check: CandidateHostCheck,
 ) -> Result<String, E> {
     let limits = settings.values.mutation_limits().map_err(E::Settings)?;
     let quality = settings.quality_policy_snapshot().map_err(E::Settings)?;
@@ -124,11 +129,133 @@ fn ready(
         task,
         profile,
         settings,
+        host_check,
     )
     .map_err(|cause| caused(cause.code(), cause))
 }
 
+/// Current automatic worker-start refusals in one recorded Work snapshot.
+/// Codes contain only static engine classifications. An empty list means that
+/// this observation found no refusal in its covered checks.
+#[derive(Debug, serde::Serialize)]
+pub struct MissionLaunchDiagnostics {
+    pub work: String,
+    pub revision: i64,
+    pub refusals: Vec<MissionLaunchRefusal>,
+}
+
+/// One refusal for the whole mission (null task) or for an identified task in
+/// that mission. Other missions and filesystem/provider data stay private.
+#[derive(Debug, serde::Serialize)]
+pub struct MissionLaunchRefusal {
+    pub task: Option<String>,
+    pub codes: Vec<String>,
+}
+
+impl MissionLaunchRefusal {
+    /// Keep the primary and typed nested reasons in diagnostic order without
+    /// formatting process output, paths, or other free-form error data.
+    fn from_error(task: Option<String>, error: &E) -> Self {
+        let mut codes = vec![error.code().to_owned()];
+        for cause in crate::native_diagnostics::project(error) {
+            for code in cause.labels {
+                if !codes.contains(&code) {
+                    codes.push(code);
+                }
+            }
+        }
+        Self { task, codes }
+    }
+}
+
+/// Preserve known semantic permission refusals for both observation and queue
+/// cleanup. Unknown or compound failures remain errors with their original cause.
+fn launch_permission(
+    store: &RootStore,
+    work: &Work,
+) -> Result<Result<crate::MissionControlSettings, E>, E> {
+    match mission_agent::permission(&store.db, work) {
+        Ok((controls, _)) => Ok(Ok(controls)),
+        Err(error @ E::Refused(
+            "planning-mission-paused"
+            | "mission_archived"
+            | "mission-controls-required"
+            | "mission-autonomy-required"
+            | "mission-consent-required",
+        )) => Ok(Err(error)),
+        Err(error) => Err(error),
+    }
+}
+
 impl RootStore {
+    /// Observe automatic worker start refusals from the current Work, controls,
+    /// task admission checks and saved FIFO in a SQL read snapshot. Saved settings
+    /// and host checks are observations. A later launch rechecks them and requires
+    /// its lease, workspace and factory admission. No provider invocation,
+    /// attempt, queue registration, reservation or approval is performed.
+    /// Unknown Work and SQL/queue/settings observation failures preserve their
+    /// typed cause. A task preflight refusal preserves its typed codes.
+    pub fn mission_launch_diagnostics(&self, id: &str) -> Result<MissionLaunchDiagnostics, E> {
+        let settings = self.settings().map_err(|cause| E::Root(Box::new(cause)))?;
+        read_transaction(&self.db, || {
+            let work = crate::read_recorded_work(&self.db, id)
+                .map_err(|cause| E::Root(Box::new(crate::RootStoreError::Work(cause))))?;
+            let mut refusals = Vec::new();
+            match launch_permission(self, &work)? {
+                Err(error) => refusals.push(MissionLaunchRefusal::from_error(None, &error)),
+                Ok(controls) => {
+                    let capacity = mission_agent::check_capacity(
+                        &self.db, id, None, controls.slots, &settings,
+                    );
+                    let full = match capacity {
+                        Ok(()) => false,
+                        Err(E::Refused("mission-agent-slots-occupied")) => true,
+                        Err(error) => return Err(error),
+                    };
+                    let order = mission_task_order::read_order(&self.db, &work)?;
+                    let turns = workspace_turn::read(&self.db).map_err(mission_workspace_queue::error)?;
+                    let mut ready_tasks = Vec::new();
+                    for candidate in mission_candidates::select(&work, &order)? {
+                        let task = candidate.task_id;
+                        match candidate.profile.and_then(|profile| {
+                            ready(self, &work, &task, &profile, &settings, CandidateHostCheck::ReadOnly)
+                        }) {
+                            Err(E::Refused("mission-candidates-status-ineligible")) => {}
+                            Err(error) => refusals.push(MissionLaunchRefusal::from_error(Some(task), &error)),
+                            Ok(workspace) => ready_tasks.push((task, workspace)),
+                        }
+                    }
+                    let candidates: Vec<_> = ready_tasks.iter().map(|(task_id, workspace)| {
+                        Candidate { task_id, workspace }
+                    }).collect();
+                    let blocked = queue::preview_waiting_blockers(&turns, id, &candidates)
+                        .map_err(mission_workspace_queue::error)?;
+                    for (task, workspace) in ready_tasks {
+                        let error = if blocked.contains(&task) {
+                            E::Refused("workspace-turn-fifo-blocked")
+                        } else if full {
+                            E::Refused("mission-agent-slots-occupied")
+                        } else {
+                            match crate::agent_launch::guards_owned(
+                                &self.db, id, &task, &workspace, None,
+                            ) {
+                                Ok(()) => continue,
+                                Err(cause) => caused(cause.code(), cause),
+                            }
+                        };
+                        refusals.push(MissionLaunchRefusal::from_error(Some(task), &error));
+                    }
+                }
+            }
+            Ok(MissionLaunchDiagnostics {
+                work: work.id,
+                revision: work.revision,
+                refusals,
+            })
+        })
+    }
+
+
     /// Synchronize actual ready contenders under this Root's owning process lease
     /// and current settings in one writer transaction. Ignores available slots and
     /// occupied workspaces so a waiting task keeps its place. Existing acquired
@@ -156,18 +283,9 @@ impl RootStore {
             let work = crate::read_recorded_work(&self.db, &lease.work)
                 .map_err(|cause| E::Root(Box::new(crate::RootStoreError::Work(cause))))?;
             let (controls, permission_refusal) =
-                match crate::root_store::mission_agent::permission(&self.db, &work) {
-                    Ok((controls, _)) => (Some(controls), None),
-                    Err(
-                        error @ E::Refused(
-                            "planning-mission-paused"
-                            | "mission_archived"
-                            | "mission-controls-required"
-                            | "mission-autonomy-required"
-                            | "mission-consent-required",
-                        ),
-                    ) => (None, Some(error)),
-                    Err(error) => return Err(error),
+                match launch_permission(self, &work)? {
+                    Ok(controls) => (Some(controls), None),
+                    Err(error) => (None, Some(error)),
                 };
             let mut accepted = Vec::new();
             let mut refused = Vec::new();
@@ -178,11 +296,11 @@ impl RootStore {
                     .map_err(E::Settings)?
                     .slots(Some(controls.slots))
                     .map_err(E::Settings)?;
-                let order = crate::root_store::mission_task_order::read_order(&self.db, &work)?;
-                let candidates = crate::root_store::mission_candidates::select(&work, &order)?;
+                let order = mission_task_order::read_order(&self.db, &work)?;
+                let candidates = mission_candidates::select(&work, &order)?;
                 for candidate in candidates {
                     let result = candidate.profile.and_then(|profile| {
-                        ready(self, &work, &candidate.task_id, &profile, settings)
+                        ready(self, &work, &candidate.task_id, &profile, settings, CandidateHostCheck::VerifyWrite)
                     });
                     match result {
                         Ok(path) => accepted.push((candidate.task_id, path)),

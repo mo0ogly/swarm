@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "cockpit-launch-diagnostics",
+  "inputs": [
+    "docs/architecture/TOKIO-ORCHESTRATION.md",
+    "docs/en/TOKIO-ORCHESTRATION.md",
+    "locales/en.json",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/agent_launch_preflight.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-engine/src/mission_candidates.rs",
+    "rust/crates/swarm-engine/src/mission_workspace_fifo.rs",
+    "rust/crates/swarm-engine/src/workspace_turn.rs",
+    "rust/crates/swarm-engine/src/workspace_turn_write.rs",
+    "rust/crates/swarm-web/examples/cockpit_launch_http_fixture.rs",
+    "rust/crates/swarm-web/src/service/mission.rs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_cockpit_launch_diagnostics.cjs",
+    "tests/rust_cockpit_launch_diagnostics.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_planning_attach.py",
+    "version_history.json",
+    "web/cockpit-native-read.js",
+    "web/cockpit-native.js",
+    "web/i18n-en.js",
+    "web/i18n.js",
+    "web/index.html"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "protected-cockpit-and-inert-provider",
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import os, subprocess, sys\nfrom pathlib import Path\nsys.path.insert(0, 'tests')\nfrom fixture_area import fixture_root\nbinary = Path(os.environ['SWARM_LAUNCH_DIAGNOSTICS_BINARY']).resolve(strict=True)\nhttp_fixture = Path(os.environ['SWARM_LAUNCH_DIAGNOSTICS_HTTP_FIXTURE']).resolve(strict=True)\nevidence = fixture_root('cockpit-launch-')\nsubprocess.run([sys.executable, '-B', 'tests/rust_cockpit_launch_diagnostics.py', '--binary', str(binary), '--http-fixture', str(http_fixture), '--output', str(evidence / 'result')], check=True)\nprint('REPLAY_EVIDENCE ' + str(evidence))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS healthy-candidate-and-pending-dependency",
+        "PASS nonexecutable-inert-provider",
+        "PASS cockpit-blocked-fr-etat",
+        "PASS cockpit-blocked-en-sombre",
+        "PASS provider-restored-without-attempt-or-reservation",
+        "PASS special-provider-file-refused-without-open",
+        "PASS cockpit-restored-fr-etat",
+        "PASS cockpit-restored-en-sombre",
+        "PASS paused-mission-refusal",
+        "PASS cockpit-paused-fr-etat",
+        "PASS cockpit-paused-en-sombre",
+        "PASS resumed-mission-clears-pause",
+        "PASS stopped-mission-stays-paused",
+        "PASS withdrawn-consent",
+        "PASS reads-created-no-agent-queue-claim-budget-charge-or-provider-invocation",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

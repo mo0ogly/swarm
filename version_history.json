@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Cockpit Rust : Conduite affiche la cause précise du blocage d’un démarrage automatique, par mission ou par tâche. La lecture ne lance aucun agent.",
+        "en": "Rust cockpit: Dispatch shows the specific reason automatic startup is blocked, by mission or task. Reading the diagnostics does not launch agents."
+      },
+      {
         "fr": "Orchestration Rust : les refus d’autorité d’un sous-orchestrateur remontent à la racine. La reprise du sous-périmètre attend une décision racine.",
         "en": "Rust orchestration: a sub-orchestrator's scope-authority refusal reaches the root, and the child resumes after a root decision."
       },

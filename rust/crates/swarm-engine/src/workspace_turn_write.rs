@@ -211,6 +211,78 @@ fn release_row(db: &Connection, turn: &WorkspaceTurn, at: &str) -> Result<Worksp
     Ok(released)
 }
 
+/// Check the common synchronization input contract without mutating the queue.
+fn validate_candidates(
+    turns: &[WorkspaceTurn],
+    work: &str,
+    candidates: &[Candidate<'_>],
+) -> Result<(), E> {
+    let mut seen = BTreeSet::new();
+    for candidate in candidates {
+        if !swarm_identity_contract::name(candidate.task_id.as_bytes())
+            || !canonical(candidate.workspace)
+            || !seen.insert(candidate.task_id)
+        {
+            return Err(E::Invalid("workspace-turn-candidate-invalid"));
+        }
+        if turns.iter().any(|t| {
+            t.work_id == work
+                && t.task_id == candidate.task_id
+                && t.state == TurnState::Acquired
+                && t.workspace != candidate.workspace
+        }) {
+            return Err(E::Invalid("workspace-turn-acquired-path-conflict"));
+        }
+    }
+    Ok(())
+}
+
+/// A waiting row keeps its place only for the same task and canonical workspace.
+fn keeps_waiting_turn(turn: &WorkspaceTurn, candidates: &[Candidate<'_>]) -> bool {
+    candidates.iter().any(|c| c.task_id == turn.task_id && c.workspace == turn.workspace)
+}
+
+/// Predict which candidates would wait behind earlier overlapping turns after
+/// this Work's next synchronization. Uses the already validated queue snapshot
+/// and ready candidates in dispatch order. Other Works' standing turns and all
+/// acquired turns stay in place. Obsolete waiting turns disappear and new ones
+/// join at the tail. The projection allocates no sequence or resource, stores
+/// nothing and reports only this Work's task IDs. Input refusals propagate.
+pub(crate) fn preview_waiting_blockers(
+    turns: &[WorkspaceTurn],
+    work: &str,
+    candidates: &[Candidate<'_>],
+) -> Result<BTreeSet<String>, E> {
+    validate_candidates(turns, work, candidates)?;
+    let mut standing: Vec<&str> = Vec::new();
+    let mut current = BTreeSet::new();
+    let mut blocked = BTreeSet::new();
+    for turn in turns {
+        let ours = turn.work_id == work;
+        if turn.state == TurnState::Released
+            || (ours && turn.state == TurnState::Waiting && !keeps_waiting_turn(turn, candidates))
+        {
+            continue;
+        }
+        if ours {
+            current.insert(turn.task_id.as_str());
+            if turn.state == TurnState::Waiting && standing.iter().any(|workspace| {
+                workspace_turn::overlaps(workspace, &turn.workspace)
+            }) {
+                blocked.insert(turn.task_id.clone());
+            }
+        }
+        standing.push(turn.workspace.as_str());
+    }
+    for candidate in candidates.iter().filter(|c| !current.contains(c.task_id)) {
+        if standing.iter().any(|workspace| workspace_turn::overlaps(workspace, candidate.workspace)) {
+            blocked.insert(candidate.task_id.to_owned());
+        }
+        standing.push(candidate.workspace);
+    }
+    Ok(blocked)
+}
+
 /// Synchronize the complete eligible candidate set for ONE Work, in supplied
 /// deterministic order. Existing waiting candidates keep their sequence; omitted
 /// waiting candidates release, and changed waiting paths requeue at the tail.
@@ -231,31 +303,12 @@ pub(crate) fn sync_waiting(
 ) -> Result<Vec<WorkspaceTurn>, E> {
     inputs(db, work, at)?;
     let turns = workspace_turn::read(db)?;
-    let mut seen = BTreeSet::new();
-    for candidate in candidates {
-        if !swarm_identity_contract::name(candidate.task_id.as_bytes())
-            || !canonical(candidate.workspace)
-            || !seen.insert(candidate.task_id)
-        {
-            return Err(E::Invalid("workspace-turn-candidate-invalid"));
-        }
-        if turns.iter().any(|t| {
-            t.work_id == work
-                && t.task_id == candidate.task_id
-                && t.state == TurnState::Acquired
-                && t.workspace != candidate.workspace
-        }) {
-            return Err(E::Invalid("workspace-turn-acquired-path-conflict"));
-        }
-    }
+    validate_candidates(&turns, work, candidates)?;
     for turn in turns
         .iter()
         .filter(|t| t.work_id == work && t.state == TurnState::Waiting)
     {
-        if !candidates
-            .iter()
-            .any(|c| c.task_id == turn.task_id && c.workspace == turn.workspace)
-        {
+        if !keeps_waiting_turn(turn, candidates) {
             release_row(db, turn, at)?;
         }
     }
@@ -414,6 +467,37 @@ mod tests {
             r.get(0)
         })
         .unwrap()
+    }
+
+    /// Compare the pure diagnostic against a real writer pass: a new contender
+    /// and a moved waiter join at the tail, and a removed waiter stops blocking.
+    #[test]
+    fn preview_matches_synchronized_fifo_for_new_changed_and_removed_turns() {
+        let db = fixture();
+        sync_waiting(&db, "second", &[
+            candidate("removed", "/removed"),
+            candidate("moved", "/old"),
+            candidate("kept", "/kept"),
+        ], AT).unwrap();
+        sync_waiting(&db, "first", &[
+            candidate("shared", "/shared"),
+            candidate("later", "/kept/child"),
+        ], AT).unwrap();
+        let next = [
+            candidate("new", "/shared/new"),
+            candidate("moved", "/shared/moved"),
+            candidate("kept", "/kept"),
+            candidate("after-removed", "/removed/child"),
+        ];
+        let rows = workspace_turn::read(&db).unwrap();
+        let before = db.total_changes();
+        let predicted = preview_waiting_blockers(&rows, "second", &next).unwrap();
+        assert_eq!(predicted, BTreeSet::from(["moved".into(), "new".into()]));
+        assert_eq!(db.total_changes(), before);
+        assert_eq!(workspace_turn::read(&db).unwrap(), rows);
+        sync_waiting(&db, "second", &next, LATER).unwrap();
+        let actual = workspace_turn::blockers(&workspace_turn::read(&db).unwrap(), "second").unwrap();
+        assert_eq!(predicted, actual.into_iter().map(|row| row.task_id).collect());
     }
 
     /// Real ordering across missions blocks ancestors, admits component siblings,

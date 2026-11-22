@@ -72,3 +72,29 @@ Le binaire natif exercé porte le SHA-256 `f0e92ce3749855bee14f2b6ea68037c0e5532
 | Qualification du pilote et de la recette sur la base de la PR | `4998f37a68257d6b4f576a4cc4364e1efad28160a19cee251a3a039452db6c1d` |
 
 [Canaux Tokio](https://tokio.rs/tokio/tutorial/channels) · [Arrêt asynchrone](https://tokio.rs/tokio/topics/shutdown)
+
+## Diagnostic de démarrage automatique dans Conduite
+
+En lecture actuelle, **Conduite** affiche les refus observés par le moteur Rust
+pour les workers automatiques. La lecture protégée
+`GET /api/v1/mission?work=…&action=launch-diagnostics` renvoie la révision de
+la mission, les tâches concernées et les codes moteur. Une absence de consentement
+s’affiche pour la mission entière. Un prérequis, un fournisseur indisponible,
+un créneau occupé ou un conflit d’espace s’affiche pour la tâche concernée.
+
+Le moteur réutilise les règles du conducteur et projette l’ordre FIFO sans
+inscrire de tour. Il observe les métadonnées et droits locaux. L’admission réelle
+vérifie aussi l’écriture dans l’espace de travail et les octets de l’exécutable.
+Cette lecture ne réserve aucune ressource, ne crée aucune tentative et n’appelle
+aucun fournisseur. L’admission réelle applique ses propres contrôles à la
+révision courante. La réponse ne contient ni chemins ni données d’autres missions.
+En mode historique, la pause enregistrée reste visible sans évaluer ces contrôles.
+En lecture actuelle, le cockpit indique aussi si le statut moteur n’observe
+aucun conducteur actif.
+Après correction de la cause, **Actualiser** relit le diagnostic.
+
+La [recette cockpit-launch-diagnostics](../../tools/verification/recipes/cockpit-launch-diagnostics.json)
+utilise un binaire natif qualifié (`SWARM_LAUNCH_DIAGNOSTICS_BINARY`) et un agent
+inerte dans un Root isolé. Elle vérifie l’API et le rendu dans Chromium avec le
+serveur HTTP natif seul, sans conducteur (exemple Cargo
+`cockpit_launch_http_fixture`, fourni via `SWARM_LAUNCH_DIAGNOSTICS_HTTP_FIXTURE`).

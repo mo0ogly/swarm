@@ -86,7 +86,7 @@ fn canonical_path(path: &str) -> bool {
 /// Match equality and ancestor boundaries in both directions, including `/`.
 /// Inputs must pass canonical_path; the separator is Unix representation, not
 /// a configurable policy. A shared string prefix alone does not overlap.
-fn overlaps(left: &str, right: &str) -> bool {
+pub(crate) fn overlaps(left: &str, right: &str) -> bool {
     left == right
         || left == "/"
         || right == "/"
