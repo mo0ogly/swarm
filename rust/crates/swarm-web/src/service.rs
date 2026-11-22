@@ -498,6 +498,10 @@ impl HttpServiceError {
                 "blp-dialogue-authentication-required"|"blp-dialogue-policy-required"|"blp-dialogue-policy-stale"|"blp-dialogue-access-denied"
                     if *operation=="preparation-call" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
                 "preparation-organization-mode-unported" | "preparation-organization-worker-role-required" | "preparation-release-scope-unported" => StatusCode::NOT_IMPLEMENTED,
+                // Only the typed invalidated status observation is a conflict.
+                // Independent close and storage errors keep their own status.
+                "mission-status-observation-changed" if *operation == "read"
+                    && matches!(cause.as_ref(), RootStoreError::MissionStatusChanged { .. }) => StatusCode::CONFLICT,
                 // Declared port boundary of the planning-tree status read, not a server fault.
                 "mission-status-planning-unported" if *operation == "read" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_IMPLEMENTED,
                 "command_not_ported" if *operation == "resume-read" && matches!(cause.as_ref(), RootStoreError::Projection(_)) => StatusCode::NOT_IMPLEMENTED,

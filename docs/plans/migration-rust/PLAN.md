@@ -11,6 +11,30 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Lot cockpit : statut pendant la fin d’une tentative
+
+| Critère | Preuve de clôture |
+| --- | --- |
+| FIN-01 | Des lectures du statut recouvrant la fin d’agents inertes reproduisent HTTP 500. La CLI conserve les causes internes des changements observés. |
+| FIN-02 | Le même parcours transforme les changements seuls en HTTP 409, conserve les vraies erreurs et retrouve un statut courant après actualisation. |
+| FIN-03 | Revue indépendante, intégration sur main et vérification de l’image locale. |
+
+La concurrence a regroupé `mission-status-evidence-work-changed`,
+`mission-status-work-changed`, `mission-status-inputs-changed` et
+`mission-status-dispatch-context-changed` sous `root-cleanup`. Une erreur de
+projection composée conserve les diagnostics annexes de lecture. Le nouveau
+type n’est construit qu’après vérification récursive des causes principales.
+Les vrais échecs de stockage et de fermeture restent des erreurs serveur.
+L’actualisation explicite réutilise les commandes du cockpit. Aucun nouveau
+délai, seuil opérateur ou nombre de tentatives n’est ajouté.
+
+Le premier passage CI a détecté `ETXTBSY` en exécutant un script Git généré
+par un test indépendant du statut. Le témoin positif et la configuration Git
+utilisent le même interpréteur explicite, comme le témoin déterministe déjà
+présent pour les scripts de vérification de candidat. Les assertions sur les
+callbacks bloqués et la configuration restent en vigueur. Le moteur livré
+ne change pas pour cette reprise CI.
+
 ## Lot cockpit : diagnostic de démarrage automatique
 
 Demande de Fabrice du 22 novembre. Base `f2a0fcc87`. La projection historique
