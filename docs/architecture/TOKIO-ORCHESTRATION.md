@@ -76,7 +76,7 @@ les workers est indiqué séparément dans ORCH-06.
 | ORCH-03 | PASS sur la fixture. Pause, reprise consentie et retrait confirmés. La demande de reprise après retrait refuse avec `mission-consent-required` et le Work relu est identique. |
 | ORCH-04 | PASS sur la fixture. À deux créneaux les deux workers indépendants sont actifs ensemble. À un créneau le second attend sur `mission-agent-slots-occupied`, puis démarre après achèvement du premier. C déclare A comme prédécesseur. Les sources effectives rattachent le refus de revue de C au contrôle de cette dépendance. Une variante à deux créneaux retourne un blocage FIFO sur espaces recouvrants jusqu’à la sortie du premier worker. |
 | ORCH-05 | PASS sur la fixture. Deux périmètres arbitrent. Le refus d’autorité du second remonte à la racine, puis le sous-orchestrateur reprend sous son mandat d’origine. |
-| ORCH-06 | Partiel. Les trois contrôles et la revue séparée inerte portent sur le candidat `955bc170be7bcd6b141d49e0071448de57c1ed5a`. Un changement des sources refuse la prépublication. La restauration rend la même observation. Le rejeu exact ne réexécute pas le reviewer et garde la même réservation. La nouvelle validation d’un candidat changé reste à observer. |
+| ORCH-06 | PASS sur les fixtures. Sur le candidat `955bc170be7bcd6b141d49e0071448de57c1ed5a`, le refus sur dérive et le rejeu n’ajoutent ni revue ni réservation. Sur le candidat `c2af453b3dc15d18e85e8cc4e530806db4dd115b`, un changement d’entrée effective invalide la première revue. Les nouveaux contrôles portent sur l’entrée changée et une nouvelle revue permet la publication. Le rejeu restitue la publication enregistrée. |
 
 Les reçus se trouvent sous `/run/media/fpizzi/SWARM/swarm-evidence/` dans
 `p11-multitask-20261122.9xRb0b/orchestration-external`,
@@ -89,6 +89,14 @@ revendication de revue par le lecteur commun. Le premier échec sur le
 marqueur racine historique reste dans `publication/failure.json`.
 Les témoins ciblés sont `p11-idle-controls-20261122.kUx4T0/run/result.json`
 et `p11-overlap-20261122.FPARps/run/capacity-refusal.json`.
+
+Le parcours de revalidation est dans
+`p11-requalification-20261122.DViR0e/requalification-only`.
+`profile-reuse.json` confirme les 787 entrées effectives du profil.
+`new-controls-work.stdout`, `publish-r2.stdout` et
+`publish-r2-replay.stdout` lient le résultat à la revue renouvelée.
+Le témoin de revalidation utilise l’option de préparation ciblée sur la
+revue. Le premier échec sur la file de préparation reste conservé.
 
 ## Repères des preuves dev 380
 
