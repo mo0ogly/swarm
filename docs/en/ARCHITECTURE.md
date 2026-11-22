@@ -165,28 +165,14 @@ Sources: [AI/engine protocol](AGENT-ENGINE-PROTOCOL.md), [review evidence](REVIE
 
 ## 2. Identity, authority and final use
 
-[![Swarm identity: authority source, registry and exact use](../diagrams/identity-authority-en.svg)](../diagrams/identity-authority-en.svg)
-
-[Full-size SVG](../diagrams/identity-authority-en.svg) · [PNG](../diagrams/identity-authority-en.png) · [Mermaid source](../diagrams/identity-authority-en.mmd)
-
-| Object / boundary | Contract to preserve |
+| Boundary | Code or retained observation |
 | --- | --- |
-| Human source | Adopted default personal local account, optional enterprise provider; bootstrap independent of first visitor and agents; journey still to integrate |
-| Identities | Principal with issuer/subject/kind; actor; logical agent; instance; scope owner and historical author remain distinct |
-| Authority | Current plan generation/digest, exact grants, delegable chain, dates and revocations; declared role grants no implicit `agent.create` |
-| Enrollment | Independently pinned key, request/project-bound challenge, Ed25519 response and signed journal; signed bytes distinct from current rights |
-| Publication | Exact private permit; SQLite snapshot and independent Trust head; intent, COMMIT, confirmation and recoverable publication |
-| Configuration / transport | Consistent configuration and witness; attributed handshake, pinned image/process; UID is not business authorization |
-| Request / effect | Exact operation, resource, source/recipient and content; Trust → SQLite → runtime ordering; approval, commit, reception and effect remain distinct |
-| Before a plan | Explicit preparation authority required; no permissive rule based on an absent plan |
+| Agent, lease and Root | Automatic admission binds the Agent to the Work, lease generation, workspace turn and Root instance. Local process observations carry the PID, its start stamp and supervisor host. [Binding](../../rust/crates/swarm-engine/src/mission_agent.rs#L247-L283) · [Process identity](../../rust/crates/swarm-engine/src/supervisor_identity.rs#L115-L168) |
+| Web session and Trust mandate | Enrolled bootstrap accepts a typed source for a prepared intent. Session, CSRF, current account and Biba gates are distinct. The G05.3 retrospective reports a local dev.225 run with fixture accounts on the explicitly enrolled path. [Web entry point](../../rust/crates/swarm-web/src/service.rs#L776-L797) · [G05.3 retrospective, FR](../plans/migration-rust/evidence/20261027-biba-governance-apex/RETEX-G05.3.md) |
+| Preparation dialogue reader | When an admission receipt matches the recorded turn, the reader verifies the principal and applicable receipts, then checks clearance before returning the dialogue. The path without a matching receipt retains its historical read behavior. [Reader check](../../rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs#L99-L208) |
 
-A local service under a separate account is the adopted pilot choice; a remote
-authority is planned. These decisions establish neither service installation nor
-an effective human source. Internal protocols, storage observations and receipts
-do not close public admission and usage integration.
-
-Sources: [identity and authority](AGENT-IDENTITY-CONTRACT.md),
-[memory rights and preparation, FR](../plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md).
+See the [identity contract](AGENT-IDENTITY-CONTRACT.md) for individual journeys
+and their status.
 
 ### 2.1 Integrity, confidentiality and confinement
 
@@ -194,12 +180,11 @@ Sources: [identity and authority](AGENT-IDENTITY-CONTRACT.md),
 | --- | --- | --- |
 | Biba | Control integrity and promotion through policy and separation of duties | The Trust core defines levels, roles and use checks. Each integrated journey needs last-use proof. [Biba contract](BIBA-RUST.md) |
 | Bell-LaPadula | Check classification, compartments and the reader’s clearance | The engine has policy, attribution and protected readers. End-to-end confidentiality and declassification remain open. [Scope and limits](BELL-LAPADULA.md) |
-| Identity and mandate | Bind person, logical Agent, instance, operation and scope | Enrollment or a channel identifies under its contract. Admission then evaluates current rights over the exact content. [Identity contract](AGENT-IDENTITY-CONTRACT.md) |
+| Identity and mandate | Bind person, logical Agent, instance, operation and scope | The enrolled Web path accepts an attributed source for a prepared intent. Mandate and admission guards are specific to the journey. [Identity contract](AGENT-IDENTITY-CONTRACT.md) |
 | Confinement | Limit a local process’s effects | Linux guards and the project contract define their own scope. Physical guarantees are separate from business policy and confidentiality. [Linux boundary](../../rust/crates/swarm-biba-linux/src/lib.rs) |
 
-Audit binds receipts to intent, the applied check and the observed effect.
-An integrity level grants no read clearance. A classification grants no write
-mandate. Byte provenance, authorization and effect are separate evidence.
+The [multitasking and security witnesses](#how-multitasking-evidence-relates-to-biba-and-belllapadula)
+identify the decisions and effects observed at each boundary.
 
 ## 3. Memory, received context and conversation
 
@@ -272,40 +257,25 @@ Sources: [process supervision](RUN-SUPERVISION.md), [protocol](AGENT-ENGINE-PROT
 
 ## 5. Logs, telemetry, read views and evidence
 
-[![Swarm observability: logs, live views, telemetry and evidence](../diagrams/logs-observability-en.svg)](../diagrams/logs-observability-en.svg)
-
-[Full-size SVG](../diagrams/logs-observability-en.svg) · [PNG](../diagrams/logs-observability-en.png) · [Mermaid source](../diagrams/logs-observability-en.mmd)
-
-| Source | Retention and consumption |
+| Source | Write and read path |
 | --- | --- |
-| Output / terminal | `agent_logs`, `terminal_events`, sequences/cursors and mission/attempt-bound reads; not a replayed command |
-| Engine events | Attributed activity, incidents, decisions and receipts; current/history separation and safe causes |
-| Calls and usage | Attempts and reservations; requested/observed and unknown/zero distinct; reservation does not imply invoice |
-| Linux resources | Host, PID and starttime checked before measurement; unverifiable identity and absent data remain explicit |
-| OTLP JSON | Active-agent-bound token, normalization, attributed rejections/series; separate `telemetry.db`; this normalizer stores no prompt/response |
-| Console and live views | Read-only Monaco with text fallback; server/page filtering distinct; fingerprint SSE and explicit polling fallback |
-| Export / acceptance | Original API response with scope/limitations; acceptance evidence requires originals, candidate, checks, review, human validation when required and freshness |
-
-Read views decide neither process control nor acceptance. The chain must remain
-reconstructible: objective, decision, owner, task, attempt, candidate, execution,
-originals, review and applied decision. AC-02 security timeline and network lineage
-are a future extension, separate from existing logs.
-
-Sources: [console](LOG-CONSOLE.md), [call ledger](CALL-ACCOUNTING.md),
-[traceability](TRACEABILITY.md), [native live/OTLP contract](RUST-MIGRATION.md).
+| Agent log | Admission writes a `command` entry. The native execution path writes `lifecycle` and `incident` entries, with distinct kinds for truncated messages. [Admission](../../rust/crates/swarm-engine/src/agent_launch.rs#L1067-L1084) · [Log writer](../../rust/crates/swarm-engine/src/agent_execution_store.rs#L50-L109) |
+| Recorded terminal | The live reader requests log rows and terminal blocks with separate cursors. [Live reader](../../rust/crates/swarm-web/src/service/live.rs#L705-L727) |
+| Provider telemetry | OTLP/HTTP ingestion verifies an exporter token and records normalized telemetry for the associated active subject: an Agent, review or planning call. [Ingestion](../../rust/crates/swarm-web/src/service/otel.rs#L126-L182) |
+| Authority audit | The authority journal appends and synchronizes chained entries. Reads check the chain. This check covers the journal being read. [Writer and reader](../../rust/crates/swarm-authority/src/audit.rs#L174-L275) |
 
 ### 5.1 Historical reads, retention and audit
 
-Historical log search reads an ordered page after a cursor for one Work and
-Agent. Exact decimal strings preserve i64 sequences in JavaScript. Readers show
-the retained boundary and observed gaps. Page size, retention policy and read
-authorization are separate settings or contracts.
-
-Activity logs, telemetry and audit receipts have distinct producers and
-consumers. Terminal output alone proves no business decision. In audit, check
-identity and mandate, exact content, rules, recorded effect and original
-retention. [Native log history](NATIVE-LOG-QUERY.md) ·
-[Audit chain](BIBA-GOVERNANCE-AUDIT.md)
+Protected `GET/HEAD /api/v1/logs` opens the Root read-only, checks its binding
+and the Work–Agent association, then returns filtered rows ordered after the
+cursor. The exact decimal extension preserves i64 sequences in the browser.
+`retention_gap` compares the positive cursor with the first retained entry
+for the Agent. The page-size setting can bound the response. Per-message BLP decisions remain
+unestablished on this route.
+[Route](../../rust/crates/swarm-web/src/service/log_query.rs#L46-L71) ·
+[Engine reader](../../rust/crates/swarm-engine/src/root_store/log_query.rs#L47-L109) ·
+[Web consumer](../../web/native-log-query.js#L13-L24) ·
+[Pagination contract](NATIVE-LOG-QUERY.md)
 
 ## 6. Components, data flow and adapter boundaries
 
@@ -391,6 +361,21 @@ remain questions of contract, source and qualification. [Pinned reference](https
 | Child refusal and recovery | [Plan and retained originals, FR](../plans/migration-rust/PLAN.md#remontée-des-refus-dautorité-et-reprise) · [Recipe](../../tools/verification/recipes/mission-watch-orchestration.json) · [Scenario](../../tests/rust_orchestration_scopes.py) | Original scenario result SHA-256 `b0f243ccffaf45054a3ec673046115aa62b45618bd8f7b8f3b3999f4da48948c` covers refusal, root notice, decision and resumption for one inert case. |
 | Diagnostics and installation | [Contract and recipe](TOKIO-ORCHESTRATION.md#automatic-startup-diagnostics-in-dispatch) · [Diagnostics merge](https://github.com/mo0ogly/swarm/pull/46) | The fixture setup executable has SHA-256 `7ff1854fa341e8e52763e6f3156c66de5c8c1ac2294a544b8410b6e233b9e791`. The recipe HTTP server without a driver has SHA-256 `f924be23a3982a31e3aa1690f401ccb5b7388a9b529ce087962b40921e76d36b`. The installed image differs. Local `v0.1.1-dev.389` has SHA-256 `2fa03ed1ffe14d9243f681027085d0e6f61cbc018fd3c4102e85128f00a9567c`. Its active image was verified through the process and version API. On an isolated Root, this binary served the pause reason and its French and English rendering. The provider fault and recovery belong to the recipe without a driver. [Receipt index](../diagrams/README.md#reçus-de-qualification--qualification-receipts) |
 
+
+### How multitasking evidence relates to Biba and Bell–LaPadula
+
+| Witness | Established check | Security scope |
+| --- | --- | --- |
+| Two workers in one Work | Two starts in disjoint workspaces and a waiting successor. [ORCH-04, FR](../plans/migration-rust/PLAN.md#preuves-du-candidat-local) | Startup code invokes Linux confinement. ORCH-04 establishes parallel execution. The dedicated Biba fixture below establishes access refusals. [Final startup check](../../rust/crates/swarm-engine/src/native_provider_exec.rs#L197-L233) |
+| Queue and recovery across Works | FIFO order, acquisition, release and reconciliation under the exercised guards. [P1.2 record](SAME-ROOT-FIFO-RECOVERY.md) | Turn identity and Agent–Root binding can correlate receipts. Workspace overlap establishes no Biba or BLP verdict. |
+| Child refusal and recovery | A mandate refusal, root notice and recorded decision on the inert path described above. [Notice producer](../../rust/crates/swarm-engine/src/root_store/planning_rejection_feedback.rs#L179-L212) | The mandate refusal has its own contract. An integrity-level or clearance check on the notice remains unestablished. |
+| Managed worker, Biba fixture | The `managed-fioclex-fresh` receipt records denied private reads and denied private, official and database writes, including a denial observed in a descendant. Image `909ae5d8…f03d`. [Receipt](../plans/actions-confiance/verification-biba-transverse-20261028/managed-fioclex-fresh/result.json) | Confinement evidence for this fixture. The receipt records `accepted:false` and carries no BLP verdict. |
+| Preparation and dialogue, BLP evidence | Public diagnostic of attributed prompt sources in a fixture. The dialogue read verdict is conditional on a matching admission receipt. [Diagnostic receipt](../plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/result.json) · [Dialogue read check](../../rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs#L99-L208) | Scope is preparation and the covered read path. Worker traffic confidentiality and classification of its logs need per-journey evidence. |
+
+Combined evidence must bind the same image and attempt to the subject, exact
+object or version, policy, enforcement point, verdict and observed effect.
+The witnesses above cover different boundaries.
+
 ## Native code organization
 
 The [Cargo workspace](../../rust/Cargo.toml) lists 16 members. The graph shows
@@ -444,9 +429,9 @@ an executable.
 | Queue across Work objects | The historical native 197 journey, SQLite tests and Web P1.2 cover overlap, FIFO and recovery in one Root. A pre-COMMIT crash retained B’s turn. Cross-Root scheduling remains open. |
 | Cockpit read | The isolated HTTP recipe covers inert-provider failure and recovery in French and English. A separate check on the installed image covers the paused-mission diagnostic in both languages in an isolated Root. |
 | Result validation | Native controller preserves `human` mode and the pending human decision; local wiring139 evidence; global journey and protected authentication remain separate |
-| Identity | Enrollment/configuration kernels and protocols exist; human source, installed service and final public use remain to qualify |
+| Identity | Agent–lease–Root binding in code; explicit web enrollment observed with fixture accounts (G05.3) |
 | Memory / context | Native context composition partially ported; managed field-guide memory is refused until its guard is ported; complete G8 and M20 usage enforcement remain open |
-| Logs / telemetry | Native live and OTLP surfaces locally verified; this does not establish parity for every console and consumer |
+| Logs / telemetry | Agent log writer, protected query and OTLP ingestion referenced in §5 |
 | Global cycle | `continue`/`renew` verified in their native scope; current native `judge/end` remains refused |
 | AC-02 security | Plan saved; A0–A7 not started; resume after migration/qualification and an explicit start request |
 
