@@ -1,0 +1,25 @@
+flowchart TB
+    accTitle: Multitasking within a Swarm mission
+    accDescr: Two workers can overlap after sequenced admissions. Their successor waits for evidence.
+    M_DAG["Work and DAG at the current revision"]
+    M_SORT["Ordered candidates and checked prerequisites"]
+    M_QUEUE["FIFO turns for ready candidates"]
+    M_ADMIT["Sequenced admissions under lease, slots and budget"]
+    M_A["Authorized A execution, workspace A"]
+    M_B["Authorized B execution, workspace B"]
+    M_PROOF["Deliveries, checks, review and decisions"]
+    M_C["Task C, preconditions satisfied"]
+    M_DAG --> M_SORT
+    M_SORT --> M_QUEUE
+    M_QUEUE --> M_ADMIT
+    M_ADMIT -->|"first checked start"| M_A
+    M_ADMIT -->|"another start if a slot is free"| M_B
+    M_A -->|"candidate A"| M_PROOF
+    M_B -->|"candidate B"| M_PROOF
+    M_PROOF -->|"evidence required by C"| M_C
+    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
+    classDef data fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
+    class M_SORT,M_ADMIT,M_PROOF core;
+    class M_DAG,M_QUEUE,M_C data;
+    class M_A,M_B ordinary;

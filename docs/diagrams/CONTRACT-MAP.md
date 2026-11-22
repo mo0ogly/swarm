@@ -100,6 +100,56 @@ Complément `S_ACCEPT` : [preuves et candidat courant](../architecture/REVIEW-EV
 
 Complément `L_ACCEPT` : [preuves et candidat courant](../architecture/REVIEW-EVIDENCE.md#comportement-global-du-moteur).
 
+## Multitâche et reprise / Multitasking and recovery
+
+Les trois vues supplémentaires suivent le contrat et le code à la révision indiquée dans [le catalogue](architecture-contracts.json). Les preuves inertes historiques gardent leur périmètre.
+
+The three additional views follow the contract and source revision recorded in [the catalogue](architecture-contracts.json). Historical inert evidence keeps its limited scope.
+
+### Multitâche dans une mission Swarm / Multitasking within a Swarm mission
+
+[SVG FR](mission-multitasking-fr.svg) · [SVG EN](mission-multitasking-en.svg) · [Mermaid FR](mission-multitasking-fr.mmd) · [Mermaid EN](mission-multitasking-en.mmd)
+
+| Nœud / Node | Responsabilité FR / EN | Contrat |
+| --- | --- | --- |
+| `M_DAG` | Work et DAG à la révision courante / Work and DAG at the current revision | [Architecture](../architecture/OVERVIEW.md#11-multitâche-dans-une-mission) |
+| `M_SORT` | Candidats ordonnés et prérequis vérifiés / Ordered candidates and checked prerequisites | [Architecture](../architecture/OVERVIEW.md#11-multitâche-dans-une-mission) |
+| `M_QUEUE` | Tours FIFO des candidats prêts / FIFO turns for ready candidates | [Architecture](../architecture/OVERVIEW.md#11-multitâche-dans-une-mission) |
+| `M_ADMIT` | Admissions séquencées sous bail, créneaux et budget / Sequenced admissions under lease, slots and budget | [Architecture](../architecture/OVERVIEW.md#11-multitâche-dans-une-mission) |
+| `M_A` | Exécution A autorisée, espace A / Authorized A execution, workspace A | [Architecture](../architecture/OVERVIEW.md#11-multitâche-dans-une-mission) |
+| `M_B` | Exécution B autorisée, espace B / Authorized B execution, workspace B | [Architecture](../architecture/OVERVIEW.md#11-multitâche-dans-une-mission) |
+| `M_PROOF` | Remises, contrôles, revue et décisions / Deliveries, checks, review and decisions | [Architecture](../architecture/OVERVIEW.md#11-multitâche-dans-une-mission) |
+| `M_C` | Tâche C, préconditions satisfaites / Task C, preconditions satisfied | [Architecture](../architecture/OVERVIEW.md#11-multitâche-dans-une-mission) |
+
+### Concurrence entre missions dans un Root Swarm / Concurrency across missions in one Swarm Root
+
+[SVG FR](mission-concurrency-fr.svg) · [SVG EN](mission-concurrency-en.svg) · [Mermaid FR](mission-concurrency-fr.mmd) · [Mermaid EN](mission-concurrency-en.mmd)
+
+| Nœud / Node | Responsabilité FR / EN | Contrat |
+| --- | --- | --- |
+| `F_A` | Mission A, bail et budget A / Mission A, lease and budget A | [Architecture](../architecture/OVERVIEW.md#12-concurrence-entre-missions-dans-un-root) |
+| `F_B` | Mission B, bail et budget B / Mission B, lease and budget B | [Architecture](../architecture/OVERVIEW.md#12-concurrence-entre-missions-dans-un-root) |
+| `F_C` | Mission C, espace disjoint / Mission C, disjoint workspace | [Architecture](../architecture/OVERVIEW.md#12-concurrence-entre-missions-dans-un-root) |
+| `F_QUEUE` | File des espaces du même Root / Workspace queue in the same Root | [Architecture](../architecture/OVERVIEW.md#12-concurrence-entre-missions-dans-un-root) |
+| `F_HELD` | Tour antérieur en attente ou acquis / Earlier waiting or acquired turn | [Architecture](../architecture/OVERVIEW.md#12-concurrence-entre-missions-dans-un-root) |
+| `F_WAIT` | B attend le tour qui recouvre son espace / B waits behind an overlapping turn | [Architecture](../architecture/OVERVIEW.md#12-concurrence-entre-missions-dans-un-root) |
+| `F_GO` | C peut avancer selon ses propres gardes / C can advance under its own checks | [Architecture](../architecture/OVERVIEW.md#12-concurrence-entre-missions-dans-un-root) |
+| `F_RELEASE` | Tour libéré, réévaluation de B / Turn released, B reevaluated | [Architecture](../architecture/OVERVIEW.md#12-concurrence-entre-missions-dans-un-root) |
+
+### Refus enfant et reprise dans Swarm / Child scope refusal and recovery in Swarm
+
+[SVG FR](scope-refusal-recovery-fr.svg) · [SVG EN](scope-refusal-recovery-en.svg) · [Mermaid FR](scope-refusal-recovery-fr.mmd) · [Mermaid EN](scope-refusal-recovery-en.mmd)
+
+| Nœud / Node | Responsabilité FR / EN | Contrat |
+| --- | --- | --- |
+| `E_CHILD` | Proposition native du sous-orchestrateur / Native sub-orchestrator proposal | [Architecture](../architecture/OVERVIEW.md#13-refus-interruption-et-reprise) |
+| `E_REFUSAL` | Refus d’autorité retenu dans le périmètre enfant / Authority refusal retained in the child scope | [Architecture](../architecture/OVERVIEW.md#13-refus-interruption-et-reprise) |
+| `E_NOTICE` | Avis racine, périmètre et code sûr / Root notice, scope and safe code | [Architecture](../architecture/OVERVIEW.md#13-refus-interruption-et-reprise) |
+| `E_WAIT` | Planification enfant en attente d’acquittement / Child planning waits for acknowledgment | [Architecture](../architecture/OVERVIEW.md#13-refus-interruption-et-reprise) |
+| `E_ROOT` | Décision de l’orchestrateur racine / Root orchestrator decision | [Architecture](../architecture/OVERVIEW.md#13-refus-interruption-et-reprise) |
+| `E_CHECK` | Moteur, vérification de la reprise / Engine verifies recovery | [Architecture](../architecture/OVERVIEW.md#13-refus-interruption-et-reprise) |
+| `E_RESUME` | Planification enfant de nouveau admissible / Child planning becomes eligible again | [Architecture](../architecture/OVERVIEW.md#13-refus-interruption-et-reprise) |
+
 ## Contrôles sémantiques / Semantic review
 
 - Le moteur déterministe Rust demeure le cœur de toutes les vues ; les agents proposent et le moteur contrôle/applique. / The deterministic Rust engine stays central; agents propose and the engine checks/applies.

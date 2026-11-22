@@ -267,6 +267,27 @@
       "line": 1,
       "anchor": "amélioration-récursive-des-consignes",
       "sha256": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038"
+    },
+    "intra": {
+      "path": "docs/architecture/OVERVIEW.md",
+      "section": "1.1 Multitâche dans une mission",
+      "line": 41,
+      "anchor": "11-multitâche-dans-une-mission",
+      "sha256": "e84fc3d54f3a0b63488cb2e17ceb9f627f6b04ee42ac6045cfffc3c94017c9bb"
+    },
+    "inter": {
+      "path": "docs/architecture/OVERVIEW.md",
+      "section": "1.2 Concurrence entre missions dans un Root",
+      "line": 86,
+      "anchor": "12-concurrence-entre-missions-dans-un-root",
+      "sha256": "e84fc3d54f3a0b63488cb2e17ceb9f627f6b04ee42ac6045cfffc3c94017c9bb"
+    },
+    "recovery": {
+      "path": "docs/architecture/OVERVIEW.md",
+      "section": "1.3 Refus, interruption et reprise",
+      "line": 120,
+      "anchor": "13-refus-interruption-et-reprise",
+      "sha256": "e84fc3d54f3a0b63488cb2e17ceb9f627f6b04ee42ac6045cfffc3c94017c9bb"
     }
   },
   "views": [
@@ -2412,6 +2433,538 @@
           "pending": true
         }
       ]
+    },
+    {
+      "name": "mission-multitasking",
+      "titles": {
+        "fr": "Multitâche dans une mission Swarm",
+        "en": "Multitasking within a Swarm mission"
+      },
+      "descriptions": {
+        "fr": "Deux workers peuvent se chevaucher après des admissions séquencées. Le successeur attend ses preuves.",
+        "en": "Two workers can overlap after sequenced admissions. Their successor waits for evidence."
+      },
+      "nodes": [
+        {
+          "id": "M_DAG",
+          "labels": {
+            "fr": "Work et DAG à la révision courante",
+            "en": "Work and DAG at the current revision"
+          },
+          "source": "intra",
+          "group": "FLOW",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "M_SORT",
+          "labels": {
+            "fr": "Candidats ordonnés et prérequis vérifiés",
+            "en": "Ordered candidates and checked prerequisites"
+          },
+          "source": "intra",
+          "group": "FLOW",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "M_QUEUE",
+          "labels": {
+            "fr": "Tours FIFO des candidats prêts",
+            "en": "FIFO turns for ready candidates"
+          },
+          "source": "intra",
+          "group": "FLOW",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "M_ADMIT",
+          "labels": {
+            "fr": "Admissions séquencées sous bail, créneaux et budget",
+            "en": "Sequenced admissions under lease, slots and budget"
+          },
+          "source": "intra",
+          "group": "FLOW",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "M_A",
+          "labels": {
+            "fr": "Exécution A autorisée, espace A",
+            "en": "Authorized A execution, workspace A"
+          },
+          "source": "intra",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "M_B",
+          "labels": {
+            "fr": "Exécution B autorisée, espace B",
+            "en": "Authorized B execution, workspace B"
+          },
+          "source": "intra",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "M_PROOF",
+          "labels": {
+            "fr": "Remises, contrôles, revue et décisions",
+            "en": "Deliveries, checks, review and decisions"
+          },
+          "source": "intra",
+          "group": "FLOW",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "M_C",
+          "labels": {
+            "fr": "Tâche C, préconditions satisfaites",
+            "en": "Task C, preconditions satisfied"
+          },
+          "source": "intra",
+          "group": "FLOW",
+          "kind": "data",
+          "shape": "rect"
+        }
+      ],
+      "edges": [
+        {
+          "from": "M_DAG",
+          "to": "M_SORT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_SORT",
+          "to": "M_QUEUE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_QUEUE",
+          "to": "M_ADMIT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "M_ADMIT",
+          "to": "M_A",
+          "labels": {
+            "fr": "premier démarrage vérifié",
+            "en": "first checked start"
+          },
+          "pending": false
+        },
+        {
+          "from": "M_ADMIT",
+          "to": "M_B",
+          "labels": {
+            "fr": "départ suivant si un créneau est libre",
+            "en": "another start if a slot is free"
+          },
+          "pending": false
+        },
+        {
+          "from": "M_A",
+          "to": "M_PROOF",
+          "labels": {
+            "fr": "candidat A",
+            "en": "candidate A"
+          },
+          "pending": false
+        },
+        {
+          "from": "M_B",
+          "to": "M_PROOF",
+          "labels": {
+            "fr": "candidat B",
+            "en": "candidate B"
+          },
+          "pending": false
+        },
+        {
+          "from": "M_PROOF",
+          "to": "M_C",
+          "labels": {
+            "fr": "preuves applicables à C",
+            "en": "evidence required by C"
+          },
+          "pending": false
+        }
+      ],
+      "provenance": {
+        "source_git": "50f1daee655fd735c913116cd6b61314ff871bdf",
+        "scope": "Current-source observation and bounded historical evidence",
+        "artifacts": {
+          "fr.mmd": "13a42a6dc4f364f4f863a16e3296d2dcc9399f1e5f42eea9837cb180ef46c837",
+          "fr.svg": "d1de5e5b3628c3fae6e9f6307e34a3eb7e6e36eb3637f53a27b8885aa652add9",
+          "fr.png": "adb3fa1dde9b2beacb1ce2effe60dfebd45bea2540d1ae2a766794b927a9422c",
+          "en.mmd": "b14225332ef0990b5a638ee376a9fbc0173935caeeb7de3531bbf3b47ffe0ed7",
+          "en.svg": "c3b0ab620e141789880529ca7817a6a9f83b62d853a3a10b304f31cd662cf45f",
+          "en.png": "16ae9c21fad0e017eddc8cb107a0dd608a39b417826a1f06e7a174e808f5caf8"
+        }
+      }
+    },
+    {
+      "name": "mission-concurrency",
+      "titles": {
+        "fr": "Concurrence entre missions dans un Root Swarm",
+        "en": "Concurrency across missions in one Swarm Root"
+      },
+      "descriptions": {
+        "fr": "Les Work gardent leurs créneaux et budgets. Le même Root ordonne les tours par espace de travail.",
+        "en": "Works keep their own slots and budgets. A single Root orders turns by workspace."
+      },
+      "nodes": [
+        {
+          "id": "F_A",
+          "labels": {
+            "fr": "Mission A, bail et budget A",
+            "en": "Mission A, lease and budget A"
+          },
+          "source": "inter",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "F_B",
+          "labels": {
+            "fr": "Mission B, bail et budget B",
+            "en": "Mission B, lease and budget B"
+          },
+          "source": "inter",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "F_C",
+          "labels": {
+            "fr": "Mission C, espace disjoint",
+            "en": "Mission C, disjoint workspace"
+          },
+          "source": "inter",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "F_QUEUE",
+          "labels": {
+            "fr": "File des espaces du même Root",
+            "en": "Workspace queue in the same Root"
+          },
+          "source": "inter",
+          "group": "FLOW",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "F_HELD",
+          "labels": {
+            "fr": "Tour antérieur en attente ou acquis",
+            "en": "Earlier waiting or acquired turn"
+          },
+          "source": "inter",
+          "group": "FLOW",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "F_WAIT",
+          "labels": {
+            "fr": "B attend le tour qui recouvre son espace",
+            "en": "B waits behind an overlapping turn"
+          },
+          "source": "inter",
+          "group": "FLOW",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "F_GO",
+          "labels": {
+            "fr": "C peut avancer selon ses propres gardes",
+            "en": "C can advance under its own checks"
+          },
+          "source": "inter",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "F_RELEASE",
+          "labels": {
+            "fr": "Tour libéré, réévaluation de B",
+            "en": "Turn released, B reevaluated"
+          },
+          "source": "inter",
+          "group": "FLOW",
+          "kind": "core",
+          "shape": "rect"
+        }
+      ],
+      "edges": [
+        {
+          "from": "F_A",
+          "to": "F_QUEUE",
+          "labels": {
+            "fr": "espace partagé",
+            "en": "shared workspace"
+          },
+          "pending": false
+        },
+        {
+          "from": "F_B",
+          "to": "F_QUEUE",
+          "labels": {
+            "fr": "espace recouvrant",
+            "en": "overlapping workspace"
+          },
+          "pending": false
+        },
+        {
+          "from": "F_C",
+          "to": "F_QUEUE",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "F_QUEUE",
+          "to": "F_HELD",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "F_HELD",
+          "to": "F_WAIT",
+          "labels": {
+            "fr": "ordre FIFO et recouvrement",
+            "en": "FIFO order and overlap"
+          },
+          "pending": false
+        },
+        {
+          "from": "F_QUEUE",
+          "to": "F_GO",
+          "labels": {
+            "fr": "aucun tour antérieur recouvrant",
+            "en": "no earlier overlapping turn"
+          },
+          "pending": false
+        },
+        {
+          "from": "F_WAIT",
+          "to": "F_RELEASE",
+          "labels": {
+            "fr": "après libération",
+            "en": "after release"
+          },
+          "pending": false
+        }
+      ],
+      "provenance": {
+        "source_git": "50f1daee655fd735c913116cd6b61314ff871bdf",
+        "scope": "Current-source observation and bounded historical evidence",
+        "artifacts": {
+          "fr.mmd": "ac78683a51551d147d7ae29152f20bb77eda9c79fe4b8ef4b87e328342647b12",
+          "fr.svg": "bc7a0d548d06fded83f1c0ac2b7d584ddd9311c383dfe9991afe3697caf3d2e0",
+          "fr.png": "653debb48c71b7a2623d350e8c6ba979f204e4d8cd4b931a248ed0c027413f13",
+          "en.mmd": "9d3dfe6b0c834ced484e0b0731652418e6e7937129b17d3cbc2fd747adeeca96",
+          "en.svg": "15fca3ad63056eee6c1e86a7685149f6cd1e962fc9798f7af5c40d9d3cd076f8",
+          "en.png": "a62b71f7068c657804f825995518e3e20d6e6f3cae1da67f03b96f26bd9d163d"
+        }
+      }
+    },
+    {
+      "name": "scope-refusal-recovery",
+      "titles": {
+        "fr": "Refus enfant et reprise dans Swarm",
+        "en": "Child scope refusal and recovery in Swarm"
+      },
+      "descriptions": {
+        "fr": "Le moteur conserve le refus de l’enfant. La racine reçoit un avis sûr et acquitte la reprise de planification.",
+        "en": "The engine retains the child refusal. The root receives a safe notice and acknowledges planning recovery."
+      },
+      "nodes": [
+        {
+          "id": "E_CHILD",
+          "labels": {
+            "fr": "Proposition native du sous-orchestrateur",
+            "en": "Native sub-orchestrator proposal"
+          },
+          "source": "recovery",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "E_REFUSAL",
+          "labels": {
+            "fr": "Refus d’autorité retenu dans le périmètre enfant",
+            "en": "Authority refusal retained in the child scope"
+          },
+          "source": "recovery",
+          "group": "FLOW",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "E_NOTICE",
+          "labels": {
+            "fr": "Avis racine, périmètre et code sûr",
+            "en": "Root notice, scope and safe code"
+          },
+          "source": "recovery",
+          "group": "FLOW",
+          "kind": "data",
+          "shape": "rect"
+        },
+        {
+          "id": "E_WAIT",
+          "labels": {
+            "fr": "Planification enfant en attente d’acquittement",
+            "en": "Child planning waits for acknowledgment"
+          },
+          "source": "recovery",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "E_ROOT",
+          "labels": {
+            "fr": "Décision de l’orchestrateur racine",
+            "en": "Root orchestrator decision"
+          },
+          "source": "recovery",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        },
+        {
+          "id": "E_CHECK",
+          "labels": {
+            "fr": "Moteur, vérification de la reprise",
+            "en": "Engine verifies recovery"
+          },
+          "source": "recovery",
+          "group": "FLOW",
+          "kind": "core",
+          "shape": "rect"
+        },
+        {
+          "id": "E_RESUME",
+          "labels": {
+            "fr": "Planification enfant de nouveau admissible",
+            "en": "Child planning becomes eligible again"
+          },
+          "source": "recovery",
+          "group": "FLOW",
+          "kind": "ordinary",
+          "shape": "rect"
+        }
+      ],
+      "edges": [
+        {
+          "from": "E_CHILD",
+          "to": "E_REFUSAL",
+          "labels": {
+            "fr": "refus hors périmètre",
+            "en": "out-of-scope refusal"
+          },
+          "pending": false
+        },
+        {
+          "from": "E_REFUSAL",
+          "to": "E_NOTICE",
+          "labels": {
+            "fr": "même enregistrement",
+            "en": "same recorded operation"
+          },
+          "pending": false
+        },
+        {
+          "from": "E_REFUSAL",
+          "to": "E_WAIT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "E_NOTICE",
+          "to": "E_ROOT",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "E_ROOT",
+          "to": "E_CHECK",
+          "labels": {
+            "fr": "acquittement",
+            "en": "acknowledgment"
+          },
+          "pending": false
+        },
+        {
+          "from": "E_WAIT",
+          "to": "E_CHECK",
+          "labels": {
+            "fr": "",
+            "en": ""
+          },
+          "pending": false
+        },
+        {
+          "from": "E_CHECK",
+          "to": "E_RESUME",
+          "labels": {
+            "fr": "gardes satisfaites",
+            "en": "checks pass"
+          },
+          "pending": false
+        }
+      ],
+      "provenance": {
+        "source_git": "50f1daee655fd735c913116cd6b61314ff871bdf",
+        "scope": "Current-source observation and bounded historical evidence",
+        "artifacts": {
+          "fr.mmd": "d876e1b9ea612ef97a6d351c1b353c797cebe5f3b1fed1f8834ba80b67b2a7ec",
+          "fr.svg": "1352dea78b01d5f23fd724989fb56014917c7385de8df74a57d10d8170439627",
+          "fr.png": "46322b85010510d4e61ff1ce74fb68bc0426645a39cbdb727e086e47e65d1578",
+          "en.mmd": "08c16b1c506fdc8d83f3105d62f6b6887ee9e39db3127cb4e0611bcf49be0108",
+          "en.svg": "10e88673fc7b418d92753ff4a970cb70cb722b3d428d7af941ce0cbc4990dce8",
+          "en.png": "e56ea41deeec203aa650cbd59b6be93c8048971ab7336004d51ac1e54a8f640e"
+        }
+      }
     }
   ],
   "native_source_observations": [
@@ -2444,6 +2997,81 @@
       "path": "rust/crates/swarm-engine/src/root_store/task_validation/gate.rs",
       "sha256": "dae6dc543cd5bf835dbc1e954172b90255f210e5605b79d0b05c9877b171de9e",
       "observed_symbol_or_contract": "Human apply preserves manual gates/checks and human-validation-required; it does not accept the task."
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/mission_watch.rs",
+      "sha256": "c148dd51182c3d862fc7d30165b01540243f81eba34b830c098b043c5f2a4bf3",
+      "observed_symbol_or_contract": "Worker priority and fenced startup before dispatching further work."
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/native_web/conductor.rs",
+      "sha256": "fda95de59b4893d3adc6bec49b117ab0b91ea2215e959af54d05eb7b7e1e9165",
+      "observed_symbol_or_contract": "Discovery and owned session per eligible Work."
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/mission_worker_dispatch.rs",
+      "sha256": "afe6f7cc544ac399360793ec0e95a4c363cac6e85c5124a81ecc21465ceb8d71",
+      "observed_symbol_or_contract": "Worker selection, FIFO and resource refusal precedence."
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/workspace_turn_write.rs",
+      "sha256": "0e96bb9ae960379805e146c2ae6448455226e9975fdf07f993b8accdd80dd45a",
+      "observed_symbol_or_contract": "Queue synchronization, release and read-only blocker projection."
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/planning_rejection.rs",
+      "sha256": "33ac7d40fe39fa6de9f1eca50a199ad40a9455bda6106cb207770e1db245bd52",
+      "observed_symbol_or_contract": "Child scope refusal retained with root escalation."
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/planning_step.rs",
+      "sha256": "2c940c77e9397b76458fbbec499e8263d0310ed8341de5dcc84f8a63bc6847ae",
+      "observed_symbol_or_contract": "Choose planning input; skip child scope with escalation pending."
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/mission_task_order.rs",
+      "sha256": "0ca96a175268546cfdc34f31e486b423b23bb5352100ac845edb174bc96cfeac",
+      "observed_symbol_or_contract": "ordered: exact priority, longest-path depth and lexical ID ordering of validated DAG."
     }
-  ]
+  ],
+  "concurrency_provenance": {
+    "base": "50f1daee655fd735c913116cd6b61314ff871bdf",
+    "upstream": "https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/ARCHITECTURE.md",
+    "scope": "The first five view families and their source hashes are historical. A retained hash for an earlier source can differ from the current checkout. Only the new concurrency evidence records current hashes and diagram artifacts for this increment.",
+    "renderer": {
+      "mermaid_cli": "11.12.0",
+      "configuration": "docs/diagrams/mermaid-config.json",
+      "configuration_sha256": "c0c2f4004458e3537547181e466bb145f354c7ad60f14eb44d5a7c7a45312549"
+    },
+    "historical_results": [
+      {
+        "key": "fifo-197",
+        "path": "docs/plans/migration-rust/REPLAYS.md",
+        "anchor": "cycle-fifo-natif-197",
+        "scope": "Historical closed FIFO path for two Work objects using distinct SDK and CLI evidence."
+      },
+      {
+        "key": "child-escalation",
+        "path": "docs/plans/migration-rust/PLAN.md",
+        "anchor": "remontée-des-refus-dautorité-et-reprise",
+        "result_sha256": "b0f243ccffaf45054a3ec673046115aa62b45618bd8f7b8f3b3999f4da48948c",
+        "scope": "One inert child authority refusal, root decision and resumed handling.",
+        "archive": "scope-escalation-20261122.oriJSr",
+        "archive_index": "verification-index.json",
+        "receipt_suffix": "escalation/result.json"
+      },
+      {
+        "key": "startup-diagnostics",
+        "result_sha256": "4ad201972a1ea25dcabf5e0960d21586d726901109612a067931cc28e20da64f",
+        "scope": "Protected native HTTP fixture with separate installed-image evidence.",
+        "recipe_manifest": "tools/verification/recipes/cockpit-launch-diagnostics.json",
+        "archive": "cockpit-launch-diagnostics-20261122.PlYsgz",
+        "receipt": "recipe-final/result.json",
+        "installed_image_receipts": {
+          "local-version-evidence.json": "ea7b98351ac08fadbdae373d40de6143fd8760ae59ba2e1a1bf896564936991c",
+          "installed-cockpit/result.json": "4c3989619f1664e3317f8331a91d3497d4dcc4f11e0e1578041760ff0c234dc6"
+        }
+      }
+    ]
+  }
 }
