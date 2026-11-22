@@ -56,6 +56,18 @@ de B est sorti avec le code 2 au redémarrage et le conducteur s’est arrêté
 en conservant l’intention active. La reprise de bout en bout reste ouverte.
 La perte d’un worker, l’équité en charge et l’inter-Root restent à qualifier.
 
+La relecture seule a retrouvé l’Agent en file après l’adoption de génération
+1 vers 2. Le Work est à la révision 9, la demande figée attendait 8 et la
+demande d’adoption attendait 9. Le reçu du conducteur conserve le code de
+sortie 2. Le stderr du superviseur enfant va vers `/dev/null`, et la cause
+interne reste ouverte.
+
+La reproduction par `mission_watch_restart_seed` attend un SDK et un binaire
+normal construits sur les mêmes sources. La préparation a trouvé 11 080 065 024
+octets disponibles sur l’hôte pour une réserve configurée de 21 474 836 480.
+La cible Toshiba a été admise et la réserve hôte est conservée. Les relevés
+se trouvent dans `p12-sdk-build-20261122.mnSQZQ`.
+
 Le catalogue associe ces résultats aux reçus de
 `fifo-commit-crash-20261122.VHnoWq` et conserve le premier échec de
 `fifo-commit-crash-20261122.AWWUvx`.

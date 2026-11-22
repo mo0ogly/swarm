@@ -59,6 +59,18 @@ The catalogue binds the observations to records in
 `fifo-commit-crash-20261122.VHnoWq` and preserves the earlier failure in
 `fifo-commit-crash-20261122.AWWUvx`.
 
+Read-only inspection found the Agent still queued after adoption from
+generation 1 to 2. The Work revision is 9, the frozen launch expected 8, and
+the adoption expected 9. The conductor receipt retained exit code 2.
+The child supervisor’s stderr goes to `/dev/null`. Its internal cause
+remains open.
+
+Reproduction through `mission_watch_restart_seed` needs the SDK and normal
+binary built from matching sources. Preflight found 11,080,065,024 available
+host bytes for a configured reserve of 21,474,836,480. The Toshiba target was
+admitted and the host reserve is preserved. Records are in
+`p12-sdk-build-20261122.mnSQZQ`.
+
 ## Evidence originals
 
 | Archive from 22 November | Main record |

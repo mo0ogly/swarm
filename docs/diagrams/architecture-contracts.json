@@ -3126,6 +3126,7 @@
       ]
     },
     "p12_commit_interruptions": {
+      "source_report_commit": "6b0cde22ae4eb2cb74faac94451169532e9d0553",
       "observed_image": {
         "version": "v0.1.1-dev.389",
         "commit": "50f1daee655fd735c913116cd6b61314ff871bdf",
@@ -3160,6 +3161,19 @@
           }
         }
       ]
+    },
+    "p12_post_commit_diagnosis": {
+      "scope": "Read-only inspection of the original after-COMMIT fixture and host reserve preflight. The worker refusal is unresolved.",
+      "prior_report_commit": "6b0cde22ae4eb2cb74faac94451169532e9d0553",
+      "sources": {
+        "docs/architecture/SAME-ROOT-FIFO-RECOVERY.md": "622c8f3b57f58132a12a1815e13626892453cb5b859e10e7b9eeeeb55097e249",
+        "docs/en/SAME-ROOT-FIFO-RECOVERY.md": "0d9e420000da05f1195aee9b0081ef79250f96adc0acc24c51ab8d8335f052cc"
+      },
+      "archive": "p12-sdk-build-20261122.mnSQZQ",
+      "receipts": {
+        "retained-agent-readback.json": "5bee03127bcc808e0da0f0816de2fa00a810a85f50fd17de9947965a6e73d88a",
+        "host-reserve.json": "101cf845365c3ac53583fbba4986431beb3d4470405282b889fb5e600f60910f"
+      }
     }
   }
 }
