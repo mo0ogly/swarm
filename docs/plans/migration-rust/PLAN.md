@@ -28,6 +28,13 @@ Les vrais échecs de stockage et de fermeture restent des erreurs serveur.
 L’actualisation explicite réutilise les commandes du cockpit. Aucun nouveau
 délai, seuil opérateur ou nombre de tentatives n’est ajouté.
 
+Le premier passage CI a détecté `ETXTBSY` en exécutant un script Git généré
+par un test indépendant du statut. Le témoin positif et la configuration Git
+utilisent le même interpréteur explicite, comme le témoin déterministe déjà
+présent pour les scripts de vérification de candidat. Les assertions sur les
+callbacks bloqués et la configuration restent en vigueur. Le moteur livré
+ne change pas pour cette reprise CI.
+
 ## Lot cockpit : diagnostic de démarrage automatique
 
 Demande de Fabrice du 22 novembre. Base `f2a0fcc87`. La projection historique
