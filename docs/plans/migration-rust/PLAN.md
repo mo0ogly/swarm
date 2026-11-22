@@ -95,6 +95,28 @@ le processus de revue. Le témoin de reprise injecte la modification temporaire
 depuis le propriétaire de la fixture, conserve les preuves et restaure l’original.
 La revue du diff par un autre intervenant et la livraison locale restent ouvertes.
 
+### Remontée des refus d’autorité et reprise
+
+La reprise autorisée ajoute l’avis racine au même enregistrement que le refus
+natif de l’enfant. Le journal identifie précisément cet avis même après une
+autre écriture Work. La proposition et ses pièces restent dans l’inbox enfant.
+Une acquisition enfant attend la décision racine et reprend ensuite sous les
+droits et budgets existants. Le dédoublonnage compare le périmètre, le motif et
+l’état de la décision. Il ne dépend pas d’un identifiant proposé par l’agent.
+Une référence inconnue garde le refus local hérité. Une référence existante
+hors mandat ou une décision réservée à la racine reçoit son diagnostic
+d’autorité explicite. Les politiques de capacité et de coût sont inchangées.
+
+La recette inerte conserve le défaut initial, puis la séquence racine →
+enfant valide → refus de l’autre enfant → décision racine → reprise enfant.
+Elle compare aussi les entrées privées reçues, le compte des cycles et
+l’état stable après vidage de l’inbox. Les preuves sont dans
+`/run/media/fpizzi/SWARM/swarm-evidence/scope-escalation-20261122.oriJSr`.
+La revue indépendante favorable porte sur le diff technique d’empreinte
+`6b23974d219136bca1f326ff836ead8068d0602217dcb7302c037741e38cae8c`.
+Elle couvre le code des familles de refus. Le témoin de bout en bout exerce
+une exigence existante détenue par un autre sous-périmètre.
+
 ## Régression graphe —31 octobre, APEX demandé
 
 G1/G11 : restituer zoom, fond/cartes, orientation et plein écran ; G4 : création

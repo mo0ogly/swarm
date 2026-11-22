@@ -11,6 +11,9 @@
     "rust/crates/swarm-engine/src/mission_worker_dispatch.rs",
     "rust/crates/swarm-engine/src/mission_agent.rs",
     "rust/crates/swarm-engine/src/planning_decision.rs",
+    "rust/crates/swarm-engine/src/planning_activation.rs",
+    "rust/crates/swarm-engine/src/planning_rejection.rs",
+    "rust/crates/swarm-engine/src/root_store/planning_rejection_feedback.rs",
     "rust/crates/swarm-engine/src/root_store/planning_step.rs",
     "rust/crates/swarm-engine/src/root_store/task_validation.rs",
     "rust/crates/swarm-engine/src/root_store/reviewer_native/runtime.rs",
@@ -33,6 +36,7 @@
         "PASS public mission preserves pause, resume and consent revocation",
         "PASS two isolated sub-orchestrator decisions and idle without a new provider call",
         "PASS public conductor plans when no worker can advance",
+        "PASS child authority refusal reaches root and resumes under original mandate",
         "REPLAY_EVIDENCE"
       ],
       "required_stderr": []

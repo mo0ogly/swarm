@@ -266,7 +266,10 @@ fn retry_task(root: &Path, w: &mut Work, op: &PlanningOperation, r: &PlanningReq
     P::check(policy.max_instruction_bytes, op.next.len(), "planning-operation-instruction-limit")?;
     let mut tasks = w.tasks.iter().flatten().filter(|t| t.id == op.id);
     let task = tasks.next().ok_or(E::Refused("planning-retry-task-missing"))?;
-    if tasks.next().is_some() || task.scope_id != r.scope || task.plan_role != "worker" || task.status != "blocked"
+    if task.scope_id != r.scope {
+        return Err(E::Refused("planning-operation-task-outside-scope"));
+    }
+    if tasks.next().is_some() || task.plan_role != "worker" || task.status != "blocked"
         || task.launch_held || task.planning_retry || task.next == op.next || task.plan_max_attempts <= 0
         || task.attempts.as_ref().map_or(0, Vec::len) as u128 >= task.plan_max_attempts as u128 {
         return Err(E::Refused("planning-retry-unavailable"));
@@ -300,9 +303,12 @@ fn retry_review(root: &Path, w: &mut Work, op: &PlanningOperation, r: &PlanningR
     }
     P::check(policy.max_instruction_bytes, op.next.len(), "planning-operation-instruction-limit")?;
     let task = w.tasks.iter().flatten().find(|t| t.id == op.id).ok_or(E::Refused("planning-review-retry-task-required"))?;
+    if task.scope_id != r.scope {
+        return Err(E::Refused("planning-operation-task-outside-scope"));
+    }
     let planning = w.planning.as_deref().ok_or(E::Refused("planning-review-retry-planning-required"))?;
     let delivery = planning.scopes.iter().flatten().find(|s| s.id == r.scope).and_then(|s| s.delivery.as_deref()).ok_or(E::Refused("planning-review-retry-delivery-required"))?;
-    if task.scope_id != r.scope || task.status != "submitted" || task.plan_role != "worker" || task.launch_held || task.planning_retry || task.next == op.next
+    if task.status != "submitted" || task.plan_role != "worker" || task.launch_held || task.planning_retry || task.next == op.next
         || delivery.review_retry_unavailable || planning.reviewer.as_deref().is_none_or(|v| v.calls < 0 || v.calls >= v.max_calls) {
         return Err(E::Refused("planning-review-retry-unavailable"));
     }
@@ -371,6 +377,12 @@ fn operation(
     let scope = &scopes[index];
     let requirements = op.requirements.as_deref().unwrap_or_default();
     let mut seen = BTreeSet::new();
+    if requirements.iter().any(|requirement| {
+        scopes.iter().any(|other| other.id != scope.id
+            && other.requirements.iter().flatten().any(|owned| owned == requirement))
+    }) {
+        return Err(E::Refused("planning-operation-requirement-outside-scope"));
+    }
     if requirements.is_empty()
         || requirements.iter().any(|r| {
             !seen.insert(r)
@@ -477,13 +489,14 @@ fn operation(
         "planning-task-dependency-limit",
     )?;
     for dep in op.depends.iter().flatten() {
-        if !w
+        let owner = w
             .tasks
             .iter()
             .flatten()
-            .any(|t| t.id == *dep && t.scope_id == scope_id)
-        {
-            return Err(E::Refused("planning-task-dependency-outside-scope"));
+            .find(|t| t.id == *dep)
+            .ok_or(E::Refused("planning-task-dependency-outside-scope"))?;
+        if owner.scope_id != scope_id {
+            return Err(E::Refused("planning-task-dependency-owned-by-another-scope"));
         }
     }
     let limits = settings
@@ -755,6 +768,9 @@ pub(crate) fn decide(
         } else if op.kind == "revise-instructions" {
             P::check(policy.max_instruction_bytes, op.next.len(), "planning-operation-instruction-limit")?;
             let task=next.tasks.iter_mut().flatten().find(|t|t.id==op.id).ok_or(E::Refused("instruction-task-not-found"))?;
+            if task.scope_id != r.scope {
+                return Err(E::Refused("planning-operation-task-outside-scope"));
+            }
             crate::instruction_learning::revise(task, &r.scope, op, r, at)?;
         } else if op.kind == "retry" {
             retry_task(root, &mut next, op, r, settings, &policy)?;

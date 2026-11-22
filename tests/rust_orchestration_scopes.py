@@ -2,11 +2,14 @@
 """Verify isolated root and child decisions with a sandbox-compatible inert CLI."""
 import argparse
 import json
+import os
 from pathlib import Path
+import select
 import traceback
 
 import rust_agent_model_route as fixture
 import rust_mission_report_relay as relay
+from rust_mission_watch_worker import watch_directory
 from rust_planning_bootstrap import request
 
 
@@ -49,6 +52,94 @@ decision = dict(input_events=[event['id'] for event in context['events']],
 print(json.dumps(dict(type='result', structured_output=decision,
                       usage=dict(input_tokens=7, output_tokens=8))), flush=True)
 '''
+
+ESCALATION_PROGRAM = '''#!/usr/bin/python3
+import json
+from pathlib import Path
+import sys
+
+raw = sys.stdin.read()
+context = json.loads(raw.strip().splitlines()[-1])
+scope = context['scope']['id']
+events = context['events']
+kinds = {event['kind'] for event in events}
+operations = []
+if scope == 'root' and 'scope_authority_refused' not in kinds:
+    operations = [dict(kind='delegate', id=child, title=child, requirements=[req],
+                       max_tasks=1, max_activations=limit)
+                  for child, req, limit in [('alpha','req-1',1), ('beta','req-2',2)]]
+elif scope == 'root':
+    notice = next(event for event in events if event['kind']=='scope_authority_refused')
+    assert not notice.get('handoff') and 'BETA_PRIVATE_REFUSAL_ORIGINAL' not in raw
+elif scope == 'beta' and 'planning_rejected' not in kinds:
+    operations = [dict(kind='task', id='forbidden-task', title='BETA_PRIVATE_REFUSAL_ORIGINAL',
+                       requirements=['req-1'], deliverable='Unowned', criteria=['Invalid'])]
+elif scope == 'beta':
+    assert 'planning_rejected' in kinds
+Path('owned-context.json').write_text(json.dumps(context))
+decision = dict(input_events=[event['id'] for event in events],
+                reason='Owned fixture applies only its current mandate', operations=operations)
+print(json.dumps(dict(type='result', structured_output=decision,
+                      usage=dict(input_tokens=7, output_tokens=8))), flush=True)
+'''
+
+
+def run_escalation(binary, output):
+    """Run the real watch through a child refusal, root arbitration and child resumption."""
+    owned = fixture.Fixture(binary, output, 'orchestration-escalation')
+    provider = owned.root / 'codex'
+    fixture.publish(provider, ESCALATION_PROGRAM.encode())
+    provider.chmod(0o700)
+    work = owned.ok(['work', 'create'], dict(schema_version=1, event_id='escalation-create',
+        expected_revision=0, title='Owned arbitration fixture', objective='Recover a refused child',
+        scope='Isolated fixture scope', criteria=['Alpha requirement', 'Beta requirement']))['work']
+    owned.work = work['id']
+    checks = {req: [dict(id='witness', command=['python3', '-c', 'print(1)'],
+                        inputs=['input.txt'], criteria=[1], justification='Owned fixture')]
+              for req in ('req-1', 'req-2')}
+    work = owned.ok(['planning', 'enable', owned.work],
+                    request(event='escalation-enable', max_activations=5, checks=checks))
+    owned.ok(['mission', 'start', owned.work], dict(
+        schema_version=1, event_id='escalation-start', expected_revision=work['revision'],
+        reason='Owned escalation fixture', slots=1,
+        profile=dict(provider='fixture', role='worker', workspace=owned.workspace.name,
+                     level='standard', capture_output=True)))
+    watch = output / 'watch'
+
+    def wait_for_child(_process, process_fd):
+        """Wait for a durable resumed-child observation or conductor exit."""
+        notify = watch_directory(watch, modifications=True)
+        try:
+            while True:
+                records = [json.loads(line) for line in (watch / 'watch.stdout').read_bytes()
+                           .splitlines(keepends=True) if line.endswith(b'\n')]
+                if any(r.get('selected_scope') == 'beta' and r.get('decision_applied')
+                       for r in records):
+                    return
+                ready, _, _ = select.select([notify, process_fd], [], [])
+                assert process_fd not in ready, 'conductor exited before resumed child decision'
+                os.read(notify, 65536)
+        finally:
+            os.close(notify)
+
+    records = relay.cycle(owned, watch, started=wait_for_child,
+                          completed_event='mission-planning-escalated')
+    timeline = [(r['event'], r.get('selected_scope')) for r in records
+                if r.get('decision_applied') or r['event'] == 'mission-planning-escalated']
+    assert timeline == [('mission-planning-step','root'), ('mission-planning-step','alpha'),
+                        ('mission-planning-escalated',None), ('mission-planning-step','root'),
+                        ('mission-planning-step','beta')], timeline
+    final = owned.ok(['work', 'show', owned.work])['work']
+    events = final['planning']['inbox']
+    refusal, = (event for event in events if event['kind'] == 'planning_rejected')
+    notice, = (event for event in events if event['kind'] == 'scope_authority_refused')
+    assert refusal['scope'] == 'beta' and notice['scope'] == 'root'
+    assert refusal['decision'] and notice['decision'] and refusal['handoff']
+    assert not notice.get('handoff') and not notice.get('artifacts') and not final.get('tasks')
+    assert final['planning']['activations'] == 5 and final['planning']['decisions'] == 4
+    assert owned.ok(['planning', 'step', owned.work])['status'] == 'idle'
+    assert owned.ok(['work', 'show', owned.work])['work'] == final
+    fixture.publish(output / 'result.json', dict(status='PASS', timeline=timeline, paid_provider=False))
 
 
 def run_automatic_planning(binary, output):
@@ -134,12 +225,14 @@ def main():
         binary = args.binary.resolve()
         result = run(binary, output)
         run_automatic_planning(binary, output / 'automatic')
+        run_escalation(binary, output / 'escalation')
         fixture.publish(output / 'result.json', result)
     except BaseException:
         fixture.publish(output / 'failure.json', dict(status='FAIL', cause=traceback.format_exc()))
         raise
     print('PASS two isolated sub-orchestrator decisions and idle without a new provider call', flush=True)
     print('PASS public conductor plans when no worker can advance', flush=True)
+    print('PASS child authority refusal reaches root and resumes under original mandate', flush=True)
 
 
 if __name__ == '__main__':

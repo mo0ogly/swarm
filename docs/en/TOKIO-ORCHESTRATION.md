@@ -13,6 +13,14 @@ with no admission, valid mission permission and no retained worker context.
 Recovering a previously admitted worker preserves its identity. Controls and
 review remain separate operations on evidence from the submitted result.
 
+When a native child proposal is refused on scope authority, the original
+stays in the child's scope. The same write records a notice for the root
+orchestrator. The notice carries the scope identifier and refusal code.
+The rejected operation, proposal and attachments stay in the child's
+diagnostic. A new claim for that child waits for a root decision to
+acknowledge the notice. Resumption uses the existing revision, consent,
+authority and budget checks.
+
 ## Choose the boundary
 
 Use Tokio for asynchronous coordination between cooperating Rust components that can share process privileges. A typed channel fits when a task must send an operation to one owner or receive a single result. Reuse the existing transport when the operation already has an owner and an admission rule.

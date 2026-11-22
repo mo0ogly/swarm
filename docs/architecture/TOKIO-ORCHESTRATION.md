@@ -14,6 +14,14 @@ contextes workers retenus. La reprise d’un worker déjà admis conserve son
 identité. Les contrôles et la revue restent des opérations distinctes sur les
 preuves du résultat soumis.
 
+Un refus d’autorité de périmètre d’une proposition native enfant conserve son
+original dans le périmètre d’origine. Le même enregistrement ajoute un avis
+à l’orchestrateur racine. L’avis contient l’identifiant du périmètre et le code
+de refus. Le verbe d’origine, la proposition et les pièces restent dans le
+diagnostic de l’enfant. Toute nouvelle prise en charge de cet enfant attend
+une décision racine qui acquitte l’avis. La reprise passe ensuite par les
+gardes habituelles de révision, de consentement, de droits et de budget.
+
 ## Choisir la frontière
 
 Utiliser Tokio pour la coordination asynchrone entre composants Rust coopératifs qui peuvent partager les privilèges d’un processus. Un canal typé convient lorsqu’une tâche doit confier une opération à un propriétaire unique ou recevoir un résultat ponctuel. Réutiliser le transport existant si l’opération a déjà un propriétaire et une règle d’admission.

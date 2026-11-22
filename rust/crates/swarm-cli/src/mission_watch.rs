@@ -670,6 +670,8 @@ fn planning_record(
 /// The selected planner job calls this synchronously in its owned peer, while
 /// main only uses pending=true for non-executing deferral observations. Existing
 /// cleanup joins each owned role on stop; role scheduling alone grants nothing.
+/// A verified root notification is published as a refusal with durable Work,
+/// allowing another cycle. Observation or publication failure retains both causes.
 fn planning_once(
     store: &mut RootStore,
     work: &str,
@@ -700,7 +702,21 @@ fn planning_once(
             "automatic_planner":true,"automatic_reviewer":false,"automatic_validation":false,"mission_complete":false,"observation_is_permission":false}),
         );
     }
-    let step = store.step_planning(work)?;
+    let step = match store.step_planning(work) {
+        Ok(step) => step,
+        Err(error) => match store.observe_planning_escalation(work, &error) {
+            Ok(Some((revision, event))) => {
+                *recorded = Some((work.to_owned(), revision));
+                let record = json!({"schema_version":1,"event":"mission-planning-escalated",
+                    "work":work,"work_revision":revision,"input_event":event,
+                    "causes":crate::safe_causes(&error),"decision_applied":false,
+                    "mission_complete":false,"observation_is_permission":false});
+                return emit(out, &record).map_err(|publication| join(Some(error), publication));
+            }
+            Ok(None) => return Err(error),
+            Err(observation) => return Err(join(Some(error), observation)),
+        },
+    };
     if let Some(run) = &step.run {
         *recorded = Some((run.work.id.clone(), run.work.revision));
     }
