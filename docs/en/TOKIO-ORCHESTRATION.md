@@ -95,3 +95,20 @@ uses a qualified native binary (`SWARM_LAUNCH_DIAGNOSTICS_BINARY`) and an inert 
 in an isolated Root. It checks the API and the served UI in Chromium with the
 native HTTP service running without a conductor (Cargo example
 `cockpit_launch_http_fixture`, supplied as `SWARM_LAUNCH_DIAGNOSTICS_HTTP_FIXTURE`).
+
+### Concurrent status reads at attempt completion
+
+The current status reader rechecks its inputs before publishing. When an attempt
+ends, the Work, Agent list or occupied workspaces can change between observations.
+If the guards report only changed inputs, the engine discards the projection and
+the protected `mission?…&action=status` route returns HTTP 409 with
+`mission-status-observation-changed`. The cockpit asks the operator to refresh.
+The next read recalculates the status from recorded state. The engine retains the
+change causes and ancillary diagnostics. Independent storage, identity or closure
+failures keep their error diagnostics. The read introduces no provider launch or
+new retry policy.
+
+The [cockpit-status-completion recipe](../../tools/verification/recipes/cockpit-status-completion.json)
+exercises the Web conductor with inert agents. It retains HTTP responses and,
+when a read overlaps agent completion, the observed CLI causes. The Rust test
+also covers cause classification independently of scheduling.

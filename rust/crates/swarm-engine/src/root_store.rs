@@ -266,6 +266,9 @@ pub enum RootStoreError {
         cleanup: Option<Box<rusqlite::Error>>,
     },
     Refused(&'static str),
+    /// Unpublished mission status observation invalidated by concurrent change.
+    /// Retains the typed recheck and ancillary causes without authorizing retry.
+    MissionStatusChanged { primary: Box<Self> },
     Cleanup {
         primary: Option<Box<Self>>,
         cleanup: Box<Self>,
@@ -481,6 +484,7 @@ impl RootStoreError {
             Self::Sql(_) => "root-storage",
             Self::SqlTransaction(_) => "root-sql-transaction-failed",
             Self::Refused(s) => s,
+            Self::MissionStatusChanged { .. } => "mission-status-observation-changed",
             Self::Cleanup { .. } => "root-cleanup",
             Self::Busy { .. } => "root-storage-busy",
         }
@@ -600,6 +604,7 @@ impl Error for RootStoreError {
             #[cfg(target_os = "linux")]
             Self::View(e) => Some(e),
             Self::SchemaCommit { cause, .. } => Some(cause),
+            Self::MissionStatusChanged { primary } => Some(primary.as_ref()),
             Self::Cleanup {
                 primary: Some(e), ..
             } => Some(e.as_ref()),

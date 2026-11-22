@@ -69,3 +69,21 @@ fn blp_dialogue_reader_refusals_are_forbidden_and_cleanup_stays_server_error() {
     assert_eq!(root("read", RootStoreError::Refused("blp-dialogue-access-denied")).status(), StatusCode::INTERNAL_SERVER_ERROR);
     assert_eq!(root("preparation-read", RootStoreError::Refused("paea-reader-access-denied")).status(), StatusCode::INTERNAL_SERVER_ERROR);
 }
+
+/// A stale mission projection can be refreshed. Real paired close failure,
+/// unrelated operations and a same-spelling refusal do not inherit that status.
+#[test]
+fn mission_status_conflict_requires_typed_read_and_clean_close() {
+    let conflict = || swarm_engine::RootStoreError::MissionStatusChanged {
+        primary: Box::new(swarm_engine::RootStoreError::Refused("mission-status-work-changed")),
+    };
+    let response = super::error_reply(super::root("read", conflict()), false).unwrap();
+    assert_eq!(response.response.status(), http::StatusCode::CONFLICT);
+    assert_eq!(response.failure.unwrap().code(), "mission-status-observation-changed");
+    let close = super::close(Err::<(), _>(super::root("read", conflict())),
+        Err(swarm_engine::RootStoreError::Refused("fixture-close-failed"))).unwrap_err();
+    assert_eq!(close.status(), http::StatusCode::INTERNAL_SERVER_ERROR);
+    assert_ne!(super::root("write", conflict()).status(), http::StatusCode::CONFLICT);
+    assert_ne!(super::root("read", swarm_engine::RootStoreError::Refused("mission-status-observation-changed"))
+        .status(), http::StatusCode::CONFLICT);
+}

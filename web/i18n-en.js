@@ -7102,6 +7102,7 @@ globalThis.SwarmEnglish = {
   "Réussite enregistrée": "Recorded pass",
   "Échec enregistré": "Recorded failure",
   "Démarrage automatique des agents": "Automatic agent startup",
+  "La mission a évolué pendant la lecture. Cliquez sur Actualiser pour afficher le statut à jour.": "The mission changed while its status was being read. Click Refresh to see the current status.",
   "Diagnostic indisponible. Actualisez pour reprendre.": "Diagnostics unavailable. Refresh to retry.",
   "La mission est en pause.": "The mission is paused.",
   "La mission est archivée.": "The mission is archived.",

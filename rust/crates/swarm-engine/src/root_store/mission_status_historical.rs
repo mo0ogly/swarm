@@ -30,6 +30,29 @@ fn retain(mut error: E, causes: Vec<E>) -> E {
     }
     error
 }
+/// Classify only known status recheck changes, including joins of several
+/// stale observations. SQL, storage, material identity and cleanup failures
+/// in any branch retain their own diagnostic and block this classification.
+fn observation_changed(error: &E) -> bool {
+    match error {
+        E::Refused(
+            "mission-status-work-changed"
+            | "mission-status-settings-changed"
+            | "mission-status-inputs-changed"
+            | "mission-status-controls-changed"
+            | "mission-status-dispatch-context-changed"
+            | "mission-status-supervision-changed"
+            | "mission-status-evidence-work-changed"
+            | "mission-status-evidence-settings-changed"
+            | "mission-status-reports-changed"
+            | "mission-status-provider-cooldowns-changed",
+        ) => true,
+        E::Cleanup { primary, cleanup } => {
+            primary.as_deref().is_none_or(observation_changed) && observation_changed(cleanup)
+        }
+        _ => false,
+    }
+}
 /// Go zero strings are intermediate reduction state, filled before publication.
 fn understanding() -> MissionUnderstanding {
     MissionUnderstanding {
@@ -569,7 +592,9 @@ impl RootStore {
     /// preserving typed semantic/cleanup causes beyond the material guard.
     /// Work/settings/controls/Agents and selected reports are compared before and
     /// after. These sequential observations establish neither an atomic snapshot
-    /// nor ABA protection. No visit, provider, SQL, Git or ledger mutation occurs.
+    /// nor ABA protection. A change-only outcome discards the projection and
+    /// returns a typed conflict after material checks and cleanup. Ancillary
+    /// causes remain attached. No visit, provider, SQL, Git or ledger mutation.
     /// Caller must close Root and handle output/flush; observation grants nothing.
     pub fn mission_status_historical(
         &self,
@@ -793,6 +818,9 @@ impl RootStore {
                 }
                 Ok(MissionStatusObservation { status, causes })
             }
+            Err(error) if observation_changed(&error) => Err(E::MissionStatusChanged {
+                primary: Box::new(retain(error, causes)),
+            }),
             Err(error) => Err(retain(error, causes)),
         }
     }
@@ -800,6 +828,28 @@ impl RootStore {
 
 #[cfg(all(test, target_os = "linux"))]
 mod tests {
+    /// Exercise the exact causes observed across worker completion. The same
+    /// tree with an independent SQL or identity failure must remain an error.
+    #[test]
+    fn status_completion_changes_are_distinct_from_failed_cleanup() {
+        let changes = || {
+            let inputs: Result<(), E> = Err(E::Refused("mission-status-evidence-work-changed"));
+            finished(inputs, finished(
+                Err(E::Refused("mission-status-work-changed")),
+                Err(E::Refused("mission-status-inputs-changed")),
+            )).unwrap_err()
+        };
+        assert!(super::observation_changed(&changes()));
+        for independent in [
+            E::Sql(rusqlite::Error::InvalidQuery),
+            E::Refused("material-project-instance-changed"),
+            E::Refused("mission-status-evidence-root-changed"),
+        ] {
+            let result = finished(Err::<(), _>(changes()), Err(independent)).unwrap_err();
+            assert!(!super::observation_changed(&result));
+        }
+    }
+
     #[test]
     fn only_terminal_unbound_conductor_agents_skip_status_provenance() {
         let agent = |origin: &str, status: &str| crate::Agent { origin: origin.into(), status: status.into(), ..Default::default() };
