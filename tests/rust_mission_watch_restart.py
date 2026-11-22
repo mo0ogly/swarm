@@ -139,7 +139,9 @@ def seed_queue(owned, sdk, out):
     """Run the qualified real SDK producer on an explicit marker-correlated fixture.
 
     Its process must exit0 after closing the old lease/Root, without starting a
-    provider. Retain original stdout/stderr/exit before interpreting producer JSON.
+    provider. The SDK uses the same saved Root TMPDIR as the CLI worker so the
+    admission freezes the same environment. Legacy Roots without that setting
+    keep the inherited environment. Retain the channels before parsing the seed.
     """
     request = dict(schema_version=1, kind='owned-inert-mission-watch-restart-seed',
                    root=str(owned.root), work=owned.work, result=str(out / 'seed-result.json'))
@@ -150,6 +152,10 @@ def seed_queue(owned, sdk, out):
     fixture.publish(out / 'seed-command.json', dict(argv=argv, input_environment_key='SWARM_MISSION_WATCH_RESTART_SEED',
                    input_environment_path=str(path), global_watchdog=None))
     environment = dict(owned.environment, SWARM_MISSION_WATCH_RESTART_SEED=str(path))
+    saved_temporary_directory = owned.ok(['engine-settings', 'show'])['values'].get(
+        'runtime_temporary_directory')
+    if saved_temporary_directory is not None:
+        environment['TMPDIR'] = os.path.join(owned.root, saved_temporary_directory)
     result = subprocess.run(argv, env=environment, stdin=subprocess.DEVNULL, capture_output=True)
     fixture.publish(out / 'seed.stdout', result.stdout)
     fixture.publish(out / 'seed.stderr', result.stderr)

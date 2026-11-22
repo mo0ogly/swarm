@@ -73,9 +73,9 @@ candidate commit separately.
 | ORCH-01 | PASS. Two startup grants in separate workspaces while the competing root planning input remains pending. |
 | ORCH-02 | PASS in the fixture. The conductor plans without an eligible worker. With unchanged state, the planning command returns `idle` without a new launch or execution of the configured control. The positive control witness produces the expected marker. |
 | ORCH-03 | PASS in the fixture. Pause, authorized resume and consent withdrawal were observed. A resume request after withdrawal returned `mission-consent-required` and the Work readback was identical. |
-| ORCH-04 | Partial. With two slots the processes are active together. With one slot the second is refused with `mission-agent-slots-occupied` until the first completes. The dependent task starts in neither case. This witness combines dependency and review gates. A two-slot variant isolates overlapping workspaces and returns a FIFO blocker until the first worker exits. |
+| ORCH-04 | PASS in the fixture. With two slots the independent workers are active together. With one slot the second is refused with `mission-agent-slots-occupied` until the first completes. C declares A as its predecessor. The effective sources bind C’s review refusal to the check of that dependency. A two-slot variant returns a FIFO blocker for overlapping workspaces until the first worker exits. |
 | ORCH-05 | PASS in the fixture. Two scopes make decisions. The second scope’s authority refusal reaches the root, then the child resumes under its original mandate. |
-| ORCH-06 | Partial. Three controls and a separate inert review cover candidate `955bc170be7bcd6b141d49e0071448de57c1ed5a`. Changed source blocks prepublication. Restoration returns the same observation. Exact replay leaves reviewer invocations and reservations unchanged. Fresh validation of a changed candidate remains to be observed. |
+| ORCH-06 | PASS in the fixtures. For candidate `955bc170be7bcd6b141d49e0071448de57c1ed5a`, drift refusal and replay add no review or reservation. For candidate `c2af453b3dc15d18e85e8cc4e530806db4dd115b`, an effective input change invalidates the first review. Fresh controls cover the changed input and a new review permits publication. Replay returns the recorded publication. |
 
 Receipts are under `/run/media/fpizzi/SWARM/swarm-evidence/` in
 `p11-multitask-20261122.9xRb0b/orchestration-external`,
@@ -88,6 +88,14 @@ The first failure on the historical Root-level marker remains in
 `publication/failure.json`. The focused witnesses are
 `p11-idle-controls-20261122.kUx4T0/run/result.json` and
 `p11-overlap-20261122.FPARps/run/capacity-refusal.json`.
+
+The revalidation flow is in
+`p11-requalification-20261122.DViR0e/requalification-only`.
+`profile-reuse.json` confirms all 787 effective profile inputs.
+`new-controls-work.stdout`, `publish-r2.stdout` and
+`publish-r2-replay.stdout` bind the result to the fresh review.
+The revalidation witness uses the review-focused preparation option.
+The first failure in the preparation queue remains archived.
 
 ## Evidence references for dev 380
 

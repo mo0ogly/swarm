@@ -72,6 +72,39 @@ Le catalogue associe ces résultats aux reçus de
 `fifo-commit-crash-20261122.VHnoWq` et conserve le premier échec de
 `fifo-commit-crash-20261122.AWWUvx`.
 
+## Diagnostic et témoin après COMMIT
+
+Sur la même image v0.1.1-dev.389, le rejeu du crash avec capture du stderr
+du superviseur enfant a donné `agent-execution-preflight-expired`. Le reçu
+de prévol de B était valable 30 s, tout comme le seuil de péremption du
+bail de mission. Dans les reçus originaux, le bail de génération 2 est
+acquis 1,056 s après la fin de validité du prévol. Dans le rejeu avec
+diagnostic, cet écart est de 1,621 s. Les timestamps et la trace restent
+dans `p12-historical-diagnostic-20261122.ECyyHg`.
+
+Un second Root isolé a exercé le même point de coupure avec un prévol de
+60 s et le même seuil de bail de 30 s. Le superviseur reprend l’Agent,
+la tentative, le tour 2, l’horodatage et la réservation d’origine de B.
+Une adoption 1 → 2 et un règlement estimé sont enregistrés. C garde son
+Agent et son PID. Les trois tours sont libérés. La durée de 60 s est une
+entrée du témoin. Le parcours avec prévol expiré continue de refuser.
+
+Un témoin distinct sur v0.1.1-dev.390 conduit le même état admis avant
+lancement avec le SDK lié au profil normal. Le premier témoin SDK a
+refusé avec `agent-execution-preflight-changed`. La capture aux deux
+frontières a isolé `TMPDIR` parmi les variables autorisées. L’appel SDK de
+la fixture reprend désormais la valeur résolue des paramètres du Root,
+comme le fait le CLI. Après cet alignement, l’adoption de B conserve un
+Agent, une tentative, un tour et une réservation. C reste dans le même
+processus. Le témoin emploie une observation de fichier compatible avec
+le confinement et conserve les anciens échecs du témoin à socket.
+L’archive est `p12-queued-restart-20261122.ldo3Yj`.
+
+Une correction moteur pour une adoption après expiration exigerait un
+nouveau reçu de prévol courant et attribué à cette adoption, avec contrôle
+du périmètre d’origine et refus sur dérive. Le témoin à 60 s établit une
+reprise dans sa fenêtre. La reprise au-delà de la fenêtre reste ouverte.
+
 ## Origines des preuves
 
 | Archive du 22 novembre | Pièce principale |

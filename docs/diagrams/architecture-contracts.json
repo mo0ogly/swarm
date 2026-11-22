@@ -3163,6 +3163,7 @@
       ]
     },
     "p12_post_commit_diagnosis": {
+      "source_report_commit": "61a98c9a291b84b3731b770ff8e07c572efa2042",
       "scope": "Read-only inspection of the original after-COMMIT fixture and host reserve preflight. The worker refusal is unresolved.",
       "prior_report_commit": "6b0cde22ae4eb2cb74faac94451169532e9d0553",
       "sources": {
@@ -3174,6 +3175,42 @@
         "retained-agent-readback.json": "5bee03127bcc808e0da0f0816de2fa00a810a85f50fd17de9947965a6e73d88a",
         "host-reserve.json": "101cf845365c3ac53583fbba4986431beb3d4470405282b889fb5e600f60910f"
       }
+    },
+    "p12_recovery_preflight_window": {
+      "scope": "Trace of the original failure on dev.389, scoped 60 s fixture witness on dev.389, and separate SDK environment correction on dev.390.",
+      "sources": {
+        "docs/architecture/SAME-ROOT-FIFO-RECOVERY.md": "d5685b01f0fc858a76b2b808fe5ab6fb2d61b5265ea20d135a166706bc6a5d3f",
+        "docs/en/SAME-ROOT-FIFO-RECOVERY.md": "e350aa18434572080592d5152e5eb8c1b09d58c97b89d9eb88785349d435961b"
+      },
+      "evidence": [
+        {
+          "archive": "p12-historical-diagnostic-20261122.ECyyHg",
+          "receipts": {
+            "observed-expiries.json": "02673d5267a995e2d6f1f4d07b8c5d6333d9e3946facfc6550bf015f9dd331ed",
+            "reproduction/reopened-server-worker-stderr.trace": "0c2e5b0a51ab15e2429828e546d7623c2e31231e1cd1cf82a1ebfc3b30ba504a",
+            "fixture-window/fixture-window.json": "03f3deb0b924f1a1c89fa43abc966cb7cebad802899dfb16d14f8f7bd7310244",
+            "fixture-window/07-b-original-turn-and-c-continuity.json": "170b481c71b43c5d46bb340230d55c627b4fe3eefdca9bee5495ea6f05cba9a9",
+            "fixture-window/08-persisted-settlement.json": "6ec27c4881fb941f8b73bec66542342573750195132b1ab3b5da74381eb8be1b"
+          }
+        },
+        {
+          "archive": "p12-queued-restart-20261122.ldo3Yj",
+          "receipts": {
+            "environment-witness/environment-diff.json": "2d3b081fa88e9f4b82917567775ecc7bdf46da8871f2808f87c9fde8ecd3695d",
+            "three-work-reproduction/04-refused-same-admission.json": "ebaa07802185334e736c831c25a9cdd5adac1823903979a3016b5ae19f943adb",
+            "persisted-fixture-three-work/04-adopted-same-admission.json": "f8852d5e6bded84ffbd0363d8f59ebe1190eccf04fc50b370f6a1d85585cd93d",
+            "persisted-fixture-three-work/05-persisted-settlement.json": "66288ef8f3090fc89de5ad69ba96367cd14007a210cd54fc4794ca0e20488350",
+            "restart-guards.stderr": "35019d96332244a6a1baef9b11e7976fa32ad49df4ea8fefa2f0ad513f4f223f"
+          }
+        },
+        {
+          "archive": "p12-sdk-matched-20261122.nRt0jt",
+          "receipts": {
+            "sdk/profile.json": "44b62e868f2beda457cc1f428e51f8a29e0efd501750cecc1862b67589a1f228"
+          }
+        }
+      ],
+      "guard": "The default expired-preflight path still refuses. The 60 s policy is scoped to one isolated fixture."
     }
   }
 }
