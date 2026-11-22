@@ -163,20 +163,34 @@ pub(super) fn admission(
     if parent_profile.is_some() && profile_hash(&effective_profile(work, task)?)? != profile {
         return Err(E::Refused("mission-agent-task-profile-changed"));
     }
+    check_capacity(db, &work.id, Some(agent), c.slots, settings)?;
+    super::mission_cost_guard::admit(db, &work.id, task, settings)?;
+    Ok(sequence)
+}
+
+/// Check saved dispatch capacity in the caller's snapshot. The factory excludes
+/// its own Agent intent; a read of future starts excludes none. Invalid settings,
+/// SQL failures and occupied slots retain their typed causes. No slot is reserved.
+pub(super) fn check_capacity(
+    db: &Connection,
+    work: &str,
+    excluded_agent: Option<&str>,
+    requested_slots: i64,
+    settings: &EngineSettingsDocument,
+) -> Result<(), E> {
     let slots = settings
         .values
         .mission_dispatch_policy()
         .map_err(E::Settings)?
-        .slots(Some(c.slots))
+        .slots(Some(requested_slots))
         .map_err(E::Settings)?
         .0;
-    let active=optional(db,"SELECT count(*) FROM agents WHERE work_id=? AND id!=? AND status IN ('queued','starting','running','stopping')",params![work.id,agent],|row|row.get::<_,i64>(0))?
+    let active=optional(db,"SELECT count(*) FROM agents WHERE work_id=? AND (?2 IS NULL OR id!=?2) AND status IN ('queued','starting','running','stopping')",params![work, excluded_agent],|row|row.get::<_,i64>(0))?
         .ok_or(E::Refused("mission-agent-capacity-observation-missing"))?;
     if active >= slots {
         return Err(E::Refused("mission-agent-slots-occupied"));
     }
-    super::mission_cost_guard::admit(db, &work.id, task, settings)?;
-    Ok(sequence)
+    Ok(())
 }
 
 /// Borrow an actual owning lease and saved profile; callers cannot deserialize

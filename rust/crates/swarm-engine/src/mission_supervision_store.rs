@@ -679,7 +679,7 @@ impl RootStore {
 
 #[path = "mission_workspace_fifo.rs"]
 mod workspace_fifo;
-pub use workspace_fifo::{MissionQueueRegistration, MissionCandidateRefusal};
+pub use workspace_fifo::{MissionQueueRegistration, MissionCandidateRefusal, MissionLaunchDiagnostics, MissionLaunchRefusal};
 pub(super) use workspace_fifo::schema as workspace_fifo_schema;
 
 #[path = "mission_worker_continuation.rs"]

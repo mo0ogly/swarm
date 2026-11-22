@@ -71,3 +71,27 @@ The exercised native binary has SHA-256 `f0e92ce3749855bee14f2b6ea68037c0e5532ac
 | Driver and recipe qualification on the PR base | `4998f37a68257d6b4f576a4cc4364e1efad28160a19cee251a3a039452db6c1d` |
 
 [Tokio channels](https://tokio.rs/tokio/tutorial/channels) · [Graceful shutdown](https://tokio.rs/tokio/topics/shutdown)
+
+## Automatic startup diagnostics in Dispatch
+
+In current mode, **Dispatch** shows the reasons the Rust engine observes for
+blocked automatic worker starts. The protected
+`GET /api/v1/mission?work=…&action=launch-diagnostics` read returns the mission
+revision, affected tasks and engine codes. Missing consent appears at mission
+level. A prerequisite, unavailable provider, occupied slot or workspace conflict
+appears against the affected task.
+
+The engine reuses the driver's readiness rules and projects FIFO order without
+registering a turn. Host checks use metadata and access information. Actual
+admission still verifies the workspace write and executable bytes. The read
+creates no resource reservation or attempt, and invokes no provider. Actual
+admission applies its checks at the current revision. The response excludes paths
+and other missions’ data. In history mode, the recorded pause remains visible
+without evaluating these checks. The current cockpit also reports when mission
+status observes no active driver. Use **Refresh** after resolving the cause.
+
+The [cockpit-launch-diagnostics recipe](../../tools/verification/recipes/cockpit-launch-diagnostics.json)
+uses a qualified native binary (`SWARM_LAUNCH_DIAGNOSTICS_BINARY`) and an inert agent
+in an isolated Root. It checks the API and the served UI in Chromium with the
+native HTTP service running without a conductor (Cargo example
+`cockpit_launch_http_fixture`, supplied as `SWARM_LAUNCH_DIAGNOSTICS_HTTP_FIXTURE`).

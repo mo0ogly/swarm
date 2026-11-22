@@ -11,6 +11,35 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Lot cockpit : diagnostic de démarrage automatique
+
+Demande de Fabrice du 22 novembre. Base `f2a0fcc87`. La projection historique
+du statut affiche des motifs de tâche sans porter le résultat du préflight du
+conducteur. Conduite lit une projection séparée de la mission courante. Le
+moteur conserve la source du diagnostic et le cockpit présente ses codes avec
+un libellé localisé. Le coordinateur vérifie et intègre ce lot borné.
+
+| Critère | Preuve de clôture |
+| --- | --- |
+| DÉP-01 | L’API protégée rapporte les refus typés du conducteur à la bonne révision, sans agent, file ou budget modifiés par la lecture. |
+| DÉP-02 | Le cockpit servi indique précisément le refus d’un fournisseur inerte, sa disparition après restauration, ainsi que la dépendance et la pause pertinentes. Rendu FR/EN. |
+| DÉP-03 | Revue indépendante du candidat, contrôles du dépôt, fusion sur main puis identité du binaire local vérifiée. |
+
+Contrats revus dans ce lot : les créneaux et budgets restent issus des réglages
+enregistrés. La comparaison des créneaux est partagée avec l’admission. Les états
+actifs, codes et formes JSON relèvent du contrat moteur. Aucun seuil, retry ou
+délai opérateur ajouté. Les erreurs de lecture restent visibles et les refus
+typés sont projetés en codes, sans texte privé. Le statut, l’historique et leurs
+erreurs restent indépendants de cette vue. La revue du premier candidat a
+identifié l’écriture de préflight, l’ordre FIFO avant inscription et les titres
+potentiellement périmés. La correction sépare l’observation hôte de la preuve
+d’écriture, compare le FIFO projeté à une synchronisation réelle et utilise les
+identifiants lorsque la révision des titres diffère.
+
+[Contrat FR](../../architecture/TOKIO-ORCHESTRATION.md#diagnostic-de-démarrage-automatique-dans-conduite)
+· [Contrat EN](../../en/TOKIO-ORCHESTRATION.md#automatic-startup-diagnostics-in-dispatch)
+· [Recette](../../../tools/verification/recipes/cockpit-launch-diagnostics.json)
+
 ## Déclenchement des agents et appels de planification — 22 novembre
 
 Périmètre validé par Fabrice, base `f9d9d7fee`. Le workflow configuré

@@ -111,7 +111,7 @@ pub use root_store::{
     TaskFreshnessEvidence, MissionResultObservation, MissionStatusObservation,
     MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact,
     MissionWorkspaceQueue, MissionWorkspaceTurn, MissionWorkspaceBlocker,
-    MissionQueueRegistration, MissionCandidateRefusal,
+    MissionQueueRegistration, MissionCandidateRefusal, MissionLaunchDiagnostics, MissionLaunchRefusal,
     MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome, MissionWorkerRecovery,
     MissionWorkerDispatchRequest, MissionWorkerDispatchOutcome, MissionWorkerDispatchFailure,
     MissionDispatchCause, MissionDispatchQueueEffect, MissionDispatchPreparationEffect,

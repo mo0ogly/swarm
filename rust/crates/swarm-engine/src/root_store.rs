@@ -909,7 +909,7 @@ pub use mission_status_evidence::TaskFreshnessEvidence;
 pub use mission_status_read::{MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact};
 #[cfg(target_os = "linux")]
 pub use mission_supervision_store::MissionWorkerRecovery;
-pub use mission_supervision_store::{MissionQueueRegistration, MissionCandidateRefusal, MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome};
+pub use mission_supervision_store::{MissionQueueRegistration, MissionCandidateRefusal, MissionLaunchDiagnostics, MissionLaunchRefusal, MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome};
 #[cfg(target_os = "linux")]
 pub use mission_supervision_store::{
     MissionWorkerContinuationObservation, MissionWorkerContinuationEntry,
