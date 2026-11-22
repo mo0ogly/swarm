@@ -54,10 +54,10 @@ before it proposes a new attempt.
 | --- | --- | --- |
 | Order | Engine, current Work revision and recorded priorities | The comparator sorts by descending priority, ascending longest-path depth and lexical ID. The graph and revision must match the projection. |
 | Evaluate | Mission driver, worker selection | The engine filters supported states and profiles, then checks consent, prerequisites, recovery, cost, model and workspace. A task refusal can leave other candidates eligible for examination. |
-| Register | Engine under the mission lease | Ready candidates synchronize their FIFO turns. Resource restrictions follow. A task can wait in the queue before receiving a slot. |
-| Admit | Native factory and engine, admission transaction | The engine checks revision, lease, controls, profile, slots and reservations. A workspace conflict can allow a disjoint candidate through. Full capacity ends the pass. |
-| Start | Technical Agent supervisor | The driver sequences admission and the previous attempt’s startup check. Authorized processes can then execute simultaneously in disjoint workspaces. |
-| Deliver | Worker, checks, independent review and responsible owner | Results and evidence bind to the same candidate. Checks and review inform the decision. The successor becomes eligible once its own preconditions are satisfied. |
+| Register | Engine under the mission lease | Synchronization registers ready candidates in the FIFO queue. A task can wait before receiving a slot. [Synchronization](../../rust/crates/swarm-engine/src/mission_workspace_fifo.rs#L259-L330) |
+| Admit | Native factory and engine, admission transaction | The engine rechecks revision, lease, controls, profile, slots and budget. The transaction binds the acquired turn, queued Agent, Work event and any applicable reservation. A recognized workspace conflict can leave a disjoint candidate eligible. Full capacity ends the Work’s pass. [Binding and writes](../../rust/crates/swarm-engine/src/agent_launch.rs#L1048-L1083) |
+| Start | Technical Agent supervisor | The driver starts the admitted Agent and waits for its startup gate to clear before another admission. Authorized processes can run simultaneously in disjoint workspaces. |
+| Validate the result | Worker, checks, independent review and responsible owner | Handoff identifies the candidate. Checks can leave review or a human decision pending. The successor becomes eligible once its own preconditions are satisfied. [Validation states](../../rust/crates/swarm-engine/src/root_store/task_validation/publication.rs#L181-L225) |
 
 Slots count recorded active states per Work. Saved slots remain subject to
 installation policy. When a reservation is required, the engine checks the
@@ -94,7 +94,9 @@ paths can advance independently.
 
 A valid waiting turn keeps its place. A candidate whose workspace changes
 rejoins at the tail. Earlier waiting or acquired turns block overlapping spaces.
-Released turns cease to block. Admission also rechecks active Agent and
+Releasing an acquired turn requires its recorded owner and established
+termination or cancellation. Loss of the driver lease alone leaves the
+acquired turn in place. Admission also rechecks active Agent and
 integration occupancy. On release and reevaluation, a mission can take the
 resource when the remaining checks pass. Ordering applies to workspaces and
 recorded turns. General mission fairness, a cross-Root scheduler and guaranteed
@@ -102,12 +104,11 @@ throughput remain outside qualification.
 
 **Observed scope.** Rust tests with SQLite compare the diagnostic projection and
 actual synchronization for new, moved and removed turns. They also verify
-acquisition and disjoint workspaces. The [historical native FIFO 197](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197)
+acquisition and disjoint workspaces. The [historical native FIFO 197](https://github.com/mo0ogly/swarm/blob/9e420d293eb78eeac7f6bbdd61f55e7dd2efe772/docs/plans/migration-rust/REPLAYS.md#L1145)
 already exercised two Work objects with owned leases and concurrent
 connections. P1.2 Web qualification with three missions confirmed B waiting,
-C starting in a disjoint workspace and B resuming on its original turn. It
-distinguishes cooperative stop, crash between transactions and crash before
-COMMIT. [P1.2 qualification](SAME-ROOT-FIFO-RECOVERY.md)
+C starting in a disjoint workspace and B resuming on its original turn. The qualification record describes the exercised windows and the limit
+on recovery after preflight expiry. [P1.2 qualification](SAME-ROOT-FIFO-RECOVERY.md)
 
 [Web discovery](../../rust/crates/swarm-cli/src/native_web/conductor.rs) ·
 [Shared queue](../../rust/crates/swarm-engine/src/workspace_turn.rs) ·
@@ -119,8 +120,8 @@ COMMIT. [P1.2 qualification](SAME-ROOT-FIFO-RECOVERY.md)
 A sub-orchestrator serves its scope and retains details of an authority refusal
 concerning another scope. On the covered native path, the engine records the
 refusal and a notice to the root orchestrator. The notice contains the scope and
-the safe refusal code. The root owns the cross-scope decision. The child scope’s planning waits for acknowledgment and then repeats revision, authority, consent and
-budget checks.
+the safe refusal code. The root owns the cross-scope decision. Planning in the child scope waits for the root’s recorded decision on the
+notice, then repeats revision, authority, consent and budget checks.
 
 [![Child scope refusal and recovery in Swarm](../diagrams/scope-refusal-recovery-en.svg)](../diagrams/scope-refusal-recovery-en.svg)
 
@@ -352,12 +353,22 @@ remain questions of contract, source and qualification. [Pinned reference](https
 | Deployment, performance and capacity | Distinguish local topology, recipes, installed binary, Work concurrency and Root resources. | [Capacity and qualification](#7-deployment-capacity-and-qualification). Cross-Root fairness and throughput remain open. |
 | MCP and IDE interfaces | Keep interoperability as a target that needs an authority and observation contract. | [Shared API target](../PRODUCT-ARCHITECTURE.md). The reference MCP bridge belongs to that repository. |
 
+The upstream code runs workflow steps in sequence and routes one Agentic
+Team role per turn. The dashboard and MCP have their own entry points and
+consume context stores or engines under their respective contracts. These
+paths ground Swarm’s separate views of interfaces, coordination and execution
+dependencies.
+[Workflow loop](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/orchestrator/core/engine.py#L440-L516) ·
+[Role turn loop](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/agentic_team/engine.py#L311-L373) ·
+[Dashboard](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/context_dashboard/app.py#L44-L76) ·
+[Engines called by MCP](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/mcp_server/engines.py#L22-L62)
+
 ### Evidence traceability
 
 | Observation | Input and evidence | Scope |
 | --- | --- | --- |
 | Two workers and one dependency | [Inert recipe source](../../tests/rust_mission_watch_parallel.py) · [ORCH-04 evidence, FR](../plans/migration-rust/PLAN.md#preuves-du-candidat-local) | Two active admissions and disjoint workspaces. Test results establish neither sustained throughput nor task acceptance. |
-| FIFO across two Work objects | [Historical native FIFO 197, FR](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197) covers owned leases, concurrent connections, refusal, release and recovery on the workspace. | Historical CLI and SDK profile, supplemented by current selector SQL tests. The Web P1.2 qualification is documented separately. [Three missions](SAME-ROOT-FIFO-RECOVERY.md) |
+| FIFO across two Work objects | [Historical native FIFO 197, FR](https://github.com/mo0ogly/swarm/blob/9e420d293eb78eeac7f6bbdd61f55e7dd2efe772/docs/plans/migration-rust/REPLAYS.md#L1145) covers owned leases, concurrent connections, refusal, release and recovery on the workspace. | Historical CLI and SDK profile, supplemented by current selector SQL tests. The Web P1.2 qualification is documented separately. [Three missions](SAME-ROOT-FIFO-RECOVERY.md) |
 | Child refusal and recovery | [Plan and retained originals, FR](../plans/migration-rust/PLAN.md#remontée-des-refus-dautorité-et-reprise) · [Recipe](../../tools/verification/recipes/mission-watch-orchestration.json) · [Scenario](../../tests/rust_orchestration_scopes.py) | Original scenario result SHA-256 `b0f243ccffaf45054a3ec673046115aa62b45618bd8f7b8f3b3999f4da48948c` covers refusal, root notice, decision and resumption for one inert case. |
 | Diagnostics and installation | [Contract and recipe](TOKIO-ORCHESTRATION.md#automatic-startup-diagnostics-in-dispatch) · [Diagnostics merge](https://github.com/mo0ogly/swarm/pull/46) | The fixture setup executable has SHA-256 `7ff1854fa341e8e52763e6f3156c66de5c8c1ac2294a544b8410b6e233b9e791`. The recipe HTTP server without a driver has SHA-256 `f924be23a3982a31e3aa1690f401ccb5b7388a9b529ce087962b40921e76d36b`. The installed image differs. Local `v0.1.1-dev.389` has SHA-256 `2fa03ed1ffe14d9243f681027085d0e6f61cbc018fd3c4102e85128f00a9567c`. Its active image was verified through the process and version API. On an isolated Root, this binary served the pause reason and its French and English rendering. The provider fault and recovery belong to the recipe without a driver. [Receipt index](../diagrams/README.md#reçus-de-qualification--qualification-receipts) |
 
