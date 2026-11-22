@@ -71,6 +71,37 @@ host bytes for a configured reserve of 21,474,836,480. The Toshiba target was
 admitted and the host reserve is preserved. Records are in
 `p12-sdk-build-20261122.mnSQZQ`.
 
+## After-COMMIT diagnosis and successful witness
+
+On the same v0.1.1-dev.389 image, replaying the crash with child supervisor
+stderr captured produced `agent-execution-preflight-expired`. B's preflight
+was valid for 30 s, also the mission lease staleness threshold. In the
+original receipts, generation 2 was acquired 1.056 s after preflight expiry.
+In the diagnostic replay, it was acquired 1.621 s after expiry. The
+timestamps and trace are in `p12-historical-diagnostic-20261122.ECyyHg`.
+
+A separate isolated Root exercised the same cut with a 60 s preflight and
+the same 30 s lease threshold. B resumes its original Agent, attempt, turn
+2, timestamp and reservation. The journal records one adoption from 1 to 2
+and one estimated settlement. C keeps its Agent and PID. All three turns are
+released. The 60 s duration is a fixture input. The expired-preflight path
+continues to refuse.
+
+A separate v0.1.1-dev.390 witness uses the matching SDK to produce the
+committed unstarted Agent. The first SDK case refused with
+`agent-execution-preflight-changed`. Captures at both process boundaries
+isolated `TMPDIR` among the allowlisted variables. The fixture SDK call now
+uses the effective Root setting as the CLI does. With that setting aligned,
+B's adoption preserves its Agent, attempt, turn and reservation. C keeps
+the same process. The witness uses a confinement-compatible file observation
+and retains the historical socket fixture failures.
+The archive is `p12-queued-restart-20261122.ldo3Yj`.
+
+An engine correction for adoption after expiry would require a fresh
+preflight receipt bound to that adoption, with the original input scope
+checked and drift refused. The 60 s witness establishes recovery inside
+its window. Recovery beyond the window remains open.
+
 ## Evidence originals
 
 | Archive from 22 November | Main record |
