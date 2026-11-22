@@ -3072,6 +3072,58 @@
           "installed-cockpit/result.json": "4c3989619f1664e3317f8331a91d3497d4dcc4f11e0e1578041760ff0c234dc6"
         }
       }
-    ]
+    ],
+    "p12_same_root_recovery": {
+      "source_base": "53b1fa53d2d34b84962d84c0dd2242b8cd3a7816",
+      "observed_image": {
+        "version": "v0.1.1-dev.389",
+        "commit": "50f1daee655fd735c913116cd6b61314ff871bdf",
+        "modified": true,
+        "sha256": "2fa03ed1ffe14d9243f681027085d0e6f61cbc018fd3c4102e85128f00a9567c"
+      },
+      "scope": "Three inert missions in one Root, including interruption before admission COMMIT.",
+      "current_architecture": {
+        "docs/architecture/OVERVIEW.md": "037d52faad25bd88dc3f8d09a2d75cc3af2b357ed3c3cf631f288157a20aed00",
+        "docs/en/ARCHITECTURE.md": "c4048b6682f3019dbe442291c45456b4864ebc8ac664f49e522cd03ad4c842d6"
+      },
+      "sources": {
+        "docs/architecture/SAME-ROOT-FIFO-RECOVERY.md": "31c52042ef12ba9985bd9a764d0299259a1f19dcce91e4f532e6b9334fc7638e",
+        "docs/en/SAME-ROOT-FIFO-RECOVERY.md": "dc64303d94d229d6e2bb785c35f2439fadc7ef2f844bd3fd4e5b7c3b6cc1ac22"
+      },
+      "original_evidence": [
+        {
+          "kind": "cooperative-stop",
+          "archive": "same-root-fifo-20261122.schtsm",
+          "receipts": {
+            "04-sigint-worker-survival.json": "4eaadace078d3b3acb1f2fd82a2749d4b05c0c0be8312aec8e3be5edcf8e8523",
+            "06-persisted-settlement.json": "845f51e68e0a62c5c63e48d1acff4e23a3f359570dd1c127da55b043dd8e0d32"
+          }
+        },
+        {
+          "kind": "between-transactions",
+          "archive": "same-root-fifo-sigkill-20261122.gE9V3k",
+          "receipts": {
+            "04-sigkill-worker-survival.json": "f0fb63c04a2778f1f40511f8c5e79cf1c92a55ace837d4ef684e36eb26e7ef8b",
+            "04-new-b-lease.json": "453b9dbc677972ba08f213adf95f1b10791c40d8fe48db9b59c64b0985b5e25c",
+            "readback.json": "c22a0717c0d2daa5e00c9337e54ef4f94f9f6809cea3b43b3ef69face1f9b3db",
+            "06-persisted-settlement.json": "69cab4f75ce3e3eca0bc5d694c4e25457372f0741080ae091d5a1e74c4cfd3d4"
+          }
+        },
+        {
+          "kind": "before-admission-commit",
+          "archive": "fifo-admission-crash-20261122.1H4Abh",
+          "receipts": {
+            "control/08-persisted-settlement.json": "23db904935c95b6e06837e31d351748f2f40f0d38417f306e2b0f6418024a519",
+            "crash/05-transaction-interruption.json": "26e0702a0ab731d24b0e60fa78609e41e707643acaf11c0b05b460ff17fc5224",
+            "crash/06-crash-durable-readback.json": "7d1aba8486f39acd9f55e29157c92f357bf40e5a569957d463853f995f2150db",
+            "crash/07-b-original-turn-and-c-continuity.json": "a3c3b09cbe683cc3899d8122a0fdb4dbfa4e9a6099f3100fb7998c2fb3b1ff05",
+            "crash/08-persisted-settlement.json": "f3c13712f9713823219cf532e4c3b97c700be02473dfd618fdb049cff650008c",
+            "crash/debugger.log": "a1d5ababc65dea61e1660d3238442121f2a28e28b158ef43682e9d11bd5ea45c",
+            "README.md": "ec4b1c3e87f6fe457ad5599c8fad04a0653884925c785db876c70214168b0a12",
+            "SHA256SUMS": "dea5abc32517015d75d33a42762ee757c5ee18363be2015f24acd0ee7d91791f"
+          }
+        }
+      ]
+    }
   }
 }
