@@ -1,0 +1,24 @@
+flowchart TB
+    accTitle: Concurrency across missions in one Swarm Root
+    accDescr: Works keep their own slots and budgets. A single Root orders turns by workspace.
+    F_A["Mission A, lease and budget A"]
+    F_B["Mission B, lease and budget B"]
+    F_C["Mission C, disjoint workspace"]
+    F_QUEUE["Workspace queue in the same Root"]
+    F_HELD["Earlier waiting or acquired turn"]
+    F_WAIT["B waits behind an overlapping turn"]
+    F_GO["C can advance under its own checks"]
+    F_RELEASE["Turn released, B reevaluated"]
+    F_A -->|"shared workspace"| F_QUEUE
+    F_B -->|"overlapping workspace"| F_QUEUE
+    F_C --> F_QUEUE
+    F_QUEUE --> F_HELD
+    F_HELD -->|"FIFO order and overlap"| F_WAIT
+    F_QUEUE -->|"no earlier overlapping turn"| F_GO
+    F_WAIT -->|"after release"| F_RELEASE
+    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
+    classDef data fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
+    class F_QUEUE,F_RELEASE core;
+    class F_HELD,F_WAIT data;
+    class F_A,F_B,F_C,F_GO ordinary;
