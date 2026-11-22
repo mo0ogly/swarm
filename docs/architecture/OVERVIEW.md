@@ -338,8 +338,10 @@ l’exécution technique et les preuves du résultat suivent leurs propres contr
 La résolution d’un fournisseur expose la route déclarée et les avis sûrs. Le
 catalogue local constitue une source de configuration. Une résolution ne
 qualifie ni la disponibilité du compte ni la route effectivement exécutée.
-Les connexions API sélectionnées restent explicitement non portées dans
-le contrat cité. Les erreurs de fournisseur et les attentes suivent les
+Le parcours natif de lancement de mission refuse les connexions API
+sélectionnées. La préparation textuelle dispose d’un parcours HTTP JSON ou SSE.
+La sonde manuelle de connexion utilise un parcours HTTP JSON distinct.
+Les erreurs de fournisseur et les attentes suivent les
 [politiques sauvegardées](NATIVE-PROVIDER-POLICIES.md) et le
 [contrat d’attente](NATIVE-PROVIDER-WAIT.md).
 
