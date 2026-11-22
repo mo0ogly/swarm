@@ -36,10 +36,41 @@ trois tours libérés et aucun bloqueur. Pour B, le journal contient exactement
 `enqueued → acquired → released` sur le tour 2, avec le même identifiant d’Agent
 pour l’acquisition et la libération, et une seule réservation estimée.
 
-Le témoin concerne la fenêtre **avant COMMIT** sur cette image. Un crash
-pendant COMMIT ou après validation, la disparition d’un worker, l’équité en
-charge et l’ordonnancement inter-Root restent à qualifier. Les états finaux
-décrivent les tentatives et la file de la fixture.
+Ce scénario qualifie la fenêtre **avant COMMIT** sur cette image. Les
+états finaux décrivent les tentatives et la file de la fixture.
+
+## Pendant COMMIT et avant le démarrage après COMMIT
+
+Sur la même image, un témoin sans coupure a terminé. Dans le cas interrompu
+pendant COMMIT, l’écriture d’une page avait réussi et le journal SQLite
+existait. La première sonde en lecture seule a refusé ce journal chaud. Au
+redémarrage normal, B est revenu en attente au tour 2 avec l’horodatage
+d’origine, sans Agent ni réservation persistés. Avec un bail de génération 2,
+B a acquis puis libéré le même tour, avec une seule réservation estimée.
+C a gardé son Agent et son PID. Les trois tours ont été libérés.
+
+Après le retour réussi de COMMIT et avant le lancement, la relecture a
+retrouvé B en file d’exécution avec son tour acquis, son Agent et sa
+réservation. Le témoin sans coupure a terminé. Après la coupure, le worker
+de B est sorti avec le code 2 au redémarrage et le conducteur s’est arrêté
+en conservant l’intention active. La reprise de bout en bout reste ouverte.
+La perte d’un worker, l’équité en charge et l’inter-Root restent à qualifier.
+
+La relecture seule a retrouvé l’Agent en file après l’adoption de génération
+1 vers 2. Le Work est à la révision 9, la demande figée attendait 8 et la
+demande d’adoption attendait 9. Le reçu du conducteur conserve le code de
+sortie 2. Le stderr du superviseur enfant va vers `/dev/null`, et la cause
+interne reste ouverte.
+
+La reproduction par `mission_watch_restart_seed` attend un SDK et un binaire
+normal construits sur les mêmes sources. La préparation a trouvé 11 080 065 024
+octets disponibles sur l’hôte pour une réserve configurée de 21 474 836 480.
+La cible Toshiba a été admise et la réserve hôte est conservée. Les relevés
+se trouvent dans `p12-sdk-build-20261122.mnSQZQ`.
+
+Le catalogue associe ces résultats aux reçus de
+`fifo-commit-crash-20261122.VHnoWq` et conserve le premier échec de
+`fifo-commit-crash-20261122.AWWUvx`.
 
 ## Origines des preuves
 
@@ -47,7 +78,7 @@ décrivent les tentatives et la file de la fixture.
 | --- | --- |
 | `same-root-fifo-20261122.schtsm` | `06-persisted-settlement.json` et `04-sigint-worker-survival.json` |
 | `same-root-fifo-sigkill-20261122.gE9V3k` | `06-persisted-settlement.json` et `readback.json` |
-| `fifo-admission-crash-20261122.1H4Abh` | `control/08-persisted-settlement.json`, `crash/05-transaction-interruption.json`, `crash/06-crash-durable-readback.json`, `crash/07-b-original-turn-and-c-continuity.json` `crash/08-persisted-settlement.json` et `crash/debugger.log` |
+| `fifo-admission-crash-20261122.1H4Abh` | `control/08-persisted-settlement.json`, `crash/05-transaction-interruption.json`, `crash/06-crash-durable-readback.json`, `crash/07-b-original-turn-and-c-continuity.json`, `crash/08-persisted-settlement.json` et `crash/debugger.log` |
 
 [Empreintes et portée](../diagrams/architecture-contracts.json) ·
 [Écriture de la file](../../rust/crates/swarm-engine/src/workspace_turn_write.rs) ·

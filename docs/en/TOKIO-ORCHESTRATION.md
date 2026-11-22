@@ -59,6 +59,36 @@ On dev.380, inert-provider fixtures verified nominal completion, cancellation wi
 
 The [preparation-web-stop-order recipe](../../tools/verification/recipes/preparation-web-stop-order.json) selects these two orders. Prepare a qualified native executable, an isolated checkout or source copy with a valid fixture area, and an admitted private output directory. The driver uses Linux, Python 3 and iproute2’s `ss`. Set `SWARM_PREPARATION_UI_BINARY`, `SWARM_PREPARATION_STOP_ORDER_SHA256`, `SWARM_PREPARATION_STOP_ORDER_PARENT` and `SWARM_PREPARATION_STOP_ORDER_RESERVE_BYTES` before using the [recipe runner](../../tools/verification/README.md). Retain the build identity, recipe receipt and HTTP and CLI evidence directory.
 
+## P1.1 qualification on 22 November 2026
+
+Normal binary `v0.1.1-dev.390`, SHA-256
+`99433f0f8274cf2bd45b4db43cbb7b11f1bd7b1acad4a51d318a0b5d3a042ec2`,
+declared commit `71e84be8b49dad2e6868aec9cdfb5293ece36c58`, `modified:true`.
+The rows below concern this image and local inert programs. The declared
+commit identifies the Swarm image. ORCH-06 identifies the worker-produced
+candidate commit separately.
+
+| Criterion | Result and scope |
+| --- | --- |
+| ORCH-01 | PASS. Two startup grants in separate workspaces while the competing root planning input remains pending. |
+| ORCH-02 | PASS in the fixture. The conductor plans without an eligible worker. With unchanged state, the planning command returns `idle` without a new launch or execution of the configured control. The positive control witness produces the expected marker. |
+| ORCH-03 | PASS in the fixture. Pause, authorized resume and consent withdrawal were observed. A resume request after withdrawal returned `mission-consent-required` and the Work readback was identical. |
+| ORCH-04 | Partial. With two slots the processes are active together. With one slot the second is refused with `mission-agent-slots-occupied` until the first completes. The dependent task starts in neither case. This witness combines dependency and review gates. A two-slot variant isolates overlapping workspaces and returns a FIFO blocker until the first worker exits. |
+| ORCH-05 | PASS in the fixture. Two scopes make decisions. The second scope’s authority refusal reaches the root, then the child resumes under its original mandate. |
+| ORCH-06 | Partial. Three controls and a separate inert review cover candidate `955bc170be7bcd6b141d49e0071448de57c1ed5a`. Changed source blocks prepublication. Restoration returns the same observation. Exact replay leaves reviewer invocations and reservations unchanged. Fresh validation of a changed candidate remains to be observed. |
+
+Receipts are under `/run/media/fpizzi/SWARM/swarm-evidence/` in
+`p11-multitask-20261122.9xRb0b/orchestration-external`,
+`p11-slot-comparison-20261122.6avhlZ` and
+`p11-orch06-20261122.iiLg7L`. In the last archive,
+`publication-i0/valid-current-original.stdout` binds the commit, validation
+receipt, review ID and context digest. The prepublication fixture uses the
+shared reader for the marker in the review claim’s I0 leaf.
+The first failure on the historical Root-level marker remains in
+`publication/failure.json`. The focused witnesses are
+`p11-idle-controls-20261122.kUx4T0/run/result.json` and
+`p11-overlap-20261122.FPARps/run/capacity-refusal.json`.
+
 ## Evidence references for dev 380
 
 The exercised native binary has SHA-256 `f0e92ce3749855bee14f2b6ea68037c0e5532ac58308e36988f76ad6b46678a1`. In the saturation fixture, the harness counts provider launches. Public reads establish the dialogue, budget and adopted brief state. The SHA-256 values below identify the manifests retained in the local research register.
