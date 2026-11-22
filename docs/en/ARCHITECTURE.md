@@ -104,8 +104,10 @@ throughput remain outside qualification.
 actual synchronization for new, moved and removed turns. They also verify
 acquisition and disjoint workspaces. The [historical native FIFO 197](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197)
 already exercised two Work objects with owned leases and concurrent
-connections. A complete server recipe for simultaneous
-missions in one Root still needs to exercise waiting, acquisition and recovery.
+connections. P1.2 Web qualification with three missions confirmed B waiting,
+C starting in a disjoint workspace and B resuming on its original turn. It
+distinguishes cooperative stop, crash between transactions and crash before
+COMMIT. [P1.2 qualification](SAME-ROOT-FIFO-RECOVERY.md)
 
 [Web discovery](../../rust/crates/swarm-cli/src/native_web/conductor.rs) ·
 [Shared queue](../../rust/crates/swarm-engine/src/workspace_turn.rs) ·
@@ -384,7 +386,7 @@ remain questions of contract, source and qualification. [Pinned reference](https
 | Observation | Input and evidence | Scope |
 | --- | --- | --- |
 | Two workers and one dependency | [Inert recipe source](../../tests/rust_mission_watch_parallel.py) · [ORCH-04 evidence, FR](../plans/migration-rust/PLAN.md#preuves-du-candidat-local) | Two active admissions and disjoint workspaces. Test results establish neither sustained throughput nor task acceptance. |
-| FIFO across two Work objects | [Historical native FIFO 197, FR](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197) covers owned leases, concurrent connections, refusal, release and recovery on the workspace. | Historical CLI and SDK profile, supplemented by current selector SQL tests. Concurrent Web discovery remains a separate qualification. |
+| FIFO across two Work objects | [Historical native FIFO 197, FR](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197) covers owned leases, concurrent connections, refusal, release and recovery on the workspace. | Historical CLI and SDK profile, supplemented by current selector SQL tests. The Web P1.2 qualification is documented separately. [Three missions](SAME-ROOT-FIFO-RECOVERY.md) |
 | Child refusal and recovery | [Plan and retained originals, FR](../plans/migration-rust/PLAN.md#remontée-des-refus-dautorité-et-reprise) · [Recipe](../../tools/verification/recipes/mission-watch-orchestration.json) · [Scenario](../../tests/rust_orchestration_scopes.py) | Original scenario result SHA-256 `b0f243ccffaf45054a3ec673046115aa62b45618bd8f7b8f3b3999f4da48948c` covers refusal, root notice, decision and resumption for one inert case. |
 | Diagnostics and installation | [Contract and recipe](TOKIO-ORCHESTRATION.md#automatic-startup-diagnostics-in-dispatch) · [Diagnostics merge](https://github.com/mo0ogly/swarm/pull/46) | The fixture setup executable has SHA-256 `7ff1854fa341e8e52763e6f3156c66de5c8c1ac2294a544b8410b6e233b9e791`. The recipe HTTP server without a driver has SHA-256 `f924be23a3982a31e3aa1690f401ccb5b7388a9b529ce087962b40921e76d36b`. The installed image differs. Local `v0.1.1-dev.389` has SHA-256 `2fa03ed1ffe14d9243f681027085d0e6f61cbc018fd3c4102e85128f00a9567c`. Its active image was verified through the process and version API. On an isolated Root, this binary served the pause reason and its French and English rendering. The provider fault and recovery belong to the recipe without a driver. [Receipt index](../diagrams/README.md#reçus-de-qualification--qualification-receipts) |
 
@@ -437,8 +439,8 @@ an executable.
 | Contract | Observed status and limits |
 | --- | --- |
 | Engine | `WorkEngine` and `RootStore` exist in `swarm-engine`; qualification is per journey, not a global cutover |
-| Supervision | CLI fixtures cover worker priority, two overlapping executions and child → root escalation → recovery. General role coverage and a complete concurrent Web journey remain open. |
-| Queue across Work objects | The historical native 197 journey and SQLite tests cover overlap, FIFO and recovery. These checks establish no cross-Root scheduler. |
+| Supervision | CLI fixtures cover worker priority, two overlapping executions and child → root escalation → recovery. The P1.2 Web journey covers three isolated missions in one Root. General role coverage remains open. |
+| Queue across Work objects | The historical native 197 journey, SQLite tests and Web P1.2 cover overlap, FIFO and recovery in one Root. A pre-COMMIT crash retained B’s turn. Cross-Root scheduling remains open. |
 | Cockpit read | The isolated HTTP recipe covers inert-provider failure and recovery in French and English. A separate check on the installed image covers the paused-mission diagnostic in both languages in an isolated Root. |
 | Result validation | Native controller preserves `human` mode and the pending human decision; local wiring139 evidence; global journey and protected authentication remain separate |
 | Identity | Enrollment/configuration kernels and protocols exist; human source, installed service and final public use remain to qualify |

@@ -108,9 +108,11 @@ et un débit garanti restent hors qualification.
 **Portée observée.** Les tests Rust sur SQLite comparent la projection de
 diagnostic et une vraie synchronisation pour des tours nouveaux, déplacés ou
 retirés. Ils vérifient aussi l’acquisition et les espaces disjoints. Le [cycle FIFO natif 197](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197)
-a déjà exercé deux Work avec baux et connexions concurrentes. Une recette
-du serveur complète reste à exécuter pour plusieurs missions simultanées d’un
-Root avec observations de l’attente, de l’acquisition et de la reprise.
+a exercé deux Work avec baux et connexions concurrentes. La qualification Web
+P1.2 de trois missions a confirmé l’attente de B, le départ de C dans son
+espace disjoint et la reprise de B sur son tour d’origine. Elle distingue
+arrêt coopératif, crash entre transactions et crash pré-COMMIT.
+[Fiche de qualification P1.2](SAME-ROOT-FIFO-RECOVERY.md)
 
 [Découverte web](../../rust/crates/swarm-cli/src/native_web/conductor.rs) ·
 [File partagée](../../rust/crates/swarm-engine/src/workspace_turn.rs) ·
@@ -397,7 +399,7 @@ de source et de qualification. [Référence figée](https://github.com/syntax-sy
 | Observation | Entrée et preuve | Portée |
 | --- | --- | --- |
 | Deux workers, une dépendance | [Code de la recette inerte](../../tests/rust_mission_watch_parallel.py) · [Bilan ORCH-04](../plans/migration-rust/PLAN.md#preuves-du-candidat-local) | Deux admissions actives et espaces disjoints. Les résultats du test n'établissent ni un débit soutenu ni l'acceptation des tâches. |
-| FIFO entre deux Work | [Cycle FIFO natif 197](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197), recette avec baux possédés, connexions concurrentes, refus, libération et reprise sur le workspace. | Profil historique CLI et SDK, complété par les tests SQL du sélecteur courant. La découverte Web simultanée reste une qualification séparée. |
+| FIFO entre deux Work | [Cycle FIFO natif 197](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197), recette avec baux possédés, connexions concurrentes, refus, libération et reprise sur le workspace. | Profil historique CLI et SDK, complété par les tests SQL du sélecteur courant. La qualification Web P1.2 est décrite séparément. [Trois missions](SAME-ROOT-FIFO-RECOVERY.md) |
 | Refus enfant et reprise | [Plan et emplacement des originaux](../plans/migration-rust/PLAN.md#remontée-des-refus-dautorité-et-reprise) · [Recette](../../tools/verification/recipes/mission-watch-orchestration.json) · [Scénario](../../tests/rust_orchestration_scopes.py) | Le reçu original du scénario, SHA-256 `b0f243ccffaf45054a3ec673046115aa62b45618bd8f7b8f3b3999f4da48948c`, couvre refus, avis racine, décision et reprise pour un cas inerte. |
 | Diagnostic et installation | [Contrat et recette](TOKIO-ORCHESTRATION.md#diagnostic-de-démarrage-automatique-dans-conduite) · [Fusion du diagnostic](https://github.com/mo0ogly/swarm/pull/46) | Le binaire de préparation des fixtures a le SHA-256 `7ff1854fa341e8e52763e6f3156c66de5c8c1ac2294a544b8410b6e233b9e791`. Le serveur HTTP sans conducteur de la recette a le SHA-256 `f924be23a3982a31e3aa1690f401ccb5b7388a9b529ce087962b40921e76d36b`. L’image locale est distincte. La version locale `v0.1.1-dev.389` a le SHA-256 `2fa03ed1ffe14d9243f681027085d0e6f61cbc018fd3c4102e85128f00a9567c`. Son identité active a été vérifiée par processus et API de version. Sur un Root isolé, ce binaire a servi le motif de pause et son rendu FR/EN. Le défaut de fournisseur et sa restauration appartiennent à la recette sans conducteur. [Index des reçus](../diagrams/README.md#reçus-de-qualification--qualification-receipts) |
 
@@ -450,8 +452,8 @@ les fichiers du workspace ne prouve pas leur intégration dans un exécutable.
 | Contrat | État observé et limites |
 | --- | --- |
 | Moteur | `WorkEngine` et `RootStore` existent dans `swarm-engine` ; qualification par parcours, pas bascule globale |
-| Supervision | Sur fixtures CLI, priorité workers, deux exécutions simultanées et remontée enfant → racine → reprise. La couverture générale des rôles et le parcours Web concurrent complet restent ouverts. |
-| File entre Work | La recette native 197 et les tests SQLite couvrent recouvrement, FIFO et reprise. Ils ne qualifient pas un ordonnanceur inter-Root. |
+| Supervision | Sur fixtures CLI, priorité workers, deux exécutions simultanées et remontée enfant → racine → reprise. Le parcours Web P1.2 couvre trois missions isolées dans un Root. La couverture générale des rôles reste ouverte. |
+| File entre Work | La recette 197, les tests SQLite et le scénario Web P1.2 couvrent recouvrement, FIFO et reprise dans un Root. Le crash pré-COMMIT conserve le tour de B. L’ordonnancement inter-Root reste ouvert. |
 | Lecture cockpit | Le serveur isolé couvre le fournisseur inerte et sa restauration en FR/EN. Le binaire installé, vérifié séparément sur une mission isolée, couvre le diagnostic de pause en FR/EN. |
 | Validation des résultats | Mode `human` et attente humaine préservés par le contrôleur natif ; preuves locales du raccord139 ; parcours global et authentification protégée restent distincts |
 | Identité | Noyaux et protocoles d’enrôlement/configuration présents ; source humaine, service installé et dernier usage public restent à qualifier |
