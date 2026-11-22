@@ -1323,6 +1323,17 @@ indépendante ni de parité des commandes absentes du corpus.
 
 ## Conducteur public initial — mission-watch-public
 
+### Priorité des workers et arbitres de périmètre
+
+La recette `mission-watch-orchestration.json` reçoit
+`SWARM_ORCHESTRATION_BINARY` et `SWARM_ORCHESTRATION_PROFILE` pour le même
+binaire CLI normal. Elle observe deux fournisseurs inertes démarrés dans des
+espaces distincts avant l’activation racine concurrente, puis les décisions
+de deux sous-orchestrateurs et l’absence de nouvel appel sur boîte vide.
+Elle utilise des fichiers de rendez-vous compatibles avec le bac à sable I0.
+Les preuves de contrôles et de revue gérés restent dans la recette
+[`native-managed-reviewer.json`](../../../tools/verification/recipes/native-managed-reviewer.json).
+
 Fournir SWARM_PUBLIC_WATCH_BINARY et SWARM_PUBLIC_WATCH_PROFILE pour le même CLI
 normal sans features de fixture. Recette permanente mission-watch-public.json :
 préflight corps des méthodes sous politique initiale, garde de types de schéma,

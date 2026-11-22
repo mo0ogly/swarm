@@ -211,6 +211,9 @@ pub(crate) fn prepare_claim(
     if scope.revision != request.scope_revision {
         return Err(E::Refused("revision_conflict"));
     }
+    if crate::planning_rejection::scope_escalation_pending(work, &scope.id) {
+        return Err(E::Refused("planning-root-arbitration-pending"));
+    }
     if scope.state == "closed" {
         return Err(E::Refused("planning-scope-closed"));
     }

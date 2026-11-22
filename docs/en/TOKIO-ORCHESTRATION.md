@@ -2,6 +2,25 @@
 
 [Français](../architecture/TOKIO-ORCHESTRATION.md) · [Biba plan](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md) · [Focused qualification](#replay-the-focused-qualification)
 
+## Admission order in the mission conductor
+
+The conductor attempts ready worker admission first. After starting a worker,
+it reads current state and waits for startup to cross its revision-bound gate
+before attempting the next admission under the same authority. The engine
+preserves queue order, task dependencies, workspace
+exclusion and configured capacity. A new planner activation waits for a pass
+with no admission, valid mission permission and no retained worker context.
+Recovering a previously admitted worker preserves its identity. Controls and
+review remain separate operations on evidence from the submitted result.
+
+When a native child proposal is refused on scope authority, the original
+stays in the child's scope. The same write records a notice for the root
+orchestrator. The notice carries the scope identifier and refusal code.
+The rejected operation, proposal and attachments stay in the child's
+diagnostic. A new claim for that child waits for a root decision to
+acknowledge the notice. Resumption uses the existing revision, consent,
+authority and budget checks.
+
 ## Choose the boundary
 
 Use Tokio for asynchronous coordination between cooperating Rust components that can share process privileges. A typed channel fits when a task must send an operation to one owner or receive a single result. Reuse the existing transport when the operation already has an owner and an admission rule.

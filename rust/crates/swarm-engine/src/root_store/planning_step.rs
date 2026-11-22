@@ -54,6 +54,7 @@ fn choose(db: &rusqlite::Connection, work: &Work, at: &str) -> Result<Option<Cho
         swarm_wire_json::go_rfc3339::parse(at).map_err(|e| A::caused("planning-step-clock", e))?;
     let mut seen = BTreeSet::new();
     let mut blocked = None;
+    let mut waiting_for_root = false;
     for event in p.inbox.iter().flatten() {
         if !event.decision.is_empty() || !seen.insert(&event.scope) {
             continue;
@@ -65,6 +66,10 @@ fn choose(db: &rusqlite::Connection, work: &Work, at: &str) -> Result<Option<Cho
             .find(|s| s.id == event.scope)
             .ok_or(A::Refused("planning-scope-not-found"))?;
         if scope.state == "closed" {
+            continue;
+        }
+        if crate::planning_rejection::scope_escalation_pending(work, &scope.id) {
+            waiting_for_root = true;
             continue;
         }
         let runs = crate::planning_run_store::scope_runs(db, &work.id, &scope.id)?;
@@ -112,10 +117,60 @@ fn choose(db: &rusqlite::Connection, work: &Work, at: &str) -> Result<Option<Cho
     }
     match blocked {
         Some(error) => Err(error),
+        None if waiting_for_root => Err(A::Refused("planning-root-arbitration-pending")),
         None => Ok(None),
     }
 }
 impl RootStore {
+    /// Read the root notification for a clean, durably recorded scope refusal.
+    /// Correlate Work and recorded revision with the exact refusal event in the
+    /// durable journal, then read its derived root notice from current Work.
+    /// A later unrelated Work revision does not erase the recorded routing.
+    /// Compound errors never qualify. Read failures retain their cause.
+    /// This observation grants no retries, provider calls or decision authority.
+    pub fn observe_planning_escalation(
+        &self,
+        work: &str,
+        error: &E,
+    ) -> Result<Option<(i64, String)>, E> {
+        use crate::{WorkEngineError, planning_rejection as rejection};
+        let E::WorkRecorded { primary, work: recorded, revision } = error else {
+            return Ok(None);
+        };
+        if recorded != work {
+            return Ok(None);
+        }
+        let E::Mutation(WorkEngineError::PlanningActivation(cause)) = primary.as_ref() else {
+            return Ok(None);
+        };
+        if !matches!(cause.as_ref(), A::Refused(code) if rejection::scope_authority_refusal(code)) {
+            return Ok(None);
+        }
+        let original = crate::agent_launch::query(
+            &self.db,
+            "SELECT id FROM events WHERE work_id=? AND revision=? AND kind='planning.rejected'",
+            rusqlite::params![work, revision],
+            |rows| {
+                let value = rows.next()?.map(|row| row.get::<_, String>(0)).transpose()?;
+                if rows.next()?.is_some() {
+                    return Err(A::Refused("planning-escalation-ambiguous-refusal"));
+                }
+                Ok(value)
+            },
+        ).map_err(launch)?;
+        let Some(original) = original else {
+            return Ok(None);
+        };
+        let id = format!("{}{original}", rejection::SCOPE_ESCALATION_PREFIX);
+        let current = self.read_work(work)?;
+        let input = current.planning.as_ref()
+            .and_then(|p| p.inbox.as_ref())
+            .and_then(|inbox| inbox.iter().find(|event| event.id == id
+                && event.scope == crate::ROOT_ORCHESTRATOR_SCOPE
+                && event.kind == rejection::SCOPE_ESCALATION_KIND));
+        Ok(input.map(|event| (*revision, event.id.clone())))
+    }
+
     /// Perform at most the one activation explicitly requested by this command.
     /// Select current inbox FIFO under a settings reservation, consume saved27
     /// default lease, then use normal authoritative claim and protected run.
