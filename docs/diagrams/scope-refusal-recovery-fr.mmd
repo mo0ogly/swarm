@@ -1,0 +1,23 @@
+flowchart TB
+    accTitle: Refus enfant et reprise dans Swarm
+    accDescr: Le moteur conserve le refus de l’enfant. La racine reçoit un avis sûr et acquitte la reprise de planification.
+    E_CHILD["Proposition native du sous-orchestrateur"]
+    E_REFUSAL["Refus d’autorité retenu dans le périmètre enfant"]
+    E_NOTICE["Avis racine, périmètre et code sûr"]
+    E_WAIT["Planification enfant en attente d’acquittement"]
+    E_ROOT["Décision de l’orchestrateur racine"]
+    E_CHECK["Moteur, vérification de la reprise"]
+    E_RESUME["Planification enfant de nouveau admissible"]
+    E_CHILD -->|"refus hors périmètre"| E_REFUSAL
+    E_REFUSAL -->|"même enregistrement"| E_NOTICE
+    E_REFUSAL --> E_WAIT
+    E_NOTICE --> E_ROOT
+    E_ROOT -->|"acquittement"| E_CHECK
+    E_WAIT --> E_CHECK
+    E_CHECK -->|"gardes satisfaites"| E_RESUME
+    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
+    classDef data fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
+    class E_CHECK core;
+    class E_REFUSAL,E_NOTICE data;
+    class E_CHILD,E_WAIT,E_ROOT,E_RESUME ordinary;
