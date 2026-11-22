@@ -55,10 +55,10 @@ une nouvelle tentative.
 | --- | --- | --- |
 | Ordonner | Moteur, révision courante du Work et priorités enregistrées | Le comparateur trie par priorité décroissante, profondeur du plus long chemin croissante, puis identifiant lexical. Le graphe et la révision doivent correspondre à la projection. |
 | Examiner | Conducteur de mission, sélection des workers | Le moteur filtre les états et profils pris en charge, puis vérifie consentement, prérequis, reprise, coût, modèle et espace de travail. Un refus de tâche laisse les autres candidatures examinables. |
-| Inscrire | Moteur, sous bail de mission | Les candidats prêts synchronisent leurs tours FIFO. Les restrictions de ressources s’appliquent ensuite. Une tâche peut attendre dans la file avant d’avoir un créneau. |
-| Admettre | Usine native et moteur, transaction d’admission | La révision, le bail, les contrôles, le profil, les créneaux et les réservations sont vérifiés. Un conflit d’espace peut laisser passer une candidature disjointe. Une capacité pleine arrête la passe. |
-| Démarrer | Superviseur technique de l’agent | Le conducteur séquence l’admission et le contrôle de démarrage de la tentative précédente. Les processus déjà autorisés peuvent ensuite travailler simultanément dans des espaces disjoints. |
-| Remettre | Worker, contrôles, revue indépendante et responsable | Les résultats et preuves se rattachent au même candidat. Les contrôles ou la revue alimentent la décision. Le successeur devient admissible lorsque ses préconditions propres sont satisfaites. |
+| Inscrire | Moteur, sous bail de mission | La synchronisation inscrit les candidats prêts dans la file FIFO. Une tâche peut attendre avant d’avoir un créneau. [Synchronisation](../../rust/crates/swarm-engine/src/mission_workspace_fifo.rs#L259-L330) |
+| Admettre | Usine native et moteur, transaction d’admission | Le moteur revérifie la révision, le bail, les contrôles, le profil, les créneaux et le budget. La transaction lie le tour acquis, l’Agent en file, l’événement du Work et la réservation applicable. Un conflit d’espace reconnu peut laisser passer un candidat disjoint. La capacité pleine termine la passe du Work. [Liaison et écritures](../../rust/crates/swarm-engine/src/agent_launch.rs#L1048-L1083) |
+| Démarrer | Superviseur technique de l’agent | Le conducteur démarre l’Agent admis, puis attend le franchissement de sa barrière de démarrage avant une autre admission. Les processus déjà autorisés peuvent tourner simultanément dans des espaces disjoints. |
+| Valider le résultat | Worker, contrôles, revue indépendante et responsable | La remise identifie le candidat. Les contrôles peuvent aboutir à une attente de revue ou de décision humaine. Le successeur devient admissible lorsque ses préconditions propres sont satisfaites. [États de validation](../../rust/crates/swarm-engine/src/root_store/task_validation/publication.rs#L181-L225) |
 
 Les créneaux sont comptés par Work sur les états actifs enregistrés. Le
 réglage enregistré reste soumis à la politique d’installation. Lorsqu’une
@@ -98,7 +98,9 @@ chemins frères disjoints peuvent avancer indépendamment.
 
 Un tour en attente valide conserve son rang. Une candidature déplacée reprend
 place en fin de file. Les tours en attente ou acquis plus anciens bloquent
-les espaces recouvrants. Un tour libéré cesse de bloquer. Le moteur revérifie
+les espaces recouvrants. Libérer un tour acquis exige le propriétaire enregistré
+et une fin ou annulation établie. La perte du bail du conducteur ne libère pas
+à elle seule le tour acquis. Le moteur revérifie
 aussi les occupations par agents et intégrations lors de l’admission. Après
 libération et réévaluation, une mission peut prendre la ressource si les
 autres gardes aboutissent. L’ordre porte sur les espaces de travail et les
@@ -107,11 +109,11 @@ et un débit garanti restent hors qualification.
 
 **Portée observée.** Les tests Rust sur SQLite comparent la projection de
 diagnostic et une vraie synchronisation pour des tours nouveaux, déplacés ou
-retirés. Ils vérifient aussi l’acquisition et les espaces disjoints. Le [cycle FIFO natif 197](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197)
+retirés. Ils vérifient aussi l’acquisition et les espaces disjoints. Le [cycle FIFO natif 197](https://github.com/mo0ogly/swarm/blob/9e420d293eb78eeac7f6bbdd61f55e7dd2efe772/docs/plans/migration-rust/REPLAYS.md#L1145)
 a exercé deux Work avec baux et connexions concurrentes. La qualification Web
 P1.2 de trois missions a confirmé l’attente de B, le départ de C dans son
-espace disjoint et la reprise de B sur son tour d’origine. Elle distingue
-arrêt coopératif, crash entre transactions et crash pré-COMMIT.
+espace disjoint et la reprise de B sur son tour d’origine. La fiche détaille les
+fenêtres exercées et la limite de reprise lorsque le prévol est expiré.
 [Fiche de qualification P1.2](SAME-ROOT-FIFO-RECOVERY.md)
 
 [Découverte web](../../rust/crates/swarm-cli/src/native_web/conductor.rs) ·
@@ -125,8 +127,8 @@ Un sous-orchestrateur conduit son périmètre et conserve le détail d’un refu
 d’autorité visant un autre périmètre. Pour le parcours natif couvert, le moteur
 enregistre le refus et un avis adressé à l’orchestrateur racine. L’avis décrit
 le périmètre et le code sûr. La racine détient la décision transversale. La
-planification du sous-périmètre attend son acquittement, puis repasse
-les contrôles de révision, de droits, de consentement et de budget.
+planification du sous-périmètre attend une décision enregistrée de la racine
+sur l’avis, puis repasse les contrôles de révision, de droits, de consentement et de budget.
 
 [![Refus enfant et reprise dans Swarm](../diagrams/scope-refusal-recovery-fr.svg)](../diagrams/scope-refusal-recovery-fr.svg)
 
@@ -171,28 +173,14 @@ Sources : [protocole IA/moteur](AGENT-ENGINE-PROTOCOL.md), [preuves de revue](RE
 
 ## 2. Identité, autorité et dernier usage
 
-[![Identité Swarm : source d’autorité, registre et usage exact](../diagrams/identity-authority-fr.svg)](../diagrams/identity-authority-fr.svg)
-
-[SVG en grand](../diagrams/identity-authority-fr.svg) · [PNG](../diagrams/identity-authority-fr.png) · [Source Mermaid](../diagrams/identity-authority-fr.mmd)
-
-| Objet / frontière | Contrat à conserver |
+| Frontière | Code ou observation conservée |
 | --- | --- |
-| Source humaine | Compte personnel local par défaut retenu, fournisseur d’entreprise optionnel ; bootstrap indépendant du premier visiteur et des agents ; parcours encore à intégrer |
-| Identités | Principal avec issuer/sujet/catégorie ; acteur ; agent logique ; instance ; propriétaire du périmètre et auteur historique distincts |
-| Autorité | Plan courant avec génération/empreinte, octrois exacts, chaîne délégable, dates et révocations ; aucun rôle déclaré n’accorde implicitement `agent.create` |
-| Enrôlement | Clé épinglée indépendamment, challenge lié à la demande/projet, réponse Ed25519 et journal signé ; signature des octets distincte des droits courants |
-| Publication | Permis privé exact ; instantané SQLite et tête Trust indépendante ; intention, COMMIT, confirmation et reprise récupérable |
-| Configuration / canal | Configuration et témoin cohérents ; handshake attribué, image et processus épinglés ; un UID n’est pas une habilitation métier |
-| Demande / effet | Opération, ressource, sources/destinataire et contenu exacts ; contrôles dans l’ordre Trust → SQLite → runtime ; accord, engagement, réception et effet distincts |
-| Avant plan | Autorité de préparation explicite nécessaire ; aucune règle permissive fondée sur l’absence de plan |
+| Agent, bail et Root | L’admission automatique lie l’Agent au Work, à la génération du bail, au tour d’espace et à l’instance du Root. Une observation locale de processus porte le PID, son instant de démarrage et l’hôte du superviseur. [Liaison](../../rust/crates/swarm-engine/src/mission_agent.rs#L247-L283) · [Identité du processus](../../rust/crates/swarm-engine/src/supervisor_identity.rs#L115-L168) |
+| Session Web et mandat Trust | Le bootstrap enrôlé accepte une source typée pour une intention préparée. Les gardes de session, CSRF, compte courant et Biba restent distinctes. Le RETEX G05.3 rapporte un essai local en dev.225 avec comptes de fixture, sur le parcours explicitement enrôlé. [Entrée Web](../../rust/crates/swarm-web/src/service.rs#L776-L797) · [RETEX G05.3](../plans/migration-rust/evidence/20261027-biba-governance-apex/RETEX-G05.3.md) |
+| Lecteur d’un dialogue de préparation | Quand un reçu d’admission correspond au tour lu, le lecteur vérifie le principal et les reçus applicables, puis contrôle l’habilitation avant restitution. Le chemin sans reçu correspondant conserve sa lecture historique. [Contrôle du lecteur](../../rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs#L99-L208) |
 
-Le service local sous compte distinct est le choix pilote adopté ; l’autorité
-distante est prévue. Ces décisions ne déclarent ni installation du service ni
-source humaine effective. Les protocoles internes, observations de stockage et
-reçus ne ferment pas les raccords publics d’admission et d’usage.
-
-Sources : [identité et autorité](AGENT-IDENTITY-CONTRACT.md),
-[droits mémoire et avant-plan](../plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md).
+Voir le [contrat d’identité](AGENT-IDENTITY-CONTRACT.md) pour les parcours
+détaillés et leurs statuts.
 
 ### 2.1 Intégrité, confidentialité et confinement
 
@@ -200,13 +188,11 @@ Sources : [identité et autorité](AGENT-IDENTITY-CONTRACT.md),
 | --- | --- | --- |
 | Biba | Contrôler l’intégrité et les promotions par politique et séparation des rôles | Le noyau Trust porte niveaux, rôles et contrôles d’usage. L’intégration des parcours se vérifie à leur dernier point d’effet. [Contrat Biba](BIBA-RUST.md) |
 | Bell-LaPadula | Vérifier classification, compartiments et habilitation du lecteur | Le moteur porte la politique, les attributions et des lecteurs contrôlés. La confidentialité de bout en bout et la déclassification restent ouvertes. [Périmètre et limites](BELL-LAPADULA.md) |
-| Identité et mandat | Associer personne, agent logique, instance, opération et périmètre | L’enrôlement ou le canal identifie selon son contrat. L’admission vérifie ensuite le droit courant pour le contenu exact. [Contrat d’identité](AGENT-IDENTITY-CONTRACT.md) |
+| Identité et mandat | Associer personne, agent logique, instance, opération et périmètre | Le chemin Web enrôlé accepte une source attribuée pour une intention préparée. Le mandat et les gardes d’admission restent propres au parcours. [Contrat d’identité](AGENT-IDENTITY-CONTRACT.md) |
 | Confinement | Restreindre les effets d’un processus local | Les gardes Linux et le contrat projet fixent leurs propres limites. Leur portée physique est distincte de la politique métier et de la confidentialité. [Frontière Linux](../../rust/crates/swarm-biba-linux/src/lib.rs) |
 
-L’audit rattache les reçus à l’intention, au contrôle appliqué et à l’effet
-constaté. Le niveau d’intégrité n’accorde pas une habilitation de lecture. Une
-classification n’accorde pas de mandat d’écriture. La provenance des octets,
-la décision d’autoriser et l’effet restent trois éléments à examiner.
+Les [témoins de multitâche et de sécurité](#lien-entre-multitâche-biba-et-belllapadula)
+indiquent quelles décisions et quels effets ont été observés à chaque frontière.
 
 ## 3. Mémoire, contexte reçu et conversation
 
@@ -282,41 +268,25 @@ Sources : [conduite](RUN-SUPERVISION.md), [protocole](AGENT-ENGINE-PROTOCOL.md),
 
 ## 5. Logs, télémétrie, consultation et preuve
 
-[![Observabilité Swarm : logs, direct, télémétrie et preuves](../diagrams/logs-observability-fr.svg)](../diagrams/logs-observability-fr.svg)
-
-[SVG en grand](../diagrams/logs-observability-fr.svg) · [PNG](../diagrams/logs-observability-fr.png) · [Source Mermaid](../diagrams/logs-observability-fr.mmd)
-
-| Source | Conservation et consommation |
+| Source | Écriture et lecture |
 | --- | --- |
-| Sorties / terminal | `agent_logs`, `terminal_events`, séquences/curseurs et lecture par mission/tentative ; pas une commande réexécutée |
-| Événements moteur | Activités, incidents, décisions et reçus attribués ; distinction historique/courant et cause sûre |
-| Appels et usages | Tentatives et réservations ; demandé/observé et inconnu/zéro distincts ; aucune facture déduite d’une réservation |
-| Ressources Linux | Hôte, PID et starttime vérifiés avant mesure ; identité non vérifiable et donnée absente restent explicites |
-| OTLP JSON | Jeton lié à l’agent actif, normalisation, rejets et séries attribués ; `telemetry.db` séparée, pas de prompt/réponse stocké par cette normalisation |
-| Console et direct | Monaco en lecture seule avec repli texte ; filtres de serveur/page distingués ; SSE par empreinte et interrogation de repli explicite |
-| Export / acceptation | Réponse originale de l’API avec périmètre/limites ; la preuve d’acceptation exige les originaux, candidat, contrôles, revue, validation humaine si requise et fraîcheur |
-
-La consultation ne décide ni conduite ni acceptation. La chaîne doit rester
-reconstructible : objectif, décision, propriétaire, tâche, tentative, candidat,
-exécution, originaux, revue et décision appliquée. La timeline de sécurité et
-la filiation réseau d’AC-02 sont une extension future, distincte des logs actuels.
-
-Sources : [console](LOG-CONSOLE.md), [registre](CALL-ACCOUNTING.md),
-[traçabilité](TRACEABILITY.md), [direct et OTLP natifs](RUST-MIGRATION.md).
+| Journal d’Agent | L’admission écrit une entrée `command`. Le chemin d’exécution natif produit notamment les entrées `lifecycle` et `incident`, avec un type distinct si le message a été tronqué. [Admission](../../rust/crates/swarm-engine/src/agent_launch.rs#L1067-L1084) · [Écriture du journal](../../rust/crates/swarm-engine/src/agent_execution_store.rs#L50-L109) |
+| Terminal enregistré | Le lecteur live demande les lignes du journal et les blocs du terminal avec des curseurs distincts. [Lecture live](../../rust/crates/swarm-web/src/service/live.rs#L705-L727) |
+| Télémétrie fournisseur | L’ingestion OTLP/HTTP vérifie un jeton d’exporteur et enregistre la télémétrie normalisée pour le sujet actif associé, Agent, revue ou appel de planification. [Ingestion](../../rust/crates/swarm-web/src/service/otel.rs#L126-L182) |
+| Audit de l’autorité | Le journal de l’autorité ajoute et synchronise des entrées chaînées. La lecture contrôle la chaîne. Ce contrôle porte sur le journal relu. [Écriture et relecture](../../rust/crates/swarm-authority/src/audit.rs#L174-L275) |
 
 ### 5.1 Lecture historique, rétention et audit
 
-La recherche de journaux par Work et Agent lit une page ordonnée après un
-curseur. Les chaînes décimales exactes évitent de transformer une séquence
-i64 en arrondi JavaScript. Le lecteur signale le premier élément retenu et
-les lacunes observables. Le nombre de lignes par page, la politique de
-rétention et l’autorité de consulter sont des réglages ou contrats distincts.
-
-Les journaux d’activité, les données de télémétrie et les reçus d’audit ont des
-producteurs et consommateurs différents. Une sortie de terminal ne prouve pas
-une décision métier. Pour l’audit, vérifier l’identité et le mandat, le contenu
-exact, les règles, l’effet enregistré et la conservation de l’original.
-[Historique natif](NATIVE-LOG-QUERY.md) · [Chaîne d’audit](BIBA-GOUVERNANCE-AUDIT.md)
+La route protégée `GET/HEAD /api/v1/logs` ouvre le Root en lecture, vérifie sa
+liaison et l’association Work–Agent, puis retourne les lignes filtrées et
+ordonnées après le curseur. L’extension décimale exacte préserve les séquences
+i64 jusque dans le navigateur. `retention_gap` compare le curseur positif
+au premier élément conservé pour l’Agent. Le réglage de taille de page peut borner la réponse.
+Le verdict BLP par message reste non établi sur cette route.
+[Route](../../rust/crates/swarm-web/src/service/log_query.rs#L46-L71) ·
+[Lecture moteur](../../rust/crates/swarm-engine/src/root_store/log_query.rs#L47-L109) ·
+[Consommateur Web](../../web/native-log-query.js#L13-L24) ·
+[Contrat de pagination](NATIVE-LOG-QUERY.md)
 
 ## 6. Composants, flux et frontières d’adaptation
 
@@ -396,14 +366,40 @@ de source et de qualification. [Référence figée](https://github.com/syntax-sy
 | Déploiement, performance et capacité | Distinguer topologie locale, recette, binaire installé, concurrence par Work et ressources du Root. | [Capacité et qualification](#7-déploiement-capacité-et-qualification). Équité et débit inter-Root restent à établir. |
 | MCP et interfaces IDE | Garder un objectif d’interopérabilité subordonné à un contrat de droits et d’observation. | [API commune cible](../PRODUCT-ARCHITECTURE.md). Le pont MCP du dépôt de référence reste un composant de ce dépôt. |
 
+Le code amont exécute les étapes de workflow en série et Agentic Team
+route un rôle par tour. Le dashboard et MCP ont leurs propres entrées et
+consomment les contextes ou les moteurs selon leur contrat. Ces passages
+justifient la séparation des vues d’interface, de coordination et de
+dépendances d’exécution dans Swarm.
+[Boucle workflow](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/orchestrator/core/engine.py#L440-L516) ·
+[Boucle par rôle](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/agentic_team/engine.py#L311-L373) ·
+[Dashboard](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/context_dashboard/app.py#L44-L76) ·
+[Moteurs appelés par MCP](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/mcp_server/engines.py#L22-L62)
+
 ### Traçabilité des témoins
 
 | Observation | Entrée et preuve | Portée |
 | --- | --- | --- |
 | Deux workers, une dépendance | [Code de la recette inerte](../../tests/rust_mission_watch_parallel.py) · [Bilan ORCH-04](../plans/migration-rust/PLAN.md#preuves-du-candidat-local) | Deux admissions actives et espaces disjoints. Les résultats du test n'établissent ni un débit soutenu ni l'acceptation des tâches. |
-| FIFO entre deux Work | [Cycle FIFO natif 197](../plans/migration-rust/REPLAYS.md#cycle-fifo-natif-197), recette avec baux possédés, connexions concurrentes, refus, libération et reprise sur le workspace. | Profil historique CLI et SDK, complété par les tests SQL du sélecteur courant. La qualification Web P1.2 est décrite séparément. [Trois missions](SAME-ROOT-FIFO-RECOVERY.md) |
+| FIFO entre deux Work | [Cycle FIFO natif 197](https://github.com/mo0ogly/swarm/blob/9e420d293eb78eeac7f6bbdd61f55e7dd2efe772/docs/plans/migration-rust/REPLAYS.md#L1145), recette avec baux possédés, connexions concurrentes, refus, libération et reprise sur le workspace. | Profil historique CLI et SDK, complété par les tests SQL du sélecteur courant. La qualification Web P1.2 est décrite séparément. [Trois missions](SAME-ROOT-FIFO-RECOVERY.md) |
 | Refus enfant et reprise | [Plan et emplacement des originaux](../plans/migration-rust/PLAN.md#remontée-des-refus-dautorité-et-reprise) · [Recette](../../tools/verification/recipes/mission-watch-orchestration.json) · [Scénario](../../tests/rust_orchestration_scopes.py) | Le reçu original du scénario, SHA-256 `b0f243ccffaf45054a3ec673046115aa62b45618bd8f7b8f3b3999f4da48948c`, couvre refus, avis racine, décision et reprise pour un cas inerte. |
 | Diagnostic et installation | [Contrat et recette](TOKIO-ORCHESTRATION.md#diagnostic-de-démarrage-automatique-dans-conduite) · [Fusion du diagnostic](https://github.com/mo0ogly/swarm/pull/46) | Le binaire de préparation des fixtures a le SHA-256 `7ff1854fa341e8e52763e6f3156c66de5c8c1ac2294a544b8410b6e233b9e791`. Le serveur HTTP sans conducteur de la recette a le SHA-256 `f924be23a3982a31e3aa1690f401ccb5b7388a9b529ce087962b40921e76d36b`. L’image locale est distincte. La version locale `v0.1.1-dev.389` a le SHA-256 `2fa03ed1ffe14d9243f681027085d0e6f61cbc018fd3c4102e85128f00a9567c`. Son identité active a été vérifiée par processus et API de version. Sur un Root isolé, ce binaire a servi le motif de pause et son rendu FR/EN. Le défaut de fournisseur et sa restauration appartiennent à la recette sans conducteur. [Index des reçus](../diagrams/README.md#reçus-de-qualification--qualification-receipts) |
+
+
+### Lien entre multitâche, Biba et Bell–LaPadula
+
+| Témoin | Contrôle établi | Portée de sécurité |
+| --- | --- | --- |
+| Deux workers dans un Work | Deux départs dans des espaces disjoints et un successeur en attente. [ORCH-04](../plans/migration-rust/PLAN.md#preuves-du-candidat-local) | Le code du départ raccorde le confinement Linux. Le témoin ORCH-04 établit le parallélisme. Les refus d’accès sont établis par la fixture Biba dédiée ci-dessous. [Dernier contrôle](../../rust/crates/swarm-engine/src/native_provider_exec.rs#L197-L233) |
+| File et reprise entre Work | Rang FIFO, acquisition, libération et réconciliation sous les gardes du parcours testé. [Fiche P1.2](SAME-ROOT-FIFO-RECOVERY.md) | L’identifiant du tour et la liaison Agent–Root permettent de rapprocher des reçus. Aucun verdict Biba ou BLP ne découle du recouvrement des espaces. |
+| Refus enfant et reprise | Refus de mandat, avis racine et décision enregistrée dans le cas inerte décrit plus haut. [Production des avis](../../rust/crates/swarm-engine/src/root_store/planning_rejection_feedback.rs#L179-L212) | Le refus de mandat a son propre contrat. Un contrôle de niveau d’intégrité ou d’habilitation sur cet avis reste à établir. |
+| Worker géré, fixture Biba | Le reçu `managed-fioclex-fresh` observe des refus de lecture privée et d’écriture privée, officielle et en base, ainsi qu’un refus chez un descendant. Image `909ae5d8…f03d`. [Reçu](../plans/actions-confiance/verification-biba-transverse-20261028/managed-fioclex-fresh/result.json) | Preuve de confinement pour cette fixture. Le reçu indique `accepted:false` et ne porte aucun verdict BLP. |
+| Préparation et dialogue, preuves BLP | Diagnostic public des sources attribuées du prompt sur fixture. Pour le dialogue, le verdict au point de lecture est conditionné par un reçu d’admission correspondant. [Reçu du diagnostic](../plans/actions-confiance/verification-blp/20261101-preparation-check-public-01/result.json) · [Contrôle du dialogue](../../rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs#L99-L208) | Portée limitée à la préparation et à la lecture couverte. La confidentialité du trafic d’un worker et la classification de ses logs restent à établir par parcours. |
+
+Une preuve combinée doit relier, pour une même image et une même tentative,
+le sujet, l’objet exact ou sa version, la politique, le point de contrôle,
+le verdict et l’effet observé. Les témoins ci-dessus couvrent des frontières
+différentes.
 
 ## Organisation native du code
 
@@ -458,9 +454,9 @@ les fichiers du workspace ne prouve pas leur intégration dans un exécutable.
 | File entre Work | La recette 197, les tests SQLite et le scénario Web P1.2 couvrent recouvrement, FIFO et reprise dans un Root. Le crash pré-COMMIT conserve le tour de B. L’ordonnancement inter-Root reste ouvert. |
 | Lecture cockpit | Le serveur isolé couvre le fournisseur inerte et sa restauration en FR/EN. Le binaire installé, vérifié séparément sur une mission isolée, couvre le diagnostic de pause en FR/EN. |
 | Validation des résultats | Mode `human` et attente humaine préservés par le contrôleur natif ; preuves locales du raccord139 ; parcours global et authentification protégée restent distincts |
-| Identité | Noyaux et protocoles d’enrôlement/configuration présents ; source humaine, service installé et dernier usage public restent à qualifier |
+| Identité | Liaison technique Agent–bail–Root dans le code ; enrôlement Web explicite observé sur comptes de fixture (G05.3) |
 | Mémoire / contexte | Composition de contexte natif partiellement portée ; le guide mémoire géré est refusé tant que sa garde n’est pas portée ; parcours G8 complet et droits M20 ouverts |
-| Journaux / télémétrie | Surfaces natives live et OTLP vérifiées localement ; cela n’établit pas la parité de toutes les consoles et de tous les consommateurs |
+| Journaux / télémétrie | Écriture du journal d’Agent, recherche protégée et ingestion OTLP référencées au §5 |
 | Cycle global | `continue`/`renew` vérifiés dans leur périmètre natif ; `judge/end` reste refusé dans le contrat natif actuel |
 | Sécurité AC-02 | Plan enregistré ; A0–A7 non démarrés ; reprise après migration/qualification et demande explicite |
 
