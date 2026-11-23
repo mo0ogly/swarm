@@ -5140,3 +5140,19 @@ python3 tools/verification/recipe.py run --recipe tools/verification/recipes/p02
 python3 tools/verification/recipe.py verify --evidence /CHEMIN/NEUF
 python3 -B tests/p02_pilot/run.py --verify-output /CHEMIN/NEUF/step-0001.stdout
 ```
+
+Le contrôle automatique P02 appelle `make check-p02-pilot`. Cette cible
+exécute la recette, contrôle les empreintes et recalcule la décision de clôture
+depuis le dossier conservé. La CI conserve ce dossier comme artefact. Pour
+refaire le même contrôle en local, indiquer un chemin neuf. Pour relire
+seulement un dossier existant, utiliser `make verify-p02-pilot`.
+
+The automatic P02 check calls `make check-p02-pilot`. It executes the recipe,
+verifies evidence hashes and recomputes closure from the retained output. CI
+retains the evidence directory as an artifact. Use a fresh path to run the same
+check locally, or `make verify-p02-pilot` to check existing evidence only.
+
+```sh
+make check-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
+make verify-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
+```
