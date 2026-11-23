@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conducteur : le bail peut se renouveler après une contention SQLite transitoire sous la politique enregistrée. Un bail retiré, remplacé ou expiré reste refusé.",
+        "en": "Conductor: the lease can renew after transient SQLite contention under the saved policy. A retired, replaced or expired lease remains refused."
+      },
+      {
         "fr": "Préparations Rust : le diagnostic Trust rapproche les octets des sources. Le travailleur API lie les octets du prompt au tour détenu et, lorsqu’elle existe, à son admission.",
         "en": "Rust preparations: Trust diagnostics match source bytes. The API worker binds prompt bytes to the owned turn and its admission when present."
       },
@@ -53,6 +57,14 @@
       {
         "fr": "Orchestration : canevas du travail avec orchestrateur principal dès la création, hiérarchie des sous-orchestrateurs et équipe configurée obligatoire pour tout lancement manuel.",
         "en": "Orchestration: the Work canvas opens with its principal orchestrator, shows the sub-orchestrator hierarchy, and requires a configured team for manual launches."
+      },
+      {
+        "fr": "Planificateurs et validateurs peuvent démarrer lorsque les valeurs historiques d’attente concordent avec les réglages natifs.",
+        "en": "Planners and reviewers can start when historical wait values match native settings."
+      },
+      {
+        "fr": "Le graphe du cockpit regroupe les cartes par branche de planification et conserve les dépendances entre branches.",
+        "en": "The cockpit graph groups task cards by planning branch and preserves cross-branch dependencies."
       },
       {
         "fr": "Vérifications PAEA et Sécurité et preuves : même habillage qu’Audit et Sécurité (rail commun, en-tête avec section, sélecteur Sombre/Clair, liens et sections en cartes). Aucun changement moteur.",

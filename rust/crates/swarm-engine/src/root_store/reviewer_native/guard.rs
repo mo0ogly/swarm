@@ -314,7 +314,7 @@ fn dependencies(
     funding: FundingBoundary,
     source:Option<&task_validation::ReviewCandidate>,
 ) -> Result<(crate::Work, crate::TaskReviewInputs), E> {
-    material::require_native_wait(root)?;
+    material::require_native_wait(root, &settings)?;
     let (work, request) = match funding {
         FundingBoundary::Prospective => frame(root, tx, &settings, job)?,
         FundingBoundary::KnownResult => result_frame(root, tx, &settings, job)?,

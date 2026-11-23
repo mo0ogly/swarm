@@ -4034,6 +4034,7 @@ mod preparation_proposal;
 #[path="provider_wait_store.rs"]
 mod provider_wait_store;
 #[cfg(target_os="linux")]
+pub(crate) use provider_wait_store::verify_native_wait;
 pub use provider_wait_store::{ProviderWaitView,ProviderWaitMutation};
 
 #[cfg(target_os="linux")]
