@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Reprise automatique : une adoption sous un nouveau bail peut refaire le prévol expiré d’un agent admis avant son premier démarrage, dans le même périmètre.",
+        "en": "Automatic recovery: adoption under a new lease can refresh an expired preflight for an admitted, never-started agent in the same scope."
+      },
+      {
         "fr": "Cockpit Rust : les échanges d’une mission permettent de rejoindre une remise ou sa réponse enregistrée et indiquent la présence d’un accusé.",
         "en": "Rust cockpit: mission exchanges link to recorded handoffs and replies and show acknowledgement status."
       },
