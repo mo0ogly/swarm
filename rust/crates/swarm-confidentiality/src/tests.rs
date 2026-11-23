@@ -71,6 +71,60 @@ fn same_level_distinct_compartments_are_incomparable() {
     assert!(p.dominates(&label("confidential", &["client-a","client-b"]),&a).unwrap());
 }
 
+/// Check the full finite BLP catalogue against independent level and set tables.
+/// The fixture covers admission, subsequent reads and outputs, with typed
+/// refusals and an unchanged exposure label. It does not exercise a real sink.
+#[test]
+fn complete_level_compartment_operation_matrix() {
+    let levels = ["public", "internal", "confidential", "restricted"];
+    let compartments: [&[&str]; 4] = [&[], &["client-a"], &["client-b"], &["client-a", "client-b"]];
+    // Rows represent the dominator in both tables. Expected relationships
+    // come from the declared fixture ordering, independently of Policy.
+    let level_dominance = [
+        [true, false, false, false],
+        [true, true, false, false],
+        [true, true, true, false],
+        [true, true, true, true],
+    ];
+    let set_dominance = [
+        [true, false, false, false],
+        [true, true, false, false],
+        [true, false, true, false],
+        [true, true, true, true],
+    ];
+    let master = policy();
+    let mut counts = [[0; 2]; 3];
+    for (a, level) in levels.iter().enumerate() {
+        for (b, group) in compartments.iter().enumerate() {
+            let origin = label(level, group);
+            let domain = ExecutionDomain::prepare(&master, 1, "worker", &[Some(origin.clone())])
+                .expect("valid control domain under the maximal fixture clearance");
+            let mut limited = master.clone();
+            limited.clearances.insert("reader".into(), origin.clone());
+            for (c, peer_level) in levels.iter().enumerate() {
+                for (d, peer_group) in compartments.iter().enumerate() {
+                    let peer = label(peer_level, peer_group);
+                    let accepts_read = level_dominance[a][c] && set_dominance[b][d];
+                    let accepts_output = level_dominance[c][a] && set_dominance[d][b];
+                    let decisions = [
+                        (limited.check_read("reader", Some(&peer)), accepts_read),
+                        (domain.check_input(Some(&peer)), accepts_read),
+                        (domain.check_output(&master, 1, Some(&peer)), accepts_output),
+                    ];
+                    for (op, (got, allowed)) in decisions.into_iter().enumerate() {
+                        let expected = if allowed { Ok(()) } else { Err(ConfidentialityError::AccessDenied) };
+                        assert_eq!(got, expected, "op={op} origin={origin:?} peer={peer:?}");
+                        counts[op][usize::from(allowed)] += 1;
+                    }
+                    assert_eq!(domain.output_classification(), &origin);
+                }
+            }
+        }
+    }
+    assert_eq!(counts, [[166, 90]; 3]);
+    println!("T406_BLP_MATRIX verdicts=768 allowed=270 refused=498 operations=3");
+}
+
 #[test]
 fn join_preserves_all_exposed_compartments_and_maximum_level() {
     let p = policy();
