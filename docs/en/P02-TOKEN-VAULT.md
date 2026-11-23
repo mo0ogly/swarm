@@ -7,8 +7,9 @@ host. The host owns one vault per batch, substitutes the selected field before
 handing data to the agent, and sends only the authorized projection.
 For the Q04 invoice draft flow, the host calls
 `RootStore::prepare_p02_invoice_batch`. The adapter prepares input and drafts
-in memory. Transport, draft publication and pilot execution require separate
-decisions. Raw values stay within the local Rust API.
+in memory. A trusted host can deliver a draft over a private connected Unix
+socket and read an acknowledgement. Raw values stay in the local Rust API.
+Selection of a business recipient and pilot launch remain separate decisions.
 
 ```mermaid
 flowchart LR
@@ -18,6 +19,8 @@ flowchart LR
   F -->|identifiers and tokens| P[Local processing]
   P -->|pair of identifiers| F
   F -->|identifier and comparison result| A
+  A -->|private Unix socket, one JSON draft| D[Host-selected receiver]
+  D -->|byte-bound acknowledgement| A
   V -->|copy under mandate| R[Authorized local resolver]
 ```
 
@@ -76,14 +79,39 @@ drafts refuse. Mandate withdrawal or a change of the Trust revision also
 refuses operations requiring the mandate. Recovery creates a fresh batch
 from data the host remains authorized to use.
 
+## Local delivery and acknowledgement
+
+The trusted host passes an already connected `P02DraftDestination` to
+`deliver_draft`. It binds the channel to the mandate context, audience and
+reference invoice also known to the recipient, and configures socket I/O
+deadlines, which the engine checks before writing. Swarm resolves no address and opens no listener. The mandate and
+aliases are checked before writing, without holding the Trust reservation
+during I/O. Revocation prevents future preparation. It cannot recall an
+already authorized delivery.
+
+The channel is consumed for one draft. The sender writes the closed JSON and
+shuts down its write half. The test receiver validates the schema and expected
+invoice ID, observes the result and replies with the 32 raw SHA-256 bytes of
+that JSON, followed by EOF. Only that exact response yields a `P02DraftReceipt`.
+Preparation errors write no bytes. An I/O error or a missing or invalid
+acknowledgement leaves delivery unconfirmed. The host must reconcile at the
+receiver before any new attempt. The engine never retries. The digest binds the
+response to the draft on the chosen channel. The acknowledgement grants no
+authority and proves neither durable storage nor payment. The Python receiver
+is a test fixture.
+
 ## Verification
 
 The [p02-token-vault recipe](../../tools/verification/recipes/p02-token-vault.json)
 exercises the public Rust API with fictional invoices in an isolated Root. It
-requires Linux, locked Cargo, an admitted build target and qualified scratch space.
+requires Linux, Python 3, locked Cargo, an admitted build target and qualified scratch space.
 It covers alias scope, principal/project/batch/audience mismatches, expiry, alias and
 mandate revocation, stale Trust revisions and reopening. The P02 DAT and
 directives D03, D06 and D10 retain the original proposal and pilot conditions.
 The draft test checks both serialized schemas, shared and distinct aliases, the
 computed result, refusals without delivery to an inert receiver, and recovery
 from a partially prepared batch.
+
+The recipe also launches the Python receiver in a separate process. It reads
+back fictional drafts, exact receipts and unconfirmed outcomes, and checks
+that the receiver sees zero bytes after an audience denial or revocation.

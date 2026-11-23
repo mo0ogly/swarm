@@ -314,3 +314,214 @@ fn fictional_invoice_projection_and_draft_are_closed_and_mandate_bound() {
     drop((batch, other));
     store.close().unwrap();
 }
+
+/// Connect to a distinct fixture subprocess over a private kernel socket.
+/// The deadline bounds this socket operation if the test receiver stalls.
+/// The returned child owns the other socket end and its observed draft.
+fn draft_receiver(
+    context: &P02Context,
+    mode: &str,
+    expected_invoice: &str,
+) -> (swarm_engine::P02DraftDestination, std::process::Child) {
+    use std::{
+        os::{fd::OwnedFd, unix::net::UnixStream},
+        process::{Command, Stdio},
+    };
+
+    let (sender, receiver) = UnixStream::pair().unwrap();
+    sender
+        .set_read_timeout(Some(Duration::from_secs(30)))
+        .unwrap();
+    sender
+        .set_write_timeout(Some(Duration::from_secs(30)))
+        .unwrap();
+    let child = Command::new("python3")
+        .args([
+            "-c",
+            include_str!("fixtures/p02_draft_receiver.py"),
+            mode,
+            expected_invoice,
+        ])
+        .stdin(Stdio::from(OwnedFd::from(receiver.try_clone().unwrap())))
+        .stdout(Stdio::from(OwnedFd::from(receiver)))
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    (
+        swarm_engine::P02DraftDestination {
+            stream: sender,
+            context: context.clone(),
+            reference_invoice_id: "reference".into(),
+        },
+        child,
+    )
+}
+
+/// Exercise the engine's sender and a separate receiver on fictional data.
+/// The receiver readback distinguishes actual receipt from acknowledgement.
+#[test]
+fn fictional_draft_crosses_socket_and_requires_an_exact_receipt() {
+    use sha2::{Digest, Sha256};
+    use swarm_engine::P02DraftDeliveryError as DeliveryError;
+
+    let work = tempfile::tempdir().unwrap();
+    RootStore::initialize(work.path(), &mut SystemEnvironment)
+        .unwrap()
+        .close()
+        .unwrap();
+    configure(work.path(), 0);
+    let store = RootStore::open(work.path(), false).unwrap();
+    let mandate = grant("transport-fixture");
+    let context = mandate.context.clone();
+    let mut batch = store
+        .prepare_p02_invoice_batch(
+            mandate,
+            &[
+                P02InvoiceInput {
+                    invoice_id: "reference",
+                    account_reference: ACCOUNT_A,
+                },
+                P02InvoiceInput {
+                    invoice_id: "equal",
+                    account_reference: ACCOUNT_A,
+                },
+                P02InvoiceInput {
+                    invoice_id: "different",
+                    account_reference: ACCOUNT_B,
+                },
+            ],
+            ISSUER,
+        )
+        .unwrap();
+
+    for (mode, subject, expected) in [
+        ("accept", "equal", true),
+        ("empty", "equal", true),
+        ("truncated", "equal", true),
+        ("trailing", "equal", true),
+        ("mismatch", "equal", true),
+        ("accept", "different", false),
+    ] {
+        let (destination, peer) = draft_receiver(&context, mode, subject);
+        let result = batch.deliver_draft(destination, subject, RESOLVER);
+        let output = peer.wait_with_output().unwrap();
+        assert!(output.status.success(), "fixture receiver failed: {mode}");
+        let expected_draft = json!({"invoice_id": subject, "account_matches": expected});
+        assert_eq!(
+            serde_json::from_slice::<serde_json::Value>(&output.stderr).unwrap(),
+            expected_draft
+        );
+        if mode == "accept" {
+            let expected_bytes =
+                format!(r#"{{"invoice_id":"{subject}","account_matches":{expected}}}"#);
+            let expected_digest: [u8; 32] = Sha256::digest(expected_bytes).into();
+            assert_eq!(result.unwrap().sha256, expected_digest);
+        } else {
+            assert!(
+                matches!(result, Err(DeliveryError::InvalidReceipt)),
+                "{mode}: {result:?}"
+            );
+        }
+    }
+
+    let mut wrong_audience = context.clone();
+    wrong_audience.audience = "foreign-receiver".into();
+    let (destination, peer) = draft_receiver(&wrong_audience, "no-draft", "");
+    let Err(DeliveryError::Preparation(error)) =
+        batch.deliver_draft(destination, "equal", RESOLVER)
+    else {
+        panic!("wrong audience reached transport");
+    };
+    denied::<()>(Err(error));
+    let output = peer.wait_with_output().unwrap();
+    assert!(output.status.success() && output.stderr.is_empty());
+
+    for remove_read_deadline in [true, false] {
+        // The peer also closes on unexpected input, so this check fails
+        // promptly if the sender's deadline guard is removed.
+        let (destination, peer) = draft_receiver(&context, "no-draft", "");
+        if remove_read_deadline {
+            destination.stream.set_read_timeout(None).unwrap();
+        } else {
+            destination.stream.set_write_timeout(None).unwrap();
+        }
+        let result = batch.deliver_draft(destination, "equal", RESOLVER);
+        let output = peer.wait_with_output().unwrap();
+        assert!(matches!(result, Err(DeliveryError::MissingDeadline)));
+        assert!(output.status.success() && output.stderr.is_empty());
+    }
+
+    let (stream, closed_peer) = std::os::unix::net::UnixStream::pair().unwrap();
+    stream
+        .set_read_timeout(Some(Duration::from_secs(30)))
+        .unwrap();
+    stream
+        .set_write_timeout(Some(Duration::from_secs(30)))
+        .unwrap();
+    drop(closed_peer);
+    let destination = swarm_engine::P02DraftDestination {
+        stream,
+        context: context.clone(),
+        reference_invoice_id: "reference".into(),
+    };
+    assert!(matches!(
+        batch.deliver_draft(destination, "equal", RESOLVER),
+        Err(DeliveryError::Unconfirmed(error)) if error.kind() == std::io::ErrorKind::BrokenPipe
+    ));
+
+    assert!(batch.revoke_account("reference", ISSUER).unwrap());
+    let (destination, peer) = draft_receiver(&context, "no-draft", "");
+    let Err(DeliveryError::Preparation(error)) =
+        batch.deliver_draft(destination, "different", RESOLVER)
+    else {
+        panic!("revoked reference reached transport");
+    };
+    denied::<()>(Err(error));
+    let output = peer.wait_with_output().unwrap();
+    assert!(output.status.success() && output.stderr.is_empty());
+    drop(batch);
+    store.close().unwrap();
+}
+
+/// Confirm that malformed wire inputs cannot yield a fixture acknowledgement.
+#[test]
+fn fictional_receiver_rejects_nonobject_and_oversized_drafts() {
+    use std::{
+        io::Write,
+        process::{Command, Stdio},
+    };
+    let witness = br#"{"invoice_id":"equal","account_matches":true}"#;
+    let mut oversized = witness.to_vec();
+    oversized.resize(257, b' ');
+    let array = br#"[["invoice_id","equal"],["account_matches",true]]"#;
+    for (data, expected) in [
+        (witness.as_slice(), None),
+        (array.as_slice(), Some("draft must be a JSON object")),
+        (oversized.as_slice(), Some("oversized draft")),
+    ] {
+        let mut child = Command::new("python3")
+            .args([
+                "-c",
+                include_str!("fixtures/p02_draft_receiver.py"),
+                "accept",
+                "equal",
+            ])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child.stdin.take().unwrap().write_all(data).unwrap();
+        let output = child.wait_with_output().unwrap();
+        if let Some(expected) = expected {
+            assert!(!output.status.success() && output.stdout.is_empty());
+            assert_eq!(
+                std::str::from_utf8(&output.stderr).unwrap().trim(),
+                expected
+            );
+        } else {
+            assert!(output.status.success());
+            assert_eq!(output.stdout.len(), 32);
+        }
+    }
+}
