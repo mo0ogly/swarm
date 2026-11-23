@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Préparations Rust : le diagnostic Trust rapproche les octets des sources. Le travailleur API lie les octets du prompt au tour détenu et, lorsqu’elle existe, à son admission.",
+        "en": "Rust preparations: Trust diagnostics match source bytes. The API worker binds prompt bytes to the owned turn and its admission when present."
+      },
+      {
         "fr": "Factures Rust : remise locale d’un brouillon P02 sur une socket Unix connectée avec accusé lié aux octets reçus. Le récepteur fictif est réservé aux tests.",
         "en": "Rust invoices: local P02 draft delivery over a connected Unix socket with a byte-bound acknowledgement. The fictional receiver is test-only."
       },

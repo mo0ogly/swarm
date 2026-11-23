@@ -26,8 +26,9 @@ fn codes(error: E) -> String {
 }
 
 /// With an owned TMPDIR Root, explicit identities/policy and an inserted native
-/// row, exercise control attribution and source-derived diagnostics. Panics on
-/// refusal/replay/corruption/recovery mismatch; writes only the isolated fixture.
+/// row, exercise control attribution and exact diagnostics for compiled text,
+/// framing, plan and project context using the saved historical settings.
+/// Panics on refusal/replay/corruption/recovery mismatch; writes only the fixture.
 /// This proves consumer behavior, never admission, real providers or confinement.
 #[test]
 fn recorded_sources_authentication_join_refusal_and_recovery() {
@@ -42,9 +43,26 @@ fn recorded_sources_authentication_join_refusal_and_recovery() {
             {"subject":"worker","integrity":1,"roles":["requester"],"token":"fixture-worker-token"},
             {"subject":"approver","integrity":2,"roles":["approver"],"token":"fixture-approver-token"}]}),"").unwrap();
     call(&root,"blp-policy-apply",policy(0),"fixture-admin-token").unwrap();
-    let (mut turn,mut native)=super::level_tests::provenance_row();
+    let instructions = super::super::preparation_prompt::ENGINE_INSTRUCTIONS;
+    let original_settings = root.settings().unwrap();
+    let plan = plan_contract(&original_settings.values).unwrap();
+    let profile_path = dir.path().join("swarm.project.json");
+    let guide_path = dir.path().join("guide.md");
+    let profile = br#"{"version":1,"name":"Project","instructions":[{"path":"guide.md","roles":["preparation"]}]}"#;
+    let guide = b"fixture project instructions";
+    std::fs::write(&profile_path, profile).unwrap();
+    std::fs::write(&guide_path, guide).unwrap();
+    let original_limits = original_settings.values.context_policy_limits().unwrap();
+    let project = crate::read_project_context(&root.root, "preparation", &original_limits)
+        .unwrap().unwrap();
+    let (mut turn, mut native) = super::level_tests::provenance_row_with_sources(
+        instructions, Some(&plan), Some(&project.prompt),
+    );
+    turn.project = Some(Box::new(project.context.clone()));
+    native.project = Some(project.context);
     turn.revision=1;
     native.root=root.instance().unwrap();
+    native.settings_digest = original_settings.history.last().unwrap().digest.clone();
     let original=encoded(&turn,&native).unwrap();
     root.db.execute("INSERT INTO preparations(id,revision,body) VALUES('preparation',1,'{}')",[]).unwrap();
     root.db.execute("INSERT INTO preparation_turns(id,preparation_id,status,body) VALUES('turn','preparation','pending',?1)",[&original]).unwrap();
@@ -104,6 +122,158 @@ fn recorded_sources_authentication_join_refusal_and_recovery() {
     assert_eq!(witness["runtime_authorized"],false); assert_eq!(witness["diagnostic_only"],true);
     assert_eq!(witness["actor"],"admin");
     assert!(!witness.to_string().contains("fixture-user-message"));
+    let parts = manifest["parts"].as_array().unwrap();
+    let engine_index = parts.iter().position(|part| part["origin"]["kind"] == "engine_instructions").unwrap();
+    let other_index = parts.iter().position(|part| part["origin"]["field"] == "user_message").unwrap();
+    let framing_index = parts.iter().position(|part| part["origin"]["kind"] == "data_framing").unwrap();
+    let mut framing = request.clone();
+    framing["engine_source_index"] = framing_index.into();
+    let framing_observation = call(&root, "blp-preparation-check", framing.clone(), "fixture-admin-token").unwrap();
+    assert_eq!(framing_observation["engine_source_integrity"], json!({
+        "kind": "preparation_data_framing",
+        "source_index": framing_index, "source_revision": "1",
+        "sha256": parts[framing_index]["sha256"],
+    }));
+    assert_eq!(framing_observation["runtime_authorized"], false);
+    assert!(codes(call(&root, "blp-preparation-check", framing, "fixture-worker-token").unwrap_err())
+        .contains("blp-access-denied"));
+    assert!(witness.get("engine_source_integrity").is_none());
+    let mut protected_source = request.clone();
+    protected_source["engine_source_index"] = engine_index.into();
+    let verified = call(&root,"blp-preparation-check",protected_source.clone(),"fixture-admin-token").unwrap();
+    assert_eq!(verified["engine_source_integrity"], json!({
+        "kind":"compiled_preparation_instructions",
+        "source_index":engine_index, "source_revision":"1",
+        "sha256":crate::trust::hash(instructions.as_bytes()),
+    }));
+    assert_eq!(verified["runtime_authorized"],false);
+    let plan_index = parts.iter().position(|part| part["origin"]["kind"] == "plan_contract").unwrap();
+    let mut plan_source = request.clone();
+    plan_source["engine_source_index"] = plan_index.into();
+    let verified_plan = call(&root,"blp-preparation-check",plan_source.clone(),"fixture-admin-token").unwrap();
+    assert_eq!(verified_plan["engine_source_integrity"], json!({
+        "kind":"preparation_plan_contract",
+        "source_index":plan_index, "source_revision":"1",
+        "sha256":crate::trust::hash(plan.as_bytes()),
+    }));
+    let project_index = parts.iter().position(|part| part["origin"]["kind"] == "project_context").unwrap();
+    let mut project_source = request.clone();
+    project_source["engine_source_index"] = project_index.into();
+    let project_witness = json!({
+        "kind":"preparation_project_context",
+        "source_index":project_index, "source_revision":"1",
+        "sha256":crate::trust::hash(project.prompt.as_bytes()),
+    });
+    let state_before_project_checks = std::fs::read(&state_path).unwrap();
+    let verified_project = call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token").unwrap();
+    assert_eq!(verified_project["engine_source_integrity"], project_witness);
+    assert_eq!(verified_project["runtime_authorized"], false);
+    assert!(!verified_project.to_string().contains("fixture project instructions"));
+    assert!(codes(call(&root, "blp-preparation-check", project_source.clone(), "fixture-worker-token").unwrap_err())
+        .contains("blp-access-denied"));
+    assert_eq!(state_before_project_checks, std::fs::read(&state_path).unwrap());
+
+    let mut settings_change = original_settings.history.last().unwrap().change.clone();
+    settings_change.event_id = "fixture-new-settings".into();
+    settings_change.expected_revision = original_settings.revision;
+    settings_change.values.task_max_attempts = Some(crate::engine_settings::SettingCount(
+        if settings_change.values.task_max_attempts.as_ref().is_some_and(|value| value.0 == 2) { 3 } else { 2 },
+    ));
+    settings_change.values.project_profile_max_document_bytes =
+        Some(crate::SettingCap(Some(crate::SettingCount(1))));
+    settings_change.preview_token = root.preview_settings(&settings_change).unwrap().preview_token;
+    let (new_settings, _) = root.apply_settings(&settings_change, &mut crate::SystemEnvironment).unwrap();
+    assert_ne!(plan_contract(&new_settings.values).unwrap(), plan);
+    assert_eq!(call(&root,"blp-preparation-check",plan_source.clone(),"fixture-admin-token").unwrap(), verified_plan);
+    let new_limits = new_settings.values.context_policy_limits().unwrap();
+    assert!(crate::read_project_context(&root.root, "preparation", &new_limits).is_err());
+    assert_eq!(call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token").unwrap(), verified_project);
+    // The source bytes can change independently of the already captured prompt.
+    std::fs::write(&guide_path, b"changed project instructions").unwrap();
+    assert!(matches!(
+        call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token"),
+        Err(E::Refused("preparation-integrity-project-context-unavailable"))
+    ));
+    std::fs::write(&guide_path, guide).unwrap();
+    assert_eq!(call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token").unwrap(), verified_project);
+    std::fs::remove_file(&guide_path).unwrap();
+    match call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token").unwrap_err() {
+        E::Context(error) => assert_eq!(error.reason(), "source-path"),
+        error => panic!("expected typed context read cause: {error}"),
+    }
+    std::fs::write(&guide_path, guide).unwrap();
+    assert_eq!(call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token").unwrap(), verified_project);
+
+    // The same source bytes can be retained under a different origin in a
+    // grammar-valid fixture. All of these digests are already attributed.
+    let (alternate, alternate_native) = super::level_tests::provenance_row_with_sources(
+        &project.prompt, Some(&plan), Some(&project.prompt),
+    );
+    let mut altered_turn = turn.clone();
+    altered_turn.prompt = alternate.prompt;
+    let mut altered_native: Native = serde_json::from_value(serde_json::to_value(&native).unwrap()).unwrap();
+    altered_native.prompt_provenance = alternate_native.prompt_provenance;
+    root.db.execute("UPDATE preparation_turns SET body=?1",[encoded(&altered_turn,&altered_native).unwrap()]).unwrap();
+    assert_eq!(call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token").unwrap()["engine_source_integrity"], project_witness);
+    let mut wrong_origin = project_source.clone();
+    wrong_origin["engine_source_index"] = engine_index.into();
+    assert!(matches!(
+        call(&root, "blp-preparation-check", wrong_origin, "fixture-admin-token"),
+        Err(E::Refused("preparation-integrity-engine-bytes-unavailable"))
+    ));
+    // The recorded metadata can still agree while the captured slice differs.
+    let (alternate, alternate_native) = super::level_tests::provenance_row_with_sources(
+        instructions, Some(&plan), Some(instructions),
+    );
+    altered_turn.prompt = alternate.prompt;
+    altered_native.prompt_provenance = alternate_native.prompt_provenance;
+    root.db.execute("UPDATE preparation_turns SET body=?1",[encoded(&altered_turn,&altered_native).unwrap()]).unwrap();
+    assert!(matches!(
+        call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token"),
+        Err(E::Refused("preparation-integrity-engine-bytes-unavailable"))
+    ));
+    altered_turn.prompt = turn.prompt.clone();
+    altered_native.prompt_provenance = native.prompt_provenance.clone();
+    altered_native.project = None;
+    root.db.execute("UPDATE preparation_turns SET body=?1",[encoded(&altered_turn,&altered_native).unwrap()]).unwrap();
+    assert!(matches!(
+        call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token"),
+        Err(E::Refused("preparation-integrity-project-context-unavailable"))
+    ));
+    root.db.execute("UPDATE preparation_turns SET body=?1",[&original]).unwrap();
+    assert_eq!(call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token").unwrap(), verified_project);
+    turn.target = "brief".into();
+    root.db.execute("UPDATE preparation_turns SET body=?1",[encoded(&turn,&native).unwrap()]).unwrap();
+    assert!(codes(call(&root,"blp-preparation-check",plan_source.clone(),"fixture-admin-token").unwrap_err())
+        .contains("preparation-prompt-provenance-invalid"));
+    turn.target = "plan".into();
+    let mut wrong_settings: Native = serde_json::from_value(serde_json::to_value(&native).unwrap()).unwrap();
+    wrong_settings.settings_digest = new_settings.history.last().unwrap().digest.clone();
+    root.db.execute("UPDATE preparation_turns SET body=?1",[encoded(&turn,&wrong_settings).unwrap()]).unwrap();
+    assert!(codes(call(&root,"blp-preparation-check",plan_source.clone(),"fixture-admin-token").unwrap_err())
+        .contains("preparation-integrity-engine-bytes-unavailable"));
+    match call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token").unwrap_err() {
+        E::Context(error) => assert_eq!(error.reason(), "source-exceeds-configured-cap"),
+        error => panic!("expected typed historical cap refusal: {error}"),
+    }
+    wrong_settings.settings_digest = "0".repeat(64);
+    root.db.execute("UPDATE preparation_turns SET body=?1",[encoded(&turn,&wrong_settings).unwrap()]).unwrap();
+    assert!(codes(call(&root,"blp-preparation-check",plan_source.clone(),"fixture-admin-token").unwrap_err())
+        .contains("preparation-integrity-settings-unavailable"));
+    assert!(matches!(
+        call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token"),
+        Err(E::Refused("preparation-integrity-settings-unavailable"))
+    ));
+    root.db.execute("UPDATE preparation_turns SET body=?1",[&original]).unwrap();
+    assert_eq!(call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token").unwrap(), verified_project);
+    assert_eq!(state_before_project_checks, std::fs::read(&state_path).unwrap());
+    assert_eq!(call(&root,"blp-preparation-check",plan_source,"fixture-admin-token").unwrap(), verified_plan);
+    let mut other_source = protected_source.clone();
+    other_source["engine_source_index"] = other_index.into();
+    assert!(codes(call(&root,"blp-preparation-check",other_source,"fixture-admin-token").unwrap_err())
+        .contains("preparation-integrity-producer-not-attested"));
+    assert!(codes(call(&root,"blp-preparation-check",protected_source.clone(),"fixture-worker-token").unwrap_err())
+        .contains("blp-access-denied"));
     let before=std::fs::read(&state_path).unwrap();
     assert!(codes(call(&root,"blp-preparation-check",request.clone(),"fixture-worker-token").unwrap_err()).contains("blp-access-denied"));
     let mut bad=request.clone();bad["expected_revision"]=0.into();
@@ -121,9 +291,16 @@ fn recorded_sources_authentication_join_refusal_and_recovery() {
     let mut historical=sample_legacy(&native);
     root.db.execute("UPDATE preparation_turns SET body=?1",[encoded(&changed,&historical).unwrap()]).unwrap();
     assert!(codes(call(&root,"blp-preparation-check",request.clone(),"fixture-admin-token").unwrap_err()).contains("blp-preparation-provenance-required"));
+    assert!(codes(call(&root,"blp-preparation-check",protected_source.clone(),"fixture-admin-token").unwrap_err())
+        .contains("blp-preparation-provenance-required"));
+    assert!(matches!(
+        call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token"),
+        Err(E::Refused("blp-preparation-provenance-required"))
+    ));
     assert!(codes(call(&root,"blp-preparation-attribute",capture.clone(),"fixture-admin-token").unwrap_err()).contains("blp-preparation-provenance-required"));
     root.db.execute("UPDATE preparation_turns SET body=?1",[&original]).unwrap();
     assert_eq!(call(&root,"blp-preparation-check",request.clone(),"fixture-admin-token").unwrap(),witness);
+    assert_eq!(call(&root,"blp-preparation-check",protected_source,"fixture-admin-token").unwrap(),verified);
     historical=serde_json::from_slice(&serde_json::to_vec(&native).unwrap()).unwrap();
     historical.root.directory.0+=1;
     root.db.execute("UPDATE preparation_turns SET body=?1",[encoded(&changed,&historical).unwrap()]).unwrap();
@@ -131,6 +308,10 @@ fn recorded_sources_authentication_join_refusal_and_recovery() {
     changed.prompt.pop();
     root.db.execute("UPDATE preparation_turns SET body=?1",[encoded(&changed,&historical).unwrap()]).unwrap();
     assert!(codes(call(&root,"blp-preparation-check",request.clone(),"fixture-admin-token").unwrap_err()).contains("preparation-root-instance-changed"));
+    assert!(matches!(
+        call(&root, "blp-preparation-check", project_source.clone(), "fixture-admin-token"),
+        Err(E::Refused("preparation-root-instance-changed"))
+    ));
     assert!(codes(call(&root,"blp-preparation-attribute",capture.clone(),"fixture-admin-token").unwrap_err()).contains("preparation-root-instance-changed"));
     root.db.execute("UPDATE preparation_turns SET body=?1",[&original]).unwrap();
     assert_eq!(call(&root,"blp-preparation-check",request.clone(),"fixture-admin-token").unwrap(),witness);

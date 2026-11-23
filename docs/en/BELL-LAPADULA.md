@@ -199,7 +199,7 @@ recipe `tools/verification/recipes/blp-preparation-transport-public.json`.
 The API worker (`_prepare_turn`, Api branch of `swarm-cli/src/
 preparation_worker.rs`) now calls the decision at last use before any
 classified emission, through
-`RootStore::preparation_worker_transport_gate(id, token, base_url, model)`.
+`RootStore::preparation_worker_transport_gate(id, token, base_url, model, prompt)`.
 The gate runs inside the shared egress reservation already held by the worker
 and refuses before the HTTP request is built: no socket opens without a
 decision.
