@@ -32,6 +32,8 @@ pub struct P02DraftReceipt {
 pub enum P02DraftDeliveryError {
     Preparation(RootStoreError),
     Encoding(serde_json::Error),
+    Channel(io::Error),
+    MissingDeadline,
     Unconfirmed(io::Error),
     InvalidReceipt,
 }
@@ -41,6 +43,8 @@ impl fmt::Display for P02DraftDeliveryError {
         match self {
             Self::Preparation(_) => f.write_str("P02 draft preparation failed before send"),
             Self::Encoding(_) => f.write_str("P02 draft encoding failed before send"),
+            Self::Channel(_) => f.write_str("P02 socket inspection failed before send"),
+            Self::MissingDeadline => f.write_str("P02 socket needs read and write deadlines"),
             Self::Unconfirmed(_) => f.write_str("P02 draft delivery is unconfirmed"),
             Self::InvalidReceipt => f.write_str("P02 draft acknowledgement is invalid"),
         }
@@ -52,8 +56,8 @@ impl std::error::Error for P02DraftDeliveryError {
         match self {
             Self::Preparation(error) => Some(error),
             Self::Encoding(error) => Some(error),
-            Self::Unconfirmed(error) => Some(error),
-            Self::InvalidReceipt => None,
+            Self::Channel(error) | Self::Unconfirmed(error) => Some(error),
+            Self::MissingDeadline | Self::InvalidReceipt => None,
         }
     }
 }
@@ -61,7 +65,8 @@ impl std::error::Error for P02DraftDeliveryError {
 impl P02InvoiceBatch<'_> {
     /// Compare the subject and destination-bound reference under current Trust,
     /// then send the closed draft over the consumed socket. A preparation error
-    /// writes no bytes. The write half closes after the JSON, and the peer must
+    /// writes no bytes. Missing read or write timeouts refuse before sending.
+    /// The write half closes after the JSON, and the peer must
     /// reply with its 32-byte SHA-256 digest followed by EOF. Empty, truncated,
     /// oversized or mismatched receipts fail. A missing confirmation may hide
     /// receipt of the draft. Revocation prevents future preparations; this call
@@ -81,6 +86,15 @@ impl P02InvoiceBatch<'_> {
             .prepare_draft(&context, invoice_id, &reference_invoice_id, credential)
             .map_err(P02DraftDeliveryError::Preparation)?;
         let bytes = serde_json::to_vec(&draft).map_err(P02DraftDeliveryError::Encoding)?;
+        let read_timeout = stream
+            .read_timeout()
+            .map_err(P02DraftDeliveryError::Channel)?;
+        let write_timeout = stream
+            .write_timeout()
+            .map_err(P02DraftDeliveryError::Channel)?;
+        if read_timeout.is_none() || write_timeout.is_none() {
+            return Err(P02DraftDeliveryError::MissingDeadline);
+        }
         let sha256: [u8; 32] = Sha256::digest(&bytes).into();
         stream
             .write_all(&bytes)

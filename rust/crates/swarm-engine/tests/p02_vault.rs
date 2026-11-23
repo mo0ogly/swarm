@@ -436,7 +436,35 @@ fn fictional_draft_crosses_socket_and_requires_an_exact_receipt() {
     let output = peer.wait_with_output().unwrap();
     assert!(output.status.success() && output.stderr.is_empty());
 
+    use std::io::Read;
+    for read_deadline in [true, false] {
+        let (stream, mut peer) = std::os::unix::net::UnixStream::pair().unwrap();
+        let deadline = Some(Duration::from_secs(30));
+        if read_deadline {
+            stream.set_read_timeout(deadline).unwrap();
+        } else {
+            stream.set_write_timeout(deadline).unwrap();
+        }
+        let destination = swarm_engine::P02DraftDestination {
+            stream,
+            context: context.clone(),
+            reference_invoice_id: "reference".into(),
+        };
+        assert!(matches!(
+            batch.deliver_draft(destination, "equal", RESOLVER),
+            Err(DeliveryError::MissingDeadline)
+        ));
+        let mut ignored = [0; 1];
+        assert_eq!(peer.read(&mut ignored).unwrap(), 0);
+    }
+
     let (stream, closed_peer) = std::os::unix::net::UnixStream::pair().unwrap();
+    stream
+        .set_read_timeout(Some(Duration::from_secs(30)))
+        .unwrap();
+    stream
+        .set_write_timeout(Some(Duration::from_secs(30)))
+        .unwrap();
     drop(closed_peer);
     let destination = swarm_engine::P02DraftDestination {
         stream,
@@ -460,4 +488,47 @@ fn fictional_draft_crosses_socket_and_requires_an_exact_receipt() {
     assert!(output.status.success() && output.stderr.is_empty());
     drop(batch);
     store.close().unwrap();
+}
+
+/// Confirm that malformed wire inputs cannot yield a fixture acknowledgement.
+#[test]
+fn fictional_receiver_rejects_nonobject_and_oversized_drafts() {
+    use std::{
+        io::Write,
+        process::{Command, Stdio},
+    };
+    let witness = br#"{"invoice_id":"equal","account_matches":true}"#;
+    let mut oversized = witness.to_vec();
+    oversized.resize(257, b' ');
+    let array = br#"[["invoice_id","equal"],["account_matches",true]]"#;
+    for (data, expected) in [
+        (witness.as_slice(), None),
+        (array.as_slice(), Some("draft must be a JSON object")),
+        (oversized.as_slice(), Some("oversized draft")),
+    ] {
+        let mut child = Command::new("python3")
+            .args([
+                "-c",
+                include_str!("fixtures/p02_draft_receiver.py"),
+                "accept",
+                "equal",
+            ])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child.stdin.take().unwrap().write_all(data).unwrap();
+        let output = child.wait_with_output().unwrap();
+        if let Some(expected) = expected {
+            assert!(!output.status.success() && output.stdout.is_empty());
+            assert_eq!(
+                std::str::from_utf8(&output.stderr).unwrap().trim(),
+                expected
+            );
+        } else {
+            assert!(output.status.success());
+            assert_eq!(output.stdout.len(), 32);
+        }
+    }
 }

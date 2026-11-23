@@ -42,7 +42,8 @@
         "test fictional_invoices_require_current_scoped_mandate_and_respect_revocation ... ok",
         "test fictional_invoice_projection_and_draft_are_closed_and_mandate_bound ... ok",
         "test fictional_draft_crosses_socket_and_requires_an_exact_receipt ... ok",
-        "3 passed; 0 failed"
+        "test fictional_receiver_rejects_nonobject_and_oversized_drafts ... ok",
+        "4 passed; 0 failed"
       ],
       "required_stderr": []
     }

@@ -84,7 +84,7 @@ from data the host remains authorized to use.
 The trusted host passes an already connected `P02DraftDestination` to
 `deliver_draft`. It binds the channel to the mandate context, audience and
 reference invoice also known to the recipient, and configures socket I/O
-deadlines. Swarm resolves no address and opens no listener. The mandate and
+deadlines, which the engine checks before writing. Swarm resolves no address and opens no listener. The mandate and
 aliases are checked before writing, without holding the Trust reservation
 during I/O. Revocation prevents future preparation. It cannot recall an
 already authorized delivery.

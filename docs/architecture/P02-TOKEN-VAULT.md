@@ -92,7 +92,7 @@ données dont l'hôte possède encore l'autorité.
 L’hôte de confiance passe une `P02DraftDestination` déjà connectée à
 `deliver_draft`. Il lie le canal à une audience, à un contexte de mandat et à
 une facture de référence également connue du récepteur. Il choisit les délais
-d’E/S sur la socket. Swarm ne résout aucune adresse et n’ouvre aucun listener.
+de lecture et d’écriture sur la socket. Le moteur vérifie leur présence avant envoi. Swarm ne résout aucune adresse et n’ouvre aucun listener.
 Le mandat et les alias sont vérifiés avant l’écriture, sans conserver la
 réservation Trust pendant les E/S. Une révocation empêche les préparations
 ultérieures. Elle ne retire pas une remise déjà autorisée.
