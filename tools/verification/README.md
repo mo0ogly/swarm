@@ -3296,6 +3296,16 @@ compilation, ni la provenance de livraison du fichier, ni l'installation du
 service, la séparation UID ou une mission vivante acceptée.
 
 
+For the controlled delivered-settlement recipe, `SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1`
+requires the private `TMPDIR` effective in the test process. The supported
+Cargo launcher may replace the recipe runner's initial temporary directory
+with its admitted scratch. Both fixture allocators validate the private
+parent before allocation and emit placement witnesses. Missing or invalid
+scratch fails before allocation in this mode. Direct test invocations with
+the mode unset keep the historical private fallback. The launcher owns
+volume admission and descriptor retention. Select the Cargo target through
+the launcher's existing configuration or an admitted target override.
+
 Delivered-binary fictitious settlement chain: `recipes/paea-delivered-settlement-cli-rust.json`
 runs the second domain (separate fictitious ledger) through the same one
 designated delivered ELF. With fresh isolated owned project/ledger roots and the
@@ -3345,6 +3355,15 @@ fail the test — and the public reconciliation journal stays `consistent` with
 `effectCount=1`, the exact provisioned terms and the debt settled once, also
 read through SQLite connections opened read-only separately from the CLI. No
 UID separation, real payment or independent acceptance is claimed by this case.
+
+La recette contrôlée du règlement livré fixe `SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1`.
+Les deux allocateurs vérifient le `TMPDIR` privé effectif du processus de test
+avant allocation et consignent leur parent. Le lanceur Cargo pris en charge
+peut remplacer le répertoire initial de la recette par son aire temporaire
+admise. En mode contrôlé, un parent absent ou invalide bloque l’allocation.
+L’appel direct sans ce mode conserve le repli privé historique. Le lanceur
+assure l’admission du volume et la conservation du descripteur. La cible Cargo
+vient de la configuration du lanceur ou d’une cible explicite admise.
 
 Chaîne de règlement fictif sur binaire livré : la recette
 `recipes/paea-delivered-settlement-cli-rust.json` exécute le second domaine

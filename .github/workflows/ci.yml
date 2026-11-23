@@ -76,6 +76,47 @@ jobs:
       - run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked --workspace --lib
       - name: Check configured worker admission and extractive summary scope
         run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-engine --test agent_launch
+      - name: Check admitted settlement fixture placement
+        shell: bash
+        run: |
+          export SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1
+          export SWARM_PAEA_DELIVERED_BIN="$PWD/bin/swarm"
+          SWARM_PAEA_DELIVERED_BIN_SHA256=$(sha256sum "$SWARM_PAEA_DELIVERED_BIN" | cut -d ' ' -f 1)
+          export SWARM_PAEA_DELIVERED_BIN_SHA256
+          output=$(mktemp -d "$SWARM_RUNNER_TMPDIR/settlement-check.XXXXXXXX")
+          TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked \
+            -p swarm-cli --test paea_settlement_delivered --no-run --message-format=json > "$output/cargo.json"
+          test_binary=$(python3 - "$output/cargo.json" <<'PYEOF'
+          import json
+          import sys
+
+          with open(sys.argv[1]) as stream:
+              events = [json.loads(line) for line in stream]
+          executables = [event["executable"] for event in events
+                         if event.get("target", {}).get("name") == "paea_settlement_delivered"
+                         and event.get("executable")]
+          executable, = executables
+          print(executable)
+          PYEOF
+          )
+          nominal=delivered_settlement_commit_replay_reconcile_once
+          wrong_agreement=delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers
+          for case in "$nominal" "$wrong_agreement"; do
+            TMPDIR="$SWARM_RUNNER_TMPDIR" "$test_binary" --ignored --exact "$case" --nocapture | tee "$output/$case.log"
+            grep -F "test $case ... ok" "$output/$case.log"
+            grep -F "delivered-root-fixture-parent $SWARM_RUNNER_TMPDIR" "$output/$case.log"
+            grep -F "delivered-identity-fixture-parent $SWARM_RUNNER_TMPDIR" "$output/$case.log"
+          done
+          status=0
+          env -u TMPDIR "$test_binary" --ignored --exact "$nominal" --nocapture > "$output/missing.log" 2>&1 || status=$?
+          test "$status" -eq 101
+          grep -F "admitted fixture run requires TMPDIR" "$output/missing.log"
+          status=0
+          TMPDIR="$output/absent" "$test_binary" --ignored --exact "$nominal" --nocapture > "$output/invalid.log" 2>&1 || status=$?
+          test "$status" -eq 101
+          grep -F "delivered ledger fixture parent must be private" "$output/invalid.log"
+          test ! -e "$output/absent"
+          ! grep -E 'delivered-(root|identity)-fixture-parent|delivered-binary-witness' "$output/missing.log" "$output/invalid.log"
       - name: Check the P02 vault with fictional invoices
         run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-engine --test p02_vault
       - name: Replay the fictional P02 pilot and verify closure
