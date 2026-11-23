@@ -163,8 +163,9 @@ v2, ancre HMAC schéma 1 et clé acquise séparément. La vérification n’atte
 heure tierce, ni protection contre le même UID, ni acceptation indépendante.
 
 Le [coffre P02](P02-TOKEN-VAULT.md) expose une substitution en mémoire par lot
-et une résolution sous mandat dans l’API Rust locale. Son raccordement à un
-parcours de facture relève du pilote.
+et une résolution sous mandat dans l’API Rust locale. La préparation de facture
+Q04 utilise ce coffre pour produire une projection et un brouillon minimal.
+L’envoi du brouillon relève du pilote.
 
 ## Confidentialité Bell-LaPadula — administration livrée, contrôle partiel
 

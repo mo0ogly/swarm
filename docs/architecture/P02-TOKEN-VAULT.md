@@ -5,15 +5,20 @@
 Le moteur Rust sous Linux expose `RootStore::open_p02_vault` pour un hôte local
 de confiance. L'hôte tient un coffre par lot, remplace le champ retenu avant
 de remettre la donnée à l'agent et transmet seulement la projection autorisée.
-L'adaptateur métier devra faire ces deux dernières opérations. Le composant
-n'est raccordé ni à l'ingestion de factures, ni au fournisseur, ni à la
-publication, et n'expose aucune opération HTTP ou CLI sur les valeurs.
+Pour le parcours de brouillon de facture Q04, l'hôte appelle
+`RootStore::prepare_p02_invoice_batch`. L'adaptateur prépare les données et le
+brouillon en mémoire. Le transport, la publication du brouillon et le lancement
+du pilote demandent une décision distincte. Les valeurs brutes restent dans
+l'API Rust locale.
 
 ```mermaid
 flowchart LR
-  A[Hôte local de confiance] -->|référence brute| V[Coffre du lot]
-  V -->|jeton opaque| A
+  A[Hôte local de confiance] -->|factures et références brutes| F[Préparation Q04]
+  F <-->|référence et jeton| V[Coffre du lot]
   T[État Trust de la racine ouverte] -->|identité et révision courantes| V
+  F -->|identifiants et jetons| P[Traitement local]
+  P -->|paire d’identifiants| F
+  F -->|identifiant et résultat de comparaison| A
   V -->|copie sous mandat| R[Résolveur local habilité]
 ```
 
@@ -56,6 +61,29 @@ rôle requis, ou l'hôte peut détruire le coffre. Une reprise ouvre un nouveau
 mandat et émet de nouvelles associations. Le droit de résoudre ne confère
 aucune autorisation de publication.
 
+## Préparation du brouillon de rapprochement
+
+L'hôte approuve les identifiants de facture pour la divulgation, fournit les
+références de compte sensibles, borne le nombre de lignes et fixe les termes
+du mandat P02. Les identifiants doivent être valides et uniques. Une ligne
+invalide ou un refus Trust entraîne la destruction du coffre partiel.
+`project_for_agent` retourne exclusivement `invoice_id` et `account_token` à
+l'émetteur sous mandat courant. L'égalité des jetons est lisible dans le lot.
+
+Le traitement propose deux identifiants de facture distincts. L'hôte appelle
+`prepare_draft` avec le contexte et le résolveur autorisé. Le moteur vérifie
+les deux alias dans la même réservation Trust et calcule l'égalité. Le
+brouillon contient exclusivement `invoice_id` et `account_matches` pour
+l'audience du mandat. Il ne déclenche aucun envoi ni règlement PAEA.
+L'hôte reste responsable de l'autorité de sortie et du récepteur effectif.
+
+La résolution du compte via `resolve_account` est une opération locale à part.
+Le retrait d'un compte affecte toutes les factures qui partagent son alias.
+Il fait refuser une nouvelle projection complète et les brouillons touchés.
+Après retrait du mandat ou changement de révision Trust, les opérations
+exigeant le mandat refusent. La reprise crée un nouveau lot à partir des
+données dont l'hôte possède encore l'autorité.
+
 ## Vérification
 
 La recette [p02-token-vault](../../tools/verification/recipes/p02-token-vault.json)
@@ -65,3 +93,6 @@ qualifiés. Les cas couvrent les alias intra-lot et inter-lots, les différences
 de principal/projet/lot/audience, l’expiration, le retrait, la révocation et la
 révision de l'autorité et la réouverture du projet. Le DAT P02 et les directives
 D03, D06 et D10 conservent la proposition d'origine et les conditions du pilote.
+Le test du brouillon vérifie les deux schémas sérialisés, les alias communs et
+séparés, le résultat calculé, les refus sans remise au récepteur inerte et
+la reprise après échec d'un lot partiellement préparé.

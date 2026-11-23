@@ -4,15 +4,20 @@
 
 The Linux Rust engine exposes `RootStore::open_p02_vault` to a trusted local
 host. The host owns one vault per batch, substitutes the selected field before
-handing data to the agent, and sends only the authorized projection. A business
-adapter must supply the last two operations. Invoice ingestion, provider calls
-and publication have no vault integration, and values have no HTTP or CLI route.
+handing data to the agent, and sends only the authorized projection.
+For the Q04 invoice draft flow, the host calls
+`RootStore::prepare_p02_invoice_batch`. The adapter prepares input and drafts
+in memory. Transport, draft publication and pilot execution require separate
+decisions. Raw values stay within the local Rust API.
 
 ```mermaid
 flowchart LR
-  A[Trusted local host] -->|raw reference| V[Batch vault]
-  V -->|opaque token| A
+  A[Trusted local host] -->|invoices and raw references| F[Q04 preparation]
+  F <-->|reference and token| V[Batch vault]
   T[Trust state of the opened Root] -->|current identity and revision| V
+  F -->|identifiers and tokens| P[Local processing]
+  P -->|pair of identifiers| F
+  F -->|identifier and comparison result| A
   V -->|copy under mandate| R[Authorized local resolver]
 ```
 
@@ -49,6 +54,28 @@ withdraw values if still authorized, or the host can drop the vault. Reopening
 requires a new mandate and new associations. Resolution grants no publication
 authority.
 
+## Preparing the reconciliation draft
+
+The host approves invoice identifiers for disclosure, supplies sensitive
+account references, bounds the number of rows and provides the P02 mandate
+terms. Invoice identifiers must be valid and unique. An invalid row or Trust
+refusal drops the partial vault. `project_for_agent` returns only
+`invoice_id` and `account_token` to the issuer under a current mandate.
+Token equality is visible within the batch.
+
+The processor proposes two distinct invoice identifiers. The host calls
+`prepare_draft` with the context and authorized resolver. The engine checks both
+aliases under one Trust reservation and computes equality. The draft contains
+only `invoice_id` and `account_matches` for the mandate audience. It triggers
+no delivery or PAEA settlement. The host retains responsibility for release
+authority and for the actual receiver.
+
+`resolve_account` remains a separate local operation. Account withdrawal
+covers all invoices sharing an alias. A later full projection and affected
+drafts refuse. Mandate withdrawal or a change of the Trust revision also
+refuses operations requiring the mandate. Recovery creates a fresh batch
+from data the host remains authorized to use.
+
 ## Verification
 
 The [p02-token-vault recipe](../../tools/verification/recipes/p02-token-vault.json)
@@ -57,3 +84,6 @@ requires Linux, locked Cargo, an admitted build target and qualified scratch spa
 It covers alias scope, principal/project/batch/audience mismatches, expiry, alias and
 mandate revocation, stale Trust revisions and reopening. The P02 DAT and
 directives D03, D06 and D10 retain the original proposal and pilot conditions.
+The draft test checks both serialized schemas, shared and distinct aliases, the
+computed result, refusals without delivery to an inert receiver, and recovery
+from a partially prepared batch.

@@ -229,11 +229,7 @@ impl P02Vault<'_> {
         token: &str,
         credential: &str,
     ) -> Result<P02ResolvedValue, R> {
-        self.root.with_p02_authority(credential, |state, actor| {
-            self.require_current(state, context, Instant::now())?;
-            if actor.subject != self.grant.resolver {
-                return Err(trust_error(E::Data("p02-mandate-refused")));
-            }
+        self.with_resolver(context, credential, || {
             self.values
                 .get(token)
                 .and_then(Option::as_ref)
@@ -241,6 +237,65 @@ impl P02Vault<'_> {
                 .map(P02ResolvedValue)
                 .ok_or_else(|| trust_error(E::Data("p02-mandate-refused")))
         })
+    }
+
+    /// Share the current Trust reservation and resolver check between the raw
+    /// lookup and the account comparison. Release failure withholds the result.
+    fn with_resolver<T>(
+        &self,
+        context: &P02Context,
+        credential: &str,
+        apply: impl FnOnce() -> Result<T, R>,
+    ) -> Result<T, R> {
+        self.root.with_p02_authority(credential, |state, actor| {
+            self.require_current(state, context, Instant::now())?;
+            if actor.subject != self.grant.resolver {
+                return Err(trust_error(E::Data("p02-mandate-refused")));
+            }
+            apply()
+        })
+    }
+
+    /// Check issuer, exact scope and live aliases before returning an invoice
+    /// projection. There is no lookup of raw bytes or storage mutation.
+    pub(super) fn authorize_projection<'a>(
+        &self,
+        context: &P02Context,
+        credential: &str,
+        aliases: impl Iterator<Item = &'a str>,
+    ) -> Result<(), R> {
+        self.root.with_p02_authority(credential, |state, actor| {
+            self.require_issuer(actor)?;
+            self.require_current(state, context, Instant::now())?;
+            self.require_live_aliases(aliases)
+        })
+    }
+
+    /// Compare two active aliases under one current resolver authorization.
+    /// Withdrawn or missing aliases refuse. Raw values are never copied.
+    pub(super) fn compare_aliases(
+        &self,
+        context: &P02Context,
+        first: &str,
+        second: &str,
+        credential: &str,
+    ) -> Result<bool, R> {
+        self.with_resolver(context, credential, || {
+            self.require_live_aliases([first, second].into_iter())?;
+            Ok(first == second)
+        })
+    }
+
+    /// Refuse aliases with no current value. Callers hold the Trust reservation
+    /// and have already checked the applicable authority.
+    fn require_live_aliases<'a>(
+        &self,
+        mut aliases: impl Iterator<Item = &'a str>,
+    ) -> Result<(), R> {
+        if aliases.all(|alias| self.values.get(alias).is_some_and(Option::is_some)) {
+            return Ok(());
+        }
+        Err(trust_error(E::Data("p02-mandate-refused")))
     }
 
     /// Withdraw one alias and drop its owned value buffer. Only the current

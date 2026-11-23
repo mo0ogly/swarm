@@ -9,6 +9,7 @@
     "rust/crates/swarm-engine/Cargo.toml",
     "rust/crates/swarm-engine/src/lib.rs",
     "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/p02_invoice.rs",
     "rust/crates/swarm-engine/src/root_store/p02_vault.rs",
     "rust/crates/swarm-engine/src/root_store/trust_store.rs",
     "rust/crates/swarm-engine/src/trust/*.rs",
@@ -24,7 +25,8 @@
       "expected_exit": 0,
       "required_stdout": [
         "test fictional_invoices_require_current_scoped_mandate_and_respect_revocation ... ok",
-        "1 passed; 0 failed"
+        "test fictional_invoice_projection_and_draft_are_closed_and_mandate_bound ... ok",
+        "2 passed; 0 failed"
       ],
       "required_stderr": []
     }

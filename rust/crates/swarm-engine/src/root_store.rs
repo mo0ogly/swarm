@@ -74,6 +74,10 @@ pub use admin_budget::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,Admi
 mod material_path;
 mod trust_store;
 #[cfg(target_os = "linux")]
+mod p02_invoice;
+#[cfg(target_os = "linux")]
+pub use p02_invoice::{P02AgentInvoice, P02InvoiceBatch, P02InvoiceDraft, P02InvoiceInput};
+#[cfg(target_os = "linux")]
 mod p02_vault;
 #[cfg(target_os = "linux")]
 pub use p02_vault::{P02Context, P02Grant, P02ResolvedValue, P02Vault};
