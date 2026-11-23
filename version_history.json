@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Factures Rust : la préparation du rapprochement P02 remplace la référence de compte par un jeton et prépare un brouillon minimal sous mandat. Le pilote reste en pause.",
+        "en": "Rust invoices: P02 reconciliation preparation substitutes an account token and prepares a minimal draft under a mandate. The pilot remains paused."
+      },
+      {
         "fr": "Moteur Rust : coffre P02 en mémoire par lot, résolution soumise à un mandat local courant et retrait des jetons. Les diagnostics de résolution masquent les valeurs brutes. Le pilote de facture reste à décider.",
         "en": "Rust engine: in-memory P02 vault per batch, resolution under a current local mandate, and token withdrawal. Resolution diagnostics redact raw values. The invoice pilot remains a separate decision."
       },

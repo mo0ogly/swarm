@@ -2,7 +2,9 @@
 #![cfg(target_os = "linux")]
 use serde_json::json;
 use std::{num::NonZeroUsize, path::Path, time::Duration};
-use swarm_engine::{P02Context, P02Grant, RootStore, RootStoreError, SystemEnvironment};
+use swarm_engine::{
+    P02Context, P02Grant, P02InvoiceInput, RootStore, RootStoreError, SystemEnvironment,
+};
 
 const ISSUER: &str = "fixture-p02-issuer-token";
 const RESOLVER: &str = "fixture-p02-resolver-token";
@@ -165,4 +167,150 @@ fn fictional_invoices_require_current_scoped_mandate_and_respect_revocation() {
     );
     drop(fresh);
     reopened.close().unwrap();
+}
+
+/// Observe the serialized input and the inert draft receiver on fictional
+/// invoices. Only an authorized engine comparison reaches that receiver.
+#[test]
+fn fictional_invoice_projection_and_draft_are_closed_and_mandate_bound() {
+    let work = tempfile::tempdir().unwrap();
+    let root = work.path();
+    RootStore::initialize(root, &mut SystemEnvironment)
+        .unwrap()
+        .close()
+        .unwrap();
+    configure(root, 0);
+    let store = RootStore::open(root, false).unwrap();
+    let a = grant("batch-a").context;
+    let b = grant("batch-b").context;
+    let inputs = [
+        P02InvoiceInput {
+            invoice_id: "f001",
+            account_reference: ACCOUNT_A,
+        },
+        P02InvoiceInput {
+            invoice_id: "f002",
+            account_reference: ACCOUNT_A,
+        },
+        P02InvoiceInput {
+            invoice_id: "f003",
+            account_reference: ACCOUNT_B,
+        },
+    ];
+    let bad_tail = [
+        P02InvoiceInput {
+            invoice_id: "f001",
+            account_reference: ACCOUNT_A,
+        },
+        P02InvoiceInput {
+            invoice_id: "f002",
+            account_reference: b"",
+        },
+    ];
+    assert!(store
+        .prepare_p02_invoice_batch(grant("batch-a"), &bad_tail, ISSUER)
+        .is_err());
+    assert!(store
+        .prepare_p02_invoice_batch(grant("batch-a"), &[], ISSUER)
+        .is_err());
+    denied(store.prepare_p02_invoice_batch(grant("batch-a"), &inputs, RESOLVER));
+
+    let duplicate = [
+        P02InvoiceInput {
+            invoice_id: "f001",
+            account_reference: ACCOUNT_A,
+        },
+        P02InvoiceInput {
+            invoice_id: "f001",
+            account_reference: ACCOUNT_B,
+        },
+    ];
+    assert!(matches!(
+        store.prepare_p02_invoice_batch(grant("batch-a"), &duplicate, ISSUER),
+        Err(RootStoreError::Refused("p02-invoice-identifiers"))
+    ));
+    let trust_before = std::fs::read(root.join(".swarm/trust-actions.json")).unwrap();
+    let mut batch = store
+        .prepare_p02_invoice_batch(grant("batch-a"), &inputs, ISSUER)
+        .unwrap();
+    let other = store
+        .prepare_p02_invoice_batch(grant("batch-b"), &inputs[..1], ISSUER)
+        .unwrap();
+    denied(batch.project_for_agent(&a, RESOLVER));
+    denied(batch.project_for_agent(&b, ISSUER));
+    let agent_json = serde_json::to_value(batch.project_for_agent(&a, ISSUER).unwrap()).unwrap();
+    let cross = serde_json::to_value(other.project_for_agent(&b, ISSUER).unwrap()).unwrap();
+    let shared = &agent_json[0]["account_token"];
+    assert_eq!(
+        agent_json[0],
+        json!({"invoice_id":"f001","account_token":shared})
+    );
+    assert_eq!(agent_json[1]["account_token"], *shared);
+    assert_ne!(agent_json[2]["account_token"], *shared);
+    assert_ne!(cross[0]["account_token"], *shared);
+    assert!(!agent_json
+        .to_string()
+        .contains("fictitious-invoice-account"));
+
+    let mut wrong_audience = a.clone();
+    wrong_audience.audience = "foreign-receiver".into();
+    assert_eq!(
+        batch
+            .resolve_account(&a, "f001", RESOLVER)
+            .unwrap()
+            .as_bytes(),
+        ACCOUNT_A
+    );
+    denied(batch.resolve_account(&a, "f001", ISSUER));
+    let mut received = Vec::new();
+    {
+        let mut deliver = |context, invoice, reference, credential| {
+            let draft = batch.prepare_draft(context, invoice, reference, credential)?;
+            received.push(serde_json::to_value(draft).unwrap());
+            Ok::<(), RootStoreError>(())
+        };
+        deliver(&a, "f002", "f001", RESOLVER).unwrap();
+        denied(deliver(&wrong_audience, "f002", "f001", RESOLVER));
+        denied(deliver(&a, "f002", "f001", ISSUER));
+        assert!(deliver(&a, "f002", "missing-invoice", RESOLVER).is_err());
+        assert!(deliver(&a, "f002", "f002", RESOLVER).is_err());
+    }
+    assert_eq!(
+        received,
+        vec![json!({"invoice_id":"f002","account_matches":true})]
+    );
+    let different = batch.prepare_draft(&a, "f003", "f001", RESOLVER).unwrap();
+    assert_eq!(
+        serde_json::to_value(different).unwrap(),
+        json!({"invoice_id":"f003","account_matches":false})
+    );
+    assert!(batch.revoke_account("f001", ISSUER).unwrap());
+    denied(batch.project_for_agent(&a, ISSUER));
+    denied(batch.prepare_draft(&a, "f003", "f002", RESOLVER));
+    denied(batch.resolve_account(&a, "f002", RESOLVER));
+    assert_eq!(
+        batch
+            .resolve_account(&a, "f003", RESOLVER)
+            .unwrap()
+            .as_bytes(),
+        ACCOUNT_B
+    );
+    batch.revoke_mandate(ISSUER).unwrap();
+    denied(batch.resolve_account(&a, "f003", RESOLVER));
+    assert_eq!(
+        trust_before,
+        std::fs::read(root.join(".swarm/trust-actions.json")).unwrap()
+    );
+    assert_eq!(
+        other
+            .resolve_account(&b, "f001", RESOLVER)
+            .unwrap()
+            .as_bytes(),
+        ACCOUNT_A
+    );
+    configure(root, 1);
+    denied(other.project_for_agent(&b, ISSUER));
+    denied(other.resolve_account(&b, "f001", RESOLVER));
+    drop((batch, other));
+    store.close().unwrap();
 }

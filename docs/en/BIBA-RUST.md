@@ -160,8 +160,9 @@ schema1 HMAC anchor and separately acquired key. Verification establishes neithe
 third-party time, protection against the same UID nor independent acceptance.
 
 The [P02 vault](P02-TOKEN-VAULT.md) exposes in-memory substitution per batch
-and resolution under a mandate in the local Rust API. The invoice workflow
-integration belongs to the proposed pilot.
+and resolution under a mandate in the local Rust API. Q04 invoice preparation
+uses this vault to produce a projection and a minimal draft. Draft delivery
+belongs to the proposed pilot.
 
 ## Bell-LaPadula confidentiality — delivered administration, undelivered control
 
