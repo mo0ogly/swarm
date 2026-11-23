@@ -29,6 +29,7 @@ pub(crate) struct ExecutionPreparation {
     /// this is not an enduring settings lease or execution authority.
     pub model_values: crate::EngineSettingsValues,
     pub host: HostPreparation,
+    pub effective_preflight: crate::PreflightResult,
     pub launch_policy: crate::AgentLaunchPolicy,
     pub reserved: crate::agent_execution_store::ReservationReceipt,
 }
@@ -36,7 +37,7 @@ pub(crate) struct ExecutionPreparation {
 /// Unknown original request content cannot disappear through Go projection and
 /// become an executable request. Missing/type/codec/finalization causes survive.
 pub(crate) fn retained(
-    tx: &Transaction<'_>,
+    tx: &rusqlite::Connection,
     id: &str,
 ) -> Result<(Agent, Launch, Vec<u8>), AgentLaunchError> {
     launch::query(
@@ -335,47 +336,15 @@ pub(crate) fn inspect(
         return Err(AgentLaunchError::Refused("agent-execution-memory-paths-changed"));
     }
     launch::field_guide(root)?;
-    let (source_provider, provider_raw) = launch::provider(dir, &request, &policy)?;
-    launch::cooldown(root, &agent.provider)?;
-    let model = crate::provider_model_route::resolve(
-        &source_provider,
-        &request,
-        &settings.values,
-        &policy,
-    )?;
-    crate::task_model::check_resolved(&work, &agent.task_id, model.route())?;
-    if agent.model_route.as_deref() != model.route() {
-        return Err(AgentLaunchError::Refused(
-            "agent-execution-model-route-changed",
-        ));
+    let (model, host, provider_raw) = observe_retained_host(root, dir, settings, &work, &agent, &request, &policy)?;
+    let effective_preflight = match mission.as_ref() {
+        Some(binding) => crate::root_store::adoption_preflight(tx, &agent, binding, settings)
+            .map_err(|e| AgentLaunchError::caused("agent-execution-adoption-preflight", e))?,
+        None => None,
     }
-    let provider = model.provider();
-    let host = agent_launch_preflight::observe(root, &agent.provider, &model, &request, &policy)?;
-    let original = agent.preflight.as_ref().ok_or(AgentLaunchError::Refused(
-        "agent-execution-preflight-missing",
-    ))?;
-    model.check_recorded_scope(original)?;
-    let now = crate::system_timestamp()
-        .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))?;
-    let parse = |raw: &str| {
-        swarm_wire_json::go_rfc3339::parse(raw)
-            .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))
-    };
-    if parse(&now)? >= parse(&original.valid_until)? {
-        return Err(AgentLaunchError::Refused(
-            "agent-execution-preflight-expired",
-        ));
-    }
-    if host.preflight.scope != original.scope
-        || host.workspace.to_str() != Some(agent.workspace.as_str())
-        || provider.command != agent.command
-        || provider.args != agent.args
-        || agent.env_allow.as_deref() != Some(host.environment_names.as_slice())
-    {
-        return Err(AgentLaunchError::Refused(
-            "agent-execution-preflight-changed",
-        ));
-    }
+    .or_else(|| agent.preflight.as_deref().cloned())
+    .ok_or(AgentLaunchError::Refused("agent-execution-preflight-missing"))?;
+    check_expiry(&effective_preflight)?;
     let workflow = crate::read_agent_workflow(
         root,
         "worker",
@@ -421,9 +390,106 @@ pub(crate) fn inspect(
         model,
         model_values: settings.values.clone(),
         host,
+        effective_preflight,
         launch_policy: policy,
         reserved: crate::agent_execution_store::reservation(tx, id)?,
     })
+}
+
+/// Check the selected execution receipt at the current process boundary.
+/// The caller selects it from the original admission or verified adoption lineage.
+pub(crate) fn check_expiry(receipt: &crate::PreflightResult) -> Result<(), AgentLaunchError> {
+    let now = crate::system_timestamp()
+        .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))?;
+    let parse = |raw: &str| {
+        swarm_wire_json::go_rfc3339::parse(raw)
+            .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))
+    };
+    if parse(&now)? >= parse(&receipt.valid_until)? {
+        return Err(AgentLaunchError::Refused("agent-execution-preflight-expired"));
+    }
+    Ok(())
+}
+
+/// Observe host and route under saved policy, matching the immutable original.
+/// This may perform the existing workspace write probe. No launch or grant
+/// follows. Read, model and scope failures retain their original causes.
+fn observe_retained_host(
+    root: &Path,
+    dir: &LocalDirectory,
+    settings: &EngineSettingsDocument,
+    work: &crate::Work,
+    agent: &Agent,
+    request: &Launch,
+    policy: &crate::AgentLaunchPolicy,
+) -> Result<(crate::provider_model_route::ModelRoutePreparation, HostPreparation, Vec<u8>), AgentLaunchError> {
+    let (source_provider, provider_raw) = launch::provider(dir, request, policy)?;
+    launch::cooldown(root, &agent.provider)?;
+    let model = crate::provider_model_route::resolve(
+        &source_provider, request, &settings.values, policy,
+    )?;
+    crate::task_model::check_resolved(work, &agent.task_id, model.route())?;
+    if agent.model_route.as_deref() != model.route() {
+        return Err(AgentLaunchError::Refused("agent-execution-model-route-changed"));
+    }
+    let provider = model.provider();
+    let host = agent_launch_preflight::observe(root, &agent.provider, &model, request, policy)?;
+    let original = agent.preflight.as_ref()
+        .ok_or(AgentLaunchError::Refused("agent-execution-preflight-missing"))?;
+    model.check_recorded_scope(original)?;
+    if host.preflight.scope != original.scope
+        || host.workspace.to_str() != Some(agent.workspace.as_str())
+        || provider.command != agent.command
+        || provider.args != agent.args
+        || agent.env_allow.as_deref() != Some(host.environment_names.as_slice())
+    {
+        return Err(AgentLaunchError::Refused("agent-execution-preflight-changed"));
+    }
+    Ok((model, host, provider_raw))
+}
+
+/// Produce a fresh observation for an expired, still-queued automatic Agent.
+/// The adoption writer checks the current lease, consent and canonical Agent,
+/// and verifies that the reservation remains unchanged. This helper uses its
+/// Root and Work under the writer's transaction and reads the saved request.
+/// Provider, model or host drift refuses. The proposed receipt grants no
+/// process permission and this helper writes no journal.
+pub(crate) fn observe_adoption_preflight(
+    db: &rusqlite::Connection,
+    root: &Path,
+    dir: &LocalDirectory,
+    settings: &EngineSettingsDocument,
+    work: &crate::Work,
+    agent: &Agent,
+) -> Result<crate::PreflightResult, AgentLaunchError> {
+    if db.is_autocommit() {
+        return Err(AgentLaunchError::Refused("agent-adoption-preflight-transaction-required"));
+    }
+    let (actual, mut request, _) = retained(db, &agent.id)?;
+    if actual != *agent || work.id != agent.work_id
+        || request.expected_revision.checked_add(1) != Some(work.revision)
+    {
+        return Err(AgentLaunchError::Refused("agent-execution-context-stale"));
+    }
+    process_boundary(agent, ExecutionStage::Queued)?;
+    launch::execution_guards(db, &agent.work_id, &request, agent)?;
+    crate::task_model::bind_launch(work, &mut request)?;
+    crate::memory_files::check(root, db, work)?;
+    if work.planning.as_deref().is_some_and(|p| p.repository.is_some()) {
+        request.workspace = crate::managed_repository::verify_worker(
+            root, db, work, agent, settings, crate::managed_repository::WorkerCheck::BeforeExecution,
+        )?;
+    }
+    let policy = settings.values.agent_launch_policy()
+        .map_err(|e| AgentLaunchError::caused(e.reason(), e))?;
+    let (model, host, provider_raw) = observe_retained_host(root, dir, settings, work, agent, &request, &policy)?;
+    let (_, current_raw) = launch::provider(dir, &request, &policy)?;
+    if current_raw != provider_raw {
+        return Err(AgentLaunchError::Refused("agent-provider-catalogue-changed"));
+    }
+    model.recheck(&request, &settings.values, &policy)?;
+    agent_launch_preflight::recheck(root, &model, &request, &policy, &host)?;
+    Ok(host.preflight)
 }
 
 #[cfg(test)]

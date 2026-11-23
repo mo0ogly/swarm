@@ -49,7 +49,7 @@ fn caused(code: &'static str, error: impl Error + Send + Sync + 'static) -> Root
     RootStoreError::Launch(Box::new(AgentLaunchError::caused(code, error)))
 }
 /// Recheck observed host/model data against the checked settings-value snapshot
-/// and the original (not refreshed) preparation TTL. Cache/env changes refuse
+/// and the selected, immutable preparation receipt TTL. Cache/env changes refuse
 /// immediately before exec; values are observations, not an enduring lease.
 /// Errors preserve causes and close prepared descriptors without a provider.
 fn fresh(root: &Path, prepared: &ExecutionPreparation) -> Result<(), RootStoreError> {
@@ -69,19 +69,8 @@ fn fresh(root: &Path, prepared: &ExecutionPreparation) -> Result<(), RootStoreEr
         &prepared.host,
     )
     .map_err(|e| RootStoreError::Launch(Box::new(e)))?;
-    let receipt = prepared
-        .agent
-        .preflight
-        .as_ref()
-        .ok_or(RootStoreError::Refused("agent-execution-preflight-missing"))?;
-    let now = crate::system_timestamp().map_err(RootStoreError::Runtime)?;
-    let parse = |v: &str| {
-        swarm_wire_json::go_rfc3339::parse(v).map_err(|e| caused("agent-execution-clock", e))
-    };
-    if parse(&now)? >= parse(&receipt.valid_until)? {
-        return Err(RootStoreError::Refused("agent-execution-preflight-expired"));
-    }
-    Ok(())
+    crate::agent_execution_preflight::check_expiry(&prepared.effective_preflight)
+        .map_err(|e| RootStoreError::Launch(Box::new(e)))
 }
 /// Preserve the worker-specific argv conflict check before shared immutable
 /// exec transport preparation. The checked model/host supplies argv/environment

@@ -9,10 +9,31 @@ const cfg=JSON.parse(fs.readFileSync(0,'utf8')),out=path.resolve(cfg.output),rep
   console.log('RUN agent-exchanges',lang,theme);const context=await browser.createBrowserContext(),page=await context.newPage();page.setDefaultTimeout(0);page.setDefaultNavigationTimeout(0);let reject;const failure=new Promise((_,r)=>reject=r),guard=p=>Promise.race([p,failure]);
   page.on('pageerror',e=>{errors.push(e.message);reject(e)});page.on('requestfailed',r=>{errors.push(new URL(r.url()).pathname);reject(Error('resource failed'))});page.on('response',r=>{if(r.status()>=400)httpErrors.push({status:r.status(),path:new URL(r.url()).pathname})});
   await page.setViewport({width:1440,height:1000});await guard(page.goto('http://'+cfg.address+'/?lang='+lang+'&theme='+theme,{waitUntil:'networkidle0'}));await page.type('#access-key',cfg.key);await guard(Promise.all([page.waitForNavigation({waitUntil:'networkidle0'}),page.click('button[type=submit]')]));await guard(page.goto('http://'+cfg.address+'/native-runtime.html?'+new URLSearchParams({work:cfg.work,lang,theme}),{waitUntil:'networkidle0'}));await guard(page.waitForSelector('[data-exchanges]'));
+  for(const [route,file] of [['cockpit.js','native-cockpit.js'],['english.js','i18n-en.js']]){
+   const served=await page.evaluate(async route=>{
+    const response=await fetch('/native-runtime/'+route);
+    if(!response.ok) throw Error('Protected asset unavailable: '+route);
+    return Array.from(new Uint8Array(await response.arrayBuffer()));
+   },route);
+   assert.deepEqual(Buffer.from(served),fs.readFileSync(path.join(repo,'web',file)));
+  }
   assert.equal(await page.evaluate(()=>performance.getEntriesByType('resource').filter(e=>new URL(e.name).pathname==='/api/v1/exchanges').length),0,'No background exchange read');
   await page.click('[data-exchanges] > summary');assert(await page.$eval('[data-exchanges] > summary',e=>e.textContent=== (document.documentElement.lang==='en'?'Agent exchanges':'Échanges entre agents')));await page.click('[data-exchanges-read]');
   const loaded=async()=>{await guard(page.waitForFunction(()=>{const e=document.querySelector('[data-exchanges-status]');return e&&!e.textContent.includes('…')}));assert(await page.$eval('[data-exchanges-status]',e=>!e.classList.contains('alert')),await page.$eval('[data-exchanges-status]',e=>e.textContent))};await loaded();
   assert.deepEqual(await page.$$eval('[data-exchanges] h4',nodes=>nodes.map(e=>e.textContent)),['a-first','z-last']);assert.equal(await page.evaluate(()=>window.exchangeInjected),undefined);assert.equal((await page.$$('[data-exchanges] img')).length,0);assert((await page.$eval('[data-exchanges]',e=>e.textContent)).includes('<img src=x onerror=window.exchangeInjected=true>'));
+  const jumps='[data-exchanges] [data-exchange-jump]';
+  assert.deepEqual(await page.$$eval(jumps,nodes=>nodes.map(node=>node.textContent.split(' · ').at(-1))),['z-last','a-first']);
+  assert((await page.$eval('[data-exchanges]',node=>node.textContent)).includes(lang==='fr'?'Aucun accusé enregistré.':'No recorded acknowledgement.'));
+  assert((await page.$eval('[data-exchanges]',node=>node.textContent)).includes('2026-01-01T00:01:00Z'));
+  const exchangeReads=()=>page.evaluate(()=>performance.getEntriesByType('resource').filter(e=>new URL(e.name).pathname==='/api/v1/exchanges').length);
+  const readsBeforeNavigation=await exchangeReads();
+  await page.click(jumps);
+  assert.equal(await page.evaluate(()=>document.activeElement.textContent),'z-last');
+  const returnButton=(await page.$$(jumps))[1];
+  await returnButton.focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.evaluate(()=>document.activeElement.textContent),'a-first');
+  assert.equal(await exchangeReads(),readsBeforeNavigation);
   const contrast=await page.$eval('[data-exchanges]',section=>{
    const rgba=raw=>{const n=raw.match(/[\d.]+/g)?.map(Number);if(!n||n.length<3)throw Error('Unsupported computed color');return[n[0],n[1],n[2],n[3]??1]},blend=(fg,bg)=>fg.slice(0,3).map((v,i)=>v*fg[3]+bg[i]*(1-fg[3])),background=node=>{const chain=[];for(let n=node;n;n=n.parentElement)chain.push(rgba(getComputedStyle(n).backgroundColor));let c=[255,255,255];for(const b of chain.reverse())c=blend(b,c);return c},luminance=c=>c.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
    return [...section.querySelectorAll('summary,button,p,dt,dd,h4')].map(node=>{const style=getComputedStyle(node),bg=background(node),fg=blend(rgba(style.color),bg),a=luminance(fg),b=luminance(bg);return {tag:node.tagName,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05),minimum:4.5}})
@@ -26,7 +47,7 @@ const cfg=JSON.parse(fs.readFileSync(0,'utf8')),out=path.resolve(cfg.output),rep
    // Hold one actual GET response, change selection, then release old records.
    await page.evaluate(()=>{const original=window.fetch.bind(window);window.exchangeOriginal=original;window.fetch=async(input,options)=>{const u=new URL(String(input),location.href);if(u.pathname!=='/api/v1/exchanges')return original(input,options);const response=await original(input,options);return new Promise(resolve=>{window.releaseExchange=()=>resolve(response);window.exchangeHeld=true})}});await page.click('[data-exchanges-read]');await guard(page.waitForFunction(()=>window.exchangeHeld));await page.click('[data-work="'+cfg.other+'"]');await page.evaluate(()=>{window.releaseExchange();window.fetch=window.exchangeOriginal});await guard(page.waitForSelector('[data-exchanges]'));await page.click('[data-exchanges] > summary');await page.click('[data-exchanges-read]');await loaded();assert.equal((await page.$$('[data-exchanges] h4')).length,0);assert((await page.$eval('[data-exchanges]',e=>e.textContent)).includes('Aucun échange enregistré.'));
   }
-  checks.push({lang,theme,explicit_only:true,literal_text:true,sorted_rows:true,desktop_mobile:true,contrast,invalid_wrong_work_error_recovery:true});await context.close();
+  checks.push({lang,theme,explicit_only:true,literal_text:true,sorted_rows:true,exact_reply_navigation:true,served_assets_match:true,desktop_mobile:true,contrast,invalid_wrong_work_error_recovery:true});await context.close();
  }
  assert.deepEqual(errors,[]);assert.deepEqual(httpErrors,[]);const proof=rt.finish(runtime,repo);fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({status:'PASS',checks,errors,httpErrors,runtime:proof},null,2)+'\n');console.log('AGENT_EXCHANGES_UI_VERIFIED 4');
 }catch(error){primary={error};fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({status:'FAIL',message:error.message,errors,httpErrors},null,2))}

@@ -881,6 +881,8 @@ mod mission_producer;
 #[path = "mission_supervision_store.rs"]
 mod mission_supervision_store;
 #[cfg(target_os = "linux")]
+pub(crate) use mission_supervision_store::adoption_preflight;
+#[cfg(target_os = "linux")]
 pub(crate) mod reported_costs;
 mod cockpit_health;
 mod cockpit_actions;

@@ -100,10 +100,25 @@ processus. Le témoin emploie une observation de fichier compatible avec
 le confinement et conserve les anciens échecs du témoin à socket.
 L’archive est `p12-queued-restart-20261122.ldo3Yj`.
 
-Une correction moteur pour une adoption après expiration exigerait un
-nouveau reçu de prévol courant et attribué à cette adoption, avec contrôle
-du périmètre d’origine et refus sur dérive. Le témoin à 60 s établit une
-reprise dans sa fenêtre. La reprise au-delà de la fenêtre reste ouverte.
+Le témoin historique à 60 s établissait une reprise dans sa fenêtre de
+validité. L’observation au-delà de cette fenêtre a motivé l’ajout d’un reçu
+de prévol lié à l’adoption et limité au périmètre initial.
+
+## Renouvellement du prévol à l’adoption
+
+Sous Linux, pour un Agent automatique jamais démarré, la transaction
+d’adoption peut conserver une observation de prévol fraîche lorsque le reçu initial est
+expiré. Il vérifie le bail effectif, le consentement courant, la révision et le
+périmètre exact du prévol initial. Une dérive de fournisseur, de modèle,
+d’espace ou d’environnement refuse l’opération. Le reçu initial, l’Agent,
+la tentative, le tour et la réservation gardent leur identité.
+
+Le reçu v2 reste lié à l’événement d’adoption. Le superviseur et le dernier
+helper en vérifient la fraîcheur avant le départ. Le rejeu d’une adoption réutilise
+le reçu enregistré avec son échéance d’origine. Un lien v1 conserve le prévol
+d’origine. Les observations historiques ci-dessus gardent leur portée propre.
+
+La [recette de reprise après expiration](../../tools/verification/recipes/mission-watch-expired-preflight.json) attend l'échéance inscrite dans le reçu d'origine. Elle vérifie le nouveau reçu, la continuité de C et le règlement unique sur des Work isolés.
 
 ## Origines des preuves
 

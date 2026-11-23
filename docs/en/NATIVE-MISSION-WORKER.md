@@ -827,10 +827,12 @@ launched and no whole-G3 or lot201 acceptance is established.
 registered process. Under a real new lease, the engine appends a receipt to
 `native_mission_worker_adoptions`; original Agent, attempt, request/binding,
 Work, FIFO and reservation remain unchanged. The receipt links historical claims
-and settings revisions with current consent. Adoption does not refresh context
-or authorize launch: the current gate rechecks actual Root identity, lease,
-profiles, rights, budget and freshness. Manual, stop, registered/terminal and
-legacy bindings1–3 refuse.
+and settings revisions with current consent. On Linux, adoption can add a
+same-scope preflight observation when the original receipt has expired. The launch
+context and original receipt remain immutable. The launch gate checks the actual
+Root identity, lease, profiles, rights, budget and applicable receipt freshness.
+Manual launches, stop requests, registered or terminal agents and bindings 1 to 3
+are refused. [Recovery after expiry](SAME-ROOT-FIFO-RECOVERY.md).
 
 ```mermaid
 flowchart LR

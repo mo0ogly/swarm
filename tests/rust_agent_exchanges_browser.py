@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Real historical-exchange cockpit on owned fixture; no native send/ACK/provider."""
+"""Verify recorded reply navigation in the embedded Cockpit on an owned fixture."""
 from pathlib import Path
-import argparse,json,subprocess,traceback
+import argparse,json,sqlite3,subprocess,traceback
 from rust_agent_model_route import publish,digest
 from rust_agent_exchanges import historical_fixture,logical
 from rust_native_http_cli import Server
@@ -12,11 +12,16 @@ def run(binary,output):
     Original browser evidence and cleanup errors retained; no silent timeout or
     missing-control wait on an older binary. Entire logical DB must be unchanged.
     """
-    output.mkdir(parents=True,exist_ok=False);f,other=historical_fixture(binary,output);rows=f.ok(['exchange','list',f.work]);assert len(rows)==2;before=logical(f.root);state=f.snapshot();server=Server(binary,f.root,output,'http',environment=f.environment);server.capture_async(output/'stream.jsonl');primary=None
+    output.mkdir(parents=True,exist_ok=False);f,other=historical_fixture(binary,output)
+    with sqlite3.connect(f.root/'.swarm/state.db') as connection:
+        connection.execute(
+            "UPDATE agent_exchanges SET reply_to=?,source_attempt_id=?,acknowledged_at=? WHERE work_id=? AND id=?",
+            ('a-first','fixture-second-attempt','2026-01-01T00:01:00Z',f.work,'z-last'))
+    rows=f.ok(['exchange','list',f.work]);assert len(rows)==2;before=logical(f.root);state=f.snapshot();server=Server(binary,f.root,output,'http',environment=f.environment);server.capture_async(output/'stream.jsonl');primary=None
     try:
         cfg=dict(binary=str(binary),root=str(f.root),work=f.work,other=other,address=server.address,key=server.key,output=str(output/'browser'))
         with (output/'browser.stdout').open('xb') as stdout,(output/'browser.stderr').open('xb') as stderr:r=subprocess.run(['node','tests/rust_agent_exchanges_ui.cjs'],input=json.dumps(cfg).encode(),stdout=stdout,stderr=stderr)
-        assert r.returncode==0,('Browser failed',r.returncode);proof=json.loads((output/'browser/result.json').read_bytes());assert proof['status']=='PASS' and len(proof['checks'])==4;assert logical(f.root)==before and f.snapshot()==state and not list(f.root.rglob('model-received.json'))
+        assert r.returncode==0,('Browser failed',r.returncode);proof=json.loads((output/'browser/result.json').read_bytes());assert proof['status']=='PASS' and len(proof['checks'])==4 and all(check['exact_reply_navigation'] and check['served_assets_match'] for check in proof['checks']);assert logical(f.root)==before and f.snapshot()==state and not list(f.root.rglob('model-received.json'))
     except BaseException as e:primary=e
     try:server.cleanup()
     except BaseException as e:
