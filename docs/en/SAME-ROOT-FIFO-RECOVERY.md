@@ -97,23 +97,24 @@ the same process. The witness uses a confinement-compatible file observation
 and retains the historical socket fixture failures.
 The archive is `p12-queued-restart-20261122.ldo3Yj`.
 
-An engine correction for adoption after expiry would require a fresh
-preflight receipt bound to that adoption, with the original input scope
-checked and drift refused. The 60 s witness establishes recovery inside
-its window. Recovery beyond the window remains open.
+The historical 60 s witness established recovery within that validity window.
+The observation beyond it led to an adoption-bound preflight receipt restricted
+to the original scope.
 
 ## Preflight renewal at adoption
 
-For a never-started automatic Agent, the writer of a new adoption can retain a
-fresh preflight observation after the original receipt expires. The writer
+On Linux, for a never-started automatic Agent, the adoption transaction can
+retain a fresh preflight observation after the original receipt expires. It
 checks the effective lease, current consent, revision and the original preflight
 scope. Provider, model, workspace or environment drift refuses the operation.
 The original receipt, Agent, attempt, turn and reservation retain their identity.
 
 The v2 receipt stays tied to the adoption event. The supervisor and the final
-helper check its freshness before startup. Replaying an adoption returns the
-recorded receipt without extending its lifetime. A v1 link keeps the original
+helper check its freshness before startup. Replaying an adoption reuses the
+recorded receipt with its original expiry. A v1 link keeps the original
 preflight. The historical observations above keep their individual scope.
+
+The [expired preflight recipe](../../tools/verification/recipes/mission-watch-expired-preflight.json) waits for the original receipt's recorded expiry. It checks the renewed receipt, C's continued execution and single settlement on isolated Work.
 
 ## Evidence originals
 
@@ -126,5 +127,3 @@ preflight. The historical observations above keep their individual scope.
 [Hashes and scope](../diagrams/architecture-contracts.json) ·
 [Queue writer](../../rust/crates/swarm-engine/src/workspace_turn_write.rs) ·
 [Admission transaction](../../rust/crates/swarm-engine/src/agent_launch.rs)
-
-The [expired preflight recipe](../../tools/verification/recipes/mission-watch-expired-preflight.json) waits for the original receipt's recorded expiry. It checks the renewed receipt, C's continued execution and single settlement on isolated Work.
