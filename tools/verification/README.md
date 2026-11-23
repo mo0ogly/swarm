@@ -1,5 +1,18 @@
 # Recettes permanentes / Permanent verification recipes
 
+T4.06 : `recipes/t406-last-use-matrix.json` exerce les 768 verdicts du
+catalogue BLP de fixture (quatre niveaux, deux compartiments et trois parcours),
+le refus d'engagement Trust à l'échéance ou après changement de révision, et
+l'invalidation de l'accord Git après changement de révision. Le témoin Trust
+observe un connecteur simulé. Utiliser une cible Cargo de test admise et un
+répertoire de preuves neuf.
+
+T4.06: `recipes/t406-last-use-matrix.json` checks all 768 verdicts for the BLP
+fixture catalogue (four levels, two compartments and three operations),
+Trust commit refusal at expiry or after revision change, and Git agreement
+invalidation after revision change. The Trust control uses a simulated
+connector. Use an admitted Cargo test target and a fresh evidence directory.
+
 Recette capture PAEA : `recipes/paea-capture-reader.json` vérifie les gardes
 `paea_capture_*` du témoin approval-web (27 noms attendus dans la recette ;
 ce compte est une attente, pas une preuve d'exécution). Le refus d'attente du
