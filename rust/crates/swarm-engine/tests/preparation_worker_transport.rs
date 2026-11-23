@@ -138,6 +138,14 @@ impl Fixture {
         token
     }
 
+    /// Return the actual API prompt from the owned worker's claim without sending it.
+    fn claim_prompt(&self, id: &str, token: &str) -> String {
+        match self.root.preparation_worker_claim(id, token).unwrap() {
+            swarm_engine::PreparationWorkerRequest::Api(request) => request.prompt,
+            swarm_engine::PreparationWorkerRequest::Cli(_) => panic!("expected API fixture"),
+        }
+    }
+
     /// Current trust revision of this Root's saved state.
     fn trust_revision(&self) -> i64 {
         serde_json::from_slice::<Value>(&self.root.trust("show", b"", "").unwrap().bytes)
@@ -233,31 +241,20 @@ fn attribute_destination(f: &Fixture, event: &str) -> Value {
         "reason":"explicit destination decision"}), "fixture-admin-token").unwrap()
 }
 
-/// The worker-side gate reuses the shared admission/destination decision for the
-/// turn it owns. The legacy zero-admission path stays byte-identical (straight
-/// Ok); an admitted but unattributed destination refuses; a tampered token
-/// refuses custody; a matching attribution authorizes with nothing reserved.
-#[test]
-fn worker_gate_refuses_unauthorized_and_passes_bound_sends() {
-    let f = Fixture::new("decision");
-    // Trust bootstrap and admission FIRST: capture_in_tx refuses a second
-    // capture while any active turn exists, so the admission capsule and its
-    // input attributions must be recorded before either turn is sent. The
-    // admission intent names event `intent`; request_hash is canonical over
-    // the full send struct INCLUDING event_id, so only a turn sent with the
-    // SAME event id matches the receipt.
-    let admission = bootstrap(&f);
+/// Complete one unclassified synthetic turn without transport, leaving a real
+/// change in the history assembled by a later capture of the same intent.
+fn finish_legacy_turn(f: &Fixture) {
     // Zero-admission turn: event `legacy-event` has NO matching receipt. Send
     // and claim exactly like the real worker journey; the gate must return
     // Ok immediately.
     let unbound = serde_json::to_vec(&f.request("legacy-event")).unwrap();
     let legacy = f.root.preparation_send(&unbound, &mut SystemEnvironment, None).unwrap();
     let legacy_token = f.register(&legacy.id);
-    f.root.preparation_worker_claim(&legacy.id, &legacy_token).unwrap();
+    let prompt = f.claim_prompt(&legacy.id, &legacy_token);
     let before = read_reservations(&f.path);
     assert_eq!(
         f.root
-            .preparation_worker_transport_gate(&legacy.id, &legacy_token, "https://example.invalid/v1", "fixed-model")
+            .preparation_worker_transport_gate(&legacy.id, &legacy_token, "https://example.invalid/v1", "fixed-model", &prompt)
             .unwrap(),
         (),
         "zero matching admissions keeps the legacy path exactly Ok"
@@ -272,23 +269,60 @@ fn worker_gate_refuses_unauthorized_and_passes_bound_sends() {
     f.root
         .preparation_worker_finish(&legacy.id, None, None, "fixture-no-contact", &mut SystemEnvironment)
         .unwrap();
+}
+
+/// The worker-side gate reuses the shared admission/destination decision for the
+/// turn it owns. The legacy zero-admission path stays byte-identical (straight
+/// Ok); an admitted but unattributed destination refuses; a tampered token
+/// refuses custody; a matching attribution authorizes with nothing reserved.
+#[test]
+fn worker_gate_refuses_unauthorized_and_passes_bound_sends() {
+    let f = Fixture::new("decision");
+    // Trust bootstrap and admission FIRST: capture_in_tx refuses a second
+    // capture while any active turn exists, so the admission capsule and its
+    // input attributions must be recorded before either turn is sent. The
+    // admission intent names event `intent`; request_hash is canonical over
+    // the full send struct INCLUDING event_id, so only a turn sent with the
+    // SAME event id matches the receipt.
+    bootstrap(&f);
+    let before = read_reservations(&f.path);
     // Admitted turn: SAME event id as the admission (`intent`), so the receipt
     // matches (preparation_id, provider, request_hash) exactly.
     let bound = serde_json::to_vec(&f.request("intent")).unwrap();
     let turn = f.root.preparation_send(&bound, &mut SystemEnvironment, Some("fixture-sender-token")).unwrap();
     let token = f.register(&turn.id);
-    f.root.preparation_worker_claim(&turn.id, &token).unwrap();
+    let prompt = f.claim_prompt(&turn.id, &token);
+    // Exercise source integrity after the real producer writes the turn and
+    // the worker claims its prompt. The private row supplies only the selector
+    // and byte interval, which are checked against the actual claimed copy.
+    let raw: Vec<u8> = f.db.query_row(
+        "SELECT CAST(body AS BLOB) FROM preparation_turns WHERE id=?",
+        [&turn.id], |row| row.get(0),
+    ).unwrap();
+    let row: Value = serde_json::from_slice(&raw).unwrap();
+    let parts = row["_native"]["prompt_provenance"]["parts"].as_array().unwrap();
+    let engine_index = parts.iter().position(|p| p["origin"]["kind"] == "engine_instructions").unwrap();
+    let engine_slice = &parts[engine_index];
+    let start = engine_slice["start"].as_u64().unwrap() as usize;
+    let end = engine_slice["end"].as_u64().unwrap() as usize;
+    let expected_digest = format!("{:x}", Sha256::digest(prompt[start..end].as_bytes()));
+    let observed = call(&f.root, "blp-preparation-check", json!({
+        "schema_version":1,"expected_revision":1,"preparation_id":turn.preparation_id,
+        "turn_id":turn.id,"engine_source_index":engine_index,
+    }), "fixture-sender-token").unwrap();
+    assert_eq!(observed["engine_source_integrity"]["sha256"], expected_digest);
+    assert_eq!(observed["engine_source_integrity"]["source_revision"], turn.revision.to_string());
     // Wrong custody token: registration identity, never a BLP code.
     let err = codes(
         f.root
-            .preparation_worker_transport_gate(&turn.id, "0".repeat(64).as_str(), "https://example.invalid/v1", "fixed-model")
+            .preparation_worker_transport_gate(&turn.id, "0".repeat(64).as_str(), "https://example.invalid/v1", "fixed-model", &prompt)
             .unwrap_err(),
     );
     assert!(err.contains("preparation-worker-registration-mismatch"), "{err}");
     // Admitted but destination not yet attributed: typed fail-closed refusal.
     let err = codes(
         f.root
-            .preparation_worker_transport_gate(&turn.id, &token, "https://example.invalid/v1", "fixed-model")
+            .preparation_worker_transport_gate(&turn.id, &token, "https://example.invalid/v1", "fixed-model", &prompt)
             .unwrap_err(),
     );
     assert!(err.contains("blp-destination-not-attributed"), "{err}");
@@ -306,27 +340,66 @@ fn worker_gate_refuses_unauthorized_and_passes_bound_sends() {
     // must refuse (the worker's actual endpoint is the gate's input).
     let err = codes(
         f.root
-            .preparation_worker_transport_gate(&turn.id, &token, "https://attacker.invalid/v1", "fixed-model")
+            .preparation_worker_transport_gate(&turn.id, &token, "https://attacker.invalid/v1", "fixed-model", &prompt)
             .unwrap_err(),
     );
     assert!(err.contains("blp-destination-echo-mismatch"), "{err}");
     let err = codes(
         f.root
-            .preparation_worker_transport_gate(&turn.id, &token, "https://example.invalid/v1", "other-model")
+            .preparation_worker_transport_gate(&turn.id, &token, "https://example.invalid/v1", "other-model", &prompt)
             .unwrap_err(),
     );
     assert!(err.contains("blp-destination-echo-mismatch"), "{err}");
+    let changed_prompt = format!("{prompt} ");
+    let err = codes(f.root.preparation_worker_transport_gate(
+        &turn.id, &token, "https://example.invalid/v1", "fixed-model", &changed_prompt,
+    ).unwrap_err());
+    assert!(err.contains("preparation-transport-prompt-mismatch"), "{err}");
     // Gate passes: the actual worker endpoint matches the attributed one.
     f.root
-        .preparation_worker_transport_gate(&turn.id, &token, "https://example.invalid/v1", "fixed-model")
+        .preparation_worker_transport_gate(&turn.id, &token, "https://example.invalid/v1", "fixed-model", &prompt)
         .unwrap();
     // No reservation was created by any gate observation: exactly the rows
-    // the two claims wrote, never a gate row.
+    // the classified turn wrote, never a gate row.
     assert_eq!(
         read_reservations(&f.path),
         before + 1,
         "the gate never reserves"
     );
+    let mut environment = SystemEnvironment;
+    f.root
+        .preparation_worker_finish(&turn.id, None, None, "fixture-no-contact", &mut environment)
+        .unwrap();
+    let fixture_path = f.path.clone();
+    f.close();
+    std::fs::remove_dir_all(&fixture_path).ok();
+}
+
+/// Matching request identity is insufficient when the real producer has
+/// assembled a different prompt. No provider is started by the fixture.
+#[test]
+fn worker_gate_refuses_changed_admitted_history() {
+    let f = Fixture::new("changed-history");
+    let admission = bootstrap(&f);
+    attribute_destination(&f, "dest-bind");
+    finish_legacy_turn(&f);
+    let input = serde_json::to_vec(&f.request("intent")).unwrap();
+    let turn = f.root.preparation_send(
+        &input, &mut SystemEnvironment, Some("fixture-sender-token"),
+    ).unwrap();
+    let token = f.register(&turn.id);
+    let prompt = f.claim_prompt(&turn.id, &token);
+    let actual_digest = format!("{:x}", Sha256::digest(prompt.as_bytes()));
+    assert_ne!(admission["prompt_sha256"].as_str().unwrap(), actual_digest);
+    let before = read_reservations(&f.path);
+    let err = codes(f.root.preparation_worker_transport_gate(
+        &turn.id, &token, "https://example.invalid/v1", "fixed-model", &prompt,
+    ).unwrap_err());
+    assert!(err.contains("blp-transport-source-changed"), "{err}");
+    assert_eq!(read_reservations(&f.path), before);
+    f.root.preparation_worker_finish(
+        &turn.id, None, None, "fixture-no-contact", &mut SystemEnvironment,
+    ).unwrap();
     let fixture_path = f.path.clone();
     f.close();
     std::fs::remove_dir_all(&fixture_path).ok();

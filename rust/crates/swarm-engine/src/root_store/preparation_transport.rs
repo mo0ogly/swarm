@@ -21,13 +21,14 @@ impl RootStore {
     /// no weaker). The connection name comes from the turn's recorded provider,
     /// never from a caller argument; the caller's actual base_url/model are
     /// echoed like the last-use transport decision, closing the claim→send
-    /// TOCTOU. Zero admission receipts matching the turn's (preparation_id,
-    /// provider, request_hash) is legacy behavior: the gate returns Ok before
-    /// reading any Trust state, so an unconfigured Root proceeds unchanged.
+    /// TOCTOU. `prompt` is the exact string passed to the transport. It must
+    /// match the owned turn before any receipt lookup. With no receipt matching
+    /// (preparation_id, provider, request_hash), no Trust state is read.
     /// With at least one matching receipt, the full admission capsule is
     /// re-verified — principal taken from the producer-written record, never
     /// supplied; instance, revisions, policy digest, every source re-join and
-    /// output label reconstruction — then settings/provider-source freshness,
+    /// output label reconstruction — and its source revision and prompt bytes
+    /// must match the owned turn. Then settings/provider-source freshness,
     /// the destination attribution on the resolved digest for the recorded
     /// connection and the last-use no-write-down check all apply exactly like
     /// the `blp-preparation-transport` decision. Any failure refuses before
@@ -40,13 +41,15 @@ impl RootStore {
         token: &str,
         base_url: &str,
         model: &str,
+        prompt: &str,
     ) -> Result<(), E> {
-        self.with_preparation_egress(|| worker_transport_gate(self, id, token, base_url, model))
+        self.with_preparation_egress(|| worker_transport_gate(self, id, token, base_url, model, prompt))
     }
 }
 
 /// Gate body under the caller's shared egress reservation. The turn custody
-/// read runs under the material guard; the receipt scan admits only names
+/// read runs under the material guard and checks the actual transport prompt.
+/// The receipt scan admits only names
 /// with the exact admission grammar, and a matching receipt that cannot be
 /// read or decoded refuses (fail-closed), never silently authorizes.
 fn worker_transport_gate(
@@ -55,10 +58,14 @@ fn worker_transport_gate(
     token: &str,
     base_url: &str,
     model: &str,
+    prompt: &str,
 ) -> Result<(), E> {
     let custody = super::material_path::with_material_read(root, || {
         super::preparation_call::gated_turn(root, id, token)
     })?;
+    if custody.turn.prompt != prompt {
+        return Err(E::Refused("preparation-transport-prompt-mismatch"));
+    }
     let mut matched = Vec::new();
     for name in root.directory.names().map_err(E::Storage)? {
         // Only exact admission grammar names are candidates; anything else in
@@ -114,6 +121,11 @@ fn worker_transport_gate(
         // refuses instead of authorizing. No token grants any principal.
         for admission in &matched {
             super::preparation_admission::verify(root, &state, &admission.principal, admission)?;
+            if admission.captured.source_revision != custody.turn.revision
+                || admission.captured.prompt != prompt
+            {
+                return Err(E::Refused("blp-transport-source-changed"));
+            }
         }
         if custody.settings_digest != current_settings_digest(root)? {
             return Err(E::Refused("blp-transport-settings-changed"));

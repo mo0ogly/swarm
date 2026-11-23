@@ -658,7 +658,7 @@ quarantine during classification does not change this contract.
 The Rust worker's Api branch (`_prepare_turn` in
 `swarm-cli/src/preparation_worker.rs`) now applies the decision before any
 classified emission, through
-`RootStore::preparation_worker_transport_gate(id, token, base_url, model)`,
+`RootStore::preparation_worker_transport_gate(id, token, base_url, model, prompt)`,
 executed inside the shared egress reservation the worker already holds
 (`with_preparation_egress`) and called before the request is built: no socket
 opens without a decision.
