@@ -69,6 +69,13 @@ struct Adoption {
     consent_sequence: i64,
     work_revision: i64,
     recorded_at: String,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_preflight")]
+    execution_preflight: Option<crate::PreflightResult>,
+}
+
+/// A preflight key must carry a receipt. Only omission represents a v1 link.
+fn present_preflight<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Option<crate::PreflightResult>, D::Error> {
+    crate::PreflightResult::deserialize(d).map(Some)
 }
 
 /// Read optional exact journal schema; missing is legacy absence, not permission.
@@ -166,7 +173,7 @@ fn link(
     request_hash: &str,
 ) -> Result<(), E> {
     request.validate()?;
-    if receipt.schema_version != 1
+    if !matches!((receipt.schema_version, receipt.execution_preflight.as_ref()), (1, None) | (2, Some(_)))
         || receipt.event_id != request.event_id
         || receipt.work != agent.work_id
         || receipt.agent != agent.id
@@ -184,7 +191,23 @@ fn link(
     {
         return Err(E::Refused("mission-adoption-lineage-invalid"));
     }
-    super::parse(&receipt.recorded_at)?;
+    let recorded_at = super::parse(&receipt.recorded_at)?;
+    if let Some(preflight) = &receipt.execution_preflight {
+        let original = agent.preflight.as_deref()
+            .ok_or(E::Refused("mission-adoption-preflight-original-required"))?;
+        let checked = super::parse(&preflight.checked_at)?;
+        if preflight.schema_version != original.schema_version
+            || preflight.verdict != original.verdict
+            || preflight.provider != original.provider
+            || preflight.workspace != original.workspace
+            || preflight.scope != original.scope
+            || checked < super::parse(&original.valid_until)?
+            || checked > recorded_at
+            || super::parse(&preflight.valid_until)? <= recorded_at
+        {
+            return Err(E::Refused("mission-adoption-preflight-lineage-invalid"));
+        }
+    }
     Ok(())
 }
 
@@ -193,15 +216,16 @@ fn link(
 /// authority projection only: Agent metadata, SQL event/request, original claim
 /// and FIFO stay unchanged. Caller MUST validate original provenance first.
 /// No schema creation, mutation, live-owner inference or grant occurs here.
-pub(super) fn authority(
+fn authority_state(
     db: &Connection,
     agent: &Agent,
     original: &Binding,
     settings: &EngineSettingsDocument,
-) -> Result<Binding, E> {
+) -> Result<(Binding, Option<crate::PreflightResult>), E> {
     let mut effective = original.clone();
+    let mut preflight = None;
     if !schema(db)? {
-        return Ok(effective);
+        return Ok((effective, preflight));
     }
     let original_hash = binding_hash(agent)?;
     let request_hash = crate::agent_launch_preflight::hash(&agent_request(db, &agent.id)?);
@@ -249,8 +273,33 @@ pub(super) fn authority(
         effective.claim_settings_revision = receipt.claim_settings_revision;
         effective.command_settings_revision = receipt.command_settings_revision;
         effective.consent_sequence = receipt.consent_sequence;
+        preflight = receipt.execution_preflight;
     }
-    Ok(effective)
+    Ok((effective, preflight))
+}
+
+/// Resolve effective conductor authority from the same verified adoption chain.
+/// The returned Binding is an observation and grants no execution.
+pub(super) fn authority(
+    db: &Connection,
+    agent: &Agent,
+    original: &Binding,
+    settings: &EngineSettingsDocument,
+) -> Result<Binding, E> {
+    authority_state(db, agent, original, settings).map(|(binding, _)| binding)
+}
+
+/// Read the preflight on the latest verified adoption receipt, if present.
+/// Caller first verifies original provenance and current grant authority in
+/// the same snapshot. Absence preserves the original receipt and its expiry.
+#[cfg(target_os = "linux")]
+pub(crate) fn adoption_preflight(
+    db: &Connection,
+    agent: &Agent,
+    original: &Binding,
+    settings: &EngineSettingsDocument,
+) -> Result<Option<crate::PreflightResult>, E> {
+    authority_state(db, agent, original, settings).map(|(_, observation)| observation)
 }
 
 /// Classify an exact retained event replay only under its still-current target
@@ -327,7 +376,9 @@ impl RootStore {
     /// refunded. Current consent, exact saved profiles, configured capacity/cost
     /// and Root instance are checked under the same reserved-settings writer
     /// transaction; provider/context/model rights are rechecked by normal launch
-    /// preflight/private gate before any actual execution. This API starts none.
+    /// preflight/private gate before any actual execution. On Linux an expired
+    /// original may receive a fresh scoped observation on the new adoption
+    /// link. Replays never refresh its lifetime. This API starts no process.
     /// Exact event replay requires the same request/current lease and still an
     /// unstarted eligible worker. Registered/terminal/stop/manual/legacy1–3 refuse.
     /// All refusal rolls back this journal transaction; commit/rollback/settings
@@ -415,8 +466,24 @@ impl RootStore {
             )?;
             let before = Preserved::read(&self.db, &agent)?;
             if !replay {
+                #[cfg(target_os = "linux")]
+                let execution_preflight = {
+                    let original_preflight = agent.preflight.as_deref()
+                        .ok_or(E::Refused("mission-adoption-preflight-original-required"))?;
+                    if super::parse(&now)? >= super::parse(&original_preflight.valid_until)? {
+                        Some(crate::agent_execution_preflight::observe_adoption_preflight(
+                            &self.db, &self.root, &self.directory, settings, &work, &agent,
+                        ).map_err(launch)?)
+                    } else {
+                        None
+                    }
+                };
+                #[cfg(not(target_os = "linux"))]
+                let execution_preflight = None;
+                let recorded_at = crate::system_timestamp()
+                    .map_err(|e| caused("mission-adoption-clock", e))?;
                 let receipt = Adoption {
-                    schema_version: 1,
+                    schema_version: if execution_preflight.is_some() { 2 } else { 1 },
                     event_id: request.event_id.clone(),
                     work: lease.work.clone(),
                     agent: agent.id.clone(),
@@ -430,7 +497,8 @@ impl RootStore {
                     command_settings_revision: settings.revision,
                     consent_sequence: consent,
                     work_revision: work.revision,
-                    recorded_at: now.clone(),
+                    recorded_at,
+                    execution_preflight,
                 };
                 // The current lease's original normalized claim is checked before
                 // schema creation/INSERT; fabricated receipt fields cannot grant.
@@ -613,6 +681,7 @@ mod tests {
             consent_sequence: 2,
             work_revision: 3,
             recorded_at: "2026-10-22T00:00:00Z".into(),
+            execution_preflight: None,
         };
         let valid = |receipt: &Adoption| {
             link(
@@ -680,6 +749,74 @@ mod tests {
     }
     /// Exact event replay is idempotent, not a way to mutate a request or follow
     /// a later lease silently. The caller separately rechecks actual queued state.
+    /// A renewed receipt is valid only on its exact adoption, in the original
+    /// host scope, between expiry of the original and recording of the new link.
+    #[test]
+    fn renewal_requires_same_scope_and_bounded_recorded_observation() {
+        let mut agent = worker();
+        let original = original();
+        let request = MissionWorkerAdoptionRequest {
+            schema_version: 1,
+            event_id: "adopt-worker".into(),
+            expected_revision: 3,
+            agent_id: agent.id.clone(),
+        };
+        let original_hash = "a".repeat(64);
+        let request_hash = "b".repeat(64);
+        let original_preflight = crate::PreflightResult {
+            schema_version: 1,
+            verdict: "compatible".into(),
+            provider: "fixture".into(),
+            workspace: "/fixture/work".into(),
+            scope: "c".repeat(64),
+            checked_at: "2026-10-22T00:00:00Z".into(),
+            valid_until: "2026-10-22T00:00:01Z".into(),
+            ..Default::default()
+        };
+        agent.preflight = Some(Box::new(original_preflight.clone()));
+        let good = Adoption {
+            schema_version: 2,
+            event_id: request.event_id.clone(),
+            work: agent.work_id.clone(),
+            agent: agent.id.clone(),
+            original_binding_sha256: original_hash.clone(),
+            agent_request_sha256: request_hash.clone(),
+            original_generation: 1,
+            previous_generation: 1,
+            generation: 2,
+            conductor: "new-conductor".into(),
+            claim_settings_revision: SettingCount(1),
+            command_settings_revision: SettingCount(1),
+            consent_sequence: 2,
+            work_revision: 3,
+            recorded_at: "2026-10-22T00:00:03Z".into(),
+            execution_preflight: Some(crate::PreflightResult {
+                checked_at: "2026-10-22T00:00:02Z".into(),
+                valid_until: "2026-10-22T00:00:04Z".into(),
+                ..original_preflight
+            }),
+        };
+        let check = |receipt: &Adoption| link(
+            receipt, &request, &agent, &original, 1, &original_hash, &request_hash,
+        );
+        check(&good).unwrap();
+        let mut bad = good.clone();
+        bad.execution_preflight = None;
+        assert!(check(&bad).is_err());
+        for mutate in [
+            (|r: &mut crate::PreflightResult| r.scope = "d".repeat(64)) as fn(&mut crate::PreflightResult),
+            |r| r.valid_until = "2026-10-22T00:00:03Z".into(),
+            |r| r.checked_at = "2026-10-22T00:00:04Z".into(),
+            |r| r.checked_at = "2026-10-22T00:00:00Z".into(),
+            |r| r.workspace = "/elsewhere".into(),
+        ] {
+            let mut bad = good.clone();
+            mutate(bad.execution_preflight.as_mut().unwrap());
+            assert!(check(&bad).is_err());
+            check(&good).unwrap();
+        }
+    }
+
     #[test]
     fn adoption_replay_keeps_same_identity_and_refuses_conflict_or_new_epoch() {
         let mut effective = original();

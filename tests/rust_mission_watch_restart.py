@@ -46,14 +46,15 @@ def typed_cell(value):
     return ['text', value]
 
 
-def admissions(owned):
+def admissions(owned, *, busy_timeout=0):
     """Observe all Work admission requests and reservations in one readonly snapshot.
 
     Rows preserve ordering, duplicate multiplicity and cell types; no absent row
     becomes a successful empty admission. Separate costs/CLI reads are not a
     transaction with this snapshot, and no global mutation absence is claimed.
+    busy_timeout applies only to the readonly SQLite snapshot, in seconds.
     """
-    database = sqlite3.connect((owned.root / '.swarm/state.db').as_uri() + '?mode=ro', uri=True, timeout=0)
+    database = sqlite3.connect((owned.root / '.swarm/state.db').as_uri() + '?mode=ro', uri=True, timeout=busy_timeout)
     try:
         database.execute('BEGIN')
         agents = database.execute('SELECT id,task_id,cwd,request FROM agents WHERE work_id=? ORDER BY id', (owned.work,)).fetchall()
@@ -246,14 +247,15 @@ def check_adoption_api(owned, sdk, agent_id, out):
     return verify_adoption_api_result(json.loads(Path(request['result']).read_bytes()), owned.work, agent_id)
 
 
-def read_adoptions(owned, agent_id):
+def read_adoptions(owned, agent_id, *, busy_timeout=0):
     """Read every actual append-only adoption row for this owned Agent.
 
     Missing table is observed legacy absence before first adoption, never an
     authority shortcut. SQL/JSON errors refuse and original bytes are retained in
     private evidence. This observer does not validate engine rights independently.
+    busy_timeout applies only to the readonly SQLite snapshot, in seconds.
     """
-    database = sqlite3.connect((owned.root / '.swarm/state.db').as_uri() + '?mode=ro', uri=True, timeout=0)
+    database = sqlite3.connect((owned.root / '.swarm/state.db').as_uri() + '?mode=ro', uri=True, timeout=busy_timeout)
     try:
         database.execute('BEGIN')
         exists = database.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='native_mission_worker_adoptions'").fetchall()

@@ -9,6 +9,8 @@ use rusqlite::{params, Connection, Params, Row};
 
 #[path = "mission_worker_adoption.rs"]
 mod worker_adoption;
+#[cfg(target_os = "linux")]
+pub(crate) use worker_adoption::adoption_preflight;
 #[path = "mission_worker_recovery.rs"]
 mod worker_recovery;
 pub use worker_recovery::MissionWorkerRecovery;

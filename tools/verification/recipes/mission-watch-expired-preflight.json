@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "mission-watch-expired-preflight",
+  "inputs": [
+    "tests/rust_*.py",
+    "tests/fixture_area.py",
+    "rust/Cargo.lock",
+    "rust/Cargo.toml",
+    ".cargo/config.toml",
+    "rust/crates/swarm-cli/examples/mission_watch_restart_seed.rs",
+    "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
+    "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+    "rust/crates/swarm-engine/src/mission_worker_adoption.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "docs/architecture/SAME-ROOT-FIFO-RECOVERY.md",
+    "docs/en/SAME-ROOT-FIFO-RECOVERY.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "expired-original-preflight-same-agent-with-independent-worker",
+      "command": [
+        "python3",
+        "-c",
+        "import os,sys,tempfile\nfrom pathlib import Path\nsys.path.insert(0,'tests')\nfrom fixture_area import fixture_area\nfrom rust_mission_watch_expired_preflight import main\nout=Path(tempfile.mkdtemp(prefix='expired-preflight-',dir=fixture_area()))/'result'\nsys.argv=['rust_mission_watch_expired_preflight.py','--binary',os.environ['SWARM_WATCH_RESTART_BINARY'],'--sdk',os.environ['SWARM_WATCH_RESTART_SDK_BINARY'],'--output',str(out)]\nprint('REPLAY_EVIDENCE '+str(out),flush=True)\nmain()\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "03b-expired",
+        "04a-renewed-receipt",
+        "04-adopted-same-admission",
+        "05-persisted-settlement",
+        "PASS expired preflight renewed for the original Agent while C stayed active"
+      ],
+      "required_stderr": []
+    }
+  ]
+}
