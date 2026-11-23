@@ -162,6 +162,10 @@ distinctes (CLI 2/4/3, HTTP 400/403/409 selon la cause). `verify` est pur : expo
 v2, ancre HMAC schéma 1 et clé acquise séparément. La vérification n’atteste ni
 heure tierce, ni protection contre le même UID, ni acceptation indépendante.
 
+Le [coffre P02](P02-TOKEN-VAULT.md) expose une substitution en mémoire par lot
+et une résolution sous mandat dans l’API Rust locale. Son raccordement à un
+parcours de facture relève du pilote.
+
 ## Confidentialité Bell-LaPadula — administration livrée, contrôle partiel
 
 Confidentialité distincte de l’intégrité Biba, indépendante et combinable :

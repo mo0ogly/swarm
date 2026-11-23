@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Moteur Rust : coffre P02 en mémoire par lot, résolution soumise à un mandat local courant et retrait des jetons. Le pilote de facture reste à décider.",
+        "en": "Rust engine: in-memory P02 vault per batch, resolution under a current local mandate, and token withdrawal. The invoice pilot remains a separate decision."
+      },
+      {
         "fr": "Cockpit Rust : si une tentative change d’état pendant le calcul du statut, Conduite indique que la lecture doit être actualisée.",
         "en": "Rust cockpit: if an attempt changes state during a status read, Dispatch shows how to refresh the observation."
       },
