@@ -159,6 +159,10 @@ errors (CLI2/4/3, HTTP400/403/409 by cause). Pure `verify` takes a v2 export,
 schema1 HMAC anchor and separately acquired key. Verification establishes neither
 third-party time, protection against the same UID nor independent acceptance.
 
+The [P02 vault](P02-TOKEN-VAULT.md) exposes in-memory substitution per batch
+and resolution under a mandate in the local Rust API. The invoice workflow
+integration belongs to the proposed pilot.
+
 ## Bell-LaPadula confidentiality — delivered administration, undelivered control
 
 Confidentiality separate from Biba integrity, independent and combinable: a

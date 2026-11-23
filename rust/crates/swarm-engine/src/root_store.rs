@@ -73,6 +73,10 @@ mod admin_budget;
 pub use admin_budget::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};
 mod material_path;
 mod trust_store;
+#[cfg(target_os = "linux")]
+mod p02_vault;
+#[cfg(target_os = "linux")]
+pub use p02_vault::{P02Context, P02Grant, P02ResolvedValue, P02Vault};
 mod reader_guard;
 pub use reader_guard::ReaderVerdict;
 #[cfg(target_os="linux")]

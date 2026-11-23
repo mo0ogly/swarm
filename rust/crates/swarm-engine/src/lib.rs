@@ -338,7 +338,7 @@ pub use local_storage::{LocalStorageError, LocalStorageOperation, PublicationSta
 #[cfg(unix)]
 pub use root_schema::{RootSchemaError, RootSchemaFailure};
 #[cfg(target_os = "linux")]
-pub use root_store::{RootBinding, TrustEnrollmentRequest};
+pub use root_store::{P02Context, P02Grant, P02ResolvedValue, P02Vault, RootBinding, TrustEnrollmentRequest};
 #[cfg(target_os = "linux")]
 pub use root_store::TrustEnrollmentCallError;
 #[cfg(target_os = "linux")]
