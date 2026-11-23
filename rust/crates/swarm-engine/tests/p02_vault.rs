@@ -436,26 +436,19 @@ fn fictional_draft_crosses_socket_and_requires_an_exact_receipt() {
     let output = peer.wait_with_output().unwrap();
     assert!(output.status.success() && output.stderr.is_empty());
 
-    use std::io::Read;
-    for read_deadline in [true, false] {
-        let (stream, mut peer) = std::os::unix::net::UnixStream::pair().unwrap();
-        let deadline = Some(Duration::from_secs(30));
-        if read_deadline {
-            stream.set_read_timeout(deadline).unwrap();
+    for remove_read_deadline in [true, false] {
+        // The peer also closes on unexpected input, so this check fails
+        // promptly if the sender's deadline guard is removed.
+        let (destination, peer) = draft_receiver(&context, "no-draft", "");
+        if remove_read_deadline {
+            destination.stream.set_read_timeout(None).unwrap();
         } else {
-            stream.set_write_timeout(deadline).unwrap();
+            destination.stream.set_write_timeout(None).unwrap();
         }
-        let destination = swarm_engine::P02DraftDestination {
-            stream,
-            context: context.clone(),
-            reference_invoice_id: "reference".into(),
-        };
-        assert!(matches!(
-            batch.deliver_draft(destination, "equal", RESOLVER),
-            Err(DeliveryError::MissingDeadline)
-        ));
-        let mut ignored = [0; 1];
-        assert_eq!(peer.read(&mut ignored).unwrap(), 0);
+        let result = batch.deliver_draft(destination, "equal", RESOLVER);
+        let output = peer.wait_with_output().unwrap();
+        assert!(matches!(result, Err(DeliveryError::MissingDeadline)));
+        assert!(output.status.success() && output.stderr.is_empty());
     }
 
     let (stream, closed_peer) = std::os::unix::net::UnixStream::pair().unwrap();
