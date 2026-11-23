@@ -14,6 +14,19 @@ La vérification HEAD lit les octets TCP réels après un GET valide : le client
 
 Preuves : recette194 PASS2/intégrité vérifiée (public Go/Rust7 et navigateur4), témoin HEAD TCP5 tests +4 parcours antérieurs, ancien lecteur de statut4 avant/après, installation21 +Version14 et cinq travaux inchangés. Les contenus des travaux/échanges réels sont comparés par empreintes sans conservation dans le nouveau rapport. Revue effective17 fichiers ; trois changements identité/préparation concurrents restent ouverts, sans conformité globale implicite. Voir le RETEX sous docs/plans/migration-rust/evidence/20261027-exchanges-hq2js3us.
 
+
+Chaque échange expose sa tentative source. Après une lecture réussie, les
+boutons de navigation suivent uniquement les identifiants exacts de `reply_to`
+présents dans la même réponse Work. Le focus rejoint le titre de l’échange
+lié sans lire à nouveau l’API. Une référence absente est signalée et les
+identifiants dupliqués font échouer le rendu. L’accusé est présenté comme une
+donnée enregistrée, avec une mention explicite en son absence.
+
+Le parcours navigateur `tests/rust_agent_exchanges_browser.py` vérifie les
+ressources JavaScript protégées servies par le binaire, les deux sens de
+navigation, l’absence de lecture supplémentaire et les états d’erreur, dans
+les deux langues et les deux thèmes.
+
 ```mermaid
 sequenceDiagram
     participant U as Opérateur

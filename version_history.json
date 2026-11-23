@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Cockpit Rust : les échanges d’une mission permettent de rejoindre une remise ou sa réponse enregistrée et indiquent la présence d’un accusé.",
+        "en": "Rust cockpit: mission exchanges link to recorded handoffs and replies and show acknowledgement status."
+      },
+      {
         "fr": "Cockpit Rust : si une tentative change d’état pendant le calcul du statut, Conduite indique que la lecture doit être actualisée.",
         "en": "Rust cockpit: if an attempt changes state during a status read, Dispatch shows how to refresh the observation."
       },

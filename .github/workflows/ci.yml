@@ -82,6 +82,10 @@ jobs:
       - run: SWARM_STATUS_CONTRACT_BINARY="$PWD/bin/swarm" python3 tools/verification/recipe.py run --recipe tools/verification/recipes/existing-cockpit-rust.json --output .cache/ci-cockpit
         env:
           CHROME_BIN: /usr/bin/google-chrome
+      - name: Check recorded exchange navigation in the embedded Cockpit
+        run: TMPDIR="$SWARM_RUNNER_TMPDIR" python3 tests/rust_agent_exchanges_browser.py --binary "$PWD/bin/swarm" --output .cache/ci-exchange-navigation
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - name: Restore namespace test environment
         if: always()
         run: |
@@ -97,6 +101,10 @@ jobs:
         with:
           name: cockpit-recipe-diagnostics
           path: |
+            .cache/ci-exchange-navigation/result.json
+            .cache/ci-exchange-navigation/failure.txt
+            .cache/ci-exchange-navigation/browser.stderr
+            .cache/ci-exchange-navigation/browser/failure.json
             .cache/ci-cockpit/result.json
             .cache/ci-cockpit/step-*.json
             .cache/ci-cockpit/step-*.stdout
