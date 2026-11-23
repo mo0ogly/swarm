@@ -115,3 +115,24 @@ from a partially prepared batch.
 The recipe also launches the Python receiver in a separate process. It reads
 back fictional drafts, exact receipts and unconfirmed outcomes, and checks
 that the receiver sees zero bytes after an audience denial or revocation.
+
+### Complete simulated pilot recipe
+
+The [p02-pilot-simulated recipe](../../tools/verification/recipes/p02-pilot-simulated.json)
+targets the local Linux fixture. Offline, locked Cargo builds the Rust example
+with `test-fixtures`. Python 3.11 or later runs two independent fictional-invoice
+journeys in temporary Roots under the configured fixture area. The SQLite
+receiver runs in a separate process on a private Unix socket and acknowledges
+after recording.
+
+Qualification precedes the simulated acts of the two roles, receiver admission,
+and the launch decision. The pilot then repeats the 14 cases in a fresh Root.
+Closure requires both journeys to agree and zero rows after purge and reopening.
+Twelve negative controls exercise refusals between stages. The journal contains
+six acts tagged with reproducible public fixture keys.
+
+The runner retains structured JSON, commands, digests, the fixture executable's
+profile and diagnostics. See the [verification guide](../../tools/verification/README.md#recette-locale-p02)
+for replay and readback commands. Coverage includes the test receiver and
+process termination. A favorable result produces local evidence. The recipe
+accesses no missions or providers.

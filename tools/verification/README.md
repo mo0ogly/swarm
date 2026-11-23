@@ -5116,3 +5116,43 @@ arbitraire. Cette fixture unitaire ne prouve ni fournisseur natif, ni approbatio
 E2E, ni acceptation indépendante. Garder le rouge original et un vert frais ;
 `recipe.py verify` contrôle l’intégrité, pas la livraison. Publication source
 complète et approbation protégée restent des vérifications distinctes.
+
+## Recette locale P02
+
+Linux, Python 3.11 ou ultérieur et Cargo hors ligne verrouillé. Exécuter depuis
+la racine du dépôt avec une cible Cargo admise et un répertoire de preuves neuf
+dont le parent existe. La recette compile un exemple réservé au banc, observe
+son empreinte, puis rejoue la qualification et le pilote sur des factures
+fictives dans deux racines isolées. Le résultat contient les décisions
+simulées et le contrôle de clôture. Les empreintes et le reçu sont des preuves
+locales de recette. Aucune mission ni aucun fournisseur n’est lu ou appelé.
+
+Linux, Python 3.11 or later and locked, offline Cargo are required. Run from
+the repository root with an admitted Cargo target and a fresh evidence
+directory whose parent exists. The recipe builds and hashes a fixture-only
+example, then runs qualification and the pilot with fictional invoices in two
+isolated Roots. Its output includes simulated decisions and closure checks.
+The receipt and hashes are local fixture evidence. The recipe reads no mission
+and calls no provider.
+
+```sh
+python3 tools/verification/recipe.py run --recipe tools/verification/recipes/p02-pilot-simulated.json --output /CHEMIN/NEUF
+python3 tools/verification/recipe.py verify --evidence /CHEMIN/NEUF
+python3 -B tests/p02_pilot/run.py --verify-output /CHEMIN/NEUF/step-0001.stdout
+```
+
+Le contrôle automatique P02 appelle `make check-p02-pilot`. Cette cible
+exécute la recette, contrôle les empreintes et recalcule la décision de clôture
+depuis le dossier conservé. La CI conserve ce dossier comme artefact. Pour
+refaire le même contrôle en local, indiquer un chemin neuf. Pour relire
+seulement un dossier existant, utiliser `make verify-p02-pilot`.
+
+The automatic P02 check calls `make check-p02-pilot`. It executes the recipe,
+verifies evidence hashes and recomputes closure from the retained output. CI
+retains the evidence directory as an artifact. Use a fresh path to run the same
+check locally, or `make verify-p02-pilot` to check existing evidence only.
+
+```sh
+make check-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
+make verify-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
+```

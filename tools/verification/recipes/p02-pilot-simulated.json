@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "p02-pilot-simulated",
+  "inputs": [
+    ".cargo/config.toml",
+    ".cargo/storage-policy.json",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/examples/p02_pilot_sender.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/p02_*.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-engine/src/trust/*.rs",
+    "tests/fixture_area.py",
+    "tests/p02_pilot/*.py",
+    "tools/verification/cargo_space_guard.py"
+  ],
+  "environment": {
+    "PYTHONOPTIMIZE": "0"
+  },
+  "steps": [
+    {
+      "id": "fixture-admission-pilot-closure",
+      "command": ["python3", "-B", "tests/p02_pilot/run.py"],
+      "expected_exit": 0,
+      "required_stdout": [
+        "P02 pilot fixture: 14 qualification cases, 14 pilot cases, 6 acts, 12 refusals, 0 rows after purge",
+        "\"decision\": \"closed_favorable\"",
+        "\"real_execution_authorized\": false"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

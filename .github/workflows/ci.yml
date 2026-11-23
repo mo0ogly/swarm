@@ -78,6 +78,16 @@ jobs:
         run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-engine --test agent_launch
       - name: Check the P02 vault with fictional invoices
         run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-engine --test p02_vault
+      - name: Replay the fictional P02 pilot and verify closure
+        run: TMPDIR="$SWARM_RUNNER_TMPDIR" make check-p02-pilot
+      - name: Retain P02 pilot evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p02-pilot-evidence
+          path: .cache/ci-p02-pilot/
+          if-no-files-found: warn
+          include-hidden-files: true
       - run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-cli --test version_no_repository
       - run: npm test
       - run: make smoke
