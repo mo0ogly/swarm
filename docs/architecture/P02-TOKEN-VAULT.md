@@ -124,3 +124,26 @@ la reprise après échec d'un lot partiellement préparé.
 La recette lance aussi le récepteur Python dans un processus distinct. Elle
 relit les brouillons fictifs côté réception, les accusés exacts et les issues
 non confirmées. Elle vérifie zéro octet reçu après refus d’audience ou retrait.
+
+### Recette complète du pilote simulé
+
+La recette [p02-pilot-simulated](../../tools/verification/recipes/p02-pilot-simulated.json)
+est destinée au banc local Linux. Cargo verrouillé et hors ligne construit
+l’exemple Rust avec `test-fixtures`. Python 3.11 ou ultérieur exécute deux
+parcours indépendants sur factures fictives, chacun dans une racine temporaire
+de l’aire de fixtures configurée. Le récepteur SQLite tourne dans un processus
+distinct sur une socket Unix privée. Il accuse réception après enregistrement.
+
+La qualification précède les actes simulés des deux rôles, l’admission du
+récepteur et la décision de lancement. Le déroulement répète ensuite les
+14 cas dans une racine neuve. La clôture exige que les deux parcours concordent
+et que la réouverture après purge retrouve zéro ligne. Douze contrôles négatifs
+vérifient les refus entre les étapes. Le journal contient six actes avec des
+clés de test publiques et reproductibles.
+
+Le lanceur conserve le JSON structuré, les commandes, les empreintes, le
+profil de l’exécutable fictif et les diagnostics. Les commandes de rejeu et
+de relecture figurent dans le [guide des recettes](../../tools/verification/README.md#recette-locale-p02).
+Le périmètre inclut le récepteur de test et des arrêts de processus. Une
+décision favorable dans cette recette a pour effet la production d’une preuve
+locale. La recette n’accède à aucune mission ni à aucun fournisseur.
