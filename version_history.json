@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Factures Rust : remise locale d’un brouillon P02 sur une socket Unix connectée avec accusé lié aux octets reçus. Le récepteur fictif est réservé aux tests.",
+        "en": "Rust invoices: local P02 draft delivery over a connected Unix socket with a byte-bound acknowledgement. The fictional receiver is test-only."
+      },
+      {
         "fr": "Factures Rust : la préparation du rapprochement P02 remplace la référence de compte par un jeton et prépare un brouillon minimal sous mandat. Le pilote reste en pause.",
         "en": "Rust invoices: P02 reconciliation preparation substitutes an account token and prepares a minimal draft under a mandate. The pilot remains paused."
       },

@@ -7,9 +7,10 @@ de confiance. L'hôte tient un coffre par lot, remplace le champ retenu avant
 de remettre la donnée à l'agent et transmet seulement la projection autorisée.
 Pour le parcours de brouillon de facture Q04, l'hôte appelle
 `RootStore::prepare_p02_invoice_batch`. L'adaptateur prépare les données et le
-brouillon en mémoire. Le transport, la publication du brouillon et le lancement
-du pilote demandent une décision distincte. Les valeurs brutes restent dans
-l'API Rust locale.
+brouillon en mémoire. Un hôte peut demander sa remise sur une socket Unix
+privée connectée et lire son accusé. Les valeurs brutes restent dans l’API
+Rust locale. Le choix du récepteur métier et le lancement du pilote restent
+soumis à décision.
 
 ```mermaid
 flowchart LR
@@ -19,6 +20,8 @@ flowchart LR
   F -->|identifiants et jetons| P[Traitement local]
   P -->|paire d’identifiants| F
   F -->|identifiant et résultat de comparaison| A
+  A -->|socket Unix privée, un JSON| D[Récepteur désigné par l’hôte]
+  D -->|accusé lié aux octets| A
   V -->|copie sous mandat| R[Résolveur local habilité]
 ```
 
@@ -74,7 +77,7 @@ Le traitement propose deux identifiants de facture distincts. L'hôte appelle
 `prepare_draft` avec le contexte et le résolveur autorisé. Le moteur vérifie
 les deux alias dans la même réservation Trust et calcule l'égalité. Le
 brouillon contient exclusivement `invoice_id` et `account_matches` pour
-l'audience du mandat. Il ne déclenche aucun envoi ni règlement PAEA.
+l'audience du mandat. La préparation seule n’a pas d’effet réseau ou PAEA.
 L'hôte reste responsable de l'autorité de sortie et du récepteur effectif.
 
 La résolution du compte via `resolve_account` est une opération locale à part.
@@ -84,11 +87,32 @@ Après retrait du mandat ou changement de révision Trust, les opérations
 exigeant le mandat refusent. La reprise crée un nouveau lot à partir des
 données dont l'hôte possède encore l'autorité.
 
+## Remise locale et accusé
+
+L’hôte de confiance passe une `P02DraftDestination` déjà connectée à
+`deliver_draft`. Il lie le canal à une audience, à un contexte de mandat et à
+une facture de référence également connue du récepteur. Il choisit les délais
+d’E/S sur la socket. Swarm ne résout aucune adresse et n’ouvre aucun listener.
+Le mandat et les alias sont vérifiés avant l’écriture, sans conserver la
+réservation Trust pendant les E/S. Une révocation empêche les préparations
+ultérieures. Elle ne retire pas une remise déjà autorisée.
+
+Le canal est consommé pour un seul brouillon. L’émetteur écrit le JSON fermé
+puis ferme sa moitié d’écriture. Le récepteur de test valide le schéma et
+l’identifiant attendu, observe le résultat et répond par les 32 octets bruts
+du SHA-256 du JSON suivi d’EOF. Seul cet accusé exact produit un
+`P02DraftReceipt`. Un échec de préparation écrit zéro octet. Une erreur d’E/S
+ou un accusé absent ou invalide laisse la réception non confirmée. L’hôte doit
+rapprocher l’état côté récepteur avant toute nouvelle tentative. Le moteur ne
+réessaie pas. Le hachage lie la réponse au brouillon sur le canal déjà choisi.
+L’accusé n’accorde aucun droit et n’atteste ni un stockage durable ni un paiement.
+Le récepteur Python est réservé à la recette.
+
 ## Vérification
 
 La recette [p02-token-vault](../../tools/verification/recipes/p02-token-vault.json)
 exerce l'API Rust publique sur des factures fictives dans une racine isolée.
-Elle requiert Linux, Cargo verrouillé, une cible admise et des temporaires
+Elle requiert Linux, Python 3, Cargo verrouillé, une cible admise et des temporaires
 qualifiés. Les cas couvrent les alias intra-lot et inter-lots, les différences
 de principal/projet/lot/audience, l’expiration, le retrait, la révocation et la
 révision de l'autorité et la réouverture du projet. Le DAT P02 et les directives
@@ -96,3 +120,7 @@ D03, D06 et D10 conservent la proposition d'origine et les conditions du pilote.
 Le test du brouillon vérifie les deux schémas sérialisés, les alias communs et
 séparés, le résultat calculé, les refus sans remise au récepteur inerte et
 la reprise après échec d'un lot partiellement préparé.
+
+La recette lance aussi le récepteur Python dans un processus distinct. Elle
+relit les brouillons fictifs côté réception, les accusés exacts et les issues
+non confirmées. Elle vérifie zéro octet reçu après refus d’audience ou retrait.
