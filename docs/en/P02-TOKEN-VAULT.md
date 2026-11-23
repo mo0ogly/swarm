@@ -30,6 +30,8 @@ flowchart LR
   mandate, exact context, current Trust revision and monotonic deadline.
   Authorization and copying take place under the opened Root's Trust
   reservation. Only the resolver receives the copy, which is zeroized at drop.
+  Debug hides the contents and length. The caller must use explicit `as_bytes()`
+  access to read the bytes.
   The trusted host owns the physical destination's identity and use of the
   returned copy. The issuer has lifecycle authority and must be named as
   resolver to obtain a copy.

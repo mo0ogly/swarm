@@ -102,8 +102,16 @@ fn fictional_invoices_require_current_scoped_mandate_and_respect_revocation() {
     assert_ne!(f001, f004);
     assert_eq!(f001.len(), 43);
     assert!(!f001.contains("fictitious"));
-    assert_eq!(&**first.resolve(&a, &f001, RESOLVER).unwrap(), ACCOUNT_A);
-    assert_eq!(&**first.resolve(&a, &f003, RESOLVER).unwrap(), ACCOUNT_B);
+    let resolved = first.resolve(&a, &f001, RESOLVER);
+    assert_eq!(resolved.as_ref().unwrap().as_bytes(), ACCOUNT_A);
+    assert!(
+        format!("{resolved:?}") == "Ok(P02ResolvedValue([redacted]))",
+        "successful P02 resolution must redact Debug"
+    );
+    assert_eq!(
+        first.resolve(&a, &f003, RESOLVER).unwrap().as_bytes(),
+        ACCOUNT_B
+    );
     denied(first.resolve(&a, &f001, OTHER));
     denied(first.resolve(&a, &f001, ISSUER));
     denied(first.resolve(&b, &f001, RESOLVER));
@@ -115,7 +123,10 @@ fn fictional_invoices_require_current_scoped_mandate_and_respect_revocation() {
     denied(first.resolve(&wrong_audience, &f001, RESOLVER));
     denied(second.resolve(&b, &f001, RESOLVER));
     denied(first.revoke(&f001, OTHER));
-    assert_eq!(&**first.resolve(&a, &f001, RESOLVER).unwrap(), ACCOUNT_A);
+    assert_eq!(
+        first.resolve(&a, &f001, RESOLVER).unwrap().as_bytes(),
+        ACCOUNT_A
+    );
     assert!(first.revoke(&f001, ISSUER).unwrap());
     assert!(!first.revoke(&f001, ISSUER).unwrap());
     denied(first.resolve(&a, &f002, RESOLVER));
@@ -124,7 +135,10 @@ fn fictional_invoices_require_current_scoped_mandate_and_respect_revocation() {
         first.tokenize(&a, ACCOUNT_A, ISSUER),
         Err(RootStoreError::Refused("p02-vault-capacity"))
     ));
-    assert_eq!(&**first.resolve(&a, &f003, RESOLVER).unwrap(), ACCOUNT_B);
+    assert_eq!(
+        first.resolve(&a, &f003, RESOLVER).unwrap().as_bytes(),
+        ACCOUNT_B
+    );
     first.revoke_mandate(ISSUER).unwrap();
     denied(first.resolve(&a, &f003, RESOLVER));
     denied(first.tokenize(&a, ACCOUNT_B, ISSUER));
@@ -132,7 +146,10 @@ fn fictional_invoices_require_current_scoped_mandate_and_respect_revocation() {
         bytes_before,
         std::fs::read(root_path.join(".swarm/trust-actions.json")).unwrap()
     );
-    assert_eq!(&**second.resolve(&b, &f004, RESOLVER).unwrap(), ACCOUNT_A);
+    assert_eq!(
+        second.resolve(&b, &f004, RESOLVER).unwrap().as_bytes(),
+        ACCOUNT_A
+    );
     configure(&root_path, 1);
     denied(second.resolve(&b, &f004, RESOLVER));
     drop((first, second));
@@ -142,7 +159,10 @@ fn fictional_invoices_require_current_scoped_mandate_and_respect_revocation() {
     let mut fresh = reopened.open_p02_vault(grant("batch-b"), ISSUER).unwrap();
     denied(fresh.resolve(&b, &f004, RESOLVER));
     let new = fresh.tokenize(&b, ACCOUNT_A, ISSUER).unwrap();
-    assert_eq!(&**fresh.resolve(&b, &new, RESOLVER).unwrap(), ACCOUNT_A);
+    assert_eq!(
+        fresh.resolve(&b, &new, RESOLVER).unwrap().as_bytes(),
+        ACCOUNT_A
+    );
     drop(fresh);
     reopened.close().unwrap();
 }

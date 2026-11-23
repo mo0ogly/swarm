@@ -33,7 +33,9 @@ flowchart LR
   le mandat d'instance, le contexte exact, la révision Trust et l'échéance
   monotone. La vérification et la copie ont lieu sous la réservation Trust de
   la racine ouverte. Seul le résolveur reçoit la copie à zéroïsation à la
-  destruction. L'identité de la destination physique et l'emploi de cette
+  destruction. Son affichage de diagnostic masque la valeur et sa taille.
+  L'appelant doit demander explicitement les octets avec `as_bytes()`.
+  L'identité de la destination physique et l'emploi de cette
   copie relèvent de l'hôte de confiance. L'émetteur dispose de ses droits
   administratifs pour le cycle de vie, et doit être désigné comme résolveur
   s'il doit aussi obtenir une copie.

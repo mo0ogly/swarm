@@ -1,9 +1,13 @@
 //! In-process value substitution under a dedicated, ephemeral P02 mandate.
 use super::{absent, finished, trust_store, RootStore, RootStoreError as R};
-use crate::trust::{authentication, state::State, TrustError as E};
+use crate::{
+    environment::{RuntimeError, RuntimeOperation},
+    trust::{authentication, state::State, TrustError as E},
+};
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
 use std::{
     collections::{hash_map::Entry, HashMap},
+    fmt,
     num::NonZeroUsize,
     time::{Duration, Instant},
 };
@@ -28,6 +32,25 @@ pub struct P02Grant {
     /// Total aliases issued, including revoked ones, to prevent reuse.
     pub max_associations: NonZeroUsize,
     pub max_value_bytes: NonZeroUsize,
+}
+
+/// A resolved value owned by the authorized local caller. The buffer zeroizes
+/// at drop. Debug shows a fixed marker, and reading bytes requires explicit access.
+pub struct P02ResolvedValue(Zeroizing<Vec<u8>>);
+
+impl P02ResolvedValue {
+    /// Borrow the sensitive bytes for the authorized local operation. The view
+    /// lasts only as long as this value. Treat any caller-made copies as sensitive.
+    pub fn as_bytes(&self) -> &[u8] {
+        self.0.as_slice()
+    }
+}
+
+impl fmt::Debug for P02ResolvedValue {
+    /// Redact the contents and size, including when formatted inside a Result.
+    fn fmt(&self, output: &mut fmt::Formatter<'_>) -> fmt::Result {
+        output.write_str("P02ResolvedValue([redacted])")
+    }
 }
 
 /// One process-local batch, bound by ownership to the opened Root.
@@ -181,7 +204,7 @@ impl P02Vault<'_> {
             // 32 bytes is the token wire representation, independent of policy.
             let mut randomness = [0; 32];
             getrandom::getrandom(&mut randomness)
-                .map_err(|_| R::Refused("p02-entropy-unavailable"))?;
+                .map_err(|error| R::Runtime(RuntimeError::new(RuntimeOperation::Entropy, error)))?;
             Ok((URL_SAFE_NO_PAD.encode(randomness), true))
         })?;
         if is_new {
@@ -198,13 +221,14 @@ impl P02Vault<'_> {
     /// Return a protected copy to the exact authenticated local resolver.
     /// The lookup and copy are authorized inside the Trust read reservation.
     /// Missing or withdrawn aliases share a content-free refusal. The caller
-    /// owns the returned buffer and must keep it out of logs and agent inputs.
+    /// owns the returned buffer. Debug redacts it, and bytes obtained through
+    /// explicit access must stay within the authorized operation.
     pub fn resolve(
         &self,
         context: &P02Context,
         token: &str,
         credential: &str,
-    ) -> Result<Zeroizing<Vec<u8>>, R> {
+    ) -> Result<P02ResolvedValue, R> {
         self.root.with_p02_authority(credential, |state, actor| {
             self.require_current(state, context, Instant::now())?;
             if actor.subject != self.grant.resolver {
@@ -214,6 +238,7 @@ impl P02Vault<'_> {
                 .get(token)
                 .and_then(Option::as_ref)
                 .cloned()
+                .map(P02ResolvedValue)
                 .ok_or_else(|| trust_error(E::Data("p02-mandate-refused")))
         })
     }

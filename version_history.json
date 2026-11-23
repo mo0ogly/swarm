@@ -7,8 +7,8 @@
     },
     "items": [
       {
-        "fr": "Moteur Rust : coffre P02 en mémoire par lot, résolution soumise à un mandat local courant et retrait des jetons. Le pilote de facture reste à décider.",
-        "en": "Rust engine: in-memory P02 vault per batch, resolution under a current local mandate, and token withdrawal. The invoice pilot remains a separate decision."
+        "fr": "Moteur Rust : coffre P02 en mémoire par lot, résolution soumise à un mandat local courant et retrait des jetons. Les diagnostics de résolution masquent les valeurs brutes. Le pilote de facture reste à décider.",
+        "en": "Rust engine: in-memory P02 vault per batch, resolution under a current local mandate, and token withdrawal. Resolution diagnostics redact raw values. The invoice pilot remains a separate decision."
       },
       {
         "fr": "Reprise automatique : une adoption sous un nouveau bail peut refaire le prévol expiré d’un agent admis avant son premier démarrage, dans le même périmètre.",
