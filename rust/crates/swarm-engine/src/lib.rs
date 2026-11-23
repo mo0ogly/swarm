@@ -111,7 +111,7 @@ pub use root_store::{
     TaskFreshnessEvidence, MissionResultObservation, MissionStatusObservation,
     MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact,
     MissionWorkspaceQueue, MissionWorkspaceTurn, MissionWorkspaceBlocker,
-    MissionQueueRegistration, MissionCandidateRefusal,
+    MissionQueueRegistration, MissionCandidateRefusal, MissionLaunchDiagnostics, MissionLaunchRefusal,
     MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome, MissionWorkerRecovery,
     MissionWorkerDispatchRequest, MissionWorkerDispatchOutcome, MissionWorkerDispatchFailure,
     MissionDispatchCause, MissionDispatchQueueEffect, MissionDispatchPreparationEffect,
@@ -338,7 +338,11 @@ pub use local_storage::{LocalStorageError, LocalStorageOperation, PublicationSta
 #[cfg(unix)]
 pub use root_schema::{RootSchemaError, RootSchemaFailure};
 #[cfg(target_os = "linux")]
-pub use root_store::{RootBinding, TrustEnrollmentRequest};
+pub use root_store::{
+    P02AgentInvoice, P02Context, P02DraftDeliveryError, P02DraftDestination, P02DraftReceipt,
+    P02Grant, P02InvoiceBatch, P02InvoiceDraft,
+    P02InvoiceInput, P02ResolvedValue, P02Vault, RootBinding, TrustEnrollmentRequest,
+};
 #[cfg(target_os = "linux")]
 pub use root_store::TrustEnrollmentCallError;
 #[cfg(target_os = "linux")]

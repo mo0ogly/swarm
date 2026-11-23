@@ -868,9 +868,13 @@ sans processus enregistré. Sous le nouveau bail réel, le moteur ajoute un reç
 dans `native_mission_worker_adoptions` ; Agent, tentative, request/binding
 originaux, Work, FIFO et réservation restent inchangés. Le reçu relie les claims
 historiques et les révisions de réglages, avec le consentement courant. Une
-adoption ne rafraîchit pas le contexte et n'autorise aucun lancement : la garde
-courante revérifie identité physique Root, bail, profils, droits, budget et fraîcheur.
-Manual, stop, registered/terminal et anciens bindings1–3 sont refusés.
+adoption sous Linux peut ajouter une observation de prévol de même périmètre
+lorsque le reçu d'origine a expiré. Le contexte de lancement et le reçu d'origine
+restent immuables. La garde de lancement vérifie l'identité physique de la Root,
+le bail, les profils, les droits, le budget et la fraîcheur du reçu applicable.
+Les lancements manuels, les demandes d'arrêt, les agents enregistrés ou terminaux
+et les bindings 1 à 3 sont refusés.
+[Reprise après expiration](SAME-ROOT-FIFO-RECOVERY.md).
 
 ```mermaid
 flowchart LR

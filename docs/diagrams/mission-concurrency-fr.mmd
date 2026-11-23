@@ -1,0 +1,24 @@
+flowchart TB
+    accTitle: Concurrence entre missions dans un Root Swarm
+    accDescr: Les Work gardent leurs créneaux et budgets. Le même Root ordonne les tours par espace de travail.
+    F_A["Mission A, bail et budget A"]
+    F_B["Mission B, bail et budget B"]
+    F_C["Mission C, espace disjoint"]
+    F_QUEUE["File des espaces du même Root"]
+    F_HELD["Tour antérieur en attente ou acquis"]
+    F_WAIT["B attend le tour qui recouvre son espace"]
+    F_GO["C peut avancer selon ses propres gardes"]
+    F_RELEASE["Tour libéré, réévaluation de B"]
+    F_A -->|"espace partagé"| F_QUEUE
+    F_B -->|"espace recouvrant"| F_QUEUE
+    F_C --> F_QUEUE
+    F_QUEUE --> F_HELD
+    F_HELD -->|"ordre FIFO et recouvrement"| F_WAIT
+    F_QUEUE -->|"aucun tour antérieur recouvrant"| F_GO
+    F_WAIT -->|"après libération"| F_RELEASE
+    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
+    classDef data fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
+    class F_QUEUE,F_RELEASE core;
+    class F_HELD,F_WAIT data;
+    class F_A,F_B,F_C,F_GO ordinary;

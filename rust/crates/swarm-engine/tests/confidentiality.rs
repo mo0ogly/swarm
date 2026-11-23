@@ -88,7 +88,8 @@ fn check(destination:Value)->Value {
 }
 
 /// Security metadata is an authenticated readonly observation, not a stored
-/// qualification. A current policy never upgrades missing runtime evidence.
+/// qualification. Compare the compiled inventory digest and every exposed flow
+/// with the current source bytes. A current policy never upgrades missing runtime evidence.
 #[test]
 fn security_status_is_admin_readonly_and_never_invents_qualification() {
     let f=Fixture::new();
@@ -100,7 +101,18 @@ fn security_status_is_admin_readonly_and_never_invents_qualification() {
     assert_eq!(absent["domains"][0]["verification"]["freshness"],"unknown");
     assert_eq!(absent["domains"][0]["qualification"]["state"],"not_qualified");
     assert_eq!(absent["domains"][0]["runtime_enforced"],false);
-    assert!(absent["domains"][0]["flows"].as_array().unwrap().len()>=25);
+    let inventory_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../docs/architecture/blp-flow-inventory.json");
+    let inventory_bytes = std::fs::read(inventory_path).unwrap();
+    use sha2::{Digest, Sha256};
+    let expected_digest = format!("{:x}", Sha256::digest(&inventory_bytes));
+    assert_eq!(absent["inventory_sha256"], expected_digest);
+    let inventory: Value = serde_json::from_slice(&inventory_bytes).unwrap();
+    let expected_flows: Vec<_> = inventory["flows"].as_array().unwrap().iter().map(|flow| {
+        json!({"id":flow["id"],"name_fr":flow["name_fr"],"name_en":flow["name_en"],
+            "owner":flow["owner"],"status":flow["status"],"missing_blp":flow["missing_blp"]})
+    }).collect();
+    assert_eq!(absent["domains"][0]["flows"], json!(expected_flows));
     for token in ["", "unknown-fixture-token", "fixture-worker-token"] {
         assert!(f.call("security-show",request.clone(),token).unwrap_err().contains("authorization_required"));
     }

@@ -11,6 +11,46 @@
         "en": "Conductor: the lease can renew after transient SQLite contention under the saved policy. A retired, replaced or expired lease remains refused."
       },
       {
+        "fr": "Préparations Rust : le diagnostic Trust rapproche les octets des sources. Le travailleur API lie les octets du prompt au tour détenu et, lorsqu’elle existe, à son admission.",
+        "en": "Rust preparations: Trust diagnostics match source bytes. The API worker binds prompt bytes to the owned turn and its admission when present."
+      },
+      {
+        "fr": "Factures Rust : remise locale d’un brouillon P02 sur une socket Unix connectée avec accusé lié aux octets reçus. Le récepteur fictif est réservé aux tests.",
+        "en": "Rust invoices: local P02 draft delivery over a connected Unix socket with a byte-bound acknowledgement. The fictional receiver is test-only."
+      },
+      {
+        "fr": "Factures Rust : la préparation du rapprochement P02 remplace la référence de compte par un jeton et prépare un brouillon minimal sous mandat. Le pilote reste en pause.",
+        "en": "Rust invoices: P02 reconciliation preparation substitutes an account token and prepares a minimal draft under a mandate. The pilot remains paused."
+      },
+      {
+        "fr": "Moteur Rust : coffre P02 en mémoire par lot, résolution soumise à un mandat local courant et retrait des jetons. Les diagnostics de résolution masquent les valeurs brutes. Le pilote de facture reste à décider.",
+        "en": "Rust engine: in-memory P02 vault per batch, resolution under a current local mandate, and token withdrawal. Resolution diagnostics redact raw values. The invoice pilot remains a separate decision."
+      },
+      {
+        "fr": "Reprise automatique : une adoption sous un nouveau bail peut refaire le prévol expiré d’un agent admis avant son premier démarrage, dans le même périmètre.",
+        "en": "Automatic recovery: adoption under a new lease can refresh an expired preflight for an admitted, never-started agent in the same scope."
+      },
+      {
+        "fr": "Cockpit Rust : les échanges d’une mission permettent de rejoindre une remise ou sa réponse enregistrée et indiquent la présence d’un accusé.",
+        "en": "Rust cockpit: mission exchanges link to recorded handoffs and replies and show acknowledgement status."
+      },
+      {
+        "fr": "Cockpit Rust : si une tentative change d’état pendant le calcul du statut, Conduite indique que la lecture doit être actualisée.",
+        "en": "Rust cockpit: if an attempt changes state during a status read, Dispatch shows how to refresh the observation."
+      },
+      {
+        "fr": "Cockpit Rust : Conduite affiche la cause précise du blocage d’un démarrage automatique, par mission ou par tâche. La lecture ne lance aucun agent.",
+        "en": "Rust cockpit: Dispatch shows the specific reason automatic startup is blocked, by mission or task. Reading the diagnostics does not launch agents."
+      },
+      {
+        "fr": "Orchestration Rust : les refus d’autorité d’un sous-orchestrateur remontent à la racine. La reprise du sous-périmètre attend une décision racine.",
+        "en": "Rust orchestration: a sub-orchestrator's scope-authority refusal reaches the root, and the child resumes after a root decision."
+      },
+      {
+        "fr": "Orchestration Rust : priorité aux workers admissibles et utilisation des places disponibles avant une nouvelle activation du planificateur.",
+        "en": "Rust orchestration: eligible workers use available slots before a new planner activation."
+      },
+      {
         "fr": "Mémoire : le premier lancement manuel dans une équipe configurée peut inclure un résumé extractif des dialogues de sa branche.",
         "en": "Memory: the first manual launch in a configured team can include an extractive summary of dialogues from its own scope."
       },

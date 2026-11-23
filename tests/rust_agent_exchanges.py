@@ -16,7 +16,9 @@ def historical_fixture(binary,output):
     data rather than receipts from an exchange operation. Retain original DB
     logical state after population so every public read can prove no mutation.
     """
-    f=Fixture(binary,output,'exchange-read');prepared=f.prepare();agent=prepared['agent']['id'];db=f.root/'.swarm/state.db'
+    f=Fixture(binary,output,'exchange-read')
+    f.configure_team()
+    prepared=f.prepare();agent=prepared['agent']['id'];db=f.root/'.swarm/state.db'
     other=f.ok(['work','create'],dict(schema_version=1,event_id='other-work',expected_revision=0,title='Other exchange scope',objective='Read isolation',scope='Owned fixture',criteria=['No cross-work rows']))['work']['id']
     with sqlite3.connect(db) as c:
         c.execute('PRAGMA foreign_keys=ON')

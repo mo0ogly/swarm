@@ -14,6 +14,17 @@ HEAD verification reads actual TCP bytes after a valid GET: the usual HTTP clien
 
 Evidence: recipe194 PASS2/verified integrity (public Go/native7 and browser4), TCP HEAD witness5 tests +4 earlier policy routes, prior status reader4 before/after, installed21 +Version14 and five unchanged Works. Actual live Work/exchange contents are compared by digest without retention in the new report. Exact17-file review keeps three concurrent identity/preparation changes open, without implying global conformance. See the retrospective under docs/plans/migration-rust/evidence/20261027-exchanges-hq2js3us.
 
+
+Each exchange shows its source attempt. After a successful read, navigation
+buttons follow exact `reply_to` identifiers in the same Work response. Focus
+moves to the linked exchange heading without another API read. Missing
+references are visible and duplicate identifiers fail the view.
+Acknowledgement is shown as recorded data, including an explicit absent state.
+
+The browser journey `tests/rust_agent_exchanges_browser.py` verifies the
+protected JavaScript bytes served by the executable, navigation in both
+directions, no additional read and error states in both languages and themes.
+
 ```mermaid
 sequenceDiagram
     participant U as Operator

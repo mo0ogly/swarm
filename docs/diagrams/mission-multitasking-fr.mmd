@@ -1,0 +1,25 @@
+flowchart TB
+    accTitle: Multitâche dans une mission Swarm
+    accDescr: Deux workers peuvent se chevaucher après des admissions séquencées. Le successeur attend ses preuves.
+    M_DAG["Work et DAG à la révision courante"]
+    M_SORT["Candidats ordonnés et prérequis vérifiés"]
+    M_QUEUE["Tours FIFO des candidats prêts"]
+    M_ADMIT["Admissions séquencées sous bail, créneaux et budget"]
+    M_A["Exécution A autorisée, espace A"]
+    M_B["Exécution B autorisée, espace B"]
+    M_PROOF["Remises, contrôles, revue et décisions"]
+    M_C["Tâche C, préconditions satisfaites"]
+    M_DAG --> M_SORT
+    M_SORT --> M_QUEUE
+    M_QUEUE --> M_ADMIT
+    M_ADMIT -->|"premier démarrage vérifié"| M_A
+    M_ADMIT -->|"départ suivant si un créneau est libre"| M_B
+    M_A -->|"candidat A"| M_PROOF
+    M_B -->|"candidat B"| M_PROOF
+    M_PROOF -->|"preuves applicables à C"| M_C
+    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
+    classDef data fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
+    class M_SORT,M_ADMIT,M_PROOF core;
+    class M_DAG,M_QUEUE,M_C data;
+    class M_A,M_B ordinary;

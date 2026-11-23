@@ -10,6 +10,41 @@ use std::{
     fmt,
 };
 
+pub(crate) const SCOPE_ESCALATION_KIND: &str = "scope_authority_refused";
+pub(crate) const SCOPE_ESCALATION_PREFIX: &str = "root-";
+
+/// Classify only explicit scope-authority refusals from the typed decision
+/// path. Malformed proposals and unrelated operational failures stay local.
+pub(crate) fn scope_authority_refusal(code: &str) -> bool {
+    matches!(
+        code,
+        "planning-task-dependency-owned-by-another-scope"
+            | "planning-operation-requirement-outside-scope"
+            | "planning-operation-task-outside-scope"
+            | "planning-judge-root-required"
+    )
+}
+
+/// Observe whether the child has an original refusal with a pending, derived
+/// root notification. Callers validate Work before using the observation.
+/// The root's committed decision releases the hold without refunding a call.
+pub(crate) fn scope_escalation_pending(work: &Work, scope: &str) -> bool {
+    let Some(inbox) = work.planning.as_ref().and_then(|p| p.inbox.as_ref()) else {
+        return false;
+    };
+    inbox.iter().any(|event| {
+        event.scope == crate::ROOT_ORCHESTRATOR_SCOPE
+            && event.kind == SCOPE_ESCALATION_KIND
+            && event.decision.is_empty()
+            && event.id.strip_prefix(SCOPE_ESCALATION_PREFIX).is_some_and(|id| {
+                inbox.iter().any(|original| {
+                    original.id == id && original.scope == scope
+                        && original.kind == "planning_rejected"
+                })
+            })
+    })
+}
+
 /// Safe fingerprint failure retaining invalid-state/codec causes. Never substitutes
 /// an empty hash or false unchanged result for a failed prerequisite.
 pub enum PlanningRejectionError {

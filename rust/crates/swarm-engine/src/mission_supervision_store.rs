@@ -10,6 +10,8 @@ use std::time::Duration;
 
 #[path = "mission_worker_adoption.rs"]
 mod worker_adoption;
+#[cfg(target_os = "linux")]
+pub(crate) use worker_adoption::adoption_preflight;
 #[path = "mission_worker_recovery.rs"]
 mod worker_recovery;
 pub use worker_recovery::MissionWorkerRecovery;
@@ -754,7 +756,7 @@ impl RootStore {
 
 #[path = "mission_workspace_fifo.rs"]
 mod workspace_fifo;
-pub use workspace_fifo::{MissionQueueRegistration, MissionCandidateRefusal};
+pub use workspace_fifo::{MissionQueueRegistration, MissionCandidateRefusal, MissionLaunchDiagnostics, MissionLaunchRefusal};
 pub(super) use workspace_fifo::schema as workspace_fifo_schema;
 
 #[path = "mission_worker_continuation.rs"]

@@ -206,6 +206,12 @@ pub(crate) fn supported_work(w: &Work, index: usize) -> Result<(), AgentLaunchEr
     }
     Ok(())
 }
+/// Which host evidence the caller may collect. Dispatch may probe writes.
+pub(crate) enum CandidateHostCheck {
+    ReadOnly,
+    VerifyWrite,
+}
+
 /// Observe provider/model/host/workspace readiness before a standing FIFO claim,
 /// deliberately without slots or workspace occupancy. Uses actual persisted
 /// policy and the same provider/preflight consumers as admission; no provider or
@@ -213,7 +219,8 @@ pub(crate) fn supported_work(w: &Work, index: usize) -> Result<(), AgentLaunchEr
 /// by the real factory. Missing policy/files, unsupported route and host errors
 /// retain their causes; canonical UTF-8 workspace is returned only on success.
 /// Managed initial tasks return a validated future-copy path without host probing
-/// or creating it. This is a standing intention only: the real fenced factory
+/// or creating it. ReadOnly checks host metadata and access without a probe file.
+/// This is a standing intention only: the real fenced factory
 /// creates and host-checks the copy before admission and execution permission.
 pub(crate) fn candidate_workspace(
     root: &Path,
@@ -222,6 +229,7 @@ pub(crate) fn candidate_workspace(
     task: &str,
     profile: &crate::LaunchProfile,
     settings: &EngineSettingsDocument,
+    host_check: CandidateHostCheck,
 ) -> Result<String, AgentLaunchError> {
     let policy = settings.values.agent_launch_policy()
         .map_err(|cause| AgentLaunchError::caused(cause.reason(), cause))?;
@@ -247,8 +255,13 @@ pub(crate) fn candidate_workspace(
     if work.planning.as_deref().is_some_and(|p| p.repository.is_some()) {
         return crate::managed_repository::candidate_worker(root, work, task, settings);
     }
-    let host = agent_launch_preflight::observe(root, &request.provider, &model, &request, &policy)?;
-    host.workspace.to_str().map(str::to_owned)
+    let path = match host_check {
+        CandidateHostCheck::ReadOnly => agent_launch_preflight::inspect(root, &model, &request, &policy)?,
+        CandidateHostCheck::VerifyWrite => {
+            agent_launch_preflight::observe(root, &request.provider, &model, &request, &policy)?.workspace
+        }
+    };
+    path.to_str().map(str::to_owned)
         .ok_or(AgentLaunchError::Refused("agent-workspace-not-utf8"))
 }
 /// Read configured CLI and API-connection namespace sources under the same saved
@@ -406,7 +419,7 @@ fn guards(
     r: &Launch,
     workspace: &str,
 ) -> Result<(), AgentLaunchError> {
-    guards_owned(tx, work, r, workspace, None)
+    guards_owned(tx, work, &r.task_id, workspace, None)
 }
 /// Recheck the common guards for this actual existing intention. Only its own
 /// verified SQL row may be excluded from the overlap query; all other active
@@ -431,7 +444,7 @@ pub(crate) fn execution_guards(
             "agent-execution-identity-conflict",
         ));
     }
-    guards_owned(tx, work, r, &agent.workspace, Some(&agent.id))
+    guards_owned(tx, work, &r.task_id, &agent.workspace, Some(&agent.id))
 }
 /// One shared guard implementation; None excludes no row, including malformed
 /// empty IDs. The existing-owner path must validate that row before exclusion.
@@ -439,10 +452,11 @@ pub(crate) fn execution_guards(
 /// preserving filesystem-root ancestry. Agent and running-integration guards
 /// share that rule. Rows are resource observations, never process/actor authority;
 /// this reads only and retains SQL/finalize causes through the common query helper.
-fn guards_owned(
+/// A diagnostic reader supplies the prospective workspace returned by preflight.
+pub(crate) fn guards_owned(
     tx: &Connection,
     work: &str,
-    r: &Launch,
+    task: &str,
     workspace: &str,
     owner: Option<&str>,
 ) -> Result<(), AgentLaunchError> {
@@ -481,7 +495,7 @@ fn guards_owned(
     if paused {
         return Err(AgentLaunchError::Refused("agent-launch-mission-paused"));
     }
-    let held=query(tx,"SELECT count(*) FROM main.preparation_launch_locks WHERE work_id=? AND task_id=? AND released=0",rusqlite::params![work,r.task_id],|rows|Ok(rows.next()?.ok_or(AgentLaunchError::Refused("agent-launch-preparation-read"))?.get::<_,i64>(0)?))?;
+    let held=query(tx,"SELECT count(*) FROM main.preparation_launch_locks WHERE work_id=? AND task_id=? AND released=0",rusqlite::params![work,task],|rows|Ok(rows.next()?.ok_or(AgentLaunchError::Refused("agent-launch-preparation-read"))?.get::<_,i64>(0)?))?;
     if held != 0 {
         return Err(AgentLaunchError::Refused(
             "agent-launch-preparation-not-authorized",
@@ -1260,7 +1274,7 @@ pub(crate) fn preview_managed_resources<E: WorkEnvironment>(
         let index=actual.tasks.iter().flatten().position(|t|t.id==request.task_id)
             .ok_or(AgentLaunchError::Refused("agent-launch-task-missing"))?;
         supported_work(&actual,index)?;
-        let workspace=candidate_workspace(root,dir,&actual,&request.task_id,profile,settings)?;
+        let workspace=candidate_workspace(root,dir,&actual,&request.task_id,profile,settings,CandidateHostCheck::VerifyWrite)?;
         guards(tx,work,request,&workspace)?;
         crate::financial_budget::admission_budget(tx,work)
             .map_err(|e| AgentLaunchError::caused(e.code(),e))?;

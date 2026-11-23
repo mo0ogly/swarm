@@ -73,6 +73,18 @@ mod admin_budget;
 pub use admin_budget::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};
 mod material_path;
 mod trust_store;
+#[cfg(target_os = "linux")]
+mod p02_invoice;
+#[cfg(target_os = "linux")]
+pub use p02_invoice::{P02AgentInvoice, P02InvoiceBatch, P02InvoiceDraft, P02InvoiceInput};
+#[cfg(target_os = "linux")]
+mod p02_transport;
+#[cfg(target_os = "linux")]
+pub use p02_transport::{P02DraftDeliveryError, P02DraftDestination, P02DraftReceipt};
+#[cfg(target_os = "linux")]
+mod p02_vault;
+#[cfg(target_os = "linux")]
+pub use p02_vault::{P02Context, P02Grant, P02ResolvedValue, P02Vault};
 mod reader_guard;
 pub use reader_guard::ReaderVerdict;
 #[cfg(target_os="linux")]
@@ -266,6 +278,9 @@ pub enum RootStoreError {
         cleanup: Option<Box<rusqlite::Error>>,
     },
     Refused(&'static str),
+    /// Unpublished mission status observation invalidated by concurrent change.
+    /// Retains the typed recheck and ancillary causes without authorizing retry.
+    MissionStatusChanged { primary: Box<Self> },
     Cleanup {
         primary: Option<Box<Self>>,
         cleanup: Box<Self>,
@@ -481,6 +496,7 @@ impl RootStoreError {
             Self::Sql(_) => "root-storage",
             Self::SqlTransaction(_) => "root-sql-transaction-failed",
             Self::Refused(s) => s,
+            Self::MissionStatusChanged { .. } => "mission-status-observation-changed",
             Self::Cleanup { .. } => "root-cleanup",
             Self::Busy { .. } => "root-storage-busy",
         }
@@ -600,6 +616,7 @@ impl Error for RootStoreError {
             #[cfg(target_os = "linux")]
             Self::View(e) => Some(e),
             Self::SchemaCommit { cause, .. } => Some(cause),
+            Self::MissionStatusChanged { primary } => Some(primary.as_ref()),
             Self::Cleanup {
                 primary: Some(e), ..
             } => Some(e.as_ref()),
@@ -872,6 +889,8 @@ mod mission_producer;
 #[path = "mission_supervision_store.rs"]
 mod mission_supervision_store;
 #[cfg(target_os = "linux")]
+pub(crate) use mission_supervision_store::adoption_preflight;
+#[cfg(target_os = "linux")]
 pub(crate) mod reported_costs;
 mod cockpit_health;
 mod cockpit_actions;
@@ -909,7 +928,7 @@ pub use mission_status_evidence::TaskFreshnessEvidence;
 pub use mission_status_read::{MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact};
 #[cfg(target_os = "linux")]
 pub use mission_supervision_store::MissionWorkerRecovery;
-pub use mission_supervision_store::{MissionQueueRegistration, MissionCandidateRefusal, MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome};
+pub use mission_supervision_store::{MissionQueueRegistration, MissionCandidateRefusal, MissionLaunchDiagnostics, MissionLaunchRefusal, MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome};
 #[cfg(target_os = "linux")]
 pub use mission_supervision_store::{
     MissionWorkerContinuationObservation, MissionWorkerContinuationEntry,

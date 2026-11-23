@@ -2,6 +2,26 @@
 
 [English](../en/TOKIO-ORCHESTRATION.md) · [Plan Biba](../plans/actions-confiance/BIBA-TRANSVERSE-APEX.md) · [Qualification ciblée](#rejouer-la-qualification-ciblée)
 
+## Ordre d’admission dans le conducteur de mission
+
+Le conducteur tente d’abord d’admettre un worker prêt. Après un départ, il
+relit l’état. Il attend que le démarrage précédent franchisse son contrôle
+lié à la révision avant de tenter l’admission suivante sous la même autorité.
+Le moteur garde l’ordre de la file, les dépendances, l’exclusion des espaces
+occupés et la capacité configurée. Une nouvelle activation du planificateur
+attend une passe sans admission, la permission de mission et la fin des
+contextes workers retenus. La reprise d’un worker déjà admis conserve son
+identité. Les contrôles et la revue restent des opérations distinctes sur les
+preuves du résultat soumis.
+
+Un refus d’autorité de périmètre d’une proposition native enfant conserve son
+original dans le périmètre d’origine. Le même enregistrement ajoute un avis
+à l’orchestrateur racine. L’avis contient l’identifiant du périmètre et le code
+de refus. Le verbe d’origine, la proposition et les pièces restent dans le
+diagnostic de l’enfant. Toute nouvelle prise en charge de cet enfant attend
+une décision racine qui acquitte l’avis. La reprise passe ensuite par les
+gardes habituelles de révision, de consentement, de droits et de budget.
+
 ## Choisir la frontière
 
 Utiliser Tokio pour la coordination asynchrone entre composants Rust coopératifs qui peuvent partager les privilèges d’un processus. Un canal typé convient lorsqu’une tâche doit confier une opération à un propriétaire unique ou recevoir un résultat ponctuel. Réutiliser le transport existant si l’opération a déjà un propriétaire et une règle d’admission.
@@ -40,6 +60,44 @@ Sur dev.380, les fixtures avec fournisseur inerte ont vérifié le nominal, l’
 
 La [recette preparation-web-stop-order](../../tools/verification/recipes/preparation-web-stop-order.json) sélectionne uniquement ces deux ordres. Préparer un binaire natif qualifié, un checkout ou une copie de sources isolée avec une zone de fixtures valide et un répertoire de sortie privé admis. Le lanceur utilise Linux, Python 3 et `ss` d’iproute2. Définir `SWARM_PREPARATION_UI_BINARY`, `SWARM_PREPARATION_STOP_ORDER_SHA256`, `SWARM_PREPARATION_STOP_ORDER_PARENT` et `SWARM_PREPARATION_STOP_ORDER_RESERVE_BYTES` avant d’appeler [le lanceur de recettes](../../tools/verification/README.md). Conserver l’identification du build, le reçu de recette et le dossier du parcours HTTP et CLI.
 
+## Qualification P1.1 du 22 novembre 2026
+
+Binaire normal `v0.1.1-dev.390`, SHA-256
+`99433f0f8274cf2bd45b4db43cbb7b11f1bd7b1acad4a51d318a0b5d3a042ec2`,
+commit déclaré `71e84be8b49dad2e6868aec9cdfb5293ece36c58`, `modified:true`.
+Les lignes ci-dessous concernent cette image et des programmes locaux inertes.
+Le commit déclaré porte sur l'image Swarm. Le commit du candidat produit par
+les workers est indiqué séparément dans ORCH-06.
+
+| Critère | Résultat et portée |
+| --- | --- |
+| ORCH-01 | PASS. Deux permissions de démarrage en espaces disjoints alors que l’entrée concurrente de planification racine reste en attente. |
+| ORCH-02 | PASS sur la fixture. Le conducteur planifie sans worker admissible. À état inchangé, la commande de planification retourne `idle`, sans nouveau lancement ni exécution du contrôle configuré. Le témoin positif du contrôle crée le marqueur attendu. |
+| ORCH-03 | PASS sur la fixture. Pause, reprise consentie et retrait confirmés. La demande de reprise après retrait refuse avec `mission-consent-required` et le Work relu est identique. |
+| ORCH-04 | PASS sur la fixture. À deux créneaux les deux workers indépendants sont actifs ensemble. À un créneau le second attend sur `mission-agent-slots-occupied`, puis démarre après achèvement du premier. C déclare A comme prédécesseur. Les sources effectives rattachent le refus de revue de C au contrôle de cette dépendance. Une variante à deux créneaux retourne un blocage FIFO sur espaces recouvrants jusqu’à la sortie du premier worker. |
+| ORCH-05 | PASS sur la fixture. Deux périmètres arbitrent. Le refus d’autorité du second remonte à la racine, puis le sous-orchestrateur reprend sous son mandat d’origine. |
+| ORCH-06 | PASS sur les fixtures. Sur le candidat `955bc170be7bcd6b141d49e0071448de57c1ed5a`, le refus sur dérive et le rejeu n’ajoutent ni revue ni réservation. Sur le candidat `c2af453b3dc15d18e85e8cc4e530806db4dd115b`, un changement d’entrée effective invalide la première revue. Les nouveaux contrôles portent sur l’entrée changée et une nouvelle revue permet la publication. Le rejeu restitue la publication enregistrée. |
+
+Les reçus se trouvent sous `/run/media/fpizzi/SWARM/swarm-evidence/` dans
+`p11-multitask-20261122.9xRb0b/orchestration-external`,
+`p11-slot-comparison-20261122.6avhlZ` et
+`p11-orch06-20261122.iiLg7L`. Dans la dernière archive,
+`publication-i0/valid-current-original.stdout` lie le commit, le reçu de
+validation, l’identifiant de revue et l’empreinte du contexte.
+La fixture de prépublication relit le marqueur dans la feuille I0 de la
+revendication de revue par le lecteur commun. Le premier échec sur le
+marqueur racine historique reste dans `publication/failure.json`.
+Les témoins ciblés sont `p11-idle-controls-20261122.kUx4T0/run/result.json`
+et `p11-overlap-20261122.FPARps/run/capacity-refusal.json`.
+
+Le parcours de revalidation est dans
+`p11-requalification-20261122.DViR0e/requalification-only`.
+`profile-reuse.json` confirme les 787 entrées effectives du profil.
+`new-controls-work.stdout`, `publish-r2.stdout` et
+`publish-r2-replay.stdout` lient le résultat à la revue renouvelée.
+Le témoin de revalidation utilise l’option de préparation ciblée sur la
+revue. Le premier échec sur la file de préparation reste conservé.
+
 ## Repères des preuves dev 380
 
 Le binaire natif exercé porte le SHA-256 `f0e92ce3749855bee14f2b6ea68037c0e5532ac58308e36988f76ad6b46678a1`. En saturation, le harnais compte les démarrages du fournisseur. Les lectures publiques établissent l’état du dialogue, du budget et du brief adopté. Les SHA-256 ci-dessous identifient les manifestes des dossiers conservés dans le registre local de recherche.
@@ -52,3 +110,47 @@ Le binaire natif exercé porte le SHA-256 `f0e92ce3749855bee14f2b6ea68037c0e5532
 | Qualification du pilote et de la recette sur la base de la PR | `4998f37a68257d6b4f576a4cc4364e1efad28160a19cee251a3a039452db6c1d` |
 
 [Canaux Tokio](https://tokio.rs/tokio/tutorial/channels) · [Arrêt asynchrone](https://tokio.rs/tokio/topics/shutdown)
+
+## Diagnostic de démarrage automatique dans Conduite
+
+En lecture actuelle, **Conduite** affiche les refus observés par le moteur Rust
+pour les workers automatiques. La lecture protégée
+`GET /api/v1/mission?work=…&action=launch-diagnostics` renvoie la révision de
+la mission, les tâches concernées et les codes moteur. Une absence de consentement
+s’affiche pour la mission entière. Un prérequis, un fournisseur indisponible,
+un créneau occupé ou un conflit d’espace s’affiche pour la tâche concernée.
+
+Le moteur réutilise les règles du conducteur et projette l’ordre FIFO sans
+inscrire de tour. Il observe les métadonnées et droits locaux. L’admission réelle
+vérifie aussi l’écriture dans l’espace de travail et les octets de l’exécutable.
+Cette lecture ne réserve aucune ressource, ne crée aucune tentative et n’appelle
+aucun fournisseur. L’admission réelle applique ses propres contrôles à la
+révision courante. La réponse ne contient ni chemins ni données d’autres missions.
+En mode historique, la pause enregistrée reste visible sans évaluer ces contrôles.
+En lecture actuelle, le cockpit indique aussi si le statut moteur n’observe
+aucun conducteur actif.
+Après correction de la cause, **Actualiser** relit le diagnostic.
+
+La [recette cockpit-launch-diagnostics](../../tools/verification/recipes/cockpit-launch-diagnostics.json)
+utilise un binaire natif qualifié (`SWARM_LAUNCH_DIAGNOSTICS_BINARY`) et un agent
+inerte dans un Root isolé. Elle vérifie l’API et le rendu dans Chromium avec le
+serveur HTTP natif seul, sans conducteur (exemple Cargo
+`cockpit_launch_http_fixture`, fourni via `SWARM_LAUNCH_DIAGNOSTICS_HTTP_FIXTURE`).
+
+### Lecture concurrente du statut après une fin de tentative
+
+La lecture courante compare ses entrées avant publication. Pendant la fin d’une
+tentative, le Work, la liste des agents ou les espaces occupés peuvent changer
+entre les deux observations. Si les contrôles signalent uniquement des entrées
+modifiées, le moteur écarte la projection et la route protégée `mission?…&action=status`
+renvoie HTTP 409 avec `mission-status-observation-changed`. Le cockpit demande
+d’actualiser. La lecture suivante recalcule depuis l’état enregistré.
+Les causes de changement et les diagnostics annexes restent disponibles au
+moteur. Une erreur indépendante de stockage, d’identité ou de fermeture
+conserve son diagnostic d’erreur. Aucune relance d’agent ni nouvelle politique
+de répétition n’est introduite.
+
+La [recette cockpit-status-completion](../../tools/verification/recipes/cockpit-status-completion.json)
+exerce le conducteur Web avec des agents inertes. Elle conserve les réponses
+HTTP et, quand une lecture recouvre la fin d’un agent, les causes CLI observées.
+Le test Rust couvre aussi le classement des causes indépendamment du calendrier.

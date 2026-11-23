@@ -1,5 +1,18 @@
 # Recettes permanentes / Permanent verification recipes
 
+T4.06 : `recipes/t406-last-use-matrix.json` exerce les 768 verdicts du
+catalogue BLP de fixture (quatre niveaux, deux compartiments et trois parcours),
+le refus d'engagement Trust à l'échéance ou après changement de révision, et
+l'invalidation de l'accord Git après changement de révision. Le témoin Trust
+observe un connecteur simulé. Utiliser une cible Cargo de test admise et un
+répertoire de preuves neuf.
+
+T4.06: `recipes/t406-last-use-matrix.json` checks all 768 verdicts for the BLP
+fixture catalogue (four levels, two compartments and three operations),
+Trust commit refusal at expiry or after revision change, and Git agreement
+invalidation after revision change. The Trust control uses a simulated
+connector. Use an admitted Cargo test target and a fresh evidence directory.
+
 Recette capture PAEA : `recipes/paea-capture-reader.json` vérifie les gardes
 `paea_capture_*` du témoin approval-web (27 noms attendus dans la recette ;
 ce compte est une attente, pas une preuve d'exécution). Le refus d'attente du
@@ -3296,6 +3309,16 @@ compilation, ni la provenance de livraison du fichier, ni l'installation du
 service, la séparation UID ou une mission vivante acceptée.
 
 
+For the controlled delivered-settlement recipe, `SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1`
+requires the private `TMPDIR` effective in the test process. The supported
+Cargo launcher may replace the recipe runner's initial temporary directory
+with its admitted scratch. Both fixture allocators validate the private
+parent before allocation and emit placement witnesses. Missing or invalid
+scratch fails before allocation in this mode. Direct test invocations with
+the mode unset keep the historical private fallback. The launcher owns
+volume admission and descriptor retention. Select the Cargo target through
+the launcher's existing configuration or an admitted target override.
+
 Delivered-binary fictitious settlement chain: `recipes/paea-delivered-settlement-cli-rust.json`
 runs the second domain (separate fictitious ledger) through the same one
 designated delivered ELF. With fresh isolated owned project/ledger roots and the
@@ -3345,6 +3368,15 @@ fail the test — and the public reconciliation journal stays `consistent` with
 `effectCount=1`, the exact provisioned terms and the debt settled once, also
 read through SQLite connections opened read-only separately from the CLI. No
 UID separation, real payment or independent acceptance is claimed by this case.
+
+La recette contrôlée du règlement livré fixe `SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1`.
+Les deux allocateurs vérifient le `TMPDIR` privé effectif du processus de test
+avant allocation et consignent leur parent. Le lanceur Cargo pris en charge
+peut remplacer le répertoire initial de la recette par son aire temporaire
+admise. En mode contrôlé, un parent absent ou invalide bloque l’allocation.
+L’appel direct sans ce mode conserve le repli privé historique. Le lanceur
+assure l’admission du volume et la conservation du descripteur. La cible Cargo
+vient de la configuration du lanceur ou d’une cible explicite admise.
 
 Chaîne de règlement fictif sur binaire livré : la recette
 `recipes/paea-delivered-settlement-cli-rust.json` exécute le second domaine
@@ -5116,3 +5148,43 @@ arbitraire. Cette fixture unitaire ne prouve ni fournisseur natif, ni approbatio
 E2E, ni acceptation indépendante. Garder le rouge original et un vert frais ;
 `recipe.py verify` contrôle l’intégrité, pas la livraison. Publication source
 complète et approbation protégée restent des vérifications distinctes.
+
+## Recette locale P02
+
+Linux, Python 3.11 ou ultérieur et Cargo hors ligne verrouillé. Exécuter depuis
+la racine du dépôt avec une cible Cargo admise et un répertoire de preuves neuf
+dont le parent existe. La recette compile un exemple réservé au banc, observe
+son empreinte, puis rejoue la qualification et le pilote sur des factures
+fictives dans deux racines isolées. Le résultat contient les décisions
+simulées et le contrôle de clôture. Les empreintes et le reçu sont des preuves
+locales de recette. Aucune mission ni aucun fournisseur n’est lu ou appelé.
+
+Linux, Python 3.11 or later and locked, offline Cargo are required. Run from
+the repository root with an admitted Cargo target and a fresh evidence
+directory whose parent exists. The recipe builds and hashes a fixture-only
+example, then runs qualification and the pilot with fictional invoices in two
+isolated Roots. Its output includes simulated decisions and closure checks.
+The receipt and hashes are local fixture evidence. The recipe reads no mission
+and calls no provider.
+
+```sh
+python3 tools/verification/recipe.py run --recipe tools/verification/recipes/p02-pilot-simulated.json --output /CHEMIN/NEUF
+python3 tools/verification/recipe.py verify --evidence /CHEMIN/NEUF
+python3 -B tests/p02_pilot/run.py --verify-output /CHEMIN/NEUF/step-0001.stdout
+```
+
+Le contrôle automatique P02 appelle `make check-p02-pilot`. Cette cible
+exécute la recette, contrôle les empreintes et recalcule la décision de clôture
+depuis le dossier conservé. La CI conserve ce dossier comme artefact. Pour
+refaire le même contrôle en local, indiquer un chemin neuf. Pour relire
+seulement un dossier existant, utiliser `make verify-p02-pilot`.
+
+The automatic P02 check calls `make check-p02-pilot`. It executes the recipe,
+verifies evidence hashes and recomputes closure from the retained output. CI
+retains the evidence directory as an artifact. Use a fresh path to run the same
+check locally, or `make verify-p02-pilot` to check existing evidence only.
+
+```sh
+make check-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
+make verify-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
+```

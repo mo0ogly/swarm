@@ -62,6 +62,64 @@
    }catch(error){if(ticket!==generation||selected!==work||!section.isConnected)return;state.className='notice alert';state.textContent=tr('L’activité n’a pas pu être lue. Relancez la lecture pour reprendre.')+' ('+failure(error)+')'}finally{busy=false;read.disabled=more.disabled=filter.disabled=false}}
    read.addEventListener('click',()=>load(false));more.addEventListener('click',()=>load(true));filter.addEventListener('change',()=>{cursor='';more.hidden=true;rows.replaceChildren();state.textContent=tr('Lecture à la demande.')});
   }
+  /** Build the recorded exchange views from one validated Work response.
+   * Only exact reply_to IDs in that response create navigation. Links neither
+   * fetch another Work nor infer an acknowledgement. Duplicate IDs refuse the
+   * whole view before any fragment is attached.
+   */
+  function exchangeCards(entries) {
+   const fragment=document.createDocumentFragment(), headings=new Map(), replies=new Map();
+   for(const entry of entries) {
+    if(!entry.id || headings.has(entry.id)) throw {code:'exchange-view-invalid'};
+    const heading=el('h4');
+    heading.textContent=entry.id;
+    heading.tabIndex=-1;
+    headings.set(entry.id,heading);
+    if(entry.reply_to && entry.reply_to!==entry.id) {
+     if(!replies.has(entry.reply_to)) replies.set(entry.reply_to,[]);
+     replies.get(entry.reply_to).push(entry.id);
+    }
+   }
+   for(const entry of entries) {
+    const card=el('article',undefined,'native-task'), facts=el('dl',undefined,'native-facts');
+    fact(facts,'Type',entry.kind);
+    fact(facts,'État enregistré',entry.state);
+    fact(facts,'Source',entry.source_task_id+' · '+entry.source_agent_id);
+    fact(facts,'Destinataire',entry.recipient_task_id+' · '+entry.recipient_role);
+    fact(facts,'Date enregistrée',entry.created_at);
+    fact(facts,'Tentative source',entry.source_attempt_id);
+    fact(facts,'Accusé enregistré',entry.acknowledged_at || entry.acknowledgement || tr('Aucun accusé enregistré.'));
+    if(entry.acknowledged_by) fact(facts,'Auteur déclaré de l’accusé',entry.acknowledged_by);
+    card.append(headings.get(entry.id),facts);
+    for(const value of [entry.need,entry.result_state,entry.acknowledged_at && entry.acknowledgement]) {
+     if(value) {const paragraph=el('p');paragraph.textContent=value;card.append(paragraph);}
+    }
+    const related=[];
+    if(entry.reply_to && entry.reply_to!==entry.id && headings.has(entry.reply_to)) related.push(['Voir la remise',entry.reply_to]);
+    for(const id of replies.get(entry.id) || []) related.push(['Voir la réponse',id]);
+    for(const [label,id] of related) {
+     const link=el('button');
+     link.type='button';
+     link.dataset.exchangeJump='';
+     link.textContent=tr(label)+' · '+id;
+     link.addEventListener('click',()=>headings.get(id).focus());
+     card.append(link);
+    }
+    if(entry.reply_to && !related.some(([label])=>label==='Voir la remise')) {
+     card.append(el('p','Remise liée indisponible dans cette lecture.'));
+    }
+    if(entry.artifacts?.length) {
+     card.append(el('h5','Pièces déclarées'));
+     for(const artifact of entry.artifacts) {
+      const paragraph=el('p');
+      paragraph.textContent=artifact.path+' · '+artifact.sha256;
+      card.append(paragraph);
+     }
+    }
+    fragment.append(card);
+   }
+   return fragment;
+  }
   function renderExchanges(work){
    const ticket=generation,section=el('details',undefined,'native-task'),title=el('summary','Échanges entre agents'),body=el('div'),read=el('button','Lire les échanges'),state=el('p','Lecture à la demande.','notice info'),rows=el('div');read.type='button';read.dataset.exchangesRead='';state.dataset.exchangesStatus='';state.setAttribute('role','status');section.dataset.exchanges='';body.append(el('p','Les déclarations ne prouvent ni transmission, ni réception, ni droit d’exécution.'),read,state,rows);section.append(title,body);detail.append(section);let busy=false;
    read.addEventListener('click',async()=>{if(busy)return;busy=true;read.disabled=true;state.className='notice info';state.textContent=tr('Chargement…');rows.replaceChildren();try{
@@ -70,7 +128,7 @@
     const required=['id','work_id','kind','source_agent_id','source_task_id','source_attempt_id','recipient_task_id','recipient_role','state','created_at'];
     if(!Array.isArray(entries)||!entries.every(e=>e&&required.every(k=>typeof e[k]==='string')&&e.work_id===work&&['recipient_attempt_id','reply_to','result_state','need','deadline_at','acknowledged_at','acknowledged_by','acknowledgement'].every(k=>!Object.hasOwn(e,k)||typeof e[k]==='string')&&(e.artifacts===null||Array.isArray(e.artifacts)&&e.artifacts.every(a=>a&&typeof a.path==='string'&&typeof a.sha256==='string'))))throw {code:'exchange-view-invalid'};
     if(!entries.length)rows.append(el('p','Aucun échange enregistré.'));
-    for(const e of entries){const card=el('article',undefined,'native-task'),heading=el('h4');heading.textContent=e.id;const facts=el('dl',undefined,'native-facts');for(const[label,value]of [['Type',e.kind],['État enregistré',e.state],['Source',e.source_task_id+' · '+e.source_agent_id],['Destinataire',e.recipient_task_id+' · '+e.recipient_role],['Date enregistrée',e.created_at]])fact(facts,label,value);card.append(heading,facts);for(const value of [e.need,e.result_state,e.acknowledgement])if(value){const p=el('p');p.textContent=value;card.append(p)}if(e.artifacts?.length){card.append(el('h5','Pièces déclarées'));for(const a of e.artifacts){const p=el('p');p.textContent=a.path+' · '+a.sha256;card.append(p)}}rows.append(card)}
+    rows.append(exchangeCards(entries));
     state.textContent=tr('Échanges relus.');
    }catch(error){if(ticket!==generation||selected!==work||!section.isConnected)return;state.className='notice alert';state.textContent=tr('Les échanges n’ont pas pu être lus. Relancez la lecture pour reprendre.')+' ('+failure(error)+')'}finally{busy=false;read.disabled=false}});
   }
