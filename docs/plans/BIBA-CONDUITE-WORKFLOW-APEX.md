@@ -101,3 +101,26 @@ les branches sœurs et rapproche uniquement le chemin réellement enregistré,
 le validateur configuré et les tâches du périmètre. Les changements de
 position sont propres à la vue et ne modifient pas la disposition mémorisée.
 Sur écran étroit, les liens passent de part et d’autre du validateur.
+
+### Disposition des tâches et séparation des flèches
+
+Le détail d’un périmètre répartit ses tâches par rang de dépendance, en une
+colonne sur petit écran ou deux quand la largeur le permet. Les affectations
+utilisent un tronc gris unique et une branche propre à chaque rangée. Les
+préconditions présentes dans ce périmètre arrivent par la droite. Les
+trajets et rangées restent des choix de présentation.
+
+```mermaid
+flowchart TD
+    S["Sous-orchestrateur"] --- T["Tronc d’affectation"]
+    T --- L1["Rangée des prérequis"]
+    T --- L2["Rangée suivante"]
+    L1 --> A["Tâche amont"]
+    L2 --> B["Tâche aval"]
+    A -->|Prérequis par la droite| B
+```
+
+Les cartes natives utilisent leur corps comme contrôle de déplacement. La
+poignée distincte a été retirée. Les flèches du clavier déplacent la carte
+ciblée et Entrée continue d’ouvrir la tâche. Le test garde les cas de
+déplacement groupé, d’annulation et d’export du placement.

@@ -210,7 +210,9 @@ second clic sur l’orchestrateur sélectionné referme son périmètre. Le vali
 configuré apparaît dès l’ouverture d’un périmètre, relié au principal. Les
 périmètres sont regroupés par niveau. En détail, seuls les ancêtres du
 périmètre restent visibles et ses tâches sont rapprochées. Sur écran étroit,
-les liens contournent le validateur.
+les liens contournent le validateur. Dans le périmètre ouvert, les tâches sont
+réparties par rang de dépendance. Une ligne d’affectation commune dessert les
+rangées par le haut, et les prérequis passent sur le côté opposé.
 L’en-tête montre la hiérarchie enregistrée et l’avis du moteur lié à la
 révision courante. Un avis indisponible ou périmé est signalé dans le graphe.
 La liaison de revue en pointillé vert représente la configuration. Les

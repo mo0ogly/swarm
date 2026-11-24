@@ -685,7 +685,9 @@
     const roleOffsets = new Map();
     let scopeHeight = Number(svg.dataset.roleHeight);
     const hasDrill = roleScopes.size > 0;
-    let scopeOffset = {x:0,y:0};
+    const scopeOffsets = new Map();
+    const assignmentBus = svgNode('g',{class:'graph-assignment-bus','aria-hidden':'true'});
+    svg.querySelector('.graph-workflow-relations')?.prepend(assignmentBus);
     let drillLevel = initial?.drillLevel === '*' || roleScopes.has(initial?.drillLevel)
       ? initial.drillLevel : '';
     const map=svgNode('svg',{class:'graph-minimap',role:'group',tabindex:0,'aria-label':t('Naviguer avec la mini-carte')});canvas.append(map);
@@ -739,7 +741,7 @@
      * @param {number} dx requested horizontal displacement in SVG units
      * @param {number} dy requested vertical displacement in SVG units
      */
-    function translateGroup(snapshot,ids,dx,dy){for(const id of ids){dx=Math.max(dx,-units.get(id).x-Math.min(0,scopeOffset.x)-(snapshot[id]?.x??0));dy=Math.max(dy,-units.get(id).y-Math.min(0,scopeOffset.y)-(snapshot[id]?.y??0))}for(const id of ids)positions[id]={x:(snapshot[id]?.x??0)+dx,y:(snapshot[id]?.y??0)+dy}}
+    function translateGroup(snapshot,ids,dx,dy){for(const id of ids){dx=Math.max(dx,-units.get(id).x-Math.min(0,scopeOffsets.get(id)?.x ?? 0)-(snapshot[id]?.x??0));dy=Math.max(dy,-units.get(id).y-Math.min(0,scopeOffsets.get(id)?.y ?? 0)-(snapshot[id]?.y??0))}for(const id of ids)positions[id]={x:(snapshot[id]?.x??0)+dx,y:(snapshot[id]?.y??0)+dy}}
     /** Selected cards move together; an unselected handle moves only itself. */
     function movementIds(id){return selectedIds.has(id)?[...selectedIds].filter(isVisible):[id]}
     /** Project native scroll bounds into unscaled SVG coordinates, clamped to
@@ -749,7 +751,8 @@
     /** Combine saved task motion and the current scope's display translation.
      * The scope translation never enters saved positions or undo history. */
     function displayedOffset(id) {
-      return {x:(positions[id]?.x ?? 0)+scopeOffset.x,y:(positions[id]?.y ?? 0)+scopeOffset.y};
+      const offset = scopeOffsets.get(id);
+      return {x:(positions[id]?.x ?? 0)+(offset?.x ?? 0),y:(positions[id]?.y ?? 0)+(offset?.y ?? 0)};
     }
     /** Recompute moved curves/extent and mirror zoom/undo/redo availability.
      * Presentation only; this helper performs no storage or engine operation. */
@@ -759,10 +762,21 @@
       let width=scoped ? Number(svg.dataset.scopeWidth) : overview ? Number(svg.dataset.roleWidth) : base.width;
       let height=scoped ? scopeHeight : overview ? Number(svg.dataset.roleHeight) : base.height;
       for(const [id,u]of units){const p=displayedOffset(id);u.group.setAttribute('transform',`translate(${p.x} ${p.y})`);if(!overview && (!scoped || isVisible(id))){width=Math.max(width,u.x+p.x+u.w+30);height=Math.max(height,u.y+p.y+u.h+30)}}
+      const scopedDependencyLane = width+8;
       for(const edge of svg.querySelectorAll('.graph-arete')){const a=units.get(edge.dataset.from),b=units.get(edge.dataset.to);if(!a||!b)continue;const ap=displayedOffset(edge.dataset.from),bp=displayedOffset(edge.dataset.to),vertical=orientation==='TB';
         const x1=a.x+ap.x+(vertical?a.w/2:a.w),y1=a.y+ap.y+(vertical?a.h:a.h/2),x2=b.x+bp.x+(vertical?b.w/2:0),y2=b.y+bp.y+(vertical?0:b.h/2),d=Math.max(60,Math.abs(vertical?y2-y1:x2-x1)/2);
+        if (scoped && isVisible(edge.dataset.from) && isVisible(edge.dataset.to)) {
+          const from = a.x+ap.x+a.w/2, to = b.x+bp.x+b.w;
+          const startY = a.y+ap.y+a.h, endY = b.y+bp.y+b.h/2;
+          const lane = scopedDependencyLane;
+          edge.setAttribute('d',roundedResponsibilityPath([[from,startY],[from,startY+16],
+            [lane,startY+16],[lane,endY],[to,endY]]));
+          width = Math.max(width,lane+20);
+          continue;
+        }
         edge.setAttribute('d',vertical?`M${x1},${y1} C${x1},${y1+d} ${x2},${y2-d} ${x2},${y2}`:`M${x1},${y1} C${x1+d},${y1} ${x2-d},${y2} ${x2},${y2}`);
       }
+      assignmentBus.replaceChildren();
       const assignmentEnds = new Map();
       const firstRowByScope = new Map();
       for (const link of svg.querySelectorAll('[data-assigned-task]')) {
@@ -776,16 +790,37 @@
         const scope = link.dataset.assignmentScope;
         if (visible) firstRowByScope.set(scope, Math.min(firstRowByScope.get(scope) ?? Infinity, end.y));
       }
+      const scopeRows = new Map();
+      if (scoped) {
+        for (const [link,end] of assignmentEnds) {
+          if (!isVisible(link.dataset.assignedTask) || !link.hasAttribute('data-visible-assignment')) continue;
+          scopeRows.set(end.y,Math.max(scopeRows.get(end.y) ?? 0,end.x));
+        }
+        if (scopeRows.size) {
+          const link = [...assignmentEnds.keys()].find(item => isVisible(item.dataset.assignedTask));
+          const owner = roleOffsets.get(drillLevel);
+          const x = Number(link.dataset.originX)+owner.x, y = Number(link.dataset.originY)+owner.y;
+          const endY = Math.max(...scopeRows.keys())-22;
+          assignmentBus.append(svgNode('path', {
+            d:roundedResponsibilityPath([[x,y],[x,y+12],[16,y+12],[16,endY]]),
+            class:'graph-workflow-edge','data-relation':'assignment-trunk'
+          }));
+          for (const [row,right] of scopeRows) {
+            assignmentBus.append(svgNode('path', {
+              d:roundedResponsibilityPath([[16,row-22],[right,row-22]]),
+              class:'graph-workflow-edge','data-relation':'assignment-trunk'
+            }));
+          }
+        }
+      }
       for (const [link, end] of assignmentEnds) {
         const offset = roleOffsets.get(link.dataset.assignmentScope);
         const x = Number(link.dataset.originX) + (offset?.x ?? 0);
         const y = Number(link.dataset.originY) + (offset?.y ?? 0);
         const first = firstRowByScope.get(link.dataset.assignmentScope) ?? end.y;
         const bend = (y + first)/2;
-        // On narrow canvases the reviewer sits between the roles and tasks.
-        // Use the left gutter so the assignment never runs behind that card.
-        const route = scoped && reviewerCard && svg.dataset.stackReview === 'true'
-          ? [[x,y],[x,y+12],[8,y+12],[8,scopeHeight-8],[end.x,scopeHeight-8],[end.x,end.y]]
+        const route = scoped
+          ? [[end.x,end.y-22],[end.x,end.y]]
           : [[x,y],[x,bend],[end.x,bend],[end.x,end.y]];
         link.setAttribute('d', roundedResponsibilityPath(route));
       }
@@ -890,7 +925,7 @@
       connection = null;
       if (!fromDrill && hasDrill) {
         drillLevel = '*';
-        scopeOffset = {x:0,y:0};
+        scopeOffsets.clear();
       }
       visibleIds = ids;
       selectedIds.clear();
@@ -940,7 +975,7 @@
         for (let id = drillLevel; id; id = parents.get(id)) lineage.unshift(id);
       }
       roleOffsets.clear();
-      scopeOffset = {x:0,y:0};
+      scopeOffsets.clear();
       scopeHeight = Number(svg.dataset.roleHeight);
       const top = new Map(lineage.map((id,index) => [id,22+index*116]));
       for (const [id,card] of rolesByScope) {
@@ -954,18 +989,7 @@
         const height = Number(rect.getAttribute('height'));
         roleOffsets.set(id,{x,y});
         card.setAttribute('transform',`translate(${x} ${y})`);
-        if (id === drillLevel) {
-          scopeHeight = top.get(id) + height + 32;
-          if (ids?.size) {
-            let left = Infinity, firstRow = Infinity;
-            for (const taskId of ids) {
-              const unit = units.get(taskId);
-              left = Math.min(left,unit.x);
-              firstRow = Math.min(firstRow,unit.y);
-            }
-            scopeOffset = {x:20-left,y:scopeHeight+24-firstRow};
-          }
-        }
+        if (id === drillLevel) scopeHeight = top.get(id) + height + 32;
       }
       reviewerCard?.removeAttribute('transform');
       if (reviewLink) reviewLink.setAttribute('d',reviewPath);
@@ -977,7 +1001,26 @@
         reviewerCard.setAttribute('transform',`translate(${20-Number(box.getAttribute('x'))} ${scopeHeight-Number(box.getAttribute('y'))})`);
         reviewLink.setAttribute('d',roundedResponsibilityPath([[right,center],[right+28,center],[right+28,to],[right,to]]));
         scopeHeight += height+24;
-        scopeOffset.y += height+24;
+
+      }
+      if (scoped && ids?.size) {
+        const ranks = new Map();
+        for (const id of ids) {
+          const rank = Number(units.get(id).group.dataset.taskRank);
+          if (!ranks.has(rank)) ranks.set(rank,[]);
+          ranks.get(rank).push(id);
+        }
+        const columns = Number(svg.dataset.taskColumns);
+        let rowTop = scopeHeight+30;
+        for (const [,members] of [...ranks].sort(([a],[b]) => a-b)) {
+          members.forEach((id,index) => {
+            const unit = units.get(id);
+            const left = 48+(index%columns)*(unit.w+76);
+            const top = rowTop+Math.floor(index/columns)*(unit.h+65);
+            scopeOffsets.set(id,{x:left-unit.x,y:top-unit.y});
+          });
+          rowTop += Math.ceil(members.length/columns)*(units.get(members[0]).h+65);
+        }
       }
       for (const link of delegationLinks) {
         const parent = link.dataset.fromRole, child = link.dataset.toRole;
@@ -1103,9 +1146,9 @@
       'Ctrl + molette garde le point sous le curseur. La vue est conservée après l’enregistrement sur le même travail.',
       'Repérer les dépendances distingue prérequis et dépendants sans masquer de carte.',
       'Analyser et sélectionner isole une branche ou tous les chemins orientés entre deux tâches. Voir tout le graphe restaure la vue.',
-      'En mode sélection, cliquez ou appuyez sur Entrée sur chaque carte, puis déplacez une poignée pour déplacer le groupe. Annuler le placement restaure tout le groupe.',
+      'En mode sélection, cliquez ou appuyez sur Entrée sur chaque carte, puis déplacez une carte du groupe. Annuler le placement restaure tout le groupe.',
       'L’export SVG télécharge le placement affiché ; les boutons ne sont pas exportés.',
-      'Déplacez le fond pour naviguer. Glissez le cadre lui-même ou sa poignée pour le placer ; un clic sans déplacement ouvre la tâche. Annuler le placement restaure le dernier déplacement ou rangement.',
+      'Glissez le fond pour naviguer. Glissez la carte pour la déplacer, ou utilisez les flèches du clavier quand elle a le focus. Un clic sans déplacement ouvre la tâche.',
       'Ajouter une tâche ouvre le formulaire : choisissez un identifiant, un titre, un livrable et des critères, puis enregistrez. Le brouillon multi-tâches permet de préparer plusieurs changements avant application.',
       'Cliquez sur une flèche pour changer son prérequis ou préparer son retrait. Le formulaire confirme le changement. Suppr sur un lien prépare directement son retrait.',
       'Mini-carte : cliquez pour centrer ; utilisez les flèches, Début et Fin au clavier.',
@@ -1143,13 +1186,26 @@
       open.addEventListener('pointerdown',e=>{if(e.button!==0)return;finish(true);suppressCardClick=false;open.focus({preventScroll:true});gesture={id,ids:movementIds(id),card:true,moved:false,suppressClick:()=>{suppressCardClick=true},target:open,pointer:e.pointerId,snapshot:copyPositions(),start:point(e),screen:{x:e.clientX,y:e.clientY}};open.setPointerCapture(e.pointerId)});
       open.addEventListener('pointermove',e=>{if(gesture?.target!==open)return;const g=gesture;if(!g.moved&&Math.hypot(e.clientX-g.screen.x,e.clientY-g.screen.y)<=4)return;g.moved=true;e.preventDefault();const p=point(e);translateGroup(g.snapshot,g.ids,p.x-g.start.x,p.y-g.start.y);update()});
       open.addEventListener('pointerup',()=>{if(gesture?.target===open)finish()});open.addEventListener('pointercancel',()=>{if(gesture?.target===open)finish(true)});
-      open.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();activateCard()});
-      const handle=svgNode('g',{class:'graph-drag',role:'button',tabindex:0,'aria-label':t('Déplacer la carte')+' '+id});handle.dataset.task=id;handle.append(svgNodeTitle(t('Poignée de déplacement')),svgNode('rect',{x:x+w-34,y:y+4,width:30,height:30,rx:6}),svgNode('text',{x:x+w-30,y:y+25},'⠿'));group.append(handle);
-      handle.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();finish(true);const before=copyPositions();translateGroup(before,movementIds(id),e.key==='ArrowLeft'?-16:e.key==='ArrowRight'?16:0,e.key==='ArrowUp'?-16:e.key==='ArrowDown'?16:0);rememberPlacement(before);update();save()});
-      handle.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();finish(true);handle.focus();gesture={id,ids:movementIds(id),target:handle,pointer:e.pointerId,snapshot:copyPositions(),start:point(e)};handle.setPointerCapture(e.pointerId)});
-      handle.addEventListener('pointermove',e=>{if(gesture?.id!==id)return;const p=point(e);translateGroup(gesture.snapshot,gesture.ids,p.x-gesture.start.x,p.y-gesture.start.y);update()});
-      handle.addEventListener('pointerup',()=>finish());handle.addEventListener('pointercancel',()=>finish(true));
-      const copy=svgNode('g',{class:'graph-copy',role:'button',tabindex:0,'aria-label':t('Copier l’identifiant')+' '+id});copy.dataset.task=id;copy.append(svgNode('title',{},t('Copier l’identifiant')+' '+id),svgNode('rect',{x:x+w-82,y:y+2,width:44,height:44,rx:6}),svgNode('text',{x:x+w-68,y:y+28},'ID'));group.append(copy);copy.addEventListener('pointerdown',e=>e.stopPropagation());copy.addEventListener('click',e=>{e.stopPropagation();copyId(id,copy)});copy.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();copyId(id,copy)}});
+      // The card is the keyboard movement control and still opens on Enter/Space.
+      open.setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight ArrowUp ArrowDown');
+      open.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          activateCard();
+          return;
+        }
+        const offsets = {ArrowLeft:[-16,0],ArrowRight:[16,0],ArrowUp:[0,-16],ArrowDown:[0,16]};
+        if (!Object.hasOwn(offsets,event.key)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        finish(true);
+        const before = copyPositions();
+        translateGroup(before,movementIds(id),...offsets[event.key]);
+        rememberPlacement(before);
+        update();
+        save();
+      });
+      const copy=svgNode('g',{class:'graph-copy',role:'button',tabindex:0,'aria-label':t('Copier l’identifiant')+' '+id});copy.dataset.task=id;copy.append(svgNode('title',{},t('Copier l’identifiant')+' '+id),svgNode('rect',{x:x+w-54,y:y+2,width:44,height:44,rx:6}),svgNode('text',{x:x+w-40,y:y+28},'ID'));group.append(copy);copy.addEventListener('pointerdown',e=>e.stopPropagation());copy.addEventListener('click',e=>{e.stopPropagation();copyId(id,copy)});copy.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();copyId(id,copy)}});
       const actions=svgNode('g',{class:'graph-task-actions',role:'button',tabindex:0,
         'aria-label':t('Fichier d’actions')+' · '+id,'aria-haspopup':'dialog'});
       actions.dataset.task=id;
@@ -1291,6 +1347,7 @@
           for (const link of assignments) {
             link.toggleAttribute('data-visible-assignment', assignmentScope === '*' || link.dataset.assignmentScope === assignmentScope);
           }
+          if (host.graphView === captureView) update();
         };
         select.addEventListener('change', showAssignments);
         showAssignments();
@@ -2001,6 +2058,8 @@
     }
     let totalWidth = depPairs.length ? g.graph().width : orientation==='LR'?Math.max(nodeWidth+40,tasks.length*(nodeWidth+28)+12):nodeWidth+40;
     let totalHeight = depPairs.length ? g.graph().height : orientation==='TB'?Math.max(nodeHeight+40,tasks.length*(nodeHeight+28)+12):nodeHeight+40;
+    const rankAxis = orientation === 'TB' ? 'y' : 'x';
+    const taskRanks = new Map(tasks.map(task => [task.id,depPairs.length ? g.node(graphNodeKey(task.id))[rankAxis] : 0]));
     // Preserve dependency ranks while packing tasks into their recorded branch.
     const bands = new Map();
     if (orchestration.assignments.size) {
@@ -2049,6 +2108,7 @@
     const stackReview = host.clientWidth > 0 && host.clientWidth < 510;
     svg.dataset.scopeWidth = String(stackReview ? 300 : workflow.scopeWidth ?? 0);
     svg.dataset.stackReview = String(stackReview);
+    svg.dataset.taskColumns = host.clientWidth > 0 && host.clientWidth < 700 ? '1' : '2';
     svg.setAttribute('width',String(totalWidth));svg.setAttribute('height',String(totalHeight));
     const defs=svgNode('defs',{}),marker=svgNode('marker',{id:'recorded-dependency-arrow',viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'});
     marker.append(svgNode('path',{d:'M0,0 L8,4 L0,8 z',class:'graph-fleche'}));defs.append(marker);svg.append(defs);
@@ -2079,6 +2139,18 @@
 
     drawWorkflowRoles(svg,workflow.roles,workflow.reviewer,orchestration.assignments,tasks,g);
 
+    // Repeated project prefixes stay in the accessible full title and search.
+    // The compact card shows its subject so adjacent cards can be distinguished.
+    const titles = new Map();
+    const prefixCounts = new Map();
+    for (const task of tasks) {
+      const separator = task.title.indexOf(' · ');
+      if (separator <= 0 || separator + 3 >= task.title.length) continue;
+      const prefix = task.title.slice(0,separator);
+      titles.set(task.id,{prefix,subject:task.title.slice(separator+3)});
+      prefixCounts.set(prefix,(prefixCounts.get(prefix) ?? 0)+1);
+    }
+
     for (const task of tasks) {
       const pos = g.node(graphNodeKey(task.id));
       const left = pos.x - nodeWidth / 2, top = pos.y - nodeHeight / 2;
@@ -2097,6 +2169,7 @@
       const detail = [stateLabel, activityLabel].filter(Boolean).join(' · ') + scope + ' · ' + worker + engineReason;
       group.setAttribute('aria-label', t('Tâche : ') + task.title + t(' — identifiant : ') + task.id + t(' — état : ') + detail);
       group.dataset.task = task.id;
+      group.dataset.taskRank = String(taskRanks.get(task.id));
       group.dataset.etat = tonalites[task.status] || 'neutre';
       group.append(document.createElementNS(SVG_NS, 'title'));
       group.lastChild.textContent = task.title + ' (' + task.id + ') — ' + detail;
@@ -2120,7 +2193,8 @@
       title.setAttribute('x', String(left + 14));
       title.setAttribute('y', String(top + 28));
       title.setAttribute('class', 'graph-titre');
-      appendTruncated(title, task.title);
+      const compact = titles.get(task.id);
+      appendTruncated(title, compact && prefixCounts.get(compact.prefix)>1 ? compact.subject : task.title);
       group.append(title);
       group.append(svgNode('circle', {
         cx: left + 18, cy: top + 48, r: 5,

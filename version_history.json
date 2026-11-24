@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Dans un périmètre ouvert, les tâches sont rangées par niveau de dépendance et les affectations utilisent un trajet commun distinct des prérequis. Les cartes se déplacent directement, à la souris ou au clavier.",
+        "en": "In an open scope, tasks are arranged by dependency rank and share an assignment route separated from prerequisites. Cards can be moved directly with the pointer or keyboard."
+      },
+      {
         "fr": "Conduite aligne la hiérarchie par niveau et regroupe le chemin du principal au périmètre ouvert avec ses tâches.",
         "en": "Dispatch aligns the hierarchy by level and groups the route from the principal orchestrator to the selected scope and its tasks."
       },

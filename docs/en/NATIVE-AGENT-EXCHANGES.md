@@ -203,7 +203,9 @@ plans open on the orchestrators. Task cards use the observed attempt’s agent I
 Clicking the selected orchestrator again closes its scope. The configured reviewer
 appears with its link to the principal orchestrator when a scope is open.
 Scopes are aligned by level. The focused view shows only their lineage and
-places the assigned tasks closer. Links route around the reviewer on narrow screens. The graph header shows the
+places the assigned tasks closer. Links route around the reviewer on narrow screens. In an open scope, tasks
+are arranged by dependency rank. A shared assignment route reaches each row
+from above. Prerequisites use the opposite side. The graph header shows the
 recorded hierarchy and the engine recommendation for the current revision.
 Unavailable and stale recommendations are reported in the graph. The dashed green review link represents
 configuration. Receipts and status signals

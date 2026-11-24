@@ -307,9 +307,12 @@ filtres et sélection ne changent pas la révision métier.
   affichées par des courbes qui partagent un trajet au départ d’un même périmètre. La carte de tâche indique l’agent observé quand le moteur le fournit.
   Un second clic sur le même orchestrateur, ou **Remonter aux orchestrateurs**,
   revient à la vue initiale. Le validateur indépendant configuré apparaît en vert
-  auprès de l’orchestrateur principal dans le périmètre ouvert ou la vue complète. La poignée **⠿**
-  en haut à droite permet de déplacer une carte à la souris ou avec les flèches
-  du clavier. Les points colorés accompagnent les états. Le contour animé suit
+  auprès de l’orchestrateur principal dans le périmètre ouvert ou la vue complète. Glissez la carte pour la déplacer ou utilisez les flèches du clavier
+  quand elle a le focus. Les points colorés accompagnent les états. Le contour animé suit
+  Dans un périmètre, les tâches sont rangées par niveau de dépendance. Les
+  affectations partagent une ligne au-dessus des rangées et les prérequis
+  arrivent par la droite. Les cartes omettent le préfixe répété d’un titre. Le
+  titre complet reste dans la recherche et dans le libellé de la carte.
   La mini-carte apparaît dans la vue complète pour laisser les cartes dégagées
   dans les autres niveaux.
   l’exécution confirmée. L’en-tête indique l’organisation

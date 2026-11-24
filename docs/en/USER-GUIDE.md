@@ -307,8 +307,10 @@ full view. Gray assignment arrows connect each orchestrator to the visible
 tasks along curves that share an initial route within a scope. Task cards identify the observed agent when supplied by the engine.
 Clicking the same orchestrator again or choosing **Back to orchestrators**
 restores the initial view. The configured independent reviewer appears in green
-beside the principal orchestrator in an open scope or in the full view. The **⠿** drag handle at the
-top right moves the card with the pointer or arrow keys. Color dots accompany
+beside the principal orchestrator in an open scope or in the full view. Drag a card to move it, or use the arrow keys while the card has focus. Color dots accompany
+In a scope, tasks are arranged by dependency rank. Assignments share a line
+above each row, while prerequisites approach from the right. Repeated title
+prefixes are omitted on cards and retained in search and accessible labels.
 The minimap appears in the full view, leaving cards clear in the other levels.
 status labels, and the moving outline follows confirmed execution. The graph header identifies a recorded
 hierarchy when sub-orchestrators report to the principal orchestrator. It also
