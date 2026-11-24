@@ -51,6 +51,8 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
         return call(label,['work','show',work])['work']
     def status(label, expected_work, expected_state, accepted_count):
         """Compare public CLI and protected HTTP observations without writes."""
+        expected_state_rows = state()
+        expected_invocation = native.read_reviewer_marker(root,retained_event)
         cli = call(label+'-cli', ['mission','status',work])
         expect = next(t for t in cli['tasks'] if t['id']==task['id'])
         assert expect['result']['state']==expected_state, expect
@@ -63,6 +65,8 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
             assert next(t for t in http['tasks'] if t['id']==task['id'])['result']==expect['result']
             server.stop()
             assert shown(label+'-unchanged')==expected_work
+            assert state()==expected_state_rows
+            assert native.read_reviewer_marker(root,retained_event)==expected_invocation
         except BaseException as error:
             primary = error
         finally:

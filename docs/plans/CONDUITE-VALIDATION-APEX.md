@@ -51,3 +51,15 @@ publication. Les essais et les révisions de plan seront rattachés ici.
 - [Bascule navigateur](/run/media/fpizzi/SWARM/swarm-evidence/apex-conduite-validation.gRwPN4il/final-navigation-ui.log)
   vérifiée au clavier, en clair et sombre, en français et anglais.
   [Identité locale active](/run/media/fpizzi/SWARM/swarm-evidence/apex-conduite-validation.gRwPN4il/active.json).
+
+## Revue séparée et reprise
+
+La [revue de source](/run/media/fpizzi/SWARM/swarm-evidence/apex-conduite-validation.gRwPN4il/glm-review/answer.txt)
+ne constate pas de contournement de l’acceptation dans le diff. Le lecteur
+de résultats ordinaires exclut déjà les travaux planifiés. Le diagnostic
+d’activation a été attribué au conducteur embarqué dans le serveur Web de
+la fixture, sur la base de son rapport de fermeture. La recette compare
+également les tentatives, événements, financements et marqueur du reviewer.
+L’ajout de la feuille réellement servie a reproduit une perte de défilement
+après rafraîchissement en vue Équipe. La reprise garde les coordonnées visibles
+avant masquage et les réapplique au retour au graphe.

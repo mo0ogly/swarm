@@ -11,8 +11,8 @@
         "en": "Managed repository status: after the first submission, a favorable review awaits publication. After publication, the engine checks current evidence before displaying validation."
       },
       {
-        "fr": "Conduite : bascule entre le graphe des tâches et l’équipe. La vue Équipe et validation présente les contrôles, l’avis indépendant enregistré et l’état de validation fourni par le moteur.",
-        "en": "Dispatch: switch between the task graph and the team. Team and validation shows checks, the recorded independent review and the validation state supplied by the engine."
+        "fr": "Conduite : bascule entre le graphe des tâches et l’équipe, avec retour à la position du graphe. La vue Équipe et validation présente les contrôles, l’avis indépendant enregistré et l’état de validation fourni par le moteur.",
+        "en": "Dispatch: switch between the task graph and the team, then return to the same graph position. Team and validation shows checks, the recorded independent review and the validation state supplied by the engine."
       },
       {
         "fr": "Conduite : un losange, une flèche de branche et une coche distinguent l’orchestrateur principal, les sous-orchestrateurs et le validateur indépendant.",

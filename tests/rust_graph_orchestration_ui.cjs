@@ -18,7 +18,7 @@ async function run() {
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     await page.setContent('<main id="graph"></main>');
-    for (const source of ['wattson_themes.css', 'graph.css', 'swarm-design.css']) {
+    for (const source of ['wattson_themes.css', 'pilotage.css', 'graph.css', 'swarm-design.css']) {
       await page.addStyleTag({path: path.join(web, source)});
     }
     for (const source of ['i18n-en.js', 'lib/dagre.min.js', 'graph.js',
@@ -64,6 +64,15 @@ async function run() {
         const get = selector => document.querySelector(selector);
         const role = value => get('[data-orchestration-role="' + value + '"]');
         const initialGraph = !get('#graph-studio').hidden && get('#conduite-team-validation').hidden;
+        const canvas = get('#pilot-canvas');
+        canvas.scrollLeft = 100;
+        canvas.scrollTop = 100;
+        const scroll = () => [get('#pilot-canvas').scrollLeft, get('#pilot-canvas').scrollTop];
+        const visibleScroll = scroll();
+        get('#conduite-show-team').click();
+        SwarmRustCockpitRead.render({work, mission});
+        get('#conduite-show-graph').click();
+        const preservedScroll = scroll();
         get('#conduite-show-team').click();
         const root = role('root');
         const roleIcons = ['root', 'subplanner', 'reviewer'].map(value => {
@@ -92,14 +101,19 @@ async function run() {
             : [sx + sw, sy + sh / 2, tx, ty + th / 2];
           return [start.x, start.y, end.x, end.y].every((value, i) => Math.abs(value - expected[i]) < 1);
         };
+        get('#conduite-show-graph').click();
+        const lrConnected = connectsCards(false);
+        get('#conduite-show-team').click();
         const snapshot = {
           initialGraph,
+          visibleScroll,
+          preservedScroll,
           teamOnly: get('#graph-studio').hidden && !get('#conduite-team-validation').hidden,
           recordedReview: get('[data-orchestration-review]').textContent,
           currentValidation: get('[data-orchestration-validation]').textContent,
           roleIcons,
           bandCount: document.querySelectorAll('[data-graph-branch]').length,
-          lrConnected: connectsCards(false),
+          lrConnected,
           driver: role('driver').textContent, reviewer: role('reviewer').textContent,
           root: root.firstElementChild.textContent, branches,
           nested: get('[data-scope="transport"] [data-scope="documentation"] details summary').textContent,
@@ -155,8 +169,10 @@ async function run() {
       }, {lang, theme});
       assert.deepEqual(result.branches, ['transport', 'validation']);
       assert(result.initialGraph && result.teamOnly && result.retainedTab);
+      assert(result.visibleScroll.some(offset => offset > 0));
+      assert.deepEqual(result.preservedScroll, result.visibleScroll);
       assert(!result.historyHasCurrentResult);
-      assert.match(result.recordedReview, /changes_requested/);
+      assert.match(result.recordedReview, lang === 'en' ? /Changes or evidence requested/ : /Corrections ou preuves demandées/);
       assert.equal(result.currentValidation, 'Current verification');
       assert.deepEqual(result.roleIcons.map(icon => icon?.glyph), ['"◆"', '"↳"', '"✓"']);
       assert.equal(new Set(result.roleIcons.map(icon => icon.background)).size, 3);
@@ -215,6 +231,8 @@ async function run() {
       await page.focus('#conduite-show-graph');
       await page.keyboard.press('Enter');
       assert.equal(await page.$eval('#conduite-show-graph', button => button.getAttribute('aria-pressed')), 'true');
+      assert.equal(await page.$eval('#conduite-show-team', button => button.getAttribute('aria-pressed')), 'false');
+      assert(await page.$eval('#graph-studio', panel => !panel.hidden && panel.getClientRects().length > 0));
       assert(await page.$eval('#conduite-team-validation', panel => panel.hidden));
     }
     assert.deepEqual(errors, []);

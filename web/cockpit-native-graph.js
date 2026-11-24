@@ -791,9 +791,14 @@
     teamView.setAttribute('aria-controls', orchestration.id);
     views.append(graphView, teamView);
     let teamSelected = false;
-    /** Switch presentation in this Work only. No request or saved policy changes.
-     * Restoring the graph reapplies its viewport after it has a visible size. */
+    /** Switch presentation in this Work only. Retain the visible viewport
+     * before hiding it and reapply it when the graph has a visible size.
+     * No request or saved policy changes. */
     function showTeam(selected) {
+      if (selected && !teamSelected) {
+        pendingScroll ??= {left: canvas.scrollLeft, top: canvas.scrollTop};
+        pendingStudio ??= {left: studio.scrollLeft, top: studio.scrollTop};
+      }
       teamSelected = selected;
       studio.hidden = selected;
       orchestration.hidden = !selected;
@@ -847,10 +852,18 @@
     }
     const reviewState = task.independent_review?.state;
     if (reviewState) {
+      const labels = {
+        __proto__: null,
+        running: 'Examen en cours',
+        passed: 'Avis favorable',
+        changes_requested: 'Corrections ou preuves demandées',
+        error: 'Vérification interrompue',
+        stale: 'Avis périmé',
+      };
       const review = document.createElement('p');
       review.dataset.orchestrationReview = '';
       review.textContent = t('Avis indépendant enregistré') + ' · ' +
-        (globalThis.SwarmI18n?.engine?.(reviewState) ?? reviewState);
+        t(labels[reviewState] ?? 'Avis indisponible');
       summary.append(review);
     }
     if (result?.validation_label) {
