@@ -26,8 +26,9 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
     The provider invocation marker is read through the claim-based I0 reviewer
     leaf of the RETAINED request event id (native-review.input.json), never a
     root-level path.
-    With check_current_status, observed CLI and protected HTTP results must
-    report the same phase before and after publication, without changing Work.
+    With check_current_status, revoke automatic consent in the owned fixture
+    before measuring; a Web server also hosts the conductor. The CLI and HTTP
+    must then report the same phase before and after publication without writes.
     """
     out.mkdir(mode=0o700,parents=True,exist_ok=False)
     fixture=native.inspection.native.fixture
@@ -60,6 +61,7 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
             http = server.request('/api/v1/mission?action=status&work='+work)
             assert http['validated']==accepted_count
             assert next(t for t in http['tasks'] if t['id']==task['id'])['result']==expect['result']
+            server.stop()
             assert shown(label+'-unchanged')==expected_work
         except BaseException as error:
             primary = error
@@ -78,6 +80,14 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
             rows=connection.execute('SELECT * FROM managed_attempts ORDER BY agent_id').fetchall()
             events=connection.execute('SELECT id,revision,kind,hex(request),hex(payload) FROM events WHERE work_id=? ORDER BY revision',(work,)).fetchall()
         return dict(attempts=rows,events=events,finance=native.finance(root,work))
+    if check_current_status:
+        # Isolate the status read from work that the same web binary is otherwise
+        # authorized to start. This changes only this owned test mission.
+        for action in ('stop', 'unpause'):
+            current=shown('status-before-'+action)
+            call('status-'+action,['mission',action,work],dict(
+                schema_version=1,event_id='status-fixture-'+action,
+                expected_revision=current['revision'],reason='Isolated status observation'))
     before=shown('before');task=next(t for t in before['tasks'] if t.get('independent_review',{}).get('state')=='passed')
     review=task['independent_review'];request=dict(schema_version=1,event_id='first-publication-'+hashlib.sha256(str(out).encode()).hexdigest(),expected_revision=before['revision'],task_id=task['id'])
     baseline=state();marker=native.read_reviewer_marker(root,retained_event)

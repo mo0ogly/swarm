@@ -37,3 +37,17 @@ constituent les témoins de départ, avec un scénario en échec conservé.
 Le coordinateur Codex intègre et vérifie un paquet de proposition SKYNET
 borné au statut Rust. Le paquet exclut l’UX, les données de mission et la
 publication. Les essais et les révisions de plan seront rattachés ici.
+
+## Preuves du premier candidat
+
+- Témoin rouge `dev.398` après avis favorable et avant publication :
+  [refus CLI](/run/media/fpizzi/SWARM/swarm-evidence/apex-conduite-validation.gRwPN4il/red-baseline.stderr).
+- Témoin `dev.400` : [dix contrôles](/run/media/fpizzi/SWARM/swarm-evidence/apex-conduite-validation.gRwPN4il/green-isolated/result.json),
+  dont statut CLI/HTTP identique avant et après publication. La fixture a
+  retiré le consentement au départ automatique avant d’ouvrir le serveur Web.
+  Les essais précédents conservent l’erreur de fermeture du conducteur qui
+  s’était engagé dans la fixture. Le fonctionnement en concurrence avec un
+  conducteur actif reste un scénario séparé.
+- [Bascule navigateur](/run/media/fpizzi/SWARM/swarm-evidence/apex-conduite-validation.gRwPN4il/final-navigation-ui.log)
+  vérifiée au clavier, en clair et sombre, en français et anglais.
+  [Identité locale active](/run/media/fpizzi/SWARM/swarm-evidence/apex-conduite-validation.gRwPN4il/active.json).
