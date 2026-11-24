@@ -1066,11 +1066,11 @@
     syncMotion();
     motion.addEventListener('click',()=>{motionPaused=!motionPaused;syncMotion()});
     activityLegend.append(motion);
-    let assignmentScope = '';
+    let assignmentScope = '*';
     if(svg.querySelector('.graph-workflow-role')){
       const relationKey=document.createElement('p');
       relationKey.className='graph-workflow-key';
-      relationKey.textContent=t('Flèches pleines : dépendances et délégations (ambre). Vert pointillé : revue configurée.');
+      relationKey.textContent=t('Dépendances en bleu, délégations en ambre, affectations en gris, revue en vert.');
       legend.append(relationKey);
       const assignments = [...svg.querySelectorAll('[data-assignment-scope]')];
       const scopes = new Set(assignments.map(link => link.dataset.assignmentScope));
@@ -1081,15 +1081,15 @@
         const select = document.createElement('select');
         select.id = 'pilot-assignment-scope';
         label.htmlFor = select.id;
-        select.append(new Option(t('Masquer les affectations'), ''));
+        select.append(new Option(t('Toutes les affectations'), '*'), new Option(t('Masquer les affectations'), ''));
         for (const scope of scopes) select.append(new Option(scope, scope));
-        select.value = scopes.has(initial?.assignmentScope) ? initial.assignmentScope : '';
-        /** Reveal the chosen scope's assignments without changing the graph or
-         * the task visibility filter. Empty selection hides all assignments. */
+        if ([...scopes, ''].includes(initial?.assignmentScope)) select.value = initial.assignmentScope;
+        /** Show all or one scope’s assignment links. An empty selection hides
+         * them. This presentation control performs no writes. */
         const showAssignments = () => {
           assignmentScope = select.value;
           for (const link of assignments) {
-            link.toggleAttribute('data-visible-assignment', link.dataset.assignmentScope === assignmentScope);
+            link.toggleAttribute('data-visible-assignment', assignmentScope === '*' || link.dataset.assignmentScope === assignmentScope);
           }
         };
         select.addEventListener('change', showAssignments);
@@ -1115,7 +1115,16 @@
     }
 
     const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez un cadre pour le déplacer. Cliquez pour ouvrir la tâche ; cliquez sur une flèche pour modifier le lien.');
-    studio.append(toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,activityLegend,canvas);
+    const workflowHeader = document.createElement('div');
+    workflowHeader.className = 'native-graph-color-key';
+    const hasHierarchy = svg.querySelector('[data-agent-role="subplanner"]');
+    if (hasHierarchy) {
+      const shape = document.createElement('strong');
+      shape.textContent = t('Organisation agentique') + ' · ' + t('Hiérarchique');
+      workflowHeader.append(shape);
+    }
+    workflowHeader.append(orchestration.workflowArchitectureSummary);
+    studio.append(workflowHeader,toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,activityLegend,canvas);
     orchestration.id = 'conduite-team-validation';
     const views = document.createElement('div');
     views.className = 'pilot-actions conduite-view-switch';
@@ -1134,7 +1143,8 @@
     let teamSelected = false;
     /** Keep the same switch with the visible panel, including the modal graph.
      * The team view exits fullscreen. Restore the viewport when the graph
-     * becomes visible again. No request or saved policy changes. */
+     * becomes visible again. The architecture reader makes a revision-bound
+     * read for the rendered graph and when opening team details. */
     function showTeam(selected) {
       if (selected && !teamSelected) {
         pendingScroll ??= {left: canvas.scrollLeft, top: canvas.scrollTop};
@@ -1161,6 +1171,7 @@
     teamView.addEventListener('click', () => {showTeam(true);teamView.focus()});
     host.replaceChildren(views,studio,orchestration,modal,help);
     showTeam(initial?.teamSelected === true);
+    if (!teamSelected && Number.isSafeInteger(work.revision)) orchestration.loadWorkflowArchitecture();
     /** Capture completed same-Work presentation, including deferred modal/scroll.
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
@@ -1261,13 +1272,17 @@
    * The supplied label stays plain text and provides the accessible name.
    */
   /** Show the current structural advice and its explicit, revision-bound receipt.
-   * No request is made until the team view opens. A warm update reads the same
-   * route for each refreshed Work. A removed panel has no UI effect. */
+   * Share one protected read and its status with both views. Approvals remain
+   * in team details. A detached panel cannot paint a stale graph. */
   function workflowArchitecture(work) {
     const section = document.createElement('section');
     section.className = 'native-workflow-architecture';
     const title = document.createElement('h4');
     title.textContent = t('Avis d’architecture du workflow');
+    const summary = document.createElement('span');
+    summary.id = 'pilot-workflow-advice';
+    summary.setAttribute('role', 'status');
+    summary.textContent = t('Avis d’architecture indisponible.');
     const status = document.createElement('p');
     status.setAttribute('role', 'status');
     const facts = document.createElement('div');
@@ -1323,6 +1338,7 @@
       const limit = document.createElement('p');
       limit.textContent = t('Valider l’avis enregistre votre décision. La réorganisation du plan est une opération distincte.');
       facts.append(reason, receipt, limit);
+      summary.textContent = t('Workflow recommandé') + ' · ' + status.textContent + ' · ' + receipt.textContent;
       if (value.approved) journalField(facts, 'Validation enregistrée', value.approval?.approved_at);
       approve.hidden = value.approved || criteria.recommendation === 'insufficient';
       approve.disabled = pending;
@@ -1335,6 +1351,7 @@
       loading = true;
       approve.hidden = true;
       status.textContent = t('Chargement…');
+      summary.textContent = t('Workflow recommandé') + ' · ' + status.textContent;
       try {
         paint(await request());
       } catch (error) {
@@ -1344,6 +1361,7 @@
         status.textContent = error.message === 'workflow-architecture-stale'
           ? t('Le plan a changé. Actualisez Conduite pour examiner le nouvel avis.')
           : t('Avis d’architecture indisponible.');
+        summary.textContent = status.textContent;
       } finally {
         loading = false;
       }
@@ -1378,7 +1396,7 @@
       }
     });
 
-    return {section, load};
+    return {section, summary, load};
   }
 
   function orchestrationRoleLabel(label) {
@@ -1456,6 +1474,7 @@
     const architecture = workflowArchitecture(work);
     panel.append(architecture.section);
     panel.loadWorkflowArchitecture = architecture.load;
+    panel.workflowArchitectureSummary = architecture.summary;
 
     const scopes = planning ? (Array.isArray(planning.scopes) ? planning.scopes : []) : [{id: rootId}];
     const byId = new Map();

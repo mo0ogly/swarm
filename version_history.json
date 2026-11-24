@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite montre les liens des orchestrateurs vers leurs tâches dès l’ouverture et présente le workflow recommandé au-dessus du graphe.",
+        "en": "Dispatch shows links from orchestrators to their tasks on opening and displays the recommended workflow above the graph."
+      },
+      {
         "fr": "Conduite allège le graphe : les flèches d’affectation s’affichent à la demande pour le périmètre choisi.",
         "en": "Dispatch declutters the graph by showing assignment arrows on demand for the selected scope."
       },

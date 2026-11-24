@@ -202,7 +202,9 @@ flowchart LR
 
 Chaque dépendance conserve ses commandes d’édition. Les relations de responsabilité
 sont en lecture seule. Les délégations sont en ambre et en trait plein. Les
-affectations sont masquées à l’ouverture et affichées par périmètre à la demande.
+affectations sont visibles en gris dès l’ouverture et filtrables par périmètre.
+L’en-tête montre la hiérarchie enregistrée et l’avis du moteur lié à la
+révision courante. Un avis indisponible ou périmé est signalé dans le graphe.
 La liaison de revue en pointillé vert représente la configuration. Les
 reçus et les remontées restent accessibles dans **Équipe et validation**.
 Le contour animé se rapporte à une observation actuelle d’un processus en cours.

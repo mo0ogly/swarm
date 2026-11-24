@@ -1,5 +1,8 @@
 {
-  "Flèches pleines : dépendances et délégations (ambre). Vert pointillé : revue configurée.": "Solid arrows: dependencies and delegation (amber). Dashed green: configured review.",
+  "Dépendances en bleu, délégations en ambre, affectations en gris, revue en vert.": "Blue dependencies, amber delegation, gray assignments, green review.",
+  "Toutes les affectations": "All assignments",
+  "Organisation agentique": "Agent organization",
+  "Workflow recommandé": "Recommended workflow",
   "Voir les affectations": "Show assignments",
   "Masquer les affectations": "Hide assignments",
   "Localiser une dépendance": "Locate a dependency",

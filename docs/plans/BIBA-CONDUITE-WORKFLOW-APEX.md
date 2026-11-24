@@ -57,3 +57,13 @@ La sélection reste locale à la vue et survit à un nouveau rendu du même Work
 Les délégations sont en trait plein ambre et la liaison de revue en pointillé
 vert. Le test navigateur contrôle l’ouverture, la sélection d’un périmètre, le
 retour à l’affichage initial et la présence des relations permanentes.
+
+## Liens de responsabilité et type de workflow à l’ouverture
+
+Le retour d’usage a montré que le réglage précédent supprimait du premier
+rendu une information essentielle. La vue initiale montre donc toutes les
+affectations en trait fin gris. Le filtre permet de se concentrer sur un
+périmètre. L’organisation enregistrée et l’avis du moteur apparaissent dans
+le graphe. Le même résultat de lecture, lié à la révision du Work, alimente
+l’avis détaillé dans **Équipe et validation**. Cette projection ne modifie pas
+le plan et la validation demeure une action explicite dans cette vue détaillée.
