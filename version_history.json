@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Le profil Rust local optimise SHA-256 pour les relectures de candidats gérés. Les empreintes, contrôles d’origine et délais configurés sont conservés.",
+        "en": "The local Rust profile optimizes SHA-256 for managed candidate reads. Digests, original checks, and configured deadlines are preserved."
+      },
+      {
         "fr": "La sélection d’un autre livrable réutilise le décodage de la mission si ses octets sont identiques. Le fichier sélectionné est toujours vérifié et relu.",
         "en": "Selecting another deliverable reuses the decoded mission if its bytes match. The selected file is always verified and read again."
       },

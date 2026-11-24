@@ -1,5 +1,17 @@
 # Native worker completion and retry
 
+### Cost of candidate rechecks
+
+Before and after a managed control runs, Swarm verifies candidate inputs
+and digests. The local binary uses Cargo's `dev` profile. That profile
+optimizes the `sha2` dependencies used for these reads, including large
+candidates. Validation still uses the same paths, bytes, algorithms,
+permission checks, and configured deadlines.
+
+To measure an improvement on a host, compare the same inputs and digests,
+then observe the result of a native control. Hashing time alone establishes
+neither a control result nor an upper bound on its runtime.
+
 During manual startup of a managed worker, `agent run` can refresh an expired
 preflight by observing the route, command, workspace and environment under the
 current policy. The scope must match the retained admission. Every startup

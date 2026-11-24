@@ -1,5 +1,17 @@
 # Fin native du worker et reprise
 
+### Coût des relectures du candidat
+
+Avant et après l’exécution d’un contrôle géré, Swarm vérifie les entrées et
+les empreintes du candidat. Le binaire local est construit avec le profil
+Cargo `dev`. Ce profil optimise les dépendances `sha2` utilisées par les
+relectures, y compris sur les gros candidats. Les chemins, octets, algorithmes,
+autorisations et délais du parcours de validation restent les mêmes.
+
+Pour vérifier un gain sur une machine, comparer les mêmes entrées et les
+mêmes empreintes, puis observer le résultat sur un contrôle natif. Le temps
+de hachage seul n’établit ni un résultat de contrôle ni sa durée maximale.
+
 Lors du démarrage manuel d’un worker géré, `agent run` peut renouveler un
 prévol expiré en observant de nouveau la route, la commande, le workspace et
 l’environnement sous la politique courante. La portée doit rester identique à
