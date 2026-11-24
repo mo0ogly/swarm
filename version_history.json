@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Un second clic sur l’orchestrateur referme son périmètre. Le validateur indépendant est visible dès l’ouverture du périmètre.",
+        "en": "A second click on an orchestrator closes its scope. The independent reviewer is visible as soon as the scope opens."
+      },
+      {
         "fr": "Conduite ouvre les plans organisés sur les orchestrateurs. Chaque périmètre donne accès à ses agents et tâches, et les cartes affichent leur activité observée. Les flèches de responsabilité suivent des courbes.",
         "en": "Dispatch opens organized plans on the orchestrators. Each scope opens its agents and tasks, with observed activity shown on the cards and curved responsibility arrows."
       },

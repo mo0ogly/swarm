@@ -304,7 +304,9 @@ filtres et sélection ne changent pas la révision métier.
   Activez une carte pour ouvrir son périmètre, ou **Afficher tous les agents et tâches**
   pour la vue complète. Les flèches grises relient l’orchestrateur aux tâches
   affichées par des courbes qui partagent un trajet au départ d’un même périmètre. La carte de tâche indique l’agent observé quand le moteur le fournit.
-  **Remonter aux orchestrateurs** revient à la vue initiale. La poignée **⠿**
+  Un second clic sur le même orchestrateur, ou **Remonter aux orchestrateurs**,
+  revient à la vue initiale. Le validateur indépendant configuré apparaît en vert
+  auprès de l’orchestrateur principal dans le périmètre ouvert ou la vue complète. La poignée **⠿**
   en haut à droite permet de déplacer une carte à la souris ou avec les flèches
   du clavier. Les points colorés accompagnent les états. Le contour animé suit
   La mini-carte apparaît dans la vue complète pour laisser les cartes dégagées

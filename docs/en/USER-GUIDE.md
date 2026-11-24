@@ -304,7 +304,9 @@ delegation, assignment and configured review. An organized plan opens on the orc
 Activate a card to open its scope, or use **Show all agents and tasks** for the
 full view. Gray assignment arrows connect each orchestrator to the visible
 tasks along curves that share an initial route within a scope. Task cards identify the observed agent when supplied by the engine.
-**Back to orchestrators** restores the initial view. The **⠿** drag handle at the
+Clicking the same orchestrator again or choosing **Back to orchestrators**
+restores the initial view. The configured independent reviewer appears in green
+beside the principal orchestrator in an open scope or in the full view. The **⠿** drag handle at the
 top right moves the card with the pointer or arrow keys. Color dots accompany
 The minimap appears in the full view, leaving cards clear in the other levels.
 status labels, and the moving outline follows confirmed execution. The graph header identifies a recorded

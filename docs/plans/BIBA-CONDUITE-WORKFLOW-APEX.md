@@ -72,7 +72,9 @@ le plan et la validation demeure une action explicite dans cette vue détaillée
 
 Le plan organisé s’ouvre sur les orchestrateurs et les délégations. Cliquer
 sur un orchestrateur ouvre ses tâches et les affectations associées. La vue
-complète ouvre les autres tâches et le validateur. Le retour restaure le focus
+complète ouvre les autres tâches. Le validateur indépendant configuré apparaît
+dans le périmètre ouvert et dans la vue complète. Le second clic sur la même
+carte ou le bouton de retour remonte aux orchestrateurs seuls. Le retour restaure le focus
 sur l’orchestrateur d’origine. La vue repose sur les données du même graphe,
 contrairement à des diagrammes distincts qui auraient dupliqué la navigation et
 le placement. Le contrôle navigateur vérifie l’état initial, le périmètre
