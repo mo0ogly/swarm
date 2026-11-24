@@ -7,7 +7,7 @@ globalThis.SwarmEnglish = {
   "Tous les agents et tâches": "All agents and tasks",
   "Remonter aux orchestrateurs": "Back to orchestrators",
   "Afficher tous les agents et tâches": "Show all agents and tasks",
-  "Ouvrir ce périmètre": "Open this scope",
+  "Ouvrir ou fermer ce périmètre": "Open or close this scope",
   "Poignée de déplacement": "Drag handle",
   "Agent observé": "Observed agent",
   "Agent non observé": "Agent not observed",

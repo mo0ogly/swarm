@@ -891,7 +891,8 @@
         edge.setAttribute('tabindex', hidden ? '-1' : '0');
       }
       for (const element of svg.querySelectorAll('[data-agent-role="reviewer"],[data-relation="review"],[data-graph-branch]')) {
-        const hidden = hasDrill && drillLevel !== '*';
+        const branchLabel = element.hasAttribute('data-graph-branch');
+        const hidden = hasDrill && (branchLabel ? drillLevel !== '*' : drillLevel === '');
         element.classList.toggle('graph-analysis-hidden', hidden);
       }
       analysis.open = false;
@@ -1183,7 +1184,8 @@
       drillBar.append(drillStatus, drillUp, drillAll);
       for (const card of roleCards) {
         const activate = () => {
-          setDrill(card.dataset.workflowScope);
+          const scope = card.dataset.workflowScope;
+          setDrill(drillLevel === scope ? '' : scope);
           canvas.scrollTop = 0;
         };
         card.addEventListener('pointerdown', event => event.stopPropagation());
@@ -1848,13 +1850,13 @@
       const icon = {root:'◆', subplanner:'↳', reviewer:'✓'}[node.kind];
       const name = node.scope?.id ?? node.detail;
       const group = svgNode('g',{class:'graph-responsibility graph-workflow-role',role:node.scope ? 'button' : 'img',
-        'aria-label':[node.label,name,t(node.activityLabel),node.scope ? t('Ouvrir ce périmètre') : ''].filter(Boolean).join(' · '),
+        'aria-label':[node.label,name,t(node.activityLabel),node.scope ? t('Ouvrir ou fermer ce périmètre') : ''].filter(Boolean).join(' · '),
         'data-agent-role':node.kind,'data-tone':tone});
       if (node.scope) {
         group.dataset.workflowScope = node.scope.id;
         group.setAttribute('tabindex','0');
       }
-      group.append(svgNodeTitle([node.label,node.detail,t(node.activityLabel),node.scope ? t('Ouvrir ce périmètre') : ''].filter(Boolean).join(' · ')),svgNode('rect',
+      group.append(svgNodeTitle([node.label,node.detail,t(node.activityLabel),node.scope ? t('Ouvrir ou fermer ce périmètre') : ''].filter(Boolean).join(' · ')),svgNode('rect',
         {x:node.x,y:node.y,width:node.width,height:node.height,rx:9}));
       const title = svgNode('text',{x:node.x+12,y:node.y+24,'data-role-line':0});
       title.textContent = icon + ' ' + node.label;

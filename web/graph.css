@@ -83,7 +83,7 @@
 .graph-responsibility[data-tone="attention"] rect{fill:var(--wattson-attention-fond);stroke:var(--wattson-attention-encre)}
 .graph-responsibility[data-tone="attention"] text{fill:var(--wattson-attention-encre)}
 .graph-responsibility:focus{outline:none}
-.graph-responsibility:focus rect,.graph-responsibility:hover rect{stroke:var(--wattson-lien);stroke-width:4}
+.graph-responsibility[aria-pressed=true] rect,.graph-responsibility:focus rect,.graph-responsibility:hover rect{stroke:var(--wattson-lien);stroke-width:4}
 
 .graph-fleche-role{fill:var(--wattson-info-encre)}
 

@@ -91,6 +91,12 @@ async function run() {
         drill.scopedCurve=visible('[data-assigned-task]')[0]?.getAttribute('d').includes(' Q ');
         drill.delegationCurve=visible('[data-relation="delegation"]').some(edge=>edge.getAttribute('d').includes(' Q '));
         drill.scopedMinimap=visible('.graph-minimap').length;
+        drill.scopedReviewer=visible('[data-agent-role="reviewer"]').length;
+        drill.scopedReviewLink=visible('[data-relation="review"]').length;
+        transport.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+        drill.toggleReturned=visible('.graph-noeud').length;
+        drill.reviewerHiddenAgain=visible('[data-agent-role="reviewer"]').length;
+        transport.dispatchEvent(new MouseEvent('click',{bubbles:true}));
         get('#pilot-drill-up').click();
         drill.returned=visible('.graph-noeud').length;
         drill.focusRestored=document.activeElement===transport;
@@ -278,6 +284,10 @@ async function run() {
       assert.equal(result.drill.scopedCurve,true);
       assert.equal(result.drill.delegationCurve,true);
       assert.equal(result.drill.scopedMinimap,0);
+      assert.equal(result.drill.scopedReviewer,1);
+      assert.equal(result.drill.scopedReviewLink,1);
+      assert.equal(result.drill.toggleReturned,0);
+      assert.equal(result.drill.reviewerHiddenAgain,0);
       assert.equal(result.drill.returned,0);
       assert.equal(result.drill.focusRestored,true);
       assert.match(result.drill.worker,/fixture-worker/);
