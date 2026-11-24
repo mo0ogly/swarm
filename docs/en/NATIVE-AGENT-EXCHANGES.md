@@ -147,3 +147,36 @@ This is an example plan. Dynamic analysis routing, data-source connections, and 
 Under **Prepare with AI → Choose a workflow architecture**, select **Draft an AI assessment**. The draft asks about dependencies, handoffs, scopes, validation, recovery, and measured costs or delays. The recommendation can be a sequence, a hierarchy, a justified combination, or insufficient evidence. Review and send the request explicitly in the conversation.
 
 When the plan or a constraint changes, select **Draft an AI reassessment**. Provide the previous assessment and the new evidence, or include the full conversation if it contains the previous assessment. The draft asks whether to keep the choice, change it with reasons, or report insufficient evidence. Both assessments are available in preparation history. The operator decides whether to adopt a plan.
+
+### Automatic assessment and approval in Dispatch
+
+Open **Dispatch → Team and validation → Workflow architecture assessment**.
+Reading the recorded graph computes the assessment. A chain of at least two
+tasks with one possible order recommends a sequence. A hierarchy is recommended
+when work in separate delegated scopes can advance at the same graph stage and
+a recorded prerequisite crosses those scopes. Independent branches alone leave
+the choice undetermined. Requirement prerequisites with a unique producer
+also constrain the computed order. Ambiguous provenance leaves the assessment
+undetermined. The reasons, numbers of tasks, dependencies and scopes,
+and the revision are visible. The structural calculation uses no model calls.
+Contextual assessment remains available in Prepare with AI.
+
+After a saved change, the next Dispatch read shows the new revision’s assessment.
+A graph edit applied in Dispatch already triggers that read. **Approve this
+assessment** records approval for the exact revision and digest. A stale
+submission is refused. Approval and plan reorganization are separate operations.
+Approval by itself leaves the Work unchanged.
+
+```mermaid
+flowchart TD
+    P["Recorded plan at revision R"] --> A["Dispatch computes and explains the assessment"]
+    A --> C{"Explicit approval?"}
+    C -->|Pending| W["Assessment remains visible"]
+    C -->|Requested| V{"Same revision and digest?"}
+    V -->|Yes| D["Assessment approval recorded"]
+    V -->|No| N["Refuse and read the new assessment"]
+    D --> E["Optional reorganization through a separate plan operation"]
+    N --> A
+```
+
+See the [APEX recipe](../plans/WORKFLOW-ARCHITECTURE-APEX.md#avis-automatique-dans-conduite).

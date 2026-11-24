@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "workflow-architecture",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/workflow_architecture.rs",
+    "rust/crates/swarm-web/src/service/workflow_architecture.rs",
+    "web/cockpit-native-graph.js",
+    "web/i18n-en.js",
+    "tests/rust_workflow_architecture.py",
+    "tests/rust_workflow_architecture_ui.cjs",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "owned-work-and-protected-conduite",
+      "command": [
+        "python3", "-c",
+        "import os,subprocess,tempfile; from pathlib import Path; out=Path(tempfile.mkdtemp(prefix='workflow-architecture-'))/'journey'; subprocess.run(['python3','tests/rust_workflow_architecture.py','--binary',os.environ['SWARM_WORKFLOW_ARCHITECTURE_BINARY'],'--output',str(out)],check=True); print('WORKFLOW_ARCHITECTURE_EVIDENCE '+str(out))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS readonly assessment and CSRF refusal",
+        "PASS workflow architecture browser fr",
+        "PASS workflow architecture browser en",
+        "PASS bound approval and exact replay leave Work unchanged",
+        "PASS changed graph recomputes and stale or indeterminate approval refuses",
+        "WORKFLOW_ARCHITECTURE_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

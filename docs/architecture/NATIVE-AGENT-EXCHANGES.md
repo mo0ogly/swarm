@@ -149,3 +149,38 @@ Il s’agit d’un exemple de plan. Le choix dynamique d’un parcours analytiqu
 Dans **Préparer avec l’IA → Choisir l’architecture du workflow**, utilisez **Préparer un avis IA**. La question ajoute au brouillon une comparaison des dépendances, des remises, des périmètres, de la validation, de la reprise et des coûts ou délais connus. Les conclusions possibles sont une séquence, une hiérarchie, une combinaison motivée ou des preuves insuffisantes. Envoyez explicitement la demande dans la conversation.
 
 Après un changement de plan ou de contrainte, utilisez **Préparer une réévaluation IA**. Fournissez l’avis précédent et les nouvelles pièces, ou transmettez la conversation complète si elle contient l’avis. La demande fait distinguer le maintien du choix, sa révision motivée et l’absence de preuves suffisantes. L’avis et sa réévaluation sont consultables dans l’historique de préparation. L’opérateur décide ensuite s’il adopte un plan.
+
+### Avis automatique et validation dans Conduite
+
+Ouvrez **Conduite → Équipe et validation → Avis d’architecture du workflow**.
+La lecture calcule l’avis à partir du graphe enregistré. Une chaîne d’au moins
+deux tâches dont les prérequis imposent un ordre unique donne un avis séquentiel.
+Des branches pouvant avancer au même stade dans des périmètres délégués distincts
+et reliées par un prérequis documenté donnent un avis hiérarchique. Des branches
+indépendantes seules laissent le choix indéterminé. Le calcul inclut aussi les
+prérequis d’exigences à producteur unique. Une provenance ambiguë laisse
+l’avis indéterminé. Les motifs, le nombre de
+tâches, de dépendances et de périmètres, ainsi que la révision, sont visibles.
+Le calcul structurel ne consomme aucun appel IA. L’analyse contextuelle reste
+accessible dans Préparer avec l’IA.
+
+Après une modification enregistrée, la prochaine lecture de Conduite présente
+l’avis de la nouvelle révision. Les modifications de graphe appliquées dans
+Conduite déclenchent déjà cette lecture. **Valider cet avis** enregistre une
+validation sur la révision et l’empreinte effectivement examinées. Une demande
+devenue périmée est refusée. L’avis validé et la réorganisation effective sont
+deux opérations. La validation seule ne change pas la mission.
+
+```mermaid
+flowchart TD
+    P["Plan enregistré à la révision R"] --> A["Conduite calcule et explique l’avis"]
+    A --> C{"Validation explicite ?"}
+    C -->|En attente| W["Avis consultable"]
+    C -->|Demandée| V{"Même révision et même empreinte ?"}
+    V -->|Oui| D["Validation de l’avis enregistrée"]
+    V -->|Non| N["Refus et lecture du nouvel avis"]
+    D --> E["Réorganisation éventuelle par une opération de plan distincte"]
+    N --> A
+```
+
+Voir la [recette APEX](../plans/WORKFLOW-ARCHITECTURE-APEX.md#avis-automatique-dans-conduite).

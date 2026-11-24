@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite calcule un avis d’architecture sur le graphe enregistré. La validation explicite est liée à la révision et à l’empreinte de l’avis.",
+        "en": "Dispatch assesses workflow architecture from the recorded graph. Explicit approval is bound to the revision and assessment digest."
+      },
+      {
         "fr": "Préparer avec l’IA propose un brouillon d’avis ou de réévaluation pour choisir entre séquence et hiérarchie, avec une aide intégrée.",
         "en": "Prepare with AI drafts an assessment or reassessment for choosing between a sequential and hierarchical workflow, with in-app help."
       },
