@@ -306,6 +306,7 @@ full view. Gray assignment arrows connect each orchestrator to the visible
 tasks. Task cards identify the observed agent when supplied by the engine.
 **Back to orchestrators** restores the initial view. The **⠿** drag handle at the
 top right moves the card with the pointer or arrow keys. Color dots accompany
+The minimap appears in the full view, leaving cards clear in the other levels.
 status labels, and the moving outline follows confirmed execution. The graph header identifies a recorded
 hierarchy when sub-orchestrators report to the principal orchestrator. It also
 shows the engine recommendation and its approval status.

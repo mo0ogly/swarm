@@ -307,6 +307,8 @@ filtres et sélection ne changent pas la révision métier.
   **Remonter aux orchestrateurs** revient à la vue initiale. La poignée **⠿**
   en haut à droite permet de déplacer une carte à la souris ou avec les flèches
   du clavier. Les points colorés accompagnent les états. Le contour animé suit
+  La mini-carte apparaît dans la vue complète pour laisser les cartes dégagées
+  dans les autres niveaux.
   l’exécution confirmée. L’en-tête indique l’organisation
   hiérarchique enregistrée quand des sous-orchestrateurs sont rattachés au
   principal. Il affiche aussi l’avis du moteur et son état de validation.

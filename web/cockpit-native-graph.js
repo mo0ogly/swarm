@@ -893,6 +893,7 @@
           drillLevel === '*' ? t('Tous les agents et tâches') : t('Périmètre') + ' · ' + drillLevel;
         drillUp.hidden = drillLevel === '';
         drillBar.dataset.level = drillLevel;
+        map.classList.toggle('graph-analysis-hidden', drillLevel !== '*');
         for (const card of roleCards) card.setAttribute('aria-pressed', String(card.dataset.workflowScope === drillLevel));
       }
       updateSelection();
