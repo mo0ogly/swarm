@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite : un contour bleu animé brièvement signale les tâches dont l’exécution est confirmée. La préférence de mouvement réduit garde ce contour fixe.",
+        "en": "Dispatch: a briefly animated blue outline marks tasks with confirmed execution. With reduced motion, the outline stays still."
+      },
+      {
         "fr": "Conduite : les boutons Graphe des tâches et Équipe et validation restent visibles en haut de la vue, y compris en plein écran. Sur écran étroit, l’aide des gestes est accessible depuis la barre du graphe.",
         "en": "Dispatch: the Task graph and Team and validation buttons stay visible at the top of the view, including in fullscreen. On narrow screens, graph gestures are available from the toolbar."
       },

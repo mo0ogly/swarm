@@ -1250,6 +1250,14 @@
       rect.setAttribute('rx', '12');
       rect.setAttribute('class', 'graph-cadre');
       group.append(rect);
+      if (activity === 'running') {
+        // The inset frame travels with the card and leaves its focus stroke clear.
+        group.append(svgNode('rect', {
+          x: left + 2, y: top + 2, width: nodeWidth - 4, height: nodeHeight - 4,
+          rx: 10, pathLength: 100, class: 'graph-activity-frame',
+          'data-activity': activity, 'aria-hidden': 'true',
+        }));
+      }
       const title = document.createElementNS(SVG_NS, 'text');
       title.setAttribute('x', String(left + 14));
       title.setAttribute('y', String(top + 28));
