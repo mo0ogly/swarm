@@ -62,7 +62,7 @@
       "expected_exit": 0,
       "required_stdout": [
         "PASS orchestration graph fr etat 1440",
-        "PASS orchestration graph fr sombre 390",
+        "PASS orchestration graph fr sombre 320",
         "PASS orchestration graph en etat 390",
         "PASS orchestration graph en sombre 1440"
       ],

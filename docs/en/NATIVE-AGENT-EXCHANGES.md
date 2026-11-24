@@ -182,3 +182,22 @@ flowchart TD
 ```
 
 See the [APEX recipe](../plans/WORKFLOW-ARCHITECTURE-APEX.md#avis-automatique-dans-conduite).
+
+### Responsibility projection in Mission control
+
+The graph reads planning scopes, their parents, task assignments and the
+configured independent reviewer. It displays these relationships.
+
+```mermaid
+flowchart LR
+    R["Principal orchestrator"] -->|Delegation| S["Sub-orchestrator"]
+    S -->|Assignment| A["Upstream task"]
+    A -->|Dependency| B["Downstream task"]
+    V["Independent reviewer"] -. Configured review .-> R
+```
+
+Dependency arrows retain their editing controls. Responsibility links are
+read-only. The review link represents configuration. Receipts and status signals
+remain available in **Team and validation**. The animated outline reflects a
+current observation of a running process. Historical views, the system reduced
+motion preference and **Pause animation** support static reading.

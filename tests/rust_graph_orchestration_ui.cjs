@@ -35,8 +35,11 @@ async function run() {
         document.documentElement.lang = lang;
         document.documentElement.dataset.theme = theme;
         globalThis.SwarmI18n = {t: key => lang === 'en' ? SwarmEnglish[key] ?? key : key};
-        let requests = 0;
-        window.fetch = () => { requests++; throw new Error('A render must make no requests'); };
+        const requests = [];
+        window.fetch = (url, options) => {
+          requests.push({path: new URL(url, 'http://localhost').pathname, method: options?.method ?? 'GET'});
+          return Promise.resolve(new Response('{"failure":{"code":"fixture-read-unavailable"}}', {status:404}));
+        };
         const tasks = [
           {id: 'wasm', title: 'Wasmtime', status: 'blocked', scope_id: 'validation',
             independent_review: {state: 'changes_requested'},
@@ -91,9 +94,25 @@ async function run() {
           interactive: frame && getComputedStyle(frame).pointerEvents,
           animates: !!motion,
           changesOffset: frame && getComputedStyle(frame).strokeDashoffset !== initialOffset,
-          duration: timing?.endTime
+          duration: timing?.duration, continuous: timing?.iterations === Infinity
         };
 
+        const workflow = {
+          roles: [...document.querySelectorAll('.graph-workflow-role')].map(node=>node.dataset.agentRole),
+          delegated: [...document.querySelectorAll('[data-relation="delegation"]')].map(edge=>edge.dataset.fromRole+'>'+edge.dataset.toRole),
+          reviewerLinks: document.querySelectorAll('[data-relation="review"]').length,
+          assignments: document.querySelectorAll('[data-assigned-task][marker-end]').length
+        };
+        const motionButton=get('#pilot-activity-motion');
+        motionButton.click();
+        workflow.pause=motionButton.getAttribute('aria-pressed');
+        workflow.playState=getComputedStyle(frame).animationPlayState;
+        motionButton.click();
+
+        assertRenderLocal();
+        function assertRenderLocal() {
+          if (requests.length) throw new Error('Graph rendering triggered a request');
+        }
         const initialGraph = !get('#graph-studio').hidden && get('#conduite-team-validation').hidden;
         const canvas = get('#pilot-canvas');
         canvas.scrollLeft = 100;
@@ -204,6 +223,7 @@ async function run() {
           scopeCount: document.querySelectorAll('[data-scope]').length,
           taskCount: document.querySelectorAll('.graph-noeud').length
         };
+        snapshot.workflow = workflow;
         snapshot.requests = requests;
         return snapshot;
       }, {lang, theme});
@@ -216,6 +236,14 @@ async function run() {
       assert.equal(result.frameState.changesOffset, !reducedMotion);
       if (!reducedMotion) assert(result.frameState.duration > 0 && result.frameState.duration < 5000);
       assert.equal(result.historyFrames, 0);
+      assert.equal(result.frameState.continuous,!reducedMotion);
+      assert.deepEqual(result.workflow.roles,['root','subplanner','subplanner','subplanner','reviewer']);
+      assert.deepEqual(result.workflow.delegated,['root>transport','root>validation','transport>documentation']);
+      assert.equal(result.workflow.reviewerLinks,1);
+      assert.equal(result.workflow.assignments,60);
+      assert.equal(result.workflow.pause,'true');
+      if (!reducedMotion) assert.equal(result.workflow.playState,'paused');
+
 
       assert.equal(new Set(result.currentActivity.map(item => item[1])).size, 4);
       const activityLabels = lang === 'en'
@@ -265,7 +293,9 @@ async function run() {
       assert.equal(result.newWork.scopeCount, 1);
       assert.equal(result.newWork.taskCount, 0);
       assert(result.newWork.visible);
-      assert.equal(result.requests, 0);
+      assert.deepEqual(result.requests, Array.from({length:6}, () => ({
+        path:'/api/v1/planning/workflow-architecture', method:'GET'
+      })));
       if (lang === 'en') {
         assert.match(result.root, /^Principal orchestrator/);
         assert.match(result.reviewer, /^Independent reviewer/);

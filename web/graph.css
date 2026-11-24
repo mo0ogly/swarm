@@ -57,7 +57,7 @@
   to { stroke-dashoffset:-10; }
 }
 @media (prefers-reduced-motion:no-preference) {
-  .graph-activity-frame { animation:graph-task-execution 2.4s linear 2; }
+  .graph-activity-frame { animation:graph-task-execution 2.4s linear infinite; }
 }
 .graph-activity-key { display:inline-flex; align-items:center; gap:.45em; }
 .native-graph-orchestration .graph-activity-key { margin-inline-start:.6em; }
@@ -328,3 +328,15 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-studio .graph-search-dim { opacity:.32; transition:opacity .15s; }
 @media(prefers-reduced-motion:reduce) { .native-graph-studio .graph-search-dim { transition:none; } }
 @media(max-width:760px) { .native-graph-studio #pilot-zoom-in,.native-graph-studio #pilot-zoom-out,.native-graph-studio #pilot-fullscreen,.native-graph-studio #pilot-search-previous,.native-graph-studio #pilot-search-next,.native-graph-studio #pilot-search-clear { width:44px; min-width:44px; min-height:44px; } }
+
+/* Recorded workflow responsibilities share the task canvas and its zoom. */
+.graph-workflow-role { cursor:default; }
+.graph-workflow-edge { fill:none; stroke-width:1.6; pointer-events:none; }
+.graph-workflow-edge[data-relation="delegation"] { stroke:var(--wattson-attention-encre); stroke-dasharray:5 4; }
+.graph-workflow-edge[data-relation="assignment"] { stroke:var(--wattson-libelle); stroke-dasharray:2 5; opacity:.55; }
+.graph-workflow-edge[data-relation="review"] { stroke:var(--wattson-succes-encre); stroke-dasharray:6 4; }
+.graph-workflow-delegation-marker { fill:var(--wattson-attention-encre); }
+.graph-workflow-assignment-marker { fill:var(--wattson-libelle); }
+.graph-workflow-review-marker { fill:var(--wattson-succes-encre); }
+.graph-workflow-key { margin-block:.3rem; }
+.native-graph-studio[data-motion-paused="true"] .graph-activity-frame { animation-play-state:paused; }
