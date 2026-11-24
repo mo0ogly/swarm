@@ -266,6 +266,26 @@ async function run() {
       assert.equal(await page.$eval('#conduite-show-team', button => button.getAttribute('aria-pressed')), 'false');
       assert(await page.$eval('#graph-studio', panel => !panel.hidden && panel.getClientRects().length > 0));
       assert(await page.$eval('#conduite-team-validation', panel => panel.hidden));
+      await page.click('#pilot-fullscreen');
+      assert(await page.$eval('dialog.native-graph-dialog[open]', dialog => {
+        const button = dialog.querySelector('#conduite-show-team');
+        if (!button) return false;
+        const bounds = button.getBoundingClientRect();
+        return bounds.width > 0 && bounds.top >= 0 && bounds.bottom <= innerHeight &&
+          button.contains(document.elementFromPoint(bounds.x + bounds.width / 2,
+            bounds.y + bounds.height / 2));
+      }), 'Team switch is visible and interactive in fullscreen');
+      await page.focus('#conduite-show-team');
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(() => !document.querySelector('dialog.native-graph-dialog').open &&
+        !document.querySelector('#conduite-team-validation').hidden &&
+        document.activeElement.id === 'conduite-show-team', {timeout: 0});
+      await page.focus('#conduite-show-graph');
+      await page.keyboard.press('Enter');
+      assert(await page.$eval('#graph-studio', panel =>
+        !panel.hidden && panel.contains(document.activeElement)));
+      assert(await page.$eval('#conduite-team-validation', panel => panel.hidden));
+      console.log('PASS fullscreen view switch and keyboard focus', lang, theme, width);
     }
     assert.deepEqual(errors, []);
   } finally {

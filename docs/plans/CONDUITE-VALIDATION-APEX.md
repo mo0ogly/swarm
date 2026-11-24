@@ -63,3 +63,23 @@ la fixture, sur la base de son rapport de fermeture. La recette compare
 L’ajout de la feuille réellement servie a reproduit une perte de défilement
 après rafraîchissement en vue Équipe. La reprise garde les coordonnées visibles
 avant masquage et les réapplique au retour au graphe.
+
+## Reprise V3 · bascule en plein écran
+
+Le passage en plein écran déplaçait le panneau Graphe dans un dialogue modal.
+Les boutons de bascule restaient dans le document rendu inactif par le dialogue.
+La solution retenue rattache les mêmes boutons au panneau Graphe visible et
+les remet devant le panneau Équipe au changement de vue. Une copie des boutons
+aurait ajouté deux groupes à synchroniser avec le même état et le même focus.
+
+- [Témoin HTTP du défaut sur dev.402](/run/media/fpizzi/SWARM/cv.6jIp/prior-served.log).
+- [Recette HTTP dev.403](/run/media/fpizzi/SWARM/cv.6jIp/candidate-served.log) :
+  URL directe, bascule visible et activable, validateur visible, focus au retour,
+  deux langues et deux thèmes, ordinateur et mobile. La révision du travail
+  de test reste identique. Le test de composant couvre aussi cette régression.
+- [Octets servis et notes bilingues](/run/media/fpizzi/SWARM/cv.6jIp/protected-assets.log)
+  et [identité active](/run/media/fpizzi/SWARM/cv.6jIp/status.log). La session
+  personnelle derrière le port d’autorité n’a pas été ouverte durant la recette.
+- Revue locale du diff : le changement utilise les états DOM du dialogue et
+  de la bascule. Il n’ajoute ni paramètre opérateur ni requête métier.
+  La fermeture issue de la bascule restitue le graphe avant le retour de focus.

@@ -291,7 +291,9 @@ filtres et sélection ne changent pas la révision métier.
   Elles tiennent compte du verdict du moteur et de la fraîcheur des preuves.
 - Les liens de responsabilité relient les rôles à leurs périmètres. Ne déduisez
   pas le sens d’un lien de sa seule couleur ou de son seul style : lisez sa légende.
-- Dans le cockpit natif, **Graphe des tâches** montre les dépendances, les états
+- Les boutons **Graphe des tâches** et **Équipe et validation** sont en haut
+  du panneau affiché et restent accessibles en plein écran. Sélectionner l’équipe
+  quitte le plein écran. **Graphe des tâches** montre les dépendances, les états
   et les commandes du graphe. Le repère bleu **En action** correspond à une
   exécution confirmée, le rouge **Arrêtée** à une tentative interrompue ou en
   échec, et l’ambre **En pause** à une tâche à faire dans une mission en pause.

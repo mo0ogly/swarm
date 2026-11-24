@@ -761,7 +761,19 @@
     canvas.addEventListener('wheel',zoomAtCursor,{passive:false});
     for(const edge of svg.querySelectorAll('.graph-arete')){edge.setAttribute('role','button');edge.setAttribute('tabindex','0');edge.setAttribute('aria-label',t('Modifier un lien')+' '+edge.dataset.from+' → '+edge.dataset.to);const remove=()=>{const target=work.tasks.find(t=>t.id===edge.dataset.to);editTask(work,target,(target.depends||[]).filter(id=>id!==edge.dataset.from))};edge.addEventListener('click',()=>inspectLink(work,edge.dataset.from,edge.dataset.to));edge.addEventListener('keydown',e=>{if(['Enter',' ','Delete','Backspace'].includes(e.key)){e.preventDefault();if(['Delete','Backspace'].includes(e.key))remove();else inspectLink(work,edge.dataset.from,edge.dataset.to)}})}
     studio.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(gesture||connection){e.preventDefault();e.stopPropagation();finish(true);connection=null;status.textContent=''}else if(selectionMode){e.preventDefault();e.stopPropagation();selectionMode=false;selectedIds.clear();updateSelection()}else if(modal.open){e.preventDefault();modal.close()}});
-    modal.addEventListener('close',()=>{if(disposed)return;finish(true);host.insertBefore(studio,modal);studio.classList.remove('is-fullscreen');document.body.classList.remove('graph-studio-open');actionLabel(full,'Plein écran');full.setAttribute('aria-expanded','false');full.focus()});
+    /** Return the graph to its host after closing fullscreen. Preserve focus
+     * on the switch when the team is selected. No engine operation. */
+    function restoreFromFullscreen() {
+      if (disposed || modal.open || studio.parentNode !== modal) return;
+      finish(true);
+      host.insertBefore(studio,modal);
+      studio.classList.remove('is-fullscreen');
+      document.body.classList.remove('graph-studio-open');
+      actionLabel(full,'Plein écran');
+      full.setAttribute('aria-expanded','false');
+      (teamSelected ? teamView : full).focus();
+    }
+    modal.addEventListener('close',restoreFromFullscreen);
     const viewportObserver=new ResizeObserver(()=>{if(disposed)return;host.graphRestoreView?.();updateViewport();persistView()});viewportObserver.observe(canvas);
     for(const id of ['pilot-layout-reset','pilot-layout-undo','pilot-layout-redo','pilot-view-reset','pilot-neighbors','pilot-neighbors-clear','pilot-export','pilot-orientation']){const control=toolbar.querySelector('#'+id);if(control)toolsBody.append(control===neighborSelect?neighbors:control)}
     const closeTools=document.createElement('button');closeTools.type='button';closeTools.id='pilot-tools-close';closeTools.textContent=t('Fermer les outils');toolsBody.append(closeTools);
@@ -802,9 +814,9 @@
     teamView.setAttribute('aria-controls', orchestration.id);
     views.append(graphView, teamView);
     let teamSelected = false;
-    /** Switch presentation in this Work only. Retain the visible viewport
-     * before hiding it and reapply it when the graph has a visible size.
-     * No request or saved policy changes. */
+    /** Keep the same switch with the visible panel, including the modal graph.
+     * The team view exits fullscreen. Restore the viewport when the graph
+     * becomes visible again. No request or saved policy changes. */
     function showTeam(selected) {
       if (selected && !teamSelected) {
         pendingScroll ??= {left: canvas.scrollLeft, top: canvas.scrollTop};
@@ -813,12 +825,21 @@
       teamSelected = selected;
       studio.hidden = selected;
       orchestration.hidden = !selected;
+      if (selected) {
+        if (views.parentNode !== host) host.insertBefore(views, orchestration);
+        if (modal.open) {
+          modal.close();
+          restoreFromFullscreen();
+        }
+      } else if (views.parentNode !== studio) {
+        studio.prepend(views);
+      }
       graphView.setAttribute('aria-pressed', String(!selected));
       teamView.setAttribute('aria-pressed', String(selected));
       if (!selected) host.graphRestoreView?.();
     }
-    graphView.addEventListener('click', () => showTeam(false));
-    teamView.addEventListener('click', () => showTeam(true));
+    graphView.addEventListener('click', () => {showTeam(false);graphView.focus()});
+    teamView.addEventListener('click', () => {showTeam(true);teamView.focus()});
     host.replaceChildren(views,studio,orchestration,modal,help);
     showTeam(initial?.teamSelected === true);
     /** Capture completed same-Work presentation, including deferred modal/scroll.
