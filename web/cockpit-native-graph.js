@@ -88,7 +88,7 @@
     dialog.addEventListener('close', () => controller.abort(), {once:true});
     try {
       const query = new URLSearchParams({work:work.id, task:task.id});
-      const response = await fetch('/api/v1/task-actions?' + query, {
+      const response = await fetch('/api/v1/agent-logs/task-actions?' + query, {
         credentials:'same-origin', headers:{Accept:'application/json'}, signal:controller.signal
       });
       const file = await response.json();

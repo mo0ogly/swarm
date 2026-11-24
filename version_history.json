@@ -7,8 +7,8 @@
     },
     "items": [
       {
-        "fr": "Conduite : ouvrez et téléchargez le fichier d’actions d’une tâche. La vue présente son plan, les résultats d’outils observés, les ajustements enregistrés et l’attente de revue humaine.",
-        "en": "Dispatch: open and download a task’s action file. The view shows the plan, observed tool outcomes, recorded adjustments, and pending human review."
+        "fr": "Conduite : ouvrez et téléchargez le fichier d’actions d’une tâche. La vue présente son plan, les résultats d’outils observés, les ajustements enregistrés et l’attente de revue humaine, selon les droits de lecture des Journaux.",
+        "en": "Dispatch: open and download a task’s action file. The view shows the plan, observed tool outcomes, recorded adjustments, and pending human review, subject to Logs access."
       },
       {
         "fr": "Conduite : un contour bleu animé brièvement signale les tâches dont l’exécution est confirmée. La préférence de mouvement réduit garde ce contour fixe.",

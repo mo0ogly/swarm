@@ -70,3 +70,14 @@ Les anciennes preuves et le diagnostic de focus SVG ont été conservés.
 - La vérification des résultats utilise le statut déclaré des événements d’outil.
   Elle ne prouve pas l’effet réel d’une commande externe. Une tâche ancienne
   conserve le reçu d’origine, sans invention de résultats d’action.
+
+## Reprise de la livraison Authority
+
+Le frontal local 38433 est un exécutable distinct. La version installée
+possède déjà la règle d’accès exclusive `view.logs`, mais ignore toute
+nouvelle règle ajoutée au seul code du démon. Une mise à jour système
+exige une authentification sudo interactive. Réutiliser
+`GET /api/v1/agent-logs/task-actions` garde le droit des Journaux sur les
+deux versions du frontal. La route hors de cet espace est retirée du
+moteur. Le même bouton en Conduite affiche un refus explicite si le
+compte n’a pas accès aux Journaux.

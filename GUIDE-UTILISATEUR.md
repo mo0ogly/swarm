@@ -371,7 +371,8 @@ Dans **Conduite**, le bouton **Actions** sur la carte ouvre le plan de la tâche
 ses tentatives et les ajustements enregistrés. L’instruction de départ
 reste lisible lorsque la remise modifie la prochaine action. Cliquez sur une action pour lire
 sa catégorie et son résultat observé. **Télécharger le fichier JSON** exporte
-la même lecture. Une tâche qui attend votre acceptation affiche **En attente
+la même lecture. Le compte doit avoir accès à la vue **Journaux**. Une tâche
+qui attend votre acceptation affiche **En attente
 de votre revue humaine** dans le fichier.
 
 Swarm rapproche les événements d’outil déclarés par le fournisseur. Le dernier

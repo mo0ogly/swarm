@@ -1407,7 +1407,7 @@ impl NativeHttpService {
             "/api/v1/work-recorded-resume" => self.work_resume(work_resume::Operation::Recorded, request),
             "/api/v1/agent-transcript" => self.agent_transcript(request),
             "/api/v1/agent-logs" => self.agent_logs(request),
-            "/api/v1/task-actions" => self.task_actions(request),
+            "/api/v1/agent-logs/task-actions" => self.task_actions(request),
             "/api/v1/cockpit-read" => self.cockpit_read(request),
             "/api/v1/work-budget" => self.work_budget_route(work_budget::Operation::Show,request),
             "/api/v1/work-budget/preview" => self.work_budget_route(work_budget::Operation::Preview,request),

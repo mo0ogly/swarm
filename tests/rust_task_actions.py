@@ -65,7 +65,7 @@ def main():
     primary = None
     try:
         server.capture_async(out/'frames.jsonl')
-        path = '/api/v1/task-actions?' + urlencode(dict(work=owned.work,task='task'))
+        path = '/api/v1/agent-logs/task-actions?' + urlencode(dict(work=owned.work,task='task'))
         def read():
             """Read the protected file through the native HTTP adapter."""
             return server.request(path,observe=False)
