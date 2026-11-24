@@ -3,6 +3,12 @@
   const t = (source) => globalThis.SwarmI18n?.t ? globalThis.SwarmI18n.t(source) : source;
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const VIEW_PREFIX = 'swarm-native-graph-view:v1:';
+  const ACTIVITY_LABELS = {
+    paused: 'En pause',
+    stopped: 'Arrêtée',
+    running: 'En action',
+    unconfirmed: 'Activité à confirmer',
+  };
   let refreshWork = null;
 
   /** Copy only the editable definition of a recorded/staged task. Never copy
@@ -773,8 +779,13 @@
     const legend=document.createElement('div');legend.id='pilot-graph-colors';legend.className='native-graph-color-key';legend.setAttribute('aria-label',t('Couleurs des états'));// Legend reuses the shared state badges (label + shape + tone) so it no longer
     // reads as checkboxes; the plain swatches remain only if the workbench is absent.
     const keyBadge=globalThis.SwarmWorkbench?.statusBadge;for(const [tone,label,state]of [['attente','à faire','todo'],['active','en cours','running'],['attention','à vérifier','submitted'],['alerte','bloquée','blocked'],['validee','acceptée','accepted']]){if(keyBadge){legend.append(keyBadge(state,state));continue}const item=document.createElement('span');item.className='graph-teinte';item.dataset.etat=tone;item.textContent=t(label);legend.append(item)}
+    const activityLegend = document.createElement('div');
+    activityLegend.className = 'native-graph-color-key';
+    activityLegend.setAttribute('role', 'group');
+    activityLegend.setAttribute('aria-label', t('Activité des tâches'));
+    for (const state of Object.keys(ACTIVITY_LABELS)) activityLegend.append(activityBadge(state));
     const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez un cadre pour le déplacer. Cliquez pour ouvrir la tâche ; cliquez sur une flèche pour modifier le lien.');
-    studio.append(toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,canvas);
+    studio.append(toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,activityLegend,canvas);
     orchestration.id = 'conduite-team-validation';
     const views = document.createElement('div');
     views.className = 'pilot-actions conduite-view-switch';
@@ -821,6 +832,36 @@
      */
     host.graphRestoreView=()=>{if(disposed||resumeFullscreen&&document.querySelector('.native-graph-editor[open]'))return;if(!resumeFullscreen&&(!canvas.clientWidth||!canvas.clientHeight))return;if(resumeFullscreen){resumeFullscreen=false;if(!modal.open)full.click()}if(pendingScroll){canvas.scrollTo(pendingScroll.left,pendingScroll.top);pendingScroll=null}if(pendingStudio){studio.scrollTo(pendingStudio.left,pendingStudio.top);pendingStudio=null}updateViewport()};
     host.graphCleanup=()=>{if(help.open)help.close();finish(true);persistView();disposed=true;viewportObserver.disconnect();media.removeEventListener('change',resizeTools);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};updateSelection();update();host.graphRestoreView();lastViewAttempt=JSON.stringify(viewRecord());if(initial&&initial.orientation!==orientation)persistView(true);
+  }
+
+  /**
+   * Classify execution separately from the recorded task status. A saved pause
+   * holds unstarted tasks; it does not stop a process. A recorded running task
+   * requires a current running observation to be shown as active. A stopped
+   * attempt can be shown from a current result or a terminal attempt in history.
+   * Returns no activity label for unrelated task states. No requests or writes.
+   */
+  function taskActivity(task, result, paused, readMode) {
+    if (readMode !== 'history') {
+      if (result?.state === 'in_progress' && result.process_state === 'running') return 'running';
+      if (result?.state === 'stopped_early') return 'stopped';
+    }
+    if (readMode === 'history' && task.status === 'blocked' &&
+        ['failed', 'interrupted'].includes(task.attempts?.at(-1)?.status)) return 'stopped';
+    if (task.status === 'todo' && paused) return 'paused';
+    if (task.status === 'running') return 'unconfirmed';
+    return '';
+  }
+
+  /** Build a labeled marker with the same colors as the graph cards. A role
+   * label describes an observation or a control without implying a live process.
+   */
+  function activityBadge(state, label = ACTIVITY_LABELS[state]) {
+    const item = document.createElement('span');
+    item.className = 'graph-activity-key';
+    item.dataset.activity = state;
+    item.textContent = t(label);
+    return item;
   }
 
   /**
@@ -898,9 +939,10 @@
    * @param {object|null} mission optional current observation
    * @param {string} readMode "history" suppresses current observations
    * @param {boolean|undefined} expanded same-Work disclosure state, if known
-   * @returns {{panel: HTMLElement, assignments: Set<string>, reasons: Map<string,string>}}
+   * @param {boolean} paused whether the mission holds new starts
+   * @returns {{panel: HTMLElement, assignments: Set<string>, reasons: Map<string,string>, results: Map<string,object>}}
    */
-  function renderOrchestration(work, mission, readMode, expanded) {
+  function renderOrchestration(work, mission, readMode, expanded, paused) {
     const panel = document.createElement('section');
     panel.className = 'native-graph-orchestration';
     panel.setAttribute('aria-labelledby', 'graph-orchestration-title');
@@ -916,7 +958,9 @@
     if (observation?.state === 'active') {
       driverState = observation.late ? 'Conducteur Swarm observé, mais vérification en retard.' : 'Conducteur Swarm observé.';
     }
-    conductor.textContent = t(driverState);
+    const driverActivity = observation?.state === 'error' ? 'error'
+      : observation?.state === 'active' && !observation.late ? 'running' : 'unconfirmed';
+    conductor.append(activityBadge(driverActivity, driverState));
     panel.append(heading, conductor);
 
     const reasons = new Map();
@@ -940,6 +984,13 @@
       (reviewer?.provider
         ? [reviewer.provider, reviewer.model_route?.model].filter(Boolean).join(' · ')
         : t('Non configuré'))));
+    if (reviewer?.provider) {
+      const reviewInProgress = [...results.values()].some(result => result.state === 'review_in_progress');
+      const reviewStatus = reviewInProgress ? activityBadge('running', 'Revue indépendante en cours')
+        : reviewer.failure ? activityBadge('error', 'Vérification interrompue')
+        : paused ? activityBadge('paused', 'Départs en pause') : activityBadge('unconfirmed');
+      configuredReviewer.append(' ', reviewStatus);
+    }
     panel.append(configuredReviewer);
 
     const scopes = planning ? (Array.isArray(planning.scopes) ? planning.scopes : []) : [{id: rootId}];
@@ -978,6 +1029,12 @@
           ? [t('Orchestrateur principal'), planning?.provider || t('À configurer'), planning?.model_route?.model].filter(Boolean).join(' · ')
           : [t('Sous-orchestrateur'), scope.id, scope.model_selection?.provider,
               scope.model_selection?.route?.model].filter(Boolean).join(' · ')));
+        if (planning) {
+          const scopeStatus = scope.state === 'closed' ? activityBadge('unconfirmed', 'Périmètre terminé')
+            : paused || planning.paused ? activityBadge('paused', 'Départs en pause')
+            : activityBadge('unconfirmed');
+          item.append(' ', scopeStatus);
+        }
         const tasks = tasksByScope.get(scope.id) || [];
         if (tasks.length) {
           const details = document.createElement('details');
@@ -988,6 +1045,8 @@
             assignments.add(task.id);
             const entry = document.createElement('li');
             entry.textContent = task.title;
+            const activity = taskActivity(task, results.get(task.id), paused, readMode);
+            if (activity) entry.append(' ', activityBadge(activity));
             if (reasons.has(task.id)) {
               const explanation = document.createElement('span');
               explanation.textContent = ' — ' + reasons.get(task.id);
@@ -1020,7 +1079,7 @@
       tree.append(missing);
     }
     panel.append(tree);
-    return { panel, assignments, reasons };
+    return { panel, assignments, reasons, results };
   }
 
   /**
@@ -1033,14 +1092,16 @@
    * @param {object} work Work including recorded planning and tasks
    * @param {object|null} mission current mission observation when available
    * @param {string} readMode distinguishes current from historical observations
+   * @param {boolean} controlPaused saved mission pause if no current observation
    * @throws {Error} on invalid Work, duplicate ids, unknown-shaped dependencies or cycles
    */
-  function render(work, mission=null, readMode='current') {
+  function render(work, mission=null, readMode='current', controlPaused=false) {
     const host = container();
     const { tasks, depPairs, unknown } = validateWork(work);
     const previous=host.graphView?.(),initial=previous?.work===work.id?previous:null;
     const expanded=initial ? host.querySelector('[data-orchestration-tree]')?.open : undefined;
-    const orchestration=renderOrchestration(work,mission,readMode,expanded);
+    const paused = (readMode === 'history' ? controlPaused : mission?.paused ?? controlPaused) === true;
+    const orchestration=renderOrchestration(work,mission,readMode,expanded,paused);
     const recovered=initial?{view:null,error:''}:readStoredView(work.id);
     host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
     const orientation=initial?(host.dataset.orientation==='TB'?'TB':'LR'):(recovered.view?.orientation||'LR');host.dataset.orientation=orientation;
@@ -1145,6 +1206,8 @@
       const pos = g.node(graphNodeKey(task.id));
       const left = pos.x - nodeWidth / 2, top = pos.y - nodeHeight / 2;
       const stateLabel = labels[task.status] || task.status;
+      const activity = taskActivity(task, orchestration.results.get(task.id), paused, readMode);
+      const activityLabel = activity ? t(ACTIVITY_LABELS[activity]) : '';
       const group = document.createElementNS(SVG_NS, 'g');
       group.setAttribute('class', 'graph-noeud');
       group.setAttribute('role', 'img');
@@ -1152,11 +1215,12 @@
         ? ' · ' + t('Périmètre') + ' ' + task.scope_id : '';
       const reason = orchestration.reasons.get(task.id);
       const engineReason = reason ? ' · ' + reason : '';
-      group.setAttribute('aria-label', t('Tâche : ') + task.title + t(' — identifiant : ') + task.id + t(' — état : ') + stateLabel + scope + engineReason);
+      const detail = [stateLabel, activityLabel].filter(Boolean).join(' · ') + scope + engineReason;
+      group.setAttribute('aria-label', t('Tâche : ') + task.title + t(' — identifiant : ') + task.id + t(' — état : ') + detail);
       group.dataset.task = task.id;
       group.dataset.etat = tonalites[task.status] || 'neutre';
       group.append(document.createElementNS(SVG_NS, 'title'));
-      group.lastChild.textContent = task.title + ' (' + task.id + ') — ' + stateLabel + scope + engineReason;
+      group.lastChild.textContent = task.title + ' (' + task.id + ') — ' + detail;
       const rect = document.createElementNS(SVG_NS, 'rect');
       rect.setAttribute('x', String(left));
       rect.setAttribute('y', String(top));
@@ -1171,11 +1235,17 @@
       title.setAttribute('class', 'graph-titre');
       appendTruncated(title, task.title);
       group.append(title);
+      if (activity) {
+        group.append(svgNode('circle', {
+          cx: left + 18, cy: top + 48, r: 4,
+          class: 'graph-activity-mark', 'data-activity': activity, 'aria-hidden': 'true',
+        }));
+      }
       const sub = document.createElementNS(SVG_NS, 'text');
-      sub.setAttribute('x', String(left + 14));
+      sub.setAttribute('x', String(left + (activity ? 28 : 14)));
       sub.setAttribute('y', String(top + 52));
       sub.setAttribute('class', 'graph-sous-titre');
-      appendTruncated(sub, task.id + ' · ' + stateLabel);
+      appendTruncated(sub, activityLabel || task.id + ' · ' + stateLabel);
       group.append(sub);
       svg.append(group);
     }
@@ -1190,7 +1260,7 @@
       canvas.append(warning);
     }
     navigation(host,canvas,svg,work,orientation,orchestration.panel,
-      () => render(work,mission,readMode),initial||recovered.view,recovered.error,recovered.errorCode);
+      () => render(work,mission,readMode,controlPaused),initial||recovered.view,recovered.error,recovered.errorCode);
   }
 
   /** Display at most 24 UTF-16 code units including the ellipsis to leave room

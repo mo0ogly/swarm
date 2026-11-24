@@ -41,6 +41,21 @@
 .graph-teinte[data-etat=neutre]::before{background:var(--wattson-carte-creuse)}
 .graph-titre{font-size:13px;font-weight:700;fill:var(--wattson-titre)}
 .graph-sous-titre{font-size:12px;fill:var(--wattson-texte)}
+[data-activity="paused"] { --graph-activity-color:var(--wattson-attention-encre); }
+[data-activity="stopped"], [data-activity="error"] { --graph-activity-color:var(--wattson-alerte-encre); }
+[data-activity="running"] { --graph-activity-color:var(--wattson-info-encre); }
+[data-activity="unconfirmed"] { --graph-activity-color:var(--wattson-libelle); }
+.graph-activity-mark { fill:var(--graph-activity-color); pointer-events:none; }
+.graph-activity-key { display:inline-flex; align-items:center; gap:.45em; }
+.native-graph-orchestration .graph-activity-key { margin-inline-start:.6em; }
+.native-graph-orchestration [data-orchestration-role="driver"] .graph-activity-key { margin-inline-start:0; }
+.graph-activity-key::before {
+  content:"";
+  inline-size:.6em;
+  block-size:.6em;
+  border-radius:50%;
+  background:var(--graph-activity-color);
+}
 .graph-agent{font-size:11px;fill:var(--wattson-libelle)}
 .graph-alerte{font-size:11px;font-weight:700;fill:var(--wattson-alerte)}
 .graph-legende{margin-top:10px;font-size:13px;color:var(--wattson-libelle)}
