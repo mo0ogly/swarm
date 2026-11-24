@@ -144,7 +144,7 @@ This is an example plan. Dynamic analysis routing, data-source connections, and 
 
 ### Audit and reassess the choice with AI
 
-The **Help** dialog in Prepare explains the four workflow patterns with examples and selection criteria. It distinguishes coordination patterns from catalog templates and explains the role of deliverables, prerequisites, and independent review.
+The **Help** dialog in Prepare explains the four workflow patterns with examples and selection criteria. On mobile, the title and close button stay visible while the content scrolls. It distinguishes coordination patterns from catalog templates and explains the role of deliverables, prerequisites, and independent review.
 
 Under **Prepare with AI → Choose a workflow architecture**, select **Draft an AI assessment**. The draft asks about dependencies, handoffs, scopes, validation, recovery, and measured costs or delays. The recommendation can be a sequence, a hierarchy, a justified combination, or insufficient evidence. Review and send the request explicitly in the conversation.
 

@@ -146,7 +146,7 @@ Il s’agit d’un exemple de plan. Le choix dynamique d’un parcours analytiqu
 
 ### Auditer et réévaluer le choix avec l’IA
 
-La fenêtre **Aide** de Préparer présente les quatre formes de workflow avec des exemples et des critères de choix. Elle distingue les formes de coordination des modèles du catalogue et rappelle le rôle des livrables, des prérequis et de la revue indépendante.
+La fenêtre **Aide** de Préparer présente les quatre formes de workflow avec des exemples et des critères de choix. Sur mobile, le titre et la fermeture restent visibles pendant la lecture. Elle distingue les formes de coordination des modèles du catalogue et rappelle le rôle des livrables, des prérequis et de la revue indépendante.
 
 Dans **Préparer avec l’IA → Choisir l’architecture du workflow**, utilisez **Préparer un avis IA**. La question ajoute au brouillon une comparaison des dépendances, des remises, des périmètres, de la validation, de la reprise et des coûts ou délais connus. Les conclusions possibles sont une séquence, une hiérarchie, une combinaison motivée ou des preuves insuffisantes. Envoyez explicitement la demande dans la conversation.
 

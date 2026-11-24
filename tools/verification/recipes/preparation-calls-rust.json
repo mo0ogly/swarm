@@ -32,6 +32,7 @@
     "web/preparation-native-dialogue.js",
     "web/prephase-dialogue.js",
     "web/prepare.html",
+    "web/prephase.css",
     "web/context-help.js",
     "web/i18n-en.js",
     "locales/en.json",
