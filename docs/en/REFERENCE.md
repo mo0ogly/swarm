@@ -169,6 +169,8 @@ actually possible, not a promise based solely on the requested slot count.
 
 ## Agent exchanges and workspaces
 
+The shipped Rust engine reads the journal through `swarm exchange list` and `GET/HEAD /api/v1/exchanges`. The `exchange send` and `exchange consume` entries below describe the historical Go contract. See [Agent exchanges](NATIVE-AGENT-EXCHANGES.md#peer-collaboration).
+
 ```sh
 swarm exchange send WORK --input exchange.json
 swarm exchange consume WORK --input acknowledgement.json
