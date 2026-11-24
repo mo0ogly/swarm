@@ -139,7 +139,7 @@ impl RootStore {
                                 request.scope.clone(),
                             );
                         }
-                        decisions.insert(uid.to_string(), (at.into_owned(), request));
+                        decisions.insert(uid.to_string(), (at, request));
                     }
                 }
                 let rows = signals.into_iter().map(|e| {
