@@ -207,7 +207,10 @@ complète. Les délégations et affectations arrondissent leurs embranchements.
 Les affectations d’un même périmètre partagent le départ de leur trajet. La vue initiale des plans organisés montre les orchestrateurs. Les
 cartes de tâche utilisent l’identifiant d’agent de la tentative observée. Un
 second clic sur l’orchestrateur sélectionné referme son périmètre. Le validateur
-configuré apparaît dès l’ouverture d’un périmètre, relié au principal.
+configuré apparaît dès l’ouverture d’un périmètre, relié au principal. Les
+périmètres sont regroupés par niveau. En détail, seuls les ancêtres du
+périmètre restent visibles et ses tâches sont rapprochées. Sur écran étroit,
+les liens contournent le validateur.
 L’en-tête montre la hiérarchie enregistrée et l’avis du moteur lié à la
 révision courante. Un avis indisponible ou périmé est signalé dans le graphe.
 La liaison de revue en pointillé vert représente la configuration. Les

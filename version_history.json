@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite aligne la hiérarchie par niveau et regroupe le chemin du principal au périmètre ouvert avec ses tâches.",
+        "en": "Dispatch aligns the hierarchy by level and groups the route from the principal orchestrator to the selected scope and its tasks."
+      },
+      {
         "fr": "Un second clic sur l’orchestrateur referme son périmètre. Le validateur indépendant est visible dès l’ouverture du périmètre.",
         "en": "A second click on an orchestrator closes its scope. The independent reviewer is visible as soon as the scope opens."
       },

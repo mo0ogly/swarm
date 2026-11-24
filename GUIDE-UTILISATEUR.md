@@ -301,7 +301,8 @@ filtres et sélection ne changent pas la révision métier.
   principal en bleu ◆, les sous-orchestrateurs en ambre ↳ et le validateur
   indépendant configuré en vert ✓. La légende distingue dépendance, délégation,
   affectation et revue configurée. Sur un plan organisé, le graphe s’ouvre sur les orchestrateurs.
-  Activez une carte pour ouvrir son périmètre, ou **Afficher tous les agents et tâches**
+  Les délégations sont alignées par niveau. Activez une carte pour isoler le
+  chemin du principal jusqu’à son périmètre, ou **Afficher tous les agents et tâches**
   pour la vue complète. Les flèches grises relient l’orchestrateur aux tâches
   affichées par des courbes qui partagent un trajet au départ d’un même périmètre. La carte de tâche indique l’agent observé quand le moteur le fournit.
   Un second clic sur le même orchestrateur, ou **Remonter aux orchestrateurs**,

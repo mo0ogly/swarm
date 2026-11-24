@@ -82,6 +82,7 @@ async function run() {
           initialRoles:visible('.graph-workflow-role').length,
           initialTasks:visible('.graph-noeud').length,
           initialReview:visible('[data-relation="review"]').length,
+          overviewCurves:visible('[data-relation="delegation"]').every(edge=>edge.getAttribute('d').includes(' Q ')),
           roleStatuses:visible('[data-workflow-scope] .graph-activity-mark').map(node => node.dataset.activity)
         };
         const transport = get('[data-workflow-scope="transport"]');
@@ -89,7 +90,9 @@ async function run() {
         drill.scopedTasks=visible('.graph-noeud').map(node=>node.dataset.task);
         drill.scopedLinks=visible('[data-assigned-task]').map(node=>node.dataset.assignedTask);
         drill.scopedCurve=visible('[data-assigned-task]')[0]?.getAttribute('d').includes(' Q ');
-        drill.delegationCurve=visible('[data-relation="delegation"]').some(edge=>edge.getAttribute('d').includes(' Q '));
+        drill.scopedRoles=visible('[data-workflow-scope]').map(el=>el.dataset.workflowScope);
+        drill.scopedDelegations=visible('[data-relation="delegation"]').map(edge=>edge.dataset.fromRole+'>'+edge.dataset.toRole);
+        drill.selectedAncestorDirect=visible('[data-relation="delegation"]')[0].getAttribute('d').split(' L ').length===2;
         drill.scopedMinimap=visible('.graph-minimap').length;
         drill.scopedReviewer=visible('[data-agent-role="reviewer"]').length;
         drill.scopedReviewLink=visible('[data-relation="review"]').length;
@@ -282,7 +285,10 @@ async function run() {
       assert.deepEqual(result.drill.scopedTasks,['rpc']);
       assert.deepEqual(result.drill.scopedLinks,['rpc']);
       assert.equal(result.drill.scopedCurve,true);
-      assert.equal(result.drill.delegationCurve,true);
+      assert.equal(result.drill.overviewCurves,true);
+      assert.deepEqual(result.drill.scopedRoles,['root','transport']);
+      assert.deepEqual(result.drill.scopedDelegations,['root>transport']);
+      assert.equal(result.drill.selectedAncestorDirect,true);
       assert.equal(result.drill.scopedMinimap,0);
       assert.equal(result.drill.scopedReviewer,1);
       assert.equal(result.drill.scopedReviewLink,1);

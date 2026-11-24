@@ -94,3 +94,10 @@ lecture. Les affectations partagent un départ par périmètre et le moteur de
 tracé du graphe arrondit leurs embranchements, ainsi que ceux des délégations.
 Le choix conserve les points d’attache et la séparation visuelle des types de
 liens. Les courbes bleues demeurent les prérequis éditables.
+
+Le retour d’usage a justifié un cadrage plus serré. La vue d’ensemble aligne
+les branches par niveau avec un trajet partagé sur le côté. Le détail cache
+les branches sœurs et rapproche uniquement le chemin réellement enregistré,
+le validateur configuré et les tâches du périmètre. Les changements de
+position sont propres à la vue et ne modifient pas la disposition mémorisée.
+Sur écran étroit, les liens passent de part et d’autre du validateur.
