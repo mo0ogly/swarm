@@ -26,6 +26,9 @@ const {address, key, work} = JSON.parse(fs.readFileSync(0, 'utf8'));
       await page.setViewport({width,height:900});
       assert.equal((await page.goto(origin+'/?'+new URLSearchParams({view:'conduite',read:'history',work,lang,theme}),
         {waitUntil:'networkidle0'})).status(),200);
+      const expected = lang === 'fr' ? 'Workflow recommandé · Séquentiel' : 'Recommended workflow · Sequential';
+      await page.waitForFunction(text => document.querySelector('#pilot-workflow-advice')?.textContent.startsWith(text), {}, expected);
+      assert.equal(posts,0);
       await page.click('#conduite-show-team');
       await page.waitForFunction((selector, text) => document.querySelector(selector+' [role=status]')?.textContent===text,
         {}, panel, lang==='fr'?'Séquentiel':'Sequential');

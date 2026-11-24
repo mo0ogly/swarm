@@ -110,7 +110,8 @@ async function run() {
             .filter(edge => getComputedStyle(edge).display !== 'none')
             .map(edge => edge.dataset.assignedTask);
         }
-        workflow.defaultAssignments = visibleAssignments();
+        workflow.defaultAssignments = visibleAssignments().length;
+        workflow.organization = get('#graph-studio strong')?.textContent;
         workflow.delegationDash = getComputedStyle(get('[data-relation="delegation"]')).strokeDasharray;
         const assignmentScope = get('#pilot-assignment-scope');
         if (assignmentScope) {
@@ -260,7 +261,8 @@ async function run() {
       assert.equal(result.workflow.reviewerLinks,1);
       assert.equal(result.workflow.assignments,60);
       assert.equal(result.workflow.permanentEdges,true);
-      assert.deepEqual(result.workflow.defaultAssignments,[]);
+      assert.equal(result.workflow.defaultAssignments,60);
+      assert.equal(result.workflow.organization,lang === 'fr' ? 'Organisation agentique · Hiérarchique' : 'Agent organization · Hierarchical');
       assert.equal(result.workflow.delegationDash,'none');
       assert.deepEqual(result.workflow.focusedAssignments,['rpc']);
       assert.deepEqual(result.workflow.clearedAssignments,[]);
