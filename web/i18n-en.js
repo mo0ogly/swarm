@@ -3,6 +3,8 @@
 globalThis.SwarmEnglish = {
   "Dépendances en bleu, délégations en ambre, affectations en gris, revue en vert.": "Blue dependencies, amber delegation, gray assignments, green review.",
   "Glissez une carte pour la déplacer. Cliquez sur la tâche pour l’ouvrir, ou sur une flèche bleue pour modifier un prérequis.": "Drag a card to move it. Click a task to open it, or a blue arrow to edit a prerequisite.",
+  "En mode sélection, cliquez ou appuyez sur Entrée sur chaque carte, puis déplacez une carte du groupe. Annuler le placement restaure tout le groupe.": "In selection mode, click or press Enter on each card, then move a card in the group. Undo placement restores the entire group.",
+  "Glissez le fond pour naviguer. Glissez la carte pour la déplacer, ou utilisez les flèches du clavier quand elle a le focus. Un clic sans déplacement ouvre la tâche.": "Drag the background to navigate. Drag a card to move it, or use the arrow keys while it has focus. A click without movement opens the task.",
   "Orchestrateurs seuls": "Orchestrators only",
   "Tous les agents et tâches": "All agents and tasks",
   "Remonter aux orchestrateurs": "Back to orchestrators",

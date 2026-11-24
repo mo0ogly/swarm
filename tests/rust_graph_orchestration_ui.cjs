@@ -89,7 +89,9 @@ async function run() {
         transport.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}));
         drill.scopedTasks=visible('.graph-noeud').map(node=>node.dataset.task);
         drill.scopedLinks=visible('[data-assigned-task]').map(node=>node.dataset.assignedTask);
-        drill.scopedCurve=visible('[data-assigned-task]')[0]?.getAttribute('d').includes(' Q ');
+        drill.scopedCurve=visible('[data-relation="assignment-trunk"]')[0]?.getAttribute('d').includes(' Q ');
+        drill.branchSegment=visible('[data-assigned-task]')[0]?.getAttribute('d').split(' L ').length===2;
+        drill.trunkCount=visible('[data-relation="assignment-trunk"]').length;
         drill.scopedRoles=visible('[data-workflow-scope]').map(el=>el.dataset.workflowScope);
         drill.scopedDelegations=visible('[data-relation="delegation"]').map(edge=>edge.dataset.fromRole+'>'+edge.dataset.toRole);
         drill.selectedAncestorDirect=visible('[data-relation="delegation"]')[0].getAttribute('d').split(' L ').length===2;
@@ -105,7 +107,14 @@ async function run() {
         drill.focusRestored=document.activeElement===transport;
         get('#pilot-drill-all').click();
         drill.worker=get('.graph-noeud[data-task="independent-0"] [data-task-agent]').textContent;
-        drill.handle=get('.graph-noeud[data-task="rpc"] .graph-drag title').textContent;
+        drill.handle=visible('.graph-drag').length;
+        const taskCard=get('.graph-task-open[data-task="rpc"]');
+        drill.keyshortcuts=taskCard.getAttribute('aria-keyshortcuts');
+        const draggable=taskCard.closest('.graph-unit');
+        const beforeMove=draggable.getAttribute('transform');
+        taskCard.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true,cancelable:true}));
+        drill.movedWithArrow=draggable.getAttribute('transform')!==beforeMove;
+        get('#pilot-layout-undo').click();
 
         const activity = id => {
           const mark = get('.graph-noeud[data-task="' + id + '"] .graph-activity-mark');
@@ -273,6 +282,20 @@ async function run() {
           scopeCount: document.querySelectorAll('[data-scope]').length,
           taskCount: document.querySelectorAll('.graph-noeud').length
         };
+        const linkedScope = structuredClone(work);
+        linkedScope.id = 'scoped-dependency';
+        linkedScope.tasks.find(task => task.id==='wasm').scope_id='transport';
+        SwarmRustCockpitRead.render({work:linkedScope,mission});
+        get('[data-workflow-scope="transport"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));
+        const scopedDependency = visible('.graph-arete')[0];
+        const dependencyD = scopedDependency.getAttribute('d');
+        const sourceBox = get('.graph-noeud[data-task="wasm"] .graph-cadre').getBoundingClientRect();
+        const dependentBox = get('.graph-noeud[data-task="rpc"] .graph-cadre').getBoundingClientRect();
+        const from = scopedDependency.getPointAtLength(0).matrixTransform(scopedDependency.getScreenCTM());
+        const to = scopedDependency.getPointAtLength(scopedDependency.getTotalLength()).matrixTransform(scopedDependency.getScreenCTM());
+        drill.ranksSeparated = sourceBox.bottom < dependentBox.top;
+        drill.dependencySide = Math.abs(to.x-dependentBox.right)<1 && Math.abs(from.y-sourceBox.bottom)<1;
+        drill.dependencyCurve = dependencyD.includes(' Q ');
         snapshot.workflow = workflow;
         snapshot.drill = drill;
         snapshot.requests = requests;
@@ -285,6 +308,11 @@ async function run() {
       assert.deepEqual(result.drill.scopedTasks,['rpc']);
       assert.deepEqual(result.drill.scopedLinks,['rpc']);
       assert.equal(result.drill.scopedCurve,true);
+      assert.equal(result.drill.branchSegment,true);
+      assert.equal(result.drill.trunkCount,2); // one shared gutter and one row
+      assert.equal(result.drill.ranksSeparated,true);
+      assert.equal(result.drill.dependencySide,true);
+      assert.equal(result.drill.dependencyCurve,true);
       assert.equal(result.drill.overviewCurves,true);
       assert.deepEqual(result.drill.scopedRoles,['root','transport']);
       assert.deepEqual(result.drill.scopedDelegations,['root>transport']);
@@ -297,7 +325,9 @@ async function run() {
       assert.equal(result.drill.returned,0);
       assert.equal(result.drill.focusRestored,true);
       assert.match(result.drill.worker,/fixture-worker/);
-      assert.equal(result.drill.handle,lang === 'fr' ? 'Poignée de déplacement' : 'Drag handle');
+      assert.equal(result.drill.handle,0);
+      assert.equal(result.drill.keyshortcuts,'ArrowLeft ArrowRight ArrowUp ArrowDown');
+      assert.equal(result.drill.movedWithArrow,true);
       assert.deepEqual(result.branches, ['transport', 'validation']);
       assert.deepEqual(result.currentActivity.map(item => item?.[0]), ['paused', 'stopped', 'running', 'unconfirmed']);
       assert.deepEqual(result.frameState.tasks, ['independent-0'], 'only the confirmed task has an activity frame');

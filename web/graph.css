@@ -276,8 +276,6 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-studio .graph-task-open { cursor:grab; touch-action:none; user-select:none; }
 .native-graph-studio .graph-task-open:active { cursor:grabbing; }
 .native-graph-studio .graph-noeud[data-etat=attente] .graph-cadre { fill:color-mix(in srgb,var(--wattson-info-fond) 45%,var(--wattson-carte)); stroke:var(--wattson-info-encre); stroke-width:2; }
-.native-graph-studio .graph-drag rect { fill:var(--wattson-info-fond); stroke:var(--wattson-info-encre); }
-.native-graph-studio .graph-drag text { fill:var(--wattson-info-encre); }
 .native-graph-studio .graph-port[data-side=in] { fill:var(--wattson-attention-fond); stroke:var(--wattson-attention-encre); }
 .native-graph-studio .graph-port[data-side=out] { fill:var(--wattson-info-fond); stroke:var(--wattson-info-encre); }
 .native-graph-studio .graph-arete { stroke:var(--wattson-info-encre); stroke-width:2.5; cursor:pointer; pointer-events:stroke; }
@@ -333,7 +331,7 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .graph-workflow-role[role="img"] { cursor:default; }
 .graph-workflow-edge { fill:none; stroke-width:1.6; pointer-events:none; }
 .graph-workflow-edge[data-relation="delegation"] { stroke:var(--wattson-attention-encre); }
-.graph-workflow-edge[data-relation="assignment"] { stroke:color-mix(in srgb,var(--wattson-libelle) 70%,var(--wattson-fond)); stroke-width:1.25; vector-effect:non-scaling-stroke; }
+.graph-workflow-edge[data-relation="assignment"], .graph-workflow-edge[data-relation="assignment-trunk"] { stroke:color-mix(in srgb,var(--wattson-libelle) 70%,var(--wattson-fond)); stroke-width:1.25; vector-effect:non-scaling-stroke; }
 .graph-workflow-edge[data-relation="assignment"]:not([data-visible-assignment]) { display:none; }
 .graph-workflow-edge[data-relation="review"] { stroke:var(--wattson-succes-encre); stroke-dasharray:6 4; }
 .graph-workflow-delegation-marker { fill:var(--wattson-attention-encre); }
