@@ -492,6 +492,11 @@ pub fn result_presentation(
     if task.status == "submitted" {
         if agent.is_none() {
             p.process_state = "unknown".into();
+            // Candidate evidence is observed from full history. The display
+            // window may omit the producer without hiding its verified review.
+            if matches!(facts.review, ReviewObservation::Presented(_)) && apply_review(&mut p, &facts.review)? {
+                return Ok(finish_result(p));
+            }
         }
         p.validation_state = "missing_gate".into();
         p.state = "result_to_review".into();

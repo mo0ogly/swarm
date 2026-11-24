@@ -73,6 +73,8 @@
     "rust/crates/swarm-engine/src/managed_publication_record.rs",
     "rust/crates/swarm-engine/src/task_lifecycle.rs",
     "tests/rust_native_first_publication.py",
+    "rust/crates/swarm-engine/src/root_store/mission_status_*.rs",
+    "rust/crates/swarm-web/src/service.rs",
     "rust/crates/swarm-engine/examples/review_evidence_probe.rs"
   ],
   "environment": {},
@@ -87,7 +89,7 @@
       "command": [
         "python3",
         "-c",
-        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='native-first-publication-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_native_first_publication.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--rollback-sdk',os.environ['SWARM_FIRST_PUBLICATION_SDK'],'--probe',os.environ['SWARM_FIRST_PUBLICATION_PROBE'],'--output',str(p)],check=True)\nr=json.loads((p/'result.json').read_text());required={'four-temporary-sql-faults-preserve-work-worker-and-event','publication-acceptance-pointer-worker-and-event-atomic','exact-replay-and-collisions-without-call-debit-or-write','actual-current-accepted-reader-verifies-canonical-publication-and-git','canonical-receipt-and-committed-git-refusal-and-restoration','historical-integrated-worker-recovery-without-new-execution'}\nassert r['status']=='PASS' and required.issubset(r['checks']) and r['task_accepted'] and not r['mission_accepted'] and not r['paid_provider']\nprint('MANAGED_FIRST_PUBLICATION_VERIFIED '+str(p))"
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='native-first-publication-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_native_first_publication.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--rollback-sdk',os.environ['SWARM_FIRST_PUBLICATION_SDK'],'--probe',os.environ['SWARM_FIRST_PUBLICATION_PROBE'],'--output',str(p),'--check-current-status'],check=True)\nr=json.loads((p/'result.json').read_text());required={'four-temporary-sql-faults-preserve-work-worker-and-event','publication-acceptance-pointer-worker-and-event-atomic','exact-replay-and-collisions-without-call-debit-or-write','actual-current-accepted-reader-verifies-canonical-publication-and-git','canonical-receipt-and-committed-git-refusal-and-restoration','historical-integrated-worker-recovery-without-new-execution','managed-opinion-awaits-publication-cli-http','managed-publication-is-current-cli-http'}\nassert r['status']=='PASS' and required.issubset(r['checks']) and r['task_accepted'] and not r['mission_accepted'] and not r['paid_provider']\nprint('MANAGED_FIRST_PUBLICATION_VERIFIED '+str(p))"
       ]
     }
   ]

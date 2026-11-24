@@ -267,8 +267,9 @@ optional; without it, not all raw provider output is retained.
 
 Arrows point from the prerequisite to the dependent task. These tasks have not started; they do not demonstrate accepted results.
 
-In the native cockpit, **Orchestration** displays the observed driver and
-the configured independent reviewer. **Team and scopes** shows the principal
+In the native cockpit, **Task graph** shows dependencies, task states and graph
+controls. **Team and validation** displays the observed driver and the configured
+independent reviewer. **Team and scopes** shows the principal
 orchestrator, sub-orchestrators, and their tasks. A blue diamond marks the
 principal orchestrator, an amber branch arrow marks sub-orchestrators, and a
 green check mark identifies the independent reviewer. These icons accompany
@@ -277,8 +278,9 @@ parent and a scope with assigned requirements and tasks. Incidents outside
 that scope belong to the parent. Sibling scopes appear as separate
 branches. Task arrows indicate prerequisites. The task
 list within a scope and the card's accessible label show the current reason
-supplied by the engine. The list displays configured checks and recorded
-receipt verdicts separately. History mode shows the recorded team and leaves
+supplied by the engine. Each assigned task lists configured checks, recorded
+check results and the recorded independent review. It also shows the current
+validation state when the engine supplies it. History mode shows the recorded team and leaves
 operational status unavailable. The graph reports when a team is unattached.
 
 In the CLI, `swarm-rust planning graph ID --root ROOT --json` shows the scopes

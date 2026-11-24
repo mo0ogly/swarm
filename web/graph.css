@@ -90,6 +90,13 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-studio .graph-noeud { cursor:default; }
 .native-graph-studio output { align-self:center; min-width:4em; text-align:center; }
 .native-graph-studio .pilot-actions { flex-wrap:wrap; }
+.conduite-view-switch { flex-wrap:wrap; margin-block-end:10px; }
+.conduite-view-switch button[aria-pressed="true"] {
+  background:var(--wattson-info-fond);
+  color:var(--wattson-info-encre);
+  border-color:currentColor;
+}
+.native-graph-studio[hidden], .native-graph-orchestration[hidden] { display:none; }
 .native-graph-orchestration {
   border:1px solid var(--wattson-ligne);
   border-radius:10px;

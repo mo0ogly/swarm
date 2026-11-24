@@ -7,6 +7,14 @@
     },
     "items": [
       {
+        "fr": "Statut d’un dépôt géré : après la première soumission, un avis favorable attend la publication. Après publication, le moteur vérifie les preuves courantes avant d’afficher la validation.",
+        "en": "Managed repository status: after the first submission, a favorable review awaits publication. After publication, the engine checks current evidence before displaying validation."
+      },
+      {
+        "fr": "Conduite : bascule entre le graphe des tâches et l’équipe. La vue Équipe et validation présente les contrôles, l’avis indépendant enregistré et l’état de validation fourni par le moteur.",
+        "en": "Dispatch: switch between the task graph and the team. Team and validation shows checks, the recorded independent review and the validation state supplied by the engine."
+      },
+      {
         "fr": "Conduite : un losange, une flèche de branche et une coche distinguent l’orchestrateur principal, les sous-orchestrateurs et le validateur indépendant.",
         "en": "Dispatch: a diamond, branch arrow and check mark distinguish the principal orchestrator, sub-orchestrators and independent reviewer."
       },

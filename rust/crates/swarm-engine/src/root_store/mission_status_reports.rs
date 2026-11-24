@@ -490,6 +490,25 @@ fn review_shape(work:&crate::Work,task:&crate::Task,agents:&[Agent])->bool {
     !review_requires_projection(task) || (work.planning.is_some() && matches!(task.status.as_str(),"submitted"|"blocked") && agents.iter().find(|a|a.task_id==task.id).is_some_and(|a|a.status=="completed" && matching_review(task,a)))
 }
 
+/// Admit the first managed attempt's supported display shapes after Root has
+/// verified its worker originals. A terminal opinion, when present, must match
+/// the same current producer and attempt. This is a shape check, not evidence.
+fn managed_status_pair(task: &crate::Task, agent: &Agent) -> bool {
+    if task.id != agent.task_id || !task.attempts.as_deref()
+        .is_some_and(|attempts| attempts.len() == 1 && attempts[0].id == agent.attempt_id)
+    {
+        return false;
+    }
+    match (task.status.as_str(), task.independent_review.as_deref()) {
+        ("running" | "blocked" | "submitted", None) => true,
+        ("submitted" | "accepted", Some(review)) => {
+            (review.state == "passed" || task.status == "submitted" && review.state == "changes_requested")
+                && review.producer == agent.id && review.attempt == agent.attempt_id
+        }
+        _ => false,
+    }
+}
+
 /// Require only branches whose result/readiness producers are implemented here.
 /// Retained profiles are accepted for stopped or completed/submitted results
 /// because Go does not consume dispatch readiness in those branches. All Agent
@@ -536,8 +555,8 @@ pub(super) fn supported(work: &crate::Work, agents: &[Agent]) -> Result<(), E> {
 }
 /// Check projection shapes after the caller has verified each managed worker's
 /// retained request/proof/SQL row. This flag is an internal prerequisite, not an
-/// operator policy or proof by itself. Only first verified running/blocked attempts
-/// without review are supported; submitted/accepted/retry branches still refuse.
+/// operator policy or proof by itself. First verified attempts support unreviewed
+/// submission, terminal opinion and published acceptance. Retries still refuse.
 /// No IO, state change, liveness, attribution or permission follows from this check.
 pub(super) fn supported_observed(work: &crate::Work, agents: &[Agent], managed_verified: bool) -> Result<(), E> {
     if agents.iter().any(|a| {
@@ -558,10 +577,7 @@ pub(super) fn supported_observed(work: &crate::Work, agents: &[Agent], managed_v
         if (planning.repository.is_some() && !agents.is_empty() && (!managed_verified ||
             agents.iter().any(|agent| !((agent.origin == "operateur" && agent.native_mission.is_none())
                     || (agent.origin == "conducteur" && agent.native_mission.is_some()))
-                || !work.tasks.iter().flatten().any(|task| task.id == agent.task_id
-                    && matches!(task.status.as_str(), "running" | "blocked")
-                    && task.independent_review.is_none()
-                    && task.attempts.as_deref().is_some_and(|attempts| attempts.len() == 1 && attempts[0].id == agent.attempt_id)))))
+                || !work.tasks.iter().flatten().any(|task| managed_status_pair(task, agent)))))
             || agents.iter().any(|agent|
                 !work.tasks.iter().flatten().any(|task| planned_pair(task,agent)))
             || scopes.iter().any(|scope| !matches!(scope.state.as_str(), "ready" | "waiting"))
@@ -706,13 +722,15 @@ pub(super) fn agent_observations<'a>(
 /// saved clock margin only after an observed NotApplicable review. A verified
 /// first verified managed worker instead retains explicit unavailable attribution:
 /// its mutable copy is never inferred from Root reports or accepted content.
-/// Managed reports retain PublicationUnavailable; actual managed review remains unsupported. Other branches
+/// Managed reports retain PublicationUnavailable. The supplied managed review
+/// must come from the current candidate observer. Other branches
 /// do not scan for attribution. No new authority, defaults, launch or mutation follows. Unknown read/close
 /// errors refuse, and caller still verifies its enclosing material snapshot.
 /// Ordinary incomplete delivery observes an absent incomplete-report source;
 /// ordinary abandonment consumes neither report nor review facts. Both preserve
 /// incoming gate/freshness and original causes, never grant execution/acceptance.
-pub(super) fn observed_result_inputs(root:&Path,work:&crate::Work,task:&crate::Task,agent:Option<&Agent>,settings:&crate::EngineSettingsDocument,causes:&mut Vec<E>,mut facts:super::TaskFreshnessEvidence)->Result<crate::mission_status_tasks::ResultObservation,E> {
+pub(super) fn observed_result_inputs(root:&Path,work:&crate::Work,task:&crate::Task,agent:Option<&Agent>,settings:&crate::EngineSettingsDocument,causes:&mut Vec<E>,evidence:(super::TaskFreshnessEvidence,Option<crate::mission_status_tasks::ReviewObservation>))->Result<crate::mission_status_tasks::ResultObservation,E> {
+    let (mut facts, managed_review) = evidence;
     causes.append(&mut facts.causes);
     // Contract: abandoned tasks without planning return NotObserved observations;
     // the existing decision consumer terminates on these statuses, so these fields stay unconsumed.
@@ -739,12 +757,16 @@ pub(super) fn observed_result_inputs(root:&Path,work:&crate::Work,task:&crate::T
         });
     }
     let managed = work.planning.as_deref().is_some_and(|p| p.repository.is_some());
-    let review=match agent {
-        Some(_) if managed => Some(crate::mission_status_tasks::ReviewObservation::NotApplicable),
+    let review=if managed {
+            if task.status == "submitted" && task.independent_review.is_some() && managed_review.is_none() {
+                return Err(E::Refused("mission-status-managed-review-unobserved"));
+            }
+            Some(managed_review.unwrap_or(crate::mission_status_tasks::ReviewObservation::NotApplicable))
+    } else { match agent {
         Some(agent) if task.status!="accepted"=>Some(super::mission_status_review::observe(root,work,task,agent,settings,causes)?),
         Some(_)=>Some(crate::mission_status_tasks::ReviewObservation::NotApplicable),
         None=>None,
-    };
+    }};
     let attribution = match agent {
         Some(agent) if managed && unsubmitted_pair(task, agent) =>
             Some(crate::mission_status_tasks::ReportAttribution::Unavailable {
@@ -1503,8 +1525,8 @@ mod tests {
             values: crate::EngineSettingsValues::installation_defaults().unwrap(), history: Vec::new() };
         let mut causes = Vec::new();
         let facts = observed_result_inputs(&root, &work, &task, Some(&agent), &settings, &mut causes,
-            super::super::TaskFreshnessEvidence { freshness: FreshnessObservation::NotObserved,
-                gate: GateObservation::NotObserved, causes: Vec::new() }).unwrap();
+            (super::super::TaskFreshnessEvidence { freshness: FreshnessObservation::NotObserved,
+                gate: GateObservation::NotObserved, causes: Vec::new() }, None)).unwrap();
         assert!(matches!(facts.incomplete_report, IncompleteReport::Observed(None)));
         assert!(matches!(facts.review, ReviewObservation::NotObserved));
         let diagnostic = crate::AttemptDiagnostic::default();

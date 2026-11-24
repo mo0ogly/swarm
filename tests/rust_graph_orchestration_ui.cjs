@@ -37,6 +37,7 @@ async function run() {
         window.fetch = () => { requests++; throw new Error('A render must make no requests'); };
         const tasks = [
           {id: 'wasm', title: 'Wasmtime', status: 'blocked', scope_id: 'validation',
+            independent_review: {state: 'changes_requested'},
             validation_policy: {controls: [{id: 'wasmtime-current', command: ['private argv']}]},
             automatic_validation: {controls: [{id: 'wasmtime-previous', executed: true, passed: false}]}},
           {id: 'rpc', title: 'gRPC', status: 'todo', scope_id: 'transport', depends: ['wasm']},
@@ -56,10 +57,14 @@ async function run() {
         };
         const mission = {supervision: {state: 'active'}, tasks: [{
           id: 'rpc', reason: 'Waiting for independent Wasmtime review'
+        }, {
+          id: 'wasm', result: {validation_label: 'Current verification'}
         }]};
         SwarmRustCockpitRead.render({work, mission});
         const get = selector => document.querySelector(selector);
         const role = value => get('[data-orchestration-role="' + value + '"]');
+        const initialGraph = !get('#graph-studio').hidden && get('#conduite-team-validation').hidden;
+        get('#conduite-show-team').click();
         const root = role('root');
         const roleIcons = ['root', 'subplanner', 'reviewer'].map(value => {
           const icon = role(value).querySelector('.orchestration-role-icon');
@@ -88,6 +93,10 @@ async function run() {
           return [start.x, start.y, end.x, end.y].every((value, i) => Math.abs(value - expected[i]) < 1);
         };
         const snapshot = {
+          initialGraph,
+          teamOnly: get('#graph-studio').hidden && !get('#conduite-team-validation').hidden,
+          recordedReview: get('[data-orchestration-review]').textContent,
+          currentValidation: get('[data-orchestration-validation]').textContent,
           roleIcons,
           bandCount: document.querySelectorAll('[data-graph-branch]').length,
           lrConnected: connectsCards(false),
@@ -103,17 +112,21 @@ async function run() {
           width: get('.native-graph-orchestration').getBoundingClientRect().right,
           viewport: innerWidth
         };
+        get('#conduite-show-graph').click();
         const orientation = get('#pilot-orientation');
         orientation.value = 'TB';
         orientation.dispatchEvent(new Event('change', {bubbles: true}));
         snapshot.tbConnected = connectsCards(true);
         snapshot.orientedDriver = role('driver').textContent;
         snapshot.orientedReason = get('.graph-task-open[data-task="rpc"]').getAttribute('aria-label');
+        get('#conduite-show-team').click();
         get('[data-orchestration-tree]').open = false;
         SwarmRustCockpitRead.render({work, mission, readMode: 'history'});
         snapshot.historyDriver = role('driver').textContent;
         snapshot.historyReason = get('.graph-task-open[data-task="rpc"]').getAttribute('aria-label');
         snapshot.retainedDisclosure = !get('[data-orchestration-tree]').open;
+        snapshot.retainedTab = !get('#conduite-team-validation').hidden;
+        snapshot.historyHasCurrentResult = !!get('[data-orchestration-validation]');
         const malformed = structuredClone(work);
         malformed.planning.scopes[0].parent = 'missing';
         SwarmRustCockpitRead.render({work: malformed, mission});
@@ -130,6 +143,7 @@ async function run() {
         SwarmRustCockpitRead.render({work: {id: 'new-work', title: 'Empty work', tasks: []}, mission: {
           organization: {root_scope: 'root', ready: false}, supervision: {state: 'absent'}
         }});
+        get('#conduite-show-team').click();
         snapshot.newWork = {
           root: role('root')?.dataset.scope, name: role('root')?.textContent,
           reviewer: role('reviewer')?.textContent, visible: !!role('root')?.getClientRects().length,
@@ -140,6 +154,10 @@ async function run() {
         return snapshot;
       }, {lang, theme});
       assert.deepEqual(result.branches, ['transport', 'validation']);
+      assert(result.initialGraph && result.teamOnly && result.retainedTab);
+      assert(!result.historyHasCurrentResult);
+      assert.match(result.recordedReview, /changes_requested/);
+      assert.equal(result.currentValidation, 'Current verification');
       assert.deepEqual(result.roleIcons.map(icon => icon?.glyph), ['"◆"', '"↳"', '"✓"']);
       assert.equal(new Set(result.roleIcons.map(icon => icon.background)).size, 3);
       assert.equal(new Set(result.roleIcons.map(icon => icon.labelBackground)).size, 3);
@@ -194,6 +212,10 @@ async function run() {
         assert.match(result.controlReceipt, /Échec enregistré/);
       }
       console.log('PASS orchestration graph', lang, theme, width);
+      await page.focus('#conduite-show-graph');
+      await page.keyboard.press('Enter');
+      assert.equal(await page.$eval('#conduite-show-graph', button => button.getAttribute('aria-pressed')), 'true');
+      assert(await page.$eval('#conduite-team-validation', panel => panel.hidden));
     }
     assert.deepEqual(errors, []);
   } finally {

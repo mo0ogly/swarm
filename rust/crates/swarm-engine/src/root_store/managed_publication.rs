@@ -174,20 +174,27 @@ impl RootStore {
     /// causes. No provider, debit, new checkpoint, Work or Git ref mutation occurs.
     pub fn preview_managed_publication(&self, work: &str, raw: &[u8]) -> Result<ManagedPublicationPreview, E> {
         let request = task_validation::decode(raw).map_err(|e| E::Launch(Box::new(e)))?;
-        let before = observe(self, work, &request, None)?;
+        self.observe_managed_publication(work, &request)
+    }
+
+    /// Read the same current candidate and original opinion used by public preview.
+    /// The request is already decoded or constructed internally from current Work.
+    /// Errors retain their causes and close the pinned candidate. No write admission.
+    pub(super) fn observe_managed_publication(&self, work: &str, request: &task_validation::Request) -> Result<ManagedPublicationPreview, E> {
+        let before = observe(self, work, request, None)?;
         let candidate = task_validation::acquire_claimed_review_candidate(
-            self, work, &request, Some(&before.review))?
+            self, work, request, Some(&before.review))?
             .ok_or(E::Refused("publication-preview-candidate-required"))?;
         let result = (|| {
             candidate.refresh(self)?;
-            let checked = observe(self, work, &request, Some(&candidate))?;
+            let checked = observe(self, work, request, Some(&candidate))?;
             if checked.settings_sha256 != before.settings_sha256 || checked.work != before.work {
                 return Err(E::Refused("publication-preview-inputs-changed"));
             }
             candidate.refresh(self)?;
             // Final canonical/material read after outside-lock Git observations;
             // no matching digest is a future source lease or permission.
-            let after = observe(self, work, &request, Some(&candidate))?;
+            let after = observe(self, work, request, Some(&candidate))?;
             if after.work != checked.work || after.settings_sha256 != checked.settings_sha256 {
                 return Err(E::Refused("publication-preview-inputs-changed"));
             }
@@ -195,7 +202,7 @@ impl RootStore {
             if checked.review.state != "passed" { blockers.push("managed-passed-opinion-required"); }
             Ok(ManagedPublicationPreview { schema_version: 1, work_id: work.into(),
                 work_revision: checked.work.revision, settings_revision: checked.settings_revision,
-                task_id: request.task_id, review_id: checked.review.id,
+                task_id: request.task_id.clone(), review_id: checked.review.id,
                 opinion_state: checked.review.state, candidate_commit: candidate.candidate().commit.clone(),
                 previous_candidate: candidate.candidate().previous.clone(),
                 candidate_binding_sha256: candidate.candidate().binding_digest().map_err(|e| E::Launch(Box::new(e)))?,

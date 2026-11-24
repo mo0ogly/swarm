@@ -774,12 +774,42 @@
     // reads as checkboxes; the plain swatches remain only if the workbench is absent.
     const keyBadge=globalThis.SwarmWorkbench?.statusBadge;for(const [tone,label,state]of [['attente','à faire','todo'],['active','en cours','running'],['attention','à vérifier','submitted'],['alerte','bloquée','blocked'],['validee','acceptée','accepted']]){if(keyBadge){legend.append(keyBadge(state,state));continue}const item=document.createElement('span');item.className='graph-teinte';item.dataset.etat=tone;item.textContent=t(label);legend.append(item)}
     const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez un cadre pour le déplacer. Cliquez pour ouvrir la tâche ; cliquez sur une flèche pour modifier le lien.');
-    studio.append(orchestration,toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,canvas);host.replaceChildren(studio,modal,help);
+    studio.append(toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,canvas);
+    orchestration.id = 'conduite-team-validation';
+    const views = document.createElement('div');
+    views.className = 'pilot-actions conduite-view-switch';
+    views.setAttribute('role', 'group');
+    views.setAttribute('aria-label', t('Vues de Conduite'));
+    const graphView = document.createElement('button');
+    const teamView = document.createElement('button');
+    graphView.type = teamView.type = 'button';
+    graphView.id = 'conduite-show-graph';
+    teamView.id = 'conduite-show-team';
+    graphView.textContent = t('Graphe des tâches');
+    teamView.textContent = t('Équipe et validation');
+    graphView.setAttribute('aria-controls', studio.id);
+    teamView.setAttribute('aria-controls', orchestration.id);
+    views.append(graphView, teamView);
+    let teamSelected = false;
+    /** Switch presentation in this Work only. No request or saved policy changes.
+     * Restoring the graph reapplies its viewport after it has a visible size. */
+    function showTeam(selected) {
+      teamSelected = selected;
+      studio.hidden = selected;
+      orchestration.hidden = !selected;
+      graphView.setAttribute('aria-pressed', String(!selected));
+      teamView.setAttribute('aria-pressed', String(selected));
+      if (!selected) host.graphRestoreView?.();
+    }
+    graphView.addEventListener('click', () => showTeam(false));
+    teamView.addEventListener('click', () => showTeam(true));
+    host.replaceChildren(views,studio,orchestration,modal,help);
+    showTeam(initial?.teamSelected === true);
     /** Capture completed same-Work presentation, including deferred modal/scroll.
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
      */
-    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
+    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),teamSelected,fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
     host.graphView=captureView;
     /** Restore after rerender, or after an editor closes. Never open a graph
      * modal above a task editor; scroll is retained until its geometry is ready.
@@ -789,11 +819,11 @@
   }
 
   /**
-   * Describe configured controls and the separately stored validation receipt.
+   * Describe recorded checks and review beside the current result, when supplied.
    * An older receipt may refer to a different policy. Only named control IDs and
-   * recorded verdicts are shown. This does not evaluate candidate freshness.
+   * recorded verdicts are shown. This renderer does not evaluate freshness.
    */
-  function taskControlSummary(task) {
+  function taskControlSummary(task, result) {
     const summary = document.createDocumentFragment();
     const policy = task.validation_policy?.controls;
     if (Array.isArray(policy) && policy.length) {
@@ -814,6 +844,20 @@
       });
       recorded.textContent = t('Reçu des contrôles') + ' · ' + verdicts.join(' · ');
       summary.append(recorded);
+    }
+    const reviewState = task.independent_review?.state;
+    if (reviewState) {
+      const review = document.createElement('p');
+      review.dataset.orchestrationReview = '';
+      review.textContent = t('Avis indépendant enregistré') + ' · ' +
+        (globalThis.SwarmI18n?.engine?.(reviewState) ?? reviewState);
+      summary.append(review);
+    }
+    if (result?.validation_label) {
+      const validation = document.createElement('p');
+      validation.dataset.orchestrationValidation = '';
+      validation.textContent = globalThis.SwarmI18n?.engine?.(result.validation_label) ?? result.validation_label;
+      summary.append(validation);
     }
     return summary;
   }
@@ -863,10 +907,14 @@
     panel.append(heading, conductor);
 
     const reasons = new Map();
+    const results = new Map();
     if (readMode !== 'history' && Array.isArray(mission?.tasks)) {
       for (const task of mission.tasks) {
-        if (typeof task?.id !== 'string' || typeof task.reason !== 'string' || !task.reason) continue;
-        reasons.set(task.id, globalThis.SwarmI18n?.engine?.(task.reason) ?? task.reason);
+        if (typeof task?.id !== 'string') continue;
+        if (task.result) results.set(task.id, task.result);
+        if (typeof task.reason === 'string' && task.reason) {
+          reasons.set(task.id, globalThis.SwarmI18n?.engine?.(task.reason) ?? task.reason);
+        }
       }
     }
     const assignments = new Set();
@@ -932,7 +980,7 @@
               explanation.textContent = ' — ' + reasons.get(task.id);
               entry.append(explanation);
             }
-            entry.append(taskControlSummary(task));
+            entry.append(taskControlSummary(task, results.get(task.id)));
             members.append(entry);
           }
           details.append(summary, members);
