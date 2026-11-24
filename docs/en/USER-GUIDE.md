@@ -263,6 +263,15 @@ In the session, read timestamps, event types and messages. Received output shows
 observable activity, not the model's private reasoning. Detailed capture is
 optional; without it, not all raw provider output is retained.
 
+### Follow status updates between orchestrators
+
+In **Dispatch → Team and validation**, open **Status updates** with Logs access.
+**Sent** records the entry into the recipient’s inbox. **Received in context**
+identifies the recorded activation containing the signal. **Processed** links
+to an applied decision that cites it. Open **Show evidence** for references.
+A decision may acknowledge the signal without an operation. Reading has no
+execution effect.
+
 ### Open a task's action file
 
 In **Dispatch**, **Actions** on the card opens the task plan, attempts, and

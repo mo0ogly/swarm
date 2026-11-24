@@ -181,6 +181,71 @@
     }
   }
 
+  const SIGNAL_LABELS = {
+    scope_closed:'Périmètre clôturé',
+    scope_authority_refused:'Arbitrage demandé',
+    attempt_ended:'Fin de tentative',
+    handoff:'Rapport remis',
+  };
+
+  /** Show one read-only timeline. A prepared context and an applied decision
+   * have separate evidence. Closing cancels the outstanding observation.
+   */
+  async function showOrchestrationSignals(work, opener) {
+    const {dialog, body} = actionsDialog('native-orchestration-signals-title', t('Remontées de statut'), opener);
+    const status = document.createElement('p');
+    status.setAttribute('role', 'status');
+    status.textContent = t('Chargement…');
+    body.append(status);
+    const controller = new AbortController();
+    dialog.addEventListener('close', () => controller.abort(), {once:true});
+    try {
+      const response = await fetch('/api/v1/agent-logs/orchestration-signals?' + new URLSearchParams({work:work.id}), {
+        credentials:'same-origin', headers:{Accept:'application/json'}, signal:controller.signal
+      });
+      const value = await response.json();
+      if (!response.ok) {
+        const code = value?.failure?.code ?? value?.error;
+        throw new Error(typeof code === 'string' && /^[a-z0-9_.-]+$/.test(code) ? code : 'orchestration-signals-refused');
+      }
+      if (value?.schema_version !== 1 || value.work !== work.id || !Array.isArray(value.signals)) {
+        throw new Error('orchestration-signals-invalid');
+      }
+      if (controller.signal.aborted || !dialog.open) return;
+      status.remove();
+      journalField(body, 'Révision', value.revision);
+      if (value.signals.length === 0) journalNote(body, 'Aucune remontée enregistrée.');
+      for (const event of value.signals) {
+        const section = document.createElement('section');
+        section.className = 'orchestration-signal';
+        const heading = document.createElement('h3');
+        const label = Object.hasOwn(SIGNAL_LABELS, event.kind) ? SIGNAL_LABELS[event.kind] : 'Remontée';
+        heading.textContent = t(label) + ' · ' + (event.from || t('Source non établie')) + ' → ' + event.to;
+        section.append(heading);
+        journalField(section, 'Transmis', event.at);
+        journalField(section, 'Reçu dans le contexte', event.received?.at || t('Réception non établie'));
+        journalField(section, 'Traité', event.processed?.at || t('Décision non établie'));
+        const proof = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = t('Voir les preuves');
+        proof.append(summary);
+        journalField(proof, 'Événement', event.id);
+        journalField(proof, 'Message', event.message);
+        journalField(proof, 'Activation', event.received?.claim);
+        journalField(proof, 'Décision', event.processed?.decision);
+        journalField(proof, 'Motif', event.processed?.reason);
+        section.append(proof);
+        body.append(section);
+      }
+    } catch (cause) {
+      if (controller.signal.aborted || !dialog.open) return;
+      body.replaceChildren(status);
+      status.className = 'notice alert';
+      status.textContent = t('Remontées indisponibles.') + ' (' +
+        (cause instanceof Error && /^[a-z0-9_.-]+$/.test(cause.message) ? cause.message : 'orchestration-signals-read-failed') + ')';
+    }
+  }
+
   /** Copy only the editable definition of a recorded/staged task. Never copy
    * status, review, model, authority, instructions or consumption into a clone.
    */
@@ -1283,6 +1348,15 @@
       const missing = document.createElement('p');
       missing.textContent = t('Tâches sans rattachement affichable') + ' · ' + (work.tasks.length - assignments.size);
       tree.append(missing);
+    }
+    if (planning) {
+      const signals = document.createElement('button');
+      signals.type = 'button';
+      signals.id = 'conduite-status-signals';
+      signals.textContent = t('Remontées de statut');
+      signals.setAttribute('aria-haspopup', 'dialog');
+      signals.addEventListener('click', () => showOrchestrationSignals(work, signals));
+      panel.append(signals);
     }
     panel.append(tree);
     return { panel, assignments, reasons, results };

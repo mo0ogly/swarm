@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite : la vue Équipe et validation rapproche les remontées transmises, reçues dans un contexte et traitées par une décision.",
+        "en": "Dispatch: Team and validation links sent updates, receipt in planning context, and the applied decision."
+      },
+      {
         "fr": "Conduite : ouvrez et téléchargez le fichier d’actions d’une tâche. La vue présente son plan, les résultats d’outils observés, les ajustements enregistrés et l’attente de revue humaine, selon les droits de lecture des Journaux.",
         "en": "Dispatch: open and download a task’s action file. The view shows the plan, observed tool outcomes, recorded adjustments, and pending human review, subject to Logs access."
       },

@@ -1,5 +1,16 @@
 # Recettes permanentes / Permanent verification recipes
 
+**Remontées de statut** — `recipes/orchestration-signals.json` utilise le
+binaire Rust de livraison indiqué par `SWARM_SIGNALS_BINARY`. Elle suit
+l’escalade native d’un sous-orchestrateur, la décision du parent et l’affichage
+protégé du même événement. Fournisseur inerte, Root et preuves isolés.
+
+**Status updates** — `recipes/orchestration-signals.json` takes a delivered
+Rust binary in `SWARM_SIGNALS_BINARY`. It follows native child escalation,
+the parent decision, and the protected display of that same event. It uses
+an inert provider and isolated Root and evidence.
+
+
 **Fichier d’actions** — `recipes/task-actions.json` prend un Swarm Rust livré
 dans `SWARM_ACTIONS_BINARY`. Elle vérifie la lecture avant tentative, le relevé
 pendant l’appel, le reçu terminal, les modales et le fichier effectivement
