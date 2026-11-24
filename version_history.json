@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Un worker manuel en dépôt géré peut revalider un prévol expiré sur la même tentative. La rétention de son rapport prépare les preuves pour la soumission opérateur.",
+        "en": "A manual worker in a managed repository can revalidate an expired preflight on the same attempt. Retaining its report prepares the evidence for operator submission."
+      },
+      {
         "fr": "Conducteur : le bail peut se renouveler après une contention SQLite transitoire sous la politique enregistrée. Un bail retiré, remplacé ou expiré reste refusé.",
         "en": "Conductor: the lease can renew after transient SQLite contention under the saved policy. A retired, replaced or expired lease remains refused."
       },

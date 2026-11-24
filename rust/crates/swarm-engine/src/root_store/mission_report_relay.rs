@@ -119,6 +119,71 @@ impl MutationFence for RelayFence<'_> {
     }
 }
 impl RootStore {
+    /// Retain the current completed manual worker's managed report at the
+    /// requested Work revision. Resolve the producer from the last recorded
+    /// attempt and verify terminal and permission-time provenance. Git custody
+    /// runs after the SQL observation closes. The caller still submits the
+    /// returned path and digest through `task submit`, which rechecks them.
+    /// Retention may survive an error or revision change. No Work mutation,
+    /// provider launch, validation or acceptance occurs here.
+    pub fn retain_manual_managed_handoff(&self, work_id: &str, raw: &[u8]) -> Result<serde_json::Value, E> {
+        if !self.writable { return Err(E::Refused("root-read-only")); }
+        let request = super::task_validation::decode(raw).map_err(|e| E::Launch(Box::new(e)))?;
+        super::material_path::with_material_operation(self, || {
+            let settings = self.read_settings()?;
+            let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
+            let observation = (|| {
+                super::mission_controls::require_planning_mission_active(&tx, work_id)
+                    .map_err(|e| caused("managed-manual-handoff-mission", e))?;
+                let work = crate::read_recorded_work(&tx, work_id).map_err(E::Work)?;
+                if work.revision != request.expected_revision {
+                    return Err(E::Refused("managed-manual-handoff-revision-conflict"));
+                }
+                if !work.planning.as_deref().is_some_and(|p| p.repository.is_some()) {
+                    return Err(E::Refused("managed-manual-handoff-repository-required"));
+                }
+                let task = work.tasks.iter().flatten().find(|task| task.id == request.task_id)
+                    .ok_or(E::Refused("mission-report-task-missing"))?;
+                if task.status != "blocked" {
+                    return Err(E::Refused("managed-manual-handoff-completed-task-required"));
+                }
+                let attempt = task.attempts.iter().flatten().last()
+                    .ok_or(E::Refused("task-report-completed-attempt-required"))?;
+                let agents = crate::list_agents(&tx, work_id).map_err(E::Agent)?;
+                let mut matches = agents.iter().filter(|a| a.task_id == task.id && a.attempt_id == attempt.id);
+                let agent = matches.next().ok_or(E::Refused("managed-manual-handoff-worker-required"))?;
+                if matches.next().is_some() || agent.origin != "operateur" || agent.native_mission.is_some() {
+                    return Err(E::Refused("managed-manual-handoff-worker-invalid"));
+                }
+                let agent = crate::task_report::completed_producer(&tx, work_id, task, &agent.id)
+                    .map_err(|e| E::Launch(Box::new(e)))?;
+                super::agent_execution_origin::require(&tx, &self.directory, &agent.id)
+                    .map_err(|e| E::Launch(Box::new(e)))?;
+                let completion = crate::agent_completion_journal::observe_terminal(&tx, &self.directory, &agent.id)?;
+                if completion.agent != agent {
+                    return Err(E::Refused("native-worker-completion-changed"));
+                }
+                crate::managed_repository::verify_worker(&self.root, &tx, &work, &agent, &settings,
+                    crate::managed_repository::WorkerCheck::Observe).map_err(|e| E::Launch(Box::new(e)))?;
+                Ok((work, agent, settings))
+            })();
+            let (work, agent, settings) = finished(observation, tx.rollback().map_err(E::Sql))?;
+            let binding = self.bind_root()?;
+            let retained = (|| {
+                super::material_path::verify_material_path(self, &binding)?;
+                let retained = crate::managed_repository::retain_bound_result(&self.directory, &work, &agent, &settings)
+                    .map_err(|e| E::Launch(Box::new(e)))?.map_err(E::Refused)?;
+                if self.read_work(work_id)? != work {
+                    return Err(E::Refused("managed-manual-handoff-revision-conflict"));
+                }
+                Ok(serde_json::json!({"schema_version":1,"work_id":work_id,"task_id":request.task_id,
+                    "agent_id":agent.id,"attempt_id":agent.attempt_id,"revision":work.revision,
+                    "report_path":retained.report_path,"report_sha256":retained.report_sha256}))
+            })();
+            finished(retained, binding.close())
+        })
+    }
+
     /// Submit one real current worker report under the owning mission lease.
     /// The caller supplies only the retained Agent ID; the engine discovers the
     /// report and rechecks lease/consent/original producer/receipt/settings/bytes

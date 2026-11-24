@@ -1,5 +1,23 @@
 # Native worker completion and retry
 
+During manual startup of a managed worker, `agent run` can refresh an expired
+preflight by observing the route, command, workspace and environment under the
+current policy. The scope must match the retained admission. Every startup
+boundary rechecks the attempt, reservation, workspace copy evidence and process
+identities. Refresh preserves the original, the attempt and the reservation.
+The applicable guard still refuses drift, cancellation or an already-owned
+intent. Other paths retain their existing preflight selection.
+
+`task retain-handoff WORK --root ROOT --input FILE --json` retains a completed
+manual managed worker's report. The JSON document contains `schema_version: 1`,
+`event_id`, `expected_revision` and `task_id`. The engine resolves the producer
+and latest attempt, checks terminal and workspace provenance, and retains the
+report bytes and Git reference. Pass the returned producer, relative path and
+SHA-256 to `task submit`. Retention keeps the task status unchanged. Managed
+storage is opened from the owned Root descriptor and its association to the
+datastore is rechecked before returning the receipt. An error
+after retention may leave evidence present. Read back the revision before submitting.
+
 Linux implementation verified on isolated native fixtures in migration lot169. The existing terminal completion journal is a private local trust boundary, not cryptographic actor identity or hostile same-UID writer protection. A dead/missing PID, expired lease or end-event message is never enough to authorize retry.
 
 The readonly observer shares the existing recovery terminal Agent/reservation projection; it does not call recovery, write state or refund an attempt. It checks the original Root identity, full terminal row, normalized ownership, native snapshot/context, recorded kernel reap, workspace release and explicit gate/output disposition. Unknown wait/release or unresolved/draining execution refuses. Known logical output failure can be described for correction, never quality acceptance. A known helper refusal is distinguished from possible provider start; no provider execution is guessed.
