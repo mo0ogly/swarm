@@ -29,6 +29,7 @@
     "web/lib/dagre.min.js",
     "web/pilotage.css",
     "web/swarm-design.css",
+    "web/swarm-workbench.js",
     "web/wattson_themes.css"
   ],
   "environment": {},

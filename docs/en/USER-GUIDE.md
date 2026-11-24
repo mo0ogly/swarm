@@ -300,9 +300,13 @@ On narrow screens in fullscreen, open **Graph gestures** for shortcuts.
 **Task graph** shows dependencies, task states and graph controls. Role cards
 show the principal orchestrator in blue ◆, sub-orchestrators in amber ↳ and the
 configured independent reviewer in green ✓. The legend distinguishes prerequisites,
-delegation, assignment and configured review. Gray assignment arrows connect
-orchestrators to their tasks on opening. **Show assignments** lets you select a
-scope or hide the assignment links. The graph header identifies a recorded
+delegation, assignment and configured review. An organized plan opens on the orchestrators.
+Activate a card to open its scope, or use **Show all agents and tasks** for the
+full view. Gray assignment arrows connect each orchestrator to the visible
+tasks. Task cards identify the observed agent when supplied by the engine.
+**Back to orchestrators** restores the initial view. The **⠿** drag handle at the
+top right moves the card with the pointer or arrow keys. Color dots accompany
+status labels, and the moving outline follows confirmed execution. The graph header identifies a recorded
 hierarchy when sub-orchestrators report to the principal orchestrator. It also
 shows the engine recommendation and its approval status.
 **Locate a dependency** centers

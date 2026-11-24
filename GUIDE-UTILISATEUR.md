@@ -300,9 +300,14 @@ filtres et sélection ne changent pas la révision métier.
   et les commandes du graphe. Les cartes de rôles y montrent l’orchestrateur
   principal en bleu ◆, les sous-orchestrateurs en ambre ↳ et le validateur
   indépendant configuré en vert ✓. La légende distingue dépendance, délégation,
-  affectation et revue configurée. Les flèches grises relient les orchestrateurs
-  à leurs tâches dès l’ouverture. **Voir les affectations** permet de choisir
-  un périmètre ou de masquer ces liens. L’en-tête indique l’organisation
+  affectation et revue configurée. Sur un plan organisé, le graphe s’ouvre sur les orchestrateurs.
+  Activez une carte pour ouvrir son périmètre, ou **Afficher tous les agents et tâches**
+  pour la vue complète. Les flèches grises relient l’orchestrateur aux tâches
+  affichées. La carte de tâche indique l’agent observé quand le moteur le fournit.
+  **Remonter aux orchestrateurs** revient à la vue initiale. La poignée **⠿**
+  en haut à droite permet de déplacer une carte à la souris ou avec les flèches
+  du clavier. Les points colorés accompagnent les états. Le contour animé suit
+  l’exécution confirmée. L’en-tête indique l’organisation
   hiérarchique enregistrée quand des sous-orchestrateurs sont rattachés au
   principal. Il affiche aussi l’avis du moteur et son état de validation.
   **Localiser une dépendance** centre la vue

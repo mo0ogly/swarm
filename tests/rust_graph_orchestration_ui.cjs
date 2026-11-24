@@ -67,7 +67,7 @@ async function run() {
         }, {
           id: 'wasm', result: {state: 'stopped_early', process_state: 'interrupted', validation_label: 'Current verification'}
         }, {
-          id: 'independent-0', result: {state: 'in_progress', process_state: 'running'}
+          id: 'independent-0', attempt: {agent_id:'fixture-worker'}, result: {state: 'in_progress', process_state: 'running'}
         }, {
           id: 'independent-1', result: {state: 'execution_unconfirmed', process_state: 'unknown'}
         }, {
@@ -76,6 +76,25 @@ async function run() {
         SwarmRustCockpitRead.render({work, mission});
         const get = selector => document.querySelector(selector);
         const role = value => get('[data-orchestration-role="' + value + '"]');
+        const visible = selector => [...document.querySelectorAll(selector)]
+          .filter(node => getComputedStyle(node).display !== 'none');
+        const drill = {
+          initialRoles:visible('.graph-workflow-role').length,
+          initialTasks:visible('.graph-noeud').length,
+          initialReview:visible('[data-relation="review"]').length,
+          roleStatuses:visible('[data-workflow-scope] .graph-activity-mark').map(node => node.dataset.activity)
+        };
+        const transport = get('[data-workflow-scope="transport"]');
+        transport.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}));
+        drill.scopedTasks=visible('.graph-noeud').map(node=>node.dataset.task);
+        drill.scopedLinks=visible('[data-assigned-task]').map(node=>node.dataset.assignedTask);
+        get('#pilot-drill-up').click();
+        drill.returned=visible('.graph-noeud').length;
+        drill.focusRestored=document.activeElement===transport;
+        get('#pilot-drill-all').click();
+        drill.worker=get('.graph-noeud[data-task="independent-0"] [data-task-agent]').textContent;
+        drill.handle=get('.graph-noeud[data-task="rpc"] .graph-drag title').textContent;
+
         const activity = id => {
           const mark = get('.graph-noeud[data-task="' + id + '"] .graph-activity-mark');
           return mark ? [mark.dataset.activity, getComputedStyle(mark).fill, mark.nextElementSibling.textContent] : null;
@@ -243,9 +262,20 @@ async function run() {
           taskCount: document.querySelectorAll('.graph-noeud').length
         };
         snapshot.workflow = workflow;
+        snapshot.drill = drill;
         snapshot.requests = requests;
         return snapshot;
       }, {lang, theme});
+      assert.equal(result.drill.initialRoles,4);
+      assert.equal(result.drill.initialTasks,0);
+      assert.equal(result.drill.initialReview,0);
+      assert.deepEqual(result.drill.roleStatuses,Array(4).fill('paused'));
+      assert.deepEqual(result.drill.scopedTasks,['rpc']);
+      assert.deepEqual(result.drill.scopedLinks,['rpc']);
+      assert.equal(result.drill.returned,0);
+      assert.equal(result.drill.focusRestored,true);
+      assert.match(result.drill.worker,/fixture-worker/);
+      assert.equal(result.drill.handle,lang === 'fr' ? 'Poignée de déplacement' : 'Drag handle');
       assert.deepEqual(result.branches, ['transport', 'validation']);
       assert.deepEqual(result.currentActivity.map(item => item?.[0]), ['paused', 'stopped', 'running', 'unconfirmed']);
       assert.deepEqual(result.frameState.tasks, ['independent-0'], 'only the confirmed task has an activity frame');

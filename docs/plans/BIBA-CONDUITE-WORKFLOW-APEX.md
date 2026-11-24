@@ -67,3 +67,22 @@ périmètre. L’organisation enregistrée et l’avis du moteur apparaissent da
 le graphe. Le même résultat de lecture, lié à la révision du Work, alimente
 l’avis détaillé dans **Équipe et validation**. Cette projection ne modifie pas
 le plan et la validation demeure une action explicite dans cette vue détaillée.
+
+## Exploration progressive et états sur les cartes
+
+Le plan organisé s’ouvre sur les orchestrateurs et les délégations. Cliquer
+sur un orchestrateur ouvre ses tâches et les affectations associées. La vue
+complète ouvre les autres tâches et le validateur. Le retour restaure le focus
+sur l’orchestrateur d’origine. La vue repose sur les données du même graphe,
+contrairement à des diagrammes distincts qui auraient dupliqué la navigation et
+le placement. Le contrôle navigateur vérifie l’état initial, le périmètre
+demandé, la remontée, les points d’activité, l’agent observé et la poignée.
+Le crochet « Voir dans le graphe » révèle explicitement la tâche recherchée.
+
+```mermaid
+flowchart LR
+    H["Orchestrateurs et délégations"] -->|Ouvrir un périmètre| S["Orchestrateur, tâches et agents observés"]
+    H -->|Afficher tous les agents et tâches| A["Vue complète et validateur"]
+    S -->|Remonter| H
+    A -->|Remonter| H
+```
