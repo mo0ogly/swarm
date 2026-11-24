@@ -125,6 +125,8 @@ both purposes when its capabilities allow it.
 
 ## 3. Prepare a mission
 
+In the preparation conversation, open **Choose a workflow architecture** to [request or revisit an AI assessment](NATIVE-AGENT-EXCHANGES.md#audit-and-reassess-the-choice-with-ai). Review and send the draft. Plan adoption remains your decision.
+
 Choose **Prepare a project**. Describe the result, target directory, boundaries
 and success criteria. For example:
 

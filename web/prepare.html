@@ -22,7 +22,15 @@
 </div></details>
 <div id="chat-turns" aria-label="Conversation enregistrée" tabindex="0"></div>
 <p id="chat-status" class="notice info" role="status">Chargement de la conversation…</p>
-<form id="chat-form"><label for="chat-message">Votre message</label><textarea id="chat-message" rows="4" placeholder="Aide-moi à préciser le besoin et propose un brief…"></textarea><div class="chat-actions"><button id="chat-send" type="submit" class="primary">Envoyer</button><button id="chat-plan" type="button">Proposer le plan</button><button id="chat-stop" type="button" hidden>Arrêter la réponse</button><button id="chat-refresh" type="button">Actualiser</button></div><p id="chat-plan-status" class="hint"></p></form>
+<form id="chat-form"><details id="workflow-architecture" class="reading-fold">
+<summary>Choisir l’architecture du workflow</summary>
+<div class="fold-body">
+<p>Comparez une séquence de tâches aux dépendances stables avec une hiérarchie de périmètres à déléguer et à coordonner.</p>
+<p>Pour réévaluer l’avis, joignez les preuves nouvelles et incluez l’avis précédent dans la demande ou choisissez la conversation complète. Relisez le brouillon puis cliquez sur Envoyer. Vous gardez la décision d’adopter le plan.</p>
+<div class="chat-actions"><button id="workflow-assess" type="button">Préparer un avis IA</button><button id="workflow-reassess" type="button">Préparer une réévaluation IA</button></div>
+</div>
+</details>
+<label for="chat-message">Votre message</label><textarea id="chat-message" rows="4" placeholder="Aide-moi à préciser le besoin et propose un brief…"></textarea><div class="chat-actions"><button id="chat-send" type="submit" class="primary">Envoyer</button><button id="chat-plan" type="button">Proposer le plan</button><button id="chat-stop" type="button" hidden>Arrêter la réponse</button><button id="chat-refresh" type="button">Actualiser</button></div><p id="chat-plan-status" class="hint"></p></form>
 </section>
 <section class="prep-workspace" aria-labelledby="document-heading">
 <form id="create-form"><button id="template-open" type="button">Choisir un modèle de mission</button><p id="template-draft-status" class="hint" role="status"></p><h2>Quel résultat souhaitez-vous obtenir ?</h2><button type="button" class="context-help-button" data-context-help="need">Aide : rédiger le besoin</button><label for="new-title">Nom de la préparation</label><input id="new-title" maxlength="180" placeholder="Exemple : refonte de l’accueil"><label for="new-need">Votre besoin</label><textarea id="new-need" rows="8" placeholder="Je souhaite… Pour… Le résultat attendu est…"></textarea><p class="hint">Votre texte est enregistré dans ce projet. Aucun agent ne sera lancé.</p><button class="primary" id="create" type="submit">Enregistrer le besoin</button><button id="download-new" type="button">Télécharger mon brouillon</button></form>

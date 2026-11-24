@@ -146,6 +146,8 @@ peut servir aux deux si ses capacités le permettent.
 
 ## 3. Préparer une mission
 
+Dans la conversation de préparation, ouvrez **Choisir l’architecture du workflow** pour [demander un avis IA ou le réévaluer](docs/architecture/NATIVE-AGENT-EXCHANGES.md#auditer-et-réévaluer-le-choix-avec-lia). Relisez le brouillon et envoyez-le. Vous gardez la décision d’adoption.
+
 Depuis le cockpit, choisissez **Préparer un projet**.
 Décrivez le résultat attendu, le dossier concerné, les limites et la façon de
 vérifier la réussite. Exemple à adapter :

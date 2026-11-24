@@ -26,6 +26,28 @@ async function chooseLevel(page,level){const options=await page.$eval('#chat-lev
   const replayBodies=[];
   if(label==='fr-etat'){await page.setRequestInterception(true);let corrupt=true;page.on('request',async request=>{if(new URL(request.url()).pathname==='/api/v1/preparations/send'){replayBodies.push(request.postData());if(corrupt){corrupt=false;try{const upstream=await new Promise((resolve,reject)=>{const call=http.request(cfg.base+'/api/v1/preparations/send',{method:'POST',headers:{'Cookie':cfg.cookie,'Origin':cfg.base,'Content-Type':'application/json','X-Swarm-CSRF':request.headers()['x-swarm-csrf']}},response=>{const chunks=[];response.on('data',c=>chunks.push(c));response.on('end',()=>{if(response.statusCode===200)forwardedId=JSON.parse(Buffer.concat(chunks)).id;resolve(response.statusCode);});});call.on('error',reject);call.end(request.postData());});assert.equal(upstream,200);await request.respond({status:200,contentType:'application/json',body:'{}'});return;}catch(error){errors.push('owned-forward-failed');await request.abort();return;}}}await request.continue();});}
   await page.type('#chat-message','Browser '+label);
+  const postsBeforeAssessment=requests.length;
+  await page.click('#help');
+  check(label+'-workflow-help-visible',await page.$eval('#help-dialog[open]',(e,lang)=>
+    e.textContent.includes(lang==='fr'?'Choisir l’architecture du workflow':'Choose a workflow architecture'),lang));
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(()=>!document.querySelector('#help-dialog').open&&document.activeElement.id==='help');
+  check(label+'-workflow-help-restores-focus',true);
+  await page.click('#workflow-architecture > summary');
+  await page.click('#workflow-assess');
+  const initial=await page.$eval('#chat-message',e=>e.value);
+  check(label+'-workflow-assessment-draft',initial.startsWith('Browser '+label)&&
+    initial.includes(lang==='fr'?'preuves insuffisantes':'insufficient evidence'));
+  if(theme==='sombre'){
+    await page.click('#workflow-reassess');
+    const updated=await page.$eval('#chat-message',e=>e.value);
+    check(label+'-workflow-reassessment-draft',updated.startsWith(initial)&&
+      updated.includes(lang==='fr'?'preuves qui ont changé':'evidence that changed'));
+    await page.click('#workflow-reassess');
+    check(label+'-workflow-reassessment-no-duplicate',await page.$eval('#chat-message',e=>e.value)===updated);
+  }
+  check(label+'-workflow-draft-does-not-send',requests.length===postsBeforeAssessment);
+
   if(label==='fr-etat'){const malformed=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/preparations/send');await page.click('#chat-send');await malformed;await page.waitForFunction(()=>!document.querySelector('#chat-send').disabled);check('malformed-send-keeps-pending-intent',await page.$eval('#chat-send',e=>e.textContent==='Vérifier l’envoi'));}
   if(cfg.explicit_level&&label==='fr-etat'){
    await page.waitForFunction(async({id,preparation})=>{const rows=await(await fetch('/api/v1/preparations/dialogue?id='+encodeURIComponent(preparation))).json();return rows.some(t=>t.id===id&&t.status==='answered');},{},{id:forwardedId,preparation:cfg.preparation.id});
@@ -35,6 +57,9 @@ async function chooseLevel(page,level){const options=await page.$eval('#chat-lev
    check('pending-replay-survives-capability-withdrawal',await page.$eval('#chat-level',e=>e.disabled));
   }
   const sent=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/preparations/send');await page.click('#chat-send');const response=await sent,turn=await response.json();check(label+'-explicit-send-recorded',response.status()===200&&['pending','running','answered'].includes(turn.status));
+  const submitted=JSON.parse(response.request().postData()).message;
+  check(label+'-workflow-draft-reaches-service',submitted.startsWith(initial)&&
+    (theme!=='sombre'||submitted.includes(lang==='fr'?'l’ancien choix':'the previous choice')));
   if(label==='fr-etat')check('malformed-send-replays-exact-event',replayBodies.length===2&&replayBodies[0]===replayBodies[1]);
   if(cfg.explicit_level){check(label+'-explicit-model-route-returned',turn.model_route?.level===cfg.explicit_level);}
   if(cfg.explicit_level&&label==='fr-etat'){
