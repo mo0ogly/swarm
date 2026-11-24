@@ -266,7 +266,8 @@ optional; without it, not all raw provider output is retained.
 ### Open a task's action file
 
 In **Dispatch**, **Actions** on the card opens the task plan, attempts, and
-recorded adjustments. Select an action to see its category and observed
+recorded adjustments. The starting instruction stays visible when submission
+changes the next step. Select an action to see its category and observed
 outcome. **Download JSON file** exports the same read. The file displays
 **Awaiting your human review** when the task is submitted under a human
 validation policy.

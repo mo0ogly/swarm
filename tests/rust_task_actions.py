@@ -124,6 +124,9 @@ def main():
         submitted=read()
         assert submitted['status']=='submitted' and submitted['review']['awaiting_human']
         assert submitted['attempts']==observed['attempts']
+        assert submitted['plan']['planned_next']=='Check result and adjust if needed'
+        assert any(item['instruction']=='Check result and adjust if needed'
+                   for item in submitted['adjustments']['decisions'])
         assert read()==submitted and owned.ok(['work','show',owned.work])['work']['revision']==submitted['revision']
         print('PASS human gate waits after actual native handoff and HTTP is read only',flush=True)
         if args.browser:

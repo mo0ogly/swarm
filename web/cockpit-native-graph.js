@@ -57,6 +57,13 @@
     parent.append(line);
   }
 
+  /** Append a notice whose label is the complete translated text. */
+  function journalNote(parent, label) {
+    const line = document.createElement('p');
+    line.textContent = t(label);
+    parent.append(line);
+  }
+
   /** Show the attributed, provider-declared details of one recorded action.
    * The modal does not run or repeat actions and issues no request.
    */
@@ -120,23 +127,24 @@
       journalField(body, 'Livrable', file.plan.deliverable);
       journalField(body, 'Critères', file.plan.criteria.join(' · '));
       journalField(body, 'Prérequis', file.plan.depends.join(' · '));
+      journalField(body, 'Instruction de départ enregistrée', file.plan.planned_next);
       journalField(body, 'Prochaine action', file.plan.next);
       for (const [key, label] of [['entry', 'Condition de départ'], ['proof', 'Preuve'], ['validation', 'Validation'], ['stop', 'Condition d’arrêt']]) {
         journalField(body, label, file.plan.approved?.step?.[key]);
       }
       section('Actions exécutées');
-      if (file.attempts.length === 0) journalField(body, 'Aucune tentative enregistrée.');
+      if (file.attempts.length === 0) journalNote(body, 'Aucune tentative enregistrée.');
       for (const attempt of file.attempts) {
         const group = document.createElement('section');
         journalField(group, 'Tentative', attempt.id);
-        if (attempt.source === 'last_heartbeat') journalField(group, 'Dernier relevé enregistré.');
+        if (attempt.source === 'last_heartbeat') journalNote(group, 'Dernier relevé enregistré.');
         if (attempt.observation == null) {
-          journalField(group, 'Détail des actions indisponible pour cette tentative.');
+          journalNote(group, 'Détail des actions indisponible pour cette tentative.');
         } else {
           if (attempt.observation.partial || attempt.output_complete === false) {
-            journalField(group, 'Observations partielles.');
+            journalNote(group, 'Observations partielles.');
           }
-          if (attempt.observation.actions.length === 0) journalField(group, 'Aucune action d’outil observée.');
+          if (attempt.observation.actions.length === 0) journalNote(group, 'Aucune action d’outil observée.');
           const list = document.createElement('ul');
           for (const action of attempt.observation.actions) {
             const row = document.createElement('li');
@@ -155,11 +163,13 @@
       section('Ajustements');
       const changes = [...file.adjustments.instructions, ...file.adjustments.restarts,
         ...(file.adjustments.decisions ?? [])];
-      if (changes.length === 0) journalField(body, 'Aucun ajustement enregistré.');
+      if (changes.length === 0) journalNote(body, 'Aucun ajustement enregistré.');
       for (const change of changes) {
         journalField(body, 'Date', change.at);
         journalField(body, 'Motif', change.reason);
         journalField(body, 'Consigne', change.instruction);
+        const state = {applied:'Appliquée', rejected:'Rejetée'}[change.state];
+        if (state) journalField(body, 'État', t(state));
         journalField(body, 'Tentative', change.attempt);
       }
     } catch (cause) {

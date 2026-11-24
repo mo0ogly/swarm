@@ -12,7 +12,7 @@ struct ExecutionReceipt {
 
 /// Current task contract and the original approved task entry, when mapped.
 /// Only this task's plan entry is exposed. The result is plain JSON data.
-fn plan(work: &Work, task: &Task) -> Value {
+fn plan(work: &Work, task: &Task, planned_next: Option<&str>) -> Value {
     let approved = work.plans.iter().flatten().rev().find_map(|plan| {
         let (original, _) = plan
             .task_map
@@ -34,37 +34,75 @@ fn plan(work: &Work, task: &Task) -> Value {
         "criteria": task.criteria.as_deref().unwrap_or_default(),
         "depends": task.depends.as_deref().unwrap_or_default(),
         "next": task.next,
+        "planned_next": planned_next,
         "approved": approved
     })
 }
 
-/// Replays the history already recorded for this task. The operation's
-/// explanation belongs to this task; the enclosing decision may span others.
-#[cfg(target_os = "linux")]
-fn revisions(db: &rusqlite::Connection, work: &str, task: &str) -> Result<Vec<Value>, E> {
-    let mut result = Vec::new();
+#[derive(Deserialize)]
+struct TaskEdit {
+    id: Option<String>,
+    status: Option<String>,
+    next: Option<String>,
+}
+
+#[derive(Default)]
+struct History {
+    planned_next: Option<String>,
+    adjustments: Vec<Value>,
+}
+
+/// Recover task instructions in Work revision order. A status transition may
+/// replace the current next step but cannot rewrite the recorded plan. Planning
+/// retries and task edits keep per-task text only. Corrupt payloads stay errors.
+fn history(db: &rusqlite::Connection, work: &str, task: &str) -> Result<History, E> {
+    let mut history = History::default();
     for event in crate::list_recorded_events(db, work).map_err(E::Events)? {
-        if event.kind != b"planning.decide" {
-            continue;
-        }
-        let decision =
-            super::planning_history::payload(event.payload.as_deref().unwrap_or_default())
-                .map_err(|cause| E::PlanningHistory(Box::new(cause)))?;
-        for op in decision
-            .operations
-            .into_iter()
-            .flatten()
-            .filter(|op| op.id == task)
-        {
-            if matches!(op.kind.as_str(), "retry" | "review-retry") {
-                result.push(json!({
-                    "at": crate::text::go_utf8(&event.at),
-                    "kind": op.kind, "instruction": op.next
+        let raw = event.payload.as_deref().unwrap_or_default();
+        if matches!(event.kind.as_slice(), b"task.add" | b"task.update") {
+            let text = crate::text::go_utf8(raw);
+            let edit: TaskEdit = serde_json::from_str(&text).map_err(|cause| {
+                E::Launch(Box::new(AgentLaunchError::caused(
+                    "task-actions-edit-invalid",
+                    cause,
+                )))
+            })?;
+            if edit.id.as_deref() != Some(task) {
+                continue;
+            }
+            let Some(next) = edit.next.filter(|value| !value.is_empty()) else {
+                continue;
+            };
+            if edit.status.as_deref().is_none_or(str::is_empty) {
+                history.planned_next = Some(next.clone());
+            }
+            if event.kind == b"task.update" {
+                history.adjustments.push(json!({
+                    "at": crate::text::go_utf8(&event.at), "kind": "task_update", "instruction": next
                 }));
             }
         }
+        #[cfg(target_os = "linux")]
+        if event.kind == b"planning.decide" {
+            let decision = super::planning_history::payload(raw)
+                .map_err(|cause| E::PlanningHistory(Box::new(cause)))?;
+            for op in decision
+                .operations
+                .into_iter()
+                .flatten()
+                .filter(|op| op.id == task)
+            {
+                if op.kind == "task" && !op.next.is_empty() {
+                    history.planned_next = Some(op.next);
+                } else if matches!(op.kind.as_str(), "retry" | "review-retry") {
+                    history.adjustments.push(json!({
+                        "at": crate::text::go_utf8(&event.at), "kind": op.kind, "instruction": op.next
+                    }));
+                }
+            }
+        }
     }
-    Ok(result)
+    Ok(history)
 }
 
 impl RootStore {
@@ -164,14 +202,11 @@ impl RootStore {
                     .as_ref()
                     .filter(|policy| !policy.authorized_at.is_empty());
                 let mode = policy.map(|policy| policy.mode.as_str());
-                #[cfg(target_os = "linux")]
-                let decisions = Some(revisions(&tx, work_id, task_id)?);
-                #[cfg(not(target_os = "linux"))]
-                let decisions: Option<Vec<Value>> = None;
+                let history = history(&tx, work_id, task_id)?;
                 Ok(json!({
                     "schema_version": 1, "work": work_id, "revision": work.revision,
-                    "task": task_id, "status": task.status, "plan": plan(&work, task),
-                    "attempts": attempts, "adjustments": {"instructions": instructions, "restarts": restarts, "decisions": decisions},
+                    "task": task_id, "status": task.status, "plan": plan(&work, task, history.planned_next.as_deref()),
+                    "attempts": attempts, "adjustments": {"instructions": instructions, "restarts": restarts, "decisions": history.adjustments},
                     "review": {"mode": mode, "awaiting_human": mode == Some("human") && task.status == "submitted"}
                 }))
             })();

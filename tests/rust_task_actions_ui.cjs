@@ -33,7 +33,7 @@ const detail = 'dialog:has(#native-task-action-title)';
       const params = new URLSearchParams({work:cfg.work, view:'conduite', read:'history', lang, theme});
       assert.equal((await page.goto(origin + '/?' + params, {waitUntil:'networkidle0'})).status(), 200);
       await page.waitForFunction(() => !document.querySelector('#main-content').hasAttribute('aria-busy'));
-      await page.focus(card);
+      await page.$eval(card, element => element.focus());
       await page.keyboard.press('Enter');
       await page.waitForSelector(journal + ' a[download]', {visible:true});
       const text = await page.$eval(journal, element => element.textContent);
@@ -43,6 +43,8 @@ const detail = 'dialog:has(#native-task-action-title)';
       for (const item of expected) assert(text.includes(item), 'missing ' + item);
       assert(!text.includes('NEVER-EXPOSE'));
       assert(text.includes('Check result and adjust if needed'));
+      if (lang === 'fr') assert(text.includes('Instruction de départ enregistrée'));
+      else assert(text.includes('Recorded starting instruction'));
       const download = await page.$eval(journal + ' a[download]', async element =>
         ({name:element.download, body:await (await fetch(element.href)).json()}));
       assert.equal(download.name, 'task-actions.json');

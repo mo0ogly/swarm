@@ -44,3 +44,13 @@ de tentative explicite la disponibilité des observations conservées.
 
 Le lot part de 0/5 critères vérifiés. Les missions en cours, les coûts et les
 acceptations existantes restent sous leurs droits et politiques effectifs.
+
+## Reprise après le premier candidat
+
+Le témoin lecture/écriture a prouvé l’observation native et l’attente humaine.
+Le test navigateur a montré que la remise remplace `Task.next`. Le fichier
+garde l’instruction du plan issue du journal de tâche et présente séparément
+la prochaine action effective. La revue SKYNET a aussi identifié des notes
+d’état vides (aucune tentative, observation partielle et dernier relevé).
+La vue utilise désormais des messages explicites pour ces situations.
+Les anciennes preuves et le diagnostic de focus SVG ont été conservés.
