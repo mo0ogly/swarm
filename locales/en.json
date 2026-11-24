@@ -1,4 +1,10 @@
 {
+  "Flèches pleines : dépendances. Pointillés : délégation et affectation. Vert : revue configurée.": "Solid arrows: dependencies. Dashed arrows: delegation and assignment. Green: configured review.",
+  "Localiser une dépendance": "Locate a dependency",
+  "Suspendre l’animation": "Pause animation",
+  "Délégation": "Delegation",
+  "Affectation": "Assignment",
+  "Revue indépendante configurée": "Configured independent review",
   "Choisir une forme de workflow": "Choose a workflow pattern",
   "Séquentiel — Les résultats s’enchaînent dans un ordre imposé. Par exemple, produire, tester, valider.": "Sequential — Results follow a required order. For example, produce, test, approve.",
   "Parallèle — Les branches indépendantes avancent selon les créneaux et les droits disponibles. Par exemple, préparer les tests et la documentation.": "Parallel — Independent branches progress as slots and permissions allow. For example, prepare tests and documentation.",

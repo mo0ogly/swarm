@@ -740,6 +740,14 @@
         const x1=a.x+ap.x+(vertical?a.w/2:a.w),y1=a.y+ap.y+(vertical?a.h:a.h/2),x2=b.x+bp.x+(vertical?b.w/2:0),y2=b.y+bp.y+(vertical?0:b.h/2),d=Math.max(60,Math.abs(vertical?y2-y1:x2-x1)/2);
         edge.setAttribute('d',vertical?`M${x1},${y1} C${x1},${y1+d} ${x2},${y2-d} ${x2},${y2}`:`M${x1},${y1} C${x1+d},${y1} ${x2-d},${y2} ${x2},${y2}`);
       }
+      for(const link of svg.querySelectorAll('[data-assigned-task]')){
+        const id=link.dataset.assignedTask,u=units.get(id);
+        if(!u)continue;
+        const delta=positions[id]||{x:0,y:0},x=Number(link.dataset.originX),y=Number(link.dataset.originY);
+        const targetX=u.x+delta.x+u.w/2,targetY=u.y+delta.y,bend=(y+targetY)/2;
+        link.classList.toggle('graph-analysis-hidden',!isVisible(id));
+        link.setAttribute('d',`M${x},${y} V${bend} H${targetX} V${targetY}`);
+      }
       extent.width=width;extent.height=height;svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width*zoom);svg.setAttribute('height',height*zoom);
       map.setAttribute('viewBox',`0 0 ${width} ${height}`);map.replaceChildren();
       for(const edge of svg.querySelectorAll('.graph-arete'))if(isVisible(edge.dataset.from)&&isVisible(edge.dataset.to))map.append(svgNode('path',{d:edge.getAttribute('d'),class:'graph-minimap-edge'}));
@@ -1046,6 +1054,40 @@
     activityLegend.setAttribute('role', 'group');
     activityLegend.setAttribute('aria-label', t('Activité des tâches'));
     for (const state of Object.keys(ACTIVITY_LABELS)) activityLegend.append(activityBadge(state));
+    let motionPaused=initial?.motionPaused === true;
+    const motion=document.createElement('button');
+    motion.type='button';
+    motion.id='pilot-activity-motion';
+    motion.textContent=t('Suspendre l’animation');
+    const syncMotion=()=>{
+      studio.dataset.motionPaused=String(motionPaused);
+      motion.setAttribute('aria-pressed',String(motionPaused));
+    };
+    syncMotion();
+    motion.addEventListener('click',()=>{motionPaused=!motionPaused;syncMotion()});
+    activityLegend.append(motion);
+    if(svg.querySelector('.graph-workflow-role')){
+      const relationKey=document.createElement('p');
+      relationKey.className='graph-workflow-key';
+      relationKey.textContent=t('Flèches pleines : dépendances. Pointillés : délégation et affectation. Vert : revue configurée.');
+      legend.append(relationKey);
+    }
+
+    const dependencyLinks = Array.from(svg.querySelectorAll('.graph-arete'));
+    if (dependencyLinks.length) {
+      let dependencyIndex = 0;
+      const locate = button('pilot-find-dependency', 'Localiser une dépendance', () => {
+        const link = dependencyLinks[dependencyIndex];
+        dependencyIndex = (dependencyIndex + 1) % dependencyLinks.length;
+        const bounds = link.getBoundingClientRect(), viewport = canvas.getBoundingClientRect();
+        canvas.scrollLeft += bounds.left + (bounds.width - viewport.width) / 2 - viewport.left;
+        canvas.scrollTop += bounds.top + (bounds.height - viewport.height) / 2 - viewport.top;
+        canvas.scrollIntoView({block:"nearest",inline:"nearest"});
+        canvas.focus({preventScroll:true});
+      });
+      legend.append(locate);
+    }
+
     const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez un cadre pour le déplacer. Cliquez pour ouvrir la tâche ; cliquez sur une flèche pour modifier le lien.');
     studio.append(toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,activityLegend,canvas);
     orchestration.id = 'conduite-team-validation';
@@ -1097,7 +1139,7 @@
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
      */
-    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),teamSelected,fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
+    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),motionPaused,teamSelected,fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
     host.graphView=captureView;
     /** Restore after rerender, or after an editor closes. Never open a graph
      * modal above a task editor; scroll is retained until its geometry is ready.
@@ -1487,6 +1529,124 @@
     return { panel, assignments, reasons, results };
   }
 
+  /** Lay out recorded responsibility nodes above the same task canvas. Scope
+   * references and reviewer configuration come from this Work only. There is no
+   * placeholder actor, inferred task dependency, or execution state. */
+  function workflowRoles(work, assignments) {
+    const roles = new Map();
+    const planning = work.planning;
+    const scopes = planning?.scopes ?? [];
+    const root = scopes.find(scope => scope?.id === 'root' && !scope.parent);
+    if (!root) return {roles, reviewer:null, height:0, width:0};
+    const dimensions = {width:218, height:62};
+    const register = (scope, kind, x, y, label, detail) => {
+      const node = {scope, kind, x, y, label, detail, ...dimensions};
+      if (scope) roles.set(scope.id, node);
+      return node;
+    };
+    register(root, 'root', 20, 22, t('Orchestrateur principal'),
+      [root.id, planning.provider].filter(Boolean).join(' · '));
+    const reviewer = planning.reviewer?.provider
+      ? register(null, 'reviewer', 258, 22, t('Validateur indépendant'),
+        [planning.reviewer.provider, planning.reviewer.model_route?.model].filter(Boolean).join(' · '))
+      : null;
+    const counts = new Map();
+    for (const task of work.tasks.filter(task => assignments.has(task.id))) {
+      counts.set(task.scope_id, (counts.get(task.scope_id) ?? 0) + 1);
+    }
+    const byParent = new Map();
+    for (const scope of scopes) {
+      if (!scope?.parent || typeof scope.id !== 'string') continue;
+      if (!byParent.has(scope.parent)) byParent.set(scope.parent, []);
+      byParent.get(scope.parent).push(scope);
+    }
+    const seen = new Set([root.id]), children = [], pending = [root.id];
+    for (let index = 0; index < pending.length; index++) {
+      for (const scope of byParent.get(pending[index]) ?? []) {
+        if (seen.has(scope.id)) continue;
+        seen.add(scope.id);
+        children.push(scope);
+        pending.push(scope.id);
+      }
+    }
+    children.forEach((scope, index) => {
+      register(scope, 'subplanner', 20 + (index % 3) * 238, 130 + Math.floor(index / 3) * 105,
+        t('Sous-orchestrateur'), scope.id + ' · ' + (counts.get(scope.id) ?? 0));
+    });
+    return {
+      roles, reviewer, height: children.length ? 130 + Math.ceil(children.length / 3) * 105 : 115,
+      width: 40 + 238 * Math.max(reviewer ? 2 : 1, Math.min(3,children.length)),
+    };
+  }
+
+  /** Draw delegations, review and assignments as separate read-only relations.
+   * Assignment endpoints are updated with the existing task movement controls.
+   * No edge here is accepted by the dependency editor. */
+  function drawWorkflowRoles(svg, roles, reviewer, assignments, tasks, graph) {
+    if (!roles.size) return;
+    const root = roles.get('root');
+    const colors = {delegation:'graph-workflow-delegation-marker', review:'graph-workflow-review-marker', assignment:'graph-workflow-assignment-marker'};
+    const defs = svg.querySelector('defs');
+    for (const [kind, color] of Object.entries(colors)) {
+      const marker = svgNode('marker', {id:'recorded-workflow-'+kind,viewBox:'0 0 8 8',
+        refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'});
+      marker.append(svgNode('path',{d:'M0,0 L8,4 L0,8 z',class:color}));
+      defs.append(marker);
+    }
+    const layer = svgNode('g', {class:'graph-workflow-relations'});
+    const edge = (kind, label, d) => {
+      const path = svgNode('path', {d,class:'graph-workflow-edge',role:'img','aria-label':label,'data-relation':kind,
+        'marker-end':'url(#recorded-workflow-'+kind+')'});
+      path.append(svgNodeTitle(label));
+      layer.append(path);
+      return path;
+    };
+    for (const node of roles.values()) {
+      const parent = roles.get(node.scope.parent);
+      if (!parent || parent === node) continue;
+      const fromX = parent.x + parent.width / 2, fromY = parent.y + parent.height;
+      const toX = node.x + node.width / 2, toY = node.y;
+      const direct = toY > fromY && toY - fromY < 60;
+      const path = direct
+        ? `M${fromX},${fromY} V${(fromY + toY) / 2} H${toX} V${toY}`
+        : `M${fromX},${fromY} V${fromY + 12} H8 V${toY - 12} H${toX} V${toY}`;
+      const link = edge('delegation',t('Délégation')+' · '+parent.scope.id+' → '+node.scope.id,
+        path);
+      link.dataset.fromRole = parent.scope.id;
+      link.dataset.toRole = node.scope.id;
+    }
+    if (reviewer) {
+      edge('review',t('Revue indépendante configurée'),
+        `M${reviewer.x},${reviewer.y + reviewer.height/2} H${root.x+root.width}`);
+    }
+    for (const task of tasks) {
+      if (!assignments.has(task.id)) continue;
+      const owner = roles.get(task.scope_id);
+      if (!owner || !graph.node(graphNodeKey(task.id))) continue;
+      const link = edge('assignment',t('Affectation')+' · '+task.scope_id+' → '+task.id,'');
+      link.dataset.assignedTask = task.id;
+      link.dataset.originX = String(owner.x+owner.width/2);
+      link.dataset.originY = String(owner.y+owner.height);
+    }
+    svg.append(layer);
+    for (const node of [...roles.values(),...(reviewer ? [reviewer] : [])]) {
+      const tone = {root:'info', subplanner:'attention', reviewer:'succes'}[node.kind];
+      const icon = {root:'◆', subplanner:'↳', reviewer:'✓'}[node.kind];
+      const name = node.scope?.id ?? node.detail;
+      const group = svgNode('g',{class:'graph-responsibility graph-workflow-role',role:'img',
+        'aria-label':node.label+' · '+name,'data-agent-role':node.kind,'data-tone':tone});
+      if (node.scope) group.dataset.workflowScope = node.scope.id;
+      group.append(svgNodeTitle(node.label+' · '+node.detail),svgNode('rect',
+        {x:node.x,y:node.y,width:node.width,height:node.height,rx:9}));
+      const title = svgNode('text',{x:node.x+12,y:node.y+24,'data-role-line':0});
+      title.textContent = icon + ' ' + node.label;
+      const detail = svgNode('text',{x:node.x+12,y:node.y+45});
+      appendTruncated(detail,node.detail);
+      group.append(title,detail);
+      svg.append(group);
+    }
+  }
+
   /**
    * Render the dependency graph of a Work into the original #graph container.
    * Recorded projection with local navigation and explicit task-editor handlers.
@@ -1578,6 +1738,10 @@
       totalHeight = vertical ? alongEnd : bandStart;
     }
 
+    const workflow = workflowRoles(work, orchestration.assignments);
+    for (const task of tasks) g.node(graphNodeKey(task.id)).y += workflow.height;
+    totalHeight += workflow.height;
+    totalWidth = Math.max(totalWidth,workflow.width);
     const svg = svgNode('svg', {});
     svg.setAttribute('width',String(totalWidth));svg.setAttribute('height',String(totalHeight));
     const defs=svgNode('defs',{}),marker=svgNode('marker',{id:'recorded-dependency-arrow',viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'});
@@ -1589,7 +1753,7 @@
 
     for (const { scope, start } of branchLabels) {
       const label = svgNode('text', { x: orientation === 'TB' ? start : 20,
-        y: orientation === 'TB' ? 16 : start + 18, class: 'graph-titre', 'data-graph-branch': scope });
+        y: workflow.height + (orientation === 'TB' ? 16 : start + 18), class: 'graph-titre', 'data-graph-branch': scope });
       label.textContent = scope || t('Sans périmètre');
       svg.append(label);
     }
@@ -1606,6 +1770,8 @@
       edge.append(svgNodeTitle(t('Dépendance : ') + e.from + t(' vers ') + e.to));
       svg.append(edge);
     }
+
+    drawWorkflowRoles(svg,workflow.roles,workflow.reviewer,orchestration.assignments,tasks,g);
 
     for (const task of tasks) {
       const pos = g.node(graphNodeKey(task.id));
@@ -1664,7 +1830,7 @@
     }
 
     canvas.append(svg);
-    canvas.hidden = tasks.length === 0;
+    canvas.hidden = tasks.length === 0 && workflow.roles.size === 0;
     if (unknown.length) {
       const warning = document.createElement('p');
       warning.setAttribute('role', 'alert');

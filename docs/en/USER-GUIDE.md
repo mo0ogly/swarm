@@ -297,10 +297,14 @@ Arrows point from the prerequisite to the dependent task. These tasks have not s
 Use **Task graph** and **Team and validation** at the top of the active panel.
 The buttons remain available in fullscreen, and selecting the team exits fullscreen.
 On narrow screens in fullscreen, open **Graph gestures** for shortcuts.
-**Task graph** shows dependencies, task states and graph controls. The blue
-**In action** marker indicates confirmed execution. The card’s blue outline
-scrolls briefly when this state is displayed, then stays still. The outline
-stays still when the system requests reduced motion. Red
+**Task graph** shows dependencies, task states and graph controls. Role cards
+show the principal orchestrator in blue ◆, sub-orchestrators in amber ↳ and the
+configured independent reviewer in green ✓. The legend distinguishes prerequisites,
+delegation, assignment and configured review. **Locate a dependency** centers
+the viewport on each prerequisite arrow in turn. The blue **In action** marker
+indicates confirmed execution. The blue outline moves while that state is
+displayed. **Pause animation** holds it still, and the system preference for
+reduced motion also applies. Red
 **Stopped** indicates an interrupted or failed attempt. Amber **Paused** marks
 an unstarted task in a paused mission. Gray **Activity unconfirmed** marks a
 recorded running task without a current running observation. Assigned tasks use

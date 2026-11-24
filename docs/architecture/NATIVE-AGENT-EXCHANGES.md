@@ -186,3 +186,23 @@ flowchart TD
 ```
 
 Voir la [recette APEX](../plans/WORKFLOW-ARCHITECTURE-APEX.md#avis-automatique-dans-conduite).
+
+### Projection des responsabilités dans Conduite
+
+Le graphe lit les périmètres du plan, leur parent, les affectations des tâches
+et le validateur indépendant configuré. Il affiche les relations suivantes.
+
+```mermaid
+flowchart LR
+    R["Orchestrateur principal"] -->|Délégation| S["Sous-orchestrateur"]
+    S -->|Affectation| A["Tâche amont"]
+    A -->|Dépendance| B["Tâche aval"]
+    V["Validateur indépendant"] -. Revue configurée .-> R
+```
+
+Chaque dépendance conserve ses commandes d’édition. Les relations de responsabilité
+sont en lecture seule. La liaison de revue représente la configuration. Les
+reçus et les remontées restent accessibles dans **Équipe et validation**.
+Le contour animé se rapporte à une observation actuelle d’un processus en cours.
+L’historique, la préférence de mouvement réduit et **Suspendre l’animation**
+permettent une lecture statique.
