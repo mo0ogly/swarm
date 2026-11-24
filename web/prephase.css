@@ -73,9 +73,9 @@ dialog { width:min(760px,calc(100% - 2rem)); max-height:90vh; padding:0; backgro
 #conversion-missions li { padding:.75rem; margin:.5rem 0; border:1px solid var(--wattson-ligne); background:var(--wattson-carte-appuyee); overflow-wrap:anywhere; }
 #conversion-missions li:nth-child(even) { background:var(--wattson-carte); }
 #conversion-error:empty { display:none; }
-#conversion-dialog[open] { display:flex; flex-direction:column; }
-#conversion-dialog > section { overflow:auto; min-height:0; }
-#conversion-dialog > header, #conversion-dialog > footer { flex-shrink:0; }
+#conversion-dialog[open], #help-dialog[open] { display:flex; flex-direction:column; }
+#conversion-dialog > section, #help-dialog > section { overflow:auto; min-height:0; }
+#conversion-dialog > header, #conversion-dialog > footer, #help-dialog > header, #help-dialog > footer { flex-shrink:0; }
 .organization-summary { margin-top:1rem; padding:1rem; border:2px solid var(--wattson-ligne); border-radius:.5rem; background:var(--wattson-carte-appuyee); }
 .organization-summary dl { display:grid; gap:.6rem; }
 .organization-summary dl div { display:grid; grid-template-columns:minmax(8rem,1fr) 3fr; gap:.75rem; }

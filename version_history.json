@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "L’aide de Préparer explique les workflows séquentiels, parallèles, hiérarchiques et itératifs, et le rôle du plan et de la revue indépendante.",
+        "en": "Preparation help explains sequential, parallel, hierarchical, and iterative workflows, along with plan scoping and independent review."
+      },
+      {
         "fr": "Conduite calcule un avis d’architecture sur le graphe enregistré. La validation explicite est liée à la révision et à l’empreinte de l’avis.",
         "en": "Dispatch assesses workflow architecture from the recorded graph. Explicit approval is bound to the revision and assessment digest."
       },

@@ -27,12 +27,19 @@ async function chooseLevel(page,level){const options=await page.$eval('#chat-lev
   if(label==='fr-etat'){await page.setRequestInterception(true);let corrupt=true;page.on('request',async request=>{if(new URL(request.url()).pathname==='/api/v1/preparations/send'){replayBodies.push(request.postData());if(corrupt){corrupt=false;try{const upstream=await new Promise((resolve,reject)=>{const call=http.request(cfg.base+'/api/v1/preparations/send',{method:'POST',headers:{'Cookie':cfg.cookie,'Origin':cfg.base,'Content-Type':'application/json','X-Swarm-CSRF':request.headers()['x-swarm-csrf']}},response=>{const chunks=[];response.on('data',c=>chunks.push(c));response.on('end',()=>{if(response.statusCode===200)forwardedId=JSON.parse(Buffer.concat(chunks)).id;resolve(response.statusCode);});});call.on('error',reject);call.end(request.postData());});assert.equal(upstream,200);await request.respond({status:200,contentType:'application/json',body:'{}'});return;}catch(error){errors.push('owned-forward-failed');await request.abort();return;}}}await request.continue();});}
   await page.type('#chat-message','Browser '+label);
   const postsBeforeAssessment=requests.length;
+  if(theme==='sombre')await page.setViewport({width:390,height:850});
   await page.click('#help');
   check(label+'-workflow-help-visible',await page.$eval('#help-dialog[open]',(e,lang)=>
-    e.textContent.includes(lang==='fr'?'Choisir l’architecture du workflow':'Choose a workflow architecture'),lang));
+    e.textContent.includes(lang==='fr'?'Choisir l’architecture du workflow':'Choose a workflow architecture') &&
+    e.textContent.includes('ActionPlan JSON v1') &&
+    e.scrollTop===0 && e.querySelector('section').scrollTop===0 &&
+    e.querySelector('header').getBoundingClientRect().top>=e.getBoundingClientRect().top &&
+    [...e.querySelectorAll('#workflow-architecture-help-patterns li')].map(item=>item.textContent.split(' — ')[0]).join('|') ===
+      (lang==='fr'?'Séquentiel|Parallèle|Hiérarchique|Itératif':'Sequential|Parallel|Hierarchical|Iterative'),lang));
   await page.keyboard.press('Escape');
   await page.waitForFunction(()=>!document.querySelector('#help-dialog').open&&document.activeElement.id==='help');
   check(label+'-workflow-help-restores-focus',true);
+  await page.setViewport({width:1280,height:900});
   await page.click('#workflow-architecture > summary');
   await page.click('#workflow-assess');
   const initial=await page.$eval('#chat-message',e=>e.value);
