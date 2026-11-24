@@ -1066,11 +1066,37 @@
     syncMotion();
     motion.addEventListener('click',()=>{motionPaused=!motionPaused;syncMotion()});
     activityLegend.append(motion);
+    let assignmentScope = '';
     if(svg.querySelector('.graph-workflow-role')){
       const relationKey=document.createElement('p');
       relationKey.className='graph-workflow-key';
-      relationKey.textContent=t('Flèches pleines : dépendances. Pointillés : délégation et affectation. Vert : revue configurée.');
+      relationKey.textContent=t('Flèches pleines : dépendances et délégations (ambre). Vert pointillé : revue configurée.');
       legend.append(relationKey);
+      const assignments = [...svg.querySelectorAll('[data-assignment-scope]')];
+      const scopes = new Set(assignments.map(link => link.dataset.assignmentScope));
+      if (scopes.size) {
+        const label = document.createElement('label');
+        label.className = 'native-graph-neighbors';
+        label.textContent = t('Voir les affectations');
+        const select = document.createElement('select');
+        select.id = 'pilot-assignment-scope';
+        label.htmlFor = select.id;
+        select.append(new Option(t('Masquer les affectations'), ''));
+        for (const scope of scopes) select.append(new Option(scope, scope));
+        select.value = scopes.has(initial?.assignmentScope) ? initial.assignmentScope : '';
+        /** Reveal the chosen scope's assignments without changing the graph or
+         * the task visibility filter. Empty selection hides all assignments. */
+        const showAssignments = () => {
+          assignmentScope = select.value;
+          for (const link of assignments) {
+            link.toggleAttribute('data-visible-assignment', link.dataset.assignmentScope === assignmentScope);
+          }
+        };
+        select.addEventListener('change', showAssignments);
+        showAssignments();
+        label.append(select);
+        legend.append(label);
+      }
     }
 
     const dependencyLinks = Array.from(svg.querySelectorAll('.graph-arete'));
@@ -1139,7 +1165,7 @@
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
      */
-    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),motionPaused,teamSelected,fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
+    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),motionPaused,assignmentScope,teamSelected,fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
     host.graphView=captureView;
     /** Restore after rerender, or after an editor closes. Never open a graph
      * modal above a task editor; scroll is retained until its geometry is ready.
@@ -1625,6 +1651,7 @@
       if (!owner || !graph.node(graphNodeKey(task.id))) continue;
       const link = edge('assignment',t('Affectation')+' · '+task.scope_id+' → '+task.id,'');
       link.dataset.assignedTask = task.id;
+      link.dataset.assignmentScope = task.scope_id;
       link.dataset.originX = String(owner.x+owner.width/2);
       link.dataset.originY = String(owner.y+owner.height);
     }

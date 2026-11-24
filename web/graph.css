@@ -332,8 +332,9 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 /* Recorded workflow responsibilities share the task canvas and its zoom. */
 .graph-workflow-role { cursor:default; }
 .graph-workflow-edge { fill:none; stroke-width:1.6; pointer-events:none; }
-.graph-workflow-edge[data-relation="delegation"] { stroke:var(--wattson-attention-encre); stroke-dasharray:5 4; }
+.graph-workflow-edge[data-relation="delegation"] { stroke:var(--wattson-attention-encre); }
 .graph-workflow-edge[data-relation="assignment"] { stroke:var(--wattson-libelle); stroke-dasharray:2 5; opacity:.55; }
+.graph-workflow-edge[data-relation="assignment"]:not([data-visible-assignment]) { display:none; }
 .graph-workflow-edge[data-relation="review"] { stroke:var(--wattson-succes-encre); stroke-dasharray:6 4; }
 .graph-workflow-delegation-marker { fill:var(--wattson-attention-encre); }
 .graph-workflow-assignment-marker { fill:var(--wattson-libelle); }

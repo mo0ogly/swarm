@@ -47,3 +47,13 @@ L’échec initial a exposé une collision entre les sélecteurs des cartes SVG 
 ceux du panneau de validation. Le graphe porte désormais son propre attribut
 de périmètre. Le témoin navigateur conserve le contrôle des données du panneau
 et distingue ses lectures d’avis des mutations.
+
+## Reprise après examen du graphe
+
+Les 60 flèches d’affectation se superposaient aux trajets des tâches. Des traits
+plus fins les auraient maintenues dans le champ. Le choix retenu masque ces
+flèches à l’ouverture et permet de les révéler pour un seul périmètre à la fois.
+La sélection reste locale à la vue et survit à un nouveau rendu du même Work.
+Les délégations sont en trait plein ambre et la liaison de revue en pointillé
+vert. Le test navigateur contrôle l’ouverture, la sélection d’un périmètre, le
+retour à l’affichage initial et la présence des relations permanentes.

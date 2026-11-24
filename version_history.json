@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite allège le graphe : les flèches d’affectation s’affichent à la demande pour le périmètre choisi.",
+        "en": "Dispatch declutters the graph by showing assignment arrows on demand for the selected scope."
+      },
+      {
         "fr": "Conduite affiche les orchestrateurs et le validateur dans le même graphe que les tâches, avec les liens enregistrés et une animation contrôlable des tâches actives.",
         "en": "Dispatch shows orchestrators and the independent reviewer on the task graph, with recorded links and pausable active-task motion."
       },
