@@ -29,6 +29,8 @@ async function run() {
       ['fr', 'etat', 1440], ['fr', 'sombre', 320], ['en', 'etat', 390], ['en', 'sombre', 1440]
     ]) {
       await page.setViewport({width, height: 900});
+      const reducedMotion = lang === 'en' && theme === 'sombre';
+      await page.emulateMediaFeatures([{name: 'prefers-reduced-motion', value: reducedMotion ? 'reduce' : 'no-preference'}]);
       const result = await page.evaluate(({lang, theme}) => {
         document.documentElement.lang = lang;
         document.documentElement.dataset.theme = theme;
@@ -76,6 +78,22 @@ async function run() {
           return mark ? [mark.dataset.activity, getComputedStyle(mark).fill, mark.nextElementSibling.textContent] : null;
         };
         const currentActivity = ['rpc', 'wasm', 'independent-0', 'independent-1'].map(activity);
+        const runningFrames = () => Array.from(document.querySelectorAll('.graph-activity-frame'));
+        const frames = runningFrames();
+        const frame = frames[0];
+        const motion = frame?.getAnimations()[0];
+        const timing = motion?.effect.getComputedTiming();
+        const initialOffset = frame && getComputedStyle(frame).strokeDashoffset;
+        if (motion) motion.currentTime = timing.duration / 2;
+        const frameState = {
+          tasks: frames.map(frame => frame.closest('.graph-noeud').dataset.task),
+          hidden: frame?.getAttribute('aria-hidden'),
+          interactive: frame && getComputedStyle(frame).pointerEvents,
+          animates: !!motion,
+          changesOffset: frame && getComputedStyle(frame).strokeDashoffset !== initialOffset,
+          duration: timing?.endTime
+        };
+
         const initialGraph = !get('#graph-studio').hidden && get('#conduite-team-validation').hidden;
         const canvas = get('#pilot-canvas');
         canvas.scrollLeft = 100;
@@ -120,6 +138,7 @@ async function run() {
         const snapshot = {
           initialGraph,
           currentActivity,
+          frameState,
           roleActivity: ['root', 'subplanner', 'reviewer', 'driver'].map(value => {
             const mark = role(value).querySelector(':scope > .graph-activity-key');
             return [mark?.dataset.activity, mark?.textContent];
@@ -157,6 +176,7 @@ async function run() {
         SwarmRustCockpitRead.render({work, mission, readMode: 'history', control: {paused: true}});
         snapshot.historyActivity = ['rpc', 'wasm', 'independent-0', 'independent-1'].map(activity);
         snapshot.historyDriver = role('driver').textContent;
+        snapshot.historyFrames = runningFrames().length;
         snapshot.historyReason = get('.graph-task-open[data-task="rpc"]').getAttribute('aria-label');
         snapshot.retainedDisclosure = !get('[data-orchestration-tree]').open;
         snapshot.retainedTab = !get('#conduite-team-validation').hidden;
@@ -189,6 +209,14 @@ async function run() {
       }, {lang, theme});
       assert.deepEqual(result.branches, ['transport', 'validation']);
       assert.deepEqual(result.currentActivity.map(item => item?.[0]), ['paused', 'stopped', 'running', 'unconfirmed']);
+      assert.deepEqual(result.frameState.tasks, ['independent-0'], 'only the confirmed task has an activity frame');
+      assert.equal(result.frameState.hidden, 'true');
+      assert.equal(result.frameState.interactive, 'none');
+      assert.equal(result.frameState.animates, !reducedMotion);
+      assert.equal(result.frameState.changesOffset, !reducedMotion);
+      if (!reducedMotion) assert(result.frameState.duration > 0 && result.frameState.duration < 5000);
+      assert.equal(result.historyFrames, 0);
+
       assert.equal(new Set(result.currentActivity.map(item => item[1])).size, 4);
       const activityLabels = lang === 'en'
         ? ['Paused', 'Stopped', 'In action', 'Activity unconfirmed']

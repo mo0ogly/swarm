@@ -296,7 +296,9 @@ filtres et sélection ne changent pas la révision métier.
   quitte le plein écran. Sur écran étroit en plein écran, ouvrez **Aide des gestes**
   pour les raccourcis. **Graphe des tâches** montre les dépendances, les états
   et les commandes du graphe. Le repère bleu **En action** correspond à une
-  exécution confirmée, le rouge **Arrêtée** à une tentative interrompue ou en
+  exécution confirmée. Le contour bleu de la carte défile brièvement à l’affichage
+  de cet état, puis reste fixe. Il reste fixe avec la préférence système de
+  mouvement réduit. Le rouge **Arrêtée** correspond à une tentative interrompue ou en
   échec, et l’ambre **En pause** à une tâche à faire dans une mission en pause.
   Le gris **Activité à confirmer** signale qu’une tentative enregistrée en cours
   n’a pas d’observation actuelle d’exécution. Les tâches rattachées reprennent

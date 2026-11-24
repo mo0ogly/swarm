@@ -271,7 +271,9 @@ Use **Task graph** and **Team and validation** at the top of the active panel.
 The buttons remain available in fullscreen, and selecting the team exits fullscreen.
 On narrow screens in fullscreen, open **Graph gestures** for shortcuts.
 **Task graph** shows dependencies, task states and graph controls. The blue
-**In action** marker indicates confirmed execution. Red
+**In action** marker indicates confirmed execution. The card’s blue outline
+scrolls briefly when this state is displayed, then stays still. The outline
+stays still when the system requests reduced motion. Red
 **Stopped** indicates an interrupted or failed attempt. Amber **Paused** marks
 an unstarted task in a paused mission. Gray **Activity unconfirmed** marks a
 recorded running task without a current running observation. Assigned tasks use

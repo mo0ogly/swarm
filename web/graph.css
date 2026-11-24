@@ -46,6 +46,19 @@
 [data-activity="running"] { --graph-activity-color:var(--wattson-info-encre); }
 [data-activity="unconfirmed"] { --graph-activity-color:var(--wattson-libelle); }
 .graph-activity-mark { fill:var(--graph-activity-color); pointer-events:none; }
+.graph-activity-frame {
+  fill:none;
+  stroke:var(--graph-activity-color);
+  stroke-width:2;
+  stroke-dasharray:6 4;
+  pointer-events:none;
+}
+@keyframes graph-task-execution {
+  to { stroke-dashoffset:-10; }
+}
+@media (prefers-reduced-motion:no-preference) {
+  .graph-activity-frame { animation:graph-task-execution 2.4s linear 2; }
+}
 .graph-activity-key { display:inline-flex; align-items:center; gap:.45em; }
 .native-graph-orchestration .graph-activity-key { margin-inline-start:.6em; }
 .native-graph-orchestration [data-orchestration-role="driver"] .graph-activity-key { margin-inline-start:0; }
