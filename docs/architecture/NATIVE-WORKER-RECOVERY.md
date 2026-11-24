@@ -1,5 +1,25 @@
 # Fin native du worker et reprise
 
+Lors du démarrage manuel d’un worker géré, `agent run` peut renouveler un
+prévol expiré en observant de nouveau la route, la commande, le workspace et
+l’environnement sous la politique courante. La portée doit rester identique à
+celle de l’admission conservée. Chaque frontière du démarrage vérifie de nouveau
+la tentative, la réservation, la preuve de copie et l’identité des processus.
+Le renouvellement conserve l’original, la tentative et la réservation. Une
+dérive, une annulation ou une prise en charge existante reste refusée par la
+garde concernée. Les autres parcours gardent leur sélection du prévol existante.
+
+`task retain-handoff WORK --root ROOT --input FILE --json` retient le rapport
+d’un worker manuel géré achevé. Le fichier JSON contient `schema_version: 1`,
+`event_id`, `expected_revision` et `task_id`. Le moteur retrouve le producteur et
+la dernière tentative, vérifie le journal terminal et la provenance du workspace,
+puis retient les octets du rapport et la référence Git. Utiliser le producteur,
+le chemin relatif et le SHA-256 renvoyés avec `task submit`. Cette opération ne
+soumet ni ne valide la tâche. Le dépôt géré est ouvert depuis le descripteur
+du Root détenu et son association au datastore est revérifiée avant le reçu.
+Une erreur après rétention peut laisser les preuves
+en place. Relire la révision avant une nouvelle soumission.
+
 Implémentation Linux vérifiée sur fixtures natives isolées dans le lot169. Le journal original de fin est une frontière de confiance locale privée, pas une identité cryptographique ni une protection contre un auteur hostile du même UID. PID absent/mort, bail expiré ou message « terminé » ne suffisent jamais à autoriser une reprise.
 
 L’observateur en lecture seule partage la projection terminale Agent/réservation de recovery ; il n’appelle aucune récupération, n’écrit aucun état et ne rembourse aucune tentative. Il vérifie identité du Root original, ligne terminale complète, ownership normalisé, snapshot/contexte natifs, collecte kernel enregistrée, libération de workspace et disposition gate/sortie explicite. Attente/libération inconnue ou exécution en quarantaine/drainage refuse. Une sortie logique invalide connue peut être décrite pour correction, jamais comme acceptation de qualité. Un refus connu du helper est distingué d’un possible démarrage provider ; aucune exécution n’est devinée.

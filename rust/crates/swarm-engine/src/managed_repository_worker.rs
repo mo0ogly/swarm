@@ -9,7 +9,7 @@ use std::{
 };
 #[path = "managed_repository_result.rs"]
 mod result;
-pub(crate) use result::{retain_result, verify_result};
+pub(crate) use result::{retain_bound_result, retain_result, verify_result};
 #[path = "managed_repository_candidate_store.rs"]
 mod candidate_store;
 pub(crate) use candidate_store::{prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, ManagedCandidate};
@@ -45,43 +45,44 @@ pub(crate) fn with_storage<T>(
     exclusive: bool,
     run: impl FnOnce(&LocalDirectory) -> Result<T, E>,
 ) -> Result<T, E> {
+    let canonical = crate::canonical_project_root(root).map_err(|e| E::caused("managed-project-path", e))?;
+    inside(LocalDirectory::open(&canonical.join(".swarm"))
+        .map_err(|e| E::caused("managed-state-directory", e))?,
+        |state| with_open_storage(state, work, exclusive, run))
+}
+
+/// Use the caller's already opened datastore directory for the same managed
+/// lane and alias check. This keeps managed acquisitions relative to the owned
+/// directory if the project pathname is replaced. Caller checks database
+/// association and owns the directory. The operation and close causes into
+/// the child scopes are preserved.
+pub(super) fn with_open_storage<T>(
+    state: &LocalDirectory,
+    work: &Work,
+    exclusive: bool,
+    run: impl FnOnce(&LocalDirectory) -> Result<T, E>,
+) -> Result<T, E> {
     let repo = work
         .planning
         .as_deref()
         .and_then(|p| p.repository.as_deref())
         .ok_or(E::Refused("managed-repository-required"))?;
-    let canonical =
-        crate::canonical_project_root(root).map_err(|e| E::caused("managed-project-path", e))?;
     if !swarm_identity_contract::name(work.id.as_bytes()) {
         return Err(E::Refused("managed-storage-binding-mismatch"));
     }
     inside(
-        LocalDirectory::open(&canonical.join(".swarm"))
-            .map_err(|e| E::caused("managed-state-directory", e))?,
-        |state| {
-            inside(
-                state
-                    .child("managed", false)
-                    .map_err(|e| E::caused("managed-parent-directory", e))?,
-                |parent| {
-                    inside(
-                        parent
-                            .child(&work.id, false)
-                            .map_err(|e| E::caused("managed-work-directory", e))?,
-                        |dir| super::with_storage_binding(state, dir, &work.id, &repo.storage, || {
-                            let lock = dir
-                                .reserve_managed(exclusive, false)
-                                .map_err(|e| E::caused("managed-operation-busy", e))?;
-                            let result = run(dir);
-                            crate::agent_launch_error::finish(
-                                result,
-                                lock.close().map_err(|e| E::caused("managed-lock-close", e)),
-                            )
-                        }),
-                    )
-                },
-            )
-        },
+        state.child("managed", false).map_err(|e| E::caused("managed-parent-directory", e))?,
+        |parent| inside(
+            parent.child(&work.id, false).map_err(|e| E::caused("managed-work-directory", e))?,
+            |dir| super::with_storage_binding(state, dir, &work.id, &repo.storage, || {
+                let lock = dir.reserve_managed(exclusive, false)
+                    .map_err(|e| E::caused("managed-operation-busy", e))?;
+                crate::agent_launch_error::finish(
+                    run(dir),
+                    lock.close().map_err(|e| E::caused("managed-lock-close", e)),
+                )
+            }),
+        ),
     )
 }
 

@@ -2,6 +2,8 @@
   "schema_version": 1,
   "id": "managed-manual-worker",
   "inputs": [
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/task_validation.rs",
     "rust/crates/swarm-cli/src/mission_watch.rs",
     "rust/crates/swarm-cli/src/native_web/conductor.rs",
     "rust/crates/swarm-engine/config/engine-settings-catalog.json",
@@ -17,6 +19,7 @@
     "rust/crates/swarm-engine/src/gate_evaluation.rs",
     "rust/crates/swarm-engine/src/local_storage.rs",
     "rust/crates/swarm-engine/src/managed_repository.rs",
+    "rust/crates/swarm-engine/src/managed_repository_result.rs",
     "rust/crates/swarm-engine/src/managed_repository_worker.rs",
     "rust/crates/swarm-engine/src/mission_agent.rs",
     "rust/crates/swarm-engine/src/mission_status_tasks.rs",
@@ -35,6 +38,7 @@
     "rust/crates/swarm-engine/src/root_store.rs",
     "rust/crates/swarm-engine/src/root_store/agent_execution_origin.rs",
     "rust/crates/swarm-engine/src/root_store/mission_producer.rs",
+    "rust/crates/swarm-engine/src/root_store/material_path.rs",
     "rust/crates/swarm-engine/src/root_store/mission_report_relay.rs",
     "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
     "rust/crates/swarm-engine/src/root_store/mission_status_readiness.rs",
@@ -105,7 +109,7 @@
       "command": [
         "python3",
         "-c",
-        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='managed-manual-worker-',dir='.cache')).resolve()\nfor label,args in [('control',[]),('refusal-recovery',['--faults','--detached-git','--subproject'])]:\n subprocess.run(['python3','tests/rust_managed_manual_worker.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/label),*args],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='managed-manual-worker-',dir='.cache')).resolve()\nfor label,args in [('control',['--expired-preflight','--retain-handoff']),('refusal-recovery',['--faults','--detached-git','--subproject'])]:\n subprocess.run(['python3','tests/rust_managed_manual_worker.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/label),*args],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
       ],
       "expected_exit": 0,
       "required_stdout": [
@@ -113,6 +117,9 @@
         "PASS managed-manual-real-worker-completes-blocked-with-retained-copy",
         "PASS managed-manual-queued-cancellation-releases-without-provider",
         "PASS managed-manual-proof-copy-refusals-preserve-same-queued-agent",
+        "PASS managed-manual-expired-preflight-refuses-provider-drift",
+        "PASS managed-manual-expired-preflight-reobserved-once-same-attempt",
+        "PASS managed-manual-retained-handoff-submitted-awaits-validation",
         "REPLAY_EVIDENCE",
         "PASS managed-status-queued-identity-without-mutation",
         "PASS managed-status-completed-without-mutable-copy-or-false-report",
