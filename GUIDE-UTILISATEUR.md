@@ -365,6 +365,21 @@ Utilisez **Vue d’ensemble** pour retrouver les flèches après un zoom. Le rep
 
 </details>
 
+### Ouvrir le fichier d’actions d’une tâche
+
+Dans **Conduite**, le bouton **Actions** sur la carte ouvre le plan de la tâche,
+ses tentatives et les ajustements enregistrés. Cliquez sur une action pour lire
+sa catégorie et son résultat observé. **Télécharger le fichier JSON** exporte
+la même lecture. Une tâche qui attend votre acceptation affiche **En attente
+de votre revue humaine** dans le fichier.
+
+Swarm rapproche les événements d’outil déclarés par le fournisseur. Le dernier
+relevé de supervision peut précéder l’action en cours. Le reçu de fin indique
+les résultats observés. Les anciens reçus peuvent manquer de détails. Les
+arguments d’outils, les chemins bruts et les sorties privées restent hors du
+fichier. Une observation partielle reste signalée. Les lectures et exports
+ne déclenchent aucune action métier.
+
 ## 6. Comprendre les états et valider
 
 | Indication | Signification | Suite |

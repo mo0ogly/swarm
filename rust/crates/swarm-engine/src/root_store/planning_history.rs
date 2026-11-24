@@ -40,7 +40,7 @@ impl Error for PlanningHistoryError {
 /// Go json.Unmarshal history semantics, including unknown fields and raw invalid
 /// UTF replacement. Full known request types are checked, but no new-command
 /// schema/action/budget/lease admission is performed. Missing/empty JSON refuses.
-fn payload(raw: &[u8]) -> Result<crate::PlanningRequest, PlanningHistoryError> {
+pub(super) fn payload(raw: &[u8]) -> Result<crate::PlanningRequest, PlanningHistoryError> {
     let text = crate::text::go_utf8(raw);
     crate::work::decode_mode(
         text.as_bytes(),

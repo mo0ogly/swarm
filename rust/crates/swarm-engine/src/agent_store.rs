@@ -200,6 +200,32 @@ pub fn list_agents(db: &Connection, work: &str) -> Result<Vec<Agent>, AgentStore
     )
 }
 
+/// Read attempts from one task using the caller's snapshot. Verify row/body
+/// identity and both ownership keys. Malformed rows and SQL errors propagate.
+pub(crate) fn list_task_agents(
+    db: &Connection,
+    work: &str,
+    task: &str,
+) -> Result<Vec<Agent>, AgentStoreError> {
+    query(
+        db,
+        "SELECT body,status,desired,id FROM main.agents WHERE work_id=? AND task_id=? ORDER BY rowid",
+        [work, task],
+        |rows| {
+            let mut agents = Vec::new();
+            while let Some(next) = rows.next()? {
+                let id = crate::sqlite_value::string(next.get_ref(3)?, 3)?;
+                let agent = checked_identity(row(next)?, &id)?;
+                if agent.work_id != work || agent.task_id != task {
+                    return Err(AgentStoreError::Refused("task-actions-ownership-mismatch"));
+                }
+                agents.push(agent);
+            }
+            Ok(agents)
+        },
+    )
+}
+
 /// Recheck all authoritative ownership columns against the observed body.
 /// Used after staged lifecycle writes to detect a later trigger changing a row's
 /// workspace/work/task while its JSON still appears valid; refusal is rolled back

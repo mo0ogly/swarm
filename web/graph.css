@@ -204,6 +204,15 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .graph-copy rect { fill:var(--wattson-carte-appuyee); stroke:var(--wattson-ligne); }
 .graph-copy text { fill:var(--wattson-texte); font-size:12px; pointer-events:none; }
 .graph-copy:focus rect,.graph-copy:hover rect { stroke:var(--wattson-lien); stroke-width:4; }
+.graph-task-actions { cursor:pointer; }
+.graph-task-actions rect { fill:var(--wattson-carte-appuyee); stroke:var(--wattson-ligne); }
+.graph-task-actions text { fill:var(--wattson-texte); font-size:11px; pointer-events:none; }
+.graph-task-actions:is(:focus,:hover) rect { stroke:var(--wattson-lien); stroke-width:2; }
+.native-task-actions { width:min(680px,calc(100vw - 24px)); }
+.native-task-actions[open] { display:flex; flex-direction:column; }
+.native-task-actions header h2 { min-width:0; overflow-wrap:anywhere; }
+.native-task-actions .modal-body { min-height:0; overflow-wrap:anywhere; }
+.native-task-actions button { min-height:44px; }
 .native-graph-copy-fallback { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
 .native-graph-copy-fallback[hidden] { display:none; }
 .native-graph-copy-fallback input { min-width:0; max-width:100%; }

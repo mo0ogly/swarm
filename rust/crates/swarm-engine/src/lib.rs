@@ -34,6 +34,7 @@ pub use assistant_provider::{prepare_assistant_provider, AssistantProviderError}
 mod agent_worker_context;
 pub use agent_launch_error::AgentLaunchError;
 mod agent_tool_guard;
+mod task_action_observation;
 pub use agent_tool_guard::{
     AgentGuardError, AgentGuardObservation, AgentGuardStop, AgentGuardVisibility, AgentToolGuard,
 };

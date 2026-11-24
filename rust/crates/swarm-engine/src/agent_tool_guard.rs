@@ -1,5 +1,5 @@
 //! Deterministic observations over declared tool events; no process/permission.
-use crate::{AgentGuardSnapshot, RunLimits};
+use crate::{task_action_observation::{Action, ActionReceipt, Family, Outcome}, AgentGuardSnapshot, RunLimits};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
@@ -89,6 +89,12 @@ pub struct AgentGuardObservation {
     pub visibility: Option<AgentGuardVisibility>,
 }
 #[derive(Clone)]
+struct Seen {
+    signature: [u8; 32],
+    number: i64,
+    family: Family,
+}
+#[derive(Clone)]
 struct Pending {
     signature: [u8; 32],
     started: i64,
@@ -107,7 +113,7 @@ pub struct AgentToolGuard {
     window: Option<u128>,
     last_at: i64,
     last_output: Option<i64>,
-    seen: HashMap<String, [u8; 32]>,
+    seen: HashMap<String, Seen>,
     pending: HashMap<String, Pending>,
     signatures: HashMap<[u8; 32], i64>,
     completed: HashMap<String, bool>,
@@ -337,7 +343,7 @@ impl AgentToolGuard {
         }
         let sig = signature(name, input)?;
         if let Some(prior) = self.seen.get(id) {
-            if *prior != sig {
+            if prior.signature != sig {
                 return Err(AgentGuardError::refused("agent-guard-call-id-conflict"));
             }
             return self.output(at);
@@ -372,7 +378,7 @@ impl AgentToolGuard {
         self.unclassified = unclassified;
         self.last_signature = Some(sig);
         self.signatures.insert(sig, occurrence);
-        self.seen.insert(id.into(), sig);
+        self.seen.insert(id.into(), Seen { signature: sig, number: calls, family: Family::from_tool(name) });
         self.pending.insert(
             id.into(),
             Pending {
@@ -390,6 +396,24 @@ impl AgentToolGuard {
         }
         Ok(())
     }
+    /// Project the already retained distinct calls in observation order. A
+    /// missing result stays pending even if the provider has exited. No raw
+    /// inputs, IDs or text leave the guard. This uses the existing observation
+    /// retention; there is no additional capture policy or execution effect.
+    pub(crate) fn task_actions(&self) -> ActionReceipt {
+        let mut actions: Vec<_> = self.seen.iter().map(|(id, seen)| Action {
+            number: seen.number,
+            family: seen.family,
+            outcome: match self.completed.get(id) {
+                Some(true) => Outcome::Failed,
+                Some(false) => Outcome::Succeeded,
+                None => Outcome::Pending,
+            },
+        }).collect();
+        actions.sort_unstable_by_key(|action| action.number);
+        ActionReceipt { actions, partial: self.visibility.is_some() || !self.pending.is_empty() }
+    }
+
     /// Match a declared result to its pending call. Freeform error text is not an
     /// authority input: infrastructure incidents belong to the engine/supervisor,
     /// not a substring exemption here. A true result flag increments observed

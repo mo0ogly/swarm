@@ -123,7 +123,7 @@ pub struct View {
 pub const VIEWS: [View; 16] = [
     View { id: "manage", key: "view.manage", section: "Missions", label: "Gérer les missions", routes: &[] },
     View { id: "brainstorm", key: "view.brainstorm", section: "Préparation", label: "Préparer avec l’IA", routes: &[] },
-    View { id: "conduite", key: "view.conduite", section: "Conduite", label: "Graphe de la mission", routes: &[] },
+    View { id: "conduite", key: "view.conduite", section: "Conduite", label: "Graphe de la mission", routes: &["/api/v1/task-actions"] },
     View { id: "tasks", key: "view.tasks", section: "Conduite", label: "Tâches", routes: &[] },
     View { id: "agents", key: "view.agents", section: "Conduite", label: "Agents et hiérarchie", routes: &[] },
     View { id: "decisions", key: "view.decisions", section: "Conduite", label: "Décisions", routes: &[] },

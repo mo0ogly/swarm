@@ -15,6 +15,7 @@ mod mission_report_relay;
 #[cfg(target_os = "linux")]
 pub use mission_report_relay::MissionReportRelayOutcome;
 mod agent_log_history;
+mod task_actions;
 mod graph_batch;
 #[cfg(target_os = "linux")]
 mod agent_archive_history;

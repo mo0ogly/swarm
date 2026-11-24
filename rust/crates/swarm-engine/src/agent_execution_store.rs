@@ -450,7 +450,8 @@ fn provider_facts(
     agent.native_provider_facts = Some(raw);
     Ok(())
 }
-/// Persist cumulative progress, declared metadata and the real supervisor heartbeat. Provider
+/// Persist cumulative progress, redacted actions and declared metadata atomically
+/// with the supervisor heartbeat. Codec errors abort the transaction. Provider
 /// vitality stays unknown; this does not assert successful exec or acceptance.
 /// A current stop intention is retained, never overwritten by stale memory.
 pub(crate) fn pulse(
@@ -458,12 +459,15 @@ pub(crate) fn pulse(
     expected: &Agent,
     progress: &crate::AgentProgress,
     facts: &crate::agent_provider_facts::ProviderFactsSnapshot,
+    actions: &crate::task_action_observation::ActionReceipt,
 ) -> Result<Agent, AgentLaunchError> {
     transaction(db, |tx| {
         let (before, raw) = owned(tx, expected)?;
         let mut a = before.clone();
         a.progress = progress.clone();
         provider_facts(&mut a, facts)?;
+        a.native_task_actions = Some(crate::model_wire::persisted_raw(actions)
+            .map_err(|e| AgentLaunchError::caused("task-actions-heartbeat-encoding", e))?);
         a.status = "running".into();
         a.heartbeat = crate::system_timestamp()
             .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))?;
@@ -723,6 +727,7 @@ fn complete_with_owner(
         a.progress = receipt.progress.clone();
         a.reply = receipt.public_reply.into();
         a.native_execution_result = Some(receipt.details.clone());
+        a.native_task_actions = None;
         receipt.facts.apply(&mut a);
         a.activity = "Processus récolté ; tâche non acceptée, validation requise".into();
         if interrupted {
@@ -825,6 +830,7 @@ pub(crate) fn quarantine(
                 .into();
         a.progress = receipt.progress.clone();
         a.native_execution_result = Some(receipt.details.clone());
+        a.native_task_actions = None;
         receipt.facts.apply(&mut a);
         replace(tx, &before, &raw, &a)?;
         append_log(tx, &a, LogFamily::Incident, &a.activity)?;
