@@ -3,6 +3,7 @@
 //! phase is not reviewer process liveness, identity authentication or acceptance.
 use super::{
     mission_status_evidence::{semantic_artifact, semantic_gate},
+    RootStore,
     RootStoreError as E,
 };
 use crate::gate_evaluation::artifact_hash;
@@ -122,6 +123,43 @@ fn apply_state(p: &mut ReviewPresentation, state: &str) {
         }
         _ => {}
     }
+}
+
+/// Observe the submitted managed task's opinion against the current pinned
+/// candidate and original control/worker evidence. The saved Work limits the
+/// request to its revision. Refusals remain errors and no provider or publication
+/// is authorized. Published tasks use the separate accepted freshness reader.
+pub(super) fn observe_managed(
+    root: &RootStore,
+    work: &Work,
+    task: &Task,
+    settings: &EngineSettingsDocument,
+) -> Result<Option<ReviewObservation>, E> {
+    let Some(review) = task.independent_review.as_deref().filter(|_| task.status == "submitted") else {
+        return Ok(None);
+    };
+    let request = super::task_validation::Request {
+        schema_version: 1,
+        event_id: "mission-status-review-read".into(),
+        expected_revision: work.revision,
+        task_id: task.id.clone(),
+    };
+    let observed = root.observe_managed_publication(&work.id, &request)?;
+    if observed.review_id != review.id || observed.opinion_state != review.state
+        || root.read_settings()? != *settings
+    {
+        return Err(E::Refused("mission-status-managed-review-changed"));
+    }
+    let mut presentation = base(review);
+    if review.state == "passed" {
+        presentation.state = "review_awaiting_publication".into();
+        presentation.validation_state = "pending_publication".into();
+        presentation.reason = "Avis favorable".into();
+        presentation.next_step = "Publication non confirmée".into();
+    } else {
+        apply_state(&mut presentation, &review.state);
+    }
+    Ok(Some(ReviewObservation::Presented(presentation)))
 }
 
 /// Distinguish stale control evidence from unknown IO/configuration/codec errors.

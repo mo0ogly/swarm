@@ -205,7 +205,11 @@ fn local(
             Err(error) => return Err(E::Gate(error)),
         }
     };
-    let review = match crate::check_current_review_evidence(root, work, &task.id, settings) {
+    // A submitted managed opinion precedes publication. Its current candidate
+    // is observed by the review reader, not by the published acceptance reader.
+    let awaiting_managed_publication = task.status == "submitted"
+        && work.planning.as_deref().is_some_and(|p| p.repository.is_some());
+    let review = if awaiting_managed_publication { false } else { match crate::check_current_review_evidence(root, work, &task.id, settings) {
         Ok(Some(_)) => true,
         Ok(None) if work.planning.is_none() => true,
         Ok(None) => return Err(E::Refused("mission-status-review-observation-missing")),
@@ -214,7 +218,7 @@ fn local(
             false
         }
         Err(error) => return Err(E::Review(error)),
-    };
+    }};
     let eligible = review
         && match task.status.as_str() {
             "accepted" => matches!(gate, GateObservation::Current),

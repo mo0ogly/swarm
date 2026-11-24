@@ -291,16 +291,18 @@ filtres et sélection ne changent pas la révision métier.
   Elles tiennent compte du verdict du moteur et de la fraîcheur des preuves.
 - Les liens de responsabilité relient les rôles à leurs périmètres. Ne déduisez
   pas le sens d’un lien de sa seule couleur ou de son seul style : lisez sa légende.
-- Dans le cockpit natif, **Orchestration** distingue l’observation du conducteur
-  de la configuration du validateur indépendant. **Équipe et périmètres**
+- Dans le cockpit natif, **Graphe des tâches** montre les dépendances, les états
+  et les commandes du graphe. **Équipe et validation** affiche l’observation du
+  conducteur et le vérificateur indépendant configuré. **Équipe et périmètres**
   présente l’orchestrateur principal, les sous-orchestrateurs et leurs tâches.
   Chaque sous-orchestrateur a un parent et reçoit des exigences et des tâches
   attribuées à son périmètre. Les incidents qui dépassent ce périmètre
   relèvent du parent. Les sous-orchestrateurs de même niveau restent des branches
   distinctes. Les flèches de tâches indiquent leurs prérequis. La
   raison courante fournie par le moteur figure dans les tâches rattachées et le
-  libellé des cartes. Les contrôles configurés et les verdicts du reçu
-  enregistré sont affichés séparément. En lecture historique, le détail opérationnel est
+  libellé des cartes. Sous chaque tâche rattachée figurent les contrôles
+  configurés, les verdicts du reçu, l’avis indépendant enregistré et, si le
+  moteur le fournit, l’état de la validation actuelle. En lecture historique, le détail opérationnel est
   indisponible. Si l’équipe n’est pas rattachée, le graphe l’indique.
 
 En CLI, `swarm-rust planning graph ID --root ROOT --json` expose les

@@ -579,7 +579,7 @@ impl RootStore {
     /// Actual queued/active/failed/interrupted/completed attempts are observed
     /// without launching or reconciling them. Frozen process identity/heartbeat
     /// distinguishes observed live from uncertain; SQL status alone is not live.
-    /// Submitted reports and current nonmanaged review opinions are presented
+    /// Submitted reports and supported current review opinions are presented
     /// from actual attempt/producer/contract/artifact observations. Passed is no
     /// acceptance. Accepted tasks independently recheck native originals, current
     /// gate, report and dependencies; stale evidence never becomes validated.
@@ -587,7 +587,7 @@ impl RootStore {
     /// eligibility. Hidden running/blocked Agents refuse rather than invent state.
     /// Review/validation events resolve only persisted review/attempt ownership.
     /// Managed copy paths are prospective metadata, never physical readiness.
-    /// Previous review/retry/recovery, managed submitted/accepted results and closed scopes remain
+    /// Previous review/retry/recovery and closed scopes remain
     /// explicit port boundaries. Missing policy/evidence and unknown IO refuse,
     /// preserving typed semantic/cleanup causes beyond the material guard.
     /// Work/settings/controls/Agents and selected reports are compared before and
@@ -676,7 +676,10 @@ impl RootStore {
                     let fact=evidence.remove(&t.id).ok_or(E::Refused("mission-status-freshness-missing"))?;
                     let agent=agents.iter().find(|a|a.task_id==t.id);
                     let dependencies:Vec<_>=t.depends.as_deref().unwrap_or(&[]).iter().map(|id|DependencyObservation {task_id:id.clone(),freshness:if dependency_current.get(id)==Some(&true) {DependencyFreshness::Current} else {DependencyFreshness::NotCurrent}}).collect();
-                    let result=super::mission_status_reports::observed_result_inputs(&self.root,&input.work,t,agent,&settings,&mut causes,fact)?;
+                    let managed_review = if managed {
+                        super::mission_status_review::observe_managed(self, &input.work, t, &settings)?
+                    } else { None };
+                    let result=super::mission_status_reports::observed_result_inputs(&self.root,&input.work,t,agent,&settings,&mut causes,(fact,managed_review))?;
                     if let ReportListing::Observed(paths)=&result.reports {report_snapshots.push((t.id.clone(),paths.clone()));}
                     let execution=if t.status=="blocked" && t.plan_max_attempts>0 && t.attempts.as_ref().map_or(0,Vec::len) as u128>=t.plan_max_attempts as u128 {
                         let admin=crate::run_limits::read_configured_runtime_limits(&self.db,&runtime_policy,work,"worker",&t.id)?;
