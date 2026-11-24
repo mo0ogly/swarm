@@ -673,6 +673,12 @@
     if(initial?.orientation===orientation&&Number.isFinite(initial.zoom)&&initial.positions){zoom=initial.zoom;positions=copyPositions(initial.positions)}
     const base={width:Number(svg.getAttribute('width')),height:Number(svg.getAttribute('height'))},units=new Map();
     const extent={width:base.width,height:base.height};
+    const roleCards = [...svg.querySelectorAll('[data-workflow-scope]')];
+    const roleScopes = new Set(roleCards.map(card => card.dataset.workflowScope));
+    const hasDrill = roleScopes.size > 0;
+    let scopeOffset = {x:0,y:0};
+    let drillLevel = initial?.drillLevel === '*' || roleScopes.has(initial?.drillLevel)
+      ? initial.drillLevel : '';
     const map=svgNode('svg',{class:'graph-minimap',role:'group',tabindex:0,'aria-label':t('Naviguer avec la mini-carte')});canvas.append(map);
     const viewport=svgNode('rect',{class:'graph-minimap-viewport','aria-hidden':'true'});
     canvas.id='pilot-canvas';canvas.classList.add('native-graph-canvas');
@@ -724,34 +730,53 @@
      * @param {number} dx requested horizontal displacement in SVG units
      * @param {number} dy requested vertical displacement in SVG units
      */
-    function translateGroup(snapshot,ids,dx,dy){for(const id of ids){dx=Math.max(dx,-units.get(id).x-(snapshot[id]?.x??0));dy=Math.max(dy,-units.get(id).y-(snapshot[id]?.y??0))}for(const id of ids)positions[id]={x:(snapshot[id]?.x??0)+dx,y:(snapshot[id]?.y??0)+dy}}
+    function translateGroup(snapshot,ids,dx,dy){for(const id of ids){dx=Math.max(dx,-units.get(id).x-Math.min(0,scopeOffset.x)-(snapshot[id]?.x??0));dy=Math.max(dy,-units.get(id).y-Math.min(0,scopeOffset.y)-(snapshot[id]?.y??0))}for(const id of ids)positions[id]={x:(snapshot[id]?.x??0)+dx,y:(snapshot[id]?.y??0)+dy}}
     /** Selected cards move together; an unselected handle moves only itself. */
     function movementIds(id){return selectedIds.has(id)?[...selectedIds].filter(isVisible):[id]}
     /** Project native scroll bounds into unscaled SVG coordinates, clamped to
      * the graph extent. Only the minimap viewport marker changes; no IO/layout.
      */
     function updateViewport(){const x=Math.min(extent.width,canvas.scrollLeft/zoom),y=Math.min(extent.height,canvas.scrollTop/zoom);for(const [key,value]of Object.entries({x,y,width:Math.max(0,Math.min(canvas.clientWidth/zoom,extent.width-x)),height:Math.max(0,Math.min(canvas.clientHeight/zoom,extent.height-y))}))viewport.setAttribute(key,value)}
+    /** Combine saved task motion and the current scope's display translation.
+     * The scope translation never enters saved positions or undo history. */
+    function displayedOffset(id) {
+      return {x:(positions[id]?.x ?? 0)+scopeOffset.x,y:(positions[id]?.y ?? 0)+scopeOffset.y};
+    }
     /** Recompute moved curves/extent and mirror zoom/undo/redo availability.
      * Presentation only; this helper performs no storage or engine operation. */
     function update(){
-      let width=base.width,height=base.height;
-      for(const [id,u]of units){const p=positions[id]||{x:0,y:0};u.group.setAttribute('transform',`translate(${p.x} ${p.y})`);width=Math.max(width,u.x+p.x+u.w+30);height=Math.max(height,u.y+p.y+u.h+30)}
-      for(const edge of svg.querySelectorAll('.graph-arete')){const a=units.get(edge.dataset.from),b=units.get(edge.dataset.to);if(!a||!b)continue;const ap=positions[edge.dataset.from]||{x:0,y:0},bp=positions[edge.dataset.to]||{x:0,y:0},vertical=orientation==='TB';
+      const overview = hasDrill && drillLevel === '';
+      const scoped = hasDrill && roleScopes.has(drillLevel);
+      let width=(overview || scoped) ? Number(svg.dataset.roleWidth) : base.width;
+      let height=(overview || scoped) ? Number(svg.dataset.roleHeight) : base.height;
+      for(const [id,u]of units){const p=displayedOffset(id);u.group.setAttribute('transform',`translate(${p.x} ${p.y})`);if(!overview && (!scoped || isVisible(id))){width=Math.max(width,u.x+p.x+u.w+30);height=Math.max(height,u.y+p.y+u.h+30)}}
+      for(const edge of svg.querySelectorAll('.graph-arete')){const a=units.get(edge.dataset.from),b=units.get(edge.dataset.to);if(!a||!b)continue;const ap=displayedOffset(edge.dataset.from),bp=displayedOffset(edge.dataset.to),vertical=orientation==='TB';
         const x1=a.x+ap.x+(vertical?a.w/2:a.w),y1=a.y+ap.y+(vertical?a.h:a.h/2),x2=b.x+bp.x+(vertical?b.w/2:0),y2=b.y+bp.y+(vertical?0:b.h/2),d=Math.max(60,Math.abs(vertical?y2-y1:x2-x1)/2);
         edge.setAttribute('d',vertical?`M${x1},${y1} C${x1},${y1+d} ${x2},${y2-d} ${x2},${y2}`:`M${x1},${y1} C${x1+d},${y1} ${x2-d},${y2} ${x2},${y2}`);
       }
-      for(const link of svg.querySelectorAll('[data-assigned-task]')){
-        const id=link.dataset.assignedTask,u=units.get(id);
-        if(!u)continue;
-        const delta=positions[id]||{x:0,y:0},x=Number(link.dataset.originX),y=Number(link.dataset.originY);
-        const targetX=u.x+delta.x+u.w/2,targetY=u.y+delta.y,bend=(y+targetY)/2;
-        link.classList.toggle('graph-analysis-hidden',!isVisible(id));
-        link.setAttribute('d',`M${x},${y} V${bend} H${targetX} V${targetY}`);
+      const assignmentEnds = new Map();
+      const firstRowByScope = new Map();
+      for (const link of svg.querySelectorAll('[data-assigned-task]')) {
+        const id = link.dataset.assignedTask, unit = units.get(id);
+        if (!unit) continue;
+        const visible = isVisible(id);
+        link.classList.toggle('graph-analysis-hidden', !visible);
+        const delta = displayedOffset(id);
+        const end = {x:unit.x + delta.x + unit.w/2, y:unit.y + delta.y};
+        assignmentEnds.set(link, end);
+        const scope = link.dataset.assignmentScope;
+        if (visible) firstRowByScope.set(scope, Math.min(firstRowByScope.get(scope) ?? Infinity, end.y));
+      }
+      for (const [link, end] of assignmentEnds) {
+        const x = Number(link.dataset.originX), y = Number(link.dataset.originY);
+        const first = firstRowByScope.get(link.dataset.assignmentScope) ?? end.y;
+        const bend = (y + first)/2;
+        link.setAttribute('d', roundedResponsibilityPath([[x,y],[x,bend],[end.x,bend],[end.x,end.y]]));
       }
       extent.width=width;extent.height=height;svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width*zoom);svg.setAttribute('height',height*zoom);
       map.setAttribute('viewBox',`0 0 ${width} ${height}`);map.replaceChildren();
       for(const edge of svg.querySelectorAll('.graph-arete'))if(isVisible(edge.dataset.from)&&isVisible(edge.dataset.to))map.append(svgNode('path',{d:edge.getAttribute('d'),class:'graph-minimap-edge'}));
-      for(const [id,u]of units){if(!isVisible(id))continue;const p=positions[id]||{x:0,y:0};map.append(svgNode('rect',{x:u.x+p.x,y:u.y+p.y,width:u.w,height:u.h,rx:8,class:'graph-minimap-node','data-task':id}))}
+      for(const [id,u]of units){if(!isVisible(id))continue;const p=displayedOffset(id);map.append(svgNode('rect',{x:u.x+p.x,y:u.y+p.y,width:u.w,height:u.h,rx:8,class:'graph-minimap-node','data-task':id}))}
       map.append(viewport);updateViewport();undo.disabled=previousPositions===null;redo.disabled=redoPositions===null;zoomOut.disabled=zoom<=.15;zoomIn.disabled=zoom>=2;
       zoomText.textContent=Math.round(zoom*100)+' %';
     }
@@ -779,7 +804,7 @@
      * viewport gutter. Existing zoom clamps remain unchanged. No path count,
      * task or operator limit is introduced; only local zoom/scroll are saved.
      */
-    function fitProjection(){update();let left=0,top=0,right=extent.width,bottom=extent.height;if(visibleIds?.size){left=Infinity;top=Infinity;right=0;bottom=0;for(const [id,u]of units){if(!isVisible(id))continue;const x=u.x+(positions[id]?.x??0),y=u.y+(positions[id]?.y??0);left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x+u.w);bottom=Math.max(bottom,y+u.h)}left=Math.max(0,left-12);top=Math.max(0,top-12);right+=12;bottom+=12}const required=Math.min(1,(canvas.clientWidth-24)/(right-left),(canvas.clientHeight-24)/(bottom-top));zoom=Math.max(.15,required);update();canvas.scrollTo(left*zoom,top*zoom);if(required<.15)status.textContent=t('Zoom minimum atteint. Rapprochez les cartes pour tout voir.');save()}
+    function fitProjection(){update();let left=0,top=0,right=extent.width,bottom=extent.height;if(visibleIds?.size&&!roleScopes.has(drillLevel)){left=Infinity;top=Infinity;right=0;bottom=0;for(const [id,u]of units){if(!isVisible(id))continue;const x=u.x+(positions[id]?.x??0),y=u.y+(positions[id]?.y??0);left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x+u.w);bottom=Math.max(bottom,y+u.h)}left=Math.max(0,left-12);top=Math.max(0,top-12);right+=12;bottom+=12}const required=Math.min(1,(canvas.clientWidth-24)/(right-left),(canvas.clientHeight-24)/(bottom-top));zoom=Math.max(.15,required);update();canvas.scrollTo(left*zoom,top*zoom);if(required<.15)status.textContent=t('Zoom minimum atteint. Rapprochez les cartes pour tout voir.');save()}
     button('pilot-fit','Vue d’ensemble',fitProjection);
     const full=button('pilot-fullscreen','Plein écran',()=>{resumeFullscreen=false;if(modal.open){modal.close();return}modal.showModal();modal.append(studio);studio.classList.add('is-fullscreen');document.body.classList.add('graph-studio-open');actionLabel(full,'Quitter le plein écran');full.setAttribute('aria-expanded','true');full.focus()});full.setAttribute('aria-expanded','false');
     button('pilot-layout-reset','Ranger les cartes',()=>{const before=copyPositions();positions=Object.create(null);rememberPlacement(before);update();save()});
@@ -844,7 +869,84 @@
      * gesture and clear selection so hidden cards cannot move unexpectedly.
      * No-path requests never call this helper and retain the current view.
      */
-    function setProjection(ids,label){finish(true);connection=null;visibleIds=ids;selectedIds.clear();for(const [id,u]of units){const hidden=!isVisible(id);u.group.classList.toggle('graph-analysis-hidden',hidden);u.group.setAttribute('aria-hidden',String(hidden));for(const control of u.group.querySelectorAll('[tabindex]'))control.setAttribute('tabindex',hidden?'-1':'0')}for(const edge of svg.querySelectorAll('.graph-arete')){const hidden=!isVisible(edge.dataset.from)||!isVisible(edge.dataset.to);edge.classList.toggle('graph-analysis-hidden',hidden);edge.setAttribute('aria-hidden',String(hidden));edge.setAttribute('tabindex',hidden?'-1':'0')}analysis.open=false;analysisToggle.focus({preventScroll:true});showAll.disabled=ids===null;analysisStatus.textContent=ids?label+' · '+ids.size+' / '+work.tasks.length+' · '+t('Vue filtrée ; les autres tâches sont masquées.'):'';updateSelection();findMatches();update()}
+    function setProjection(ids, label, fromDrill=false) {
+      finish(true);
+      connection = null;
+      if (!fromDrill && hasDrill) {
+        drillLevel = '*';
+        scopeOffset = {x:0,y:0};
+      }
+      visibleIds = ids;
+      selectedIds.clear();
+      for (const [id, unit] of units) {
+        const hidden = !isVisible(id);
+        unit.group.classList.toggle('graph-analysis-hidden', hidden);
+        unit.group.setAttribute('aria-hidden', String(hidden));
+        for (const control of unit.group.querySelectorAll('[tabindex]')) control.setAttribute('tabindex', hidden ? '-1' : '0');
+      }
+      for (const edge of svg.querySelectorAll('.graph-arete')) {
+        const hidden = !isVisible(edge.dataset.from) || !isVisible(edge.dataset.to);
+        edge.classList.toggle('graph-analysis-hidden', hidden);
+        edge.setAttribute('aria-hidden', String(hidden));
+        edge.setAttribute('tabindex', hidden ? '-1' : '0');
+      }
+      for (const element of svg.querySelectorAll('[data-agent-role="reviewer"],[data-relation="review"],[data-graph-branch]')) {
+        const hidden = hasDrill && drillLevel !== '*';
+        element.classList.toggle('graph-analysis-hidden', hidden);
+      }
+      analysis.open = false;
+      if (!fromDrill) analysisToggle.focus({preventScroll:true});
+      showAll.disabled = ids === null;
+      analysisStatus.textContent = !fromDrill && ids
+        ? label + ' · ' + ids.size + ' / ' + work.tasks.length + ' · ' + t('Vue filtrée ; les autres tâches sont masquées.') : '';
+      if (hasDrill) {
+        drillStatus.textContent = drillLevel === '' ? t('Orchestrateurs seuls') :
+          drillLevel === '*' ? t('Tous les agents et tâches') : t('Périmètre') + ' · ' + drillLevel;
+        drillUp.hidden = drillLevel === '';
+        drillBar.dataset.level = drillLevel;
+        map.classList.toggle('graph-analysis-hidden', drillLevel !== '*');
+        for (const card of roleCards) card.setAttribute('aria-pressed', String(card.dataset.workflowScope === drillLevel));
+      }
+      updateSelection();
+      findMatches();
+      update();
+    }
+
+    /** Open a recorded scope or all tasks, or return to the orchestrator view.
+     * The selection and visibility are local to this renderer, without writes. */
+    function setDrill(level) {
+      drillLevel = level;
+      const ids = level === '*' ? null : new Set(work.tasks.filter(task => level && task.scope_id === level).map(task => task.id));
+      scopeOffset = {x:0,y:0};
+      if (ids?.size) {
+        const anchor = roleCards.find(card => card.dataset.workflowScope === level)?.querySelector('rect');
+        if (anchor) {
+          let left = Infinity, top = Infinity;
+          for (const id of ids) {
+            const unit = units.get(id);
+            left = Math.min(left,unit.x);
+            top = Math.min(top,unit.y);
+          }
+          scopeOffset = {x:Number(anchor.getAttribute('x'))-left,y:Number(svg.dataset.roleHeight)+24-top};
+        }
+      }
+      setProjection(ids, '', true);
+    }
+
+    /** Reveal a task through its recorded scope, then use its existing opener.
+     * Callers can be outside the graph. Unknown IDs leave the projection intact. */
+    function revealTask(id) {
+      const unit = units.get(id);
+      if (!unit) return;
+      if (!isVisible(id)) {
+        const scope = work.tasks.find(task => task.id === id)?.scope_id;
+        if (hasDrill) setDrill(roleScopes.has(scope) ? scope : '*');
+        else setProjection(null, '', true);
+      }
+      const opener = unit.group.querySelector('.graph-task-open');
+      opener?.scrollIntoView({block:'nearest',inline:'center'});
+      opener?.focus({preventScroll:true});
+    }
 
     /** Download a standalone SVG of the current recorded layout. Resolve the
      * local palette into presentation attributes, strip controls/active content
@@ -973,7 +1075,7 @@
       open.addEventListener('pointermove',e=>{if(gesture?.target!==open)return;const g=gesture;if(!g.moved&&Math.hypot(e.clientX-g.screen.x,e.clientY-g.screen.y)<=4)return;g.moved=true;e.preventDefault();const p=point(e);translateGroup(g.snapshot,g.ids,p.x-g.start.x,p.y-g.start.y);update()});
       open.addEventListener('pointerup',()=>{if(gesture?.target===open)finish()});open.addEventListener('pointercancel',()=>{if(gesture?.target===open)finish(true)});
       open.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();activateCard()});
-      const handle=svgNode('g',{class:'graph-drag',role:'button',tabindex:0,'aria-label':t('Déplacer la carte')+' '+id});handle.dataset.task=id;handle.append(svgNode('rect',{x:x+w-34,y:y+4,width:30,height:30,rx:6}),svgNode('text',{x:x+w-30,y:y+25},'⠿'));group.append(handle);
+      const handle=svgNode('g',{class:'graph-drag',role:'button',tabindex:0,'aria-label':t('Déplacer la carte')+' '+id});handle.dataset.task=id;handle.append(svgNodeTitle(t('Poignée de déplacement')),svgNode('rect',{x:x+w-34,y:y+4,width:30,height:30,rx:6}),svgNode('text',{x:x+w-30,y:y+25},'⠿'));group.append(handle);
       handle.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();finish(true);const before=copyPositions();translateGroup(before,movementIds(id),e.key==='ArrowLeft'?-16:e.key==='ArrowRight'?16:0,e.key==='ArrowUp'?-16:e.key==='ArrowDown'?16:0);rememberPlacement(before);update();save()});
       handle.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();finish(true);handle.focus();gesture={id,ids:movementIds(id),target:handle,pointer:e.pointerId,snapshot:copyPositions(),start:point(e)};handle.setPointerCapture(e.pointerId)});
       handle.addEventListener('pointermove',e=>{if(gesture?.id!==id)return;const p=point(e);translateGroup(gesture.snapshot,gesture.ids,p.x-gesture.start.x,p.y-gesture.start.y);update()});
@@ -1066,6 +1168,34 @@
     syncMotion();
     motion.addEventListener('click',()=>{motionPaused=!motionPaused;syncMotion()});
     activityLegend.append(motion);
+    const drillBar = document.createElement('div');
+    drillBar.className = 'pilot-actions';
+    const drillStatus = document.createElement('output');
+    drillStatus.setAttribute('role', 'status');
+    const drillUp = button('pilot-drill-up', 'Remonter aux orchestrateurs', () => {
+      const previousScope = drillLevel;
+      setDrill('');
+      canvas.scrollTo(0, 0);
+      (roleCards.find(card => card.dataset.workflowScope === previousScope) ?? drillAll).focus({preventScroll:true});
+    });
+    const drillAll = button('pilot-drill-all', 'Afficher tous les agents et tâches', () => setDrill('*'));
+    if (hasDrill) {
+      drillBar.append(drillStatus, drillUp, drillAll);
+      for (const card of roleCards) {
+        const activate = () => {
+          setDrill(card.dataset.workflowScope);
+          canvas.scrollTop = 0;
+        };
+        card.addEventListener('pointerdown', event => event.stopPropagation());
+        card.addEventListener('click', activate);
+        card.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            activate();
+          }
+        });
+      }
+    }
     let assignmentScope = '*';
     if(svg.querySelector('.graph-workflow-role')){
       const relationKey=document.createElement('p');
@@ -1104,6 +1234,10 @@
       let dependencyIndex = 0;
       const locate = button('pilot-find-dependency', 'Localiser une dépendance', () => {
         const link = dependencyLinks[dependencyIndex];
+        if (link.classList.contains('graph-analysis-hidden')) {
+          if (hasDrill) setDrill('*');
+          else setProjection(null, '', true);
+        }
         dependencyIndex = (dependencyIndex + 1) % dependencyLinks.length;
         const bounds = link.getBoundingClientRect(), viewport = canvas.getBoundingClientRect();
         canvas.scrollLeft += bounds.left + (bounds.width - viewport.width) / 2 - viewport.left;
@@ -1114,7 +1248,7 @@
       legend.append(locate);
     }
 
-    const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez un cadre pour le déplacer. Cliquez pour ouvrir la tâche ; cliquez sur une flèche pour modifier le lien.');
+    const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez une carte pour la déplacer. Cliquez sur la tâche pour l’ouvrir, ou sur une flèche bleue pour modifier un prérequis.');
     const workflowHeader = document.createElement('div');
     workflowHeader.className = 'native-graph-color-key';
     const hasHierarchy = svg.querySelector('[data-agent-role="subplanner"]');
@@ -1124,7 +1258,7 @@
       workflowHeader.append(shape);
     }
     workflowHeader.append(orchestration.workflowArchitectureSummary);
-    studio.append(workflowHeader,toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,activityLegend,canvas);
+    studio.append(workflowHeader,drillBar,toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,activityLegend,canvas);
     orchestration.id = 'conduite-team-validation';
     const views = document.createElement('div');
     views.className = 'pilot-actions conduite-view-switch';
@@ -1176,13 +1310,28 @@
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
      */
-    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),motionPaused,assignmentScope,teamSelected,fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
+    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),motionPaused,assignmentScope,drillLevel,teamSelected,fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
     host.graphView=captureView;
+    host.graphRevealTask = id => {
+      showTeam(false);
+      revealTask(id);
+    };
     /** Restore after rerender, or after an editor closes. Never open a graph
      * modal above a task editor; scroll is retained until its geometry is ready.
      */
     host.graphRestoreView=()=>{if(disposed||resumeFullscreen&&document.querySelector('.native-graph-editor[open]'))return;if(!resumeFullscreen&&(!canvas.clientWidth||!canvas.clientHeight))return;if(resumeFullscreen){resumeFullscreen=false;if(!modal.open)full.click()}if(pendingScroll){canvas.scrollTo(pendingScroll.left,pendingScroll.top);pendingScroll=null}if(pendingStudio){studio.scrollTo(pendingStudio.left,pendingStudio.top);pendingStudio=null}updateViewport()};
-    host.graphCleanup=()=>{if(help.open)help.close();finish(true);persistView();disposed=true;viewportObserver.disconnect();media.removeEventListener('change',resizeTools);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};updateSelection();update();host.graphRestoreView();lastViewAttempt=JSON.stringify(viewRecord());if(initial&&initial.orientation!==orientation)persistView(true);
+    host.graphCleanup=()=>{if(help.open)help.close();finish(true);persistView();disposed=true;viewportObserver.disconnect();media.removeEventListener('change',resizeTools);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};
+    if (hasDrill) {
+      if (!drillLevel) {
+        pendingScroll = {left:0, top:0};
+        if (!initial?.work) zoom = Math.max(zoom, .8);
+      }
+      setDrill(drillLevel);
+    } else {
+      updateSelection();
+      update();
+    }
+    host.graphRestoreView();lastViewAttempt=JSON.stringify(viewRecord());if(initial&&initial.orientation!==orientation)persistView(true);
   }
 
   /**
@@ -1444,10 +1593,12 @@
 
     const reasons = new Map();
     const results = new Map();
+    const workerIds = new Map();
     if (readMode !== 'history' && Array.isArray(mission?.tasks)) {
       for (const task of mission.tasks) {
         if (typeof task?.id !== 'string') continue;
         if (task.result) results.set(task.id, task.result);
+        if (typeof task.attempt?.agent_id === 'string' && task.attempt.agent_id) workerIds.set(task.id,task.attempt.agent_id);
         if (typeof task.reason === 'string' && task.reason) {
           reasons.set(task.id, globalThis.SwarmI18n?.engine?.(task.reason) ?? task.reason);
         }
@@ -1459,16 +1610,16 @@
     const configuredReviewer = document.createElement('p');
     configuredReviewer.dataset.orchestrationRole = 'reviewer';
     const reviewer = planning?.reviewer;
+    const reviewActivity = [...results.values()].some(result => result.state === 'review_in_progress')
+      ? ['running', 'Revue indépendante en cours'] : reviewer?.failure
+        ? ['error', 'Vérification interrompue'] : paused ? ['paused', 'Départs en pause']
+          : ['unconfirmed', ACTIVITY_LABELS.unconfirmed];
     configuredReviewer.append(orchestrationRoleLabel(t('Validateur indépendant') + ' · ' +
       (reviewer?.provider
         ? [reviewer.provider, reviewer.model_route?.model].filter(Boolean).join(' · ')
         : t('Non configuré'))));
     if (reviewer?.provider) {
-      const reviewInProgress = [...results.values()].some(result => result.state === 'review_in_progress');
-      const reviewStatus = reviewInProgress ? activityBadge('running', 'Revue indépendante en cours')
-        : reviewer.failure ? activityBadge('error', 'Vérification interrompue')
-        : paused ? activityBadge('paused', 'Départs en pause') : activityBadge('unconfirmed');
-      configuredReviewer.append(' ', reviewStatus);
+      configuredReviewer.append(' ', activityBadge(...reviewActivity));
     }
     panel.append(configuredReviewer);
     const architecture = workflowArchitecture(work);
@@ -1571,21 +1722,25 @@
       panel.append(signals);
     }
     panel.append(tree);
-    return { panel, assignments, reasons, results };
+    return { panel, assignments, reasons, results, workerIds, reviewActivity };
   }
 
   /** Lay out recorded responsibility nodes above the same task canvas. Scope
    * references and reviewer configuration come from this Work only. There is no
    * placeholder actor, inferred task dependency, or execution state. */
-  function workflowRoles(work, assignments) {
+  function workflowRoles(work, assignments, paused, reviewActivity) {
     const roles = new Map();
     const planning = work.planning;
     const scopes = planning?.scopes ?? [];
     const root = scopes.find(scope => scope?.id === 'root' && !scope.parent);
     if (!root) return {roles, reviewer:null, height:0, width:0};
-    const dimensions = {width:218, height:62};
+    const dimensions = {width:218, height:82};
     const register = (scope, kind, x, y, label, detail) => {
-      const node = {scope, kind, x, y, label, detail, ...dimensions};
+      const state = scope?.state === 'closed' ? 'unconfirmed' : paused || planning.paused ? 'paused' : 'unconfirmed';
+      const activityLabel = scope?.state === 'closed' ? 'Périmètre terminé' :
+        state === 'paused' ? 'Départs en pause' : ACTIVITY_LABELS[state];
+      const [activity, activityText] = kind === 'reviewer' ? reviewActivity : [state, activityLabel];
+      const node = {scope, kind, x, y, label, detail, state:activity, activityLabel:activityText, ...dimensions};
       if (scope) roles.set(scope.id, node);
       return node;
     };
@@ -1624,6 +1779,15 @@
     };
   }
 
+  /** Route a responsibility arrow through its existing junctions, using the
+   * same corner rounding as the dependency layout. Coincident points collapse
+   * to a straight segment. This controls geometry only. */
+  function roundedResponsibilityPath(points) {
+    return graphEdgePath(points.filter(([x,y], index) =>
+      index === 0 || x !== points[index-1][0] || y !== points[index-1][1]
+    ).map(([x,y]) => ({x,y})));
+  }
+
   /** Draw delegations, review and assignments as separate read-only relations.
    * Assignment endpoints are updated with the existing task movement controls.
    * No edge here is accepted by the dependency editor. */
@@ -1652,17 +1816,21 @@
       const fromX = parent.x + parent.width / 2, fromY = parent.y + parent.height;
       const toX = node.x + node.width / 2, toY = node.y;
       const direct = toY > fromY && toY - fromY < 60;
-      const path = direct
-        ? `M${fromX},${fromY} V${(fromY + toY) / 2} H${toX} V${toY}`
-        : `M${fromX},${fromY} V${fromY + 12} H8 V${toY - 12} H${toX} V${toY}`;
+      const middle = (fromY + toY)/2;
+      const route = direct
+        ? [[fromX,fromY],[fromX,middle],[toX,middle],[toX,toY]]
+        : [[fromX,fromY],[fromX,fromY+12],[8,fromY+12],[8,toY-12],[toX,toY-12],[toX,toY]];
+      const path = roundedResponsibilityPath(route);
       const link = edge('delegation',t('Délégation')+' · '+parent.scope.id+' → '+node.scope.id,
         path);
       link.dataset.fromRole = parent.scope.id;
       link.dataset.toRole = node.scope.id;
     }
     if (reviewer) {
+      const y = reviewer.y + reviewer.height/2;
+      const end = root.x + root.width;
       edge('review',t('Revue indépendante configurée'),
-        `M${reviewer.x},${reviewer.y + reviewer.height/2} H${root.x+root.width}`);
+        `M${reviewer.x},${y} Q${(reviewer.x+end)/2},${y-12} ${end},${y}`);
     }
     for (const task of tasks) {
       if (!assignments.has(task.id)) continue;
@@ -1679,16 +1847,24 @@
       const tone = {root:'info', subplanner:'attention', reviewer:'succes'}[node.kind];
       const icon = {root:'◆', subplanner:'↳', reviewer:'✓'}[node.kind];
       const name = node.scope?.id ?? node.detail;
-      const group = svgNode('g',{class:'graph-responsibility graph-workflow-role',role:'img',
-        'aria-label':node.label+' · '+name,'data-agent-role':node.kind,'data-tone':tone});
-      if (node.scope) group.dataset.workflowScope = node.scope.id;
-      group.append(svgNodeTitle(node.label+' · '+node.detail),svgNode('rect',
+      const group = svgNode('g',{class:'graph-responsibility graph-workflow-role',role:node.scope ? 'button' : 'img',
+        'aria-label':[node.label,name,t(node.activityLabel),node.scope ? t('Ouvrir ce périmètre') : ''].filter(Boolean).join(' · '),
+        'data-agent-role':node.kind,'data-tone':tone});
+      if (node.scope) {
+        group.dataset.workflowScope = node.scope.id;
+        group.setAttribute('tabindex','0');
+      }
+      group.append(svgNodeTitle([node.label,node.detail,t(node.activityLabel),node.scope ? t('Ouvrir ce périmètre') : ''].filter(Boolean).join(' · ')),svgNode('rect',
         {x:node.x,y:node.y,width:node.width,height:node.height,rx:9}));
       const title = svgNode('text',{x:node.x+12,y:node.y+24,'data-role-line':0});
       title.textContent = icon + ' ' + node.label;
       const detail = svgNode('text',{x:node.x+12,y:node.y+45});
       appendTruncated(detail,node.detail);
-      group.append(title,detail);
+      const indicator = svgNode('circle',{cx:node.x+17,cy:node.y+65,r:5,
+        class:'graph-activity-mark','data-activity':node.state,'aria-hidden':'true'});
+      const state = svgNode('text',{x:node.x+29,y:node.y+69,class:'graph-role-activity'});
+      state.textContent = t(node.activityLabel);
+      group.append(title,detail,indicator,state);
       svg.append(group);
     }
   }
@@ -1714,7 +1890,7 @@
     const paused = (readMode === 'history' ? controlPaused : mission?.paused ?? controlPaused) === true;
     const orchestration=renderOrchestration(work,mission,readMode,expanded,paused);
     const recovered=initial?{view:null,error:''}:readStoredView(work.id);
-    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
+    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;host.graphRevealTask=null;
     const orientation=initial?(host.dataset.orientation==='TB'?'TB':'LR'):(recovered.view?.orientation||'LR');host.dataset.orientation=orientation;
     if (typeof graphNodeKey !== 'function' || typeof svgNode !== 'function' || typeof graphEdgePath !== 'function' || typeof graphTonalites !== 'object' || !globalThis.dagre || !globalThis.dagre.graphlib || !globalThis.dagre.layout) {
       throw new Error(t('Graphe : moteur dagre indisponible.'));
@@ -1784,11 +1960,13 @@
       totalHeight = vertical ? alongEnd : bandStart;
     }
 
-    const workflow = workflowRoles(work, orchestration.assignments);
+    const workflow = workflowRoles(work, orchestration.assignments, paused, orchestration.reviewActivity);
     for (const task of tasks) g.node(graphNodeKey(task.id)).y += workflow.height;
     totalHeight += workflow.height;
     totalWidth = Math.max(totalWidth,workflow.width);
     const svg = svgNode('svg', {});
+    svg.dataset.roleWidth = String(workflow.width);
+    svg.dataset.roleHeight = String(workflow.height);
     svg.setAttribute('width',String(totalWidth));svg.setAttribute('height',String(totalHeight));
     const defs=svgNode('defs',{}),marker=svgNode('marker',{id:'recorded-dependency-arrow',viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'});
     marker.append(svgNode('path',{d:'M0,0 L8,4 L0,8 z',class:'graph-fleche'}));defs.append(marker);svg.append(defs);
@@ -1832,7 +2010,9 @@
         ? ' · ' + t('Périmètre') + ' ' + task.scope_id : '';
       const reason = orchestration.reasons.get(task.id);
       const engineReason = reason ? ' · ' + reason : '';
-      const detail = [stateLabel, activityLabel].filter(Boolean).join(' · ') + scope + engineReason;
+      const workerId = orchestration.workerIds.get(task.id);
+      const worker = workerId ? t('Agent observé') + ' · ' + workerId : t('Agent non observé');
+      const detail = [stateLabel, activityLabel].filter(Boolean).join(' · ') + scope + ' · ' + worker + engineReason;
       group.setAttribute('aria-label', t('Tâche : ') + task.title + t(' — identifiant : ') + task.id + t(' — état : ') + detail);
       group.dataset.task = task.id;
       group.dataset.etat = tonalites[task.status] || 'neutre';
@@ -1860,18 +2040,18 @@
       title.setAttribute('class', 'graph-titre');
       appendTruncated(title, task.title);
       group.append(title);
-      if (activity) {
-        group.append(svgNode('circle', {
-          cx: left + 18, cy: top + 48, r: 4,
-          class: 'graph-activity-mark', 'data-activity': activity, 'aria-hidden': 'true',
-        }));
-      }
+      group.append(svgNode('circle', {
+        cx: left + 18, cy: top + 48, r: 5,
+        class: 'graph-activity-mark', 'data-activity': activity || 'idle', 'aria-hidden': 'true',
+      }));
       const sub = document.createElementNS(SVG_NS, 'text');
-      sub.setAttribute('x', String(left + (activity ? 28 : 14)));
+      sub.setAttribute('x', String(left + 29));
       sub.setAttribute('y', String(top + 52));
       sub.setAttribute('class', 'graph-sous-titre');
-      appendTruncated(sub, activityLabel || task.id + ' · ' + stateLabel);
-      group.append(sub);
+      appendTruncated(sub, activityLabel || stateLabel);
+      const workerLabel = svgNode('text',{x:left+14,y:top+77,class:'graph-sous-titre','data-task-agent':''});
+      appendTruncated(workerLabel, worker);
+      group.append(sub,workerLabel);
       svg.append(group);
     }
 
@@ -1921,7 +2101,7 @@
    */
   function clear(message) {
     const host = container();
-    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
+    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;host.graphRevealTask=null;
     const p = document.createElement('p');
     p.textContent = typeof message === 'string' ? message : '';
     host.replaceChildren(p);

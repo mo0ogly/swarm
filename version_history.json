@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite ouvre les plans organisés sur les orchestrateurs. Chaque périmètre donne accès à ses agents et tâches, et les cartes affichent leur activité observée. Les flèches de responsabilité suivent des courbes.",
+        "en": "Dispatch opens organized plans on the orchestrators. Each scope opens its agents and tasks, with observed activity shown on the cards and curved responsibility arrows."
+      },
+      {
         "fr": "Conduite montre les liens des orchestrateurs vers leurs tâches dès l’ouverture et présente le workflow recommandé au-dessus du graphe.",
         "en": "Dispatch shows links from orchestrators to their tasks on opening and displays the recommended workflow above the graph."
       },

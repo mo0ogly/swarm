@@ -44,7 +44,7 @@
 [data-activity="paused"] { --graph-activity-color:var(--wattson-attention-encre); }
 [data-activity="stopped"], [data-activity="error"] { --graph-activity-color:var(--wattson-alerte-encre); }
 [data-activity="running"] { --graph-activity-color:var(--wattson-info-encre); }
-[data-activity="unconfirmed"] { --graph-activity-color:var(--wattson-libelle); }
+[data-activity="idle"], [data-activity="unconfirmed"] { --graph-activity-color:var(--wattson-libelle); }
 .graph-activity-mark { fill:var(--graph-activity-color); pointer-events:none; }
 .graph-activity-frame {
   fill:none;
@@ -330,7 +330,7 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 @media(max-width:760px) { .native-graph-studio #pilot-zoom-in,.native-graph-studio #pilot-zoom-out,.native-graph-studio #pilot-fullscreen,.native-graph-studio #pilot-search-previous,.native-graph-studio #pilot-search-next,.native-graph-studio #pilot-search-clear { width:44px; min-width:44px; min-height:44px; } }
 
 /* Recorded workflow responsibilities share the task canvas and its zoom. */
-.graph-workflow-role { cursor:default; }
+.graph-workflow-role[role="img"] { cursor:default; }
 .graph-workflow-edge { fill:none; stroke-width:1.6; pointer-events:none; }
 .graph-workflow-edge[data-relation="delegation"] { stroke:var(--wattson-attention-encre); }
 .graph-workflow-edge[data-relation="assignment"] { stroke:color-mix(in srgb,var(--wattson-libelle) 70%,var(--wattson-fond)); stroke-width:1.25; vector-effect:non-scaling-stroke; }

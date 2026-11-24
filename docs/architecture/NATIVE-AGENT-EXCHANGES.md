@@ -202,7 +202,10 @@ flowchart LR
 
 Chaque dépendance conserve ses commandes d’édition. Les relations de responsabilité
 sont en lecture seule. Les délégations sont en ambre et en trait plein. Les
-affectations sont visibles en gris dès l’ouverture et filtrables par périmètre.
+affectations apparaissent en gris après ouverture d’un périmètre ou de la vue
+complète. Les délégations et affectations arrondissent leurs embranchements.
+Les affectations d’un même périmètre partagent le départ de leur trajet. La vue initiale des plans organisés montre les orchestrateurs. Les
+cartes de tâche utilisent l’identifiant d’agent de la tentative observée.
 L’en-tête montre la hiérarchie enregistrée et l’avis du moteur lié à la
 révision courante. Un avis indisponible ou périmé est signalé dans le graphe.
 La liaison de revue en pointillé vert représente la configuration. Les
