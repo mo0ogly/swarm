@@ -164,6 +164,9 @@ const note=document.createElement('section');note.className='notice info';note.i
 $('editor-state').textContent=tr('Éditeur texte · Ctrl/Cmd + S pour enregistrer.');editor.hidden=false;$('monaco').hidden=true;
 const shared=[...document.querySelectorAll('section.prep-note')].find(node=>node.querySelector('h2')?.textContent==='Documents partagés');if(shared)shared.querySelector('p').textContent=tr('Les versions enregistrées sont accessibles depuis le web et le CLI.');
 const help=$('help-dialog').querySelector('section');help.replaceChildren();const paragraph=document.createElement('p');paragraph.textContent=tr('Rédigez le besoin, enregistrez le brief puis adoptez-le. Enregistrez un plan JSON v1, répondez à ses questions puis vérifiez-le. Les limites viennent des réglages Admin. Une erreur conserve votre texte ; un enregistrement incertain doit être vérifié avant toute modification.');help.append(paragraph);
+const architectureHelp=document.createElement('p');
+architectureHelp.textContent=tr('Pour choisir ou revoir une architecture, ouvrez « Choisir l’architecture du workflow » dans la conversation. Le bouton prépare un brouillon. Ajoutez vos preuves et envoyez-le. Relisez les motifs avant de modifier le plan.');
+help.append(architectureHelp);
 const admin=document.createElement('a'),adminQuery=new URLSearchParams(location.search);adminQuery.set('view','admin');admin.href='/native-runtime.html?'+adminQuery;admin.textContent=tr('Ouvrir les réglages Admin');note.append(document.createTextNode(' '),admin,document.createTextNode(' '),$('budget-open'),document.createTextNode(' '),$('sources-open'),document.createTextNode(' '),$('template-open'),$('template-draft-status'));
 dialogueUI=mountPreparationDialogue(api,{
  current:async()=>{if(!ready||busy||pending||conflict||dirty||decisions.hasDraft())throw Error(tr('Enregistrez les documents avant l’envoi.'));return current;},
