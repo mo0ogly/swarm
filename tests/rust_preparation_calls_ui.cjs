@@ -29,7 +29,10 @@ async function chooseLevel(page,level){const options=await page.$eval('#chat-lev
   const postsBeforeAssessment=requests.length;
   await page.click('#help');
   check(label+'-workflow-help-visible',await page.$eval('#help-dialog[open]',(e,lang)=>
-    e.textContent.includes(lang==='fr'?'Choisir l’architecture du workflow':'Choose a workflow architecture'),lang));
+    e.textContent.includes(lang==='fr'?'Choisir l’architecture du workflow':'Choose a workflow architecture') &&
+    e.textContent.includes('ActionPlan JSON v1') &&
+    [...e.querySelectorAll('#workflow-architecture-help-patterns li')].map(item=>item.textContent.split(' — ')[0]).join('|') ===
+      (lang==='fr'?'Séquentiel|Parallèle|Hiérarchique|Itératif':'Sequential|Parallel|Hierarchical|Iterative'),lang));
   await page.keyboard.press('Escape');
   await page.waitForFunction(()=>!document.querySelector('#help-dialog').open&&document.activeElement.id==='help');
   check(label+'-workflow-help-restores-focus',true);

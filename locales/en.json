@@ -1,4 +1,11 @@
 {
+  "Choisir une forme de workflow": "Choose a workflow pattern",
+  "Séquentiel — Les résultats s’enchaînent dans un ordre imposé. Par exemple, produire, tester, valider.": "Sequential — Results follow a required order. For example, produce, test, approve.",
+  "Parallèle — Les branches indépendantes avancent selon les créneaux et les droits disponibles. Par exemple, préparer les tests et la documentation.": "Parallel — Independent branches progress as slots and permissions allow. For example, prepare tests and documentation.",
+  "Hiérarchique — Un orchestrateur délègue des périmètres et arbitre leurs dépendances. Par exemple, coordonner plusieurs spécialistes et leurs remises.": "Hierarchical — An orchestrator delegates scopes and arbitrates their dependencies. For example, coordinate specialists and their handoffs.",
+  "Itératif — Une revue peut demander une correction avec une limite de tentatives. Par exemple, produire, examiner, corriger, puis vérifier de nouveau.": "Iterative — A review can request a correction within a bounded number of attempts. For example, produce, review, correct, then check again.",
+  "Quel que soit le workflow, définissez les livrables et leurs prérequis. Attribuez la production et la revue indépendante à des rôles distincts. Le plan utilise le format ActionPlan JSON v1.": "For any workflow, define deliverables and prerequisites. Assign production and independent review to distinct roles. The plan uses ActionPlan JSON v1.",
+  "Une mission peut combiner ces formes. Consultez le catalogue pour distinguer les modèles qui construisent un plan des modèles qui aident à cadrer le besoin.": "A mission can combine these patterns. Check the catalog to distinguish templates that build a plan from templates that help scope the need.",
   "Avis d’architecture du workflow": "Workflow architecture assessment",
   "Valider cet avis": "Approve this assessment",
   "Séquentiel": "Sequential",
