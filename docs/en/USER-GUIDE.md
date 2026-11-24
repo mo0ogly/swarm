@@ -301,7 +301,8 @@ On narrow screens in fullscreen, open **Graph gestures** for shortcuts.
 show the principal orchestrator in blue ◆, sub-orchestrators in amber ↳ and the
 configured independent reviewer in green ✓. The legend distinguishes prerequisites,
 delegation, assignment and configured review. An organized plan opens on the orchestrators.
-Activate a card to open its scope, or use **Show all agents and tasks** for the
+Delegations are aligned by level. Activate a card to isolate the path from the
+principal orchestrator to its scope, or use **Show all agents and tasks** for the
 full view. Gray assignment arrows connect each orchestrator to the visible
 tasks along curves that share an initial route within a scope. Task cards identify the observed agent when supplied by the engine.
 Clicking the same orchestrator again or choosing **Back to orchestrators**

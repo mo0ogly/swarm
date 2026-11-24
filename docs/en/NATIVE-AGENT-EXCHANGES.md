@@ -201,7 +201,9 @@ read-only. Delegation uses solid amber arrows. Gray assignment arrows appear aft
 Assignments from the same scope share the beginning of their route. Organized
 plans open on the orchestrators. Task cards use the observed attempt’s agent ID.
 Clicking the selected orchestrator again closes its scope. The configured reviewer
-appears beside the principal orchestrator when a scope is open. The graph header shows the
+appears with its link to the principal orchestrator when a scope is open.
+Scopes are aligned by level. The focused view shows only their lineage and
+places the assigned tasks closer. Links route around the reviewer on narrow screens. The graph header shows the
 recorded hierarchy and the engine recommendation for the current revision.
 Unavailable and stale recommendations are reported in the graph. The dashed green review link represents
 configuration. Receipts and status signals

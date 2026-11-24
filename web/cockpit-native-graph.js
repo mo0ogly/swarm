@@ -674,7 +674,16 @@
     const base={width:Number(svg.getAttribute('width')),height:Number(svg.getAttribute('height'))},units=new Map();
     const extent={width:base.width,height:base.height};
     const roleCards = [...svg.querySelectorAll('[data-workflow-scope]')];
-    const roleScopes = new Set(roleCards.map(card => card.dataset.workflowScope));
+    const rolesByScope = new Map(roleCards.map(card => [card.dataset.workflowScope, card]));
+    const roleScopes = new Set(rolesByScope.keys());
+    const delegationLinks = [...svg.querySelectorAll('[data-relation="delegation"]')];
+    const overviewPaths = new Map(delegationLinks.map(link => [link,link.getAttribute('d')]));
+    const parents = new Map(delegationLinks.map(link => [link.dataset.toRole,link.dataset.fromRole]));
+    const reviewerCard = svg.querySelector('[data-agent-role="reviewer"]');
+    const reviewLink = svg.querySelector('[data-relation="review"]');
+    const reviewPath = reviewLink?.getAttribute('d');
+    const roleOffsets = new Map();
+    let scopeHeight = Number(svg.dataset.roleHeight);
     const hasDrill = roleScopes.size > 0;
     let scopeOffset = {x:0,y:0};
     let drillLevel = initial?.drillLevel === '*' || roleScopes.has(initial?.drillLevel)
@@ -747,8 +756,8 @@
     function update(){
       const overview = hasDrill && drillLevel === '';
       const scoped = hasDrill && roleScopes.has(drillLevel);
-      let width=(overview || scoped) ? Number(svg.dataset.roleWidth) : base.width;
-      let height=(overview || scoped) ? Number(svg.dataset.roleHeight) : base.height;
+      let width=scoped ? Number(svg.dataset.scopeWidth) : overview ? Number(svg.dataset.roleWidth) : base.width;
+      let height=scoped ? scopeHeight : overview ? Number(svg.dataset.roleHeight) : base.height;
       for(const [id,u]of units){const p=displayedOffset(id);u.group.setAttribute('transform',`translate(${p.x} ${p.y})`);if(!overview && (!scoped || isVisible(id))){width=Math.max(width,u.x+p.x+u.w+30);height=Math.max(height,u.y+p.y+u.h+30)}}
       for(const edge of svg.querySelectorAll('.graph-arete')){const a=units.get(edge.dataset.from),b=units.get(edge.dataset.to);if(!a||!b)continue;const ap=displayedOffset(edge.dataset.from),bp=displayedOffset(edge.dataset.to),vertical=orientation==='TB';
         const x1=a.x+ap.x+(vertical?a.w/2:a.w),y1=a.y+ap.y+(vertical?a.h:a.h/2),x2=b.x+bp.x+(vertical?b.w/2:0),y2=b.y+bp.y+(vertical?0:b.h/2),d=Math.max(60,Math.abs(vertical?y2-y1:x2-x1)/2);
@@ -768,10 +777,17 @@
         if (visible) firstRowByScope.set(scope, Math.min(firstRowByScope.get(scope) ?? Infinity, end.y));
       }
       for (const [link, end] of assignmentEnds) {
-        const x = Number(link.dataset.originX), y = Number(link.dataset.originY);
+        const offset = roleOffsets.get(link.dataset.assignmentScope);
+        const x = Number(link.dataset.originX) + (offset?.x ?? 0);
+        const y = Number(link.dataset.originY) + (offset?.y ?? 0);
         const first = firstRowByScope.get(link.dataset.assignmentScope) ?? end.y;
         const bend = (y + first)/2;
-        link.setAttribute('d', roundedResponsibilityPath([[x,y],[x,bend],[end.x,bend],[end.x,end.y]]));
+        // On narrow canvases the reviewer sits between the roles and tasks.
+        // Use the left gutter so the assignment never runs behind that card.
+        const route = scoped && reviewerCard && svg.dataset.stackReview === 'true'
+          ? [[x,y],[x,y+12],[8,y+12],[8,scopeHeight-8],[end.x,scopeHeight-8],[end.x,end.y]]
+          : [[x,y],[x,bend],[end.x,bend],[end.x,end.y]];
+        link.setAttribute('d', roundedResponsibilityPath(route));
       }
       extent.width=width;extent.height=height;svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width*zoom);svg.setAttribute('height',height*zoom);
       map.setAttribute('viewBox',`0 0 ${width} ${height}`);map.replaceChildren();
@@ -895,6 +911,7 @@
         const hidden = hasDrill && (branchLabel ? drillLevel !== '*' : drillLevel === '');
         element.classList.toggle('graph-analysis-hidden', hidden);
       }
+      projectRolePath(ids);
       analysis.open = false;
       if (!fromDrill) analysisToggle.focus({preventScroll:true});
       showAll.disabled = ids === null;
@@ -913,24 +930,75 @@
       update();
     }
 
-    /** Open a recorded scope or all tasks, or return to the orchestrator view.
-     * The selection and visibility are local to this renderer, without writes. */
+    /** Lay out only the selected scope and its ancestors in a compact column.
+     * Restore all original role geometry outside a scope. Task offsets are
+     * local display translations, never writes to saved placement or the plan. */
+    function projectRolePath(ids) {
+      const scoped = roleScopes.has(drillLevel);
+      const lineage = [];
+      if (scoped) {
+        for (let id = drillLevel; id; id = parents.get(id)) lineage.unshift(id);
+      }
+      roleOffsets.clear();
+      scopeOffset = {x:0,y:0};
+      scopeHeight = Number(svg.dataset.roleHeight);
+      const top = new Map(lineage.map((id,index) => [id,22+index*116]));
+      for (const [id,card] of rolesByScope) {
+        const hidden = scoped && !top.has(id);
+        card.classList.toggle('graph-analysis-hidden',hidden);
+        card.setAttribute('tabindex',hidden ? '-1' : '0');
+        card.removeAttribute('transform');
+        if (!scoped || hidden) continue;
+        const rect = card.querySelector('rect');
+        const x = 20 - Number(rect.getAttribute('x')), y = top.get(id) - Number(rect.getAttribute('y'));
+        const height = Number(rect.getAttribute('height'));
+        roleOffsets.set(id,{x,y});
+        card.setAttribute('transform',`translate(${x} ${y})`);
+        if (id === drillLevel) {
+          scopeHeight = top.get(id) + height + 32;
+          if (ids?.size) {
+            let left = Infinity, firstRow = Infinity;
+            for (const taskId of ids) {
+              const unit = units.get(taskId);
+              left = Math.min(left,unit.x);
+              firstRow = Math.min(firstRow,unit.y);
+            }
+            scopeOffset = {x:20-left,y:scopeHeight+24-firstRow};
+          }
+        }
+      }
+      reviewerCard?.removeAttribute('transform');
+      if (reviewLink) reviewLink.setAttribute('d',reviewPath);
+      if (scoped && reviewerCard && reviewLink && svg.dataset.stackReview === 'true') {
+        const box = reviewerCard.querySelector('rect');
+        const width = Number(box.getAttribute('width')), height = Number(box.getAttribute('height'));
+        const right = 20+width, center = scopeHeight+height/2;
+        const to = 22+height/2;
+        reviewerCard.setAttribute('transform',`translate(${20-Number(box.getAttribute('x'))} ${scopeHeight-Number(box.getAttribute('y'))})`);
+        reviewLink.setAttribute('d',roundedResponsibilityPath([[right,center],[right+28,center],[right+28,to],[right,to]]));
+        scopeHeight += height+24;
+        scopeOffset.y += height+24;
+      }
+      for (const link of delegationLinks) {
+        const parent = link.dataset.fromRole, child = link.dataset.toRole;
+        const hidden = scoped && (!top.has(parent) || !top.has(child));
+        link.classList.toggle('graph-analysis-hidden',hidden);
+        if (!scoped || hidden) {
+          link.setAttribute('d',overviewPaths.get(link));
+          continue;
+        }
+        const rect = rolesByScope.get(parent).querySelector('rect');
+        const x = 20 + Number(rect.getAttribute('width'))/2;
+        const y = top.get(parent) + Number(rect.getAttribute('height'));
+        link.setAttribute('d',roundedResponsibilityPath([[x,y],[x,top.get(child)]]));
+      }
+    }
+
+    /** Open an observed scope, show all tasks, or return to the hierarchy.
+     * Only presentation changes. Unknown scopes are never selected by callers. */
     function setDrill(level) {
       drillLevel = level;
       const ids = level === '*' ? null : new Set(work.tasks.filter(task => level && task.scope_id === level).map(task => task.id));
-      scopeOffset = {x:0,y:0};
-      if (ids?.size) {
-        const anchor = roleCards.find(card => card.dataset.workflowScope === level)?.querySelector('rect');
-        if (anchor) {
-          let left = Infinity, top = Infinity;
-          for (const id of ids) {
-            const unit = units.get(id);
-            left = Math.min(left,unit.x);
-            top = Math.min(top,unit.y);
-          }
-          scopeOffset = {x:Number(anchor.getAttribute('x'))-left,y:Number(svg.dataset.roleHeight)+24-top};
-        }
-      }
       setProjection(ids, '', true);
     }
 
@@ -1730,7 +1798,7 @@
   /** Lay out recorded responsibility nodes above the same task canvas. Scope
    * references and reviewer configuration come from this Work only. There is no
    * placeholder actor, inferred task dependency, or execution state. */
-  function workflowRoles(work, assignments, paused, reviewActivity) {
+  function workflowRoles(work, assignments, paused, reviewActivity, columns) {
     const roles = new Map();
     const planning = work.planning;
     const scopes = planning?.scopes ?? [];
@@ -1771,13 +1839,23 @@
         pending.push(scope.id);
       }
     }
-    children.forEach((scope, index) => {
-      register(scope, 'subplanner', 20 + (index % 3) * 238, 130 + Math.floor(index / 3) * 105,
+    let slot = 0, previousDepth = 0;
+    const depths = new Map([[root.id,0]]);
+    for (const scope of children) {
+      const depth = depths.get(scope.parent)+1;
+      depths.set(scope.id,depth);
+      if (depth !== previousDepth && slot % columns) slot += columns - slot % columns;
+      previousDepth = depth;
+      register(scope, 'subplanner', 62 + (slot % columns) * 270, 148 + Math.floor(slot / columns) * 112,
         t('Sous-orchestrateur'), scope.id + ' · ' + (counts.get(scope.id) ?? 0));
-    });
+      slot++;
+    }
+    const roleWidth = Math.max(260, children.length ? 82 + (Math.min(columns,slot)-1)*270 + dimensions.width : 0);
     return {
-      roles, reviewer, height: children.length ? 130 + Math.ceil(children.length / 3) * 105 : 115,
-      width: 40 + 238 * Math.max(reviewer ? 2 : 1, Math.min(3,children.length)),
+      roles, reviewer, height: children.length ? 148 + Math.ceil(slot / columns) * 112 : 115,
+      width: Math.max(roleWidth,reviewer ? 496 : 0),
+      overviewWidth: roleWidth,
+      scopeWidth: reviewer ? 496 : 260,
     };
   }
 
@@ -1817,11 +1895,9 @@
       if (!parent || parent === node) continue;
       const fromX = parent.x + parent.width / 2, fromY = parent.y + parent.height;
       const toX = node.x + node.width / 2, toY = node.y;
-      const direct = toY > fromY && toY - fromY < 60;
-      const middle = (fromY + toY)/2;
-      const route = direct
-        ? [[fromX,fromY],[fromX,middle],[toX,middle],[toX,toY]]
-        : [[fromX,fromY],[fromX,fromY+12],[8,fromY+12],[8,toY-12],[toX,toY-12],[toX,toY]];
+      const lane = parent === root ? 36 : parent.x - 14;
+      const route = [[fromX,fromY],[fromX,fromY+12],[lane,fromY+12],
+        [lane,toY-16],[toX,toY-16],[toX,toY]];
       const path = roundedResponsibilityPath(route);
       const link = edge('delegation',t('Délégation')+' · '+parent.scope.id+' → '+node.scope.id,
         path);
@@ -1962,13 +2038,17 @@
       totalHeight = vertical ? alongEnd : bandStart;
     }
 
-    const workflow = workflowRoles(work, orchestration.assignments, paused, orchestration.reviewActivity);
+    const workflow = workflowRoles(work, orchestration.assignments, paused, orchestration.reviewActivity,
+      host.clientWidth > 0 && host.clientWidth < 630 ? 1 : 2);
     for (const task of tasks) g.node(graphNodeKey(task.id)).y += workflow.height;
     totalHeight += workflow.height;
     totalWidth = Math.max(totalWidth,workflow.width);
     const svg = svgNode('svg', {});
-    svg.dataset.roleWidth = String(workflow.width);
+    svg.dataset.roleWidth = String(workflow.overviewWidth ?? 0);
     svg.dataset.roleHeight = String(workflow.height);
+    const stackReview = host.clientWidth > 0 && host.clientWidth < 510;
+    svg.dataset.scopeWidth = String(stackReview ? 300 : workflow.scopeWidth ?? 0);
+    svg.dataset.stackReview = String(stackReview);
     svg.setAttribute('width',String(totalWidth));svg.setAttribute('height',String(totalHeight));
     const defs=svgNode('defs',{}),marker=svgNode('marker',{id:'recorded-dependency-arrow',viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'});
     marker.append(svgNode('path',{d:'M0,0 L8,4 L0,8 z',class:'graph-fleche'}));defs.append(marker);svg.append(defs);
