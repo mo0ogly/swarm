@@ -819,6 +819,20 @@
   }
 
   /**
+   * Return a role label with a decorative icon styled by its containing row.
+   * The supplied label stays plain text and provides the accessible name.
+   */
+  function orchestrationRoleLabel(label) {
+    const name = document.createElement('strong');
+    name.className = 'orchestration-role-label';
+    const icon = document.createElement('span');
+    icon.className = 'orchestration-role-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    name.append(icon, document.createTextNode(label));
+    return name;
+  }
+
+  /**
    * Project the Work's default root role and the recorded scope hierarchy.
    * An unconfigured root has no provider or assigned tasks. Configured scopes
    * use stored parentage. Only current mission status describes the conductor.
@@ -861,10 +875,10 @@
     const configuredReviewer = document.createElement('p');
     configuredReviewer.dataset.orchestrationRole = 'reviewer';
     const reviewer = planning?.reviewer;
-    configuredReviewer.textContent = t('Validateur indépendant') + ' · ' +
+    configuredReviewer.append(orchestrationRoleLabel(t('Validateur indépendant') + ' · ' +
       (reviewer?.provider
         ? [reviewer.provider, reviewer.model_route?.model].filter(Boolean).join(' · ')
-        : t('Non configuré'));
+        : t('Non configuré'))));
     panel.append(configuredReviewer);
 
     const scopes = planning ? (Array.isArray(planning.scopes) ? planning.scopes : []) : [{id: rootId}];
@@ -899,12 +913,10 @@
         const item = document.createElement('li');
         item.dataset.orchestrationRole = scope === root ? 'root' : 'subplanner';
         item.dataset.scope = scope.id;
-        const name = document.createElement('strong');
-        name.textContent = scope === root
+        item.append(orchestrationRoleLabel(scope === root
           ? [t('Orchestrateur principal'), planning?.provider || t('À configurer'), planning?.model_route?.model].filter(Boolean).join(' · ')
           : [t('Sous-orchestrateur'), scope.id, scope.model_selection?.provider,
-              scope.model_selection?.route?.model].filter(Boolean).join(' · ');
-        item.append(name);
+              scope.model_selection?.route?.model].filter(Boolean).join(' · ')));
         const tasks = tasksByScope.get(scope.id) || [];
         if (tasks.length) {
           const details = document.createElement('details');

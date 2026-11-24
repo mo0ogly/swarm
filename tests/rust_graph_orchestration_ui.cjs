@@ -61,6 +61,19 @@ async function run() {
         const get = selector => document.querySelector(selector);
         const role = value => get('[data-orchestration-role="' + value + '"]');
         const root = role('root');
+        const roleIcons = ['root', 'subplanner', 'reviewer'].map(value => {
+          const icon = role(value).querySelector('.orchestration-role-icon');
+          if (!icon) return null;
+          const style = getComputedStyle(icon);
+          return {
+            glyph: getComputedStyle(icon, '::before').content,
+            background: style.backgroundColor,
+            foreground: style.color,
+            labelBackground: getComputedStyle(icon.parentElement).backgroundColor,
+            hidden: icon.getAttribute('aria-hidden'),
+            visible: icon.getBoundingClientRect().width > 0,
+          };
+        });
         const branches = Array.from(root.querySelectorAll(':scope > ul > li'), node => node.dataset.scope);
         const connectsCards = (vertical) => {
           const edge = get('.graph-arete[data-from="wasm"][data-to="rpc"]');
@@ -75,6 +88,7 @@ async function run() {
           return [start.x, start.y, end.x, end.y].every((value, i) => Math.abs(value - expected[i]) < 1);
         };
         const snapshot = {
+          roleIcons,
           bandCount: document.querySelectorAll('[data-graph-branch]').length,
           lrConnected: connectsCards(false),
           driver: role('driver').textContent, reviewer: role('reviewer').textContent,
@@ -126,6 +140,15 @@ async function run() {
         return snapshot;
       }, {lang, theme});
       assert.deepEqual(result.branches, ['transport', 'validation']);
+      assert.deepEqual(result.roleIcons.map(icon => icon?.glyph), ['"◆"', '"↳"', '"✓"']);
+      assert.equal(new Set(result.roleIcons.map(icon => icon.background)).size, 3);
+      assert.equal(new Set(result.roleIcons.map(icon => icon.labelBackground)).size, 3);
+      for (const icon of result.roleIcons) {
+        assert.equal(icon.hidden, 'true');
+        assert(icon.visible);
+        assert.notEqual(icon.foreground, icon.background);
+        assert.equal(icon.labelBackground, icon.foreground);
+      }
       assert.equal(result.taskCount, 60);
       assert.equal(result.bandCount, 3);
       assert(result.lrConnected && result.tbConnected, 'dependency endpoints follow the grouped cards');

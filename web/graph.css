@@ -106,7 +106,44 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-orchestration ul { margin:4px 0; padding-inline-start:16px; list-style:none; }
 .native-graph-orchestration li { padding-inline-start:10px; margin-block:4px; }
 .native-graph-orchestration li[data-scope] { border-inline-start:2px solid var(--wattson-ligne); }
-.native-graph-orchestration li[data-scope] > strong { color:var(--wattson-titre); }
+.orchestration-role-label {
+  display:inline-flex;
+  align-items:baseline;
+  gap:.5em;
+  max-inline-size:100%;
+  box-sizing:border-box;
+  padding:.2em .55em .2em .25em;
+  border:1px solid currentColor;
+  border-radius:.45em;
+  color:var(--orchestration-ink);
+  background:var(--orchestration-surface);
+}
+.orchestration-role-icon {
+  display:inline-grid;
+  flex:none;
+  place-items:center;
+  inline-size:1.65em;
+  block-size:1.65em;
+  border-radius:.35em;
+  line-height:1;
+  color:var(--orchestration-surface);
+  background:var(--orchestration-ink);
+}
+[data-orchestration-role="root"] > .orchestration-role-label {
+  --orchestration-ink:var(--wattson-info-encre);
+  --orchestration-surface:var(--wattson-info-fond);
+}
+[data-orchestration-role="root"] > .orchestration-role-label > .orchestration-role-icon::before { content:"◆"; }
+[data-orchestration-role="subplanner"] > .orchestration-role-label {
+  --orchestration-ink:var(--wattson-attention-encre);
+  --orchestration-surface:var(--wattson-attention-fond);
+}
+[data-orchestration-role="subplanner"] > .orchestration-role-label > .orchestration-role-icon::before { content:"↳"; }
+[data-orchestration-role="reviewer"] > .orchestration-role-label {
+  --orchestration-ink:var(--wattson-succes-encre);
+  --orchestration-surface:var(--wattson-succes-fond);
+}
+[data-orchestration-role="reviewer"] > .orchestration-role-label > .orchestration-role-icon::before { content:"✓"; }
 .native-graph-orchestration [data-orchestration-tree] > ul { padding-inline-start:0; }
 .native-graph-search { display:flex; flex-wrap:wrap; align-items:center; gap:8px; flex-basis:100%; min-width:0; }
 .native-graph-search label,.native-graph-search output { flex-basis:100%; min-width:0; overflow-wrap:anywhere; }
