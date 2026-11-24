@@ -365,6 +365,15 @@ Utilisez **Vue d’ensemble** pour retrouver les flèches après un zoom. Le rep
 
 </details>
 
+### Suivre une remontée entre orchestrateurs
+
+Dans **Conduite → Équipe et validation**, ouvrez **Remontées de statut** avec
+un compte qui a accès aux Journaux. **Transmis** date le dépôt dans la boîte
+du destinataire. **Reçu dans le contexte** indique l’activation enregistrée qui
+contient le signal. **Traité** indique une décision appliquée qui le cite.
+Ouvrez **Voir les preuves** pour les références. Le traitement d’une remontée
+peut être un acquittement sans opération. La lecture ne relance rien.
+
 ### Ouvrir le fichier d’actions d’une tâche
 
 Dans **Conduite**, le bouton **Actions** sur la carte ouvre le plan de la tâche,
