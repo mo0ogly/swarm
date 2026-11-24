@@ -11,6 +11,176 @@
   };
   let refreshWork = null;
 
+  const ACTION_FAMILIES = {read:'Lecture', write:'Modification', command:'Commande',
+    search:'Recherche', tool:'Outil'};
+  const ACTION_RESULTS = {pending:'Résultat non observé', succeeded:'Succès observé',
+    failed:'Échec observé'};
+
+  /** Open a read-only modal and restore focus to the invoking control.
+   * Native dialog isolation also works above the fullscreen graph.
+   */
+  function actionsDialog(id, title, opener) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'native-graph-editor native-task-actions';
+    dialog.setAttribute('aria-labelledby', id);
+    const header = document.createElement('header');
+    const heading = document.createElement('h2');
+    heading.id = id;
+    heading.textContent = title;
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.textContent = t('Fermer');
+    close.addEventListener('click', () => dialog.close());
+    header.append(heading, close);
+    const body = document.createElement('div');
+    body.className = 'modal-body';
+    dialog.append(header, body);
+    document.body.append(dialog);
+    dialog.addEventListener('close', () => {
+      dialog.remove();
+      if (opener.isConnected) opener.focus({preventScroll:true});
+    }, {once:true});
+    dialog.showModal();
+    close.focus();
+    return {dialog, body};
+  }
+
+  /** Append one labeled observation as text. Missing values keep their label
+   * out of the view. Captured content never enters markup or an executable URL.
+   */
+  function journalField(parent, label, value) {
+    if (value == null || value === '') return;
+    const line = document.createElement('p');
+    const name = document.createElement('strong');
+    name.textContent = t(label);
+    line.append(name, document.createTextNode(' · ' + value));
+    parent.append(line);
+  }
+
+  /** Append a notice whose label is the complete translated text. */
+  function journalNote(parent, label) {
+    const line = document.createElement('p');
+    line.textContent = t(label);
+    parent.append(line);
+  }
+
+  /** Show the attributed, provider-declared details of one recorded action.
+   * The modal does not run or repeat actions and issues no request.
+   */
+  function showAction(action, attempt, opener) {
+    const {body} = actionsDialog('native-task-action-title', t('Action') + ' ' + action.number, opener);
+    journalField(body, 'Tentative', attempt.id);
+    journalField(body, 'Type', t(ACTION_FAMILIES[action.family] ?? 'Outil'));
+    journalField(body, 'Résultat observé', t(ACTION_RESULTS[action.outcome] ?? 'Résultat non observé'));
+  }
+
+  /** Display and export the same authenticated task journal. Invalid or denied
+   * reads keep their safe code visible. Closing aborts the pending read.
+   * Nothing is written to the mission or to browser storage.
+   */
+  async function showTaskActions(work, task, opener) {
+    const {dialog, body} = actionsDialog('native-task-actions-title', t('Fichier d’actions') + ' · ' + task.id, opener);
+    const status = document.createElement('p');
+    status.setAttribute('role', 'status');
+    status.textContent = t('Chargement…');
+    body.append(status);
+    const controller = new AbortController();
+    dialog.addEventListener('close', () => controller.abort(), {once:true});
+    try {
+      const query = new URLSearchParams({work:work.id, task:task.id});
+      const response = await fetch('/api/v1/agent-logs/task-actions?' + query, {
+        credentials:'same-origin', headers:{Accept:'application/json'}, signal:controller.signal
+      });
+      const file = await response.json();
+      if (!response.ok) {
+        const code = file?.failure?.code ?? file?.error;
+        throw new Error(typeof code === 'string' && /^[a-z0-9_.-]+$/.test(code) ? code : 'task-actions-read-refused');
+      }
+      if (file?.schema_version !== 1 || file.work !== work.id || file.task !== task.id ||
+          !Array.isArray(file.plan?.criteria) || !Array.isArray(file.plan?.depends) ||
+          typeof file.review?.awaiting_human !== 'boolean' || !Array.isArray(file.attempts) ||
+          !Array.isArray(file.adjustments?.instructions) || !Array.isArray(file.adjustments?.restarts)) {
+        throw new Error('task-actions-response-invalid');
+      }
+      if (controller.signal.aborted || !dialog.open) return;
+      status.remove();
+      const section = label => {
+        const heading = document.createElement('h3');
+        heading.textContent = t(label);
+        body.append(heading);
+      };
+      const download = document.createElement('a');
+      download.textContent = t('Télécharger le fichier JSON');
+      const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2) + '\n'], {type:'application/json'}));
+      download.href = url;
+      download.download = task.id + '-actions.json';
+      dialog.addEventListener('close', () => URL.revokeObjectURL(url), {once:true});
+      body.append(download);
+      if (file.review.awaiting_human) {
+        const notice = document.createElement('p');
+        notice.className = 'notice info';
+        notice.textContent = t('En attente de votre revue humaine.');
+        body.append(notice);
+      }
+      section('Plan de la tâche');
+      journalField(body, 'Titre', file.plan.title);
+      journalField(body, 'Livrable', file.plan.deliverable);
+      journalField(body, 'Critères', file.plan.criteria.join(' · '));
+      journalField(body, 'Prérequis', file.plan.depends.join(' · '));
+      journalField(body, 'Instruction de départ enregistrée', file.plan.planned_next);
+      journalField(body, 'Prochaine action', file.plan.next);
+      for (const [key, label] of [['entry', 'Condition de départ'], ['proof', 'Preuve'], ['validation', 'Validation'], ['stop', 'Condition d’arrêt']]) {
+        journalField(body, label, file.plan.approved?.step?.[key]);
+      }
+      section('Actions exécutées');
+      if (file.attempts.length === 0) journalNote(body, 'Aucune tentative enregistrée.');
+      for (const attempt of file.attempts) {
+        const group = document.createElement('section');
+        journalField(group, 'Tentative', attempt.id);
+        if (attempt.source === 'last_heartbeat') journalNote(group, 'Dernier relevé enregistré.');
+        if (attempt.observation == null) {
+          journalNote(group, 'Détail des actions indisponible pour cette tentative.');
+        } else {
+          if (attempt.observation.partial || attempt.output_complete === false) {
+            journalNote(group, 'Observations partielles.');
+          }
+          if (attempt.observation.actions.length === 0) journalNote(group, 'Aucune action d’outil observée.');
+          const list = document.createElement('ul');
+          for (const action of attempt.observation.actions) {
+            const row = document.createElement('li');
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = t('Action') + ' ' + action.number + ' · ' + t(ACTION_FAMILIES[action.family] ?? 'Outil') +
+              ' · ' + t(ACTION_RESULTS[action.outcome] ?? 'Résultat non observé');
+            button.addEventListener('click', () => showAction(action, attempt, button));
+            row.append(button);
+            list.append(row);
+          }
+          group.append(list);
+        }
+        body.append(group);
+      }
+      section('Ajustements');
+      const changes = [...file.adjustments.instructions, ...file.adjustments.restarts,
+        ...(file.adjustments.decisions ?? [])];
+      if (changes.length === 0) journalNote(body, 'Aucun ajustement enregistré.');
+      for (const change of changes) {
+        journalField(body, 'Date', change.at);
+        journalField(body, 'Motif', change.reason);
+        journalField(body, 'Consigne', change.instruction);
+        const state = {applied:'Appliquée', rejected:'Rejetée'}[change.state];
+        if (state) journalField(body, 'État', t(state));
+        journalField(body, 'Tentative', change.attempt);
+      }
+    } catch (cause) {
+      if (controller.signal.aborted || !dialog.open) return;
+      body.replaceChildren(status);
+      status.className = 'notice alert';
+      status.textContent = t('Fichier d’actions indisponible.') + ' (' +
+        (cause instanceof Error && /^[a-z0-9_.-]+$/.test(cause.message) ? cause.message : 'task-actions-read-failed') + ')';
+    }
+  }
+
   /** Copy only the editable definition of a recorded/staged task. Never copy
    * status, review, model, authority, instructions or consumption into a clone.
    */
@@ -617,7 +787,7 @@
         const copy=svg.cloneNode(true),originals=[svg,...svg.querySelectorAll('*')],copies=[copy,...copy.querySelectorAll('*')];
         const properties=['fill','stroke','stroke-width','stroke-dasharray','opacity','font-family','font-size','font-weight','text-anchor','dominant-baseline','paint-order','vector-effect'];
         for(let i=0;i<copies.length;i++){const node=copies[i],style=getComputedStyle(originals[i]);for(const attribute of [...node.attributes])if(attribute.name==='style'||attribute.name==='tabindex'||attribute.name==='role'||attribute.name.startsWith('aria-')||attribute.name.startsWith('on')||attribute.localName==='href')node.removeAttributeNode(attribute);for(const property of properties){const value=style.getPropertyValue(property);if(value&&!/url\s*\(/i.test(value))node.setAttribute(property,value)}}
-        for(const node of copy.querySelectorAll('.graph-analysis-hidden,.graph-drag,.graph-copy,.graph-port,.graph-link-ghost,script,foreignObject,image,use,a,style,animate,animateTransform,set'))node.remove();
+        for(const node of copy.querySelectorAll('.graph-analysis-hidden,.graph-drag,.graph-copy,.graph-task-actions,.graph-port,.graph-link-ghost,script,foreignObject,image,use,a,style,animate,animateTransform,set'))node.remove();
         for(const node of copy.querySelectorAll('*'))for(const attribute of [...node.attributes])if(/url\s*\(/i.test(attribute.value)&&!/^url\(#[A-Za-z0-9_-]+\)$/.test(attribute.value))node.removeAttributeNode(attribute);
         copy.setAttribute('xmlns',SVG_NS);copy.setAttribute('width',extent.width);copy.setAttribute('height',extent.height);copy.setAttribute('role','img');copy.setAttribute('aria-label',work.title);
         const background=svgNode('rect',{x:0,y:0,width:extent.width,height:extent.height,fill:getComputedStyle(canvas).backgroundColor});copy.prepend(background);
@@ -736,6 +906,21 @@
       handle.addEventListener('pointermove',e=>{if(gesture?.id!==id)return;const p=point(e);translateGroup(gesture.snapshot,gesture.ids,p.x-gesture.start.x,p.y-gesture.start.y);update()});
       handle.addEventListener('pointerup',()=>finish());handle.addEventListener('pointercancel',()=>finish(true));
       const copy=svgNode('g',{class:'graph-copy',role:'button',tabindex:0,'aria-label':t('Copier l’identifiant')+' '+id});copy.dataset.task=id;copy.append(svgNode('title',{},t('Copier l’identifiant')+' '+id),svgNode('rect',{x:x+w-82,y:y+2,width:44,height:44,rx:6}),svgNode('text',{x:x+w-68,y:y+28},'ID'));group.append(copy);copy.addEventListener('pointerdown',e=>e.stopPropagation());copy.addEventListener('click',e=>{e.stopPropagation();copyId(id,copy)});copy.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();copyId(id,copy)}});
+      const actions=svgNode('g',{class:'graph-task-actions',role:'button',tabindex:0,
+        'aria-label':t('Fichier d’actions')+' · '+id,'aria-haspopup':'dialog'});
+      actions.dataset.task=id;
+      actions.append(svgNode('rect',{x:x+w-86,y:y+h-46,width:76,height:44,rx:5}),
+        svgNode('text',{x:x+w-48,y:y+h-20,'text-anchor':'middle'},t('Actions')));
+      group.append(actions);
+      const openActions=()=>showTaskActions(work,work.tasks.find(task=>task.id===id),actions);
+      actions.addEventListener('pointerdown',event=>event.stopPropagation());
+      actions.addEventListener('click',event=>{event.stopPropagation();openActions()});
+      actions.addEventListener('keydown',event=>{
+        if (!['Enter',' '].includes(event.key)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        openActions();
+      });
       for(const side of ['in','out']){
         const vertical=orientation==='TB',port=svgNode('circle',{class:'graph-port',role:'button',tabindex:0,r:9,cx:vertical?x+w/2:side==='in'?x:x+w,cy:vertical?(side==='in'?y:y+h):y+h/2,'aria-label':t(side==='out'?'Relier cette sortie':'Relier cette entrée')+' '+id});port.dataset.task=id;port.dataset.side=side;port.append(svgNode('title',{},t(side==='in'?'Entrée : prérequis':'Sortie : dépendants')+' — '+id));let suppressClick=false;group.append(port);
         port.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();e.stopPropagation();activatePort(id,side)});
@@ -1140,7 +1325,7 @@
     };
     const tonalites = graphTonalites;
 
-    const nodeWidth = 260, nodeHeight = 72;
+    const nodeWidth = 260, nodeHeight = 92;
     const g = new globalThis.dagre.graphlib.Graph();
     g.setGraph({ rankdir: orientation, ranker: 'tight-tree', nodesep: 28, ranksep: 70, marginx: 20, marginy: 20 });
     g.setDefaultEdgeLabel(() => ({}));

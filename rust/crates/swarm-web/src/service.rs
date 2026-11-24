@@ -37,6 +37,7 @@ mod cockpit_read;
 mod work_budget;
 mod work_resume;
 mod agent_logs;
+mod task_actions;
 mod agent_transcript;
 mod pricing;
 mod provider_policies;
@@ -553,6 +554,8 @@ impl HttpServiceError {
                 | "preparation-revision-requirement-limit"
                 | "preparation-organization-already-configured" | "preparation-organization-contract-changed" | "preparation-organization-history-present" | "preparation-organization-target-invalid" | "preparation-already-released" | "preparation-stale-document" | "preparation-stale-brief" | "preparation-stale-method" | "preparation-stale-plan" => StatusCode::CONFLICT,
                 "preparation-write-disabled" => StatusCode::FORBIDDEN,
+                "task-actions-task-missing" if *operation == "task-actions-read" &&
+                    matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_FOUND,
                 "preparation-not-found" | "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
                 "authorization_required" => StatusCode::FORBIDDEN,
                 // Read-only PA-09 reconciliation: the typed separation refusal
@@ -1404,6 +1407,7 @@ impl NativeHttpService {
             "/api/v1/work-recorded-resume" => self.work_resume(work_resume::Operation::Recorded, request),
             "/api/v1/agent-transcript" => self.agent_transcript(request),
             "/api/v1/agent-logs" => self.agent_logs(request),
+            "/api/v1/agent-logs/task-actions" => self.task_actions(request),
             "/api/v1/cockpit-read" => self.cockpit_read(request),
             "/api/v1/work-budget" => self.work_budget_route(work_budget::Operation::Show,request),
             "/api/v1/work-budget/preview" => self.work_budget_route(work_budget::Operation::Preview,request),

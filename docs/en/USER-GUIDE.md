@@ -263,6 +263,22 @@ In the session, read timestamps, event types and messages. Received output shows
 observable activity, not the model's private reasoning. Detailed capture is
 optional; without it, not all raw provider output is retained.
 
+### Open a task's action file
+
+In **Dispatch**, **Actions** on the card opens the task plan, attempts, and
+recorded adjustments. The starting instruction stays visible when submission
+changes the next step. Select an action to see its category and observed
+outcome. **Download JSON file** exports the same read. The account needs
+access to **Logs**. The file displays
+**Awaiting your human review** when the task is submitted under a human
+validation policy.
+
+Swarm matches tool events declared by the provider. The last supervisor
+observation may precede the current action. The completion receipt records
+observed outcomes. Older receipts may lack details. The file omits tool
+arguments, raw paths, and private output. Partial observations are labeled.
+Reading or exporting the file does not trigger a business action.
+
 ### Read the graph and inspect a task
 
 Arrows point from the prerequisite to the dependent task. These tasks have not started; they do not demonstrate accepted results.
