@@ -88,6 +88,8 @@ async function run() {
         transport.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}));
         drill.scopedTasks=visible('.graph-noeud').map(node=>node.dataset.task);
         drill.scopedLinks=visible('[data-assigned-task]').map(node=>node.dataset.assignedTask);
+        drill.scopedCurve=visible('[data-assigned-task]')[0]?.getAttribute('d').includes(' Q ');
+        drill.delegationCurve=visible('[data-relation="delegation"]').some(edge=>edge.getAttribute('d').includes(' Q '));
         drill.scopedMinimap=visible('.graph-minimap').length;
         get('#pilot-drill-up').click();
         drill.returned=visible('.graph-noeud').length;
@@ -273,6 +275,8 @@ async function run() {
       assert.deepEqual(result.drill.roleStatuses,Array(4).fill('paused'));
       assert.deepEqual(result.drill.scopedTasks,['rpc']);
       assert.deepEqual(result.drill.scopedLinks,['rpc']);
+      assert.equal(result.drill.scopedCurve,true);
+      assert.equal(result.drill.delegationCurve,true);
       assert.equal(result.drill.scopedMinimap,0);
       assert.equal(result.drill.returned,0);
       assert.equal(result.drill.focusRestored,true);

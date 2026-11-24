@@ -86,3 +86,9 @@ flowchart LR
     S -->|Remonter| H
     A -->|Remonter| H
 ```
+
+Le retour visuel a aussi identifié les coudes droits comme un obstacle de
+lecture. Les affectations partagent un départ par périmètre et le moteur de
+tracé du graphe arrondit leurs embranchements, ainsi que ceux des délégations.
+Le choix conserve les points d’attache et la séparation visuelle des types de
+liens. Les courbes bleues demeurent les prérequis éditables.

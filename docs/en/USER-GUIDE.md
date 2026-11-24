@@ -303,7 +303,7 @@ configured independent reviewer in green ✓. The legend distinguishes prerequis
 delegation, assignment and configured review. An organized plan opens on the orchestrators.
 Activate a card to open its scope, or use **Show all agents and tasks** for the
 full view. Gray assignment arrows connect each orchestrator to the visible
-tasks. Task cards identify the observed agent when supplied by the engine.
+tasks along curves that share an initial route within a scope. Task cards identify the observed agent when supplied by the engine.
 **Back to orchestrators** restores the initial view. The **⠿** drag handle at the
 top right moves the card with the pointer or arrow keys. Color dots accompany
 The minimap appears in the full view, leaving cards clear in the other levels.

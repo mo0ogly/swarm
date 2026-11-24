@@ -197,7 +197,8 @@ flowchart LR
 ```
 
 Dependency arrows retain their editing controls. Responsibility links are
-read-only. Delegation uses solid amber arrows. Gray assignment arrows appear after opening a scope or the full view. Organized
+read-only. Delegation uses solid amber arrows. Gray assignment arrows appear after opening a scope or the full view. Delegation and assignment branches use rounded corners.
+Assignments from the same scope share the beginning of their route. Organized
 plans open on the orchestrators. Task cards use the observed attempt’s agent ID. The graph header shows the
 recorded hierarchy and the engine recommendation for the current revision.
 Unavailable and stale recommendations are reported in the graph. The dashed green review link represents

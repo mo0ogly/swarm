@@ -754,13 +754,24 @@
         const x1=a.x+ap.x+(vertical?a.w/2:a.w),y1=a.y+ap.y+(vertical?a.h:a.h/2),x2=b.x+bp.x+(vertical?b.w/2:0),y2=b.y+bp.y+(vertical?0:b.h/2),d=Math.max(60,Math.abs(vertical?y2-y1:x2-x1)/2);
         edge.setAttribute('d',vertical?`M${x1},${y1} C${x1},${y1+d} ${x2},${y2-d} ${x2},${y2}`:`M${x1},${y1} C${x1+d},${y1} ${x2-d},${y2} ${x2},${y2}`);
       }
-      for(const link of svg.querySelectorAll('[data-assigned-task]')){
-        const id=link.dataset.assignedTask,u=units.get(id);
-        if(!u)continue;
-        const delta=displayedOffset(id),x=Number(link.dataset.originX),y=Number(link.dataset.originY);
-        const targetX=u.x+delta.x+u.w/2,targetY=u.y+delta.y,bend=(y+targetY)/2;
-        link.classList.toggle('graph-analysis-hidden',!isVisible(id));
-        link.setAttribute('d',`M${x},${y} V${bend} H${targetX} V${targetY}`);
+      const assignmentEnds = new Map();
+      const firstRowByScope = new Map();
+      for (const link of svg.querySelectorAll('[data-assigned-task]')) {
+        const id = link.dataset.assignedTask, unit = units.get(id);
+        if (!unit) continue;
+        const visible = isVisible(id);
+        link.classList.toggle('graph-analysis-hidden', !visible);
+        const delta = displayedOffset(id);
+        const end = {x:unit.x + delta.x + unit.w/2, y:unit.y + delta.y};
+        assignmentEnds.set(link, end);
+        const scope = link.dataset.assignmentScope;
+        if (visible) firstRowByScope.set(scope, Math.min(firstRowByScope.get(scope) ?? Infinity, end.y));
+      }
+      for (const [link, end] of assignmentEnds) {
+        const x = Number(link.dataset.originX), y = Number(link.dataset.originY);
+        const first = firstRowByScope.get(link.dataset.assignmentScope) ?? end.y;
+        const bend = (y + first)/2;
+        link.setAttribute('d', roundedResponsibilityPath([[x,y],[x,bend],[end.x,bend],[end.x,end.y]]));
       }
       extent.width=width;extent.height=height;svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width*zoom);svg.setAttribute('height',height*zoom);
       map.setAttribute('viewBox',`0 0 ${width} ${height}`);map.replaceChildren();
@@ -1768,6 +1779,15 @@
     };
   }
 
+  /** Route a responsibility arrow through its existing junctions, using the
+   * same corner rounding as the dependency layout. Coincident points collapse
+   * to a straight segment. This controls geometry only. */
+  function roundedResponsibilityPath(points) {
+    return graphEdgePath(points.filter(([x,y], index) =>
+      index === 0 || x !== points[index-1][0] || y !== points[index-1][1]
+    ).map(([x,y]) => ({x,y})));
+  }
+
   /** Draw delegations, review and assignments as separate read-only relations.
    * Assignment endpoints are updated with the existing task movement controls.
    * No edge here is accepted by the dependency editor. */
@@ -1796,17 +1816,21 @@
       const fromX = parent.x + parent.width / 2, fromY = parent.y + parent.height;
       const toX = node.x + node.width / 2, toY = node.y;
       const direct = toY > fromY && toY - fromY < 60;
-      const path = direct
-        ? `M${fromX},${fromY} V${(fromY + toY) / 2} H${toX} V${toY}`
-        : `M${fromX},${fromY} V${fromY + 12} H8 V${toY - 12} H${toX} V${toY}`;
+      const middle = (fromY + toY)/2;
+      const route = direct
+        ? [[fromX,fromY],[fromX,middle],[toX,middle],[toX,toY]]
+        : [[fromX,fromY],[fromX,fromY+12],[8,fromY+12],[8,toY-12],[toX,toY-12],[toX,toY]];
+      const path = roundedResponsibilityPath(route);
       const link = edge('delegation',t('Délégation')+' · '+parent.scope.id+' → '+node.scope.id,
         path);
       link.dataset.fromRole = parent.scope.id;
       link.dataset.toRole = node.scope.id;
     }
     if (reviewer) {
+      const y = reviewer.y + reviewer.height/2;
+      const end = root.x + root.width;
       edge('review',t('Revue indépendante configurée'),
-        `M${reviewer.x},${reviewer.y + reviewer.height/2} H${root.x+root.width}`);
+        `M${reviewer.x},${y} Q${(reviewer.x+end)/2},${y-12} ${end},${y}`);
     }
     for (const task of tasks) {
       if (!assignments.has(task.id)) continue;
