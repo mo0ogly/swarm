@@ -101,8 +101,26 @@ async function run() {
           roles: [...document.querySelectorAll('.graph-workflow-role')].map(node=>node.dataset.agentRole),
           delegated: [...document.querySelectorAll('[data-relation="delegation"]')].map(edge=>edge.dataset.fromRole+'>'+edge.dataset.toRole),
           reviewerLinks: document.querySelectorAll('[data-relation="review"]').length,
-          assignments: document.querySelectorAll('[data-assigned-task][marker-end]').length
+          assignments: document.querySelectorAll('[data-assigned-task][marker-end]').length,
+          permanentEdges: [...document.querySelectorAll('[data-relation="delegation"], [data-relation="review"]')]
+            .every(edge => getComputedStyle(edge).display !== 'none')
         };
+        function visibleAssignments() {
+          return [...document.querySelectorAll('[data-assigned-task]')]
+            .filter(edge => getComputedStyle(edge).display !== 'none')
+            .map(edge => edge.dataset.assignedTask);
+        }
+        workflow.defaultAssignments = visibleAssignments();
+        workflow.delegationDash = getComputedStyle(get('[data-relation="delegation"]')).strokeDasharray;
+        const assignmentScope = get('#pilot-assignment-scope');
+        if (assignmentScope) {
+          assignmentScope.value = 'transport';
+          assignmentScope.dispatchEvent(new Event('change', {bubbles:true}));
+          workflow.focusedAssignments = visibleAssignments();
+          assignmentScope.value = '';
+          assignmentScope.dispatchEvent(new Event('change', {bubbles:true}));
+          workflow.clearedAssignments = visibleAssignments();
+        }
         const motionButton=get('#pilot-activity-motion');
         motionButton.click();
         workflow.pause=motionButton.getAttribute('aria-pressed');
@@ -241,6 +259,11 @@ async function run() {
       assert.deepEqual(result.workflow.delegated,['root>transport','root>validation','transport>documentation']);
       assert.equal(result.workflow.reviewerLinks,1);
       assert.equal(result.workflow.assignments,60);
+      assert.equal(result.workflow.permanentEdges,true);
+      assert.deepEqual(result.workflow.defaultAssignments,[]);
+      assert.equal(result.workflow.delegationDash,'none');
+      assert.deepEqual(result.workflow.focusedAssignments,['rpc']);
+      assert.deepEqual(result.workflow.clearedAssignments,[]);
       assert.equal(result.workflow.pause,'true');
       if (!reducedMotion) assert.equal(result.workflow.playState,'paused');
 

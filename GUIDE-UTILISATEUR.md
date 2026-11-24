@@ -300,7 +300,9 @@ filtres et sélection ne changent pas la révision métier.
   et les commandes du graphe. Les cartes de rôles y montrent l’orchestrateur
   principal en bleu ◆, les sous-orchestrateurs en ambre ↳ et le validateur
   indépendant configuré en vert ✓. La légende distingue dépendance, délégation,
-  affectation et revue configurée. **Localiser une dépendance** centre la vue
+  affectation et revue configurée. Le graphe masque les flèches d’affectation à
+  l’ouverture. **Voir les affectations** les affiche pour le périmètre choisi.
+  **Localiser une dépendance** centre la vue
   sur chaque flèche de prérequis à tour de rôle. Le repère bleu **En action** correspond à une
   exécution confirmée. Le contour bleu défile tant que cet état est affiché.
   **Suspendre l’animation** permet de l’immobiliser. La préférence système de

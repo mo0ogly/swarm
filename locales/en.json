@@ -1,5 +1,7 @@
 {
-  "Flèches pleines : dépendances. Pointillés : délégation et affectation. Vert : revue configurée.": "Solid arrows: dependencies. Dashed arrows: delegation and assignment. Green: configured review.",
+  "Flèches pleines : dépendances et délégations (ambre). Vert pointillé : revue configurée.": "Solid arrows: dependencies and delegation (amber). Dashed green: configured review.",
+  "Voir les affectations": "Show assignments",
+  "Masquer les affectations": "Hide assignments",
   "Localiser une dépendance": "Locate a dependency",
   "Suspendre l’animation": "Pause animation",
   "Délégation": "Delegation",

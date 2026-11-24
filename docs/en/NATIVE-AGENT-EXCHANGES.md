@@ -197,7 +197,9 @@ flowchart LR
 ```
 
 Dependency arrows retain their editing controls. Responsibility links are
-read-only. The review link represents configuration. Receipts and status signals
+read-only. Delegation uses solid amber arrows. Assignments start hidden and can
+be shown for one scope at a time. The dashed green review link represents
+configuration. Receipts and status signals
 remain available in **Team and validation**. The animated outline reflects a
 current observation of a running process. Historical views, the system reduced
 motion preference and **Pause animation** support static reading.

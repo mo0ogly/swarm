@@ -300,7 +300,9 @@ On narrow screens in fullscreen, open **Graph gestures** for shortcuts.
 **Task graph** shows dependencies, task states and graph controls. Role cards
 show the principal orchestrator in blue ◆, sub-orchestrators in amber ↳ and the
 configured independent reviewer in green ✓. The legend distinguishes prerequisites,
-delegation, assignment and configured review. **Locate a dependency** centers
+delegation, assignment and configured review. Assignment arrows are hidden on
+opening the graph. **Show assignments** reveals the arrows for the selected scope.
+**Locate a dependency** centers
 the viewport on each prerequisite arrow in turn. The blue **In action** marker
 indicates confirmed execution. The blue outline moves while that state is
 displayed. **Pause animation** holds it still, and the system preference for

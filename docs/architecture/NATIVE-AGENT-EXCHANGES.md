@@ -201,7 +201,9 @@ flowchart LR
 ```
 
 Chaque dépendance conserve ses commandes d’édition. Les relations de responsabilité
-sont en lecture seule. La liaison de revue représente la configuration. Les
+sont en lecture seule. Les délégations sont en ambre et en trait plein. Les
+affectations sont masquées à l’ouverture et affichées par périmètre à la demande.
+La liaison de revue en pointillé vert représente la configuration. Les
 reçus et les remontées restent accessibles dans **Équipe et validation**.
 Le contour animé se rapporte à une observation actuelle d’un processus en cours.
 L’historique, la préférence de mouvement réduit et **Suspendre l’animation**
