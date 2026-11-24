@@ -54,3 +54,19 @@ la prochaine action effective. La revue SKYNET a aussi identifié des notes
 d’état vides (aucune tentative, observation partielle et dernier relevé).
 La vue utilise désormais des messages explicites pour ces situations.
 Les anciennes preuves et le diagnostic de focus SVG ont été conservés.
+
+## Preuves du candidat local
+
+- [Parcours protégé](/run/media/fpizzi/SWARM/ta.TxA8/download-verified.log) :
+  relevé vivant, reçu terminal, absence d’arguments privés et de doublon,
+  attente humaine et refus d’acceptation sans preuves. Modales et fichier JSON
+  effectivement téléchargé dans les deux langues et thèmes.
+- [Plan approuvé](/run/media/fpizzi/SWARM/ta.TxA8/handoff-approved.log) et
+  [compatibilité historique](/run/media/fpizzi/SWARM/ta.TxA8/legacy.log).
+- [Comparaison des ressources embarquées](/run/media/fpizzi/SWARM/ta.TxA8/handoff-assets.log)
+  et [identité du serveur actif](/run/media/fpizzi/SWARM/ta.TxA8/status.json).
+  Biba reste arrêté à sa révision 102. Le parcours de navigateur utilisait
+  une mission de test avec un fournisseur inerte, pas une session opérateur.
+- La vérification des résultats utilise le statut déclaré des événements d’outil.
+  Elle ne prouve pas l’effet réel d’une commande externe. Une tâche ancienne
+  conserve le reçu d’origine, sans invention de résultats d’action.

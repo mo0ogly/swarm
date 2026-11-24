@@ -25,7 +25,7 @@
       "command": [
         "python3",
         "-c",
-        "import os,subprocess,tempfile; from pathlib import Path; output=Path(tempfile.mkdtemp(prefix='task-actions-',dir='.cache')).resolve()/'journey'; subprocess.run(['python3','tests/rust_task_actions.py','--binary',os.environ['SWARM_ACTIONS_BINARY'],'--output',str(output),'--browser'],check=True); print('TASK_ACTIONS_EVIDENCE '+str(output))"
+        "import os,subprocess,tempfile; from pathlib import Path; output=Path(tempfile.mkdtemp(prefix='task-actions-')).resolve()/'journey'; subprocess.run(['python3','tests/rust_task_actions.py','--binary',os.environ['SWARM_ACTIONS_BINARY'],'--output',str(output),'--browser'],check=True); print('TASK_ACTIONS_EVIDENCE '+str(output))"
       ],
       "expected_exit": 0,
       "required_stdout": [

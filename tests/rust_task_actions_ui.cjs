@@ -45,12 +45,22 @@ const detail = 'dialog:has(#native-task-action-title)';
       assert(text.includes('Check result and adjust if needed'));
       if (lang === 'fr') assert(text.includes('Instruction de départ enregistrée'));
       else assert(text.includes('Recorded starting instruction'));
-      const download = await page.$eval(journal + ' a[download]', async element =>
-        ({name:element.download, body:await (await fetch(element.href)).json()}));
-      assert.equal(download.name, 'task-actions.json');
-      assert.equal(download.body.work, cfg.work);
-      assert(download.body.review.awaiting_human);
-      assert.equal(download.body.attempts[0].observation.actions[0].family, 'read');
+      const directory = fs.mkdtempSync(cfg.output + '/download-');
+      const cdp = await page.createCDPSession();
+      await cdp.send('Browser.setDownloadBehavior', {
+        behavior:'allow', downloadPath:directory, browserContextId:context.id, eventsEnabled:true
+      });
+      const completed = new Promise((resolve, reject) => cdp.on('Browser.downloadProgress', event => {
+        if (event.state === 'completed') resolve();
+        if (event.state === 'canceled') reject(new Error('action-file-download-canceled'));
+      }));
+      await page.click(journal + ' a[download]');
+      await completed;
+      await cdp.detach();
+      const exported = JSON.parse(fs.readFileSync(directory + '/task-actions.json', 'utf8'));
+      assert.equal(exported.work, cfg.work);
+      assert(exported.review.awaiting_human);
+      assert.equal(exported.attempts[0].observation.actions[0].family, 'read');
       const bounds = await page.$eval(journal, element => {
         const rect = element.getBoundingClientRect();
         return rect.width <= innerWidth && rect.left >= 0 && rect.right <= innerWidth;

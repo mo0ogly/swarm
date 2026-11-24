@@ -1,5 +1,19 @@
 # Recettes permanentes / Permanent verification recipes
 
+**Fichier d’actions** — `recipes/task-actions.json` prend un Swarm Rust livré
+dans `SWARM_ACTIONS_BINARY`. Elle vérifie la lecture avant tentative, le relevé
+pendant l’appel, le reçu terminal, les modales et le fichier effectivement
+téléchargé avec Chrome, puis l’attente humaine. Le fournisseur est inerte et
+l’acceptation prématurée est refusée. Préparer un répertoire de preuves neuf
+sur le volume gouverné et utiliser un Root de recette isolé.
+
+**Task action file** — `recipes/task-actions.json` takes a delivered Rust
+Swarm in `SWARM_ACTIONS_BINARY`. It checks the pre-attempt read, in-flight
+observation, terminal receipt, dialogs, Chrome download, and human review
+wait. An inert provider is used and premature acceptance is refused. Use a
+fresh evidence directory on the governed volume and an isolated recipe Root.
+
+
 T4.06 : `recipes/t406-last-use-matrix.json` exerce les 768 verdicts du
 catalogue BLP de fixture (quatre niveaux, deux compartiments et trois parcours),
 le refus d'engagement Trust à l'échéance ou après changement de révision, et
