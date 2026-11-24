@@ -26,7 +26,7 @@ async function run() {
       await page.addScriptTag({path: path.join(web, source)});
     }
     for (const [lang, theme, width] of [
-      ['fr', 'etat', 1440], ['fr', 'sombre', 390], ['en', 'etat', 390], ['en', 'sombre', 1440]
+      ['fr', 'etat', 1440], ['fr', 'sombre', 320], ['en', 'etat', 390], ['en', 'sombre', 1440]
     ]) {
       await page.setViewport({width, height: 900});
       const result = await page.evaluate(({lang, theme}) => {
@@ -38,12 +38,14 @@ async function run() {
         const tasks = [
           {id: 'wasm', title: 'Wasmtime', status: 'blocked', scope_id: 'validation',
             independent_review: {state: 'changes_requested'},
+            attempts: [{status: 'interrupted'}],
             validation_policy: {controls: [{id: 'wasmtime-current', command: ['private argv']}]},
             automatic_validation: {controls: [{id: 'wasmtime-previous', executed: true, passed: false}]}},
           {id: 'rpc', title: 'gRPC', status: 'todo', scope_id: 'transport', depends: ['wasm']},
           ...Array.from({length: 58}, (_, index) => ({
             id: 'independent-' + index, title: 'Independent ' + index,
-            status: 'todo', scope_id: 'documentation'
+            status: index < 2 ? 'running' : index === 2 ? 'submitted' : 'todo',
+            scope_id: 'documentation'
           }))
         ];
         const work = {
@@ -55,14 +57,25 @@ async function run() {
               {id: 'validation', parent: 'root'}, {id: 'documentation', parent: 'transport'}
             ]}
         };
-        const mission = {supervision: {state: 'active'}, tasks: [{
+        const mission = {paused: true, supervision: {state: 'active'}, tasks: [{
           id: 'rpc', reason: 'Waiting for independent Wasmtime review'
         }, {
-          id: 'wasm', result: {validation_label: 'Current verification'}
+          id: 'wasm', result: {state: 'stopped_early', process_state: 'interrupted', validation_label: 'Current verification'}
+        }, {
+          id: 'independent-0', result: {state: 'in_progress', process_state: 'running'}
+        }, {
+          id: 'independent-1', result: {state: 'execution_unconfirmed', process_state: 'unknown'}
+        }, {
+          id: 'independent-2', result: {state: 'review_in_progress', process_state: 'completed'}
         }]};
         SwarmRustCockpitRead.render({work, mission});
         const get = selector => document.querySelector(selector);
         const role = value => get('[data-orchestration-role="' + value + '"]');
+        const activity = id => {
+          const mark = get('.graph-noeud[data-task="' + id + '"] .graph-activity-mark');
+          return mark ? [mark.dataset.activity, getComputedStyle(mark).fill, mark.nextElementSibling.textContent] : null;
+        };
+        const currentActivity = ['rpc', 'wasm', 'independent-0', 'independent-1'].map(activity);
         const initialGraph = !get('#graph-studio').hidden && get('#conduite-team-validation').hidden;
         const canvas = get('#pilot-canvas');
         canvas.scrollLeft = 100;
@@ -106,6 +119,12 @@ async function run() {
         get('#conduite-show-team').click();
         const snapshot = {
           initialGraph,
+          currentActivity,
+          roleActivity: ['root', 'subplanner', 'reviewer', 'driver'].map(value => {
+            const mark = role(value).querySelector(':scope > .graph-activity-key');
+            return [mark?.dataset.activity, mark?.textContent];
+          }),
+          assignedActivity: get('[data-scope="transport"] details li > .graph-activity-key').dataset.activity,
           visibleScroll,
           preservedScroll,
           teamOnly: get('#graph-studio').hidden && !get('#conduite-team-validation').hidden,
@@ -135,7 +154,8 @@ async function run() {
         snapshot.orientedReason = get('.graph-task-open[data-task="rpc"]').getAttribute('aria-label');
         get('#conduite-show-team').click();
         get('[data-orchestration-tree]').open = false;
-        SwarmRustCockpitRead.render({work, mission, readMode: 'history'});
+        SwarmRustCockpitRead.render({work, mission, readMode: 'history', control: {paused: true}});
+        snapshot.historyActivity = ['rpc', 'wasm', 'independent-0', 'independent-1'].map(activity);
         snapshot.historyDriver = role('driver').textContent;
         snapshot.historyReason = get('.graph-task-open[data-task="rpc"]').getAttribute('aria-label');
         snapshot.retainedDisclosure = !get('[data-orchestration-tree]').open;
@@ -168,6 +188,18 @@ async function run() {
         return snapshot;
       }, {lang, theme});
       assert.deepEqual(result.branches, ['transport', 'validation']);
+      assert.deepEqual(result.currentActivity.map(item => item?.[0]), ['paused', 'stopped', 'running', 'unconfirmed']);
+      assert.equal(new Set(result.currentActivity.map(item => item[1])).size, 4);
+      const activityLabels = lang === 'en'
+        ? ['Paused', 'Stopped', 'In action', 'Activity unconfirmed']
+        : ['En pause', 'Arrêtée', 'En action', 'Activité à confirmer'];
+      assert.deepEqual(result.currentActivity.map(item => item[2]), activityLabels);
+      assert.deepEqual(result.roleActivity.map(item => item[0]), ['paused', 'paused', 'running', 'running']);
+      assert.match(result.roleActivity[2][1], lang === 'en' ? /Independent review in progress/ : /Revue indépendante en cours/);
+      assert.equal(result.assignedActivity, 'paused');
+      assert.equal(result.historyActivity[0]?.[0], 'paused');
+      assert.equal(result.historyActivity[1]?.[0], 'stopped');
+      assert.equal(result.historyActivity[2]?.[0], 'unconfirmed');
       assert(result.initialGraph && result.teamOnly && result.retainedTab);
       assert(result.visibleScroll.some(offset => offset > 0));
       assert.deepEqual(result.preservedScroll, result.visibleScroll);
@@ -234,6 +266,30 @@ async function run() {
       assert.equal(await page.$eval('#conduite-show-team', button => button.getAttribute('aria-pressed')), 'false');
       assert(await page.$eval('#graph-studio', panel => !panel.hidden && panel.getClientRects().length > 0));
       assert(await page.$eval('#conduite-team-validation', panel => panel.hidden));
+      await page.click('#pilot-fullscreen');
+      assert(await page.$eval('dialog.native-graph-dialog[open]', dialog => {
+        const button = dialog.querySelector('#conduite-show-team');
+        if (!button) return false;
+        const bounds = button.getBoundingClientRect();
+        return bounds.width > 0 && bounds.top >= 0 && bounds.bottom <= innerHeight &&
+          button.contains(document.elementFromPoint(bounds.x + bounds.width / 2,
+            bounds.y + bounds.height / 2));
+      }), 'Team switch is visible and interactive in fullscreen');
+      if (width === 320) {
+        assert(await page.$eval('.native-graph-gesture-hint', hint => !hint.getClientRects().length));
+        assert(await page.$eval('#pilot-graph-help-toggle', help => help.getClientRects().length > 0));
+      }
+      await page.focus('#conduite-show-team');
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(() => !document.querySelector('dialog.native-graph-dialog').open &&
+        !document.querySelector('#conduite-team-validation').hidden &&
+        document.activeElement.id === 'conduite-show-team', {timeout: 0});
+      await page.focus('#conduite-show-graph');
+      await page.keyboard.press('Enter');
+      assert(await page.$eval('#graph-studio', panel =>
+        !panel.hidden && panel.contains(document.activeElement)));
+      assert(await page.$eval('#conduite-team-validation', panel => panel.hidden));
+      console.log('PASS fullscreen view switch and keyboard focus', lang, theme, width);
     }
     assert.deepEqual(errors, []);
   } finally {

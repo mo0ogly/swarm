@@ -291,8 +291,18 @@ filtres et sélection ne changent pas la révision métier.
   Elles tiennent compte du verdict du moteur et de la fraîcheur des preuves.
 - Les liens de responsabilité relient les rôles à leurs périmètres. Ne déduisez
   pas le sens d’un lien de sa seule couleur ou de son seul style : lisez sa légende.
-- Dans le cockpit natif, **Graphe des tâches** montre les dépendances, les états
-  et les commandes du graphe. **Équipe et validation** affiche l’observation du
+- Les boutons **Graphe des tâches** et **Équipe et validation** sont en haut
+  du panneau affiché et restent accessibles en plein écran. Sélectionner l’équipe
+  quitte le plein écran. Sur écran étroit en plein écran, ouvrez **Aide des gestes**
+  pour les raccourcis. **Graphe des tâches** montre les dépendances, les états
+  et les commandes du graphe. Le repère bleu **En action** correspond à une
+  exécution confirmée, le rouge **Arrêtée** à une tentative interrompue ou en
+  échec, et l’ambre **En pause** à une tâche à faire dans une mission en pause.
+  Le gris **Activité à confirmer** signale qu’une tentative enregistrée en cours
+  n’a pas d’observation actuelle d’exécution. Les tâches rattachées reprennent
+  ces mêmes repères. Pour les orchestrateurs, le repère décrit la pause des
+  départs ou l’absence de confirmation individuelle. Le repère du vérificateur
+  peut indiquer une revue en cours. **Équipe et validation** affiche l’observation du
   conducteur et le vérificateur indépendant configuré. **Équipe et périmètres**
   présente l’orchestrateur principal, les sous-orchestrateurs et leurs tâches.
   Chaque sous-orchestrateur a un parent et reçoit des exigences et des tâches
