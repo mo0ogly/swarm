@@ -277,6 +277,9 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
   .native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-tool-icon { margin:0; }
   .native-graph-search input { flex-basis:100px; }
   .native-graph-gesture-hint { font-size:13px; line-height:1.4; }
+  /* The help button remains in the toolbar. Reclaim the duplicate hint's
+     vertical space so cards are visible before scrolling on narrow screens. */
+  .native-graph-studio.is-fullscreen .native-graph-gesture-hint { display:none; }
 }
 
 /* Scoped ID beats the shared neutral fit override without changing its token. */

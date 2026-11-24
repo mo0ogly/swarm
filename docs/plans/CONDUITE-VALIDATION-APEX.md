@@ -83,3 +83,12 @@ aurait ajouté deux groupes à synchroniser avec le même état et le même focu
 - Revue locale du diff : le changement utilise les états DOM du dialogue et
   de la bascule. Il n’ajoute ni paramètre opérateur ni requête métier.
   La fermeture issue de la bascule restitue le graphe avant le retour de focus.
+
+À 320 px, mesurer aussi la première carte après fermeture de l’aide.
+Les [mesures avant](/run/media/fpizzi/SWARM/cv.6jIp/mobile-old/browser/fr-etat-mobile-bounds.json)
+et [après la première correction](/run/media/fpizzi/SWARM/cv.6jIp/mobile-new/browser/fr-etat-mobile-bounds.json)
+montrent que le bas de la première carte passe de 816 à 880 px sur un écran
+de 844 px. En plein écran étroit, l’aide reste disponible depuis son bouton et
+le texte d’aide redondant cède la place aux cartes. Le
+[test navigateur](/run/media/fpizzi/SWARM/cv.6jIp/mobile-component.log)
+couvre la bascule et la commande d’aide à 320 px.

@@ -7,8 +7,8 @@
     },
     "items": [
       {
-        "fr": "Conduite : les boutons Graphe des tâches et Équipe et validation restent visibles en haut de la vue, y compris en plein écran.",
-        "en": "Dispatch: the Task graph and Team and validation buttons stay visible at the top of the view, including in fullscreen."
+        "fr": "Conduite : les boutons Graphe des tâches et Équipe et validation restent visibles en haut de la vue, y compris en plein écran. Sur écran étroit, l’aide des gestes est accessible depuis la barre du graphe.",
+        "en": "Dispatch: the Task graph and Team and validation buttons stay visible at the top of the view, including in fullscreen. On narrow screens, graph gestures are available from the toolbar."
       },
       {
         "fr": "Conduite : graphes et tâches rattachées distinguent la pause, l’arrêt, l’exécution confirmée et l’activité à confirmer. Les repères d’équipe indiquent la pause des départs et les observations de conduite ou de revue disponibles.",

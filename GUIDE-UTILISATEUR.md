@@ -293,7 +293,8 @@ filtres et sélection ne changent pas la révision métier.
   pas le sens d’un lien de sa seule couleur ou de son seul style : lisez sa légende.
 - Les boutons **Graphe des tâches** et **Équipe et validation** sont en haut
   du panneau affiché et restent accessibles en plein écran. Sélectionner l’équipe
-  quitte le plein écran. **Graphe des tâches** montre les dépendances, les états
+  quitte le plein écran. Sur écran étroit en plein écran, ouvrez **Aide des gestes**
+  pour les raccourcis. **Graphe des tâches** montre les dépendances, les états
   et les commandes du graphe. Le repère bleu **En action** correspond à une
   exécution confirmée, le rouge **Arrêtée** à une tentative interrompue ou en
   échec, et l’ambre **En pause** à une tâche à faire dans une mission en pause.

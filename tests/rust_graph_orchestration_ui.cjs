@@ -26,7 +26,7 @@ async function run() {
       await page.addScriptTag({path: path.join(web, source)});
     }
     for (const [lang, theme, width] of [
-      ['fr', 'etat', 1440], ['fr', 'sombre', 390], ['en', 'etat', 390], ['en', 'sombre', 1440]
+      ['fr', 'etat', 1440], ['fr', 'sombre', 320], ['en', 'etat', 390], ['en', 'sombre', 1440]
     ]) {
       await page.setViewport({width, height: 900});
       const result = await page.evaluate(({lang, theme}) => {
@@ -275,6 +275,10 @@ async function run() {
           button.contains(document.elementFromPoint(bounds.x + bounds.width / 2,
             bounds.y + bounds.height / 2));
       }), 'Team switch is visible and interactive in fullscreen');
+      if (width === 320) {
+        assert(await page.$eval('.native-graph-gesture-hint', hint => !hint.getClientRects().length));
+        assert(await page.$eval('#pilot-graph-help-toggle', help => help.getClientRects().length > 0));
+      }
       await page.focus('#conduite-show-team');
       await page.keyboard.press('Enter');
       await page.waitForFunction(() => !document.querySelector('dialog.native-graph-dialog').open &&
