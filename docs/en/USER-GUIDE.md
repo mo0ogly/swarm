@@ -269,7 +269,10 @@ Arrows point from the prerequisite to the dependent task. These tasks have not s
 
 In the native cockpit, **Orchestration** displays the observed driver and
 the configured independent reviewer. **Team and scopes** shows the principal
-orchestrator, sub-orchestrators, and their tasks. Each sub-orchestrator has a
+orchestrator, sub-orchestrators, and their tasks. A blue diamond marks the
+principal orchestrator, an amber branch arrow marks sub-orchestrators, and a
+green check mark identifies the independent reviewer. These icons accompany
+the role labels. Check results appear in the recorded receipt. Each sub-orchestrator has a
 parent and a scope with assigned requirements and tasks. Incidents outside
 that scope belong to the parent. Sibling scopes appear as separate
 branches. Task arrows indicate prerequisites. The task

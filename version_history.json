@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite : un losange, une flèche de branche et une coche distinguent l’orchestrateur principal, les sous-orchestrateurs et le validateur indépendant.",
+        "en": "Dispatch: a diamond, branch arrow and check mark distinguish the principal orchestrator, sub-orchestrators and independent reviewer."
+      },
+      {
         "fr": "Un worker manuel en dépôt géré peut revalider un prévol expiré sur la même tentative. La rétention de son rapport prépare les preuves pour la soumission opérateur.",
         "en": "A manual worker in a managed repository can revalidate an expired preflight on the same attempt. Retaining its report prepares the evidence for operator submission."
       },
