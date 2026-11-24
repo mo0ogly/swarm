@@ -1075,6 +1075,7 @@
       teamSelected = selected;
       studio.hidden = selected;
       orchestration.hidden = !selected;
+      if (selected) orchestration.loadWorkflowArchitecture?.();
       if (selected) {
         if (views.parentNode !== host) host.insertBefore(views, orchestration);
         if (modal.open) {
@@ -1191,6 +1192,127 @@
    * Return a role label with a decorative icon styled by its containing row.
    * The supplied label stays plain text and provides the accessible name.
    */
+  /** Show the current structural advice and its explicit, revision-bound receipt.
+   * No request is made until the team view opens. A warm update reads the same
+   * route for each refreshed Work. A removed panel has no UI effect. */
+  function workflowArchitecture(work) {
+    const section = document.createElement('section');
+    section.className = 'native-workflow-architecture';
+    const title = document.createElement('h4');
+    title.textContent = t('Avis d’architecture du workflow');
+    const status = document.createElement('p');
+    status.setAttribute('role', 'status');
+    const facts = document.createElement('div');
+    const approve = document.createElement('button');
+    approve.type = 'button';
+    approve.textContent = t('Valider cet avis');
+    approve.hidden = true;
+    section.append(title, status, facts, approve);
+
+    const url = '/api/v1/planning/workflow-architecture?' + new URLSearchParams({work:work.id});
+    const labels = {sequential:'Séquentiel', hierarchical:'Hiérarchique', insufficient:'Preuves insuffisantes'};
+    let shown;
+    let loading = false;
+    let pending = false;
+
+    /** Treat failures as explicit refusals; a valid reply must bind the graph's
+     * exact Work revision. Credentials remain confined to the same origin. */
+    async function request(options) {
+      const reply = await fetch(url, {credentials:'same-origin', ...options});
+      const value = await reply.json();
+      if (!reply.ok) throw Error(value?.failure?.reason || value?.failure?.code || 'workflow-architecture-unavailable');
+      if (value.schema_version !== 1 || value.work !== work.id || !Number.isSafeInteger(work.revision) ||
+          value.revision !== String(work.revision) || !/^[0-9a-f]{64}$/.test(value.proposal) ||
+          !Object.hasOwn(labels, value.assessment?.recommendation) || typeof value.approved !== 'boolean') {
+        throw Error('workflow-architecture-stale');
+      }
+      return value;
+    }
+
+    /** Render literal evidence and the saved receipt. Unknown or stale approval
+     * cannot enable a mutation on a different graph revision. */
+    function paint(value) {
+      if (!section.isConnected) return;
+      shown = value;
+      const criteria = value.assessment;
+      status.textContent = t(labels[criteria.recommendation]);
+      facts.replaceChildren();
+      journalField(facts, 'Révision', value.revision);
+      journalField(facts, 'Tâches', criteria.tasks);
+      journalField(facts, 'Dépendances', criteria.dependencies);
+      journalField(facts, 'Périmètres délégués', criteria.delegated_scopes);
+      const reason = document.createElement('p');
+      const reasons = {
+        sequential:'Les dépendances imposent un ordre unique.',
+        hierarchical:'Le graphe montre du travail parallèle et un prérequis entre périmètres délégués.',
+        insufficient:'Le graphe seul ne permet pas de trancher entre séquence et hiérarchie.'
+      };
+      reason.textContent = t(reasons[criteria.recommendation]);
+      const receipt = document.createElement('p');
+      receipt.textContent = value.approved ? t('Avis validé pour cette révision.') :
+        value.approval ? t('La validation précédente concerne une autre révision.') :
+        t('Avis en attente de validation.');
+      const limit = document.createElement('p');
+      limit.textContent = t('Valider l’avis enregistre votre décision. La réorganisation du plan est une opération distincte.');
+      facts.append(reason, receipt, limit);
+      if (value.approved) journalField(facts, 'Validation enregistrée', value.approval?.approved_at);
+      approve.hidden = value.approved || criteria.recommendation === 'insufficient';
+      approve.disabled = pending;
+    }
+
+    /** Read again after any uncertain submission. The previous receipt is never
+     * inferred from a browser response error. */
+    async function load() {
+      if (loading || pending || !section.isConnected) return;
+      loading = true;
+      approve.hidden = true;
+      status.textContent = t('Chargement…');
+      try {
+        paint(await request());
+      } catch (error) {
+        if (!section.isConnected) return;
+        shown = null;
+        facts.replaceChildren();
+        status.textContent = error.message === 'workflow-architecture-stale'
+          ? t('Le plan a changé. Actualisez Conduite pour examiner le nouvel avis.')
+          : t('Avis d’architecture indisponible.');
+      } finally {
+        loading = false;
+      }
+    }
+
+    approve.addEventListener('click', async () => {
+      if (pending || !shown || approve.hidden) return;
+      const {revision, proposal} = shown;
+      pending = approve.disabled = true;
+      try {
+        const session = await fetch('/api/v1/native-session', {credentials:'same-origin'});
+        const value = await session.json();
+        if (!session.ok || typeof value.csrf_token !== 'string') throw Error('workflow-architecture-session');
+        if (!section.isConnected) return;
+        const result = await request({
+          method:'POST',
+          headers:{'Content-Type':'application/json', 'X-Swarm-CSRF':value.csrf_token},
+          body:JSON.stringify({revision, proposal})
+        });
+        if (!result.approved) throw Error('workflow-architecture-approval-unconfirmed');
+        paint(result);
+      } catch {
+        if (!section.isConnected) return;
+        pending = false;
+        await load();
+        if (shown && !shown.approved) {
+          status.textContent = t('Validation de l’avis indisponible. Vérifiez vos droits et la révision.');
+        }
+      } finally {
+        pending = false;
+        approve.disabled = false;
+      }
+    });
+
+    return {section, load};
+  }
+
   function orchestrationRoleLabel(label) {
     const name = document.createElement('strong');
     name.className = 'orchestration-role-label';
@@ -1263,6 +1385,9 @@
       configuredReviewer.append(' ', reviewStatus);
     }
     panel.append(configuredReviewer);
+    const architecture = workflowArchitecture(work);
+    panel.append(architecture.section);
+    panel.loadWorkflowArchitecture = architecture.load;
 
     const scopes = planning ? (Array.isArray(planning.scopes) ? planning.scopes : []) : [{id: rootId}];
     const byId = new Map();

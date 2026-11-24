@@ -18,6 +18,7 @@ mod agent_log_history;
 mod task_actions;
 #[cfg(target_os = "linux")]
 mod orchestration_signals;
+mod workflow_architecture;
 mod graph_batch;
 #[cfg(target_os = "linux")]
 mod agent_archive_history;

@@ -31,6 +31,7 @@ pub use paea_git_call::PaeaGitCallSource;
 pub use paea_git_call::PaeaGitCallApprovalSource;
 mod paea;
 mod planning;
+mod workflow_architecture;
 mod lifecycle_inventory;
 mod mission;
 mod cockpit_read;
@@ -400,6 +401,8 @@ impl HttpServiceError {
                 "blp-transport-connection-changed"|"blp-transport-provider-source-changed"|"blp-transport-settings-changed" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
                 "blp-admission-not-found"|"preparation-turn-not-found"|"blp-preparation-source-not-found" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
                 "blp-preparation-platform-unsupported" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
+                "workflow-architecture-stale" | "workflow-architecture-insufficient"
+                    if *operation == "workflow-architecture" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::CONFLICT,
                 "project-profile-conflict" if matches!(*operation,"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
                 "project-profile-choice-unknown" if *operation=="project-profile-write" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
                 // The versioned-memory guard is ported (project_memory_source.rs),
@@ -1412,6 +1415,7 @@ impl NativeHttpService {
             "/api/v1/agent-logs/task-actions" => self.task_actions(request),
             #[cfg(target_os = "linux")]
             "/api/v1/agent-logs/orchestration-signals" => self.orchestration_signals(request),
+            "/api/v1/planning/workflow-architecture" => self.workflow_architecture(request),
             "/api/v1/cockpit-read" => self.cockpit_read(request),
             "/api/v1/work-budget" => self.work_budget_route(work_budget::Operation::Show,request),
             "/api/v1/work-budget/preview" => self.work_budget_route(work_budget::Operation::Preview,request),
